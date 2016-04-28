@@ -20,15 +20,26 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
+        Term B = f.term(b);
+
+        if (B == null)
+            return false;
+
         if (y instanceof Compound) {
-            Term B = f.term(b);
-            return (B instanceof Compound) && //includes null test
-                   commonSubterms((Compound) B, (Compound)y,
-                           //subtermIsCommon
-                           nonVarSubtermIsCommon
-                   );
+
+            if (B instanceof Compound) {
+                return commonSubterms((Compound) B, (Compound) y,
+                        //subtermIsCommon
+                        nonVarSubtermIsCommon
+                );
+            } else {
+                return ((Compound)y).containsTermRecursively(B);
+            }
+
+        } else if (B instanceof Compound) {
+            return ((Compound)B).containsTermRecursively(y);
         }
-        return false;
+        return B.equals(y);
     }
 
     @NotNull

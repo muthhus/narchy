@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <style type="text/css">
+        @import url("spacegraph.dark.css");
+        @import url("spacegraph.css");
+    </style>
     <link rel="import" href="init.html">
 
 
@@ -31,7 +35,7 @@
                 handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
                 handleLineWidth: 1, // width of handle line in pixels
                 handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-                hoverDelay: 75, // time spend over a target node before it is considered a target selection
+                hoverDelay: 45, // time spend over a target node before it is considered a target selection
                 cxt: true, // whether cxt events trigger edgehandles (useful on touch)
                 enabled: true, // whether to start the plugin in the enabled state
                 toggleOffOnLeave: true, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)

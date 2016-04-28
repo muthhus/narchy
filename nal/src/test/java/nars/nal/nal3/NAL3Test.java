@@ -4,6 +4,7 @@ package nars.nal.nal3;
 import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
+import nars.nal.Tense;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +26,7 @@ public class NAL3Test extends AbstractNALTest {
 
 
     @Test
-    public void compound_composition_two_premises() throws Narsese.NarseseException {
+    public void compound_composition_two_premises()  {
         TestNAR tester = test();
         tester.believe("<swan --> swimmer>",0.9f,0.9f); //.en("Swan is a type of swimmer.");
         tester.believe("<swan --> bird>", 0.8f, 0.9f); //.en("Swan is a type of bird.");
@@ -35,7 +36,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_composition_two_premises2() throws Narsese.NarseseException {
+    public void compound_composition_two_premises2()  {
         TestNAR tester = test();
         tester.believe("<sport --> competition>",0.9f,0.9f); //.en("Sport is a type of competition.");
         tester.believe("<chess --> competition>", 0.8f, 0.9f); //.en("Chess is a type of competition.");
@@ -45,7 +46,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_decomposition_two_premises() throws Narsese.NarseseException {
+    public void compound_decomposition_two_premises()  {
         TestNAR tester = test();
         tester.believe("<robin --> (|,bird,swimmer)>",1.0f,0.9f); //.en("Robin is a type of bird or a type of swimmer.");
         tester.believe("<robin --> swimmer>", 0.0f, 0.9f); //.en("Robin is not a type of swimmer.");
@@ -54,7 +55,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test //works, just control related issue (DecomposeNegativeNegativeNegative)
-    public void compound_decomposition_two_premises2() throws Narsese.NarseseException {
+    public void compound_decomposition_two_premises2()  {
         TestNAR tester = test();
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin is not a type of swimmer.");
         tester.believe("<robin --> (-,mammal,swimmer)>", 0.0f, 0.9f); //.en("Robin is not a nonswimming mammal.");
@@ -63,7 +64,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operations() throws Narsese.NarseseException {
+    public void set_operations()  {
         TestNAR tester = test();
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.7f,0.9f); //.en("PlanetX is probably Pluto or Saturn.");
@@ -73,7 +74,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operationsSetExt_union() throws Narsese.NarseseException {
+    public void set_operationsSetExt_union()  {
         TestNAR tester = test();
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -82,7 +83,7 @@ public class NAL3Test extends AbstractNALTest {
 
     }
     @Test
-    public void set_operationsSetInt_union_2_3_4() throws Narsese.NarseseException {
+    public void set_operationsSetInt_union_2_3_4()  {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -90,7 +91,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operationsSetInt_union1_1_2_3() throws Narsese.NarseseException {
+    public void set_operationsSetInt_union1_1_2_3()  {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -99,7 +100,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operations2_difference() throws Narsese.NarseseException {
+    public void set_operations2_difference()  {
         TestNAR tester = test();
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -109,7 +110,7 @@ public class NAL3Test extends AbstractNALTest {
 
 
     @Test
-    public void set_operations3_difference() throws Narsese.NarseseException {
+    public void set_operations3_difference()  {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -117,7 +118,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operations4() throws Narsese.NarseseException {
+    public void set_operations4()  {
         TestNAR tester = test();
         tester.believe("<[marsy,earthly,venusy] --> planetX>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<[earthly,saturny] --> planetX>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -127,7 +128,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void set_operations5() throws Narsese.NarseseException {
+    public void set_operations5()  {
         TestNAR tester = test();
         tester.believe("<{Mars,Pluto,Venus} --> planetX>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<{Pluto,Saturn} --> planetX>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
@@ -137,7 +138,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement() throws Narsese.NarseseException {
+    public void composition_on_both_sides_of_a_statement()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(&,bird,swimmer) --> (&,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
@@ -146,7 +147,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement_2() throws Narsese.NarseseException {
+    public void composition_on_both_sides_of_a_statement_2()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(|,bird,swimmer) --> (|,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
@@ -157,7 +158,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2() throws Narsese.NarseseException {
+    public void composition_on_both_sides_of_a_statement2()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(-,swimmer,animal) --> (-,swimmer,bird)>"); //.en("Is a nonanimal swimmer a type of a nonbird swimmer?");
@@ -166,7 +167,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2_2() throws Narsese.NarseseException {
+    public void composition_on_both_sides_of_a_statement2_2()  {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(~,swimmer,animal) --> (~,swimmer,bird)>"); //.en("Is a nonanimal swimmer a type of a nonbird swimmer?");
@@ -175,7 +176,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-     public void compound_composition_one_premise() throws Narsese.NarseseException {
+     public void compound_composition_one_premise()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<swan --> (|,bird,swimmer)>"); //.en("Is a swan a type of bird or swimmer?");
@@ -184,7 +185,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-     public void compound_composition_one_premise2() throws Narsese.NarseseException {
+     public void compound_composition_one_premise2()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<(&,swan,swimmer) --> bird>"); //.en("Is swimming swan a type of bird?");
@@ -193,7 +194,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_composition_one_premise3() throws Narsese.NarseseException {
+    public void compound_composition_one_premise3()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
@@ -202,7 +203,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_composition_one_premise4() throws Narsese.NarseseException {
+    public void compound_composition_one_premise4()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<(~,swimmer, swan) --> bird>"); //.en("Is being bird what differ swimmer from swan?");
@@ -211,7 +212,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_decomposition_one_premise() throws Narsese.NarseseException {
+    public void compound_decomposition_one_premise()  {
         TestNAR tester = test();
         tester.believe("<robin --> (-,bird,swimmer)>", 0.9f, 0.9f); //.en("Robin is a type of nonswimming bird.");
         tester.mustBelieve(cycles, "<robin --> bird>", 0.90f ,0.73f); //.en("Robin is a type of bird.");
@@ -219,7 +220,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_decomposition_one_premise2() throws Narsese.NarseseException {
+    public void compound_decomposition_one_premise2()  {
         TestNAR tester = test();
         tester.believe("<(|, boy, girl) --> youth>", 0.9f, 0.9f); //.en("Boys and gials are youth.");
         tester.mustBelieve(cycles*3, "<boy --> youth>", 0.90f ,0.73f); //.en("Boys are youth.");
@@ -227,10 +228,18 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void compound_decomposition_one_premise3() throws Narsese.NarseseException {
+    public void compound_decomposition_one_premise3()  {
         TestNAR tester = test();
         tester.believe("<(~, boy, girl) --> [strong]>", 0.9f, 0.9f); //.en("What differs boys from girls are being strong.");
         tester.mustBelieve(cycles, "<boy --> [strong]>", 0.90f ,0.73f); //.en("Boys are strong.");
+
+    }
+    
+    @Test public void testNoCommonSubterm1() {
+        test()
+            .believe("a:b")
+            .believe("b:c")
+            .mustNotOutput(1000, "(((a~c)~c)-->b)", '.', Tense.ETERNAL);
 
     }
 }

@@ -1,5 +1,66 @@
 "use strict";
 
+var db = new loki('default', {});
+
+/*var db = new loki('default', {
+    //https://github.com/techfort/LokiJS/wiki/LokiJS-persistence-and-adapters
+    adapter: new LokiIndexedAdapter('narchy'),
+    autosave: true,
+    autosaveInterval: 10000
+} );(
+*/
+
+function TaskDB(terminal) {
+    var tasks = db.addCollection('tasks', {
+        indices: ['occ', 'term', 'pri', 'conf', 'punc']
+    });
+
+    function arrayToDoc(a) {
+        return {
+            // String.valueOf(t.punc()),
+            punc: a[0],
+
+            // t.term().toString(),
+            term: a[1],
+
+            // truth!=null ? t.freq() : 0,
+            freq: a[2],
+            // truth!=null ? t.conf() : 0,
+            conf: a[3],
+
+            // occ!=ETERNAL ? occ : ":",
+            occ: a[4],
+
+            // Math.round(t.pri()*1000),
+            pri: a[5],
+
+            // Math.round(t.dur()*1000),
+            dur: a[6],
+
+            // Math.round(t.qua()*1000),
+            qua: a[7],
+
+            // t.lastLogged()
+            log: a[8]
+
+        };
+    }
+    /** inserts a task from the raw array format provided by a server */
+    tasks.addTaskArray = function(taskArrays/* array */) {
+
+        if (!Array.isArray(taskArrays))
+            taskArrays = [taskArrays];
+
+        _.each(taskArrays, function(i) { tasks.insert(arrayToDoc(i)); });
+
+
+    };
+
+    terminal.on('message', tasks.addTaskArray);
+
+    return tasks;
+}
+
 function SocketNARGraph(path) {
     var sg = SocketSpaceGraph(path, function(x) { return x[0]; },
         function(id, x, newNodes, newEdges) {
@@ -11,7 +72,6 @@ function SocketNARGraph(path) {
                 label: id,
                 pri: pri,
                 qua: qua,
-                'shape': 'hexagon'
             });
 
             var tlPrefix = 'tl_' + id;
@@ -25,12 +85,14 @@ function SocketNARGraph(path) {
                 var target = e[0];
 
                 var tlpri = e[1]/1000.0;
+                var tldur = e[2]/1000.0;
                 var tlqua = e[3]/1000.0;
 
                 newEdges.push({
                     id: tlPrefix + '_' + target,
                     source: id, target: target,
                     pri: tlpri,
+                    dur: tldur,
                     qua: tlqua
                 });
             }
@@ -43,10 +105,12 @@ function SocketNARGraph(path) {
     }
 
     var sizeFunc = function(x) {
-        return 64 + 164 * parseInt(d(x, 'pri'));
+        var p1 = 1 + d(x, 'pri');
+        return parseInt(12 + 24 * (p1 * p1));
     };
 
     sg.spacegraph.style().selector('node')
+        .style('shape', 'hexagon')
         .style('width', sizeFunc)
         .style('height', sizeFunc)
         .style('background-color', function(x) {
@@ -60,7 +124,7 @@ function SocketNARGraph(path) {
 
     sg.spacegraph.style().selector('edge')
         .style('width', function(x) {
-            return 2 + 6 * d(x, 'pri');
+            return parseInt(2 + 5 * d(x, 'pri'));
         })
         .style('mid-target-arrow-shape', 'triangle')
         .style('opacity', function(x) {
@@ -68,10 +132,12 @@ function SocketNARGraph(path) {
         })
         .style('curve-style', 'segments') //(tlpri > 0.5) ? 'segments' : 'haystack',
         .style('line-color', function(x) {
-            return "rgb(128,128," + parseInt((0.5 + 0.5 * d(x, 'qua')) * 255) + ")";
+            return "rgb(" +
+                parseInt((0.5 + 0.25 * d(x, 'pri')) * 255) + "," +
+                parseInt((0.5 + 0.25 * d(x, 'dur')) * 255) + "," +
+                parseInt((0.5 + 0.25 * d(x, 'qua')) * 255) + ")";
         });
 
-    sg.spacegraph.style().update();
 
     return sg;
 }
@@ -170,10 +236,10 @@ function NARConsole(terminal) {
         return JSON.stringify(m);
     }
 
-    terminal.on('message', function(newLines) {
+    terminal.on('message', function(newTasks) {
 
         setTimeout(function() {
-            var lines = editor.session.getLength() + newLines.length;
+            var lines = editor.session.getLength() + newTasks.length;
             var linesOver = lines - maxLines;
             if (linesOver > 0) {
                 editor.session.getDocument().removeFullLines(0, linesOver);
@@ -182,11 +248,11 @@ function NARConsole(terminal) {
             editor.navigateFileEnd();
             editor.navigateLineEnd();
 
-            for (var n = Math.max(0, newLines.length - maxLines); n < newLines.length; n++) {
+            for (var n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
                 if (lines + n > 0)
                     editor.insert('\n');
                 editor.navigateLineStart();
-                editor.insert(line(newLines[n]));
+                editor.insert(line(newTasks[n]));
             }
 
             editor.scrollToRow(editor.getLastVisibleRow());

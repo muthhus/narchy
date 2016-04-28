@@ -161,11 +161,16 @@
 
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+
+    $(document).ready(function() {
 
         terminal = NARTerminal();
 
-        var tasks = TaskBar($( ".taskbar" ), {
+        TaskDB(terminal);
+
+
+
+        var taskbar = TaskBar($( ".taskbar" ), {
             'log': {
                 label: 'Log',
                 onClick: function(taskbar) {

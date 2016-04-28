@@ -295,8 +295,24 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
+    default boolean containsTermRecursively(Term b) {
+        if (impossibleSubTermOrEquality(b)) return false;
 
+        if (this.equals(b)) return true;
 
+        for (Term x : terms()) {
+            if (x instanceof Compound) {
+                if (((Compound)x).containsTermRecursively(b))
+                    return true;
+            }
+            else {
+                if (x.equals(b))
+                    return true;
+            }
+        }
+
+        return false;
+    }
 
 
 //    public int countOccurrences(final Term t) {

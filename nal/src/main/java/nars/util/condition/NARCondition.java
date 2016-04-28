@@ -13,7 +13,6 @@ public interface NARCondition extends Serializable {
 
 
 
-    long getSuccessTime();
 
     boolean isTrue();
 

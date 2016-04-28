@@ -791,7 +791,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public static Future runAsync(@NotNull Runnable t) {
 
-        logger.info("runAsyncs run {}", t);
+        logger.trace("runAsyncs run {}", t);
 
         try {
             Future<?> f = asyncs.submit(t);

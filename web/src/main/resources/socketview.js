@@ -196,6 +196,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             //console.log(prev.size, 'to delete');
 
             var changed = false;
+            var shownEdgeSet = new Set();
 
             sg.batch(function() {
                 //anything remaining in prev is inactive
@@ -204,16 +205,12 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                     changed = true;
                 }
                 if (nodesToShow.length > 0) {
-                    //sg.addNodes(newNodes);
                     _.each(nodesToShow, sg.addNode);
 
                     changed = true;
                 }
-            });
-
-            var shownEdgeSet = new Set();
-
-            sg.batch(function() {
+            //});
+            //sg.batch(function() {
 
                 if (edgesToRemove.length > 0) {
                     _.each(edgesToRemove, sg.removeEdge);
@@ -236,6 +233,9 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 //     layout(); //trigger layout
                 // }
 
+
+
+                //sg.elements().style();
             });
 
 
@@ -246,7 +246,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     );
 
     sv.spacegraph = sg;
-    
+
     return sv;
 }
 

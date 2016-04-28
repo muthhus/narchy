@@ -94,7 +94,7 @@ public class WebServer /*extends PathHandler*/ {
                         )
                         .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 64) {
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1200, 100) {
 
                             @Override
                             Object[] summarize(BLink<? extends Concept> bc, int n) {
@@ -107,8 +107,8 @@ public class WebServer /*extends PathHandler*/ {
                                 };
                             }
 
-                            final int maxTermLinks = 6;
-                            final int minTermLinks = 1;
+                            final int maxTermLinks = 5;
+                            final int minTermLinks = 0;
 
                             private Object[] termLinks(Concept c, int num) {
                                 Bag<Termed> b = c.termlinks();
@@ -173,11 +173,9 @@ public class WebServer /*extends PathHandler*/ {
         NAR nar = newRealtimeNAR();
 
         nar.input("a:b. b:c. c:d! ");
-        nar.conceptRemembering.setValue(2 * 1000);
-        nar.termLinkRemembering.setValue(20 * 1000);
-        nar.taskLinkRemembering.setValue(10 * 1000);
 
-        new WebServer(nar, 10, httpPort);
+
+        new WebServer(nar, 20, httpPort);
 
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);
@@ -204,7 +202,7 @@ public class WebServer /*extends PathHandler*/ {
     public static Default newRealtimeNAR() {
         Memory mem = new Memory(new RealtimeMSClock(),
                 new MapIndex2(
-                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
+                        new SoftValueHashMap(256*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
                 )
                 //new MapCacheBag(
                 //new WeakValueHashMap<>()
@@ -216,23 +214,26 @@ public class WebServer /*extends PathHandler*/ {
                 //)
         );
 
-        int numConceptsPerCycle = 5;
+        int numConceptsPerCycle = 1;
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
                 return new DefaultConceptBuilder(random, 32, 128);
             }
         };
+
         nar.conceptActivation.setValue(1f/numConceptsPerCycle);
+        nar.cyclesPerFrame.set(20);
+
         //nar.log();
         nar.with(
                 Anticipate.class,
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(1000 * 5);
-        nar.termLinkRemembering.setValue(1000 * 15);
-        nar.taskLinkRemembering.setValue(1000 * 10);
+        nar.conceptRemembering.setValue(1000 * 1);
+        nar.termLinkRemembering.setValue(1000 * 10);
+        nar.taskLinkRemembering.setValue(1000 * 5);
         return nar;
     }
 

@@ -44,11 +44,6 @@ public class ExecutionCondition implements NARCondition {
     }
 
     @Override
-    public long getSuccessTime() {
-        return successTime;
-    }
-
-    @Override
     public boolean isTrue() {
         return success;
     }

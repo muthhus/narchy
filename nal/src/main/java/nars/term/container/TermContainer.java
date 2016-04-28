@@ -96,6 +96,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return y.anySatisfyWith(isCommonPredicate, (ImmutableSet<?>)x);
     }
 
+
+
     /** recursively */
     @NotNull static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
 

@@ -33,12 +33,9 @@ public enum Op {
 
     NEGATE("--", 5, Args.One),
 
-    /* Relations */
     INHERIT("-->", 1, OpType.Relation, Args.Two),
     SIMILAR("<->", true, 2, OpType.Relation, Args.Two),
 
-
-    /* CompountTerm operators */
     INTERSECT_EXT("&", true, 3, Args.GTETwo),
     INTERSECT_INT("|", true, 3, Args.GTETwo),
 

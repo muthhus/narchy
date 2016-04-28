@@ -11,8 +11,6 @@ import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.truth.DefaultTruth;
-import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +67,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //public Tense tense = Tense.Eternal;
 
 
-    public final List<Task> valid = Global.newArrayList();
+    public final List<Task> matched = Global.newArrayList();
 
 
     final transient int maxSimilars = 3;
@@ -291,7 +289,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     public final boolean test(@NotNull Task task) {
 
         if (matches(task)) {
-            valid.add(task);
+            matched.add(task);
             succeeded = true;
             return true;
         }
@@ -364,11 +362,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return x;
 //    }
 
-    @NotNull
-    public Truth getTruthMean() {
-        return new DefaultTruth(0.5f * (freqMax + freqMin), 0.5f * (confMax + confMin));
-    }
-
 
 //    public List<Task> getTrueReasons() {
 //        return valid;
@@ -412,10 +405,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     }
 
-    @Override
-    public final long getSuccessTime() {
-        return successTime;
-    }
 
     @Override
     public long getFinalCycle() {
@@ -435,15 +424,15 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (succeeded) {
             logger.info(msg);
 
-            if (valid != null && logger.isTraceEnabled()) {
-                valid.forEach(s -> {
+            if (matched != null && logger.isTraceEnabled()) {
+                matched.forEach(s -> {
                     logger.trace("\t{}", s);
                     //logger.debug("\t\t{}", s.getLog());
                     //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                 });
             }
         } else {
-            assert (valid.isEmpty());
+            assert (matched.isEmpty());
 
             logger.error(msg);
 

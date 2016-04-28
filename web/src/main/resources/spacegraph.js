@@ -516,10 +516,10 @@ function spacegraph(targetWrapper, opt) {
     function spacegraphToCytoscape(d) {
         var w = { data: d };
 
-        var css = w.css = d.style || {};
+        //var css = w.css = d.style || {};
 
         //if (d.shape) {
-            css.shape = d.shape;
+            //css.shape = d.shape;
         //}
 
 
@@ -663,7 +663,6 @@ function spacegraph(targetWrapper, opt) {
         var se = spacegraphToCytoscape(n);
 
         if (!ee) {
-
             s.add(se);
         } else {
             ee.data(se);
@@ -673,6 +672,8 @@ function spacegraph(targetWrapper, opt) {
                     ee.css(k, v);
                 });
             }
+
+
         }
     };
 
@@ -684,7 +685,8 @@ function spacegraph(targetWrapper, opt) {
         // this.addChannel(cc);
         // return cc;
 
-        _.each(nn, s.addNode);
+        for (var n of nn)
+            s.addNode(n);
     };
 
 
@@ -714,13 +716,10 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.addEdges = function(ee) {
-        _.each(ee, s.addEdge);
 
-        //HACK avoid this
-        //HACK create a temporary channel and run through addChannel
-        /*this.addChannel(new Channel({
-            edges: ee
-        }));*/
+        for (var e of ee)
+            s.addEdge(e);
+
     };
 
     s.updateChannel = function(c) {
