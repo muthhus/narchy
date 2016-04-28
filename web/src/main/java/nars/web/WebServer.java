@@ -24,6 +24,7 @@ import nars.term.Termed;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XORShiftRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import ognl.OgnlException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 import java.util.function.Function;
 
 import static io.undertow.Handlers.*;
@@ -172,10 +174,7 @@ public class WebServer /*extends PathHandler*/ {
 
         NAR nar = newRealtimeNAR();
 
-        nar.input("a:b. b:c. c:d! ");
-
-
-        new WebServer(nar, 20, httpPort);
+        new WebServer(nar, 50, httpPort);
 
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);
@@ -200,10 +199,7 @@ public class WebServer /*extends PathHandler*/ {
     }*/
     @NotNull
     public static Default newRealtimeNAR() {
-        Memory mem = new Memory(new RealtimeMSClock(),
-                new MapIndex2(
-                        new SoftValueHashMap(256*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
-                )
+
                 //new MapCacheBag(
                 //new WeakValueHashMap<>()
 
@@ -212,18 +208,19 @@ public class WebServer /*extends PathHandler*/ {
                     InfiniPeer.tmp().getCache()
                 )*/
                 //)
+
+        Random random = new XorShift128PlusRandom(1);
+        int numConceptsPerCycle = 8;
+
+        Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
+                new MapIndex2(
+                    new SoftValueHashMap(256*1024),
+                    new DefaultConceptBuilder(random, 32, 32)),
+                new RealtimeMSClock()
         );
 
-        int numConceptsPerCycle = 1;
-        Default nar = new Default(1024, numConceptsPerCycle, 3, 3) {
-            @Override
-            public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(random, 32, 128);
-            }
-        };
-
         nar.conceptActivation.setValue(1f/numConceptsPerCycle);
-        nar.cyclesPerFrame.set(20);
+        nar.cyclesPerFrame.set(8);
 
         //nar.log();
         nar.with(
@@ -231,9 +228,9 @@ public class WebServer /*extends PathHandler*/ {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(1000 * 1);
-        nar.termLinkRemembering.setValue(1000 * 10);
-        nar.taskLinkRemembering.setValue(1000 * 5);
+        nar.conceptRemembering.setValue(100 * 15);
+        nar.termLinkRemembering.setValue(100 * 21);
+        nar.taskLinkRemembering.setValue(100 * 9);
         return nar;
     }
 

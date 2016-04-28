@@ -7,6 +7,7 @@ import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,9 +39,15 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
 
                 List<O /*ConceptSummary*/> l = Global.newArrayList(n);
                 final int[] i = {0};
+
+                //SummaryStatistics s = new SummaryStatistics();
+
                 ((Default)nar).core.active.forEach(n, c -> {
                     l.add( summarize(c, i[0]++) );
+                    //s.addValue(c.pri());
                 });
+
+                //System.out.println(nar.time() + ": " + s.getMin() + " " + s.getMax());
 
                 if (lPrev!=null && lPrev.equals(l)) {
                     ready.set(true);

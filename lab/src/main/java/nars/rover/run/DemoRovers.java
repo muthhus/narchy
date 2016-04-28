@@ -23,6 +23,7 @@ import nars.rover.obj.*;
 import nars.rover.run.DemoRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
+import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
@@ -345,7 +346,7 @@ public class DemoRovers {
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1200, conceptsFirePerCycle, 2, 3, rng, index);
+                1200, conceptsFirePerCycle, 2, 3, rng, index, new FrameClock());
         /*nar.with(
                 Anticipate.class,
                 Inperience.class

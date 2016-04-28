@@ -21,6 +21,7 @@ import nars.task.flow.TaskPerception;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -77,11 +78,12 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new DefaultTermIndex(activeConcepts * 8, random));
+                new DefaultTermIndex(activeConcepts * 8, random), new FrameClock());
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, TermIndex index) {
-        super(new FrameClock(),
+
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, TermIndex index, Clock clock) {
+        super(clock,
                 index,
                 random,
                 Global.DEFAULT_SELF);

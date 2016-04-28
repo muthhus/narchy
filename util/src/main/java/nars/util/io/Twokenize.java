@@ -183,7 +183,7 @@ public enum Twokenize {
             //lowest priority first
 
             put("word", compile(word));
-            put("hearts", compile(Hearts));
+            put("hearticon", compile(Hearts));
             put("url", compile(url));
             put("email", compile(Email));
             put("temporal", compile(timeLike));
@@ -197,7 +197,7 @@ public enum Twokenize {
             put("abbrev", compile(arbitraryAbbrev));
             put("separator", compile(separators));
             put("decoration", compile(decorations));
-            put("wordApos", compile(embeddedApostrophe));
+            put("apostrophe", compile(embeddedApostrophe));
             put("hashtag", compile(Hashtag));
             put("mention", compile(AtMention));
         }

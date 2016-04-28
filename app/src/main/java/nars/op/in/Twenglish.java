@@ -36,11 +36,11 @@ import java.util.*;
  * Twitter English - english with additional tags for twitter-like content 
  */
 public class Twenglish {
-    public static final Atom GOAL = $.the("goal");
-    public static final Atom QUESTION = $.the("question");
-    public static final Atom QUEST = $.the("quest");
-    public static final Atom JUDGMENT = $.the("judgment");
-    public static final Atom FRAGMENT = $.the("words");
+    public static final Atom GOAL = $.the("exclaims");
+    public static final Atom QUESTION = $.the("asks");
+    //public static final Atom QUEST = $.the("quest");
+    public static final Atom JUDGMENT = $.the("declares");
+    public static final Atom FRAGMENT = $.the("says");
 
     //public final ArrayList<String> vocabulary = new ArrayList<>();
     
@@ -118,7 +118,7 @@ public class Twenglish {
             switch (last.content) {
                 case ".": sentenceType = JUDGMENT; break;
                 case "?": sentenceType = QUESTION; break;
-                case "@": sentenceType = QUEST; break;
+                //case "@": sentenceType = QUEST; break;
                 case "!": sentenceType = GOAL; break;
             }
         }
@@ -135,15 +135,17 @@ public class Twenglish {
         //1. add the logical structure of the sequence of terms
         if (inputProduct) {
 
-            Term p =
+            Term tokens =
                 $.p(t.toArray(new Term[t.size()]));
-            Term q =
-                    $.image(2,
-                            $.the(source),
-                            sentenceType,
-                            p
-                    )
-            ;
+//            Term q =
+//                    $.image(2,
+//                            $.the(source),
+//                            sentenceType,
+//                            tokens
+//                    )
+
+            Term q = $.image(2, sentenceType, $.the(source), $.sete(tokens));
+
             if (q != null) {
                 MutableTask newtask = new MutableTask(q,'.').present(n); //n.task(q + ". %0.95|0.95%");
                 if (newtask!=null)
