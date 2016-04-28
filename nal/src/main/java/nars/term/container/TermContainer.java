@@ -4,6 +4,7 @@ import com.gs.collections.api.block.predicate.Predicate2;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
+import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.Global;
@@ -71,10 +72,10 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
 
-    Predicate2<Object,ImmutableSet> subtermIsCommon = (Object yy, ImmutableSet xx) -> {
+    Predicate2<Object,SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {
         return xx.contains(yy);
     };
-    Predicate2<Object,ImmutableSet> nonVarSubtermIsCommon = (Object yy, ImmutableSet xx) -> {
+    Predicate2<Object,SetIterable> nonVarSubtermIsCommon = (Object yy, SetIterable xx) -> {
         return yy instanceof Variable ? false : xx.contains(yy);
     };
 
@@ -83,17 +84,34 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     /** recursively */
-    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, Predicate2<Object,ImmutableSet> isCommonPredicate) {
+    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, Predicate2<Object,SetIterable> isCommonPredicate) {
 
-        ImmutableSet<Term> x = a.recurseTermsToSet();
-        ImmutableSet<Term> y = b.recurseTermsToSet();
+        SetIterable<Term> x, y;
+        if (isCommonPredicate == nonVarSubtermIsCommon) {
+            int commonStructure = a.structure() & b.structure();
+            commonStructure = commonStructure & ~(Op.VariableBits); //mask by variable bits since we do not want them
+
+            if (commonStructure == 0)
+                return false;
+
+            x = a.recurseTermsToSet(commonStructure);
+            y = b.recurseTermsToSet(commonStructure);
+
+            //the simpler predicate is sufficient to use below now that variables have been eliminated from the beginning
+
+        } else {
+            //All terms, unrestricted
+            x = a.recurseTermsToSet();
+            y = b.recurseTermsToSet();
+        }
+
         if (x.size() < y.size()) { //swap so that y is smaller
-            ImmutableSet<Term> tmp = x;
+            SetIterable<Term> tmp = x;
             x = y;
             y = tmp;
         }
 
-        return y.anySatisfyWith(isCommonPredicate, (ImmutableSet<?>)x);
+        return y.anySatisfyWith(subtermIsCommon, (SetIterable<?>)x);
     }
 
 

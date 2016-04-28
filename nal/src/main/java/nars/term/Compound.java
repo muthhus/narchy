@@ -20,7 +20,9 @@
  */
 package nars.term;
 
+import com.gs.collections.api.factory.set.ImmutableSetFactory;
 import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
@@ -67,10 +69,19 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return t;
     }
 
-    default ImmutableSet<Term> recurseTermsToSet() {
+    default SetIterable<Term> recurseTermsToSet() {
         UnifiedSet<Term> t = Global.newHashSet(volume());
         recurseTerms((t1, superterm) -> t.add(t1));
-        return t.toImmutable();
+        return t;
+        //return t.toImmutable();
+    }
+    default SetIterable<Term> recurseTermsToSet(int inStructure) {
+        UnifiedSet<Term> t = Global.newHashSet(0);
+        recurseTerms((s, superterm) -> {
+            if ((s.structure() & inStructure) > 0)
+                t.add(s);
+        });
+        return t;//.toImmutable();
     }
 
     @Override
@@ -286,11 +297,15 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     default boolean containsTermRecursively(Term b) {
-        if (impossibleSubTermOrEquality(b)) return false;
+        if (this.equals(b))
+            return true;
 
-        if (this.equals(b)) return true;
+        if (impossibleSubTermOrEquality(b))
+            return false;
 
-        for (Term x : terms()) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            Term x = term(i);
             if (x instanceof Compound) {
                 if (((Compound)x).containsTermRecursively(b))
                     return true;

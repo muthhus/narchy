@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static nars.term.container.TermContainer.commonSubterms;
 import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
+import static nars.term.container.TermContainer.subtermIsCommon;
 
 
 public final class NoCommonSubtermsConstraint implements MatchConstraint {
@@ -35,8 +36,8 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Compound C = (Compound) y;
             if (B instanceof Compound) {
                 return commonSubterms((Compound) B, C,
-                        //subtermIsCommon
-                        nonVarSubtermIsCommon
+                        subtermIsCommon //variables are excluded by the
+                        //nonVarSubtermIsCommon
                 );
             } else {
                 return C.containsTermRecursively(B);
