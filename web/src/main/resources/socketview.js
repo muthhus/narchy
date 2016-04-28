@@ -86,12 +86,12 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     var currentLayout = sg.makeLayout({
         /* https://github.com/cytoscape/cytoscape.js-spread */
         name: 'spread',
-        minDist: 125,
-        speed: 0.05,
+        minDist: 150,
+        speed: 0.1,
         animate: false,
         randomize: false, // uses random initial node positions on true
         fit: false,
-        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
         maxExpandIterations: 1, // Maximum number of expanding iterations
 
         ready: function () {

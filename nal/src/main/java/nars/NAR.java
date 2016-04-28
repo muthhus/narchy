@@ -194,12 +194,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * parses and forms a Task from a string but doesnt input it
      */
     @Nullable
-    public Task task(@NotNull String taskText) {
+    public Task task(@NotNull String taskText) throws NarseseException {
         return Narsese.the().task(taskText, this);
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse) {
+    public List<Task> tasks(@NotNull String parse) throws NarseseException {
         List<Task> result = Global.newArrayList(1);
         Narsese.the().tasks(parse, result, this);
         return result;

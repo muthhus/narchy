@@ -100,7 +100,7 @@ public class WebServer /*extends PathHandler*/ {
                             Object[] summarize(BLink<? extends Concept> bc, int n) {
                                 Concept c = bc.get();
                                 return new Object[] {
-                                    c.toString(), //ID
+                                    escape(c), //ID
                                     b(bc.pri()), b(bc.dur()), b(bc.qua()),
                                     termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) )
                                     //TODO tasklinks, beliefs
@@ -116,7 +116,7 @@ public class WebServer /*extends PathHandler*/ {
                                 final int[] n = {0};
                                 b.forEach(num, t -> {
                                     tl[n[0]++] = new Object[] {
-                                       t.get().toString(), //ID
+                                       escape(t.get()), //ID
                                        b(t.pri()), b(t.dur()), b(t.qua())
                                     };
                                 });

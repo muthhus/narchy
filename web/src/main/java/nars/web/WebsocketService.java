@@ -3,10 +3,13 @@ package nars.web;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
+import nars.task.Task;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.UnifriedMap;
 import nars.util.meter.event.FloatGuage;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -80,6 +83,12 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 //            } catch (JsonProcessingException ex) {
 //                ex.printStackTrace();
 //            }
+    }
+
+
+    @Nullable
+    public static String escape(Object o) {
+        return StringEscapeUtils.escapeJson(o.toString());
     }
 
     @NotNull

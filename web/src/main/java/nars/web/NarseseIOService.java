@@ -4,13 +4,19 @@ import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.NAR;
+import nars.Narsese;
+import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.util.event.Active;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -19,6 +25,8 @@ import static nars.nal.Tense.ETERNAL;
  */
 public class NarseseIOService extends WebsocketService {
 
+
+    static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
     private final NAR nar;
     private Active active;
@@ -63,7 +71,7 @@ public class NarseseIOService extends WebsocketService {
         buffer.add(
             new Object[] {
                 String.valueOf(t.punc()),
-                t.term().toString(),
+                escape(t),
                 truth!=null ? t.freq() : 0,
                 truth!=null ? t.conf() : 0,
                 occ!=ETERNAL ? occ : ":",
@@ -74,6 +82,8 @@ public class NarseseIOService extends WebsocketService {
             }
         );
     }
+
+
     protected void queue(Object o) {
         buffer.add(new Object[] { o.toString() } );
     }
@@ -86,8 +96,21 @@ public class NarseseIOService extends WebsocketService {
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
 
-        //System.out.println("onFullTextMessage: " + message);
-        nar.input(message.getData());
+        String msg = message.getData();
+
+        boolean narsese = tryNarsese(msg);
+        if (narsese)
+            return;
+
+        boolean twenglish = tryTwenglish(msg);
+        if (twenglish)
+            return;
+
+        logger.error("Unrecognizable input: {}", msg);
+
+
+
+
 
 //            if (attemptJSONParseOfText) {
 //                try {
@@ -98,6 +121,34 @@ public class NarseseIOService extends WebsocketService {
 //                    e.printStackTrace();
 //                }
 //            }
+    }
+
+    private boolean tryTwenglish(String msg) {
+
+        try {
+            new Twenglish().parse("ui", nar, msg).forEach(t -> {
+                //t.setPriority(INPUT_SENTENCE_PRIORITY);
+                if (t!=null)
+                    nar.input(t);
+            });
+            return true;
+        } catch (Exception f) {
+            logger.error("{}", f);
+            return false;
+        }
+    }
+
+    private boolean tryNarsese(String msg) {
+        try {
+            List<Task> t = nar.tasks(msg);
+            if (t.isEmpty())
+                return false;
+
+            nar.input(t);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 
