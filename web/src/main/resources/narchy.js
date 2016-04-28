@@ -117,7 +117,7 @@ function SocketNARGraph(path) {
             var qua = d(x, 'qua');
             return "rgb(" + parseInt((0.5 + 0.25 * qua) * 255) + ",128,128)";
         })
-        .style('background-opacity', function(x) {
+        .style('opacity', function(x) {
             var pri = d(x, 'pri');
             return 0.25 + pri * 0.75;
         });
