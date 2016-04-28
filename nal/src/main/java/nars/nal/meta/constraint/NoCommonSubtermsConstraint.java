@@ -3,6 +3,7 @@ package nars.nal.meta.constraint;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.container.TermContainer.commonSubterms;
@@ -25,20 +26,26 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         if (B == null)
             return false;
 
+        //variables excluded, along with 'nonVarSubtermIsCommon' predicate in the compound vs compound case
+        if ((B instanceof Variable) || (y instanceof Variable))
+            return false;
+
         if (y instanceof Compound) {
 
+            Compound C = (Compound) y;
             if (B instanceof Compound) {
-                return commonSubterms((Compound) B, (Compound) y,
+                return commonSubterms((Compound) B, C,
                         //subtermIsCommon
                         nonVarSubtermIsCommon
                 );
             } else {
-                return ((Compound)y).containsTermRecursively(B);
+                return C.containsTermRecursively(B);
             }
 
         } else if (B instanceof Compound) {
             return ((Compound)B).containsTermRecursively(y);
         }
+
         return B.equals(y);
     }
 
