@@ -13,7 +13,7 @@ import java.util.*;
 import static java.lang.System.out;
 import static org.junit.Assert.*;
 
-public class RuleDerivationGraphTest {
+public class DeriverTest {
 
     final static TrieDeriver d = Deriver.getDefaultDeriver();
 

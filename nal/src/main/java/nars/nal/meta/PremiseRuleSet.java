@@ -2,14 +2,11 @@ package nars.nal.meta;
 
 import nars.*;
 import nars.nal.Deriver;
-import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.index.PatternIndex;
-import nars.term.transform.CompoundTransform;
-import nars.term.variable.Variable;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -39,39 +37,12 @@ public class PremiseRuleSet  {
 
     final static Term rule = $.the("rule");
 
-    public void reifyTo(@NotNull NAR n) {
-        rules.forEach(r-> reifyTo(n,r));
-    }
-
-
-
-    //TODO abstract
-    protected static void reifyTo(@NotNull NAR n, @NotNull PremiseRule r) {
-
-        PatternVarReifier pr = new PatternVarReifier(r.hashCode()); //HACK todo use not hashcode this unsafe way
-
-        //a rule is fundamentally an implication associating precondition to postcondition
-        n.input(
-            new MutableTask(
-                $.inh( $.p(
-                    ruleComponent((Compound) r.term(0), pr),
-                    ruleComponent((Compound) r.term(1), pr),
-                    $.the(pr.id)
-                ), rule),
-            Symbols.BELIEF) //.truth(1f,1f)
-        );
-    }
-
-    @Nullable
-    private static Term ruleComponent(@NotNull Compound term, @NotNull PatternVarReifier r) {
-        return Terms.terms.transform(term, r);
-    }
 
 
     private static final Pattern twoSpacePattern = Pattern.compile("  ", Pattern.LITERAL);
-    private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
-    private static final Pattern implOperatorPattern = Pattern.compile("==>", Pattern.LITERAL);
-    private static final Pattern conjOperatorPattern = Pattern.compile("&&", Pattern.LITERAL);
+    //private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
+    //private static final Pattern implOperatorPattern = Pattern.compile("==>", Pattern.LITERAL);
+    //private static final Pattern conjOperatorPattern = Pattern.compile("&&", Pattern.LITERAL);
     public final List<PremiseRule> rules;
 
 
@@ -96,9 +67,7 @@ public class PremiseRuleSet  {
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
         this.rules = Global.newArrayList();
         for (PremiseRule p : rules) {
-            if (normalize)
-                p = p.normalizeRule(patterns);
-            this.rules.add(p);
+            this.rules.add(normalize ? p.normalizeRule(patterns) : p);
         }
     }
 
@@ -368,36 +337,5 @@ public class PremiseRuleSet  {
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
 
 
-    private static class PatternVarReifier implements CompoundTransform<Compound,Term> {
-
-        final int id;
-
-        public PatternVarReifier(int ruleID) {
-            this.id = ruleID;
-        }
-
-        @Override
-        public boolean test(@NotNull Term superterm) {
-            return (superterm.varPattern()>0);
-            //return (o instanceof Compound) && ((Compound)o).varPattern() > 0;
-        }
-
-        @Nullable
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm) {
-            return unpatternify(subterm);
-        }
-
-        @Nullable
-        public Term unpatternify(@NotNull Term subterm) {
-            String ruleID = Integer.toString(id, 36);
-            if (subterm.op() == Op.VAR_PATTERN) {
-                return $.quote("%" + ((Variable) subterm).id() + "_" + ruleID);
-            } else if (subterm instanceof Compound) {
-                 return ruleComponent((Compound) subterm, this);
-            }
-            return subterm;
-        }
-    }
 }
 

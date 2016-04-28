@@ -206,8 +206,8 @@ public class PostCondition implements Serializable, Level //since there can be m
         Term term = this.term;
 
         if (!modifiesPunctuation() && term instanceof Compound) {
-            if (rule.getTaskTermPattern().equals(term) ||
-                    rule.getBeliefTermPattern().equals(term))
+            if (rule.getTask().equals(term) ||
+                    rule.getBelief().equals(term))
                 return false;
         }
 

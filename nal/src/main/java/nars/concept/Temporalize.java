@@ -492,8 +492,8 @@ public interface Temporalize {
     Temporalize Auto = (derived, p, d, occReturn) -> {
 
 
-        Term tp = d.rule.getTaskTermPattern();
-        Term bp = d.rule.getBeliefTermPattern();
+        Term tp = d.rule.getTask();
+        Term bp = d.rule.getBelief();
 
         ConceptProcess premise = p.premise;
 

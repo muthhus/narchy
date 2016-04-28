@@ -3,6 +3,7 @@ package nars.nal.meta;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.concept.Temporalize;
@@ -223,10 +224,11 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.TaskJudgment) return TaskPunctuation.class;
         if (b == TaskPunctuation.TaskQuestion) return TaskPunctuation.class;
 
-        if (b instanceof Solve)  return Solve.class;
+        if (b instanceof Solve) return Solve.class;
 
         return b.getClass();
     }
+
     /**
      * apply deterministic and uniform sort to the current preconditions.
      * the goal of this is to maximally fold subexpressions while also
@@ -239,15 +241,14 @@ public class PremiseRule extends GenericCompound {
             Object ac = preconditionClass(a);
 
             int i = Integer.compare(
-                        preconditionScore.getOrDefault(bc,0),
-                        preconditionScore.getOrDefault(ac, 0));
-            if (i!=0) return i;
+                    preconditionScore.getOrDefault(bc, 0),
+                    preconditionScore.getOrDefault(ac, 0));
+            if (i != 0) return i;
             return b.compareTo(a);
         });
 
 
     }
-
 
 
     @NotNull
@@ -296,18 +297,17 @@ public class PremiseRule extends GenericCompound {
         return source;
     }
 
-    @Nullable
-    protected final Term getTask() {
+    /** the task-term pattern */
+    @NotNull protected final Term getTask() {
         return getPremise().term(0);
     }
 
-
-    @Nullable
-    protected final Term getBelief() {
+    /** the belief-term pattern */
+    @NotNull protected final Term getBelief() {
         return getPremise().term(1);
     }
 
-    @Nullable
+    @NotNull
     protected final Term getConclusionTermPattern() {
         return getConclusion().term(0);
     }
@@ -335,6 +335,15 @@ public class PremiseRule extends GenericCompound {
         Term[] premisePattern = ((Compound) term(0)).terms();
         premisePattern[0] = index.the(premisePattern[0]).term(); //task pattern
         premisePattern[1] = index.the(premisePattern[1]).term(); //belief pattern
+    }
+
+    public Compound reified() {
+
+        //TODO include representation of precondition and postconditions
+        return (Compound) $.impl(
+                $.p(getTask(), getBelief()),
+                getConclusion()
+        );
     }
 
     static final class UppercaseAtomsToPatternVariables implements CompoundTransform<Compound, Term> {
@@ -409,8 +418,8 @@ public class PremiseRule extends GenericCompound {
         List<BooleanCondition> posts = Global.newArrayList(precon.length);
 
 
-        Term taskTermPattern = getTaskTermPattern();
-        Term beliefTermPattern = getBeliefTermPattern();
+        Term taskTermPattern = getTask();
+        Term beliefTermPattern = getBelief();
 
         if (beliefTermPattern.op() == Op.ATOM) {
             throw new RuntimeException("belief term must contain no atoms: " + beliefTermPattern);
@@ -634,12 +643,23 @@ public class PremiseRule extends GenericCompound {
 
                 case "task":
                     switch (arg1.toString()) {
-                        case "negative":  preNext = TaskNegative.the; break;
-                        case "positive":  preNext = TaskPositive.the; break;
-                        case "\"?\"":     preNext = TaskPunctuation.TaskQuestion; break;
-                        case "\".\"":     preNext = TaskPunctuation.TaskJudgment; break;
-                        case "\"!\"":     preNext = TaskPunctuation.TaskGoal;break;
-                        default: throw new RuntimeException("Unknown task punctuation type: " + predicate.term(0));
+                        case "negative":
+                            preNext = TaskNegative.the;
+                            break;
+                        case "positive":
+                            preNext = TaskPositive.the;
+                            break;
+                        case "\"?\"":
+                            preNext = TaskPunctuation.TaskQuestion;
+                            break;
+                        case "\".\"":
+                            preNext = TaskPunctuation.TaskJudgment;
+                            break;
+                        case "\"!\"":
+                            preNext = TaskPunctuation.TaskGoal;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown task punctuation type: " + predicate.term(0));
                     }
                     break;
 
@@ -708,13 +728,7 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public final Term getTaskTermPattern() {
-        return ((Compound) term(0)).terms()[0];
-    }
 
-    public final Term getBeliefTermPattern() {
-        return ((Compound) term(0)).terms()[1];
-    }
 
     public final void setAllowBackward() {
         this.allowBackward = true;
@@ -735,8 +749,8 @@ public class PremiseRule extends GenericCompound {
      */
     public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w) {
 
-        Term T = getTaskTermPattern(); //Task
-        Term B = getBeliefTermPattern(); //Belief
+        Term T = getTask(); //Task
+        Term B = getBelief(); //Belief
         Term C = getConclusionTermPattern(); //Conclusion
 
         // C, B, [pre], task_is_question() |- T, [post]
@@ -775,8 +789,8 @@ public class PremiseRule extends GenericCompound {
 
         // T, B, [pre] |- C, [post] ||--
 
-        Term T = getTaskTermPattern();
-        Term B = getBeliefTermPattern();
+        Term T = getTask();
+        Term B = getBelief();
         Term C = getConclusionTermPattern();
 
         ////      B, T, [pre], task_is_question() |- T, [post]
@@ -791,8 +805,8 @@ public class PremiseRule extends GenericCompound {
     private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {
 
         Map<Term, Term> m = new HashMap(3);
-        m.put(getTaskTermPattern(), newT);
-        m.put(getBeliefTermPattern(), newB);
+        m.put(getTask(), newT);
+        m.put(getBelief(), newB);
         m.put(getConclusionTermPattern(), newR);
 
         Compound remapped = (Compound) (terms.transform(this, new MapSubst(m)).term());
