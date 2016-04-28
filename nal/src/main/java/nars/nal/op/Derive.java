@@ -113,25 +113,27 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
         Term d = m.resolve(conclusionPattern);
+        if (d != null && d.varPattern() == 0) {
 
-        if ((d instanceof EllipsisMatch)) {
-            //TODO hack prevent this
-            //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
-            EllipsisMatch em = ((EllipsisMatch) d);
-            switch (em.size()) {
-                case 1:
-                    d = em.term(0); //unwrap the item
-                    break;
-                case 0:
-                    return;
-                default:
-                    //throw new RuntimeException("invalid ellipsis match: " + em);
-                    return;
+            if ((d instanceof EllipsisMatch)) {
+                //TODO hack prevent this
+                //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
+                EllipsisMatch em = ((EllipsisMatch) d);
+                switch (em.size()) {
+                    case 1:
+                        d = em.term(0); //unwrap the item
+                        break;
+                    case 0:
+                        return;
+                    default:
+                        throw new RuntimeException("invalid ellipsis match: " + em);
+                        //return;
+                }
             }
-        }
 
-        if (d != null && d.varPattern() == 0 && ensureValidVolume(d) && postMatch.booleanValueOf(m))
-            derive(m, d);
+            if (ensureValidVolume(d) && postMatch.booleanValueOf(m))
+                derive(m, d);
+        }
 
     }
 

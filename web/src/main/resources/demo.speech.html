@@ -227,10 +227,11 @@
         }
     }
     var create_email = false;
-    var final_transcript = '';
+
     var recognizing = false;
     var ignore_onend;
     var start_timestamp;
+    var final_transcript = '';
     if (!('webkitSpeechRecognition' in window)) {
         upgrade();
     } else {

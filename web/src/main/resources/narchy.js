@@ -1,6 +1,6 @@
 "use strict";
 
-var db = new loki('default', {});
+
 
 /*var db = new loki('default', {
     //https://github.com/techfort/LokiJS/wiki/LokiJS-persistence-and-adapters
@@ -10,7 +10,14 @@ var db = new loki('default', {});
 } );(
 */
 
-function TaskDB(terminal) {
+function DB() {
+    var db = new loki('default', {});
+    return db;
+}
+
+function TaskDB(db, terminal) {
+
+
     var tasks = db.addCollection('tasks', {
         indices: ['occ', 'term', 'pri', 'conf', 'punc']
     });
@@ -117,7 +124,7 @@ function SocketNARGraph(path) {
             var qua = d(x, 'qua');
             return "rgb(" + parseInt((0.5 + 0.25 * qua) * 255) + ",128,128)";
         })
-        .style('opacity', function(x) {
+        .style('background-opacity', function(x) {
             var pri = d(x, 'pri');
             return 0.25 + pri * 0.75;
         });
@@ -185,14 +192,14 @@ function _ace(div) {
     return editor;
 }
 
-function NALEditor(initialValue, connection) {
+function NALEditor(terminal, initialValue) {
 
 
     var div = $('<div/>').addClass('NALEditor');
 
     var editor = _ace(div);
 
-    editor.setValue(initialValue); //"((a ==> b) <-> x)!\n\necho(\"what\");");
+    editor.setValue(initialValue || ''); //"((a ==> b) <-> x)!\n\necho(\"what\");");
 
     div.editor = editor;
 
@@ -201,7 +208,7 @@ function NALEditor(initialValue, connection) {
 
         //console.log('submit:' , txt);
 
-        connection.send(txt);
+        terminal.send(txt);
 
         editor.setValue('');
     };
@@ -214,6 +221,144 @@ function NALEditor(initialValue, connection) {
     });
 
     return div;
+}
+
+function NARSpeechRecognition(editor) {
+    if (!('webkitSpeechRecognition' in window)) {
+        console.info('Speech recognition not available');
+        return;
+    }
+
+    //http://semantic-ui.com/elements/icon.html#audio
+    var speechIcon = $('<i class="icon"></i>');
+
+    var speechToggleButton = //$('<button/>').data('record', false);
+        //$('<button class="ui inverted icon button"/>');
+        $('<button class="ui icon button"></div>').attr('title', 'Record Speech').append(speechIcon);
+
+
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    var ignore_onend;
+    var start_timestamp;
+    var recognizing;
+
+    function showInfo(msg) {
+        console.log(msg);
+    }
+
+    recognition.onstart = function() {
+        recognizing = true;
+        //showInfo('info_speak_now');
+    };
+    recognition.onerror = function(event) {
+        if (event.error == 'no-speech') {
+            alert('no speech');
+            ignore_onend = true;
+        }
+        if (event.error == 'audio-capture') {
+            alert('no microphone');
+            ignore_onend = true;
+        }
+        if (event.error == 'not-allowed') {
+            if (event.timeStamp - start_timestamp < 100) {
+                alert('info_blocked');
+            } else {
+                alert('info_denied');
+            }
+            ignore_onend = true;
+        }
+    };
+    recognition.onend = function() {
+        recognizing = false;
+        if (ignore_onend) {
+            return;
+        }
+
+        // if (!final_transcript) {
+        //     return;
+        // }
+        //
+        // if (window.getSelection) {
+        //     window.getSelection().removeAllRanges();
+        //     var range = document.createRange();
+        //     range.selectNode(document.getElementById('final_span'));
+        //     window.getSelection().addRange(range);
+        // }
+
+    };
+    recognition.onresult = function(event) {
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            var r = event.results[i];
+            if (r.isFinal) {
+                editor.insert( r[0].transcript );
+            }
+        }
+
+//         var interim_transcript = '';
+//         var new_final_transcript = '';
+//         for (var i = event.resultIndex; i < event.results.length; ++i) {
+//             if (event.results[i].isFinal) {
+//                 new_final_transcript += event.results[i][0].transcript;
+//             } else {
+//                 interim_transcript += event.results[i][0].transcript;
+//             }
+//         }
+// //console.log(new_final_transcript);
+//         final_transcript = capitalize(new_final_transcript);
+//         final_span.innerHTML = final_span.innerHTML + linebreak(final_transcript);
+//         interim_span.innerHTML = linebreak(interim_transcript);
+//         if (final_transcript || interim_transcript) {
+//             showButtons('inline-block');
+//         }
+    };
+
+
+    function setRecording(r) {
+        speechToggleButton.removeClass(r ? "green" : "red");
+        speechToggleButton.addClass(r ? "red" : "green");
+        speechIcon.removeClass(r ? 'unmute' : 'mute');
+        speechIcon.addClass(r ? 'mute' : 'unmute');
+
+        //speechToggleButton.attr('class', r ? 'unmute red icon huge ui button' : 'mute green icon huge ui button');
+        if (r) {
+            //recognition.lang = select_dialect.value;
+            recognition.start();
+            ignore_onend = false;
+            start_timestamp = event.timeStamp;
+        } else {
+            recognition.stop();
+        }
+    }
+
+    setRecording(false);
+
+    return speechToggleButton.click(function() {
+        var recording = !speechToggleButton.data('record');
+
+        setRecording(recording);
+
+        speechToggleButton.data('record', recording);
+    });
+
+}
+
+function NARInputter(terminal, initialValue) {
+
+    var e = NALEditor(terminal, initialValue);
+    var d = $('<div/>').append(
+
+        NARSpeechRecognition(e.editor),
+
+        //other input types..
+
+        e);
+
+    d.editor = e.editor;
+
+    return d.addClass('ui fluid menu inverted');
 }
 
 function NARConsole(terminal) {

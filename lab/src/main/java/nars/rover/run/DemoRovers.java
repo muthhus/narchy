@@ -370,7 +370,7 @@ public class DemoRovers {
 //        });
 
 
-        nar.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
+        nar.DEFAULT_JUDGMENT_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
@@ -387,7 +387,7 @@ public class DemoRovers {
         nar.conceptActivation.setValue(0.1f);
 
 
-        nar.conceptRemembering.setValue(2f);
+        nar.conceptRemembering.setValue(1f);
         nar.termLinkRemembering.setValue(16);
         nar.taskLinkRemembering.setValue(12);
 

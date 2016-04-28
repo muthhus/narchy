@@ -1137,6 +1137,8 @@ public class Narsese extends BaseParser<Object> {
             return (Task) x[0];
         }
         Term contentRaw = (Term) x[1];
+        if (contentRaw == null)
+            throw new NarseseException("Invalid task term");
         Termed content = m.index.normalized(contentRaw);
         if (content == null)
             throw new NarseseException("Task term unnormalizable: " + contentRaw);

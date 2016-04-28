@@ -24,10 +24,15 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
     private final Derive derive;
 
-    public Solve(String id, Derive derive) {
+    protected final BeliefFunction belief;
+    protected final DesireFunction desire;
+
+    public Solve(String id, Derive derive, BeliefFunction belief, DesireFunction desire) {
         super();
         this.id = id;
         this.derive = derive;
+        this.belief = belief;
+        this.desire = desire;
     }
 
 
@@ -101,7 +106,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 //        return measureTruthOverride(m, punct, belief, desire);
 //    }
 
-    static boolean measure(@NotNull PremiseEval m, char punct, TruthOperator belief, TruthOperator desire) {
+    final boolean measure(@NotNull PremiseEval m, char punct) {
         boolean r;
         switch (punct) {
             case Symbols.BELIEF:
@@ -129,11 +134,10 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
         ConceptProcess p = m.premise;
 
-        Premise premise = p;
 
-        Task task = premise.task();
+        Task task = p.task();
 
-        @Nullable Task belief = premise.belief();
+        @Nullable Task belief = p.belief();
 
 
 
@@ -159,7 +163,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         Truth truth = tf.apply(
                 task.truth(),
                 belief!=null ? belief.truth() : null,
-                premise.nar(),
+                p.nar(),
                 minConf
         );
 
@@ -193,36 +197,29 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
 
     public static final class SolvePuncFromTask extends Solve {
-        private final BeliefFunction belief;
-        private final DesireFunction desire;
 
         public SolvePuncFromTask(String i, Derive der, BeliefFunction belief, DesireFunction desire) {
-            super(i, der);
-            this.belief = belief;
-            this.desire = desire;
+            super(i, der, belief, desire);
         }
 
         @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
             return measure(m,
-                    m.punct.get(),
-                    belief, desire);
+                    m.punct.get()
+                   );
         }
     }
 
     public static final class SolvePuncOverride extends Solve {
         private final char puncOverride;
-        private final BeliefFunction belief;
-        private final DesireFunction desire;
+
 
         public SolvePuncOverride(String i, Derive der, char puncOverride, BeliefFunction belief, DesireFunction desire) {
-            super(i, der);
+            super(i, der, belief, desire);
             this.puncOverride = puncOverride;
-            this.belief = belief;
-            this.desire = desire;
         }
 
         @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return measure(m, puncOverride, belief, desire);
+            return measure(m, puncOverride);
         }
     }
 

@@ -28,6 +28,8 @@
         #nalInput {
             position: fixed; bottom: 0; left: 0; width: 100%;
             height: 30px; opacity: 0.8;
+            margin: 0;
+            border: 0;
         }
         #nalInput .NALEditor {
             font-size: 30px;
@@ -70,22 +72,7 @@
     <div id="narOutput">
     </div>
 
-    <div id="nalInput">
-        <!--<div class="ui buttons">-->
-            <!--<button class="ui labeled icon button active">-->
-                <!--<i class="left chevron icon"></i>-->
-                <!--Back-->
-            <!--</button>-->
-            <!--<button class="ui button">-->
-                <!--<i class="stop icon"></i>-->
-                <!--Stop-->
-            <!--</button>-->
-            <!--<button class="ui right labeled icon button">-->
-                <!--Forward-->
-                <!--<i class="right chevron icon"></i>-->
-            <!--</button>-->
-        <!--</div>-->
-    </div>
+
 
 
 
@@ -166,9 +153,7 @@
 
         terminal = NARTerminal();
 
-        TaskDB(terminal);
-
-
+        //TaskDB(DB(), terminal);
 
         var taskbar = TaskBar($( ".taskbar" ), {
             'log': {
@@ -210,7 +195,7 @@
         });
 
         /** input line */
-        $("#nalInput").append(NALEditor('', terminal));
+        $("body").append(NARInputter(terminal).attr('id', 'nalInput'));
 
         $("#active").append(SocketNARGraph("active"));
 

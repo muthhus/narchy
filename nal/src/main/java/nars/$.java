@@ -29,11 +29,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Terms.terms;
+import static nars.term.Terms.toSet;
 
 /**
  * core utility class for:
@@ -293,7 +295,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(),e.getValue()))
-                        .collect( toList())
+                        .collect( Collectors.toSet() )
         );
     }
     @NotNull
@@ -301,7 +303,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
-                        .collect( toList())
+                        .collect( Collectors.toSet())
         );
     }
 

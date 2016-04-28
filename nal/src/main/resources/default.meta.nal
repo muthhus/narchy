@@ -325,8 +325,10 @@
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
-//not sure why this also appears necessary
     ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction)
+        //TODO modify ellipsis to allow these two rules to be expressed as one:
+        // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
+        //  which will match A..+ to a Conjunction
 
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
@@ -494,9 +496,17 @@
 
     ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
 
-//Recursion Force
-    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z), Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ((X,Z) --> Y), Z |- ((X,Z)-->(X, (/,Y,X,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//Recursion Force - TODO use varargs
+
+  //2
+    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+  //3
+    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+
+
 
 ////composition on both sides of a statement:
 

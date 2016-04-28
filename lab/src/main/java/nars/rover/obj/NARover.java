@@ -80,8 +80,8 @@ public class NARover extends AbstractPolygonBot {
         gun = new Turret();
 
 
-        int minUpdateTime = 2;
-        int maxUpdateTime = 16;
+        int minUpdateTime = 4;
+        int maxUpdateTime = 8;
 
 
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
@@ -151,15 +151,15 @@ public class NARover extends AbstractPolygonBot {
                 .timing(minUpdateTime, maxUpdateTime);
 
         hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f - health.nutrition, linearPositive)
-                .timing(minUpdateTime, 0);
+                .timing(minUpdateTime, maxUpdateTime);
 
         sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage, linearPositive)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        float motorThresh = 0.5f;
+        float motorThresh = 0.51f;
 
         int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
-        int maxMotorFeedbackCycles = 1; //nar.duration() * 3;
+        int maxMotorFeedbackCycles = 4; //nar.duration() * 3;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
             //if (a < 0) return Float.NaN;

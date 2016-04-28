@@ -472,10 +472,20 @@ public class EllipsisTest {
                 $("((|,%X,%A..+) --> (|,%X,%B..+))"),
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1);
-
-
-
     }
+
+    @Test public void testIntersection1() {
+        testCombinations(
+                $("(%M --> (|,%S,%A..+))"),
+                $("(m-->(|,s,a))"),
+                2);
+        testCombinations(
+                $("(%M --> (&,%S,%A..+))"),
+                $("(m-->(&,s,a))"),
+                2);
+    }
+
+
 
     @Test public void testEllipsisInMinArity() {
         Atom a = $.the("a");

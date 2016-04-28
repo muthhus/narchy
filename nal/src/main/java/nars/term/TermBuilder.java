@@ -518,8 +518,7 @@ public abstract class TermBuilder {
     @Nullable
     public Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
         switch (t.length) {
-            case 0:
-                return t[0];
+
             case 1:
 
                 Term single = t[0];
