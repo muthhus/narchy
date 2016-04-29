@@ -88,7 +88,7 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 
     @Nullable
     public static String escape(Object o) {
-        return StringEscapeUtils.escapeJson(o.toString());
+        return o == null ? null : StringEscapeUtils.escapeJson(o.toString());
     }
 
     @NotNull

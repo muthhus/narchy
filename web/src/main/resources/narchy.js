@@ -160,8 +160,13 @@ function NARTerminal() {
         e.emit('connect', this);
     };
     ws.onmessage = function(m) {
-        var x = JSON.parse(m.data);
-        e.emit('message', [x]);
+        try {
+            var x = JSON.parse(m.data);
+            e.emit('message', [x]);
+        } catch (c) {
+            console.error(c, m.data);
+        }
+
     };
     ws.onclose = function() {
         e.emit('disconnect', this);

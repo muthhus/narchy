@@ -20,6 +20,10 @@
         }
 
 
+        #mainButtons div {
+            margin: 0 !important;
+        }
+
         .NARConsole {
             width: 100% !important;
             height: 100% !important;
@@ -38,6 +42,10 @@
         .ui-dialog {
             opacity: 0.8 !important;
         }
+        .simone-taskbar-horizontal.simone-taskbar-stick-top .simone-taskbar-window-buttons-container {
+            padding-left: 80px; /* shift over so that the main buttons dont cover the left taskbar buttons */
+
+        }
 
     </style>
 
@@ -50,11 +58,54 @@
 
     <div id="active" style="position: fixed; width: 100%; height: 100%"></div>
 
-    <div class="taskbar"></div>
 
-    <div class="demo">
-        <div class="description">...</div>
+
+    <div class="taskbar">
+
     </div>
+
+    <div id="mainButtons">
+        <div class="ui dropdown icon orange button" style="z-index: 20000; cursor: crosshair">
+            <i class="warning sign icon"></i>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item" id="log">+ Log</div>
+                <div class="item" id="timeline">+ Timeline</div>
+                <div class="item">+ Status</div>
+                <hr/>
+                <div class="item">Load...</div>
+                <div class="item">Save...</div>
+                <hr/>
+                <div class="item">Reset</div>
+                <div class="item">Shutdown</div>
+            </div>
+        </div>
+        <div class="ui dropdown icon purple button" id="rootButton" style="z-index: 20000; cursor: crosshair">
+            <i class="bomb icon"></i>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item">
+                    Mode:
+                    <select id="rootSelect">
+                        <option>Graph</option>
+                        <option>Tasks</option>
+                        <option>Terminal</option>
+                        <option>Status</option>
+                        <option>News</option>
+                        <option>Map</option>
+                        <option>Social</option>
+                        <option>Web Browser</option>
+                    </select>
+                    <div id="rootOptions" class="ui segment">
+                        options..
+                        <!-- updated by change in rootSelect selector -->
+                    </div>
+                    <button onclick="$('#rootButton').dropdown({action:'hide'})">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!--<div class="ui grid">-->
 
@@ -95,7 +146,7 @@
 
         var o = {
             windowsContainment: "viewport",
-            horizontalStick: "top left",
+            horizontalStick: "top right",
             draggable: true,
             buttons: { },
             buttonsOrder: [ ]
@@ -112,14 +163,6 @@
 
         };
 
-        _.each(menu, function(m,k) {
-            o.buttons[k] = {
-                label: m.label
-            };
-            o.buttonsOrder.push(k);
-        });
-
-
         tasks.taskbar(o);
 
         /** creates a new taskbar-managed window */
@@ -133,12 +176,16 @@
         };
 
 
-        tasks.button = function(id, onClick) {
-            return this.taskbar( "option", "buttons." + id ).$element.on( "click", onClick);
-        }
+        //setup main menus
+
+        $('.ui.dropdown').dropdown();
 
         _.each(menu, function(m, k) {
-            tasks.button(k, function() {
+            var menuitem = $('#' + k);
+            if (menuitem.length === 0)
+                console.error('menu item not found', k);
+
+            menuitem.click(function() {
                 m.onClick(tasks);
             });
         });
@@ -157,7 +204,6 @@
 
         var taskbar = TaskBar($( ".taskbar" ), {
             'log': {
-                label: 'Log',
                 onClick: function(taskbar) {
                     var c = NARConsole(terminal);
 
@@ -175,7 +221,6 @@
                 }
             },
             'timeline': {
-                label: 'Timeline',
                 onClick: function(taskbar) {
                     var g = SocketNARGraph("active");
 
@@ -201,6 +246,15 @@
 
         //$("#emotion").append(SocketMetaWidget("emotion"));
 
+
+        $('.ui.dropdown').dropdown({
+
+        });
+        $('#rootButton').dropdown({
+           onHide: function(e) {
+               return false;
+           }
+        });
 
     });
 
