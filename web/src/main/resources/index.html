@@ -22,11 +22,26 @@
 
 
         #mainButtons {
-
+            z-index: 20000 !important;
+            position: fixed;
+            top:0;
+            left:0;
+        }
+        .mainPopup {
+            position: relative;
+            top: 15px;
+            left: 15px;
         }
         #mainButtons div {
             margin: 0 !important;
-            z-index: 20000;
+            z-index: 20000 !important;
+        }
+        #mainButtons .button {
+            opacity: 0.75;
+            vertical-align: top !important;
+        }
+        #mainButtons .button.active {
+            opacity: 1.0;
         }
 
         .NARConsole {
@@ -69,21 +84,21 @@
     </div>
 
     <div id="mainButtons" style="cursor: crosshair;">
-        <div class="ui dropdown icon orange button">
-            <i class="warning sign icon"></i>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-                <div class="item" id="log">+ Log</div>
-                <div class="item" id="timeline">+ Timeline</div>
-                <div class="item">+ Status</div>
-                <hr/>
-                <div class="item">Load...</div>
-                <div class="item">Save...</div>
-                <hr/>
-                <div class="item">Reset</div>
-                <div class="item">Shutdown</div>
-            </div>
-        </div>
+        <!--<div class="ui dropdown icon orange button active">-->
+            <!--<i class="warning sign icon"></i>-->
+            <!--<i class="dropdown icon"></i>-->
+            <!--<div class="menu">-->
+                <!--<div class="item" id="log">+ Log</div>-->
+                <!--<div class="item" id="timeline">+ Timeline</div>-->
+                <!--<div class="item">+ Status</div>-->
+                <!--<hr/>-->
+                <!--<div class="item">Load...</div>-->
+                <!--<div class="item">Save...</div>-->
+                <!--<hr/>-->
+                <!--<div class="item">Reset</div>-->
+                <!--<div class="item">Shutdown</div>-->
+            <!--</div>-->
+        <!--</div>-->
     </div>
 
 
@@ -141,32 +156,45 @@
          </div>
     */
 
-        var dropDownIcon, dropDownMenu;
+        var dropDownIcon;
 
-        var x = $('<div class="ui dropdown icon ' + v.color + ' button"/>').append(
+        var x = $('<div class="ui icon ' + v.color + ' button"/>').append(
              '<i class="' + v.icon + ' icon"></i>',
-             dropDownIcon = $('<i class="dropdown icon"></i>'),
-             dropDownMenu = $('<div class="menu"/>').append(
-                 $('<div class="item"/>')
-             )
+             dropDownIcon = $('<i class="dropdown icon"></i>')
+
         );
+
+        var ddMenu = $('<div class="mainPopup item"/>');
+        ddMenu.appendTo(x);
+        ddMenu.hide();
+
+        ddMenu.append(v.menu());
+
 
         v.update = function() {
             if (viewing === v) {
+                x.addClass('active');
+
                 dropDownIcon.show();
-                v.start();
-            } else if (viewing!==undefined) {
+
+
+                setTimeout(v.start, 0);
+
+            } else {
+                x.removeClass('active');
                 dropDownIcon.hide();
-                v.stop();
+                ddMenu.hide();
+
+                if (viewing!==undefined) {
+                    setTimeout(v.stop, 0);
+                }
             }
         };
 
-        x.dropdown({
 
-        });
 
-        x.click(function() {
-            if (viewing !== v) {
+        function enable() {
+            if (viewing!==v) {
                 var prev = viewing;
 
                 //enable drop-down
@@ -180,9 +208,26 @@
 
                 v.update();
 
-            } else {
-                //drop-down
+                return true;
             }
+            return false;
+        }
+
+        function toggle() {
+            console.log('normal dropdown');
+            ddMenu.toggle(':visible');
+        }
+
+        x.click(function(e) {
+            if (viewing !== v) {
+                enable();
+            } else {
+                toggle();
+            }
+        });
+        x.dblclick(function() {
+            if (enable())
+                toggle();
         });
 
         v.update();
@@ -265,6 +310,9 @@
             start: function() {
                 $('#view').append(this.graph = SocketNARGraph("active"));
             },
+            menu: function() {
+                return 'abc';
+            },
             stop: function() {
                 this.graph.stop();
             }
@@ -275,6 +323,9 @@
             color: 'green',
             start: function() {
                 $('#view').append(SocketMetaWidget("emotion"));
+            },
+            menu: function() {
+                return 'abc';
             },
             stop: function() {
 
@@ -338,14 +389,8 @@
 
 
 
-        $('.ui.dropdown').dropdown({
+        $('.ui.dropdown').dropdown();
 
-        });
-//        $('#rootButton').dropdown({
-//           onHide: function(e) {
-//               return false;
-//           }
-//        });
 
     });
 
