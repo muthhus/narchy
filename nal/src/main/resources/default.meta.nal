@@ -145,21 +145,34 @@
 
 //Set comprehension:
 
-    (C --> {A..+}), (C --> {B..+}), neq(A..+,B..+) |- (C --> {A..+,B..+}), (Belief:Union),
-                                                      (C --> intersect({A..+},{B..+})), (Belief:Intersection),
-                                                      (C --> differ({A..+},{B..+})), (Belief:Difference)
 
-    (C --> [A..+]), (C --> [B..+]), neq(A..+,B..+) |- (C --> [A..+,B..+]), (Belief:Intersection),
-                                                      (C --> intersect([A..+],[B..+])), (Belief:Union),
-                                                      (C --> differ([A..+],[B..+])), (Belief:Difference)
 
-    ({A..+} --> C), ({B..+} --> C), neq(A..+,B..+) |- ({A..+,B..+} --> C), (Belief:Intersection),
-                                                      (intersect({A..+},{B..+}) --> C), (Belief:Union),
-                                                      (differ({A..+},{B..+}) --> C), (Belief:Difference)
 
-    ([A..+] --> C), ([B..+] --> C), neq(A..+,B..+) |- ([A..+,B..+] --> C), (Belief:Union),
-                                                      (intersect([A..+],[B..+]) --> C), (Belief:Intersection),
-                                                      (differ([A..+],[B..+]) --> C), (Belief:Difference)
+
+
+//(C --> A), (C --> B), set_ext(A), union(A,B,R) |- (C --> R), (Truth:Union)
+//(C --> A), (C --> B), set_ext(A), intersection(A,B,R) |- (C --> R), (Truth:Intersection)
+    (C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union)
+    (C --> {A..+}), (C --> {B..+}) |- (C --> intersect({A..+},{B..+})), (Belief:Intersection)
+    (C --> {A..+}), (C --> {B..+}) |- (C --> differ({A..+},{B..+})), (Belief:Difference)
+
+//(C --> A), (C --> B), set_int(A), union(A,B,R) |- (C --> R), (Truth:Intersection)
+//(C --> A), (C --> B), set_int(A), intersection(A,B,R) |- (C --> R), (Truth:Union)
+    (C --> [A..+]), (C --> [B..+]) |- (C --> [A..+,B..+]), (Belief:Intersection)
+    (C --> [A..+]), (C --> [B..+]) |- (C --> intersect([A..+],[B..+])), (Belief:Union)
+    (C --> [A..+]), (C --> [B..+]) |- (C --> differ([A..+],[B..+])), (Belief:Difference)
+
+//(A --> C), (B --> C), set_ext(A), union(A,B,R) |- (R --> C), (Truth:Intersection)
+//(A --> C), (B --> C), set_ext(A), intersection(A,B,R) |- (R --> C), (Truth:Union)
+    ({A..+} --> C), ({B..+} --> C) |- (intersect({A..+},{B..+}) --> C), (Belief:Union)
+    ({A..+} --> C), ({B..+} --> C) |- ({A..+,B..+} --> C), (Belief:Intersection)
+    ({A..+} --> C), ({B..+} --> C) |- (differ({A..+},{B..+}) --> C), (Belief:Difference)
+
+//(A --> C), (B --> C), set_int(A), union(A,B,R) |- (R --> C), (Truth:Union)
+//(A --> C), (B --> C), set_int(A), intersection(A,B,R) |- (R --> C), (Truth:Intersection)
+    ([A..+] --> C), ([B..+] --> C) |- ([A..+,B..+] --> C), (Belief:Union)
+    ([A..+] --> C), ([B..+] --> C) |- (intersect([A..+],[B..+]) --> C), (Belief:Intersection)
+    ([A..+] --> C), ([B..+] --> C) |- (differ([A..+],[B..+]) --> C), (Belief:Difference)
 
 //Set element takeout:
 

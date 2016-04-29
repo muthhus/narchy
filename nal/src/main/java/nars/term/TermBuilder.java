@@ -559,7 +559,7 @@ public abstract class TermBuilder {
 
         if ((o1 == setUnion) && (o2 == setUnion)) {
             //the set type that is united
-            return TermSet.union(this, setUnion, (Compound) term1, (Compound) term2);
+            return TermContainer.union(this, setUnion, (Compound) term1, (Compound) term2);
         }
 
 

@@ -131,34 +131,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 }
             }
 
-            if (ensureValidVolume(d) && postMatch.booleanValueOf(m))
-                derive(m, d);
+            derive(m, d);
         }
 
     }
 
-    private static boolean ensureValidVolume(@NotNull Term derived) {
-
-        //HARD VOLUME LIMIT
-        boolean valid = derived.volume() <= Global.compoundVolumeMax;
-        if (!valid && Global.DEBUG) {
-            //$.logger.error("Term volume overflow");
-                /*c.forEach(x -> {
-                    Terms.printRecursive(x, (String line) ->$.logger.error(line) );
-                });*/
-
-            $.logger.warn("Derivation explosion: {}", derived/*, rule*/);
-
-            //System.err.println(m.premise.task().explanation());
-            //System.err.println( (m.premise.belief()!=null) ? m.premise.belief().explanation() : "belief: null");
-            //System.exit(1);
-            //throw new RuntimeException(message);
-            return false;
-        }
-
-        return valid;
-
-    }
 
 
     /**
@@ -166,6 +143,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      */
     private void derive(@NotNull PremiseEval p, @NotNull Term t) {
 
+        if (!postMatch.booleanValueOf(p))
+            return;
 
         ConceptProcess premise = p.premise;
         NAR nar = premise.nar();

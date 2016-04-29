@@ -47,7 +47,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, @NotNull Memory m, float minConf) {
@@ -55,7 +55,8 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise @AllowOverlap
+    @SinglePremise
+    @AllowOverlap
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
@@ -108,7 +109,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Resemblance() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -133,7 +134,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Difference() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -141,7 +142,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Analogy() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -239,7 +240,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     BeliefStructuralDeduction() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -248,7 +249,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     BeliefStructuralDifference() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -257,6 +258,7 @@ public enum BeliefFunction implements TruthOperator {
             return (res != null) ? new DefaultTruth(1.0f - res.freq(), res.conf()) : null;
         }
     },
+
     BeliefNegation() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {

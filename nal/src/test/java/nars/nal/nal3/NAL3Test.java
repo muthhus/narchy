@@ -12,6 +12,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
@@ -239,7 +241,7 @@ public class NAL3Test extends AbstractNALTest {
         test()
             .believe("a:b")
             .believe("b:c")
-            .mustNotOutput(1000, "(((a~c)~c)-->b)", '.', Tense.ETERNAL);
+            .mustNotOutput(1000, "(((a~c)~c)-->b)", '.', ETERNAL);
 
     }
 
@@ -249,7 +251,7 @@ public class NAL3Test extends AbstractNALTest {
                 .log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))", 0f, 0.9f)
-                .mustBelieve(10, "(a-->c)", 0f, 0.81f, Tense.ETERNAL);
+                .mustBelieve(10, "(a-->c)", 0f, 0.81f, ETERNAL);
 
     }
     @Test public void testArity1_Decomposition_IntersectExt2() {
@@ -258,7 +260,7 @@ public class NAL3Test extends AbstractNALTest {
                 .log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))")
-                .mustBelieve(10, "(a-->c)", 1f, 0.81f, Tense.ETERNAL);
+                .mustBelieve(10, "(a-->c)", 1f, 0.81f, ETERNAL);
 
     }
     @Test public void testArity1_Decomposition_IntersectInt() {
@@ -267,9 +269,32 @@ public class NAL3Test extends AbstractNALTest {
         test()
                 .believe("(a-->b)")
                 .believe("(a-->(|,b,c))", 0f, 0.9f)
-                .mustBelieve(10, "(a-->c)", 1f, 0.81f, Tense.ETERNAL);
+                .mustBelieve(10, "(a-->c)", 1f, 0.81f, ETERNAL);
 
     }
 
+    @Test public void testIntersectDiffUnionOfCommonSubterms() {
+        TestNAR x = test();
+
+//        x.nar.eventTaskProcess.on(t -> {
+//            if (t.freq() == 0) {
+//                System.err.println(t.explanation());
+//            }
+//        });
+
+        x
+            //.log()
+            .believe("<{x,y}-->c>")
+            .believe("<{x,z}-->c>")
+            .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
+            .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
+            .mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
+            .mustBelieve(cycles, "<{z}-->c>", 0f, 0.81f) //difference
+            .mustNotOutput(500,"<{x}-->c>", '.', 0, 0, 0, 1, ETERNAL)
+            .mustNotOutput(500,"<{x,y}-->c>", '.', 0, 0, 0, 1, ETERNAL)
+            .mustNotOutput(500,"<{x,z}-->c>", '.', 0, 0, 0, 1, ETERNAL)
+        ;
+
+    }
 }
 

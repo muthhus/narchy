@@ -373,7 +373,7 @@ public class ArrayBeliefTable implements BeliefTable {
     /** if a duplicate exists, it will merge the incoming task and return true.
      * otherwise false */
     private boolean filterDuplicate(@NotNull Task input, @NotNull NAR nar) {
-        Task existing = contains(input);
+        Task existing = map.get(input);
         if (existing!=null) {
             if (existing!=input) {
                 //Average allows duplicate tasks to not explode like plus would
@@ -408,21 +408,21 @@ public class ArrayBeliefTable implements BeliefTable {
 //        return t == displaced ? null: t;
 //    }
 
-    @Nullable
-    public Task contains(Task incoming) {
-
-        Task existing = map.get(incoming);
-        if (existing!=null)  {
-//            if (existing!=incoming) {
-//                //existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
-//                //((MutableTask) existing).state(incoming.state()); //clear any state
-//                onBeliefRemoved(incoming, "Duplicate", memory);
-//            }
-            return existing;
-        }
-
-        return null;
-    }
+//    @Nullable
+//    public Task contains(Task incoming) {
+//
+//        Task existing = map.get(incoming);
+//        if (existing!=null)  {
+////            if (existing!=incoming) {
+////                //existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
+////                //((MutableTask) existing).state(incoming.state()); //clear any state
+////                onBeliefRemoved(incoming, "Duplicate", memory);
+////            }
+//            return existing;
+//        }
+//
+//        return null;
+//    }
 
 
 

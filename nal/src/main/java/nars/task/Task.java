@@ -853,9 +853,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     /** pre-verify tests to early disqualify terms that are not acceptable as Task content */
     static boolean preNormalize(@NotNull Term t, @NotNull Memory memory) {
-        if (t.levelValid( memory.nal() )) {
+        if (Global.ensureValidVolume(t) && t.levelValid( memory.nal() ) ) {
+
             if (t.op().isStatement()) {
                 Compound ct = (Compound)t;
+                //TODO detect this sooner
                 if (ct.isTerm(0, Op.VAR_INDEP) || ct.isTerm(1, Op.VAR_INDEP))
                     return false;
             }

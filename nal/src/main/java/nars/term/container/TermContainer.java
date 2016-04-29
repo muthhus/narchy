@@ -30,6 +30,38 @@ import static com.gs.collections.impl.factory.Sets.mutable;
  */
 public interface TermContainer<T extends Term> extends Termlike, Comparable, Iterable<T> {
 
+    @NotNull
+    static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
+        if (a.equals(b))
+            return a;
+
+        int as = a.size();
+        int bs = b.size();
+        int maxSize = Math.max(as, bs);
+        TreeSet<Term> t = new TreeSet<>();
+        a.addAllTo(t);
+        b.addAllTo(t);
+        if (t.size() == maxSize) {
+            //the smaller is contained by the larger other
+            return as > bs ? a : b;
+        }
+        return TermSet.the(t);
+    }
+
+    static Compound union(TermBuilder b, Compound term1, Compound term2) {
+        return union(b, term1.op(), term1, term2);
+    }
+
+    static Compound union(TermBuilder b, Op o, Compound term1, Compound term2) {
+        TermContainer u = TermContainer.union(term1, term2);
+        if (u == term1)
+            return term1;
+        else if (u == term2)
+            return term2;
+        else
+            return (Compound) b.newCompound(o, u);
+    }
+
     int varDep();
 
     int varIndep();

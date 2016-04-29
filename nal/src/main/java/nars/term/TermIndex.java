@@ -223,7 +223,7 @@ public interface TermIndex {
         Op sop = src.op();
 
         if (sop.isStatement() && sub.size()!=2)
-            return src;
+            return null;
 
         TermContainer transformedSubterms = TermContainer.the(sop, sub);
 
@@ -236,7 +236,7 @@ public interface TermIndex {
 
             //Filtering of transformed result:
             if (result == null)
-                return src;
+                return null;
 
             //apply any known immediate transform operators
             //TODO decide if this is evaluated incorrectly somehow in reverse
@@ -244,7 +244,7 @@ public interface TermIndex {
             if (sop.isImage()) {
                 int resultSize = sub.size();
                 if (sub.isEmpty() || (resultSize == 1 && sub.get(0).equals(Imdex)))
-                    return src;
+                    return null;
             }
 
             //        if ((minArity!=-1) && (resultSize < minArity)) {
