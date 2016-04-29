@@ -486,8 +486,9 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public static Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        return TermContainer.difference(setType, A, B);
+    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
+        //return TermContainer.difference(setType, A, B);
+        return TermContainer.difference(this, setType, A, B);
     }
 
     @Nullable
@@ -558,16 +559,13 @@ public abstract class TermBuilder {
 
         if ((o1 == setUnion) && (o2 == setUnion)) {
             //the set type that is united
-            return newCompound(setUnion, TermSet.union((Compound) term1, (Compound) term2));
+            return TermSet.union(this, setUnion, (Compound) term1, (Compound) term2);
         }
 
 
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
-            MutableSet<Term> i = TermContainer.intersect((Compound) term1, (Compound) term2);
-            if (i.isEmpty())
-                return null; //empty set
-            return newCompound(setIntersection, i);
+            return TermContainer.intersect(this, setIntersection, (Compound) term1, (Compound) term2);
         }
 
         if (o2 == intersection && o1 != intersection) {

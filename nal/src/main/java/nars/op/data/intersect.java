@@ -2,6 +2,7 @@ package nars.op.data;
 
 import com.gs.collections.api.set.MutableSet;
 import nars.nal.op.BinaryTermOperator;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.container.TermContainer;
@@ -12,10 +13,7 @@ public class intersect extends BinaryTermOperator {
 
     @Nullable
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
-        MutableSet<Term> s = TermContainer.intersect(
-                (TermContainer) a, (TermContainer) b
-        );
-        return s.isEmpty() ? null : i.the(a.op(), s).term();
+        return TermContainer.intersect(i.builder(), (Compound)a, (Compound) b);
     }
 
 }

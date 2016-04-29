@@ -9,16 +9,14 @@ import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termlike;
-import nars.term.Terms;
+import nars.term.*;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -68,6 +66,23 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         return Sets.intersect(a.toSet(),b.toSet());
+    }
+
+    static @NotNull Compound intersect(TermBuilder builder, @NotNull Compound a, @NotNull Compound b) {
+        return intersect(builder, a.op(), a, b);
+    }
+
+    static @NotNull Compound intersect(TermBuilder builder, Op o, @NotNull Compound a, @NotNull Compound b) {
+        if (a.equals(b))
+            return a;
+
+        if ((a.structure() & b.structure())==0)
+            return null; //nothing in common
+
+        MutableSet<Term> s = TermContainer.intersect(
+                (TermContainer) a, (TermContainer) b
+        );
+        return s.isEmpty() ? null : (Compound) builder.newCompound(o, s);
     }
 
 
@@ -153,10 +168,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     /** can be called from equals() */
     static boolean equals(@NotNull TermContainer a, @NotNull TermContainer b) {
-
         return
                 (a == b) ||
-
                 ((a.equalMeta(b)) &&
                  (a.equalTerms(b)));
     }
@@ -183,38 +196,47 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return true;
     }
 
-//    static TermSet differ(TermSet a, TermSet b) {
-//        if (a.size() == 1 && b.size() == 1) {
-//            //special case
-//            return a.term(0).equals(b.term(0)) ?
-//                    TermIndex.EmptySet :
-//                    a;
-//        } else {
-//            MutableSet dd = Sets.difference(a.toSet(), b.toSet());
-//            if (dd.isEmpty()) return TermIndex.EmptySet;
-//            return TermSet.the(dd);
-//        }
-//    }
 
-
-    /** returns null if empty set; not sorted */
+    /** returns null if empty set */
     @Nullable
-    @Deprecated static Term difference(@NotNull Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
+    static Compound difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
+        return difference(Terms.terms, op, a, b);
+    }
 
-        if (a.equals(b))
-            return Terms.empty(op);
+    @Nullable
+    static Compound difference(@NotNull TermBuilder t, @NotNull Compound a, @NotNull TermContainer b) {
+        return difference(t, a.op(), a, b);
+    }
+
+    @Nullable
+    static Compound difference(@NotNull TermBuilder t, Op o, @NotNull Compound a, @NotNull TermContainer b) {
+
+        //intersect the mask
+        if ((a.structure()&b.structure())==0)
+            return null;
 
         Term[] aa = a.terms();
 
         List<Term> terms = Global.newArrayList(aa.length);
 
-        for(Term x: aa) { //set difference
-            if (!b.containsTerm(x))
+        int retained = 0, size = a.size();
+        for (int i = 0; i < size; i++) {
+            Term x = a.term(i);
+            if (!b.containsTerm(x)) {
                 terms.add(x);
+                retained++;
+            }
         }
 
-        if (terms.isEmpty()) return Terms.empty(op);
-        return $.the(op, terms).term();
+        if (retained == size) { //same as 'a'
+            return a;
+        }
+
+        if (terms.isEmpty()) {
+            return null;
+        }
+
+        return (Compound) t.newCompound(o, terms);
 
 //        if (a.size() == 1 && b.size() == 1) {
 //            //special case
@@ -227,7 +249,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 //            return Terms.toArray(dd);
 //        }
     }
-
 
 
     void addAllTo(Collection<Term> target);
