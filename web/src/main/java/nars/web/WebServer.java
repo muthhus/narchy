@@ -8,6 +8,7 @@ import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import javassist.scopedpool.SoftValueHashMap;
+import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.NARLoop;
@@ -199,6 +200,8 @@ public class WebServer /*extends PathHandler*/ {
     }*/
     @NotNull
     public static Default newRealtimeNAR() {
+
+        Global.DEBUG = true;
 
                 //new MapCacheBag(
                 //new WeakValueHashMap<>()

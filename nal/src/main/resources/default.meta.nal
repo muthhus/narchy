@@ -145,21 +145,21 @@
 
 //Set comprehension:
 
-    (C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union),
-                                      (C --> intersect({A..+},{B..+})), (Belief:Intersection),
-                                      (C --> differ({A..+},{B..+})), (Belief:Difference)
+    (C --> {A..+}), (C --> {B..+}), neq(A..+,B..+) |- (C --> {A..+,B..+}), (Belief:Union),
+                                                      (C --> intersect({A..+},{B..+})), (Belief:Intersection),
+                                                      (C --> differ({A..+},{B..+})), (Belief:Difference)
 
-    (C --> [A..+]), (C --> [B..+]) |- (C --> [A..+,B..+]), (Belief:Intersection),
-                                      (C --> intersect([A..+],[B..+])), (Belief:Union),
-                                      (C --> differ([A..+],[B..+])), (Belief:Difference)
+    (C --> [A..+]), (C --> [B..+]), neq(A..+,B..+) |- (C --> [A..+,B..+]), (Belief:Intersection),
+                                                      (C --> intersect([A..+],[B..+])), (Belief:Union),
+                                                      (C --> differ([A..+],[B..+])), (Belief:Difference)
 
-    ({A..+} --> C), ({B..+} --> C) |- ({A..+,B..+} --> C), (Belief:Intersection),
-                                      (intersect({A..+},{B..+}) --> C), (Belief:Union),
-                                      (differ({A..+},{B..+}) --> C), (Belief:Difference)
+    ({A..+} --> C), ({B..+} --> C), neq(A..+,B..+) |- ({A..+,B..+} --> C), (Belief:Intersection),
+                                                      (intersect({A..+},{B..+}) --> C), (Belief:Union),
+                                                      (differ({A..+},{B..+}) --> C), (Belief:Difference)
 
-    ([A..+] --> C), ([B..+] --> C) |- ([A..+,B..+] --> C), (Belief:Union),
-                                      (intersect([A..+],[B..+]) --> C), (Belief:Intersection),
-                                      (differ([A..+],[B..+]) --> C), (Belief:Difference)
+    ([A..+] --> C), ([B..+] --> C), neq(A..+,B..+) |- ([A..+,B..+] --> C), (Belief:Union),
+                                                      (intersect([A..+],[B..+]) --> C), (Belief:Intersection),
+                                                      (differ([A..+],[B..+]) --> C), (Belief:Difference)
 
 //Set element takeout:
 

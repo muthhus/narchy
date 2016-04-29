@@ -87,16 +87,16 @@ public final class Emotion implements Serializable {
     //TODO use Meter subclass that will accept and transform these float parameters
 
     @Deprecated public void happy(float delta) {
-        happy.accept( f2l(delta) );
+        happy.accept( delta );
     }
     @Deprecated public void busy(float pri) {
-        busy.accept( f2l(pri) );
+        busy.accept( pri );
     }
     @Deprecated public void stress(float pri) {
-        stress.accept( f2l(pri) );
+        stress.accept( pri );
     }
     @Deprecated public void frustration(float pri) {
-        frustration.accept( f2l(pri) );
+        frustration.accept( pri );
     }
 
     /** new frame started */
@@ -113,14 +113,14 @@ public final class Emotion implements Serializable {
     }*/
 
 
-    /** float to long at the default conversion precision */
-    private static long f2l(float f) {
-        return (long)(f * 1000f); //0.001 precision
-    }
-    /** float to long at the default conversion precision */
-    private static float l2f(long l) {
-        return l / 1000f; //0.001 precision
-    }
+//    /** float to long at the default conversion precision */
+//    private static long f2l(float f) {
+//        return (long)(f * 1000f); //0.001 precision
+//    }
+//    /** float to long at the default conversion precision */
+//    private static float l2f(long l) {
+//        return l / 1000f; //0.001 precision
+//    }
 
 
 

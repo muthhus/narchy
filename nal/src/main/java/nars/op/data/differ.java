@@ -14,6 +14,9 @@ public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*
     @Override
     public Term apply(@NotNull Term a, Term b, TermIndex i) {
         //TODO construct TermSet directly
+        if (a.equals(b)) {
+            throw new RuntimeException("equal arguments; could have been avoided earlier by a constraint");
+        }
         return TermContainer.difference(
                 a.op(),
             (Compound) a, (Compound) b

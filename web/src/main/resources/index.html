@@ -13,33 +13,37 @@
     <style>
 
         #active {
-            position: fixed; width: 100%;
+            position: fixed;
+            width: 100%;
         }
 
         #view {
             height: 100%;
         }
 
-
         #mainButtons {
             z-index: 20000 !important;
             position: fixed;
-            top:0;
-            left:0;
+            top: 0;
+            left: 0;
         }
+
         .mainPopup {
             position: relative;
             top: 15px;
             left: 15px;
         }
+
         #mainButtons div {
             margin: 0 !important;
             z-index: 20000 !important;
         }
+
         #mainButtons .button {
             opacity: 0.75;
             vertical-align: top !important;
         }
+
         #mainButtons .button.active {
             opacity: 1.0;
         }
@@ -50,11 +54,16 @@
         }
 
         #nalInput {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: 30px; opacity: 0.8;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            opacity: 0.8;
             margin: 0;
             border: 0;
         }
+
         #nalInput .NALEditor {
             font-size: 30px;
         }
@@ -62,6 +71,7 @@
         .ui-dialog {
             opacity: 0.8 !important;
         }
+
         .simone-taskbar-horizontal.simone-taskbar-stick-top .simone-taskbar-window-buttons-container {
             padding-left: 80px; /* shift over so that the main buttons dont cover the left taskbar buttons */
 
@@ -74,56 +84,47 @@
 <body>
 
 
-
-    <div id="view" style="position: fixed; width: 100%; height: 100%"></div>
-
+<div id="view" style="position: fixed; width: 100%; height: 100%"></div>
 
 
-    <div class="taskbar">
+<div class="taskbar">
 
-    </div>
-
-    <div id="mainButtons" style="cursor: crosshair;">
-        <!--<div class="ui dropdown icon orange button active">-->
-            <!--<i class="warning sign icon"></i>-->
-            <!--<i class="dropdown icon"></i>-->
-            <!--<div class="menu">-->
-                <!--<div class="item" id="log">+ Log</div>-->
-                <!--<div class="item" id="timeline">+ Timeline</div>-->
-                <!--<div class="item">+ Status</div>-->
-                <!--<hr/>-->
-                <!--<div class="item">Load...</div>-->
-                <!--<div class="item">Save...</div>-->
-                <!--<hr/>-->
-                <!--<div class="item">Reset</div>-->
-                <!--<div class="item">Shutdown</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    </div>
+</div>
 
 
-    <!--<div class="ui grid">-->
+<div id="mainButtons">
 
-        <!--<div class="four wide column">-->
-            <!--<div class="ui segment" style="opacity: 0.2">-->
-                <!--<h1>Emotion</h1>-->
-                <!--<div id="emotion"></div>-->
-            <!--</div>-->
-        <!--</div>-->
+</div>
 
-    <!--</div>-->
+<!--<div class="ui grid">-->
 
-    <!--<div id="menu"></div>-->
+<!--<div class="four wide column">-->
+<!--<div class="ui segment" style="opacity: 0.2">-->
+<!--<h1>Emotion</h1>-->
+<!--<div id="emotion"></div>-->
+<!--</div>-->
+<!--</div>-->
 
-    <div id="narOutput">
-    </div>
+<!--</div>-->
 
+<!--<div id="menu"></div>-->
 
+<div id="narOutput">
+</div>
 
-
+<div id="menu" class="ui compact vertical menu" style="position: absolute">
+    <div class="item" id="log">+ Log</div>
+    <div class="item" id="timeline">+ Timeline</div>
+    <div class="item">+ Status</div>
+    <hr/>
+    <div class="item">Load...</div>
+    <div class="item">Save...</div>
+    <hr/>
+    <div class="item">Reset</div>
+    <div class="item">Shutdown</div>
+</div>
 
 </body>
-
 
 
 <script src="narchy.js"></script>
@@ -136,12 +137,12 @@
     function addView(v) {
         /*
          <div class="ui dropdown icon purple button" id="rootButton">
-             <i class="bomb icon"></i>
-             <i class="dropdown icon"></i>
-            <div class="menu">
-                <div class="item">
-                    <i class="options icon"></i>
-                    <select id="rootSelect">
+         <i class="bomb icon"></i>
+         <i class="dropdown icon"></i>
+         <div class="menu">
+         <div class="item">
+         <i class="options icon"></i>
+         <select id="rootSelect">
 
          </select>
 
@@ -154,47 +155,50 @@
          </div>
          </div>
          </div>
-    */
+         */
 
         var dropDownIcon;
 
-        var x = $('<div class="ui icon ' + v.color + ' button"/>').append(
-             '<i class="' + v.icon + ' icon"></i>',
-             dropDownIcon = $('<i class="dropdown icon"></i>')
-
-        );
+        //button
+        var b = $('<div class="ui icon ' + v.color + ' button"/>').append(
+                '<i class="' + v.icon + ' icon"></i>',
+                dropDownIcon = $('<i class="dropdown icon"></i>')
+        ).attr('title', v.id);
 
         var ddMenu = $('<div class="mainPopup item"/>');
-        ddMenu.appendTo(x);
-        ddMenu.hide();
-
-        ddMenu.append(v.menu());
+        ddMenu.hide().appendTo(b).append(v.menu());
 
 
-        v.update = function() {
+        if (!v.start) {
+            b.addClass('active');
+        }
+        
+        v.update = function () {
             if (viewing === v) {
-                x.addClass('active');
+                b.addClass('active');
 
                 dropDownIcon.show();
 
-
                 setTimeout(v.start, 0);
-
             } else {
-                x.removeClass('active');
-                dropDownIcon.hide();
-                ddMenu.hide();
 
-                if (viewing!==undefined) {
-                    setTimeout(v.stop, 0);
+                if (v.start || v.stop) {
+                    b.removeClass('active');
+                    dropDownIcon.hide();
+                    ddMenu.hide();
+                }
+
+                if (v.stop) {
+                    if (viewing !== undefined) {
+                        setTimeout(v.stop, 0);
+                    }
                 }
             }
         };
 
 
-
         function enable() {
-            if (viewing!==v) {
+            if (viewing !== v) {
                 var prev = viewing;
 
                 //enable drop-down
@@ -214,25 +218,28 @@
         }
 
         function toggle() {
-            console.log('normal dropdown');
             ddMenu.toggle(':visible');
         }
 
-        x.click(function(e) {
-            if (viewing !== v) {
-                enable();
+        b.click(function (e) {
+            if (v.start) {
+                if (viewing !== v) {
+                    enable();
+                } else {
+                    toggle();
+                }
             } else {
                 toggle();
             }
         });
-        x.dblclick(function() {
+        b.dblclick(function () {
             if (enable())
                 toggle();
         });
 
         v.update();
 
-        $('#mainButtons').append( x );
+        $('#mainButtons').append(b);
 
 
         return v;
@@ -248,8 +255,8 @@
             windowsContainment: "viewport",
             horizontalStick: "top right",
             draggable: true,
-            buttons: { },
-            buttonsOrder: [ ]
+            buttons: {},
+            buttonsOrder: []
 //            buttons: {
 //                log: {
 //                    label: "Log",
@@ -266,7 +273,7 @@
         tasks.taskbar(o);
 
         /** creates a new taskbar-managed window */
-        tasks.newWindow = function(title, contentBuilder, onClose, onResized) {
+        tasks.newWindow = function (title, contentBuilder, onClose, onResized) {
             return contentBuilder().window({
                 taskbar: this,
                 title: title,
@@ -279,12 +286,12 @@
         //setup main menus
 
 
-        _.each(menu, function(m, k) {
+        _.each(menu, function (m, k) {
             var menuitem = $('#' + k);
             if (menuitem.length === 0)
                 console.error('menu item not found', k);
 
-            menuitem.click(function() {
+            menuitem.click(function () {
                 m.onClick(tasks);
             });
         });
@@ -295,25 +302,32 @@
     }
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         terminal = NARTerminal();
 
         //TaskDB(DB(), terminal);
 
-
+        addView({
+            id: 'main',
+            icon: 'warning',
+            color: 'orange',
+            menu: function () {
+                return $('#menu');
+            }
+        });
 
         addView({
             id: 'graph',
             icon: 'bomb',
             color: 'yellow',
-            start: function() {
+            start: function () {
                 $('#view').append(this.graph = SocketNARGraph("active"));
             },
-            menu: function() {
+            menu: function () {
                 return 'abc';
             },
-            stop: function() {
+            stop: function () {
                 this.graph.stop();
             }
         });
@@ -321,13 +335,13 @@
             id: 'status',
             icon: 'options',
             color: 'green',
-            start: function() {
+            start: function () {
                 $('#view').append(SocketMetaWidget("emotion"));
             },
-            menu: function() {
+            menu: function () {
                 return 'abc';
             },
-            stop: function() {
+            stop: function () {
 
             }
         });
@@ -340,38 +354,38 @@
          <option>Map</option>
          <option>Social</option>
          <option>Web Browser</option>
-        */
+         */
 
-        var taskbar = TaskBar($( ".taskbar" ), {
+        var taskbar = TaskBar($(".taskbar"), {
             'log': {
-                onClick: function(taskbar) {
+                onClick: function (taskbar) {
                     var c = NARConsole(terminal);
 
                     taskbar.newWindow("Log",
-                            function() {
+                            function () {
                                 return c;
                             },
                             function (event) {
                                 console.log('close');
                             },
-                            function( event, ui ) {
+                            function (event, ui) {
                                 c.editor.resize(true); //ace editor needs resized manually when its container has
                             }
                     );
                 }
             },
             'timeline': {
-                onClick: function(taskbar) {
+                onClick: function (taskbar) {
                     var g = SocketNARGraph("active");
 
                     taskbar.newWindow("Timeline",
-                            function() {
+                            function () {
                                 return c;
                             },
                             function (event) {
                                 console.log('close');
                             },
-                            function( event, ui ) {
+                            function (event, ui) {
                                 c.editor.resize(true); //ace editor needs resized manually when its container has
                             }
                     );
@@ -380,16 +394,10 @@
         });
 
 
-
-
         /** input line */
         $("body").append(NARInputter(terminal).attr('id', 'nalInput'));
 
 
-
-
-
-        $('.ui.dropdown').dropdown();
 
 
     });
