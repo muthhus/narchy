@@ -106,11 +106,13 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
 
     var layout = function () {
-        currentLayout.stop();
-        currentLayout.run();
+        if (currentLayout) {
+            currentLayout.stop();
+            currentLayout.run();
 
-        setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
+            setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
 
+        }
 
         /* https://github.com/cytoscape/cytoscape.js-cola#api */
 
@@ -259,6 +261,14 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     );
 
     sv.spacegraph = sg;
+    sv.stop = function() {
+
+        sg.destroy();
+
+        currentLayout.destroy();
+        currentLayout = null;
+
+    };
 
     return sv;
 }

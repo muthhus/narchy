@@ -8,6 +8,7 @@
         @import url("spacegraph.dark.css");
         @import url("spacegraph.css");
     </style>
+    <link rel="import" href="init.html">
 
     <style>
 
@@ -15,13 +16,17 @@
             position: fixed; width: 100%;
         }
 
-        #active {
+        #view {
             height: 100%;
         }
 
 
+        #mainButtons {
+
+        }
         #mainButtons div {
             margin: 0 !important;
+            z-index: 20000;
         }
 
         .NARConsole {
@@ -49,14 +54,13 @@
 
     </style>
 
-    <link rel="import" href="init.html">
 
 </head>
 <body>
 
 
 
-    <div id="active" style="position: fixed; width: 100%; height: 100%"></div>
+    <div id="view" style="position: fixed; width: 100%; height: 100%"></div>
 
 
 
@@ -64,8 +68,8 @@
 
     </div>
 
-    <div id="mainButtons">
-        <div class="ui dropdown icon orange button" style="z-index: 20000; cursor: crosshair">
+    <div id="mainButtons" style="cursor: crosshair;">
+        <div class="ui dropdown icon orange button">
             <i class="warning sign icon"></i>
             <i class="dropdown icon"></i>
             <div class="menu">
@@ -78,30 +82,6 @@
                 <hr/>
                 <div class="item">Reset</div>
                 <div class="item">Shutdown</div>
-            </div>
-        </div>
-        <div class="ui dropdown icon purple button" id="rootButton" style="z-index: 20000; cursor: crosshair">
-            <i class="bomb icon"></i>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-                <div class="item">
-                    Mode:
-                    <select id="rootSelect">
-                        <option>Graph</option>
-                        <option>Tasks</option>
-                        <option>Terminal</option>
-                        <option>Status</option>
-                        <option>News</option>
-                        <option>Map</option>
-                        <option>Social</option>
-                        <option>Web Browser</option>
-                    </select>
-                    <div id="rootOptions" class="ui segment">
-                        options..
-                        <!-- updated by change in rootSelect selector -->
-                    </div>
-                    <button onclick="$('#rootButton').dropdown({action:'hide'})">OK</button>
-                </div>
             </div>
         </div>
     </div>
@@ -136,7 +116,82 @@
 <script>
     "use strict";
 
-    var terminal;
+    var terminal, viewing = undefined;
+
+    function addView(v) {
+        /*
+         <div class="ui dropdown icon purple button" id="rootButton">
+             <i class="bomb icon"></i>
+             <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item">
+                    <i class="options icon"></i>
+                    <select id="rootSelect">
+
+         </select>
+
+         <div id="rootOptions" class="ui segment">
+         options..
+         <!-- updated by change in rootSelect selector -->
+         </div>
+
+         <button class="right floated primary ui button" onclick="$('#rootButton .menu').hide()">OK</button>
+         </div>
+         </div>
+         </div>
+    */
+
+        var dropDownIcon, dropDownMenu;
+
+        var x = $('<div class="ui dropdown icon ' + v.color + ' button"/>').append(
+             '<i class="' + v.icon + ' icon"></i>',
+             dropDownIcon = $('<i class="dropdown icon"></i>'),
+             dropDownMenu = $('<div class="menu"/>').append(
+                 $('<div class="item"/>')
+             )
+        );
+
+        v.update = function() {
+            if (viewing === v) {
+                dropDownIcon.show();
+                v.start();
+            } else if (viewing!==undefined) {
+                dropDownIcon.hide();
+                v.stop();
+            }
+        };
+
+        x.dropdown({
+
+        });
+
+        x.click(function() {
+            if (viewing !== v) {
+                var prev = viewing;
+
+                //enable drop-down
+                viewing = v;
+
+                if (prev) {
+                    prev.update();
+                }
+
+                $('#view').empty();
+
+                v.update();
+
+            } else {
+                //drop-down
+            }
+        });
+
+        v.update();
+
+        $('#mainButtons').append( x );
+
+
+        return v;
+    }
 
     function TaskBar(target, menu) {
 
@@ -178,7 +233,6 @@
 
         //setup main menus
 
-        $('.ui.dropdown').dropdown();
 
         _.each(menu, function(m, k) {
             var menuitem = $('#' + k);
@@ -201,6 +255,41 @@
         terminal = NARTerminal();
 
         //TaskDB(DB(), terminal);
+
+
+
+        addView({
+            id: 'graph',
+            icon: 'bomb',
+            color: 'yellow',
+            start: function() {
+                $('#view').append(this.graph = SocketNARGraph("active"));
+            },
+            stop: function() {
+                this.graph.stop();
+            }
+        });
+        addView({
+            id: 'status',
+            icon: 'options',
+            color: 'green',
+            start: function() {
+                $('#view').append(SocketMetaWidget("emotion"));
+            },
+            stop: function() {
+
+            }
+        });
+        /*
+         <option>Graph</option>
+         <option>Tasks</option>
+         <option>Terminal</option>
+         <option>Status</option>
+         <option>News</option>
+         <option>Map</option>
+         <option>Social</option>
+         <option>Web Browser</option>
+        */
 
         var taskbar = TaskBar($( ".taskbar" ), {
             'log': {
@@ -239,22 +328,24 @@
             }
         });
 
+
+
+
         /** input line */
         $("body").append(NARInputter(terminal).attr('id', 'nalInput'));
 
-        $("#active").append(SocketNARGraph("active"));
 
-        //$("#emotion").append(SocketMetaWidget("emotion"));
+
 
 
         $('.ui.dropdown').dropdown({
 
         });
-        $('#rootButton').dropdown({
-           onHide: function(e) {
-               return false;
-           }
-        });
+//        $('#rootButton').dropdown({
+//           onHide: function(e) {
+//               return false;
+//           }
+//        });
 
     });
 
