@@ -97,7 +97,7 @@ public class WebServer /*extends PathHandler*/ {
                         )
                         .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1200, 100) {
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 800, 128) {
 
                             @Override
                             Object[] summarize(BLink<? extends Concept> bc, int n) {
@@ -175,7 +175,7 @@ public class WebServer /*extends PathHandler*/ {
 
         NAR nar = newRealtimeNAR();
 
-        new WebServer(nar, 50, httpPort);
+        new WebServer(nar, 25, httpPort);
 
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);
@@ -213,7 +213,7 @@ public class WebServer /*extends PathHandler*/ {
                 //)
 
         Random random = new XorShift128PlusRandom(1);
-        int numConceptsPerCycle = 8;
+        int numConceptsPerCycle = 4;
 
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
                 new MapIndex2(
@@ -223,7 +223,7 @@ public class WebServer /*extends PathHandler*/ {
         );
 
         nar.conceptActivation.setValue(1f/numConceptsPerCycle);
-        nar.cyclesPerFrame.set(8);
+        nar.cyclesPerFrame.set(16);
 
         //nar.log();
         nar.with(
@@ -231,9 +231,9 @@ public class WebServer /*extends PathHandler*/ {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(100 * 15);
-        nar.termLinkRemembering.setValue(100 * 21);
-        nar.taskLinkRemembering.setValue(100 * 9);
+        nar.conceptRemembering.setValue(100 * 45);
+        nar.termLinkRemembering.setValue(100 * 100);
+        nar.taskLinkRemembering.setValue(100 * 75);
         return nar;
     }
 

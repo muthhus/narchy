@@ -417,17 +417,48 @@ function NARConsole(terminal) {
 
 function TopTable(path) {
     var d = $('<div/>');
+    var e = $('<div/>').attr('class', 'ConceptTable').css('overflow', 'scroll');
+
+    function row(c) {
+        var pri = c[1]/1000.0;
+        var dur = c[2]/1000.0;
+        var qua = c[3]/1000.0;
+
+        return $(document.createElement('span'))
+            .attr('class', 'ConceptRow')
+            .attr('style',
+                    'font-size:' +
+                        parseInt(100.0 + 3 * 100.0*pri) +
+                    '%; color: rgb(' +
+                        parseInt(128 + 128 * pri) + ',' +
+                        parseInt(64 + 192 * dur) + ',' +
+                        parseInt(64 + 192 * qua) +
+                    ')'
+            )
+            .text(c[0]);
+    }
+
+    d.append(e);
+
     var sv = SocketView(path,
 
-        function(path) {
-            return view;
+        function(p) {
+            return d;
         },
 
         function(msg) {
+            var m = JSON.parse(msg.data);
+
+            var rr = [];
+            for (var k of m) {
+                rr.push(row(k));
+            }
+
+            e.empty().append(rr);
 
         }
     );
 
-    return d;
+    return sv;
 
 }
