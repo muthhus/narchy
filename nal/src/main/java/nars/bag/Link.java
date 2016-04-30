@@ -7,7 +7,5 @@ import java.util.function.Supplier;
  */
 public interface Link<X> extends Supplier<X> {
 
-    /** relative score metric used to rank items */
-    float getScore();
 
 }

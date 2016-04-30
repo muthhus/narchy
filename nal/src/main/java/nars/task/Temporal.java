@@ -22,11 +22,11 @@ public interface Temporal extends Tasked {
 //        return Tense.concurrent(s.getOccurrenceTime(), getOccurrenceTime(), duration);
 //    }
 
-    default int tDelta(@NotNull Temporal other/*, int perceptualDuration*/) {
-        long start = start();
-        long other_end = other.end();
-        return (int)(start - other_end); //TODO long/int
-    }
+//    default int tDelta(@NotNull Temporal other/*, int perceptualDuration*/) {
+//        long start = start();
+//        long other_end = other.end();
+//        return (int)(start - other_end); //TODO long/int
+//    }
 
     long start();
     long end();
@@ -37,10 +37,6 @@ public interface Temporal extends Tasked {
 //        return createdAt >= Tense.TIMELESS ? memory.time() - createdAt : -1;
 //
 //    }
-
-    default boolean isTimeless() {
-        return occurrence() == Tense.TIMELESS;
-    }
 
     default void setEternal() {
         setOccurrenceTime(Tense.ETERNAL);

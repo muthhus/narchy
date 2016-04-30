@@ -20,8 +20,6 @@
  */
 package nars.term;
 
-import com.gs.collections.api.factory.set.ImmutableSetFactory;
-import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import com.gs.collections.impl.set.mutable.UnifiedSet;

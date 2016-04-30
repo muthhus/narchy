@@ -75,8 +75,8 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     @Nullable
     public static Term subst(@NotNull PremiseEval r, @NotNull Term term, @NotNull Term x, Term y) {
-        if (x.equals(y))
-            return term;
+//        if (x.equals(y))
+//            return term;
 
         x = resolve(r, x);
         y = resolve(r, y);

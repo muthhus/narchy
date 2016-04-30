@@ -101,10 +101,6 @@ public final class BLink<X> extends Budget implements Link<X> {
         changed = false;
     }
 
-    @Override public final float getScore() {
-        return pri();
-    }
-
     @Override
     public final float pri() {
         return b[0];
@@ -187,7 +183,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return id + "=" + getBudgetString();
     }
 
-    public boolean hasDelta() {
+    public final boolean hasDelta() {
         return changed;
 //        float[] b = this.b;
 //        return nonZero(b[3]) || nonZero(b[4]) || nonZero(b[5]);

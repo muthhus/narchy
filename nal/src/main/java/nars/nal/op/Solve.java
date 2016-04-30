@@ -2,7 +2,6 @@ package nars.nal.op;
 
 import nars.Global;
 import nars.Op;
-import nars.Premise;
 import nars.Symbols;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBooleanCondition;

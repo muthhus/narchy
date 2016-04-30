@@ -2,9 +2,7 @@ package nars.nal.nal3;
 
 
 import nars.NAR;
-import nars.Narsese;
 import nars.nal.AbstractNALTest;
-import nars.nal.Tense;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -241,7 +239,7 @@ public class NAL3Test extends AbstractNALTest {
         test()
             .believe("a:b")
             .believe("b:c")
-            .mustNotOutput(1000, "(((a~c)~c)-->b)", '.', ETERNAL);
+            .mustNotOutput(200, "(((a~c)~c)-->b)", '.', ETERNAL);
 
     }
 

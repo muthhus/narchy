@@ -445,12 +445,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     @Override
-    public final void setEternal() {
-        setOccurrenceTime(Tense.ETERNAL);
-    }
-
-
-    @Override
     public final int hashCode() {
         int h = this.hash;
         if (h == 0) {

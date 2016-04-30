@@ -23,7 +23,7 @@ dependencies {
 
     compile group: 'net.openhft', name: 'affinity', version: '3.0.6' //TODO move to /app
 
-    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.11'
+    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.12'
 
     compile 'junit:junit:4.12'
 

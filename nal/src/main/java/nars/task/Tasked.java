@@ -11,9 +11,9 @@ public interface Tasked  {
     Task task();
 
     @Nullable
-    static Task the(Object v) {
-        if (v instanceof Tasked)
-            return ((Tasked)v).task();
+    static Task the(Object possiblyTask) {
+        if (possiblyTask instanceof Tasked)
+            return ((Tasked)possiblyTask).task();
         return null;
     }
 }

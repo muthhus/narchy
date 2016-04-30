@@ -66,18 +66,17 @@ pre {
 .previousInput {
     opacity: 0.85;    
 }
-#menu {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    font-size: 150%;
-    z-index: 5;
-    padding: 4px;
-}
-#menu button {
-    vertical-align:top;
-}
+/*#menu {*/
+    /*position: fixed;*/
+    /*left: 0;*/
+    /*top: 0;*/
+    /*width: 100%;*/
+    /*z-index: 5;*/
+    /*padding: 4px;*/
+/*}*/
+/*#menu button {*/
+    /*vertical-align:top;*/
+/*}*/
 #menubuttons {
     float: left;    
 }

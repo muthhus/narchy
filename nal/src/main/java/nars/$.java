@@ -31,11 +31,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Terms.terms;
-import static nars.term.Terms.toSet;
 
 /**
  * core utility class for:

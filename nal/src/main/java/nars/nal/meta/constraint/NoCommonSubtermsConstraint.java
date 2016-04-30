@@ -7,7 +7,6 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.container.TermContainer.commonSubterms;
-import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
 import static nars.term.container.TermContainer.subtermIsCommon;
 
 

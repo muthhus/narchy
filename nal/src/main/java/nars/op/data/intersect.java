@@ -1,6 +1,5 @@
 package nars.op.data;
 
-import com.gs.collections.api.set.MutableSet;
 import nars.nal.op.BinaryTermOperator;
 import nars.term.Compound;
 import nars.term.Term;

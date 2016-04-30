@@ -1,9 +1,7 @@
 package nars.concept;
 
 import com.gs.collections.impl.bag.mutable.HashBag;
-import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;

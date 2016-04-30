@@ -414,3 +414,20 @@ function NARConsole(terminal) {
     return div;
 
 }
+
+function TopTable(path) {
+    var d = $('<div/>');
+    var sv = SocketView(path,
+
+        function(path) {
+            return view;
+        },
+
+        function(msg) {
+
+        }
+    );
+
+    return d;
+
+}

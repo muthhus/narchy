@@ -1,39 +1,24 @@
 package nars.util.graph;
 
-import com.google.common.collect.Iterables;
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
-import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
-import nars.Premise;
-import nars.concept.ConceptProcess;
-import nars.concept.UnifySubst;
 import nars.nal.Deriver;
-import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.PremiseRuleSet;
-import nars.nal.meta.match.Ellipsis;
-import nars.nal.nal8.AbstractOperator;
-import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
-import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DirectedPseudograph;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static nars.term.Terms.*;
+import static nars.term.Terms.terms;
 
 /**
  * table for holding derivation results for online & offline

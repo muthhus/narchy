@@ -395,9 +395,9 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.isSorted();
     }
 
-    public final float priAt(int cap) {
-        return arrayBag.priAt(cap);
-    }
+//    public final float priAt(int cap) {
+//        return arrayBag.priAt(cap);
+//    }
 
 //    //TODO
 //    public int sizeQueue() {

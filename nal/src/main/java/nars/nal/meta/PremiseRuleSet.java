@@ -1,6 +1,8 @@
 package nars.nal.meta;
 
-import nars.*;
+import nars.$;
+import nars.Global;
+import nars.Narsese;
 import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;

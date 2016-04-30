@@ -13,8 +13,8 @@ public abstract class BinaryTermOperator extends ImmediateTermTransform {
 
     @Nullable
     @Override public final Term function(@NotNull Compound x, TermIndex i) {
-        if (x.size()<2)
-            throw new RuntimeException(this + " requires >= 2 args");
+//        if (x.size()<2)
+//            throw new RuntimeException(this + " requires >= 2 args");
 
         return apply(x.term(0), x.term(1), i);
     }

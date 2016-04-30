@@ -113,12 +113,16 @@
 </div>
 
 <div id="menu" class="ui compact vertical menu" style="position: absolute">
+
     <div class="item" id="log">+ Log</div>
     <div class="item" id="timeline">+ Timeline</div>
     <div class="item">+ Status</div>
     <hr/>
     <div class="item">Load...</div>
     <div class="item">Save...</div>
+    <hr/>
+    <div class="item">CPU Limit (slider)</div>
+    <div class="item">Memory Limit (slider)</div>
     <hr/>
     <div class="item">Reset</div>
     <div class="item">Shutdown</div>
@@ -172,7 +176,7 @@
         if (!v.start) {
             b.addClass('active');
         }
-        
+
         v.update = function () {
             if (viewing === v) {
                 b.addClass('active');
@@ -345,11 +349,27 @@
 
             }
         });
+        addView({
+            id: 'top',
+            icon: 'options',
+            color: 'blue',
+            start: function () {
+                $('#view').append(TopTable("emotion"));
+            },
+            menu: function () {
+                return 'abc';
+            },
+            stop: function () {
+
+            }
+        });
+
+
         /*
          <option>Graph</option>
          <option>Tasks</option>
          <option>Terminal</option>
-         <option>Status</option>
+         <option>Status/InterNARs</option>
          <option>News</option>
          <option>Map</option>
          <option>Social</option>

@@ -8,7 +8,6 @@ import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericNormalizedVariable;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
