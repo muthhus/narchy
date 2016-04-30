@@ -282,7 +282,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * desire goal
      */
     @Nullable
-    public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
         return goal(
                 getDefaultPriority(GOAL),
                 getDefaultDurability(GOAL),
@@ -290,7 +290,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf)  {
         believe(getDefaultPriority(BELIEF), term, time(tense), freq, conf);
         return this;
     }
@@ -305,7 +305,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, Tense.Eternal, freq, conf);
     }
     @NotNull
-    public NAR goal(@NotNull Termed term, float freq, float conf) throws NarseseException {
+    public NAR goal(@NotNull Termed term, float freq, float conf)  {
         return goal(term, Tense.Eternal, freq, conf);
     }
     @NotNull
@@ -348,8 +348,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
         return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
     }
+
+    public NAR goal(@NotNull Termed<Compound> term)  {
+        return goal(term, true);
+    }
+
     @NotNull
-    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
+    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
         return goal(term, trueOrFalse, getDefaultConfidence(BELIEF));
     }
     @NotNull
@@ -357,7 +362,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
     @NotNull
-    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
+    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
         return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -370,7 +375,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * TODO add parameter for Tense control. until then, default is Now
      */
     @Nullable
-    public NAR goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf) throws NarseseException {
+    public NAR goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf)  {
         input(pri, dur, goal, GOAL, occurrence, freq, conf);
         return this;
     }

@@ -27,6 +27,9 @@ import java.util.List;
  */
 public class OperationConcept extends CompoundConcept implements Runnable {
 
+    /** whether this is a concept for an actual Operation term, ex: x(a,b,c) */
+    private final boolean isOperation;
+
     /**
      * cache for expectation measurement; set to NaN to invalidate
      */
@@ -49,6 +52,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
         //ensureOperation(term);
+        this.isOperation = Op.isOperation(this);
 
     }
 
@@ -56,6 +60,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
         super(term, n);
         this.nar = n;
+        this.isOperation = Op.isOperation(this);
         //ensureOperation(term);
         n.on(this);
     }
@@ -162,7 +167,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         //if (task.op() != NEGATE) {
 
             //emit for both beliefs and goals
-        boolean isOperation = Op.isOperation(this); //TODO cache in field
+
         if (isOperation) {
             Topic<Task> tt = nar.concept(Operator.operator(this)).get(Execution.class);
             if (tt != null && !tt.isEmpty()) {

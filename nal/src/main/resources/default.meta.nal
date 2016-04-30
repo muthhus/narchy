@@ -262,6 +262,8 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+    (A ==> C), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+
 //    M, (M ==> P), time(decomposeBelief) |- P, (Belief:Deduction, Desire:Induction)
 //          C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Event:Anticipate),
 //          X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Event:Anticipate)
@@ -269,9 +271,13 @@
 //          X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction)
 
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
+    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
+
 //    M, (P ==> M), time(decomposeBelief) |- P, (Belief:Abduction, Desire:Deduction)
 
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
+    (A <=> C), B, time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
+
 //    M, (S <=> M), time(decomposeBelief) |- S, (Belief:Analogy, Desire:Strong)
 //    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
 

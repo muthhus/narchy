@@ -1,7 +1,13 @@
 package nars.nal.nal8;
 
+import nars.$;
+import nars.Global;
 import nars.NAR;
+import nars.concept.OperationConcept;
 import nars.nal.AbstractNALTest;
+import nars.nal.Tense;
+import nars.nar.Default;
+import nars.util.signal.FloatConcept;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -474,5 +480,48 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("(a:b<->c:d).");
         tester.input("c:d!");
         tester.mustDesire(cycles, "a:b", 1.0f, 0.81f);
+    }
+
+    @Test public void testDeiredImpl() {
+        /*
+        $0.61;0.39;0.50$ (y)! :172: %1.00;0.45%
+              PARENT   $0.75;0.80;0.95$ <(x) ==> (y)>! :3: %1.00;0.90%
+              BELIEF   $0.50;0.80;0.95$ (x). :4: %1.00;0.90%
+         */
+
+        TestNAR t = test();
+        t.log()
+            .believe("(x)")
+            .goal("((x)==>(y))")
+            .mustDesire(cycles, "(y)", 1f, 0.45f);
+    }
+
+    @Test public void testBelievedImplOfDesire() {
+
+        TestNAR t = test();
+        t.log()
+                .goal("(x)")
+                .believe("((x)==>(y))")
+                .mustDesire(cycles, "(y)", 1f, 0.45f);
+    }
+
+    @Test public void testDeiredImplDelayed() {
+
+
+        TestNAR t = test();
+        t.log()
+                .believe("(x)", Tense.Present, 1f, 0.9f)
+                .goal("((x)==>+3(y))")
+                .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
+                .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
+    }
+    @Test public void testBelievedImplOfDesireDelayed() {
+
+        TestNAR t = test();
+        t.log()
+                .goal("(x)", Tense.Present, 1f, 0.9f)
+                .believe("((x)==>+3(y))")
+                .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
+                .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
     }
 }

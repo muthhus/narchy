@@ -151,9 +151,21 @@ public class TestNAR  {
         return this;
     }
 
-    public void believe(@NotNull String t, @NotNull Tense tense, float f, float c) {
+    public TestNAR believe(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         nar.believe(t, tense, f, c);
+        return this;
+    }
+
+    public TestNAR goal(@NotNull String t, @NotNull Tense tense, float f, float c) {
+        finished = false;
+        nar.goal(nar.term(t), tense, f, c);
+        return this;
+    }
+
+    public TestNAR goal(String s) {
+        nar.goal(s);
+        return this;
     }
 
     @NotNull
@@ -161,7 +173,6 @@ public class TestNAR  {
         nar.log();
         return this;
     }
-
 
 
     final class EarlyExit extends CycleReaction {

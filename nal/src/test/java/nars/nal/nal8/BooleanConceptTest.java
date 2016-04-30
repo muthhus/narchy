@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static nars.nal.nal8.MotivationTest.timeUntil;
 
+
 /**
  * Created by me on 4/7/16.
  */
