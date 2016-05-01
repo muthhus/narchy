@@ -13,11 +13,10 @@ public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*
     @Nullable
     @Override
     public Term apply(@NotNull Term a, Term b, TermIndex i) {
-        //assert(!a.equals(b));
+        if (!(a instanceof Compound) || !(b instanceof Compound))
+            return null;
 
-        //TODO construct TermSet directly
-        return TermContainer.difference(
-                i.builder(),
+        return TermContainer.difference(i.builder(),
                 (Compound) a, (Compound) b
         );
     }

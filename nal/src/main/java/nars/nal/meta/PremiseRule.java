@@ -7,10 +7,7 @@ import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.concept.Temporalize;
-import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
-import nars.nal.meta.constraint.NotEqualsConstraint;
-import nars.nal.meta.constraint.NotOpConstraint;
+import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
@@ -484,6 +481,20 @@ public class PremiseRule extends GenericCompound {
                 case "notSet":
                     constraints.put(arg1, new NotOpConstraint(Op.SetsBits));
                     break;
+
+                case "setext":
+                    //assumes arity=2 but arity=1 support can be written
+                    constraints.put(arg1, new OpConstraint(Op.SET_EXT));
+                    constraints.put(arg2, new OpConstraint(Op.SET_EXT));
+                    preNext = new SubTermsStructure(Op.SET_EXT.bit());
+                    break;
+                case "setint":
+                    //assumes arity=2 but arity=1 support can be written
+                    constraints.put(arg1, new OpConstraint(Op.SET_INT));
+                    constraints.put(arg2, new OpConstraint(Op.SET_INT));
+                    preNext = new SubTermsStructure(Op.SET_INT.bit());
+                    break;
+
                 case "notConjunction":
                     constraints.put(arg1, new NotOpConstraint(Op.CONJUNCTION));
                     break;

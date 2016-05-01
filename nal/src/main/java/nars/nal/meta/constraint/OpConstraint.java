@@ -6,27 +6,24 @@ import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class NotOpConstraint implements MatchConstraint {
+public final class OpConstraint implements MatchConstraint {
 
-    private final int op;
+    private final Op op;
 
-    public NotOpConstraint(@NotNull Op o) {
-        this(o.bit());
+    public OpConstraint(@NotNull Op o) {
+        op = o;
     }
 
-    public NotOpConstraint(int opVector) {
-        this.op = opVector;
-    }
 
     @Override
     public boolean invalid(Term assignee, @NotNull Term value, FindSubst f) {
-        return value.op().in(op);
+        return value.op()!=op;
     }
 
     @NotNull
     @Override
     public String toString() {
-        return "notOp:" + Integer.toHexString(op);
+        return "op:" + op.str;
     }
 }
 

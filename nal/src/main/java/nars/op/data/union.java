@@ -11,6 +11,11 @@ public class union extends BinaryTermOperator {
     
     @NotNull
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+        if (!(a instanceof Compound) || !(b instanceof Compound))
+            return null;
+
+        if (a.equals(b)) return a;
+
         return TermContainer.union(i.builder(), (Compound) a, (Compound) b );
     }
 

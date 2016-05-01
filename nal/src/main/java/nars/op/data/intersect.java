@@ -12,6 +12,9 @@ public class intersect extends BinaryTermOperator {
 
     @Nullable
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+        if (!(a instanceof Compound) || !(b instanceof Compound))
+            return null;
+
         return TermContainer.intersect(i.builder(), (Compound)a, (Compound) b);
     }
 

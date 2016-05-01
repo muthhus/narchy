@@ -152,27 +152,27 @@
 
 //(C --> A), (C --> B), set_ext(A), union(A,B,R) |- (C --> R), (Truth:Union)
 //(C --> A), (C --> B), set_ext(A), intersection(A,B,R) |- (C --> R), (Truth:Intersection)
-    (C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union)
-    (C --> {A..+}), (C --> {B..+}) |- (C --> intersect({A..+},{B..+})), (Belief:Intersection)
-    (C --> {A..+}), (C --> {B..+}) |- (C --> differ({A..+},{B..+})), (Belief:Difference)
+    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union)
+    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference)
 
 //(C --> A), (C --> B), set_int(A), union(A,B,R) |- (C --> R), (Truth:Intersection)
 //(C --> A), (C --> B), set_int(A), intersection(A,B,R) |- (C --> R), (Truth:Union)
-    (C --> [A..+]), (C --> [B..+]) |- (C --> [A..+,B..+]), (Belief:Intersection)
-    (C --> [A..+]), (C --> [B..+]) |- (C --> intersect([A..+],[B..+])), (Belief:Union)
-    (C --> [A..+]), (C --> [B..+]) |- (C --> differ([A..+],[B..+])), (Belief:Difference)
+    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union)
+    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference)
 
 //(A --> C), (B --> C), set_ext(A), union(A,B,R) |- (R --> C), (Truth:Intersection)
 //(A --> C), (B --> C), set_ext(A), intersection(A,B,R) |- (R --> C), (Truth:Union)
-    ({A..+} --> C), ({B..+} --> C) |- (intersect({A..+},{B..+}) --> C), (Belief:Union)
-    ({A..+} --> C), ({B..+} --> C) |- ({A..+,B..+} --> C), (Belief:Intersection)
-    ({A..+} --> C), ({B..+} --> C) |- (differ({A..+},{B..+}) --> C), (Belief:Difference)
+    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference)
 
 //(A --> C), (B --> C), set_int(A), union(A,B,R) |- (R --> C), (Truth:Union)
 //(A --> C), (B --> C), set_int(A), intersection(A,B,R) |- (R --> C), (Truth:Intersection)
-    ([A..+] --> C), ([B..+] --> C) |- ([A..+,B..+] --> C), (Belief:Union)
-    ([A..+] --> C), ([B..+] --> C) |- (intersect([A..+],[B..+]) --> C), (Belief:Intersection)
-    ([A..+] --> C), ([B..+] --> C) |- (differ([A..+],[B..+]) --> C), (Belief:Difference)
+    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference)
 
 //Set element takeout:
 
@@ -518,12 +518,12 @@
 //Recursion Force - TODO use varargs
 
   //2
-    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B) --> Y), A |- ((A,B)-->((/,Y,_,B), B)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B) --> Y), B |- ((A,B)-->(A, (/,Y,A,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
   //3
-    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B,C) --> Y), A |- ((A,B,C)-->((/,Y, _, B, C), B, C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B,C) --> Y), B |- ((A,B,C)-->(A, (/,Y, A, _, C), C)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+//    ((A,B,C) --> Y), C |- ((A,B,C)-->(A, B, (/,Y, A, B, _))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
 
 

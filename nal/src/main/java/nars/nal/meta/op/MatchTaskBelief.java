@@ -160,9 +160,9 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             pre.add(new SubTermOp(1, belief.op()));
 
         if (task!=null && !taskIsPatVar)
-            pre.add(new SubTermStructure(Op.VAR_PATTERN, 0, task.structure()));
+            pre.add(new SubTermStructure(0, task.structure()));
         if (belief!=null && !belIsPatVar)
-            pre.add(new SubTermStructure(Op.VAR_PATTERN, 1, belief.structure()));
+            pre.add(new SubTermStructure(1, belief.structure()));
 
         //        } else {
         //            if (x0.containsTermRecursively(x1)) {

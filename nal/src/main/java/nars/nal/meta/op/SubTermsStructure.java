@@ -3,32 +3,30 @@ package nars.nal.meta.op;
 import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
-import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * requires a specific subterm to have minimum bit structure
+ * requires both subterms to match a minimum bit structure
  */
-public final class SubTermStructure extends AtomicBooleanCondition<PremiseEval> {
-    public final int subterm;
+public final class SubTermsStructure extends AtomicBooleanCondition<PremiseEval> {
+
     public final int bits;
     @NotNull
     private final transient String id;
 
 
-    public SubTermStructure(int subterm, int bits) {
-        this(Op.VAR_PATTERN, subterm, bits);
+    public SubTermsStructure(int bits) {
+        this(Op.VAR_PATTERN, bits);
     }
 
-    public SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
-        this.subterm = subterm;
+    public SubTermsStructure(@NotNull Op matchingType, int bits) {
 
         if (matchingType != Op.VAR_PATTERN)
             bits &= (~matchingType.bit());
         //bits &= ~(Op.VariableBits);
 
         this.bits = bits;
-        id = subterm + ":" +
+        id = "(0&&1):" +
                 Integer.toString(bits, 16);
     }
 
@@ -43,6 +41,6 @@ public final class SubTermStructure extends AtomicBooleanCondition<PremiseEval> 
     public boolean booleanValueOf(@NotNull PremiseEval ff) {
         /*Compound t = ff.term;
         return !t.term(subterm).impossibleStructureMatch(bits);*/
-        return ff.subTermMatch(subterm, bits);
+        return ff.subTermsMatch(bits);
     }
 }

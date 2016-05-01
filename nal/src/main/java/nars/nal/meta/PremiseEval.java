@@ -14,6 +14,7 @@ import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.Subst;
@@ -64,6 +65,7 @@ public class PremiseEval extends FindSubst {
 
     /** cached value */
     private int termSub1Op, termSub2Op;
+    private int termSub1Struct, termSub2Struct;
 
     public PremiseEval(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
@@ -159,7 +161,9 @@ public class PremiseEval extends FindSubst {
         this.termutesPerMatch = p.getMaxMatches();
 
         term.set( taskTerm, beliefTerm );
+        this.termSub1Struct = taskTerm.structure();
         this.termSub1Op = taskTerm.op().ordinal();
+        this.termSub2Struct = beliefTerm.structure();
         this.termSub2Op = beliefTerm.op().ordinal();
 
         //term.set( termPattern );
@@ -228,13 +232,23 @@ public class PremiseEval extends FindSubst {
         return minConfidence;
     }
 
-    /** gets the op of the (top-level) pattern being compared */
+    /** gets the op of the (top-level) pattern being compared
+     * @param subterm 0 or 1, indicating task or belief
+     * */
     public final boolean subTermIs(int subterm, int op) {
-        switch(subterm) {
-            case 0: return termSub1Op == op;
-            case 1: return termSub2Op == op;
-        }
-        throw new UnsupportedOperationException();
+        return (subterm==0 ? termSub1Op : termSub2Op) == op;
+    }
+
+    /** @param subterm 0 or 1, indicating task or belief */
+    public boolean subTermMatch(int subterm, int bits) {
+        return !Termlike.impossibleStructureMatch(
+                    (subterm == 0 ? termSub1Struct : termSub2Struct), bits);
+    }
+
+    /** both */
+    public boolean subTermsMatch(int bits) {
+        return !Termlike.impossibleStructureMatch(termSub1Struct, bits) &&
+               !Termlike.impossibleStructureMatch(termSub2Struct, bits);
     }
 
     /** returns whether the put operation was successful */
@@ -261,6 +275,8 @@ public class PremiseEval extends FindSubst {
     public void replaceAllXY(Subst m) {
         m.forEach(this::replaceXY);
     }
+
+
 }
 
 
