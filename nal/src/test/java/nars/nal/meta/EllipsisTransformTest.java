@@ -1,8 +1,10 @@
-package nars.nal.meta.match;
+package nars.nal.meta;
 
 import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseRule;
+import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;

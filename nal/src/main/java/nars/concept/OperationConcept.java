@@ -47,6 +47,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     transient private final List<Task> pending = Global.newArrayList(0);
 
     public transient NAR nar;
+    private boolean pendingRun;
 
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
@@ -106,7 +107,11 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     protected void executeLater(@NotNull NAR nar) {
         this.nar = nar;
-        nar.runOnceLater(this);
+
+        if (!pendingRun) {
+            nar.runLater(this);
+            pendingRun = true;
+        }
     }
 
     @Override
@@ -115,12 +120,13 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         update(nar);
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
-        List<Task> pending = this.pending;
-        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
-            execute(pending.get(i), nar);
-        }
+//        List<Task> pending = this.pending;
+//        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
+//        }
+        execute(pending, nar);
 
         pending.clear();
+        pendingRun = false;
     }
 
     public void update(@NotNull NAR nar) {
@@ -158,7 +164,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
      * The goal has already successfully been inserted to belief table.
      * the job here is to update the resulting motivation state
      */
-    final void execute(@NotNull Task task, @NotNull NAR nar) {
+    final void execute(@NotNull List<Task> tasks, @NotNull NAR nar) {
 
 
         //        if (motivation < executionThreshold.floatValue())
@@ -168,21 +174,31 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
             //emit for both beliefs and goals
 
-        if (isOperation) {
-            Topic<Task> tt = nar.concept(Operator.operator(this)).get(Execution.class);
-            if (tt != null && !tt.isEmpty()) {
-                //beforeNextFrame( //<-- enqueue after this frame, before next
-                tt.emit(task);
+        long now = nar.time();
+        float belief = belief(now).expectation();
+        float desire = desire(now).expectation();
+        if (desire > 0.5f && desire > belief) {
+
+            if (isOperation) {
+                Topic<List<Task>> tt = nar.concept(Operator.operator(this)).get(Execution.class);
+                if (tt != null && !tt.isEmpty()) {
+                    //beforeNextFrame( //<-- enqueue after this frame, before next
+                    tt.emit(tasks);
+                }
             }
-        }
 
 
             //call Task.execute only for goals
-            if (task.isGoal()) {
-                if (Global.DEBUG)
-                    task.log("execute(b=" + believed + ",d=" + desired + ')');
-                task.execute(this, nar); //call the task's custom event handler
-            }
+            tasks.forEach(task -> {
+                if (task.isGoal()) {
+                    if (Global.DEBUG)
+                        task.log("execute(b=" + believed + ",d=" + desired + ')');
+                    task.execute(this, nar); //call the task's custom event handler
+                }
+            });
+
+        }
+
         //}
     }
 

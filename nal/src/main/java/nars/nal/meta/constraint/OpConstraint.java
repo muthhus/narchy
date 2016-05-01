@@ -23,7 +23,7 @@ public final class OpConstraint implements MatchConstraint {
     @NotNull
     @Override
     public String toString() {
-        return "op:" + op.str;
+        return "op:\"" + op.str + '"';
     }
 }
 

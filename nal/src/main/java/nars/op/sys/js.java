@@ -17,6 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Executes a Javascript expression
@@ -70,25 +71,25 @@ public class js extends TermFunction {
 
     }
 
-    /** create dynamic javascript functions */
-    //TODO make this an ImmediateOperator that will not conceptualize its subterms
-    public class jsop extends NullOperator {
-
-        @Override
-        public void execute(@NotNull Task op) {
-            Term[] x = Operator.argArray(op.term());
-            String funcName = Atom.unquote(x[0]);
-            String functionCode = Atom.unquote(x[1]);
-            //nar.input( echo.newTask("JS Operator Bind: " + funcName + " = " + functionCode));
-            DynamicFunction d = new DynamicFunction(funcName, functionCode);
-            nar.onExec(d);
-
-            //op.stop();
-        }
-
-
-
-    }
+//    /** create dynamic javascript functions */
+//    //TODO make this an ImmediateOperator that will not conceptualize its subterms
+//    public class jsop extends NullOperator {
+//
+//        @Override
+//        public void execute(@NotNull List<Task> op) {
+//            Term[] x = Operator.argArray(op.term());
+//            String funcName = Atom.unquote(x[0]);
+//            String functionCode = Atom.unquote(x[1]);
+//            //nar.input( echo.newTask("JS Operator Bind: " + funcName + " = " + functionCode));
+//            DynamicFunction d = new DynamicFunction(funcName, functionCode);
+//            nar.onExec(d);
+//
+//            //op.stop();
+//        }
+//
+//
+//
+//    }
 
 //    public class JSBelievedConceptBuilder extends ConstantConceptBuilder {
 //

@@ -20,10 +20,12 @@ package nars.op.mental;
 import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
+import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +43,15 @@ public class doubt extends SyncOperator {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(@NotNull Task execution) {
+    public void execute(@NotNull List<Task> execution) {
+
+        Compound t = execution.get(0).term();
 
         nar.runLater(()->{
-            Task operation = execution;
-            Term term = Operator.argArray(execution.term())[0];
+
+            Term term = Operator.argArray(t)[0];
+
+            Task operation = execution.get(0); //TODO use the sum or average of the execution task budgets
 
             Concept concept = nar.conceptualize(term, operation);
             if (concept!=null) {

@@ -90,49 +90,49 @@ public class OperatorTest {
         assertEquals(Op.INHERIT, o.op());
     }
 
-    @Test public void testTermReactionRegistration() {
+//    @Test public void testTermReactionRegistration() {
+//
+//        AtomicBoolean executed = new AtomicBoolean(false);
+//
+//        NAR n = new Default();
+//        n.onExecTerm("exe", (Term[] event) -> {
+//            //System.out.println("executed: " + Arrays.toString(args));
+//            executed.set(true);
+//            return null;
+//        });
+//
+//        n.input("exe(a,b,c,#x)!");
+//
+//        n.run(1);
+//
+//        assertTrue(executed.get());
+//
+//    }
 
-        AtomicBoolean executed = new AtomicBoolean(false);
-
-        NAR n = new Default();
-        n.onExecTerm("exe", (Term[] event) -> {
-            //System.out.println("executed: " + Arrays.toString(args));
-            executed.set(true);
-            return null;
-        });
-
-        n.input("exe(a,b,c,#x)!");
-
-        n.run(1);
-
-        assertTrue(executed.get());
-
-    }
-
-    @Test public void testSynchOperator() {
-
-
-        AtomicBoolean executed = new AtomicBoolean(false);
-
-        NAR n = new Default();
-        n.onExec("exe", (exec) -> {
-            executed.set(true);
-        });
-
-        //n.trace();
-        n.input("exe(a,b,c)!");
-
-        n.run(1);
-
-        assertTrue(executed.get());
-
-        assertNotNull("should have conceptualized or linked to ^exe",
-                n.concept("^exe"));
-
-        assertNull("^exe should not conceptualize nor link to atom exe", n.index.get("exe") );
-
-
-    }
+//    @Test public void testSynchOperator() {
+//
+//
+//        AtomicBoolean executed = new AtomicBoolean(false);
+//
+//        NAR n = new Default();
+//        n.onExec("exe", (exec) -> {
+//            executed.set(true);
+//        });
+//
+//        //n.trace();
+//        n.input("exe(a,b,c)!");
+//
+//        n.run(1);
+//
+//        assertTrue(executed.get());
+//
+//        assertNotNull("should have conceptualized or linked to ^exe",
+//                n.concept("^exe"));
+//
+//        assertNull("^exe should not conceptualize nor link to atom exe", n.index.get("exe") );
+//
+//
+//    }
 
 //    @Ignore @Test public void testCompoundOperator() {
 //

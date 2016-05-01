@@ -14,7 +14,13 @@ import static nars.nal.nal8.MotivationTest.timeUntil;
 
 
 /**
- * Created by me on 4/7/16.
+ * tests sensor/motor activation patterns:
+ * --on/off phases, and lag time for truth to propagate from sensor to motor
+ * --partial on
+ * --delayed link
+ * --and(sensorA, sensorB)
+ * --or(sensorA, sensorB)
+ * --xor(sensorA, sensorB)
  */
 public class BooleanConceptTest {
 

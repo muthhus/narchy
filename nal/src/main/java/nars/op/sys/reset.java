@@ -4,6 +4,8 @@ import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Resets memory, @see memory.reset()
  */
@@ -16,7 +18,7 @@ public class reset extends ImmediateOperator {
     }
 
     @Override
-    public void execute(@NotNull Task e) {
+    public void execute(@NotNull List<Task> e) {
         nar.reset();
         //nar.reset()
     }

@@ -215,7 +215,7 @@ public abstract class AbstractNAR extends NAR {
 
             new schizo(),     //change Memory's SELF term (default: SELF)
 
-            new js(), //javascript evalaution
+            //new js(), //javascript evalaution
 
             /*new json.jsonfrom(),
             new json.jsonto()*/

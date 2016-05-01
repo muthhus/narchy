@@ -17,15 +17,7 @@ import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
-/**
- * tests sensor/motor activation patterns:
- * --on/off phases, and lag time for truth to propagate from sensor to motor
- * --partial on
- * --delayed link
- * --and(sensorA, sensorB)
- * --or(sensorA, sensorB)
- * --xor(sensorA, sensorB)
- */
+
 public class MotivationTest {
 
 

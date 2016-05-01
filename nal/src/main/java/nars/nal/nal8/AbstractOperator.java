@@ -28,12 +28,13 @@ import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * An operator implementation
  */
-public abstract class AbstractOperator implements Consumer<Task> {
+public abstract class AbstractOperator implements Consumer<List<Task>> {
 
 
     public final @NotNull Operator atomicTerm;
@@ -70,7 +71,7 @@ public abstract class AbstractOperator implements Consumer<Task> {
 
 
     @Override
-    public void accept(@NotNull Task execution) {
+    public void accept(@NotNull List<Task> execution) {
         if (async()) {
             //asynch
             NAR.runAsync(() -> execute(execution));
@@ -88,7 +89,7 @@ public abstract class AbstractOperator implements Consumer<Task> {
      * reportExecution
      */
 
-    public abstract void execute(Task execution);
+    public abstract void execute(List<Task> execution);
 
 //    {
 //        try {

@@ -241,21 +241,21 @@ public class NARide extends StackPane {
 //                }*/
 //                return () -> ni;
 //            });
-        nar.onExec("gc", (c) -> nar.runLater(() -> {
-            long before = Runtime.getRuntime().freeMemory();
-            System.gc();
-            long after = Runtime.getRuntime().freeMemory();
-            $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
-        }));
-
-        nar.onExec("memstat", (c) -> {
-            String report = "";
-            //report += "Busy: " + nar.emotion.busy() + "<br/>";
-            report += "Index Size (Terms): " + nar.index.size() + "<br/>";
-            report += "Active Concept Bag Histogram: " +
-                    Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
-            nar.input("html(\"" + report + "\");");
-        });
+//        nar.onExec("gc", (c) -> nar.runLater(() -> {
+//            long before = Runtime.getRuntime().freeMemory();
+//            System.gc();
+//            long after = Runtime.getRuntime().freeMemory();
+//            $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
+//        }));
+//
+//        nar.onExec("memstat", (c) -> {
+//            String report = "";
+//            //report += "Busy: " + nar.emotion.busy() + "<br/>";
+//            report += "Index Size (Terms): " + nar.index.size() + "<br/>";
+//            report += "Active Concept Bag Histogram: " +
+//                    Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
+//            nar.input("html(\"" + report + "\");");
+//        });
 //        nar.onExec("feel", (c) -> {
 //            nar.emotion.logger.info("{}", nar.emotion);
 //        });

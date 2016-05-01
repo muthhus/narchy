@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +45,9 @@ public class GoalPrecisionTest {
     protected void run(@NotNull NAR n, int end) {
 
         Global.DEBUG = true;
-        n.onExecution($.operator("x"), (Task a) -> {
+        n.onExecution($.operator("x"), (List<Task> bb) -> {
+            Task a = bb.get(0);
+
             Term[] aa = Operator.argArray(a.term());
             float pri = a.pri() * a.expectation();
 

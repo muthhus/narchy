@@ -109,7 +109,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final transient List<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
-    private final transient Set<Runnable> nextUniqueTasks = new LinkedHashSet();
+
 
     private NARLoop loop;
 
@@ -157,7 +157,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public synchronized NAR reset() {
 
         nextTasks.clear();
-        nextUniqueTasks.clear();
 
         if (asyncs!=null)
             asyncs.shutdown();
@@ -491,39 +490,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //    }
 
 
-    /**
-     * creates a TermFunction operator from a supplied function, which can be a lambda
-     */
-    public final On onExecTerm(@NotNull String operator, @NotNull Function<Term[], Object> func) {
-        return onExec(new TermFunction(operator) {
-
-            @Override
-            public Object function(@NotNull Compound x, TermIndex i) {
-                return func.apply(x.terms());
-            }
-
-        });
-    }
-
     public final On onExec(@NotNull AbstractOperator r) {
         r.init(this);
         return onExecution(r.getOperatorTerm(), r);
     }
 
 
-    public final On onExec(@NotNull String op, @NotNull Consumer<Term[]> each) {
-        return onExecution($.operator(op), e -> {
-            each.accept(Operator.argArray(e.term()));
-        });
-    }
 
-    public final On onExecution(@NotNull String op, @NotNull Consumer<Task> each) {
+    public final On onExecution(@NotNull String op, @NotNull Consumer<List<Task>> each) {
         return onExecution($.operator(op), each);
     }
 
-    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<Task> each) {
+    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<List<Task>> each) {
         return concept(op,true)
-                .<Topic<Task>>meta(Execution.class,
+                .<Topic<List<Task>>>meta(Execution.class,
                         (k, v) -> v!=null ?  v : new DefaultTopic<>())
                 .on(each);
     }
@@ -757,23 +737,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
     }
 
-    /** runs between the next frame the specified runnable only once
-     *   (it is unique by its being stored in a HashSet).
-     *   order is not guaranteed */
-    public final boolean runOnceLater(@NotNull Runnable t) {
-        return nextUniqueTasks.add(t);
-    }
 
     /**
      * runs all the tasks in the 'Next' queue
      */
     private final void runNextTasks() {
-
-        Set<Runnable> u = this.nextUniqueTasks;
-        if (!u.isEmpty()) {
-            u.forEach(Runnable::run);
-            u.clear();
-        }
 
         List<Runnable> n = this.nextTasks;
         if (!n.isEmpty()) {

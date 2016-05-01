@@ -3,6 +3,7 @@ package nars.nal.nal8.operator;
 import nars.$;
 import nars.Op;
 import nars.Symbols;
+import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
@@ -19,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /** 
@@ -146,17 +149,24 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Override
-    public void execute(@NotNull Task tt) {
-        final Compound ttt = tt.term();
-        final Compound args = Operator.opArgs(ttt);
-        if (!tt.isCommand()) {
-            if (!validArgs(args))
-                return;
-        }
-        O y = function(args, nar.index());
-        if (!tt.isCommand()) {
-            feedback(tt, y);
-        }
+    public void execute(@NotNull List<Task> uuu) {
+
+
+        Task tt = uuu.get(0); //first one
+
+
+            final Compound ttt = tt.term();
+            final Compound args = Operator.opArgs(ttt);
+            if (!tt.isCommand()) {
+                if (!validArgs(args))
+                    return;
+            }
+            O y = function(args, nar.index());
+            if (!tt.isCommand()) {
+                feedback(tt, y);
+            }
+
+
     }
 
     protected void feedback(@NotNull Task cause, @Nullable Object y) {
@@ -195,8 +205,8 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
         //1. try to parse as task
-        char mustBePuncToBeTask = ys.charAt(ys.length()-1); //early prevention from invoking parser
-        if (isPunctuation(mustBePuncToBeTask) || mustBePuncToBeTask == ':' /* tense ending character */) {
+        char possibleTaskPunc = ys.charAt(ys.length()-1); //early prevention from invoking parser
+        if (isPunctuation(possibleTaskPunc) || possibleTaskPunc == ':' /* tense ending character */) {
             try {
                 Task t = nar.task(ys);
                 if (t != null) {
@@ -220,7 +230,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         throw new RuntimeException(this + " return value invalid: " + y);
     }
 
-    /** the term that the output will inherit from; analogous to the 'Range' of a function in mathematical terminology */
+    ///** the term that the output will inherit from; analogous to the 'Range' of a function in mathematical terminology */
     //protected Term getRange() {        return null;    }
 
     //protected int getMinArity() {        return 0;    }

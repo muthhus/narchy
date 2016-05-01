@@ -3,6 +3,7 @@ package nars.util.condition;
 import nars.$;
 import nars.NAR;
 import nars.nal.Tense;
+import nars.task.Task;
 import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,15 +28,17 @@ public class ExecutionCondition implements NARCondition {
         this.maxExpect = maxExpect;
 
         operator = $.operator(opTerm);
-        n.onExecution(operator, t -> {
+        n.onExecution(operator, tt -> {
 
             if (!success) {
-                long now = n.time();
-                if ((now >= start) && (now <= end)) {
-                    float expect = t.expectation();
-                    if ((expect >= minExpect) && (expect <= maxExpect)) {
-                        success = true;
-                        successTime = now;
+                for (Task t : tt) {
+                    long now = n.time();
+                    if ((now >= start) && (now <= end)) {
+                        float expect = t.expectation();
+                        if ((expect >= minExpect) && (expect <= maxExpect)) {
+                            success = true;
+                            successTime = now;
+                        }
                     }
                 }
             }
