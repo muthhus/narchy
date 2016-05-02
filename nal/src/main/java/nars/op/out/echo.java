@@ -1,5 +1,6 @@
 package nars.op.out;
 
+import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
 import nars.term.Compound;
@@ -14,8 +15,7 @@ import java.util.List;
 public class echo extends ImmediateOperator {
 
     @Override
-    public void execute(@NotNull List<Task> e) {
-        Compound t = e.get(0).term();
+    public void execute(@NotNull OperationConcept t) {
         nar.eventSpeak.emit( Operator.opArgs(t) );
     }
 

@@ -23,6 +23,7 @@ package nars.nal.nal8;
 
 import nars.$;
 import nars.NAR;
+import nars.concept.OperationConcept;
 import nars.task.Task;
 import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ import java.util.function.Consumer;
 /**
  * An operator implementation
  */
-public abstract class AbstractOperator implements Consumer<List<Task>> {
+public abstract class AbstractOperator implements Consumer<OperationConcept> {
 
 
     public final @NotNull Operator atomicTerm;
@@ -71,13 +72,13 @@ public abstract class AbstractOperator implements Consumer<List<Task>> {
 
 
     @Override
-    public void accept(@NotNull List<Task> execution) {
+    public void accept(@NotNull OperationConcept exec) {
         if (async()) {
             //asynch
-            NAR.runAsync(() -> execute(execution));
+            NAR.runAsync(() -> execute(exec));
         } else {
             //synchronous
-            execute(execution);
+            execute(exec);
         }
     }
 
@@ -89,7 +90,7 @@ public abstract class AbstractOperator implements Consumer<List<Task>> {
      * reportExecution
      */
 
-    public abstract void execute(List<Task> execution);
+    public abstract void execute(OperationConcept exec);
 
 
     /** determines the execution strategy. currently there are only two: synch and async, and if

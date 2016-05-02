@@ -3,6 +3,7 @@ package nars.nal.nal8.operator;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
@@ -67,17 +68,17 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
     @Nullable
-    protected MutableTask result(@NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/) {
-        return Execution.result(nar, goal, y, getResultTense(goal));
+    protected MutableTask result(@NotNull OperationConcept goal, Term y/*, Term[] x0, Term lastTerm*/) {
+        return Execution.result(nar, goal, y, getResultTense());
     }
 
     /**
      * default tense applied to result tasks
      */
     @NotNull
-    public Tense getResultTense(@NotNull Task goal) {
-        return goal.isEternal() ? Tense.Eternal : Tense.Present;
-        //return Tense.Present;
+    public Tense getResultTense() {
+        //return goal.isEternal() ? Tense.Eternal : Tense.Present;
+        return Tense.Present;
     }
 
 //    /** default confidence applied to result tasks */
@@ -139,27 +140,27 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
     @Override
-    public void execute(@NotNull List<Task> uuu) {
+    public void execute(@NotNull OperationConcept exec) {
 
 
-        Task tt = uuu.get(0); //first one
 
 
-        final Compound ttt = tt.term();
+
+        final Compound ttt = exec;
         final Compound args = Operator.opArgs(ttt);
-        if (!tt.isCommand()) {
+        //if (!tt.isCommand()) {
             if (!validArgs(args))
                 return;
-        }
+        //}
         O y = function(args, nar.index());
-        if (!tt.isCommand()) {
-            feedback(tt, y);
-        }
+        //if (!tt.isCommand()) {
+        feedback(exec, y);
+        //}
 
 
     }
 
-    protected void feedback(@NotNull Task cause, @Nullable Object y) {
+    protected void feedback(@NotNull OperationConcept cause, @Nullable Object y) {
 
         if (y == null || (y instanceof Term)) {
             Execution.feedback(cause, result(cause, (Term) y), nar);
@@ -178,10 +179,10 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
         if (y instanceof Task) {
             Task ty = (Task) y;
-            if (ty.pri() == 0) {
+            //if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
-                ty.budget().set(cause);
-            }
+                //ty.budget().set(cause);
+            //}
             Execution.feedback(cause, (Task) y, nar);
             return;
         }

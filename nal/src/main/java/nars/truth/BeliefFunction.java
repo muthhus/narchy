@@ -78,6 +78,12 @@ public enum BeliefFunction implements TruthOperator {
             return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf);
         }
     },
+    AbductionInv() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(B, T, minConf);
+        }
+    },
 
     Comparison() {
         @Nullable
@@ -290,15 +296,19 @@ public enum BeliefFunction implements TruthOperator {
 
 
     //TODO use an enum map with terms bound to the enum values directly
-    static final Map<Term, BeliefFunction> atomToTruthModifier = Global.newHashMap(BeliefFunction.values().length);
+    static final Map<Term, TruthOperator> atomToTruthModifier = Global.newHashMap(BeliefFunction.values().length);
+
+
 
     static {
-        for (BeliefFunction tm : BeliefFunction.values())
+        for (BeliefFunction tm : BeliefFunction.values()) {
             atomToTruthModifier.put($.the(tm.toString()), tm);
+            atomToTruthModifier.put($.the(tm.toString() + 'X'), TruthOperator.inverse(tm));
+        }
     }
 
     @Nullable
-    public static BeliefFunction get(Term a) {
+    public static TruthOperator get(Term a) {
         return atomToTruthModifier.get(a);
     }
 
@@ -328,4 +338,5 @@ public enum BeliefFunction implements TruthOperator {
     public boolean allowOverlap() {
         return overlap;
     }
+
 }

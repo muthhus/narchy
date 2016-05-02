@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
+import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -27,8 +28,8 @@ public interface Execution  {
 
     //private static final Logger logger = LoggerFactory.getLogger(Execution.class);
 
-    float feedbackPriorityMultiplier = 1.0f;
-    float feedbackDurabilityMultiplier = 1.0f;
+    //float feedbackPriorityMultiplier = 1.0f;
+    //float feedbackDurabilityMultiplier = 1.0f;
     Variable defaultResultVariable = $.varDep("defaultResultVariable");
 //    public final NAR nar;
 //    public final Task task;
@@ -40,9 +41,8 @@ public interface Execution  {
 
 //    }
 
-    static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
+    static MutableTask result(@NotNull NAR nar, @NotNull OperationConcept operation, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
 
-        Compound operation = goal.term();
 
         //Variable var=new Variable("$1");
         //  Term actual_part = Similarity.make(var, y);
@@ -66,16 +66,12 @@ public interface Execution  {
             return null;
         }
 
-        if (goal.isDeleted()) {
-            //throw new RuntimeException("goal Deleted");
-            return null;
-        }
 
         return (MutableTask) new MutableTask(inh)
                 .judgment()  //with default truth value
                 .time(tense, nar)
-                .budget(goal.budget())
-                .budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
+                //.budget(goal.budget())
+                //.budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
                 .log("Execution Result")
                 ;
 
@@ -164,7 +160,7 @@ public interface Execution  {
     //feedback(Task[] t)
     //feedback(Object o)
 
-    static void feedback(@NotNull Task cause, Task feedback, @NotNull NAR n) {
+    static void feedback(@NotNull OperationConcept cause, Task feedback, @NotNull NAR n) {
         n.input(
             noticeExecuted(n, cause),
             feedback
@@ -176,18 +172,15 @@ public interface Execution  {
      *
      * @param operation
      */
-    static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
+    static Task noticeExecuted(@NotNull NAR nar, @NotNull OperationConcept operation) {
 
-        Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
+        //Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
 
-
-        return $.belief(operation.term(),
-
-                operation.truth()). //equal to input, balanced
+        return $.belief(operation, operation.desire(nar.time())). //equal to input, balanced
                 //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
-                        budget(b).
-                        occurr(operation.isEternal() ? Tense.ETERNAL : nar.time()).
+                        //budget(b).
+                        occurr(nar.time()). //operation.isEternal() ? Tense.ETERNAL :
                 //parent(operation). //https://github.com/opennars/opennars/commit/23d34d5ddaf7c71348d0a70a88e2805ec659ed1c#diff-abb6b480847c96e2dbf488d303fb4962L235
                         because("Executed")
                 ;

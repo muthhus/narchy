@@ -3,6 +3,7 @@ package nars.nar;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.NullOperator;
 import nars.task.Task;
 import nars.term.Operator;
@@ -28,7 +29,7 @@ public class CommandTest {
         n.onExec(new NullOperator("c") {
 
             @Override
-            public void execute(@NotNull List<Task> t) {
+            public void execute(@NotNull OperationConcept t) {
 
                 invoked.set(true);
 //                Term[] a = Operator.argArray(t.term());

@@ -1,5 +1,6 @@
 package nars.op.sys;
 
+import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ public class reset extends ImmediateOperator {
     }
 
     @Override
-    public void execute(@NotNull List<Task> e) {
+    public void execute(@NotNull OperationConcept e) {
         nar.reset();
         //nar.reset()
     }

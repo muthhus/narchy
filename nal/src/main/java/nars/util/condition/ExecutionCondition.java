@@ -31,7 +31,7 @@ public class ExecutionCondition implements NARCondition {
         n.onExecution(operator, tt -> {
 
             if (!success) {
-                for (Task t : tt) {
+                for (Task t : tt.pendingGoals) {
                     long now = n.time();
                     if ((now >= start) && (now <= end)) {
                         float expect = t.expectation();

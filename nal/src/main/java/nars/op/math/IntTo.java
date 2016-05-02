@@ -36,7 +36,7 @@ public abstract class IntTo<Y> extends TermFunction<Y> {
 
     @NotNull
     @Override
-    public Tense getResultTense(Task t) {
+    public Tense getResultTense() {
         return Tense.Eternal;
     }
 }

@@ -20,7 +20,10 @@ package nars.op.mental;
 import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
+import nars.budget.Budget;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
@@ -42,25 +45,25 @@ public class doubt extends AbstractOperator {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(@NotNull List<Task> execution) {
+    public void execute(@NotNull OperationConcept t) {
 
-        Compound t = execution.get(0).term();
 
-        nar.runLater(()->{
 
-            Term term = Operator.argArray(t)[0];
-
-            Task operation = execution.get(0); //TODO use the sum or average of the execution task budgets
-
-            Concept concept = nar.conceptualize(term, operation);
-            if (concept!=null) {
-                discountBeliefConfidence(concept, operation.punc(),
-                        //TODO use min/max parameters somehow
-                        0.5f + (1f - operation.motivation()),
-                        nar);
-            }
-
-        });
+//        nar.runLater(()->{
+//
+//            Term term = Operator.argArray(t)[0];
+//
+//            Budget operation = UnitBudget.Zero; //execution.get(0); //TODO use the sum or average of the execution task budgets
+//
+//            Concept concept = nar.conceptualize(term, operation);
+//            if (concept!=null) {
+//                discountBeliefConfidence(concept, operation.punc(),
+//                        //TODO use min/max parameters somehow
+//                        0.5f + (1f - operation.motivation()),
+//                        nar);
+//            }
+//
+//        });
 
     }
 

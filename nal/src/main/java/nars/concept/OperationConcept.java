@@ -44,9 +44,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     protected long lastMotivationUpdate = Tense.ETERNAL;
 
     //TODO allocate this only for Operation (not negations)
-    transient private final List<Task> pendingGoals = Global.newArrayList(0);
+    public transient final List<Task> pendingBeliefs = Global.newArrayList(0);
+    public transient final List<Task> pendingGoals = Global.newArrayList(0);
 
-    public transient NAR nar;
+    transient NAR nar;
     private boolean pendingRun;
 
 
@@ -100,8 +101,12 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         if (t.isGoal()) {
             pendingGoals.add(t);
-            executeLater(nar);
+        } else {
+            pendingBeliefs.add(t);
         }
+
+        executeLater(nar);
+
         /*} else {
             nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
         }*/
@@ -126,8 +131,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        List<Task> pending = this.pending;
 //        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
 //        }
-        execute(pendingGoals, nar);
+        execute(nar);
 
+        pendingBeliefs.clear();
         pendingGoals.clear();
         pendingRun = false;
     }
@@ -167,7 +173,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
      * The goal has already successfully been inserted to belief table.
      * the job here is to update the resulting motivation state
      */
-    final void execute(@NotNull List<Task> tasks, @NotNull NAR nar) {
+    final void execute(@NotNull NAR nar) {
 
 
         //        if (motivation < executionThreshold.floatValue())
@@ -183,16 +189,16 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         if (desire > 0.5f && desire > belief) {
 
             if (isOperation) {
-                Topic<List<Task>> tt = nar.concept(Operator.operator(this)).get(Execution.class);
+                Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
                 if (tt != null && !tt.isEmpty()) {
                     //beforeNextFrame( //<-- enqueue after this frame, before next
-                    tt.emit(tasks);
+                    tt.emit(this);
                 }
             }
 
 
             //call Task.execute only for goals
-            tasks.forEach(task -> {
+            pendingGoals.forEach(task -> {
                 if (task.isGoal()) {
                     if (Global.DEBUG)
                         task.log("execute(b=" + believed + ",d=" + desired + ')');

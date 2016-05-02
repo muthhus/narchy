@@ -249,7 +249,7 @@ public class NAL3Test extends AbstractNALTest {
                 .log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))", 0f, 0.9f)
-                .mustBelieve(10, "(a-->c)", 0f, 0.81f, ETERNAL);
+                .mustBelieve(cycles, "(a-->c)", 0f, 0.81f, ETERNAL);
 
     }
     @Test public void testArity1_Decomposition_IntersectExt2() {
@@ -258,7 +258,7 @@ public class NAL3Test extends AbstractNALTest {
                 .log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))")
-                .mustBelieve(10, "(a-->c)", 1f, 0.81f, ETERNAL);
+                .mustBelieve(cycles, "(a-->c)", 1f, 0.81f, ETERNAL);
 
     }
     @Test public void testArity1_Decomposition_IntersectInt() {
@@ -267,7 +267,7 @@ public class NAL3Test extends AbstractNALTest {
         test()
                 .believe("(a-->b)")
                 .believe("(a-->(|,b,c))", 0f, 0.9f)
-                .mustBelieve(10, "(a-->c)", 1f, 0.81f, ETERNAL);
+                .mustBelieve(cycles, "(a-->c)", 1f, 0.81f, ETERNAL);
 
     }
 

@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.concept.OperationConcept;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Operator;
@@ -45,36 +46,37 @@ public class GoalPrecisionTest {
     protected void run(@NotNull NAR n, int end) {
 
         Global.DEBUG = true;
-        n.onExecution($.operator("x"), (List<Task> bb) -> {
-            Task a = bb.get(0);
+        n.onExecution($.operator("x"), (OperationConcept c) -> {
 
-            Term[] aa = Operator.argArray(a.term());
-            float pri = a.pri() * a.expectation();
+            for (Task a : c.pendingGoals) {
 
-            float[] d = plan.get(aa[0].toString());
-            if (d == null) {
-                throw new RuntimeException("unknown action: " + a);
+                Term[] aa = Operator.argArray(a.term());
+                float pri = a.pri() * a.expectation();
+
+                float[] d = plan.get(aa[0].toString());
+                if (d == null) {
+                    throw new RuntimeException("unknown action: " + a);
+                }
+
+
+                if (d[1] == -1) {
+                    //first time
+                    d[1] = (int) n.time();
+                    d[2] = pri;
+                    System.out.println("OK " + a);
+                } else {
+                    d[3] += pri;
+                    d[4]++;
+
+                    System.out.println();
+                    System.out.println(a);
+                    System.out.println(a.log());
+                    n.concept(a).print();
+                    System.out.println(a.explanation());
+                }
+
+                //a.task.mulPriority(0);
             }
-
-
-            if (d[1] == -1) {
-                //first time
-                d[1] = (int) n.time();
-                d[2] = pri;
-                System.out.println("OK " + a);
-            } else {
-                d[3] += pri;
-                d[4]++;
-
-                System.out.println();
-                System.out.println(a);
-                System.out.println(a.log());
-                n.concept(a).print();
-                System.out.println(a.explanation());
-            }
-
-            //a.task.mulPriority(0);
-
 
         });
 

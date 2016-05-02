@@ -22,4 +22,35 @@ public interface TruthOperator {
 
     boolean allowOverlap();
     boolean single();
+
+
+    public static TruthOperator inverse(TruthOperator o) {
+        return new InverseTruthOperator(o);
+    }
+
+    final class InverseTruthOperator implements TruthOperator {
+
+        private final TruthOperator o;
+
+        public InverseTruthOperator(TruthOperator o) {
+            this.o = o;
+        }
+
+        @Override
+        public
+        @Nullable
+        Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf) {
+            return o.apply(belief, task, m, minConf);
+        }
+
+        @Override
+        public boolean allowOverlap() {
+            return o.allowOverlap();
+        }
+
+        @Override
+        public boolean single() {
+            return o.single();
+        }
+    }
 }

@@ -177,16 +177,8 @@ public class PremiseRuleTest {
         assertEquals(6, s.size());
 
         String x = s.toString();
-        /*
-        (((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
-        (((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
-        (((%1-->%2),(%1-->%3),neq(%1,%2),task("?")),((%3-->%2),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
-        (((%1-->%2),(%1-->%3),neq(%1,%3),task("?")),((%2-->%3),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
-        (((%1-->%2),(%3-->%2),neq(%3,%2),task("?")),((%3-->%1),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
-        (((%1-->%2),(%3-->%2),neq(%1,%2),task("?")),((%1-->%3),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))
 
-         */
-        assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((Deduction-->Belief),(Strong-->Desire),(AllowBackward-->Derive))))"));
+        assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((DeductionX-->Belief),(StrongX-->Desire),(AllowBackward-->Derive))))"));
         assertTrue(x.contains("(((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),"));
         assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%2),task(\"?\")),((%3-->%2),"));
         assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%3),task(\"?\")),((%2-->%3),"));

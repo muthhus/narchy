@@ -285,7 +285,12 @@ public class PremiseRuleSet  {
     }
 
     public static void permuteForward(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
+
         PremiseRule f = add(ur, b.forwardPermutation(), src + ":forward", index);
+        if (f == null)
+            return;
+        //PremiseRule f = b;
+
         if (thenBackward) {
             f.backwardPermutation((s, reasonBF) -> {
                 add(ur, s, src + ':' + reasonBF, index);
@@ -304,12 +309,15 @@ public class PremiseRuleSet  {
             String x = s.toString();
             if ((x.contains("task(")) ||
                 (x.contains("time(")) ||
+                (x.contains("decomposeTask")) ||
+                (x.contains("decomposeBelief")) ||
                 (x.contains("after(")) ||
                 (x.contains("Punctuation")) ||
                 (x.contains("Structural")) ||
                 (x.contains("Identity")) ||
                 //(x.contains("substitute")) || //TESTING THIS
-                (x.contains("Negation"))) {
+                (x.contains("Negation"))
+            ) {
 
                 fwd[0] = false;
             }
@@ -328,6 +336,8 @@ public class PremiseRuleSet  {
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
 //        if (q == null)
 //            throw new RuntimeException("null: " + q + ' ' + src);
+        if (q == null)
+            return null;
 
         PremiseRule normalized = q.normalizeRule(index).setup(index);
         normalized.setSource(src);

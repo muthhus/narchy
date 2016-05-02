@@ -23,10 +23,10 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
     private final Derive derive;
 
-    protected final BeliefFunction belief;
-    protected final DesireFunction desire;
+    protected final TruthOperator belief;
+    protected final TruthOperator desire;
 
-    public Solve(String id, Derive derive, BeliefFunction belief, DesireFunction desire) {
+    public Solve(String id, Derive derive, TruthOperator belief, TruthOperator desire) {
         super();
         this.id = id;
         this.derive = derive;
@@ -197,7 +197,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
     public static final class SolvePuncFromTask extends Solve {
 
-        public SolvePuncFromTask(String i, Derive der, BeliefFunction belief, DesireFunction desire) {
+        public SolvePuncFromTask(String i, Derive der, TruthOperator belief, TruthOperator desire) {
             super(i, der, belief, desire);
         }
 
@@ -212,7 +212,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         private final char puncOverride;
 
 
-        public SolvePuncOverride(String i, Derive der, char puncOverride, BeliefFunction belief, DesireFunction desire) {
+        public SolvePuncOverride(String i, Derive der, char puncOverride, TruthOperator belief, TruthOperator desire) {
             super(i, der, belief, desire);
             this.puncOverride = puncOverride;
         }

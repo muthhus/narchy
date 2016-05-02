@@ -21,6 +21,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
@@ -41,6 +42,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
+import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.Terms.*;
 
@@ -114,6 +116,36 @@ public class PremiseRule extends GenericCompound {
 
     @Nullable
     private Temporalize temporalize = Temporalize.Auto;
+    private static final CompoundTransform truthSwap = new CompoundTransform<Compound,Term>() {
+
+        final Atom belief = $.the("Belief");
+        final Atom desire = $.the("Desire");
+
+        @Nullable
+        @Override
+        public Termed<?> apply(Compound parent, Term subterm) {
+
+            Compound tf = (Compound)subterm;
+            Term func = tf.term(0);
+            Term mode = tf.term(1);
+
+            return $.inh(swap(func), mode);
+
+        }
+
+        private Term swap(Term func) {
+            return $.the(func.toString() + "X");
+        }
+
+        @Override
+        public boolean test(Term o) {
+            if (o.op() == INHERIT){
+                Term pred = ((Compound)o).term(1);
+                return pred.equals(belief) || pred.equals(desire);
+            }
+            return false;
+        }
+    };
 
     @NotNull
     public final Compound getPremise() {
@@ -255,9 +287,9 @@ public class PremiseRule extends GenericCompound {
 
         char puncOverride = p.puncOverride;
 
-        BeliefFunction belief = BeliefFunction.get(p.beliefTruth);
+        TruthOperator belief = BeliefFunction.get(p.beliefTruth);
         String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
-        DesireFunction desire = DesireFunction.get(p.goalTruth);
+        TruthOperator desire = DesireFunction.get(p.goalTruth);
         String desireLabel = desire != null ? p.goalTruth.toString() : "_";
 
         String sn = "Truth:(";
@@ -817,9 +849,12 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {
 
+
         Map<Term, Term> m = new HashMap(3);
         m.put(getTask(), newT);
         m.put(getBelief(), newB);
+        boolean swapTruth = (!question && getTask().equals(newB) && getBelief().equals(newT));
+
         m.put(getConclusionTermPattern(), newR);
 
         Compound remapped = (Compound) (terms.transform(this, new MapSubst(m)).term());
@@ -831,7 +866,12 @@ public class PremiseRule extends GenericCompound {
                 p(concat(pp, TaskQuestionTerm)) :
                 pc;
 
-        return new PremiseRule(newPremise, (Compound) remapped.term(1));
+        Compound newConclusion = (Compound) remapped.term(1);
+        if (swapTruth) {
+            newConclusion = (Compound) terms.transform(newConclusion, truthSwap);
+        }
+
+        return new PremiseRule(newPremise, newConclusion);
 
 
 //

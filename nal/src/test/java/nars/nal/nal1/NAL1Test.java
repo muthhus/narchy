@@ -11,6 +11,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
@@ -100,15 +102,15 @@ public class NAL1Test extends AbstractNALTest {
         <swan --> swimmer>. %0.9;0.9%
         <swan --> bird>.
          */
-        TestNAR test = test();
-        test.believe("<swan --> swimmer>", 0.90f, 0.9f)
-                //.en("Swan is a type of swimmer.");
-                .believe("<swan --> bird>")
-                        //.en("Swan is a type of bird.");
-
-                .mustBelieve(withinCycles, "<bird --> swimmer>", 0.90f, 0.45f)
-                        //.en("I guess bird is a type of swimmer.");
-                .mustBelieve(withinCycles, "<swimmer --> bird>", 1.0f, 0.42f);
+        test()
+            .log()
+            .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
+            .believe("<swan --> bird>") //.en("Swan is a type of bird.");
+            .mustBelieve(withinCycles, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
+            .mustNotOutput(withinCycles, "<bird --> swimmer>", '.', 1f, 1f, 0.41f, 0.43f, ETERNAL) //test for correct ordering of the premise wrt truth value function
+            .mustBelieve(withinCycles, "<swimmer --> bird>", 1.0f, 0.42f)
+            .mustNotOutput(withinCycles, "<swimmer --> bird>", '.', 0.9f, 0.9f, 0.44f, 0.46f, ETERNAL) //test for correct ordering of the premise wrt truth value function
+            ;
     }
 
     @Test

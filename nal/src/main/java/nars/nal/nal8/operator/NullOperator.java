@@ -20,6 +20,7 @@
  */
 package nars.nal.nal8.operator;
 
+import nars.concept.OperationConcept;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
 
@@ -40,7 +41,7 @@ public class NullOperator extends AbstractOperator {
     }
 
     @Override
-    public void execute(List<Task> e) {
+    public void execute(OperationConcept e) {
 
     }
 }

@@ -9,6 +9,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -497,13 +498,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
-    public final On onExecution(@NotNull String op, @NotNull Consumer<List<Task>> each) {
+    public final On onExecution(@NotNull String op, @NotNull Consumer<OperationConcept> each) {
         return onExecution($.operator(op), each);
     }
 
-    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<List<Task>> each) {
+    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
         return concept(op,true)
-                .<Topic<List<Task>>>meta(Execution.class,
+                .<Topic<OperationConcept>>meta(Execution.class,
                         (k, v) -> v!=null ?  v : new DefaultTopic<>())
                 .on(each);
     }

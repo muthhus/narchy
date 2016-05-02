@@ -27,14 +27,14 @@ public enum DesireFunction implements TruthOperator {
     Strong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return B == null ? null : TruthFunctions.desireStrong(T, B, minConf);
+            return (T == null || B == null) ? null : TruthFunctions.desireStrong(T, B, minConf);
         }
     },
 
     Weak() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return B == null ? null : TruthFunctions.desireWeak(T, B, minConf);
+            return (T == null || B == null) ? null : TruthFunctions.desireWeak(T, B, minConf);
         }
     },
 
@@ -88,15 +88,17 @@ public enum DesireFunction implements TruthOperator {
     }
 
 
-    static final Map<Term, DesireFunction> atomToTruthModifier = Global.newHashMap(DesireFunction.values().length);
+    static final Map<Term, TruthOperator> atomToTruthModifier = Global.newHashMap(DesireFunction.values().length);
 
     static {
-        for (DesireFunction tm : DesireFunction.values())
+        for (DesireFunction tm : DesireFunction.values()) {
             atomToTruthModifier.put($.the(tm.toString()), tm);
+            atomToTruthModifier.put($.the(tm.toString() + 'X'), TruthOperator.inverse(tm));
+        }
     }
 
 
-    public static DesireFunction get(Term a) {
+    public static TruthOperator get(Term a) {
         return atomToTruthModifier.get(a);
     }
 
