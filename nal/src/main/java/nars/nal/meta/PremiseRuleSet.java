@@ -286,13 +286,14 @@ public class PremiseRuleSet  {
 
     public static void permuteForward(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
 
-        PremiseRule f = add(ur, b.forwardPermutation(), src + ":forward", index);
-        if (f == null)
-            return;
+        @NotNull PremiseRule bSwap = b.forwardPermutation(index);
+        if (bSwap!=null) {
+            add(ur, bSwap, src + ":forward", index);
+        }
         //PremiseRule f = b;
 
         if (thenBackward) {
-            f.backwardPermutation((s, reasonBF) -> {
+            b.backwardPermutation((s, reasonBF) -> {
                 add(ur, s, src + ':' + reasonBF, index);
             });
         }
@@ -332,17 +333,21 @@ public class PremiseRuleSet  {
 //
 //     }
 
-    @Nullable
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
 //        if (q == null)
 //            throw new RuntimeException("null: " + q + ' ' + src);
-        if (q == null)
-            return null;
 
-        PremiseRule normalized = q.normalizeRule(index).setup(index);
+
+        PremiseRule normalized = normalize(q, index);
         normalized.setSource(src);
         target.add(normalized);
+
         return normalized;
+    }
+
+    @NotNull
+    static PremiseRule normalize(@Nullable PremiseRule q, @NotNull PatternIndex index) {
+        return q.normalizeRule(index).setup(index);
     }
 
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);

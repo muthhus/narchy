@@ -209,7 +209,7 @@ public enum BeliefFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposeNegativePositivePositive(T,B);
+            return TruthFunctions.decomposeNegativePositivePositive(T,B, minConf);
         }
     },
     DecomposePositivePositivePositive() {
@@ -217,7 +217,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             Truth Tn = TruthFunctions.negation(T, minConf);
-            return (Tn == null) ? null : TruthFunctions.decomposeNegativePositivePositive(Tn, B);
+            return (Tn == null) ? null : TruthFunctions.decomposeNegativePositivePositive(Tn, B, minConf);
         }
     },
     DecomposePositiveNegativeNegative() {

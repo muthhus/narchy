@@ -494,7 +494,7 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     @NotNull
-    public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b) {
+    public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float c1 = a.conf();
         float f2 = b.freq();
@@ -503,7 +503,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float f = and((1-f1),f2);
 
         float c = and(f, c1, c2);
-        return new DefaultTruth(f, c);
+        return c < minConf ? null : new DefaultTruth(f, c);
     }
 
     @NotNull

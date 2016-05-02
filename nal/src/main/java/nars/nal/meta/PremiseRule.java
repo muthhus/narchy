@@ -44,6 +44,7 @@ import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
+import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
 
 /**
@@ -96,7 +97,7 @@ public class PremiseRule extends GenericCompound {
 
     public PostCondition[] postconditions;
 
-    public PatternCompound pattern;
+//    public PatternCompound pattern;
 
     //it has certain pre-conditions, all given as predicates after the two input premises
 
@@ -349,15 +350,15 @@ public class PremiseRule extends GenericCompound {
 //        return str;
 //    }
 
-    @Nullable
-    public final Term task() {
-        return pattern.term(0);
-    }
-
-    @Nullable
-    public final Term belief() {
-        return pattern.term(1);
-    }
+//    @Nullable
+//    public final Term task() {
+//        return pattern.term(0);
+//    }
+//
+//    @Nullable
+//    public final Term belief() {
+//        return pattern.term(1);
+//    }
 
     /**
      * deduplicate and generate match-optimized compounds for rules
@@ -460,7 +461,7 @@ public class PremiseRule extends GenericCompound {
         //and not a belief term pattern
         //(which will not reference any particular atoms)
 
-        pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
+        //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
         ListMultimap<Term, MatchConstraint> constraints = MultimapBuilder.treeKeys().arrayListValues().build();
@@ -726,7 +727,7 @@ public class PremiseRule extends GenericCompound {
 
 
         this.match = new MatchTaskBelief(
-                new TaskBeliefPair(pattern.term(0), pattern.term(1)), //HACK
+                new TaskBeliefPair(getTask(), getBelief()), //HACK
                 constraints);
 
 
@@ -760,12 +761,11 @@ public class PremiseRule extends GenericCompound {
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
-        minNAL =
-                Math.max(minNAL,
+        minNAL = Math.max(minNAL,
                         Math.max(
-                                maxLevel(pattern.term(0)),
-                                maxLevel(pattern.term(1)
-                                )));
+                                maxLevel(getTask()),
+                                maxLevel(getBelief())
+                        ));
 
 
         ensureValid();
@@ -830,7 +830,7 @@ public class PremiseRule extends GenericCompound {
      * after generating, these are then backward permuted
      */
     @NotNull
-    public final PremiseRule forwardPermutation() {
+    public final PremiseRule forwardPermutation(PatternIndex index) {
 
         // T, B, [pre] |- C, [post] ||--
 
@@ -841,7 +841,13 @@ public class PremiseRule extends GenericCompound {
         ////      B, T, [pre], task_is_question() |- T, [post]
         //      B, T, [pre], task_is_question() |- C, [post]
 
-        return clonePermutation(B, T, C, false);
+        PremiseRule p = clonePermutation(B, T, C, false);
+        p = normalize(p, index);
+        if (p.getTask().equals(T) && p.getBelief().equals(B)) {
+            //no change, ignore the permutation
+            p = null;
+        }
+        return p;
     }
 
     static final Term TaskQuestionTerm = exec("task", "\"?\"");
