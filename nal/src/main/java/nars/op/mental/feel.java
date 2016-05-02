@@ -19,7 +19,7 @@ package nars.op.mental;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
-import nars.nal.nal8.operator.SyncOperator;
+import nars.nal.nal8.AbstractOperator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Feeling common operations
  */
-public abstract class feel extends SyncOperator {
+public abstract class feel extends AbstractOperator {
 
     /**
      * To get the current value of an internal sensor

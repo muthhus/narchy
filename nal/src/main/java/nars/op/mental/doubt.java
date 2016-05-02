@@ -20,10 +20,9 @@ package nars.op.mental;
 import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
-import nars.nal.nal8.operator.SyncOperator;
+import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
@@ -35,7 +34,7 @@ import java.util.List;
 /**
  * Operator that activates a concept
  */
-public class doubt extends SyncOperator {
+public class doubt extends AbstractOperator {
 
     /**
      * To activate a concept as if a question has been asked about it

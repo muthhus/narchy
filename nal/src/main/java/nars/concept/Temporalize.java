@@ -265,6 +265,9 @@ public interface Temporalize {
                 for (int i = 0; i < decTerm.size(); i++) {
                     Term dct = decTerm.term(i);
                     Term rdt = p.resolve(dct);
+                    if (rdt==null)
+                        continue;
+
                     if (rdt.equals(derived)) {
                         int st = decTerm.subtermTime(dct);
                         if (st != DTERNAL) {
@@ -273,7 +276,7 @@ public interface Temporalize {
                         }
                     }
 
-                    if (otherTerm != null && rdt.equals(otherTerm)) {
+                    if (rdt.equals(otherTerm)) {
                         int st = decTerm.subtermTime(dct);
                         if (st != DTERNAL) {
                             shift -= st;

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class add extends IntIntTo<Integer> {
 
     @NotNull
-    @Override protected Integer function(int a, int b) {
+    @Override protected Integer apply(int a, int b) {
         return a+b;
     }
 }

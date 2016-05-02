@@ -58,7 +58,7 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
     //final HashBiMap<Object,Term> instances = new HashBiMap();
     final MutableMap<Class, ProxyFactory> proxyCache = new UnifiedMap().asSynchronized();
 
-    final Map<Class, ClassOperator> classOps = Global.newHashMap();
+    //final Map<Class, ClassOperator> classOps = Global.newHashMap();
     //final Map<Method, MethodOperator> methodOps = Global.newHashMap();
 
     /**
@@ -288,11 +288,11 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
 
         T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
 
-        ClassOperator co = classOps.computeIfAbsent(instance, i -> {
-            ClassOperator co2 = new ClassOperator(i, goalInvoke, Lobjects.this);
-            nar.onExec(co2);
-            return co2;
-        });
+//        ClassOperator co = classOps.computeIfAbsent(instance, i -> {
+//            ClassOperator co2 = new ClassOperator(i, goalInvoke, Lobjects.this);
+//            nar.onExec(co2);
+//            return co2;
+//        });
 
         //onInstanceOfClass(identifier, term(instance));
 

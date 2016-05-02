@@ -1,10 +1,10 @@
 package nars.nal.nal8.operator;
 
 import nars.$;
+import nars.Narsese;
 import nars.Op;
-import nars.Symbols;
-import nars.concept.Concept;
 import nars.nal.Tense;
+import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 
-/** 
+/**
  * Superclass of functions that execute synchronously (blocking, in thread) and take
  * N input Global and one variable argument (as the final argument), generating a new task
  * with the result of the function substituted in the variable's place.
  */
-public abstract class TermFunction<O> extends SyncOperator {
+public abstract class TermFunction<O> extends AbstractOperator {
 
     private static final Logger logger = LoggerFactory.getLogger(TermFunction.class);
 
@@ -41,11 +41,10 @@ public abstract class TermFunction<O> extends SyncOperator {
         super(name);
     }
 
-    public static int integer(@NotNull Term x, int defaultValue)  {
+    public static int integer(@NotNull Term x, int defaultValue) {
         try {
             return integer(x);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
@@ -54,22 +53,14 @@ public abstract class TermFunction<O> extends SyncOperator {
         return Texts.i(Atom.unquote(x));
     }
 
-    public static boolean isPunctuation(char c) {
-        switch (c) {
-            case Symbols.BELIEF:
-            case Symbols.GOAL:
-            case Symbols.QUEST:
-            case Symbols.QUESTION:
-                return true;
-        }
-        return false;
-    }
-
     //TODO supply the execution instead of the TermBuilder which is referenced from it. in TermBuilder, supply a dummy Execution context for the ImmediateTransforms that need it
-    /** y = function(x) 
-     * @return y, or null if unsuccessful
+
+    /**
+     * y = function(x)
+     *
      * @param arguments - the product subject of an Operation
      * @param i
+     * @return y, or null if unsuccessful
      */
     @Nullable
     public abstract O function(Compound arguments, TermIndex i);
@@ -80,7 +71,9 @@ public abstract class TermFunction<O> extends SyncOperator {
         return Execution.result(nar, goal, y, getResultTense(goal));
     }
 
-    /** default tense applied to result tasks */
+    /**
+     * default tense applied to result tasks
+     */
     @NotNull
     public Tense getResultTense(@NotNull Task goal) {
         return goal.isEternal() ? Tense.Eternal : Tense.Present;
@@ -97,7 +90,6 @@ public abstract class TermFunction<O> extends SyncOperator {
 //    public float getResultConfidence() {
 //        return 0.99f;
 //    }
-
 
 
 //    protected ArrayList<Task> result2(Operation operation, Term y, Term[] x0, Term lastTerm) {
@@ -146,8 +138,6 @@ public abstract class TermFunction<O> extends SyncOperator {
 //    }
 
 
-
-
     @Override
     public void execute(@NotNull List<Task> uuu) {
 
@@ -155,16 +145,16 @@ public abstract class TermFunction<O> extends SyncOperator {
         Task tt = uuu.get(0); //first one
 
 
-            final Compound ttt = tt.term();
-            final Compound args = Operator.opArgs(ttt);
-            if (!tt.isCommand()) {
-                if (!validArgs(args))
-                    return;
-            }
-            O y = function(args, nar.index());
-            if (!tt.isCommand()) {
-                feedback(tt, y);
-            }
+        final Compound ttt = tt.term();
+        final Compound args = Operator.opArgs(ttt);
+        if (!tt.isCommand()) {
+            if (!validArgs(args))
+                return;
+        }
+        O y = function(args, nar.index());
+        if (!tt.isCommand()) {
+            feedback(tt, y);
+        }
 
 
     }
@@ -172,32 +162,32 @@ public abstract class TermFunction<O> extends SyncOperator {
     protected void feedback(@NotNull Task cause, @Nullable Object y) {
 
         if (y == null || (y instanceof Term)) {
-            Execution.feedback( cause, result(cause, (Term) y), nar );
+            Execution.feedback(cause, result(cause, (Term) y), nar);
             return;
         }
 
         if (y instanceof Boolean) {
-            boolean by = (Boolean)y;
+            boolean by = (Boolean) y;
             y = new DefaultTruth(by ? 1 : 0, 0.99f);
         }
 
         if (y instanceof Truth) {
-            Execution.feedback( cause, result(cause, null).truth((Truth)y), nar );
+            Execution.feedback(cause, result(cause, null).truth((Truth) y), nar);
             return;
         }
 
         if (y instanceof Task) {
-            Task ty = (Task)y;
+            Task ty = (Task) y;
             if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
                 ty.budget().set(cause);
             }
-            Execution.feedback( cause, (Task)y, nar );
+            Execution.feedback(cause, (Task) y, nar);
             return;
         }
 
         if (y instanceof Number) {
-            y = ($.the((Number)y));
+            y = ($.the((Number) y));
         }
 
 
@@ -205,12 +195,12 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
         //1. try to parse as task
-        char possibleTaskPunc = ys.charAt(ys.length()-1); //early prevention from invoking parser
-        if (isPunctuation(possibleTaskPunc) || possibleTaskPunc == ':' /* tense ending character */) {
+        char possibleTaskPunc = ys.charAt(ys.length() - 1); //early prevention from invoking parser
+        if (Narsese.isPunctuation(possibleTaskPunc) || possibleTaskPunc == ':' /* tense ending character */) {
             try {
                 Task t = nar.task(ys);
                 if (t != null) {
-                    Execution.feedback(cause, t, nar );
+                    Execution.feedback(cause, t, nar);
                     return;
                 }
             } catch (Throwable t) {
@@ -223,7 +213,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         Term t = $.the(ys, true);
 
         if (t != null) {
-            Execution.feedback( cause, result(cause, t/*, x, lastTerm*/), nar );
+            Execution.feedback(cause, result(cause, t/*, x, lastTerm*/), nar);
             return;
         }
 
@@ -237,7 +227,8 @@ public abstract class TermFunction<O> extends SyncOperator {
     //abstract protected int getMaxArity();
 
 
-    /** (can be overridden in subclasses) the extent to which it is truth 
+    /**
+     * (can be overridden in subclasses) the extent to which it is truth
      * that the 2 given terms are equal.  in other words, a distance metric
      */
     public float equals(@NotNull Term a, Term b) {
@@ -247,10 +238,9 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     private static boolean validArgs(@NotNull Compound args) {
         //TODO filtering
-        return args.size()>=1 && args.last().op() == Op.VAR_DEP;
+        return args.size() >= 1 && args.last().op() == Op.VAR_DEP;
     }
 }
-
 
 
 //if (variable) {

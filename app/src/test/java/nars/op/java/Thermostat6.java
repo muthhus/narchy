@@ -29,20 +29,20 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat6 {
 
-    public static final float basePeriod = 300;
-    public static final float tolerance = 0.01f;
+    public static final float basePeriod = 25;
+    public static final float tolerance = 0.02f;
     public static float targetPeriod = 8;
-    public static final float speed = 0.001f;
+    public static final float speed = 0.1f;
     static boolean print = true;
     static boolean printMotors = false;
     static boolean debugError = false;
-    static int sensorPeriod = 4; //frames per max sensor silence
-    static int commandPeriod = 1024;
+    static int sensorPeriod = 2; //frames per max sensor silence
+    static int commandPeriod = 256;
 
     public static void main(String[] args) {
-        Default d = new Default(1024, 24, 2, 3);
+        Default d = new Default(1024, 8, 2, 3);
         d.conceptRemembering.setValue(3);
-        d.cyclesPerFrame.set(5);
+        d.cyclesPerFrame.set(12);
         d.conceptActivation.setValue(0.1f);
         //d.conceptBeliefsMax.set(32);
         d.shortTermMemoryHistory.set(3);
@@ -50,7 +50,7 @@ public class Thermostat6 {
         //d.perfection.setValue(0.9f);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 2000);
+        float score = eval(d, 12000);
         System.out.println("score=" + score);
     }
 
@@ -322,11 +322,11 @@ public class Thermostat6 {
     }
 
     public static void mission(NAR n) {
-        n.goal($.$("(above)"), Tense.Eternal, 0f, 0.99f); //not above nor below
-        n.goal($.$("(below)"), Tense.Eternal, 0f, 0.99f); //not above nor below
+        n.goal($.$("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+        n.goal($.$("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
 
-        n.goal($.$("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
-        n.goal($.$("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
+        //n.goal($.$("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
+        //n.goal($.$("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
 
     }
 
@@ -341,12 +341,14 @@ public class Thermostat6 {
 
 
         //EXTREME CHEATS: "if i am up i should go down"
-        n.input("((above) ==> (down))!");
-        n.input("((below) ==> (up))!");
-        //n.input("((above) ==> (--,(up)))! :|:");
-        //n.input("((below) ==> (--,(down)))! :|:");
+        n.input("((above) ==>+0 (down))!");
+        n.input("((below) ==>+0 (up))!");
+        //n.input("((above) ==>+0 (--,(up)))!");
+        //n.input("((below) ==>+0 (--,(down)))!");
 
         //MODERATE CHEATS: "being up leads to me going down"
+        n.input("((above) ==>+0 (down)).");
+        n.input("((below) ==>+0 (up)).");
         //n.input("((above) ==> (down)). :|:");
         //n.input("((below) ==> (up)). :|:");
         //n.input("<(above) ==> (--,(up))>. :|:");
@@ -385,24 +387,23 @@ public class Thermostat6 {
         }
 
         @Override
-        public float motor(float believed, float desired) {
+        protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
+            return eternalOrTemporal ? 0 : cap; //no eternal
+        }
 
+        @Override
+        public float motor(float b, float d) {
 
-            if (desired < 0.55f) {
-                return Float.NaN;
-                //return 0;
-            }
-            if (believed > desired) {
-                return Float.NaN;
-                //return 0f;
-            }
+            //if (d < 0.5f) return Float.NaN;
+            if (d < b) return Float.NaN;
+            //if (d < 0.5f && b < d) return Float.NaN;
 
             float current = Util.clamp(yEst.floatValue());
-            float delta = speed * (up ? 1 : -1);
+            float delta = speed * (up ? 1 : -1) * (d - b);
             float next = Util.clamp(delta + current);
             yEst.setValue(next);
 
-            return 1f; //0.5f + desired/2f;
+            return (d-b); //0.5f + desired/2f;
 
         }
 

@@ -20,6 +20,7 @@
  */
 package nars.nal.nal8.operator;
 
+import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
  *  A class used as a template for Operator definition.
  *  Can also be extended for purely procedural operators.
  */
-public class NullOperator extends SyncOperator {
+public class NullOperator extends AbstractOperator {
 
     public NullOperator(String name) {
         super(name);

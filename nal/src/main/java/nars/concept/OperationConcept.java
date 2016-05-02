@@ -44,7 +44,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     protected long lastMotivationUpdate = Tense.ETERNAL;
 
     //TODO allocate this only for Operation (not negations)
-    transient private final List<Task> pending = Global.newArrayList(0);
+    transient private final List<Task> pendingGoals = Global.newArrayList(0);
 
     public transient NAR nar;
     private boolean pendingRun;
@@ -97,8 +97,11 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         if (t == null) return null;
 
         //if (op()!=NEGATE) {
-            pending.add(t);
-        executeLater(nar);
+
+        if (t.isGoal()) {
+            pendingGoals.add(t);
+            executeLater(nar);
+        }
         /*} else {
             nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
         }*/
@@ -109,8 +112,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         this.nar = nar;
 
         if (!pendingRun) {
-            nar.runLater(this);
             pendingRun = true;
+            nar.runLater(this);
         }
     }
 
@@ -123,9 +126,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        List<Task> pending = this.pending;
 //        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
 //        }
-        execute(pending, nar);
+        execute(pendingGoals, nar);
 
-        pending.clear();
+        pendingGoals.clear();
         pendingRun = false;
     }
 

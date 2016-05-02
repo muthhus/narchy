@@ -1,0 +1,42 @@
+//<<($1) --> sentence> ==>+0 <$1 --> word>>.
+//<<($1,$2) --> sentence> ==>+0 (&&,<$1 --> word>,<$2 --> word>)>.
+//<<($1,$2,$3) --> sentence> ==>+0 (&|,<$1 --> word>,<$2 --> word>,<$3 --> word>)>.
+//<<($1,$2,$3,$4) --> sentence> ==>+0 (&|,<$1 --> word>,<$2 --> word>,<$3 --> word>,<$4 --> word>)>.
+//<<($1,$2,$3,$4,$5) --> sentence> ==>+0 (&|,<$1 --> word>,<$2 --> word>,<$3 --> word>,<$4 --> word>,<$5 --> word>)>.
+//<<($1,$2,$3,$4,$5,$6) --> sentence> ==>+0 (&|,<$1 --> word>,<$2 --> word>,<$3 --> word>,<$4 --> word>,<$5 --> word>,<$6 --> word>)>.
+
+//if something is a sentence, and NARS tell it, then NARS is active
+<(<$1 --> sentence> && say($1)) ==>+0 <SELF --> [active]>>.
+//if something is a sentence and NARS tells thanks for telling then NARS is active
+<(<$1 --> sentence> && say(thank,you,for,telling,me,$1)) ==>+0 <SELF --> [active]>>.
+//if tell,me,something,about is told, then it is a sign for curiosity
+<(<$1 --> word> && say(tell,me,something,about,$1)) ==>+0 <SELF --> [curious]>>.
+<(<$1 --> word> && say(why,$1)) ==>+0 <SELF --> [curious]>>.
+
+//if there is no talking going on,
+//then it is fine to desire to request knowledge
+<(--,<SELF --> [active]>) ==>+0 <SELF --> [curious]>>!
+
+//the things which are said are sentences and vice versa
+<say($1) <=>+0 <$1 --> sentence>>.
+
+//some grammar evidence:
+<<$1 --> sentence>,<$2 --> sentence> ==>+0 <($1,and,$2) --> sentence>>.
+
+
+
+//some words
+<{earth, life, word} --> word>.
+
+
+<SELF --> [curious]>!
+<SELF --> [curious]>!
+<SELF --> [curious]>!
+<SELF --> [active]>!
+<SELF --> [active]>!
+
+
+//<interesting <-> relevant>.
+
+//<<(i,dont,know) --> sentence> <-> UNSURE>.
+

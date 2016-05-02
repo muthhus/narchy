@@ -14,32 +14,22 @@ public abstract class IntIntTo<Y> extends TermFunction<Y> {
     @Override
     public final Y function(@NotNull Compound o, TermIndex i) {
 
-        Term[] x = o.terms();
-
-        if (x.length < 2) {
+        if (o.size() < 2) {
             throw new RuntimeException("Requires 2 arguments");
         }
 
-        int n1;
-
         try {
-            n1 = integer(x[0]);
+            int n1 = integer(o.term(0));
+            int n2 = integer(o.term(1));
+            return apply(n1, n2);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("1st parameter not an integer: " + x[0]);
+            throw new RuntimeException("non-integer parameter" + o);
         }
 
-        int n2;
-        try {
-            n2 = integer(x[1]);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("2nd parameter not an integer: " + x[1]);
-        }
-
-        return function(n1, n2);
     }
 
     @NotNull
-    protected abstract Y function(int a, int b);
+    protected abstract Y apply(int a, int b);
 
     @NotNull
     @Override

@@ -91,22 +91,6 @@ public abstract class AbstractOperator implements Consumer<List<Task>> {
 
     public abstract void execute(List<Task> execution);
 
-//    {
-//        try {
-//            List<Task> feedback = apply(op);
-//            executed(op, feedback);
-//        } catch (Exception e) {
-//            nar().memory.eventError.emit(e);
-//
-//            //TODO hack this should be handled by the error handler
-//            if (Global.DEBUG) {
-//                e.printStackTrace();
-//            }
-//            return false;
-//        }
-//
-//        return true;
-//    }
 
     /** determines the execution strategy. currently there are only two: synch and async, and if
      * we want to add more we can use a lambda Consumer<Runnable> or something
@@ -133,13 +117,6 @@ public abstract class AbstractOperator implements Consumer<List<Task>> {
     <patham9_> 4. the system wont try to execute and pursue things in the current moment which are "sheduled" to be in the future.
     <patham9_> 5. the system wont pursue a goal it already pursued for the same reason (due to revision, it is related to 1)
     */
-
-    //abstract public boolean decide(final Operation op);
-
-//    protected void executed(Operation op, Task... feedback) {
-//        executed(op, Lists.newArrayList(feedback));
-//    }
-
 
 
 
