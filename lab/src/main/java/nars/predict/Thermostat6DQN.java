@@ -254,8 +254,8 @@ public class Thermostat6DQN {
     }
 
     public static void mission(NAR n) {
-        n.goal($.$("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
-        n.goal($.$("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+        n.goal(("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+        n.goal(("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
 
         //n.goal($.$("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
         //n.goal($.$("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
@@ -264,8 +264,8 @@ public class Thermostat6DQN {
 
     public static void command(NAR n) {
 
-        n.goal($.$("(up)"), Tense.Present, 1f, 0.75f);
-        n.goal($.$("(down)"), Tense.Present, 1f, 0.75f);
+        n.goal(("(up)"), Tense.Present, 1f, 0.75f);
+        n.goal(("(down)"), Tense.Present, 1f, 0.75f);
 
         //n.goal($.$("(up)"), Tense.Present, 0f, 0.25f);
         //n.goal($.$("(down)"), Tense.Present, 0f, 0.25f);

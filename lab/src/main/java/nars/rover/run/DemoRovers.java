@@ -222,9 +222,9 @@ public class DemoRovers {
                                                 (r) -> {
                                                     System.out.println("forward");
                                                     nar.believe(motorFore, Tense.Present, 0f, inputStrengthf);
-                                                    nar.goal($.$(motorFore), Tense.Present, 1f, inputStrengthf);
+                                                    nar.goal((motorFore), Tense.Present, 1f, inputStrengthf);
                                                     nar.believe(motorBack, Tense.Present, 0f, inputStrengthf);
-                                                    nar.goal($.$(motorBack), Tense.Present, 0f, inputStrengthf);
+                                                    nar.goal((motorBack), Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
                                                     //System.out.println("up -");
@@ -237,9 +237,9 @@ public class DemoRovers {
                                                 (r) -> {
                                                     System.out.println("back");
                                                     nar.believe(motorBack, Tense.Present, 0f, inputStrengthf);
-                                                    nar.goal($.$(motorBack), Tense.Present, 1f, inputStrengthf);
+                                                    nar.goal((motorBack), Tense.Present, 1f, inputStrengthf);
                                                     nar.believe(motorFore, Tense.Present, 0f, inputStrengthf);
-                                                    nar.goal($.$(motorFore), Tense.Present, 0f, inputStrengthf);
+                                                    nar.goal((motorFore), Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
                                                 },
@@ -250,8 +250,8 @@ public class DemoRovers {
                                         new ManualOverride<AbstractRover>(KeyCode.NUMPAD4,
                                                 (r) -> {
                                                     System.out.println("left");
-                                                    nar.goal($.$(motorLeft), Tense.Present, 1f, inputStrengthf);
-                                                    nar.goal($.$(motorRight), Tense.Present, 0f, inputStrengthf);
+                                                    nar.goal((motorLeft), Tense.Present, 1f, inputStrengthf);
+                                                    nar.goal((motorRight), Tense.Present, 0f, inputStrengthf);
                                                     nar.believe(motorLeft, Tense.Present, 0f, inputStrengthf);
                                                     nar.believe(motorRight, Tense.Present, 0f, inputStrengthf);
                                                 },
@@ -265,8 +265,8 @@ public class DemoRovers {
                                         new ManualOverride<AbstractRover>(KeyCode.NUMPAD6,
                                                 (r) -> {
                                                     System.out.println("right");
-                                                    nar.goal($.$(motorRight), Tense.Present, 1f, inputStrengthf);
-                                                    nar.goal($.$(motorLeft), Tense.Present, 0f, inputStrengthf);
+                                                    nar.goal((motorRight), Tense.Present, 1f, inputStrengthf);
+                                                    nar.goal((motorLeft), Tense.Present, 0f, inputStrengthf);
                                                     nar.believe(motorLeft, Tense.Present, 0f, inputStrengthf);
                                                     nar.believe(motorRight, Tense.Present, 0f, inputStrengthf);
                                                 },

@@ -67,7 +67,8 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         FloatToFloatFunction motivationToFeedback = (f) -> {
             return 0.5f + (f / 2f);
         };
-        feedback = new Sensor(n, this, this, motivationToFeedback) {
+        feedback = new Sensor(n, this, this) {
+
             @Override
             protected int dt() {
                 return 0; //0=now/immediate, +=future tense
@@ -75,21 +76,10 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
             @NotNull
             @Override
-            protected Task newInputTask(float f, float c, long now) {
-                Task t = super.newInputTask(f, c, now);
+            protected Task newInputTask(float v, long now) {
+                Task t = super.newInputTask(v, now);
                 t.log("Motor Feedback");
                 return t;
-            }
-
-            @Override
-            protected float freq(float v) {
-                return v; //v < 0.5f ? 0 : 1;
-            }
-
-            @Override
-            protected float conf(float v) {
-                return 0.9f;
-                //return 0.9f* (v < 0.5f ? (1f - v) : v);
             }
 
             @Override

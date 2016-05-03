@@ -84,14 +84,6 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "open(t1)", '!',  0) //no temporal
         ;
     }
-    @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
-        test()
-                .log()
-                .input("(open(t1) &&+5 [opened]:t1)! :|:")
-                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //temporal
-                .mustDesire(cycles, "[opened]:t1", 1.0f, 0.81f, 5) //temporal
-        ;
-    }
 
 
 
@@ -202,13 +194,11 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void further_detachment()  {
-        TestNAR tester = test();
-
-
-        tester.input("<(SELF,{t002}) --> reachable>. :|:");
-        tester.inputAt(10, "(<(SELF,{t002}) --> reachable> &&+5 pick({t002}))!");
-
-        tester.mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
+        test()
+            .log()
+            .input("reachable:(SELF,{t002}). :|:")
+            .inputAt(10, "(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
+            .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5);
 
     }
 
@@ -341,26 +331,14 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
-    @Test
-    public void subgoal_2_small()  {
-        TestNAR tester = test();
-
-        tester.input("(hold:(SELF,y) &&+5 at:(SELF,x))!");
-
-        tester.mustDesire(cycles, "hold:(SELF,y)", 1.0f, 0.81f);
-
-    }
 
 
     @Test
     public void subgoal_2()  {
-        TestNAR tester = test();
-
-        //tester.log();
-        tester.input("(<(SELF,{t002}) --> hold> &&+5 (at:(SELF,{t001}) &&+5 open({t001})))!");
-
-        tester.mustDesire(cycles, "<(SELF,{t002}) --> hold>",
-                1.0f, 0.81f);
+        test()
+            .log()
+            .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))!")
+            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f);
 
     }
 
@@ -517,11 +495,54 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testBelievedImplOfDesireDelayed() {
 
-        TestNAR t = test();
-        t.log()
+        test()
+                //t.log()
                 .goal("(x)", Tense.Present, 1f, 0.9f)
                 .believe("((x)==>+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
                 .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
     }
+
+    @Test public void testGoalConjunctionDecompose() {
+        TestNAR t = test();
+        t.log()
+                .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
+                .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
+                .mustNotOutput(cycles, "(y)", '!', 3)
+                .mustNotOutput(cycles, "(y)", '!', ETERNAL);
+
+
+        //        @Test
+        //        public void subgoal_2_small()  {
+        //            TestNAR tester = test();
+        //
+        //            tester.input("(hold:(SELF,y) &&+5 at:(SELF,x))!");
+        //
+        //            tester.mustDesire(cycles, "hold:(SELF,y)", 1.0f, 0.81f);
+        //
+        //        }
+
+
+        //        @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
+        //        test()
+        //                .log()
+        //                .input("(open(t1) &&+5 [opened]:t1)! :|:")
+        //                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //temporal
+        //                .mustNotDesire(cycles, "[opened]:t1", 1.0f, 0.81f, 5) //temporal
+        //        ;
+        //    }
+
+    }
+
+
+    @Test public void testGoalConjunctionDecomposeSuffix() {
+        TestNAR t = test();
+        t.log()
+                .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
+                .inputAt(4, "(x). :|:")
+                .mustDesire(cycles, "(y)", 1f, 0.81f, (4+3))
+                .mustNotOutput(cycles, "(y)", '!', 3)
+                .mustNotOutput(cycles, "(y)", '!', ETERNAL);
+    }
+
 }

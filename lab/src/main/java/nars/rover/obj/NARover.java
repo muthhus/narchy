@@ -10,7 +10,6 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
-import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -20,8 +19,6 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -114,10 +111,10 @@ public class NARover extends AbstractRover {
                 };
 
 
-        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, linearPositive)
+        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, linearNegative)
+        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed)
                 .timing(minUpdateTime, maxUpdateTime);
 
 
@@ -131,16 +128,16 @@ public class NARover extends AbstractRover {
             return v;
         };
 
-        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearPositive)
+        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearNegative)
+        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition, linearPositive)
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage, linearPositive)
+        sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage)
                 .timing(minUpdateTime, maxUpdateTime);
 
         float motorThresh = 0.51f;

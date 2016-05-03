@@ -226,19 +226,19 @@ public class Thermostat6Hai {
 //            //move.beliefs().clear();
 //            //move.goals().clear();
 //            do {
-//                n.goal($.$("(up)"), Tense.Present, 1f, str);
-//                n.goal($.$("(down)"), Tense.Present, 0f, str);
+//                n.goal(("(up)"), Tense.Present, 1f, str);
+//                n.goal(("(down)"), Tense.Present, 0f, str);
 //                n.step();
 //            } while (above.get() < 0.6f);
 //
 //            System.out.println("training down");
 //            yEst.setValue(0.5f + dd);
-//            //n.goal($.$("(up)"), Tense.Present, 0f, str);
+//            //n.goal(("(up)"), Tense.Present, 0f, str);
 //            //move.beliefs().clear();
 //            //move.goals().clear();
 //            do {
-//                n.goal($.$("(up)"), Tense.Present, 0f, str);
-//                n.goal($.$("(down)"), Tense.Present, 1f, str);
+//                n.goal(("(up)"), Tense.Present, 0f, str);
+//                n.goal(("(down)"), Tense.Present, 1f, str);
 //                n.step();
 //                //System.out.println(diffness.get());
 //            } while (below.get() < 0.6f);
@@ -282,21 +282,21 @@ public class Thermostat6Hai {
     }
 
     public static void mission(NAR n) {
-        n.goal($.$("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
-        n.goal($.$("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+        n.goal(("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+        n.goal(("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
 
-        //n.goal($.$("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
-        //n.goal($.$("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
+        //n.goal(("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
+        //n.goal(("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
 
     }
 
     public static void command(NAR n) {
 
-        n.goal($.$("(up)"), Tense.Present, 1f, 0.75f);
-        n.goal($.$("(down)"), Tense.Present, 1f, 0.75f);
+        n.goal(("(up)"), Tense.Present, 1f, 0.75f);
+        n.goal(("(down)"), Tense.Present, 1f, 0.75f);
 
-        //n.goal($.$("(up)"), Tense.Present, 0f, 0.25f);
-        //n.goal($.$("(down)"), Tense.Present, 0f, 0.25f);
+        //n.goal(("(up)"), Tense.Present, 0f, 0.25f);
+        //n.goal(("(down)"), Tense.Present, 0f, 0.25f);
 
 
 

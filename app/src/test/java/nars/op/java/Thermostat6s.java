@@ -1,6 +1,7 @@
 package nars.op.java;
 
-import nars.$;
+import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
@@ -8,7 +9,7 @@ import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.util.Optimization;
+import nars.truth.DefaultTruth;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
@@ -31,9 +32,9 @@ import static nars.util.Texts.n2;
 public class Thermostat6s {
 
 
-    public static final float tolerance = 0.01f;
+    public static final float tolerance = 0.03f;
     public static float targetPeriod = 160;
-    public static final float speed = 0.4f;
+    public static final float speed = 0.2f;
     static boolean print = true;
 
     static int sensorPeriod = 4; //frames per max sensor silence
@@ -41,7 +42,7 @@ public class Thermostat6s {
     public static void main(String[] args) {
         Default d = new Default(1024,4, 2, 3);
 
-        d.cyclesPerFrame.set(24);
+        d.cyclesPerFrame.set(12);
         d.conceptActivation.setValue(0.25f);
         //d.conceptBeliefsMax.set(32);
         //d.shortTermMemoryHistory.set(3);
@@ -49,7 +50,7 @@ public class Thermostat6s {
         //d.perfection.setValue(0.9f);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 120000);
+        float score = eval(d, 1200);
         System.out.println("score=" + score);
     }
 
@@ -71,21 +72,24 @@ public class Thermostat6s {
         SensorConcept above, below;
 
 
+        FloatToObjectFunction sensorTruth = (v) -> {
+            return new DefaultTruth(v, 0.9f);
+        };
         above = new SensorConcept("(above)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff > -tolerance) return 0;
-            //else return -diff; //Util.clamp( -diff /2f + 0.5f);
             else return Util.clamp( -diff/2f  + 0.5f);
-            //return 1f;
-        }).resolution(0.02f).timing(-1, sensorPeriod).pri(0.55f);
+            //else return Util.clamp( -diff  + 0.5f);
+            //else return 1f;
+        }, sensorTruth).resolution(0.01f).timing(-1, -1);
 
         below = new SensorConcept("(below)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff < tolerance) return 0;
-            //else return diff; //Util.clamp( diff /2f + 0.5f);
-            else return Util.clamp( diff/2f + 0.5f);
-            //return 1f;
-        }).resolution(0.02f).timing(-1, sensorPeriod).pri(0.55f);
+            else return diff; //Util.clamp( diff /2f + 0.5f);
+            //else return Util.clamp( diff + 0.5f);
+            //else return 1f;
+        }, sensorTruth).resolution(0.01f).timing(-1, -1);
 
         MotorConcept up = new Motor1D(n, true, yEst);
         MotorConcept down = new Motor1D(n, false, yEst);
@@ -108,8 +112,8 @@ public class Thermostat6s {
             if (print) {
 
                 int cols = 50;
-                int colActual = (int) Math.round(cols * actual);
-                int colEst = (int) Math.round(cols * estimated);
+                int colActual = Math.round(cols * actual);
+                int colEst = Math.round(cols * estimated);
                 for (int i = 0; i <= cols; i++) {
 
                     char c;
@@ -169,11 +173,12 @@ public class Thermostat6s {
 //        n.input("((below) ==>+0 (up))! %0.90;1.00%");
 //        n.input("((above) ==>+0 (--,(up)))! %0.90;1.00%");
 //        n.input("((below) ==>+0 (--,(down)))! %0.90;1.00%");
-        
-        n.goal("((above) ==>+0 (down))", Tense.Eternal, 0.8f, 1f);
-        n.goal("((below) ==>+0 (up))!", Tense.Eternal, 0.8f, 1f);
-        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, 0.8f, 1f);
-        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, 0.8f, 1f);
+
+        float f = 0.75f;
+        n.goal("((above) ==>+0 (down))", Tense.Eternal, f, 1f);
+        n.goal("((below) ==>+0 (up))!", Tense.Eternal, f, 1f);
+        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, f, 1f);
+        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, f, 1f);
 
         //n.goal("(above)", Tense.Eternal, 0.25f, 1f); //not above nor below
         //n.goal("(below)", Tense.Eternal, 0.25f, 1f); //not above nor below

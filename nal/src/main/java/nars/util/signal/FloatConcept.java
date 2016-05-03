@@ -2,6 +2,8 @@ package nars.util.signal;
 
 import nars.NAR;
 import nars.Narsese;
+import nars.Symbols;
+import nars.truth.DefaultTruth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +24,9 @@ public class FloatConcept extends SensorConcept {
     }
 
     public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MutableFloat v) throws Narsese.NarseseException {
-        super(compoundTermString, n, v);
+        super(compoundTermString, n, () -> v.floatValue(),
+                (vv) -> new DefaultTruth(vv, n.getDefaultConfidence(Symbols.BELIEF) )
+        );
         this.value = v;
     }
 

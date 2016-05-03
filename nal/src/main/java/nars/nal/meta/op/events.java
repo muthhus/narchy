@@ -82,8 +82,16 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
 
-            Compound tt = m.premise.task().term();
+            Task task = m.premise.task();
+            Compound tt = task.term();
             int ttdt = tt.dt();
+
+            Task belief = m.premise.belief();
+            if ((belief!=null) && (belief.occurrence()!=ETERNAL) && (task.occurrence()!=ETERNAL)) {
+                //only allow a belief if it occurred before or during the task's specified occurrence
+                if (belief.occurrence() > task.occurrence())
+                    return false;
+            }
 
             if ((ttdt == DTERNAL) || (ttdt == 0)) {
                 return true;

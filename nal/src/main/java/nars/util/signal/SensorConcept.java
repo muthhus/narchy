@@ -1,19 +1,18 @@
 package nars.util.signal;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.truth.Truth;
 import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.util.data.Sensor.direct;
 
 /** primarily a collector for believing time-changing input signals */
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
@@ -23,32 +22,16 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     private FloatSupplier input;
     private float current = Float.NaN;
 
-    public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MutableFloat v) throws Narsese.NarseseException {
-        this(compoundTermString, n, v::floatValue);
+
+
+    public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
+        this((Compound)$.$(term), n, input, truth);
     }
 
-    public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatSupplier input) throws Narsese.NarseseException {
-        this($.$(compoundTermString), n, input, direct);
-    }
-
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input)  {
-        this(term, n, input, direct);
-    }
-
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, this, this, toFreq) {
-//            @Override
-//            protected float freq(float v) {
-//                return SensorConcept.this.freq(v);
-//            }
-//            @Override
-//            protected float conf(float v) {
-//                return SensorConcept.this.conf(v);
-//            }
-
-        };
+        this.sensor = new Sensor(n, this, this, truth);
         n.on(this);
 
         this.input = input;

@@ -105,8 +105,9 @@ public class ArrayBeliefTable implements BeliefTable {
         }
     }
 
-    @Nullable
-    public Truth topTemporalWeighted(long when, long now, @Nullable Task topEternal) {
+
+    //NEEDS DEBUGGED
+    @Nullable public Truth topTemporalWeighted(long when, long now, @Nullable Task topEternal) {
 
         float sumFreq = 0, sumConf = 0;
         float nF = 0, nC = 0;
@@ -158,7 +159,7 @@ public class ArrayBeliefTable implements BeliefTable {
                     when, x.occurrence(), now, window);
 
             //strength decreases with distance in time
-            float strength = w * w * tc;
+            float strength =  w * tc;
 
             sumConf += tc * w;
             nC+=tc;

@@ -2,6 +2,7 @@ package nars.util.data;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
@@ -10,6 +11,8 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -29,12 +32,13 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     @NotNull
     private final Term term;
     private final FloatFunction<Term> value;
-    private final FloatToFloatFunction freq;
+    private final FloatToObjectFunction<Truth> truthFloatFunction;
+
     @NotNull
     public final NAR nar;
     private float pri;
     private final float dur;
-    private float confFactor;
+
     private float prevF = Float.NaN;
 
     boolean inputIfSame;
@@ -47,32 +51,20 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
 
-    public Sensor(@NotNull NAR n, @NotNull Termed  t, FloatFunction<Term> value) {
-        this(n, t, value, direct);
+    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
+        this(n, t, value,
+                (v) -> new DefaultTruth(v, n.getDefaultConfidence(Symbols.BELIEF) ) );
     }
 
-    public Sensor(@NotNull NAR n, @NotNull String tt, FloatFunction<Term> value) {
-        this(n, tt, value, direct);
+    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
+        this(n, t, value, truthFloatFunction, n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
     }
 
-    public Sensor(@NotNull NAR n, @NotNull String tt, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
-        this(n, n.term(tt), value, valueToFreq);
-    }
-
-    public Sensor(@NotNull NAR n, @NotNull Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
-        this(n, t, value, valueToFreq,
-
-                n.getDefaultConfidence(Symbols.BELIEF),
-
-                n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
-    }
-
-    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
+    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {
         this.nar = n;
         this.term = t.term();
         this.value = value;
-        this.freq = valueToFreq;
-        this.confFactor = conf;
+        this.truthFloatFunction = truthFloatFunction;
 
         this.pri = pri;
         this.dur = dur;
@@ -100,31 +92,25 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     public void ready() {
-        this.lastInput = nar.time()-minTimeBetweenUpdates;
+        this.lastInput = nar.time() - minTimeBetweenUpdates;
     }
 
     @Override
     public void accept(@NotNull NAR nar) {
 
-        int timeSinceLastInput = (int)(nar.time() - lastInput);
+        int timeSinceLastInput = (int) (nar.time() - lastInput);
 
 
-        double nextD = value.floatValueOf(term);
-        if (!Double.isFinite(nextD))
+        double next = value.floatValueOf(term);
+        if (!Double.isFinite(next))
             return; //allow the value function to prevent input by returning NaN
-        float next = (float) nextD;
 
-        float fRaw = freq.valueOf(next);
-        if (!Float.isFinite(fRaw))
-            return; //allow the frequency function to prevent input by returning NaN
-
-
-        float f = Util.round(fRaw, resolution);
+        float f = Util.round((float) next, resolution);
 
         int maxT = this.maxTimeBetweenUpdates;
         boolean limitsMaxTime = maxT > 0;
         int minT = this.minTimeBetweenUpdates;
-        boolean limitsMinTime =  minT > 0;
+        boolean limitsMinTime = minT > 0;
 
         boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
         boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
@@ -159,32 +145,26 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //            c = (v - 0.5f)*(2f * confFactor);
 //        }
 
-
-        float f = freq(v);
-        float c = conf(v);
-        //float f = 1f;
-        //float c = v;
-
         long now = nar.time();
-        Task t = newInputTask(f, c, now);
+        Task t = newInputTask(v, now);
         nar.input(t);
         return t;
     }
 
-    protected float conf(float v) {
-        return confFactor;
-    }
-    protected float freq(float v) {
-        return v;
-    }
+//    protected float conf(float v) {
+//        return confFactor;
+//    }
+//    protected float freq(float v) {
+//        return v;
+//    }
 
     @NotNull
-    protected Task newInputTask(float f, float c, long now) {
+    protected Task newInputTask(float v, long now) {
         return new MutableTask(term(), punc)
-                    //.truth(v, conf)
-                    .truth(f, c)
-                    .time(now, now + dt())
-                    .budget(pri, dur);
+                //.truth(v, conf)
+                .truth(truthFloatFunction.valueOf(v))
+                .time(now, now + dt())
+                .budget(pri, dur);
     }
 
     @NotNull
@@ -192,7 +172,9 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return term;
     }
 
-    /** time shift input tasks, relative to NAR's current time */
+    /**
+     * time shift input tasks, relative to NAR's current time
+     */
     protected int dt() {
         return 0;
     }
@@ -202,13 +184,6 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return prevF;
     }
 
-    
-    /** sets default confidence */
-    @NotNull
-    public Sensor confDefault(float conf) {
-        this.confFactor = conf;
-        return this;
-    }
 
 //    /** sets minimum time between updates, even if nothing changed. zero to disable this */
 //    @NotNull
@@ -222,6 +197,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.minTimeBetweenUpdates = dt;
         return this;
     }
+
     @NotNull
     public Sensor maxTimeBetweenUpdates(int dt) {
         this.maxTimeBetweenUpdates = dt;
