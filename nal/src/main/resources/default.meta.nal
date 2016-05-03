@@ -303,16 +303,16 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
-                                                       //(&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies(X,"#",(&&,A..+),B), (Belief:StructuralDeduction),
+                                                       substituteIfUnifies((&&,A..+),"#",X,B), (Belief:StructuralDeduction)
 
 
      //(&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
 //try:     (&&,X,A..+), B, time(decomposeTaskIfBefore), task("!") |- substituteIfUnifies((&&,A..+),"#",X,B), (Desire:Strong)
 
     //decompose (only) the leading event in a conjunction goal
-    (&&,B,A..+), B, time(decomposeTaskIfBefore), task("!") |- B, (Desire:StructuralStrong, Punctuation:Goal)
-    (&&,B,A), B, time(decomposeTask), task("!") |- A, (Desire:Deduction, Punctuation:Goal)
+    (&&,X,A..+), B, time(decomposeTaskIfBefore), task("!") |- B, (Desire:StructuralStrong, Punctuation:Goal)
+    (&&,X,A), B, time(decomposeTask), task("!") |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction, Punctuation:Goal)
 
 //the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly
     // Original NAL7:

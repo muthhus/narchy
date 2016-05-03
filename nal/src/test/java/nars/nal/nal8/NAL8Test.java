@@ -250,25 +250,8 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
-    @Test
-    public void detaching_single_premise()  {
-        TestNAR tester = test();
-        tester
-                //.log()
-                .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
-                .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
-                .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
-    }
-    @Test
-    public void detaching_single_premise_temporal()  {
-        TestNAR tester = test();
-        tester
-                //.log()
-                .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))! :|:")
-                .mustDesire(6, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
-                .mustDesire(6, "pick({t002})", 1.0f, 0.81f, 5)
-        ;
-    }
+
+
     @Test
     public void detaching_condition_2()  {
         test()
@@ -380,15 +363,14 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test
     public void condition_belief_deduction_2()  {
-        String selfAtT3 = "at:(SELF,{t003})";
         int time = 124;
 
         test()
             .log()
-            .input(       "on:({t002},{t003}). :|:")
-            .inputAt(10, "(on:({t002},#1) &&+0 at:(SELF,#1)).")
-            .mustBelieve(time, selfAtT3, 1.0f, 0.43f, 0)
-            .mustNotOutput(time, selfAtT3, '.', 0, 1f, 0, 1f, ETERNAL);
+            .input(              "on:({t002},{t003}). :|:")
+            .inputAt(10,         "(on:({t002},#1) &&+0 at:(SELF,#1)).")
+            .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.81f, 0)
+            .mustNotOutput(time, "at:(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
 
     }
 
@@ -405,15 +387,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    @Test
-    public void detaching_single_premise2()  {
-        TestNAR tester = test();
 
-        tester.input("(at:(SELF,{t001}) &&+5 open({t001}) )!");
-        tester.mustDesire(cycles, "at:(SELF,{t001})", 1.0f, 0.81f);
-        tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f);
-
-    }
 
     @Test
     public void detaching_condition()  {
@@ -532,6 +506,36 @@ public class NAL8Test extends AbstractNALTest {
         //        ;
         //    }
 
+        //        @Test
+        //        public void detaching_single_premise2()  {
+        //            TestNAR tester = test();
+        //
+        //            tester.input("(at:(SELF,{t001}) &&+5 open({t001}) )!");
+        //            tester.mustDesire(cycles, "at:(SELF,{t001})", 1.0f, 0.81f);
+        //            tester.mustNotDesire(cycles, "open({t001})", 1.0f, 0.81f);
+        //
+        //        }
+
+        //        @Test
+        //        public void detaching_single_premise_temporal()  {
+        //            TestNAR tester = test();
+        //            tester
+        //                    //.log()
+        //                    .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))! :|:")
+        //                    .mustDesire(6, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
+        //                    .mustNotDesire(6, "pick({t002})", 1.0f, 0.81f, 5)
+        //            ;
+        //        }
+
+        //        @Test
+        //        public void detaching_single_premise()  {
+        //            TestNAR tester = test();
+        //            tester
+        //                    //.log()
+        //                    .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
+        //                    .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
+        //                    .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
+        //        }
     }
 
 
