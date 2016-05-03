@@ -30,20 +30,19 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat6s {
 
-    public static final float basePeriod = 100;
+
     public static final float tolerance = 0.01f;
-    public static float targetPeriod = 8;
-    public static final float speed = 0.2f;
+    public static float targetPeriod = 160;
+    public static final float speed = 0.4f;
     static boolean print = true;
-    static boolean printMotors = false;
-    static boolean debugError = false;
+
     static int sensorPeriod = 4; //frames per max sensor silence
 
     public static void main(String[] args) {
-        Default d = new Default(1024,8, 2, 3);
+        Default d = new Default(1024,4, 2, 3);
 
-        d.cyclesPerFrame.set(2);
-        d.conceptActivation.setValue(1f);
+        d.cyclesPerFrame.set(24);
+        d.conceptActivation.setValue(0.25f);
         //d.conceptBeliefsMax.set(32);
         //d.shortTermMemoryHistory.set(3);
         //d.derivationDurabilityThreshold.setValue(0.03f);
@@ -62,8 +61,7 @@ public class Thermostat6s {
 
         Global.DEBUG = true;
 
-        //MutableFloat x0 = new MutableFloat();
-        //MutableFloat x1 = new MutableFloat();
+
         MutableFloat yEst = new MutableFloat(0.5f); //NAR estimate of Y
         MutableFloat yHidden = new MutableFloat(0.5f); //actual best Y used by loss function
 
@@ -76,18 +74,18 @@ public class Thermostat6s {
         above = new SensorConcept("(above)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff > -tolerance) return 0;
-            else return -diff; //Util.clamp( -diff /2f + 0.5f);
-            //else return Util.clamp( -diff  + 0.5f);
+            //else return -diff; //Util.clamp( -diff /2f + 0.5f);
+            else return Util.clamp( -diff/2f  + 0.5f);
             //return 1f;
-        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
+        }).resolution(0.02f).timing(-1, sensorPeriod).pri(0.55f);
 
         below = new SensorConcept("(below)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff < tolerance) return 0;
-            else return diff; //Util.clamp( diff /2f + 0.5f);
-            //else return Util.clamp( diff + 0.5f);
+            //else return diff; //Util.clamp( diff /2f + 0.5f);
+            else return Util.clamp( diff/2f + 0.5f);
             //return 1f;
-        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
+        }).resolution(0.02f).timing(-1, sensorPeriod).pri(0.55f);
 
         MotorConcept up = new Motor1D(n, true, yEst);
         MotorConcept down = new Motor1D(n, false, yEst);
@@ -95,49 +93,18 @@ public class Thermostat6s {
 
         n.onFrame(nn -> {
 
-            //float switchPeriod = 20;
-            //float highPeriod = 5f;
 
             float estimated = yEst.floatValue();
 
             int tt = t.intValue();
             float actual;
-            if (tt > 0) {
 
-                //double y = 0.5f + 0.45f * Math.sin(tt / (targetPeriod * basePeriod));
+            yHidden.setValue(0.5f + 0.5f * Math.sin(tt / (targetPeriod)));
+            actual = yHidden.floatValue();
 
-                //float nnn = 3; //steps
-                //double y = 0.5f + 0.5f * Math.round(nnn * Math.sin(tt / (targetPeriod * basePeriod)))/nnn;
+            loss.add(Math.abs(actual - estimated));
 
-                double y = 0.5f + 0.5f * Math.sin(tt / (targetPeriod * basePeriod));
-                //y = y > 0.5f ? 0.95f : 0.05f;
 
-                //x0.setValue(y); //high frequency phase
-                //x1.setValue( 0.5f + 0.3f * Math.sin(n.time()/(highPeriod * period)) ); //low frequency phase
-
-                //yHidden.setValue((n.time() / (switchPeriod * period)) % 2 == 0 ? x0.floatValue() : x1.floatValue());
-                yHidden.setValue(y);
-
-                actual = yHidden.floatValue();
-                //out.println( actual + "," + estimated );
-
-                loss.add(Math.abs(actual - estimated));
-            } else {
-                actual = 0.5f;
-            }
-
-//            if (down.hasGoals()) {
-//                System.out.println(down.goals().top(n.time()).explanation());
-//                System.out.println(down.goals().top(n.time()).log());
-//            }
-
-            if (tt > 0 && printMotors) {
-                up.print();
-                down.print();
-
-                //System.out.println(up.current);
-                //System.out.println(down.current);
-            }
             if (print) {
 
                 int cols = 50;
@@ -168,7 +135,6 @@ public class Thermostat6s {
         yEst.setValue(0.5f);
 
 
-        //n.log();
 
         mission(n);
 
@@ -204,10 +170,10 @@ public class Thermostat6s {
 //        n.input("((above) ==>+0 (--,(up)))! %0.90;1.00%");
 //        n.input("((below) ==>+0 (--,(down)))! %0.90;1.00%");
         
-        n.goal("((above) ==>+0 (down))", Tense.Eternal, 0.9f, 1f);
-        n.goal("((below) ==>+0 (up))!", Tense.Eternal, 0.9f, 1f);
-        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, 0.9f, 1f);
-        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, 0.9f, 1f);
+        n.goal("((above) ==>+0 (down))", Tense.Eternal, 0.8f, 1f);
+        n.goal("((below) ==>+0 (up))!", Tense.Eternal, 0.8f, 1f);
+        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, 0.8f, 1f);
+        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, 0.8f, 1f);
 
         //n.goal("(above)", Tense.Eternal, 0.25f, 1f); //not above nor below
         //n.goal("(below)", Tense.Eternal, 0.25f, 1f); //not above nor below
@@ -273,7 +239,7 @@ public class Thermostat6s {
 
             //System.out.println(this + " " + b + " " + d + " " + );
 
-            if (d < 0.51f) return Float.NaN;
+            if (d < 0.55) return Float.NaN;
             if (d < b) return Float.NaN;
             //if (d < 0.5f && b < d) return Float.NaN;
 
