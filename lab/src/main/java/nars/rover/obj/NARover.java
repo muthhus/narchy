@@ -6,6 +6,7 @@ package nars.rover.obj;
 
 import com.artemis.Entity;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -13,6 +14,8 @@ import nars.budget.UnitBudget;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.FloatSupplier;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
@@ -38,12 +41,18 @@ public class NARover extends AbstractRover {
     final SensorConcept speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
-    public static final Compound EAT_FOOD = $.image(1, $.the("eat"), $.the("food"));
-    public static final Compound EAT_POISON = $.image(1, $.the("eat"), $.the("poison"));
-    public static final Compound SPEED_LEFT = $.image(1, $.the("speed"), $.the("Left"));
-    public static final Compound SPEED_RIGHT = $.image(1, $.the("speed"), $.the("Right"));
-    public static final Compound SPEED_FORE = $.image(1, $.the("speed"), $.the("Fore"));
-    public static final Compound SPEED_BACK = $.image(1, $.the("speed"), $.the("Back"));
+//    public static final Compound EAT_FOOD = $.p($.the("eat"), $.the("food"));
+//    public static final Compound EAT_POISON = $.p($.the("eat"), $.the("poison"));
+//    public static final Compound SPEED_LEFT = $.p($.the("speed"), $.the("Left"));
+//    public static final Compound SPEED_RIGHT = $.p($.the("speed"), $.the("Right"));
+//    public static final Compound SPEED_FORE = $.p($.the("speed"), $.the("Fore"));
+//    public static final Compound SPEED_BACK = $.p($.the("speed"), $.the("Back"));
+    public static final Compound EAT_FOOD = $.p($.the("eat"), $.the("food"));
+    public static final Compound EAT_POISON = $.p($.the("eat"), $.the("poison"));
+    public static final Compound SPEED_LEFT = $.p( $.the("feelleft"));
+    public static final Compound SPEED_RIGHT = $.p( $.the("feelright"));
+    public static final Compound SPEED_FORE = $.p( $.the("feelfore"));
+    public static final Compound SPEED_BACK = $.p( $.the("feelback"));
 
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
@@ -56,6 +65,10 @@ public class NARover extends AbstractRover {
 
     //private MotorControls motors;
 
+    public static final FloatToObjectFunction<Truth> tf = (v) -> {
+        return new DefaultTruth(v, 0.9f);
+    };
+
     public NARover(String id, Entity e, NAR nar) {
         super(id, e);
 
@@ -64,7 +77,7 @@ public class NARover extends AbstractRover {
 
 
 
-        int minUpdateTime = 1;
+        int minUpdateTime = 2;
         int maxUpdateTime = -1;
 
 
@@ -111,10 +124,11 @@ public class NARover extends AbstractRover {
                 };
 
 
-        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed)
+
+        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed)
+        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
 
@@ -128,63 +142,57 @@ public class NARover extends AbstractRover {
             return v;
         };
 
-        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed)
+        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed)
+        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition)
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage)
+        sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage, tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        float motorThresh = 0.51f;
 
         int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
         int maxMotorFeedbackCycles = -1; //nar.duration() * 3;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
-            //if (a < 0) return Float.NaN;
-            if (b > l-0.01) l = 0;
-            return motor.left(l = (l < motorThresh) ? 0 : l);
+            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            return motor.left(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
-            //if (a < 0) return Float.NaN;
-            if (b > l-0.01) l = 0;
-            return motor.right(l = (l < motorThresh) ? 0 : l);
+            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            return motor.right(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
-            //if (l < 0) return Float.NaN;
-            if (b > l-0.01) l = 0;
-            return motor.forward(l = (l < motorThresh) ? 0 : l);
+            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            return motor.forward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
-            //if (l < 0) return Float.NaN;
-            if (b > l-0.01) l = 0;
-            return motor.backward(l = (l < motorThresh) ? 0 : l);
+            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            return motor.backward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
-        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,s) -> {
-            //if (s < 0) return Float.NaN;
-            if (s < motorThresh) return 0;
-            return motor.stop(1);
+        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,l) -> {
+            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            return motor.stop(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (b,s) -> {
 
-            if (s > motorThresh) {
-                if (gun.fire(torso, s)) {
-                    return s;
-                }
-            }
+//            if (s > motorThresh) {
+//                if (gun.fire(torso, s)) {
+//                    return s;
+//                }
+//            }
             return Float.NaN; //unfired;
 
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
@@ -436,16 +444,16 @@ public class NARover extends AbstractRover {
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
                         float x = (1f - v.seenDist); //closer = larger number (up to 1.0)
-                        if (x < 0.01f) return 0;
+                        if (x < 0.01f) return 0.5f;
                         else return 0.5f + 0.45f * x;
                     }
-                    return 0; //nothing seen within the range
+                    return Float.NaN; //nothing seen within the range
                 };
 
 
                 Compound term =
                         //$.imageInt(1, visionTerm.term(), material);
-                        $.prop(visionTerm.term(), material);
+                        $.instprop(visionTerm.term(), material);
 
                 SensorConcept visionSensor = new SensorConcept(
 
@@ -455,9 +463,9 @@ public class NARover extends AbstractRover {
 
                         nar,
 
-                        () -> (float) value.getAsDouble()
+                        () -> (float) value.getAsDouble(), tf
 
-                ).resolution(0.04f)/*.timing(1, 4)*/.
+                ).resolution(0.1f)/*.timing(1, 4)*/.
                         pri(pixelPri);
                 sensorConcepts.add(visionSensor);
 

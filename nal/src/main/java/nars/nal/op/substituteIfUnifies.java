@@ -16,23 +16,15 @@ public final class substituteIfUnifies extends substitute {
     @Nullable
     @Override public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
         final Term[] xx = p.terms();
-        final Term term = xx[0];
-        final Term opT = xx[1];
-        final Term x = xx[2];
         if (xx.length < 4) {
             throw new UnsupportedOperationException();
         }
+        final Term term = xx[0];
+        final Term opT = xx[1];
+        final Term x = xx[2];
         final Term y = xx[3];
 
-        Op op = substitute.getOp(opT);
-        if (op == null)
-            //throw new RuntimeException("unrecognizd subst type: " + type);
-            return null;
-
-        OneMatchFindSubst omf = new OneMatchFindSubst(op, r, term);
-        Term mm = omf.tryMatch(x, y);
-        omf.delete();
-        return mm;
+        return new OneMatchFindSubst(substitute.getOp(opT), r, term).tryMatch(x, y);
     }
 
     public final static class OneMatchFindSubst extends FindSubst {
@@ -60,6 +52,7 @@ public final class substituteIfUnifies extends substitute {
         @Nullable
         public Term tryMatch(@NotNull Term x, @NotNull Term y) {
             matchAll(x, y, true);
+            delete();
             return result;
         }
 

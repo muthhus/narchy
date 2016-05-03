@@ -34,15 +34,16 @@ public class MotivationTest {
         FloatConcept x = new FloatConcept("(x)", n).punc('!');
         MotorConcept y = new MotorConcept("(y)", n, (b,d)->{
 
+            if (d < 0.5f) return Float.NaN;
             if (d > 0.5f && d < b) return Float.NaN;
-            if (d < 0.5f && b < d) return Float.NaN;
+            //if (d < 0.5f && b < d) return Float.NaN;
 
             float sat = d - b;
             System.out.println("exec: " + b + " ," + d + " -> " + sat);
 
             execs.addAndGet(1);
 
-            return sat;
+            return d;
         });
 
         n.believe($.impl(x, y));

@@ -20,7 +20,7 @@ public class TermFunctionTest {
         d.log();
         d.input("add(1,2,#x)!");
         d.run(16);
-        d.input("add(3,4,#x)!");
+        d.input("add(4,5,#x)!");
         d.run(16);
     }
 
@@ -30,7 +30,7 @@ public class TermFunctionTest {
         d.log();
         d.input("add(1,2,#x)! :|:");
         d.run(16);
-        d.input("add(3,4,#x)! :|:");
+        d.input("add(4,5,#x)! :|:");
         d.run(16);
     }
 

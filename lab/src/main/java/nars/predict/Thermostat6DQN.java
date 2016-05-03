@@ -240,18 +240,6 @@ public class Thermostat6DQN {
         //return loss.floatValue() / t.intValue();
     }
 
-    public static @NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
-        return new SensorConcept(cname, n, () -> {
-            float low = ii * dv;
-            float high = ii * dv;
-            float v = zz.floatValue();
-            if ((v >= low && v <= high)) {
-                return 1f;
-            } else {
-                return 0f;
-            }
-        });
-    }
 
     public static void mission(NAR n) {
         n.goal(("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below

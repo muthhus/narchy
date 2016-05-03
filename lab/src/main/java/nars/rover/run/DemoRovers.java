@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.guifx.NARfx;
 import nars.guifx.NARtop;
 import nars.guifx.chart.MatrixImage;
@@ -22,6 +23,7 @@ import nars.rover.Sim;
 import nars.rover.obj.*;
 import nars.rover.run.DemoRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.task.Task;
 import nars.term.TermIndex;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -218,6 +220,22 @@ public class DemoRovers {
                 Stage stage = newWindow("Motors",
                         new VBox(
                                 new ManualControl<AbstractRover>(nr,
+                                        new ManualOverride<AbstractRover>(KeyCode.NUMPAD5,
+                                                (r) -> {
+                                                    System.out.println("forward");
+
+                                                    for (String c : new String[] { motorFore, motorBack, motorLeft, motorRight, }) {
+                                                        nar.believe(c, Tense.Present, 0f, inputStrengthf);
+                                                        nar.goal(c, Tense.Present, 0.5f, inputStrengthf);
+                                                    }
+                                                },
+                                                (r) -> {
+                                                    //System.out.println("up -");
+                                                },
+                                                (r) -> {
+                                                    return new Button("FWD");
+                                                }
+                                        ),
                                         new ManualOverride<AbstractRover>(KeyCode.NUMPAD8,
                                                 (r) -> {
                                                     System.out.println("forward");
@@ -345,7 +363,7 @@ public class DemoRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 1;
+        int conceptsFirePerCycle = 4;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
@@ -365,12 +383,13 @@ public class DemoRovers {
 //        nar.input("$0.8$ <food <-> poison>?");
 //        nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.35f);
-//        nar.log(Systenar.out, x -> {
+        //nar.logSummaryGT(System.out, 0.35f);
+//        nar.log(System.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
 //                //if (t.isInput()) return false;
-//                return t.budget().summary() > 0.0f;
+//                if (t.op().in(Op.ImplicationOrEquivalenceBits))
+//                    return t.budget().summary() > 0.0f;
 //            }
 //            return false;
 //        });
@@ -390,14 +409,14 @@ public class DemoRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.conceptActivation.setValue(0.5f);
+        nar.conceptActivation.setValue(0.25f);
 
 
         nar.conceptRemembering.setValue(1f);
         nar.termLinkRemembering.setValue(6);
         nar.taskLinkRemembering.setValue(4);
 
-        nar.cyclesPerFrame.set(128);
+        nar.cyclesPerFrame.set(256);
         nar.shortTermMemoryHistory.set(2);
 
         //nar.executionThreshold.setValue(0.01f);
@@ -458,17 +477,17 @@ public class DemoRovers {
 
 
         //nearsight & mouth
-        List<SensorConcept> nearSight = r.addEyeWithMouth("n", torso, 7, 2, front,
+        List<SensorConcept> nearSight = r.addEyeWithMouth("n", torso, 3, 2, front,
                 0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
-        List<SensorConcept> farSight = r.addEye("f", torso, 5, 5, front,
+        List<SensorConcept> farSight = r.addEye("f", torso, 3, 5, front,
                 1.25f, 0, dist, (e) -> {
                 });
 
         //reverse
-        List<SensorConcept> backSight = r.addEye("b", torso, 3, 9, new Vec2(-0.5f, 0),
+        List<SensorConcept> backSight = r.addEye("b", torso, 3, 6, new Vec2(-0.5f, 0),
                 1.25f, pi / 2f, dist / 2f, (e) -> {
                 });
 

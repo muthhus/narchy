@@ -34,15 +34,15 @@ public class Thermostat6s {
 
     public static final float tolerance = 0.03f;
     public static float targetPeriod = 160;
-    public static final float speed = 0.2f;
+    public static final float speed = 0.05f;
     static boolean print = true;
 
     static int sensorPeriod = 4; //frames per max sensor silence
 
     public static void main(String[] args) {
-        Default d = new Default(1024,4, 2, 3);
+        Default d = new Default(1024, 3, 2, 3);
 
-        d.cyclesPerFrame.set(12);
+        d.cyclesPerFrame.set(8);
         d.conceptActivation.setValue(0.25f);
         //d.conceptBeliefsMax.set(32);
         //d.shortTermMemoryHistory.set(3);
@@ -50,7 +50,7 @@ public class Thermostat6s {
         //d.perfection.setValue(0.9f);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 1200);
+        float score = eval(d, 12000);
         System.out.println("score=" + score);
     }
 
@@ -174,11 +174,16 @@ public class Thermostat6s {
 //        n.input("((above) ==>+0 (--,(up)))! %0.90;1.00%");
 //        n.input("((below) ==>+0 (--,(down)))! %0.90;1.00%");
 
-        float f = 0.75f;
-        n.goal("((above) ==>+0 (down))", Tense.Eternal, f, 1f);
-        n.goal("((below) ==>+0 (up))!", Tense.Eternal, f, 1f);
-        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, f, 1f);
-        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, f, 1f);
+        float f = 0.85f;
+//        n.goal("((above) ==>+0 (down))", Tense.Eternal, f, 1f);
+//        n.goal("((below) ==>+0 (up))", Tense.Eternal, f, 1f);
+//        n.goal("((above) ==>+0 (--,(up)))", Tense.Eternal, f, 1f);
+//        n.goal("((below) ==>+0 (--,(down)))", Tense.Eternal, f, 1f);
+
+        n.goal("((above) &&+1 (down))", Tense.Eternal, f, 1f);
+        n.goal("((below) &&+1 (up))", Tense.Eternal, f, 1f);
+        n.goal("((above) &&+1 (--,(up)))", Tense.Eternal, f, 1f);
+        n.goal("((below) &&+1 (--,(down)))", Tense.Eternal, f, 1f);
 
         //n.goal("(above)", Tense.Eternal, 0.25f, 1f); //not above nor below
         //n.goal("(below)", Tense.Eternal, 0.25f, 1f); //not above nor below

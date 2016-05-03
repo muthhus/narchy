@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 import static java.lang.System.out;
+import static nars.rover.obj.NARover.tf;
 import static nars.util.Texts.n2;
 
 /**
@@ -62,9 +63,7 @@ public class Thermostat6Hai {
         //Hsom som = new Hsom(inputs, states, new XorShift128PlusRandom(1));
         Autoencoder ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         HaiQ h = new HaiQ(states, 3) {
-            
-            @Override
-            protected int perceive(float[] input) {
+            @Override protected int perceive(float[] input) {
                 ae.train(input, 0.03f, 0.001f, 0.001f, false);
                 return ae.max();
         		//som.learn(input);
@@ -266,19 +265,6 @@ public class Thermostat6Hai {
 //        printBeliefs(n, false);
 
         //return loss.floatValue() / t.intValue();
-    }
-
-    public static @org.jetbrains.annotations.NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
-        return new SensorConcept(cname, n, () -> {
-            float low = ii * dv;
-            float high = ii * dv;
-            float v = zz.floatValue();
-            if ((v >= low && v <= high)) {
-                return 1f;
-            } else {
-                return 0f;
-            }
-        });
     }
 
     public static void mission(NAR n) {

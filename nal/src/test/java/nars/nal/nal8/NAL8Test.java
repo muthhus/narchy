@@ -442,16 +442,18 @@ public class NAL8Test extends AbstractNALTest {
          */
 
         TestNAR t = test();
-        t.log()
+        t
+            //.log()
             .believe("(x)")
-            .goal("((x)==>(y))")
+            .goal("((x)&&(y))")
             .mustDesire(cycles, "(y)", 1f, 0.45f);
     }
 
     @Test public void testBelievedImplOfDesire() {
 
         TestNAR t = test();
-        t.log()
+        t
+                //.log()
                 .goal("(x)")
                 .believe("((x)==>(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f);
@@ -463,7 +465,7 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR t = test();
         t.log()
                 .believe("(x)", Tense.Present, 1f, 0.9f)
-                .goal("((x)==>+3(y))")
+                .goal("((x)&&+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
                 .mustNotOutput(cycles*3, "(y)", '!', ETERNAL);
     }
