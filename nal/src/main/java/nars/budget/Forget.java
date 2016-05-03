@@ -39,8 +39,10 @@ public enum Forget { ;
         @Override
         public boolean test(@NotNull BLink<? extends X> b) {
             //assert(!b.isDeleted());
-            if (b.get().isDeleted())
+            if (b.get().isDeleted()) {
+                b.delete();
                 return false;
+            }
             forget.accept(b);
             return true;
         }
@@ -182,8 +184,6 @@ public enum Forget { ;
                     p *= (float) Math.exp(
                             -((1.0f - budget.dur()) / forgetCyclesCached) * dt
                     );
-                } else {
-                    return; //no change necessary
                 }
             }
 

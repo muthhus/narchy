@@ -1,34 +1,21 @@
 package nars.predict;
 
-import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.table.BeliefTable;
-import nars.guifx.NARfx;
-import nars.guifx.chart.MatrixImage;
-import nars.guifx.util.ColorArray;
-import nars.guifx.util.ColorMatrix;
+import nars.DQN;
 import nars.nal.Tense;
-import nars.nar.Default;
 import nars.task.Task;
-import nars.util.HaiQ;
-import nars.util.Hsom;
-import nars.util.Optimization;
-import nars.util.data.MutableInteger;
 import nars.util.data.Util;
-import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.Autoencoder;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.TreeSet;
 
 import static java.lang.System.out;
-import static nars.util.Texts.n2;
 
 /**
  * this is trying to guess how to react to a hidden variable, its only given clues when its above or below
@@ -38,13 +25,13 @@ import static nars.util.Texts.n2;
  * then to really guess right it has to learn the timing of the sine wave
  * and imagine at what rate it will travel and when it will change direction etc
  */
-public class Thermostat6Hai {
+public class Thermostat6DQN {
 
     public static final float basePeriod = 16;
     public static float targetPeriod = 16;
     static boolean print = true;
 
-    static int resolution = 12;
+    static int resolution = 8;
     static final float speed = 1f/resolution;
 
     public static void main(String[] args) {
@@ -54,56 +41,43 @@ public class Thermostat6Hai {
     public static void eval(int cycles) {
 
 
-        int histories = 2;
+        int histories = 1;
         int inputs = (1 + (histories)) * (resolution * 2);
-        int states = 24;
 
-
-        //Hsom som = new Hsom(inputs, states, new XorShift128PlusRandom(1));
-        Autoencoder ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
-        HaiQ h = new HaiQ(states, 3) {
-            
-            @Override
-            protected int perceive(float[] input) {
-                ae.train(input, 0.03f, 0.001f, 0.001f, false);
-                return ae.max();
-        		//som.learn(input);
-		        //return som.winnerx + (som.winnery * states);
-            }
-        };
+        DQN h = new DQN(inputs, 3);
 
 
 
-        MatrixImage mi = new MatrixImage();
-        MatrixImage.MatrixRGBA qColor = (i, a) -> {
-            @NotNull float qa = h.q[i][a];
-            @NotNull float et = h.et[i][a];
+//        MatrixImage mi = new MatrixImage();
+//        MatrixImage.MatrixRGBA qColor = (i, a) -> {
+//            @NotNull float qa = h.q[i][a];
+//            @NotNull float et = h.et[i][a];
+//
+//            float r = qa;
+//            float g = -qa;
+//            float b = et;
+//            return ColorArray.rgba(r, g, 0, (0.5f + 0.5f * b));
+//        };
+//        mi.setFitWidth(300);
+//        mi.setFitHeight(30);
+//
+//        NARfx.run( () -> {
+//
+//
+//            BorderPane bmi = new BorderPane(mi);
+//            NARfx.newWindow("q", bmi);
+//
+//            new Thread(()->{
+//            }).start();
+//
+//        });
 
-            float r = qa;
-            float g = -qa;
-            float b = et;
-            return ColorArray.rgba(r, g, 0, (0.5f + 0.5f * b));
-        };
-        mi.setFitWidth(300);
-        mi.setFitHeight(30);
-
-        NARfx.run( () -> {
-
-
-            BorderPane bmi = new BorderPane(mi);
-            NARfx.newWindow("q", bmi);
-
-            new Thread(()->{
-                eval2(cycles, resolution, inputs, h, mi, qColor);
-            }).start();
-
-        });
-
+        eval2(cycles, resolution, inputs, h);
 
 
     }
 
-    public static void eval2(int cycles, int resolution, int inputs, HaiQ h, MatrixImage mi, MatrixImage.MatrixRGBA qColor) {
+    public static void eval2(int cycles, int resolution, int inputs, DQN h) {
         MutableFloat yEst = new MutableFloat(0.5f); //NAR estimate of Y
         MutableFloat yHidden = new MutableFloat(0.5f); //actual best Y used by loss function
 
@@ -115,8 +89,6 @@ public class Thermostat6Hai {
         for (int tt = 0; tt < cycles; tt++) {
 
             Util.pause(5);
-
-            mi.set(h.inputs(), h.actions(), qColor);
 
             int a = Math.round(yHidden.floatValue() * (resolution-1));
             int b = Math.round(yEst.floatValue() * (resolution-1));
@@ -134,7 +106,7 @@ public class Thermostat6Hai {
 
             float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
 
-            int aa = h.act(ins, reward);
+            int aa = h.learn(reward, ins);
             float de = 0;
             switch (aa) {
                 case 1:
@@ -268,7 +240,7 @@ public class Thermostat6Hai {
         //return loss.floatValue() / t.intValue();
     }
 
-    public static @org.jetbrains.annotations.NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
+    public static @NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
         return new SensorConcept(cname, n, () -> {
             float low = ii * dv;
             float high = ii * dv;

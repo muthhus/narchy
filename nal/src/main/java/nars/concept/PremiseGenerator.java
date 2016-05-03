@@ -154,26 +154,26 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
         for (BLink<Task> taskLink : tasksArray) {
             if (taskLink == null) break; //null-terminated array, ends
-            Task task = taskLink.get();
-            if (task.isDeleted())
-                continue;
 
-            long occ = task.occurrence();
 
-            premiseTask(conceptLink, termsArray, taskLink, task, occ);
+            premiseTask(conceptLink, termsArray, taskLink);
 
         }
 
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, BLink<Task> taskLink, @NotNull Task task, long occ) {
+    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, BLink<Task> taskLink) {
+
+        Task task = taskLink.get();
+
+        long occ = task.occurrence();
 
         Compound taskTerm = task.term();
 
         for (BLink<Termed> termLink : termsArray) {
 
-            if (termLink == null || task.isDeleted())
+            if (termLink == null || taskLink.isDeleted() || task.isDeleted())
                 break; //end of termsArray, or task has become deleted in the previous iteration, cancel
 
             Termed tl = termLink.get();
@@ -193,7 +193,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     @NotNull
     protected ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-        return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, nar::process);
+        return new DefaultConceptProcess(nar, taskLink, termLink, belief, nar::process);
     }
 
     /** resolves the most relevant belief of a given term/concept */
