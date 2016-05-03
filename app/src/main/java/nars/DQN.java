@@ -25,7 +25,10 @@ public class DQN {
             CompiledScript cscript = engine.compile(
                     "java.lang.System.out.println('creating new rl.js agent'); " +
                     "var Math = Java.type('java.lang.Math'); " +
-                    "var agent = new RL.DQNAgent({ getNumStates: function() { return " + inputs + "; }, getMaxNumActions: function() { return " + actions + "; } }, { alpha: 0.01 }); " +
+                    "var env = { getNumStates: function() { return " + inputs + "; }, getMaxNumActions: function() { return " + actions + "; } }; " +
+                    //http://cs.stanford.edu/people/karpathy/reinforcejs/index.html
+                    "var opts =  { alpha: 0.01 }; " +
+                    "var agent = new RL.DQNAgent(env, opts); " +
                     "function act(i,r) { var a = agent.act(i); agent.learn(r); return a;  } ");
 
             //Bindings bindings = cscript.getEngine().createBindings();
@@ -71,8 +74,8 @@ public class DQN {
 
     public int learn(float prevReward, float... nextInputs) {
         try {
-            Integer a = (Integer) js.invokeFunction("act", nextInputs, prevReward);
-            return a;
+            Number a = (Number) js.invokeFunction("act", nextInputs, prevReward);
+            return a.intValue();
         } catch (Exception e) {
             e.printStackTrace();
         }

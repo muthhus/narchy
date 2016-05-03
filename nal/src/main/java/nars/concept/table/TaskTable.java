@@ -122,4 +122,6 @@ public interface TaskTable extends Iterable<Task> {
 
     /** forcibly remove a held Task */
     void remove(@NotNull Task belief, @NotNull NAR nar);
+
+
 }

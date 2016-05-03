@@ -286,6 +286,9 @@ public interface BeliefTable extends TaskTable {
             out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log());
         });
     }
+    default void print() {
+        print(System.out);
+    }
 
     /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
      *  returns 0 if no tasks exist */
