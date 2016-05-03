@@ -366,7 +366,7 @@ public class DemoRovers {
         int conceptsFirePerCycle = 4;
 
         Random rng = new XorShift128PlusRandom(1);
-        TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
+        TermIndex index = new AbstractNAR.WeakTermIndex(256 * 1024, rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 3, rng, index, new FrameClock());
@@ -412,11 +412,11 @@ public class DemoRovers {
         nar.conceptActivation.setValue(0.25f);
 
 
-        nar.conceptRemembering.setValue(1f);
-        nar.termLinkRemembering.setValue(6);
-        nar.taskLinkRemembering.setValue(4);
+        nar.conceptRemembering.setValue(3f);
+        nar.termLinkRemembering.setValue(12);
+        nar.taskLinkRemembering.setValue(8);
 
-        nar.cyclesPerFrame.set(256);
+        nar.cyclesPerFrame.set(32);
         nar.shortTermMemoryHistory.set(2);
 
         //nar.executionThreshold.setValue(0.01f);

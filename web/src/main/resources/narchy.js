@@ -90,31 +90,121 @@ function SocketNARGraph(path) {
 
             var tlPrefix = 'tl_' + id;
             var termlinks = x[4];
-            for (var e of termlinks) {
-                /*if (!(e = e.seq))
-                    return;*/
-                if (!e)
-                    return;
+            if (termlinks) {
+                for (var e of termlinks) {
+                    /*if (!(e = e.seq))
+                     return;*/
+                    if (!e)
+                        return;
 
-                var target = e[0];
+                    var target = e[0];
 
-                var tlpri = e[1]/1000.0;
-                var tldur = e[2]/1000.0;
-                var tlqua = e[3]/1000.0;
+                    var tlpri = e[1] / 1000.0;
+                    var tldur = e[2] / 1000.0;
+                    var tlqua = e[3] / 1000.0;
 
-                newEdges.push({
-                    id: tlPrefix + '_' + target,
-                    source: id, target: target,
-                    pri: tlpri,
-                    dur: tldur,
-                    qua: tlqua
-                });
+                    newEdges.push({
+                        id: tlPrefix + '_' + target,
+                        source: id, target: target,
+                        pri: tlpri,
+                        dur: tldur,
+                        qua: tlqua
+                    });
+                }
             }
 
 
 
         }
     );
+
+    //var layoutUpdateMaxPeriodMS = 1000;
+
+    var currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
+        /* https://github.com/cytoscape/cytoscape.js-spread */
+        name: 'spread',
+        minDist: 150,
+        speed: 0.1,
+        animate: false,
+        randomize: false, // uses random initial node positions on true
+        fit: false,
+        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 1, // Maximum number of expanding iterations
+
+        ready: function () {
+            //console.log('starting cola', Date.now());
+        },
+        stop: function () {
+            //console.log('stop cola', Date.now());
+        }
+    });
+
+    var layoutUpdatePeriodMS = 250;
+    currentLayout.run();
+
+
+    var layout = function () {
+        var currentLayout = sg.currentLayout;
+        if (currentLayout) {
+            currentLayout.stop();
+            currentLayout.run();
+
+            setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
+
+        }
+
+        /* https://github.com/cytoscape/cytoscape.js-cola#api */
+
+
+        // if (currentLayout) {
+        //     currentLayout.stop();
+        // } else {
+        //     // currentLayout = sg.makeLayout({
+        //     //     name: 'cola',
+        //     //     animate: true,
+        //     //     fit: false,
+        //     //     randomize: false,
+        //     //     maxSimulationTime: 700, // max length in ms to run the layout
+        //     //     speed: 1,
+        //     //     refresh: 2,
+        //     //     //infinite: true,
+        //     //     nodeSpacing: function (node) {
+        //     //         return 70;
+        //     //     }, // extra spacing around nodes
+        //     //
+        //     //     ready: function () {
+        //     //         //console.log('starting cola', Date.now());
+        //     //     },
+        //     //     stop: function () {
+        //     //         //console.log('stop cola', Date.now());
+        //     //     }
+        //     // });
+        //
+        //
+        // }
+        //
+        // currentLayout.run();
+
+
+        // sg.layout({ name: 'cose',
+        //     animate: true,
+        //     fit: false,
+        //     refresh: 1,
+        //     //animationThreshold: 1,
+        //     iterations: 5000,
+        //     initialTemp: 100,
+        //     //coolingfactor: 0.98,
+        //     ready: function() {
+        //         //console.log('starting cose', Date.now());
+        //     },
+        //     stop: function() {
+        //         //console.log('stop cose', Date.now());
+        //     }
+        // });
+
+    };
+    setTimeout(layout, layoutUpdatePeriodMS);
+
 
     function d(x, key) {
         return x._private.data[key];
@@ -124,6 +214,7 @@ function SocketNARGraph(path) {
         var p1 = 1 + d(x, 'pri') * d(x, 'belief');
         return parseInt(12 + 24 * (p1 * p1));
     };
+
 
     sg.spacegraph.style().selector('node')
         .style('shape', 'hexagon')

@@ -16,18 +16,17 @@ window.socket = function(path) {
 
 function SocketView(path, pathToElement, onData) {
 
-
     mwdata[path] = ''; //initially empty
 
     var view = pathToElement(path);
 
     var ws = window.socket(path);
 
-    ws.onopen = function() {
+    ws.onopen = function () {
         //state.html("Connected");
     };
     ws.onmessage = onData;
-    ws.onclose = function() {
+    ws.onclose = function () {
         //state.html("Disconnected");
     };
 
@@ -36,6 +35,7 @@ function SocketView(path, pathToElement, onData) {
         //disconnect the socket when element is removed
         $(this).data('socket').close();
     });
+
 
     return view;
 }
@@ -81,192 +81,125 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         //options
     });
 
-    //var layoutUpdateMaxPeriodMS = 1000;
 
-    var currentLayout = sg.makeLayout({
-        /* https://github.com/cytoscape/cytoscape.js-spread */
-        name: 'spread',
-        minDist: 150,
-        speed: 0.1,
-        animate: false,
-        randomize: false, // uses random initial node positions on true
-        fit: false,
-        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 1, // Maximum number of expanding iterations
+    sg.onMsg = function(msg) {
+        var v;
 
-        ready: function () {
-            //console.log('starting cola', Date.now());
-        },
-        stop: function () {
-            //console.log('stop cola', Date.now());
-        }
-    });
-    var layoutUpdatePeriodMS = 250;
-    currentLayout.run();
-
-
-    var layout = function () {
-        if (currentLayout) {
-            currentLayout.stop();
-            currentLayout.run();
-
-            setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
-
-        }
-
-        /* https://github.com/cytoscape/cytoscape.js-cola#api */
-
-
-            // if (currentLayout) {
-            //     currentLayout.stop();
-            // } else {
-            //     // currentLayout = sg.makeLayout({
-            //     //     name: 'cola',
-            //     //     animate: true,
-            //     //     fit: false,
-            //     //     randomize: false,
-            //     //     maxSimulationTime: 700, // max length in ms to run the layout
-            //     //     speed: 1,
-            //     //     refresh: 2,
-            //     //     //infinite: true,
-            //     //     nodeSpacing: function (node) {
-            //     //         return 70;
-            //     //     }, // extra spacing around nodes
-            //     //
-            //     //     ready: function () {
-            //     //         //console.log('starting cola', Date.now());
-            //     //     },
-            //     //     stop: function () {
-            //     //         //console.log('stop cola', Date.now());
-            //     //     }
-            //     // });
-            //
-            //
-            // }
-            //
-            // currentLayout.run();
-
-
-        // sg.layout({ name: 'cose',
-        //     animate: true,
-        //     fit: false,
-        //     refresh: 1,
-        //     //animationThreshold: 1,
-        //     iterations: 5000,
-        //     initialTemp: 100,
-        //     //coolingfactor: 0.98,
-        //     ready: function() {
-        //         //console.log('starting cose', Date.now());
-        //     },
-        //     stop: function() {
-        //         //console.log('stop cose', Date.now());
-        //     }
-        // });
-
-    };
-    setTimeout(layout, layoutUpdatePeriodMS);
-
-    var sv = SocketView(path,
-
-        function(path) {
-            return view;
-        },
-
-        function(msg) {
-            var v;
+        if (msg.data && typeof msg.data === "string") {
             try {
                 v = JSON.parse(msg.data);
             } catch (e) {
                 v = 'Error parsing: ' + e.data;
             }
+        } else {
+            v = msg;
+        }
 
-            var nodesToRemove = view.nodesShown || new Set() /* empty */;
+        var nodesToRemove = view.nodesShown || new Set() /* empty */;
 
-            var newNodeSet = new Set();
+        var newNodeSet = new Set();
 
-            var nodesToShow = [];
-            var edgesToShow = [];
+        var nodesToShow = [];
+        var edgesToShow = [];
 
-            //console.log(prev.size, 'previously');
-            _.each(v, function(x) {
+        //console.log(prev.size, 'previously');
+        _.each(v, function(x) {
 
-                var id = idFunc(x); //x[1];
-                //if (!toRemove.delete(id)) {
+            var id = idFunc(x); //x[1];
+            //if (!toRemove.delete(id)) {
 
-                /** nodeFunc can return false to cause any previous node to be removed */
-                if (nodeFunc(id, x, nodesToShow, edgesToShow)!==false) {
-                    nodesToRemove.delete(id);
-                }
-                newNodeSet.add(id);
-                //}
-            });
-
-
+            /** nodeFunc can return false to cause any previous node to be removed */
+            if (nodeFunc(id, x, nodesToShow, edgesToShow)!==false) {
+                nodesToRemove.delete(id);
+            }
+            newNodeSet.add(id);
+            //}
+        });
 
 
-            var edgesToRemove = view.edgesShown || new Set() /* empty */;
 
-            _.each(edgesToShow, function(e) { edgesToRemove.delete(e.id); });
 
-            //console.log(prev.size, 'to delete');
+        var edgesToRemove = view.edgesShown || new Set() /* empty */;
 
-            var changed = false;
-            var shownEdgeSet = new Set();
+        _.each(edgesToShow, function(e) { edgesToRemove.delete(e.id); });
 
-            sg.batch(function() {
-                //anything remaining in prev is inactive
-                if (nodesToRemove.size > 0) {
-                    sg.removeNodes(Array.from(nodesToRemove));
-                    changed = true;
-                }
-                if (nodesToShow.length > 0) {
-                    _.each(nodesToShow, sg.addNode);
+        //console.log(prev.size, 'to delete');
 
-                    changed = true;
-                }
+        var changed = false;
+        var shownEdgeSet = new Set();
+
+        sg.batch(function() {
+
+
+            //anything remaining in prev is inactive
+            if (nodesToRemove.size > 0) {
+                sg.removeNodes(Array.from(nodesToRemove));
+                changed = true;
+            }
+            if (nodesToShow.length > 0) {
+                _.each(nodesToShow, sg.addNode);
+
+                changed = true;
+            }
             //});
             //sg.batch(function() {
 
-                if (edgesToRemove.length > 0) {
-                    _.each(edgesToRemove, sg.removeEdge);
-                    changed = true;
-                }
+            if (edgesToRemove.length > 0) {
+                _.each(edgesToRemove, sg.removeEdge);
+                changed = true;
+            }
 
-                if (edgesToShow.length > 0) {
-                    _.each(edgesToShow, function (e) {
-                        var target = e.target;
+            if (edgesToShow.length > 0) {
+                _.each(edgesToShow, function (e) {
+                    var target = e.target;
 
-                        if (sg.get(target)) { //if target exists
-                            sg.addEdge(e);
-                            shownEdgeSet.add(e.id);
-                        }
-                    });
-                    changed = true;
-                }
+                    if (sg.get(target)) { //if target exists
+                        sg.addEdge(e);
+                        shownEdgeSet.add(e.id);
+                    }
+                });
+                changed = true;
+            }
 
-                // if (changed) {
-                //     layout(); //trigger layout
-                // }
-
-
-
-                //sg.elements().style();
-            });
+            // if (changed) {
+            //     layout(); //trigger layout
+            // }
 
 
 
-            view.nodesShown = newNodeSet;
-            view.edgesShown = shownEdgeSet;
-        }
-    );
+            //sg.elements().style();
+        });
+
+
+
+        view.nodesShown = newNodeSet;
+        view.edgesShown = shownEdgeSet;
+    };
+
+    var sv;
+    if (path) { //TODO different types of data interfaces/loaders
+        sv = SocketView(path,
+
+            function (path) {
+                return view;
+            },
+
+            sg.onMsg
+        );
+    } else {
+        sv = view;
+    }
 
     sv.spacegraph = sg;
+
     sv.stop = function() {
 
         sg.destroy();
 
-        currentLayout.destroy();
-        currentLayout = null;
+        if (sv.currentLayout) {
+            sv.currentLayout.destroy();
+            sv.currentLayout = null;
+        }
 
     };
 
