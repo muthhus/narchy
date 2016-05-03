@@ -254,7 +254,7 @@ public class NarQ implements Consumer<NAR> {
         final Autoencoder ae;
 
         public HaiQImpl(int inputs, int states, int outputs) {
-            super(inputs, states, outputs);
+            super(states, outputs);
             ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         }
 

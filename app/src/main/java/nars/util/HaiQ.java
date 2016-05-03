@@ -23,7 +23,7 @@ abstract public class HaiQ {
 	@NotNull
 	final float[][] et;
 
-	final int actions, nStates;
+	final int actions;
 	int lastState, lastDecidedAction;
 
 	/*
@@ -66,21 +66,19 @@ abstract public class HaiQ {
 	private final int inputs;
 	public float Epsilon;
 
-	public HaiQ(int inputs, int _states, int outputs) {
+	public HaiQ(int inputs, int outputs) {
 		rng = new XorShift128PlusRandom(1);
 
 		actions = outputs;
 
-		//int states = (int) Math.ceil(1+Math.sqrt(_states)); //states*states;
-		nStates = _states;
 
 		this.inputs = inputs;
 
 		//som = new Hsom(inputs, states);
 
-		q = new float[nStates][outputs];
-		et = new float[nStates][outputs];
-		setQ(0.05f, 0.5f, 0.9f, 0.2f); // 0.1 0.5 0.9
+		q = new float[inputs][outputs];
+		et = new float[inputs][outputs];
+		setQ(0.05f, 0.5f, 0.9f, 0.02f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
@@ -130,7 +128,7 @@ abstract public class HaiQ {
 		float gammaLambda = Gamma * Lambda;
 
 
-		for (int i = 0; i < nStates; i++) {
+		for (int i = 0; i < inputs; i++) {
 			float[] eti = et[i];
 			float[] qi = q[i];
 

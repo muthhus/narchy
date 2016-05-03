@@ -24,9 +24,9 @@ public class Hsom {
     float gamma;
     float eta = 0.1f;
     float outmul = 1.0f;
-    int winnerx;
-    int winnery;
-    float Leak = 0.1f;
+    public int winnerx;
+    public int winnery;
+    float Leak = 0.05f;
     float InMul = 1.0f;
 
     public Hsom(int numInputs, int SomSize, @NotNull Random rng) {
@@ -47,10 +47,10 @@ public class Hsom {
         for (int x = 0; x < SomSize; x++) {
             for (int y = 0; y < SomSize; y++) {
                 for (int z = 0; z < numInputs; z++) {
-                    links[x][y][z] = (float) ((rng.nextFloat()/**
+                    links[x][y][z] = (rng.nextFloat()/**
                      * 2.0-1.0
                      */
-                    ) * 0.1);
+                     * 2f - 1f);
                 }
             }
         }
@@ -58,15 +58,16 @@ public class Hsom {
 
     void input(float[] input) {
         int j;
+        float leak = Leak;
 
         for (j = 0; j < numInputs; j++) {
             if (!Leaky) {
                 this.inputs[j] = input[j] * InMul;
             } else {
-                this.inputs[j] += (-Leak * this.inputs[j]) + input[j];
+                this.inputs[j] += (-leak * this.inputs[j]) + (1f- leak) * input[j];
             }
         }
-        float minv = Float.MAX_VALUE;
+        float minv = Float.POSITIVE_INFINITY;
         for (int i1 = 0; i1 < SomSize; i1++) {
             for (int i2 = 0; i2 < SomSize; i2++) {
                 float summe = 0.0f;
