@@ -19,9 +19,9 @@ abstract public class HaiQ {
 	//final Hsom som;
 
 	@NotNull
-	final float[][] q; // state x action
+	public final float[][] q; // state x action
 	@NotNull
-	final float[][] et;
+	public final float[][] et;
 
 	final int actions;
 	int lastState, lastDecidedAction;

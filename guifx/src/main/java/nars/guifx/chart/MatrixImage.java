@@ -21,6 +21,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
+import static javafx.application.Platform.runLater;
+
 
 /**
  * Renders a matrix as an image. Positive elements are shades of red, negative
@@ -70,7 +72,11 @@ public class MatrixImage extends ImageView {
             }
         }
 
-        setImage(img);
+        runLater(()->{
+            setImage(null);
+            setImage(img);
+        });
+
     }
 
 

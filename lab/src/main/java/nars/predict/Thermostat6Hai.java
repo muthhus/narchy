@@ -1,9 +1,14 @@
-package nars.op.java;
+package nars.predict;
 
+import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.table.BeliefTable;
+import nars.guifx.NARfx;
+import nars.guifx.chart.MatrixImage;
+import nars.guifx.util.ColorArray;
+import nars.guifx.util.ColorMatrix;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
@@ -13,9 +18,11 @@ import nars.util.Optimization;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.Autoencoder;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.TreeSet;
@@ -33,33 +40,69 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat6Hai {
 
-    public static final float basePeriod = 12;
+    public static final float basePeriod = 16;
     public static float targetPeriod = 8;
     public static final float speed = 0.05f;
     static boolean print = true;
 
 
     public static void main(String[] args) {
-        eval(120000);
+        eval(320000);
     }
 
     public static void eval(int cycles) {
 
         int resolution = 12;
 
-        int inputs = resolution * 2;
-        int states = resolution;
+        int histories = 2;
+        int inputs = (1 + (histories)) * (resolution * 2);
+        int states = 32;
 
-        Hsom som = new Hsom(inputs, states, new XorShift128PlusRandom(1));
-        HaiQ h = new HaiQ(states*states, 3) {
+        //Hsom som = new Hsom(inputs, states, new XorShift128PlusRandom(1));
+        Autoencoder ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
+        HaiQ h = new HaiQ(states, 5) {
             
             @Override
             protected int perceive(float[] input) {
-        		som.learn(input);
-		        return som.winnerx + (som.winnery * states);
+                ae.train(input, 0.05f, 0.01f, 0f, false);
+                return ae.max();
+        		//som.learn(input);
+		        //return som.winnerx + (som.winnery * states);
             }
         };
 
+
+
+        MatrixImage mi = new MatrixImage();
+        MatrixImage.MatrixRGBA qColor = (i, a) -> {
+            @NotNull float qa = h.q[i][a];
+            @NotNull float et = h.et[i][a];
+
+            float r = qa;
+            float g = -qa;
+            float b = et;
+            return ColorArray.rgba(r, g, 0, (0.5f + 0.5f * b));
+        };
+        mi.setFitWidth(300);
+        mi.setFitHeight(30);
+
+        NARfx.run( () -> {
+
+
+            BorderPane bmi = new BorderPane(mi);
+            NARfx.newWindow("q", bmi);
+
+            new Thread(()->{
+                eval2(cycles, resolution, inputs, h, mi, qColor);
+            }).start();
+
+        });
+
+
+
+    }
+
+    public static void eval2(int cycles, int resolution, int inputs, HaiQ h, MatrixImage mi, MatrixImage.MatrixRGBA qColor) {
         MutableFloat yEst = new MutableFloat(0.5f); //NAR estimate of Y
         MutableFloat yHidden = new MutableFloat(0.5f); //actual best Y used by loss function
 
@@ -70,18 +113,25 @@ public class Thermostat6Hai {
 
         for (int tt = 0; tt < cycles; tt++) {
 
+            Util.pause(5);
+
+            mi.set(h.inputs(), h.actions(), qColor);
+
             int a = Math.round(yHidden.floatValue() * (resolution-1));
             int b = Math.round(yEst.floatValue() * (resolution-1));
 
-            for (int i = 0; i < resolution; i++) {
-                ins[i] = (i == a) ?  1 : -1;
-                ins[i+resolution] = (i == b) ? 1 : -1;
+            System.arraycopy(ins, 0, ins, resolution*2, (ins.length - resolution*2)); //shift history down
+            for (int i = 0; i < resolution; ) {
+                ins[i++] = (i == a) ?  1 : 0;
+                ins[i++] = (i == b) ? 1 : 0;
             }
 
-            //System.out.println(Arrays.toString(ins).replace((char)0, '0').replace((char)1, '1'));
-            System.out.print(som.winnerx + "," + som.winnery);
 
-            float reward = -1f + 1f / (1f + Math.abs(yHidden.floatValue() - yEst.floatValue()));
+            //System.out.println(Arrays.toString(ins).replace((char)0, '0').replace((char)1, '1'));
+
+            float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
+            float reward = dist < 0.15f ? 0.5f : 0.15f - dist;
+
             int aa = h.act(ins, reward);
             float de = 0;
             switch (aa) {
@@ -90,6 +140,12 @@ public class Thermostat6Hai {
                     break;
                 case 2:
                     de = -1f * speed;
+                    break;
+                case 3:
+                    de = 1f * speed/2f;
+                    break;
+                case 4:
+                    de = -1f * speed/2f;
                     break;
                 case 0:
                 default:
@@ -208,7 +264,6 @@ public class Thermostat6Hai {
 //        printBeliefs(n, false);
 
         //return loss.floatValue() / t.intValue();
-
     }
 
     public static @org.jetbrains.annotations.NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
