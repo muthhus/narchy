@@ -251,18 +251,18 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term inst(Term subj, Term pred) {
-        return newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), pred));
+    public Compound inst(Term subj, Term pred) {
+        return (Compound) newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), pred));
     }
 
     @Nullable
-    public Term prop(Term subj, Term pred) {
-        return newCompound(INHERIT, TermVector.the(subj, newCompound(SET_INT, pred)));
+    public Compound prop(Term subj, Term pred) {
+        return (Compound) newCompound(INHERIT, TermVector.the(subj, newCompound(SET_INT, pred)));
     }
 
     @Nullable
-    public Term instprop(@NotNull Term subj, @NotNull Term pred) {
-        return newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
+    public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
+        return (Compound) newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
     }
 
     @Nullable

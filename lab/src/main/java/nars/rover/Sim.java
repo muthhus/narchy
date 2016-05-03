@@ -41,6 +41,7 @@ public class Sim {
             .setSystem(new RendererSystem(this))
             .setSystem(new RunNARSystem())
             .setSystem(new EdibleUpdate())
+            .setSystem(new HealthUpdate())
             //.setSystem(new WeaponSystem())
         );
 

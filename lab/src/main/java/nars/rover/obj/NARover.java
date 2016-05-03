@@ -31,24 +31,22 @@ import java.util.function.DoubleSupplier;
 /**
  * Triangular mobile vehicle
  */
-public class NARover extends AbstractPolygonBot {
+public class NARover extends AbstractRover {
 
     public final NAR nar;
-    private final String id;
-    public final Entity entity;
+
 
     //final Lobjects objs;
 
-    final Health health;
     final SensorConcept speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
     public static final Compound EAT_FOOD = $.image(1, $.the("eat"), $.the("food"));
     public static final Compound EAT_POISON = $.image(1, $.the("eat"), $.the("poison"));
-    public static final Compound SPEED_LEFT = $.image(1, $.the("speed"), $.the("left"));
-    public static final Compound SPEED_RIGHT = $.image(1, $.the("speed"), $.the("right"));
-    public static final Compound SPEED_FORE = $.image(1, $.the("speed"), $.the("fore"));
-    public static final Compound SPEED_BACK = $.image(1, $.the("speed"), $.the("back"));
+    public static final Compound SPEED_LEFT = $.image(1, $.the("speed"), $.the("Left"));
+    public static final Compound SPEED_RIGHT = $.image(1, $.the("speed"), $.the("Right"));
+    public static final Compound SPEED_FORE = $.image(1, $.the("speed"), $.the("Fore"));
+    public static final Compound SPEED_BACK = $.image(1, $.the("speed"), $.the("Back"));
 
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
@@ -57,31 +55,20 @@ public class NARover extends AbstractPolygonBot {
 
     //public class DistanceInput extends ChangedTextInput
 
-    final static Logger logger = LoggerFactory.getLogger(NARover.class);
+    //final static Logger logger = LoggerFactory.getLogger(NARover.class);
 
     //private MotorControls motors;
-    private Turret gun;
 
     public NARover(String id, Entity e, NAR nar) {
-        this.id = id;
-        this.entity = e;
+        super(id, e);
+
 
         this.nar = nar;
 
-        //material = new BeingMaterial(this);
-        @Deprecated Body torso = e.getComponent(Physical.class).body;
-        @Deprecated Motorized motor = e.getComponent(Motorized.class);
-
-        health = e.getComponent(Health.class);
-        nar.onFrame((nn)->{
-            health.update();
-        });
-
-        gun = new Turret();
 
 
-        int minUpdateTime = 4;
-        int maxUpdateTime = 8;
+        int minUpdateTime = 1;
+        int maxUpdateTime = -1;
 
 
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
@@ -150,7 +137,7 @@ public class NARover extends AbstractPolygonBot {
         this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearNegative)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f - health.nutrition, linearPositive)
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition, linearPositive)
                 .timing(minUpdateTime, maxUpdateTime);
 
         sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage, linearPositive)
@@ -159,30 +146,30 @@ public class NARover extends AbstractPolygonBot {
         float motorThresh = 0.51f;
 
         int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
-        int maxMotorFeedbackCycles = 4; //nar.duration() * 3;
+        int maxMotorFeedbackCycles = -1; //nar.duration() * 3;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
             //if (a < 0) return Float.NaN;
-            if (b > l-0.05) l = 0;
+            if (b > l-0.01) l = 0;
             return motor.left(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
             //if (a < 0) return Float.NaN;
-            if (b > l-0.05) l = 0;
+            if (b > l-0.01) l = 0;
             return motor.right(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
-            if (b > l-0.05) l = 0;
+            if (b > l-0.01) l = 0;
             return motor.forward(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
-            if (b > l-0.05) l = 0;
+            if (b > l-0.01) l = 0;
             return motor.backward(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
@@ -425,7 +412,7 @@ public class NARover extends AbstractPolygonBot {
 
         Term[] materials = {$.the("food"), $.the("poison"), $.the("wall")};
 
-        float pixelPri = 1f / (float)Math.sqrt(materials.length * pixels);
+        float pixelPri = 0.05f; //1f / (float)Math.sqrt(materials.length * pixels);
 
 
         for (int i = 0; i < pixels; i++) {
@@ -459,7 +446,9 @@ public class NARover extends AbstractPolygonBot {
                 };
 
 
-                Compound term = $.imageInt(1, visionTerm.term(), material);
+                Compound term =
+                        //$.imageInt(1, visionTerm.term(), material);
+                        $.prop(visionTerm.term(), material);
 
                 SensorConcept visionSensor = new SensorConcept(
 
@@ -471,7 +460,7 @@ public class NARover extends AbstractPolygonBot {
 
                         () -> (float) value.getAsDouble()
 
-                ).resolution(0.06f).timing(1, 4).
+                ).resolution(0.04f)/*.timing(1, 4)*/.
                         pri(pixelPri);
                 sensorConcepts.add(visionSensor);
 

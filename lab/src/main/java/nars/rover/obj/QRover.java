@@ -1,22 +1,53 @@
-//package nars.rover.run;
+package nars.rover.run;
+
+
+import com.artemis.Entity;
+import nars.guifx.chart.MatrixImage;
+import nars.guifx.util.ColorArray;
+import nars.rover.obj.AbstractRover;
+import nars.util.HaiQ;
+import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.Autoencoder;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Q-learning ONLY to contrast with QLearning+NAR
+ TODO repair from API changes
+ */
+public class QRover extends AbstractRover {
+
+    public QRover(String id, Entity e) {
+        super(id, e);
+
+//        //Hsom som = new Hsom(inputs, states, new XorShift128PlusRandom(1));
+//        Autoencoder ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
+//        HaiQ h = new HaiQ(states, 5) {
 //
-//import nars.util.learn.HaiQ;
-//import nars.rover.Material;
-//import nars.rover.obj.VisionRay;
-//import nars.rover.robot.AbstractPolygonBot;
-//import nars.util.data.Util;
-//import org.jbox2d.common.Color3f;
-//import org.jbox2d.common.Vec2;
-//import org.jbox2d.dynamics.Body;
+//            @Override
+//            protected int perceive(float[] input) {
+//                ae.train(input, 0.05f, 0.01f, 0f, false);
+//                return ae.max();
+//                //som.learn(input);
+//                //return som.winnerx + (som.winnery * states);
+//            }
+//        };
 //
-//import static nars.rover.Material.*;
 //
-///**
-// * Q-learning ONLY to contrast with QLearning+NAR
-// TODO repair from API changes
-// */
-//public class QRover extends AbstractPolygonBot {
 //
+//        MatrixImage mi = new MatrixImage();
+//        MatrixImage.MatrixRGBA qColor = (i, a) -> {
+//            @NotNull float qa = h.q[i][a];
+//            @NotNull float et = h.et[i][a];
+//
+//            float r = qa;
+//            float g = -qa;
+//            float b = et;
+//            return ColorArray.rgba(r, g, 0, (0.5f + 0.5f * b));
+//        };
+//        mi.setFitWidth(300);
+//        mi.setFitHeight(30);
+    }
+
 //    final int retinaPixels = 16;
 //    final int motionPixels = 2;
 //
@@ -149,4 +180,4 @@
 //
 //        //System.out.println( Arrays.toString(in) + " "  + rew);
 //    }
-//}
+}

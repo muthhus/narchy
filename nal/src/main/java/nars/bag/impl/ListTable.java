@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import nars.bag.Table;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ public interface ListTable<V, L> extends Table<V, L> {
 
         @Override
         public Iterator iterator() {
-            return Iterators.empty();
+            return Collections.emptyIterator();
         }
 
         @Override

@@ -79,12 +79,16 @@ public class ArrayBeliefTable implements BeliefTable {
 
         Task eternal = topEternal();
 
-        if (temporal.isEmpty()) //optimization: just return the top eternal truth if no temporal to adjust with
-            return eternal.truth();
+        if (temporal.isEmpty()) {
+            if (eternal != null) //optimization: just return the top eternal truth if no temporal to adjust with
+                return eternal.truth();
+            else
+                return Truth.Zero;
+        }
 
 
-        //return topTemporalCurrent(when, now, eternal);
-        return topTemporalWeighted(when, now, eternal);
+        return topTemporalCurrent(when, now, eternal);
+        //return topTemporalWeighted(when, now, eternal);
     }
 
     @Nullable

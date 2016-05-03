@@ -101,10 +101,10 @@ public enum Global {
 
 
     /** minimum durability and quality necessary for a derivation to form */
-    public static float DERIVATION_DURABILITY_THRESHOLD = 0.001f;
+    public static float DERIVATION_DURABILITY_THRESHOLD = 0.005f;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_PROPAGATION_EPSILON = 0.0001f;
+    public static final float BUDGET_PROPAGATION_EPSILON = 0.003f;
 
 
 //    /* ---------- default input values ---------- */

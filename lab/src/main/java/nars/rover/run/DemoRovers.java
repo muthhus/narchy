@@ -176,13 +176,9 @@ public class DemoRovers {
 
         boolean gui = true;
 
-
-
-
-
         Default nar = newNAR();
 
-        Entity rover = sim.game.createEntity().edit()
+        Entity e = sim.game.createEntity().edit()
                 .add(new Physical(
                         AbstractPolygonBot.newDynamic(0, 0),
                         AbstractPolygonBot.newTriangle()))
@@ -194,7 +190,8 @@ public class DemoRovers {
         sim.game.process(); //initialize
 
 
-        NARover nr = new NARover("r1", rover, nar);
+        NARover nr = new NARover("r1", e,
+            nar);
 
         nar.goal(EAT_FOOD, Tense.Eternal, 1f, 0.9f);//"eat:food! %1.00|0.95%");
         nar.goal(EAT_POISON, Tense.Eternal, 0f, 0.9f);
@@ -220,11 +217,13 @@ public class DemoRovers {
                 float inputStrengthf = 0.75f;
                 Stage stage = newWindow("Motors",
                         new VBox(
-                                new ManualControl<NARover>(nr,
-                                        new ManualOverride<NARover>(KeyCode.NUMPAD8,
+                                new ManualControl<AbstractRover>(nr,
+                                        new ManualOverride<AbstractRover>(KeyCode.NUMPAD8,
                                                 (r) -> {
                                                     System.out.println("forward");
+                                                    nar.believe(motorFore, Tense.Present, 0f, inputStrengthf);
                                                     nar.goal($.$(motorFore), Tense.Present, 1f, inputStrengthf);
+                                                    nar.believe(motorBack, Tense.Present, 0f, inputStrengthf);
                                                     nar.goal($.$(motorBack), Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
@@ -234,10 +233,12 @@ public class DemoRovers {
                                                     return new Button("FWD");
                                                 }
                                         ),
-                                        new ManualOverride<NARover>(KeyCode.NUMPAD2,
+                                        new ManualOverride<AbstractRover>(KeyCode.NUMPAD2,
                                                 (r) -> {
                                                     System.out.println("back");
+                                                    nar.believe(motorBack, Tense.Present, 0f, inputStrengthf);
                                                     nar.goal($.$(motorBack), Tense.Present, 1f, inputStrengthf);
+                                                    nar.believe(motorFore, Tense.Present, 0f, inputStrengthf);
                                                     nar.goal($.$(motorFore), Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
@@ -246,11 +247,13 @@ public class DemoRovers {
                                                     return new Button("BACK");
                                                 }
                                         ),
-                                        new ManualOverride<NARover>(KeyCode.NUMPAD4,
+                                        new ManualOverride<AbstractRover>(KeyCode.NUMPAD4,
                                                 (r) -> {
                                                     System.out.println("left");
                                                     nar.goal($.$(motorLeft), Tense.Present, 1f, inputStrengthf);
                                                     nar.goal($.$(motorRight), Tense.Present, 0f, inputStrengthf);
+                                                    nar.believe(motorLeft, Tense.Present, 0f, inputStrengthf);
+                                                    nar.believe(motorRight, Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
                                                     //System.out.println("up -");
@@ -259,11 +262,13 @@ public class DemoRovers {
                                                     return new Button("LEFT");
                                                 }
                                         ),
-                                        new ManualOverride<NARover>(KeyCode.NUMPAD6,
+                                        new ManualOverride<AbstractRover>(KeyCode.NUMPAD6,
                                                 (r) -> {
                                                     System.out.println("right");
                                                     nar.goal($.$(motorRight), Tense.Present, 1f, inputStrengthf);
                                                     nar.goal($.$(motorLeft), Tense.Present, 0f, inputStrengthf);
+                                                    nar.believe(motorLeft, Tense.Present, 0f, inputStrengthf);
+                                                    nar.believe(motorRight, Tense.Present, 0f, inputStrengthf);
                                                 },
                                                 (r) -> {
                                                 },
@@ -275,7 +280,7 @@ public class DemoRovers {
                                 updateMatrices(sensors, nar),
                                 new HBox(
                                         scrolled(new NARtop(nar).addAll(
-                                                "MotorControls(#x,motor,(),#z)",
+                                                "motor(#x)",
                                                 motorLeft, motorRight,
                                                 motorFore, motorBack,
                                                 motorStop, turretFire)),
@@ -340,7 +345,7 @@ public class DemoRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 5;
+        int conceptsFirePerCycle = 1;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
@@ -360,7 +365,7 @@ public class DemoRovers {
 //        nar.input("$0.8$ <food <-> poison>?");
 //        nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.7f);
+        nar.logSummaryGT(System.out, 0.35f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -371,7 +376,7 @@ public class DemoRovers {
 //        });
 
 
-        nar.DEFAULT_JUDGMENT_PRIORITY = 0.6f;
+        nar.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
@@ -385,15 +390,15 @@ public class DemoRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.conceptActivation.setValue(0.1f);
+        nar.conceptActivation.setValue(0.5f);
 
 
         nar.conceptRemembering.setValue(1f);
-        nar.termLinkRemembering.setValue(16);
-        nar.taskLinkRemembering.setValue(12);
+        nar.termLinkRemembering.setValue(6);
+        nar.taskLinkRemembering.setValue(4);
 
-        nar.cyclesPerFrame.set(8);
-        nar.shortTermMemoryHistory.set(3);
+        nar.cyclesPerFrame.set(128);
+        nar.shortTermMemoryHistory.set(2);
 
         //nar.executionThreshold.setValue(0.01f);
         //nar.derivationDurabilityThreshold.setValue(0.01f);

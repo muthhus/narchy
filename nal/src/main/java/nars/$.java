@@ -236,15 +236,15 @@ public enum $ /* TODO: implements TermIndex */ {
      * @return A compound generated or null
      */
     @Nullable
-    public static Term inst(@NotNull Term subj, Term pred) {
+    public static Compound inst(@NotNull Term subj, Term pred) {
         return terms.builder().inst(subj, pred);
     }
     @Nullable
-    public static Term instprop(@NotNull Term subject, @NotNull Term predicate) {
+    public static Compound instprop(@NotNull Term subject, @NotNull Term predicate) {
         return terms.builder().instprop(subject, predicate);
     }
     @Nullable
-    public static Term prop(Term subject, Term predicate) {
+    public static Compound prop(Term subject, Term predicate) {
         return terms.prop(subject, predicate);
     }
 

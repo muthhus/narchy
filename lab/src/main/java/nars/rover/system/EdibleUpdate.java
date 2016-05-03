@@ -14,6 +14,7 @@ public class EdibleUpdate extends EntityProcessingSystem {
 
 
     public EdibleUpdate() {
+
         super(Aspect.all(Edible.class, MaterialColor.class));
     }
 

@@ -39,14 +39,14 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         super(term, n);
 
         this.sensor = new Sensor(n, this, this, toFreq) {
-            @Override
-            protected float freq(float v) {
-                return SensorConcept.this.freq(v);
-            }
-            @Override
-            protected float conf(float v) {
-                return SensorConcept.this.conf(v);
-            }
+//            @Override
+//            protected float freq(float v) {
+//                return SensorConcept.this.freq(v);
+//            }
+//            @Override
+//            protected float conf(float v) {
+//                return SensorConcept.this.conf(v);
+//            }
 
         };
         n.on(this);
@@ -55,12 +55,12 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
-    float freq(float v) {
-        return v;
-    }
-    float conf(float v) {
-        return 0.90f;
-    }
+//    float freq(float v) {
+//        return v;
+//    }
+//    float conf(float v) {
+//        return 0.90f;
+//    }
     
     /**
      * adjust min/max temporal resolution of feedback input
@@ -71,16 +71,15 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
      */
     @NotNull
     public SensorConcept timing(int minCycles, int maxCycles) {
-
         sensor.minTimeBetweenUpdates(minCycles);
         sensor.maxTimeBetweenUpdates(maxCycles);
         return this;
     }
 
-//    @Override
-//    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-//        return eternalOrTemporal ? 0 : maxBeliefs; //no eternal
-//    }
+    @Override
+    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        return eternalOrTemporal ? 0 : maxBeliefs; //no eternal
+    }
 
     public void setInput(FloatSupplier input) {
         this.input = input;

@@ -83,12 +83,13 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
             @Override
             protected float freq(float v) {
-                return v < 0.5f ? 0 : 1;
+                return v; //v < 0.5f ? 0 : 1;
             }
 
             @Override
             protected float conf(float v) {
-                return 0.9f* (v < 0.5f ? (1f - v) : v);
+                return 0.9f;
+                //return 0.9f* (v < 0.5f ? (1f - v) : v);
             }
 
             @Override
