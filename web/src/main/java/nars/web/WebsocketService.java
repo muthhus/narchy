@@ -57,7 +57,7 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
         //System.out.println("send: " + object);
 
         if (object instanceof Object[]) {
-            WebSockets.sendText(Json.arrayToJson((Object[])object).toString(), socket, this);
+            WebSockets.sendText(Json.arrayToJson((Object[])object, new StringBuilder()).toString(), socket, this);
         } else if (object instanceof String) {
             WebSockets.sendText((String)object, socket, this);
         } else if (object instanceof StringBuilder) {

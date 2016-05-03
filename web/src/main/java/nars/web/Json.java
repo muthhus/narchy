@@ -47,12 +47,12 @@ public class Json {
     }
 
     /** simple primitive array to json */
-    public static StringBuilder arrayToJson(Object[] object) {
-        StringBuilder sb = new StringBuilder();
+    public static StringBuilder arrayToJson(Object[] object, StringBuilder sb) {
+
         sb.append('[');
         for (int i = 0, objectLength = object.length; i < objectLength; i++) {
             Object o = object[i];
-            sb.append(objectToJson(o));
+            objectToJson(o, sb);
             if (i!=objectLength-1)
                 sb.append(',');
         }
@@ -60,33 +60,35 @@ public class Json {
         return sb;
     }
 
-    public static CharSequence objectToJson(Object o) {
+    public static void objectToJson(Object o, StringBuilder sb) {
+
         if (o == null)
-            return "null";
+            sb.append("null");
 
-        if (o instanceof CharSequence)
-            return "\"" + ((CharSequence)o) + "\"";
+        else if (o instanceof CharSequence)
+            sb.append("\"").append(((CharSequence)o)).append("\"");
 
-        if (o instanceof Object[])
-            return arrayToJson((Object[])o);
+        else if (o instanceof Object[])
+            arrayToJson((Object[])o, sb);
 
-        if (o instanceof Collection)
-            return collectionToJson((Collection)o);
+        else if (o instanceof Collection)
+            collectionToJson((Collection)o, sb);
 
-        if (o instanceof Number)
-            return String.valueOf(o);
+        else if (o instanceof Number)
+            sb.append(o);//String.valueOf(o));
 
-        throw new RuntimeException("unsupported type: " + o.getClass() + " while trying to serialize " + o);
+        else
+            throw new RuntimeException("unsupported type: " + o.getClass() + " while trying to serialize " + o);
 
     }
 
-    public static CharSequence collectionToJson(Collection o) {
-        StringBuilder sb = new StringBuilder();
+    public static StringBuilder collectionToJson(Collection o, StringBuilder sb) {
+
         sb.append('[');
         int i = 0;
         int s = o.size();
         for (Object x : o) {
-            sb.append(objectToJson(x));
+            objectToJson(x, sb);
             if (i++!=s-1)
                 sb.append(',');
         }

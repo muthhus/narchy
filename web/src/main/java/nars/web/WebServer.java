@@ -16,14 +16,17 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
+import nars.concept.table.BeliefTable;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
+import nars.truth.Truth;
 import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import ognl.OgnlException;
@@ -105,9 +108,17 @@ public class WebServer /*extends PathHandler*/ {
                                 return new Object[] {
                                     escape(c), //ID
                                     b(bc.pri()), b(bc.dur()), b(bc.qua()),
-                                    termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) )
+                                    termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) ),
+                                    truth(c.beliefs()),
+                                    truth(c.goals()),
                                     //TODO tasklinks, beliefs
                                 };
+                            }
+
+                            private Object[] truth(BeliefTable b) {
+                                Truth t = b.truth(now);
+                                if (t == null) return new Object[] {} /* blank */;
+                                return new Object[] { Math.round(100f* t.freq()), Math.round(100f * t.conf()) };
                             }
 
                             final int maxTermLinks = 5;
@@ -213,7 +224,7 @@ public class WebServer /*extends PathHandler*/ {
                 //)
 
         Random random = new XorShift128PlusRandom(1);
-        int numConceptsPerCycle = 4;
+        int numConceptsPerCycle = 32;
 
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
                 new MapIndex2(
@@ -222,8 +233,9 @@ public class WebServer /*extends PathHandler*/ {
                 new RealtimeMSClock()
         );
 
-        nar.conceptActivation.setValue(1f/numConceptsPerCycle);
-        nar.cyclesPerFrame.set(16);
+        //nar.conceptActivation.setValue(1f/numConceptsPerCycle);
+        nar.cyclesPerFrame.set(4);
+        nar.perfection.setValue(0);
 
         //nar.log();
         nar.with(
@@ -231,7 +243,7 @@ public class WebServer /*extends PathHandler*/ {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(100 * 45);
+        nar.conceptRemembering.setValue(100 * 25);
         nar.termLinkRemembering.setValue(100 * 100);
         nar.taskLinkRemembering.setValue(100 * 75);
         return nar;

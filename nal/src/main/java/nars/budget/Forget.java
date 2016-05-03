@@ -72,7 +72,7 @@ public enum Forget { ;
 
         @Override public abstract void accept(@NotNull BLink<? extends X> budget);
 
-        @Override public final void update(@NotNull NAR nar) {
+        @Override public void update(@NotNull NAR nar) {
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue();
             perfectionCached = perfection.floatValue();
@@ -90,8 +90,26 @@ public enum Forget { ;
     /** linaer decay in proportion to time since last forget */
     public static class LinearForget<X> extends AbstractForget<X> {
 
-        public LinearForget(@NotNull NAR nar, @NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
-            super(forgetTime, perfection);
+        private final MutableFloat forgetMax;
+        protected transient float forgetMaxCyclesCached = Float.NaN;
+        private float forgetCyclesMaxMinRange;
+
+        /**
+         *
+         * @param forgetTimeMin minimum forgetting time
+         * @param forgetTimeMax maximum forgetting time
+         * @param perfection
+         */
+        public LinearForget(@NotNull MutableFloat forgetTimeMin, @NotNull MutableFloat forgetTimeMax, @NotNull MutableFloat perfection) {
+            super(forgetTimeMin, perfection);
+            this.forgetMax = forgetTimeMax;
+        }
+
+        @Override
+        public void update(NAR nar) {
+            super.update(nar);
+            this.forgetMaxCyclesCached = forgetMax.floatValue();
+            this.forgetCyclesMaxMinRange = forgetMaxCyclesCached - forgetCyclesCached;
         }
 
         @Override
@@ -111,12 +129,10 @@ public enum Forget { ;
             }
 
 
-            //measure of how many forgetting periods have occurred.
-            float forgetPeriods = (forgetDeltaCycles / this.forgetCyclesCached);
 
             //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
             // lower values approaching 0.0 means will happen at faster rates
-            float forgetProportion = forgetPeriods * (1.0f - budget.dur());
+            float forgetProportion = forgetCyclesCached + forgetCyclesMaxMinRange * (1.0f - budget.dur());
 
 
             float newPriority;

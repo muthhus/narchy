@@ -74,11 +74,18 @@ function SocketNARGraph(path) {
 
             var pri = x[1]/1000.0;
             var qua = x[3]/1000.0;
+
+            var belief = x[5] ? [x[5][0]/100.0, x[5][1]/100.0] : [0.5, 0];
+            var desire = x[6] ? [x[6][0]/100.0, x[6][1]/100.0] : [0.5, 0];
+
             newNodes.push({
                 id: id,
                 label: id,
                 pri: pri,
                 qua: qua,
+
+                belief: 2.0 * (belief[0]-0.5) * belief[1],
+                desire: 2.0 * (desire[0]-0.5) * desire[1]
             });
 
             var tlPrefix = 'tl_' + id;
@@ -104,6 +111,8 @@ function SocketNARGraph(path) {
                 });
             }
 
+
+
         }
     );
 
@@ -112,7 +121,7 @@ function SocketNARGraph(path) {
     }
 
     var sizeFunc = function(x) {
-        var p1 = 1 + d(x, 'pri');
+        var p1 = 1 + d(x, 'pri') * d(x, 'belief');
         return parseInt(12 + 24 * (p1 * p1));
     };
 
@@ -121,8 +130,21 @@ function SocketNARGraph(path) {
         .style('width', sizeFunc)
         .style('height', sizeFunc)
         .style('background-color', function(x) {
+            var belief = d(x, 'belief');
+            var aBelief = Math.abs(belief);
+            var pri = d(x, 'pri');
+            var priColor = parseInt((0.5 + 0.5 * pri) * 128);
+            var beliefColor = parseInt(( aBelief) * 255);
             var qua = d(x, 'qua');
-            return "rgb(" + parseInt((0.5 + 0.25 * qua) * 255) + ",128,128)";
+            var quaColor = parseInt((0.5 + 0.5 * qua) * 128);
+            if (belief >= 0.05) {
+                return "rgb(" + priColor + "," + beliefColor + "," + quaColor + ")";
+            } else if (belief <= -0.05) {
+                return "rgb(" + beliefColor + "," + priColor + "," + quaColor + ")";
+            } else {
+                return "rgb(" + priColor + "," + priColor + "," + quaColor + ")";
+            }
+
         })
         .style('background-opacity', function(x) {
             var pri = d(x, 'pri');

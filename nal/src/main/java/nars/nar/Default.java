@@ -324,9 +324,9 @@ public class Default extends AbstractNAR {
 //        public final MutableInteger capacity = new MutableInteger();
 
 
-        @NotNull
-        @Deprecated @Range(min = 0, max = 1f, unit = "Perfection")
-        public final MutableFloat perfection;
+//        @NotNull
+//        @Deprecated @Range(min = 0, max = 1f, unit = "Perfection")
+//        public final MutableFloat perfection;
 
 
         @NotNull
@@ -349,7 +349,6 @@ public class Default extends AbstractNAR {
             this.premiser = premiseGenerator;
 
             this.conceptRemembering = nar.conceptRemembering;
-            this.perfection = nar.perfection;
 
             conceptsFiredPerCycle = new MutableInteger(1);
             active = concepts;
@@ -360,7 +359,7 @@ public class Default extends AbstractNAR {
                     nar.eventReset.on(this::reset)
             );
 
-            conceptForget = new Forget.ExpForget(conceptRemembering, perfection);
+            conceptForget = new Forget.ExpForget(conceptRemembering, nar.perfection);
 
 
         }
