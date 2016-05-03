@@ -30,20 +30,19 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat6s {
 
-    public static final float basePeriod = 150;
-    public static final float tolerance = 0.02f;
+    public static final float basePeriod = 100;
+    public static final float tolerance = 0.01f;
     public static float targetPeriod = 8;
-    public static final float speed = 0.05f;
+    public static final float speed = 0.2f;
     static boolean print = true;
     static boolean printMotors = false;
     static boolean debugError = false;
     static int sensorPeriod = 4; //frames per max sensor silence
-    static int commandPeriod = 256;
 
     public static void main(String[] args) {
         Default d = new Default(1024,8, 2, 3);
 
-        d.cyclesPerFrame.set(1);
+        d.cyclesPerFrame.set(2);
         d.conceptActivation.setValue(1f);
         //d.conceptBeliefsMax.set(32);
         //d.shortTermMemoryHistory.set(3);
@@ -78,6 +77,7 @@ public class Thermostat6s {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff > -tolerance) return 0;
             else return -diff; //Util.clamp( -diff /2f + 0.5f);
+            //else return Util.clamp( -diff  + 0.5f);
             //return 1f;
         }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
 
@@ -85,6 +85,7 @@ public class Thermostat6s {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff < tolerance) return 0;
             else return diff; //Util.clamp( diff /2f + 0.5f);
+            //else return Util.clamp( diff + 0.5f);
             //return 1f;
         }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
 
@@ -188,18 +189,6 @@ public class Thermostat6s {
 
     }
 
-    public static @org.jetbrains.annotations.NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
-        return new SensorConcept(cname, n, () -> {
-            float low = ii * dv;
-            float high = ii * dv;
-            float v = zz.floatValue();
-            if ((v >= low && v <= high)) {
-                return 1f;
-            } else {
-                return 0f;
-            }
-        });
-    }
 
     public static void mission(NAR n) {
 
@@ -210,10 +199,18 @@ public class Thermostat6s {
 
 
         //EXTREME CHEATS: "if i am up i should go down"
-        n.input("((above) ==>+0 (down))! %0.90;1.00%");
-        n.input("((below) ==>+0 (up))! %0.90;1.00%");
-        n.input("((above) ==>+0 (--,(up)))! %0.90;1.00%");
-        n.input("((below) ==>+0 (--,(down)))! %0.90;1.00%");
+//        n.input("((above) ==>+0 (down))! %0.90;1.00%");
+//        n.input("((below) ==>+0 (up))! %0.90;1.00%");
+//        n.input("((above) ==>+0 (--,(up)))! %0.90;1.00%");
+//        n.input("((below) ==>+0 (--,(down)))! %0.90;1.00%");
+        
+        n.goal("((above) ==>+0 (down))", Tense.Eternal, 0.9f, 1f);
+        n.goal("((below) ==>+0 (up))!", Tense.Eternal, 0.9f, 1f);
+        n.goal("((above) ==>+0 (--,(up)))!", Tense.Eternal, 0.9f, 1f);
+        n.goal("((below) ==>+0 (--,(down)))!", Tense.Eternal, 0.9f, 1f);
+
+        //n.goal("(above)", Tense.Eternal, 0.25f, 1f); //not above nor below
+        //n.goal("(below)", Tense.Eternal, 0.25f, 1f); //not above nor below
 
         //MODERATE CHEATS: "being up leads to me going down"
 //        n.input("((above) ==>+0 (down)).");
@@ -230,8 +227,7 @@ public class Thermostat6s {
         //n.goal($.$("(up)"), Tense.Present, 1f, 0.75f);
         //n.goal($.$("(down)"), Tense.Present, 1f, 0.75f);
 
-        //n.goal($.$("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
-        //n.goal($.$("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
+
 
         //n.goal($.$("((above) && (below))"), Tense.Eternal, 0f, 0.99f); //neither above or below
         //n.goal($.$("((above) || (below))"), Tense.Eternal, 0f, 0.99f); //not above nor below
@@ -286,7 +282,7 @@ public class Thermostat6s {
             float next = Util.clamp(delta + current);
             yEst.setValue(next);
 
-            return (d-b)*0.5f; //0.5f + desired/2f;
+            return (d-b); //0.5f + desired/2f;
 
 
         }

@@ -278,6 +278,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        return ask(quest, QUEST);
 //    }
 
+    public NAR goal(String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
+        return goal((Termed)$.$(goalTermString), tense, freq, conf);
+    }
+
     /**
      * desire goal
      */

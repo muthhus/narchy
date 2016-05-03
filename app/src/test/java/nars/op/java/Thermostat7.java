@@ -214,7 +214,7 @@ public class Thermostat7 {
             //move.beliefs().clear();
             //move.goals().clear();
             do {
-                n.goal($.$("(up)"), Tense.Present, 1f, str);
+                n.goal("(up)", Tense.Present, 1f, str);
                 n.step();
             } while (above.get() < 0.6f);
 
@@ -224,7 +224,7 @@ public class Thermostat7 {
             //move.beliefs().clear();
             //move.goals().clear();
             do {
-                n.goal($.$("(up)"), Tense.Present, 0f, str);
+                n.goal("(up)", Tense.Present, 0f, str);
                 n.step();
                 //System.out.println(diffness.get());
             } while (below.get() < 0.6f);
@@ -236,7 +236,7 @@ public class Thermostat7 {
         printBeliefs(n, true);
         printBeliefs(n, false);*/
 
-        n.goal($.$("(up)"), Tense.Present, 0.5f, str);
+        n.goal("(up)", Tense.Present, 0.5f, str);
         yEst.setValue(0.5f);
 
 
