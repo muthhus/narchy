@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static nars.op.java.Lobjects.getMethodOperator;
 
 /**
  * Created by me on 8/19/15.
@@ -190,11 +189,11 @@ public class DefaultTermizer implements Termizer {
             return $.sete(components);
         }
 
-        else if (o instanceof Method) {
-            //translate the method to an operation term
-            Method m = (Method)o;
-            return getOperation(m, getMethodArgVariables(m));
-        }
+//        else if (o instanceof Method) {
+//            //translate the method to an operation term
+//            Method m = (Method)o;
+//            return getOperation(m, getMethodArgVariables(m));
+//        }
 
         return instanceTerm(o);
 
@@ -225,10 +224,11 @@ public class DefaultTermizer implements Termizer {
     protected static Term number(Number o) {
         return $.the(o);
     }
-    @NotNull
-    public Compound getOperation(@NotNull Method m, Term[] args) {
-        return getMethodOperator(m, args);
-    }
+
+//    @NotNull
+//    public Compound getOperation(@NotNull Method m, Term[] args) {
+//        return getMethodOperator(m, args);
+//    }
 
     private boolean reportClassInPackage(@NotNull Class oc) {
         if (classInPackageExclusions.contains(oc)) return false;

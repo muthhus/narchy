@@ -29,28 +29,28 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat6 {
 
-    public static final float basePeriod = 25;
+    public static final float basePeriod = 150;
     public static final float tolerance = 0.02f;
     public static float targetPeriod = 8;
-    public static final float speed = 0.1f;
+    public static final float speed = 0.02f;
     static boolean print = true;
     static boolean printMotors = false;
     static boolean debugError = false;
-    static int sensorPeriod = 2; //frames per max sensor silence
+    static int sensorPeriod = 4; //frames per max sensor silence
     static int commandPeriod = 256;
 
     public static void main(String[] args) {
         Default d = new Default(1024, 8, 2, 3);
-        d.conceptRemembering.setValue(3);
-        d.cyclesPerFrame.set(12);
-        d.conceptActivation.setValue(0.1f);
+        d.conceptRemembering.setValue(6);
+        d.cyclesPerFrame.set(4);
+        d.conceptActivation.setValue(0.2f);
         //d.conceptBeliefsMax.set(32);
         d.shortTermMemoryHistory.set(3);
         //d.derivationDurabilityThreshold.setValue(0.03f);
         //d.perfection.setValue(0.9f);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 12000);
+        float score = eval(d, 120000);
         System.out.println("score=" + score);
     }
 
@@ -131,20 +131,29 @@ public class Thermostat6 {
             if (diff > -tolerance) return 0;
             else return Util.clamp( -diff /2f + 0.5f);
             //return 1f;
-        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.35f);
+        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
 
         below = new SensorConcept("(below)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff < tolerance) return 0;
             else return Util.clamp( diff /2f + 0.5f);
             //return 1f;
-        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.35f);
+        }).resolution(0.01f).timing(-1, sensorPeriod).pri(0.55f);
+
+
+        int visionResolution = 5;
+        float dv = 1f/visionResolution;
+
+        for (int i = 0; i < visionResolution; i++) {
+            vSensor(n, dv, i, yHidden, "(w" + i + ")").pri(0.05f);
+            vSensor(n, dv, i, yEst, "(v" + i + ")").pri(0.05f);
+        }
 
         MotorConcept up = new Motor1D(n, true, yEst);
         MotorConcept down = new Motor1D(n, false, yEst);
 
-        up.getFeedback().pri(0.4f);
-        down.getFeedback().pri(0.4f);
+        up.getFeedback().pri(0.5f);
+        down.getFeedback().pri(0.5f);
 
 //        DebugMotorConcept up, down;
 //        n.on(up = new DebugMotorConcept(n, "(up)", yEst, yHidden,
@@ -245,7 +254,7 @@ public class Thermostat6 {
 
         //n.logSummaryGT(System.out, 0.0f);
 
-        float str = 0.55f;
+        float str = 0.75f;
 
         //n.log();
 
@@ -321,6 +330,19 @@ public class Thermostat6 {
 
     }
 
+    public static @org.jetbrains.annotations.NotNull SensorConcept vSensor(NAR n, float dv, int ii, MutableFloat zz, String cname) {
+        return new SensorConcept(cname, n, () -> {
+            float low = ii * dv;
+            float high = ii * dv;
+            float v = zz.floatValue();
+            if ((v >= low && v <= high)) {
+                return 1f;
+            } else {
+                return 0f;
+            }
+        });
+    }
+
     public static void mission(NAR n) {
         n.goal($.$("(above)"), Tense.Eternal, 0f, 0.9f); //not above nor below
         n.goal($.$("(below)"), Tense.Eternal, 0f, 0.9f); //not above nor below
@@ -332,8 +354,8 @@ public class Thermostat6 {
 
     public static void command(NAR n) {
 
-        n.goal($.$("(up)"), Tense.Present, 1f, 0.85f);
-        n.goal($.$("(down)"), Tense.Present, 1f, 0.85f);
+        n.goal($.$("(up)"), Tense.Present, 1f, 0.75f);
+        n.goal($.$("(down)"), Tense.Present, 1f, 0.75f);
 
         //n.goal($.$("(up)"), Tense.Present, 0f, 0.25f);
         //n.goal($.$("(down)"), Tense.Present, 0f, 0.25f);
@@ -341,14 +363,14 @@ public class Thermostat6 {
 
 
         //EXTREME CHEATS: "if i am up i should go down"
-        n.input("((above) ==>+0 (down))!");
-        n.input("((below) ==>+0 (up))!");
-        //n.input("((above) ==>+0 (--,(up)))!");
-        //n.input("((below) ==>+0 (--,(down)))!");
+//        n.input("((above) ==>+0 (down))!");
+//        n.input("((below) ==>+0 (up))!");
+//        n.input("((above) ==>+0 (--,(up)))!");
+//        n.input("((below) ==>+0 (--,(down)))!");
 
         //MODERATE CHEATS: "being up leads to me going down"
-        n.input("((above) ==>+0 (down)).");
-        n.input("((below) ==>+0 (up)).");
+//        n.input("((above) ==>+0 (down)).");
+//        n.input("((below) ==>+0 (up)).");
         //n.input("((above) ==> (down)). :|:");
         //n.input("((below) ==> (up)). :|:");
         //n.input("<(above) ==> (--,(up))>. :|:");
@@ -394,7 +416,7 @@ public class Thermostat6 {
         @Override
         public float motor(float b, float d) {
 
-            //if (d < 0.5f) return Float.NaN;
+            if (d < 0.51f) return Float.NaN;
             if (d < b) return Float.NaN;
             //if (d < 0.5f && b < d) return Float.NaN;
 
@@ -403,7 +425,8 @@ public class Thermostat6 {
             float next = Util.clamp(delta + current);
             yEst.setValue(next);
 
-            return (d-b); //0.5f + desired/2f;
+            return (d-b)*0.5f; //0.5f + desired/2f;
+
 
         }
 

@@ -403,7 +403,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
                 }
             } else {
                 Term n = resolve(et.from);
-                if (n.op() != type) {
+                if (n!=null && n.op() != type) {
                     int imageIndex = Y.indexOf(n);
                     if (imageIndex != -1)
                         return (matchEllipsedLinear(X, e, Y)) &&

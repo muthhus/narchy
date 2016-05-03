@@ -327,7 +327,7 @@ public interface Temporalize {
 
         Task t = prem.task();
         Task b = prem.belief();
-        if (!taskOrBelief && b.occurrence()!=ETERNAL) {
+        if (!taskOrBelief && b!=null && b.occurrence()!=ETERNAL) {
             int derivedInT = dtTerm.subtermTime(derived);
             if (derivedInT == DTERNAL && derived.op() == Op.IMPLICATION) {
                 //try to find the subtermTime of the implication's subject

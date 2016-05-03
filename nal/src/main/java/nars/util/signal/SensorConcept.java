@@ -38,13 +38,30 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, this, this, toFreq);
+        this.sensor = new Sensor(n, this, this, toFreq) {
+            @Override
+            protected float freq(float v) {
+                return SensorConcept.this.freq(v);
+            }
+            @Override
+            protected float conf(float v) {
+                return SensorConcept.this.conf(v);
+            }
+
+        };
         n.on(this);
 
         this.input = input;
 
     }
 
+    float freq(float v) {
+        return v;
+    }
+    float conf(float v) {
+        return 0.90f;
+    }
+    
     /**
      * adjust min/max temporal resolution of feedback input
      * ex:

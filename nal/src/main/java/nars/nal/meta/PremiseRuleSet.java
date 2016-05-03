@@ -307,19 +307,18 @@ public class PremiseRuleSet  {
             if (!fwd[0])
                 return; //already disqualified
 
+
             String x = s.toString();
+
             if ((x.contains("task(")) ||
                 (x.contains("time(")) ||
-                (x.contains("decomposeTask")) ||
-                (x.contains("decomposeBelief")) ||
-                (x.contains("after(")) ||
-                (x.contains("Punctuation")) ||
-                (x.contains("Structural")) ||
-                (x.contains("Identity")) ||
+                (x.contains("Punctuation"))  ||
+                //(x.contains("Structural")) ||
+                //(x.contains("Identity")) ||
                 //(x.contains("substitute")) || //TESTING THIS
                 (x.contains("Negation"))
-            ) {
 
+            ) {
                 fwd[0] = false;
             }
         });

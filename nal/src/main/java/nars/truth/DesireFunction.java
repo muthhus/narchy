@@ -59,7 +59,7 @@ public enum DesireFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return T.conf() < minConf ? null : T;
+            return ((T != null) && (T.conf() < minConf)) ? null : T;
         }
     },
 

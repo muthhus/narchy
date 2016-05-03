@@ -195,7 +195,7 @@ public class Revection {
             dtDist = tDist; //use tDist again
         }
 
-        float originality = Math.min(a.originality(), b.originality());
+        float originality = (a.originality() + b.originality()) * 0.5f;
 
         //more time distance to now factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
         float timeliness = 1f / (1f + abs(now - ao) + abs(now - bo)); //similar to BeliefTable.relevance
@@ -203,7 +203,7 @@ public class Revection {
         return (1f + freqDist ) *
                (1f + tDist  ) *
                (1f + dtDist) *
-               (originality) *
+               (1f + originality) *
                (avgConf) *
                ((float)(timeliness))
                ;

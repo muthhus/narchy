@@ -22,7 +22,7 @@ public class ChatBotTest {
 
         n.onExecution("say", x -> {
 
-            Term w = x.get(0).term().subterm(0, 0);
+            Term w = x.subterm(0, 0);
             if (!(w instanceof Variable) && (0 == w.vars()) && (!w.hasAny(Op.ImageBits))) {
                 System.out.println("SAY: " + x);
                 n.input("say(" + w + "). :/:");
