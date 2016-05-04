@@ -1,4 +1,4 @@
-package nars;
+package nars.util;
 
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 
@@ -10,25 +10,45 @@ import static java.lang.System.*;
 /**
  * Created by me on 5/3/16.
  */
-public class DQN {
-
+public class DQN implements Agent {
 
     private Invocable js;
 
-    public DQN(int inputs, int actions)  {
+    public DQN() {
 
+    }
+
+    public DQN(int inputs, int actions) {
+        start(inputs, actions);
+    }
+
+    @Override public void start(int inputs, int actions)  {
         try {
             NashornScriptEngine engine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-            engine.eval(new FileReader("/home/me/opennars/app/src/main/java/nars/rl.js"));
+            engine.eval(new FileReader("/home/me/opennars/app/src/main/java/nars/util/rl.js"));
 
+
+            float alpha = 0.02f;
+            int hiddens = 2 * inputs * actions; //heuristic
 
             CompiledScript cscript = engine.compile(
                     "java.lang.System.out.println('creating new rl.js agent'); " +
                     "var Math = Java.type('java.lang.Math'); " +
                     "var env = { getNumStates: function() { return " + inputs + "; }, getMaxNumActions: function() { return " + actions + "; } }; " +
-                    //http://cs.stanford.edu/people/karpathy/reinforcejs/index.html
-                    "var opts =  { alpha: 0.01 }; " +
-                    "var agent = new RL.DQNAgent(env, opts); " +
+
+                    /*
+                    http://cs.stanford.edu/people/karpathy/reinforcejs/index.html
+                    spec.gamma = 0.9; // discount factor, [0, 1)
+                    spec.epsilon = 0.2; // initial epsilon for epsilon-greedy policy, [0, 1)
+                    spec.alpha = 0.005; // value function learning rate
+                    spec.experience_add_every = 5; // number of time steps before we add another experience to replay memory
+                    spec.experience_size = 10000; // size of experience
+                    spec.learning_steps_per_iteration = 5;
+                    spec.tderror_clamp = 1.0; // for robustness
+                    spec.num_hidden_units = 100 // number of neurons in hidden layer
+                    */
+                    "var spec =  { alpha: + " + alpha + ", num_hidden_units: " + hiddens + " }; " +
+                    "var agent = new RL.DQNAgent(env, spec); " +
                     "function act(i,r) { var a = agent.act(i); agent.learn(r); return a;  } ");
 
             //Bindings bindings = cscript.getEngine().createBindings();
@@ -72,7 +92,7 @@ public class DQN {
 
     }
 
-    public int learn(float prevReward, float... nextInputs) {
+    @Override public int act(float prevReward, float... nextInputs) {
         try {
             Number a = (Number) js.invokeFunction("act", nextInputs, prevReward);
             return a.intValue();
@@ -84,8 +104,8 @@ public class DQN {
 
     public static void main(String[] args) throws Exception {
         DQN d = new DQN(2, 3);
-        out.println( d.learn(0, 0.5f, 0.5f) );
-        out.println( d.learn(-0.2f, 0.5f, 0.7f) );
-        out.println( d.learn(0.2f, 0.1f, 0.7f) );
+        out.println( d.act(0, 0.5f, 0.5f) );
+        out.println( d.act(-0.2f, 0.5f, 0.7f) );
+        out.println( d.act(0.2f, 0.1f, 0.7f) );
     }
 }

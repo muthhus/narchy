@@ -1,17 +1,14 @@
 package nars.predict;
 
-import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.table.BeliefTable;
-import nars.DQN;
+import nars.util.DQN;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.TreeSet;
 
@@ -106,7 +103,7 @@ public class Thermostat6DQN {
 
             float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
 
-            int aa = h.learn(reward, ins);
+            int aa = h.act(reward, ins);
             float de = 0;
             switch (aa) {
                 case 1:
