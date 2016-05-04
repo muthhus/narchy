@@ -447,7 +447,7 @@ public class NARover extends AbstractRover {
                         if (x < 0.01f) return 0.5f;
                         else return 0.5f + 0.45f * x;
                     }
-                    return Float.NaN; //nothing seen within the range
+                    return 0; //nothing seen within the range
                 };
 
 

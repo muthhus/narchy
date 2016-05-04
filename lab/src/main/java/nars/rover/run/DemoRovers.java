@@ -216,7 +216,7 @@ public class DemoRovers {
 //                                ),
 //                            400,200);
 
-                float inputStrengthf = 0.75f;
+                float inputStrengthf = 0.9f;
                 Stage stage = newWindow("Motors",
                         new VBox(
                                 new ManualControl<AbstractRover>(nr,

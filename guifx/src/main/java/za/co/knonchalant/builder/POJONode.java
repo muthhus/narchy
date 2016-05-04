@@ -550,7 +550,7 @@ public enum POJONode {
             w.setConverter(new StringConverter<Class>() {
                 @Override
                 public String toString(Class aClass) {
-                    return aClass.getSimpleName();
+                    return aClass!=null ? aClass.getSimpleName() : "null";
                 }
 
                 @Override

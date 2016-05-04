@@ -78,9 +78,16 @@ function SocketNARGraph(path) {
             var belief = x[5] ? [x[5][0]/100.0, x[5][1]/100.0] : [0.5, 0];
             var desire = x[6] ? [x[6][0]/100.0, x[6][1]/100.0] : [0.5, 0];
 
+            var maxLabelLen = 16;
+            function labelize(l) {
+                if (l.length > maxLabelLen)
+                    l = l.substr(0, maxLabelLen) + '..';
+                return l;
+            }
+
             newNodes.push({
                 id: id,
-                label: id,
+                label: labelize(id),
                 pri: pri,
                 qua: qua,
 
@@ -123,13 +130,15 @@ function SocketNARGraph(path) {
     var currentLayout = sg.currentLayout = sg.spacegraph.makeLayout({
         /* https://github.com/cytoscape/cytoscape.js-spread */
         name: 'spread',
-        minDist: 150,
-        speed: 0.1,
+        minDist: 250,
+        //padding: 100,
+
+        speed: 0.06,
         animate: false,
         randomize: false, // uses random initial node positions on true
         fit: false,
-        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 1, // Maximum number of expanding iterations
+        maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 2, // Maximum number of expanding iterations
 
         ready: function () {
             //console.log('starting cola', Date.now());
@@ -139,7 +148,7 @@ function SocketNARGraph(path) {
         }
     });
 
-    var layoutUpdatePeriodMS = 250;
+    var layoutUpdatePeriodMS = 150;
     currentLayout.run();
 
 
@@ -212,10 +221,14 @@ function SocketNARGraph(path) {
 
     var sizeFunc = function(x) {
         var p1 = 1 + d(x, 'pri') * d(x, 'belief');
-        return parseInt(12 + 24 * (p1 * p1));
+        return parseInt(24 + 48 * (p1 * p1));
     };
 
 
+    var priToOpacity = function(x) {
+        var pri = d(x, 'pri');
+        return (25 + parseInt(pri*75))/100.0;
+    };
     sg.spacegraph.style().selector('node')
         .style('shape', 'hexagon')
         .style('width', sizeFunc)
@@ -237,20 +250,19 @@ function SocketNARGraph(path) {
             }
 
         })
-        .style('background-opacity', function(x) {
-            var pri = d(x, 'pri');
-            return 0.25 + pri * 0.75;
-        });
+        .style('background-opacity', priToOpacity);
 
     sg.spacegraph.style().selector('edge')
         .style('width', function(x) {
             return parseInt(2 + 5 * d(x, 'pri'));
         })
         .style('mid-target-arrow-shape', 'triangle')
-        .style('opacity', function(x) {
-            return 0.25 + d(x, 'pri') * 0.75;
+        .style('opacity', priToOpacity)
+        .style('curve-style', function(x) {
+            var pri = d(x, 'pri');
+            if (pri < 0.25) return 'haystack';
+            return 'segments';
         })
-        .style('curve-style', 'segments') //(tlpri > 0.5) ? 'segments' : 'haystack',
         .style('line-color', function(x) {
             return "rgb(" +
                 parseInt((0.5 + 0.25 * d(x, 'pri')) * 255) + "," +

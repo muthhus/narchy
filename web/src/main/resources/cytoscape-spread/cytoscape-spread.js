@@ -873,7 +873,6 @@
                 speed: 0.1,
                 minDist: 20, // Minimum distance between nodes
                 padding: 20, // Padding
-                jitter: 0.001, //random fluctuation to prevent a singularity
                 expandingFactor: -1.0, // If the network does not satisfy the minDist
                 // criterium then it expands the network of this amount
                 // If it is set to -1.0 the amount of expansion is automatically
@@ -991,7 +990,6 @@
                     'maxExpIt': options.maxExpandIterations,
                     'vertices': [],
                     'edges': [],
-                    'jitter': options.jitter,
                     //'startTime': startTime,
                     'maxFruchtermanReingoldIterations': options.maxFruchtermanReingoldIterations
                 };
@@ -1135,10 +1133,10 @@
                         };
                     }
 
-                    function sitesDistance(ls, rs) {
+                    function sitesDistanceSq(ls, rs) {
                         var dx = ls.x - rs.x;
                         var dy = ls.y - rs.y;
-                        return Math.sqrt(dx * dx + dy * dy);
+                        return (dx * dx + dy * dy);
                     }
 
                     foograph = _ref_('foograph');
@@ -1148,6 +1146,7 @@
                     var lWidth = pData['width'];
                     var lHeight = pData['height'];
                     var lMinDist = pData['minDist'];
+                    var lMinDistSq = lMinDist*lMinDist;
                     var lExpFact = pData['expFact'];
                     var lMaxExpIt = pData['maxExpIt'];
                     var lMaxFruchtermanReingoldIterations = pData['maxFruchtermanReingoldIterations'];
@@ -1187,7 +1186,6 @@
 
                     var frgNodes = {};
 
-                    var jitter = pData['jitter'] * lHeight;
 
                     // Then we have to add the vertices
                     var dataVertices = pData['vertices'];
@@ -1196,8 +1194,8 @@
                         var id = dn.id;
                         var v = new foograph.Vertex(id,
                             //( Math.random() * lHeight ), ( Math.random() * lHeight )
-                            ( Math.random() * 2 - 1 * jitter ) + dn.x,
-                            ( Math.random() * 2 - 1 * jitter ) + dn.y
+                            dn.x,
+                            dn.y
                         );
                         frgNodes[id] = v;
                         frg.insertVertex(v);
@@ -1258,7 +1256,7 @@
                         // Then we check if the minimum distance is satisfied
                         for (var eei = 0; eei < ee.length; ++eei) {
                             var e = ee[eei];
-                            if (( e.lSite != null ) && ( e.rSite != null ) && sitesDistance(e.lSite, e.rSite) < lMinDist) {
+                            if (( e.lSite != null ) && ( e.rSite != null ) && sitesDistanceSq(e.lSite, e.rSite) < lMinDistSq) {
                                 ++infractions;
                             }
                         }

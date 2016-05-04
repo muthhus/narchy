@@ -372,7 +372,7 @@ function spacegraph(targetWrapper, opt) {
         motionBlur: false,
         wheelSensitivity: 1,
         //pixelRatio: 0.25, //downsample pixels
-        pixelRatio: 0.5,
+        //pixelRatio: 0.5,
         //pixelRatio: 1,
 
         initrender: function (evt) { /* ... */ },
@@ -458,7 +458,10 @@ function spacegraph(targetWrapper, opt) {
     s.channels = { };
     s.overlay = overlaylayer;
 
-    var time;
+
+    //var ren = s.renderer();
+
+    /*var time;
     function draw() {
         requestAnimationFrame(draw);
         var now = new Date().getTime(),
@@ -468,7 +471,7 @@ function spacegraph(targetWrapper, opt) {
 
         // Drawing code goes here... for example updating an 'x' position:
         this.x += 10 * dt; // Increase 'x' by 10 units per millisecond
-    }
+    }*/
 
     // //IMPROVED CANVAS RENDERER FUNCTION THAT CAN THROTTLE FPS
     // s.renderer().redraw = function(roptions) {
@@ -663,7 +666,9 @@ function spacegraph(targetWrapper, opt) {
         var se = spacegraphToCytoscape(n);
 
         if (!ee) {
-            s.add(se);
+            var added = s.add(se);
+            added.position({x: Math.random(), y: Math.random() });
+
         } else {
             ee.data(se);
 
