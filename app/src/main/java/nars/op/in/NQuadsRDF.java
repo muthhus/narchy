@@ -2,6 +2,7 @@ package nars.op.in;
 
 import nars.$;
 import nars.NAR;
+import nars.Symbols;
 import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -302,8 +303,7 @@ public abstract class NQuadsRDF {
             Term term = $.inst($.p(subject, object), predicate);
             if (term == null)
                 throw new NullPointerException();
-            Task t = new MutableTask(
-                    term, '.');
+            Task t = new MutableTask(term, '.', 1f, nar);
             return t;
         } catch (Exception e) {
             logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
@@ -410,8 +410,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new MutableTask(belief).
-                    belief().truth(1.0f,0.95f)
+            return new MutableTask(belief, Symbols.BELIEF, 1f, nar)
                     .time(nar.time(),
                     Tense.ETERNAL //TODO Tense parameter
                     );

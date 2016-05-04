@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.NAR;
+import nars.Symbols;
 import nars.nal.Tense;
 import nars.nar.Default;
 import org.junit.Test;
@@ -17,13 +18,13 @@ public class MutableTaskTest {
 
         String s = "<a --> b>";
 
-        assertTrue(Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
+        assertTrue(Tense.isEternal(n.task(s).occurrence()));
 
-        assertTrue("default is eternal", new MutableTask(n,s).isEternal());
+        assertTrue("default is eternal", n.task(s).isEternal());
 
-        assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
+        assertTrue("tense=eternal is eternal", Tense.isEternal(((MutableTask)n.task(s)).eternal().occurrence()));
 
-        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n,s).present(n).occurrence()));
+        assertTrue("present is non-eternal", !Tense.isEternal(((MutableTask)n.task(s)).present(n).occurrence()));
 
     }
 
@@ -34,9 +35,9 @@ public class MutableTaskTest {
         String s = "<a --> b>";
 
         //the final occurr() or tense() is the value applied
-        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().occurr(100).occurrence()));
-        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().present(n).occurrence()));
-        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).occurr(100).eternal().occurrence()));
+        assertTrue(!Tense.isEternal(((MutableTask)n.task(s)).eternal().occurr(100).occurrence()));
+        assertTrue(!Tense.isEternal(((MutableTask)n.task(s)).eternal().present(n).occurrence()));
+        assertTrue(Tense.isEternal(((MutableTask)n.task(s)).occurr(100).eternal().occurrence()));
     }
 
 

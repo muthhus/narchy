@@ -26,6 +26,7 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.time.Clock;
+import nars.truth.DefaultTruth;
 import nars.util.TermCodec;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
@@ -391,8 +392,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        Task t = new MutableTask(term, punc)
-                .truth(freq, conf)
+        Task t = new MutableTask(term, punc, new DefaultTruth(freq, conf))
                 .budget(pri, dur)
                 .time(time(), occurrenceTime);
 
@@ -410,16 +410,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
-
-        MutableTask t = new MutableTask(term);
-        if (questionOrQuest == QUESTION)
-            t.question();
-        else if (questionOrQuest == QUEST)
-            t.quest();
-        else
+        if ((questionOrQuest != QUESTION) && (questionOrQuest != QUEST))
             throw new RuntimeException("invalid punctuation");
 
-
+        MutableTask t = new MutableTask(term, questionOrQuest, null);
         t.time(time(), when);
 
         input(t);
@@ -1030,9 +1024,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         public final Task task;
 
-        public InvalidTaskException(Task t) {
-            this(t, "Invalid Task");
-        }
 
         public InvalidTaskException(Task t, String message) {
             super(message);
@@ -1042,7 +1033,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         @NotNull
         @Override
         public String getMessage() {
-            return super.getMessage() + ": " + task.explanation();
+            return super.getMessage();// + ": " + task.explanation();
         }
 
     }

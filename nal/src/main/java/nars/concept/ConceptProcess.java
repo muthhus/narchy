@@ -16,6 +16,7 @@ import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -180,8 +181,7 @@ abstract public class ConceptProcess implements Premise {
                 single = false;
         }
 
-        Task derived = newDerivedTask(c, punct)
-                .truth(truth)
+        Task derived = newDerivedTask(c, punct, truth)
                 .time(now, occ)
                 .parent(task(), !single ? belief() : null)
                 .budget(budget) // copied in, not shared
@@ -194,11 +194,7 @@ abstract public class ConceptProcess implements Premise {
 
         if ((occ != ETERNAL) && (truth != null) && d.eternalize) {
 
-            accept(newDerivedTask(c, punct)
-                    .truth(
-                        truth.freq(),
-                        eternalize(truth.conf())
-                    )
+            accept(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())))
 
                     .time(now, ETERNAL)
 
@@ -216,8 +212,8 @@ abstract public class ConceptProcess implements Premise {
     }
 
     @NotNull
-    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct) {
-        return new DerivedTask(c, punct, this);
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth) {
+        return new DerivedTask(c, punct, truth, this);
     }
 
 

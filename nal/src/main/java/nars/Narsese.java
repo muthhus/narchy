@@ -83,9 +83,7 @@ public class Narsese extends BaseParser<Object> {
         }
 
         MutableTask ttt =
-                new MutableTask(content)
-                        .punctuation(p)
-                        .truth(t)
+                new MutableTask(content, p, t)
                         .time(
                                 memory.time(), //creation time
                                 Tense.getRelativeOccurrence(

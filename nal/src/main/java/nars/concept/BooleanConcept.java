@@ -13,6 +13,7 @@ import nars.task.Task;
 import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -33,7 +34,7 @@ public class BooleanConcept extends OperationConcept {
         @NotNull Operator op();
 
         /** set the truth and evidence on the task before returning */
-        @Nullable MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask result, @NotNull Termed[] args);
+        @Nullable MutableTask update(@NotNull NAR nar, long now, Termed content, boolean beliefOrGoal, @NotNull Termed[] args);
     }
 
     static final BooleanModel AND = new DefaultBooleanModel(true);
@@ -50,14 +51,13 @@ public class BooleanConcept extends OperationConcept {
         @NotNull
         @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
 
-        @Override public MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask task, @NotNull Termed[] args) {
+        @Override public MutableTask update(@NotNull NAR nar, long now, Termed content, boolean beliefOrGoal, @NotNull Termed[] args) {
 
             boolean mode = this.mode;
 
             float f = mode ? 1f : 0f;
             float c = mode ? 1f : 0f;
 
-            boolean beliefOrGoal = task.punc() == Symbols.BELIEF;
 
             LongArrayList ev = new LongArrayList(Global.STAMP_MAX_EVIDENCE);
             int evidencePerArg = Math.max(Global.STAMP_MAX_EVIDENCE / args.length, 1);
@@ -96,8 +96,10 @@ public class BooleanConcept extends OperationConcept {
                 }
             }
 
+            MutableTask task = new MutableTask(content, beliefOrGoal ? '.' : '!', new DefaultTruth(f,c));
+
             if (!ev.isEmpty()) {
-                return task.evidence(Stamp.toSetArray(ev)).truth(f, c);
+                return task.evidence(Stamp.toSetArray(ev));
             } else {
                 return null; //task.truth(Truth.Zero);
             }
@@ -203,7 +205,7 @@ public class BooleanConcept extends OperationConcept {
         protected Task update(long now) {
 
             Term[] args = parameters().terms();
-            MutableTask result = model.update(nar, now, new MutableTask(term, beliefOrGoal ? '.' : '!'), args);
+            MutableTask result = model.update(nar, now, term, beliefOrGoal, args);
 
             return result != null ? result.present(now).normalize(nar) : null;
         }

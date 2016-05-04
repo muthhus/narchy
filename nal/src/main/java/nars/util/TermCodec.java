@@ -114,7 +114,7 @@ public class TermCodec extends FSTConfiguration {
                 float dur = in.readFloat();
                 float qua = in.readFloat();
 
-                MutableTask mm = new MutableTask(term, punc).truth(truth).time(cre, occ);
+                MutableTask mm = new MutableTask(term, punc, truth).time(cre, occ);
                 mm.evidence(evi);
                 mm.budget(pri, dur, qua);
 

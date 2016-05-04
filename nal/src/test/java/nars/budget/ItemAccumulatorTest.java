@@ -114,7 +114,7 @@ public class ItemAccumulatorTest {
         assertTrue(ii.bag().isSorted());
 
         for (int i = 0; i < capacity - 1; i++) {
-            ii.bag().put($.$("a:" + i, '?').budget( (float)Math.random() * 0.95f, 0.5f, 0.5f));
+            ii.bag().put($.task($.$("a:" + i), '?', null).budget( (float)Math.random() * 0.95f, 0.5f, 0.5f));
         }
 
         ii.bag().commit();
@@ -143,7 +143,7 @@ public class ItemAccumulatorTest {
 
         for (int i = 0; i < capacity-1; i++) {
             float dur = i * 0.05f;
-            ii.bag().put($.$("a:" + i, '?').budget(0.5f, dur, 0.5f));
+            ii.bag().put($.task($.$("a:" + i), '?', null).budget(0.5f, dur, 0.5f));
         }
 
         assertTrue(ii.bag().isSorted());

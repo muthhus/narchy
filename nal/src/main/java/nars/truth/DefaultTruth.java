@@ -90,6 +90,11 @@ public class DefaultTruth implements Truth  {
         return hash;
     }
 
+    @Override
+    public final DefaultTruth toNegative() {
+        return new DefaultTruth(1f - freq(), conf);
+    }
+
     protected boolean equalsFrequency(@NotNull Truth t) {
         return (Util.equals(freq, t.freq(), Global.TRUTH_EPSILON));
     }

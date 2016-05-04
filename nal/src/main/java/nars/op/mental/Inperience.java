@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -224,7 +225,8 @@ public class Inperience {
 //        }
 
         long now = nar.time();
-        nar.input(new MutableTask(ret).judgment()
+
+        nar.input(new MutableTask(ret, Symbols.BELIEF, 1f, nar)
                         .parent(task).time(now, now)
                         //.truth(1.0f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
                         //.budget(pri, dur)
@@ -284,9 +286,8 @@ public class Inperience {
 
         long now = nar.time();
 
-        nar.input(new MutableTask(new_term).goal()
-                        /*.truth(1, Global.DEFAULT_JUDGMENT_CONFIDENCE)
-                        .budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
+        nar.input(new MutableTask(new_term, Symbols.GOAL, 1f, nar)
+                        /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
                         .parent(parent, belief)
                         .time(now, now + delay)

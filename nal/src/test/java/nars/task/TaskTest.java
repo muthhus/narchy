@@ -39,7 +39,7 @@ public class TaskTest {
         for (float f = 0; f < 1.0f; f += 0.3f)
             for (float c = 0; c < 1.0f; c += 0.3f) {
                 t.add(
-                    $.$("a:b", '.').truth(f, c)
+                    $.task("a:b", '.',f, c)
                 );
                 count++;
             }

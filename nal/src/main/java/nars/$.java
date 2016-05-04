@@ -17,6 +17,7 @@ import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import org.apache.commons.lang3.ArrayUtils;
@@ -57,10 +58,7 @@ public enum $ /* TODO: implements TermIndex */ {
         //        catch (InvalidInputException e) { }
     }
 
-    @Nullable
-    @Deprecated public static MutableTask $(@NotNull String term, char punc) {
-        return new MutableTask($.$(term), punc);
-    }
+
 
 
 //    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
@@ -259,12 +257,25 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static MutableTask belief(@NotNull Compound term, float freq, float conf) {
-        return new MutableTask(term).belief().truth(freq, conf);
+        return task(term, Symbols.BELIEF, freq, conf);
     }
 
     @NotNull
     public static MutableTask goal(@NotNull Compound term, float freq, float conf) {
-        return new MutableTask(term).goal().truth(freq, conf);
+        return task(term, Symbols.GOAL, freq, conf);
+    }
+
+    @NotNull
+    public static MutableTask task(@NotNull String term, char punct, float freq, float conf) throws Narsese.NarseseException {
+        return task((Compound)$.$(term), punct, freq, conf);
+    }
+
+    @NotNull
+    public static MutableTask task(@NotNull Compound term, char punct, float freq, float conf) {
+        return task(term, punct, new DefaultTruth(freq, conf));
+    }
+    public static MutableTask task(@NotNull Compound term, char punct, Truth truth) {
+        return new MutableTask(term, punct, truth);
     }
 
 //    @NotNull
@@ -724,6 +735,8 @@ public enum $ /* TODO: implements TermIndex */ {
         assert(product.op() == Op.PRODUCT);
         return image(relation, false, product.terms());
     }
+
+
 
     //TODO add this to a '$.printree' command
 

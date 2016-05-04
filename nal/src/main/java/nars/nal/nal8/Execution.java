@@ -3,8 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
+import nars.Symbols;
 import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.task.MutableTask;
@@ -67,8 +66,7 @@ public interface Execution  {
         }
 
 
-        return (MutableTask) new MutableTask(inh)
-                .judgment()  //with default truth value
+        return (MutableTask) new MutableTask(inh, Symbols.BELIEF, 1f, nar)  //with default truth value
                 .time(tense, nar)
                 //.budget(goal.budget())
                 //.budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)

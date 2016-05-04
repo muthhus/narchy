@@ -31,6 +31,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Temporal;
 import nars.term.Compound;
+import nars.truth.DefaultTruth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -127,9 +128,9 @@ public final class Anticipate {
 //        if (debug)
 //            System.err.println("Anticipation Negated " + tt.task);
 
-        nar.input(new MutableTask(prediction) //$.neg(prediction))
-                .belief()
-                .truth(0f /* FALSE */, nar.getTruthDefault(Symbols.BELIEF).conf())
+        nar.input(new MutableTask(prediction, Symbols.BELIEF,
+                        new DefaultTruth(0f /* FALSE */, nar.getTruthDefault(Symbols.BELIEF).conf())
+                )
                 .time(nar.time(), expectedOccurrenceTime)
                 //.parent(tt, null)
                 .because("Absent Anticipated Event"));

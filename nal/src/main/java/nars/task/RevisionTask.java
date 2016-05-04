@@ -21,10 +21,9 @@ import org.jetbrains.annotations.NotNull;
 public class RevisionTask extends MutableTask {
 
     public RevisionTask(@NotNull Termed<Compound> term, Budget revisionBudget, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
-        super(term, newBelief.punc());
+        super(term, newBelief.punc(), conclusion);
 
         budget(revisionBudget);
-        truth(conclusion);
         parent(newBelief, oldBelief);
         time(creationTime, occTime);
         because("Insertion Revision");

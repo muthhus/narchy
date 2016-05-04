@@ -225,10 +225,9 @@ public class OperatorTest {
                 int b = i(s.term(B).toString());
 
                 return Lists.newArrayList(
-                        $.$("add(" + a + ',' + b + ',' +
-                            Integer.toString(a+b) + ')', '.')
+                        $.task("add(" + a + ',' + b + ',' + Integer.toString(a+b) + ')',
+                                '.', 1.0f, 0.99f)
                             .eternal()
-                            .truth(1.0f, 0.99f)
                             .parent(question)
                             .budget(question)
                             .because("Addition")

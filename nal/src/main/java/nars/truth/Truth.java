@@ -264,6 +264,7 @@ public interface Truth extends Truthed {
         );
     }
 
+    Truth toNegative();
 
 
     enum TruthComponent {

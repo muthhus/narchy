@@ -147,7 +147,7 @@ public class Twenglish {
             Term q = $.image(2, sentenceType, $.the(source), $.sete(tokens));
 
             if (q != null) {
-                MutableTask newtask = new MutableTask(q,'.').present(n); //n.task(q + ". %0.95|0.95%");
+                MutableTask newtask = new MutableTask(q,'.', 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
                 if (newtask!=null)
                     tt.add(newtask); //TODO non-string construct
             }

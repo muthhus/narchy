@@ -247,8 +247,8 @@ public class NarseseTest {
 
     @Test
     public void testNegation() throws Narsese.NarseseException {
-        taskParses("(--,negated).");
-        taskParses("(--, negated).");
+        taskParses("(--,(negated)).");
+        taskParses("(--, (negated)).");
 
         assertEquals("(--,negated)", term("(--, negated)").toString());
 

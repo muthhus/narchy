@@ -162,9 +162,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     @NotNull
     protected Task newInputTask(float v, long now) {
-        return new MutableTask(term(), punc)
-                //.truth(v, conf)
-                .truth(truthFloatFunction.valueOf(v))
+        return new MutableTask(term(), punc, truthFloatFunction.valueOf(v))
                 .time(now, now + dt())
                 .budget(pri, dur);
     }

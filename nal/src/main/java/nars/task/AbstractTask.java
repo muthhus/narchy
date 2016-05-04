@@ -1,13 +1,11 @@
 package nars.task;
 
-import nars.Global;
-import nars.Memory;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -109,8 +107,23 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
                         @Nullable Reference<Task> parentTask, @Nullable Reference<Task> parentBelief) {
         super(p, d, q);
-        this.truth = truth;
+
         this.punctuation = punctuation;
+
+        //unwrap top-level negation
+        if (term.op() == Op.NEGATE) {
+            Term nt = term.term().term(0);
+            if (nt instanceof Compound) {
+                term = nt;
+
+                if (isBeliefOrGoal())
+                    truth = truth.toNegative();
+            } else {
+                throw new NAR.InvalidTaskException(this, "Top-level negation not wrapping a Compound");
+            }
+        }
+
+        this.truth = truth;
         this.term = term;
         this.parentTask = parentTask;
         this.parentBelief = parentBelief;
@@ -131,6 +144,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             throw new NAR.InvalidTaskException(this, "Deleted");
 
         Compound t = term();
+
         if (!t.levelValid( memory.nal() ))
             throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
 

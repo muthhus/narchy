@@ -7,6 +7,7 @@ import nars.data.Range;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
 import nars.util.HaiQ;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.Autoencoder;
@@ -153,8 +154,7 @@ public class NarQ implements Consumer<NAR> {
             int dt = 0;
             //TODO solve for strength/additional desire so expectation is correct
             long now = nar.time();
-            final Task t = new MutableTask(term, punct).
-                    truth(invert ? 0f : 1f, conf)
+            final Task t = new MutableTask(term, punct, new DefaultTruth(invert ? 0f : 1f, conf))
                     //.time(Tense.Future, nar.memory)                   
                     .time(now, now + dt )
                     .log("Q Action");

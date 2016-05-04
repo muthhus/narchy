@@ -158,7 +158,7 @@ public class NarseseExtendedTest {
     public void testNegation2() throws Narsese.NarseseException {
 
 
-        for (String s : new String[]{"--negated!", "-- negated!"}) {
+        for (String s : new String[]{"--(negated-->a)!", "-- (negated-->a)!"}) {
             Task t = task(s);
 
             //System.out.println(t);
@@ -168,8 +168,8 @@ public class NarseseExtendedTest {
             */
 
             Term tt = t.term();
-            assertEquals(Op.NEGATE, tt.op());
-            assertTrue("negated".equals(((Compound) tt).term(0).toString()));
+            assertEquals(Op.INHERIT, tt.op());
+            assertTrue("(negated-->a)".equals(((Compound) tt).toString()));
             assertTrue(t.punc() == Symbols.GOAL);
         }
     }

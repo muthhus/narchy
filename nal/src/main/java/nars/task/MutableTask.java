@@ -25,14 +25,17 @@ import static nars.Global.reference;
  */
 public class MutableTask extends AbstractTask {
 
-    public MutableTask(@NotNull NAR nar, @NotNull String termString) throws Narsese.NarseseException {
-        this(nar.term(termString));
+    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, NAR nar) throws Narsese.NarseseException {
+        this(t, punct, new DefaultTruth(freq, nar.getDefaultConfidence(punct)));
+    }
+
+    public MutableTask(@NotNull String compoundTermString, char punct, @Nullable Truth truth) throws Narsese.NarseseException {
+        this((Compound)$.$(compoundTermString), punct, truth);
     }
 
 
-    public MutableTask(@NotNull Termed<Compound> term) {
-        /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
-        super(term.term(), (char) 0, null,
+    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth) {
+        super(term.term(), punct, truth,
             /* budget: */ 0, Float.NaN, Float.NaN);
     }
 
@@ -42,12 +45,12 @@ public class MutableTask extends AbstractTask {
 //    }
 
 
-    public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
-        this(taskToClone);
-        term(newTerm);
-        punc(taskToClone.punc());
-
-    }
+//    public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
+//        this(taskToClone);
+//        term(newTerm);
+//        punc(taskToClone.punc());
+//
+//    }
 
 
     @NotNull
@@ -59,9 +62,7 @@ public class MutableTask extends AbstractTask {
     }
 
     public MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
-        this(taskToClone);
-        punctuation(taskToClone.punc());
-        setEvidence(taskToClone.evidence());
+        super(taskToClone);
         truth(newTruth);
         time(now, occ);
         parent(taskToClone);
@@ -73,22 +74,21 @@ public class MutableTask extends AbstractTask {
 
     /** used by QuestionTable */
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
-        this(taskToClone);
+        this(taskToClone, taskToClone.punc(), newTruth);
 
-        punctuation(taskToClone.punc());
         this.parentBelief = Global.reference(otherTask);
         setEvidence(newEvidence);
-        truth(newTruth);
+
         time(now, occ);
 
         budget(taskToClone.budget());
         budgetMerge.merge(budget(), otherTask.budget(), 1f);
     }
 
-    public MutableTask(@NotNull Termed<Compound> content, char punc) {
-        this(content);
-        punctuation(punc);
-    }
+//    public MutableTask(@NotNull Termed<Compound> content, char punc) {
+//        this(content);
+//        punctuation(punc);
+//    }
 
 
     @NotNull
@@ -145,11 +145,6 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask belief() {
-        return judgment();
-    }
-
-    @NotNull
-    public MutableTask judgment() {
         punc(Symbols.BELIEF);
         return this;
     }

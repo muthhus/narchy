@@ -227,8 +227,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         Task solution;
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-            solution = new MutableTask(newTerm, punc())
-                    .truth(solTruth)
+            solution = new MutableTask(newTerm, punc(), solTruth)
                     .time(now, solutionOcc)
                     .parent(question, this)
                     .budget(solutionBudget)
@@ -283,8 +282,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         Task solution;
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-        solution = new MutableTask(theTerm, punc())
-                .truth(solTruth)
+        solution = new MutableTask(theTerm, punc(), solTruth)
                 .time(now, solutionOcc)
                 .parent(this)
                 .budget(solutionBudget)
@@ -679,7 +677,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     static Task command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
-        return new MutableTask(op, Symbols.COMMAND);
+        return new MutableTask(op, Symbols.COMMAND, null);
     }
 
     default boolean isEternal() {
@@ -778,12 +776,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     }
 
-
-    /** creates a new child task (has this task as its parent) */
-    @NotNull
-    default MutableTask spawn(@NotNull Compound content, char punc) {
-        return new MutableTask(content, punc);
-    }
 
     default long occurrence() {
         return Tense.ETERNAL;

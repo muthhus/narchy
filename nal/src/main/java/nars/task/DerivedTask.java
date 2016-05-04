@@ -23,8 +23,8 @@ public final class DerivedTask extends MutableTask {
     //avoid storing the ConceptProcess reference because it creates a garbage-collection chain of derivedtask -> premise -> derivedtask etc..
     //public final ConceptProcess premise;
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @NotNull ConceptProcess premise) {
-        super(tc, punct);
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+        super(tc, punct, truth);
         this.premise = Global.reference(premise);
 
 

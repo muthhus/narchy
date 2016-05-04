@@ -2,11 +2,13 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
+import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.truth.DefaultTruth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
@@ -128,9 +130,8 @@ public class Abbreviation implements Consumer<Task> {
                         logger.info("Abbreviation " + abbreviation);
 
                         nar.input(
-                                new MutableTask(abbreviation)
-                                        .judgment()
-                                        .truth(1, abbreviationConfidence.floatValue())
+                                new MutableTask(abbreviation, Symbols.BELIEF,
+                                        new DefaultTruth(1, abbreviationConfidence.floatValue()))
                                         .present(nar)
                         );
 

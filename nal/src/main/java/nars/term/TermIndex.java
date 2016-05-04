@@ -120,8 +120,7 @@ public interface TermIndex {
 
     @NotNull
     static Task spawn(@NotNull Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
-        return new MutableTask(content, punctuation)
-                .truth(truth)
+        return new MutableTask(content, punctuation, truth)
                 .budget(p, d, q)
                 .parent(parent)
                 .occurr(occ);
