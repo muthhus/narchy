@@ -11,6 +11,7 @@ import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.Agent;
 import nars.util.DQN;
+import nars.util.NAgent;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
@@ -28,9 +29,8 @@ import static nars.util.Texts.n2;
 public class Thermostat {
 
 
-    public final float tolerance = 0.03f;
-    public float targetPeriod = 60;
-    public final float speed = 0.15f;
+    public float targetPeriod = 120;
+    public final float speed = 0.05f;
     boolean print = true;
 
 
@@ -128,7 +128,11 @@ public class Thermostat {
     }
 
     public static void main(String[] args) {
-        float score = new Thermostat().score( new DQN(), 5000 );
+        float score = new Thermostat().score(
+            //new DQN(),
+            new NAgent(new Default()),
+            15000
+        );
         System.out.println("score=" + score);
     }
 
