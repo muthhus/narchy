@@ -235,16 +235,16 @@ public class NAL5Test extends AbstractNALTest {
     public void negation0(){
 
         TestNAR tester = test();
-        tester.believe("(--,<robin --> [flying]>)",0.1f,0.9f); //.en("It is unlikely that robin cannot fly.");
-        tester.mustBelieve(cycles,"<robin --> [flying]>",0.90f,0.90f); //.en("Robin can fly.");
+        tester.believe("(--,<robin --> [flying]>)",0.9f,0.9f); //.en("It is unlikely that robin cannot fly.");
+        tester.mustBelieve(cycles,"<robin --> [flying]>",0.10f,0.90f); //.en("Robin can fly.");
 
     }
     @Test
     public void negation1(){
 
         TestNAR tester = test();
-        tester.believe("(--,<robin <-> parakeet>)",0.1f,0.9f);
-        tester.mustBelieve(cycles,"<robin <-> parakeet>",0.90f,0.90f);
+        tester.believe("(--,<robin <-> parakeet>)",0.9f,0.9f);
+        tester.mustBelieve(cycles,"<robin <-> parakeet>",0.10f,0.90f);
 
     }
 

@@ -102,10 +102,10 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     }
 
 
-//    @Override
-//    protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
-//        return eternalOrTemporal ? 0 : cap; //no eternal
-//    }
+    @Override
+    protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        return eternalOrTemporal ? 0 : cap; //no eternal
+    }
 
 
     /**
@@ -184,10 +184,4 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         }*/
     }
 
-
-    @Nullable
-    @Override
-    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return super.processBelief(belief, nar);
-    }
 }

@@ -118,14 +118,16 @@ public class Thermostat {
     }
 
     public static void main(String[] args) {
-        Default n = new Default(128, 2, 2, 4);
-        n.conceptActivation.setValue(0.5);
-        NAgent a = new NAgent(n, 12);
+        Default n = new Default(256, 4, 2, 3);
+        n.conceptActivation.setValue(0.25);
+        n.cyclesPerFrame.set(64);
+        //n.conceptRemembering.setValue(1);
+        NAgent a = new NAgent(n);
 
         new Thermostat().run(
             //new DQN(),
             a,
-            5000
+            512
         );
 
         printTasks(n, true);

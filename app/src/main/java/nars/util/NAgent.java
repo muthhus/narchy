@@ -22,7 +22,6 @@ import java.util.stream.IntStream;
 public class NAgent implements Agent {
 
     private final NAR nar;
-    private final int framesPerAction;
 
     float motivation[];
     float input[];
@@ -33,12 +32,13 @@ public class NAgent implements Agent {
     private int lastAction = -1;
     private float prevReward;
 
-    int observeFrames, learnFrames;
+    /** exploratoin rate - confidence of initial goal for each action */
+    float epsilon = 0.1f;
 
+    float actionBeliefConfidence = 0.9f;
 
-    public NAgent(NAR n, int framesPerAction) {
+    public NAgent(NAR n) {
         this.nar = n;
-        this.framesPerAction = framesPerAction;
     }
 
     @Override
@@ -52,7 +52,9 @@ public class NAgent implements Agent {
 
             MotorConcept.MotorFunction motorFunc = (b,d) -> {
 
-                motivation[i] = d-b;
+                motivation[i] =
+                        //d-b;
+                        Math.max(0, d-b);
 
                 /*if (d < 0.5) return 0; //Float.NaN;
                 if (d < b) return 0; //Float.NaN;
@@ -65,8 +67,9 @@ public class NAgent implements Agent {
         }).collect( Collectors.toList());
 
         FloatToObjectFunction sensorTruth = (v) -> {
-            return new DefaultTruth(v, 0.75f);
+            return new DefaultTruth(v, 0.9f);
         };
+
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
             return new SensorConcept(inputConceptName(i), nar,  () -> {
 
@@ -89,9 +92,6 @@ public class NAgent implements Agent {
         actions.forEach(m -> init(m));
 
 
-        observeFrames = Math.max(1, framesPerAction/2);
-        learnFrames = Math.max(1, framesPerAction/2);
-
     }
 
     private void seekReward() {
@@ -100,7 +100,8 @@ public class NAgent implements Agent {
 
     private void init(MotorConcept m) {
         //nar.ask($.$("(?x &&+0 " + m + ")"), '@');
-        nar.goal(m, Tense.Eternal, 0.5f, 0.1f);
+        nar.goal(m, Tense.Present, 1f, epsilon);
+
 
     }
 
@@ -121,15 +122,12 @@ public class NAgent implements Agent {
     public void observe(float[] nextObservation) {
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
-        //nar.conceptualize(reward, UnitBudget.One);
-        nar.run(observeFrames);
+        nar.conceptualize(reward, UnitBudget.One);
+        nar.step();
     }
 
     private void learn(float[] input, int action, float reward) {
         this.prevReward = reward;
-
-        nar.run(learnFrames);
-
 
     }
 
@@ -146,10 +144,10 @@ public class NAgent implements Agent {
 
         if (lastAction!=nextAction) {
             if (lastAction != -1) {
-                nar.believe(actions.get(lastAction), Tense.Present, 0f, 0.9f);
+                nar.believe(actions.get(lastAction), Tense.Present, 0f, actionBeliefConfidence);
             }
-            nar.believe(actions.get(nextAction), Tense.Present, 1f, 0.9f);
         }
+        nar.believe(actions.get(nextAction), Tense.Present, 1f, actionBeliefConfidence);
 
         /*for (int a = 0; a < actions.size(); a++)
             nar.believe(actions.get(a), Tense.Present,
@@ -163,6 +161,12 @@ public class NAgent implements Agent {
     }
     private String inputConceptName(int i) {
         return "(i" + i + ")";
+
+        //return "{i" + i + "}";
+        //return "(input, i" + i + ")";
+        //return "input:i" + i;
+        //return "input:{i" + i + '}';
+
     }
 
     public static void printTasks(NAR n, boolean beliefsOrGoals) {
