@@ -91,6 +91,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
+    public char punc() { return punc; }
+
     public void ready() {
         this.lastInput = nar.time() - minTimeBetweenUpdates;
     }

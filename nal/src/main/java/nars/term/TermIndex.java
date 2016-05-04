@@ -546,7 +546,7 @@ public interface TermIndex {
     /**
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
-    @NotNull
+    @Nullable
     default Termed validConceptTerm(@NotNull Termed term) {
 
         if (term instanceof Atomic) {
@@ -575,8 +575,12 @@ public interface TermIndex {
             Termed anonymizedTerm = term.anonymous();
             if (anonymizedTerm != term) {
                 //complete anonymization process
-                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer)))
-                    throw new InvalidTerm((Compound) term);
+                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer))) {
+                    if (Global.DEBUG)
+                        throw new InvalidTerm((Compound) term);
+                    else
+                        return null;
+                }
 
                 term = anonymizedTerm;
             }

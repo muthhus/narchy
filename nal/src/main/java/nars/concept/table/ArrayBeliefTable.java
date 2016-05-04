@@ -451,14 +451,17 @@ public class ArrayBeliefTable implements BeliefTable {
             table.forEach(overridden);
             table.clear();
             table.setCapacity(1);
-            table.put(incoming, incoming);
 
             //2. clear the other table, set capcity to zero preventing temporal tasks
-            table = (table == eternal) ? temporal : eternal;
-            table.forEach(overridden);
-            table.clear();
-            table.setCapacity(0);
+            ListTable<Task, Task> otherTable = (table == eternal) ? temporal : eternal;
+            otherTable.forEach(overridden);
+            otherTable.clear();
+            otherTable.setCapacity(0);
             NAR.logger.info("axiom: {}", incoming);
+
+            table.put(incoming, incoming);
+
+
             return true;
         }
 

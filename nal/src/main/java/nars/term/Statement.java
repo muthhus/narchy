@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
  * A statement or relation is a compound term, consisting of a subject, a predicate, and a
  * relation symbol in between. It can be of either first-order or higher-order.
  */
-@Deprecated
 public interface Statement {
 
     /**

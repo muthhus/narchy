@@ -912,6 +912,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
         tt = index.validConceptTerm(tt);
+        if (tt == null)
+            return null;
 
         return (Concept)(createIfMissing ?  index.the(tt) : index.get(tt) );
 

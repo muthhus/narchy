@@ -1,6 +1,5 @@
 package nars.op.java;
 
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
@@ -19,6 +18,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import java.util.TreeSet;
 
 import static java.lang.System.out;
+import static nars.util.NAgent.printTasks;
 import static nars.util.Texts.n2;
 
 /**
@@ -152,8 +152,8 @@ public class Thermostat6s {
 
         }
 
-        printBeliefs(n, true);
-        printBeliefs(n, false);
+        printTasks(n, true);
+        printTasks(n, false);
 
         return loss.floatValue() / t.intValue();
 
@@ -210,20 +210,6 @@ public class Thermostat6s {
 
     }
 
-
-    public static void printBeliefs(NAR n, boolean beliefsOrGoals) {
-        TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
-        n.forEachConcept(c -> {
-            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
-            if (!table.isEmpty()) {
-                bt.add(table.top(n.time()));
-                //System.out.println("\t" + c.beliefs().top(n.time()));
-            }
-        });
-        bt.forEach(xt -> {
-            System.out.println(xt);
-        });
-    }
 
     private static class Motor1D extends MotorConcept implements MotorConcept.MotorFunction {
 

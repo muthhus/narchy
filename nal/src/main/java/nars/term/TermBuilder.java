@@ -487,17 +487,13 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        //return TermContainer.difference(setType, A, B);
         return TermContainer.difference(this, setType, A, B);
     }
 
     @Nullable
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
         Term s = junction(CONJUNCTION, t, subject, oldCondition);
-        if (s == null)
-            return null;
-
-        return newCompound(IMPLICATION, t, TermVector.the(s, pred(predicate)));
+        return s != null ? newCompound(IMPLICATION, t, TermVector.the(s, pred(predicate))) : null;
     }
 
     @Nullable
@@ -525,7 +521,7 @@ public abstract class TermBuilder {
                 Term single = t[0];
                 if (single instanceof Ellipsis) {
                     //allow
-                    return finish(intersection, -1, TermContainer.the(intersection, single));
+                    single = finish(intersection, -1, TermContainer.the(intersection, single));
                 }
 
                 return single;
@@ -543,7 +539,6 @@ public abstract class TermBuilder {
                 );
         }
 
-        //return newCompound(intersection, t, -1, true);
     }
 
     @Nullable

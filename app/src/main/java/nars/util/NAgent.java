@@ -3,12 +3,16 @@ package nars.util;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
+import nars.budget.UnitBudget;
+import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
+import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 
 import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,6 +22,7 @@ import java.util.stream.IntStream;
 public class NAgent implements Agent {
 
     private final NAR nar;
+    private final int framesPerAction;
 
     float motivation[];
     float input[];
@@ -31,8 +36,9 @@ public class NAgent implements Agent {
     int observeFrames, learnFrames;
 
 
-    public NAgent(NAR n) {
+    public NAgent(NAR n, int framesPerAction) {
         this.nar = n;
+        this.framesPerAction = framesPerAction;
     }
 
     @Override
@@ -59,7 +65,7 @@ public class NAgent implements Agent {
         }).collect( Collectors.toList());
 
         FloatToObjectFunction sensorTruth = (v) -> {
-            return new DefaultTruth(v, 0.9f);
+            return new DefaultTruth(v, 0.75f);
         };
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
             return new SensorConcept(inputConceptName(i), nar,  () -> {
@@ -69,7 +75,7 @@ public class NAgent implements Agent {
             }, sensorTruth).resolution(0.01f).timing(-1, -1);
         }).collect( Collectors.toList());
 
-        this.reward = new SensorConcept("(r)", nar,  () -> prevReward, sensorTruth)
+        this.reward = new SensorConcept("(r)", nar,  new RangeNormalizedFloat(() -> prevReward), sensorTruth)
                 .resolution(0.01f).timing(-1, -1);
 
         init();
@@ -77,17 +83,24 @@ public class NAgent implements Agent {
 
     protected void init() {
 
-        nar.input("(r)! %1.00;1.00%");
+        seekReward();
+
+        //nar.input("(--,(r))! %0.00;1.00%");
         actions.forEach(m -> init(m));
 
-        observeFrames = 64;
-        learnFrames = 64;
 
+        observeFrames = Math.max(1, framesPerAction/2);
+        learnFrames = Math.max(1, framesPerAction/2);
+
+    }
+
+    private void seekReward() {
+        nar.goal("(r)", Tense.Eternal, 1f, 1f);
     }
 
     private void init(MotorConcept m) {
         //nar.ask($.$("(?x &&+0 " + m + ")"), '@');
-        nar.goal(m, 1f, 0.1f);
+        nar.goal(m, Tense.Eternal, 0.5f, 0.1f);
 
     }
 
@@ -100,34 +113,49 @@ public class NAgent implements Agent {
 
         observe(nextObservation);
 
-        return this.lastAction = decide();
+        int nextAction = decide(this.lastAction);
+
+        return this.lastAction = nextAction;
     }
 
     public void observe(float[] nextObservation) {
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
+
+        //nar.conceptualize(reward, UnitBudget.One);
         nar.run(observeFrames);
     }
 
     private void learn(float[] input, int action, float reward) {
         this.prevReward = reward;
 
-        nar.believe(actions.get(action), Tense.Present, 1f, 0.9f);
-
         nar.run(learnFrames);
+
+
     }
 
-    private int decide() {
-        int b = -1;
+    private int decide(int lastAction) {
+        int nextAction = -1;
         float best = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < motivation.length; i++) {
             float m = motivation[i];
             if (m > best) {
                 best = m;
-                b = i;
+                nextAction = i;
             }
         }
 
-        return b;
+        if (lastAction!=nextAction) {
+            if (lastAction != -1) {
+                nar.believe(actions.get(lastAction), Tense.Present, 0f, 0.9f);
+            }
+            nar.believe(actions.get(nextAction), Tense.Present, 1f, 0.9f);
+        }
+
+        /*for (int a = 0; a < actions.size(); a++)
+            nar.believe(actions.get(a), Tense.Present,
+                    (nextAction == a ? 1f : 0f), 0.9f);*/
+
+        return nextAction;
     }
 
     private String actionConceptName(int i) {
@@ -135,6 +163,21 @@ public class NAgent implements Agent {
     }
     private String inputConceptName(int i) {
         return "(i" + i + ")";
+    }
+
+    public static void printTasks(NAR n, boolean beliefsOrGoals) {
+        TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
+        n.forEachConcept(c -> {
+            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
+
+            if (!table.isEmpty()) {
+                bt.add(table.top(n.time()));
+                //System.out.println("\t" + c.beliefs().top(n.time()));
+            }
+        });
+        bt.forEach(xt -> {
+            System.out.println(xt);
+        });
     }
 
 
