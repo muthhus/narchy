@@ -360,7 +360,7 @@ public class NAL7Test extends AbstractNALTest {
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
         tester.mustBelieve(cycles,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
-                1.00f, 0.81f, //0.45f,
+                1.00f, 0.45f,
                 0
         );
 
@@ -569,8 +569,8 @@ public class NAL7Test extends AbstractNALTest {
                 .log()
                 .inputAt(2,"a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
-                .mustBelieve(cycles, "(b:#1 &&-3 a:#1)", 1f, 0.40f, 2)
-                .mustNotOutput(cycles*2, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
+                .mustBelieve(cycles*8, "(b:#1 &&-3 a:#1)", 1f, 0.40f, 2)
+                .mustNotOutput(cycles*8, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
 
     }
 

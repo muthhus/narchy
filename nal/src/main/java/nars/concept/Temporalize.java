@@ -144,17 +144,17 @@ public interface Temporalize {
     };
 
 
-    /**
-     * if the premise is an event (and it is allowed to not be) then the dt is the difference
-     * in task and belief occurrence times, and the occurrence time is the belief's.
-     */
-    Temporalize dtIfEvent = (derived, p, d, occReturn) -> {
-        if (!p.premise.isEvent()) {
-            return derived;
-        } else {
-            return occBeliefMinTask(derived, p, occReturn, +1);
-        }
-    };
+//    /**
+//     * if the premise is an event (and it is allowed to not be) then the dt is the difference
+//     * in task and belief occurrence times, and the occurrence time is the belief's.
+//     */
+//    Temporalize dtIfEvent = (derived, p, d, occReturn) -> {
+//        if (!p.premise.isEvent()) {
+//            return derived;
+//        } else {
+//            return occBeliefMinTask(derived, p, occReturn, +1);
+//        }
+//    };
 
 //    /** shifts to task's predicate by the task's dt (if present) */
 //    Temporalize taskPredicate = (derived, p, d, occReturn) -> {
@@ -190,8 +190,8 @@ public interface Temporalize {
             Compound bt = prem.belief().term();
             Term d0 = derived.term(0);
 
-            if (d0.equals(bt) || derived.term(1).equals(prem.task().term())
-                    || d0.equalsIgnoringVariables(bt)) //last chance: try by ignoring variables to handle variable introduction cases
+            if (d0.equals(bt) || derived.term(1).equals(prem.task().term()) ||
+                     d0.equalsIgnoringVariables(bt)) //last chance: try by ignoring variables to handle variable introduction cases
                 eventDelta *= -1;
         }
 

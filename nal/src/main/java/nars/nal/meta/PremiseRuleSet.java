@@ -149,7 +149,7 @@ public class PremiseRuleSet  {
         String ret = '<' + rule.toString() + '>';
 
         //while (ret.contains("  ")) {
-            ret = twoSpacePattern.matcher(ret).replaceAll(Matcher.quoteReplacement(" "));
+            //ret = twoSpacePattern.matcher(ret).replaceAll(Matcher.quoteReplacement(" "));
         //}
 
         ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
