@@ -85,7 +85,7 @@ public interface BeliefTable extends TaskTable {
         @Nullable
         @Override
         public Truth truth(long when, long now) {
-            return Truth.Zero;
+            return Truth.Null;
         }
 
 

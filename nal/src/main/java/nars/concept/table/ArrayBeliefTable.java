@@ -83,7 +83,7 @@ public class ArrayBeliefTable implements BeliefTable {
             if (eternal != null) //optimization: just return the top eternal truth if no temporal to adjust with
                 return eternal.truth();
             else
-                return Truth.Zero;
+                return Truth.Null;
         }
 
 
@@ -96,7 +96,7 @@ public class ArrayBeliefTable implements BeliefTable {
         //find the temporal with the best rank
         Task t = topTemporal(when, now);
         if (t == null) {
-            return (topEternal != null) ? topEternal.truth() : Truth.Zero;
+            return (topEternal != null) ? topEternal.truth() : Truth.Null;
         } else {
             Truth tt = t.truth();
             return (topEternal() != null) ? tt.interpolate(topEternal.truth()) : tt;
@@ -168,7 +168,7 @@ public class ArrayBeliefTable implements BeliefTable {
             nF+=strength;
         }
 
-        return nC == 0 ? Truth.Zero :
+        return nC == 0 ? Truth.Null :
                 new DefaultTruth(sumFreq / nF, (sumConf/nC));
     }
 

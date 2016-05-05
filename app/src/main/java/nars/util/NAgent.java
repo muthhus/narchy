@@ -5,10 +5,12 @@ import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -40,7 +42,17 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.75f;
+    float alpha = 0.6f;
+
+    final FloatToObjectFunction sensorTruth =  (v) -> {
+        /*return new DefaultTruth(
+                v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
+
+        return new DefaultTruth(v, alpha);
+        //return new DefaultTruth(1f, v);
+        //0.5f + alpha /2f /* learning rate */);
+    };
+
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.75f;
@@ -81,17 +93,13 @@ public class NAgent implements Agent {
             return new MotorConcept(actionConceptName(i), nar, motorFunc);
         }).collect( toList());
 
-        FloatToObjectFunction sensorTruth = (v) -> {
-            return new DefaultTruth(v,
-                    alpha);
-                    //0.5f + alpha /2f /* learning rate */);
-        };
+
 
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
             return getSensorConcepts(sensorTruth, i, discretization);
         }).flatMap(x -> x).collect( toList());
 
-        this.reward = new SensorConcept("(R)", nar,
+        this.reward = new SensorConceptDebug("(R)", nar,
                 new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
                 .resolution(0.01f).timing(-1, -1);
 
@@ -105,6 +113,22 @@ public class NAgent implements Agent {
 //                .resolution(0.01f).timing(-1, -1);
 
         init();
+    }
+
+    public class SensorConceptDebug extends SensorConcept {
+
+        public SensorConceptDebug(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
+            super(term, n, input, truth);
+        }
+
+        @Override
+        protected void onConflict(@NotNull Task belief) {
+            NAgent.this.onConflict(this, belief);
+        }
+    }
+
+    protected void onConflict(SensorConceptDebug sensorConceptDebug, Task belief) {
+
     }
 
     @Override
@@ -128,7 +152,7 @@ public class NAgent implements Agent {
 
             if (bits == 1) {
                 //single bit case
-                return new SensorConcept(inputConceptName(i,bit), nar,  () -> {
+                return new SensorConceptDebug(inputConceptName(i,bit), nar,  () -> {
                     return input[i];
                 }, sensorTruth).resolution(0.01f).timing(-1, -1);
             }
@@ -149,7 +173,7 @@ public class NAgent implements Agent {
 
             float min = bit / bits, max = min + (1f/bits);
 
-            return new SensorConcept(inputConceptName(i,bit), nar,  () -> {
+            return new SensorConceptDebug(inputConceptName(i,bit), nar,  () -> {
 
                 float v = input[i];
                 if (v >= 1f) v = 1f - Global.TRUTH_EPSILON; //clamp below 1.0 for this discretization

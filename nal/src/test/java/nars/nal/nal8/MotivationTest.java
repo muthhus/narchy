@@ -55,10 +55,10 @@ public class MotivationTest {
         x.set(1);
 
         n.run(4);
-        assertEquals(1, execs.get());
+        assertEquals(2, execs.get());
 
         n.run(16); //remains stable with one execution
-        assertEquals(1, execs.get());
+        assertEquals(2, execs.get());
 
         //OFF
         x.set(0);

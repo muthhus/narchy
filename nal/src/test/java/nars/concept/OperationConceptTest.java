@@ -26,8 +26,8 @@ public class OperationConceptTest {
         NAR n = new Default();
 
         Termed op = new OperationConcept("f(x)", n) {
-            @Override public void update(NAR nar) {
-                super.update(nar);
+            @Override public void update() {
+                super.update();
                 history.add(nar.time() + ":(" + n2(believed.expectation()) + "," + n2(desired.expectation()) + ")");
             }
         };

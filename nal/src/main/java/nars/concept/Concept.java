@@ -321,12 +321,12 @@ public interface Concept extends Termed, Comparable {
 
     @Nullable
     default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(when, now) : Truth.Zero;
+        return hasBeliefs() ? beliefs().truth(when, now) : Truth.Null;
     }
 
     @Nullable
     default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(when, now) : Truth.Zero;
+        return hasGoals() ? goals().truth(when, now) : Truth.Null;
     }
 
     @Nullable

@@ -57,11 +57,17 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
             //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
 
             //TODO delete its non-input parent tasks?
+            onConflict(belief);
 
             return null;
         }
 
         return super.processBelief(belief, nar);
+    }
+
+    /** called when a conflicting belief has attempted to be processed */
+    protected void onConflict(@NotNull Task belief) {
+
     }
 
     //    float freq(float v) {

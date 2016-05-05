@@ -6,6 +6,7 @@ import nars.nar.Default;
 import nars.util.Agent;
 import nars.util.DQN;
 import nars.util.NAgent;
+import nars.util.NAgentDebug;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
@@ -125,7 +126,7 @@ public class Thermostat implements Environment {
         //n.logSummaryGT(System.out, 0.55f);
 
         //n.conceptRemembering.setValue(1);
-        NAgent a = new NAgent(n);
+        NAgent a = new NAgentDebug(n);
 
         new Thermostat().run(
             //new DQN(),

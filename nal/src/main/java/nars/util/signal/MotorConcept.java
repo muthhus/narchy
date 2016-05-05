@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 
 
-public class MotorConcept extends OperationConcept implements Consumer<NAR>, FloatFunction<Term> {
+public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
 
     /**
      * all effected motor actuation relative to the differential of current desire and current belief
@@ -94,7 +94,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
         setMotor(motor);
 
-        n.onFrame(this);
+        //n.onFrame(this);
 
     }
 
@@ -150,11 +150,9 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     }
 
 
-
-    /** called after each frame */
-    @Override public final void accept(@NotNull NAR nar) {
-
-        update();
+    @Override
+    public void update() {
+        super.update();
 
         float desired =  hasGoals() ?
                 this.desired.expectation()

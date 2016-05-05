@@ -56,7 +56,7 @@ public class BooleanConceptTest {
 
             timeUntil("switch on", n, nn -> {
                 //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-                return y.expectation(nn) >= 0.51f;
+                return y.desire(nn.time()).expectation() >= 0.51f;
             }, 150);
 
             n.run(cyclesBetweenPhases);
@@ -65,7 +65,7 @@ public class BooleanConceptTest {
 
             timeUntil("switch off", n, nn -> {
                 //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-                return y.expectation(nn) <= 0.49f;
+                return y.desire(nn.time()).expectation() <= 0.49f;
             }, 150);
         }
 
@@ -103,7 +103,7 @@ public class BooleanConceptTest {
 
             timeUntil("switch (on,on)", n, nn -> {
                 //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-                return y.expectation(nn) >= 0.49f;
+                return y.desire(nn.time()).expectation() >= 0.49f;
             }, 150);
 
             n.run(cyclesBetweenPhases);
@@ -112,7 +112,7 @@ public class BooleanConceptTest {
 
             timeUntil("switch (on,off)", n, nn -> {
                 //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-                float m = y.expectation(nn);
+                float m = y.desire(nn.time()).expectation();
                 return m >= 0.51f;
                 //return m <= 0.55f && m >= 0.45f; //~=0.5
             }, 150);

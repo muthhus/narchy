@@ -5,6 +5,8 @@ import nars.util.Agent;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
+import java.util.Arrays;
+
 import static java.lang.System.out;
 
 /**
@@ -21,6 +23,9 @@ public interface Environment {
         final int inputs = x.getOne();
 
         float[] ins = new float[inputs];
+
+        Arrays.fill(ins, 0.5f);
+
         a.start(inputs, x.getTwo());
 
         float reward = 0, rewardSum = 0;

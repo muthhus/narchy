@@ -262,29 +262,24 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
+
+//    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
+//    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
+//    X, (XI ==> B), substitute_if_unifies("$",XI,(&/,X,/0)), shift_occurrence_forward(XI,"==>") |- B, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-    (A ==> C), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+//    (A ==> C), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
 
-//    M, (M ==> P), time(decomposeBelief) |- P, (Belief:Deduction, Desire:Induction)
-//          C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Event:Anticipate),
-//          X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-//                    substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction)
-//          X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction)
-
+//    M, (P ==> M), shift_occurrence_backward(unused,"==>") |- P, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
+//    B, (C ==> A), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"==>") |- C, (Truth:Abduction, Order:ForAllSame)
+//    X, (BI ==> Y), substitute_if_unifies("$",Y,X), shift_occurrence_backward(BI,"==>") |- BI, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
-    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
+    //(C ==> A), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
 
-//    M, (P ==> M), time(decomposeBelief) |- P, (Belief:Abduction, Desire:Deduction)
-
+//    M, (S <=> M), shift_occurrence_backward(unused,"<=>") |- S, (Truth:Analogy, Desire:Strong, Order:ForAllSame)
+//      ?? B, (A <=> C), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
+//      ?? B, (C <=> A), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
     //(A <=> C), B, time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
-
-//    M, (S <=> M), time(decomposeBelief) |- S, (Belief:Analogy, Desire:Strong)
-//    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
-
-
-
-
 
 
 
