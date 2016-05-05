@@ -156,8 +156,14 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
         update();
 
-        float desired =  hasGoals() ? this.desired.expectation() : 0;
-        float believed = hasBeliefs() ? this.believed.expectation() : 0;
+        float desired =  hasGoals() ?
+                this.desired.expectation()
+                //this.desired.freq() * this.desired.conf()
+                : 0;
+        float believed = hasBeliefs() ?
+                this.believed.expectation()
+                //this.believed.freq() * this.believed.conf()
+                : 0;
 
         float response = motor.motor(believed, desired);
 

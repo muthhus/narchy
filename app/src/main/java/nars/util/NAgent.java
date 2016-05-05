@@ -1,5 +1,7 @@
 package nars.util;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
@@ -12,6 +14,7 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -34,16 +37,16 @@ public class NAgent implements Agent {
     private List<SensorConcept> inputs;
     private SensorConcept reward;
     private int lastAction = -1;
-    private float prevReward = 0, dReward = 0;
+    private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.51f;
+    float alpha = 0.75f;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.6f;
+    float epsilon = 0.75f;
 
-    private int discretization = 3;
-    private SensorConcept dRewardPos, dRewardNeg;
+    private int discretization = 1;
+    //private SensorConcept dRewardPos, dRewardNeg;
 
     public NAgent(NAR n) {
         this.nar = n;
@@ -63,6 +66,8 @@ public class NAgent implements Agent {
                 motivation[i] =
                         //d;
                         //Math.max(0, d-b);
+                        //(1+d)/(1+b);
+                        //d / (d+b);
                         d-b;
                         //d  / (1f + b);
 
@@ -87,28 +92,46 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect( toList());
 
         this.reward = new SensorConcept("(R)", nar,
-                new RangeNormalizedFloat(() -> prevReward, -1, 1), sensorTruth)
+                new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
                 .resolution(0.01f).timing(-1, -1);
 
-        FloatSupplier linearPositive = () -> Util.clamp(dReward > 0 ? dReward/2f + 0.5f : 0);
-        FloatSupplier linearNegative = () -> Util.clamp(-dReward > 0 ? (-dReward)/2f + 0.5f : 0);
-        this.dRewardPos = new SensorConcept("(dRp)", nar,
-                linearPositive, sensorTruth)
-                .resolution(0.01f).timing(-1, -1);
-        this.dRewardNeg = new SensorConcept("(dRn)", nar,
-                linearNegative, sensorTruth)
-                .resolution(0.01f).timing(-1, -1);
+//        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
+//        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
+//        this.dRewardPos = new SensorConcept("(dRp)", nar,
+//                linearPositive, sensorTruth)
+//                .resolution(0.01f).timing(-1, -1);
+//        this.dRewardNeg = new SensorConcept("(dRn)", nar,
+//                linearNegative, sensorTruth)
+//                .resolution(0.01f).timing(-1, -1);
 
         init();
     }
+
+    @Override
+    public String summary() {
+        return Texts.n2(motivation) + " [" +
+                reward.belief(nar.time())
+//                + "," + dRewardPos.belief(nar.time()) +
+//                "," + dRewardNeg.belief(nar.time());
+        ;
+
+    }
+
 
     public
     @NotNull
     Stream<SensorConcept> getSensorConcepts(FloatToObjectFunction sensorTruth, int i, int bits) {
 
 
+
         return IntStream.range(0, bits).mapToObj(bit -> {
 
+            if (bits == 1) {
+                //single bit case
+                return new SensorConcept(inputConceptName(i,bit), nar,  () -> {
+                    return input[i];
+                }, sensorTruth).resolution(0.01f).timing(-1, -1);
+            }
 
 //
 //            00 0
@@ -152,8 +175,8 @@ public class NAgent implements Agent {
     private void seekReward() {
         //TODO get this from the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 0.95f, 1f); //goal reward
-        nar.goal("(dRp)", Tense.Eternal, 0.95f, 1f); //prefer increase
-        nar.goal("(dRn)", Tense.Eternal, 0.05f, 1f); //avoid decrease
+        //nar.goal("(dRp)", Tense.Eternal, 0.95f, 1f); //prefer increase
+        //nar.goal("(dRn)", Tense.Eternal, 0.05f, 1f); //avoid decrease
     }
 
     private void init(MotorConcept m) {
@@ -187,7 +210,10 @@ public class NAgent implements Agent {
 
     private void learn(float[] input, int action, float reward) {
 
-        this.dReward = reward - prevReward;
+        if (Float.isFinite(prevReward))
+            this.dReward = reward - prevReward;
+        else
+            this.dReward = 0;
 
         this.prevReward = reward;
 

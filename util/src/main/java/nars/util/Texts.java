@@ -1,5 +1,7 @@
 package nars.util;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.CharBuffer;
@@ -502,6 +504,18 @@ public enum Texts {
                 c++;
 
         return c;
+    }
+
+    public static String n2(float[] v) {
+        StringBuilder sb = new StringBuilder();
+        int s = v.length;
+        for (int i = 0; i < s; i++) {
+            sb.append(n2(v[i]));
+            if (i!= s -1)
+                sb.append(' ');
+        }
+
+        return sb.toString();
     }
 
 //    /** fast append to CharBuffer */

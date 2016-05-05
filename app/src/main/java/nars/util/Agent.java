@@ -9,4 +9,7 @@ public interface Agent {
 
     public int act(float reward, float[] nextObservation);
 
+    default String summary() {
+        return "";
+    }
 }
