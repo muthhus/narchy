@@ -126,7 +126,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
             case 0: throw new RuntimeException("empty result procedure");
             case 1: return derive.iterator().next();
             default:
-                return new PremiseFork(derive.toArray(new Derive[derive.size()]));
+                return PremiseFork.the(derive.toArray(new Derive[derive.size()]));
         }
     }
 

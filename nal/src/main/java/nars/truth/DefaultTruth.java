@@ -91,8 +91,13 @@ public class DefaultTruth implements Truth  {
     }
 
     @Override
-    public final DefaultTruth toNegative() {
-        return new DefaultTruth(1f - freq(), conf);
+    public final DefaultTruth negated() {
+        float fPos = freq;
+
+        //if = 0.5, negating will produce same result
+        return Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON) ? this :
+                new DefaultTruth(1.0f - fPos, conf);
+
     }
 
     protected boolean equalsFrequency(@NotNull Truth t) {

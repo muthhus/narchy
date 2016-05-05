@@ -109,9 +109,12 @@ public class TrieDeriver extends Deriver {
 //                System.out.println();
 //            }
 
-            bb.add(branch(
+            ProcTerm branch = branch(
                     condition,
-                    compileActions(TrieDeriver.this.getBranches(n))));
+                    compileActions(TrieDeriver.this.getBranches(n)));
+
+            if (branch!=Return.the)
+                bb.add(branch);
         });
 
 
@@ -154,35 +157,34 @@ public class TrieDeriver extends Deriver {
 
 
     @NotNull
-    private static PremiseFork compileActions(@NotNull List<ProcTerm> t) {
+    private static ProcTerm compileActions(@NotNull List<ProcTerm> t) {
 
-        if (t.isEmpty())
-            return null;
+        switch (t.size()) {
+            case 0: return null;
+            case 1:
+                return t.get(0);
+            default:
+                //optimization: find expression prefix types common to all, and see if a switch can be formed
+                return PremiseFork.the(t.toArray(new ProcTerm[t.size()]));
+        }
 
-        
-        //optimization: find expression prefix types common to all, and see if a switch can be formed
-
-
-        //t.forEach(x -> System.out.println(x.getClass() + " " + x));
-        return new PremiseFork(t.toArray(new ProcTerm[t.size()]));
     }
 
 
     @NotNull
     public static ProcTerm branch(
             @NotNull List<BooleanCondition<PremiseEval>> condition,
-            @Nullable ThenFork conseq) {
+            @Nullable ProcTerm conseq) {
 
-
-        if (condition.isEmpty()) {
-            return conseq;
+        if (conseq == null) {
+            conseq = Return.the;
         }
 
-        if (conseq != null) {
-            //assert(condition.size()!=0);
-            return new PremiseBranch(condition, conseq);
+        BooleanCondition<PremiseEval> cc = AndCondition.the(condition);
+        if (cc!=null) {
+            return new PremiseBranch(cc, conseq);
         } else {
-            return new PremiseBranch(condition, Return.the); //END
+            return conseq;
         }
     }
 

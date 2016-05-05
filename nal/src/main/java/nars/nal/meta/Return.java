@@ -4,7 +4,7 @@ import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by me on 12/31/15.
+ * serves only as a placeholder
  */
 public final class Return extends Atom implements ProcTerm {
 
@@ -22,7 +22,7 @@ public final class Return extends Atom implements ProcTerm {
 
     @Override
     public void accept(PremiseEval versioneds) {
-
+        //throw new UnsupportedOperationException("should not be invoked");
     }
 
 }

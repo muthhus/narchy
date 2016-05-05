@@ -224,7 +224,7 @@ public enum BeliefFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposePositiveNegativeNegative(T,B);
+            return TruthFunctions.decomposePositiveNegativeNegative(T,B, minConf);
         }
     },
 

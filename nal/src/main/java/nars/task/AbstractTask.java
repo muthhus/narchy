@@ -117,7 +117,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
                 term = nt;
 
                 if (isBeliefOrGoal())
-                    truth = truth.toNegative();
+                    truth = truth.negated();
             } else {
                 throw new NAR.InvalidTaskException(this, "Top-level negation not wrapping a Compound");
             }

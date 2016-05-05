@@ -4,21 +4,17 @@ import nars.NAR;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
 import nars.concept.table.ArrayBeliefTable;
-import nars.concept.table.BeliefTable;
 import nars.concept.table.TaskTable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Math.abs;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.UtilityFunctions.or;
 
 /**
  * Revection: revision, projection, rejection
@@ -180,7 +176,7 @@ public class Revection {
         long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
         float matchFactor = 1f;
-        Truth newTruth = TruthFunctions.revision(a, b, newOcc, matchFactor, minConf);
+        Truth newTruth = Revision.revision(a, b, newOcc, matchFactor, minConf);
         if (newTruth == null) {
             return null;
         } else {

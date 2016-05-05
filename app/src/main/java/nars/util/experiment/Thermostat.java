@@ -20,8 +20,8 @@ import static nars.util.Texts.n2;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 220;
-    public final float speed = 0.03f;
+    public float targetPeriod = 450;
+    public final float speed = 0.01f;
     boolean print = true;
     private MutableFloat yHidden;
     private MutableFloat yEst;
@@ -70,14 +70,15 @@ public class Thermostat implements Environment {
 
 
         float diff = yHidden.floatValue() - yEst.floatValue();
-        //ins[0] = Util.clamp(diff);
-        //ins[1] = Util.clamp(-diff);
-        ins[0] = Util.clamp(yHidden.floatValue());
-        ins[1] = Util.clamp(yEst.floatValue());
+        ins[0] = Util.clamp(diff);
+        ins[1] = Util.clamp(-diff);
+
+        //ins[0] = Util.clamp(yHidden.floatValue());
+        //ins[1] = Util.clamp(yEst.floatValue());
 
         float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
 
-        float reward = 1f-dist; reward *= reward;
+        float reward = 1f-dist;
         //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
         //float reward = -dist + 0.1f;
         //float reward = 1f / (1+dist*dist);
@@ -111,16 +112,17 @@ public class Thermostat implements Environment {
     }
 
     public float function(int t) {
+        float a = 0.95f;
         return 0.5f +
-                0.5f * (float)Math.sin(t / (targetPeriod)) +
-                0.05f * ((float)Math.cos(t / (targetPeriod/3f))-1)
+                0.5f * (a * (float)Math.sin(t / (targetPeriod))) +
+                0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
                 ;
         //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
     }
 
     public static void main(String[] args) {
-        Default n = new Default(256, 2, 1, 3);
-        n.conceptActivation.setValue(0.5);
+        Default n = new Default(512, 3, 1, 3);
+        n.conceptActivation.setValue(0.33);
         n.cyclesPerFrame.set(16);
         //n.shortTermMemoryHistory.set(3);
         //n.logSummaryGT(System.out, 0.55f);

@@ -566,7 +566,7 @@
 //WASTEPAPER ===
 
 //Single product variations
-    (S), (P), neq(S,P), no_common_subterm(S,P) |- (S | P), (Belief:Union),
-                                                  (S & P), (Belief:Intersection),
-                                                  (P ~ S), (Belief:Difference)
+//    (S), (P), neq(S,P), no_common_subterm(S,P) |- (S | P), (Belief:Union),
+//                                                  (S & P), (Belief:Intersection),
+//                                                  (P ~ S), (Belief:Difference)
 

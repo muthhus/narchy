@@ -24,7 +24,6 @@ import nars.Global;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
-import nars.task.Task;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,18 +55,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth negation(@Nullable Truth v1, float minConf) {
-        if (v1 == null) return null;
-
-        float c = v1.conf();
-        if (c < minConf) return null;
-
-        float fPos = v1.freq();
-
-        //if = 0.5, negating will produce same result
-        if (Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON))
-            return v1;
-
-        return new DefaultTruth(1.0f - fPos, c);
+        return ((v1 == null) || (v1.conf() < minConf)) ? null : v1.negated();
 
         /*
 
@@ -96,73 +84,8 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     /* ----- double argument functions, called in MatchingRules ----- */
-    /**
-     * {<S ==> P>, <S ==> P>} |- <S ==> P>
-     * @param a Truth value of the first premise
-     * @param b Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float minConf) {
-        float w1 = c2w(a.conf());
-        float w2 = c2w(b.conf());
-        float w = (w1 + w2);
-        float newConf = w2c(w) * match;
-        if (newConf < minConf)
-            return null;
 
-        float f1 = a.freq();
-        float f2 = b.freq();
-
-        return new DefaultTruth(
-            (w1 * f1 + w2 * f2) / w,
-            newConf
-        );
-    }
-
-    @Nullable
-    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long target, float match, float confThreshold) {
-        Truth a = ta.truth();
-        Truth b = tb.truth();
-
-        long at = ta.occurrence();
-        long bt = tb.occurrence();
-
-        //temporal proximity balancing metric (similar to projection)
-        long adt = 1 + Math.abs(at-target);
-        long bdt = 1 + Math.abs(bt-target);
-        float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
-
-        //float w1 = c2w(a.conf()) * closeness;
-        //float w2 = c2w(b.conf()) * (1-closeness);
-        float w1 = a.conf() * closeness;
-        float w2 = b.conf() * (1-closeness);
-
-        final float w = (w1 + w2);
-//        float newConf = w2c(w) * match *
-//                temporalIntersection(target, at, bt,
-//                    Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
-//                );
-//                //* TruthFunctions.temporalProjectionOld(at, bt, now)
-
-        float newConf = or(w1,w2) * match *
-                temporalIntersection(target, at, bt,
-                        Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
-                );
-
-        if (newConf < confThreshold)
-            return null;
-
-
-        float f1 = a.freq();
-        float f2 = b.freq();
-        return new DefaultTruth(
-            (w1 * f1 + w2 * f2) / w,
-            newConf
-        );
-    }
-
-//    public static float temporalIntersection(long now, long at, long bt) {
+    //    public static float temporalIntersection(long now, long at, long bt) {
 //        //return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
 //        return temporalIntersection(now, at, bt, 1f);
 //    }
@@ -480,56 +403,31 @@ public final class TruthFunctions extends UtilityFunctions {
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
     }
 
-    @NotNull
-    public static Truth decomposePositiveNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.freq();
-        float c1 = a.conf();
-        float f2 = b.freq();
-        float c2 = b.conf();
-
-        float f = and(f1,1-f2);
-
+    public static Truth decomposePosNeg(@NotNull Truth a, @NotNull Truth b, boolean x, boolean y, boolean z, float minConf) {
+        float f1 = a.freq(), c1 = a.conf(), f2 = b.freq(), c2 = b.conf();
+        float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
         float c = and(f, c1, c2);
-        return new DefaultTruth(1-f, c);
+        return c < minConf ? null : new DefaultTruth(z ? f : 1 - f, c);
+    }
+
+    @NotNull
+    public static Truth decomposePositiveNegativeNegative(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        return decomposePosNeg(a, b, true, false, false, minConf);
     }
 
     @NotNull
     public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float c1 = a.conf();
-        float f2 = b.freq();
-        float c2 = b.conf();
-
-        float f = and((1-f1),f2);
-
-        float c = and(f, c1, c2);
-        return c < minConf ? null : new DefaultTruth(f, c);
+        return decomposePosNeg(a, b, false, true, true, minConf);
     }
 
     @NotNull
     public static Truth decomposePositiveNegativePositive(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float c1 = a.conf();
-        float f2 = b.freq();
-        float c2 = b.conf();
-
-        float f = and(f1,(1-f2));
-
-        float c = and(f, c1, c2);
-        return c < minConf ? null : new DefaultTruth(f, c);
+        return decomposePosNeg(a, b, true, false, true, minConf);
     }
 
     @NotNull
     public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float c1 = a.conf();
-        float f2 = b.freq();
-        float c2 = b.conf();
-
-        float f = and((1-f1),(1-f2));
-
-        float c = and(f, c1, c2);
-        return c < minConf ? null : new DefaultTruth(1 - f, c);
+        return decomposePosNeg(a, b, false, false, false, minConf);
     }
 
     @NotNull

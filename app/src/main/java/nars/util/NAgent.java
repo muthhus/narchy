@@ -42,7 +42,11 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.6f;
+    float alpha = 0.95f;
+
+    /** exploration rate - confidence of initial goal for each action */
+    float epsilon = 0.25f;
+
 
     final FloatToObjectFunction sensorTruth =  (v) -> {
         /*return new DefaultTruth(
@@ -54,8 +58,6 @@ public class NAgent implements Agent {
     };
 
 
-    /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.75f;
 
     private int discretization = 1;
     //private SensorConcept dRewardPos, dRewardNeg;
@@ -259,10 +261,10 @@ public class NAgent implements Agent {
                 nar.believe(actions.get(lastAction), Tense.Present, 0f, alpha);
                 nar.goal(actions.get(lastAction), Tense.Present, 0f, alpha);
             }
-        }
-        nar.goal(actions.get(nextAction), Tense.Present, 1f, alpha);
-        nar.believe(actions.get(nextAction), Tense.Future, 1f, alpha);
 
+        }
+        nar.goal(actions.get(nextAction), Tense.Future, 1f, alpha);
+        nar.believe(actions.get(nextAction), Tense.Future, 1f, alpha);
 
         /*for (int a = 0; a < actions.size(); a++)
             nar.believe(actions.get(a), Tense.Present,

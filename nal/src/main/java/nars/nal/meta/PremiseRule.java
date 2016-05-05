@@ -44,6 +44,7 @@ import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
+import static nars.nal.meta.BooleanCondition.TRUE;
 import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
 
@@ -64,21 +65,21 @@ public class PremiseRule extends GenericCompound {
 //        occurrsBackward.class
     };
 
-    /**
-     * blank marker trie node indicating the derivation and terminating the branch
-     */
-    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseEval>() {
-
-        @Override
-        public boolean booleanValueOf(PremiseEval versioneds) {
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "End";
-        }
-    };
+//    /**
+//     * blank marker trie node indicating the derivation and terminating the branch
+//     */
+//    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseEval>() {
+//
+//        @Override
+//        public boolean booleanValueOf(PremiseEval versioneds) {
+//            return true;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "End";
+//        }
+//    };
 
     public boolean immediate_eternalize;
 
@@ -228,7 +229,7 @@ public class PremiseRule extends GenericCompound {
 
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
 
-        l.add(END);
+        l.add(TRUE);
 
         return l;
     }

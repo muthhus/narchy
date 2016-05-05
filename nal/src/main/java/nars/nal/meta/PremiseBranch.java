@@ -45,11 +45,9 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm {
 //    }
 
 
-    public PremiseBranch(@NotNull List<BooleanCondition<PremiseEval>> cond, ProcTerm conseq) {
+    public PremiseBranch(@NotNull BooleanCondition<PremiseEval> cond, ProcTerm conseq) {
         super(Op.IMPLICATION,
-            TermVector.the(
-                        cond.size() == 1 ? cond.get(0) : new AndCondition(cond),
-                        conseq)
+            TermVector.the( cond, conseq)
         );
 
         this.cond = (BooleanCondition<PremiseEval>) term(0);

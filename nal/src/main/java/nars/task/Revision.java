@@ -6,8 +6,10 @@ import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
 import nars.concept.table.BeliefTable;
 import nars.nal.LocalRules;
+import nars.nal.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Terms;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -63,8 +65,8 @@ public class Revision {
             Truth oldBeliefTruth = x.truth();
 
             Truth c = newBelief.isEternal() ?
-                    TruthFunctions.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf) :
-                    TruthFunctions.revision(newBelief, x, newTime, matchFactor, bestConf);
+                    revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf) :
+                    revision(newBelief, x, newTime, matchFactor, bestConf);
 
             if (c == null)
                 continue;
@@ -170,4 +172,69 @@ public class Revision {
         return null;
     }
 
+    @Nullable
+    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long target, float match, float confThreshold) {
+        Truth a = ta.truth();
+        Truth b = tb.truth();
+
+        long at = ta.occurrence();
+        long bt = tb.occurrence();
+
+        //temporal proximity balancing metric (similar to projection)
+        long adt = 1 + Math.abs(at-target);
+        long bdt = 1 + Math.abs(bt-target);
+        float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
+
+        //float w1 = c2w(a.conf()) * closeness;
+        //float w2 = c2w(b.conf()) * (1-closeness);
+        float w1 = a.conf() * closeness;
+        float w2 = b.conf() * (1-closeness);
+
+        final float w = (w1 + w2);
+//        float newConf = w2c(w) * match *
+//                temporalIntersection(target, at, bt,
+//                    Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
+//                );
+//                //* TruthFunctions.temporalProjectionOld(at, bt, now)
+
+        float newConf = UtilityFunctions.or(w1,w2) * match *
+                TruthFunctions.temporalIntersection(target, at, bt,
+                        Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
+                );
+
+        if (newConf < confThreshold)
+            return null;
+
+
+        float f1 = a.freq();
+        float f2 = b.freq();
+        return new DefaultTruth(
+            (w1 * f1 + w2 * f2) / w,
+            newConf
+        );
+    }
+
+    /**
+     * {<S ==> P>, <S ==> P>} |- <S ==> P>
+     * @param a Truth value of the first premise
+     * @param b Truth value of the second premise
+     * @return Truth value of the conclusion
+     */
+    @Nullable
+    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float minConf) {
+        float w1 = TruthFunctions.c2w(a.conf());
+        float w2 = TruthFunctions.c2w(b.conf());
+        float w = (w1 + w2);
+        float newConf = UtilityFunctions.w2c(w) * match;
+        if (newConf < minConf)
+            return null;
+
+        float f1 = a.freq();
+        float f2 = b.freq();
+
+        return new DefaultTruth(
+            (w1 * f1 + w2 * f2) / w,
+            newConf
+        );
+    }
 }

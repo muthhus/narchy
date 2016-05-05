@@ -96,12 +96,14 @@ public class NAL1Test extends AbstractNALTest {
     }
 
     @Test
-    public void induction() throws Narsese.NarseseException {
+    public void abduction2() throws Narsese.NarseseException {
         
         /*
         <swan --> swimmer>. %0.9;0.9%
         <swan --> bird>.
          */
+        //(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward)
+
         test()
             .log()
             .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
@@ -112,6 +114,16 @@ public class NAL1Test extends AbstractNALTest {
             .mustNotOutput(withinCycles, "<swimmer --> bird>", '.', 0.9f, 0.9f, 0.44f, 0.46f, ETERNAL) //test for correct ordering of the premise wrt truth value function
             ;
     }
+
+    @Test public void induction() {
+        //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
+        test()
+                .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
+                .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
+                .mustBelieve(withinCycles, "<pteradactyl --> parakeet>", 1, 0.42f)
+        ;
+    }
+
 
     @Test
     public void exemplification() throws Narsese.NarseseException {
