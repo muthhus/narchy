@@ -53,4 +53,10 @@ public interface TruthOperator {
             return o.single();
         }
     }
+
+
+    @Nullable
+    static Truth identity(@Nullable Truth t, float minConf) {
+        return (t == null || (t.conf() < minConf)) ? null : t;
+    }
 }

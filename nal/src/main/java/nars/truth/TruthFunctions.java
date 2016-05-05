@@ -403,31 +403,12 @@ public final class TruthFunctions extends UtilityFunctions {
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
     }
 
-    public static Truth decomposePosNeg(@NotNull Truth a, @NotNull Truth b, boolean x, boolean y, boolean z, float minConf) {
+    /** decompose positive / negative */
+    public static Truth decompose(@NotNull Truth a, @NotNull Truth b, boolean x, boolean y, boolean z, float minConf) {
         float f1 = a.freq(), c1 = a.conf(), f2 = b.freq(), c2 = b.conf();
         float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
         float c = and(f, c1, c2);
         return c < minConf ? null : new DefaultTruth(z ? f : 1 - f, c);
-    }
-
-    @NotNull
-    public static Truth decomposePositiveNegativeNegative(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return decomposePosNeg(a, b, true, false, false, minConf);
-    }
-
-    @NotNull
-    public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return decomposePosNeg(a, b, false, true, true, minConf);
-    }
-
-    @NotNull
-    public static Truth decomposePositiveNegativePositive(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return decomposePosNeg(a, b, true, false, true, minConf);
-    }
-
-    @NotNull
-    public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return decomposePosNeg(a, b, false, false, false, minConf);
     }
 
     @NotNull

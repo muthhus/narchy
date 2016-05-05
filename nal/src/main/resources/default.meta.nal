@@ -24,8 +24,8 @@
 
 //// Immediate Inference ////////////////////////////////////////////////////////////////////////////////////
 
-  --A,   A, task("?") |- --A, (Belief:BeliefNegation, Punctuation:Judgment)
-    A, --A, task("?") |-   A, (Belief:BeliefNegation, Punctuation:Judgment)
+//  --A,   A, task("?") |- --A, (Belief:BeliefNegation, Punctuation:Judgment)
+//    A, --A, task("?") |-   A, (Belief:BeliefNegation, Punctuation:Judgment)
 
 //A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
 

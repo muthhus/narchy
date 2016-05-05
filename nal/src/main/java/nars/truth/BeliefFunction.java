@@ -191,40 +191,48 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.exemplification(T, B, minConf);
         }
     },
+
+
+    /*
+     sseehh__> there are 5 of these decompose used, but 8 possible permutations so the 3 which are missing are
+    <sseehh__> + + -
+    <sseehh__> - - +
+    <sseehh__> - + -
+     */
+
     DecomposeNegativeNegativeNegative() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposeNegativeNegativeNegative(T, B, minConf);
+            return TruthFunctions.decompose(T, B, false, false, false, minConf);
         }
     },
     DecomposePositiveNegativePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposePositiveNegativePositive(T,B,minConf);
+            return TruthFunctions.decompose(T,B, true, false, true, minConf);
         }
     },
     DecomposeNegativePositivePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposeNegativePositivePositive(T,B, minConf);
+            return TruthFunctions.decompose(T,B, false, true, true, minConf);
         }
     },
     DecomposePositivePositivePositive() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            Truth Tn = TruthFunctions.negation(T, minConf);
-            return (Tn == null) ? null : TruthFunctions.decomposeNegativePositivePositive(Tn, B, minConf);
+            return TruthFunctions.decompose(T,B, true, true, true, minConf);
         }
     },
     DecomposePositiveNegativeNegative() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposePositiveNegativeNegative(T,B, minConf);
+            return TruthFunctions.decompose(T,B, true, false, false, minConf);
         }
     },
 
@@ -232,18 +240,17 @@ public enum BeliefFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
-            return (T==null || (T.conf() < minConf)) ? null : T;
-            //return new DefaultTruth(T.freq(), T.conf());
+            return TruthOperator.identity(T, minConf);
         }
     },
 
     BeliefIdentity() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            //if (B == null) return null;
-            //return new DefaultTruth(B.freq(), B.conf());
-            return (B == null || (B.conf() < minConf)) ? null : B;
+            return TruthOperator.identity(B, minConf);
         }
+
+
     },
 
     //@AllowOverlap
