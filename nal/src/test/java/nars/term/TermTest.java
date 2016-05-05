@@ -25,6 +25,7 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -660,6 +661,10 @@ public class TermTest {
 
     }
 
+    public static void assertValidTerm(Term o) {
+        assertNotNull(o);
+    }
+
     public static void assertInvalidTerm(Supplier<Term> o) {
         try {
             o.get();
@@ -861,5 +866,17 @@ public class TermTest {
     @Test public void testEmptyProductEquality()  {
         assertEquals( $("()"),$("()") );
         assertEquals( $("()"),Terms.ZeroProduct);
+    }
+
+    @Test public void testFilterCommutedWithCoNegatedSubterms() {
+        //any commutive terms with both a subterm and its negative are invalid
+        assertInvalidTerm( () -> $("((--,(a1)) && (a1))") );
+        assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
+        assertInvalidTerm( () -> $("((--,(a1)) &&+0 (a1))") );
+        assertValidTerm(         $("((--,(a1)) &&+1 (a1))") );
+
+        assertValidTerm(         $("((--,(a1)) ==> (a1))") );
+
+        assertInvalidTerm( ()->   $("((--,(a1)) <-> (a1))") );
     }
 }

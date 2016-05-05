@@ -72,16 +72,25 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    /** frequency negated induction */
+    InductionNeg() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T.negated(), B, minConf);
+        }
+    },
+
     Abduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf);
         }
     },
-    AbductionInv() {
+
+    AbductionNeg() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(B, T, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T.negated(), B, minConf);
         }
     },
 
