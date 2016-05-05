@@ -33,7 +33,7 @@ public class NAgent implements Agent {
     private float prevReward;
 
     /** exploratoin rate - confidence of initial goal for each action */
-    float epsilon = 0.1f;
+    float epsilon = 0.05f;
 
     float actionBeliefConfidence = 0.9f;
 
@@ -54,7 +54,9 @@ public class NAgent implements Agent {
 
                 motivation[i] =
                         //d-b;
-                        Math.max(0, d-b);
+                        //Math.max(0, d-b);
+                        //d-b;
+                        d  / (1f + b);
 
                 /*if (d < 0.5) return 0; //Float.NaN;
                 if (d < b) return 0; //Float.NaN;
@@ -67,7 +69,7 @@ public class NAgent implements Agent {
         }).collect( Collectors.toList());
 
         FloatToObjectFunction sensorTruth = (v) -> {
-            return new DefaultTruth(v, 0.9f);
+            return new DefaultTruth(v, 0.95f);
         };
 
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
@@ -101,6 +103,7 @@ public class NAgent implements Agent {
     private void init(MotorConcept m) {
         //nar.ask($.$("(?x &&+0 " + m + ")"), '@');
         nar.goal(m, Tense.Present, 1f, epsilon);
+        //nar.goal(m, Tense.Present, 0f, epsilon);
 
 
     }
@@ -122,7 +125,7 @@ public class NAgent implements Agent {
     public void observe(float[] nextObservation) {
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
-        nar.conceptualize(reward, UnitBudget.One);
+        //nar.conceptualize(reward, UnitBudget.One);
         nar.step();
     }
 
@@ -146,8 +149,8 @@ public class NAgent implements Agent {
             if (lastAction != -1) {
                 nar.believe(actions.get(lastAction), Tense.Present, 0f, actionBeliefConfidence);
             }
+            nar.believe(actions.get(nextAction), Tense.Future, 1f, actionBeliefConfidence);
         }
-        nar.believe(actions.get(nextAction), Tense.Present, 1f, actionBeliefConfidence);
 
         /*for (int a = 0; a < actions.size(); a++)
             nar.believe(actions.get(a), Tense.Present,

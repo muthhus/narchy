@@ -38,13 +38,13 @@ public class ConceptMenu extends FlowPane {
         });
 
         Button activateButton = new NARActionButton(nar, "+", (n) -> n.conceptualize(t, new UnitBudget(1f, 0.75f, 0.75f), 1f, 1f, null));
-        Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(t, '!').present(nar).log("GUI Goal")));
-        Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(t, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal")));
-        Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(t, '.').present(nar).log("GUI True")));
-        Button falseButton = new NARActionButton(nar, "F", (n) -> n.input(new MutableTask(neg(t.term()), '.').present(nar).log("GUI False")));
+        Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(t, '!', 1f, nar).present(nar).log("GUI Goal")));
+        Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(t, '!', 0f, nar).present(nar).log("GUI Goal")));
+        Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(t, '.', 1f, nar).present(nar).log("GUI True")));
+        Button falseButton = new NARActionButton(nar, "F", (n) -> n.input(new MutableTask(t, '.', 0f, nar).present(nar).log("GUI False")));
 
-        Button isTrueButton = new NARActionButton(nar, "?", (n) -> n.input(new MutableTask(t, '?').time(Tense.Future, nar).log("GUI Question")));
-        Button shouldIButton = new NARActionButton(nar, "@", (n) -> n.input(new MutableTask(t, '@').time(Tense.Future, nar).log("GUI Quest")));
+        Button isTrueButton = new NARActionButton(nar, "?", (n) -> n.input(new MutableTask(t, '?', null).time(Tense.Future, nar).log("GUI Question")));
+        Button shouldIButton = new NARActionButton(nar, "@", (n) -> n.input(new MutableTask(t, '@', null).time(Tense.Future, nar).log("GUI Quest")));
 
         if (!(t instanceof Compound)) {
             trueButton.setVisible(false); //TODO dont create these task buttons in the first place
