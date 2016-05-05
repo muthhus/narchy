@@ -121,7 +121,7 @@ public class Thermostat implements Environment {
     public static void main(String[] args) {
         Default n = new Default(256, 2, 1, 3);
         n.conceptActivation.setValue(0.5);
-        n.cyclesPerFrame.set(64);
+        n.cyclesPerFrame.set(16);
         //n.shortTermMemoryHistory.set(3);
         //n.logSummaryGT(System.out, 0.55f);
 

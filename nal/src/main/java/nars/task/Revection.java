@@ -46,10 +46,10 @@ public class Revection {
     public static boolean revect(@NotNull Task input, @NotNull ArrayBeliefTable table, @NotNull NAR nar) {
 
         @NotNull ListTable<Task, Task> temporal = table.temporal;
-        List<Task> tl = temporal.list();
-        int n = tl.size();
+        List<Task> tasks = temporal.list();
+        int n = tasks.size();
 
-        if (tl.size() <= 1)
+        if (tasks.size() <= 1)
             return false; //may be due to axiomatic belief locking the table to size=cap=1
 
         //find a potential pair of beliefs such that they are more similar than the most similar task to the input
@@ -64,12 +64,12 @@ public class Revection {
         //naive O(N*N) search for closest pair
         Task a = null, b = null;
 
-        Task w = null;
-        float wr = Float.POSITIVE_INFINITY;
+        Task weakest = null;
+        float weakestRank = Float.POSITIVE_INFINITY;
 
         long maxOcc = Long.MIN_VALUE, minOcc = Long.MAX_VALUE;
         for (int i = 0; i < n; i++) {
-            long occ = tl.get(i).occurrence();
+            long occ = tasks.get(i).occurrence();
             if (occ > maxOcc) maxOcc = occ;
             if (occ < minOcc) minOcc = occ;
         }
@@ -78,18 +78,18 @@ public class Revection {
         float bestDist = Float.POSITIVE_INFINITY;
         for (int i = 0; i < n; i++) {
 
-            Task ii = tl.get(i);
+            Task ii = tasks.get(i);
 
             //consider ii for being the weakest ranked task to remove
             float r = rankTemporalByConfidenceAndOriginality(ii, now, now, 1f, -1);
-            if (r < wr) {
-                wr = r;
-                w = ii;
+            if (r < weakestRank) {
+                weakestRank = r;
+                weakest = ii;
             }
 
             for (int j = i+1; j < n; j++) {
                 if (i != j) {
-                    Task jj = tl.get(j);
+                    Task jj = tasks.get(j);
                     if (!Stamp.overlapping(ii, jj)) {
                         float d = distance(ii, jj, now, timeRange, bestDist);
                         if (d < bestDist) {
@@ -105,59 +105,69 @@ public class Revection {
 
         }
 
-        float ir = rankTemporalByConfidenceAndOriginality(input, now, now, 1f, -1);
-        if (ir >= wr) {
+        float inputRank = rankTemporalByConfidenceAndOriginality(input, now, now, 1f, -1);
+
+//        Task revised = Revision.tryRevision(input, nar, tasks);
+//        float revisedRank = rankTemporalByConfidenceAndOriginality(revised, now, now, 1f, -1);
+//        System.out.println(input + " (" + inputRank +
+//                "\n\t revised=" + revised + "(" + revisedRank +
+//                "\n\t  weakest=" + weakest + " (" + weakestRank);
+
+        if (inputRank >= weakestRank) {
             //input ranks higher than the lowest of all existing
 
-            if (a!=null) {
-                //merge the selected closest pair
-                return revect(input, nar, temporal, now, a, b);
-            } else if (w!=null) {
-                //no pair was found; remove the weakest found
-                remove(temporal, w, nar);
+
+
+            //attempt to merge the selected closest pair
+            if ((a!=null) && revect(0, nar, temporal, now, a, b)) {
+                return true;
             }
 
-            return true;
+            //if (weakest!=null) {
+                remove(temporal, weakest, nar);
+                return true;
+            //}
 
         }
 
         return false;
     }
 
-    public static boolean revect(@NotNull Task input, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {
+    public static boolean revect(float minConf, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {
 
 
-        Task recombined = combine(a, b, now, input.conf());
+        Task recombined = combine(a, b, now, minConf);
 
-        if (recombined == null) {
-
-            float r1 = BeliefTable.rankTemporalByConfidenceAndOriginality(a, now, now, 1, -1);
-            float r2 = BeliefTable.rankTemporalByConfidenceAndOriginality(b, now, now, 1, -1);
-            float rin = BeliefTable.rankTemporalByConfidenceAndOriginality(input, now, now, 1, -1);
-
-            if ((rin < r1) && (rin < r2)) {
-                //reject the input, it is worse
-                return false;
-            } else {
-
-                //only remove the "worst" existing task
-                remove(temporal,
-                        ///* the weakest */ (p.best1.conf() < p.best2.conf()) ?
-                        ///* the oldest */ (p.best1.occurrence() < p.best2.occurrence()) ?
-                        (r1 < r2) ?
-                                a : b, nar);
-            }
-
-        } else {
-
+        if (recombined != null) {
+            //System.out.println("\t recombnied=" + recombined + " (" + rankTemporalByConfidenceAndOriginality(recombined, now, now, 1, -1));
             remove(temporal, a, nar);
             remove(temporal, b, nar);
 
             nar.process(recombined);
-            //temporal.put(recombined, recombined);
+            return true;
+        } else {
+
+            return false;
+
+//            float r1 = BeliefTable.rankTemporalByConfidenceAndOriginality(a, now, now, 1, -1);
+//            float r2 = BeliefTable.rankTemporalByConfidenceAndOriginality(b, now, now, 1, -1);
+//            float rin = BeliefTable.rankTemporalByConfidenceAndOriginality(input, now, now, 1, -1);
+//
+//            if ((rin < r1) && (rin < r2)) {
+//                //reject the input, it is worse
+//                return false;
+//            } else {
+//
+//                //only remove the "worst" existing task
+//                remove(temporal,
+//                        ///* the weakest */ (p.best1.conf() < p.best2.conf()) ?
+//                        ///* the oldest */ (p.best1.occurrence() < p.best2.occurrence()) ?
+//                        (r1 < r2) ?
+//                                a : b, nar);
+//            }
+
         }
 
-        return true;
     }
 
     //return false;
@@ -208,16 +218,16 @@ public class Revection {
 
         //more time distance to now factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
         float untimeliness = //(abs(now - ao) + abs(now - bo))/(2*timeRange);
-                (abs(now - ao) + abs(now - bo));
+                Math.max(abs(now - ao), abs(now - bo));
 
-        return (1f + 5f * freqDist ) *
+        return (1f + 3f * freqDist ) *
                (1f + 0.1f * confDelta) * //mostly a tie-breaker; conf is more fully accounted for below
                (1f + 0.5f * dtDist ) *
-               (1f + 0.25f * tDist  ) *
+               (1f + 2f * tDist  ) *
                (1f + 0.5f * originality ) *
                (1f + 0.5f * confSum )
                 / (  (float)
-                    Math.sqrt(1f + 0.1f * untimeliness)
+                    (1f + 0.25f * untimeliness)
                 )
                ;
 

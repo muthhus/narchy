@@ -14,12 +14,12 @@ public class BeliefLab {
 	// static {
 	// Global.HORIZON = 2f;
 	// }
-	public static final int beliefCapacity = 32;
-	static float waveFreq = 0.08715f;
-	static float conf = 0.85f;
-	static float predictionProbability = 0.05f; // how often to ask for a
+	public static final int beliefCapacity = 64;
+	static float waveFreq = 0.1715f;
+	static float conf = 0.9f;
+	static float predictionProbability = 0.03f; // how often to ask for a
 												// prediction
-	static float pastProbability = 0.05f; // how often to ask for a prediction
+	static float pastProbability = 0.03f; // how often to ask for a prediction
 	static final float fps = 45f;
 	static boolean enableEternals = false;
 	static boolean enableTemporals = true;
