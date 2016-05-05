@@ -183,9 +183,15 @@ public interface Temporalize {
             occReturn[0] = earliest;
         }
 
+
         //HACK to handle commutive switching so that the dt is relative to the effective subject
         if (derived.op().isCommutative()) {
-            if (derived.term(0).equals(prem.belief().term()))
+
+            Compound bt = prem.belief().term();
+            Term d0 = derived.term(0);
+
+            if (d0.equals(bt) || derived.term(1).equals(prem.task().term())
+                    || d0.equalsIgnoringVariables(bt)) //last chance: try by ignoring variables to handle variable introduction cases
                 eventDelta *= -1;
         }
 

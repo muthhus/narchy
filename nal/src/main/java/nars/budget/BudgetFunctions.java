@@ -251,6 +251,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         Budgeted taskLink = nal.taskLink;
         assert(!taskLink.isDeleted());
+
+        BLink<? extends Termed> termLink = nal.termLink;
+        assert(!termLink.isDeleted());
         //if (task.isDeleted()) return null;
         //Task task = nal.task();
 
@@ -259,33 +262,36 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         //Task task = taskLink.get();
 
-        float priority = taskLink.pri();
-        float durability = taskLink.dur();
-        float quality  = qualRaw;
 
 
+
+
+
+        //float volRatioScale = 1f / derived.volume();
 
         int tasktermVol = nal.task().term().volume();
         float volRatioScale =
-                //Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
-                1f / derived.volume();
-
-        durability *= volRatioScale;
-        quality *= volRatioScale;
+            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
 
 
-        BLink<? extends Termed> termLink = nal.termLink;
-        assert(!termLink.isDeleted());
-        priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-        durability = and(durability, termLink.dur()); //originaly was 'AND'
+        //originally was OR, but this can explode because the result of OR can exceed the inputs
+        float priority = or(taskLink.pri(), termLink.pri());
+
+        //originaly was 'AND'
+        float durability = and(taskLink.dur() * volRatioScale, termLink.dur());
+
+        float quality = qualRaw * volRatioScale;
 
 
-        //Strengthen the termlink by the quality and termlink's & tasklink's concepts
+        //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
         final float targetActivation = nal.nar.conceptPriority(nal.termLink.get(), 0f);
         final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get(), 0f);
 
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-        termLink.orPriority(or(quality, and(sourceActivation, targetActivation))); //was: termLink.orPriority(or(quality, targetActivation));
+        termLink.orPriority(quality,
+                //and(sourceActivation, targetActivation)
+                or(sourceActivation, targetActivation)
+        ); //was: termLink.orPriority(or(quality, targetActivation));
         termLink.orDurability(quality);
 
 
@@ -331,9 +337,9 @@ public final class BudgetFunctions extends UtilityFunctions {
     /**
      * tests a budget's validity for a task to be processed by a memory
      */
-    public static boolean valid(@NotNull Budget budget, @NotNull Memory m) {
+    @Nullable public static Budget valid(@NotNull Budget budget, @NotNull Memory m) {
         return //!budget.isDeleted() &&
-            valid(budget.dur(), m);
+                (budget!=null && valid(budget.dur(), m)) ? budget : null;
     }
 
     public static boolean valid(/*float p,*/ float d, @NotNull Memory m) {

@@ -76,7 +76,10 @@ public class UtilityFunctions   {
     public static float or(float a, float b) {
         return 1.0f -((1.0f - a) * (1.0f - b));
     }
-    
+    public static float or(float a, float b, float c) {
+        return 1.0f -((1.0f - a) * (1.0f - b) * (1.0f - c));
+    }
+
     /**
      * A function where the output is the arithmetic average the inputs
      * @param arr The inputs, each in [0, 1]

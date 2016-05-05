@@ -139,17 +139,17 @@ public enum Global {
     /** hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug */
-    public static final int compoundVolumeMax = 256;
+    public static final int compoundVolumeMax = 192;
 
 
     /**
      * maximum changes which are stored in stack
      */
-    public final static int unificationStackMax = 96;
-    public final static int unificationTermutesMax = 16;
+    public final static int UnificationStackMax = 128;
+    public final static int UnificationTermutesMax = 16;
 
 
-    public static float matchTermutationsMax = 4;
+    public static float matchTermutationsMax = 3;
     public static float matchTermutationsMin = 1;
 
 

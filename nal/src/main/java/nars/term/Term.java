@@ -22,6 +22,7 @@ package nars.term;
 
 
 import nars.Op;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -288,6 +289,10 @@ public interface Term extends Termed, Comparable, Termlike {
         meta[5] |= structure();
 
         return hashCode();
+    }
+
+    default boolean equalsIgnoringVariables(Term other) {
+        return (this instanceof Variable) || (other instanceof Variable) || equals(other);
     }
 
 

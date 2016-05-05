@@ -128,7 +128,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     }
 
     protected FindSubst(Op type, Random random, Versioning toSharePool) {
-        super(Global.unificationStackMax, toSharePool);
+        super(Global.UnificationStackMax, toSharePool);
         this.random = random;
         this.type = type;
 
@@ -951,11 +951,11 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     private static final class LimitedFasterList extends FasterList {
 
         public LimitedFasterList() {
-            super(Global.unificationTermutesMax);
+            super(Global.UnificationTermutesMax);
         }
 
         final void ensureLimit() {
-            if (size()+1 > Global.unificationTermutesMax) {
+            if (size()+1 > Global.UnificationTermutesMax) {
                 throw new RuntimeException("Termute limit exceeded");
                         //+ this + " while trying to add " + x);
             }

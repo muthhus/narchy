@@ -162,7 +162,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         Truth truth = p.truth.get();
 
-        Budget budget = p.getBudget(truth, tNorm.term());
+        Budget budget = p.budget(truth, tNorm.term());
         if (budget == null)
             return;
 

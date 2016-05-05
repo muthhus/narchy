@@ -164,6 +164,9 @@ public abstract class Budget extends BudgetedHandle {
     public void orPriority(float v) {
         setPriority(or(pri(), v));
     }
+    public void orPriority(float x, float y) {
+        setPriority(or(pri(), x, y));
+    }
 
 
 

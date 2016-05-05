@@ -29,6 +29,7 @@ import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
+import nars.term.variable.Variable;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
@@ -317,6 +318,18 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
+    default boolean equalsIgnoringVariables(Term other) {
+        int s = size();
+        if ((other.opRel() == opRel()) && (other.size() == s)) {
+            Compound o = (Compound)other;
+            for (int i = 0; i < s; i++) {
+                if (!term(i).equalsIgnoringVariables(o.term(i)))
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
 
 //    public int countOccurrences(final Term t) {
 //        final AtomicInteger o = new AtomicInteger(0);

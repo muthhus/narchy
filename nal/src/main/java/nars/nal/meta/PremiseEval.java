@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.BiPredicate;
 
+import static nars.budget.BudgetFunctions.*;
+import static nars.budget.BudgetFunctions.compoundForward;
+
 
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
@@ -197,29 +200,12 @@ public class PremiseEval extends FindSubst {
 
     /** calculates Budget used in a derived task,
      *  returns null if invalid / insufficient */
-    public final Budget getBudget(@Nullable Truth truth, @NotNull Term c) {
-
+    public final Budget budget(@Nullable Truth truth, @NotNull Term derived) {
         ConceptProcess p = this.premise;
-
-        Budget budget = truth != null ?
-                BudgetFunctions.compoundForward(truth, c, p) :
-                BudgetFunctions.compoundBackward(c, p);
-
-//        if (Budget.isDeleted(budget.getPriority())) {
-//            throw new RuntimeException("why is " + budget + " Deleted");
-//        }
-
-        return budget!=null && BudgetFunctions.valid(budget, p.nar()) ? budget : null;
-
-
-//        if (!!budget.summaryLessThan(p.memory().derivationThreshold.floatValue())) {
-////            if (false) {
-////                RuleMatch.removeInsufficientBudget(premise, new PreTask(t,
-////                        m.punct.get(), truth, budget,
-////                        m.occurrenceShift.getIfAbsent(Tense.TIMELESS), premise));
-////            }
-//            return null;
-//        }
+        return valid(truth != null ?
+                    compoundForward(truth, derived, p) :
+                    compoundBackward(derived, p)
+                , p.nar());
     }
 
 
@@ -240,13 +226,13 @@ public class PremiseEval extends FindSubst {
     }
 
     /** @param subterm 0 or 1, indicating task or belief */
-    public boolean subTermMatch(int subterm, int bits) {
+    public final boolean subTermMatch(int subterm, int bits) {
         return !Termlike.impossibleStructureMatch(
                     (subterm == 0 ? termSub1Struct : termSub2Struct), bits);
     }
 
     /** both */
-    public boolean subTermsMatch(int bits) {
+    public final boolean subTermsMatch(int bits) {
         return !Termlike.impossibleStructureMatch(termSub1Struct, bits) &&
                !Termlike.impossibleStructureMatch(termSub2Struct, bits);
     }

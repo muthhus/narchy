@@ -123,13 +123,13 @@
 //// inheritance-based composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection),
-                                                                                    ((S & P) --> M), (Belief:Union),
-                                                                                    ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection),
-                                                                                    (M --> (P | S)), (Belief:Union),
-                                                                                    (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference)
 
 //// inheritance-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
@@ -237,11 +237,11 @@
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P || S) ==> M), (Belief:Intersection),
-                                                       ((P && S) ==> M), (Belief:Union)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P || S) ==> M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P && S) ==> M), (Belief:Union)
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtCombine) |- (M ==> (P && S)), (Belief:Intersection),
-                                                       (M ==> (P || S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(S,P), time(dtCombine) |- (M ==> (P && S)), (Belief:Intersection)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- (M ==> (P || S)), (Belief:Union)
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
 //                                      (R =\> K), (Belief:Induction),
@@ -299,8 +299,8 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction),
-                                                       substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
 
 
      //(&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
@@ -308,7 +308,7 @@
 
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A..+), X, time(decomposeTaskIfBefore), task("!") |- X, (Desire:StructuralStrong)
-    (&&,X,A), B, time(decomposeTask), task("!") |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
+    (&&,X,A), B, time(decomposeTask), task("!")            |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
         //TODO use ellipsis here?
 
 //the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly
@@ -366,17 +366,17 @@
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
 
-    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- ((P --> $X) ==> (S --> $X)), (Belief:Abduction),
-                                      ((S --> $X) ==> (P --> $X)), (Belief:Induction),
-                                      ((P --> $X) <=> (S --> $X)), (Belief:Comparison),
-                                      (&&,(S --> #Y),(P --> #Y)), (Belief:Intersection)
+    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- ((P --> $X) ==> (S --> $X)), (Belief:Abduction)
+    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- ((S --> $X) ==> (P --> $X)), (Belief:Induction)
+    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- ((P --> $X) <=> (S --> $X)), (Belief:Comparison)
+    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- (&&,(S --> #Y),(P --> #Y)), (Belief:Intersection)
 
 
 
-    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (($X --> S) ==> ($X --> P)), (Belief:Induction),
-                                      (($X --> P) ==> ($X --> S)), (Belief:Abduction),
-                                      (($X --> S) <=> ($X --> P)), (Belief:Comparison),
-                                      (&&,(#Y --> S),(#Y --> P)), (Belief:Intersection)
+    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (($X --> S) ==> ($X --> P)), (Belief:Induction)
+    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (($X --> P) ==> ($X --> S)), (Belief:Abduction)
+    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (($X --> S) <=> ($X --> P)), (Belief:Comparison)
+    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (&&, (#Y --> S), (#Y --> P)), (Belief:Intersection)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
@@ -395,18 +395,18 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
-                                                  (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
+    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction)
+    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
-                                                               (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction)
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
 //TODO test that this not_equal with a compound parameter works correctly
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
-                                                                                     (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction)
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
-                                                               (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction)
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 
 //conditional abduction by dependent variable
@@ -432,10 +432,10 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
-                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
-                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction
