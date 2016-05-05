@@ -1,6 +1,7 @@
 package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
@@ -11,9 +12,7 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -366,25 +365,32 @@ public abstract class TermBuilder {
     @NotNull
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
-        TermContainer tc;
-        if (dt ==0 || dt == DTERNAL) {
-            List<Term> s = Global.newArrayList(u.length);
-            flatten(op, u, dt, s);
-            tc = TermSet.the(s);
-        } else {
-            tc = TermSet.the(u);
-        }
 
+        assert(dt ==0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
+
+
+        TreeSet<Term> s = new TreeSet();
+        UnifiedSet<Term> negs = new UnifiedSet(0);
+
+        flatten(op, u, dt, s, negs);
+
+        //any commutive terms with both a subterm and its negative are invalid
+        if (negs.anySatisfy(s::contains))
+            return null; //throw new InvalidTerm(op, u);
+
+        TermContainer tc = TermSet.the(s);
         return finish(op, -1, dt, tc);
-
     }
 
-    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
+    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, Set<Term> unwrappedNegations) {
         for (Term x : u) {
             if ((x.op() == op) && (((Compound) x).dt()==dt)) {
-                flatten(op, ((Compound) x).terms(), dt, s); //recurse
+                flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
             } else {
-                s.add(x); //ordinary term, add
+                if (s.add(x)) { //ordinary term, add
+                    if (x.op() == NEGATE)
+                        unwrappedNegations.add(((Compound)x).term(0));
+                }
             }
         }
     }

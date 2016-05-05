@@ -20,6 +20,7 @@
  */
 package nars.term;
 
+import nars.Op;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,6 @@ public interface Statement {
      */
     static boolean invalidStatement(@NotNull Term subject, @NotNull Term predicate) {
         return subject.equals(predicate) || invalidStatement2(subject, predicate);
-
     }
 
     /** skips the null and equality test */
@@ -61,6 +61,11 @@ public interface Statement {
         return ss[0].equals(pp[1]) && ss[1].equals(pp[0]);
     }
 
+    static boolean coNegated(@NotNull Term subject, @NotNull Term predicate) {
+        if (subject.op() == Op.NEGATE && ((Compound)subject).term(0).equals(predicate))
+            return true;
+        return false;
+    }
 
 
     @Nullable

@@ -25,7 +25,6 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -496,7 +495,7 @@ public class TermTest {
     @Test
     public void validStatement() {
         Compound t = $("<({tom},{vienna}) --> livingIn>");
-        assertFalse(Statement.invalidStatement(t.term(0), t.term(1)));
+        assertFalse(Statement.invalidStatement2(t.term(0), t.term(1)));
 
     }
 
@@ -670,6 +669,8 @@ public class TermTest {
             o.get();
             assertTrue(false);
         } catch (InvalidTerm e) {
+            //correct if happens here
+        } catch (Narsese.NarseseException e) {
             //correct if happens here
         }
     }
@@ -870,13 +871,20 @@ public class TermTest {
 
     @Test public void testFilterCommutedWithCoNegatedSubterms() {
         //any commutive terms with both a subterm and its negative are invalid
+
+
         assertInvalidTerm( () -> $("((--,(a1)) && (a1))") );
-        assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
         assertInvalidTerm( () -> $("((--,(a1)) &&+0 (a1))") );
         assertValidTerm(         $("((--,(a1)) &&+1 (a1))") );
 
-        assertValidTerm(         $("((--,(a1)) ==> (a1))") );
+        assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
 
+
+
+        //invalid because of ordinary common subterm:
+        assertInvalidTerm( ()->   $("((--,(a1)) ==> (a1))") );
         assertInvalidTerm( ()->   $("((--,(a1)) <-> (a1))") );
+
     }
+
 }

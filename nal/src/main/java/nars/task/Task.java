@@ -121,13 +121,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             if (subjectOrPredicateIsIndependentVar(cc))
                 throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Statement Task's subject or predicate is VAR_INDEP");
 
-            if (Global.DEBUG_PARANOID) {
-                //should be checked on statement construction
-                //if it occurrs here, that did not happen somewhere prior
-                if (Statement.invalidStatement(cc.term(0), cc.term(1)))
-                    throw new RuntimeException("statement invalidity should be tested before created: " +
-                            cc);
-            }
 
         }
 

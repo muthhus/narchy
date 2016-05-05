@@ -245,7 +245,7 @@ public class PremiseRuleSet  {
                 permute(index, ur, src, preNorm);
 
             } catch (Exception ex) {
-                logger.error("Invalid TaskRule: {}", ex);
+                logger.error("Invalid TaskRule: {} {}", src, ex.getMessage());
             }
 
             return ur;
