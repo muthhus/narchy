@@ -7,15 +7,23 @@ public class RangeNormalizedFloat implements FloatSupplier {
 
     private final FloatSupplier in;
     private float min, max;
+    private float minStart, maxStart;
 
 
     public RangeNormalizedFloat(FloatSupplier in) {
+        this(in, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY);
+    }
+
+    public RangeNormalizedFloat(FloatSupplier in, float minStart, float maxStart) {
         this.in = in;
+        this.minStart = minStart;
+        this.minStart = maxStart;
+        reset();
     }
 
     public void reset() {
-        min = Float.POSITIVE_INFINITY;
-        max = Float.NEGATIVE_INFINITY;
+        min = minStart;
+        max = maxStart;
     }
 
     @Override

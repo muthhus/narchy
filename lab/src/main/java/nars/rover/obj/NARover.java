@@ -77,7 +77,7 @@ public class NARover extends AbstractRover {
 
 
 
-        int minUpdateTime = 2;
+        int minUpdateTime = -1;
         int maxUpdateTime = -1;
 
 
@@ -94,10 +94,10 @@ public class NARover extends AbstractRover {
             return n < 0 ? Util.sigmoid(-n) : -1; //Float.NaN;
         };
         FloatToFloatFunction linearPositive = (n) -> {
-            return n > 0 ? Util.clamp(0.5f + n/2f) : -1; //Float.NaN;
+            return n > 0 ? Util.clamp(0.5f + n/2f) : 0; //Float.NaN;
         };
         FloatToFloatFunction linearNegative = (n) -> {
-            return n < 0 ? Util.clamp(0.5f + (-n)/2f) : -1; //Float.NaN;
+            return n < 0 ? Util.clamp(0.5f + (-n)/2f) : 0; //Float.NaN;
         };
 
         Vec2 forwardVec = new Vec2(1, 0f);
@@ -125,10 +125,12 @@ public class NARover extends AbstractRover {
 
 
 
-        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, tf)
+        this.speedFore = new SensorConcept(SPEED_FORE, nar,
+                () -> linearPositive.valueOf(linearSpeed.asFloat()), tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, tf)
+        this.speedBack = new SensorConcept(SPEED_BACK, nar,
+                () -> linearNegative.valueOf(linearSpeed.asFloat()), tf)
                 .timing(minUpdateTime, maxUpdateTime);
 
 
@@ -142,11 +144,13 @@ public class NARover extends AbstractRover {
             return v;
         };
 
-        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, tf)
-                .timing(minUpdateTime, maxUpdateTime);
+        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar,
+                () -> linearPositive.valueOf(angleSpeed.asFloat()),
+                tf).timing(minUpdateTime, maxUpdateTime);
 
-        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, tf)
-                .timing(minUpdateTime, maxUpdateTime);
+        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar,
+                () -> linearNegative.valueOf(angleSpeed.asFloat()),
+                tf).timing(minUpdateTime, maxUpdateTime);
 
         hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> health.nutrition, tf)
                 .timing(minUpdateTime, maxUpdateTime);
@@ -155,33 +159,33 @@ public class NARover extends AbstractRover {
                 .timing(minUpdateTime, maxUpdateTime);
 
 
-        int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
+        int minMotorFeedbackCycles = -1; ////nar.duration() / 2;
         int maxMotorFeedbackCycles = -1; //nar.duration() * 3;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            if ((b > l) || (l < 0.5f)) return 0;
             return motor.left(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            if ((b > l) || (l < 0.5f)) return 0;
             return motor.right(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            if ((b > l) || (l < 0.5f)) return 0;
             return motor.forward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            if ((b > l) || (l < 0.5f)) return 0;
             return motor.backward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return Float.NaN;
+            if ((b > l) || (l < 0.5f)) return 0;
             return motor.stop(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;

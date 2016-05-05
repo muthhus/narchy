@@ -64,9 +64,6 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
-        FloatToFloatFunction motivationToFeedback = (f) -> {
-            return 0.5f + (f / 2f);
-        };
         feedback = new Sensor(n, this, this) {
 
             @Override
@@ -153,23 +150,14 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     }
 
 
-    @Override
-    public void update(@NotNull NAR nar) {
-        feedback.ready();
-        super.update(nar);
-    }
 
-    @Override
-    public final void accept(@NotNull NAR nar) {
+    /** called after each frame */
+    @Override public final void accept(@NotNull NAR nar) {
 
-        if (!hasGoals())
-            return;
+        update();
 
-        //if (m != null) {
-        float desired =
-                //motivation(nar);
-                expectation(nar);
-        float believed = this.believed.expectation();
+        float desired =  hasGoals() ? this.desired.expectation() : 0;
+        float believed = hasBeliefs() ? this.believed.expectation() : 0;
 
         float response = motor.motor(believed, desired);
 
@@ -178,10 +166,6 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
             feedback.accept(nar);
         }
 
-
-        /*} else {
-            logger.info("null motor function");
-        }*/
     }
 
 }

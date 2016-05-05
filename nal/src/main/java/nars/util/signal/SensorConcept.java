@@ -6,7 +6,9 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
+import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -14,6 +16,11 @@ import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 /** primarily a collector for believing time-changing input signals */
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
@@ -23,6 +30,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     private FloatSupplier input;
     private float current = Float.NaN;
 
+    public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
@@ -39,7 +47,24 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
-//    float freq(float v) {
+    @Override
+    public @Nullable
+    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        //if (belief.evidence().length > 1) {
+
+        //Filter feedback that contradicts the sensor's provided beliefs
+        if (belief!=sensor.next()) {
+            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+
+            //TODO delete its non-input parent tasks?
+
+            return null;
+        }
+
+        return super.processBelief(belief, nar);
+    }
+
+    //    float freq(float v) {
 //        return v;
 //    }
 //    float conf(float v) {

@@ -38,13 +38,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     @Nullable
     protected transient Truth desired;
 
-    /**
-     * set to Tense.ETERNAL to invalidate
-     */
-    protected long lastMotivationUpdate = Tense.ETERNAL;
 
     //TODO allocate this only for Operation (not negations)
-    public transient final List<Task> pendingBeliefs = Global.newArrayList(0);
+    //public transient final List<Task> pendingBeliefs = Global.newArrayList(0);
     public transient final List<Task> pendingGoals = Global.newArrayList(0);
 
     transient NAR nar;
@@ -100,9 +96,11 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         //if (op()!=NEGATE) {
 
         if (t.isGoal()) {
+            desired = null; //clear
             pendingGoals.add(t);
         } else {
-            pendingBeliefs.add(t);
+            believed = null; //clear
+            //pendingBeliefs.add(t);
         }
 
         executeLater(nar);
@@ -122,49 +120,45 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         }
     }
 
+    public void update() {
+
+        long now = nar.time();
+
+        if (hasGoals()) {
+            if (desired == null) {
+                desired = desire(now);
+            }
+        } else {
+            desired = null;
+        }
+
+        if (hasBeliefs()) {
+            if (believed == null) {
+                believed = belief(now);
+            }
+        } else {
+            believed = null;
+        }
+    }
+
     @Override
     public void run() {
         final NAR nar = this.nar;
 
-        update(nar);
+        update();
+
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
 //        List<Task> pending = this.pending;
 //        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
 //        }
         execute(nar);
 
-        pendingBeliefs.clear();
+        //pendingBeliefs.clear();
         pendingGoals.clear();
         pendingRun = false;
     }
 
-    public void update(@NotNull NAR nar) {
-        long now = nar.time();
 
-
-        if (now != lastMotivationUpdate) { //update once per cycle TODO parameter for this limitation min/max
-
-
-            //int dur = nar.duration();
-
-            //OperationConcept p = positive(nar);
-            //Concept n = negative(nar);
-
-
-            //if (p != null) { //measure contributed positive state
-                desired = desire(now);
-                believed = belief(now);
-            //}
-
-//            if (n != null) {  //measure contributed negative state
-//                d -= n.goalMotivation(now, dur);
-//                b -= n.beliefMotivation(now, dur);
-//            }
-
-            this.lastMotivationUpdate = now;
-        }
-
-    }
 
 
     /**
@@ -183,16 +177,19 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
             //emit for both beliefs and goals
 
-        long now = nar.time();
-        float belief = belief(now).expectation();
-        float desire = desire(now).expectation();
-        if (desire > 0.5f && desire > belief) {
+
 
             if (isOperation) {
-                Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
-                if (tt != null && !tt.isEmpty()) {
-                    //beforeNextFrame( //<-- enqueue after this frame, before next
-                    tt.emit(this);
+                float belief = believed.expectation();
+                float desire = desired.expectation();
+
+                if (isExecutingGoals(belief,desire)) {
+
+                    Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
+                    if (tt != null && !tt.isEmpty()) {
+                        //beforeNextFrame( //<-- enqueue after this frame, before next
+                        tt.emit(this);
+                    }
                 }
             }
 
@@ -206,10 +203,16 @@ public class OperationConcept extends CompoundConcept implements Runnable {
                 }
             });
 
-        }
+
 
         //}
     }
+
+    //TODO
+    protected boolean isExecutingGoals(float belief, float desire) {
+        return (desire > 0.5f && desire > belief);
+    }
+
 
     //    private final boolean updateNecessary(long now) {
 //        long last = this.lastMotivationUpdate;
@@ -236,45 +239,37 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //    }
 
 
-    public final float expectation(@NotNull NAR nar) {
-        update(nar);
-        float d = desired.expectation();
-        return d;
-        //float b = believed.expectation();
-
-    }
-
-    /** provide motivation value after triggering an update */
-    public final float motivation(@NotNull NAR nar) {
-        update(nar);
-
-//        float bf = believed.freq();
-//        float bc = believed.conf();
-//        float df = desired.freq();
-//        float dc = desired.conf();
-
-        //expectation = (confidence * (frequency - 0.5f) + 0.5f);
-
-
-        /*return
-                 UtilityFunctions.or(
-                    ((desired.conf() * (desired.freq()-0.5f)) + 0.5f),
-                    1f - ((believed.conf() * ((believed.freq())-0.5f ))  + 0.5f)
-                 );*/
-
-//        return UtilityFunctions.or(desired.conf(), believed.conf()) *
-//                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
-//                ) + 0.5f;
-
-
-        float d = (desired.expectation()-0.5f);
-        if (d < 0) return d;
-        float b = (believed.expectation()-0.5f);
-        /*if (b > 0)*/ d-=b;
-        //float beliefAttenuation = 1f - Math.max(0, ((believed.expectation()) - 0.5f) * 2f);
-        //d *= beliefAttenuation;
-        return d*2;
-    }
+//    /** provide motivation value after triggering an update */
+//    public final float motivation(@NotNull NAR nar) {
+//        update(nar);
+//
+////        float bf = believed.freq();
+////        float bc = believed.conf();
+////        float df = desired.freq();
+////        float dc = desired.conf();
+//
+//        //expectation = (confidence * (frequency - 0.5f) + 0.5f);
+//
+//
+//        /*return
+//                 UtilityFunctions.or(
+//                    ((desired.conf() * (desired.freq()-0.5f)) + 0.5f),
+//                    1f - ((believed.conf() * ((believed.freq())-0.5f ))  + 0.5f)
+//                 );*/
+//
+////        return UtilityFunctions.or(desired.conf(), believed.conf()) *
+////                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
+////                ) + 0.5f;
+//
+//
+//        float d = (desired.expectation()-0.5f);
+//        if (d < 0) return d;
+//        float b = (believed.expectation()-0.5f);
+//        /*if (b > 0)*/ d-=b;
+//        //float beliefAttenuation = 1f - Math.max(0, ((believed.expectation()) - 0.5f) * 2f);
+//        //d *= beliefAttenuation;
+//        return d*2;
+//    }
 
 
 

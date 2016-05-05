@@ -226,7 +226,7 @@ public class DemoRovers {
 
                                                     for (String c : new String[] { motorFore, motorBack, motorLeft, motorRight, }) {
                                                         nar.believe(c, Tense.Present, 0f, inputStrengthf);
-                                                        nar.goal(c, Tense.Present, 0.5f, inputStrengthf);
+                                                        nar.goal(c, Tense.Present, 0.0f, inputStrengthf);
                                                     }
                                                 },
                                                 (r) -> {

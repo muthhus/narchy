@@ -18,8 +18,8 @@ import static nars.util.Texts.n2;
 public class Thermostat {
 
 
-    public float targetPeriod = 150;
-    public final float speed = 0.04f;
+    public float targetPeriod = 90;
+    public final float speed = 0.01f;
     boolean print = true;
 
 
@@ -82,7 +82,8 @@ public class Thermostat {
 
             float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
 
-            float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
+            //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
+            float reward = -dist;
 
             int aa = a.act(reward, ins);
             float de = 0;
@@ -118,9 +119,12 @@ public class Thermostat {
     }
 
     public static void main(String[] args) {
-        Default n = new Default(512, 2, 2, 3);
-        n.conceptActivation.setValue(0.33);
+        Default n = new Default(512, 4, 2, 2);
+        n.conceptActivation.setValue(0.25);
         n.cyclesPerFrame.set(8);
+        n.shortTermMemoryHistory.set(3);
+        //n.logSummaryGT(System.out, 0.55f);
+
         //n.conceptRemembering.setValue(1);
         NAgent a = new NAgent(n);
 

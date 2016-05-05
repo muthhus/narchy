@@ -180,15 +180,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     @Nullable
     public Task inputTask(@NotNull String taskText) {
-        //try {
-        Task t = task(taskText);
+        return inputTask( task(taskText) );
+    }
 
+    @Nullable
+    public Task inputTask(@NotNull Task t) {
         input(t);
-
         return t;
-        /*} catch (Exception e) {
-            return null;
-        }*/
     }
 
     /**

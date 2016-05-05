@@ -30,9 +30,9 @@
 //A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
 
 //    A, A, task(negative) |- --A, (Belief:Negation, Desire:Negation)
-    --A, A, task(positive) |- A, (Belief:Negation, Desire:Negation)
+//    --A, A, task(positive) |- A, (Belief:Negation, Desire:Negation)
 
-    (A-->B), (A-->B), task(negative) |- (--,(A --> B)), (Belief:Negation, Desire:Negation)
+//    (A-->B), (A-->B), task(negative) |- (--,(A --> B)), (Belief:Negation, Desire:Negation)
 //    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 //    (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
@@ -571,8 +571,7 @@
 //WASTEPAPER ===
 
 //Single product variations
-    (S), (P), neq(S,P), no_common_subterm(S,P) |- (S | P) (Belief:Union),
+    (S), (P), neq(S,P), no_common_subterm(S,P) |- (S | P), (Belief:Union),
                                                   (S & P), (Belief:Intersection),
                                                   (P ~ S), (Belief:Difference)
 
-    (X), X, task(negative) |- (--,(X)), (Belief:Negation, Desire:Negation)

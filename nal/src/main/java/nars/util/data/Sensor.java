@@ -50,6 +50,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private long lastInput;
 
     public final static FloatToFloatFunction direct = n -> n;
+    private Task next = null;
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
         this(n, t, value,
@@ -93,6 +94,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public char punc() { return punc; }
 
+    /** clears timing information so it thinks it will need to input on next attempt */
     public void ready() {
         this.lastInput = nar.time() - minTimeBetweenUpdates;
     }
@@ -130,6 +132,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         //this.prevValue = next;
     }
 
+    public Task next() {
+        return next;
+    }
+
     @NotNull
     public Sensor resolution(float r) {
         this.resolution = r;
@@ -148,10 +154,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //        }
 
         long now = nar.time();
-        Task t = newInputTask(v, now);
-        nar.input(t);
-        return t;
+
+        return nar.inputTask(this.next = newInputTask(v, now));
     }
+
+
 
 //    protected float conf(float v) {
 //        return confFactor;
@@ -164,7 +171,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     protected Task newInputTask(float v, long now) {
         return new MutableTask(term(), punc, truthFloatFunction.valueOf(v))
                 .time(now, now + dt())
-                .budget(pri, dur);
+                .budget(pri, dur)
+                .log(this);
     }
 
     @NotNull
