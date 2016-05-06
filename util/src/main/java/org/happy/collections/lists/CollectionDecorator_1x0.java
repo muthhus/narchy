@@ -1,7 +1,5 @@
 package org.happy.collections.lists;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -18,7 +16,7 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 
 
 
-	abstract public D getDecorated();
+	abstract public D decorated();
 
 
 
@@ -88,27 +86,27 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 
 	@Override
 	public boolean add(final E e) {
-		return getDecorated().add(e);
+		return decorated().add(e);
 	}
 
 	@Override
 	public boolean addAll(final Collection<? extends E> c) {
-		return getDecorated().addAll(c);
+		return decorated().addAll(c);
 	}
 
 	@Override
 	public void clear() {
-		getDecorated().clear();
+		decorated().clear();
 	}
 
 	@Override
 	public boolean contains(final Object o) {
-		return getDecorated().contains(o);
+		return decorated().contains(o);
 	}
 
 	@Override
 	public boolean containsAll(final Collection<?> c) {
-		return getDecorated().containsAll(c);
+		return decorated().containsAll(c);
 	}
 
 	// public boolean equals(Object o) {
@@ -117,62 +115,58 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 
 	@Override
 	public int hashCode() {
-		return getDecorated().hashCode();
+		return decorated().hashCode();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return getDecorated().isEmpty();
+		return decorated().isEmpty();
 	}
 
 	@Override
 	public Iterator<E> iterator() {
-		Iterator<E> it = null;
-		if (this.decorateIterators && !this.avoidLoop) {
-			this.avoidLoop = true;
-			it = this.iteratorImpl();
-			this.avoidLoop = false;
-		} else {
-			it = getDecorated().iterator();
-		}
-		return it;
+		return decorated().iterator();
+//		Iterator<E> it = null;
+//		if (this.decorateIterators && !this.avoidLoop) {
+//			this.avoidLoop = true;
+//			it = this.iteratorImpl();
+//			this.avoidLoop = false;
+//		} else {
+//			it = getDecorated().iterator();
+//		}
+//		return it;
 	}
 
-	/**
-	 * implement this method to decorate iterators
-	 * 
-	 * @return
-	 */
-	protected abstract Iterator<E> iteratorImpl();
+
 
 	@Override
 	public boolean remove(final Object o) {
-		return getDecorated().remove(o);
+		return decorated().remove(o);
 	}
 
 	@Override
 	public boolean removeAll(final Collection<?> c) {
-		return getDecorated().removeAll(c);
+		return decorated().removeAll(c);
 	}
 
 	@Override
 	public boolean retainAll(final Collection<?> c) {
-		return getDecorated().retainAll(c);
+		return decorated().retainAll(c);
 	}
 
 	@Override
 	public int size() {
-		return getDecorated().size();
+		return decorated().size();
 	}
 
 	@Override
 	public Object[] toArray() {
-		return getDecorated().toArray();
+		return decorated().toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(final T[] a) {
-		return getDecorated().toArray(a);
+		return decorated().toArray(a);
 	}
 
 	public boolean isDecorateIterators() {
@@ -185,7 +179,7 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 
 	@Override
 	public String toString() {
-		return getDecorated().toString();
+		return decorated().toString();
 	}
 
 	@Override
@@ -193,7 +187,7 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 		if (this == obj) {
 			return true;
 		}
-		return getDecorated().equals(obj);
+		return decorated().equals(obj);
 	}
 
 }

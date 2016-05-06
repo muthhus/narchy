@@ -40,7 +40,7 @@ public abstract class ListDecorator_1x0<E, D extends List<E>> extends Collection
 	}
 
 	@Override
-	public D getDecorated() {
+	public D decorated() {
 		return list;
 	}
 

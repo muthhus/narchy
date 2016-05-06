@@ -80,7 +80,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		return new SortedList_1x4<E>(list, comparator, searchType, doSort);
 	}
 
-	protected final int minListSizeForArrayType = 128;
+	protected final int binarySearchThreshold = 8;
 
 	/**
 	 * defines the sorting strategy for {@link SortedList_1x4}
@@ -151,32 +151,43 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	public boolean add(final E element) {
 		// use the linked-list sorting if the type is set or if the list-size
 		// is to small
-		if ((this.size() < minListSizeForArrayType)
-				|| SearchType.LinearSearch.equals(this.sortType)) {
-			final ListIterator<E> it = list
-					.listIterator();
-			while (it.hasNext()) {
-				final E current = it.next();
-				if (0 <= this.comparator.compare(current, element)) {
-					it.previous();// go step back
-					it.add(element);
-					return true;
-				}
+		int s = this.size();
+		final List<E> list = this.list;
 
-			}
+		Comparator<E> cmp = this.comparator;
+		if ((s < binarySearchThreshold) || SearchType.LinearSearch == this.sortType) {
+			return addLinear(element, s, list, cmp);
 		} else {
-			// use the binary search
-			final int index = this.findInsertionIndex_TypeArray(list, element, 0, list.size() - 1, new int[1]);
-			final int sz = this.size();
-			final E last = list.get(sz - 1);
-			if (index == sz || this.comparator.compare(last, element) < 0) {
-				list.add(element);
-			} else {
-				list.add(index, element);
-			}
-			return true;
+			return addBinary(element, s, list, cmp);
 		}
-		return list.add(element);
+
+	}
+
+	public boolean addBinary(E element, int s, List<E> list, Comparator<E> cmp) {
+		// use the binary search
+		final int index = this.findInsertionIndex_TypeArray(element, 0, s - 1, new int[1]);
+		final int sz = s;
+		final E last = list.get(sz - 1);
+		if (index == sz || cmp.compare(last, element) < 0) {
+            list.add(element);
+        } else {
+			if (index == -1)
+				list.add(element);
+			else
+            	list.add(index, element);
+        }
+		return true;
+	}
+
+	public boolean addLinear(E element, int s, List<E> list, Comparator<E> cmp) {
+		for (int i = 0; i < s; i++) {
+            final E current = list.get(i);
+            if (0 <= cmp.compare(current, element)) {
+                list.add(i, element);
+                return true;
+            }
+        }
+		return list.add(element); //add to end
 	}
 
 	/**
@@ -321,40 +332,31 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		return list.set(index, element);
 	}
 
-	@Override
-	protected Iterator<E> iteratorImpl() {
-		return list.iterator();
-	}
 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public int indexOf(final Object element) {
-		if (list.size() < minListSizeForArrayType
-				|| SearchType.LinearSearch.equals(this.sortType)) {
+	public int indexOf(@NotNull final Object element) {
+
+		List<E> list = this.list;
+		int size = list.size();
+		if (size < binarySearchThreshold || SearchType.LinearSearch.equals(this.sortType)) {
 			return super.indexOf(element);
 		}
 
-		E elemE = null;
-		try {
-			elemE = (E) element;
-		} catch (final ClassCastException ex) {
-			return -1;
-		}
-		if (elemE == null) {
-			return -1;
-		}
+		/*if (element == null)
+			return -1;*/
+
+		E elemE = (E) element;
 
 		final int[] rightBorder = new int[] { 0 };
-		final int left = this.findInsertionIndex_TypeArray(list, elemE, 0, list.size(), rightBorder);
+		final int left = this.findInsertionIndex_TypeArray(elemE, 0, size, rightBorder);
 
 		int index = left;
 		final int iteratorIndex = left;
 
-		final ListIterator<E> it = list.listIterator(
-				iteratorIndex);
-		while (it.hasNext()) {
-			final E e = it.next();
+		for (int i = 0; i < iteratorIndex; i++) {
+			final E e = list.get(i);
 			if (element.equals(e)) {
 				return index;// element is found
 			}
@@ -363,6 +365,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 				break;
 			}
 		}
+
 		return -1;
 
 	}
@@ -370,7 +373,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public int lastIndexOf(final Object element) {
-		if (list.size() < minListSizeForArrayType
+		if (list.size() < binarySearchThreshold
 				|| SearchType.LinearSearch.equals(this.sortType)) {
 			return super.lastIndexOf(element);
 		}
@@ -386,11 +389,12 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		}
 
 		final int[] rightBorder = new int[] { 0 };
-		final int left = this.findInsertionIndex_TypeArray(list, elemE, 0, list.size(), rightBorder);
+		final int left = this.findInsertionIndex_TypeArray(elemE, 0, list.size(), rightBorder);
+
+		//TODO convert this to a non-iterator loop
 
 		int index = left;
-		final ListIterator<E> it = list.listIterator(
-				left);
+		final ListIterator<E> it = list.listIterator(left);
 		boolean found = false;
 		while (it.hasNext()) {
 			final E e = it.next();
@@ -433,7 +437,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	 *            right border.
 	 * @return first index of the element where the element should be inserted
 	 */
-	private int findInsertionIndex_TypeArray(final List<E> list,
+	private int findInsertionIndex_TypeArray(
 			final E element, final int left, final int right,
 			@NotNull final int[] rightBorder) {
 		/*if (rightBorder == null) {
@@ -445,23 +449,23 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 					"right must be bigger or equals as the left");
 		}
 
-		if ((right - left) <= minListSizeForArrayType) {
+		if ((right - left) <= binarySearchThreshold) {
 			rightBorder[0] = right;//.setObject(right);
 			return findFirstIndex_TypeLinked(list, element, left, right);
 		}
 		final int midle = left + (right - left) / 2;
-		final E midleE = this.list.get(midle);
+		final E midleE = list.get(midle);
 		final int comparedValue = this.comparator.compare(midleE, element);
 		if (0 < comparedValue) {
 			// element < middleE
-			return this.findInsertionIndex_TypeArray(list, element, left,
-					midle, rightBorder);
+			return this.findInsertionIndex_TypeArray(element, left, midle, rightBorder);
 		} else if (comparedValue == 0) {
 			// find the first element
 			int index = midle;
+			final Comparator<E> cmp = this.comparator;
 			for ( ; index >= 0; ) {
 				final E e = list.get(index);
-				if (0 != this.comparator.compare(e, element)) {
+				if (0 != cmp.compare(e, element)) {
 					break;
 				}
 				index--;
@@ -470,7 +474,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 			return index;
 		}
 
-		return this.findInsertionIndex_TypeArray(list, element, midle, right,
+		return this.findInsertionIndex_TypeArray(element, midle, right,
 				rightBorder);
 	}
 
@@ -759,7 +763,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		final int right = this.list.size();
 		switch (this.sortType) {
 		case BinarySearch:
-			index = this.findInsertionIndex_TypeArray(list, elem, left, right, new int[1]);
+			index = this.findInsertionIndex_TypeArray(elem, left, right, new int[1]);
 			break;
 
 		case LinearSearch:
