@@ -129,7 +129,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
-                .mustBelieve(5, "(z ==>+1 x)", 1.00f, 0.45f);
+                .mustBelieve(5*2, "(z ==>+1 x)", 1.00f, 0.45f);
     }
 
     @Test
