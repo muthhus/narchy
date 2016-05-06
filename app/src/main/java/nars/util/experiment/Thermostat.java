@@ -132,8 +132,8 @@ public class Thermostat implements Environment {
                 new NAgent(n);
 
         new Thermostat().run(
-            //new DQN(),
-            a,
+            new DQN(),
+            //a,
             12512
         );
 

@@ -109,7 +109,7 @@ public class UnitBudget extends RawBudget {
     }
 
     final public boolean isDeleted() {
-        float p = pri();
+        float p = priority;
         return p!=p; //fast NaN check
         //return !Float.isFinite(pri());
     }

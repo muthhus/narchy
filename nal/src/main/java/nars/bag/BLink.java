@@ -91,6 +91,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     @Override
     public final void delete() {
         b[0] = Float.NaN;
+        changed = true;
     }
 
     /** TODO return false to signal to the bag to remove this item */

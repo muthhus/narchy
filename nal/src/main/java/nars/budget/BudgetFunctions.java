@@ -20,10 +20,12 @@
  */
 package nars.budget;
 
+import nars.Global;
 import nars.Memory;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -249,7 +251,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         //BLink<? extends Task> taskLink = nal.taskLink;
 
 
-        Budgeted taskLink = nal.taskLink;
+        BLink<? extends Task> taskLink = nal.taskLink;
         assert(!taskLink.isDeleted());
 
         BLink<? extends Termed> termLink = nal.termLink;
@@ -277,7 +279,13 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
         //originally was OR, but this can explode because the result of OR can exceed the inputs
-        float priority = and(taskLink.pri(), termLink.pri());
+        //float priority = or(taskLink.pri(), termLink.pri());
+        //float priority = and(taskLink.pri(), termLink.pri());
+        Task task = taskLink.get();
+        float priority = task.priIfFiniteElseZero();
+        if (priority > Global.BUDGET_EPSILON)
+            priority *= or(taskLink.pri(), termLink.pri());
+
 
         //originaly was 'AND'
         float durability = and(taskLink.dur() * volRatioScale, termLink.dur());

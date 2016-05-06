@@ -47,7 +47,13 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
     @Override
     public final int compare(BLink<V> o1, BLink<V> o2) {
-        return Float.compare(o2.pri(), o1.pri());
+        float f1 = o1.priIfFiniteElseZero();
+        float f2 = o2.priIfFiniteElseZero();
+        if (f1 < f2)
+            return 1;           // Neither val is NaN, thisVal is smaller
+        if (f1 > f2)
+            return -1;            // Neither val is NaN, thisVal is larger
+        return 0;
     }
 
     @NotNull

@@ -34,7 +34,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	int timerPeriod=12;  // in miliseconds
 
 	// the timer will increment this variable to signal a frame
-	int signalMove=0;
+	protected int signalMove=0;
 
 	// for graphics
 	final int canvasWidth=368;
@@ -444,52 +444,6 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	///////////////////////////////////////////
 	public void update(Graphics g)
 	{
-		// System.out.println("update called");
-		if (gameState == INITIMAGE)
-			return;
-
-		// seperate the timer from update
-		if (signalMove!=0)
-		{
-			// System.out.println("update by timer");
-			signalMove=0;
-
-			/*if (wait!=0)
-			{
-				wait--;
-				return;
-			}*/
-
-			switch (gameState)
-			{
-			case STARTWAIT: 
-				//if (pacKeyDir==ctables.UP)	// the key to start game
-					gameState=RUNNING;
-				//else
-					return;
-				//break;
-			case RUNNING:
-				if (key==SUSPEND)
-					gameState=SUSPENDED;
-				else
-					move();
-				break;
-			case DEADWAIT:
-				if (pacRemain>0)
-					startRound();
-				else
-					startGame();
-				gameState=STARTWAIT;
-				//wait=WAITCOUNT;
-				pacKeyDir=ctables.DOWN;
-				break;
-			case SUSPENDED:
-				if (key==SUSPEND)
-					gameState=RUNNING;
-				break;
-			}
-			key=NONE;
-		}
 
 		paintUpdate(g);	
 	}
@@ -572,22 +526,75 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	/////////////////////////////////////////////////
 	public void run()
 	{
-		while (true)
-		{
-			if (cycle()) return;
-		}
+//		while (true)
+//		{
+//			//if (cycle()) return;
+//
+//		}
 	}
 
-	public boolean cycle() {
+	public void cycle(int n) {
 		/*try { Thread.sleep(timerPeriod); }
         catch (InterruptedException e)
         {
 			return true;
         }*/
+		repaint();
+//		invalidate();
 
 		signalMove++;
-		repaint();
-		return false;
+
+		// System.out.println("update called");
+		if (gameState == INITIMAGE)
+			return;
+
+		// seperate the timer from update
+		if (signalMove!=0)
+		{
+			// System.out.println("update by timer");
+			signalMove=0;
+
+			/*if (wait!=0)
+			{
+				wait--;
+				return;
+			}*/
+
+			switch (gameState)
+			{
+				case STARTWAIT:
+					//if (pacKeyDir==ctables.UP)	// the key to start game
+					gameState=RUNNING;
+					//else
+					return;
+				//break;
+				case RUNNING:
+					if (key==SUSPEND)
+						gameState=SUSPENDED;
+					else
+						for (int i = 0; i < n; i++)
+							move();
+					break;
+				case DEADWAIT:
+					if (pacRemain>0)
+						startRound();
+					else
+						startGame();
+					gameState=STARTWAIT;
+					//wait=WAITCOUNT;
+					pacKeyDir=ctables.DOWN;
+					break;
+				case SUSPENDED:
+					if (key==SUSPEND)
+						gameState=RUNNING;
+					break;
+			}
+			//key=NONE;
+		}
+
+
+
+
 	}
 
 	// for applet the check state

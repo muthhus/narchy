@@ -358,7 +358,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
 
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
-        tester.mustBelieve(cycles,
+        tester.mustBelieve(cycles*2,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
                 1.00f, 0.45f,
                 0
@@ -377,7 +377,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
 
 
-        tester.mustBelieve(cycles,
+        tester.mustBelieve(cycles*2,
                 "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
                 1.00f,
                 0.45f,

@@ -46,11 +46,9 @@ import java.util.Set;
 public enum Global {
     ;
 
-    public static final float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
-    public static final float TRUTH_EPSILON = 0.01f;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
@@ -81,35 +79,24 @@ public enum Global {
 
 
 
-    //FIELDS BELOW ARE BEING CONVERTED TO DYNAMIC, NO MORE STATIC: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //Pei comments: parameters will be separated into a dynamic group and a static group
-    //              and the latter contains "personality parameters" that cannot be changed
-    //              in the lifetime of the system, though different systems may take different
-    //              values. For example, to change HORIZON dynamically will cause inconsistency 
-    //              in evidence evaluation.
 
-
-
-//    public static final int METRICS_HISTORY_LENGTH = 256;
 
     /** Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
     public static float HORIZON = 1f;
 
+    public static final float TRUTH_EPSILON = 0.01f;
 
-
-    /** minimum durability and quality necessary for a derivation to form */
-    public static float DERIVATION_DURABILITY_THRESHOLD = 0.005f;
+    /** how precise unit test results must match expected values to pass */
+    public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.005f;
+    public static final float BUDGET_EPSILON = 0.001f;
 
+    /** minimum durability and quality necessary for a derivation to form */
+    public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
 
-//    /* ---------- default input values ---------- */
-//    /** Default expectation for confirmation. */
-//    public static final float DEFAULT_CONFIRMATION_EXPECTATION = 0.8f;
 
 
 
@@ -143,14 +130,21 @@ public enum Global {
 
 
     /**
-     * maximum changes which are stored in stack
+     * maximum changes logged in deriver's stack
      */
     public final static int UnificationStackMax = 128;
+
+    /**
+     * max # of chained termutes which can be active
+     */
     public final static int UnificationTermutesMax = 16;
 
 
-    public static float matchTermutationsMax = 3;
+    /** lower limit for # of termutations derived, determined by premise's priority */
     public static float matchTermutationsMin = 1;
+
+    /** upper limit for # of termutations derived, determined by premise's priority */
+    public static float matchTermutationsMax = 3;
 
 
 

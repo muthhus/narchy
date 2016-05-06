@@ -369,7 +369,7 @@ public class NAL8Test extends AbstractNALTest {
             .log()
             .input(              "on:({t002},{t003}). :|:")
             .inputAt(10,         "(on:({t002},#1) &&+0 at:(SELF,#1)).")
-            .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.81f, 0)
+            .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.43f, 0)
             .mustNotOutput(time, "at:(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
 
     }
