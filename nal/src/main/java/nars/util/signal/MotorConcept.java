@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
+import static nars.$.$;
+
 
 public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
 
@@ -42,7 +44,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     private final Logger logger;
 
     @FunctionalInterface  public interface MotorFunction {
-        public float motor(float believed, float desired);
+        float motor(float believed, float desired);
     }
 
     /**
@@ -57,7 +59,10 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     float nextFeedback;
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, MotorFunction motor) throws Narsese.NarseseException {
-        super(compoundTermString, n);
+        this((Compound)$(compoundTermString), n, motor);
+    }
+    public MotorConcept(@NotNull Compound term, @NotNull NAR n, MotorFunction motor) throws Narsese.NarseseException {
+        super(term, n);
 
         assert (Op.isOperation(term()));
 

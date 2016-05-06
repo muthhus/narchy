@@ -453,14 +453,16 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		}
 		final int midle = left + (right - left) / 2;
 		final E midleE = list.get(midle);
-		final int comparedValue = this.comparator.compare(midleE, element);
+
+		final Comparator<E> cmp = this.comparator;
+
+		final int comparedValue = cmp.compare(midleE, element);
 		if (0 < comparedValue) {
 			// element < middleE
 			return this.findInsertionIndex_TypeArray(element, left, midle, rightBorder);
 		} else if (comparedValue == 0) {
 			// find the first element
 			int index = midle;
-			final Comparator<E> cmp = this.comparator;
 			for ( ; index >= 0; ) {
 				final E e = list.get(index);
 				if (0 != cmp.compare(e, element)) {
@@ -468,7 +470,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 				}
 				index--;
 			}
-			rightBorder[0] = index; //.setObject(index);
+			rightBorder[0] = index;
 			return index;
 		}
 
@@ -491,17 +493,28 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	 */
 	private int findFirstIndex_TypeLinked(final List<E> list, final E element,
 			final int left, final int right) {
-		int index = left;
-		final ListIterator<E> it = list.listIterator(left);
-		while (it.hasNext() && index < right) {
-			final E e = it.next();
 
-			if (0 <= comparator.compare(e, element)) {
+		int index = left;
+		final Comparator<E> cmp = this.comparator;
+		for ( ; index < right; ) {
+			if (0 <= cmp.compare(list.get(index), element)) {
 				return index;
 			}
 			index++;
 		}
 		return right;
+
+//		int index = left;
+//		final ListIterator<E> it = list.listIterator(left);
+//		while (it.hasNext() && index < right) {
+//			final E e = it.next();
+//
+//			if (0 <= comparator.compare(e, element)) {
+//				return index;
+//			}
+//			index++;
+//		}
+//		return right;
 	}
 
 	@Override
@@ -1298,12 +1311,12 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	}
 
 	@Override
-	public E get(final int arg0) {
+	public final E get(final int arg0) {
 		return list.get(arg0);
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public final boolean isEmpty() {
 		return list.isEmpty();
 	}
 

@@ -144,12 +144,12 @@ public enum $ /* TODO: implements TermIndex */ {
 
 
     @Nullable
-    public static Term impl(@NotNull Term a, @NotNull Term b) {
-        return the(IMPLICATION, a, b);
+    public static Compound impl(@NotNull Term a, @NotNull Term b) {
+        return (Compound) the(IMPLICATION, a, b);
     }
     @Nullable
-    public static Term impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return the(IMPLICATION, -1, dt, TermVector.the(a, b));
+    public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
+        return (Compound) the(IMPLICATION, -1, dt, TermVector.the(a, b));
     }
 
     @Nullable
