@@ -13,7 +13,6 @@ import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import nars.util.ArraySortedIndex;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

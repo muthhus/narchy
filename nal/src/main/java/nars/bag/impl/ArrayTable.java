@@ -3,6 +3,7 @@ package nars.bag.impl;
 import com.google.common.collect.Lists;
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
+import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,12 +19,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     /**
      * array of lists of items, for items on different level
      */
-    public final List<L> items;
+    public final SortedList_1x4<L> items;
     private int capacity;
 
     public ArrayTable(List<L> items, Map<V, L> map) {
         super(map);
-        this.items = items;
+        this.items = new SortedList_1x4<>(items, this, SortedList_1x4.SearchType.BinarySearch, false);
     }
 
 
@@ -199,7 +200,6 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     }
 
 
-
 //    @Override
 //    public final void topN(int limit, @NotNull Consumer action) {
 //        List l = items.getList();
@@ -219,33 +219,21 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     @Override
     protected final L addItem(L i) {
 
-        int size = size(), cap = capacity, result;
-        L overflow = null;
-        if (size == 0) {
-            result = 0;
-        } else {
-            //result = Collections.binarySearch(items, i, (Comparator) this);
+        int size = size();
 
-            //HACK - use binary search
-            for (result = 0; result < size; result++) {
-                if (compare(list().get(result), i) >= 0) {
-                    break;
-                }
+        L displaced = null;
+        if (size == capacity) {
+            if (compare(items.last(), i) < 0) {
+                //insufficient rank, bounce
+                return i;
             }
 
-            if (size == cap) {
-                if (result < cap){
-                    //remove lowest
-                    overflow = removeItem(cap - 1);
-                }else{
-                    return i; //could not be inserted, insufficient rank
-                }
-            }
+            displaced = items.remove(size - 1); //remove last
         }
 
-        items.add(result, i);
+        items.add(i);
 
-        return overflow;
+        return displaced;
     }
 
 

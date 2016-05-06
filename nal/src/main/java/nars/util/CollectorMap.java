@@ -55,8 +55,7 @@ public abstract class CollectorMap<K, V>  {
 
 
 
-    public V put(K key, V value) {
-
+    public final V put(K key, V value) {
 
         /*synchronized (nameTable)*/
         V removed = putKey(key, value);
@@ -73,17 +72,17 @@ public abstract class CollectorMap<K, V>  {
                     throw new RuntimeException("unable to remove item corresponding to key " + key);
 
             }
-        }// else {
+        }
 
-            V removed2 = addItem(value);
+        V displaced = addItem(value);
 
-            if (removed != null && removed2 != null) {
-                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
-            }
-            if (removed2 != null) { //&& (!key(removed2).equals(key))) {
-                removeKey(key(removed2));
-                removed = removed2;
-            }
+        if (removed != null && displaced != null) {
+            throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
+        }
+        if (displaced != null) { //&& (!key(removed2).equals(key))) {
+            removeKeyForValue(displaced);
+            removed = displaced;
+        }
 
 
         return removed;

@@ -38,17 +38,18 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 1;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 
 
 	public static void main (String[] args) 	{
-		NAgent a = new NAgent(new Default()
+		NAgent a = new NAgent(new Default(768, 1, 1, 3)
 				//.logSummaryGT(System.out, 0.01f)
 				);
-		a.nar.cyclesPerFrame.set(200);
+		//a.nar.conceptActivation.setValue(0.45f);
+		a.nar.cyclesPerFrame.set(400);
 
 		new PacmanEnvironment().run(
 				//new DQN(),
@@ -84,26 +85,30 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		int p = 0;
 		if (maze!=null && pac!=null) {
 			int[][] m = maze.iMaze;
+			int pix = pac.iX / 16;
+			int piy = pac.iY / 16;
 			for (int i = -visionRadius; i <= +visionRadius; i++) {
 				for (int j = -visionRadius; j <= +visionRadius; j++) {
-					int px = pac.iX / 16 + i;
-					int py = pac.iY / 16 + j;
+					int px = pix + i;
+					int py = piy + j;
 
-					if (px >= 0 && py >= 0 && px < m.length && py < m[0].length) {
-						int v = m[px][py];
-						ins[p++] = (v == cmaze.WALL) ? 1f : 0f;
+					float dotness = 0;
+					boolean ghost = false;
+					int v = cmaze.WALL;
 
-						float dotness = 0;
+					if (px >= 0 && py >= 0 && py < m.length && px < m[0].length) {
+						v = m[py][px];
+
 						switch (v) {
 							case cmaze.DOT:
-								dotness = 0.75f;
+								dotness = 0.85f;
+								break;
 							case cmaze.POWER_DOT:
 								dotness = 1f;
+								break;
 						}
-						ins[p++] = dotness;
 
 
-						boolean ghost = false;
 						for (cghost g : ghosts) {
 							int ix = g.iX / 16;
 							int iy = g.iY / 16;
@@ -113,11 +118,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 							}
 						}
 
-						//if (ghost)
-						//System.out.println("ghost at " + i + ", " + j);
+						if (ghost)
+							System.out.println("ghost at " + i + ", " + j);
 
-						ins[p++] = ghost ? 1f : 0f; //TODO attenuate distance
 					}
+
+					ins[p++] = (v == cmaze.WALL) ? 1f : 0f;
+					ins[p++] = dotness;
+					ins[p++] = ghost ? 1f : 0f; //TODO attenuate distance
 				}
 			}
 			//System.out.println(Arrays.toString(ins));
@@ -139,24 +147,24 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		static final int POWER_DOT=8;*/
 
 
-		float bias = -0.15f; //pain of boredom
+		float bias = -0.25f; //pain of boredom
 
 		//delta score from pacman game
 		float ds = score - lastScore;
 		this.lastScore = score;
 
 		ds/=10f;
-		if (ds > 1f) ds = 1f;
-		if (ds < -1f) ds = -1f;
 
 		ds += bias;
 
 		ds += interScore;
-		interScore = 0;
+		interScore *= 0.95f;
+		//interScore = 0;
+
+		if (ds > 1f) ds = 1f;
+		if (ds < -1f) ds = -1f;
 
 		System.out.println(ds);
-
-
 		return ds;
 	}
 

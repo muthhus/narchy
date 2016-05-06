@@ -5,7 +5,6 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.util.ArraySortedIndex;
 import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -264,7 +263,8 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     @Override
     public Bag<V> commit() {
         forEach(this::update);
-        Collections.sort(items, (Comparator)this);
+        ((FasterList)items.list).sortThis(this);
+        //Collections.sort(items, (Comparator)this);
         return this;
     }
 
@@ -343,20 +343,20 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     }
 
 
-    public final float priAt(int cap) {
-        return size() <= cap ? 1f : item(cap).pri();
-    }
+//    public final float priAt(int cap) {
+//        return size() <= cap ? 1f : item(cap).pri();
+//    }
+//
 
-
-    public final static class BudgetedArraySortedIndex<X extends Budgeted> extends ArraySortedIndex<X> {
-        public BudgetedArraySortedIndex(int capacity) {
-            super(1, capacity);
-        }
-
-
-        @Override
-        public float score(@NotNull X v) {
-            return v.pri();
-        }
-    }
+//    public final static class BudgetedArraySortedIndex<X extends Budgeted> extends ArraySortedIndex<X> {
+//        public BudgetedArraySortedIndex(int capacity) {
+//            super(1, capacity);
+//        }
+//
+//
+//        @Override
+//        public float score(@NotNull X v) {
+//            return v.pri();
+//        }
+//    }
 }
