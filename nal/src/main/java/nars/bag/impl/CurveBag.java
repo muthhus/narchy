@@ -5,6 +5,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -29,27 +30,22 @@ import java.util.function.Predicate;
  * <p>
  * TODO make a CurveSampling interface with at least 2 implementations: Random and LinearScanning. it will use this instead of the 'boolean random' constructor argument
  */
-public class CurveBag<V> implements Bag<V> {
+public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
-    @NotNull final ArrayBag<V> arrayBag;
+
 
     @NotNull final CurveSampler sampler;
 
     public CurveBag(int capacity, @NotNull Random rng) {
-        this(
-            //CurveBag.power6BagCurve,
-            power6BagCurve,
-            capacity, rng);
+        this(capacity,
+             new NormalizedSampler(power6BagCurve, rng));
     }
 
-
-    public CurveBag(int capacity, @NotNull CurveSampler sampler) {
-        this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), sampler);
-    }
-
-    public CurveBag(@NotNull BagCurve curve, int capacity, @NotNull Random rng) {
-        this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
-
+    public CurveBag(int capacity, CurveSampler c) {
+        super(capacity);
+        this.sampler = c;
+            //new DirectSampler(curve, rng)
+            //new NormalizedSampler(curve, rng);
 
                                 /*if (capacity < 128)*/
         //items = new ArraySortedItemList<>(capacity);
@@ -60,24 +56,6 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
-    public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull CurveSampler sampler) {
-        this.arrayBag = new ArrayBag(items);
-        this.sampler = sampler;
-    }
-
-    public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull BagCurve curve, @NotNull Random rng) {
-        this(items,
-            //new DirectSampler(curve, rng)
-            new NormalizedSampler(curve, rng)
-        );
-    }
-
-
-    @NotNull
-    public CurveBag<V> merge(@NotNull BudgetMerge mergeFunction) {
-        arrayBag.merge(mergeFunction);
-        return this;
-    }
 
     @Nullable
     @Override
@@ -88,22 +66,23 @@ public class CurveBag<V> implements Bag<V> {
     @NotNull
     @Override
     public Bag<V> commit() {
-        arrayBag.commit();
+        super.commit();
         sampler.commit(this);
         return this;
     }
 
+
+
     @Nullable
     public BLink<V> peekNext(boolean remove) {
 
-        ArrayBag<V> b = this.arrayBag;
 
         while (!isEmpty()) {
 
             int index = sampleIndex();
 
             BLink<V> i = remove ?
-                    b.removeItem(index) : b.item(index);
+                    removeItem(index) : item(index);
 
             if (!i.isDeleted()) {
                 return i;
@@ -120,11 +99,6 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
-
-    @Override
-    public final void topWhile(@NotNull Predicate each) {
-        arrayBag.topWhile(each);
-    }
 
 
 
@@ -155,7 +129,7 @@ public class CurveBag<V> implements Bag<V> {
         }
 
         //BLink<V>[] ll = ((FasterList<BLink<V>>) arrayBag.items.list()).array();
-        List<BLink<V>> l = arrayBag.items.list();
+        List<BLink<V>> l = items;
         for (int i = begin; i < end; i++) {
             target.accept(
                 //ll[i]
@@ -168,66 +142,14 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
-    @Override
-    public void clear() {
-        arrayBag.clear();
-    }
 
-    @Nullable @Override
-    public final BLink<V> get(@NotNull Object key) {
-        return arrayBag.get(key);
-    }
 
     @Nullable @Override
     public final BLink<V> sample() {
         return peekNext(false);
     }
 
-    @Nullable @Override
-    public final BLink<V> remove(@NotNull V x) {
-        return arrayBag.remove(x);
-    }
 
-
-    @Nullable @Override
-    public final BLink<V> put(@NotNull V v, @NotNull Budgeted vBagBudget, float scale, @Nullable MutableFloat overflow) {
-        return arrayBag.put(v, vBagBudget, scale, overflow);
-    }
-
-
-
-    @Override
-    public final int capacity() {
-        return arrayBag.capacity();
-    }
-
-    @NotNull
-    @Override
-    public final CurveBag<V> filter(@NotNull Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
-        arrayBag.filter(forEachIfFalseThenRemove);
-        return this;
-    }
-
-    @Override
-    public final int size() {
-        return arrayBag.size();
-    }
-
-    @NotNull
-    @Override
-    public final Iterator<BLink<V>> iterator() {
-        return arrayBag.iterator();
-    }
-
-    @Override
-    public void forEach(@NotNull Consumer<? super BLink<V>> action) {
-        arrayBag.forEach(action);
-    }
-
-    @Override
-    public final void forEachKey(@NotNull Consumer<? super V> each) {
-        arrayBag.forEachKey(each);
-    }
 
     //    public static long fastRound(final double d) {
 //        if (d > 0) {
@@ -385,16 +307,6 @@ public class CurveBag<V> implements Bag<V> {
 //        return next; //# of items actually filled in the array
 //    }
 
-    @Override
-    public void setCapacity(int c) {
-        arrayBag.setCapacity(c);
-    }
-
-    /** (utility method specific to curvebag) */
-    public boolean isSorted() {
-        return arrayBag.isSorted();
-    }
-
 //    public final float priAt(int cap) {
 //        return arrayBag.priAt(cap);
 //    }
@@ -460,14 +372,6 @@ public class CurveBag<V> implements Bag<V> {
 //        else return i;
 //    }
 
-    @Override
-    public float priMin() {
-        return arrayBag.priMin();
-    }
-    @Override
-    public float priMax() {
-        return arrayBag.priMax();
-    }
 
 
 

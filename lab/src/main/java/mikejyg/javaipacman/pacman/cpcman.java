@@ -463,11 +463,11 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			switch (gameState)
 			{
 			case STARTWAIT: 
-				if (pacKeyDir==ctables.UP)	// the key to start game
+				//if (pacKeyDir==ctables.UP)	// the key to start game
 					gameState=RUNNING;
-				else
+				//else
 					return;
-				break;
+				//break;
 			case RUNNING:
 				if (key==SUSPEND)
 					gameState=SUSPENDED;
@@ -579,11 +579,11 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	}
 
 	public boolean cycle() {
-		try { Thread.sleep(timerPeriod); }
+		/*try { Thread.sleep(timerPeriod); }
         catch (InterruptedException e)
         {
 			return true;
-        }
+        }*/
 
 		signalMove++;
 		repaint();

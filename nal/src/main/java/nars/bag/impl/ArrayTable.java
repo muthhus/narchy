@@ -1,13 +1,12 @@
 package nars.bag.impl;
 
+import com.google.common.collect.Lists;
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -15,13 +14,14 @@ import java.util.function.Predicate;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements ListTable<V,L> {
+abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements ListTable<V,L>, Comparator<L> {
     /**
      * array of lists of items, for items on different level
      */
-    public final SortedIndex<L> items;
+    public final List<L> items;
+    private int capacity;
 
-    public ArrayTable(SortedIndex<L> items, Map<V, L> map) {
+    public ArrayTable(List<L> items, Map<V, L> map) {
         super(map);
         this.items = items;
     }
@@ -38,9 +38,6 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //        return this.put(v, l);
 //    }
 
-    public boolean isSorted() {
-        return items.isSorted();
-    }
 
     @Override
     public final void clear() {
@@ -50,7 +47,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 
     @Override
     public final List<L> list() {
-        return items.list();
+        return items;
     }
 
     //    /**
@@ -67,7 +64,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 
     @Override
     public final void setCapacity(int capacity) {
-        items.setCapacity(capacity);
+        this.capacity = capacity;
     }
 
     /**
@@ -152,14 +149,14 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 
     @Override
     public final int capacity() {
-        return items.capacity();
+        return capacity;
     }
 
 
     @Override
     public final void forEach(@NotNull Consumer<? super L> action) {
 
-        items.list().forEach(action);
+        items.forEach(action);
 
 //        //items.forEach(b -> action.accept(b.get()));
 //
@@ -183,7 +180,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
     public void forEach(int max, @NotNull Consumer<? super L> action) {
-        List<? extends L> l = items.list();
+        List<? extends L> l = items;
         int n = Math.min(l.size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
         for (int i = 0; i < n; i++) {
@@ -193,7 +190,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 
     @Override
     public void topWhile(@NotNull Predicate<L> action) {
-        List<? extends L> l = items.list();
+        List<? extends L> l = items;
         int n = l.size();
         for (int i = 0; i < n; i++) {
             if (!action.test(l.get(i)))
@@ -221,12 +218,34 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 
     @Override
     protected final L addItem(L i) {
-        //        if (overflow!=null) {
-//            L v = removeKeyForValue(overflow);
-//            if (v!=overflow)
-//                throw new RuntimeException("bag inconsistency: " + overflow + " mismatched with " + v);
-//        }
-        return items.insert(i);
+
+        int size = size(), cap = capacity, result;
+        L overflow = null;
+        if (size == 0) {
+            result = 0;
+        } else {
+            //result = Collections.binarySearch(items, i, (Comparator) this);
+
+            //HACK - use binary search
+            for (result = 0; result < size; result++) {
+                if (compare(list().get(result), i) >= 0) {
+                    break;
+                }
+            }
+
+            if (size == cap) {
+                if (result < cap){
+                    //remove lowest
+                    overflow = removeItem(cap - 1);
+                }else{
+                    return i; //could not be inserted, insufficient rank
+                }
+            }
+        }
+
+        items.add(result, i);
+
+        return overflow;
     }
 
 

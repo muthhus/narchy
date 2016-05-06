@@ -94,11 +94,13 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     /** TODO return false to signal to the bag to remove this item */
     public void commit() {
-        float[] b = this.b;
-        b[0] = clamp(b[0] + b[1]); b[1] = 0;
-        b[2] = clamp(b[2] + b[3]); b[3] = 0;
-        b[4] = clamp(b[4] + b[5]); b[5] = 0;
-        changed = false;
+        if (hasDelta()) {
+            float[] b = this.b;
+            b[0] = clamp(b[0] + b[1]); b[1] = 0;
+            b[2] = clamp(b[2] + b[3]); b[3] = 0;
+            b[4] = clamp(b[4] + b[5]); b[5] = 0;
+            changed = false;
+        }
     }
 
     @Override

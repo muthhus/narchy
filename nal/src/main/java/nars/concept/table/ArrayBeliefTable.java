@@ -14,6 +14,7 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,13 +55,26 @@ public class ArrayBeliefTable implements BeliefTable {
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         if (eternalCapacity > 0)
-            eternal = new SetTable<>(mp, new EternalTaskIndex(eternalCapacity));
+            eternal = new SetTable<Task>(mp, new FasterList(eternalCapacity)) {
+
+                @Override
+                public int compare(Task o1, Task o2) {
+                    return Float.compare(BeliefTable.rankEternalByOriginality(o2), BeliefTable.rankEternalByOriginality(o1));
+                }
+            };
         else
             eternal = ListTable.Empty;
 
 
-        if (temporalCapacity > 0)
-            temporal = new SetTable<>(mp, new TemporalTaskIndex(temporalCapacity, this::rankTemporalByOriginality));
+        if (temporalCapacity > 0) {
+            temporal = new SetTable<Task>(mp, new FasterList(temporalCapacity)) {
+
+                @Override
+                public int compare(Task o1, Task o2) {
+                    return Float.compare(rankTemporalByOriginality(o2), rankTemporalByOriginality(o1));
+                }
+            };
+        }
         else
             temporal = ListTable.Empty;
 
@@ -506,43 +520,22 @@ public class ArrayBeliefTable implements BeliefTable {
 //        });
 //    }
 
-    final static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(Map<T, T> index, ArraySortedIndex<T> items) {
+    abstract static class SetTable<T> extends ArrayTable<T,T> {
+        public SetTable(Map<T, T> index, List<T> items) {
             super(items, index);
         }
 
         @Override
-        public T key(T t) {
+        public final T key(T t) {
             return t;
         }
 
+
     }
 
-    private static final class EternalTaskIndex extends ArraySortedIndex<Task> {
-        public EternalTaskIndex(int cap) {
-            super(cap);
-        }
 
-        @Override
-        public float score(@NotNull Task v) {
-            return BeliefTable.rankEternalByOriginality(v);
-        }
-    }
 
-    private static final class TemporalTaskIndex extends ArraySortedIndex<Task> {
 
-        private final FloatFunction<Task> rank;
-
-        public TemporalTaskIndex(int cap, FloatFunction<Task> rank) {
-            super(cap);
-            this.rank = rank;
-        }
-
-        @Override
-        public float score(@NotNull Task v) {
-            return rank.floatValueOf(v);
-        }
-    }
 
 
 //    /** computes the truth/desire as an aggregate of projections of all

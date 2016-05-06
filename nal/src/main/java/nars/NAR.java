@@ -425,8 +425,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
-    public void logSummaryGT(@NotNull Appendable out, float summaryThreshold) {
-        log(out, v -> {
+    public NAR logSummaryGT(@NotNull Appendable out, float summaryThreshold) {
+        return log(out, v -> {
             Budgeted b = null;
             if (v instanceof Budgeted) {
                 b = ((Budgeted) v);

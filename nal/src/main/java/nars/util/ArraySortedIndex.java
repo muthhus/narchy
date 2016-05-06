@@ -240,12 +240,9 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
 
             phase = !phase;
 
-            if (phase)
-                r++;
-
             int u;
             if (phase) {
-                u = p + r;
+                u = p + (++r);
                 if (u >= s) continue;
             }
             else {

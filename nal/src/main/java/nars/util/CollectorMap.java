@@ -73,17 +73,18 @@ public abstract class CollectorMap<K, V>  {
                     throw new RuntimeException("unable to remove item corresponding to key " + key);
 
             }
-        }
+        }// else {
 
-        V removed2 = addItem(value);
+            V removed2 = addItem(value);
 
-        if (removed != null && removed2 != null) {
-            throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
-        }
-        if (removed2 != null) { //&& (!key(removed2).equals(key))) {
-            removeKey(key(removed2));
-            removed = removed2;
-        }
+            if (removed != null && removed2 != null) {
+                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
+            }
+            if (removed2 != null) { //&& (!key(removed2).equals(key))) {
+                removeKey(key(removed2));
+                removed = removed2;
+            }
+
 
         return removed;
     }

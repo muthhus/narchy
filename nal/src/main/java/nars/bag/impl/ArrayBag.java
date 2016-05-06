@@ -6,13 +6,13 @@ import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.util.ArraySortedIndex;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -26,23 +26,26 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
 
     public ArrayBag(int cap) {
-        this(new BudgetedArraySortedIndex<>(cap));
+        this(new FasterList(cap), cap);
     }
 
-    public ArrayBag(@NotNull SortedIndex<BLink<V>> items) {
+    public ArrayBag(@NotNull List<BLink<V>> items, int capacity) {
         this(items,
                 Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
                 //new HashMap(items.capacity()/2)
         );
+        setCapacity(capacity);
     }
 
-    public ArrayBag(@NotNull SortedIndex<BLink<V>> items, Map<V, BLink<V>> map) {
+    public ArrayBag(@NotNull List<BLink<V>> items, Map<V, BLink<V>> map) {
         super(items, map);
-
-        items.clear();
-        setCapacity(items.capacity());
     }
 
+
+    @Override
+    public final int compare(BLink<V> o1, BLink<V> o2) {
+        return Float.compare(o2.pri(), o1.pri());
+    }
 
     @NotNull
     public Bag<V> merge(BudgetMerge mergeFunction) {
@@ -105,7 +108,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     @NotNull
     @Override
     public Bag<V> filter(@NotNull Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
-        List<BLink<V>> l = items.list();
+        List<BLink<V>> l = items;
         int n = l.size();
         if (n > 0) {
             for (int i = 0; i < n; i++) {
@@ -261,38 +264,46 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     @Override
     public Bag<V> commit() {
         forEach(this::update);
+        Collections.sort(items, (Comparator)this);
         return this;
     }
 
-    public void update(@NotNull BLink<V> v) {
-        if (!v.hasDelta()) {
-            return;
-        }
 
-//
-//        int size = ii.size();
-//        if (size == 1) {
-//            //its the only item
-//            v.commit();
+    //    final Comparator<? super BLink<V>> comparator = (a, b) -> {
+//        return Float.compare(items.score(b), items.score(a));
+//    };
+
+    public void update(@NotNull BLink<V> v) {
+        v.commit();
+    }
+//        if (!v.hasDelta()) {
 //            return;
 //        }
-
-        SortedIndex ii = this.items;
-
-        int currentIndex = ii.locate(v);
-
-        v.commit(); //after finding where it was, apply its updates to find where it will be next
-
-        if (currentIndex == -1) {
-            //an update for an item which has been removed already. must be re-inserted
-            put(v.get(), v);
-        } else if (ii.scoreBetween(currentIndex, ii.size(), v)) { //has position changed?
-            ii.reinsert(currentIndex, v);
-        }
-        /*} else {
-            //otherwise, it remains in the same position and a move is unnecessary
-        }*/
-    }
+//
+////
+////        int size = ii.size();
+////        if (size == 1) {
+////            //its the only item
+////            v.commit();
+////            return;
+////        }
+//
+//        SortedIndex ii = this.items;
+//
+//        int currentIndex = ii.locate(v);
+//
+//        v.commit(); //after finding where it was, apply its updates to find where it will be next
+//
+//        if (currentIndex == -1) {
+//            //an update for an item which has been removed already. must be re-inserted
+//            put(v.get(), v);
+//        } else if (ii.scoreBetween(currentIndex, ii.size(), v)) { //has position changed?
+//            ii.reinsert(currentIndex, v);
+//        }
+//        /*} else {
+//            //otherwise, it remains in the same position and a move is unnecessary
+//        }*/
+//    }
 
     protected final BLink<V> removeHighest() {
         return isEmpty() ? null : removeItem(0);
@@ -307,12 +318,12 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
     @Override
     public float priMax() {
-        return isEmpty() ? 0 : items.getFirst().pri();
+        return isEmpty() ? 0 : items.get(0).pri();
     }
 
     @Override
     public float priMin() {
-        return isEmpty() ? 0 : items.getLast().pri();
+        return isEmpty() ? 0 : items.get(items.size()-1).pri();
     }
 
     public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
@@ -341,6 +352,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
         public BudgetedArraySortedIndex(int capacity) {
             super(1, capacity);
         }
+
 
         @Override
         public float score(@NotNull X v) {

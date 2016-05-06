@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class NAgent implements Agent {
 
-    private final NAR nar;
+    public final NAR nar;
 
     float motivation[];
     float input[];
@@ -61,6 +61,8 @@ public class NAgent implements Agent {
 
     private int discretization = 1;
     private float lastMotivation = 0;
+    private double epsilonRandom = 0.02f;
+
     //private SensorConcept dRewardPos, dRewardNeg;
 
     public NAgent(NAR n) {
@@ -249,14 +251,14 @@ public class NAgent implements Agent {
 
     private void decide(int lastAction) {
         int nextAction = -1;
-        float nextMotivation = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < motivation.length; i++) {
-            float m = motivation[i];
-            if (m > nextMotivation) {
-                nextMotivation = m;
-                nextAction = i;
-            }
+        float nextMotivation;
+        if (Math.random() < epsilonRandom) {
+            nextAction = (int)(Math.random() * actions.size());
+        } else {
+            nextAction = decideMotivation();
+
         }
+        nextMotivation = motivation[nextAction];
 
         float on;
         if (lastAction!=nextAction) {
@@ -296,8 +298,21 @@ public class NAgent implements Agent {
         this.lastMotivation = nextMotivation;
     }
 
+    private int decideMotivation() {
+        int nextAction = -1;
+        float nextMotivation = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < motivation.length; i++) {
+            float m = motivation[i];
+            if (m > nextMotivation) {
+                nextAction = i;
+            }
+        }
+        return nextAction;
+    }
+
     private String actionConceptName(int i) {
-        return "(a" + i + ")";
+
+        return "(a,a" + i + ")";
     }
 
     private String inputConceptName(int i, int component) {
