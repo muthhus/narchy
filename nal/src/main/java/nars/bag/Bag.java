@@ -1,7 +1,9 @@
 package nars.bag;
 
 import nars.budget.Budgeted;
+import nars.budget.Forget;
 import nars.budget.UnitBudget;
+import nars.concept.Concept;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -461,6 +463,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
     default void putAll(@NotNull Collection<? extends V> a) {
         a.forEach(this::put);
+    }
+
+    default void commit(Consumer<BLink<? extends V>> each) {
+        forEach(each);
+        commit();
     }
 
 }

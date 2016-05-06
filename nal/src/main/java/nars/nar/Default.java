@@ -377,6 +377,8 @@ public class Default extends AbstractNAR {
 
         }
 
+        long lastCommit = -1;
+
         /**
          * apply pending activity at the end of a cycle
          */
@@ -384,10 +386,13 @@ public class Default extends AbstractNAR {
 
             Bag<Concept> active = this.active;
 
-            active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
+            //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            active.commit();
+            active.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
+                //active.commit(lastForget != now ? conceptForget : .. );
+
+            lastCommit = nar.time();
 
 //            if (!((CurveBag)active).isSorted()) {
 //                throw new RuntimeException(active + " not sorted");

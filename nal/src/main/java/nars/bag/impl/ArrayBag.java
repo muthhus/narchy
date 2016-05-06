@@ -24,6 +24,8 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
 
+    private float reinsertionThreshold = 0.01f;
+
     public ArrayBag(int cap) {
         this(new FasterList(cap), cap);
     }
@@ -33,6 +35,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
                 Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
                 //new HashMap(items.capacity()/2)
         );
+
         setCapacity(capacity);
     }
 
@@ -267,6 +270,65 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
         ((FasterList)items.list).sortThis(this);
 
         return this;
+    }
+
+    /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
+    @Override public void commit(Consumer<BLink<? extends V>> each) {
+        int s = size();
+        int dirtyStart = -1;
+        int dirtyEnd = -1;
+        BLink<V> prev = null;
+        for (int i = 0; i < s; i++) {
+            BLink<V> b = item(i);
+
+            if (each!=null)
+                each.accept(b);
+
+            if (b.commit()) {
+                if (prev!=null && compare(b, prev) < 0) {
+                    //detected out-of-order
+
+                    if (dirtyStart == -1) {
+                        dirtyStart = i; //TODO this only happens once
+                    }
+
+                    dirtyEnd = i;  //TODO this only happens once
+                }
+            }
+
+            prev = b;
+        }
+
+        if (dirtyStart == -1) {
+            //already sorted
+            return;
+        } else {
+
+            //Special case: only one unordered item; remove and reinsert
+            int dirtyRange = 1 + dirtyEnd - dirtyStart;
+            if (dirtyRange == 1) {
+                //TODO
+                BLink<V> x = items.list.remove(dirtyEnd); //remove directly from the decorated list
+                items.add(x); //add using the sorted list
+                return;
+            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * size()) ) {
+                BLink<V>[] tmp = new BLink[dirtyRange];
+
+                for (int k = 0; k < dirtyRange; k++)
+                    tmp[k] = items.list.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+
+                //TODO items.get(i) and
+                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
+
+                for (BLink<V> x : tmp)
+                   items.add(x);
+
+                return;
+            }
+
+            ((FasterList) items.list).sortThis(this);
+        }
+
     }
 
 

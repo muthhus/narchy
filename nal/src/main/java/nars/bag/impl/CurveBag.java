@@ -71,7 +71,11 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         return this;
     }
 
-
+    @Override
+    public void commit(Consumer<BLink<? extends V>> each) {
+        super.commit(each);
+        sampler.commit(this);
+    }
 
     @Nullable
     public BLink<V> peekNext(boolean remove) {
