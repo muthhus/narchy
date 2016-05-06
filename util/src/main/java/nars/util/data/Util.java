@@ -611,9 +611,9 @@ public enum Util {
      */
     public static float clamp(float p) {
         if (p > 1.0f)
-            return 1.0f;
-        if (p < 0.0f)
-            return 0.0f;
+            p = 1.0f;
+        else if (p < 0.0f)
+            p = 0.0f;
         return p;
     }
 

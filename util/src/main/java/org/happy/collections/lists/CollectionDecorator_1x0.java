@@ -17,22 +17,10 @@ import java.util.Iterator;
 public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implements Collection<E> {
 
 
-	protected D decorated;
 
-	public D getDecorated() {
-		return decorated;
-	}
+	abstract public D getDecorated();
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.happy.commons.patterns.decorator.Decorator_1x0#setDecorateable(T)
-	 */
 
-	public void setDecorated(final D decorated) {
-		this.decorated = decorated;
-	}
 
 
 //	/**
@@ -96,29 +84,7 @@ public abstract class CollectionDecorator_1x0<E, D extends Collection<E>> implem
 	private boolean decorateIterators = true;
 	private boolean avoidLoop;
 
-	/**
-	 * constructor
-	 * 
-	 * @param decorateable
-	 *            decorateable collection
-	 */
-	public CollectionDecorator_1x0(@NotNull final D decorateable) {
-		setDecorated(decorateable);
-	}
 
-	/**
-	 * constructor
-	 * 
-	 * @param decorateable
-	 *            decorateable collection
-	 * @param decorateIterators
-	 *            if false then the iterators will be not decorated
-	 */
-	public CollectionDecorator_1x0(final D decorateable,
-			final boolean decorateIterators) {
-		this(decorateable);
-		this.decorateIterators = decorateIterators;
-	}
 
 	@Override
 	public boolean add(final E e) {

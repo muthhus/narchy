@@ -111,7 +111,6 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	 */
 	private final SearchType sortType;
 
-	public final List<E> list;
 
 	/**
 	 * constructor
@@ -133,9 +132,7 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	public SortedList_1x4(final List<E> list, final Comparator<E> comparator,
 			final SearchType searchType, final boolean doSort) {
 		super(list);
-		this.setDecorated(list);
 		//this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
-		this.list = list;
 
 		this.comparator = comparator;
 		this.sortType = searchType;
@@ -146,13 +143,9 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 
 	@Override
 	public void forEach(Consumer<? super E> action) {
-		decorated.forEach(action);
+		list.forEach(action);
 	}
 
-	@Override
-	public void setDecorated(final List<E> decorated) {
-		super.setDecorated(decorated);
-	}
 
 	@Override
 	public boolean add(final E element) {
@@ -333,118 +326,6 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 		return list.iterator();
 	}
 
-	@Override
-	protected ListIterator<E> listIteratorImpl(final int index) {
-		throw new UnsupportedOperationException();
-//
-//		return new ListIteratorDecorator_1x0<E>(list
-//				.listIterator(index)) {
-//
-//			private E currentElem = null;
-//			private boolean iterationDirectionByUsingNext = true;
-//
-//			@Override
-//			public E next() {
-//				iterationDirectionByUsingNext = true;
-//				this.currentElem = super.next();
-//				return this.currentElem;
-//			}
-//
-//			@Override
-//			public E previous() {
-//				iterationDirectionByUsingNext = false;
-//				this.currentElem = super.previous();
-//				return this.currentElem;
-//			}
-//
-//			@Override
-//			public void add(final E e) {
-//				final boolean iterationDirectionByUsingNextCopy = iterationDirectionByUsingNext;
-//				// get element before
-//				E nextElem = null;
-//				if (!iterationDirectionByUsingNextCopy) {
-//					this.next();
-//				}
-//				if (this.hasNext()) {
-//					nextElem = this.next();
-//					this.previous();
-//					this.previous();
-//					this.next();
-//				}
-//
-//				if (!iterationDirectionByUsingNextCopy) {
-//					this.previous();
-//				}
-//
-//				// check the neighbors
-//				if (currentElem != null) {// proof element before
-//					final int result = SortedList_1x4.this.comparator.compare(
-//							currentElem, e);// compare to previews object
-//					if (0 < result) {
-//						throw new IllegalStateException(
-//								"SortedList_1x0.set(int index, E element) caused exception, because "
-//										+ currentElem.toString()
-//										+ "is bigger then "
-//										+ currentElem.toString());
-//					}
-//				}
-//				if (nextElem != null) {// proof element after
-//					final int result = SortedList_1x4.this.comparator.compare(
-//							e, nextElem);// compare to successor object
-//					if (0 <= result) {
-//						throw new IllegalStateException(
-//								"SortedList_1x0.set(int index, E element) caused exception, because "
-//										+ nextElem.toString()
-//										+ "is smaller then "
-//										+ nextElem.toString());
-//					}
-//				}
-//				super.add(e);
-//			}
-//
-//			@Override
-//			public void set(final E e) {
-//				// get element before
-//				E prevElem = null;
-//				if (this.hasPrevious()) {
-//					prevElem = this.previous();
-//					this.next();
-//				}
-//				// check the neighbors
-//				if (prevElem != null) {// proof element before
-//					final int result = SortedList_1x4.this.comparator.compare(
-//							prevElem, e);// compare to previews object
-//					if (0 < result) {
-//						throw new IllegalStateException(
-//								"SortedList_1x0.set(int index, E element) caused exception, because "
-//										+ prevElem.toString()
-//										+ "is bigger then "
-//										+ prevElem.toString());
-//					}
-//				}
-//
-//				// get element after
-//				E nextElem = null;
-//				if (this.hasNext()) {
-//					nextElem = this.previous();
-//					this.previous();
-//				}
-//				if (nextElem != null) {// proof element after
-//					final int result = SortedList_1x4.this.comparator.compare(
-//							e, nextElem);// compare to successor object
-//					if (0 <= result) {
-//						throw new IllegalStateException(
-//								"SortedList_1x0.set(int index, E element) caused exception, because "
-//										+ nextElem.toString()
-//										+ "is smaller then "
-//										+ nextElem.toString());
-//					}
-//				}
-//				super.set(e);
-//			}
-//
-//		};
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override

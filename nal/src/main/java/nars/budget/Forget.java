@@ -1,5 +1,6 @@
 package nars.budget;
 
+import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.nal.Tense;
@@ -150,9 +151,8 @@ public enum Forget { ;
                         minPriorityForgettingCanAffect * (forgetProportion);
             }
 
-
-            budget.setPriority(newPriority);
-
+            if (Math.abs(newPriority - currentPriority) > Global.BUDGET_EPSILON)
+                budget.setPriority(newPriority);
 
         }
 

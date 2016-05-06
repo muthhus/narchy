@@ -6,6 +6,7 @@ import java.util.ListIterator;
 
 import org.happy.collections.lists.CollectionDecorator_1x0;
 import org.happy.collections.lists.List_1x0;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Decorator_1x0Impl which can be used to decorate any Lists
@@ -18,8 +19,8 @@ import org.happy.collections.lists.List_1x0;
  *            type of the decorated list
  */
 public abstract class ListDecorator_1x0<E, D extends List<E>> extends CollectionDecorator_1x0<E, D> implements List_1x0<E> {
+	public final D list;
 
-	private boolean avoidLoop;
 
 	/**
 	 * constructor
@@ -27,193 +28,195 @@ public abstract class ListDecorator_1x0<E, D extends List<E>> extends Collection
 	 * @param list
 	 *            list which you want to decorate
 	 */
-	public ListDecorator_1x0(final D list) {
-		this(list, true);// decorate iterators by default
-	}
 
 	/**
 	 * constructor
 	 * 
 	 * @param list
 	 *            list you want to decorate
-	 * @param decorateIterators
-	 *            if you want more performance in foreach-loop and you don't
-	 *            really use iterator you can disable the decoration of
-	 *            iterators
 	 */
-	public ListDecorator_1x0(final D list, final boolean decorateIterators) {
-		super(list);
-		// check arguments
-		if (list == null) {
-			throw new IllegalArgumentException(
-					"the decorated list can't be null");
-		}
-
+	public ListDecorator_1x0(final D list) {
+		this.list = list;
 	}
 
 	@Override
 	public D getDecorated() {
-		return super.getDecorated();
+		return list;
 	}
-
-
 
 	@Override
 	public boolean add(final E arg0) {
-		return getDecorated().add(arg0);
+		return list.add(arg0);
 	}
 
 	@Override
 	public void add(final int arg0, final E arg1) {
-		getDecorated().add(arg0, arg1);
+		list.add(arg0, arg1);
 	}
 
 	@Override
 	public boolean addAll(final Collection<? extends E> arg0) {
-		return getDecorated().addAll(arg0);
+		return list.addAll(arg0);
 	}
 
 	@Override
 	public boolean addAll(final int arg0, final Collection<? extends E> arg1) {
-		return getDecorated().addAll(arg0, arg1);
+		return list.addAll(arg0, arg1);
 	}
 
 	@Override
 	public void clear() {
-		getDecorated().clear();
+		list.clear();
 	}
 
 	@Override
 	public boolean contains(final Object arg0) {
-		return getDecorated().contains(arg0);
+		return list.contains(arg0);
 	}
 
 	@Override
 	public boolean containsAll(final Collection<?> arg0) {
-		return getDecorated().containsAll(arg0);
+		return list.containsAll(arg0);
 	}
 
 	@Override
 	public E get(final int arg0) {
-		return getDecorated().get(arg0);
+		return list.get(arg0);
 	}
 
 	@Override
 	public int indexOf(final Object arg0) {
-		return getDecorated().indexOf(arg0);
+		return list.indexOf(arg0);
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return getDecorated().isEmpty();
+		return list.isEmpty();
 	}
 
 	@Override
 	public int lastIndexOf(final Object arg0) {
-		return getDecorated().lastIndexOf(arg0);
+		return list.lastIndexOf(arg0);
 	}
 
-	/**
-	 * don't override this method in inherited classes, to avoid twice
-	 * decoration of the same decorator often list uses
-	 * ListIterator.listIterator(int index) method to create the list-iterator
-	 * for ListIterator.listIterator(), thus if you would override this method
-	 * and create inside of it new ListDecorator the Iterator of decorated List
-	 * will be decorated twice this method calls the method
-	 * this.ListIterator.listIterator(int index), thus override that method if
-	 * you want to decorate the listiterator
-	 */
+
+	@NotNull
 	@Override
 	public ListIterator<E> listIterator() {
-		if (this.isDecorateIterators()) {
-			return this.listIterator(0);
-		} else {
-			return getDecorated().listIterator();
-		}
+		return list.listIterator();
+	}
+
+	@NotNull
+	@Override
+	public ListIterator<E> listIterator(int index) {
+		return list.listIterator(index);
 	}
 
 	@Override
-	public ListIterator<E> listIterator(final int index) {
-		ListIterator<E> it = null;
-		if (this.isDecorateIterators() && !this.avoidLoop) {
-			this.avoidLoop = true;
-			it = this.listIteratorImpl(index);
-			this.avoidLoop = false;
-		} else {
-			it = getDecorated().listIterator(index);
-		}
-		return it;
+	public ListIterator<E> listIterator(E elem) {
+		return list.listIterator(indexOf(elem));
 	}
+	//	/**
+//	 * don't override this method in inherited classes, to avoid twice
+//	 * decoration of the same decorator often list uses
+//	 * ListIterator.listIterator(int index) method to create the list-iterator
+//	 * for ListIterator.listIterator(), thus if you would override this method
+//	 * and create inside of it new ListDecorator the Iterator of decorated List
+//	 * will be decorated twice this method calls the method
+//	 * this.ListIterator.listIterator(int index), thus override that method if
+//	 * you want to decorate the listiterator
+//	 */
+//	@Override
+//	public ListIterator<E> listIterator() {
+//		if (this.isDecorateIterators()) {
+//			return this.listIterator(0);
+//		} else {
+//			return list.listIterator();
+//		}
+//	}
 
-	@Override
-	public ListIterator<E> listIterator(final E elem) {
-		int i = 0;
-		final ListIterator<E> it = getDecorated().listIterator();
-		while (it.hasNext()) {
-			if (elem.equals(it.next())) {
-				return this.listIterator(i);// iterator for element found
-			}
-			i++;
-		}
-		return null;
-	}
+//	@Override
+//	public ListIterator<E> listIterator(final int index) {
+//		ListIterator<E> it = null;
+//		if (this.isDecorateIterators() && !this.avoidLoop) {
+//			this.avoidLoop = true;
+//			it = this.listIteratorImpl(index);
+//			this.avoidLoop = false;
+//		} else {
+//			it = list.listIterator(index);
+//		}
+//		return it;
+//	}
+//
+//	@Override
+//	public ListIterator<E> listIterator(final E elem) {
+//		int i = 0;
+//		final ListIterator<E> it = list.listIterator();
+//		while (it.hasNext()) {
+//			if (elem.equals(it.next())) {
+//				return this.listIterator(i);// iterator for element found
+//			}
+//			i++;
+//		}
+//		return null;
+//	}
 
-	/**
-	 * implement this method for a iterator-decorator
-	 * 
-	 * @param index
-	 * @return
-	 */
-	protected abstract ListIterator<E> listIteratorImpl(int index);
+//	/**
+//	 * implement this method for a iterator-decorator
+//	 *
+//	 * @param index
+//	 * @return
+//	 */
+//	protected abstract ListIterator<E> listIteratorImpl(int index);
 
 	@Override
 	public E remove(final int index) {
-		return getDecorated().remove(index);
+		return list.remove(index);
 	}
 
 	@Override
 	public boolean remove(final Object o) {
-		return getDecorated().remove(o);
+		return list.remove(o);
 	}
 
 	@Override
 	public boolean removeAll(final Collection<?> c) {
-		return getDecorated().removeAll(c);
+		return list.removeAll(c);
 	}
 
 	@Override
 	public boolean retainAll(final Collection<?> c) {
-		return getDecorated().retainAll(c);
+		return list.retainAll(c);
 	}
 
 	@Override
 	public E set(final int index, final E element) {
-		return getDecorated().set(index, element);
+		return list.set(index, element);
 	}
 
 	@Override
 	public int size() {
-		return getDecorated().size();
+		return list.size();
 	}
 
 	@Override
 	public List<E> subList(final int fromIndex, final int toIndex) {
-		return getDecorated().subList(fromIndex, toIndex);
+		return list.subList(fromIndex, toIndex);
 	}
 
 	@Override
 	public Object[] toArray() {
-		return getDecorated().toArray();
+		return list.toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(final T[] a) {
-		return getDecorated().toArray(a);
+		return list.toArray(a);
 	}
 
 	@Override
 	public String toString() {
-		return this.getDecorated().toString();
+		return this.list.toString();
 	}
 
 	@Override
@@ -222,7 +225,7 @@ public abstract class ListDecorator_1x0<E, D extends List<E>> extends Collection
 		// return false;
 		// }
 		// return Collections_1x2.isEqualLists(this, (List<?>)obj);
-		return getDecorated().equals(obj);
+		return list.equals(obj);
 	}
 
 }

@@ -13,7 +13,6 @@ import nars.op.math.length;
 import nars.op.mental.*;
 import nars.op.out.echo;
 import nars.op.out.say;
-import nars.op.sys.js;
 import nars.op.sys.reset;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -127,8 +126,8 @@ public abstract class AbstractNAR extends NAR {
         this.taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 
         //budget propagation thresholds
-        this.termLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
-        this.taskLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
+        this.termLinkThreshold.setValue(Global.BUDGET_EPSILON);
+        this.taskLinkThreshold.setValue(Global.BUDGET_EPSILON);
 
         this.executionThreshold.setValue(Global.TRUTH_EPSILON);
 

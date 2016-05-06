@@ -104,7 +104,7 @@ public enum Global {
     public static float DERIVATION_DURABILITY_THRESHOLD = 0.005f;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_PROPAGATION_EPSILON = 0.003f;
+    public static final float BUDGET_EPSILON = 0.003f;
 
 
 //    /* ---------- default input values ---------- */

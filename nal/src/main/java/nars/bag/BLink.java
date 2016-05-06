@@ -88,19 +88,21 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void delete() {
+    public final void delete() {
         b[0] = Float.NaN;
     }
 
     /** TODO return false to signal to the bag to remove this item */
-    public void commit() {
-        if (hasDelta()) {
+    public final boolean commit() {
+        if (changed) {
             float[] b = this.b;
             b[0] = clamp(b[0] + b[1]); b[1] = 0;
             b[2] = clamp(b[2] + b[3]); b[3] = 0;
             b[4] = clamp(b[4] + b[5]); b[5] = 0;
             changed = false;
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -109,7 +111,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public boolean isDeleted() {
+    public final boolean isDeleted() {
         float p = b[0];
         return (p!=p); //fast NaN test
     }
@@ -191,11 +193,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return id + "=" + getBudgetString();
     }
 
-    public final boolean hasDelta() {
-        return changed;
-//        float[] b = this.b;
-//        return nonZero(b[3]) || nonZero(b[4]) || nonZero(b[5]);
-    }
+
 
 //    public void charge(float overflow) {
 //        assert(overflow > 0);

@@ -262,9 +262,10 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     @Nullable
     @Override
     public Bag<V> commit() {
-        forEach(this::update);
+
+        forEach(BLink::commit);
         ((FasterList)items.list).sortThis(this);
-        //Collections.sort(items, (Comparator)this);
+
         return this;
     }
 
@@ -273,9 +274,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 //        return Float.compare(items.score(b), items.score(a));
 //    };
 
-    public void update(@NotNull BLink<V> v) {
-        v.commit();
-    }
+
 //        if (!v.hasDelta()) {
 //            return;
 //        }
