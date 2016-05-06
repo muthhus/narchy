@@ -23,8 +23,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     private int capacity;
 
     public ArrayTable(List<L> items, Map<V, L> map) {
+        this(items, map, SortedList_1x4.SearchType.BinarySearch);
+    }
+
+    public ArrayTable(List<L> items, Map<V, L> map, SortedList_1x4.SearchType searchType) {
         super(map);
-        this.items = new SortedList_1x4<>(items, this, SortedList_1x4.SearchType.BinarySearch, false);
+        this.items = new SortedList_1x4<>(items, this, searchType, false);
     }
 
 
@@ -103,12 +107,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //    }
 
     @Nullable @Override
-    public final L top() {
+    public L top() {
         return isEmpty() ? null : item(0);
     }
 
     @Nullable @Override
-    public final L bottom() {
+    public L bottom() {
         int s = size();
         return s == 0 ? null : item(s - 1);
     }
@@ -217,7 +221,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     }
 
     @Override
-    protected final L addItem(L i) {
+    protected L addItem(L i) {
 
         int size = size();
 

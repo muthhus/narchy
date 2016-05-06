@@ -99,8 +99,10 @@ public abstract class CollectorMap<K, V>  {
 //                    throw new RuntimeException(key + " removed from index but not from items list");*/
 //                //return null;
 //            }
-            if (removed != e)
+            if (removed != e) {
+                removeItem(e);
                 throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
+            }
             return removed;
         }
 

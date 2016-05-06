@@ -1,7 +1,6 @@
 package nars.concept.table;
 
 import com.google.common.collect.Iterators;
-import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
@@ -14,6 +13,7 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.util.data.list.FasterList;
+import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,25 +54,13 @@ public class ArrayBeliefTable implements BeliefTable {
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         if (eternalCapacity > 0)
-            eternal = new SetTable<Task>(mp, eternalCapacity) {
-
-                @Override
-                public int compare(Task o1, Task o2) {
-                    return Float.compare(BeliefTable.rankEternalByOriginality(o2), BeliefTable.rankEternalByOriginality(o1));
-                }
-            };
+            eternal = new EternalTable(mp, eternalCapacity);
         else
             eternal = ListTable.Empty;
 
 
         if (temporalCapacity > 0) {
-            temporal = new SetTable<Task>(mp, temporalCapacity) {
-
-                @Override
-                public int compare(Task o1, Task o2) {
-                    return Float.compare(rankTemporalByOriginality(o2), rankTemporalByOriginality(o1));
-                }
-            };
+            temporal = new TemporalTable(mp, temporalCapacity);
         }
         else
             temporal = ListTable.Empty;
@@ -520,8 +508,8 @@ public class ArrayBeliefTable implements BeliefTable {
 //    }
 
     abstract static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(Map<T, T> index, int capacity) {
-            super( new FasterList(capacity), index);
+        public SetTable(Map<T, T> index, int capacity, SortedList_1x4.SearchType searchType) {
+            super( new FasterList(capacity), index, searchType);
             setCapacity(capacity);
         }
 
@@ -533,9 +521,53 @@ public class ArrayBeliefTable implements BeliefTable {
 
     }
 
+    /** stores the items unsorted; revection manages their ranking and removal */
+    private static class TemporalTable extends SetTable<Task> {
 
+        public TemporalTable(Map<Task, Task> mp, int temporalCapacity) {
+            super(mp, temporalCapacity, SortedList_1x4.SearchType.LinearSearch);
+        }
 
+        @Override
+        public int compare(Task o1, Task o2) {
+            throw new UnsupportedOperationException();
+            //return Float.compare(rankTemporalByOriginality(o2), rankTemporalByOriginality(o1));
+        }
 
+        @Nullable
+        @Override
+        public Task top() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Nullable
+        @Override
+        public Task bottom() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected Task addItem(Task i) {
+            if (size() >= capacity()) //should ensure space for this task before calling
+                throw new RuntimeException("temporal belief table fault");
+
+            ((SortedList_1x4)list()).list.add(i); //store unsorted directly
+            return null;
+        }
+
+    }
+
+    private static class EternalTable extends SetTable<Task> {
+
+        public EternalTable(Map<Task, Task> mp, int eternalCapacity) {
+            super(mp, eternalCapacity, SortedList_1x4.SearchType.BinarySearch);
+        }
+
+        @Override
+        public int compare(Task o1, Task o2) {
+            return Float.compare(BeliefTable.rankEternalByOriginality(o2), BeliefTable.rankEternalByOriginality(o1));
+        }
+    }
 
 
 //    /** computes the truth/desire as an aggregate of projections of all

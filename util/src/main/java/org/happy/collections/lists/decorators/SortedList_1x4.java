@@ -125,18 +125,18 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	 * @param inverted
 	 *            if true the sorted order will be inverted, the list will be
 	 *            sorted in descending order
-	 * @param doSort
+	 * @param preSort
 	 *            if true the the list, which is the parameter in the
 	 *            constructor will be sorted, before it will be decorated
 	 */
 	public SortedList_1x4(final List<E> list, final Comparator<E> comparator,
-			final SearchType searchType, final boolean doSort) {
+			final SearchType searchType, final boolean preSort) {
 		super(list);
 		//this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
 
 		this.comparator = comparator;
 		this.sortType = searchType;
-		if (doSort) {
+		if (preSort) {
 			Collections.sort(list, this.comparator);// sort list
 		}
 	}
@@ -338,31 +338,29 @@ public final class SortedList_1x4<E> extends ListDecorator_1x0<E, List<E>> {
 	@Override
 	public int indexOf(@NotNull final Object element) {
 
-		List<E> list = this.list;
-		int size = list.size();
-		if (size < binarySearchThreshold || SearchType.LinearSearch.equals(this.sortType)) {
+		if (element == null)
+			return -1;
+
+		if (SearchType.LinearSearch == this.sortType) {
 			return super.indexOf(element);
 		}
 
-		/*if (element == null)
-			return -1;*/
+		List<E> list = this.list;
+		int size = list.size();
+		if (size < binarySearchThreshold) {
+			return super.indexOf(element);
+		}
+
 
 		E elemE = (E) element;
 
 		final int[] rightBorder = new int[] { 0 };
 		final int left = this.findInsertionIndex_TypeArray(elemE, 0, size, rightBorder);
 
-		int index = left;
-		final int iteratorIndex = left;
 
-		for (int i = 0; i < iteratorIndex; i++) {
-			final E e = list.get(i);
-			if (element.equals(e)) {
+		for (int index = left; index < rightBorder[0]; index++) {
+			if (element.equals(list.get(index))) {
 				return index;// element is found
-			}
-			index++;
-			if (rightBorder[0] < index) {
-				break;
 			}
 		}
 
