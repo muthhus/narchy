@@ -52,6 +52,11 @@ public class RawBudget extends Budget {
         return priority;
     }
 
+    @Override
+    public boolean isDeleted() {
+        return priority != priority; //fast NaN test
+    }
+
     /**
      * Get durability value
      *

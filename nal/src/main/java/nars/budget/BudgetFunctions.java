@@ -286,8 +286,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
         //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
-        final float targetActivation = nal.nar.conceptPriority(nal.termLink.get(), 0f);
-        final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get(), 0f);
+        final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
+        final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get());
 
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
         termLink.orPriority(quality,

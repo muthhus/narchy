@@ -53,8 +53,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment().run(
 				//new DQN(),
 				a,
-
-				150);
+				15000);
 
 		printTasks(a.nar, true);
 		printTasks(a.nar, false);

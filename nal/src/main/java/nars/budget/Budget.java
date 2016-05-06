@@ -33,8 +33,13 @@ public abstract class Budget extends BudgetedHandle {
 //    public static boolean isDeleted(float pri) {
 //        return !Float.isFinite(pri);
 //    }
-    
 
+
+    @Override
+    public final float priIfFiniteElseZero() {
+        float p = pri();
+        return /*Float.isFinite(p)*/ (p==p) ? p : 0;
+    }
 
     public static String toString(@NotNull Budget b) {
 
@@ -100,7 +105,7 @@ public abstract class Budget extends BudgetedHandle {
      */
     @Override
     public final void setPriority(float p) {
-        if (!Float.isFinite(p))
+        if (p!=p /* fast NaN test */)
             throw new InvalidPriorityException();
 
         _setPriority(Util.clamp(p));

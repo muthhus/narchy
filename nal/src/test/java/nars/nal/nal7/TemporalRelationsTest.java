@@ -6,6 +6,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.junit.Test;
 
+import java.util.TreeSet;
+
 import static java.lang.System.out;
 import static nars.$.$;
 import static org.junit.Assert.*;
@@ -147,10 +149,11 @@ public class TemporalRelationsTest {
         n.step();
 
         StringBuilder cc = new StringBuilder();
-        n.forEachConcept(c -> { cc.append(c.toString()).append(' '); });
+        TreeSet d = new TreeSet();
+        n.forEachConcept(d::add);
 
         //2 unique impl concepts created
-        assertEquals("(x==>y) (y==>x) y x ", cc.toString());
+        assertEquals("[x, y, (x==>y), (y==>x)]", d.toString());
     }
 
     @Test public void testCommutivity() {

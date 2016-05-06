@@ -17,6 +17,11 @@ public final class ROBudget extends Budget {
     }
 
     @Override
+    public final boolean isDeleted() {
+        return false;
+    }
+
+    @Override
     public void delete() {
         throw new UnsupportedOperationException();
     }

@@ -42,7 +42,7 @@ public class TaskAxis extends HighDim.AutoEnc2Projection<Task> {
         Term t = c.term();
         //x[0] = (c.hashCode() % 32) / 32.0f;
         //x[1] = (t instanceof Compound ? 1f : 0f);
-        x[0] = c.priIfFiniteElse(0);
+        x[0] = c.priIfFiniteElseZero();
         x[1] = c.dur();
         x[2] = c.qua();
         Util.writeBits(t.op().ordinal() + 1, 5, x, 3); //+5

@@ -54,6 +54,8 @@ public interface Budgeted  {
     }
 
     float pri();
+    float priIfFiniteElseZero();
+    boolean isDeleted();
 
     float qua();
 
@@ -64,17 +66,7 @@ public interface Budgeted  {
 
     //        default long lastForgetTime() { return getLastForgetTime(); }
 //
-    default boolean	isDeleted() {
-        return !Float.isFinite(pri());
-    }
 
-    default float priIfFiniteElseZero() {
-        return priIfFiniteElse(0);
-    }
 
-    default float priIfFiniteElse(float ifNonFinite) {
-        float p = pri();
-        return Float.isFinite(p) ? p : ifNonFinite;
-    }
 
 }

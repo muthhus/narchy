@@ -108,6 +108,12 @@ public final class BLink<X> extends Budget implements Link<X> {
         return b[0];
     }
 
+    @Override
+    public boolean isDeleted() {
+        float p = b[0];
+        return (p!=p); //fast NaN test
+    }
+
     protected final void setValue(int x, float v) {
         float[] b = this.b;
         int twoX = 2 * x;

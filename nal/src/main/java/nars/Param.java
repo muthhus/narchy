@@ -121,7 +121,8 @@ public abstract class Param extends Container implements Level {
         if (t.isBeliefOrGoal()) {
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
-            if (!Float.isFinite(t.qua())) {
+            float q = t.qua();
+            if (q!=q /* fast NaN test */) {
                 t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
             }
         } else if (t.isQuestion()) {

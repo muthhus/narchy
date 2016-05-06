@@ -982,7 +982,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float conceptPriority(Termed termed, float priIfNonExistent);
+    abstract public float conceptPriority(Termed termed);
 
     public Termed[] terms(String... terms) {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);

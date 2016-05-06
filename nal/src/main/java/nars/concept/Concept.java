@@ -296,7 +296,7 @@ public interface Concept extends Termed, Comparable {
         float minScale =
                 nar.taskLinkThreshold.floatValue() / b.pri();
 
-        return Float.isFinite(minScale) && link(b, initialScale, minScale, nar, conceptOverflow);
+        return (minScale==minScale /* fast NaN test */) && link(b, initialScale, minScale, nar, conceptOverflow);
     }
 
     /**

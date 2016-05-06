@@ -54,7 +54,7 @@ public class Terminal extends AbstractNAR {
 
 
     @Override
-    public float conceptPriority(Termed termed, float priIfNonExistent) {
+    public float conceptPriority(Termed termed) {
         return 0;
     }
 

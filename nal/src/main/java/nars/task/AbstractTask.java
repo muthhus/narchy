@@ -130,13 +130,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         updateEvidence();
     }
 
-    /** direct implementation, hopefully faster since it is frequently invoked */
-    @Override public final boolean isDeleted() {
-        return !Float.isFinite(priority);
-    }
-
-
-
     @Override @NotNull
     public final Task normalize(@NotNull Memory memory) {
 
@@ -204,7 +197,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
         /** NaN quality is a signal that a budget's values need initialized */
-        if (!Float.isFinite(qua())) {
+        float q = qua();
+        if (q!=q /* fast NaN test */) {
             //HACK for now just assume that only MutableTask supports unbudgeted input
             memory.applyDefaultBudget((MutableTask)this);
         }

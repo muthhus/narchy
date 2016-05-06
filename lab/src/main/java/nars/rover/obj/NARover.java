@@ -430,7 +430,7 @@ public class NARover extends AbstractRover {
             Termed visionTerm = nar.conceptualize($.the(id + i), UnitBudget.Zero);
 
             VisionRay v = new VisionRay(center, angle, aStep, base, distance, resolution, (dist, c) -> {
-                float p = nar.conceptPriority(visionTerm, 0);
+                float p = nar.conceptPriority(visionTerm);
                 //if (Float.isFinite(dist)) {
                 float closeness = 1f - dist;
                 c.x = p/2f * (0.5f + 0.5f * closeness); c.y = 0;
