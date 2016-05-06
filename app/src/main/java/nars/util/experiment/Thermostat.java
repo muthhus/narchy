@@ -121,13 +121,13 @@ public class Thermostat implements Environment {
     }
 
     public static void main(String[] args) {
-        Default n = new Default(512, 3, 1, 3);
-        n.conceptActivation.setValue(0.3);
+        Default n = new Default(256, 4, 1, 2);
+        n.conceptActivation.setValue(0.2);
         n.cyclesPerFrame.set(16);
         //n.shortTermMemoryHistory.set(3);
         //n.logSummaryGT(System.out, 0.55f);
+        n.conceptRemembering.setValue(5);
 
-        //n.conceptRemembering.setValue(1);
         NAgent a = //new NAgentDebug(n);
                 new NAgent(n);
 

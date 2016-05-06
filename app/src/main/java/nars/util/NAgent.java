@@ -42,10 +42,10 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.95f;
+    float alpha = 0.2f;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.25f;
+    float epsilon = 0.3f;
 
 
     final FloatToObjectFunction sensorTruth =  (v) -> {
@@ -201,7 +201,7 @@ public class NAgent implements Agent {
 
     private void seekReward() {
         //TODO get this from the sensor/digitizers
-        nar.goal("(R)", Tense.Eternal, 0.95f, 1f); //goal reward
+        nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         //nar.goal("(dRp)", Tense.Eternal, 0.95f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Eternal, 0.05f, 1f); //avoid decrease
     }
@@ -270,9 +270,11 @@ public class NAgent implements Agent {
                     off = 1; //full off
                 }
 
-                nar.believe(actions.get(lastAction), Tense.Present, 0, alpha * off);
-                nar.goal(actions.get(lastAction), Tense.Present, 0, alpha * off);
+                nar.believe(actions.get(lastAction), Tense.Present, 0, alpha);
+                nar.goal(actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
             }
+
+            nar.goal(actions.get(nextAction), Tense.Present, 1f, alpha );
 
             on = 1f;
         } else {
@@ -284,7 +286,6 @@ public class NAgent implements Agent {
                 on = 0.5f;
             }
         }
-        nar.goal(actions.get(nextAction), Tense.Present, 1f, alpha * on);
         nar.believe(actions.get(nextAction), Tense.Present, 1f, alpha * on);
 
         /*for (int a = 0; a < actions.size(); a++)
