@@ -130,7 +130,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             return; //no tasklinks
 
         Bag<Termed> termLinks = concept.termlinks();
-        if (termLinks.forEachThen(termLinkForget).commit().isEmpty())
+        if (termLinks.commit(termLinkForget).isEmpty())
             return; //no termlinks
 
         Collection<BLink<? extends Termed>> termsBuffer;

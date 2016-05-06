@@ -465,9 +465,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         a.forEach(this::put);
     }
 
-    default void commit(Consumer<BLink<? extends V>> each) {
+    default Bag<V> commit(Consumer<BLink<? extends V>> each) {
         forEach(each);
         commit();
+        return this;
     }
 
 }

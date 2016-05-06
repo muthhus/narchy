@@ -262,18 +262,26 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     }
 
 
-    @Nullable
+//    @Nullable
+//    @Override
+//    public Bag<V> commit() {
+//
+//        forEach(BLink::commit);
+//        ((FasterList)items.list).sortThis(this);
+//
+//        return this;
+//    }
+    @NotNull
     @Override
     public Bag<V> commit() {
-
-        forEach(BLink::commit);
-        ((FasterList)items.list).sortThis(this);
-
-        return this;
+//        super.commit();
+//        sampler.commit(this);
+//        return this;
+        return commit(null);
     }
 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
-    @Override public void commit(Consumer<BLink<? extends V>> each) {
+    @Override public Bag<V> commit(Consumer<BLink<? extends V>> each) {
         int s = size();
         int dirtyStart = -1;
         int dirtyEnd = -1;
@@ -301,7 +309,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
         if (dirtyStart == -1) {
             //already sorted
-            return;
+            return this;
         } else {
 
             //Special case: only one unordered item; remove and reinsert
@@ -310,7 +318,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
                 //TODO
                 BLink<V> x = items.list.remove(dirtyEnd); //remove directly from the decorated list
                 items.add(x); //add using the sorted list
-                return;
+                return this;
             } else if ( dirtyRange < Math.max(1, reinsertionThreshold * size()) ) {
                 BLink<V>[] tmp = new BLink[dirtyRange];
 
@@ -323,12 +331,13 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
                 for (BLink<V> x : tmp)
                    items.add(x);
 
-                return;
+                return this;
             }
 
             ((FasterList) items.list).sortThis(this);
         }
 
+        return this;
     }
 
 
