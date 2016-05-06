@@ -1,5 +1,6 @@
 package nars.bag;
 
+import nars.Global;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
@@ -119,7 +120,8 @@ public final class BLink<X> extends Budget implements Link<X> {
     protected final void setValue(int x, float v) {
         float[] b = this.b;
         int twoX = 2 * x;
-        b[twoX + 1] += v - b[twoX];
+        float delta = v - b[twoX];
+        b[twoX + 1] += delta;
         changed = true;
     }
 
@@ -151,13 +153,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     @Override
     public final long setLastForgetTime(long currentTime) {
         long lastForget = this.lastForget;
-        long diff;
-        if (lastForget == Tense.TIMELESS) {
-            diff = 0;
-        } else {
-            diff = currentTime - lastForget;
-            if (diff == 0) return 0; //return but dont set lastForget
-        }
+        long diff = (lastForget == Tense.TIMELESS) ? 0 : (currentTime - lastForget);
         this.lastForget = currentTime;
         return diff;
     }

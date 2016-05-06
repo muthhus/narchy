@@ -1,7 +1,5 @@
 package nars.util;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
@@ -11,15 +9,12 @@ import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -42,11 +37,15 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.2f;
+    float alpha = 0.3f;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.3f;
+    float epsilon = 0.35f;
 
+    float sensorPriority = 0.4f;
+    float rewardPriority = 0.85f;
+    float goalFeedbackPriority = rewardPriority;
+    float goalPriority = rewardPriority;
 
     final FloatToObjectFunction sensorTruth =  (v) -> {
         /*return new DefaultTruth(
@@ -106,7 +105,7 @@ public class NAgent implements Agent {
 
         this.reward = new SensorConceptDebug("(R)", nar,
                 new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
-                .resolution(0.01f).timing(-1, -1);
+                .resolution(0.01f).timing(-1, -1).pri(rewardPriority);
 
 //        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
 //        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
@@ -159,7 +158,7 @@ public class NAgent implements Agent {
                 //single bit case
                 return new SensorConceptDebug(inputConceptName(i,bit), nar,  () -> {
                     return input[i];
-                }, sensorTruth).resolution(0.01f).timing(-1, -1);
+                }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority);
             }
 
 //
@@ -186,7 +185,7 @@ public class NAgent implements Agent {
                 //System.out.println(i + ": " + input[i] + " " + bit + " = " + v);
                 return (v >= min) && (v < max) ? 1f : 0f;
 
-            }, sensorTruth).resolution(0.01f).timing(-1, -1);
+            }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority);
 
         });
     }
@@ -272,11 +271,11 @@ public class NAgent implements Agent {
                     off = 1; //full off
                 }
 
-                nar.believe(actions.get(lastAction), Tense.Present, 0, alpha);
-                nar.goal(actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
+                nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha);
+                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
             }
 
-            nar.goal(actions.get(nextAction), Tense.Present, 1f, alpha );
+            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, alpha );
 
             on = 1f;
         } else {
@@ -288,7 +287,7 @@ public class NAgent implements Agent {
                 on = 0.5f;
             }
         }
-        nar.believe(actions.get(nextAction), Tense.Present, 1f, alpha * on);
+        nar.believe(goalFeedbackPriority, actions.get(nextAction), Tense.Present, 1f, alpha * on);
 
         /*for (int a = 0; a < actions.size(); a++)
             nar.believe(actions.get(a), Tense.Present,

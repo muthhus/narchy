@@ -288,7 +288,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
         return goal(
                 getDefaultPriority(GOAL),
-                getDefaultDurability(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
@@ -296,6 +295,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf)  {
         believe(getDefaultPriority(BELIEF), term, time(tense), freq, conf);
         return this;
+    }
+
+    @Nullable
+    public Task believe(float priority, @NotNull Termed term, Tense tense, float freq, float conf) throws NarseseException {
+        return believe(priority, getDefaultDurability(BELIEF), term, time(tense), freq, conf);
     }
 
     @Nullable
@@ -374,12 +378,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return input(pri, dur, term, BELIEF, occurrenceTime, freq, conf);
     }
 
-    /**
-     * TODO add parameter for Tense control. until then, default is Now
-     */
-    @Nullable
-    public NAR goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf)  {
-        input(pri, dur, goal, GOAL, occurrence, freq, conf);
+
+    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf)  {
+        input(pri, getDefaultDurability(GOAL), goal, GOAL, when, freq, conf);
+        return this;
+    }
+    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, Tense tense, float freq, float conf)  {
+        input(pri, getDefaultDurability(GOAL), goal, GOAL, time(tense), freq, conf);
         return this;
     }
 

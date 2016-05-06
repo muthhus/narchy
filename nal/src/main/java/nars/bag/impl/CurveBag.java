@@ -66,7 +66,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
     @Override
-    public Bag<V> commit(Consumer<BLink<? extends V>> each) {
+    public Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
         super.commit(each);
         sampler.commit(this);
         return this;

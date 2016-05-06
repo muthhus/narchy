@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static nars.nal.Tense.TIMELESS;
+
 
 /**
  * Utility methods for Attention Forgetting processes
@@ -66,7 +68,7 @@ public enum Forget { ;
         /** cached value of # cycles equivalent of the supplied forget durations parameter */
         protected transient float forgetCyclesCached = Float.NaN;
         protected transient float perfectionCached = Float.NaN;
-        protected transient long now = Tense.TIMELESS;
+        protected transient long now = TIMELESS;
 
         public AbstractForget(@NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
             this.forgetDurations = forgetDurations;
@@ -170,24 +172,24 @@ public enum Forget { ;
 
         @Override
         public void accept(@NotNull BLink<? extends X> budget) {
-            forget(budget, budget.setLastForgetTime(now));
-        }
+            boolean noo = budget.getLastForgetTime() == TIMELESS;
+            long dt = budget.setLastForgetTime(now);
+            if (dt > 0 || noo) {
 
-        private void forget(@NotNull BLink<? extends X> budget, long dt) {
+                float p = budget.priIfFiniteElseZero();
+                float threshold = budget.qua() * perfectionCached;
 
-            float p = budget.priIfFiniteElseZero();
-            float threshold = budget.qua() * perfectionCached;
+                if (p > threshold) {
 
-            if (p > threshold) {
-                if (dt > 0) {
                     //Exponential decay
                     p *= (float) Math.exp(
                             -((1.0f - budget.dur()) / forgetCyclesCached) * dt
                     );
-                }
-            }
 
-            budget.setPriority(Math.max(threshold, p));
+                }
+
+                budget.setPriority(Math.max(threshold, p));
+            }
         }
 
     }

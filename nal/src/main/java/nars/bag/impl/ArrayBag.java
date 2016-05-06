@@ -8,6 +8,7 @@ import nars.budget.Budgeted;
 import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -273,35 +274,35 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 //    }
     @NotNull
     @Override
-    public Bag<V> commit() {
+    @Deprecated public Bag<V> commit() {
 //        super.commit();
 //        sampler.commit(this);
 //        return this;
-        return commit(null);
+        return commit(n -> {});
     }
 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
-    @Override public Bag<V> commit(Consumer<BLink<? extends V>> each) {
+    @Override public Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
         int s = size();
+        if (s == 0)
+            return this;
+
         int dirtyStart = -1;
         int dirtyEnd = -1;
-        BLink<V> prev = null;
+        @NotNull BLink<V> prev = item(0); //compares with self below to avoid a null check in subsequent iterations
         for (int i = 0; i < s; i++) {
             BLink<V> b = item(i);
 
-            if (each!=null)
-                each.accept(b);
+            each.accept(b);
 
-            if (b.commit()) {
-                if (prev!=null && compare(b, prev) < 0) {
-                    //detected out-of-order
+            if (b.commit() && compare(b, prev) < 0) {
+                //detected out-of-order
 
-                    if (dirtyStart == -1) {
-                        dirtyStart = i; //TODO this only happens once
-                    }
-
-                    dirtyEnd = i;  //TODO this only happens once
+                if (dirtyStart == -1) {
+                    dirtyStart = i; //TODO this only happens once
                 }
+
+                dirtyEnd = i;
             }
 
             prev = b;
@@ -314,16 +315,20 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
             //Special case: only one unordered item; remove and reinsert
             int dirtyRange = 1 + dirtyEnd - dirtyStart;
+            SortedList_1x4<BLink<V>> items = this.items;
+            List<BLink<V>> itemList = items.list;
+
             if (dirtyRange == 1) {
                 //TODO
-                BLink<V> x = items.list.remove(dirtyEnd); //remove directly from the decorated list
+                BLink<V> x = itemList.remove(dirtyStart); //remove directly from the decorated list
                 items.add(x); //add using the sorted list
                 return this;
-            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * size()) ) {
+            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
                 BLink<V>[] tmp = new BLink[dirtyRange];
 
-                for (int k = 0; k < dirtyRange; k++)
-                    tmp[k] = items.list.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+                for (int k = 0; k < dirtyRange; k++) {
+                    tmp[k] = itemList.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+                }
 
                 //TODO items.get(i) and
                 //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
@@ -334,7 +339,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
                 return this;
             }
 
-            ((FasterList) items.list).sortThis(this);
+            ((FasterList) itemList).sortThis(this);
         }
 
         return this;

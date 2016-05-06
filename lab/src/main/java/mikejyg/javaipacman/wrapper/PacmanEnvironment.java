@@ -38,18 +38,18 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 3;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 
 
 	public static void main (String[] args) 	{
-		NAgent a = new NAgent(new Default(768, 1, 1, 3)
+		NAgent a = new NAgent(new Default(1024, 5, 1, 3)
 				//.logSummaryGT(System.out, 0.01f)
 				);
-		//a.nar.conceptActivation.setValue(0.45f);
-		a.nar.cyclesPerFrame.set(400);
+		a.nar.conceptActivation.setValue(0.2f);
+		a.nar.cyclesPerFrame.set(600);
 
 		new PacmanEnvironment().run(
 				//new DQN(),
