@@ -692,6 +692,16 @@ public class PremiseRule extends GenericCompound {
 ////                    }
 //                    break;
 
+                case "belief":
+                    switch (arg1.toString()) {
+                        case "negative":
+                            preNext = BeliefNegative.the;
+                            break;
+                        case "positive":
+                            preNext = BeliefPositive.the;
+                            break;
+                    }
+                    break;
 
                 case "task":
                     switch (arg1.toString()) {

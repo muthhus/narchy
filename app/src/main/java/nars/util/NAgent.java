@@ -60,6 +60,7 @@ public class NAgent implements Agent {
 
 
     private int discretization = 1;
+    private float lastMotivation = 0;
     //private SensorConcept dRewardPos, dRewardNeg;
 
     public NAgent(NAR n) {
@@ -222,9 +223,10 @@ public class NAgent implements Agent {
 
         observe(nextObservation);
 
-        int nextAction = decide(this.lastAction);
+        decide(this.lastAction);
 
-        return this.lastAction = nextAction;
+        return lastAction;
+
     }
 
     public void observe(float[] nextObservation) {
@@ -245,32 +247,52 @@ public class NAgent implements Agent {
 
     }
 
-    private int decide(int lastAction) {
+    private void decide(int lastAction) {
         int nextAction = -1;
-        float best = Float.NEGATIVE_INFINITY;
+        float nextMotivation = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < motivation.length; i++) {
             float m = motivation[i];
-            if (m > best) {
-                best = m;
+            if (m > nextMotivation) {
+                nextMotivation = m;
                 nextAction = i;
             }
         }
 
+        float on;
         if (lastAction!=nextAction) {
             if (lastAction != -1) {
-                nar.believe(actions.get(lastAction), Tense.Present, 0f, alpha);
-                nar.goal(actions.get(lastAction), Tense.Present, 0f, alpha);
+
+                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
+                float off;
+                if (lastMotivation > nextMotivation) {
+                    off = 0.5f; //partial off
+                } else {
+                    off = 1; //full off
+                }
+
+                nar.believe(actions.get(lastAction), Tense.Present, 0, alpha * off);
+                nar.goal(actions.get(lastAction), Tense.Present, 0, alpha * off);
             }
 
+            on = 1f;
+        } else {
+
+            //TWEAK - activate a repeated chosen goal less if reward has decreased
+            if (dReward >= 0) {
+                on = 1f;
+            } else {
+                on = 0.5f;
+            }
         }
-        nar.goal(actions.get(nextAction), Tense.Future, 1f, alpha);
-        nar.believe(actions.get(nextAction), Tense.Future, 1f, alpha);
+        nar.goal(actions.get(nextAction), Tense.Present, 1f, alpha * on);
+        nar.believe(actions.get(nextAction), Tense.Present, 1f, alpha * on);
 
         /*for (int a = 0; a < actions.size(); a++)
             nar.believe(actions.get(a), Tense.Present,
                     (nextAction == a ? 1f : 0f), 0.9f);*/
 
-        return nextAction;
+        this.lastAction = nextAction;
+        this.lastMotivation = nextMotivation;
     }
 
     private String actionConceptName(int i) {

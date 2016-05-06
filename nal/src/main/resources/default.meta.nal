@@ -357,7 +357,8 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M), belief(positive) |- ((&&,M,A..+) ==> C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M), belief(negative) |- ((&&,(--,M),A..+) ==> C), (Belief:InductionNeg)
 
     ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==> C), (Belief:Deduction)
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==> C), (Belief:Abduction)

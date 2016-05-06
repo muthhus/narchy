@@ -3,19 +3,20 @@ package nars.nal.meta.op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Created by me on 5/5/16.
+ */
+public final class BeliefNegative extends AtomicBooleanCondition<PremiseEval> {
 
-public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
-
-    public static final TaskNegative the = new TaskNegative();
+    public static final BeliefNegative the = new BeliefNegative();
 
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
-        Truth t = m.premise.task().truth();
-        return (t!=null && t.freq() < 0.5f);
+        Task b = m.premise.belief();
+        return (b != null && b.freq() < 0.5f);
     }
 
     @NotNull
@@ -23,6 +24,4 @@ public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
     public String toString() {
         return getClass().getSimpleName();
     }
-
-
 }

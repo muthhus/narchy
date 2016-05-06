@@ -267,15 +267,17 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
 
-        //float volRatioScale = 1f / derived.volume();
+        float volRatioScale = 1f / derived.volume();
 
+        /*
         int tasktermVol = nal.task().term().volume();
         float volRatioScale =
             Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
+        */
 
 
         //originally was OR, but this can explode because the result of OR can exceed the inputs
-        float priority = or(taskLink.pri(), termLink.pri());
+        float priority = and(taskLink.pri(), termLink.pri());
 
         //originaly was 'AND'
         float durability = and(taskLink.dur() * volRatioScale, termLink.dur());
@@ -289,8 +291,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
         termLink.orPriority(quality,
-                //and(sourceActivation, targetActivation)
-                or(sourceActivation, targetActivation)
+                and(sourceActivation, targetActivation)
+                //or(sourceActivation, targetActivation)
         ); //was: termLink.orPriority(or(quality, targetActivation));
         termLink.orDurability(quality);
 

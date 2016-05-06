@@ -20,8 +20,8 @@ import static nars.util.Texts.n2;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 450;
-    public final float speed = 0.01f;
+    public float targetPeriod = 250;
+    public final float speed = 0.02f;
     boolean print = true;
     private MutableFloat yHidden;
     private MutableFloat yEst;
@@ -122,13 +122,14 @@ public class Thermostat implements Environment {
 
     public static void main(String[] args) {
         Default n = new Default(512, 3, 1, 3);
-        n.conceptActivation.setValue(0.33);
+        n.conceptActivation.setValue(0.3);
         n.cyclesPerFrame.set(16);
         //n.shortTermMemoryHistory.set(3);
         //n.logSummaryGT(System.out, 0.55f);
 
         //n.conceptRemembering.setValue(1);
-        NAgent a = new NAgentDebug(n);
+        NAgent a = //new NAgentDebug(n);
+                new NAgent(n);
 
         new Thermostat().run(
             //new DQN(),
