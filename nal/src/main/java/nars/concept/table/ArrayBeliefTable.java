@@ -55,7 +55,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         if (eternalCapacity > 0)
-            eternal = new SetTable<Task>(mp, new FasterList(eternalCapacity)) {
+            eternal = new SetTable<Task>(mp, eternalCapacity) {
 
                 @Override
                 public int compare(Task o1, Task o2) {
@@ -67,7 +67,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
         if (temporalCapacity > 0) {
-            temporal = new SetTable<Task>(mp, new FasterList(temporalCapacity)) {
+            temporal = new SetTable<Task>(mp, temporalCapacity) {
 
                 @Override
                 public int compare(Task o1, Task o2) {
@@ -521,8 +521,9 @@ public class ArrayBeliefTable implements BeliefTable {
 //    }
 
     abstract static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(Map<T, T> index, List<T> items) {
-            super(items, index);
+        public SetTable(Map<T, T> index, int capacity) {
+            super( new FasterList(capacity), index);
+            setCapacity(capacity);
         }
 
         @Override
