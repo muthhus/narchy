@@ -25,7 +25,7 @@ public class TruthPolation {
     int count;
 
     public TruthPolation(int size) {
-        s = new InterpolatingMicrosphere(1, size * 2, 0.5, 0.01, 0.5f,
+        s = new InterpolatingMicrosphere(1, size * 8, 1.0, Global.TRUTH_EPSILON, 0.5f,
                 new UnitSphereRandomVectorGenerator(1));
 
         times = new double[size][];
@@ -62,7 +62,7 @@ public class TruthPolation {
     }
 
     public Truth value(long when) {
-        double[] v = s.value(new double[]{when}, times, freq, conf, 2, 0.5, count);
+        double[] v = s.value(new double[]{when}, times, freq, conf, 1, 0.5, count);
         return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
     }
 
@@ -72,9 +72,9 @@ public class TruthPolation {
         List<Task> l = Global.newArrayList();
 
         NAR n = new Default();
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(0).setCreationTime(0) );
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(5).setCreationTime(0) );
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(10).setCreationTime(0) );
+        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
+        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
+        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
 
         p.set(l, null);
 

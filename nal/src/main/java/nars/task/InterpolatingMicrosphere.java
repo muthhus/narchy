@@ -19,7 +19,6 @@ package nars.task;
 import nars.Global;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathArrays;
 
 import java.util.Arrays;
@@ -227,7 +226,7 @@ public class InterpolatingMicrosphere {
             final double[] diff = MathArrays.ebeSubtract(samplePoints[i], targetPoint);
             final double diffNorm = MathArrays.safeNorm(diff);
 
-            if (FastMath.abs(diffNorm) < noInterpolationTolerance) {
+            if (Math.abs(diffNorm) < noInterpolationTolerance) {
                 // No need to interpolate, as the interpolation point is
                 // actually (very close to) one of the sampled points.
 
@@ -236,10 +235,8 @@ public class InterpolatingMicrosphere {
             }
 
             double weight = pow(diffNorm, -exponent);
-            if (sampleWeights!=null)
-                weight *= sampleWeights[i];
 
-            illuminate(diff, sampleValues[i], weight);
+            illuminate(diff, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
         }
 
         return interpolate();
@@ -277,7 +274,7 @@ public class InterpolatingMicrosphere {
         }
 
         microsphere.add(normal);
-        microsphereData.add(new double[] { 0d, 0d});
+        microsphereData.add(new double[3]);
     }
 
     /**
@@ -293,9 +290,11 @@ public class InterpolatingMicrosphere {
         double value = 0;
         double totalWeight = 0;
         for (double[] fd : microsphereData) {
-            final double iV = fd[0]; /* illumination */
+            double iV = fd[0]; /* illumination */
             if (iV != 0d) {
-                value += iV * fd[1]; /* sample */
+                double conf = fd[2];
+                iV *= conf;
+                value += iV * fd[1] * conf; /* sample */
                 totalWeight += iV;
             } else {
                 ++darkCount;
@@ -308,7 +307,9 @@ public class InterpolatingMicrosphere {
             value / totalWeight :
             background;
 
-        double c = totalWeight / microsphereData.size();
+        double c = totalWeight /
+                (microsphereData.size());
+                //(microsphereData.size());
 
         return new double[] {v, c};
     }
@@ -323,7 +324,8 @@ public class InterpolatingMicrosphere {
      */
     private void illuminate(double[] sampleDirection,
                             double sampleValue,
-                            double weight) {
+                            double weight,
+                            double conf) {
         for (int i = 0; i < size; i++) {
             final double[] n = microsphere.get(i);
             final double cos = MathArrays.cosAngle(n, sampleDirection);
@@ -333,16 +335,17 @@ public class InterpolatingMicrosphere {
 
                 if (illumination > darkThreshold &&
                     illumination > microsphereData.get(i)[0]) {
-                    setData(i, illumination, sampleValue );
+                    setData(i, illumination, sampleValue, conf );
                 }
             }
         }
     }
 
-    protected void setData(int i, double illumination, double sampleValue) {
+    protected void setData(int i, double illumination, double sampleValue, double conf) {
         double[] d = microsphereData.get(i);
         d[0] = illumination;
         d[1] = sampleValue;
+        d[2] = conf;
     }
 
     /**
@@ -350,7 +353,7 @@ public class InterpolatingMicrosphere {
      */
     private void clear() {
         for (int i = 0; i < size; i++) {
-            setData(i, 0, 0);
+            setData(i, 0, 0, 0);
         }
     }
 
@@ -414,30 +417,6 @@ public class InterpolatingMicrosphere {
 //        }
 //    }
 
-
-    public static void main(String[] args) {
-        InterpolatingMicrosphere s = new InterpolatingMicrosphere(1, 16, 0.5, 0.01, 0.5f,
-                new UnitSphereRandomVectorGenerator(1));
-
-        double[][] data = new double[3][];  //occurrence (1D)
-        data[0] = new double[] { 0 };
-        data[1] = new double[] { 1 };
-        data[2] = new double[] { 2 };
-
-        double[] value = new double[3]; //freq
-        value[0] = 0;
-        value[1] = 0.75;
-        value[2] = 1.0;
-
-        //interpolation (revision) and extrapolation (projection)
-        for (double d = -1; d < 8; d+=0.2) {
-            double[] a1 = s.value(new double[]{d}, data, value, 2, Math.ulp(1d) /* occurrence time epsilon */);
-            System.out.println(d + ": " + Arrays.toString(a1));
-        }
-
-
-
-    }
 
     public double[] value(double[] doubles, double[][] data, double[] value, int i, double ulp) {
         return value(doubles, data, value, null, i, ulp, data.length);
