@@ -3,11 +3,12 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.NAR;
-import nars.bag.impl.ArrayTable;
+import nars.bag.Table;
+import nars.bag.impl.SortedArrayTable;
 import nars.bag.impl.ListTable;
+import nars.bag.impl.SortedTable;
 import nars.budget.BudgetMerge;
 import nars.task.Revection;
-import nars.task.Revision;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 public class DefaultBeliefTable implements BeliefTable {
 
     public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
-    @NotNull public final ListTable<Task,Task> eternal;
+    public final @NotNull SortedTable<Task,Task> eternal;
     @NotNull public final ListTable<Task,Task> temporal;
     @NotNull final Map<Task,Task> map;
 
@@ -40,9 +41,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
     //float ageFactor;
 
-    @Deprecated public DefaultBeliefTable(int capacity) {
-        this( Math.max(2, capacity), Math.max(2, capacity) );
-    }
 
     public DefaultBeliefTable(int eternalCapacity, int temporalCapacity) {
         super();
@@ -56,11 +54,11 @@ public class DefaultBeliefTable implements BeliefTable {
         if (eternalCapacity > 0)
             eternal = new EternalTable(mp, eternalCapacity);
         else
-            eternal = ListTable.Empty;
+            eternal = SortedTable.Empty;
 
 
         if (temporalCapacity > 0) {
-            temporal = new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity);
+            temporal = new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity, eternal);
         }
         else
             temporal = ListTable.Empty;
@@ -174,42 +172,12 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-//    @Override
-//    public boolean remove(@NotNull Task w) {
-//        if (w.isEternal()) {
-//            return eternal.remove(w)!=null;
-//        } else {
-//            if (temporal.remove(w)!=null) {
-//                updateTime(now, true);
-//                return true;
-//            }
-//            return false;
-//        }
-//    }
-//
-//    void updateTimeRange() {
-//        if (temporal.isEmpty()) {
-//            minT = maxT = lastUpdate;
-//        } else {
-//            long minT = this.minT = Long.MAX_VALUE;
-//            long maxT = this.maxT = Long.MIN_VALUE;
-//            List<Task> list = temporal.items.list();
-//            for (int i = 0, listSize = list.size(); i < listSize; i++) {
-//                long o = list.get(i).occurrence();
-//                if (o > maxT) maxT = o;
-//                if (o < minT) minT = o;
-//            }
-//            this.minT = minT;
-//            this.maxT = maxT;
-//        }
-//
-//        //ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
-//    }
 
 
     public float rankTemporalByOriginality(@NotNull Task b) {
         return rankTemporalByOriginality(b, lastUpdate);
     }
+
     public static float rankTemporalByOriginality(@NotNull Task b, long when) {
         return BeliefTable.rankEternalByOriginality(b) *
                 BeliefTable.relevance(b, when, 1);
@@ -221,8 +189,8 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Iterator<Task> iterator() {
         return Iterators.concat(
-            eternal.list().iterator(),
-            temporal.list().iterator()
+            eternal.iterator(),
+            temporal.iterator()
         );
     }
 
@@ -253,7 +221,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public int getCapacity() {
+    public int capacity() {
         return eternal.capacity() + temporal.capacity();
     }
 
@@ -330,7 +298,7 @@ public class DefaultBeliefTable implements BeliefTable {
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = Revision.tryRevision(input, nar, eternal.list());
+        Task revised = ((EternalTable)eternal).tryRevision(input, nar);
         if (revised!=null)  {
             if(Global.DEBUG) {
                 if (revised.isDeleted())
@@ -349,8 +317,31 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
 
+        //AXIOMATIC/CONSTANT BELIEF/GOAL
+        if (input.conf() >=1f && eternal.capacity()!=1 && (eternal.isEmpty()||eternal.top().conf()<1f)) {
+            //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
+            //1. clear the corresponding table, set capacity to one, and insert this task
+            Consumer<Task> overridden = t -> {
+                TaskTable.removeTask(t, "Overridden", nar);
+            };
+            eternal.forEach(overridden);
+            eternal.clear();
+            eternal.setCapacity(1);
+
+            //2. clear the other table, set capcity to zero preventing temporal tasks
+            Table<Task, Task> otherTable = (eternal == eternal) ? temporal : eternal;
+            otherTable.forEach(overridden);
+            otherTable.clear();
+            otherTable.setCapacity(0);
+            NAR.logger.info("axiom: {}", input);
+
+            eternal.put(input, input);
+
+            return input;
+        }
+
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        return tryInsert(input, nar) ? input : null;
+        return insert(input, eternal, nar) ? input : null;
     }
 
     private Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
@@ -369,7 +360,7 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
         //inserting this task.  should be successful
-        boolean ii = tryInsert(input, nar);
+        boolean ii = insert(input, temporal, nar);
         assert(ii);
         return input;
 
@@ -435,36 +426,9 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private boolean tryInsert(@NotNull Task incoming, @NotNull NAR nar) {
+    private boolean insert(@NotNull Task incoming, Table<Task,Task> table, @NotNull NAR nar) {
 
         this.lastUpdate = nar.time();
-
-        ListTable<Task, Task> table = tableFor(incoming);
-
-
-        //AXIOMATIC/CONSTANT BELIEF/GOAL
-        if (incoming.conf() >=1f && table.capacity()!=1 && (table.isEmpty()||table.top().conf()<1f)) {
-            //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
-            //1. clear the corresponding table, set capacity to one, and insert this task
-            Consumer<Task> overridden = t -> {
-                TaskTable.removeTask(t, "Overridden", nar);
-            };
-            table.forEach(overridden);
-            table.clear();
-            table.setCapacity(1);
-
-            //2. clear the other table, set capcity to zero preventing temporal tasks
-            ListTable<Task, Task> otherTable = (table == eternal) ? temporal : eternal;
-            otherTable.forEach(overridden);
-            otherTable.clear();
-            otherTable.setCapacity(0);
-            NAR.logger.info("axiom: {}", incoming);
-
-            table.put(incoming, incoming);
-
-
-            return true;
-        }
 
         Task displaced = table.put(incoming, incoming);
 
@@ -483,10 +447,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return inserted;
     }
 
-    @NotNull
-    private ListTable<Task, Task> tableFor(@NotNull Task t) {
-        return t.isEternal() ? this.eternal : this.temporal;
-    }
+
 
     //    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
 //        if (input.getDeleted())
@@ -507,67 +468,6 @@ public class DefaultBeliefTable implements BeliefTable {
 //        });
 //    }
 
-    abstract static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(Map<T, T> index, int capacity, SortedList_1x4.SearchType searchType) {
-            super( new FasterList(capacity), index, searchType);
-            setCapacity(capacity);
-        }
-
-        @Override
-        public final T key(T t) {
-            return t;
-        }
-
-
-    }
-
-    /** stores the items unsorted; revection manages their ranking and removal */
-    private static class MicrosphereRevectionTemporalBeliefTable extends SetTable<Task> {
-
-        public MicrosphereRevectionTemporalBeliefTable(Map<Task, Task> mp, int temporalCapacity) {
-            super(mp, temporalCapacity, SortedList_1x4.SearchType.LinearSearch);
-        }
-
-        @Override
-        public int compare(Task o1, Task o2) {
-            throw new UnsupportedOperationException();
-            //return Float.compare(rankTemporalByOriginality(o2), rankTemporalByOriginality(o1));
-        }
-
-        @Nullable
-        @Override
-        public Task top() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Nullable
-        @Override
-        public Task bottom() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        protected Task addItem(Task i) {
-            if (size() >= capacity()) //should ensure space for this task before calling
-                throw new RuntimeException("temporal belief table fault");
-
-            ((SortedList_1x4)list()).list.add(i); //store unsorted directly
-            return null;
-        }
-
-    }
-
-    private static class EternalTable extends SetTable<Task> {
-
-        public EternalTable(Map<Task, Task> mp, int eternalCapacity) {
-            super(mp, eternalCapacity, SortedList_1x4.SearchType.BinarySearch);
-        }
-
-        @Override
-        public int compare(Task o1, Task o2) {
-            return Float.compare(BeliefTable.rankEternalByOriginality(o2), BeliefTable.rankEternalByOriginality(o1));
-        }
-    }
 
 
 //    /** computes the truth/desire as an aggregate of projections of all

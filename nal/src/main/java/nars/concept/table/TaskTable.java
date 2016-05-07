@@ -23,7 +23,7 @@ public interface TaskTable extends Iterable<Task> {
             memory.remove(t, reason);
     }
 
-    int getCapacity();
+    int capacity();
 
     void setCapacity(int newCapacity);
 
@@ -90,7 +90,7 @@ public interface TaskTable extends Iterable<Task> {
         }
 
         @Override
-        public int getCapacity() {
+        public int capacity() {
             return 0;
         }
 

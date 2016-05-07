@@ -29,6 +29,7 @@ public abstract class CollectorMap<K, V>  {
 
     /**
      * implementation for adding the value to another collecton (called internally)
+     * returns null if successful, non-null if an item was displaced it will be that item
      */
     protected abstract V addItem(V e);
 
@@ -118,9 +119,7 @@ public abstract class CollectorMap<K, V>  {
         return removeKey(key(value));
     }
 
-    public int size() {
-        return map.size();
-    }
+
 
 //    public final boolean containsValue(V it) {
 //        return map.containsValue(it);

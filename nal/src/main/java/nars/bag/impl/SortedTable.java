@@ -2,40 +2,22 @@ package nars.bag.impl;
 
 import nars.bag.Table;
 import nars.task.Task;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-/**
- * adds list selection and ranking methods to the Table interface
- */
-public interface ListTable<V, L> extends Table<V, L> {
 
+public interface SortedTable<V, L> extends Table<V,L> {
 
+    SortedTable Empty = new SortedTable() {
 
-    /** returns a list of the values */
-    List<L> list();
-
-
-
-    @Override default Iterator<L> iterator() {
-        return list().iterator();
-    }
-
-
-    @Override
-    default int size() {
-        return list().size();
-    }
-
-
-    ListTable Empty = new ListTable() {
-
+        @Override
+        public Iterator<Object> iterator() {
+            return Collections.emptyIterator();
+        }
 
         @Override
         public void clear() {
@@ -86,13 +68,21 @@ public interface ListTable<V, L> extends Table<V, L> {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         @Override
-        public List<Object> list() {
-            return Collections.emptyList();
+        public Object top() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public Object bottom() {
+            return null;
         }
     };
 
+    @Nullable L top();
 
-
+    @Nullable L bottom();
 
 }

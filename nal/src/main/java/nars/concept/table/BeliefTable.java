@@ -36,7 +36,7 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public int getCapacity() {
+        public int capacity() {
             return 0;
         }
 

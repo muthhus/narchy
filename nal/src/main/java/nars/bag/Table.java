@@ -1,9 +1,13 @@
 package nars.bag;
 
 import com.google.common.base.Joiner;
+import nars.bag.impl.SortedTable;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -24,9 +28,6 @@ public interface Table<K,V> extends Iterable<V> {
 
     int size();
 
-    default boolean isEmpty() {
-        return size() == 0;
-    }
 
 //    void setOnRemoval(Consumer<V> onRemoval);
 //    Consumer<V> getOnRemoval();
@@ -37,6 +38,19 @@ public interface Table<K,V> extends Iterable<V> {
 
     /** iterates in sorted order */
     void forEachKey(@NotNull Consumer<? super K> each);
+
+    int capacity();
+
+    void setCapacity(int i);
+
+    default boolean isEmpty() {
+        return size() == 0;
+    }
+
+    default boolean isFull() {
+        return size() >= capacity();
+    }
+
 
 //    default void top(@NotNull Consumer<V> each) {
 //        topWhile(e -> {
@@ -56,5 +70,4 @@ public interface Table<K,V> extends Iterable<V> {
         return Joiner.on(",").join(this);
     }
 
-    boolean isFull();
 }

@@ -381,11 +381,6 @@ public final class BudgetFunctions extends UtilityFunctions {
      *
      * if either input budget is null or deleted (non-exists), the burden will shift
      * to the other budget (if exists). if neither exists, no effect results.
-     *
-     * @param a
-     * @param b
-     * @param resultPri
-     * @param aStrength
      */
     public static void balancePri(@Nullable Budget a, @Nullable Budget b, float resultPri, float aStrength) {
 

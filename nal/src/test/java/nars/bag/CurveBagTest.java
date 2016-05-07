@@ -89,13 +89,13 @@ public class CurveBagTest  {
 
         a.commit();
 
-        assertEquals("[y=$0.2000;0.5000;0.5000$, x=$0.1000;0.5000;0.5000$]", a.items.toString());
+        assertEquals("[y=$0.2000;0.5000;0.5000$, x=$0.1000;0.5000;0.5000$]", a.list().toString());
 
         a.put("x", new UnitBudget(0.2f,0.5f,0.5f));
         a.commit();
 
         //x should now be ahead
-        assertEquals("[x=$0.3000;0.5000;0.5000$, y=$0.2000;0.5000;0.5000$]", a.items.toString());
+        assertEquals("[x=$0.3000;0.5000;0.5000$, y=$0.2000;0.5000;0.5000$]", a.list().toString());
 
         ii = a.iterator();
         assertEquals("x", ii.next().get());
@@ -131,7 +131,7 @@ public class CurveBagTest  {
         a.remove("x");
         assertEquals(0, a.size());
         assertTrue(a.isEmpty());
-        assertTrue(a.items.isEmpty());
+        assertTrue(a.list().isEmpty());
         assertTrue(a.keySet().isEmpty());
 
     }

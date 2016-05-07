@@ -6,7 +6,6 @@ import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.util.data.list.FasterList;
-import nars.util.data.sorted.SortedIndex;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
+public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V> {
 
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;

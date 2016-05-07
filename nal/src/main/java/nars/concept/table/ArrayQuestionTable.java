@@ -37,7 +37,7 @@ public class ArrayQuestionTable implements QuestionTable {
     }
 
     @Override
-    public int getCapacity() {
+    public int capacity() {
         return capacity;
     }
 
