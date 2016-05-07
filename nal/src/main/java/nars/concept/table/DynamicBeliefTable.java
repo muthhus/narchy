@@ -83,11 +83,6 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     }
 
     @Override
-    public void setCapacity(int newCapacity) {
-
-    }
-
-    @Override
     public int size() {
         return isEmpty() ? 0 : 1;
     }

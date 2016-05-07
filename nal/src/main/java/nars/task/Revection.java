@@ -5,6 +5,7 @@ import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.TaskTable;
+import nars.concept.table.TemporalBeliefTable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -39,9 +40,8 @@ public class Revection {
     /**
      * returns true if the full table has been compacted allowing a free space for the new input task
      */
-    public static boolean revect(@NotNull Task input, @NotNull DefaultBeliefTable table, @NotNull NAR nar) {
+    public static boolean revect(@NotNull Task input, @NotNull TemporalBeliefTable temporal, @NotNull NAR nar) {
 
-        @NotNull ListTable<Task, Task> temporal = table.temporal;
         List<Task> tasks = temporal.list();
         int n = tasks.size();
 

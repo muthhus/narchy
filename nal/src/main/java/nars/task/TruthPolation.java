@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.Global;
+import nars.concept.table.TemporalBeliefTable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
@@ -63,7 +64,7 @@ public class TruthPolation {
 
     final WeakHashMap<Task,Float> credit =new WeakHashMap();
 
-    public void updateCredit() {
+    protected void updateCredit() {
 
         for (double[] ss : s.microsphereData) {
             int sample = (int)ss[3];
@@ -114,5 +115,9 @@ public class TruthPolation {
         }
 
         System.out.println(p.credit);
+    }
+
+    public int capacity() {
+        return times.length;
     }
 }

@@ -41,11 +41,6 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void setCapacity(int newCapacity) {
-
-        }
-
-        @Override
         public int size() {
             return 0;
         }
@@ -169,6 +164,11 @@ public interface BeliefTable extends TaskTable {
             return rank;
         }
 
+    }
+
+    static float rankTemporalByOriginality(@NotNull Task b, long when) {
+        return BeliefTable.rankEternalByOriginality(b) *
+                BeliefTable.relevance(b, when, 1);
     }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
@@ -368,8 +368,8 @@ public interface BeliefTable extends TaskTable {
         Task belief;
         do {
             belief = top(
-                    //nar.time()
-                    taskOcc
+                //nar.time()
+                taskOcc
             );
 
             if (belief == null)

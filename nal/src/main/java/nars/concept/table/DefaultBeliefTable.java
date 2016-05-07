@@ -4,22 +4,14 @@ import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.NAR;
 import nars.bag.Table;
-import nars.bag.impl.SortedArrayTable;
-import nars.bag.impl.ListTable;
 import nars.bag.impl.SortedTable;
 import nars.budget.BudgetMerge;
-import nars.task.Revection;
 import nars.task.Task;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import nars.util.data.list.FasterList;
-import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -30,20 +22,18 @@ import java.util.function.Consumer;
 public class DefaultBeliefTable implements BeliefTable {
 
     public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
-    public final @NotNull SortedTable<Task,Task> eternal;
-    @NotNull public final ListTable<Task,Task> temporal;
+
+    @NotNull public final SortedTable<Task,Task> eternal;
+    @NotNull public final TemporalBeliefTable temporal;
     @NotNull final Map<Task,Task> map;
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQDominant;
 
     private long lastUpdate; //cached value, updated before temporal operations begin
-    //private long minT, maxT;
 
-    //float ageFactor;
 
 
     public DefaultBeliefTable(int eternalCapacity, int temporalCapacity) {
-        super();
 
         Map<Task, Task> mp;
         this.map = mp =
@@ -57,133 +47,30 @@ public class DefaultBeliefTable implements BeliefTable {
             eternal = SortedTable.Empty;
 
 
-        if (temporalCapacity > 0) {
+        if (temporalCapacity > 0)
             temporal = new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity, eternal);
-        }
         else
-            temporal = ListTable.Empty;
+            temporal = TemporalBeliefTable.Empty;
 
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
     @Override
-    @Nullable public Truth truth(long when, long now) {
+    @Nullable public final Truth truth(long when, long now) {
 
-        //old method: project the top task
-        //Task top = top(when, now);
-        //return (top == null) ? null : top.truth().project(when, top.occurrence(), now, dur);
-
-
-        //compute weighted average:
-
-        Task eternal = topEternal();
-
-        if (temporal.isEmpty()) {
+        if (!temporal.isEmpty()) {
+            return temporal.truth(when);
+        } else {
+            Task eternal = topEternal();
             if (eternal != null) //optimization: just return the top eternal truth if no temporal to adjust with
                 return eternal.truth();
             else
                 return Truth.Null;
         }
-
-
-        return topTemporalCurrent(when, now, eternal);
-        //return topTemporalWeighted(when, now, eternal);
     }
-
-    @Nullable
-    public Truth topTemporalCurrent(long when, long now, @Nullable Task topEternal) {
-        //find the temporal with the best rank
-        Task t = topTemporal(when, now);
-        if (t == null) {
-            return (topEternal != null) ? topEternal.truth() : Truth.Null;
-        } else {
-            Truth tt = t.truth();
-            return (topEternal() != null) ? tt.interpolate(topEternal.truth()) : tt;
-
-            //return t.truth();
-        }
-    }
-
-
-    //NEEDS DEBUGGED
-    @Nullable public Truth topTemporalWeighted(long when, long now, @Nullable Task topEternal) {
-
-        float sumFreq = 0, sumConf = 0;
-        float nF = 0, nC = 0;
-
-        if (topEternal!=null) {
-            //include with strength of 1
-
-            float ec = topEternal.conf();
-
-            sumFreq += topEternal.freq() * ec;
-            sumConf += ec;
-            nF+= ec;
-            nC+= ec;
-        }
-
-        List<Task> temp = temporal.list();
-        int numTemporal = temp.size();
-
-        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
-            return temp.get(0).truth();
-
-
-//        long maxtime = Long.MIN_VALUE;
-//        long mintime = Long.MAX_VALUE;
-//        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-//            long t = temp.get(i).occurrence();
-//            if (t > maxtime)
-//                maxtime = t;
-//            if (t < mintime)
-//                mintime = t;
-//        }
-//        float dur = 1f/(1f + (maxtime - mintime));
-
-
-        long mdt = Long.MAX_VALUE;
-        for (int i = 0; i < numTemporal; i++) {
-            long t = temp.get(i).occurrence();
-            mdt = Math.min(mdt, Math.abs(now - t));
-        }
-        float window = 1f / (1f + mdt/2);
-
-
-        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-            Task x = temp.get(i);
-
-            float tc = x.conf();
-
-            float w = TruthFunctions.temporalIntersection(
-                    when, x.occurrence(), now, window);
-
-            //strength decreases with distance in time
-            float strength =  w * tc;
-
-            sumConf += tc * w;
-            nC+=tc;
-
-            sumFreq += x.freq() * strength;
-            nF+=strength;
-        }
-
-        return nC == 0 ? Truth.Null :
-                new DefaultTruth(sumFreq / nF, (sumConf/nC));
-    }
-
-
-
-
-    public float rankTemporalByOriginality(@NotNull Task b) {
-        return rankTemporalByOriginality(b, lastUpdate);
-    }
-
-    public static float rankTemporalByOriginality(@NotNull Task b, long when) {
-        return BeliefTable.rankEternalByOriginality(b) *
-                BeliefTable.relevance(b, when, 1);
-
-    }
-
+//    public float rankTemporalByOriginality(@NotNull Task b) {
+//        return BeliefTable.rankTemporalByOriginality(b, lastUpdate);
+//    }
 
     @NotNull
     @Override
@@ -200,17 +87,6 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal.forEach(action);
     }
 
-    //TODO public void setCapacity(int eternal, int temporal) { ... }
-
-    @Override
-    public void setCapacity(int newCapacity) {
-        throw new UnsupportedOperationException();
-
-//        if (newCapacity == 1) newCapacity = 2; //prevent 0 by accident
-//        eternal.setCapacity(newCapacity/2);
-//        temporal.setCapacity(newCapacity/2);
-    }
-
     @Override
     public int size() {
         return map.size(); //eternal.size() + temporal.size();
@@ -224,11 +100,6 @@ public class DefaultBeliefTable implements BeliefTable {
     public int capacity() {
         return eternal.capacity() + temporal.capacity();
     }
-
-    //    @Override
-//    public Task top(boolean hasQueryVar, long now, long occTime, Truth truth) {
-//        throw new RuntimeException("not supposed to be called");
-//    }
 
 
     @Override
@@ -253,29 +124,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public final Task topTemporal(long when, long now) {
-        Task best = null;
-        List<? extends Task> l = temporal.list();
-
-        //find the best balance of temporal proximity and confidence
-        int ls = l.size();
-        if (ls == 1)
-            return l.get(0); //the only task
-
-        float ageFactor = 1f;///(1 + Math.abs(when - now) * 1f);
-        float bestRank = -1;
-
-        for (int i = 0; i < ls; i++) {
-            Task x = l.get(i);
-            float r = BeliefTable.rankTemporalByConfidence(x, when, now, ageFactor, bestRank);
-            if (r > bestRank) {
-                best = x;
-                bestRank = r;
-            }
-        }
-        //System.out.println("\t " + best);
-
-
-        return best;
+        return temporal.top(when, now);
     }
 
 
@@ -296,6 +145,10 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
+
+        //HACK
+        if (eternal == SortedTable.Empty)
+            return null;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
         Task revised = ((EternalTable)eternal).tryRevision(input, nar);
@@ -346,22 +199,13 @@ public class DefaultBeliefTable implements BeliefTable {
 
     private Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
-        if (temporal.isFull() /*&& temporal.capacity() > 1*/) {
-            //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-
-            //TODO cache start, stop
-            //long start = temporal.list().stream().mapToLong(t -> t.occurrence()).min().getAsLong();
-            //long end = temporal.list().stream().mapToLong(t -> t.occurrence()).max().getAsLong();
-
-            if (!Revection.revect(input, this, nar)) {
-                return null; //rejected
-            }
-
+        input = temporal.prepare(input, nar);
+        if (input != null) {
+            //inserting this task.  should be successful
+            boolean ii = insert(input, temporal, nar);
+            assert (ii);
         }
 
-        //inserting this task.  should be successful
-        boolean ii = insert(input, temporal, nar);
-        assert(ii);
         return input;
 
     }
@@ -386,6 +230,33 @@ public class DefaultBeliefTable implements BeliefTable {
         }
         return false;
     }
+
+
+
+
+    /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
+     *  returns true if it was inserted, false if not
+     * */
+    private boolean insert(@NotNull Task incoming, Table<Task,Task> table, @NotNull NAR nar) {
+
+        this.lastUpdate = nar.time();
+
+        Task displaced = table.put(incoming, incoming);
+
+        boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
+
+        if (displaced!=null && !displaced.isDeleted()) {
+            TaskTable.removeTask(displaced,
+                    "Displaced",
+                    //"Displaced by " + incoming,
+                    nar);
+        }
+
+        return inserted;
+    }
+
+}
+
 
 
 //    private Task insert(@NotNull Task t, @NotNull Memory memory) {
@@ -422,34 +293,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
 
-
-    /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
-     *  returns true if it was inserted, false if not
-     * */
-    private boolean insert(@NotNull Task incoming, Table<Task,Task> table, @NotNull NAR nar) {
-
-        this.lastUpdate = nar.time();
-
-        Task displaced = table.put(incoming, incoming);
-
-        boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
-
-        if (displaced!=null && !displaced.isDeleted()) {
-            TaskTable.removeTask(displaced,
-                    "Displaced",
-                    //"Displaced by " + incoming,
-                    nar);
-        }
-
-//        if (inserted && !incoming.isEternal())
-//            updateTimeRange();
-
-        return inserted;
-    }
-
-
-
-    //    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
+//    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
 //        if (input.getDeleted())
 //            throw new RuntimeException("Deleted task being added");
 //
@@ -675,7 +519,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
 
-    //    public static float rankBeliefConfidence(final Sentence judg) {
+//    public static float rankBeliefConfidence(final Sentence judg) {
 //        return judg.getTruth().getConfidence();
 //    }
 //
@@ -761,4 +605,3 @@ public class DefaultBeliefTable implements BeliefTable {
 //        if (closest == null) return null;
 //        return closest.projectTask(t.getOccurrenceTime(), now);
 //    }
-}

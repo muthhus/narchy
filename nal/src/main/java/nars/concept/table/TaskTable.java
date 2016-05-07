@@ -25,8 +25,6 @@ public interface TaskTable extends Iterable<Task> {
 
     int capacity();
 
-    void setCapacity(int newCapacity);
-
     /**
      * number of items in this collection
      */

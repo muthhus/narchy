@@ -18,6 +18,7 @@ public interface QuestionTable extends TaskTable {
     @Nullable
     Task add(Task t, Memory m);
 
+    void setCapacity(int newCapacity);
 
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
