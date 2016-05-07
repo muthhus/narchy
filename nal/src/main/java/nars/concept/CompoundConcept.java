@@ -253,11 +253,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
     @NotNull
     protected BeliefTable newBeliefTable(int cap) {
-        return new ArrayBeliefTable(capacity(cap, true, true), capacity(cap, true, false));
+        return new DefaultBeliefTable(capacity(cap, true, true), capacity(cap, true, false));
     }
     @NotNull
     protected BeliefTable newGoalTable(int cap) {
-        return new ArrayBeliefTable(capacity(cap, false, true), capacity(cap, false, false));
+        return new DefaultBeliefTable(capacity(cap, false, true), capacity(cap, false, false));
     }
 
 //    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {

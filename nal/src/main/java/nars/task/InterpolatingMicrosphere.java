@@ -32,9 +32,9 @@ import java.util.List;
  */
 public class InterpolatingMicrosphere {
     /** Microsphere. */
-    private final List<double[]> microsphere; /* n-element (size) */
+    public final List<double[]> microsphere; /* n-element (size) */
     /** Microsphere data. */
-    private final List<double[]> microsphereData; /* 2-element illumination, value pairs */
+    public final List<double[]> microsphereData; /* 2-element illumination, value pairs */
     /** Space dimension. */
     private final int dimension;
     /** Number of surface elements. */
@@ -93,6 +93,8 @@ public class InterpolatingMicrosphere {
         this.background = background;
         microsphere = Global.newArrayList(size);
         microsphereData = Global.newArrayList(size);
+
+
     }
 
     public void setBackground(double background) {
@@ -236,8 +238,9 @@ public class InterpolatingMicrosphere {
 
             double weight = pow(diffNorm, -exponent);
 
-            illuminate(diff, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
+            illuminate(i, diff, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
         }
+
 
         return interpolate();
 
@@ -274,8 +277,10 @@ public class InterpolatingMicrosphere {
         }
 
         microsphere.add(normal);
-        microsphereData.add(new double[3]);
+        microsphereData.add(new double[4]);
     }
+
+
 
     /**
      * Interpolation.
@@ -321,8 +326,9 @@ public class InterpolatingMicrosphere {
      * point and tail is at the sample location.
      * @param sampleValue Data value of the sample.
      * @param weight Weight.
+     *
      */
-    private void illuminate(double[] sampleDirection,
+    private void illuminate(int sampleNum, double[] sampleDirection,
                             double sampleValue,
                             double weight,
                             double conf) {
@@ -335,17 +341,18 @@ public class InterpolatingMicrosphere {
 
                 if (illumination > darkThreshold &&
                     illumination > microsphereData.get(i)[0]) {
-                    setData(i, illumination, sampleValue, conf );
+                    setData(i, illumination, sampleValue, conf, sampleNum );
                 }
             }
         }
     }
 
-    protected void setData(int i, double illumination, double sampleValue, double conf) {
+    protected void setData(int i, double illumination, double sampleValue, double conf, int sampleNum) {
         double[] d = microsphereData.get(i);
         d[0] = illumination;
         d[1] = sampleValue;
         d[2] = conf;
+        d[3] = sampleNum;
     }
 
     /**
@@ -353,7 +360,7 @@ public class InterpolatingMicrosphere {
      */
     private void clear() {
         for (int i = 0; i < size; i++) {
-            setData(i, 0, 0, 0);
+            setData(i, 0, 0, 0, -1);
         }
     }
 

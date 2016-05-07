@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
-public class ArrayBeliefTable implements BeliefTable {
+public class DefaultBeliefTable implements BeliefTable {
 
     public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
     @NotNull public final ListTable<Task,Task> eternal;
@@ -40,11 +40,11 @@ public class ArrayBeliefTable implements BeliefTable {
 
     //float ageFactor;
 
-    @Deprecated public ArrayBeliefTable(int capacity) {
+    @Deprecated public DefaultBeliefTable(int capacity) {
         this( Math.max(2, capacity), Math.max(2, capacity) );
     }
 
-    public ArrayBeliefTable(int eternalCapacity, int temporalCapacity) {
+    public DefaultBeliefTable(int eternalCapacity, int temporalCapacity) {
         super();
 
         Map<Task, Task> mp;
@@ -60,7 +60,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
         if (temporalCapacity > 0) {
-            temporal = new TemporalTable(mp, temporalCapacity);
+            temporal = new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity);
         }
         else
             temporal = ListTable.Empty;
@@ -522,9 +522,9 @@ public class ArrayBeliefTable implements BeliefTable {
     }
 
     /** stores the items unsorted; revection manages their ranking and removal */
-    private static class TemporalTable extends SetTable<Task> {
+    private static class MicrosphereRevectionTemporalBeliefTable extends SetTable<Task> {
 
-        public TemporalTable(Map<Task, Task> mp, int temporalCapacity) {
+        public MicrosphereRevectionTemporalBeliefTable(Map<Task, Task> mp, int temporalCapacity) {
             super(mp, temporalCapacity, SortedList_1x4.SearchType.LinearSearch);
         }
 

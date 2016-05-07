@@ -1,14 +1,12 @@
 package nars.task;
 
 import nars.Global;
-import nars.NAR;
-import nars.nar.Default;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
@@ -23,6 +21,7 @@ public class TruthPolation {
     double[] freq;
     double[] conf;
     int count;
+    private List<Task> tasks;
 
     public TruthPolation(int size) {
         s = new InterpolatingMicrosphere(1, size * 8, 1.0, Global.TRUTH_EPSILON, 0.5f,
@@ -35,7 +34,6 @@ public class TruthPolation {
         freq = new double[size];
         conf = new double[size];
 
-
         count = 0;
     }
 
@@ -45,6 +43,7 @@ public class TruthPolation {
         int s = tasks.size();
 
         this.count = s;
+        this.tasks = tasks;
 
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
@@ -61,8 +60,30 @@ public class TruthPolation {
 
     }
 
+
+    final WeakHashMap<Task,Float> credit =new WeakHashMap();
+
+    public void updateCredit() {
+
+        for (double[] ss : s.microsphereData) {
+            int sample = (int)ss[3];
+            if (sample >= 0) {
+                credit.compute(tasks.get(sample), (tt,v) -> {
+                    float ill = (float)ss[0];
+                    if (v == null)
+                        return ill;
+                    else
+                        return v+ill;
+                });
+            }
+
+        }
+
+    }
+
     public Truth value(long when) {
         double[] v = s.value(new double[]{when}, times, freq, conf, 1, 0.5, count);
+        updateCredit();
         return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
     }
 
@@ -71,7 +92,7 @@ public class TruthPolation {
 
         List<Task> l = Global.newArrayList();
 
-        NAR n = new Default();
+        //NAR n = new Default();
         l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
         l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
         l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
@@ -91,5 +112,7 @@ public class TruthPolation {
             Truth a1 = p.value(d);
             System.out.println(d + ": " + a1);
         }
+
+        System.out.println(p.credit);
     }
 }

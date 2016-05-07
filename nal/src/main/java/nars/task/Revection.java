@@ -3,7 +3,7 @@ package nars.task;
 import nars.NAR;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
-import nars.concept.table.ArrayBeliefTable;
+import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.TaskTable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -39,7 +39,7 @@ public class Revection {
     /**
      * returns true if the full table has been compacted allowing a free space for the new input task
      */
-    public static boolean revect(@NotNull Task input, @NotNull ArrayBeliefTable table, @NotNull NAR nar) {
+    public static boolean revect(@NotNull Task input, @NotNull DefaultBeliefTable table, @NotNull NAR nar) {
 
         @NotNull ListTable<Task, Task> temporal = table.temporal;
         List<Task> tasks = temporal.list();
