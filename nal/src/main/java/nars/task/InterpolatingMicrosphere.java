@@ -21,7 +21,6 @@ import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.MathArrays;
 
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -45,7 +44,7 @@ public class InterpolatingMicrosphere {
     private final double darkThreshold;
     /** Background value. */
     private double background;
-    private double darkConfidence;
+    private double backgroundConfidence;
 
     /**
      * Create an unitialiazed sphere.
@@ -91,7 +90,7 @@ public class InterpolatingMicrosphere {
         this.size = size;
         this.maxDarkFraction = maxDarkFraction;
         this.darkThreshold = darkThreshold;
-        this.darkConfidence = 1.0;
+        this.backgroundConfidence = 1.0;
         this.background = background;
         microsphere = Global.newArrayList(size);
         microsphereData = Global.newArrayList(size);
@@ -101,7 +100,7 @@ public class InterpolatingMicrosphere {
 
     public void setBackground(double background, double confidence) {
         this.background = background;
-        this.darkConfidence = confidence;
+        this.backgroundConfidence = confidence;
     }
 
     /**
@@ -134,10 +133,18 @@ public class InterpolatingMicrosphere {
                                     UnitSphereRandomVectorGenerator rand) {
         this(dimension, size, maxDarkFraction, darkThreshold, background);
 
-        // Generate the microsphere normals, assuming that a number of
-        // randomly generated normals will represent a sphere.
-        for (int i = 0; i < size; i++) {
-            addNormal(rand.nextVector());
+        if (dimension == 1) {
+            if ((size!=2) || (rand!=null))
+                throw new RuntimeException("there are only 2 possible unit vectors in 1D");
+            addNormal(new double[] { -1 });
+            addNormal(new double[] { +1 });
+        } else {
+
+            // Generate the microsphere normals, assuming that a number of
+            // randomly generated normals will represent a sphere.
+            for (int i = 0; i < size; i++) {
+                addNormal(rand.nextVector());
+            }
         }
     }
 
@@ -234,14 +241,13 @@ public class InterpolatingMicrosphere {
             if (Math.abs(diffNorm) < noInterpolationTolerance) {
                 // No need to interpolate, as the interpolation point is
                 // actually (very close to) one of the sampled points.
-
-
                 return new double[] { sampleValues[i], sampleWeights == null ? 1f : sampleWeights[i] };
+            } else {
+
+                double weight = pow(diffNorm, -exponent);
+
+                illuminate(i, diff, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
             }
-
-            double weight = pow(diffNorm, -exponent);
-
-            illuminate(i, diff, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
         }
 
 
@@ -298,16 +304,20 @@ public class InterpolatingMicrosphere {
 
         double value = 0;
         double totalWeight = 0;
+        //double totalConfDen = 0, totalConfNum = 0;
+        double maxConf = 0;
         for (double[] fd : microsphereData) {
             double iV = fd[0]; /* illumination */
+            double conf = fd[2];
             if (iV != 0d) {
-                double conf = fd[2];
-                iV *= conf;
                 value += iV * fd[1]; /* sample */
                 totalWeight += iV;
+                maxConf = Math.max(conf*iV, maxConf);
+                //totalConfNum += conf * iV; //how much this confidence actually applied to the outcome
             } else {
                 ++darkCount;
             }
+            //totalConfDen += conf; //total conf contributed
         }
 
         final double darkFraction = darkCount / (double) size;
@@ -321,7 +331,9 @@ public class InterpolatingMicrosphere {
             value / totalWeight :
             background;
 
-        double c = totalWeight /                 (size);
+        double c = maxConf / totalWeight;
+        //double c = totalConfDen!=0 ? totalConfNum / totalConfDen : this.backgroundConfidence;
+        //double c = totalWeight /                 (size);
                 //(microsphereData.size());
 
         return new double[] {v, c};
@@ -341,15 +353,14 @@ public class InterpolatingMicrosphere {
                             double weight,
                             double conf) {
 
-        double visibleThreshold = darkThreshold * darkConfidence;
+        double visibleThreshold = darkThreshold * backgroundConfidence;
 
         for (int i = 0; i < size; i++) {
             final double[] n = microsphere.get(i);
-            final double cos = MathArrays.cosAngle(n, sampleDirection);
+            final double cos = cosAngle(n, sampleDirection);
 
             if (cos > 0) {
-                final double illumination = cos * weight;
-
+                final double illumination = cos * weight * conf;
 
                 if (illumination > visibleThreshold &&
                     illumination > microsphereData.get(i)[0]) {
@@ -357,6 +368,15 @@ public class InterpolatingMicrosphere {
                 }
             }
         }
+    }
+
+    protected double cosAngle(double[] x, double[] y) {
+        if (x.length == 1) {
+            double x0 = x[0];
+            double y0 = y[0];
+            return (x0 > 0 && y0 > 0) || (x0 < 0 && y0 < 0) ? 1.0 : -1.0;
+        } else
+            return MathArrays.cosAngle(x, y);
     }
 
     protected void setData(int i, double illumination, double sampleValue, double conf, int sampleNum) {
@@ -436,9 +456,9 @@ public class InterpolatingMicrosphere {
 //        }
 //    }
 
-
-    public double[] value(double[] doubles, double[][] data, double[] value, int i, double ulp) {
-        return value(doubles, data, value, null, i, ulp, data.length);
-    }
+//
+//    public double[] value(double[] doubles, double[][] data, double[] value, double exp, double ulp) {
+//        return value(doubles, data, value, null, exp, ulp, data.length);
+//    }
 
 }

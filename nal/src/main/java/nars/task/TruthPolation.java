@@ -21,13 +21,14 @@ public class TruthPolation {
     double[] conf;
     int count;
     private List<Task> tasks;
+    final private double exp = 1.1f;
 
     public TruthPolation(int size, float eternalization) {
-        s = new InterpolatingMicrosphere(1, size * 4,
+        s = new InterpolatingMicrosphere(1, 2,
                 1f - eternalization,  //ratio of dark before eternal is used
                 eternalization != 0 ? Global.TRUTH_EPSILON : 0,
                 0.5f,
-                new UnitSphereRandomVectorGenerator(1));
+                null);
 
         times = new double[size][];
         for (int i = 0; i < size; i++) {
@@ -43,25 +44,28 @@ public class TruthPolation {
         assert(times.length <= tasks.size());
 
         int s = tasks.size();
+        if (s == 1)
+            return tasks.get(0).truth();
 
         this.count = s;
         this.tasks = tasks;
 
-        long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
-        for (int i = 0; i < s; i++) {
-            Task t = tasks.get(i);
-            long o = t.occurrence();
-            if (o < tmin) tmin = o;
-            if (o > tmax) tmax = o;
-        }
-        if (tmin == tmax) {  tmax++; } //just expand one unit around
+//        long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
+//        for (int i = 0; i < s; i++) {
+//            Task t = tasks.get(i);
+//            long o = t.occurrence();
+//            if (o < tmin) tmin = o;
+//            if (o > tmax) tmax = o;
+//        }
+//        if (tmin == tmax) {  tmax++; } //just expand one unit around
 
-        long range = tmax - tmin;
+//        long range = tmax - tmin;
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
-            times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
+            //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
+            times[i][0] = (double)t.occurrence();
             freq[i] = t.freq();
-            conf[i] = c2w(t.conf());
+            conf[i] = /*c2w*/(t.conf());
             //TODO dt
         }
 
@@ -71,9 +75,10 @@ public class TruthPolation {
             this.s.setBackground(Float.NaN, 0);
         }
 
-        double whenNormalized = ((double)when - tmin) / range;
-        double[] v = this.s.value(new double[]{whenNormalized}, times, freq, conf, 1, 0.5 / range, count);
-        return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
+        //double whenNormalized = ((double)when - tmin) / range;
+
+        double[] v = this.s.value(new double[]{when}, times, freq, conf, exp, 0.5, count);
+        return new DefaultTruth( (float)v[0], /*w2c*/( (float) v[1]));
 
     }
 

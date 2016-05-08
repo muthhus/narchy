@@ -42,8 +42,8 @@ public class NAgent implements Agent {
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.35f;
 
-    float sensorPriority = 0.4f;
-    float rewardPriority = 0.85f;
+    float sensorPriority = 0.5f;
+    float rewardPriority = 0.75f;
     float goalFeedbackPriority = rewardPriority;
     float goalPriority = rewardPriority;
 
@@ -263,13 +263,13 @@ public class NAgent implements Agent {
         if (lastAction!=nextAction) {
             if (lastAction != -1) {
 
-                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
+//                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
                 float off;
-                if (lastMotivation > nextMotivation) {
-                    off = 0.5f; //partial off
-                } else {
+//                if (lastMotivation > nextMotivation) {
+//                    off = 0.5f; //partial off
+//                } else {
                     off = 1; //full off
-                }
+//                }
 
                 nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha);
                 nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
@@ -280,12 +280,12 @@ public class NAgent implements Agent {
             on = 1f;
         } else {
 
-            //TWEAK - activate a repeated chosen goal less if reward has decreased
-            if (dReward >= 0) {
+//            //TWEAK - activate a repeated chosen goal less if reward has decreased
+//            if (dReward >= 0) {
                 on = 1f;
-            } else {
-                on = 0.5f;
-            }
+//            } else {
+//                on = 0.5f;
+//            }
         }
         nar.believe(goalFeedbackPriority, actions.get(nextAction), Tense.Present, 1f, alpha * on);
 
