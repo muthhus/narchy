@@ -45,6 +45,7 @@ public class InterpolatingMicrosphere {
     private final double darkThreshold;
     /** Background value. */
     private double background;
+    private double darkConfidence;
 
     /**
      * Create an unitialiazed sphere.
@@ -90,6 +91,7 @@ public class InterpolatingMicrosphere {
         this.size = size;
         this.maxDarkFraction = maxDarkFraction;
         this.darkThreshold = darkThreshold;
+        this.darkConfidence = 1.0;
         this.background = background;
         microsphere = Global.newArrayList(size);
         microsphereData = Global.newArrayList(size);
@@ -97,8 +99,9 @@ public class InterpolatingMicrosphere {
 
     }
 
-    public void setBackground(double background) {
+    public void setBackground(double background, double confidence) {
         this.background = background;
+        this.darkConfidence = confidence;
     }
 
     /**
@@ -337,6 +340,9 @@ public class InterpolatingMicrosphere {
                             double sampleValue,
                             double weight,
                             double conf) {
+
+        double visibleThreshold = darkThreshold * darkConfidence;
+
         for (int i = 0; i < size; i++) {
             final double[] n = microsphere.get(i);
             final double cos = MathArrays.cosAngle(n, sampleDirection);
@@ -344,7 +350,8 @@ public class InterpolatingMicrosphere {
             if (cos > 0) {
                 final double illumination = cos * weight;
 
-                if (illumination > darkThreshold &&
+
+                if (illumination > visibleThreshold &&
                     illumination > microsphereData.get(i)[0]) {
                     setData(i, illumination, sampleValue, conf, sampleNum );
                 }

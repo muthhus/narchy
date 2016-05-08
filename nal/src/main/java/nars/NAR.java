@@ -872,7 +872,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         float solutionConf = solution.conf();
 
-        question.concept(this).crossLink(question, solution, solutionConf, this);
+        Concept q = question.concept(this);
+        if (q!=null) {
+            q.crossLink(question, solution, solutionConf, this);
+        }
 
         //amount boosted will be in proportion to the lack of quality, so that a high quality question will survive longer by not being drained so quickly
         BudgetFunctions.transferPri(question.budget(), solution.budget(), (1f - question.qua()) * solutionConf);

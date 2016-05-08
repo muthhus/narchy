@@ -65,7 +65,11 @@ public class TruthPolation {
             //TODO dt
         }
 
-        this.s.setBackground((topEternal!=null) ? topEternal.freq() : Float.NaN );
+        if (topEternal!=null) {
+            this.s.setBackground(topEternal.freq(), topEternal.conf());
+        } else {
+            this.s.setBackground(Float.NaN, 0);
+        }
 
         double whenNormalized = ((double)when - tmin) / range;
         double[] v = this.s.value(new double[]{whenNormalized}, times, freq, conf, 1, 0.5 / range, count);
