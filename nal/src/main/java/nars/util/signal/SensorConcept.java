@@ -47,6 +47,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
+    public SensorConcept sensorDT(int newDT) {
+        sensor.dt(newDT);
+        return this;
+    }
+
     @Override
     public @Nullable
     Task processBelief(@NotNull Task belief, @NotNull NAR nar) {

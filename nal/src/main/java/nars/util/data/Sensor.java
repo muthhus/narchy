@@ -51,6 +51,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
     private Task next = null;
+    private int dt = 0;
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
         this(n, t, value,
@@ -184,7 +185,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
      * time shift input tasks, relative to NAR's current time
      */
     protected int dt() {
-        return 0;
+        return dt;
+    }
+
+    public void dt(int dt) {
+        this.dt = dt;
     }
 
     @Override

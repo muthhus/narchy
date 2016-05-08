@@ -41,7 +41,7 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.55f;
+    float alpha = 0.2f;
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.01f;
@@ -114,7 +114,9 @@ public class NAgent implements Agent {
 
         this.reward = new SensorConceptDebug("(R)", nar,
                 new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
-                .resolution(0.01f).timing(-1, -1).pri(rewardPriority);
+                .resolution(0.01f)
+                .pri(rewardPriority)
+                .sensorDT(-1); //pertains to the prevoius frame
 
 //        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
 //        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
@@ -282,7 +284,7 @@ public class NAgent implements Agent {
 //                }
 
                 nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha * off);
-                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
+                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0f, alpha * off);
             }
 
             nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, alpha );
