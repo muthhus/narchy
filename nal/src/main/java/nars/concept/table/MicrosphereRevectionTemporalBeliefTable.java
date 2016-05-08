@@ -32,15 +32,16 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     @Override
     public Task prepare(Task input, NAR nar) {
         if (isFull() /*&& temporal.capacity() > 1*/) {
-            //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-
-            //TODO cache start, stop
-            //long start = temporal.list().stream().mapToLong(t -> t.occurrence()).min().getAsLong();
-            //long end = temporal.list().stream().mapToLong(t -> t.occurrence()).max().getAsLong();
 
             if (!Revection.revect(input, this, nar)) {
-                return null; //rejected
+                return null; //rejected input
             }
+
+//            Task w = weakest(input, nar);
+//            if (w == null)
+//                throw new RuntimeException("no weakest task determined");
+//            remove(w);
+//            nar.remove(w, "Temporal Forget");
 
         }
 
@@ -88,6 +89,35 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         polation.set(list(), eternal.top());
         return polation.value(when);
     }
+
+//    public Task weakest(Task input, NAR nar) {
+//
+//        //if (polation == null) {
+//            //force update for current time
+//
+//        polation.credit.clear();
+//        Truth current = truth(nar.time());
+//        //}
+//
+////        if (polation.credit.isEmpty())
+////            throw new RuntimeException("empty credit table");
+//
+//        List<Task> list = list();
+//        float min = Float.POSITIVE_INFINITY;
+//        Task minT = null;
+//        for (int i = 0, listSize = list.size(); i < listSize; i++) {
+//            Task t = list.get(i);
+//            float x = polation.value(t, -1);
+//            if (x >= 0 && x < min) {
+//                min = x;
+//                minT = t;
+//            }
+//        }
+//
+//        System.out.println("removing " + min + "\n\t" + polation.credit);
+//
+//        return minT;
+//    }
 
 
     //    public @Nullable Truth topTemporalCurrent(long when, long now, @Nullable Task topEternal) {

@@ -25,7 +25,10 @@ public class TruthPolation {
     private List<Task> tasks;
 
     public TruthPolation(int size) {
-        s = new InterpolatingMicrosphere(1, size * 8, 1.0, Global.TRUTH_EPSILON, 0.5f,
+        s = new InterpolatingMicrosphere(1, size * 4,
+                0.9,  //ratio of dark before eternal is used
+                Global.TRUTH_EPSILON,
+                0.5f,
                 new UnitSphereRandomVectorGenerator(1));
 
         times = new double[size][];
@@ -62,29 +65,28 @@ public class TruthPolation {
     }
 
 
-    final WeakHashMap<Task,Float> credit =new WeakHashMap();
-
-    protected void updateCredit() {
-
-        for (double[] ss : s.microsphereData) {
-            int sample = (int)ss[3];
-            if (sample >= 0) {
-                credit.compute(tasks.get(sample), (tt,v) -> {
-                    float ill = (float)ss[0];
-                    if (v == null)
-                        return ill;
-                    else
-                        return v+ill;
-                });
-            }
-
-        }
-
-    }
+//    public final WeakHashMap<Task,Float> credit =new WeakHashMap();
+//
+//    protected void updateCredit() {
+//
+//        for (double[] ss : s.microsphereData) {
+//            int sample = (int)ss[3];
+//            if (sample >= 0) {
+//                credit.compute(tasks.get(sample), (tt,v) -> {
+//                    float ill = (float)ss[0];
+//                    if (v == null)
+//                        return ill;
+//                    else
+//                        return v+ill;
+//                });
+//            }
+//
+//        }
+//
+//    }
 
     public Truth value(long when) {
         double[] v = s.value(new double[]{when}, times, freq, conf, 1, 0.5, count);
-        updateCredit();
         return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
     }
 
@@ -114,10 +116,15 @@ public class TruthPolation {
             System.out.println(d + ": " + a1);
         }
 
-        System.out.println(p.credit);
     }
 
     public int capacity() {
         return times.length;
     }
+
+//    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */
+//    public float value(Task t, float valueIfNotKnown) {
+//        return credit.getOrDefault(t, valueIfNotKnown);
+//    }
+
 }

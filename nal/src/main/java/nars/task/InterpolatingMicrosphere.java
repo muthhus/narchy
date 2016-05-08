@@ -299,7 +299,7 @@ public class InterpolatingMicrosphere {
             if (iV != 0d) {
                 double conf = fd[2];
                 iV *= conf;
-                value += iV * fd[1] * conf; /* sample */
+                value += iV * fd[1]; /* sample */
                 totalWeight += iV;
             } else {
                 ++darkCount;
