@@ -22,6 +22,9 @@ public interface ListTable<V, L> extends Table<V, L> {
     List<L> list();
 
 
+    default L get(int i) {
+        return list().get(i);
+    }
 
     @Override default Iterator<L> iterator() {
         return list().iterator();

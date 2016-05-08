@@ -8,6 +8,7 @@ import nars.budget.Budgeted;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -72,8 +73,12 @@ public class MutableTask extends AbstractTask {
         this(taskToClone, otherTask, now, occ, newEvidence, taskToClone.truth(), budgetMerge);
     }
 
-    /** used by QuestionTable */
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
+        this(taskToClone, taskToClone, otherTask, now, occ, newEvidence, taskToClone.truth(), budgetMerge);
+    }
+
+    /** used by QuestionTable */
+    public MutableTask(Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
         this(taskToClone, taskToClone.punc(), newTruth);
 
         this.parentBelief = Global.reference(otherTask);

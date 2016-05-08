@@ -3,13 +3,16 @@ package nars.concept.table;
 import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
-import nars.task.Revection;
-import nars.task.Task;
-import nars.task.TruthPolation;
+import nars.budget.BudgetMerge;
+import nars.task.*;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 
 import java.util.List;
 import java.util.Map;
+
+import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
+import static nars.nal.Tense.DTERNAL;
 
 /** stores the items unsorted; revection manages their ranking and removal */
 public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
@@ -24,12 +27,21 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     }
 
     @Override
+    public void setCapacity(int c) {
+        if (c < 3)
+            throw new RuntimeException("temporal capacity must be > 2");
+        super.setCapacity(c);
+    }
+
+    @Override
     public Task prepare(Task input, NAR nar) {
         if (isFull() /*&& temporal.capacity() > 1*/) {
 
-            if (!Revection.revect(input, this, nar)) {
+            compress(nar.time(), nar);
+
+            /*if (!Revection.revect(input, this, nar)) {
                 return null; //rejected input
-            }
+            }*/
 
 //            Task w = weakest(input, nar);
 //            if (w == null)
@@ -42,6 +54,71 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         //proceed with this task now that there is room
         return input;
     }
+
+
+    public Task weakest(long now) {
+        return weakest(now, null);
+    }
+
+
+    public Task weakest(long now, Task excluding) {
+        Task weakest = null;
+        float weakestRank = Float.POSITIVE_INFINITY;
+        int n = size();
+        for (int i = 0; i < n; i++) {
+
+            Task ii = get(i);
+            if (ii == excluding)
+                continue;
+
+            //consider ii for being the weakest ranked task to remove
+            float r = rankTemporalByConfidenceAndOriginality(ii, now, now, 1f, -1);
+            if (r < weakestRank) {
+                weakestRank = r;
+                weakest = ii;
+            }
+
+        }
+
+        return weakest;
+    }
+
+    /** frees one slot by removing 2 and projecting a new belief to their midpoint */
+    protected Task compress(long now, NAR nar) {
+
+        Task a = weakest(now);
+        Task b = weakest(now, a);
+        //TODO proper iterpolate: truth, time, dt
+        float ac = a.conf();
+        float bc = b.conf();
+        long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
+
+        Truth newTruth = truth(newOcc);
+
+        long[] newEv = Stamp.zip(a, b); //TODO impl a weighted zip
+
+        //TODO interpolate the dt()
+        int newDT;
+        if (b.term().dt()!=DTERNAL)
+            newDT = b.term().dt();
+        else if (a.term().dt()!=DTERNAL)
+            newDT = a.term().dt();
+        else
+            newDT = DTERNAL;
+
+        Task merged = new MutableTask(a.term().dt(newDT), a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
+                .log("Revection Merge");
+
+        remove(a);
+        TaskTable.removeTask(a, "Revection Forget", nar);
+        remove(b);
+        TaskTable.removeTask(b, "Revection Forget", nar);
+
+        nar.process(merged);
+        return merged;
+    }
+
+
 
     public final Task key(Task task) {
         return task;

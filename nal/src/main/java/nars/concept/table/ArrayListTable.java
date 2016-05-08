@@ -120,7 +120,7 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
     }
 
     @Override
-    public final void setCapacity(int capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 
