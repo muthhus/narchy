@@ -1,6 +1,5 @@
 package nars.nal.nal8;
 
-import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -8,11 +7,8 @@ import nars.Symbols;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.util.Texts;
 import nars.util.signal.MotorConcept;
-import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 
@@ -45,60 +41,74 @@ public class ControlFlowTest {
         return $.p("s" + i);
     }
 
-    public List<int[]> testSequence(Supplier<NAR> nn, int length, int delay) {
+    public static class ExeTracker {
 
-        System.out.println("sequence execution:  states=" +length + " inter-state delay=" + delay);
+        final List<int[]> events = Global.newArrayList();
+        final SummaryStatistics eventIntervals = new SummaryStatistics();
 
-        float exeThresh = 0.1f;
+        public void record(int i, long now) {
+
+            if (!events.isEmpty())
+                eventIntervals.addValue(now - events.get(events.size() - 1)[0]);
+
+            events.add(new int[]{(int) now, i});
+
+        }
+
+        public void assertLength(int length, int delay) {
+            System.out.println("Execution Intervals: \t min=" + eventIntervals.getMin() + " avg=" + eventIntervals.getMean() + " max=" + eventIntervals.getMax() + " stddev=" + eventIntervals.getStandardDeviation());
+
+            System.out.println("  mean timing error: " + Texts.n2((((float) Math.abs(eventIntervals.getMean() - delay) / delay) * 100.0)) + "%");
+            System.out.println();
+
+            assertEquals(Arrays.toString(events.get(events.size() - 1)), length, events.size());
+        }
+    }
+
+
+    public ExeTracker testSequence(Supplier<NAR> nn, int length, int delay) {
+
+        System.out.println("sequence execution:  states=" + length + " inter-state delay=" + delay);
 
         int runtime = (delay * length) * 10;
 
-
         NAR n = nn.get();
 
-        //n.log();
+        ExeTracker exeTracker = new ExeTracker();
 
-        List<int[]> events = Global.newArrayList();
-        SummaryStatistics eventIntervals = new SummaryStatistics();
+        for (int i = 0; i < length; i++)
+            newExeState(n, exeTracker, i);
 
+        for (int i = 0; i < length - 1; i++)
+            n.goal($.conj(delay, s(i), s(i + 1)));
 
-        for (int i = 0; i < length; i++) {
-            int ii = i;
-            new MotorConcept(s(i), n, (b, d) -> {
-                if (d > b + exeThresh) {
-                    long now = n.time();
-                    System.out.println(ii + " at " + now + " " + (d-b));
-
-                    if (!events.isEmpty())
-                        eventIntervals.addValue(now - events.get(events.size()-1)[0] );
-
-                    events.add(new int[] {(int) now, ii });
-
-                    return 0.9f;
-                }
-                return Float.NaN;
-            });
-        }
-
-        for (int i = 0; i < length-1; i++) {
-            Term t = $.conj(delay, s(i), s(i+1));
-            n.goal(t);
-        }
-
+        //start
         n.goal(s(0), Tense.Present, 1f, n.getDefaultConfidence(Symbols.GOAL));
 
         n.run(runtime);
 
-        System.out.println("Execution Intervals: \t min=" + eventIntervals.getMin() + " avg=" + eventIntervals.getMean() + " max=" + eventIntervals.getMax() + " stddev=" + eventIntervals.getStandardDeviation());
+        exeTracker.assertLength(length, delay);
 
-        System.out.println("  mean timing error: " + Texts.n2(( ((float)Math.abs(eventIntervals.getMean() - delay)/delay) * 100.0)) + "%");
-        System.out.println();
-
-        assertEquals(Arrays.toString(events.get(events.size()-1)), length, events.size());
-
-        return events;
+        return exeTracker;
 
     }
+
+    public void newExeState(NAR n, ExeTracker e, int i) {
+        float exeThresh = 0.2f;
+
+        new MotorConcept(s(i), n, (b, d) -> {
+            if (d > b + exeThresh) {
+                long now = n.time();
+                System.out.println(i + " at " + now + " " + (d - b));
+
+                e.record(i, now);
+
+                return 0.9f;
+            }
+            return Float.NaN;
+        });
+    }
+
 
     @Test
     public void testToggledSequence() {
@@ -109,6 +119,7 @@ public class ControlFlowTest {
     public void testWeightedFork() {
 
     }
+
     @Test
     public void testLoop() {
 

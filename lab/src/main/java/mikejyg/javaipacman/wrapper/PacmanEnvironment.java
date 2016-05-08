@@ -42,15 +42,15 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 16;
+	private int pacmanCyclesPerFrame = 12;
 
 
 	public static void main (String[] args) 	{
-		NAgent a = new NAgent(new Default(1024, 4, 1, 2)
+		NAgent a = new NAgent(new Default(1024, 5, 1, 2)
 				//.logSummaryGT(System.out, 0.01f)
 				);
-		a.nar.conceptActivation.setValue(0.25f);
-		a.nar.cyclesPerFrame.set(400);
+		a.nar.conceptActivation.setValue(0.2f);
+		a.nar.cyclesPerFrame.set(600);
 
 		new PacmanEnvironment().run(
 				//new DQN(),
@@ -113,6 +113,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 						for (cghost g : ghosts) {
 							int ix = g.iX / 16;
 							int iy = g.iY / 16;
+							//int ix = Math.round(g.iX / 16f);
+							//int iy = Math.round(g.iY / 16f);
 							if (ix == px && iy == py) {
 								ghost = true;
 								break;
