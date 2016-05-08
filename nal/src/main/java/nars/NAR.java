@@ -296,6 +296,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         believe(getDefaultPriority(BELIEF), term, time(tense), freq, conf);
         return this;
     }
+    @NotNull public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
+        return believe(term, tense, freq, getDefaultConfidence(Symbols.BELIEF));
+    }
+    @NotNull public NAR goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
+        return goal(term, tense, freq, getDefaultConfidence(Symbols.GOAL));
+    }
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, Tense tense, float freq, float conf) throws NarseseException {
