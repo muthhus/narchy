@@ -83,7 +83,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     @Override
     public Truth truth(long when) {
         if (polation == null || polation.capacity() < capacity()) {
-            polation = new TruthPolation(capacity());
+            int ecap = eternal.capacity();
+            polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
         }
 
         polation.set(list(), eternal.top());

@@ -24,10 +24,10 @@ public class TruthPolation {
     int count;
     private List<Task> tasks;
 
-    public TruthPolation(int size) {
+    public TruthPolation(int size, float eternalization) {
         s = new InterpolatingMicrosphere(1, size * 4,
-                0.9,  //ratio of dark before eternal is used
-                Global.TRUTH_EPSILON,
+                1f - eternalization,  //ratio of dark before eternal is used
+                eternalization != 0 ? Global.TRUTH_EPSILON : 0,
                 0.5f,
                 new UnitSphereRandomVectorGenerator(1));
 
@@ -57,10 +57,7 @@ public class TruthPolation {
             //TODO dt
         }
 
-        if (topEternal!=null) {
-            this.s.setBackground(topEternal.freq());
-            //TODO use topEternal conf
-        }
+        this.s.setBackground((topEternal!=null) ? topEternal.freq() : Float.NaN );
 
     }
 
@@ -91,7 +88,7 @@ public class TruthPolation {
     }
 
     public static void main(String[] args) {
-        TruthPolation p = new TruthPolation(4);
+        TruthPolation p = new TruthPolation(4, 0.1f);
 
         List<Task> l = Global.newArrayList();
 

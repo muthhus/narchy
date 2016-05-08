@@ -290,6 +290,7 @@ public class InterpolatingMicrosphere {
      */
     private double[] interpolate() {
         // Number of non-illuminated facets.
+        int size = microsphereData.size();
         int darkCount = 0;
 
         double value = 0;
@@ -308,12 +309,16 @@ public class InterpolatingMicrosphere {
 
         final double darkFraction = darkCount / (double) size;
 
+
+        if (((size == darkCount && maxDarkFraction >= 1.0) || (maxDarkFraction < 1.0 && !Double.isFinite(background)))) {
+            throw new RuntimeException("no illumination accepted or background value not used or invalid");
+        }
+
         double v = darkFraction <= maxDarkFraction ?
             value / totalWeight :
             background;
 
-        double c = totalWeight /
-                (microsphereData.size());
+        double c = totalWeight /                 (size);
                 //(microsphereData.size());
 
         return new double[] {v, c};
