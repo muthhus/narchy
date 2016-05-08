@@ -267,6 +267,10 @@ public interface Truth extends Truthed {
     /** the negated (1 - freq) of this truth value */
     Truth negated();
 
+    default boolean equals(Truth x, float tolerance) {
+        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
+    }
+
 
     enum TruthComponent {
         Frequency, Confidence, Expectation

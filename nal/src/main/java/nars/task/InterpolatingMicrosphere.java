@@ -210,20 +210,15 @@ public class InterpolatingMicrosphere {
      * {@code samplePoints}.
      * @param exponent Exponent used in the power law that computes
      * the weights (distance dimming factor) of the sample data.
-     * @param noInterpolationTolerance When the distance between the
-     * {@code point} and one of the {@code samplePoints} is less than
-     * this value, no interpolation will be performed, and the value
-     * of the sample will just be returned.
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
      */
     public double[]  value(double[] targetPoint,
-                        double[][] samplePoints,
-                        double[] sampleValues,
-                        double[] sampleWeights,
-                        double exponent,
-                        double noInterpolationTolerance,
-                        int numSamples) {
+                           double[][] samplePoints,
+                           double[] sampleValues,
+                           double[] sampleWeights,
+                           double exponent,
+                           int numSamples) {
         assert(exponent >= 0);
         if (exponent < 0) {
             throw new NotPositiveException(exponent);
@@ -231,28 +226,37 @@ public class InterpolatingMicrosphere {
 
         clear();
 
+
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
-        for (int i = 0; i < numSamples; i++) {
-            // Vector between interpolation point and current sample point.
-            final double[] diff = MathArrays.ebeSubtract(samplePoints[i], targetPoint);
-            final double diffNorm = MathArrays.safeNorm(diff);
-
-            if (noInterpolationTolerance>0 && Math.abs(diffNorm) < noInterpolationTolerance) {
-                // No need to interpolate, as the interpolation point is
-                // actually (very close to) one of the sampled points.
-                return new double[] { sampleValues[i], sampleWeights == null ? 1f : sampleWeights[i] };
-            } else {
-
-                double weight = diffNorm > 0 ? pow(diffNorm, -exponent) : 1;
-
-                illuminate(i, diffNorm > 0 ? diff : null, sampleValues[i], weight, sampleWeights == null ? 1f : sampleWeights[i]);
-            }
-        }
-
+        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, true);
+        illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, false);
 
         return interpolate();
 
+    }
+
+    public void illuminate(double[] targetPoint, double[][] samplePoints, double[] sampleValues, double[] sampleWeights, double exponent, int numSamples, boolean phase) {
+        double epsilon = 0.5f;
+
+        for (int i = 0; i < numSamples; i++) {
+            // Vector between interpolation point and current sample point.
+            final double[] diff = MathArrays.ebeSubtract(samplePoints[i], targetPoint);
+            final double diffNorm = Math.max(epsilon, MathArrays.safeNorm(diff));
+
+            /*if (noInterpolationTolerance>0 && Math.abs(diffNorm) < noInterpolationTolerance) {
+                // No need to interpolate, as the interpolation point is
+                // actually (very close to) one of the sampled points.
+                return new double[] { sampleValues[i], sampleWeights == null ? 1f : sampleWeights[i] };
+            } else {*/
+
+                double weight = pow(diffNorm, -exponent);
+
+                illuminate(i, diffNorm > 0 ? diff : null, sampleValues[i], weight,
+                        sampleWeights == null ? 1f : sampleWeights[i],
+                        phase);
+            //}
+        }
     }
 
     /**
@@ -267,22 +271,28 @@ public class InterpolatingMicrosphere {
     private void illuminate(int sampleNum, double[] sampleDirection,
                             double sampleValue,
                             double weight,
-                            double conf) {
+                            double conf, boolean phase) {
 
         double visibleThreshold = darkThreshold * backgroundConfidence;
 
-        for (int i = 0; i < (sampleDirection!=null ? size : 1); i++) {
+        for (int i = 0; i < size; i++) {
             final double[] n = microsphere.get(i);
             final double cos = sampleDirection!=null ? cosAngleNormalized(n, sampleDirection) : 1;
 
             if (cos > 0) {
-                final double illumination = cos * weight * conf;
+                final double illumination = cos * weight;
+
+                double[] dd = microsphereData.get(i);
 
                 if (illumination > visibleThreshold) {
-                    if (illumination > microsphereData.get(i)[0]){
-                        setData(i, illumination, sampleValue, conf, sampleNum);
-                    }else{
-                        addConf(i, illumination, sampleValue, conf);
+                    if (phase) {
+                        if (illumination > dd[0]) {
+                            maxData(i, illumination, sampleValue, illumination, sampleNum);
+                        }
+                    } else {
+                        if (dd[0] > 0) {
+                            confData(i, illumination / dd[0], sampleValue, conf);
+                        }
                     }
                 }
             }
@@ -333,7 +343,8 @@ public class InterpolatingMicrosphere {
      */
     private double[] interpolate() {
         // Number of non-illuminated facets.
-        int size = microsphereData.size();
+        int mm = microsphereData.size();
+        int size = mm;
         int darkCount = 0;
 
         double value = 0;
@@ -341,18 +352,25 @@ public class InterpolatingMicrosphere {
         //double totalConfDen = 0, totalConfNum = 0;
         //double maxConf = 0;
         double confSum = 0;
-        for (double[] fd : microsphereData) {
-            double iV = fd[0]; /* illumination */
+        for (int i = 0, microsphereDataSize = mm; i < microsphereDataSize; i++) {
+            double[] fd = microsphereData.get(i);
+
+            double ill = fd[0]; /* illumination */
             double conf = fd[2];
-            if (iV != 0d) {
-                value += iV * fd[1]; /* sample */
-                totalWeight += iV;
-                confSum += conf;
+            if (ill != 0d) {
+
+
+                ill *= conf;
+
+                value += ill * fd[1]; /* sample */
+                totalWeight += ill;
+
                 //maxConf = Math.max(conf*iV, maxConf);
                 //totalConfNum += conf * iV; //how much this confidence actually applied to the outcome
             } else {
                 ++darkCount;
             }
+            confSum += conf;
             //totalConfDen += conf; //total conf contributed
         }
 
@@ -378,46 +396,51 @@ public class InterpolatingMicrosphere {
 
     /** assumes input vectors already normalized */
     protected double cosAngleNormalized(double[] x, double[] y) {
-//        if (x.length == 1) {
-//            double x0 = x[0];
-//            double y0 = y[0];
-//            return (x0 > 0 && y0 > 0) || (x0 < 0 && y0 < 0) ? 1.0 : -1.0;
-//        } else
+        if (x.length == 1) {
+            double x0 = x[0];
+            double y0 = y[0];
+            return (x0 > 0 && y0 > 0) || (x0 < 0 && y0 < 0) ? 1.0 : -1.0;
+        } else
             return MathArrays.cosAngle(x, y);
     }
 
-    protected void setData(int i, double illumination, double sampleValue, double conf, int sampleNum) {
+    protected void maxData(int i, double illumination, double sampleValue, double conf, int sampleNum) {
         double[] d = microsphereData.get(i);
 
         d[0] = illumination;
 
         d[1] = sampleValue;
 
-        double illuminationOverlap =
-                (d[0] == 0) ? 1 /* initial setting */ :
-                        MathArrays.cosAngle(new double[] { d[1] }, new double[] { sampleValue } );
-
-        d[2] += conf * illumination * illuminationOverlap;
-
         d[3] = sampleNum; /* winner */
     }
 
-    protected void addConf(int i, double illumination, double sampleValue, double conf) {
+    /** assumes sampleValue in range 0..1 */
+    static double valueIntersection(double a, double b) {
+        return 1f - Math.abs(a - b);
+    }
+
+    /** accumulate a measure of relevant evidence */
+    protected void confData(int i, double illuminationProportion, double sampleValue, double conf) {
         double[] d = microsphereData.get(i);
 
         //d[0] illumination doesnt change
 
-        double illuminationOverlap =
-                        MathArrays.cosAngle(new double[] { d[1] }, new double[] { sampleValue } );
+        double existingValue = d[1];
 
-        d[2] += conf * illumination * illuminationOverlap;
+        //add the amount of confidence in proportion to how equal the frequency (sampleValue) is
+        if (!Double.isFinite(conf)) {
+            throw new RuntimeException("?");
+        }
+
+        d[2] += conf * illuminationProportion * valueIntersection(existingValue, sampleValue);
     }
+
     /**
      * Reset the all the {@link Facet facets} data to zero.
      */
     private void clear() {
         for (int i = 0; i < size; i++) {
-            setData(i, 0, 0, 0, -1);
+            maxData(i, 0, 0, 0, -1);
         }
     }
 

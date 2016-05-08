@@ -4,6 +4,7 @@ import nars.$;
 import nars.Global;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.List;
@@ -14,21 +15,82 @@ import static org.junit.Assert.*;
  * Created by me on 5/8/16.
  */
 public class TruthPolationTest {
+    TruthPolation polation = new TruthPolation(8 /* cap */, 0);
 
     @Test
-    public void testRevisionEquivalence() throws Exception {
-        TruthPolation polation = new TruthPolation(2, 0);
+    public void testRevisionEquivalence()  {
+        MutableTask a = t(1f, 0.5f, 0); //c~=0.67
+        a.evidence(new long[] { 0 } );
+        MutableTask b = t(1f, 0.5f, 0);
+        b.evidence(new long[] { 1 } ); //cause different hash
 
+        //assertEquals(a.truth(), polation.truth(0, a, a)); //same item
+
+        //System.out.println( polation.truth(0, a, b) );
+        assertEquals(Revision.revision(a, b), polation.truth(0, a, b));
+
+        polation.print();
+    }
+
+    @Test
+    public void testRevisionEquivalence2() {
+        Task a = t(1f, 0.5f, -1);
+        Task b = t(0f, 0.5f, 1);
+
+        Truth pt = polation.truth(0, a, b);
+
+        assertTrue(Revision.revision(a, b).equals(pt, 0.02f));
+    }
+
+
+    @Test
+    public void testRevisionEquivalence2Instant() {
         Task a = t(1f, 0.5f, 0);
-        assertEquals( Revision.revision(a, a), polation.truth(0, a, a) );
+        Task b = t(0f, 0.5f, 0);
+        assertEquals( Revision.revision(a, b), polation.truth(0, a, b) );
+    }
+
+    @Test
+    public void testRevisionEquivalence3() {
+        Task a = t(1f, 0.5f, 3);
+        Task b = t(0f, 0.5f, 6);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(i + " " + polation.truth(i, a, b));
+        }
+
+        System.out.println();
+
+        Truth ab2 = polation.truth(2, a, b);
+        assertTrue( ab2.conf() > 0.5f );
+
+        Truth abneg1 = polation.truth(-1, a, b);
+        assertTrue( abneg1.freq() > 0.75f );
+        assertTrue( abneg1.conf() > 0.5f );
+
+        Truth ab5 = polation.truth(5, a, b);
+        assertTrue( ab5.freq() < 0.35f );
+        assertTrue( ab5.conf() > 0.5f );
+    }
+
+    @Test
+    public void testRevisionEquivalence4() {
+        Task a = t(0f, 0.1f, 3);
+        Task b = t(0f, 0.1f, 4);
+        Task c = t(1f, 0.1f, 5);
+        Task d = t(0f, 0.1f, 6);
+        Task e = t(0f, 0.1f, 7);
+
+        for (int i = 0; i < 15; i++) {
+            System.out.println(i + " " + polation.truth(i, a, b, c, d, e));
+        }
 
     }
 
-    public static Task t(float freq, float conf, long occ) {
+    public static MutableTask t(float freq, float conf, long occ) {
         return new MutableTask("a:b", '.', $.t(freq, conf)).time(0, occ);
     }
 
-    public static void main(String[] args) {
+    public static void _main(String[] args) {
         TruthPolation p = new TruthPolation(4,
                 0f);
         //0.1f);

@@ -1,11 +1,15 @@
 package nars.task;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
@@ -21,7 +25,7 @@ public class TruthPolation {
     double[] conf;
     int count;
     private List<Task> tasks;
-    final private double exp = 1.1f;
+    final private double exp = 1f;
 
     public TruthPolation(int size, float eternalization) {
         s = new InterpolatingMicrosphere(1, 2,
@@ -65,17 +69,26 @@ public class TruthPolation {
 //            if (o < tmin) tmin = o;
 //            if (o > tmax) tmax = o;
 //        }
-//        if (tmin == tmax) {  tmax++; } //just expand one unit around
-
+//
 //        long range = tmax - tmin;
+
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
-            times[i][0] = t.occurrence();
+
+            //offset the specified occurence time to a small window around the pure occurrence time,
+            //so that tasks with equivalent truths but different evidence (and thus different hash) will
+            //have a slightly different position on the time axis
+            double window = 0.1;
+            int increments = 31337;
+            times[i][0] = t.occurrence() + (window * (-0.5 + (t.hashCode()%increments)/((double)increments)  ));  /* keeps occurrence times unique */;
+
             freq[i] = t.freq();
             conf[i] = c2w(t.conf());
             //TODO dt
         }
+
+
 
         if (topEternal!=null) {
             this.s.setBackground(topEternal.freq(), topEternal.conf());
@@ -85,8 +98,11 @@ public class TruthPolation {
 
         //double whenNormalized = ((double)when - tmin) / range;
 
-        double[] v = this.s.value(new double[]{when}, times, freq, conf, exp,
-                -1 /* always interpolate, otherwise repeat points wont accumulate confidence */,
+
+        double[] v = this.s.value(new double[]{
+                when
+        }, times, freq, conf, exp,
+                //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
                 count);
         return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
 
@@ -116,6 +132,10 @@ public class TruthPolation {
 
     public int capacity() {
         return times.length;
+    }
+
+    public void print() {
+        System.out.println(Joiner.on("\n").join(this.s.microsphereData.stream().map(x -> new DoubleArrayList(x)).collect(Collectors.toList())));
     }
 
 //    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */

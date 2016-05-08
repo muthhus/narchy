@@ -449,6 +449,6 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     public static float c2w(float c) {
-        return Global.HORIZON * c / (1 - c);
+        return Global.HORIZON * c / (1 - Math.min(c, 1.0f - Global.TRUTH_EPSILON));
     }
 }
