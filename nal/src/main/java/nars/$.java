@@ -736,6 +736,9 @@ public enum $ /* TODO: implements TermIndex */ {
         return image(relation, false, product.terms());
     }
 
+    public static Truth t(float f, float c) {
+        return new DefaultTruth(f, c);
+    }
 
 
     //TODO add this to a '$.printree' command

@@ -34,7 +34,7 @@ public class ControlFlowTest {
             x.cyclesPerFrame.set(2);
             return x;
         };
-        //testSequence(n, 2, 5);
+        testSequence(n, 2, 5);
         testSequence(n, 3, 20);
         testSequence(n, 4, 30);
         testSequence(n, 8, 30);

@@ -161,7 +161,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
             polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
         }
 
-        return polation.value(when, list(), eternal.top());
+        return polation.truth(when, list(), eternal.top());
     }
 
 //    public Task weakest(Task input, NAR nar) {

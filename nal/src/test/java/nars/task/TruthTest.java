@@ -1,8 +1,11 @@
 package nars.task;
 
+import nars.$;
 import nars.Global;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -99,5 +102,23 @@ public class TruthTest {
         assertEquals(0.75f, new DefaultTruth(1f, 0.5f).expectation(), 0.01f);
         assertEquals(0.95f, new DefaultTruth(1f, 0.9f).expectation(), 0.01f);
         assertEquals(0.05f, new DefaultTruth(0f, 0.9f).expectation(), 0.01f);
+    }
+
+    @Test public void testTruthRevision() {
+        Truth d = Revision.revision($.t(1f, 0.1f), $.t(1f, 0.1f));
+        assertEquals(1f, d.freq(), 0.01f);
+        assertEquals(0.18f, d.conf(), 0.01f);
+
+        Truth a = Revision.revision($.t(1f, 0.3f), $.t(1f, 0.3f));
+        assertEquals(1f, a.freq(), 0.01f);
+        assertEquals(0.46f, a.conf(), 0.01f);
+
+        Truth b = Revision.revision($.t(0f, 0.3f), $.t(1f, 0.3f));
+        assertEquals(0.5f, b.freq(), 0.01f);
+        assertEquals(0.46f, b.conf(), 0.01f);
+
+        Truth c = Revision.revision($.t(1f, 0.9f), $.t(1f, 0.9f));
+        assertEquals(1f, c.freq(), 0.01f);
+        assertEquals(0.95f, c.conf(), 0.01f);
     }
 }

@@ -12,6 +12,7 @@ import nars.term.Terms;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -140,7 +141,7 @@ public class Revision {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float minConf) {
+    public static Truth revision(@NotNull Truthed a, @NotNull Truthed b, float match, float minConf) {
         float w1 = TruthFunctions.c2w(a.conf());
         float w2 = TruthFunctions.c2w(b.conf());
         float w = (w1 + w2);
@@ -156,4 +157,10 @@ public class Revision {
             newConf
         );
     }
+
+    @Nullable
+    public static Truth revision(@NotNull Truthed a, @NotNull Truthed b) {
+        return revision(a, b, 1f, 0f);
+    }
+
 }
