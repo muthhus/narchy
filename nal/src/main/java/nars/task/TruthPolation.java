@@ -1,13 +1,11 @@
 package nars.task;
 
 import nars.Global;
-import nars.concept.table.TemporalBeliefTable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 
 import java.util.List;
-import java.util.WeakHashMap;
 
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
@@ -41,7 +39,7 @@ public class TruthPolation {
         count = 0;
     }
 
-    public void set(List<Task> tasks, Task topEternal /* background */) {
+    public Truth value(long when, List<Task> tasks, Task topEternal /* background */) {
         assert(times.length <= tasks.size());
 
         int s = tasks.size();
@@ -49,15 +47,29 @@ public class TruthPolation {
         this.count = s;
         this.tasks = tasks;
 
+        long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
-            times[i][0] = t.occurrence();
+            long o = t.occurrence();
+            if (o < tmin) tmin = o;
+            if (o > tmax) tmax = o;
+        }
+        if (tmin == tmax) {  tmax++; } //just expand one unit around
+
+        long range = tmax - tmin;
+        for (int i = 0; i < s; i++) {
+            Task t = tasks.get(i);
+            times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
             freq[i] = t.freq();
             conf[i] = c2w(t.conf());
             //TODO dt
         }
 
         this.s.setBackground((topEternal!=null) ? topEternal.freq() : Float.NaN );
+
+        double whenNormalized = ((double)when - tmin) / range;
+        double[] v = this.s.value(new double[]{whenNormalized}, times, freq, conf, 1, 0.5 / range, count);
+        return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
 
     }
 
@@ -82,13 +94,12 @@ public class TruthPolation {
 //
 //    }
 
-    public Truth value(long when) {
-        double[] v = s.value(new double[]{when}, times, freq, conf, 1, 0.5, count);
-        return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
-    }
+
 
     public static void main(String[] args) {
-        TruthPolation p = new TruthPolation(4, 0.1f);
+        TruthPolation p = new TruthPolation(4,
+                0f);
+                //0.1f);
 
         List<Task> l = Global.newArrayList();
 
@@ -97,7 +108,6 @@ public class TruthPolation {
         l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
         l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
 
-        p.set(l, null);
 
         //interpolation (revision) and extrapolation (projection)
         System.out.println("INPUT");
@@ -109,7 +119,7 @@ public class TruthPolation {
 
         System.out.println("TRUTHPOLATION");
         for (long d = -4; d < 15; d++) {
-            Truth a1 = p.value(d);
+            Truth a1 = p.value(d, l, null);
             System.out.println(d + ": " + a1);
         }
 

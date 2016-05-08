@@ -2,17 +2,11 @@ package nars.concept.table;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.impl.ListTable;
-import nars.bag.impl.SortedArrayTable;
 import nars.bag.impl.SortedTable;
 import nars.task.Revection;
 import nars.task.Task;
 import nars.task.TruthPolation;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import org.happy.collections.lists.decorators.SortedList_1x4;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -87,8 +81,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
             polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
         }
 
-        polation.set(list(), eternal.top());
-        return polation.value(when);
+        return polation.value(when, list(), eternal.top());
     }
 
 //    public Task weakest(Task input, NAR nar) {
