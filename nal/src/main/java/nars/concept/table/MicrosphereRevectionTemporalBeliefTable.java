@@ -28,13 +28,16 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
     @Override
     public void setCapacity(int c) {
-        if (c < 3)
+        if (c!=0 && (c < 3))
             throw new RuntimeException("temporal capacity must be > 2");
         super.setCapacity(c);
     }
 
     @Override
     public Task prepare(Task input, NAR nar) {
+        if (capacity() == 0)
+            return null;
+
         if (isFull() /*&& temporal.capacity() > 1*/) {
 
             compress(nar.time(), nar);

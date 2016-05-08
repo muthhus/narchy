@@ -38,19 +38,19 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 3;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 2;
+	private int pacmanCyclesPerFrame = 16;
 
 
 	public static void main (String[] args) 	{
-		NAgent a = new NAgent(new Default(1024, 10, 1, 2)
+		NAgent a = new NAgent(new Default(1024, 4, 1, 2)
 				//.logSummaryGT(System.out, 0.01f)
 				);
-		a.nar.conceptActivation.setValue(0.1f);
-		a.nar.cyclesPerFrame.set(200);
+		a.nar.conceptActivation.setValue(0.25f);
+		a.nar.cyclesPerFrame.set(400);
 
 		new PacmanEnvironment().run(
 				//new DQN(),
@@ -151,7 +151,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		static final int POWER_DOT=8;*/
 
 
-		float bias = -0.25f; //pain of boredom
+		float bias = -0.2f; //pain of boredom
 
 		//delta score from pacman game
 		float ds = score - lastScore;
@@ -182,7 +182,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	@Override
 	public void killGhost() {
 		super.killGhost();
-		interScore += 1f;
+		//interScore += 1f; //DISABLED FOR NOW TO NOT CONFUSE IT
 	}
 }
 

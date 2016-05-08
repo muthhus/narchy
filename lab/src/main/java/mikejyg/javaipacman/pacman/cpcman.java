@@ -19,6 +19,7 @@
 
 package mikejyg.javaipacman.pacman;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -105,6 +106,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	final int SUSPEND=1;  // stop/start
 	final int BOSS=2;      // boss
 
+	int numGhosts = 1; //max 4
 	int zoom = 2;
 
 	////////////////////////////////////////////////
@@ -119,6 +121,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	}
 
 	public void init() {
+
+		setIgnoreRepaint(true);
 
 		// init variables
 		hiScore=0;
@@ -160,6 +164,35 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 		addNotify();  // for updated inset information
 
+		if (gameState == INITIMAGE)
+		{
+			// System.out.println("first paint(...)...");
+
+			// init images, must be done after show() because of Graphics
+			initImages();
+
+			// set the proper size of canvas
+			Insets insets=getInsets();
+
+			topOffset=insets.top;
+			leftOffset=insets.left;
+
+			//  System.out.println(topOffset);
+			//  System.out.println(leftOffset);
+
+			setSize(canvasWidth+insets.left+insets.right,
+					canvasHeight+insets.top+insets.bottom+10);
+
+			setResizable(false);
+
+			// now we can start timer
+			startGame();
+
+			startTimer();
+
+		}
+
+
 		// System.out.println("initGUI done.");
 	}
 
@@ -171,13 +204,20 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			System.out.println("createImage failed");
 		offScreenG=offScreen.getGraphics();
 
+		float alpha = 0.5f;
+		int type = AlphaComposite.SRC_OVER;
+		AlphaComposite composite =
+				AlphaComposite.getInstance(type, alpha);
+		((Graphics2D)offScreenG).setComposite(composite);
+
 		// initialize maze object
 		maze = new cmaze(this, offScreenG);
 
 		// initialize ghosts object
 		// 4 ghosts
-		ghosts = new cghost[4];
-		for (int i=0; i<4; i++)
+
+		ghosts = new cghost[numGhosts];
+		for (int i = 0; i< numGhosts; i++)
 		{
 			Color color;
 			if (i==0)
@@ -253,66 +293,39 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 		pac.start();
 		pacKeyDir=ctables.DOWN;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<ghosts.length; i++)
 			ghosts[i].start(i,round);
 
 		gameState=RUNNING;
 		//wait=WAITCOUNT;
-	}
 
-	///////////////////////////////////////////
-	// paint everything
-	///////////////////////////////////////////
-	public void paint(Graphics g)
-	{
-		if (gameState == INITIMAGE)
-		{
-			// System.out.println("first paint(...)...");
 
-			// init images, must be done after show() because of Graphics
-			initImages();
-
-			// set the proper size of canvas
-			Insets insets=getInsets();
-
-			topOffset=insets.top;
-			leftOffset=insets.left;
-
-			//  System.out.println(topOffset);
-			//  System.out.println(leftOffset);
-
-			setSize(canvasWidth+insets.left+insets.right,
-					canvasHeight+insets.top+insets.bottom);
-
-			setResizable(false);
-
-			// now we can start timer
-			startGame();	  
-
-			startTimer();
-
-		}
-
-		g.setColor(Color.black);
-		g.fillRect(leftOffset,topOffset,canvasWidth, canvasHeight);
 
 		changeScore=1;
 		changeHiScore=1;
 		changePacRemain=1;
 
-		paintUpdate(g);
 	}
 
-	void paintUpdate(Graphics g)
-	{
+
+	void paintUpdate(Graphics g) 	{
+
+		//g.setColor(Color.black);
+
+		g.setColor(new Color(0,0,0,0.1f));
+		g.fillRect(leftOffset,topOffset,getWidth(), getHeight());
+
+
 		// updating the frame
+		maze.draw();
 
 		powerDot.draw();
 
-		for (int i=0; i<4; i++)
-			ghosts[i].draw();
+		for (cghost gg : ghosts)
+			gg.draw();
 
 		pac.draw();
+
 
 		// display the offscreen
 		g.drawImage(offScreen, 
@@ -371,7 +384,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 		int oldScore=score;
 
-		for (int i=0; i<4; i++)
+		for (int i=0; i<ghosts.length; i++)
 			ghosts[i].move(pac.iX, pac.iY, pac.iDir);
 
 		k=pac.move(pacKeyDir);
@@ -395,7 +408,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			return;
 		}
 
-		for (int i=0; i<4; i++)
+		for (int i=0; i<ghosts.length; i++)
 		{
 			k=ghosts[i].testCollision(pac.iX, pac.iY);
 			if (k==1)	// kill pac
@@ -539,7 +552,12 @@ implements Runnable, KeyListener, ActionListener, WindowListener
         {
 			return true;
         }*/
-		repaint();
+
+
+
+		SwingUtilities.invokeLater(this::repaint);
+		//repaint();
+
 //		invalidate();
 
 		signalMove++;
@@ -615,7 +633,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		maze=null;
 		pac=null;
 		powerDot=null;
-		for (int i=0; i<4; i++)
+		for (int i=0; i<ghosts.length; i++)
 			ghosts[i]=null;
 		ghosts=null;
 

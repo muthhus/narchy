@@ -9,6 +9,8 @@ import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.util.data.Util;
+import nars.util.data.array.Arrays;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,8 @@ public class NAgent implements Agent {
     public final NAR nar;
 
     float motivation[];
+    int motivationOrder[];
+
     float input[];
 
     private List<MotorConcept> actions;
@@ -37,13 +41,14 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.3f;
+    float alpha = 0.55f;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.35f;
+    float epsilon = 0.01f;
+    private double epsilonRandom = 0.01f;
 
     float sensorPriority = 0.5f;
-    float rewardPriority = 0.75f;
+    float rewardPriority = 0.5f;
     float goalFeedbackPriority = rewardPriority;
     float goalPriority = rewardPriority;
 
@@ -60,7 +65,7 @@ public class NAgent implements Agent {
 
     private int discretization = 1;
     private float lastMotivation = 0;
-    private double epsilonRandom = 0.02f;
+
 
     //private SensorConcept dRewardPos, dRewardNeg;
 
@@ -73,6 +78,10 @@ public class NAgent implements Agent {
         nar.reset();
 
         motivation = new float[actions];
+        motivationOrder = new int[actions];
+        for (int i = 0; i < actions; i++)
+            motivationOrder[i] = i;
+
         input = new float[inputs];
 
         this.actions = IntStream.range(0, actions).mapToObj(i -> {
@@ -252,10 +261,11 @@ public class NAgent implements Agent {
         int nextAction = -1;
         float nextMotivation;
         if (Math.random() < epsilonRandom) {
-            nextAction = (int)(Math.random() * actions.size());
+            nextAction = randomMotivation();
         } else {
             nextAction = decideMotivation();
-
+            if (nextAction == -1)
+                nextAction = randomMotivation();
         }
         nextMotivation = motivation[nextAction];
 
@@ -264,14 +274,14 @@ public class NAgent implements Agent {
             if (lastAction != -1) {
 
 //                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
-                float off;
+                float off = 1f;
 //                if (lastMotivation > nextMotivation) {
 //                    off = 0.5f; //partial off
 //                } else {
-                    off = 1; //full off
+//                    off = 1; //full off
 //                }
 
-                nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha);
+                nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha * off);
                 nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, alpha * off);
             }
 
@@ -297,15 +307,34 @@ public class NAgent implements Agent {
         this.lastMotivation = nextMotivation;
     }
 
+    private int randomMotivation() {
+        return (int)(Math.random() * actions.size());
+    }
+
     private int decideMotivation() {
         int nextAction = -1;
+        boolean equalToLast = true;
         float nextMotivation = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < motivation.length; i++) {
+
+        Arrays.shuffle(motivationOrder, nar.random);
+
+        for (int j = 0; j < motivation.length; j++) {
+            int i = motivationOrder[j];
             float m = motivation[i];
+
             if (m > nextMotivation) {
                 nextAction = i;
+                nextMotivation = m;
             }
+            if (equalToLast && j > 0 && !Util.equals(m, motivation[motivationOrder[j-1]]) ) {
+                equalToLast = false; //there is some variation
+            }
+
         }
+        if (equalToLast) //all equal?
+            return -1;
+
+
         return nextAction;
     }
 

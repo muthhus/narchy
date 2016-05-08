@@ -30,7 +30,7 @@ public class cghost
 	final int EYE=3;
 
 	final int[] steps=	{7, 7, 1, 1};
-	final int[] frames=	{16, 16, 2, 1}; //increase these to make the ghosts slower
+	final int[] frames=	{64, 64, 2, 1}; //increase these to make the ghosts slower
 
 	final int INIT_BLIND_COUNT=600;	// remain blind for ??? frames
 	int blindCount;
