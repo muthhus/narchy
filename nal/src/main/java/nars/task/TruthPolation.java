@@ -25,7 +25,7 @@ public class TruthPolation {
     double[] conf;
     int count;
     private List<Task> tasks;
-    final private double exp = 1f;
+    final private double exp = 2f;
 
     public TruthPolation(int size, float eternalization) {
         s = new InterpolatingMicrosphere(1, 2,
@@ -72,6 +72,12 @@ public class TruthPolation {
 //
 //        long range = tmax - tmin;
 
+        float confSum = 0;
+        for (int i = 0; i < s; i++) {
+            Task t = tasks.get(i);
+            confSum += t.conf();
+        }
+
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
@@ -84,7 +90,7 @@ public class TruthPolation {
             times[i][0] = t.occurrence() + (window * (-0.5 + (t.hashCode()%increments)/((double)increments)  ));  /* keeps occurrence times unique */;
 
             freq[i] = t.freq();
-            conf[i] = c2w(t.conf());
+            conf[i] = c2w(t.conf())/confSum;
             //TODO dt
         }
 

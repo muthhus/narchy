@@ -90,21 +90,21 @@ public class TruthPolationTest {
         return new MutableTask("a:b", '.', $.t(freq, conf)).time(0, occ);
     }
 
-    public static void _main(String[] args) {
-        TruthPolation p = new TruthPolation(4,
-                0f);
-        //0.1f);
-
-        List<Task> l = Global.newArrayList();
-
-        //NAR n = new Default();
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
-        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
-        print(p, l, -5, 15);
-
-
-    }
+//    public static void _main(String[] args) {
+//        TruthPolation p = new TruthPolation(4,
+//                0f);
+//        //0.1f);
+//
+//        List<Task> l = Global.newArrayList();
+//
+//        //NAR n = new Default();
+//        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.5f) ).occurr(0).setCreationTime(0) );
+//        l.add( new MutableTask("a:b", '.', new DefaultTruth(1f, 0.5f) ).occurr(5).setCreationTime(0) );
+//        l.add( new MutableTask("a:b", '.', new DefaultTruth(0f, 0.75f) ).occurr(10).setCreationTime(0) );
+//        print(p, l, -5, 15);
+//
+//
+//    }
 
     public static void print(TruthPolation p, List<Task> l, int start, int end) {
         //interpolation (revision) and extrapolation (projection)

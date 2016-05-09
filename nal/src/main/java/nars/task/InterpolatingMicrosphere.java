@@ -416,7 +416,9 @@ public class InterpolatingMicrosphere {
 
     /** assumes sampleValue in range 0..1 */
     static double valueIntersection(double a, double b) {
-        return 1f - Math.abs(a - b);
+        double s = 1f - Math.abs(a - b);
+        return s;
+        //return s*s;
     }
 
     /** accumulate a measure of relevant evidence */

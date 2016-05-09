@@ -20,7 +20,7 @@ import static nars.util.Texts.n2;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 90;
+    public float targetPeriod = 180;
     public final float speed = 0.01f;
     boolean print = true;
     private MutableFloat yHidden;
