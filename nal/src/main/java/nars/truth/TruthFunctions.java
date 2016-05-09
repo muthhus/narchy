@@ -219,15 +219,23 @@ public final class TruthFunctions extends UtilityFunctions {
         return c < minConf ? null : new DefaultTruth(1, c);
     }
 
+
+    @Nullable
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        return comparison(a, b, false, minConf);
+    }
+
     /**
      * {<M ==> S>, <M ==> P>} |- <S <=> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    @Nullable
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
         float f1 = a.freq();
+        if (invertA) f1 = 1 - f1;
+
         float f2 = b.freq();
         float f0 = or(f1, f2);
         float c = w2c(and(f0, a.conf(), b.conf()));

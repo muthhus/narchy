@@ -62,12 +62,14 @@ public class ControlFlowTest {
 
     }
 
-    @Test public void testBranch1then()  {
-        Global.DEBUG = true;
+    @Test public void testBranchThen()  {
         testBranch(n, 10, 1f);
     }
-    @Test public void testBranch1else()  {
-        Global.DEBUG = true;
+    @Test public void testBranchThenThen()  {
+        testBranch(n, 10,
+                        1f, 1f);
+    }
+    @Test public void testBranchElse()  {
         testBranch(n, 10, 0f);
     }
 

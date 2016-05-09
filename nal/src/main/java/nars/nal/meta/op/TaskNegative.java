@@ -6,7 +6,7 @@ import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-
+/** freq < 0.5 */
 public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
 
     public static final TaskNegative the = new TaskNegative();

@@ -5,9 +5,7 @@ import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by me on 5/5/16.
- */
+/** freq < 0.5 */
 public final class BeliefNegative extends AtomicBooleanCondition<PremiseEval> {
 
     public static final BeliefNegative the = new BeliefNegative();

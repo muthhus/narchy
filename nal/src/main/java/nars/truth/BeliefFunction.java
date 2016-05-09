@@ -101,6 +101,13 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    ComparisonNeg() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.comparison(T, B, true, minConf);
+        }
+    },
+
     Conversion() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
@@ -143,7 +150,7 @@ public enum BeliefFunction implements TruthOperator {
     Intersection() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, false, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, minConf);
         }
     },
 
