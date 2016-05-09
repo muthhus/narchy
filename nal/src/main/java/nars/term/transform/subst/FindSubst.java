@@ -1,6 +1,5 @@
 package nars.term.transform.subst;
 
-import com.gs.collections.api.map.ImmutableMap;
 import com.gs.collections.api.set.MutableSet;
 import nars.Global;
 import nars.Op;
@@ -17,7 +16,6 @@ import nars.term.transform.subst.choice.CommutivePermutations;
 import nars.term.transform.subst.choice.Termutator;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.version.*;
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -51,9 +48,9 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
-    //TODO make final
-    public Random random;
-    public Op type;
+
+    public final Random random;
+    public Op type; //TODO make final again
 
     public final Versioning versioning;
 
@@ -112,7 +109,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
     protected FindSubst(Op type, Random random) {
-        this(type, random, new PooledVersioning(Global.UnificationStackMax, 8));
+        this(type, random,
+            new HeapVersioning(Global.UnificationStackMax, 4)
+            //new PooledVersioning(Global.UnificationStackMax, 8)
+        );
     }
 
     protected FindSubst(Op type, Random random, Versioning versioning) {
@@ -123,7 +123,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         this.versioning = versioning;
         xy = new VersionMap(versioning, 16);
         yx = new VersionMap(versioning, 16);
-        reassigner = new VersionMap.Reassigner<>( this, this::assignable );
+        reassigner = new VersionMap.Reassigner<>(this::assignable );
         parent = new Versioned(versioning);
         constraints = new Versioned(versioning, new int[2], new FasterList(0, new MatchConstraint[2]));
 
@@ -827,6 +827,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
+    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Versioned<Term> y) {
+        return replaceXY(x, y.get());
+    }
+
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         assert(y!=null);
         xy.put(x, y);
@@ -850,11 +854,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return true;
     }
 
-    @Override
-    public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-        xy.forEach(each);
-        //TODO yx also?
-    }
 
     public final int now() {
         return versioning.now();
@@ -868,6 +867,12 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //        xy.forEachVersioned(each);
 //        //TODO yx also?
 //    }
+
+    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
+        xy.forEachVersioned(each);
+    }
+
+
 //    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
 //        return xy.forEachVersioned(each);
 //        //TODO yx also?

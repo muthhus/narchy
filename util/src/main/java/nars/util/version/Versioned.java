@@ -35,7 +35,6 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     /** called when this versioned is removed/Deleted from a context */
     void delete() {
         clear();
-        current = null;
     }
 
     @Override

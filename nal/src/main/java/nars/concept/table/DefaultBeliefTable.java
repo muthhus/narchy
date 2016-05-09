@@ -197,7 +197,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return insert(input, eternal, nar) ? input : null;
     }
 
-    private Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
+    protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
         input = temporal.prepare(input, nar);
         if (input != null) {

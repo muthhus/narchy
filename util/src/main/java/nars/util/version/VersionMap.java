@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
@@ -87,6 +88,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     /** avoid using this if possible because it involves transforming the entries from the internal map to the external form */
     @NotNull
     @Override public Set<Entry<X, Y>> entrySet() {
+//        throw new UnsupportedOperationException("inefficient");
         ArrayUnenforcedSet<Entry<X,Y>> e = new ArrayUnenforcedSet<>(size());
         map.forEach( (k, v) -> {
             e.add(new AbstractMap.SimpleEntry<>(k, v.get()));
@@ -123,13 +125,17 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @NotNull
     public final Versioned<Y> newEntry(X k) {
-        return new Versioned(context);
+        //return new Versioned(context);
         //return cache(k) ? new Versioned(context) :
-        //return new RemovingVersionedEntry(k);
+        return new RemovingVersionedEntry(k);
     }
 
     public final boolean computeAssignable(X x, @NotNull Reassigner<X,Y> r) {
         return map.compute(x, r)!=null;
+    }
+
+    public void forEachVersioned(BiConsumer<? super X, ? super Versioned<Y>> each) {
+        map.forEach(each);
     }
 
 
@@ -156,7 +162,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         private void removeFromMap() {
             VersionMap.this.remove(key);
         }
+
+      
     }
+
+
 
 //    public boolean cache(X key) {
 //        return false;
@@ -186,20 +196,17 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
 
         private Y y;
-        private final Supplier<Versioned<Y>> pool;
+        private VersionMap map;
         private final BiPredicate<X, Y> assigner;
 
-        public Reassigner(Supplier<Versioned<Y>> pool, BiPredicate<X, Y> assigner) {
-            this.pool = pool;
+        public Reassigner(BiPredicate<X, Y> assigner) {
             this.assigner = assigner;
         }
-
-
 
         @Override
         public Versioned<Y> apply(X X, @Nullable Versioned<Y> py) {
             if (py == null) {
-                return assigner.test(X, y) ? pool.get().set(y) : null;
+                return assigner.test(X, y) ? map.newEntry(X).set(y) : null;
             } else {
                 Y yy = py.get();
                 if (yy == null) {
@@ -217,6 +224,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         /** should not be used by multiple threads at once! */
         public final boolean compute(@NotNull VersionMap xy, @NotNull X x, @NotNull Y y) {
             this.y = y;
+            this.map = xy;
             boolean b = xy.computeAssignable(x, this);
             this.y = null;
             return b;

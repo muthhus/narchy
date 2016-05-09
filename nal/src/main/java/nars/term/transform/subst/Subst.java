@@ -3,6 +3,7 @@ package nars.term.transform.subst;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,23 +28,25 @@ public interface Subst  {
 
     void clear();
 
-    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
-
-    /** returns true only if each evaluates true; if empty, returns true also */
-    default boolean forEach(@NotNull BiPredicate<? super Term, ? super Term> each) {
-        final boolean[] b = {true};
-        forEach((k,v)-> {
-            if (!each.test(k, v)) {
-                b[0] = false;
-            }
-        });
-        return b[0];
-    }
+//    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
+//
+//    /** returns true only if each evaluates true; if empty, returns true also */
+//    default boolean forEach(@NotNull BiPredicate<? super Term, ? super Term> each) {
+//        final boolean[] b = {true};
+//        forEach((k,v)-> {
+//            if (!each.test(k, v)) {
+//                b[0] = false;
+//            }
+//        });
+//        return b[0];
+//    }
 
     @Nullable
     default ImmediateTermTransform getTransform(@NotNull Atomic t) {
         return null;
     }
+
+
 
 
 //

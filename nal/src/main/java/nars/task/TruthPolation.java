@@ -62,15 +62,7 @@ public class TruthPolation {
         this.count = s;
         this.tasks = tasks;
 
-//        long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
-//        for (int i = 0; i < s; i++) {
-//            Task t = tasks.get(i);
-//            long o = t.occurrence();
-//            if (o < tmin) tmin = o;
-//            if (o > tmax) tmax = o;
-//        }
-//
-//        long range = tmax - tmin;
+
 
         float confSum = 0;
         for (int i = 0; i < s; i++) {

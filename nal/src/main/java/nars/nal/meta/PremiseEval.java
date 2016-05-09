@@ -236,14 +236,14 @@ public class PremiseEval extends FindSubst {
                !Termlike.impossibleStructureMatch(termSub2Struct, bits);
     }
 
-    /** returns whether the put operation was successful */
-    public final boolean putXY(Term k, Versioned<Term> vv) {
-        Term v = vv.get();
-        if (v != null) {
-            return putXY(k, v);
-        }
-        return false;
-    }
+//    /** returns whether the put operation was successful */
+//    public final boolean putXY(Term k, Versioned<Term> vv) {
+//        Term v = vv.get();
+//        if (v != null) {
+//            return putXY(k, v);
+//        }
+//        return false;
+//    }
 
 //    /** copy the new mappings to the match; returns false if there was an error, true if successful or if it was empty */
 //    public final boolean putAllXY(Subst m) {
@@ -257,8 +257,8 @@ public class PremiseEval extends FindSubst {
 //        return true;
 //    }
 
-    public void replaceAllXY(Subst m) {
-        m.forEach(this::replaceXY);
+    public void replaceAllXY(FindSubst m) {
+        m.forEachVersioned(this::replaceXY);
     }
 
 

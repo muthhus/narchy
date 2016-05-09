@@ -18,10 +18,10 @@ import java.util.Random;
  * */
 public final class substituteIfUnifies extends substitute {
 
-    private final OneMatchFindSubst matcher;
+    private OneMatchFindSubst matcher;
 
     public substituteIfUnifies() {
-        this.matcher = new OneMatchFindSubst();
+
     }
 
     @Nullable
@@ -35,8 +35,11 @@ public final class substituteIfUnifies extends substitute {
         final Term x = xx[2];
         final Term y = xx[3];
 
+        if (this.matcher == null) {
+            this.matcher = new OneMatchFindSubst(r.premise.nar().random);
+        }
 
-        return matcher.tryMatch(substitute.getOp(opT), r.premise.nar().random, r, term, x, y);
+        return matcher.tryMatch(substitute.getOp(opT), r, term, x, y);
     }
 
     public final static class OneMatchFindSubst extends FindSubst {
@@ -45,8 +48,8 @@ public final class substituteIfUnifies extends substitute {
         private @NotNull PremiseEval r;
         @Nullable private Term result;
 
-        public OneMatchFindSubst() {
-            super(null, null); //HACK
+        public OneMatchFindSubst(Random random) {
+            super(null, random); //HACK
         }
 
         @Override
@@ -64,16 +67,12 @@ public final class substituteIfUnifies extends substitute {
         }
 
         @Nullable
-        public Term tryMatch(@NotNull Op op, Random random, @NotNull PremiseEval r, @NotNull Term xterm, @NotNull Term x, @NotNull Term y) {
+        public Term tryMatch(@NotNull Op op, @NotNull PremiseEval r, @NotNull Term xterm, @NotNull Term x, @NotNull Term y) {
             this.type = op;
-            this.random = random;
             this.xterm = xterm;
             this.r = r;
             matchAll(x, y, true);
-
-            //clear();
-            versioning.delete();
-
+            clear();
             return result;
         }
 

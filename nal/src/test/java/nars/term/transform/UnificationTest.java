@@ -104,7 +104,7 @@ public class UnificationTest {
 
                     assertFalse("incomplete: " + toString(), this.isEmpty());
 
-                    this.forEach((k, v) -> {
+                    this.forEachVersioned((k, v) -> {
                         if (k.op() == type)
                             assertNotNull(v);
                     });

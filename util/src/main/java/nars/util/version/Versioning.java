@@ -110,15 +110,8 @@ abstract public class Versioning extends FasterList<Versioned> {
     abstract public int[] newIntStack();
 
 
-
-    public void delete() {
-        clear();
-        forEach((Consumer<? super Versioned>)this::delete);
-    }
-
     public void clear() {
         revert(0);
-        super.clear(); //<- necessary?
     }
 
     public <Y> void delete(Versioned<Y> v) {

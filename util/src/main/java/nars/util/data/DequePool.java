@@ -12,13 +12,17 @@ public abstract class DequePool<X> implements Pool<X> {
     private int capacity;
 
 
-    public DequePool(int initialCapacity) {
+    public DequePool(int initialCapacity, int preallocate) {
         data = new ArrayDeque(initialCapacity);
         setCapacity(initialCapacity);
         //data = new CircularArrayList<>(initialCapacity);
 
-        /*for (int i = 0; i < preallocate; i++)
-            put(create());*/
+        for (int i = 0; i < preallocate; i++)
+            put(create());
+
+    }
+    public DequePool(int initialCapacity) {
+        this(initialCapacity, initialCapacity);
     }
 
     public void setCapacity(int c) {
@@ -43,7 +47,10 @@ public abstract class DequePool<X> implements Pool<X> {
 
         Deque<X> d = data;
 
-        if (d.isEmpty()) return create();
+        if (d.isEmpty()) {
+            //System.err.println(this + " emptied, initialize larger or plug leaks");
+            return create();
+        }
         return d.poll();
         //}
     }
