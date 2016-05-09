@@ -43,7 +43,13 @@ public final class Emotion implements Serializable {
 
     }
 
-
+    /** percentage of business which was not frustration */
+    public float learning() {
+        double b = busy.getSum();
+        if (b == 0)
+            return 0;
+        return 1f - (float)(frustration.getSum() / b);
+    }
 
     public void print(@NotNull OutputStream output) {
         final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);

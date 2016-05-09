@@ -77,4 +77,9 @@ public class MapIndex1 extends AbstractMapIndex {
     public int subtermsCount() {
         return -1; //unsupported
     }
+
+    @Override
+    public String summary() {
+        return data.size() + " concepts, " + ((HashSymbolMap)atoms).map.size() + " atoms";
+    }
 }

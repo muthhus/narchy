@@ -380,14 +380,16 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	////////////////////////////////////////////////////////////
 	void move()
 	{
-		int k;
+		int k = -1;
 
 		int oldScore=score;
 
 		for (int i=0; i<ghosts.length; i++)
 			ghosts[i].move(pac.iX, pac.iY, pac.iDir);
 
-		k=pac.move(pacKeyDir);
+		if (pacKeyDir != 0) {
+			k=pac.move(pacKeyDir);
+		}
 
 		if (k==1)	// eaten a dot
 		{

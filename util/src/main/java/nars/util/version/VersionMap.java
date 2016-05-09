@@ -192,20 +192,17 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
-        private BiPredicate<X, Y> assigner;
+
         private Y y;
-        final Supplier<Versioned<Y>> pool;
+        private final Supplier<Versioned<Y>> pool;
+        private final BiPredicate<X, Y> assigner;
 
-        public Reassigner(Supplier<Versioned<Y>> pool) {
+        public Reassigner(Supplier<Versioned<Y>> pool, BiPredicate<X, Y> assigner) {
             this.pool = pool;
+            this.assigner = assigner;
         }
 
-        @NotNull
-        public Reassigner<X,Y> set(BiPredicate<X, Y> assigner, Y y) {
-            this.assigner = assigner;
-            this.y = y;
-            return this;
-        }
+
 
         @Override
         public Versioned<Y> apply(X X, @Nullable Versioned<Y> py) {
@@ -225,6 +222,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             }
         }
 
-
+        public final boolean compute(@NotNull VersionMap xy, X x, Y y) {
+            this.y = y;
+            return xy.computeAssignable(x, this);
+        }
     }
 }

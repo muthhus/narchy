@@ -316,44 +316,6 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
 
-    public static class DefaultTermIndex2 extends MapIndex2  {
-
-        public DefaultTermIndex2(int capacity, @NotNull Random random) {
-            super(new UnifriedMap(capacity),
-                  new DefaultConceptBuilder(random, 32, 32));
-
-        }
-    }
-    public static class DefaultTermIndex extends MapIndex1  {
-
-        public DefaultTermIndex(int capacity, @NotNull Random random) {
-            super(Terms.terms,
-                    new DefaultConceptBuilder(random, 32, 32),
-                    new HashMap(capacity)
-                    //new ConcurrentHashMapUnsafe(capacity)
-            );
-        }
-    }
-
-    public static class WeakTermIndex2 extends MapIndex2  {
-
-        public WeakTermIndex2(int capacity, @NotNull Random random) {
-            super(new WeakHashMap<>(capacity),
-                    new DefaultConceptBuilder(random, 32, 32));
-
-        }
-    }
-    public static class WeakTermIndex extends MapIndex1 {
-
-        public WeakTermIndex(int capacity, @NotNull Random random) {
-            super(Terms.terms,
-                    new DefaultConceptBuilder(random, 32, 32),
-                    //new SoftValueHashMap(capacity)
-                    new WeakHashMap<>(capacity)
-                    );
-
-        }
-    }
 
 //    public static class DefaultTermIndex2 extends MapIndex3 {
 //

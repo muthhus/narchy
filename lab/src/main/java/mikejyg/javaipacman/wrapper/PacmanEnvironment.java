@@ -26,10 +26,14 @@ import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
 import nars.nar.Default;
+import nars.time.FrameClock;
 import nars.util.Agent;
 import nars.util.DQN;
 import nars.util.NAgent;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
+
+import java.util.Random;
 
 import static nars.util.NAgent.printTasks;
 
@@ -42,23 +46,29 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 12;
+	private int pacmanCyclesPerFrame = 8;
 
 
 	public static void main (String[] args) 	{
-		NAgent a = new NAgent(new Default(1024, 5, 1, 2)
-				//.logSummaryGT(System.out, 0.01f)
-				);
-		a.nar.conceptActivation.setValue(0.2f);
-		a.nar.cyclesPerFrame.set(600);
+		Random rng = new XorShift128PlusRandom(1);
+		Default nar = new Default(
+				1024, 8, 2, 3, rng,
+				new Default.SoftTermIndex(256 * 1024, rng),
+				new FrameClock());
+		nar.conceptActivation.setValue(0.1f);
+		nar.cyclesPerFrame.set(200);
+		//a.nar.conceptRemembering.setValue(1);
+		//a.nar.termLinkRemembering.setValue(0.5f);
+		//a.nar.taskLinkRemembering.setValue(0.5f);
+		//.logSummaryGT(System.out, 0.01f)
 
 		new PacmanEnvironment().run(
 				//new DQN(),
-				a,
+				new NAgent(nar),
 				15000);
 
-		printTasks(a.nar, true);
-		printTasks(a.nar, false);
+		printTasks(new NAgent(nar).nar, true);
+		printTasks(new NAgent(nar).nar, false);
 	}
 
 	@Override
@@ -121,8 +131,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 							}
 						}
 
-						if (ghost)
-							System.out.println("ghost at " + i + ", " + j);
+						/*if (ghost)
+							System.out.println("ghost at " + i + ", " + j);*/
 
 					}
 
@@ -141,6 +151,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			case 3: pacKeyDir = ctables.DOWN; break;
 		}
 
+		float bias = -0.15f; //pain of boredom
+
+		if (interScore < bias*2f) {
+			//too much pain
+			pacKeyDir = 0;
+		}
 
 
 		cycle(pacmanCyclesPerFrame);
@@ -153,7 +169,6 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		static final int POWER_DOT=8;*/
 
 
-		float bias = -0.2f; //pain of boredom
 
 		//delta score from pacman game
 		float ds = score - lastScore;
@@ -164,13 +179,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		ds += bias;
 
 		ds += interScore;
-		interScore *= 0.95f;
+		interScore *= 0.97f;
 		//interScore = 0;
 
 		if (ds > 1f) ds = 1f;
 		if (ds < -1f) ds = -1f;
 
-		System.out.println(ds);
+		System.out.println(ds + "\t" + a.summary());
 		return ds;
 	}
 

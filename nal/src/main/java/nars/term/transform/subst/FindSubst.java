@@ -134,7 +134,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
-        reassigner = new VersionMap.Reassigner<>( this );
+        reassigner = new VersionMap.Reassigner<>( this, this::assignable );
         //term = new Versioned(this);
         parent = new Versioned(this);
         constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
@@ -826,12 +826,13 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 
 
 
+
     /**
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
         assert(y!=null);
-        return xy.computeAssignable(x, reassigner.set(this::assignable, y));
+        return reassigner.compute(xy, x, y);
     }
 
 

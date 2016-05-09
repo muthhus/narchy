@@ -1,5 +1,6 @@
 package nars.nar;
 
+import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -21,16 +22,22 @@ import nars.task.flow.TaskPerception;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.term.Terms;
+import nars.term.index.MapIndex1;
+import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
+import nars.util.data.map.UnifriedMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Random;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -112,6 +119,56 @@ public class Default extends AbstractNAR {
     }
 
 
+    public static class DefaultTermIndex2 extends MapIndex2 {
+
+        public DefaultTermIndex2(int capacity, @NotNull Random random) {
+            super(new UnifriedMap(capacity),
+                    new DefaultConceptBuilder(random, 32, 32));
+
+        }
+    }
+    public static class DefaultTermIndex extends MapIndex1 {
+
+        public DefaultTermIndex(int capacity, @NotNull Random random) {
+            super(Terms.terms,
+                    new DefaultConceptBuilder(random, 32, 32),
+                    new HashMap(capacity)
+                    //new ConcurrentHashMapUnsafe(capacity)
+            );
+        }
+    }
+
+    public static class WeakTermIndex2 extends MapIndex2  {
+
+        public WeakTermIndex2(int capacity, @NotNull Random random) {
+            super(new WeakHashMap<>(capacity),
+                    new DefaultConceptBuilder(random, 32, 32));
+
+        }
+    }
+    public static class WeakTermIndex extends MapIndex1 {
+
+        public WeakTermIndex(int capacity, @NotNull Random random) {
+            super(Terms.terms,
+                    new DefaultConceptBuilder(random, 32, 32),
+                    //new SoftValueHashMap(capacity)
+                    new WeakHashMap<>(capacity)
+            );
+
+        }
+    }
+    public static class SoftTermIndex extends MapIndex1 {
+
+        public SoftTermIndex(int capacity, @NotNull Random random) {
+            super(Terms.terms,
+                    new DefaultConceptBuilder(random, 32, 32),
+                    new SoftValueHashMap(capacity)
+                    //new WeakHashMap<>(capacity)
+            );
+
+        }
+    }
+
     /**
      * process a Task through its Concept
      */
@@ -135,7 +192,7 @@ public class Default extends AbstractNAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            conceptualize(c, t, activation, 1f, overflow);
+            conceptualize(c, t, activation, activation /*1f*/, overflow);
 
             if (overflow.floatValue() > 0) {
                 emotion.stress(overflow.floatValue());

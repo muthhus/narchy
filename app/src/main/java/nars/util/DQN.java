@@ -28,8 +28,8 @@ public class DQN implements Agent {
             engine.eval(new FileReader("/home/me/opennars/app/src/main/java/nars/util/rl.js"));
 
 
-            float alpha = 0.02f;
-            int hiddens = 2 * inputs * actions; //heuristic
+            float alpha = 0.03f;
+            int hiddens = 3 * inputs * actions; //heuristic
 
             CompiledScript cscript = engine.compile(
                     "java.lang.System.out.println('creating new rl.js agent'); " +

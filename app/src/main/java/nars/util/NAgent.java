@@ -14,6 +14,9 @@ import nars.util.data.array.Arrays;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
+import org.nustaq.serialization.coders.FSTJsonEncoder;
+import org.nustaq.serialization.serializers.FSTJSonSerializers;
+import org.nustaq.serialization.util.FSTUtil;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -47,7 +50,7 @@ public class NAgent implements Agent {
     float epsilon = 0.01f;
     private double epsilonRandom = 0.01f;
 
-    float sensorPriority = 0.5f;
+    float sensorPriority = 0.4f;
     float rewardPriority = 0.5f;
     float goalFeedbackPriority = rewardPriority;
     float goalPriority = rewardPriority;
@@ -148,8 +151,13 @@ public class NAgent implements Agent {
 
     @Override
     public String summary() {
-        return Texts.n2(motivation) + " [" +
-                reward.belief(nar.time())
+        return Texts.n2(motivation) + " "
+                //reward.belief(nar.time()) +
+                //" busyAvg=" + Texts.n4(nar.emotion.busy.getAverage()) +
+                /*" busySum="*/ + Texts.n4(nar.emotion.busy.getSum()) + " "
+                /*" frstSum="*/ + Texts.n4(nar.emotion.learning()) + " "
+                /*" strsSum="*/ + Texts.n4(nar.emotion.stress.getSum()) + " "
+                                + nar.index().summary()
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
         ;

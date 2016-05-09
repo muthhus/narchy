@@ -589,6 +589,11 @@ public interface TermIndex {
 
     }
 
+    /** a string containing statistics of the index's current state */
+    default String summary() {
+        return "";
+    }
+
     final class InvalidConceptTerm extends RuntimeException {
 
         public final Termed term;

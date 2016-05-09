@@ -112,14 +112,14 @@ public class ControlFlowTest {
             n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
         }
 
+        n.goal($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
+        n.goal($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
+
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
 
         //n.goal($.conj(delay, $.conj(  s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(  s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
-
-        n.goal($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
-        n.goal($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
 
         //n.believe($.impl(condition, delay, s(THEN, 0)));
         //n.believe($.impl($.neg(condition), delay, s(ELSE, 0)));

@@ -366,10 +366,10 @@ public class DemoRovers {
         int conceptsFirePerCycle = 4;
 
         Random rng = new XorShift128PlusRandom(1);
-        TermIndex index = new AbstractNAR.WeakTermIndex(256 * 1024, rng);
         Default nar = new Default(
-                //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1200, conceptsFirePerCycle, 2, 3, rng, index, new FrameClock());
+                1200, conceptsFirePerCycle, 2, 3, rng,
+                new Default.WeakTermIndex(256 * 1024, rng),
+                new FrameClock());
         /*nar.with(
                 Anticipate.class,
                 Inperience.class
