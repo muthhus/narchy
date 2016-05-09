@@ -102,7 +102,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed t, char punc, @NotNull Memory memory) {
+    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed t, char punc, @NotNull Memory memory, boolean input) {
 
 
         Termed normalizedTerm = memory.index.normalized(t);
@@ -111,7 +111,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         Op op = normalizedTerm.op();
 
-        if ((punc == Symbols.GOAL) && (op ==Op.IMPLICATION || op == Op.EQUIV))
+        if (input && (punc == Symbols.GOAL) && (op ==Op.IMPLICATION || op == Op.EQUIV))
             throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Goal task term may not be Implication or Equivalence");
 
         if (op.isStatement()) {
@@ -605,6 +605,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * or if its origin has been forgotten or never known
      */
     default boolean isInput() {
+        //return evidence().length <= 1;
         return (getParentTask() == null);
         //return (evidence().length <= 1) && ;
     }

@@ -209,7 +209,7 @@ public class ControlFlowTest {
 
 
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
-        float exeThresh = 0.1f;
+        float exeThresh = 0.3f;
 
         return new MotorConcept(term, n, (b, d) -> {
             if (d > 0.5f && (d > b + exeThresh)) {

@@ -172,7 +172,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
-        setTerm(Task.normalizeTaskTerm(t, punc, memory));
+        setTerm(Task.normalizeTaskTerm(t, punc, memory, isInput()));
 
         // if a task has an unperceived creationTime,
         // set it to the memory's current time here,
