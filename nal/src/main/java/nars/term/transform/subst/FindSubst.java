@@ -20,10 +20,7 @@ import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
-import nars.util.version.HeapVersioning;
-import nars.util.version.VersionMap;
-import nars.util.version.Versioned;
-import nars.util.version.Versioning;
+import nars.util.version.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,12 +48,14 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst extends HeapVersioning implements Subst, Supplier<Versioned<Term>> {
+public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
-    public final Random random;
+    //TODO make final
+    public Random random;
+    public Op type;
 
-    public final Op type;
+    public final Versioning versioning;
 
     @Nullable
     public TermIndex index = Terms.terms; //default static index
@@ -101,7 +100,7 @@ public abstract class FindSubst extends HeapVersioning implements Subst, Supplie
     @Override
     public String toString() {
         return "subst:{" +
-                "now:" + now() +
+                "now:" + versioning.now() +
                 ", type:" + type +
                 //", term:" + term +
                 ", parent:" + parent +
@@ -113,25 +112,26 @@ public abstract class FindSubst extends HeapVersioning implements Subst, Supplie
 
 
     protected FindSubst(Op type, Random random) {
-        this(type, random, null);
+        this(type, random, new PooledVersioning(Global.UnificationStackMax, 8));
     }
 
-    protected FindSubst(Op type, Random random, Versioning parentPoolToShare) {
-        super(Global.UnificationStackMax, 8);
+    protected FindSubst(Op type, Random random, Versioning versioning) {
+        //super(Global.UnificationStackMax, 8);
         this.random = random;
         this.type = type;
 
-        xy = new VersionMap(this, 16);
-        yx = new VersionMap(this, 16);
+        this.versioning = versioning;
+        xy = new VersionMap(versioning, 16);
+        yx = new VersionMap(versioning, 16);
         reassigner = new VersionMap.Reassigner<>( this, this::assignable );
-        parent = new Versioned(this);
-        constraints = new Versioned(this, new int[2], new FasterList(0, new MatchConstraint[2]));
+        parent = new Versioned(versioning);
+        constraints = new Versioned(versioning, new int[2], new FasterList(0, new MatchConstraint[2]));
 
     }
 
     @Override
     public Versioned<Term> get() {
-        return new Versioned(this);
+        return new Versioned(versioning);
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class FindSubst extends HeapVersioning implements Subst, Supplie
 
     @Override
     public void clear() {
-        revert(0);
+        versioning.clear();
     }
 
 
@@ -854,6 +854,14 @@ public abstract class FindSubst extends HeapVersioning implements Subst, Supplie
     public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
         xy.forEach(each);
         //TODO yx also?
+    }
+
+    public final int now() {
+        return versioning.now();
+    }
+
+    public final void revert(int then) {
+        versioning.revert(then);
     }
 
 //    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {

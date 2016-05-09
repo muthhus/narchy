@@ -18,9 +18,6 @@ import org.jetbrains.annotations.Nullable;
 /** TODO is this better named "substituteAny" */
 public class substitute extends ImmediateTermTransform implements PremiseAware {
 
-    public static final Atom INDEP_VAR = $.the("$", true);
-    public static final Atom QUERY_VAR = $.the("?", true);
-    public static final Atom DEP_VAR = $.the("#", true);
 
     @NotNull
     @Override
@@ -81,9 +78,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         x = resolve(r, x);
         y = resolve(r, y);
 
-        return resolve(r,
-                new MapSubst.MapSubstWithOverride(r.yx, x, y),
-                term);
+        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x, y), term);
     }
 
 
@@ -127,16 +122,17 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     @Nullable
     public static Op getOp(@NotNull Term type) {
-        Op o;
 
-        //TODO cache the type
-        if (type.equals(INDEP_VAR)) o = Op.VAR_INDEP;
-        else if (type.equals(DEP_VAR)) o = Op.VAR_DEP;
-        else if (type.equals(QUERY_VAR)) o = Op.VAR_QUERY;
-            //...else
-        else
-            o = null;
-        return o;
+        switch (type.toString()) {
+            case "\"$\"":
+                return Op.VAR_INDEP;
+            case "\"#\"":
+                return Op.VAR_DEP;
+            case "\"?\"":
+                return Op.VAR_QUERY;
+        }
+
+        return null;
     }
 
 }

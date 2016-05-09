@@ -11,6 +11,10 @@ public final class PooledVersioning extends Versioning {
     final DequePool<FasterList> valueStackPool;
     final DequePool<int[]> intStackPool;
 
+    public PooledVersioning(int capacity, int stackLimit) {
+        this(capacity, stackLimit, null);
+    }
+
     public PooledVersioning(int capacity, int stackLimit, PooledVersioning toSharePool) {
         super(capacity);
 

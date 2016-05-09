@@ -222,7 +222,7 @@ public class ControlFlowTest {
 
                 return 1f;
             }
-            System.out.println("\t not: " + term + " at " + n.time() + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
+            //System.out.println("\t not: " + term + " at " + n.time() + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
 
             return Float.NaN;
             //return 1f;

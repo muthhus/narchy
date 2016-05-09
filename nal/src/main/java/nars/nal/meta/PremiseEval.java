@@ -80,9 +80,9 @@ public class PremiseEval extends FindSubst {
         this.deriver = deriver;
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        truth = new Versioned(this);
-        punct = new Versioned(this);
-        pattern = new Versioned(this);
+        truth = new Versioned(versioning);
+        punct = new Versioned(versioning);
+        pattern = new Versioned(versioning);
     }
 
     private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
@@ -104,8 +104,7 @@ public class PremiseEval extends FindSubst {
 
         boolean finished = callback != null;
 
-        //if (finished)
-            this.pattern.set(callback); //to notify of matches
+        this.pattern.set(callback); //to notify of matches
 
         if (constraints!=null)
             this.constraints.set( constraints );
@@ -113,9 +112,8 @@ public class PremiseEval extends FindSubst {
         matchAll(x, y, finished);
 
         if (finished) {
-            revert(t);
+            versioning.revert(t);
         } //else: allows the set constraints to continue
-
     }
 
     @Override

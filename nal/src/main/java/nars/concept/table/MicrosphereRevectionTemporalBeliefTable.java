@@ -40,7 +40,9 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
         if (isFull() /*&& temporal.capacity() > 1*/) {
 
-            compress(nar.time(), nar);
+            if (null == compress(input, nar.time(), nar)) {
+                return null; //reject input because it didnt rank
+            }
 
             /*if (!Revection.revect(input, this, nar)) {
                 return null; //rejected input
@@ -59,14 +61,10 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     }
 
 
-    public Task weakest(long now) {
-        return weakest(now, null);
-    }
 
-
-    public Task weakest(long now, Task excluding) {
+    public Task weakest(long now, Task excluding, float minRank) {
         Task weakest = null;
-        float weakestRank = Float.POSITIVE_INFINITY;
+        float weakestRank = minRank;
         int n = size();
         for (int i = 0; i < n; i++) {
 
@@ -75,7 +73,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rankTemporalByConfidenceAndOriginality(ii, now, now, 1f, -1);
+            float r = rank(ii, now);
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;
@@ -86,11 +84,22 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         return weakest;
     }
 
-    /** frees one slot by removing 2 and projecting a new belief to their midpoint */
-    protected Task compress(long now, NAR nar) {
+    public static float rank(Task t, long when) {
+        return rankTemporalByConfidenceAndOriginality(t, when, when, 1f, -1);
+    }
 
-        Task a = weakest(now);
-        Task b = weakest(now, a);
+
+    /** frees one slot by removing 2 and projecting a new belief to their midpoint */
+    protected Task compress(Task input, long now, NAR nar) {
+
+        float inputRank = rank(input, now);
+
+        Task a = weakest(now, null, inputRank);
+        if (a == null)
+            return null;
+
+        Task b = weakest(now, a, Float.POSITIVE_INFINITY);
+
         //TODO proper iterpolate: truth, time, dt
         float ac = a.conf();
         float bc = b.conf();
