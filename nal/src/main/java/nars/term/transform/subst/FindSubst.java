@@ -20,6 +20,7 @@ import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
+import nars.util.version.HeapVersioning;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
 import nars.util.version.Versioning;
@@ -50,7 +51,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst extends Versioning implements Subst, Supplier<Versioned<Term>> {
+public abstract class FindSubst extends HeapVersioning implements Subst, Supplier<Versioned<Term>> {
 
 
     public final Random random;
@@ -64,16 +65,15 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     /**
      * variables whose contents are disallowed to equal each other
      */
-    @NotNull
-    public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
+    public final Versioned<MatchConstraint> constraints;
     @NotNull
     public final VersionMap.Reassigner<Term,Term> reassigner;
 
 
     @NotNull
-    public final VarCachedVersionMap xy;
+    public final VersionMap<Term,Term> xy;
     @NotNull
-    public final VarCachedVersionMap yx;
+    public final VersionMap<Term,Term> yx;
 
 
 //    @NotNull
@@ -87,17 +87,6 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 
 
     public final List<Termutator> termutes = new LimitedFasterList();
-
-//    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
-//        int xsize = X.size();
-//        for (int i = 0; i < xsize; i++) {
-//            Term xi = X.term(i);
-//            if (xi instanceof Ellipsis) {
-//                return (Ellipsis) xi;
-//            }
-//        }
-//        return null;
-//    }
 
     /**
      * @param x a compound which contains one or more ellipsis terms
@@ -127,17 +116,16 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
         this(type, random, null);
     }
 
-    protected FindSubst(Op type, Random random, Versioning toSharePool) {
-        super(Global.UnificationStackMax, toSharePool);
+    protected FindSubst(Op type, Random random, Versioning parentPoolToShare) {
+        super(Global.UnificationStackMax, 8);
         this.random = random;
         this.type = type;
 
-        xy = new VarCachedVersionMap(this);
-        yx = new VarCachedVersionMap(this);
+        xy = new VersionMap(this, 16);
+        yx = new VersionMap(this, 16);
         reassigner = new VersionMap.Reassigner<>( this, this::assignable );
-        //term = new Versioned(this);
         parent = new Versioned(this);
-        constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
+        constraints = new Versioned(this, new int[2], new FasterList(0, new MatchConstraint[2]));
 
     }
 
@@ -166,7 +154,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     @Nullable
     @Override
     public final Term term(@NotNull Term t) {
-        return xy.term(t);
+        return xy.get(t);
     }
 
 
@@ -307,7 +295,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     }
 
     private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
-        Term t = yx.term(y);
+        Term t = yx.get(y);
         return (t != null) ?
                 match(x, t) :
                 (putYX(/*(Variable)*/ y, x) &&
@@ -802,36 +790,39 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 //
 //    }
 
+//    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
+//        //yx.put(x, y);
+//
+//        VarCachedVersionMap yx = this.yx;
+//
+//        Versioned<Term> v = yx.map.get(x);
+//
+//        /*if (!assignable(x, y))
+//            return false;*/
+//
+//        if (v == null) {
+//            v = yx.getOrCreateIfAbsent(x);
+//        } else {
+//            Term vv = (v != null) ? v.get() : null;
+//            if (vv != null) {
+//                return y.equals(vv);
+//            }
+//        }
+//        v.set(y);
+//        return true;
+//    }
+
+    /**
+     * returns true if the assignment was allowed, false otherwise
+     */
     public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
-        //yx.put(x, y);
-
-        VarCachedVersionMap yx = this.yx;
-
-        Versioned<Term> v = yx.map.get(x);
-
-        /*if (!assignable(x, y))
-            return false;*/
-
-        if (v == null) {
-            v = yx.getOrCreateIfAbsent(x);
-        } else {
-            Term vv = (v != null) ? v.get() : null;
-            if (vv != null) {
-                return y.equals(vv);
-            }
-        }
-        v.set(y);
-        return true;
+        return reassigner.compute(yx, x, y);
     }
-
-
-
 
     /**
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        assert(y!=null);
         return reassigner.compute(xy, x, y);
     }
 
@@ -847,14 +838,14 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
      * TODO find a way to efficiently eliminate redundant rules shared between versions
      */
     public final boolean assignable(@NotNull Term x, @NotNull Term y) {
-        Versioned<ImmutableMap<Term, MatchConstraint>> cc = this.constraints;
-        int s = cc.size() - 1;
-        if (s < 0) return true;
-        ImmutableMap<Term, MatchConstraint>[] ccc = cc.value.array();
-        for (; s >= 0; s--) {
-            MatchConstraint c = ccc[s].get(x);
-            if ((c != null) && c.invalid(x, y, this))
-                return false;
+        Versioned<MatchConstraint> cc = this.constraints;
+        int s = cc.size();
+        if (s > 0) {
+            MatchConstraint[] ccc = cc.value.array();
+            for (; s > 0; ) {
+                if (ccc[--s].invalid(x, y, this))
+                    return false;
+            }
         }
         return true;
     }
@@ -865,94 +856,94 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
         //TODO yx also?
     }
 
-    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
-        xy.forEachVersioned(each);
-        //TODO yx also?
-    }
-    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
-        return xy.forEachVersioned(each);
-        //TODO yx also?
-    }
+//    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
+//        xy.forEachVersioned(each);
+//        //TODO yx also?
+//    }
+//    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
+//        return xy.forEachVersioned(each);
+//        //TODO yx also?
+//    }
 
 
-    /**
-     * VersionMap<Term,Term> which caches Variable keys, but allows any Term as keys (uncached)
-     */
-    public static final class VarCachedVersionMap extends VersionMap<Term, Term> implements Subst {
-
-        public VarCachedVersionMap(Versioning context) {
-            super(context);
-        }
-
-//        public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
-//            super(context, map);
+//    /**
+//     * VersionMap<Term,Term> which caches Variable keys, but allows any Term as keys (uncached)
+//     */
+//    public static final class VarCachedVersionMap extends VersionMap<Term, Term> implements Subst {
+//
+//        public VarCachedVersionMap(Versioning context) {
+//            super(context);
 //        }
-
-        @Override
-        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-            Map<Term, Versioned<Term>> m = this.map;
-            if (!m.isEmpty()) {
-                m.forEach((k, vv) -> {
-                    Term v = vv.get();
-                    if (v != null)
-                        each.accept(k, v);
-                });
-            }
-        }
-
-        public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
-            Map<Term, Versioned<Term>> m = this.map;
-            if (!m.isEmpty())
-                m.forEach(each);
-        }
-
-        /** returns true only if each evaluates true; if empty, returns true also */
-        public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
-            Map<Term, Versioned<Term>> m = this.map;
-            if (!m.isEmpty()) {
-                final boolean[] b = {true};
-
-                m.forEach((k,v)->{
-
-                    if (!each.test(k, v)) {
-                        b[0] = false;
-                    }
-
-                });
-
-                return b[0];
-            }
-            return true;
-        }
-
-
-        @Override
-        public final Term term(Term t) {
-
-            assert(!(t instanceof GenericVariable)); //throw new RuntimeException("variables must be normalized");
-
-            Versioned<Term> v = map.get(t);
-            return v == null ? null : v.get();
-        }
-
-        /**
-         * must inspect elements because the entries will be there but possibly null
-         */
-        @Override
-        public boolean isEmpty() {
-            if (!super.isEmpty()) {
-                for (Versioned x : map.values()) {
-                    if (x.get() != null) return false;
-                }
-            }
-            return true;
-        }
-    }
+//
+////        public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
+////            super(context, map);
+////        }
+//
+//        @Override
+//        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
+//            Map<Term, Versioned<Term>> m = this.map;
+//            if (!m.isEmpty()) {
+//                m.forEach((k, vv) -> {
+//                    Term v = vv.get();
+//                    if (v != null)
+//                        each.accept(k, v);
+//                });
+//            }
+//        }
+//
+//        public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
+//            Map<Term, Versioned<Term>> m = this.map;
+//            if (!m.isEmpty())
+//                m.forEach(each);
+//        }
+//
+//        /** returns true only if each evaluates true; if empty, returns true also */
+//        public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
+//            Map<Term, Versioned<Term>> m = this.map;
+//            if (!m.isEmpty()) {
+//                final boolean[] b = {true};
+//
+//                m.forEach((k,v)->{
+//
+//                    if (!each.test(k, v)) {
+//                        b[0] = false;
+//                    }
+//
+//                });
+//
+//                return b[0];
+//            }
+//            return true;
+//        }
+//
+//
+//        @Override
+//        public final Term term(Term t) {
+//
+//            assert(!(t instanceof GenericVariable)); //throw new RuntimeException("variables must be normalized");
+//
+//            Versioned<Term> v = map.get(t);
+//            return v == null ? null : v.get();
+//        }
+//
+//        /**
+//         * must inspect elements because the entries will be there but possibly null
+//         */
+//        @Override
+//        public boolean isEmpty() {
+//            if (!super.isEmpty()) {
+//                for (Versioned x : map.values()) {
+//                    if (x.get() != null) return false;
+//                }
+//            }
+//            return true;
+//        }
+//    }
 
     private static final class LimitedFasterList extends FasterList {
 
         public LimitedFasterList() {
-            super(Global.UnificationTermutesMax);
+            super(0); //start empty
         }
 
         final void ensureLimit() {

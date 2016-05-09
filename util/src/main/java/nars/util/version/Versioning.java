@@ -1,29 +1,17 @@
 package nars.util.version;
 
-import nars.util.data.DequePool;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 /** versioning context that holds versioned instances */
-public class Versioning extends FasterList<Versioned> {
-
-    public Versioning(int capacity, @Nullable Versioning toSharePool) {
-        super(0, new Versioned[capacity]);
-        if (toSharePool != null) {
-            this.valueStackPool = toSharePool.valueStackPool;
-            this.intStackPool = toSharePool.intStackPool;
-        } else {
-            this.valueStackPool = new FasterListDequePool();
-            this.intStackPool = new intDequePool();
-        }
-    }
+abstract public class Versioning extends FasterList<Versioned> {
 
     public Versioning(int capacity) {
-        this(capacity, null);
+        super(0, new Versioned[capacity]);
     }
+
 
     private int now;
 
@@ -71,10 +59,10 @@ public class Versioning extends FasterList<Versioned> {
     public final void revert(int when) {
         int was = now;
         if (was != when)
-            doRevert(when, was);
+            doRevert(when);
     }
 
-    public void doRevert(int when, int was) {
+    private final void doRevert(int when) {
         //if (was < when)
             //throw new RuntimeException("reverting to future time");
         now = when;
@@ -96,69 +84,15 @@ public class Versioning extends FasterList<Versioned> {
         return nextID++;
     }
 
-    static final int initiALPOOL_CAPACITY = 16;
-    static final int stackLimit = 12;
 
-    final DequePool<FasterList> valueStackPool;
-    final DequePool<int[]> intStackPool;
+    abstract public <X> FasterList<X> newValueStack();
+    abstract public int[] newIntStack();
+    abstract public void onDeleted(@NotNull Versioned v);
 
-    public final <X> FasterList<X> newValueStack() {
-        //from heap:
-        //return new FasterList(16);
-
-        //object pooling value stacks from context:
-        return valueStackPool.get();
-    }
-
-    public final int[] newIntStack() {
-        return intStackPool.get();
-    }
-
-    /** should only call this when v will never be used again because its buffers are recycled here */
-    public <X> void onDeleted(@NotNull Versioned v) {
-        FasterList vStack = v.value;
-
-        ////TODO maybe flush these periodically for GC
-        vStack.clearFast();
-
-        //TODO reject arrays that have grown beyond a certain size
-        valueStackPool.put(vStack);
-        intStackPool.put(v.array());
-    }
 
     public void delete() {
         forEach((Consumer<? super Versioned>)Versioned::delete);
         clear();
     }
-
-    private static final class FasterListDequePool extends DequePool<FasterList> {
-        public FasterListDequePool() {
-            super(Versioning.initiALPOOL_CAPACITY);
-        }
-
-        @NotNull
-        @Override public FasterList create() {
-            return new FasterList(8);
-        }
-    }
-
-    private static final class intDequePool extends DequePool<int[]> {
-        public intDequePool() {
-            super(Versioning.initiALPOOL_CAPACITY);
-        }
-
-        @NotNull
-        @Override public int[] create() {
-            return new int[stackLimit];
-        }
-    }
-
-
-
-//    public boolean toStackString() {
-//
-//
-//
-//    }
 
 }

@@ -15,9 +15,11 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -173,7 +175,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         //@Nullable ListMultimap<Term, MatchConstraint> c){
 
 
-        @Nullable ImmutableMap<Term, MatchConstraint> cc = initConstraints(constraints);
+        ImmutableMap<Term, MatchConstraint> cc = initConstraints(constraints);
         if (task!=null && belief!=null) {
 
             //match both
@@ -223,6 +225,24 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             }
         });
         return immutable.ofAll(con);
+    }
+
+    static public MatchConstraint compile(ImmutableMap<Term, MatchConstraint> mm) {
+        switch (mm.size()) {
+            case 1:
+                Term z = mm.castToMap().keySet().iterator().next();
+                return new SingleMatchConstraint(z, mm.get(z));
+            case 2:
+                Iterator<Term> mki = mm.castToMap().keySet().iterator();
+                Term x = mki.next();
+                Term y = mki.next();
+                MatchConstraint cx = mm.get(x);
+                MatchConstraint cy = mm.get(y);
+               return new DoubleMatchConstraint(x, cx, y, cy);
+            default:
+                return new MultiMatchConstraint(mm);
+        }
+
     }
 
     /** matches the possibility that one half of the premise must be contained within the other.
@@ -285,6 +305,52 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         @Override
         public String toString() {
             return id;
+        }
+    }
+
+    public static final class SingleMatchConstraint implements MatchConstraint {
+        private final Term x;
+        private final MatchConstraint constraint;
+
+        public SingleMatchConstraint(Term x, MatchConstraint constraint) {
+            this.x = x;
+            this.constraint = constraint;
+        }
+
+        @Override
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+            return x.equals(assignee) && constraint.invalid(assignee, value, f);
+        }
+    }
+    public static final class DoubleMatchConstraint implements MatchConstraint {
+        private final Term x, y;
+        private final MatchConstraint xConstraint, yConstraint;
+
+        public DoubleMatchConstraint(Term x, MatchConstraint xConstraint, Term y, MatchConstraint yConstraint) {
+            this.x = x;
+            this.xConstraint = xConstraint;
+            this.y = y;
+            this.yConstraint = yConstraint;
+        }
+
+        @Override
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+            return (x.equals(assignee) && xConstraint.invalid(assignee, value, f)) ||
+                   (y.equals(assignee) && yConstraint.invalid(assignee, value, f));
+        }
+    }
+
+    public static final class MultiMatchConstraint implements MatchConstraint {
+        private final ImmutableMap<Term, MatchConstraint> mm;
+
+        public MultiMatchConstraint(ImmutableMap<Term, MatchConstraint> mm) {
+            this.mm = mm;
+        }
+
+        @Override
+        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
+            MatchConstraint cN = mm.get(assignee);
+            return (cN != null) && cN.invalid(assignee, value, f);
         }
     }
 

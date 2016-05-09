@@ -1,0 +1,49 @@
+package nars.util.version;
+
+import nars.util.data.DequePool;
+import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Created by me on 5/9/16.
+ */
+public final class PooledVersioning extends Versioning {
+    final DequePool<FasterList> valueStackPool;
+    final DequePool<int[]> intStackPool;
+
+    public PooledVersioning(int capacity, int stackLimit, PooledVersioning toSharePool) {
+        super(capacity);
+
+        if (toSharePool != null) {
+            this.valueStackPool = toSharePool.valueStackPool;
+            this.intStackPool = toSharePool.intStackPool;
+        } else {
+            this.valueStackPool = new FasterListDequePool(capacity, stackLimit);
+            this.intStackPool = new intDequePool(capacity, stackLimit);
+        }
+    }
+
+    public final <X> FasterList<X> newValueStack() {
+        //from heap:
+        //return new FasterList(16);
+
+        //object pooling value stacks from context:
+        return valueStackPool.get();
+    }
+
+    public final int[] newIntStack() {
+        return intStackPool.get();
+    }
+
+    /**
+     * should only call this when v will never be used again because its buffers are recycled here
+     */
+    public void onDeleted(@NotNull Versioned v) {
+
+        //TODO reject arrays that have grown beyond a certain size
+        valueStackPool.put(v.value);
+        intStackPool.put(v.array());
+    }
+
+
+}

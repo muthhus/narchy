@@ -15,7 +15,7 @@ public final class NotEqualsConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(Term x, @NotNull Term y, @NotNull FindSubst f) {
-        Term canNotEqual = f.xy.term(b);
+        Term canNotEqual = f.xy.get(b);
         return (canNotEqual != null) && y.equals(canNotEqual);
     }
 

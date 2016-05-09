@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 import static nars.$.seteMap;
+import static nars.nal.meta.op.MatchTaskBelief.compile;
 
 /**
  * Establishes conditions for the Term match
@@ -27,7 +28,7 @@ import static nars.$.seteMap;
 abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
 
     @Nullable
-    public final ImmutableMap<Term, MatchConstraint> constraints;
+    public final MatchConstraint constraints;
 
     @NotNull
     private final Term id;
@@ -42,7 +43,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
         this.id = id;
 
         this.x = pattern;
-        this.constraints = constraints;
+        this.constraints = constraints!=null ? compile(constraints) : null;
     }
 
 

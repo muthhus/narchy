@@ -98,7 +98,7 @@ public class PremiseEval extends FindSubst {
     }
 
     /** only one thread should be in here at a time */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, ImmutableMap<Term, MatchConstraint> constraints) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, MatchConstraint constraints) {
 
         int t = now();
 
@@ -107,7 +107,8 @@ public class PremiseEval extends FindSubst {
         //if (finished)
             this.pattern.set(callback); //to notify of matches
 
-        this.constraints.set( constraints );
+        if (constraints!=null)
+            this.constraints.set( constraints );
 
         matchAll(x, y, finished);
 
@@ -246,17 +247,17 @@ public class PremiseEval extends FindSubst {
         return false;
     }
 
-    /** copy the new mappings to the match; returns false if there was an error, true if successful or if it was empty */
-    public final boolean putAllXY(Subst m) {
-        if (m instanceof FindSubst) {
-            return ((FindSubst) m).forEachVersioned((BiPredicate<Term,Versioned>)this::putXY);
-        } else {
-            if (!m.isEmpty()) {
-                return m.forEach((BiPredicate<Term,Term>)this::putXY);
-            }
-        }
-        return true;
-    }
+//    /** copy the new mappings to the match; returns false if there was an error, true if successful or if it was empty */
+//    public final boolean putAllXY(Subst m) {
+//        if (m instanceof FindSubst) {
+//            return ((FindSubst) m).forEachVersioned((BiPredicate<Term,Versioned>)this::putXY);
+//        } else {
+//            if (!m.isEmpty()) {
+//                return m.forEach((BiPredicate<Term,Term>)this::putXY);
+//            }
+//        }
+//        return true;
+//    }
 
     public void replaceAllXY(Subst m) {
         m.forEach(this::replaceXY);

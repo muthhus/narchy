@@ -1,13 +1,12 @@
 package nars.util.version;
 
+import jdk.nashorn.internal.objects.Global;
+import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
@@ -18,11 +17,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     private final Versioning context;
     public final Map<X, Versioned<Y>> map;
 
-    public VersionMap(Versioning context) {
+    public VersionMap(Versioning context, int initialSize) {
         this(context,
-            //new LinkedHashMap<>()
-            //Global.newHashMap(16)
-            new HashMap(64)
+            new UnifriedMap(initialSize)  //the only one that works which doesnt think a read-only get() should cause a concurrent modification, fuck hashmap. since the compute call involves constraints which check the state of the map itself BFD
+            //new LinkedHashMap<>(32)
+            //new HashMap(32)
         );
     }
 
@@ -123,8 +122,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @NotNull
     public final Versioned<Y> newEntry(X k) {
+        return new Versioned(context);
         //return cache(k) ? new Versioned(context) :
-        return new RemovingVersionedEntry(k);
+        //return new RemovingVersionedEntry(k);
     }
 
     public final boolean computeAssignable(X x, @NotNull Reassigner<X,Y> r) {
@@ -151,10 +151,6 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             return v;
         }
 
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException();
-        }
 
         private void removeFromMap() {
             VersionMap.this.remove(key);
@@ -168,8 +164,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     @Override
     public final Y get(/*X*/Object key) {
         Versioned<Y> v = version((X) key);
-        if (v!=null) return v.get();
-        return null;
+        return v != null ? v.get() : null;
     }
 
     @Nullable
@@ -184,11 +179,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     public final Versioned<Y> version(X key) {
-        return map.computeIfPresent(key, (k, v) -> {
-            if (v == null || v.isEmpty())
-                return null;
-            return v;
-        });
+        return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
     }
 
     public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
@@ -222,9 +213,12 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             }
         }
 
-        public final boolean compute(@NotNull VersionMap xy, X x, Y y) {
+        /** should not be used by multiple threads at once! */
+        public final boolean compute(@NotNull VersionMap xy, @NotNull X x, @NotNull Y y) {
             this.y = y;
-            return xy.computeAssignable(x, this);
+            boolean b = xy.computeAssignable(x, this);
+            this.y = null;
+            return b;
         }
     }
 }
