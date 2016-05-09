@@ -112,10 +112,12 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         int n = size();
 
         float ageFactor = ageFactor();
+        long[] excludingEvidence = excluding!=null ? excluding.evidence() : null;
         for (int i = 0; i < n; i++) {
 
             Task ii = get(i);
-            if (ii == excluding)
+            if (excluding!=null &&
+                    ((ii == excluding) || (Stamp.overlapping(excludingEvidence, ii.evidence()))))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
@@ -139,7 +141,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     }
 
     public float ageFactor() {
-        return 1f / (max - min);
+        return 1f;
+        //return 1f / (max - min);
     }
 
 
@@ -156,33 +159,40 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
 
-        //TODO proper iterpolate: truth, time, dt
-        float ac = a.conf();
-        float bc = b.conf();
-        long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
+        Task merged = null;
+        if (b!=null) {
 
-        Truth newTruth = truth(newOcc);
+            //TODO proper iterpolate: truth, time, dt
+            float ac = a.conf();
+            float bc = b.conf();
+            long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
-        long[] newEv = Stamp.zip(a, b); //TODO impl a weighted zip
+            Truth newTruth = truth(newOcc);
 
-        //TODO interpolate the dt()
-        int newDT;
-        if (b.term().dt()!=DTERNAL)
-            newDT = b.term().dt();
-        else if (a.term().dt()!=DTERNAL)
-            newDT = a.term().dt();
-        else
-            newDT = DTERNAL;
+            long[] newEv = Stamp.zip(a, b); //TODO impl a weighted zip
 
-        Task merged = new MutableTask(a.term().dt(newDT), a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
-                .log("Revection Merge");
+            //TODO interpolate the dt()
+            int newDT;
+            if (b.term().dt() != DTERNAL)
+                newDT = b.term().dt();
+            else if (a.term().dt() != DTERNAL)
+                newDT = a.term().dt();
+            else
+                newDT = DTERNAL;
+
+            merged = new MutableTask(a.term().dt(newDT), a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
+                    .log("Revection Merge");
+
+            remove(b);
+            TaskTable.removeTask(b, "Revection Forget", nar);
+        }
 
         remove(a);
         TaskTable.removeTask(a, "Revection Forget", nar);
-        remove(b);
-        TaskTable.removeTask(b, "Revection Forget", nar);
 
-        nar.process(merged);
+        if (merged!=null)
+            nar.process(merged);
+
         return merged;
     }
 

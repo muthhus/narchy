@@ -31,7 +31,7 @@ public class ControlFlowTest {
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
     @Test public void testSequence4()   { testSequence(n, 4, 30);    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
-    @Test public void testSequence16()  { testSequence(n, 16, 40);     }
+    @Test public void testSequence10()  { testSequence(n, 10, 30);     }
 
 
 
@@ -63,7 +63,7 @@ public class ControlFlowTest {
     }
 
     @Test public void testBranchThen()  {
-        testBranch(n, 10, 1f);
+        testBranch(n, 30, 1f);
     }
     @Test public void testBranchThenThen()  {
         testBranch(n, 30, 1f, 1f);
@@ -155,9 +155,9 @@ public class ControlFlowTest {
     }
 
 
-        static final Supplier<NAR> n = () -> {
-        Default x = new Default(512, 2, 1, 3);
-        x.cyclesPerFrame.set(2);
+    static final Supplier<NAR> n = () -> {
+        Default x = new Default(512, 1, 1, 3);
+        x.cyclesPerFrame.set(1);
         return x;
     };
 

@@ -34,8 +34,9 @@ public class MotivationTest {
         FloatConcept x = new FloatConcept("(x)", n).punc('!');
         MotorConcept y = new MotorConcept("(y)", n, (b,d)->{
 
+            float thresh = 0f;
             if (d < 0.5f) return Float.NaN;
-            if (d > 0.5f && d < b) return Float.NaN;
+            if (d > 0.5f && d - b < thresh) return Float.NaN;
             //if (d < 0.5f && b < d) return Float.NaN;
 
             float sat = d - b;
