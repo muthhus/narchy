@@ -62,12 +62,16 @@ public class ControlFlowTest {
 
     }
 
-    @Test public void testBranch1()  {
+    @Test public void testBranch1then()  {
         Global.DEBUG = true;
-        testBranch(n, 10);
+        testBranch(n, 10, 1f);
+    }
+    @Test public void testBranch1else()  {
+        Global.DEBUG = true;
+        testBranch(n, 10, 0f);
     }
 
-    public ExeTracker testBranch(Supplier<NAR> nn, int delay) {
+    public ExeTracker testBranch(Supplier<NAR> nn, int delay, float... conditionSequence) {
 
 
         int beforeBranchLength = 2;
@@ -110,8 +114,11 @@ public class ControlFlowTest {
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
 
-        n.goal($.conj(delay, $.conj( 0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
-        n.goal($.conj(delay, $.conj( 0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
+        //n.goal($.conj(delay, $.conj(  s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
+        //n.goal($.conj(delay, $.conj(  s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
+
+        n.goal($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
+        n.goal($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
 
         //n.believe($.impl(condition, delay, s(THEN, 0)));
         //n.believe($.impl($.neg(condition), delay, s(ELSE, 0)));
@@ -121,35 +128,22 @@ public class ControlFlowTest {
 
         n.log();
 
-        System.out.println("Execute Forward THEN branch");
-        n.believe(condition, Tense.Present, 0f).step();
-        {
-            n.goal(start, Tense.Present, 1f);
+        for (float B : conditionSequence ) {
+            System.out.println("Execute Forward branch w/ condition=" + B);
+            n.believe(condition, Tense.Present, 1f, 0.5f).step();
 
+            n.goal(start, Tense.Present, 1f);
 
             n.run(runtime);
 
             exeTracker.assertLength(length, delay);
-            exeTracker.assertPath( s(PRE,0), s(PRE,1), s(THEN, 0), s(THEN, 1) );
+            exeTracker.assertPath(s(PRE, 0), s(PRE, 1), s(THEN, 0), s(THEN, 1));
             exeTracker.clear();
+
+            //pause between
+            n.run(delay);
         }
 
-
-        //pause between
-        n.run(delay);
-
-
-        System.out.println("Execute Forward ELSE branch");
-        n.believe(condition, Tense.Present, 1f).step();
-        {
-            n.goal(start, Tense.Present, 1f);
-
-            n.run(runtime*2);
-
-            exeTracker.assertPath(s(PRE,0), s(PRE,1), s(ELSE, 0), s(ELSE, 1) );
-            exeTracker.assertLength(length, delay);
-            exeTracker.clear();
-        }
 
 
         return exeTracker;
@@ -214,13 +208,13 @@ public class ControlFlowTest {
         float exeThresh = 0.1f;
 
         return new MotorConcept(term, n, (b, d) -> {
-            if (d > b + exeThresh) {
+            if (d > 0.5f && (d > b + exeThresh)) {
                 long now = n.time();
                 System.out.println(term + " at " + now + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
 
                 e.record(term, now);
 
-                n.goal(term, Tense.Present, 0f); //neutralize
+                //n.goal(term, Tense.Present, 0f); //neutralize
 
                 return 1f;
             }

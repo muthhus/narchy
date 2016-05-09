@@ -135,17 +135,22 @@ public enum BeliefFunction implements TruthOperator {
     Union() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null || T == null) return null;
-            return TruthFunctions.union(T,B,minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.union(T, B, minConf);
         }
     },
 
-    //@AllowOverlap
+
     Intersection() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null || T == null) return null;
-            return TruthFunctions.intersection(T,B,minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, false, minConf);
+        }
+    },
+
+    IntersectionNeg() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            return ((B == null) || (T == null)) ? null : TruthFunctions.intersection(T, B, true, minConf);
         }
     },
 
@@ -161,8 +166,7 @@ public enum BeliefFunction implements TruthOperator {
     Analogy() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null || T == null) return null;
-            return TruthFunctions.analogy(T,B,minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.analogy(T, B, minConf);
         }
     },
     ReduceConjunction() {

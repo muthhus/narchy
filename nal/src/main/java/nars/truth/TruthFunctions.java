@@ -310,6 +310,11 @@ public final class TruthFunctions extends UtilityFunctions {
 
     }
 
+    @Nullable
+    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
+        return intersection(v1, v2, false, minConf);
+    }
+
     /**
      * {<M --> S>, <M <-> P>} |- <M --> (S&P)>
      * @param v1 Truth value of the first premise
@@ -317,20 +322,19 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, boolean invert1, float minConf) {
         if (v1 == null) return null;
 
-        float c1 = v1.conf();
-        float c2 = v2.conf();
-        float c = and(c1, c2);
+        float c = and(v1.conf(), v2.conf());
+
+
+
         if (c < minConf) return null;
 
         float f1 = v1.freq();
-        float f2 = v2.freq();
-
-        float f = and(f1, f2);
-
-        return new DefaultTruth(f, c);
+        if (invert1)
+            f1 = 1-f1;
+        return new DefaultTruth(and(f1, v2.freq()), c);
     }
 
     /**

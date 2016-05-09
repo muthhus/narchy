@@ -69,10 +69,10 @@ public class TemporalRelationsTest {
         Term c = $.conj(10, $("((--,(b0)) &&+0 (pre_1))"), $("(else_0)"));
         Term d = $.conj(-10, $("(else_0)"), $("((--,(b0)) &&+0 (pre_1))"));
 
-        System.out.println(a);
-        System.out.println(b);
-        System.out.println(c);
-        System.out.println(d);
+//        System.out.println(a);
+//        System.out.println(b);
+//        System.out.println(c);
+//        System.out.println(d);
 
         assertEquals(a, b);
         assertEquals(b, c);

@@ -46,10 +46,12 @@ public class UtilityFunctions   {
 //        }
 //        return product;
 //    }
-    
+
     public static float and(float a, float b) {
         return a*b;
     }
+
+
 
     public static float and(float a, float b, float c) {
         return a*b*c;

@@ -380,7 +380,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
     @Nullable
     public static Term conj(int dt, Term... a) {
-        return the(CONJUNCTION, -1, dt, TermSet.the(a));
+        return the(CONJUNCTION, -1, dt, TermVector.the(a)); //must be a vector, not set
     }
 
     @Nullable
