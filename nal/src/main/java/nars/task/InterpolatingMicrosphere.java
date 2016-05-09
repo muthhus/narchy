@@ -287,7 +287,7 @@ public class InterpolatingMicrosphere {
                 if (illumination > visibleThreshold) {
                     if (phase) {
                         if (illumination > dd[0]) {
-                            maxData(i, illumination, sampleValue, illumination, sampleNum);
+                            maxData(i, illumination, sampleValue, sampleNum);
                         }
                     } else {
                         if (dd[0] > 0) {
@@ -404,7 +404,7 @@ public class InterpolatingMicrosphere {
             return MathArrays.cosAngle(x, y);
     }
 
-    protected void maxData(int i, double illumination, double sampleValue, double conf, int sampleNum) {
+    protected void maxData(int i, double illumination, double sampleValue, int sampleNum) {
         double[] d = microsphereData.get(i);
 
         d[0] = illumination;
@@ -440,7 +440,8 @@ public class InterpolatingMicrosphere {
      */
     private void clear() {
         for (int i = 0; i < size; i++) {
-            maxData(i, 0, 0, 0, -1);
+            double[] d = microsphereData.get(i);
+            d[0] = d[1] = d[2] = 0; d[3] = -1;
         }
     }
 

@@ -66,8 +66,7 @@ public class ControlFlowTest {
         testBranch(n, 10, 1f);
     }
     @Test public void testBranchThenThen()  {
-        testBranch(n, 10,
-                        1f, 1f);
+        testBranch(n, 30, 1f, 1f);
     }
     @Test public void testBranchElse()  {
         testBranch(n, 10, 0f);
@@ -223,6 +222,8 @@ public class ControlFlowTest {
 
                 return 1f;
             }
+            System.out.println("\t not: " + term + " at " + n.time() + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
+
             return Float.NaN;
             //return 1f;
         });

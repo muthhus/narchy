@@ -103,7 +103,7 @@ public class TruthPolation {
                 when
         }, times, freq, conf, exp,
                 //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
-                count);
+                s);
         return new DefaultTruth( (float)v[0], w2c( (float) v[1]));
 
     }
