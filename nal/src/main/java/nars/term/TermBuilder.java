@@ -26,7 +26,7 @@ import static nars.term.Statement.subj;
 public abstract class TermBuilder {
 
     @Nullable
-    public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws InvalidTerm {
+    public Term the(@NotNull Op op, int relation, int dt, @NotNull TermContainer tt) throws InvalidTerm {
 
         Term[] u = tt.terms();
 
@@ -39,19 +39,19 @@ public abstract class TermBuilder {
 
 
             case INSTANCE:
-                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(INSTANCE);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE);
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(PROPERTY);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(PROPERTY);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
+                if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
                 return instprop(u[0], u[1]);
 
             case CONJUNCTION:
-                return junction(CONJUNCTION, t, u);
+                return junction(CONJUNCTION, dt, u);
             case DISJUNCTION:
-                return junction(DISJUNCTION, t, u);
+                return junction(DISJUNCTION, dt, u);
 
             case IMAGE_INT:
             case IMAGE_EXT:
@@ -82,7 +82,7 @@ public abstract class TermBuilder {
 
         }
 
-        return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
+        return op.isStatement() ? statement(op, dt, u) : finish(op, relation, dt, tt);
 
     }
 

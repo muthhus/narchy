@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Compound;
@@ -62,6 +63,23 @@ public class TemporalRelationsTest {
         }
     }
 
+    @Test public void testCommutiveWithCompoundSubterm() {
+        Term a = $("(((--,(b0)) &&+0 (pre_1)) &&+10 (else_0))");
+        Term b = $("((else_0) &&-10 ((--,(b0)) &&+0 (pre_1)))");
+        Term c = $.conj(10, $("((--,(b0)) &&+0 (pre_1))"), $("(else_0)"));
+        Term d = $.conj(-10, $("(else_0)"), $("((--,(b0)) &&+0 (pre_1))"));
+
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println(c);
+        System.out.println(d);
+
+        assertEquals(a, b);
+        assertEquals(b, c);
+        assertEquals(c, d);
+        assertEquals(a, c);
+        assertEquals(a, d);
+    }
 
     @Test public void testConceptualization() {
         Default d = new Default();

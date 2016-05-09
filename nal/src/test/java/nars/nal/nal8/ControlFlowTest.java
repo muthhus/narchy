@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 5/6/16.
@@ -32,9 +33,7 @@ public class ControlFlowTest {
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
     @Test public void testSequence16()  { testSequence(n, 16, 40);     }
 
-    @Test public void testBranch1()  {
-        testBranch(n, 30);
-    }
+
 
     public ExeTracker testSequence(Supplier<NAR> nn, int length, int delay) {
 
@@ -53,7 +52,7 @@ public class ControlFlowTest {
             n.goal($.conj(delay, s(i), s(i + 1)));
 
         //start
-        n.goal(s(0), Tense.Present, 1f, n.getDefaultConfidence(Symbols.GOAL));
+        n.goal(s(0), Tense.Present, 1f);
 
         n.run(runtime);
 
@@ -63,8 +62,13 @@ public class ControlFlowTest {
 
     }
 
+    @Test public void testBranch1()  {
+        Global.DEBUG = true;
+        testBranch(n, 10);
+    }
 
     public ExeTracker testBranch(Supplier<NAR> nn, int delay) {
+
 
         int beforeBranchLength = 2;
         int afterBranchLength = 2;
@@ -78,9 +82,9 @@ public class ControlFlowTest {
         ExeTracker exeTracker = new ExeTracker();
         NAR n = nn.get();
 
-        final int PRE = 0;
-        final int THEN = 1;
-        final int ELSE = 2;
+        final String PRE = "pre";
+        final String THEN = "then";
+        final String ELSE = "else";
 
 
         for (int i = 0; i < beforeBranchLength; i++) {
@@ -90,7 +94,7 @@ public class ControlFlowTest {
             n.goal($.conj(delay, s(PRE, i), s(PRE, i + 1)));
         }
 
-        Term condition = newExeState(n, b(0), exeTracker).term();
+        Term condition = b(0); //newExeState(n, b(0), exeTracker).term();
 
         $.conj(delay, s(PRE, beforeBranchLength-1), condition);
 
@@ -103,21 +107,50 @@ public class ControlFlowTest {
             n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
         }
 
-        n.goal($.conj(delay, condition, s(THEN, 0)));
-        n.goal($.conj(delay, $.neg(condition), s(ELSE, 0)));
+        //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
+        //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
+
+        n.goal($.conj(delay, $.conj( 0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
+        n.goal($.conj(delay, $.conj( 0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
+
+        //n.believe($.impl(condition, delay, s(THEN, 0)));
+        //n.believe($.impl($.neg(condition), delay, s(ELSE, 0)));
 
 
-
-        //start
         Compound start = s(PRE, 0);
 
-        n.goal(start, Tense.Present, 1f);
-        n.believe(condition, Tense.Present, 1f);
-
         n.log();
-        n.run(runtime);
 
-        exeTracker.assertLength(length, delay);
+        System.out.println("Execute Forward THEN branch");
+        n.believe(condition, Tense.Present, 0f).step();
+        {
+            n.goal(start, Tense.Present, 1f);
+
+
+            n.run(runtime);
+
+            exeTracker.assertLength(length, delay);
+            exeTracker.assertPath( s(PRE,0), s(PRE,1), s(THEN, 0), s(THEN, 1) );
+            exeTracker.clear();
+        }
+
+
+        //pause between
+        n.run(delay);
+
+
+        System.out.println("Execute Forward ELSE branch");
+        n.believe(condition, Tense.Present, 1f).step();
+        {
+            n.goal(start, Tense.Present, 1f);
+
+            n.run(runtime*2);
+
+            exeTracker.assertPath(s(PRE,0), s(PRE,1), s(ELSE, 0), s(ELSE, 1) );
+            exeTracker.assertLength(length, delay);
+            exeTracker.clear();
+        }
+
 
         return exeTracker;
 
@@ -134,8 +167,8 @@ public class ControlFlowTest {
     public static Compound s(int i) {
         return $.p("s" + i);
     }
-    public static Compound s(int group, int i) {
-        return $.p("s" + group + "_" + i);
+    public static Compound s(String group, int i) {
+        return $.p(group + "_" + i);
     }
     public static Compound b(int i) {
         return $.p("b" + i);
@@ -161,25 +194,38 @@ public class ControlFlowTest {
             System.out.println("  mean timing error: " + Texts.n2((((float) Math.abs(eventIntervals.getMean() - delay) / delay) * 100.0)) + "%");
             System.out.println();
 
-            assertEquals(events.get(events.size() - 1).toString(), length, events.size());
+            assertEquals(length, events.size());
+        }
+
+        public void clear() {
+            events.clear();
+            eventIntervals.clear();
+        }
+
+        public void assertPath(Term... states) {
+            final int[] i = {0};
+            assertTrue( events.stream().allMatch(p -> p.getTwo().equals(states[i[0]++])) );
         }
     }
 
 
 
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
-        float exeThresh = 0.2f;
+        float exeThresh = 0.1f;
 
         return new MotorConcept(term, n, (b, d) -> {
             if (d > b + exeThresh) {
                 long now = n.time();
-                System.out.println(term + " at " + now + " " + (d - b));
+                System.out.println(term + " at " + now + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
 
                 e.record(term, now);
 
-                return 0.9f;
+                n.goal(term, Tense.Present, 0f); //neutralize
+
+                return 1f;
             }
             return Float.NaN;
+            //return 1f;
         });
     }
 
