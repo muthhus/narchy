@@ -25,7 +25,7 @@ public class TruthPolation {
     double[] conf;
     int count;
     private List<Task> tasks;
-    final private double exp = 2f;
+    final private double exp = 1f;
 
     public TruthPolation(int size, float eternalization) {
         s = new InterpolatingMicrosphere(1, 2,
