@@ -35,15 +35,10 @@ public final class PooledVersioning extends Versioning {
         return intStackPool.get();
     }
 
-    /**
-     * should only call this when v will never be used again because its buffers are recycled here
-     */
-    public void onDeleted(@NotNull Versioned v) {
-
-        //TODO reject arrays that have grown beyond a certain size
+    @Override
+    public <Y> void delete(Versioned<Y> v) {
+        super.delete(v);
         valueStackPool.put(v.value);
         intStackPool.put(v.array());
     }
-
-
 }

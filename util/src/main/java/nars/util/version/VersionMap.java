@@ -50,12 +50,13 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     @Override
     public Y remove(Object key) {
         Versioned<Y> x = map.remove(key);
-        if (x == null)
+        if (x != null) {
+            Y value = x.get();
+            context.delete(x);
+            return value;
+        } else {
             return null;
-
-        Y value = x.get();
-        x.delete();
-        return value;
+        }
     }
 
     @Override

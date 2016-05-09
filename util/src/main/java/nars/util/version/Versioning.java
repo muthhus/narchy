@@ -3,6 +3,7 @@ package nars.util.version;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /** versioning context that holds versioned instances */
@@ -68,7 +69,14 @@ abstract public class Versioning extends FasterList<Versioned> {
         now = when;
 
         int s = size()-1;
-        if (s == -1) return; //empty
+        if (s == -1)
+            return; //empty
+
+        doRevertPop(when, s);
+    }
+
+    private final void doRevertPop(int when, final int start) {
+        int s = start;
 
         Versioned[] ii = this.items;
         while (ii[s].revertNext(when)) {
@@ -76,7 +84,20 @@ abstract public class Versioning extends FasterList<Versioned> {
                 break;
         }
 
-        popTo(s);
+        if (start!=s) {
+            doRevertClean(s+1, ii, start - s);
+        }
+    }
+
+    private final void doRevertClean(int s, Versioned[] ii, int popped) {
+
+        if (popped > 1) {
+            Arrays.fill(ii, s, s + popped, null);
+        } else { //if (popped == 1) {
+            ii[s] = null;
+        }
+
+        popTo(s-1);
     }
 
     /** assigns a new serial ID to a versioned item for its use as a hashcode */
@@ -87,7 +108,6 @@ abstract public class Versioning extends FasterList<Versioned> {
 
     abstract public <X> FasterList<X> newValueStack();
     abstract public int[] newIntStack();
-    abstract public void onDeleted(@NotNull Versioned v);
 
 
     public void delete() {
@@ -95,4 +115,7 @@ abstract public class Versioning extends FasterList<Versioned> {
         clear();
     }
 
+    public <Y> void delete(Versioned<Y> v) {
+        v.delete();
+    }
 }

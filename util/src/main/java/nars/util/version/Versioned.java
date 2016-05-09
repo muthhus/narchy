@@ -36,7 +36,6 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     void delete() {
         clear();
         current = null;
-        context.onDeleted(this);
     }
 
     @Override
@@ -86,8 +85,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     private final X getUncached() {
         int s = size();
-        if (s == 0) return null;
-        return value.get(s-1);
+        return s == 0 ? null : value.get(s - 1);
     }
 
 //    /**
@@ -109,16 +107,16 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         return this;
     }
 
-    /**
-     * set but does not commit;
-     * a commit should precede this call otherwise it will have the version of a previous commit
-     */
-    @NotNull
-    public void thenSet(X nextValue) {
-        if (this.current!=nextValue) {
-            set(context.continueChange(this), this.current = nextValue);
-        }
-    }
+//    /**
+//     * set but does not commit;
+//     * a commit should precede this call otherwise it will have the version of a previous commit
+//     */
+//    @NotNull
+//    public void thenSet(X nextValue) {
+//        if (this.current!=nextValue) {
+//            set(context.continueChange(this), this.current = nextValue);
+//        }
+//    }
 
     /**
      * sets at a specific time but does not commit;

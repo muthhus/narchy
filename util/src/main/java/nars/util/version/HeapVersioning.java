@@ -24,7 +24,5 @@ public class HeapVersioning extends Versioning {
         return new int[stackSize];
     }
 
-    @Override
-    public void onDeleted(@NotNull Versioned v) {
-    }
+
 }
