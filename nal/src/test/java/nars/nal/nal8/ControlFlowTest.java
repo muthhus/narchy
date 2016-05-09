@@ -130,14 +130,17 @@ public class ControlFlowTest {
 
         for (float B : conditionSequence ) {
             System.out.println("Execute Forward branch w/ condition=" + B);
-            n.believe(condition, Tense.Present, 1f, 0.5f).step();
+            n.believe(condition, Tense.Present, B, 1f).step();
 
             n.goal(start, Tense.Present, 1f);
 
             n.run(runtime);
 
             exeTracker.assertLength(length, delay);
-            exeTracker.assertPath(s(PRE, 0), s(PRE, 1), s(THEN, 0), s(THEN, 1));
+
+            String postBranch = B > 0.5f ? THEN : ELSE;
+            exeTracker.assertPath(s(PRE, 0), s(PRE, 1), s(postBranch, 0), s(postBranch, 1));
+
             exeTracker.clear();
 
             //pause between
