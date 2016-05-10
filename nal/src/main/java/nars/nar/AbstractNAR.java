@@ -117,9 +117,9 @@ public abstract class AbstractNAR extends NAR {
         this.conceptGoalsMax.set(12);
         this.conceptQuestionsMax.set(3);
 
-        this.conceptRemembering.setValue(5 * 2.0);
-        this.termLinkRemembering.setValue(5 * 5.0);
-        this.taskLinkRemembering.setValue(5 * 3.0);
+        this.conceptRemembering.setValue(5 * 1.0);
+        this.termLinkRemembering.setValue(12 * 1.0);
+        this.taskLinkRemembering.setValue(7 * 1.0);
 
         this.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 

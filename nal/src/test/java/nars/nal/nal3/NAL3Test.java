@@ -198,7 +198,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.log();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
-        tester.askAt(0,"<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
+        tester.askAt(cycles/2,"<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
         tester.mustBelieve(cycles, "<swan --> (-,swimmer,bird)>", 0.10f ,0.73f); //.en("A swan is not a type of nonbird swimmer.");
 
     }
@@ -207,8 +207,8 @@ public class NAL3Test extends AbstractNALTest {
     public void compound_composition_one_premise4()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
-        tester.ask("<(~,swimmer, swan) --> bird>"); //.en("Is being bird what differ swimmer from swan?");
-        tester.mustBelieve(cycles, "<(~,swimmer, swan) --> bird>", 0.10f, 0.73f); //.en("What differs swimmer from swan is not being bird.");
+        tester.askAt(cycles/2,"<(~,swimmer, swan) --> bird>"); //.en("Is being bird what differ swimmer from swan?");
+        tester.mustBelieve(cycles*2, "<(~,swimmer, swan) --> bird>", 0.10f, 0.73f); //.en("What differs swimmer from swan is not being bird.");
 
     }
 

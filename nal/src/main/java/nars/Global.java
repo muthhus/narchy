@@ -92,7 +92,7 @@ public enum Global {
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.001f;
+    public static final float BUDGET_EPSILON = 0.0001f;
 
     /** minimum durability and quality necessary for a derivation to form */
     public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;

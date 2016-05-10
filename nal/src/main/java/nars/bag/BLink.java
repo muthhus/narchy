@@ -154,7 +154,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     @Override
     public final float setLastForgetTime(float currentTime) {
         float lastForget = this.lastForget;
-        float diff = (lastForget != lastForget /* NaN test */) ? 0 + Global.SUBFRAME_EPSILON : (currentTime - lastForget);
+        float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
         this.lastForget = currentTime;
         return diff;
     }

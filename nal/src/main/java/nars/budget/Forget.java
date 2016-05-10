@@ -179,10 +179,12 @@ public enum Forget { ;
         public void accept(@NotNull BLink<? extends X> budget) {
 
             float dt = budget.setLastForgetTime(now);
-            if (dt > 0) {
+
+            float threshold = budget.qua() * perfectionCached;
+            //if (dt > 0) {
 
                 float p = budget.priIfFiniteElseZero();
-                float threshold = budget.qua() * perfectionCached;
+
 
                 if (p > threshold) {
 
@@ -194,7 +196,7 @@ public enum Forget { ;
                 }
 
                 budget.setPriority(Math.max(threshold, p));
-            }
+            //}
         }
 
     }
