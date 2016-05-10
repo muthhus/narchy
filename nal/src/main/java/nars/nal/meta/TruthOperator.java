@@ -25,7 +25,7 @@ public interface TruthOperator {
 
 
     @NotNull
-    public static TruthOperator inverse(TruthOperator o) {
+    static TruthOperator inverse(TruthOperator o) {
         return new InverseTruthOperator(o);
     }
 

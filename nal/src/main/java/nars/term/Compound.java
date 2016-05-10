@@ -319,6 +319,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
+    @Override
     default boolean equalsIgnoringVariables(@NotNull Term other) {
         int s = size();
         if ((other.opRel() == opRel()) && (other.size() == s)) {

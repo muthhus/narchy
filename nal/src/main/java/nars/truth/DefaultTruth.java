@@ -57,7 +57,7 @@ public class DefaultTruth implements Truth  {
     @NotNull
     @Override
     public Truth confMult(float factor) {
-        return (factor == 1) ? this : withConf(conf() * factor);
+        return withConf(conf() * factor);
     }
 
     @NotNull

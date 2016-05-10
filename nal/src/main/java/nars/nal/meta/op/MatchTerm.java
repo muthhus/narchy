@@ -108,7 +108,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
     }
 
     /** delegates a partial or complete match to each of the known derivation handlers */
-    public boolean onMatch(@NotNull PremiseEval m) {
+    public void onMatch(@NotNull PremiseEval m) {
 //        if (Global.DEBUG && derive.isEmpty())
 //            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 
@@ -119,7 +119,6 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
         }
 
         o.accept(m);
-        return true;
     }
 
     private final @NotNull ProcTerm init() {

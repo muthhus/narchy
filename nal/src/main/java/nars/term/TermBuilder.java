@@ -306,11 +306,10 @@ public abstract class TermBuilder {
 
         if (u.length == 1) {
             Term only = u[0];
-            if (ellipsisoid(only)) {
-                return finish(op, -1, t, TermContainer.the(only)); //preserve unitary ellipsis
-            } else {
-                return only;
-            }
+            //preserve unitary ellipsis
+            return ellipsisoid(only) ?
+                    finish(op, -1, t, TermContainer.the(only)) : only;
+
         }
 
         if (t != DTERNAL) {

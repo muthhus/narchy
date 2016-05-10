@@ -34,7 +34,16 @@ abstract public class PatternCompound extends GenericCompound {
             if (ellipsis == null)
                 throw new RuntimeException("no ellipsis");
 
-            this.ellipsisTransform = hasEllipsisTransform(this);
+            //this.ellipsisTransform = hasEllipsisTransform(this);
+            boolean hasEllipsisTransform = false;
+            int xs = size();
+            for (int i = 0; i < xs; i++) {
+                if (term(i) instanceof EllipsisTransform) {
+                    hasEllipsisTransform = true;
+                    break;
+                }
+            }
+            this.ellipsisTransform = hasEllipsisTransform;
 
         }
 
@@ -112,11 +121,9 @@ abstract public class PatternCompound extends GenericCompound {
     public static PatternCompound make(@NotNull Compound seed, @NotNull TermContainer v) {
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
-        if (e!=null) {
-            return new PatternCompoundContainingEllipsis(seed, e, v);
-        } else {
-            return new PatternCompoundSimple(seed, v);
-        }
+        return e != null ?
+                new PatternCompoundContainingEllipsis(seed, e, v) :
+                new PatternCompoundSimple(seed, v);
     }
 
 
@@ -136,14 +143,6 @@ abstract public class PatternCompound extends GenericCompound {
                 seed.structure() & ~(Op.VAR_PATTERN.bit());
         this.volCached = seed.volume();
         this.termsCached = subterms.terms();
-    }
-
-    public static boolean hasEllipsisTransform(@NotNull TermContainer x) {
-        int xs = x.size();
-        for (int i = 0; i < xs; i++)
-            if (x.term(i) instanceof EllipsisTransform)
-                return true;
-        return false;
     }
 
 

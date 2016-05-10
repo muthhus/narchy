@@ -119,7 +119,11 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean onMatch() {
-        return (termutes-- > 0) && pattern.get().onMatch(this);
+        if (termutes-- > 0) {
+            pattern.get().onMatch(this);
+            return true;
+        }
+        return false;
     }
 
 

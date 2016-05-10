@@ -162,14 +162,14 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             if (taskLink == null) break; //null-terminated array, ends
 
 
-            premiseTask(conceptLink, termsArray, taskLink);
+            premiseTask(termsArray, taskLink);
 
         }
 
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink) {
+    private void premiseTask(@Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink) {
 
         Task task = taskLink.get();
 
@@ -189,7 +189,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             if (!Terms.equalSubTermsInRespectToImageAndProduct( taskTerm, termLinkTerm )) {
 
                 matcher.run(
-                    newPremise(concept, taskLink, termLink,
+                    newPremise(taskLink, termLink,
                             match(task, tl, occ) //TODO cache this, if occ is same then the belief probably is also, in same cycle
                     )
                 );
@@ -198,7 +198,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     }
 
     @NotNull
-    protected ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+    protected ConceptProcess newPremise(BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
         return new DefaultConceptProcess(nar, taskLink, termLink, belief, nar::process);
     }
 

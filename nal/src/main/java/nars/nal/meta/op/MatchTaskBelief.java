@@ -141,7 +141,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, code, task, belief, pattern, constraints);
+        compileTaskBelief(pre, code, task, belief, constraints);
 
         //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
         if (addToEndOfPreGuards!=null)
@@ -150,7 +150,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     private static void compileTaskBelief(
             @NotNull List<BooleanCondition<PremiseEval>> pre,
-            @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+            @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 

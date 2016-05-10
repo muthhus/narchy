@@ -54,24 +54,24 @@ public class EllipsisTransform extends EllipsisOneOrMore {
                 to instanceof Variable ? vnn.applyAfter((Variable)to).term() : to);
     }
 
-    @NotNull
-    public Term match(@NotNull Compound y, int a, int b, @NotNull FindSubst subst) {
-        if (from == Op.Imdex && (y.op().isImage())) {
-
-            int rel = y.relation();
-            int n = (b-a)+1;
-            int i = 0;
-            int ab = 0;
-            Term[] t = new Term[n];
-            Term to = this.to;
-            while (i < n)  {
-                t[i++] = ((i == rel) ? subst.resolve(to) : y.term(ab));
-                ab++;
-            }
-            return EllipsisMatch.match(t);
-
-        } else {
-            return EllipsisMatch.match(y, a, b);
-        }
-    }
+//    @NotNull
+//    public Term match(@NotNull Compound y, int a, int b, @NotNull FindSubst subst) {
+//        if (from == Op.Imdex && (y.op().isImage())) {
+//
+//            int rel = y.relation();
+//            int n = (b-a)+1;
+//            int i = 0;
+//            int ab = 0;
+//            Term[] t = new Term[n];
+//            Term to = this.to;
+//            while (i < n)  {
+//                t[i++] = ((i == rel) ? subst.resolve(to) : y.term(ab));
+//                ab++;
+//            }
+//            return EllipsisMatch.match(t);
+//
+//        } else {
+//            return EllipsisMatch.match(y, a, b);
+//        }
+//    }
 }

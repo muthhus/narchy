@@ -290,12 +290,12 @@ public interface BeliefTable extends TaskTable {
         print(System.out);
     }
 
-    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
-     *  returns 0 if no tasks exist */
-    default float coherence() {
-        //TODO
-        return 0;
-    }
+//    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
+//     *  returns 0 if no tasks exist */
+//    default float coherence() {
+//        //TODO
+//        return 0;
+//    }
 
     default float priSum() {
         return (float) stream(spliterator(), false)

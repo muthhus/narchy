@@ -105,12 +105,12 @@ public interface Execution  {
     static Term result(@NotNull Compound operation, @Nullable Term y) {
 
         Compound x = (Compound) operation.term(0);
-        if (!(x.op() == PRODUCT))
+        if (x.op() != PRODUCT)
             throw new RuntimeException("invalid operation");
 
         //add var dep as last term if missing
         Term xLast = x.last();
-        if (!(xLast.op() == Op.VAR_DEP)) {
+        if (xLast.op() != Op.VAR_DEP) {
             //logger.warn(
             throw new RuntimeException(
                 "feedback requires variable in last position: " + operation);

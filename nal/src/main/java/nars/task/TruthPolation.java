@@ -82,7 +82,7 @@ public class TruthPolation {
             //have a slightly different position on the time axis
             double window = 0.1;
             int increments = 31337;
-            times[i][0] = t.occurrence() + (window * (-0.5 + (t.hashCode()%increments)/((double)increments)  ));  /* keeps occurrence times unique */;
+            times[i][0] = t.occurrence() + (window * (-0.5 + (t.hashCode()%increments)/((double)increments)  ));  /* keeps occurrence times unique */
 
             freq[i] = t.freq();
             conf[i] = c2w(t.conf())/confSum;

@@ -17,6 +17,7 @@ public enum Forget { ;
     /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
     public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>>, BudgetForget<X> {
         /** called each frame to update parameters */
+        @Override
         void update(@NotNull NAR nar);
     }
 

@@ -383,11 +383,13 @@ public class InterpolatingMicrosphere {
         final double darkFraction = darkCount / (double) size;
 
 
-        if (((size == darkCount && maxDarkFraction >= 1.0) || (maxDarkFraction < 1.0 && !Double.isFinite(background)))) {
+        double mdf = this.maxDarkFraction;
+
+        if ((size == darkCount && mdf >= 1.0)/* || (mdf < 1.0 && !Double.isFinite(background)))*/) {
             throw new RuntimeException("no illumination accepted or background value not used or invalid");
         }
 
-        double v = darkFraction <= maxDarkFraction ?
+        double v = darkFraction <= mdf ?
             value / totalWeight :
             background;
 

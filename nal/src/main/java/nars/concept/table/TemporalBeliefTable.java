@@ -17,10 +17,9 @@ import java.util.function.Predicate;
 public interface TemporalBeliefTable extends ListTable<Task,Task> {
 
 
-    @Nullable Task top(long when, long now);
+    @Nullable Task top(long when);
 
-    @Nullable
-    public static TemporalBeliefTable Empty = new TemporalBeliefTable() {
+    @Nullable TemporalBeliefTable Empty = new TemporalBeliefTable() {
 
         @Override
         public void clear() {
@@ -72,7 +71,7 @@ public interface TemporalBeliefTable extends ListTable<Task,Task> {
 
         @Nullable
         @Override
-        public Task top(long when, long now) {
+        public Task top(long when) {
             return null;
         }
 

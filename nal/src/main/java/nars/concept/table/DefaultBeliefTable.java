@@ -30,10 +30,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQDominant;
 
-    private long lastUpdate; //cached value, updated before temporal operations begin
-
-
-
     public DefaultBeliefTable(int eternalCapacity, int temporalCapacity) {
 
         Map<Task, Task> mp;
@@ -42,16 +38,10 @@ public class DefaultBeliefTable implements BeliefTable {
             new HashMap(eternalCapacity + temporalCapacity);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        if (eternalCapacity > 0)
-            eternal = new EternalTable(mp, eternalCapacity);
-        else
-            eternal = SortedTable.Empty;
+        eternal = eternalCapacity > 0 ? new EternalTable(mp, eternalCapacity) : SortedTable.Empty;
 
 
-        if (temporalCapacity > 0)
-            temporal = new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity, eternal);
-        else
-            temporal = TemporalBeliefTable.Empty;
+        temporal = temporalCapacity > 0 ? new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity, eternal) : TemporalBeliefTable.Empty;
 
     }
 
@@ -63,10 +53,8 @@ public class DefaultBeliefTable implements BeliefTable {
             return temporal.truth(when);
         } else {
             Task eternal = topEternal();
-            if (eternal != null) //optimization: just return the top eternal truth if no temporal to adjust with
-                return eternal.truth();
-            else
-                return Truth.Null;
+            //optimization: just return the top eternal truth if no temporal to adjust with
+            return eternal != null ? eternal.truth() : Truth.Null;
         }
     }
 //    public float rankTemporalByOriginality(@NotNull Task b) {
@@ -125,7 +113,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public final Task topTemporal(long when, long now) {
-        return temporal.top(when, now);
+        return temporal.top(when);
     }
 
 
@@ -136,23 +124,21 @@ public class DefaultBeliefTable implements BeliefTable {
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
-        if (filterDuplicate(input, nar))
-            return null;
-
-        if (input.isEternal())
-            return addEternal(input, nar);
-        else
-            return addTemporal(input, nar);
+        return filterDuplicate(input, nar) ? null :
+                (input.isEternal() ?
+                        addEternal(input, nar) :
+                        addTemporal(input, nar));
     }
 
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
 
         //HACK
-        if (eternal == SortedTable.Empty)
+        @NotNull SortedTable<Task, Task> et = this.eternal;
+        if (et == SortedTable.Empty)
             return null;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = ((EternalTable)eternal).tryRevision(input, nar);
+        Task revised = ((EternalTable) et).tryRevision(input, nar);
         if (revised!=null)  {
             if(Global.DEBUG) {
                 if (revised.isDeleted())
@@ -172,30 +158,30 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
         //AXIOMATIC/CONSTANT BELIEF/GOAL
-        if (input.conf() >=1f && eternal.capacity()!=1 && (eternal.isEmpty()||eternal.top().conf()<1f)) {
+        if (input.conf() >=1f && et.capacity()!=1 && (et.isEmpty()|| et.top().conf()<1f)) {
             //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
             //1. clear the corresponding table, set capacity to one, and insert this task
             Consumer<Task> overridden = t -> {
                 TaskTable.removeTask(t, "Overridden", nar);
             };
-            eternal.forEach(overridden);
-            eternal.clear();
-            eternal.setCapacity(1);
+            et.forEach(overridden);
+            et.clear();
+            et.setCapacity(1);
 
             //2. clear the other table, set capcity to zero preventing temporal tasks
-            Table<Task, Task> otherTable = (eternal == eternal) ? temporal : eternal;
+            Table<Task, Task> otherTable = (et == et) ? temporal : et;
             otherTable.forEach(overridden);
             otherTable.clear();
             otherTable.setCapacity(0);
             NAR.logger.info("axiom: {}", input);
 
-            eternal.put(input, input);
+            et.put(input, input);
 
             return input;
         }
 
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        return insert(input, eternal, nar) ? input : null;
+        return insert(input, et, nar) ? input : null;
     }
 
     @NotNull
@@ -240,8 +226,6 @@ public class DefaultBeliefTable implements BeliefTable {
      *  returns true if it was inserted, false if not
      * */
     private boolean insert(@NotNull Task incoming, @NotNull Table<Task,Task> table, @NotNull NAR nar) {
-
-        this.lastUpdate = nar.time();
 
         Task displaced = table.put(incoming, incoming);
 

@@ -53,8 +53,9 @@ public class RawBudget extends Budget {
     }
 
     @Override
-    public boolean isDeleted() {
-        return priority != priority; //fast NaN test
+    public final boolean isDeleted() {
+        float p = priority;
+        return p!=p; //fast NaN check
     }
 
     /**

@@ -223,12 +223,13 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
 
 
+    @Override
     public final Task key(Task task) {
         return task;
     }
 
     @Nullable
-    @Override public Task top(long when, long now) {
+    @Override public Task top(long when) {
 
         List<? extends Task> l = list();
 
@@ -260,7 +261,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     @Override
     public Truth truth(long when) {
         if (polation == null || polation.capacity() < capacity()) {
-            int ecap = eternal.capacity();
+            float ecap = eternal.capacity();
             polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
         }
 

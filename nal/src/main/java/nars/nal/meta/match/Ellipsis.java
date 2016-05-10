@@ -72,12 +72,12 @@ public abstract class Ellipsis extends AbstractVariable {
 
     public static class EllipsisTransformPrototype extends GenericVariable {
 
-        public final Variable name;
+        //public final Variable name;
         public final Term from, to;
 
         public EllipsisTransformPrototype(/*Op type, */Variable name, Term from, Term to) {
             super(Op.VAR_PATTERN, ".." + from + '=' + to + "..+");
-            this.name = name;
+            //this.name = name;
             this.from = from;
             this.to = to;
         }

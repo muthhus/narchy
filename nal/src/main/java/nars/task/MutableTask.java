@@ -73,7 +73,7 @@ public class MutableTask extends AbstractTask {
     }
 
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
-        this(taskToClone, taskToClone, otherTask, now, occ, newEvidence, taskToClone.truth(), budgetMerge);
+        this(taskToClone, taskToClone, otherTask, now, occ, newEvidence, newTruth, budgetMerge);
     }
 
     /** used by QuestionTable */

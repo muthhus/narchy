@@ -333,6 +333,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
 
+    @Override
     void setCapacity(int c);
 
 

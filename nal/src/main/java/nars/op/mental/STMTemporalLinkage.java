@@ -119,7 +119,6 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
         stm.add(t);
 
-        return;
     }
 
 

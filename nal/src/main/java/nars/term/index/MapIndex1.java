@@ -25,11 +25,7 @@ public class MapIndex1 extends AbstractMapIndex {
     @Nullable
     @Override
     protected final Termed theCompound(@NotNull Compound x, boolean create) {
-        if (create) {
-            return data.computeIfAbsent(x, (X) -> {
-                Compound XX = (Compound)X; //??
-                return internCompound(internSubterms(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
-            });
+        //??
 //            Termed existing = data.get(x);
 //            if (existing!=null)
 //                return existing;
@@ -37,9 +33,12 @@ public class MapIndex1 extends AbstractMapIndex {
 //            Termed c = internCompound(internSubterms(x.subterms(), x.op(), x.relation(), x.dt()));
 //            data.put(c, c);
 //            return c;
-        } else {
-            return data.get(x);
-        }
+        return create ?
+                data.computeIfAbsent(x, (X) -> {
+                    Compound XX = (Compound) X; //??
+                    return internCompound(internSubterms(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
+                }) :
+                data.get(x);
     }
 
     @Nullable
