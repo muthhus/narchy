@@ -32,7 +32,7 @@ public final class ROBudget extends Budget {
     }
 
     @Override
-    public long setLastForgetTime(long currentTime) {
+    public float setLastForgetTime(float currentTime) {
         throw new UnsupportedOperationException();
     }
 
@@ -68,7 +68,7 @@ public final class ROBudget extends Budget {
     }
 
     @Override
-    public long getLastForgetTime() {
-        return Tense.TIMELESS;
+    public float getLastForgetTime() {
+        return Float.NaN;
     }
 }

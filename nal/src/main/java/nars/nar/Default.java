@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.BudgetForget;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
@@ -192,7 +193,7 @@ public class Default extends AbstractNAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            conceptualize(c, t, activation, activation /*1f*/, overflow);
+            conceptualize(c, t, activation, /*activation*/ 1f, overflow);
 
             if (overflow.floatValue() > 0) {
                 emotion.stress(overflow.floatValue());
@@ -391,6 +392,8 @@ public class Default extends AbstractNAR {
 
 
         final PremiseGenerator premiser;
+        private float cyclesPerFrame;
+        private int cycleNum;
 
 //        @Deprecated
 //        int tasklinks = 2; //TODO use MutableInteger for this
@@ -421,40 +424,37 @@ public class Default extends AbstractNAR {
 
         }
 
-        protected final void frame(@NotNull NAR nar) {
+        protected void frame(@NotNull NAR nar) {
+            this.cyclesPerFrame = nar.cyclesPerFrame.floatValue();
+            this.cycleNum = 0;
             conceptForget.update(nar);
             premiser.frame(nar);
         }
 
-        protected final void cycle(Memory memory) {
-
+        protected void cycle(Memory memory) {
 
             fireConcepts(conceptsFiredPerCycle.intValue());
-            commit();
 
-        }
 
-        long lastCommit = -1;
+            float subCycle = cycleNum++ / cyclesPerFrame;
+            conceptForget.cycle(subCycle);
 
-        /**
-         * apply pending activity at the end of a cycle
-         */
-        private final void commit() {
+            premiser.cycle(subCycle);
 
-            Bag<Concept> active = this.active;
+            Bag<Concept> active1 = this.active;
 
             //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            active.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
-                //active.commit(lastForget != now ? conceptForget : .. );
-
-            lastCommit = nar.time();
+            active1.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
+            //active.commit(lastForget != now ? conceptForget : .. );
 
 //            if (!((CurveBag)active).isSorted()) {
 //                throw new RuntimeException(active + " not sorted");
 //            }
+
         }
+
 
         /**
          * samples a next active concept
@@ -561,7 +561,7 @@ public class Default extends AbstractNAR {
 //            this(nar, deriver, Global.newHashSet(64));
 //        }
 
-        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
+        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull BudgetForget<Termed> termLinkForget) {
             super(nar, new PremiseEval(nar.random, deriver), taskLinkForget, termLinkForget);
 
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
@@ -577,6 +577,7 @@ public class Default extends AbstractNAR {
             taskLinkForget.update(nar);
             termLinkForget.update(nar);
         }
+
 
 
 

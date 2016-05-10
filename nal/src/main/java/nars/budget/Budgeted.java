@@ -61,7 +61,7 @@ public interface Budgeted  {
 
     float dur();
 
-    long getLastForgetTime();
+    float getLastForgetTime();
 
 
     //        default long lastForgetTime() { return getLastForgetTime(); }

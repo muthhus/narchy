@@ -24,6 +24,12 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
     long min = 0, max = 0;
 
+    /** history factor:
+     *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
+     *      lower means more accuracy at the expense of shorter memory span
+     */
+    private final float historyFactor = 1.5f;
+
     public MicrosphereRevectionTemporalBeliefTable(Map<Task, Task> mp, int cap, SortedTable<Task,Task> eternal) {
         super(mp, Global.newArrayList(cap));
         setCapacity(cap);
@@ -141,8 +147,10 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     }
 
     public float ageFactor() {
-        return 1f;
-        //return 1f / (max - min);
+        //return 1f;
+        long range = max - min;
+        return (range == 0) ? 1 :
+                ((1f) / (range * historyFactor));
     }
 
 

@@ -146,6 +146,8 @@ public enum Global {
     /** upper limit for # of termutations derived, determined by premise's priority */
     public static float matchTermutationsMax = 3;
 
+    /** smallest non-zero sub-cycle time measurement; # of cycles per frame should not exceed 1 / SUBFRAME_EPSILON */
+    public static float SUBFRAME_EPSILON = 0.0001f;
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

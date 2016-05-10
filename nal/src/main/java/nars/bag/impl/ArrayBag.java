@@ -32,8 +32,8 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
     public ArrayBag(@NotNull List<BLink<V>> items, int capacity) {
         this(items,
-                Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
-                //new HashMap(items.capacity()/2)
+                //Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
+                new HashMap(capacity/2)
         );
 
         setCapacity(capacity);

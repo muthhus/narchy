@@ -188,11 +188,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     private final boolean equalsFurther(@NotNull Termed thatTerm) {
 
         Term u = thatTerm.term();
-        if (op == u.op() /*&& (((t instanceof Compound))*/) {
+        if (opRel() == u.opRel() /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
-            if (relation != c.relation())
-                return false;
-            if (op.isTemporal() && dt!=c.dt())
+            /*if (relation != c.relation())
+                return false;*/
+            if (/*op.isTemporal() &&*/ dt!=c.dt())
                 return false;
             if (!subterms.equals(c.subterms()))
                 return false;

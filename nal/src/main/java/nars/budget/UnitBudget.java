@@ -49,7 +49,7 @@ public class UnitBudget extends RawBudget {
     /**
      * time at which this budget was last forgotten, for calculating accurate memory decay rates
      */
-    protected long lastForgetTime = Tense.TIMELESS;
+    protected float lastForgetTime = Float.NaN;
 
 
     public UnitBudget(float p, float d, @Nullable Truth qualityFromTruth) {
@@ -90,7 +90,7 @@ public class UnitBudget extends RawBudget {
         if (v != null) {
             budget(v);
             if (!copyLastForgetTime)
-                setLastForgetTime(Tense.TIMELESS);
+                setLastForgetTime(Float.NaN);
         }
     }
 
@@ -134,16 +134,16 @@ public class UnitBudget extends RawBudget {
 
 
     @Override
-    public final long setLastForgetTime(long currentTime) {
+    public final float setLastForgetTime(float currentTime) {
 
-        long period = lastForgetTime == Tense.TIMELESS ? 0 : currentTime - lastForgetTime;
+        float period = (lastForgetTime == lastForgetTime /* NaN test */) ? 0 : currentTime - lastForgetTime;
 
         lastForgetTime = currentTime;
         return period;
     }
 
     @Override
-    public final long getLastForgetTime() {
+    public final float getLastForgetTime() {
         return lastForgetTime;
     }
 

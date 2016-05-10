@@ -22,7 +22,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     public final X id;
 
     /** time of last forget */
-    private long lastForget = Tense.TIMELESS;
+    private float lastForget = Tense.TIMELESS;
 
     /** changed status bit */
     boolean changed;
@@ -152,15 +152,15 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final long setLastForgetTime(long currentTime) {
-        long lastForget = this.lastForget;
-        long diff = (lastForget == Tense.TIMELESS) ? 0 : (currentTime - lastForget);
+    public final float setLastForgetTime(float currentTime) {
+        float lastForget = this.lastForget;
+        float diff = (lastForget != lastForget /* NaN test */) ? 0 + Global.SUBFRAME_EPSILON : (currentTime - lastForget);
         this.lastForget = currentTime;
         return diff;
     }
 
     @Override
-    public long getLastForgetTime() {
+    public float getLastForgetTime() {
         return lastForget;
     }
 

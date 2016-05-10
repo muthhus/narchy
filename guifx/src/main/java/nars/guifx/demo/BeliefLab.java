@@ -16,8 +16,11 @@ public class BeliefLab {
 	// }
 	public static final int beliefCapacity = 64;
 	static float waveFreq = 0.1715f;
-	static float conf = 0.9f;
-	static float predictionProbability = 0.5f; // how often to ask for a
+
+    static float confMax = 0.9f;
+    static float confMin = 0.2f;
+
+	static float predictionProbability = 0.1f; // how often to ask for a
 												// prediction
 	static float pastProbability = 0.1f; // how often to ask for a prediction
 	static final float fps = 45f;
@@ -60,7 +63,7 @@ public class BeliefLab {
                     nar.input("y:x? :\\:");
                 else {
                     CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
-                    nar.input("y:x. :|: %" + y + ";" + conf + "%");
+                    nar.input("y:x. :|: %" + y + ";" + ((float)(Math.random()*(confMax-confMin))+ confMin) + "%");
                 }
 
             }

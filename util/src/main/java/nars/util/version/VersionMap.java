@@ -20,9 +20,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            new UnifriedMap(initialSize)  //the only one that works which doesnt think a read-only get() should cause a concurrent modification, fuck hashmap. since the compute call involves constraints which check the state of the map itself BFD
-            //new LinkedHashMap<>(32)
-            //new HashMap(32)
+            new UnifriedMap(initialSize)
+            //new LinkedHashMap<>(initialSize)
+            //new HashMap(initialSize)
         );
     }
 

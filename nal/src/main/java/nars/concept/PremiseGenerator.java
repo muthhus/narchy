@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
 import nars.bag.Bag;
+import nars.budget.BudgetForget;
 import nars.budget.Forget;
 import nars.concept.table.BeliefTable;
 import nars.data.Range;
@@ -63,7 +64,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     @NotNull
     public final Forget.BudgetForgetFilter<Task> taskLinkForget;
     @NotNull
-    public final Forget.BudgetForget<Termed> termLinkForget;
+    public final BudgetForget<Termed> termLinkForget;
 
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
@@ -74,7 +75,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
+    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull BudgetForget<Termed> termLinkForget) {
 
         this.nar = nar;
         this.matcher = matcher;
@@ -112,6 +113,11 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     /** to be overridden by subclasses, called on each frame to update parameters */
     public void frame(NAR nar) {
+    }
+
+    public void cycle(float subCycle) {
+        termLinkForget.cycle(subCycle);
+        taskLinkForget.cycle(subCycle);
     }
 
     /**

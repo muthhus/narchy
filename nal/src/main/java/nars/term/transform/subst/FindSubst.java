@@ -111,7 +111,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     protected FindSubst(Op type, Random random) {
         this(type, random,
             new HeapVersioning(Global.UnificationStackMax, 4)
-            //new PooledVersioning(Global.UnificationStackMax, 8)
+            //new PooledVersioning(Global.UnificationStackMax, 4)
         );
     }
 
@@ -121,8 +121,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         this.type = type;
 
         this.versioning = versioning;
-        xy = new VersionMap(versioning, 16);
-        yx = new VersionMap(versioning, 16);
+        xy = new VersionMap(versioning, 12);
+        yx = new VersionMap(versioning, 4);
         reassigner = new VersionMap.Reassigner<>(this::assignable );
         parent = new Versioned(versioning);
         constraints = new Versioned(versioning, new int[2], new FasterList(0, new MatchConstraint[2]));

@@ -16,7 +16,8 @@ import static nars.nal.UtilityFunctions.or;
 /**
  * Created by me on 12/11/15.
  */
-public abstract class Budget extends BudgetedHandle {
+public abstract class Budget implements Budgeted {
+
 
 
     //@Contract(pure = true)
@@ -103,7 +104,6 @@ public abstract class Budget extends BudgetedHandle {
      * @param p The new priority
      * @return whether the operation had any effect
      */
-    @Override
     public final void setPriority(float p) {
         if (p!=p /* fast NaN test */)
             throw new InvalidPriorityException();
@@ -118,8 +118,7 @@ public abstract class Budget extends BudgetedHandle {
      * returns the period in time: currentTime - lastForgetTime and sets the lastForgetTime to currentTime
      */
 
-    @Override
-    public abstract long setLastForgetTime(long currentTime);
+    public abstract float setLastForgetTime(float currentTime);
 
    
 

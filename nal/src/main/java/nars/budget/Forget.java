@@ -1,16 +1,12 @@
 package nars.budget;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.nal.Tense;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static nars.nal.Tense.TIMELESS;
 
 
 /**
@@ -18,14 +14,8 @@ import static nars.nal.Tense.TIMELESS;
  */
 public enum Forget { ;
 
-    /** processes a BLink, usually affecting its budget somehow */
-    public interface BudgetForget<X> extends Consumer<BLink<? extends X>> {
-        /** called each frame to update parameters */
-        void update(@NotNull NAR nar);
-    }
-
     /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
-    public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>> {
+    public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>>, BudgetForget<X> {
         /** called each frame to update parameters */
         void update(@NotNull NAR nar);
     }
@@ -51,9 +41,20 @@ public enum Forget { ;
         }
 
         @Override
+        public void accept(BLink<? extends X> bLink) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public final void update(@NotNull NAR nar) {
             forget.update(nar);
         }
+
+        @Override
+        public final void cycle(float subFrame) {
+            forget.cycle(subFrame);
+        }
+
     }
 
     public abstract static class AbstractForget<X> implements BudgetForget<X> {
@@ -68,7 +69,9 @@ public enum Forget { ;
         /** cached value of # cycles equivalent of the supplied forget durations parameter */
         protected transient float forgetCyclesCached = Float.NaN;
         protected transient float perfectionCached = Float.NaN;
-        protected transient long now = TIMELESS;
+        protected transient float now = Float.NaN;
+        protected transient float subFrame = Float.NaN;
+        private long frame = Tense.TIMELESS;
 
         public AbstractForget(@NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
             this.forgetDurations = forgetDurations;
@@ -81,7 +84,11 @@ public enum Forget { ;
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue();
             perfectionCached = perfection.floatValue();
-            now = nar.time();
+            this.now = frame = nar.time();
+        }
+
+        @Override public void cycle(float subFrame) {
+            this.now = (this.subFrame = subFrame) + frame;
         }
 
         @NotNull
@@ -121,7 +128,7 @@ public enum Forget { ;
         public void accept(@NotNull BLink<? extends X> budget) {
 
             final float currentPriority = budget.pri();
-            final long forgetDeltaCycles = budget.setLastForgetTime(now);
+            final float forgetDeltaCycles = budget.setLastForgetTime(now);
             if (forgetDeltaCycles == 0) {
                 return;
             }
@@ -132,8 +139,6 @@ public enum Forget { ;
                 //priority already below threshold, don't decrease any further
                 return ;
             }
-
-
 
             //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
             // lower values approaching 0.0 means will happen at faster rates
@@ -153,8 +158,8 @@ public enum Forget { ;
                         minPriorityForgettingCanAffect * (forgetProportion);
             }
 
-            if (Math.abs(newPriority - currentPriority) > Global.BUDGET_EPSILON)
-                budget.setPriority(newPriority);
+            //if (Math.abs(newPriority - currentPriority) > Global.BUDGET_EPSILON)
+            budget.setPriority(newPriority);
 
         }
 
@@ -172,9 +177,9 @@ public enum Forget { ;
 
         @Override
         public void accept(@NotNull BLink<? extends X> budget) {
-            boolean noo = budget.getLastForgetTime() == TIMELESS;
-            long dt = budget.setLastForgetTime(now);
-            if (dt > 0 || noo) {
+
+            float dt = budget.setLastForgetTime(now);
+            if (dt > 0) {
 
                 float p = budget.priIfFiniteElseZero();
                 float threshold = budget.qua() * perfectionCached;
