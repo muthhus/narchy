@@ -32,8 +32,11 @@ public class ArrayQuestionTable implements QuestionTable {
 
     public ArrayQuestionTable(int capacity) {
         super();
+
         this.list = Global.newArrayList(capacity);
-        setCapacity(capacity);
+
+        this.capacity = capacity;
+        //setCapacity(capacity);
     }
 
     @Override
@@ -41,17 +44,18 @@ public class ArrayQuestionTable implements QuestionTable {
         return capacity;
     }
 
-    //TODO not tested yet
     @Override public void setCapacity(int newCapacity) {
-        if (this.capacity==newCapacity) return;
-
-        capacity = newCapacity;
-
-        int s = list.size();
-
-        int toRemove = s - capacity;
-        while (toRemove-- > 0)
-            list.remove( --s ); //last element
+        //TODO when tasks are removed, they need to be deleted and notify the NAR
+        throw new UnsupportedOperationException();
+//        if (this.capacity==newCapacity) return;
+//
+//        capacity = newCapacity;
+//
+//        int s = list.size();
+//
+//        int toRemove = s - capacity;
+//        while (toRemove-- > 0)
+//            list.remove( --s ); //last element
 
     }
 

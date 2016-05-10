@@ -84,23 +84,15 @@ public interface Stamp {
     static long[] toSetArray(@NotNull long[] x, final int outputLen) {
         int l = x.length;
 
-        if (l < 2)
-            return x;
-
-        //1. copy evidentialBase and sort it
-        long[] sorted = Arrays.copyOf(x, l);
-        return _toSetArray(outputLen, sorted);
+        //copy evidentialBase and sort it
+        return (l < 2) ? x : _toSetArray(outputLen, Arrays.copyOf(x, l));
     }
     @NotNull
     static long[] toSetArray(@NotNull LongArrayList x) {
         int l = x.size();
 
-        if (l < 2)
-            return x.toArray();
-
-        //1. copy evidentialBase and sort it
-        long[] sorted = x.toArray();
-        return _toSetArray(l, sorted);
+        //copy evidentialBase and sort it
+        return l < 2 ? x.toArray() : _toSetArray(l, x.toArray());
     }
 
     @NotNull

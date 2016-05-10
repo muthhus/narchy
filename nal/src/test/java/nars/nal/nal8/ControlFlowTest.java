@@ -93,7 +93,7 @@ public class ControlFlowTest {
 
         ExeTracker exeTracker = new ExeTracker();
         NAR n = nn.get();
-        n.log();
+        //n.log();
 
         Sequence seq = new Sequence("(seq)", n, length) {
 

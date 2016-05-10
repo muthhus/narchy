@@ -146,8 +146,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
             if (p.cyclic())
                 return false;
 
-            if (tf.single()) {
-            } else {
+            if (!tf.single()) {
                 //double premise
                 if (p.overlap())
                     return false;
@@ -172,7 +171,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
             if (Global.DEBUG) {
                 if (!tf.single() && belief == null) {
-                    System.err.println("null belief but non-single truth function");
+                    throw new RuntimeException("null belief but non-single truth function");
                 }
             }
 
