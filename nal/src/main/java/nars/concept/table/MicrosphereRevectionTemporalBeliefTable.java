@@ -188,7 +188,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
             Truth newTruth = truth(newOcc);
 
             //TODO impl a weighted zip
-            long[] newEv = Stamp.zip(a, b);
+            long[] newEv = Stamp.zip(a.evidence(), b.evidence(), ac/(ac+bc));
 
             Compound at = a.term();
             if (at.op().isTemporal()) {

@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static java.util.Arrays.*;
+
 import static junit.framework.TestCase.assertTrue;
 import static nars.truth.Stamp.*;
 import static org.junit.Assert.*;
@@ -92,16 +94,19 @@ public class StampTest {
                     new long[]{1, 2, 3, 4},
                     Stamp.zip(
                             new long[]{1, 2},
-                            new long[]{3, 4}, 4, dir)
+                            new long[]{3, 4}, 0.5f, 4, dir)
             );
         }
     }
 
     @NotNull public static long[] zipReverse(@NotNull long[] a, @NotNull long[] b, int i) {
-        return zip(a, b, i, false);
+        return zip(a, b, 0.5f, i, false);
     }
     @NotNull public static long[] zipForward(@NotNull long[] a, @NotNull long[] b, int i) {
-        return zip(a, b, i, true);
+        return zip(a, b, 0.5f, i, true);
+    }
+    @NotNull public static long[] zipForward(@NotNull long[] a, @NotNull long[] b, float aToB, int i) {
+        return zip(a, b, aToB, i, true);
     }
 
     @Test
@@ -140,6 +145,77 @@ public class StampTest {
         assertEquals(
                 new LongArrayList(new long[] { 1, 2, 3, 5}),
                 new LongArrayList(zipReverse(a, b, 4)));
+    }
+
+
+    @Test public void testStampZipForwardWeighted() {
+
+        long[] a = {1, 2, 8, 12};
+        long[] b = {3, 4, 7, 13};
+
+        assertEquals(
+                Arrays.toString(new long[] { 7, 8, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.5f, 4))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 2, 8, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.75f, 4))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 2, 8, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.95f, 4)) //same as 0.75, at minimum includes 1 (not 0) from either
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 4, 7, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.25f, 4))
+        );
+
+    }
+    @Test public void testStampZipForwardWeighted2() {
+
+        long[] a = {0, 2, 4, 6, 8, 10, 12};
+        long[] b = {1, 3, 5, 7, 9, 11, 13};
+
+        assertEquals(
+                Arrays.toString(new long[] { 7, 8, 9, 10, 11, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.5f, 7))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 4, 6, 8, 10, 11, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.75f, 7))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 2, 4, 6, 8, 10, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.95f, 7))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 5, 7, 9, 10, 11, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.35f, 7))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 3, 5, 7, 9, 11, 12, 13 }),
+                Arrays.toString(zipForward(a,b, 0.1f, 7))
+        );
+    }
+    @Test public void testStampZipForwardWeighted3() {
+
+        //imbalanced
+        long[] a = {0, 2};
+        long[] b = {1, 3, 5, 7};
+
+        assertEquals(
+                Arrays.toString(new long[] { 0, 2, 3, 5, 7 }),
+                Arrays.toString(zipForward(a,b, 0.5f, 5))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 0, 2, 3, 5, 7 }), //same as before
+                Arrays.toString(zipForward(a,b, 0.8f, 5))
+        );
+        assertEquals(
+                Arrays.toString(new long[] { 1, 2, 3, 5, 7 }),
+                Arrays.toString(zipForward(a,b, 0.25f, 5))
+        );
+
     }
 
 }

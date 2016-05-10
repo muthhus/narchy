@@ -32,10 +32,15 @@ public interface Stamp {
 
     /** "default" zipping config: prefer newest */
     @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
-        return zip(a, b,
+        return zip(a, b, 0.5f);
+    }
+
+    @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB) {
+        return zip(a, b, aToB,
                 Global.STAMP_MAX_EVIDENCE,
                 true);
     }
+
 
     /***
      * zips two evidentialBase arrays into a new one
@@ -43,29 +48,64 @@ public interface Stamp {
      * the later-created task should be in 'b'
      */
     @NotNull
-    static long[] zip(@NotNull long[] a, @NotNull long[] b, int maxLen, boolean newToOld) {
+    static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB, int maxLen, boolean newToOld) {
 
         int aLen = a.length, bLen = b.length;
         int baseLength = Math.min(aLen + bLen, maxLen);
         long[] c = new long[baseLength];
 
+        //how many items to exclude from each due to weighting
+        int aMin = 0, bMin = 0;
+        if (aToB == 0.5f) {
+            //no adjustment necessary
+        } else if (aLen+bLen > maxLen) {
+            if (!newToOld)
+                throw new UnsupportedOperationException("reverse weighted not yet unimplemented");
+
+            //find which ones to exclude from
+
+            //usedA + usedB = maxLen
+            int usedA = Math.min(Math.max(1, (int)Math.floor(aToB * maxLen)), aLen);
+
+            int usedB = Math.min(maxLen - usedA, bLen);
+
+            if (usedA < aLen) {
+                aMin = aLen - usedA;
+            }
+            if (usedB < bLen) {
+                bMin = bLen - usedB;
+            }
+
+        }
 
         if (newToOld) {
             //"forward" starts with newes, oldest are trimmed
             int ib = bLen-1, ia = aLen-1;
             for (int i = baseLength-1; i >= 0; ) {
-                boolean ha = (ia >=0), hb = (ib >= 0);
+                boolean ha = (ia >= aMin), hb = (ib >= bMin);
 
-                c[i--] = ((ha && hb) ?
-                            ((i & 1) > 0) : ha) ?
-                            a[ia--] : b[ib--];
+//                c[i--] = ((ha && hb) ?
+//                            ((i & 1) > 0) : ha) ?
+//                            a[ia--] : b[ib--];
+                long next;
+                if (ha && hb) {
+                    next = (i & 1) > 0 ? a[ia--] : b[ib--];
+                } else if (ha) {
+                    next = a[ia--];
+                } else if (hb) {
+                    next = b[ib--];
+                } else {
+                    throw new RuntimeException("stamp fault");
+                }
+
+                c[i--] = next;
             }
         } else {
             //"reverse" starts with oldest, newest are trimmed
             int ib = 0, ia = 0;
             for (int i = 0; i < baseLength; ) {
 
-                boolean ha = ia < aLen, hb = ib < bLen;
+                boolean ha = ia < (aLen - aMin), hb = ib < (bLen - bMin);
                 c[i++] = ((ha && hb) ?
                             ((i & 1) > 0) : ha) ?
                             a[ia++] : b[ib++];
