@@ -115,7 +115,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         }
     }
 
-    default void appendArg(Appendable p, int i) throws IOException {
+    default void appendArg(@NotNull Appendable p, int i) throws IOException {
         term(i).append(p);
     }
 

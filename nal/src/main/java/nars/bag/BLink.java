@@ -21,8 +21,6 @@ public final class BLink<X> extends Budget implements Link<X> {
     /** the referred item */
     public final X id;
 
-    /** time of last forget */
-    private float lastForget = Tense.TIMELESS;
 
     /** changed status bit */
     boolean changed;
@@ -43,14 +41,16 @@ public final class BLink<X> extends Budget implements Link<X> {
     final static int DQUA = 5;
 
     /** overflow/backpressure buffer variable */
-    final static int BUFFERED = 6;
+    //final static int BUFFERED = 6;
+
+    /** time of last forget */
+    final static int LASTFORGET = 6;
+
+    private final float[] b = new float[7];
 
 
-    private final float[] b = new float[6];
 
-
-
-    public BLink(X id) {
+    private BLink(X id) {
         this.id = id;
     }
 
@@ -75,22 +75,20 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     private void init(@NotNull Budgeted c, float scale) {
-        //this.lastForget = c.getLastForgetTime();
-        this.lastForget = Tense.TIMELESS;
-
         init(c.pri() * scale, c.dur(), c.qua());
     }
 
     public void init(float p, float d, float q) {
         float[] b = this.b;
-        b[0] = clamp(p);
-        b[2] = clamp(d);
-        b[4] = clamp(q);
+        b[PRI] = clamp(p);
+        b[DUR] = clamp(d);
+        b[QUA] = clamp(q);
+        b[LASTFORGET] = Float.NaN;
     }
 
     @Override
     public final void delete() {
-        b[0] = Float.NaN;
+        b[PRI] = Float.NaN;
         changed = true;
     }
 
@@ -98,9 +96,9 @@ public final class BLink<X> extends Budget implements Link<X> {
     public final boolean commit() {
         if (changed) {
             float[] b = this.b;
-            b[0] = clamp(b[0] + b[1]); b[1] = 0;
-            b[2] = clamp(b[2] + b[3]); b[3] = 0;
-            b[4] = clamp(b[4] + b[5]); b[5] = 0;
+            b[PRI] = clamp(b[PRI] + b[DPRI]); b[DPRI] = 0;
+            b[DUR] = clamp(b[DUR] + b[DDUR]); b[DDUR] = 0;
+            b[QUA] = clamp(b[QUA] + b[DQUA]); b[DQUA] = 0;
             changed = false;
             return true;
         }
@@ -109,12 +107,12 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final float pri() {
-        return b[0];
+        return b[PRI];
     }
 
     @Override
     public final boolean isDeleted() {
-        float p = b[0];
+        float p = b[PRI];
         return (p!=p); //fast NaN test
     }
 
@@ -133,7 +131,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final float dur() {
-        return b[2];
+        return b[DUR];
     }
 
     @Override
@@ -143,7 +141,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final float qua() {
-        return b[4];
+        return b[QUA];
     }
 
     @Override
@@ -153,15 +151,16 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final float setLastForgetTime(float currentTime) {
-        float lastForget = this.lastForget;
+        float[] b = this.b;
+        float lastForget = b[LASTFORGET];
         float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
-        this.lastForget = currentTime;
+        b[LASTFORGET] = currentTime;
         return diff;
     }
 
     @Override
     public float getLastForgetTime() {
-        return lastForget;
+        return b[LASTFORGET];
     }
 
 

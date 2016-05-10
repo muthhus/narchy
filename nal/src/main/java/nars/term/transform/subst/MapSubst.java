@@ -94,7 +94,7 @@ public class MapSubst implements Subst {
         @NotNull
         @Override
         public String toString() {
-            return "Substitution{(" + ox +"," + oy + ") && " +
+            return "Substitution{(" + ox + ',' + oy + ") && " +
                     "inherited subs=" + xy +
                     '}';
         }

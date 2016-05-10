@@ -5,7 +5,6 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.task.flow.FIFOTaskPerception;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -38,14 +36,6 @@ public class Terminal extends AbstractNAR {
         the("input", initInput());
     }
 
-
-
-
-    @Nullable
-    @Override
-    protected Function<Term, Concept> newConceptBuilder() {
-        return (t) -> null;
-    }
 
     @Override
     public Concept conceptualize(@NotNull Termed termed, Budgeted activation, float conceptActivation, float linkActivation, MutableFloat overflow) {

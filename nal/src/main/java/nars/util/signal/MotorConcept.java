@@ -94,7 +94,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         };
 
 
-        setMotor(motor);
+        this.motor = motor;
 
         //n.onFrame(this);
 

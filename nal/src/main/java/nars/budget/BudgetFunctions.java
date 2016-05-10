@@ -349,7 +349,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      */
     @Nullable public static Budget valid(@NotNull Budget budget, @NotNull Memory m) {
         return //!budget.isDeleted() &&
-                (budget!=null && valid(budget.dur(), m)) ? budget : null;
+                (/*budget!=null && */valid(budget.dur(), m)) ? budget : null;
     }
 
     public static boolean valid(/*float p,*/ float d, @NotNull Memory m) {
@@ -386,7 +386,10 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         boolean aExist = a!=null && !a.isDeleted();
         boolean bExist = b!=null && !b.isDeleted();
-        if (aExist && bExist) {
+        if (!bExist && !aExist) {
+            //do nothing, the sources are non-existant
+        }
+        else if (aExist && bExist) {
 
             float bPriNext = b.pri() - resultPri * aStrength;
             float aPriNext = a.pri() - resultPri * (1f - aStrength);
@@ -405,14 +408,12 @@ public final class BudgetFunctions extends UtilityFunctions {
             //apply the changes
             a.setPriority(aPriNext);
             b.setPriority(bPriNext);
-        } else if (aExist && !bExist) {
+        } else if (aExist /*&& !bExist*/) {
             //take from 'a' only
             a.priSub(resultPri);
-        } else if (!aExist && bExist) {
+        } else if (bExist /*&& !aExist*/) {
             //take from 'b' only
             b.priSub(resultPri);
-        } else {
-            //do nothing, the sources are non-existant
         }
     }
 

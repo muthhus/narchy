@@ -209,9 +209,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * @param it An item
      * @return Whether the Item is in the Bag
      */
-    default boolean contains(@NotNull V it) {
-        return get(it) != null;
-    }
+    boolean contains(@NotNull V it);
 
 
     //    /**

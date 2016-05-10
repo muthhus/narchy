@@ -115,12 +115,12 @@ public class NARLoop implements Runnable {
     }
 
     public void stop() throws InterruptedException  {
+        logger.info("stopping {}", this);
 
         synchronized (thread) {
             if (stopping || stopped)
                 throw new RuntimeException("already waiting for stop");
 
-            logger.info("stopping {}", this);
             stopping = true;
             thread.join();
         }

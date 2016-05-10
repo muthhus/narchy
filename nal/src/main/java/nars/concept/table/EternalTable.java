@@ -80,8 +80,7 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
 //                continue;
 //            }
 
-            final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length;
-//            float minValidConf = Math.min(newBeliefConf, x.conf());
+            //            float minValidConf = Math.min(newBeliefConf, x.conf());
 //            if (minValidConf < bestConf) continue;
 //            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
 //            if (minValidRank < bestRank) continue;
@@ -102,6 +101,7 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
                 continue;
 
             float cconf = c.conf();
+            final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length; //newBelief.evidence().length + x.evidence().length;
             float rank = BeliefTable.rankEternalByOriginality(cconf, totalEvidence);
 
             if (rank > bestRank) {

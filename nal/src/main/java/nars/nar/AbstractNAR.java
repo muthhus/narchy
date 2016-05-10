@@ -130,9 +130,6 @@ public abstract class AbstractNAR extends NAR {
 
     }
 
-    @Nullable
-    abstract protected Function<Term, Concept> newConceptBuilder();
-
 
 //    public static final AbstractOperator[] exampleOperators = {
 //            //new Wait(),

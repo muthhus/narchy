@@ -218,9 +218,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
-        Task solution;
+
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-            solution = new MutableTask(newTerm, punc(), solTruth)
+        Task solution = new MutableTask(newTerm, punc(), solTruth)
                     .time(now, solutionOcc)
                     .parent(question, this)
                     .budget(solutionBudget)

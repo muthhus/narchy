@@ -401,7 +401,7 @@ public class InterpolatingMicrosphere {
 
 
     /** assumes input vectors already normalized */
-    protected double cosAngleNormalized(@NotNull double[] x, @NotNull double[] y) {
+    protected static double cosAngleNormalized(@NotNull double[] x, @NotNull double[] y) {
         if (x.length == 1) {
             double x0 = x[0];
             double y0 = y[0];

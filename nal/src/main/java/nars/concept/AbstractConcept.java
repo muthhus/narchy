@@ -37,7 +37,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         this.termLinks = termLinks;
     }
 
-    public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
+    //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
     /** returns the outgoing component only */
     @Nullable

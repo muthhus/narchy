@@ -133,7 +133,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
         //System.out.println(a + " " + b + " " + (matches > 0));
         boolean match = matches > 0;
         if (match && !a.equals(b))
-            System.out.println(a + " " + b + " " + (match));
+            System.out.println(a + " " + b + ' ' + (match));
         return match;
 
     }

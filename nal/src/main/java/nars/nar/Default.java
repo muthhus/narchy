@@ -20,7 +20,6 @@ import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
-import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.Terms;
@@ -40,7 +39,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Various extensions enabled
@@ -328,14 +326,6 @@ public class Default extends AbstractNAR {
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
         core.active.forEachKey(recip);
         return this;
-    }
-
-    @Nullable
-    @Override
-    public Function<Term, Concept> newConceptBuilder() {
-        return new DefaultConceptBuilder(random,
-                12 /* tasklinks*/,
-                16 /*termlinks */);
     }
 
     /**

@@ -22,11 +22,11 @@ public class TruthPolation {
 
     @Nullable
     final InterpolatingMicrosphere s;
-    double[][] times;
-    double[] freq;
-    double[] conf;
+    final double[][] times;
+    final double[] freq;
+    final double[] conf;
     int count;
-    private List<Task> tasks;
+    //private List<Task> tasks;
     final private double exp = 1f;
 
     public TruthPolation(int size, float eternalization) {
@@ -65,9 +65,7 @@ public class TruthPolation {
             return tasks.get(0).truth();
 
         this.count = s;
-        this.tasks = tasks;
-
-
+        //this.tasks = tasks;
 
         float confSum = 0;
         for (int i = 0; i < s; i++) {

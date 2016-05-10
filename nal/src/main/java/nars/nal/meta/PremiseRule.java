@@ -137,7 +137,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         private Term swap(@NotNull Term func) {
-            return $.the(func.toString() + "X");
+            return $.the(func.toString() + 'X');
         }
 
         @Override
@@ -375,7 +375,7 @@ public class PremiseRule extends GenericCompound {
     public Compound reified() {
 
         //TODO include representation of precondition and postconditions
-        return (Compound) $.impl(
+        return $.impl(
                 $.p(getTask(), getBelief()),
                 getConclusion()
         );
@@ -453,7 +453,7 @@ public class PremiseRule extends GenericCompound {
         List<BooleanCondition> posts = Global.newArrayList(precon.length);
 
 
-        Term taskTermPattern = getTask();
+        //Term taskTermPattern = getTask();
         Term beliefTermPattern = getBelief();
 
         if (beliefTermPattern.op() == Op.ATOM) {
@@ -729,7 +729,7 @@ public class PremiseRule extends GenericCompound {
 
 
                 default:
-                    throw new RuntimeException("unhandled postcondition: " + predicateNameStr + " in " + this + "");
+                    throw new RuntimeException("unhandled postcondition: " + predicateNameStr + " in " + this);
 
             }
 

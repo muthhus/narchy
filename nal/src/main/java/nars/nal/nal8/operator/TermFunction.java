@@ -176,7 +176,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
         }
 
         if (y instanceof Task) {
-            Task ty = (Task) y;
+            //Task ty = (Task) y;
             //if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
                 //ty.budget().set(cause);

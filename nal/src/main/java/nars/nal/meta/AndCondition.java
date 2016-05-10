@@ -46,13 +46,6 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
         return true;
     }
 
-    public void appendJavaCondition(StringBuilder s) {
-//        Joiner.on(" && ").appendTo(s, Stream.of(terms()).map(
-//                b -> ('(' + b.toJavaConditionString() + ')'))
-//                .iterator()
-//        );
-    }
-
     @Nullable
     public static BooleanCondition<PremiseEval> the(@NotNull List<BooleanCondition<PremiseEval>> cond) {
 

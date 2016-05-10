@@ -150,7 +150,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         return rank(t, when, ageFactor());
 
     }
-    public float rank(@NotNull Task t, long when, float ageFactor) {
+    public static float rank(@NotNull Task t, long when, float ageFactor) {
         return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
     }
 
@@ -194,10 +194,11 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
                 //TODO interpolate the dt()
                 int newDT;
-                if (b.term().dt() != DTERNAL)
-                    newDT = b.term().dt();
-                else if (a.term().dt() != DTERNAL)
-                    newDT = a.term().dt();
+                Compound bt = b.term();
+                if (bt.dt() != DTERNAL)
+                    newDT = bt.dt();
+                else if (at.dt() != DTERNAL)
+                    newDT = at.dt();
                 else
                     newDT = DTERNAL;
 

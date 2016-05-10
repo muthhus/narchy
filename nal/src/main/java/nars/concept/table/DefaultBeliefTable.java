@@ -224,7 +224,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
                 nar.remove(input,
                     Global.DEBUG ?
-                        input.lastLogged().toString() + " " + DUPLICATE_BELIEF_GOAL :
+                        input.lastLogged().toString() + ' ' + DUPLICATE_BELIEF_GOAL :
                         DUPLICATE_BELIEF_GOAL
                 );
             }

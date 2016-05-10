@@ -31,11 +31,15 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
         this.nar = nar;
 
-        stm = Global.THREADS == 1 ? new ArrayDeque() : new ConcurrentLinkedDeque<>();
+        stm = Global.THREADS == 1 ? new ArrayDeque(capacity()) : new ConcurrentLinkedDeque<>();
 
         nar.eventTaskProcess.on(this);
         nar.eventReset.on(n -> stm.clear());
 
+    }
+
+    public int capacity() {
+        return nar.shortTermMemoryHistory.intValue();
     }
 
 
@@ -64,7 +68,7 @@ public final class STMTemporalLinkage implements Consumer<Task> {
         if (concept == null)
             return;
 
-        int stmSize = nar.shortTermMemoryHistory.intValue();
+        int stmSize = capacity();
 
 
 //        if (!currentTask.isTemporalInductable() && !anticipation) { //todo refine, add directbool in task

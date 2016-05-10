@@ -166,19 +166,19 @@ public interface BeliefTable extends TaskTable {
 
     }
 
-    static float rankTemporalByOriginality(@NotNull Task b, long when) {
-        return BeliefTable.rankEternalByOriginality(b) *
-                BeliefTable.relevance(b, when, 1);
-    }
+//    static float rankTemporalByOriginality(@NotNull Task b, long when) {
+//        return BeliefTable.rankEternalByOriginality(b) *
+//                BeliefTable.relevance(b, when, 1);
+//    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
     @Nullable Task add(@NotNull Task input, NAR nar);
 
 
-    @Nullable
-    default Task top(@NotNull NAR nar) {
-        return top(nar.time());
-    }
+//    @Nullable
+//    default Task top(@NotNull NAR nar) {
+//        return top(nar.time());
+//    }
 
     @Nullable
     default Task top(long now) {

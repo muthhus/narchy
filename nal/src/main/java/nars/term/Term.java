@@ -34,14 +34,12 @@ import static nars.nal.Tense.DTERNAL;
 public interface Term extends Termed, Comparable, Termlike {
 
 
-
-
     @NotNull
     @Override default Term term() {
         return this;
     }
 
-    @Nullable
+    @NotNull
     @Override
     Op op();
 
@@ -63,6 +61,7 @@ public interface Term extends Termed, Comparable, Termlike {
     int size();
 
     @Override boolean equals(Object o);
+
     @Override int hashCode();
 
     default void recurseTerms(@NotNull SubtermVisitor v) {

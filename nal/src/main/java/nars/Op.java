@@ -109,7 +109,7 @@ public enum Op {
     public final int minLevel;
 
     private final boolean commutative;
-    private boolean temporal;
+    private final boolean temporal;
 
 
 //    Op(char c, int minLevel) {

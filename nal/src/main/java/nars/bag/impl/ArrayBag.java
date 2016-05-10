@@ -10,6 +10,7 @@ import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
 
-    private float reinsertionThreshold = 0.01f;
+    private final float reinsertionThreshold = 0.01f;
 
     public ArrayBag(int cap) {
         this(new FasterList(cap), cap);
@@ -339,8 +340,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                 //TODO items.get(i) and
                 //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
 
-                for (BLink<V> x : tmp)
-                   items.add(x);
+                Collections.addAll(items, tmp);
 
                 return this;
             }
@@ -386,10 +386,6 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 //        }*/
 //    }
 
-    protected final BLink<V> removeHighest() {
-        return isEmpty() ? null : removeItem(0);
-    }
-
     @NotNull
     @Override
     public String toString() {
@@ -407,22 +403,21 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         return isEmpty() ? 0 : items.get(items.size()-1).pri();
     }
 
-    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
-        forEach(receiver);
-        clear();
-    }
+//    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
+//        forEach(receiver);
+//        clear();
+//    }
 
-    public void pop(@NotNull Consumer<BLink<V>> receiver, int n) {
-        if (n == size()) {
-            //special case where size <= inputPerCycle, the entire bag can be flushed in one operation
-            popAll(receiver);
-        } else {
-            for (int i = 0; i < n; i++) {
-                receiver.accept(pop());
-            }
-        }
-    }
-
+//    public void pop(@NotNull Consumer<BLink<V>> receiver, int n) {
+//        if (n == size()) {
+//            //special case where size <= inputPerCycle, the entire bag can be flushed in one operation
+//            popAll(receiver);
+//        } else {
+//            for (int i = 0; i < n; i++) {
+//                receiver.accept(pop());
+//            }
+//        }
+//    }
 
 //    public final float priAt(int cap) {
 //        return size() <= cap ? 1f : item(cap).pri();
