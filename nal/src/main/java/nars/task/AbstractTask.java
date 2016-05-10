@@ -440,12 +440,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (b !=null) b.clear();
     }
 
-    public final void invalidate() {
+    protected final void invalidate() {
         hash = 0;
     }
 
-    @Override
-    public final void setOccurrenceTime(long o) {
+    /** TODO for external use in MutableTask instances only */
+    @Override public final void setOccurrenceTime(long o) {
         if (o != occurrenceTime) {
             this.occurrenceTime = o;
             invalidate();

@@ -339,6 +339,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @NotNull
     @Override
     public final Compound dt(int cycles) {
+
         if (cycles == dt) return this;
 
         if (!op().isTemporal())

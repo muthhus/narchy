@@ -195,6 +195,7 @@ public interface Temporalize {
                 eventDelta *= -1;
         }
 
+
         return deriveDT(derived, polarity, prem, eventDelta);
     }
 
@@ -339,6 +340,11 @@ public interface Temporalize {
                 //try to find the subtermTime of the implication's subject
                 derivedInT = dtTerm.subtermTime( derived.term(0) );
             }
+
+            if (derivedInT == DTERNAL) {
+                derivedInT = 0;
+            }
+
             occReturn[0] = t.occurrence() + derivedInT;
         } else {
             occReturn[0] = t.occurrence(); //the original behavior, but may not be right
