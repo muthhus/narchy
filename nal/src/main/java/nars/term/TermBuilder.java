@@ -168,12 +168,6 @@ public abstract class TermBuilder {
 //    }
 
 
-    @Nullable
-    public Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
-        if (csrc.subterms().equals(subs))
-            return csrc;
-        return the(csrc.op(), csrc.relation(), csrc.dt(), subs);
-    }
 
     @Nullable
     public Term newCompound(@NotNull Op op, @NotNull TermContainer subs) {
@@ -598,5 +592,11 @@ public abstract class TermBuilder {
     }
 
 
+    public final Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
+        if (csrc.subterms().equals(subs))
+            return csrc;
+
+        return the(csrc.op(), csrc.relation(), csrc.dt(), subs);
+    }
 
 }

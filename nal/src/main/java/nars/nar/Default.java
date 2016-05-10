@@ -552,7 +552,7 @@ public class Default extends AbstractNAR {
 //        }
 
         public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull BudgetForget<Termed> termLinkForget) {
-            super(nar, new PremiseEval(nar.random, deriver), taskLinkForget, termLinkForget);
+            super(nar, new PremiseEval(nar.index, nar.random, deriver), taskLinkForget, termLinkForget);
 
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 

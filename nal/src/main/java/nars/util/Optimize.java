@@ -116,7 +116,7 @@ public class Optimize<X> {
 //                new CMAESOptimizer.PopulationSize(pop));
 
         int dim = start.length;
-        final int numIterpolationPoints = 2 * dim + 1;
+        final int numIterpolationPoints = 2 * dim + 1 + 1;
         PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints)
                     .optimize(new MaxEval(maxIterations),
                         func,

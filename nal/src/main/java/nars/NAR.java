@@ -472,14 +472,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-
-    /**
-     * returns the global concept index
-     */
-    public final TermIndex index() {
-        return index;
-    }
-
     @NotNull
     public TaskQueue input(@NotNull Collection<Task> t) {
         TaskQueue tq = new TaskQueue(t);
@@ -1005,7 +997,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
         PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
-        index().forEach(t -> {
+        index.forEach(t -> {
             if (t instanceof Concept) {
                 Concept cc = (Concept)t;
                 cc.print(pw);

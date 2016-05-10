@@ -6,7 +6,6 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.Termed;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,10 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         //replacement term (y)
         final Term y = xx[2];
 
-        return subst(r, term, x, y);
+        Term x1 = resolve(r, x);
+        Term y1 = resolve(r, y);
+
+        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
     }
 //
 //    @Nullable
@@ -55,37 +57,15 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     @Nullable
     public static final Term resolve(@NotNull PremiseEval r, Term x) {
         //TODO make a half resolve that only does xy?
-
         Term ret = r.yx.get(x);
-        if(ret != null) {
-//            Term ret2 = r.xy.get(ret);
-//            if (ret2!=null)
-//                return ret2;
-//            else
-                return ret;
-        }
-        return x;
-
+        return ret != null ? ret : x;
     }
-
-    @Nullable
-    public static Term subst(@NotNull PremiseEval r, @NotNull Term term, @NotNull Term x, Term y) {
-//        if (x.equals(y))
-//            return term;
-
-        x = resolve(r, x);
-        y = resolve(r, y);
-
-        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x, y), term);
-    }
-
 
 
     public
     @Nullable
     static Term resolve(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
-        Termed resolved = r.premise.nar().index.apply(m, term);
-        return Termed.termOrNull(resolved);
+        return r.resolve(term, m);
     }
 
     //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {

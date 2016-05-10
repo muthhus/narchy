@@ -881,7 +881,7 @@ public class PremiseRule extends GenericCompound {
 
         m.put(getConclusionTermPattern(), newR);
 
-        Compound remapped = (Compound) (terms.transform(this, new MapSubst(m)).term());
+        Compound remapped = (Compound) (terms.resolve(this, new MapSubst(m)).term());
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);

@@ -1,5 +1,6 @@
 package nars.nal.op;
 
+import nars.NAR;
 import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
@@ -16,6 +17,9 @@ import java.util.Random;
  * */
 public final class substituteIfUnifies extends substitute {
 
+    /** recycled
+     *  TODO initialize in construtor
+     * */
     private OneMatchFindSubst matcher;
 
     public substituteIfUnifies() {
@@ -34,7 +38,7 @@ public final class substituteIfUnifies extends substitute {
         final Term y = xx[3];
 
         if (this.matcher == null) {
-            this.matcher = new OneMatchFindSubst(r.premise.nar().random);
+            this.matcher = new OneMatchFindSubst(r.premise.nar);
         }
 
         return matcher.tryMatch(substitute.getOp(opT), r, term, x, y);
@@ -46,8 +50,8 @@ public final class substituteIfUnifies extends substitute {
         private @NotNull PremiseEval r;
         @Nullable private Term result;
 
-        public OneMatchFindSubst(Random random) {
-            super(null, random); //HACK
+        public OneMatchFindSubst(NAR nar) {
+            super(nar.index, null, nar.random); //HACK
         }
 
         @Override
@@ -60,7 +64,6 @@ public final class substituteIfUnifies extends substitute {
             //apply the match before the xy/yx mapping gets reverted after leaving the termutator
             r.replaceAllXY(this);
             result = substitute.resolve(r, r, xterm);
-
             return false;
         }
 

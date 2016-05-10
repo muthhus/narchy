@@ -58,7 +58,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Versioning versioning;
 
     @Nullable
-    public TermIndex index = Terms.terms; //default static index
+    public final TermIndex index;
 
 
     /**
@@ -112,15 +112,18 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    protected FindSubst(Op type, Random random) {
-        this(type, random,
+    protected FindSubst(TermIndex index, Op type, Random random) {
+        this(index, type, random,
             new HeapVersioning(Global.UnificationStackMax, 4)
             //new PooledVersioning(Global.UnificationStackMax, 4)
         );
     }
 
-    protected FindSubst(Op type, Random random, @NotNull Versioning versioning) {
+    protected FindSubst(TermIndex index, Op type, Random random, @NotNull Versioning versioning) {
         //super(Global.UnificationStackMax, 8);
+
+        this.index = index;
+
         this.random = random;
         this.type = type;
 
@@ -324,54 +327,59 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return xy.isEmpty();
     }
 
-    public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
-
-
-//        final int numNonpatternVars;
-//        int ellipsisToMatch = Ellipsis.numUnmatchedEllipsis(X, this);
-//        if (ellipsisToMatch == 0) {
+//    public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
 //
-//            int ellipsisTotal = Ellipsis.numEllipsis(X);
-//            if (ellipsisTotal > 0) {
-//                //compute a virtual set of subterms based on an existing Ellipsis match
-//                Term XX = X.substituted(this);
-//                return (match(XX, Y));
-//            }
 //
-//            /** NORMAL: match subterms but do not collect for ellipsis */
-//            if (xsize != Y.size()) {
-//                return false;
-//            }
-//            numNonpatternVars = xsize;
+////        final int numNonpatternVars;
+////        int ellipsisToMatch = Ellipsis.numUnmatchedEllipsis(X, this);
+////        if (ellipsisToMatch == 0) {
+////
+////            int ellipsisTotal = Ellipsis.numEllipsis(X);
+////            if (ellipsisTotal > 0) {
+////                //compute a virtual set of subterms based on an existing Ellipsis match
+////                Term XX = X.substituted(this);
+////                return (match(XX, Y));
+////            }
+////
+////            /** NORMAL: match subterms but do not collect for ellipsis */
+////            if (xsize != Y.size()) {
+////                return false;
+////            }
+////            numNonpatternVars = xsize;
+////        } else {
+////            numNonpatternVars = Ellipsis.countNumNonEllipsis(X);
+////        }
+//
+//        //TODO see if there is a volume or structural constraint that can terminate early here
+//
+//
+//        Ellipsis e = Ellipsis.firstEllipsis(X);
+//
+//
+////        if (!e.valid(numNonpatternVars, ysize)) {
+////            return false;
+////        }
+//
+//
+//        if (X.isCommutative()) {
+//            return matchEllipsedCommutative(
+//                    X, e, Y
+//            );
 //        } else {
-//            numNonpatternVars = Ellipsis.countNumNonEllipsis(X);
+//            return matchCompoundWithEllipsisLinear(X, Y, e);
 //        }
-
-        //TODO see if there is a volume or structural constraint that can terminate early here
-
-
-        Ellipsis e = Ellipsis.firstEllipsis(X);
-
-
-//        if (!e.valid(numNonpatternVars, ysize)) {
-//            return false;
-//        }
-
-
-        if (X.isCommutative()) {
-            return matchEllipsedCommutative(
-                    X, e, Y
-            );
-        } else {
-            return matchCompoundWithEllipsisLinear(X, Y, e);
-        }
-
-    }
+//
+//    }
 
     @Nullable
     public final Term resolve(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
-        return Termed.termOrNull(index.apply(this, t));
+        return resolve(t, this);
+    }
+
+    @Nullable
+    public final Term resolve(@NotNull Term t, Subst subst) {
+        return index.resolve(t, subst);
     }
 
     public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {

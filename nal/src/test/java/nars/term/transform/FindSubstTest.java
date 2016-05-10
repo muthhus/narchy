@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.Subst;
 import nars.util.data.random.XORShiftRandom;
@@ -30,7 +31,7 @@ public class FindSubstTest {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 
-        FindSubst f = new FindSubst(Op.VAR_QUERY, new XORShiftRandom()) {
+        FindSubst f = new FindSubst(Terms.terms, Op.VAR_QUERY, new XORShiftRandom()) {
 
             @Override
             public boolean onMatch() {

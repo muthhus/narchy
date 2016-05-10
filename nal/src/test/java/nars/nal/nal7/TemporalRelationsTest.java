@@ -95,9 +95,9 @@ public class TemporalRelationsTest {
 
         d.step();
 
-        int indexSize = d.index().size();
+        int indexSize = d.index.size();
 
-        d.index().print(System.out);
+        d.index.print(System.out);
 
         assertEquals(2, d.concept("(x==>y)").beliefs().size() );
 
@@ -108,10 +108,10 @@ public class TemporalRelationsTest {
 
         assertEquals(4, d.concept("(x==>y)").beliefs().size() );
 
-        d.index().print(System.out);
-        assertEquals(indexSize, d.index().size() ); //remains same amount
+        d.index.print(System.out);
+        assertEquals(indexSize, d.index.size() ); //remains same amount
 
-        d.index().print(out);
+        d.index.print(out);
         d.concept("(x==>y)").print();
     }
 

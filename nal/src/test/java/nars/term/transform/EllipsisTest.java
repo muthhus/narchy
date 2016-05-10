@@ -10,10 +10,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisZeroOrMore;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.index.MapIndex2;
@@ -85,7 +82,7 @@ public class EllipsisTest {
 
                 System.out.println(seed + ": " + x + " " + y + " .. " + r);
 
-                FindSubst f = new FindSubst(VAR_PATTERN, new XorShift128PlusRandom(1+seed)) {
+                FindSubst f = new FindSubst(index, VAR_PATTERN, new XorShift128PlusRandom(1+seed)) {
 
                     @Override
                     public boolean onMatch() {
@@ -100,7 +97,7 @@ public class EllipsisTest {
                             assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
                             Set<Term> varArgTerms = Global.newHashSet(1);
-                            Term u = Termed.termOrNull(index.apply(this, varArgs));
+                            Term u = term(varArgs);
                             if (u == null) {
                                 u = varArgs;
                             }
@@ -129,7 +126,7 @@ public class EllipsisTest {
 
 
                         //2. test substitution
-                        Term s = Termed.termOrNull(index.transform(r, this));
+                        Term s = Termed.termOrNull(index.resolve(r, this));
                         if (s!=null) {
                             //System.out.println(s);
                             if (s.varPattern()==0)
@@ -142,7 +139,6 @@ public class EllipsisTest {
                     }
                 };
 
-                f.index = index;
                 f.matchAll(x, y);
 
 //                assertTrue(f.toString() + " " + matched,
@@ -405,7 +401,7 @@ public class EllipsisTest {
             Set<String> results = Global.newHashSet(0);
 
             Random rng = new XorShift128PlusRandom(seed);
-            FindSubst f = new FindSubst(VAR_PATTERN, rng) {
+            FindSubst f = new FindSubst(Terms.terms, VAR_PATTERN, rng) {
                 @Override
                 public boolean onMatch() {
                     results.add(xy.toString());

@@ -131,12 +131,13 @@ public class Thermostat implements Environment {
 //        );
 
         Optimize.Result r = new Optimize<NAR>(() -> new Default())
-                .call("conceptRem", 1, 8, 0.5f, "conceptRemembering.setValue(#x)")
-                .call("taskRem",    1, 8, 0.5f, "taskLinkRemembering.setValue(#x)")
-                .call("termRem",    1, 8, 0.5f, "termLinkRemembering.setValue(#x)")
+                .call("conceptRem", 0.25f, 8, 0.25f, "conceptRemembering.setValue(#x)")
+                .call("taskRem",    2f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
+                .call("termRem",    2f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
+                .call("conceptAct", 0.3f, 1f, 0.1f,  "conceptActivation.setValue(#x)")
 
                 .call("cycPerFrame", 1, 4, 1f, "cyclesPerFrame.setValue(#i)")
-                .run(100, (x) -> new Thermostat().run(new NAgent(x), 300));
+                .run(500, (x) -> new Thermostat().run(new NAgent(x), 10000));
 
         System.out.println();
         r.print();

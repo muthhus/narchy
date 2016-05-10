@@ -28,7 +28,7 @@ public class UnifySubst extends FindSubst  {
     int matches;
 
     public UnifySubst(Op varType, @NotNull Memory memory, Collection<Termed> target, int maxMatches) {
-        super(varType, memory.random);
+        super(memory.index, varType, memory.random);
 
         this.memory = memory;
         this.maxMatches = maxMatches;
@@ -60,7 +60,7 @@ public class UnifySubst extends FindSubst  {
 
         //TODO combine these two blocks to use the same sub-method
 
-        Termed aa = applySubstituteAndRenameVariables(a, xy);
+        Term aa = resolve(a, xy);
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();
 //        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
@@ -86,10 +86,10 @@ public class UnifySubst extends FindSubst  {
     //abstract protected boolean accept(Term beliefTerm, Termed unifiedBeliefTerm);
 
     @Nullable
-    Termed applySubstituteAndRenameVariables(@NotNull Term t, @Nullable Map<Term,Term> subs) {
+    Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
-                memory.index.apply(new MapSubst(subs), t);
+                memory.index.resolve(t, new MapSubst(subs));
     }
 
 }

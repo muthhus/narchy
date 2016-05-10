@@ -150,7 +150,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
             if (!validArgs(args))
                 return;
         //}
-        O y = function(args, nar.index());
+        O y = function(args, nar.index);
         //if (!tt.isCommand()) {
         feedback(exec, y);
         //}

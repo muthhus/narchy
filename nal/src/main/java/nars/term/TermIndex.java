@@ -168,34 +168,46 @@ public interface TermIndex {
 //        return new TermVector<>(t, this::the);
 //    }
 
+    @Nullable
+    default Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
+        return builder().theTransformed(csrc, subs);
+    }
+
 
     /**
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Termed transform(@Nullable Compound input, @NotNull Subst f) {
+    default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
-        if (input == null)
-            return null; //pass-through
+        if (src == null)
+            throw new NullPointerException();
+            //return null; //pass-through
 
-        //if f is empty there will be no changes to apply anyway
-        if (f.isEmpty())
-            return input;
+        //constant atom or zero-length compound, ex: ()
+        int len = src.size();
+        boolean variable;
+        if (len == 0) {
+            variable = (src instanceof Variable);
+            if (!variable)
+                return src;
+        } else {
+            variable = false;
+        }
 
-        Term y = f.term(input);
+
+        Term y = f.term(src);
         if (y != null)
-            return y;
+            return y; //an assigned substitution, whether a variable or other type of term
+        else if (variable)
+            return null; //unassigned variable
 
-        int len = input.size();
-        if (len == 0)
-            return input; //atomic or zero size ( ex: () ), proceed no further
-
-        Compound src = input;
+        Compound crc = (Compound)src;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
-            Term t = src.term(i);
-            Term u = Termed.termOrNull(apply(f, t));
+            Term t = crc.term(i);
+            Term u = resolve(t, f);
 
             if (u instanceof EllipsisMatch) {
 
@@ -218,61 +230,42 @@ public interface TermIndex {
         }
 
 
-
         //Prefilters
         Op sop = src.op();
 
-        if (sop.isStatement() && sub.size()!=2)
-            return null;
-
-        TermContainer transformedSubterms = TermContainer.the(sop, sub);
-
-        Termed result;
-        if (transformedSubterms.equals(input.subterms())) {
-            result = input;
-        } else {
-
-            result = transformedCompound(src, transformedSubterms);
-
-            //Filtering of transformed result:
-            if (result == null)
-                return null;
-
-            //apply any known immediate transform operators
-            //TODO decide if this is evaluated incorrectly somehow in reverse
-
-            if (sop.isImage()) {
+        {
+            //prefilters
+            if (sop.isStatement() && sub.size() != 2) {
+                throw new RuntimeException("transformed to degenerate statement");
+            }
+            else if (sop.isImage()) {
                 int resultSize = sub.size();
-                if (sub.isEmpty() || (resultSize == 1 && sub.get(0).equals(Imdex)))
-                    return null;
+                if (resultSize == 0 || (resultSize == 1 && sub.get(0).equals(Imdex)))
+                    throw new RuntimeException("transformed to degenerate image");
             }
 
+            //
             //        if ((minArity!=-1) && (resultSize < minArity)) {
             //            //?
             //        }
 
         }
 
+        Term result = theTransformed(crc, TermContainer.the(sop, sub));
 
-        //Post-Processnig of result:
+        if (result != null) {
 
-        if (isOperation(result)) {
-            ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
-            if (tf != null) {
-                result = applyImmediateTransform(f, result.term(), tf);
+            //post-process: apply any known immediate transform operators
+            if (isOperation(result)) {
+                ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
+                if (tf != null) {
+                    result = applyImmediateTransform(f, result, tf);
+                }
             }
         }
 
-        return result!=null ? result.term() : null;
+        return result;
     }
-
-    @Nullable
-    default Termed transformedCompound(@NotNull Compound src, @NotNull TermContainer transformedSubterms) {
-        return /*Termed t = */builder().theTransformed(src, transformedSubterms);
-        //return t != null ? the(t) : null;
-    }
-
-
 
 
     @Nullable
@@ -287,17 +280,7 @@ public interface TermIndex {
     }
 
 
-    @Nullable
-    default Termed apply(@NotNull Subst f, @NotNull Term src) {
 
-        if (src instanceof Compound) {
-            return transform((Compound) src, f);
-        } else if (src instanceof Variable) {
-            return f.term(src);
-        } else {
-            return src;
-        }
-    }
 
 
 //    class ImmediateTermIndex implements TermIndex {
@@ -451,37 +434,33 @@ public interface TermIndex {
             return true;
         }
 
-        @NotNull @Override
+        @NotNull
+        @Override
         public Termed apply(Compound parent, @NotNull Term subterm) {
             return subterm.anonymous();
         }
     };
 
 
-
     @Nullable
     default Term theTransformed(@NotNull Compound src, @Nullable Term[] newSubs) {
         return ((newSubs == null) || (newSubs == src.terms())) ?
                 src :
-                builder().theTransformed(src, TermContainer.the(src.op(), newSubs));
+                theTransformed(src, TermContainer.the(src.op(), newSubs));
     }
 
 
     @Nullable
     default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (!t.testSuperTerm(src)) {
-            return src; //nothing changed
-        } else {
-            return theTransformed(src, _transform(src, t));
-        }
+        return !t.testSuperTerm(src) ? src : _transform(src, t);
     }
 
 
     /**
      * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
      */
-    @NotNull
-    default Term[] _transform(@NotNull Compound src, @NotNull CompoundTransform<Compound, Term> trans) {
+    @Nullable
+    default Term _transform(@NotNull Compound src, @NotNull CompoundTransform<Compound, Term> trans) {
 
         int n = src.size();
 
@@ -503,7 +482,7 @@ public interface TermIndex {
             if (cx == null)
                 return null;
 
-            if (x!=cx) { //REFERENCE EQUALTY
+            if (x != cx) { //REFERENCE EQUALTY
                 modifications++;
                 x = cx;
             }
@@ -511,7 +490,7 @@ public interface TermIndex {
             target[i] = x;
         }
 
-        return modifications > 0 ? target : src.terms();
+        return modifications > 0 ? theTransformed(src, target) : src;
     }
 
     /**
@@ -558,7 +537,7 @@ public interface TermIndex {
 
         } else {
             //COMPOUND -------
-            Compound tc = (Compound)term.term();
+            Compound tc = (Compound) term.term();
 
             if (tc.op() == NEGATE) {
                 Term t0 = tc.term(0);
@@ -594,7 +573,9 @@ public interface TermIndex {
 
     }
 
-    /** a string containing statistics of the index's current state */
+    /**
+     * a string containing statistics of the index's current state
+     */
     @NotNull
     default String summary() {
         return "";

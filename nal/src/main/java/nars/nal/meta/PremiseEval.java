@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
+import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
@@ -10,9 +11,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termlike;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;
@@ -65,8 +64,13 @@ public class PremiseEval extends FindSubst {
     private int termSub1Op, termSub2Op;
     private int termSub1Struct, termSub2Struct;
 
+    /** initializes with the default static term index/builder */
     public PremiseEval(Random r, Deriver deriver) {
-        super(Op.VAR_PATTERN, r );
+        this(Terms.terms, r, deriver);
+    }
+
+    public PremiseEval(TermIndex index, Random r, Deriver deriver) {
+        super(index, Op.VAR_PATTERN, r );
 
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
             addTransform(c);
@@ -150,8 +154,6 @@ public class PremiseEval extends FindSubst {
     public final void run(@NotNull ConceptProcess p) {
 
         this.premise = p;
-
-        this.index = premise.nar().index;
 
         Task task = p.task();
         Compound taskTerm = task.term();

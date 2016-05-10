@@ -202,7 +202,7 @@ public class TermIndexTest {
 
     @Test public void testSubtermIntern() {
         Default n = new Default();
-        AbstractMapIndex i = (AbstractMapIndex)(n.index());
+        AbstractMapIndex i = (AbstractMapIndex)(n.index);
 
         Term at = $("a");
         TermVector a = TermVector.the(at, $("b"), $("cd"));
@@ -233,7 +233,7 @@ public class TermIndexTest {
     }
 
     public static void testCommonPrefix(boolean direction) {
-        AbstractMapIndex i = (AbstractMapIndex)(new Default().index());
+        AbstractMapIndex i = (AbstractMapIndex)(new Default().index);
         Atomic sui = operator("substituteIfUnifies");
         Atomic su = operator("substitute");
 
