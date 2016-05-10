@@ -4,6 +4,7 @@ package nars;
 import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static com.gs.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * NAL symbol table
@@ -251,6 +253,19 @@ public enum Op {
     /** whether this op allows temporal relation (true) or ignores it  (false) */
     public boolean isTemporal() {
         return temporal;
+    }
+
+    public static boolean isTemporal(Term t, int newDT) {
+        return isTemporal(t.op(), newDT, t.size());
+    }
+
+    public static boolean isTemporal(Op o, int dt, int arity) {
+        if (o.isTemporal()) {
+            if (o == Op.CONJUNCTION && dt!=0 && dt!=DTERNAL && arity > 2)
+                return false;
+            return true;
+        }
+        return false;
     }
 
     public boolean validSize(int length) {

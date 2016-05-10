@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.bag.impl.SortedTable;
 import nars.budget.BudgetMerge;
 import nars.task.MutableTask;

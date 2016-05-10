@@ -118,19 +118,19 @@ public class Default extends AbstractNAR {
     }
 
 
-    public static class DefaultTermIndex2 extends MapIndex2 {
-
-        public DefaultTermIndex2(int capacity, @NotNull Random random) {
-            super(new UnifriedMap(capacity),
-                    new DefaultConceptBuilder(random, 32, 32));
-
-        }
-    }
+//    public static class DefaultTermIndex2 extends MapIndex2 {
+//
+//        public DefaultTermIndex2(int capacity, @NotNull Random random) {
+//            super(new UnifriedMap(capacity),
+//                    new DefaultConceptBuilder(random, 32, 32));
+//
+//        }
+//    }
     public static class DefaultTermIndex extends MapIndex1 {
 
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
-                    new DefaultConceptBuilder(random, 32, 32),
+                    new DefaultConceptBuilder(random, 8, 24),
                     new HashMap(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)
             );

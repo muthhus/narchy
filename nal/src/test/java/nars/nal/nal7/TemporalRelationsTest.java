@@ -2,8 +2,10 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.NAR;
+import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.term.InvalidTerm;
 import nars.term.Term;
 import org.junit.Test;
 
@@ -11,6 +13,7 @@ import java.util.TreeSet;
 
 import static java.lang.System.out;
 import static nars.$.$;
+import static nars.nal.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 /**
@@ -184,6 +187,24 @@ public class TemporalRelationsTest {
         assertEquals( "( &&+0 ,a,b,c)", abc.toString() );
         assertTrue( abc.isCommutative() );
 
+    }
+
+    @Test public void testInvalidConjunction() {
+        NarseseTest.assertParseException( "( &&-59 ,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
+
+        Compound x = $("(&&,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
+        assertNotNull(x);
+
+        assertNotNull(x.dt(0));
+        assertNotNull(x.dt(0).dt(DTERNAL));
+        assertEquals(x, x.dt(0).dt(DTERNAL));
+
+        try {
+            x.dt(-59);
+            assertTrue(false);
+        } catch (InvalidTerm e) {
+            assertTrue(true);
+        }
     }
 
 //    @Test public void testRelationTaskNormalization() {

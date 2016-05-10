@@ -342,10 +342,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         if (cycles == dt) return this;
 
-        if (!op().isTemporal())
-            throw new InvalidTerm(op(), relation, cycles, terms());
+        if (!Op.isTemporal(this, cycles))
+            throw new InvalidTerm(this.op, relation, cycles, terms());
 
-        GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
+        GenericCompound g = new GenericCompound(this.op, relation, cycles, subterms);
         if (normalized) g.setNormalized();
         return g;
     }

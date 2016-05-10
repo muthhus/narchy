@@ -351,7 +351,8 @@ public interface Temporalize {
         }
 
 
-        if (derived.op().isTemporal()) {
+
+        if (dtTerm instanceof Compound && Op.isTemporal(derived, ((Compound)dtTerm).dt())) {
             int dtdt = dtTerm instanceof Compound ? ((Compound)dtTerm).dt() : DTERNAL;
             return deriveDT(derived, +1, prem, dtdt);
         } else
