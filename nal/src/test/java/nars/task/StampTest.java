@@ -159,7 +159,7 @@ public class StampTest {
         );
         assertEquals(
                 Arrays.toString(new long[] { 2, 8, 12, 13 }),
-                Arrays.toString(zipForward(a,b, 0.75f, 4))
+                Arrays.toString(zipForward(a,b, 0.8f, 4))
         );
         assertEquals(
                 Arrays.toString(new long[] { 2, 8, 12, 13 }),
@@ -167,10 +167,11 @@ public class StampTest {
         );
         assertEquals(
                 Arrays.toString(new long[] { 4, 7, 12, 13 }),
-                Arrays.toString(zipForward(a,b, 0.25f, 4))
+                Arrays.toString(zipForward(a,b, 0.2f, 4))
         );
 
     }
+
     @Test public void testStampZipForwardWeighted2() {
 
         long[] a = {0, 2, 4, 6, 8, 10, 12};
@@ -182,14 +183,14 @@ public class StampTest {
         );
         assertEquals(
                 Arrays.toString(new long[] { 4, 6, 8, 10, 11, 12, 13 }),
-                Arrays.toString(zipForward(a,b, 0.75f, 7))
+                Arrays.toString(zipForward(a,b, 0.8f, 7))
         );
         assertEquals(
                 Arrays.toString(new long[] { 2, 4, 6, 8, 10, 12, 13 }),
                 Arrays.toString(zipForward(a,b, 0.95f, 7))
         );
         assertEquals(
-                Arrays.toString(new long[] { 5, 7, 9, 10, 11, 12, 13 }),
+                Arrays.toString(new long[] { 7, 8, 9, 10, 11, 12, 13 }),
                 Arrays.toString(zipForward(a,b, 0.35f, 7))
         );
         assertEquals(
@@ -213,7 +214,7 @@ public class StampTest {
         );
         assertEquals(
                 Arrays.toString(new long[] { 1, 2, 3, 5, 7 }),
-                Arrays.toString(zipForward(a,b, 0.25f, 5))
+                Arrays.toString(zipForward(a,b, 0.2f, 5))
         );
 
     }

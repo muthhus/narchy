@@ -65,15 +65,20 @@ public interface Stamp {
             //find which ones to exclude from
 
             //usedA + usedB = maxLen
-            int usedA = Math.min(Math.max(1, (int)Math.floor(aToB * maxLen)), aLen);
-
-            int usedB = Math.min(maxLen - usedA, bLen);
-
-            if (usedA < aLen) {
-                aMin = aLen - usedA;
-            }
-            if (usedB < bLen) {
-                bMin = bLen - usedB;
+            if (aToB < 0.5f) {
+                int usedA = Math.max(1, (int) Math.floor(aToB * (aLen + bLen)));
+                if (usedA < aLen) {
+                    if (bLen + usedA < maxLen)
+                        usedA+= maxLen - usedA - bLen; //pad to fill
+                    aMin = Math.max(0, aLen - usedA);
+                }
+            } else /* aToB > 0.5f */ {
+                int usedB = Math.max(1, (int) Math.floor((1f-aToB) * (aLen + bLen)));
+                if (usedB < bLen) {
+                    if (aLen + usedB < maxLen)
+                        usedB += maxLen - usedB - aLen;  //pad to fill
+                    bMin = Math.max(0, bLen - usedB);
+                }
             }
 
         }
