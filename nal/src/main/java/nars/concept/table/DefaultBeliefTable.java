@@ -173,7 +173,8 @@ public class DefaultBeliefTable implements BeliefTable {
             otherTable.forEach(overridden);
             otherTable.clear();
             otherTable.setCapacity(0);
-            NAR.logger.info("axiom: {}", input);
+
+            //NAR.logger.info("axiom: {}", input);
 
             et.put(input, input);
 

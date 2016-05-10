@@ -4,6 +4,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.nar.Default;
 import nars.util.Agent;
+import nars.util.DQN;
 import nars.util.NAgent;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -19,7 +20,7 @@ public class Thermostat implements Environment {
 
     public float targetPeriod = 180;
     public final float speed = 0.01f;
-    boolean print = true;
+    boolean print = false;
     private MutableFloat yHidden;
     private MutableFloat yEst;
 
@@ -118,24 +119,41 @@ public class Thermostat implements Environment {
     }
 
     public static void main(String[] args) {
-        Default n = new Default(256, 2, 1, 3);
-        n.conceptActivation.setValue(0.5);
-        n.cyclesPerFrame.set(2);
-        //n.shortTermMemoryHistory.set(3);
-        //n.logSummaryGT(System.out, 0.55f);
-        //n.conceptRemembering.setValue(5);
 
-        NAgent a = //new NAgentDebug(n);
-                new NAgent(n);
+        int cycles = 10000;
 
+        //baseline
         new Thermostat().run(
-            //new DQN(),
-            a,
-            52512
+                new DQN(),
+                cycles
         );
 
-        printTasks(n, true);
-        printTasks(n, false);
+        //for (int cycPerFrame : new int[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
+        for (float cRem : new float[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
+            System.out.println("concept remembering: " + cRem );
+            //System.out.println("cycperFrame: " + cycPerFrame );
+
+            Default n = new Default(512, 1, 1, 3);
+            //n.cyclesPerFrame.setValue(cycPerFrame);
+            //n.conceptRemembering.setValue(cRem);
+            //n.conceptActivation.setValue(0.5);
+            //n.cyclesPerFrame.set(2);
+            //n.shortTermMemoryHistory.set(3);
+            //n.logSummaryGT(System.out, 0.55f);
+            n.conceptRemembering.setValue(cRem);
+
+            NAgent a = //new NAgentDebug(n);
+                    new NAgent(n);
+
+            new Thermostat().run(
+                    //new DQN(),
+                    a,
+                    cycles
+            );
+        }
+
+        /*printTasks(n, true);
+        printTasks(n, false);*/
     }
 
 

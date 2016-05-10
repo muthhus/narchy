@@ -11,6 +11,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -559,9 +560,13 @@ public interface TermIndex {
             //COMPOUND -------
             Compound tc = (Compound)term.term();
 
-            if (tc.op() == NEGATE && tc.term(0) instanceof Atomic) {
-                //negations of atoms are invalid
-                throw new InvalidConceptTerm(term);
+            if (tc.op() == NEGATE) {
+                Term t0 = tc.term(0);
+                if (t0 instanceof Atomic) {
+                    //negations of non-DepVar atomics are invalid
+                    if (t0.op() != Op.VAR_DEP)
+                        throw new InvalidConceptTerm(term);
+                }
             }
 
             //NORMALIZATION

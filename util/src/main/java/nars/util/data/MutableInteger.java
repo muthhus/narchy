@@ -79,9 +79,10 @@ public class MutableInteger extends Number implements Comparable, Mutable {
 
   @Override
   public void setValue(Object value) {
-      if (value instanceof Integer)
-        set(value);
-      throw new RuntimeException("not integer");
+      if (value instanceof Number)
+          set((Number)value);
+      else
+        throw new RuntimeException("not number: " + value.getClass());
   }
 
 
@@ -106,7 +107,7 @@ public class MutableInteger extends Number implements Comparable, Mutable {
    * @throws ClassCastException
    *           if the type is not a {@link Number}
    */
-  public void set(Object value) {
+  public void set(Number value) {
     set(((Number) value).intValue());
   }
 

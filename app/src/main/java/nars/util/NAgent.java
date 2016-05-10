@@ -41,7 +41,7 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.3f;
+    float alpha = 0.7f;
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.02f;
