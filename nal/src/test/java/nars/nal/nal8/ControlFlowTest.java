@@ -5,18 +5,20 @@ import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Symbols;
 import nars.concept.CompoundConcept;
+import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.Texts;
 import nars.util.signal.MotorConcept;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
@@ -31,9 +33,56 @@ public class ControlFlowTest {
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
     @Test public void testSequence4()   { testSequence(n, 4, 30);    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
-    @Test public void testSequence10()  { testSequence(n, 10, 30);     }
+    @Test public void testSequence10()  { testSequence(n, 10, 50);     }
 
 
+    abstract public static class Sequence extends ConceptGroup {
+
+        private final List<Termed> states;
+
+
+        public Sequence(String id, NAR nar, int length) {
+            super(id, nar);
+
+
+            states = Global.newArrayList(length);
+            for (int i = 0; i < length; i++) {
+                states.add(newState(i));
+            }
+
+
+
+        }
+
+
+        /** flow desire forward */
+        public Sequence forward(int delay, float startFrequency) {
+
+            int length = states.size();
+            for (int i = 0; i < length - 1; i++) {
+                nar.goal($.conj(delay, states.get(i).term(), states.get(i + 1).term()));
+            }
+
+            if (startFrequency > 0) {
+                nar.goal(start(), Tense.Present, startFrequency);
+            }
+
+            return this;
+        }
+
+
+        public Termed start() { return states.get(0); }
+        public Termed end() { return states.get(states.size()-1); }
+
+        protected abstract Termed newState(int i);
+
+
+        @Override
+        public void forEachMember(Consumer<Termed> each) {
+            states.forEach(each);
+        }
+
+    }
 
     public ExeTracker testSequence(Supplier<NAR> nn, int length, int delay) {
 
@@ -44,15 +93,17 @@ public class ControlFlowTest {
 
         ExeTracker exeTracker = new ExeTracker();
         NAR n = nn.get();
+        n.log();
 
-        for (int i = 0; i < length; i++)
-            newExeState(n, s(i), exeTracker);
+        Sequence seq = new Sequence("(seq)", n, length) {
 
-        for (int i = 0; i < length - 1; i++)
-            n.goal($.conj(delay, s(i), s(i + 1)));
+            @Override
+            protected Termed newState(int i) {
+                return newExeState(n, $.p( id , Integer.toString(i) ), exeTracker);
+            }
 
-        //start
-        n.goal(s(0), Tense.Present, 1f);
+        }.forward(delay, 1f);
+
 
         n.run(runtime);
 
@@ -63,14 +114,34 @@ public class ControlFlowTest {
     }
 
     @Test public void testBranchThen()  {
-        testBranch(n, 30, 1f);
+        testBranch(n, 50, 1f);
     }
-    @Test public void testBranchThenThen()  {
-        testBranch(n, 30, 1f, 1f);
-    }
+
     @Test public void testBranchElse()  {
-        testBranch(n, 10, 0f);
+        testBranch(n, 50, 0f);
     }
+
+    @Test public void testBranchThenThen()  {
+        testBranch(n, 50, 1f, 1f);
+    }
+
+    abstract public static class ConceptGroup extends OperationConcept {
+
+        public final String id;
+
+        public ConceptGroup(String id, NAR nar) {
+            super(id, nar);
+            this.id = id;
+        }
+
+        /* visitor */
+        abstract public void forEachMember(Consumer<Termed> each);
+
+    }
+
+
+
+
 
     public ExeTracker testBranch(Supplier<NAR> nn, int delay, float... conditionSequence) {
 
@@ -131,7 +202,7 @@ public class ControlFlowTest {
 
         for (float B : conditionSequence ) {
             System.out.println("Execute Forward branch w/ condition=" + B);
-            n.believe(condition, Tense.Present, B, 1f).step();
+            n.believe(condition, Tense.Present, B).step();
 
             n.goal(start, Tense.Present, 1f);
 

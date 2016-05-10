@@ -44,7 +44,7 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.3f;
+    float alpha = 0.6f;
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.02f;
@@ -220,7 +220,12 @@ public class NAgent implements Agent {
     }
 
     private void seekReward() {
-        //TODO get this from the sensor/digitizers
+
+
+
+        nar.believe("((A:#x && I:#y) ==>+0 (R)).");
+
+        //TODO specify goal via a method in the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         //nar.goal("(dRp)", Tense.Eternal, 0.95f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Eternal, 0.05f, 1f); //avoid decrease
@@ -349,12 +354,15 @@ public class NAgent implements Agent {
     }
 
     private String actionConceptName(int i) {
-
-        return "(a" + i + ")";
+        //return "A:a" + i;
+        return "A:{a" + i + "}";
+        //return "(a" + i + ")";
     }
 
     private String inputConceptName(int i) {
-        return inputConceptName(i, -1);
+        //return inputConceptName(i, -1);
+        //return "I:i" + i;
+        return "I:{i" + i + "}";
     }
 
     private String inputConceptName(int i, int component) {

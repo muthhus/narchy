@@ -42,17 +42,17 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 3;
+	final int visionRadius = 2;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 8;
+	private int pacmanCyclesPerFrame = 12;
 
 
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				768, 4, 1, 2, rng,
+				512, 4, 1, 2, rng,
 				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
@@ -67,7 +67,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment().run(
 				//new DQN(),
 				new NAgent(nar),
-				15000);
+				1500);
 
 		printTasks(new NAgent(nar).nar, true);
 		printTasks(new NAgent(nar).nar, false);
