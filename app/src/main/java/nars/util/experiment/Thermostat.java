@@ -2,10 +2,12 @@ package nars.util.experiment;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
+import nars.NAR;
 import nars.nar.Default;
 import nars.util.Agent;
 import nars.util.DQN;
 import nars.util.NAgent;
+import nars.util.Optimize;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
@@ -122,35 +124,47 @@ public class Thermostat implements Environment {
 
         int cycles = 10000;
 
-        //baseline
-        new Thermostat().run(
-                new DQN(),
-                cycles
-        );
+//        //baseline
+//        new Thermostat().run(
+//                new DQN(),
+//                cycles
+//        );
 
-        //for (int cycPerFrame : new int[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
-        for (float cRem : new float[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
-            System.out.println("concept remembering: " + cRem );
-            //System.out.println("cycperFrame: " + cycPerFrame );
+        Optimize.Result r = new Optimize<NAR>(() -> new Default())
+                .call("conceptRem", 1, 8, 0.5f, "conceptRemembering.setValue(#x)")
+                .call("taskRem",    1, 8, 0.5f, "taskLinkRemembering.setValue(#x)")
+                .call("termRem",    1, 8, 0.5f, "termLinkRemembering.setValue(#x)")
 
-            Default n = new Default(512, 1, 1, 3);
-            //n.cyclesPerFrame.setValue(cycPerFrame);
-            //n.conceptRemembering.setValue(cRem);
-            //n.conceptActivation.setValue(0.5);
-            //n.cyclesPerFrame.set(2);
-            //n.shortTermMemoryHistory.set(3);
-            //n.logSummaryGT(System.out, 0.55f);
-            n.conceptRemembering.setValue(cRem);
+                .call("cycPerFrame", 1, 4, 1f, "cyclesPerFrame.setValue(#i)")
+                .run(100, (x) -> new Thermostat().run(new NAgent(x), 300));
 
-            NAgent a = //new NAgentDebug(n);
-                    new NAgent(n);
+        System.out.println();
+        r.print();
 
-            new Thermostat().run(
-                    //new DQN(),
-                    a,
-                    cycles
-            );
-        }
+
+//        //for (int cycPerFrame : new int[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
+//        for (float cRem : new float[] { 1, 2, 3, 4, 5, 6, 7, 8}) {
+//            System.out.println("concept remembering: " + cRem );
+//            //System.out.println("cycperFrame: " + cycPerFrame );
+//
+//            Default n = new Default(512, 1, 1, 3);
+//            //n.cyclesPerFrame.setValue(cycPerFrame);
+//            //n.conceptRemembering.setValue(cRem);
+//            //n.conceptActivation.setValue(0.5);
+//            //n.cyclesPerFrame.set(2);
+//            //n.shortTermMemoryHistory.set(3);
+//            //n.logSummaryGT(System.out, 0.55f);
+//            n.conceptRemembering.setValue(cRem);
+//
+//            NAgent a = //new NAgentDebug(n);
+//                    new NAgent(n);
+//
+//            new Thermostat().run(
+//                    //new DQN(),
+//                    a,
+//                    cycles
+//            );
+//        }
 
         /*printTasks(n, true);
         printTasks(n, false);*/

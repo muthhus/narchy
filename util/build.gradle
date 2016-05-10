@@ -40,6 +40,9 @@ dependencies {
 
 //    compile(group:'io.reactives', name:'rxjava', version:'1.0.10')
 
+    compile 'ognl:ognl:3.1.4'
+
+
     testCompile(group: 'org.testng', name: 'testng', version: '6.9.10') {
         exclude(module: 'ant')
         exclude(module: 'guice')

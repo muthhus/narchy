@@ -32,7 +32,7 @@ public interface Environment {
         }
 
         float scoreAvg = rewardSum/cycles;
-        System.out.println(a + " score=" + scoreAvg);
+        //System.out.println(a + " score=" + scoreAvg);
         return scoreAvg;
     }
 
