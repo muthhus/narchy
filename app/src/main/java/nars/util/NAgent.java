@@ -47,11 +47,11 @@ public class NAgent implements Agent {
     float alpha = 0.3f;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.01f;
-    private double epsilonRandom = 0.01f;
+    float epsilon = 0.02f;
+    private double epsilonRandom = 0.02f;
 
     float sensorPriority = 0.4f;
-    float rewardPriority = 0.5f;
+    float rewardPriority = 0.6f;
     float goalFeedbackPriority = rewardPriority;
     float goalPriority = rewardPriority;
 
@@ -175,7 +175,7 @@ public class NAgent implements Agent {
 
             if (bits == 1) {
                 //single bit case
-                return new SensorConceptDebug(inputConceptName(i,bit), nar,  () -> {
+                return new SensorConceptDebug(inputConceptName(i), nar,  () -> {
                     return input[i];
                 }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority);
             }
@@ -350,7 +350,11 @@ public class NAgent implements Agent {
 
     private String actionConceptName(int i) {
 
-        return "(a,a" + i + ")";
+        return "(a" + i + ")";
+    }
+
+    private String inputConceptName(int i) {
+        return inputConceptName(i, -1);
     }
 
     private String inputConceptName(int i, int component) {

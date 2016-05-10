@@ -15,6 +15,7 @@ import java.util.Map;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.c2w;
 
 /** stores the items unsorted; revection manages their ranking and removal */
 public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
@@ -171,8 +172,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         if (b!=null) {
 
             //TODO proper iterpolate: truth, time, dt
-            float ac = a.conf();
-            float bc = b.conf();
+            float ac = c2w(a.conf());
+            float bc = c2w(b.conf());
             long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
             Truth newTruth = truth(newOcc);

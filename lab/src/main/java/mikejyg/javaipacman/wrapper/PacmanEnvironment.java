@@ -52,11 +52,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				1024, 8, 1, 2, rng,
+				768, 4, 1, 2, rng,
+				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
+				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
-		nar.conceptActivation.setValue(0.12f);
-		nar.cyclesPerFrame.set(300);
+		nar.conceptActivation.setValue(0.1f);
+		nar.cyclesPerFrame.set(100);
 		//a.nar.conceptRemembering.setValue(1);
 		//a.nar.termLinkRemembering.setValue(0.5f);
 		//a.nar.taskLinkRemembering.setValue(0.5f);

@@ -34,6 +34,7 @@ import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.nal.Tense.DTERNAL;
+import static nars.truth.TruthFunctions.c2w;
 
 
 /**
@@ -337,12 +338,15 @@ public enum LocalRules {
     public static Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         if (a.equals(b)) return a;
 
+        float aWeight = c2w(aConf);
+        float bWeight = c2w(bConf);
+
         int dt = DTERNAL;
         int at = a.term().dt();
         if (at != DTERNAL) {
             int bt = b.term().dt();
             if (bt!= DTERNAL) {
-                dt = Math.round(Util.lerp(at, bt, aConf/(aConf+bConf)));
+                dt = Math.round(Util.lerp(at, bt, aWeight/(aWeight+bWeight)));
             }
         }
 
