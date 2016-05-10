@@ -3,19 +3,12 @@ package nars.bag.impl;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
-import nars.util.data.list.FasterList;
-import nars.util.data.sorted.SortedIndex;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Bag which stores items, sorted, in one array.
@@ -41,7 +34,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
              new NormalizedSampler(power6BagCurve, rng));
     }
 
-    public CurveBag(int capacity, CurveSampler c) {
+    public CurveBag(int capacity, @NotNull CurveSampler c) {
         super(capacity);
         this.sampler = c;
             //new DirectSampler(curve, rng)
@@ -65,6 +58,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
 
+    @NotNull
     @Override
     public Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
         super.commit(each);
@@ -411,7 +405,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         }
 
         @Override
-        protected void commit(CurveBag bag) {
+        protected void commit(@NotNull CurveBag bag) {
             float max = bag.priMax();
             float min = bag.priMin();
             this.range = max - min;

@@ -20,6 +20,8 @@ import nars.Global;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.MathArrays;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -31,8 +33,10 @@ import java.util.List;
  */
 public class InterpolatingMicrosphere {
     /** Microsphere. */
+    @NotNull
     public final List<double[]> microsphere; /* n-element (size) */
     /** Microsphere data. */
+    @NotNull
     public final List<double[]> microsphereData; /* 2-element illumination, value pairs */
     /** Space dimension. */
     private final int dimension;
@@ -130,7 +134,7 @@ public class InterpolatingMicrosphere {
                                     double maxDarkFraction,
                                     double darkThreshold,
                                     double background,
-                                    UnitSphereRandomVectorGenerator rand) {
+                                    @Nullable UnitSphereRandomVectorGenerator rand) {
         this(dimension, size, maxDarkFraction, darkThreshold, background);
 
         if (dimension == 1) {
@@ -213,7 +217,8 @@ public class InterpolatingMicrosphere {
      * @return the estimated value at the given {@code point}.
      * @throws NotPositiveException if {@code exponent < 0}.
      */
-    public double[]  value(double[] targetPoint,
+    @NotNull
+    public double[]  value(@NotNull double[] targetPoint,
                            double[][] samplePoints,
                            double[] sampleValues,
                            double[] sampleWeights,
@@ -236,7 +241,7 @@ public class InterpolatingMicrosphere {
 
     }
 
-    public void illuminate(double[] targetPoint, double[][] samplePoints, double[] sampleValues, double[] sampleWeights, double exponent, int numSamples, boolean phase) {
+    public void illuminate(@NotNull double[] targetPoint, double[][] samplePoints, double[] sampleValues, @Nullable double[] sampleWeights, double exponent, int numSamples, boolean phase) {
         double epsilon = 0.5f;
 
         for (int i = 0; i < numSamples; i++) {
@@ -268,7 +273,7 @@ public class InterpolatingMicrosphere {
      * @param weight Weight.
      *
      */
-    private void illuminate(int sampleNum, double[] sampleDirection,
+    private void illuminate(int sampleNum, @Nullable double[] sampleDirection,
                             double sampleValue,
                             double weight,
                             double conf, boolean phase) {
@@ -321,7 +326,7 @@ public class InterpolatingMicrosphere {
      * @throws MaxCountExceededException if the method has been called
      * more times than the size of the sphere.
      */
-    protected void addNormal(double[] normal) {
+    protected void addNormal(@NotNull double[] normal) {
         if (microsphere.size() >= size) {
             throw new MaxCountExceededException(size);
         }
@@ -341,6 +346,7 @@ public class InterpolatingMicrosphere {
      * @return the value estimated from the current illumination of the
      * microsphere.
      */
+    @NotNull
     private double[] interpolate() {
         // Number of non-illuminated facets.
         int mm = microsphereData.size();
@@ -395,7 +401,7 @@ public class InterpolatingMicrosphere {
 
 
     /** assumes input vectors already normalized */
-    protected double cosAngleNormalized(double[] x, double[] y) {
+    protected double cosAngleNormalized(@NotNull double[] x, @NotNull double[] y) {
         if (x.length == 1) {
             double x0 = x[0];
             double y0 = y[0];

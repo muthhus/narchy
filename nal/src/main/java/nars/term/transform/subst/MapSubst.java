@@ -1,8 +1,8 @@
 package nars.term.transform.subst;
 
 import nars.term.Term;
-import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -40,6 +40,7 @@ public class MapSubst implements Subst {
      * gets the substitute
      * @param t
      */
+    @Nullable
     @Override
     public Term term(Term t) {
         return xy.get(t);
@@ -61,6 +62,7 @@ public class MapSubst implements Subst {
 
     /** wrapper which parameterized by an additional mapping pair that acts as an overriding overlay prior to accessing the MapSubst internal map */
     public final static class MapSubstWithOverride extends MapSubst {
+        @NotNull
         final Term ox, oy;
 
         public MapSubstWithOverride(@NotNull Map<Term, Term> xy, @NotNull Term ox, @NotNull Term oy) {
@@ -70,7 +72,7 @@ public class MapSubst implements Subst {
         }
 
         @Override
-        public Term term(Term t) {
+        public Term term(@NotNull Term t) {
             return t.equals(ox) ? oy : super.term(t);
         }
 

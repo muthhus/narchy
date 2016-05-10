@@ -85,7 +85,7 @@ public enum TermLinkBuilder {
     }
 
     @NotNull
-    public static List<TermTemplate> linearWeightedTermLinks(HashBag<Termed> s) {
+    public static List<TermTemplate> linearWeightedTermLinks(@NotNull HashBag<Termed> s) {
         float total = s.size();
         List<TermTemplate> x = newArrayList(s.sizeDistinct());
         s.forEachWithOccurrences((t,n) ->

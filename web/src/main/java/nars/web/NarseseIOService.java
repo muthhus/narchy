@@ -4,18 +4,14 @@ import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.NAR;
-import nars.Narsese;
 import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.util.event.Active;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.List;
 
 import static nars.nal.Tense.ETERNAL;

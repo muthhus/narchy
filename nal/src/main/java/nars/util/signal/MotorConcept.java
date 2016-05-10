@@ -12,11 +12,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.function.Consumer;
 
 import static nars.$.$;
 
@@ -58,10 +55,10 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
      */
     float nextFeedback;
 
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, MotorFunction motor) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         this((Compound)$(compoundTermString), n, motor);
     }
-    public MotorConcept(@NotNull Compound term, @NotNull NAR n, MotorFunction motor) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         super(term, n);
 
         assert (Op.isOperation(term()));
@@ -142,7 +139,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     /**
      * change the motor function
      */
-    public void setMotor(MotorFunction motor) {
+    public void setMotor(@NotNull MotorFunction motor) {
         this.motor = motor;
     }
 

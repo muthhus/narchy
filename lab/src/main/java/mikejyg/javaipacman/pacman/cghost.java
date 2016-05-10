@@ -19,7 +19,6 @@
 
 package mikejyg.javaipacman.pacman;
 
-import java.lang.Error;
 import java.awt.*;
 
 public class cghost

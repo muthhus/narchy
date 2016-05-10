@@ -90,6 +90,7 @@ public class DefaultTruth implements Truth  {
         return hash;
     }
 
+    @NotNull
     @Override
     public final DefaultTruth negated() {
         float fPos = freq;

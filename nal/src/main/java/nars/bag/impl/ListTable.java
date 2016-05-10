@@ -1,8 +1,6 @@
 package nars.bag.impl;
 
 import nars.bag.Table;
-import nars.task.Task;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -37,7 +35,7 @@ public interface ListTable<V, L> extends Table<V, L> {
     }
 
 
-    ListTable Empty = new ListTable() {
+    @Nullable ListTable Empty = new ListTable() {
 
 
         @Override

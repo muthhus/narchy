@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 
 /**
  * Superclass of functions that execute synchronously (blocking, in thread) and take

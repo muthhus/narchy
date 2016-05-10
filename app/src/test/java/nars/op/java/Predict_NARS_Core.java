@@ -7,8 +7,6 @@ import nars.Op;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;
 import nars.task.Task;
-import nars.util.TimeMap;
-import nars.util.data.Util;
 import nars.util.time.IntervalTree;
 
 import java.util.List;

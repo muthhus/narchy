@@ -227,7 +227,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         return immutable.ofAll(con);
     }
 
-    static public MatchConstraint compile(ImmutableMap<Term, MatchConstraint> mm) {
+    @NotNull
+    static public MatchConstraint compile(@NotNull ImmutableMap<Term, MatchConstraint> mm) {
         switch (mm.size()) {
             case 1:
                 Term z = mm.castToMap().keySet().iterator().next();

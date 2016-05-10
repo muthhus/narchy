@@ -2,10 +2,13 @@ package nars.util;
 
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 
-import javax.script.*;
+import javax.script.CompiledScript;
+import javax.script.Invocable;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngineManager;
 import java.io.FileReader;
 
-import static java.lang.System.*;
+import static java.lang.System.out;
 
 /**
  * Created by me on 5/3/16.

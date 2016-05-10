@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.NAR;
-import nars.Symbols;
 import nars.nal.Tense;
 import nars.nar.Default;
 import org.junit.Test;

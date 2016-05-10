@@ -12,7 +12,7 @@ public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*
 
     @Nullable
     @Override
-    public Term apply(@NotNull Term a, Term b, TermIndex i) {
+    public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
         if (!(a instanceof Compound) || !(b instanceof Compound))
             return null;
 

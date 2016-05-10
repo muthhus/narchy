@@ -14,6 +14,7 @@ import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -50,6 +51,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private long lastInput;
 
     public final static FloatToFloatFunction direct = n -> n;
+    @Nullable
     private Task next = null;
     private int dt = 0;
 
@@ -133,6 +135,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         //this.prevValue = next;
     }
 
+    @Nullable
     public Task next() {
         return next;
     }

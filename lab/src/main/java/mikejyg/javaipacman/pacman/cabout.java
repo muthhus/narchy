@@ -20,7 +20,8 @@
 package mikejyg.javaipacman.pacman;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 // to display about information
 class cabout extends Window

@@ -1,7 +1,6 @@
 package nars.util.version;
 
 import nars.util.data.list.FasterList;
-import org.jetbrains.annotations.NotNull;
 
 /** allocates supporting instances on the heap */
 public class HeapVersioning extends Versioning {

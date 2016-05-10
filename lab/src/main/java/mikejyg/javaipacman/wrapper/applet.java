@@ -19,11 +19,12 @@
 
 package mikejyg.javaipacman.wrapper;
 
+import mikejyg.javaipacman.pacman.cpcman;
+
 import java.applet.Applet;
 import java.awt.*;
-import java.awt.event.*;
-
-import mikejyg.javaipacman.pacman.cpcman;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * a java applet class for pacman

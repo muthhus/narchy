@@ -78,6 +78,7 @@ public class MapIndex1 extends AbstractMapIndex {
         return -1; //unsupported
     }
 
+    @NotNull
     @Override
     public String summary() {
         return data.size() + " concepts, " + ((HashSymbolMap)atoms).map.size() + " atoms";

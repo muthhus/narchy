@@ -73,6 +73,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
             }
         }
     };
+    @Nullable
     public static final BooleanCondition ifTermLinkIsBefore = new events() {
         @Override
         public String toString() {

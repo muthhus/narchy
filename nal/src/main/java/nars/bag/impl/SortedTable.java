@@ -1,7 +1,6 @@
 package nars.bag.impl;
 
 import nars.bag.Table;
-import nars.task.Task;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -12,7 +11,7 @@ import java.util.function.Predicate;
 
 public interface SortedTable<V, L> extends Table<V,L> {
 
-    SortedTable Empty = new SortedTable() {
+    @Nullable SortedTable Empty = new SortedTable() {
 
         @Override
         public Iterator<Object> iterator() {

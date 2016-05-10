@@ -2,7 +2,6 @@ package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
-import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

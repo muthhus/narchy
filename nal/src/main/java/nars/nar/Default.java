@@ -90,7 +90,7 @@ public class Default extends AbstractNAR {
     }
 
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, TermIndex index, Clock clock) {
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, TermIndex index, @NotNull Clock clock) {
         super(clock,
                 index,
                 random,

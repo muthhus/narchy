@@ -118,6 +118,7 @@ public class PremiseRule extends GenericCompound {
 
     @Nullable
     private Temporalize temporalize = Temporalize.Auto;
+    @Nullable
     private static final CompoundTransform truthSwap = new CompoundTransform<Compound,Term>() {
 
         final Atom belief = $.the("Belief");
@@ -135,12 +136,12 @@ public class PremiseRule extends GenericCompound {
 
         }
 
-        private Term swap(Term func) {
+        private Term swap(@NotNull Term func) {
             return $.the(func.toString() + "X");
         }
 
         @Override
-        public boolean test(Term o) {
+        public boolean test(@NotNull Term o) {
             if (o.op() == INHERIT){
                 Term pred = ((Compound)o).term(1);
                 return pred.equals(belief) || pred.equals(desire);
@@ -370,6 +371,7 @@ public class PremiseRule extends GenericCompound {
         premisePattern[1] = index.the(premisePattern[1]).term(); //belief pattern
     }
 
+    @Nullable
     public Compound reified() {
 
         //TODO include representation of precondition and postconditions
@@ -846,7 +848,7 @@ public class PremiseRule extends GenericCompound {
      * after generating, these are then backward permuted
      */
     @NotNull
-    public final PremiseRule forwardPermutation(PatternIndex index) {
+    public final PremiseRule forwardPermutation(@NotNull PatternIndex index) {
 
         // T, B, [pre] |- C, [post] ||--
 

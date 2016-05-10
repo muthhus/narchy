@@ -29,7 +29,6 @@ import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
-import nars.term.variable.Variable;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
@@ -68,12 +67,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return t;
     }
 
+    @NotNull
     default SetIterable<Term> recurseTermsToSet() {
         UnifiedSet<Term> t = Global.newHashSet(volume());
         recurseTerms((t1, superterm) -> t.add(t1));
         return t;
         //return t.toImmutable();
     }
+    @NotNull
     default SetIterable<Term> recurseTermsToSet(int inStructure) {
         UnifiedSet<Term> t = Global.newHashSet(0);
         recurseTerms((s, superterm) -> {
@@ -240,7 +241,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     /** whether the anonymized form of this term equals x */
-    @Override default boolean equalsAnonymously(Term x) {
+    @Override default boolean equalsAnonymously(@NotNull Term x) {
 
         if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
 
@@ -295,7 +296,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
-    default boolean containsTermRecursively(Term b) {
+    default boolean containsTermRecursively(@NotNull Term b) {
         if (this.equals(b))
             return true;
 
@@ -318,7 +319,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
-    default boolean equalsIgnoringVariables(Term other) {
+    default boolean equalsIgnoringVariables(@NotNull Term other) {
         int s = size();
         if ((other.opRel() == opRel()) && (other.size() == s)) {
             Compound o = (Compound)other;

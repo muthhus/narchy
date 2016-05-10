@@ -2,12 +2,8 @@ package nars.util.experiment;
 
 import com.gs.collections.api.tuple.Twin;
 import nars.util.Agent;
-import nars.util.data.Util;
-import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.Arrays;
-
-import static java.lang.System.out;
 
 /**
  * Created by me on 5/5/16.

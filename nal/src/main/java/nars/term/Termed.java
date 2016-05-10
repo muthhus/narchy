@@ -10,7 +10,7 @@ public interface Termed<T extends Term>  {
 
     @NotNull T term();
 
-    @NotNull
+    @Nullable
     default Op op() { return term().op(); }
 
     default int opRel() {
@@ -37,7 +37,7 @@ public interface Termed<T extends Term>  {
     }
 
     /** whether the anonymized form of this term equals x */
-    default boolean equalsAnonymously(Term x) {
+    default boolean equalsAnonymously(@NotNull Term x) {
         return x.equals(this);
     }
 

@@ -20,7 +20,6 @@
  */
 package nars.budget;
 
-import nars.nal.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

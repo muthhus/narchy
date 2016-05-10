@@ -5,7 +5,6 @@ import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
 import nars.rover.obj.Edible;
 import nars.rover.obj.MaterialColor;
-import org.jbox2d.common.Color3f;
 
 /**
  * Created by me on 4/25/16.

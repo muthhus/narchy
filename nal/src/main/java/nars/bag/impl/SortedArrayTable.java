@@ -1,15 +1,13 @@
 package nars.bag.impl;
 
 import nars.concept.table.ArrayListTable;
-import nars.task.Task;
-import nars.util.CollectorMap;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -20,6 +18,7 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
     /**
      * array of lists of items, for items on different level
      */
+    @NotNull
     protected final SortedList_1x4<L> items;
 
 
@@ -52,6 +51,7 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
     abstract public V key(L l);
 
 
+    @Nullable
     @Override
     protected L addItem(L i) {
 

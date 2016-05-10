@@ -318,7 +318,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public boolean match(Compound y, FindSubst subst) {
+    public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
 
         int ys = y.size();

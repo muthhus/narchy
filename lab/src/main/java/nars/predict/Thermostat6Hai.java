@@ -1,35 +1,25 @@
 package nars.predict;
 
 import javafx.scene.layout.BorderPane;
-import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.table.BeliefTable;
 import nars.guifx.NARfx;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
-import nars.guifx.util.ColorMatrix;
 import nars.nal.Tense;
-import nars.nar.Default;
 import nars.task.Task;
 import nars.util.HaiQ;
-import nars.util.Hsom;
-import nars.util.Optimization;
-import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.Autoencoder;
 import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.TreeSet;
 
 import static java.lang.System.out;
-import static nars.rover.obj.NARover.tf;
-import static nars.util.Texts.n2;
 
 /**
  * this is trying to guess how to react to a hidden variable, its only given clues when its above or below

@@ -41,7 +41,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
-    @NotNull
+    @Nullable
     @Override
     Op op();
 

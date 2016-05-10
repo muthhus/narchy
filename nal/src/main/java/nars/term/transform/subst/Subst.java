@@ -3,12 +3,8 @@ package nars.term.transform.subst;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 
 
 public interface Subst  {

@@ -1,10 +1,7 @@
 package nars.rl;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -12,8 +9,6 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JFrame;
 
 /** https://gist.github.com/Miretz/f10b18df01f9f9ebfad5 */
 public class Arkanoid extends JFrame implements KeyListener {

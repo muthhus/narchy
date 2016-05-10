@@ -97,7 +97,7 @@ public class Kernel {
         MutableTask m = new MutableTask($.exec(op, args), Symbols.COMMAND, null) {
 
             /** isnt called for Command tasks currently; they will be executed right away anyway */
-            @Override protected void onInput(Memory m) {
+            @Override protected void onInput(@NotNull Memory m) {
                 super.onInput(m);
                 logger.info("start: {}", this);
             }

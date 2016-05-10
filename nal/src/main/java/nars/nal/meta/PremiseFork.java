@@ -1,13 +1,6 @@
 package nars.nal.meta;
 
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import nars.Op;
-import nars.nal.meta.op.SubTermOp;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 /**
  * reverting fork for use during premise matching
@@ -33,7 +26,8 @@ public final class PremiseFork extends ThenFork {
         }
     }
 
-    public static ProcTerm the(ProcTerm[] n) {
+    @NotNull
+    public static ProcTerm the(@NotNull ProcTerm[] n) {
 
 //        //1. test for switch on all op type (TODO several term types with a a default branch for non-op type conditions)
 //

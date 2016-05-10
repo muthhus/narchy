@@ -198,6 +198,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return insert(input, eternal, nar) ? input : null;
     }
 
+    @NotNull
     protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
         input = temporal.prepare(input, nar);
@@ -238,7 +239,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private boolean insert(@NotNull Task incoming, Table<Task,Task> table, @NotNull NAR nar) {
+    private boolean insert(@NotNull Task incoming, @NotNull Table<Task,Task> table, @NotNull NAR nar) {
 
         this.lastUpdate = nar.time();
 

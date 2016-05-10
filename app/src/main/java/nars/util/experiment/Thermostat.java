@@ -4,15 +4,12 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.nar.Default;
 import nars.util.Agent;
-import nars.util.DQN;
 import nars.util.NAgent;
-import nars.util.NAgentDebug;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import static java.lang.System.out;
 import static nars.util.NAgent.printTasks;
-import static nars.util.Texts.n2;
 
 /**
  * Created by me on 5/4/16.

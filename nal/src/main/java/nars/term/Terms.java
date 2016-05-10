@@ -52,7 +52,7 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
     /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
-    public static int hashSubterms(@NotNull Term[] term, int[] meta) {
+    public static int hashSubterms(@NotNull Term[] term, @NotNull int[] meta) {
         int h = 1;
         for (Term t : term) {
             h = 31 /*Util.PRIME1 */ * h + t.init(meta);
@@ -582,7 +582,7 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
 
-    public static boolean equalsAnonymous(Compound a, Compound b) {
+    public static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
         if (a.op().isTemporal() && (a.opRel() == b.opRel()) && (a.volume() == b.volume())) {
 
             return equalsAnonymous(a.subterms(), b.subterms());
@@ -592,7 +592,7 @@ public class Terms extends TermBuilder implements TermIndex {
         }
     }
 
-    public static boolean equalsAnonymous(TermContainer a, TermContainer b) {
+    public static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
         int n = a.size();
         if (n == b.size()) {
             for (int i = 0; i < n; i++) {
@@ -606,7 +606,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return false;
     }
 
-    public static boolean equalsAnonymous(Term as, Term bs) {
+    public static boolean equalsAnonymous(@NotNull Term as, @NotNull Term bs) {
         if (as.op() == bs.op()) {
             if (as instanceof Compound && bs instanceof Compound) {
                 return equalsAnonymous((Compound) as, (Compound) bs);

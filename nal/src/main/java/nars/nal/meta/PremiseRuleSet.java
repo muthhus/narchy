@@ -332,6 +332,7 @@ public class PremiseRuleSet  {
 //
 //     }
 
+    @NotNull
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
 //        if (q == null)
 //            throw new RuntimeException("null: " + q + ' ' + src);

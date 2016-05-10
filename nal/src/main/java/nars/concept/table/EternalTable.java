@@ -35,7 +35,7 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
     }
 
     @Override
-    public final int compare(Task o1, Task o2) {
+    public final int compare(@NotNull Task o1, @NotNull Task o2) {
         float f1 = BeliefTable.rankEternalByOriginality(o2); //reversed
         float f2 = BeliefTable.rankEternalByOriginality(o1);
         if (f1 < f2)

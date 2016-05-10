@@ -151,19 +151,22 @@ public class TestNAR  {
         return this;
     }
 
+    @NotNull
     public TestNAR believe(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         nar.believe(t, tense, f, c);
         return this;
     }
 
+    @NotNull
     public TestNAR goal(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         nar.goal(nar.term(t), tense, f, c);
         return this;
     }
 
-    public TestNAR goal(String s) {
+    @NotNull
+    public TestNAR goal(@NotNull String s) {
         nar.goal(s);
         return this;
     }

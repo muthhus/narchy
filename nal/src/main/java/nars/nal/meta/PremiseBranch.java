@@ -5,8 +5,6 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 /**
 
  < (&&, cond1, cond2, ...) ==> (&|, fork1, fork2, ... ) >

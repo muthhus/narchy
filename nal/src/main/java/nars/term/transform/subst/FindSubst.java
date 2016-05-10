@@ -18,7 +18,10 @@ import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
-import nars.util.version.*;
+import nars.util.version.HeapVersioning;
+import nars.util.version.VersionMap;
+import nars.util.version.Versioned;
+import nars.util.version.Versioning;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +29,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 
@@ -52,6 +54,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Random random;
     public Op type; //TODO make final again
 
+    @NotNull
     public final Versioning versioning;
 
     @Nullable
@@ -61,6 +64,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * variables whose contents are disallowed to equal each other
      */
+    @NotNull
     public final Versioned<MatchConstraint> constraints;
     @NotNull
     public final VersionMap.Reassigner<Term,Term> reassigner;
@@ -115,7 +119,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         );
     }
 
-    protected FindSubst(Op type, Random random, Versioning versioning) {
+    protected FindSubst(Op type, Random random, @NotNull Versioning versioning) {
         //super(Global.UnificationStackMax, 8);
         this.random = random;
         this.type = type;
@@ -815,7 +819,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
+    public final boolean putYX(@NotNull Term y /* usually a Variable */, @NotNull Term x) {
         return reassigner.compute(yx, x, y);
     }
 

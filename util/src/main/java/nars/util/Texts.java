@@ -1,7 +1,5 @@
 package nars.util;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.CharBuffer;

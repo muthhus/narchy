@@ -8,8 +8,6 @@ import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TruthOperator;
 import nars.task.Task;
-import nars.truth.BeliefFunction;
-import nars.truth.DesireFunction;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

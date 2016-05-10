@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class OpConstraint implements MatchConstraint {
 
+    @NotNull
     private final Op op;
 
     public OpConstraint(@NotNull Op o) {

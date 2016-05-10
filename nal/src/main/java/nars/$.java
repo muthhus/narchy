@@ -12,7 +12,6 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
@@ -274,6 +273,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static MutableTask task(@NotNull Compound term, char punct, float freq, float conf) {
         return task(term, punct, new DefaultTruth(freq, conf));
     }
+    @NotNull
     public static MutableTask task(@NotNull Compound term, char punct, Truth truth) {
         return new MutableTask(term, punct, truth);
     }
@@ -736,6 +736,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return image(relation, false, product.terms());
     }
 
+    @NotNull
     public static Truth t(float f, float c) {
         return new DefaultTruth(f, c);
     }

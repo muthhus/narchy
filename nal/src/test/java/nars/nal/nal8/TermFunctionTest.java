@@ -1,14 +1,6 @@
 package nars.nal.nal8;
 
-import nars.Global;
-import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.variable.Variable;
-import nars.util.signal.MotorConcept;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 

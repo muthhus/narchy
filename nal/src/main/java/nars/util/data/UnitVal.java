@@ -35,6 +35,7 @@ public class UnitVal {
         this.dv = dv;
     }
 
+    @NotNull
     public Truth inc(boolean positive) {
         return _inc(positive, dv);
     }

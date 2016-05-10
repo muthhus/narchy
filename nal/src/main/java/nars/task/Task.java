@@ -111,7 +111,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         Op op = normalizedTerm.op();
 
-        if (input && (punc == Symbols.GOAL) && (op ==Op.IMPLICATION || op == Op.EQUIV))
+        if (/*input && */(punc == Symbols.GOAL) && (op ==Op.IMPLICATION || op == Op.EQUIV))
             throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Goal task term may not be Implication or Equivalence");
 
         if (op.isStatement()) {

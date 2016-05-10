@@ -4,18 +4,14 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
-import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
-
-import java.util.TreeSet;
 
 import static java.lang.System.out;
 import static nars.util.NAgent.printTasks;

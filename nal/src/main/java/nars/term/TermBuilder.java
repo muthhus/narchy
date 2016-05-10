@@ -2,7 +2,6 @@ package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
@@ -12,7 +11,10 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -382,7 +384,7 @@ public abstract class TermBuilder {
         return finish(op, -1, dt, tc);
     }
 
-    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, Set<Term> unwrappedNegations) {
+    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull Set<Term> unwrappedNegations) {
         for (Term x : u) {
             if ((x.op() == op) && (((Compound) x).dt()==dt)) {
                 flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse

@@ -20,16 +20,11 @@ package nars.op.mental;
 import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Operator;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

@@ -169,7 +169,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, BLink<Task> taskLink) {
+    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink) {
 
         Task task = taskLink.get();
 
@@ -253,7 +253,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     }
 
-    public void matchQueryQuestion(@NotNull Task task, Task belief) {
+    public void matchQueryQuestion(@NotNull Task task, @NotNull Task belief) {
         List<Termed> result = Global.newArrayList(1);
         new UnifySubst(Op.VAR_QUERY, nar, result, 1).matchAll(
                 task.term(), belief.term()

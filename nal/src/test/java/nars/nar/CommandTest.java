@@ -6,12 +6,9 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.NullOperator;
 import nars.task.Task;
-import nars.term.Operator;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static junit.framework.TestCase.assertEquals;

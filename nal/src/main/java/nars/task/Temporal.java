@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.nal.Tense;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * interface for the temporal information about the

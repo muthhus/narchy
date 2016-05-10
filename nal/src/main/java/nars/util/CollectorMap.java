@@ -20,6 +20,7 @@ public abstract class CollectorMap<K, V>  {
         this.map = map;
     }
 
+    @Nullable
     abstract public K key(V v);
 
     @Override
@@ -31,6 +32,7 @@ public abstract class CollectorMap<K, V>  {
      * implementation for adding the value to another collecton (called internally)
      * returns null if successful, non-null if an item was displaced it will be that item
      */
+    @Nullable
     protected abstract V addItem(V e);
 
     /**
@@ -56,6 +58,7 @@ public abstract class CollectorMap<K, V>  {
 
 
 
+    @Nullable
     public final V put(K key, V value) {
 
         /*synchronized (nameTable)*/

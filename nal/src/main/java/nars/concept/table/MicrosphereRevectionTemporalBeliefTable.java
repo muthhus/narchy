@@ -4,10 +4,14 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
 import nars.budget.BudgetMerge;
-import nars.nal.Tense;
-import nars.task.*;
+import nars.task.MutableTask;
+import nars.task.Task;
+import nars.task.TruthPolation;
+import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -44,8 +48,9 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         super.setCapacity(c);
     }
 
+    @Nullable
     @Override
-    public Task prepare(Task input, NAR nar) {
+    public Task prepare(@NotNull Task input, @NotNull NAR nar) {
         if (capacity() == 0)
             return null;
 
@@ -91,8 +96,9 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         return ageFactor();
     }
 
+    @Nullable
     @Override
-    protected Task addItem(Task i) {
+    protected Task addItem(@NotNull Task i) {
         long occ = i.occurrence();
         if ((occ < min) || (occ > max)) {
             invalidateRange();
@@ -101,7 +107,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     }
 
     @Override
-    protected Task removeItem(Task removed) {
+    protected Task removeItem(@NotNull Task removed) {
         long occ = removed.occurrence();
         if ((occ == min) || (occ == max)) {
             invalidateRange();
@@ -113,7 +119,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         min = max = ETERNAL;
     }
 
-    public Task weakest(long now, Task excluding, float minRank) {
+    @Nullable
+    public Task weakest(long now, @Nullable Task excluding, float minRank) {
         Task weakest = null;
         float weakestRank = minRank;
         int n = size();
@@ -139,11 +146,11 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         return weakest;
     }
 
-    public float rank(Task t, long when) {
+    public float rank(@NotNull Task t, long when) {
         return rank(t, when, ageFactor());
 
     }
-    public float rank(Task t, long when, float ageFactor) {
+    public float rank(@NotNull Task t, long when, float ageFactor) {
         return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
     }
 
@@ -156,7 +163,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
 
     /** frees one slot by removing 2 and projecting a new belief to their midpoint */
-    protected Task compress(Task input, long now, NAR nar) {
+    @Nullable
+    protected Task compress(@NotNull Task input, long now, @NotNull NAR nar) {
 
         updateRange();
 
@@ -178,18 +186,25 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
             Truth newTruth = truth(newOcc);
 
-            long[] newEv = Stamp.zip(a, b); //TODO impl a weighted zip
+            //TODO impl a weighted zip
+            long[] newEv = Stamp.zip(a, b);
 
-            //TODO interpolate the dt()
-            int newDT;
-            if (b.term().dt() != DTERNAL)
-                newDT = b.term().dt();
-            else if (a.term().dt() != DTERNAL)
-                newDT = a.term().dt();
-            else
-                newDT = DTERNAL;
+            Compound at = a.term();
+            if (at.op().isTemporal()) {
 
-            merged = new MutableTask(a.term().dt(newDT), a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
+                //TODO interpolate the dt()
+                int newDT;
+                if (b.term().dt() != DTERNAL)
+                    newDT = b.term().dt();
+                else if (a.term().dt() != DTERNAL)
+                    newDT = a.term().dt();
+                else
+                    newDT = DTERNAL;
+
+                at = at.dt(newDT);
+            }
+
+            merged = new MutableTask(at, a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
                     .log("Revection Merge");
 
             remove(b);
@@ -211,6 +226,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
         return task;
     }
 
+    @Nullable
     @Override public Task top(long when, long now) {
 
         List<? extends Task> l = list();
@@ -239,6 +255,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
     }
 
+    @Nullable
     @Override
     public Truth truth(long when) {
         if (polation == null || polation.capacity() < capacity()) {

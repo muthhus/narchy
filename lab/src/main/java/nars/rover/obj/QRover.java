@@ -2,13 +2,7 @@ package nars.rover.run;
 
 
 import com.artemis.Entity;
-import nars.guifx.chart.MatrixImage;
-import nars.guifx.util.ColorArray;
 import nars.rover.obj.AbstractRover;
-import nars.util.HaiQ;
-import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.Autoencoder;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Q-learning ONLY to contrast with QLearning+NAR

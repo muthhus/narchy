@@ -4,7 +4,6 @@ import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Symbols;
 import nars.budget.Budgeted;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
@@ -51,7 +50,7 @@ public class BooleanConcept extends OperationConcept {
         @NotNull
         @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
 
-        @Override public MutableTask update(@NotNull NAR nar, long now, Termed content, boolean beliefOrGoal, @NotNull Termed[] args) {
+        @Override public MutableTask update(@NotNull NAR nar, long now, @NotNull Termed content, boolean beliefOrGoal, @NotNull Termed[] args) {
 
             boolean mode = this.mode;
 

@@ -169,7 +169,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    public final boolean isConceptOf(Termed t) {
+    public final boolean isConceptOf(@NotNull Termed t) {
         return t == this ? true : t.equalsAnonymously(term());
     }
 

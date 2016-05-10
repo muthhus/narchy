@@ -4,19 +4,13 @@ import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.concept.table.BeliefTable;
-import nars.nal.LocalRules;
 import nars.nal.UtilityFunctions;
-import nars.term.Compound;
-import nars.term.Terms;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Revision Utilities

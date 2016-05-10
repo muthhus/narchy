@@ -28,7 +28,6 @@ import mikejyg.javaipacman.pacman.ctables;
 import nars.nar.Default;
 import nars.time.FrameClock;
 import nars.util.Agent;
-import nars.util.DQN;
 import nars.util.NAgent;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
@@ -42,23 +41,23 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 3;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 12;
+	private int pacmanCyclesPerFrame = 4;
 
 
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				512, 4, 1, 2, rng,
+				1024, 4, 1, 2, rng,
 				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		nar.conceptActivation.setValue(0.1f);
-		nar.cyclesPerFrame.set(100);
+		nar.cyclesPerFrame.set(200);
 		//a.nar.conceptRemembering.setValue(1);
 		//a.nar.termLinkRemembering.setValue(0.5f);
 		//a.nar.taskLinkRemembering.setValue(0.5f);

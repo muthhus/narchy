@@ -47,11 +47,13 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return TermSet.the(t);
     }
 
-    static Compound union(TermBuilder b, Compound term1, Compound term2) {
+    @Nullable
+    static Compound union(@NotNull TermBuilder b, @NotNull Compound term1, @NotNull Compound term2) {
         return union(b, term1.op(), term1, term2);
     }
 
-    static Compound union(TermBuilder b, Op o, Compound term1, Compound term2) {
+    @Nullable
+    static Compound union(@NotNull TermBuilder b, @NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
         TermContainer u = TermContainer.union(term1, term2);
         if (u == term1)
             return term1;
@@ -99,11 +101,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return Sets.intersect(a.toSet(),b.toSet());
     }
 
-    static @NotNull Compound intersect(TermBuilder builder, @NotNull Compound a, @NotNull Compound b) {
+    static @NotNull Compound intersect(@NotNull TermBuilder builder, @NotNull Compound a, @NotNull Compound b) {
         return intersect(builder, a.op(), a, b);
     }
 
-    static @NotNull Compound intersect(TermBuilder builder, Op o, @NotNull Compound a, @NotNull Compound b) {
+    static @NotNull Compound intersect(@NotNull TermBuilder builder, @NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
         if (a.equals(b))
             return a;
 
@@ -240,7 +242,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     @Nullable
-    static Compound difference(@NotNull TermBuilder t, Op o, @NotNull Compound a, @NotNull TermContainer b) {
+    static Compound difference(@NotNull TermBuilder t, @NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 
         //intersect the mask
         if ((a.structure()&b.structure())==0)

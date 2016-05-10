@@ -6,8 +6,9 @@ import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public class TruthPolation {
 
+    @Nullable
     final InterpolatingMicrosphere s;
     double[][] times;
     double[] freq;
@@ -44,15 +46,18 @@ public class TruthPolation {
         count = 0;
     }
 
+    @Nullable
     public Truth truth(long when, Task... tasks) {
         return truth(when, Lists.newArrayList(tasks), null);
     }
 
-    public Truth truth(long when, List<Task> tasks) {
+    @Nullable
+    public Truth truth(long when, @NotNull List<Task> tasks) {
         return truth(when, tasks, null);
     }
 
-    public Truth truth(long when, List<Task> tasks, Task topEternal /* background */) {
+    @Nullable
+    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal /* background */) {
         assert(times.length <= tasks.size());
 
         int s = tasks.size();

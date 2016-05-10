@@ -3,10 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.concept.OperationConcept;
-import nars.nal.Tense;
 import nars.nar.Default;
-import nars.term.Term;
 import nars.util.signal.FloatConcept;
 import nars.util.signal.MotorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +12,8 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class MotivationTest {

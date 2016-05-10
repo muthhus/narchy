@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
@@ -11,7 +10,9 @@ import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -45,7 +46,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
 
     @Override
-    public final int compare(BLink<V> o1, BLink<V> o2) {
+    public final int compare(@NotNull BLink<V> o1, @NotNull BLink<V> o2) {
         float f1 = o1.priIfFiniteElseZero();
         float f2 = o2.priIfFiniteElseZero();
         if (f1 < f2)
@@ -56,7 +57,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     }
 
     @NotNull
-    public Bag<V> merge(BudgetMerge mergeFunction) {
+    public Bag<V> merge(@NotNull BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
         return this;
     }
@@ -238,7 +239,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
      * the applied budget will not become effective until commit()
      */
     @NotNull
-    private final BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+    private final BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
         if (existing != b) {
 

@@ -1,6 +1,5 @@
 package nars.nal.op;
 
-import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -8,7 +7,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;

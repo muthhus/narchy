@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import nars.bag.impl.ListTable;
 import nars.util.CollectorMap;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,12 +35,13 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
         forEach(t -> each.accept(key(t)));
     }
 
+    @NotNull
     @Override public Iterator<L> iterator() {
         return list.iterator();
     }
 
     @Override
-    public void topWhile(Predicate<L> action) {
+    public void topWhile(@NotNull Predicate<L> action) {
         List<L> l = list();
         int n = l.size();
         for (int i = 0; i < n; i++) {
@@ -72,12 +72,14 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
         return list;
     }
 
+    @Nullable
     @Override
     protected L removeItem(L removed) {
         return list.remove(removed) ? removed : null;
     }
 
 
+    @Nullable
     @Override
     protected L addItem(L i) {
         if (isFull())

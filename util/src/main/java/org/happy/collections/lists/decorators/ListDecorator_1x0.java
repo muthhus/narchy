@@ -1,12 +1,12 @@
 package org.happy.collections.lists.decorators;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.happy.collections.lists.CollectionDecorator_1x0;
 import org.happy.collections.lists.List_1x0;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Decorator_1x0Impl which can be used to decorate any Lists

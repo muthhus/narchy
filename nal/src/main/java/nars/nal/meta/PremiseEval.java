@@ -1,11 +1,9 @@
 package nars.nal.meta;
 
-import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -17,7 +15,6 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
-import nars.term.transform.subst.Subst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
-import java.util.function.BiPredicate;
 
 import static nars.budget.BudgetFunctions.*;
-import static nars.budget.BudgetFunctions.compoundForward;
 
 
 /**
@@ -98,7 +93,7 @@ public class PremiseEval extends FindSubst {
     }
 
     /** only one thread should be in here at a time */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, MatchConstraint constraints) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, @Nullable MatchConstraint constraints) {
 
         int t = now();
 
@@ -199,6 +194,7 @@ public class PremiseEval extends FindSubst {
 
     /** calculates Budget used in a derived task,
      *  returns null if invalid / insufficient */
+    @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Term derived) {
         ConceptProcess p = this.premise;
         return valid(truth != null ?
@@ -257,7 +253,7 @@ public class PremiseEval extends FindSubst {
 //        return true;
 //    }
 
-    public void replaceAllXY(FindSubst m) {
+    public void replaceAllXY(@NotNull FindSubst m) {
         m.forEachVersioned(this::replaceXY);
     }
 

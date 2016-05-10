@@ -15,7 +15,6 @@ import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.PatternAnswer;
-import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
 import nars.task.MutableTask;
@@ -46,7 +45,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -277,7 +275,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        return ask(quest, QUEST);
 //    }
 
-    public NAR goal(String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
+    @Nullable
+    public NAR goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
         return goal((Termed)$.$(goalTermString), tense, freq, conf);
     }
 
@@ -304,7 +303,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @Nullable
-    public Task believe(float priority, @NotNull Termed term, Tense tense, float freq, float conf) throws NarseseException {
+    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return believe(priority, getDefaultDurability(BELIEF), term, time(tense), freq, conf);
     }
 
@@ -362,6 +361,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
     }
 
+    @NotNull
     public NAR goal(@NotNull Termed<Compound> term)  {
         return goal(term, true);
     }
@@ -389,7 +389,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         input(pri, getDefaultDurability(GOAL), goal, GOAL, when, freq, conf);
         return this;
     }
-    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, Tense tense, float freq, float conf)  {
+    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf)  {
         input(pri, getDefaultDurability(GOAL), goal, GOAL, time(tense), freq, conf);
         return this;
     }
@@ -436,6 +436,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
+    @NotNull
     public NAR logSummaryGT(@NotNull Appendable out, float summaryThreshold) {
         return log(out, v -> {
             Budgeted b = null;
@@ -874,7 +875,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     /** called when a solution is found */
-    public void answer(@NotNull Task question, Task solution) {
+    public void answer(@NotNull Task question, @NotNull Task solution) {
 
         float solutionConf = solution.conf();
 

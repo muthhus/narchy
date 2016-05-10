@@ -16,7 +16,6 @@ import nars.term.Compound;
 import nars.term.Termed;
 
 import static javafx.application.Platform.runLater;
-import static nars.$.neg;
 
 /**
  * Created by me on 3/18/16.

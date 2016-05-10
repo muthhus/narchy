@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.bag.impl.ListTable;
 import nars.task.Task;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -18,8 +17,9 @@ import java.util.function.Predicate;
 public interface TemporalBeliefTable extends ListTable<Task,Task> {
 
 
-    Task top(long when, long now);
+    @Nullable Task top(long when, long now);
 
+    @Nullable
     public static TemporalBeliefTable Empty = new TemporalBeliefTable() {
 
         @Override
@@ -70,23 +70,26 @@ public interface TemporalBeliefTable extends ListTable<Task,Task> {
             return Collections.emptyList();
         }
 
+        @Nullable
         @Override
         public Task top(long when, long now) {
             return null;
         }
 
+        @Nullable
         @Override
         public Truth truth(long when) {
             return null;
         }
 
+        @Nullable
         @Override
         public Task prepare(Task input, NAR nar) {
             return null;
         }
     };
 
-    Truth truth(long when);
+    @Nullable Truth truth(long when);
 
-    Task prepare(Task input, NAR nar);
+    @Nullable Task prepare(Task input, NAR nar);
 }

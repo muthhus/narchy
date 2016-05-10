@@ -1,13 +1,9 @@
 package nars.bag;
 
 import com.google.common.base.Joiner;
-import nars.bag.impl.SortedTable;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

@@ -1,7 +1,5 @@
 package nars.web;
 
-import nars.util.data.MutableInteger;
-import nars.util.data.Util;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.jetbrains.annotations.Nullable;

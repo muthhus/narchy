@@ -8,7 +8,6 @@ import nars.budget.Budgeted;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -26,7 +25,7 @@ import static nars.Global.reference;
  */
 public class MutableTask extends AbstractTask {
 
-    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, NAR nar) throws Narsese.NarseseException {
+    public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, @NotNull NAR nar) throws Narsese.NarseseException {
         this(t, punct, new DefaultTruth(freq, nar.getDefaultConfidence(punct)));
     }
 
@@ -78,7 +77,7 @@ public class MutableTask extends AbstractTask {
     }
 
     /** used by QuestionTable */
-    public MutableTask(Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
+    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
         this(newTerm, taskToClone.punc(), newTruth);
 
         this.parentBelief = Global.reference(otherTask);

@@ -24,6 +24,7 @@ public interface TruthOperator {
     boolean single();
 
 
+    @NotNull
     public static TruthOperator inverse(TruthOperator o) {
         return new InverseTruthOperator(o);
     }

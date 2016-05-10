@@ -6,7 +6,6 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
-import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -14,13 +13,10 @@ import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 /** primarily a collector for believing time-changing input signals */
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
@@ -47,6 +43,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
+    @NotNull
     public SensorConcept sensorDT(int newDT) {
         sensor.dt(newDT);
         return this;

@@ -7,18 +7,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.web.WebView;
 import nars.NAR;
 import nars.guifx.nars.TaskButton;
 import nars.guifx.util.NSlider;
 import nars.task.Task;
-import nars.term.Operator;
-import nars.term.Term;
-import nars.term.atom.Atom;
-import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
-
-import static javafx.application.Platform.runLater;
 
 /**
  * Created by me on 8/2/15.

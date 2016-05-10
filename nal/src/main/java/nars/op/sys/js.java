@@ -1,14 +1,11 @@
 package nars.op.sys;
 
 import nars.NAR;
-import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +14,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Executes a Javascript expression

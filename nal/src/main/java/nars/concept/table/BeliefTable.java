@@ -363,7 +363,8 @@ public interface BeliefTable extends TaskTable {
      *
      *  TODO apply term's 'dt' in ranking if present
      * */
-    default Task match(Compound term, long taskOcc, NAR nar) {
+    @Nullable
+    default Task match(Compound term, long taskOcc, @NotNull NAR nar) {
 
         Task belief;
         do {

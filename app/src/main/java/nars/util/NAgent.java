@@ -14,9 +14,6 @@ import nars.util.data.array.Arrays;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
-import org.nustaq.serialization.coders.FSTJsonEncoder;
-import org.nustaq.serialization.serializers.FSTJSonSerializers;
-import org.nustaq.serialization.util.FSTUtil;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -44,13 +41,13 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.6f;
+    float alpha = 0.3f;
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.02f;
     private double epsilonRandom = 0.02f;
 
-    float sensorPriority = 0.4f;
+    float sensorPriority = 0.3f;
     float rewardPriority = 0.6f;
     float goalFeedbackPriority = rewardPriority;
     float goalPriority = rewardPriority;

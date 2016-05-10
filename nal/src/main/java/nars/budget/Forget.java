@@ -102,6 +102,7 @@ public enum Forget { ;
     /** linaer decay in proportion to time since last forget */
     public static class LinearForget<X> extends AbstractForget<X> {
 
+        @NotNull
         private final MutableFloat forgetMax;
         protected transient float forgetMaxCyclesCached = Float.NaN;
         private float forgetCyclesMaxMinRange;
@@ -118,7 +119,7 @@ public enum Forget { ;
         }
 
         @Override
-        public void update(NAR nar) {
+        public void update(@NotNull NAR nar) {
             super.update(nar);
             this.forgetMaxCyclesCached = forgetMax.floatValue();
             this.forgetCyclesMaxMinRange = forgetMaxCyclesCached - forgetCyclesCached;

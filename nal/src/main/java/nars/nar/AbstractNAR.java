@@ -3,7 +3,6 @@ package nars.nar;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.op.ImmediateTermTransform;
@@ -16,18 +15,12 @@ import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.index.MapIndex1;
-import nars.term.index.MapIndex2;
 import nars.time.Clock;
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Random;
-import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

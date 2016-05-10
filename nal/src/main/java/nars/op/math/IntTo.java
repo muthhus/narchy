@@ -2,7 +2,6 @@ package nars.op.math;
 
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;

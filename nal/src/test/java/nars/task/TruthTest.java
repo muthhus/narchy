@@ -4,8 +4,6 @@ import nars.$;
 import nars.Global;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

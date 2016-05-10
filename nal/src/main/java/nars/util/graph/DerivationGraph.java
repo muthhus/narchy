@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.graph.DirectedPseudograph;
 
@@ -43,7 +44,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
 
     int edgeID = 0;
 
-    public DerivationGraph(PremiseRuleSet rules) {
+    public DerivationGraph(@NotNull PremiseRuleSet rules) {
         super(Integer.class);
 
         List<Compound> patterns = rules.rules.stream().map(PremiseRule::reified).distinct().collect(Collectors.toList());
@@ -121,7 +122,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
         }
     };
 
-    private boolean unifies(Term a, Term b) {
+    private boolean unifies(@NotNull Term a, @NotNull Term b) {
         //HACK
         matches = 0;
 

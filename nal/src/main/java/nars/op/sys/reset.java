@@ -2,10 +2,7 @@ package nars.op.sys;
 
 import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.ImmediateOperator;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Resets memory, @see memory.reset()

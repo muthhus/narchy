@@ -590,6 +590,7 @@ public interface TermIndex {
     }
 
     /** a string containing statistics of the index's current state */
+    @NotNull
     default String summary() {
         return "";
     }

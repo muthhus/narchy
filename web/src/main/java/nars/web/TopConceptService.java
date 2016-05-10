@@ -1,13 +1,11 @@
 package nars.web;
 
-import io.undertow.websockets.WebSocketConnectionCallback;
 import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -10,7 +10,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
     }
 
     @Nullable
-    public static BooleanCondition<PremiseEval> the(List<BooleanCondition<PremiseEval>> cond) {
+    public static BooleanCondition<PremiseEval> the(@NotNull List<BooleanCondition<PremiseEval>> cond) {
 
         //remove suffix 'TRUE'
         int s = cond.size();
@@ -73,6 +72,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
         return new AndCondition(cond);
     }
 
+    @Nullable
     public BooleanCondition<PremiseEval> without(BooleanCondition<C> condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
         BooleanCondition[] x = ArrayUtils.removeElement(termCache, condition);

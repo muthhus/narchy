@@ -22,9 +22,6 @@ package nars.nal.nal8.operator;
 
 import nars.concept.OperationConcept;
 import nars.nal.nal8.AbstractOperator;
-import nars.task.Task;
-
-import java.util.List;
 
 /**
  *  A class used as a template for Operator definition.
