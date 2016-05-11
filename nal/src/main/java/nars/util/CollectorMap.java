@@ -80,10 +80,10 @@ public abstract class CollectorMap<K, V>  {
 
         V displaced = addItem(value);
 
-        if (removed != null && displaced != null) {
-            throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
-        }
         if (displaced != null) { //&& (!key(removed2).equals(key))) {
+            if (removed != null) {
+                throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + displaced);
+            }
             removeKeyForValue(displaced);
             removed = displaced;
         }

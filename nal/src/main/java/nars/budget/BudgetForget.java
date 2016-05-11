@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 /** processes a BLink, usually affecting its budget somehow */
-public interface BudgetForget<X> extends Consumer<BLink<? extends X>> {
+public interface BudgetForget extends Consumer<BLink> {
     /**
      * called each frame to update parameters
      */

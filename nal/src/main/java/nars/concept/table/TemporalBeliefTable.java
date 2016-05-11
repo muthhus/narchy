@@ -83,12 +83,12 @@ public interface TemporalBeliefTable extends ListTable<Task,Task> {
 
         @Nullable
         @Override
-        public Task prepare(Task input, NAR nar) {
+        public Task ready(Task input, NAR nar) {
             return null;
         }
     };
 
     @Nullable Truth truth(long when);
 
-    @Nullable Task prepare(Task input, NAR nar);
+    @Nullable Task ready(Task input, NAR nar);
 }

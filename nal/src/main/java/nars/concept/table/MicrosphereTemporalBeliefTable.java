@@ -22,7 +22,7 @@ import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
 /** stores the items unsorted; revection manages their ranking and removal */
-public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
 
     private TruthPolation polation;
     private final SortedTable<Task, Task> eternal;
@@ -35,7 +35,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
      */
     private final float historyFactor = 1.5f;
 
-    public MicrosphereRevectionTemporalBeliefTable(Map<Task, Task> mp, int cap, SortedTable<Task,Task> eternal) {
+    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, int cap, SortedTable<Task,Task> eternal) {
         super(mp, Global.newArrayList(cap));
         setCapacity(cap);
         this.eternal = eternal;
@@ -50,7 +50,7 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
     @Nullable
     @Override
-    public Task prepare(@NotNull Task input, @NotNull NAR nar) {
+    public Task ready(@NotNull Task input, @NotNull NAR nar) {
         if (capacity() == 0)
             return null;
 

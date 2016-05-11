@@ -1,5 +1,7 @@
 package nars.util.signal;
 
+import com.gs.collections.api.block.procedure.primitive.ObjectBooleanProcedure;
+import nars.concept.Concept;
 import nars.util.meter.event.FloatGuage;
 import org.jetbrains.annotations.NotNull;
 import org.nustaq.serialization.FSTConfiguration;
@@ -7,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.function.BiConsumer;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
@@ -31,6 +34,11 @@ public final class Emotion implements Serializable {
 
     private transient final Logger logger;
 
+    /** # concepts enter + exit */
+    public final FloatGuage focusChange;
+
+    public BiConsumer conceptFocus;
+
     public Emotion() {
         super();
 
@@ -40,7 +48,39 @@ public final class Emotion implements Serializable {
         this.happy = new FloatGuage("happy");
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
+        this.focusChange = new FloatGuage("focusChange");
 
+        conceptFocus = (incoming, outgoing) -> {
+            if (outgoing == null) {
+                //new item, nothing displaced
+                //focusChange.accept(1);
+            } else {
+                if (incoming == null) {
+                    //removal
+                    //focusChange.accept(1);
+                } else {
+
+                    if (incoming == outgoing) {
+                        //input rejected
+                        //
+                    } else {
+                        //insert and displaced
+                        focusChange.accept(1);
+                    }
+                }
+            }
+
+        };
+    }
+
+
+    /** new frame started */
+    public void frame() {
+        happy.clear();
+        busy.clear();
+        stress.clear();
+        frustration.clear();
+        focusChange.clear();
     }
 
     /** percentage of business which was not frustration */
@@ -105,13 +145,6 @@ public final class Emotion implements Serializable {
         frustration.accept( pri );
     }
 
-    /** new frame started */
-    public void frame() {
-        happy.clear();
-        busy.clear();
-        stress.clear();
-        frustration.clear();
-    }
 
 
 /*    public void busy(@NotNull Task cause, float activation) {

@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  * TODO remove unnecessary methods, documetn
  * TODO implement java.util.Map interface
  */
-public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<V>>, Iterable<BLink<V>> {
+public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<V>> {
 
 
 
@@ -160,14 +160,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 //    public abstract Set<K> keySet();
 
 
-    /**
-     * Choose an Item according to distribution policy and take it out of the Bag
-     * TODO rename removeNext()
-     *
-     * @return The selected Item, or null if this bag is empty
-     */
-    @Nullable
-    BLink<V> pop();
+//    /**
+//     * Choose an Item according to distribution policy and take it out of the Bag
+//     * TODO rename removeNext()
+//     *
+//     * @return The selected Item, or null if this bag is empty
+//     */
+//    @Nullable
+//    BLink<V> pop();
 
     /**
      * The number of items in the bag
@@ -242,14 +242,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         put(v);
     }
 
-    /**
-     * implements the Supplier<V> interface; invokes a remove()
-     */
-    @Nullable
-    @Override
-    default BLink<V> get() {
-        return pop();
-    }
+//    /**
+//     * implements the Supplier<V> interface; invokes a remove()
+//     */
+//    @Nullable
+//    @Override
+//    default BLink<V> get() {
+//        return pop();
+//    }
 
 
 
@@ -443,7 +443,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
 
     @Nullable
-    Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
+    Bag<V> filter(Predicate<BLink> forEachIfFalseThenRemove);
 
 
 //    @NotNull
@@ -456,7 +456,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         a.forEach(this::put);
     }
 
-    default Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
+    default Bag<V> commit(@NotNull Consumer<BLink> each) {
         forEach(each);
         commit();
         return this;

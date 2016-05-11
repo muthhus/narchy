@@ -6,17 +6,26 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.concept.OperationConcept;
+import nars.concept.table.QuestionTable;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import nars.util.Texts;
+import nars.util.meter.Signals;
+import nars.util.meter.TemporalMetrics;
+import nars.util.meter.event.DoubleMeter;
+import nars.util.meter.event.SourceFunctionMeter;
 import nars.util.signal.MotorConcept;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -28,6 +37,9 @@ import static org.junit.Assert.assertTrue;
  * Created by me on 5/6/16.
  */
 public class ControlFlowTest {
+
+    private final List<CompoundConcept> states = new ArrayList();
+    private final TemporalMetrics ts = new TemporalMetrics<>(8192);
 
     @Test public void testSequence2()   { testSequence(n, 2, 5);     }
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
@@ -108,6 +120,9 @@ public class ControlFlowTest {
         n.run(runtime);
 
         exeTracker.assertLength(length, delay);
+
+        ts.printCSV4(System.out);
+        ts.clear();
 
         return exeTracker;
 
@@ -226,8 +241,11 @@ public class ControlFlowTest {
     }
 
 
-    static final Supplier<NAR> n = () -> {
+    final Supplier<NAR> n = () -> {
         Default x = new Default(512, 1, 1, 3);
+        x.onCycle(c -> {
+            ts.update(c.time());
+        });
         x.cyclesPerFrame.set(1);
         return x;
     };
@@ -280,9 +298,10 @@ public class ControlFlowTest {
 
 
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
+
         float exeThresh = 0.3f;
 
-        return new MotorConcept(term, n, (b, d) -> {
+        CompoundConcept c = new MotorConcept(term, n, (b, d) -> {
             if (d > 0.5f && (d > b + exeThresh)) {
                 long now = n.time();
                 System.out.println(term + " at " + now + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
@@ -298,6 +317,12 @@ public class ControlFlowTest {
             return Float.NaN;
             //return 1f;
         });
+
+        ts.add(new ConceptBeliefGoalPriorityMeter(c, n));
+
+        states.add(c);
+
+        return c;
     }
 
 
@@ -321,4 +346,37 @@ public class ControlFlowTest {
 
     }
 
+    private static class ConceptBeliefGoalPriorityMeter extends SourceFunctionMeter {
+
+        private final CompoundConcept c;
+        private final NAR n;
+        public Truth desire;
+        public Truth belief;
+
+        public ConceptBeliefGoalPriorityMeter(CompoundConcept c, NAR n) {
+            super(c.toString(), "_blf_frq", "_blf_conf", "_gol_frq", "_gol_conf", "_pri");
+            this.c = c;
+            this.n = n;
+        }
+
+        @Override public Object getValue(Object key, int index) {
+
+            switch (index) {
+                case 0:
+                    belief = c.beliefs().truth(n.time());
+                    return belief.freq();
+                case 1:
+                    return belief.conf();
+                case 2:
+                    desire = c.goals().truth(n.time());
+                    return desire.freq();
+                case 3:
+                    return desire.conf();
+                case 4:
+                    return n.conceptPriority(c);
+            }
+
+            return Float.NaN; //shouldnt happen
+        }
+    }
 }

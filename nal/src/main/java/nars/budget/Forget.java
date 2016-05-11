@@ -15,25 +15,25 @@ import java.util.function.Predicate;
 public enum Forget { ;
 
     /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
-    public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>>, BudgetForget<X> {
+    public interface BudgetForgetFilter extends Predicate<BLink>, BudgetForget {
         /** called each frame to update parameters */
         @Override
         void update(@NotNull NAR nar);
     }
 
     /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
-    public static final class ForgetAndDetectDeletion<X extends Budgeted> implements BudgetForgetFilter<X> {
+    public static final class ForgetAndDetectDeletion implements BudgetForgetFilter {
 
-        final BudgetForget<X> forget;
+        final BudgetForget forget;
 
-        public ForgetAndDetectDeletion(BudgetForget<X> forget) {
+        public ForgetAndDetectDeletion(BudgetForget forget) {
             this.forget = forget;
         }
 
         @Override
-        public boolean test(@NotNull BLink<? extends X> b) {
+        public boolean test(@NotNull BLink b) {
             //assert(!b.isDeleted());
-            if (b.get().isDeleted()) {
+            if (((Budgeted)b.get()).isDeleted()) {
                 b.delete();
                 return false;
             }
@@ -42,7 +42,7 @@ public enum Forget { ;
         }
 
         @Override
-        public void accept(BLink<? extends X> bLink) {
+        public void accept(BLink bLink) {
             throw new UnsupportedOperationException();
         }
 
@@ -58,7 +58,7 @@ public enum Forget { ;
 
     }
 
-    public abstract static class AbstractForget<X> implements BudgetForget<X> {
+    public abstract static class AbstractForget implements BudgetForget {
 
         @NotNull
         protected final MutableFloat forgetDurations;
@@ -79,7 +79,7 @@ public enum Forget { ;
             this.perfection = perfection;
         }
 
-        @Override public abstract void accept(@NotNull BLink<? extends X> budget);
+        @Override public abstract void accept(@NotNull BLink budget);
 
         @Override public void update(@NotNull NAR nar) {
             //same for duration of the cycle
@@ -93,15 +93,15 @@ public enum Forget { ;
         }
 
         @NotNull
-        public <B extends Budgeted> ForgetAndDetectDeletion<B> withDeletedItemFiltering() {
-            return new ForgetAndDetectDeletion<>((BudgetForget<B>) this);
+        public ForgetAndDetectDeletion withDeletedItemFiltering() {
+            return new ForgetAndDetectDeletion(this);
         }
 
     }
 
 
     /** linaer decay in proportion to time since last forget */
-    public static class LinearForget<X> extends AbstractForget<X> {
+    public static class LinearForget extends AbstractForget {
 
         @NotNull
         private final MutableFloat forgetMax;
@@ -127,7 +127,7 @@ public enum Forget { ;
         }
 
         @Override
-        public void accept(@NotNull BLink<? extends X> budget) {
+        public void accept(@NotNull BLink budget) {
 
             final float currentPriority = budget.pri();
             final float forgetDeltaCycles = budget.setLastForgetTime(now);
@@ -171,14 +171,14 @@ public enum Forget { ;
 
     /** exponential decay in proportion to time since last forget.
      *  provided by TonyLo as used in the ALANN system. */
-    public final static class ExpForget<X> extends AbstractForget<X> {
+    public final static class ExpForget extends AbstractForget {
 
         public ExpForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
             super(forgetTime, perfection);
         }
 
         @Override
-        public void accept(@NotNull BLink<? extends X> budget) {
+        public void accept(@NotNull BLink budget) {
 
             float dt = budget.setLastForgetTime(now);
 

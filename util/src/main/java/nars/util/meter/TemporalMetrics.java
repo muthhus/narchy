@@ -5,6 +5,7 @@
  */
 package nars.util.meter;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class TemporalMetrics<O> extends Metrics<Double,O> {
      */
     public void update(long integerTime) {
         update((double)integerTime);
-    }    
-    
+    }
+
+
 }

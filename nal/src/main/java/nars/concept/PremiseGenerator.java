@@ -62,9 +62,9 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     //long lastMatch = Tense.TIMELESS;
 
     @NotNull
-    public final Forget.BudgetForgetFilter<Task> taskLinkForget;
+    public final Forget.BudgetForgetFilter taskLinkForget;
     @NotNull
-    public final BudgetForget<Termed> termLinkForget;
+    public final BudgetForget termLinkForget;
 
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
@@ -75,7 +75,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull BudgetForget<Termed> termLinkForget) {
+    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter taskLinkForget, @NotNull BudgetForget termLinkForget) {
 
         this.nar = nar;
         this.matcher = matcher;

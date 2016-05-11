@@ -50,17 +50,17 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     }
 
 
-    @Nullable
-    @Override
-    public BLink<V> pop() {
-        return peekNext(true);
-    }
+//    @Nullable
+//    @Override
+//    public BLink<V> pop() {
+//        return peekNext(true);
+//    }
 
 
 
     @NotNull
     @Override
-    public Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
+    public Bag<V> commit(@NotNull Consumer<BLink> each) {
         super.commit(each);
         sampler.commit(this);
         return this;

@@ -41,7 +41,7 @@ public class DefaultBeliefTable implements BeliefTable {
         eternal = eternalCapacity > 0 ? new EternalTable(mp, eternalCapacity) : SortedTable.Empty;
 
 
-        temporal = temporalCapacity > 0 ? new MicrosphereRevectionTemporalBeliefTable(mp, temporalCapacity, eternal) : TemporalBeliefTable.Empty;
+        temporal = temporalCapacity > 0 ? new MicrosphereTemporalBeliefTable(mp, temporalCapacity, eternal) : TemporalBeliefTable.Empty;
 
     }
 
@@ -188,7 +188,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull
     protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
-        input = temporal.prepare(input, nar);
+        input = temporal.ready(input, nar);
         if (input != null) {
             //inserting this task.  should be successful
             boolean ii = insert(input, temporal, nar);

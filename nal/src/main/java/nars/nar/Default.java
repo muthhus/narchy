@@ -1,5 +1,6 @@
 package nars.nar;
 
+import com.gs.collections.api.block.procedure.primitive.ObjectBooleanProcedure;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
@@ -28,7 +29,6 @@ import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
-import nars.util.data.map.UnifriedMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -118,11 +119,11 @@ public class Default extends AbstractNAR {
     }
 
 
-//    public static class DefaultTermIndex2 extends MapIndex2 {
+//    public static class DefaultTermIndex extends MapIndex2 {
 //
-//        public DefaultTermIndex2(int capacity, @NotNull Random random) {
-//            super(new UnifriedMap(capacity),
-//                    new DefaultConceptBuilder(random, 32, 32));
+//        public DefaultTermIndex(int capacity, @NotNull Random random) {
+//            super(new HashMap(capacity, 0.9f),
+//                    new DefaultConceptBuilder(random, 8, 24));
 //
 //        }
 //    }
@@ -131,7 +132,7 @@ public class Default extends AbstractNAR {
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
                     new DefaultConceptBuilder(random, 8, 24),
-                    new HashMap(capacity)
+                    new HashMap(capacity, 0.9f)
                     //new ConcurrentHashMapUnsafe(capacity)
             );
         }
@@ -156,6 +157,7 @@ public class Default extends AbstractNAR {
 
         }
     }
+
     public static class SoftTermIndex extends MapIndex1 {
 
         public SoftTermIndex(int capacity, @NotNull Random random) {
@@ -167,6 +169,17 @@ public class Default extends AbstractNAR {
 
         }
     }
+//    public static class SoftTermIndex extends MapIndex2 {
+//
+//        public SoftTermIndex(int capacity, @NotNull Random random) {
+//            super(new SoftValueHashMap(capacity),
+//                    new DefaultConceptBuilder(random, 32, 32)
+//
+//                    //new WeakHashMap<>(capacity)
+//            );
+//
+//        }
+//    }
 
     /**
      * process a Task through its Concept
@@ -250,8 +263,8 @@ public class Default extends AbstractNAR {
     @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
         return new DefaultPremiseGenerator(this, newDeriver(),
-            new Forget.ExpForget<>(taskLinkRemembering, perfection).withDeletedItemFiltering(),
-            new Forget.ExpForget<>(termLinkRemembering, perfection)
+            new Forget.ExpForget(taskLinkRemembering, perfection).withDeletedItemFiltering(),
+            new Forget.ExpForget(termLinkRemembering, perfection)
         );
     }
 
@@ -378,7 +391,7 @@ public class Default extends AbstractNAR {
 
 
         @NotNull
-        public final Forget.AbstractForget<Concept> conceptForget;
+        public final Forget.AbstractForget conceptForget;
 
 
         final PremiseGenerator premiser;
@@ -492,15 +505,42 @@ public class Default extends AbstractNAR {
 
 
         public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, int activeConcepts) {
-            super(nar, newConceptBag(nar.random, activeConcepts), premiseGenerator);
+            super(nar, newConceptBag(nar, activeConcepts), premiseGenerator);
         }
 
 
+        /** extends CurveBag to invoke entrance/exit event handler lambda */
+        public static class MonitoredCurveBag<C> extends CurveBag<C> {
+
+            private final BiConsumer event;
+
+            public MonitoredCurveBag(int capacity, Random rng, BiConsumer event) {
+                super(capacity, rng);
+                this.event = event;
+            }
+
+            @Nullable
+            @Override
+            protected BLink<C> putNew(C i, BLink<C> b) {
+                BLink<C> displaced = super.putNew(i, b);
+                event.accept(b, displaced);
+                return displaced;
+            }
+
+            @Nullable
+            @Override
+            public BLink<C> remove(C x) {
+                BLink<C> removed = super.remove(x);
+                event.accept(null, removed);
+                return removed;
+            }
+        }
+
         @NotNull
-        public static Bag<Concept> newConceptBag(@NotNull Random r, int n) {
-            return new CurveBag<Concept>(n, r)
-                    //.merge(BudgetMerge.plusDQBlend);
+        public static Bag<Concept> newConceptBag(NAR nar, int n) {
+            return new MonitoredCurveBag<Concept>(n, nar.random, nar.emotion.conceptFocus)
                     .merge(BudgetMerge.plusDQDominant);
+                    //.merge(BudgetMerge.plusDQBlend);
         }
 
 
@@ -551,7 +591,7 @@ public class Default extends AbstractNAR {
 //            this(nar, deriver, Global.newHashSet(64));
 //        }
 
-        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull BudgetForget<Termed> termLinkForget) {
+        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter taskLinkForget, @NotNull BudgetForget termLinkForget) {
             super(nar, new PremiseEval(nar.index, nar.random, deriver), taskLinkForget, termLinkForget);
 
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);

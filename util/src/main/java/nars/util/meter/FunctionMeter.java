@@ -61,19 +61,24 @@ public abstract class FunctionMeter<M> implements Signals<M>, Serializable {
     public abstract M getValue(Object key, int index);
 
     protected void fillVector(Object key, int fromIndex, int toIndex) {
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = getValue(key, i);
+        M[] v = this.vector;
+        int len = v.length;
+
+        for (int i = 0; i < len; i++) {
+            v[i] = getValue(key, i);
         }
 
     }
 
     @Override
     public M[] sample(Object key) {
+        M[] vector = this.vector;
+
         if (vector == null) {
             //the following wont work because firstValue may be null
             //M firstValue = getValue(key, 0);            
             //vector = (M[]) Array.newInstance(firstValue.getClass(), signals.size());
-            vector = (M[]) new Object[signals.size()];
+            vector = this.vector = (M[]) new Object[signals.size()];
 
         }
 

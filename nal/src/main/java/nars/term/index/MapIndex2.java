@@ -21,15 +21,14 @@ public class MapIndex2 extends AbstractMapIndex {
         public final TermContainer vector;
 
         public SubtermNode(TermContainer normalized) {
-            super(4);
+            super(1);
             this.vector = normalized;
         }
 
     }
 
     /** uses an array for fast lookup and write access to basic term types where relation isnt used */
-    public static class SubtermNodeWithArray extends SubtermNode {
-        public final TermContainer vector;
+    public static final class SubtermNodeWithArray extends SubtermNode {
 
         final static int NUM_FAST = 16;
         @NotNull
@@ -37,7 +36,6 @@ public class MapIndex2 extends AbstractMapIndex {
 
         public SubtermNodeWithArray(TermContainer normalized) {
             super(normalized);
-            this.vector = normalized;
             this.fast = new Termed[NUM_FAST];
         }
 
@@ -57,7 +55,9 @@ public class MapIndex2 extends AbstractMapIndex {
             if (Terms.relComponent(key) == 0xffff) {
                 int o = Terms.opComponent(key);
                 if (o < NUM_FAST) {
+                    Termed p = fast[o];
                     fast[o] = value;
+                    return p;
                 }
             }
             return super.put(key, value);
@@ -202,4 +202,11 @@ public class MapIndex2 extends AbstractMapIndex {
         atoms.forEach(c);
         data.values().forEach(v->v.forEach(c));
     }
+
+    @NotNull
+    @Override
+    public String summary() {
+        return data.size() + " termVectors, " + ((HashSymbolMap)atoms).map.size() + " atoms";
+    }
+
 }

@@ -19,11 +19,12 @@ import static java.lang.System.out;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 20;
-    public final float speed = 0.07f;
+    public float targetPeriod = 15;
+    public final float speed = 0.17f;
     boolean print = false;
     private MutableFloat yHidden;
     private MutableFloat yEst;
+    boolean enableAbsolute = false; //additional inputs
 
     @Override public Twin<Integer> start() {
 
@@ -38,7 +39,7 @@ public class Thermostat implements Environment {
         yEst.setValue(0.5f);
 
 
-        return Tuples.twin(2, 3);
+        return Tuples.twin(2 + (enableAbsolute ? 2 : 0), 3);
     }
 
     @Override
@@ -72,8 +73,10 @@ public class Thermostat implements Environment {
         ins[0] = Util.clamp(diff);
         ins[1] = Util.clamp(-diff);
 
-        //ins[0] = Util.clamp(yHidden.floatValue());
-        //ins[1] = Util.clamp(yEst.floatValue());
+        if (enableAbsolute) {
+            ins[2] = Util.clamp(yHidden.floatValue());
+            ins[3] = Util.clamp(yEst.floatValue());
+        }
 
         float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
 
@@ -121,7 +124,6 @@ public class Thermostat implements Environment {
 
     public static void main(String[] args) {
 
-        int cycles = 10000;
 
 //        //baseline
 //        new Thermostat().run(
@@ -138,20 +140,20 @@ public class Thermostat implements Environment {
                 .call("conceptsPerCyc", 2, 3, 1f, "core.conceptsFiredPerCycle.setValue(#i)")
                 .call("termLinksPerConcept", 1, 3, 1f, "premiser.termlinksFiredPerFiredConcept.setValue(#i)")
 
-                .call("cycPerFrame", 4, 8, 1f, "cyclesPerFrame.setValue(#i)")
+                .call("cycPerFrame", 4, 24, 1f, "cyclesPerFrame.setValue(#i)")
 
-                .call("conceptBeliefs", 2f, 16f, 1, "conceptBeliefsMax.set(#i)")
-                .call("conceptGoals", 2f, 16f, 1, "conceptGoalsMax.set(#i)")
+                .call("conceptBeliefs", 4f, 16f, 1, "conceptBeliefsMax.set(#i)")
+                .call("conceptGoals", 4f, 16f, 1, "conceptGoalsMax.set(#i)")
 
-                .call("conceptRem", 4f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
-                .call("taskRem",    2f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
-                .call("termRem",    2f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
+                .call("conceptRem", 1f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
+                .call("taskRem",    1f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
+                .call("termRem",    1f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
 
                 //((DefaultConceptBuilder)new Default(512, 1, 1, 3).index.conceptBuilder()).termLinkBagSize
 
-                .call("conceptAct", 0.5f, 0.8f, 0.1f,  "conceptActivation.setValue(#x)")
+                .call("conceptAct", 0.1f, 0.8f, 0.05f,  "conceptActivation.setValue(#x)")
 
-                .run(2500, (x) ->
+                .run(3500, (x) ->
                     new Thermostat().run(new NAgent(x), 500)
                 );
 

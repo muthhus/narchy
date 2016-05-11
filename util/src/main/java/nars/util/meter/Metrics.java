@@ -9,6 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
+import nars.util.Texts;
 import nars.util.meter.event.DoubleMeter;
 import nars.util.meter.event.HitMeter;
 
@@ -495,20 +496,57 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     }
 
     public void printCSVHeader(PrintStream out) {
-        printJSONArray(out, getSignalIDs(),false );
-    }
-    public void printCSVLastLine(PrintStream out) {
-        if (!rows.isEmpty())
-            printJSONArray(out, rowLast(), false);
+        //printJSONArray(out, getSignalIDs(),false );
+        printCSVRow(out, getSignalIDs());
     }
 
+//    public void printCSVLastLine(PrintStream out) {
+//        if (!rows.isEmpty())
+//            printJSONArray(out, rowLast(), false);
+//    }
+
     public void printCSV(PrintStream out) {
+//        printCSVHeader(out);
+//        for (Object[] row : this) {
+//            printCSVRow(out, row);
+//        }
+//        out.flush();
+
+        printCSV4(out);
+    }
+
+    /** print CSV with numbers up to 4 decimal points accuracy */
+    public void printCSV4(PrintStream out) {
         printCSVHeader(out);
         for (Object[] row : this) {
-            printJSONArray(out, row, false);
+            printCSVRow4(out, row);
         }
         out.flush();
     }
+
+    private static void printCSVRow(PrintStream out, Object[] row) {
+//        for (Object o : row) {
+//            //TODO quote strings
+//            out.append(String.valueOf(o)).append(',');
+//        }
+//        out.append('\n');
+        printCSVRow4(out, row);
+    }
+
+    private static void printCSVRow4(PrintStream out, Object[] row) {
+        for (Object o : row) {
+            //TODO quote strings
+            if (o instanceof Number) {
+                Number n = (Number)o;
+                out.append(Texts.n4(n.floatValue()));
+            } else {
+                out.append('"').append(String.valueOf(o)).append('"');
+            }
+            out.append(',');
+        }
+        out.append('\n');
+    }
+
     public void printCSV(String filepath) throws FileNotFoundException {
         printCSV(new PrintStream(new FileOutputStream(filepath)));
     }

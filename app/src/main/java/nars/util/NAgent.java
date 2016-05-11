@@ -159,8 +159,9 @@ public class NAgent implements Agent {
                 //" busyAvg=" + Texts.n4(nar.emotion.busy.getAverage()) +
                 /*" busySum="*/ + Texts.n4(nar.emotion.busy.getSum()) + " "
                 /*" frstSum="*/ + Texts.n4(nar.emotion.learning()) + " "
-                /*" strsSum="*/ + Texts.n4(nar.emotion.stress.getSum()) + " \t"
-                                + nar.index.summary()
+                /*" strsSum="*/ + Texts.n4(nar.emotion.stress.getSum()) + " "
+                /*" frstSum="*/ + Texts.n4(nar.emotion.focusChange.getSum()) + " "
+                                + "\t" + nar.index.summary()
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
         ;

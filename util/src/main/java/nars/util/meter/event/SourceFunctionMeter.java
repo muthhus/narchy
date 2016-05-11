@@ -10,12 +10,16 @@ import nars.util.meter.FunctionMeter;
 /**
  * Function meter with one specific ID
  */
-abstract class SourceFunctionMeter<T> extends FunctionMeter<T> {
+abstract public class SourceFunctionMeter<T> extends FunctionMeter<T> {
     
     private final String name;
 
     public SourceFunctionMeter(String id) {
         super(id);
+        name = id;
+    }
+    public SourceFunctionMeter(String id, String... components) {
+        super(id, false, components);
         name = id;
     }
 

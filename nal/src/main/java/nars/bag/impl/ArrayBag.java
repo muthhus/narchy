@@ -2,6 +2,7 @@ package nars.bag.impl;
 
 import nars.bag.BLink;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.util.data.list.FasterList;
@@ -35,7 +36,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     public ArrayBag(@NotNull List<BLink<V>> items, int capacity) {
         this(items,
                 //Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
-                new HashMap(capacity/2)
+                new HashMap(capacity/2, 0.5f)
         );
 
         setCapacity(capacity);
@@ -47,7 +48,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
 
     @Override
-    public final int compare(@NotNull BLink<V> o1, @NotNull BLink<V> o2) {
+    public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = o1.priIfFiniteElseZero();
         float f2 = o2.priIfFiniteElseZero();
         if (f1 < f2)
@@ -117,7 +118,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
     @NotNull
     @Override
-    public Bag<V> filter(@NotNull Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+    public Bag<V> filter(@NotNull Predicate<BLink> forEachIfFalseThenRemove) {
         List<BLink<V>> l = items;
         int n = l.size();
         if (n > 0) {
@@ -193,17 +194,17 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 //    }
 
 
-    /**
-     * Choose an Item according to priority distribution and take it out of the
-     * Bag
-     *
-     * @return The selected Item, or null if this bag is empty
-     */
-    @Nullable
-    @Override
-    public BLink<V> pop() {
-        throw new UnsupportedOperationException();
-    }
+//    /**
+//     * Choose an Item according to priority distribution and take it out of the
+//     * Bag
+//     *
+//     * @return The selected Item, or null if this bag is empty
+//     */
+//    @Nullable
+//    @Override
+//    public BLink<V> pop() {
+//        throw new UnsupportedOperationException();
+//    }
 
 
     /**
@@ -220,7 +221,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
         return (existing != null) ?
                 putExists(b, scale, existing, overflow) :
-                putNew(i, b, scale);
+                putNew(i, link(i, b, scale));
 
 //        //TODO optional displacement until next update, allowing sub-threshold to grow beyond threshold
 //        BagBudget<V> displaced = null;
@@ -253,20 +254,18 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         return existing;
     }
 
+    protected BLink<V> link(V i, Budgeted b, float scale) {
+        if (b instanceof BLink)
+            return (BLink)b;
+        if (i instanceof BLink)
+            return (BLink)i;
+        return new BLink<>(i, b, scale);
+    }
+
     @Nullable
-    private final BLink<V> putNew(V i, Budgeted b, float scale) {
-        BLink<V> newBudget;
-        if (!(b instanceof BLink)) {
-            newBudget = new BLink<>(i, b, scale);
-        } else {
-            //use provided
-            newBudget = (BLink) b;
-            newBudget.commit();
-        }
-
-        put(i, newBudget);
-
-        return newBudget;
+    protected BLink<V> putNew(V i, BLink<V> newBudget) {
+        newBudget.commit(); //?? necessary
+        return put(i, newBudget);
     }
 
 
@@ -289,7 +288,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     }
 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
-    @Override public Bag<V> commit(@NotNull Consumer<BLink<? extends V>> each) {
+    @Override public Bag<V> commit(@NotNull Consumer<BLink> each) {
         int s = size();
         if (s == 0)
             return this;

@@ -36,9 +36,8 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
 
-    @NotNull
-    private final Sensor feedback;
-    private final Logger logger;
+    @NotNull private final Sensor feedback;
+    //private final Logger logger;
 
     @FunctionalInterface  public interface MotorFunction {
         float motor(float believed, float desired);
@@ -63,7 +62,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
         assert (Op.isOperation(term()));
 
-        this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
+        //this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
         feedback = new Sensor(n, this, this) {
