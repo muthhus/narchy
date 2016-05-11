@@ -37,7 +37,7 @@ public class TaskTest {
         TreeSet<Task> t = new TreeSet<>();
         int count = 0;
         for (float f = 0; f < 1.0f; f += 0.3f)
-            for (float c = 0; c < 1.0f; c += 0.3f) {
+            for (float c = 0.01f; c < 1.0f; c += 0.3f) {
                 t.add(
                     $.task("a:b", '.',f, c)
                 );
@@ -48,8 +48,8 @@ public class TaskTest {
         List<Task> l = Lists.newArrayList(t);
         //l.forEach(System.out::println);
         int last = l.size() - 1;
-        assertTrue(l.get(0).toString().contains("(b-->a). :-: %.90;.90%"));
-        assertTrue(l.get(last).toString().contains("(b-->a). :-: %0.0;0.0%"));
+        assertTrue(l.get(0).toString().contains("(b-->a). :-: %.90;.91%"));
+        assertTrue(l.get(last).toString().contains("(b-->a). :-: %0.0;.01%"));
 
         //test monotonically decreasing
         Task y = null;
@@ -57,7 +57,7 @@ public class TaskTest {
             if (y!=null) {
                 assertTrue( x.freq() <= y.freq() );
                 float c = y.conf();
-                if (x.conf() != 0.9f) //wrap around only time when it will decrease
+                if (x.conf() < 0.90f) //wrap around only time when it will decrease
                     assertTrue( x.conf() <= c);
             }
             y = x;

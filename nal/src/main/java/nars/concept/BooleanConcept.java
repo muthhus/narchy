@@ -95,13 +95,17 @@ public class BooleanConcept extends OperationConcept {
                 }
             }
 
-            MutableTask task = new MutableTask(content, beliefOrGoal ? '.' : '!', new DefaultTruth(f,c));
+            if (c > 0) {
+                MutableTask task = new MutableTask(content, beliefOrGoal ? '.' : '!', new DefaultTruth(f, c));
 
-            if (!ev.isEmpty()) {
-                return task.evidence(Stamp.toSetArray(ev));
-            } else {
-                return null; //task.truth(Truth.Zero);
+                if (!ev.isEmpty()) {
+                    return task.evidence(Stamp.toSetArray(ev));
+                }
+
             }
+
+            return null; //task.truth(Truth.Zero);
+
 
         }
     }

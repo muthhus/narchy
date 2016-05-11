@@ -66,9 +66,9 @@ public class TruthTest {
         assertNotEquals( new DefaultTruth(0.506f, 0.5f).hashCode(), new DefaultTruth(0.5f, 0.5f).hashCode() );
 
 
-        assertEquals( new DefaultTruth(0, 0).hashCode(), new DefaultTruth(0, 0).hashCode() );
-        assertEquals( new DefaultTruth(0.004f, 0).hashCode(), new DefaultTruth(0, 0).hashCode() );
-        assertNotEquals( new DefaultTruth(0.006f, 0).hashCode(), new DefaultTruth(0, 0).hashCode() );
+        assertEquals( new DefaultTruth(0, 0.01f).hashCode(), new DefaultTruth(0, 0.01f).hashCode() );
+        assertEquals( new DefaultTruth(0.004f, 0.01f).hashCode(), new DefaultTruth(0, 0.01f).hashCode() );
+        assertNotEquals( new DefaultTruth(0.006f, 0.01f).hashCode(), new DefaultTruth(0, 0.01f).hashCode() );
 
     }
 
