@@ -182,15 +182,14 @@ public interface TermIndex {
 
         if (src == null)
             throw new NullPointerException();
-            //return null; //pass-through
+        //return null; //pass-through
 
         //constant atom or zero-length compound, ex: ()
         int len = src.size();
         boolean variable;
         if (len == 0) {
-            variable = (src instanceof Variable);
-            if (!variable)
-                return src;
+            if (!(variable = (src instanceof Variable)))
+                return src; //constant term, of which none should be mapped in the subst
         } else {
             variable = false;
         }
@@ -202,54 +201,55 @@ public interface TermIndex {
         else if (variable)
             return null; //unassigned variable
 
-        Compound crc = (Compound)src;
+        Compound crc = (Compound) src;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
+
+        boolean changed = false;
+        int j; //pointer to the term of crc to compare changes against
         for (int i = 0; i < len; i++) {
             Term t = crc.term(i);
             Term u = resolve(t, f);
 
             if (u instanceof EllipsisMatch) {
 
-                EllipsisMatch m = (EllipsisMatch) u;
-
-//                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
+                //                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
 //                    return src; //invalid transformation, violated arity constraint
 //                }
 
-                Collections.addAll(sub, m.term);
+                Term[] ee = ((EllipsisMatch) u).term;
+                Collections.addAll(sub, ee);
+                changed = true; //just assume it was changed
 
             } else {
 
-//                if (maxArity != -1 && 1 + sub.size() > maxArity) {
-//                    return src; //invalid transformation, violates arity constraint
-//                }
+                //                if (maxArity != -1 && 1 + sub.size() > maxArity) {
+                //                    return src; //invalid transformation, violates arity constraint
+                //                }
 
-                sub.add(u != null ? u : t);
+                if (u == null) {
+                    u = t; //keep value
+                } else if (t!=u) {//!changed && !t.equals(u)) {
+                    changed = true; //check for any changes
+                }
+
+                sub.add(u);
             }
         }
 
+        if (!changed)
+            return src;
 
         //Prefilters
         Op sop = src.op();
 
-        {
-            //prefilters
-            if (sop.isStatement() && sub.size() != 2) {
-                throw new RuntimeException("transformed to degenerate statement");
-            }
-            else if (sop.isImage()) {
-                int resultSize = sub.size();
-                if (resultSize == 0 || (resultSize == 1 && sub.get(0).equals(Imdex)))
-                    throw new RuntimeException("transformed to degenerate image");
-            }
+        //Prefilters?
+        //        if ((minArity!=-1) && (resultSize < minArity)) {
+        //            //?
+        //        }
 
-            //
-            //        if ((minArity!=-1) && (resultSize < minArity)) {
-            //            //?
-            //        }
-
-        }
+        if (sop.isStatement() && (sub.size() != 2 || sub.get(0).equals(sub.get(1))))
+            return null; //transformed to degenerate statement
 
         Term result = theTransformed(crc, TermContainer.the(sop, sub));
 
@@ -257,30 +257,46 @@ public interface TermIndex {
 
             //post-process: apply any known immediate transform operators
             if (isOperation(result)) {
-                ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
+                Compound cres = (Compound)result;
+                ImmediateTermTransform tf = f.getTransform(Operator.operator(cres));
                 if (tf != null) {
-                    result = applyImmediateTransform(f, result, tf);
+                    result = applyImmediateTransform(f, cres, tf);
                 }
             }
-        }
+        } /*else {
+//            //why was it null?
+//            if (!sop.isStatement())
+//                System.err.println(crc + " " + TermContainer.the(sop, sub));
+
+
+            if (Global.DEBUG_PARANOID) {
+
+                //these should not happen
+
+                if (sop.isStatement() && sub.size() != 2) {
+                    throw new RuntimeException("transformed to degenerate statement");
+                } else if (sop.isImage()) {
+                    int resultSize = sub.size();
+                    if (resultSize == 0 || (resultSize == 1 && sub.get(0).equals(Imdex)))
+                        throw new RuntimeException("transformed to degenerate image");
+                }
+            }
+        }*/
 
         return result;
     }
 
 
     @Nullable
-    default Term applyImmediateTransform(Subst f, Term result, ImmediateTermTransform tf) {
+    default Term applyImmediateTransform(Subst f, Compound result, ImmediateTermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
-        Compound args = Operator.opArgs((Compound) result);
+        Compound args = Operator.opArgs(result);
 
         return ((tf instanceof PremiseAware) && (f instanceof PremiseEval)) ?
                 ((PremiseAware) tf).function(args, (PremiseEval) f) :
                 tf.function(args, this);
     }
-
-
-
 
 
 //    class ImmediateTermIndex implements TermIndex {
@@ -443,10 +459,8 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term theTransformed(@NotNull Compound src, @Nullable Term[] newSubs) {
-        return ((newSubs == null) || (newSubs == src.terms())) ?
-                src :
-                theTransformed(src, TermContainer.the(src.op(), newSubs));
+    default Term theTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
+        return theTransformed(src, TermContainer.the(src.op(), newSubs));
     }
 
 
@@ -482,7 +496,7 @@ public interface TermIndex {
             if (cx == null)
                 return null;
 
-            if (x != cx) { //REFERENCE EQUALTY
+            if (x!= cx) { //must be refernce equality test for some variable normalization cases
                 modifications++;
                 x = cx;
             }

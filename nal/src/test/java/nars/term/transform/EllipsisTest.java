@@ -490,9 +490,10 @@ public class EllipsisTest {
         for (Op o : Op.values()) {
             if (o.minSize <= 1) continue;
 
-            assertEquals(o + " with normal term",
-                    a, $.the(o,a));
+            if (o.isStatement()) continue;
 
+            assertEquals(o + " with normal term",
+                    a, $.the(o, a));
 
             assertEquals(o + " with ellipsis not reduced",
                     o.isStatement() ? VAR_PATTERN : o,

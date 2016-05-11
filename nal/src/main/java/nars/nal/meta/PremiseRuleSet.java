@@ -325,12 +325,6 @@ public class PremiseRuleSet  {
         return fwd[0];
     }
 
-//    private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
-//
-//        r.forEachQuestionReversal((q,reason) ->
-//                add(target, q, src + "//" + reason, patterns));
-//
-//     }
 
     @NotNull
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {

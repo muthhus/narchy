@@ -812,17 +812,19 @@ public class PremiseRule extends GenericCompound {
      */
     public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w) {
 
-        Term T = getTask(); //Task
-        Term B = getBelief(); //Belief
-        Term C = getConclusionTermPattern(); //Conclusion
+        if (Global.BACKWARD_QUESTIONS) {
+            Term T = getTask(); //Task
+            Term B = getBelief(); //Belief
+            Term C = getConclusionTermPattern(); //Conclusion
 
-        // C, B, [pre], task_is_question() |- T, [post]
-        PremiseRule clone1 = clonePermutation(C, B, T, true);
-        w.accept(clone1, "C,B,question |- B");
+            // C, B, [pre], task_is_question() |- T, [post]
+            PremiseRule clone1 = clonePermutation(C, B, T, true);
+            w.accept(clone1, "C,B,question |- B");
 
-        // T, C, [pre], task_is_question() |- B, [post]
-        PremiseRule clone2 = clonePermutation(T, C, B, true);
-        w.accept(clone2, "T,C,question |- B");
+            // T, C, [pre], task_is_question() |- B, [post]
+            PremiseRule clone2 = clonePermutation(T, C, B, true);
+            w.accept(clone2, "T,C,question |- B");
+        }
 
     }
 

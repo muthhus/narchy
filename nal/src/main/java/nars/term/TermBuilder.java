@@ -398,8 +398,8 @@ public abstract class TermBuilder {
         switch (u.length) {
             case 2:
                 return statement2(op, t, u);
-            case 1:
-                return u[0];
+            //case 1:
+                //return u[0];
             default:
                 throw new RuntimeException("invalid statement arguments: " + Arrays.toString(u));
         }

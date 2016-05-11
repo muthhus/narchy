@@ -150,6 +150,10 @@ public enum Global {
     public static float SUBFRAME_EPSILON = 0.0001f;
 
 
+    /** permute certain rules backward to questions (experimental, generates a lot of questions) */
+    public static boolean BACKWARD_QUESTIONS = false;
+
+
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {
 //        return 0.02f + taskPriority * 0.02f; //search up to 4% of concepts
 //    }

@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
+import nars.Global;
 import nars.Narsese;
 import nars.term.Compound;
 import nars.term.Term;
@@ -167,24 +168,26 @@ public class PremiseRuleTest {
 
     @Test
     public void testBackwardPermutations() {
-        Set<PremiseRule> s = PremiseRuleSet.permute(
-                rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)>")
-        );
-        assertNotNull(s);
-        //System.out.println(Joiner.on('\n').join(s));
+        if (Global.BACKWARD_QUESTIONS) {
+            Set<PremiseRule> s = PremiseRuleSet.permute(
+                    rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)>")
+            );
+            assertNotNull(s);
+            //System.out.println(Joiner.on('\n').join(s));
 
-        //total variations from the one input:
-        assertEquals(4, s.size());
+            //total variations from the one input:
+            assertEquals(4, s.size());
 
-        String x = s.toString();
+            String x = s.toString();
 
-        assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((DeductionX-->Belief),(StrongX-->Desire),(AllowBackward-->Derive))))"));
-        assertTrue(x.contains("(((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),"));
-        //assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%2),task(\"?\")),((%3-->%2),"));
-        assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%3),task(\"?\")),((%2-->%3),"));
-        //assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%3,%2),task(\"?\")),((%3-->%1),"));
-        assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%1,%2),task(\"?\")),((%1-->%3),"));
+            assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((DeductionX-->Belief),(StrongX-->Desire),(AllowBackward-->Derive))))"));
+            assertTrue(x.contains("(((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),"));
+            //assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%2),task(\"?\")),((%3-->%2),"));
+            assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%3),task(\"?\")),((%2-->%3),"));
+            //assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%3,%2),task(\"?\")),((%3-->%1),"));
+            assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%1,%2),task(\"?\")),((%1-->%3),"));
 
+        }
     }
 
     @Test public void testSubstIfUnifies() {
