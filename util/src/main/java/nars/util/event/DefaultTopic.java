@@ -12,17 +12,17 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 
     //TODO extract this to Topics and a graph metamodel of the events
 
-    static Map<String, Topic<?>> topics = new HashMap();
+    //static Map<String, Topic<?>> topics = new HashMap();
 
 
 
 
-    public static void register(Topic<?> t) {
-        topics.put(t.name(), t);
-    }
-    public static void unregister(Topic<?> t) {
-        topics.remove(t.name());
-    }
+//    public static void register(Topic<?> t) {
+//        topics.put(t.name(), t);
+//    }
+//    public static void unregister(Topic<?> t) {
+//        topics.remove(t.name());
+//    }
 
     static AtomicInteger topicSerial = new AtomicInteger();
     static int nextTopicID() {
@@ -50,7 +50,7 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
     DefaultTopic(String id) {
         super(Consumer[]::new);
         this.id = id;
-        register(this);
+        //register(this);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 
     @Override
     public void delete() {
-        unregister(this);
+        //unregister(this);
         data.clear();
     }
 
