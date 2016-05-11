@@ -286,30 +286,30 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
         return goal(
-                getDefaultPriority(GOAL),
+                priorityDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf)  {
-        believe(getDefaultPriority(BELIEF), term, time(tense), freq, conf);
+        believe(priorityDefault(BELIEF), term, time(tense), freq, conf);
         return this;
     }
     @NotNull public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
-        return believe(term, tense, freq, getDefaultConfidence(Symbols.BELIEF));
+        return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
     }
     @NotNull public NAR goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
-        return goal(term, tense, freq, getDefaultConfidence(Symbols.GOAL));
+        return goal(term, tense, freq, confidenceDefault(Symbols.GOAL));
     }
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        return believe(priority, getDefaultDurability(BELIEF), term, time(tense), freq, conf);
+        return believe(priority, durabilityDefault(BELIEF), term, time(tense), freq, conf);
     }
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, long when, float freq, float conf) throws NarseseException {
-        return believe(priority, getDefaultDurability(BELIEF), term, when, freq, conf);
+        return believe(priority, durabilityDefault(BELIEF), term, when, freq, conf);
     }
 
     @NotNull
@@ -322,7 +322,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(getDefaultPriority(BELIEF), term(term), time(tense), freq, conf);
+        believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
         return this;
     }
 
@@ -358,7 +358,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
-        return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
+        return believe(term, trueOrFalse, confidenceDefault(BELIEF));
     }
 
     @NotNull
@@ -368,7 +368,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
-        return goal(term, trueOrFalse, getDefaultConfidence(BELIEF));
+        return goal(term, trueOrFalse, confidenceDefault(BELIEF));
     }
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
@@ -386,11 +386,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf)  {
-        input(pri, getDefaultDurability(GOAL), goal, GOAL, when, freq, conf);
+        input(pri, durabilityDefault(GOAL), goal, GOAL, when, freq, conf);
         return this;
     }
     @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf)  {
-        input(pri, getDefaultDurability(GOAL), goal, GOAL, time(tense), freq, conf);
+        input(pri, durabilityDefault(GOAL), goal, GOAL, time(tense), freq, conf);
         return this;
     }
 

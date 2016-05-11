@@ -156,7 +156,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             case Symbols.GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    truth = memory.getTruthDefault(punc);
+                    truth = memory.truthDefault(punc);
                 }
                 break;
             case Symbols.QUEST:
@@ -200,7 +200,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         float q = qua();
         if (q!=q /* fast NaN test */) {
             //HACK for now just assume that only MutableTask supports unbudgeted input
-            memory.applyDefaultBudget((MutableTask)this);
+            memory.budgetDefault((MutableTask)this);
         }
 
 

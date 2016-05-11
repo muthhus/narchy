@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import nars.Global;
 import nars.NAR;
-import nars.Op;
 import nars.bag.impl.SortedTable;
 import nars.budget.BudgetMerge;
 import nars.task.MutableTask;
@@ -54,6 +53,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
     public Task prepare(@NotNull Task input, @NotNull NAR nar) {
         if (capacity() == 0)
             return null;
+
+        //removeDeleted();
 
         if (isFull() /*&& temporal.capacity() > 1*/) {
 
@@ -202,6 +203,9 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
                 else
                     newDT = DTERNAL;
 
+                if (!at.op().isTemporal(at, newDT))
+                    throw new RuntimeException("??");
+
                 at = at.dt(newDT);
             }
 
@@ -230,6 +234,8 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
 
     @Nullable
     @Override public Task top(long when) {
+
+        //removeDeleted();
 
         List<? extends Task> l = list();
 
@@ -265,8 +271,24 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
             polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
         }
 
+        //removeDeleted();
+
         return polation.truth(when, list(), eternal.top());
     }
+
+
+//    private final void removeDeleted() {
+//        int s = size();
+//        for (int i = 0; i < s; ) {
+//            Task x = get(i);
+//            if (x.isDeleted()) {
+//                removeItem(i);
+//                s--;
+//            } else {
+//                i++;
+//            }
+//        }
+//    }
 
 //    public Task weakest(Task input, NAR nar) {
 //

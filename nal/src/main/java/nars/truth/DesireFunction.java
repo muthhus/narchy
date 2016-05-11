@@ -84,7 +84,7 @@ public enum DesireFunction implements TruthOperator {
 
     @Nullable
     private static Truth defaultTruth(@NotNull Memory m) {
-        return m.getTruthDefault(Symbols.GOAL /* goal? */);
+        return m.truthDefault(Symbols.GOAL /* goal? */);
     }
 
 

@@ -74,7 +74,7 @@ public class Optimize<X> {
         int n = tweaks.size();
 
         double[] start = new double[n];
-        double[] sigma = new double[n];
+        //double[] sigma = new double[n];
         double[] min = new double[n];
         double[] max = new double[n];
 
@@ -84,7 +84,7 @@ public class Optimize<X> {
             start[i] = (s.getMax() + s.getMin()) / 2f;
             min[i] = (s.getMin());
             max[i] = (s.getMax());
-            sigma[i] = Math.abs(max[i] - min[i]) * 0.75f; //(s.getInc());
+            //sigma[i] = Math.abs(max[i] - min[i]) * 0.75f; //(s.getInc());
             i++;
         }
 
@@ -98,7 +98,15 @@ public class Optimize<X> {
             for (Tweak w : tweaks) {
                 w.apply.value((float) point[i1++], x);
             }
-            float score = eval.floatValueOf(x);
+
+            float score;
+            try {
+                score = eval.floatValueOf(x);
+            } catch (Exception e) {
+                e.printStackTrace();;
+                score = Float.NEGATIVE_INFINITY;
+            }
+
             //System.out.println(Arrays.toString(point) + " = " + loss);
             if (trace)
                 System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
@@ -116,8 +124,8 @@ public class Optimize<X> {
 //                new CMAESOptimizer.PopulationSize(pop));
 
         int dim = start.length;
-        final int numIterpolationPoints = 2 * dim + 1 + 1;
-        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints)
+        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
+        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, 1.0D, 1.0E-8D)
                     .optimize(new MaxEval(maxIterations),
                         func,
                         GoalType.MAXIMIZE,

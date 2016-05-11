@@ -79,7 +79,7 @@ public class Narsese extends BaseParser<Object> {
         }
 
         if (t == null) {
-            t = memory.getTruthDefault(p);
+            t = memory.truthDefault(p);
         }
 
         MutableTask ttt =
@@ -97,12 +97,12 @@ public class Narsese extends BaseParser<Object> {
             case 1:
                 if ((p == Symbols.QUEST || p == Symbols.QUESTION)) {
                     ttt.budget(b[0],
-                            memory.getDefaultDurability(p),
-                            memory.getDefaultQuality(p));
+                            memory.durabilityDefault(p),
+                            memory.qualityDefault(p));
 
                 } else {
                     ttt.budget(b[0],
-                            memory.getDefaultDurability(p));
+                            memory.durabilityDefault(p));
                 }
                 break;
             case 2:
@@ -1156,7 +1156,7 @@ public class Narsese extends BaseParser<Object> {
 
         Truth t = (Truth) x[3];
         if (t!=null && !Float.isFinite(t.conf()))
-            t = t.withConf(m.getDefaultConfidence(punct));
+            t = t.withConf(m.confidenceDefault(punct));
 
         return makeTask(m, (float[]) x[0], content, punct, t, (Tense) x[4]);
     }

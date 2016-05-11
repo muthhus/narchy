@@ -98,7 +98,7 @@ public abstract class Param extends Container implements Level {
     /** Maximum number of goals kept in a Concept */
     public final AtomicInteger conceptGoalsMax = new AtomicInteger();
 
-    public float getDefaultConfidence(char punctuation) {
+    public float confidenceDefault(char punctuation) {
 
         switch (punctuation) {
             case BELIEF:
@@ -112,11 +112,11 @@ public abstract class Param extends Container implements Level {
         }
     }
 
-    public void applyDefaultBudget(@NotNull MutableTask t) {
+    public void budgetDefault(@NotNull MutableTask t) {
 
         char punc = t.punc();
-        t.setPriority(getDefaultPriority(punc));
-        t.setDurability(getDefaultDurability(punc));
+        t.setPriority(priorityDefault(punc));
+        t.setDurability(durabilityDefault(punc));
 
         if (t.isBeliefOrGoal()) {
 
@@ -158,7 +158,7 @@ public abstract class Param extends Container implements Level {
     float DEFAULT_QUESTION_QUALITY = 0.5f;
     float DEFAULT_QUEST_QUALITY = 0.5f;
 
-    float getDefaultPriority(char punctuation) {
+    public float priorityDefault(char punctuation) {
         switch (punctuation) {
             case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_PRIORITY;
@@ -175,7 +175,7 @@ public abstract class Param extends Container implements Level {
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
 
-    float getDefaultDurability(char punctuation) {
+    public float durabilityDefault(char punctuation) {
         switch (punctuation) {
             case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_DURABILITY;
@@ -188,7 +188,8 @@ public abstract class Param extends Container implements Level {
         }
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
-    float getDefaultQuality(char punctuation) {
+
+    public float qualityDefault(char punctuation) {
         switch (punctuation) {
             case QUEST:
                 return DEFAULT_QUEST_QUALITY;
@@ -201,15 +202,15 @@ public abstract class Param extends Container implements Level {
     }
 
     //decision threshold is enough for now
-    float EXECUTION_SATISFACTION_TRESHOLD;
+    //float EXECUTION_SATISFACTION_TRESHOLD;
 
-    public float getExecutionSatisfactionThreshold() {
+    /*public float getExecutionSatisfactionThreshold() {
         return EXECUTION_SATISFACTION_TRESHOLD;
-    }
+    }*/
 
 
 
-    @Nullable public final Truth getTruthDefault(char p) {
+    @Nullable public final Truth truthDefault(char p) {
         switch (p) {
             case GOAL:
                 return defaultGoalTruth;
@@ -306,16 +307,17 @@ public abstract class Param extends Container implements Level {
 //    }
 
     Param() {
-        setDefaultJudgmentConfidence(0.9f);
-        setDefaultGoalConfidence(0.9f);
-
+        beliefConfidence(0.9f);
+        goalConfidence(0.9f);
     }
 
-    public void setDefaultGoalConfidence(float v) {
+    /** sets the default input goal confidence */
+    public void goalConfidence(float v) {
         defaultGoalTruth = new DefaultTruth(1.0f, v);
     }
 
-    public void setDefaultJudgmentConfidence(float v) {
+    /** sets the default input belief confidence */
+    public void beliefConfidence(float v) {
         defaultJudgmentTruth = new DefaultTruth(1.0f, v);
     }
 }

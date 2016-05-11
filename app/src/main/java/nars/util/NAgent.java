@@ -4,6 +4,7 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
+import nars.Symbols;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -41,16 +42,16 @@ public class NAgent implements Agent {
     private float prevReward = Float.NaN, dReward = 0;
 
     /** learning rate */
-    float alpha = 0.7f;
+    float alpha;
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.02f;
     private double epsilonRandom = 0.02f;
 
-    float sensorPriority = 0.3f;
-    float rewardPriority = 0.6f;
-    float goalFeedbackPriority = rewardPriority;
-    float goalPriority = rewardPriority;
+    float sensorPriority;
+    float rewardPriority;
+    float goalFeedbackPriority;
+    float goalPriority;
 
     final FloatToObjectFunction sensorTruth =  (v) -> {
         /*return new DefaultTruth(
@@ -76,6 +77,11 @@ public class NAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
         nar.reset();
+
+        rewardPriority = goalFeedbackPriority = sensorPriority = nar.priorityDefault(Symbols.BELIEF);
+        goalPriority = nar.priorityDefault(Symbols.GOAL);
+
+        alpha = nar.confidenceDefault(Symbols.BELIEF);
 
         motivation = new float[actions];
         motivationOrder = new int[actions];

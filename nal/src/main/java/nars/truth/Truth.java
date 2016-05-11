@@ -21,6 +21,7 @@
 package nars.truth;
 
 import nars.$;
+import nars.Global;
 import nars.Symbols;
 import nars.term.Term;
 import nars.util.Texts;
@@ -43,7 +44,7 @@ public interface Truth extends Truthed {
     Term Truth_TRUE = $.the("TRUE");
     Term Truth_FALSE = $.the("FALSE");
     Term Truth_UNSURE = $.the("UNSURE");
-    Truth Null = new DefaultTruth(0.5f, 0);
+    Truth Null = new DefaultTruth(0.5f, Global.TRUTH_EPSILON);
     Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
 
 

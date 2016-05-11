@@ -39,6 +39,9 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(float f, float c, float epsilon, int discreteness) {
+        if (c==0)
+            throw new RuntimeException("zero conf");
+
         //assert(Float.isFinite(f) && Float.isFinite(c));
         this.freq = f = round(f, epsilon);
         this.conf = c = round(c, epsilon);
@@ -46,7 +49,7 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {
-        this(1.0f, m.getDefaultConfidence(punctuation));
+        this(1.0f, m.confidenceDefault(punctuation));
     }
 
 

@@ -26,7 +26,7 @@ import static nars.Global.reference;
 public class MutableTask extends AbstractTask {
 
     public MutableTask(@NotNull Termed<Compound> t, char punct, float freq, @NotNull NAR nar) throws Narsese.NarseseException {
-        this(t, punct, new DefaultTruth(freq, nar.getDefaultConfidence(punct)));
+        this(t, punct, new DefaultTruth(freq, nar.confidenceDefault(punct)));
     }
 
     public MutableTask(@NotNull String compoundTermString, char punct, @Nullable Truth truth) throws Narsese.NarseseException {

@@ -5,14 +5,12 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.Agent;
-import nars.util.DQN;
 import nars.util.NAgent;
 import nars.util.Optimize;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import static java.lang.System.out;
-import static nars.util.NAgent.printTasks;
 
 /**
  * Created by me on 5/4/16.
@@ -131,13 +129,26 @@ public class Thermostat implements Environment {
 //        );
 
         Optimize.Result r = new Optimize<NAR>(() -> new Default())
-                .call("conceptRem", 0.25f, 8, 0.25f, "conceptRemembering.setValue(#x)")
+
+                .call("beliefConf", 0.1f, 0.95f, 0.05f, "beliefConfidence(#x)")
+                .call("goalConf", 0.1f, 0.95f, 0.05f, "goalConfidence(#x)")
+
+
+                .call("conceptsPerCyc", 2, 3, 1f, "core.conceptsFiredPerCycle.setValue(#i)")
+                .call("termLinksPerConcept", 1, 3, 1f, "premiser.termlinksFiredPerFiredConcept.setValue(#i)")
+
+                .call("cycPerFrame", 2, 4, 1f, "cyclesPerFrame.setValue(#i)")
+
+
+                .call("conceptRem", 4f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
                 .call("taskRem",    2f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
                 .call("termRem",    2f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
-                .call("conceptAct", 0.3f, 1f, 0.1f,  "conceptActivation.setValue(#x)")
 
-                .call("cycPerFrame", 1, 4, 1f, "cyclesPerFrame.setValue(#i)")
-                .run(500, (x) -> new Thermostat().run(new NAgent(x), 10000));
+                .call("conceptAct", 0.5f, 0.8f, 0.1f,  "conceptActivation.setValue(#x)")
+
+
+
+                .run(2500, (x) -> new Thermostat().run(new NAgent(x), 15000));
 
         System.out.println();
         r.print();
@@ -155,6 +166,8 @@ public class Thermostat implements Environment {
 //            //n.cyclesPerFrame.set(2);
 //            //n.shortTermMemoryHistory.set(3);
 //            //n.logSummaryGT(System.out, 0.55f);
+
+
 //            n.conceptRemembering.setValue(cRem);
 //
 //            NAgent a = //new NAgentDebug(n);
