@@ -557,8 +557,12 @@ public interface TermIndex {
                 Term t0 = tc.term(0);
                 if (t0 instanceof Atomic) {
                     //negations of non-DepVar atomics are invalid
-                    if (t0.op() != Op.VAR_DEP)
-                        throw new InvalidConceptTerm(term);
+                    if (t0.op() != Op.VAR_DEP) {
+                        if (Global.DEBUG)
+                            throw new InvalidConceptTerm(term);
+                        else
+                            return null;
+                    }
                 }
             }
 

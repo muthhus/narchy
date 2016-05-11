@@ -41,32 +41,37 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 1;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 	private int pacmanCyclesPerFrame = 8;
 
+	public PacmanEnvironment(int ghosts) {
+		super(ghosts);
+	}
+
 
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				1024, 2, 1, 2, rng,
+				1024, 8, 1, 2, rng,
 				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
-		nar.conceptActivation.setValue(0.1f);
-		nar.cyclesPerFrame.set(200);
-		//a.nar.conceptRemembering.setValue(1);
-		//a.nar.termLinkRemembering.setValue(0.5f);
-		//a.nar.taskLinkRemembering.setValue(0.5f);
+		nar.beliefConfidence(0.2f);
+		nar.conceptActivation.setValue(0.12f);
+		nar.cyclesPerFrame.set(50);
+//		nar.conceptRemembering.setValue(1f);
+//		nar.termLinkRemembering.setValue(3f);
+//		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new PacmanEnvironment().run(
+		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				1500);
+				35000);
 
 		printTasks(new NAgent(nar).nar, true);
 		printTasks(new NAgent(nar).nar, false);
@@ -156,7 +161,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		if (interScore < bias*2f) {
 			//too much pain
-			pacKeyDir = 0;
+			pacKeyDir = -1;
 		}
 
 

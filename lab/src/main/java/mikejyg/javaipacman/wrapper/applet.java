@@ -51,7 +51,7 @@ implements ActionListener
 
 	void newGame()
 	{
-		pacMan=new cpcman();
+		pacMan=new cpcman(4);
 	}
 
 	/////////////////////////////////////////////////

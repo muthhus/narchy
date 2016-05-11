@@ -45,7 +45,7 @@ public class NAgent implements Agent {
     float alpha;
 
     /** exploration rate - confidence of initial goal for each action */
-    float epsilon = 0.02f;
+    float epsilon = 0.01f;
     private double epsilonRandom = 0.02f;
 
     float sensorPriority;
@@ -357,15 +357,15 @@ public class NAgent implements Agent {
     }
 
     private String actionConceptName(int i) {
-        //return "A:a" + i;
-        return "A:{a" + i + "}";
+        return "A:a" + i;
+        //return "A:{a" + i + "}";
         //return "(a" + i + ")";
     }
 
     private String inputConceptName(int i) {
         //return inputConceptName(i, -1);
-        //return "I:i" + i;
-        return "I:{i" + i + "}";
+        return "I:i" + i;
+        //return "I:{i" + i + "}";
     }
 
     private String inputConceptName(int i, int component) {

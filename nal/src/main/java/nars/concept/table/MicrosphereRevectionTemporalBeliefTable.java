@@ -204,9 +204,10 @@ public class MicrosphereRevectionTemporalBeliefTable extends ArrayListTable<Task
                     newDT = DTERNAL;
 
                 if (!at.op().isTemporal(at, newDT))
-                    throw new RuntimeException("??");
-
-                at = at.dt(newDT);
+                    System.err.println("temporal fault");
+                    //throw new RuntimeException("??");
+                else
+                    at = at.dt(newDT);
             }
 
             merged = new MutableTask(at, a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)

@@ -106,16 +106,17 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	final int SUSPEND=1;  // stop/start
 	final int BOSS=2;      // boss
 
-	int numGhosts = 1; //max 4
+	int numGhosts; //max 4
 	int zoom = 2;
 
 	////////////////////////////////////////////////
 	// initialize the object
 	// only called once at the beginning
 	////////////////////////////////////////////////
-	public cpcman()
+	public cpcman(int ghosts)
 	{
-		super("P*C MAN");
+		super("CRK MAN");
+		this.numGhosts = ghosts;
 
 
 	}
@@ -329,7 +330,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 		// display the offscreen
 		g.drawImage(offScreen, 
-				iMazeX+ leftOffset, iMazeY+ topOffset, getWidth(), getHeight(), this);
+				iMazeX+ leftOffset, iMazeY +topOffset/2, getWidth(), getHeight()-topOffset/2, this);
 
 		// display extra information
 		if (changeHiScore==1)
@@ -387,7 +388,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		for (int i=0; i<ghosts.length; i++)
 			ghosts[i].move(pac.iX, pac.iY, pac.iDir);
 
-		if (pacKeyDir != 0) {
+		if (pacKeyDir != -1) {
 			k=pac.move(pacKeyDir);
 		}
 
@@ -557,7 +558,6 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 
 
-		SwingUtilities.invokeLater(this::repaint);
 		//repaint();
 
 //		invalidate();
@@ -592,8 +592,9 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 					if (key==SUSPEND)
 						gameState=SUSPENDED;
 					else
-						for (int i = 0; i < n; i++)
+						for (int i = 0; i < n; i++) {
 							move();
+						}
 					break;
 				case DEADWAIT:
 					if (pacRemain>0)
@@ -612,6 +613,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			//key=NONE;
 		}
 
+		SwingUtilities.invokeLater(this::repaint);
 
 
 

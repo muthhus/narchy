@@ -12,8 +12,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.*;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,17 +72,19 @@ public class Optimize<X> {
         int i = 0;
         int n = tweaks.size();
 
-        double[] start = new double[n];
+        double[] mid = new double[n];
         //double[] sigma = new double[n];
         double[] min = new double[n];
         double[] max = new double[n];
+        double[] inc = new double[n];
 
         for (Tweak w : tweaks) {
             //w.apply.value((float) point[i++], x);
             FloatRange s = (FloatRange) w;
-            start[i] = (s.getMax() + s.getMin()) / 2f;
+            mid[i] = (s.getMax() + s.getMin()) / 2f;
             min[i] = (s.getMin());
             max[i] = (s.getMax());
+            inc[i] = s.getInc();
             //sigma[i] = Math.abs(max[i] - min[i]) * 0.75f; //(s.getInc());
             i++;
         }
@@ -113,6 +114,8 @@ public class Optimize<X> {
             return score;
         });
 
+        int dim = mid.length;
+
 //        CMAESOptimizer optim = new CMAESOptimizer(cmaesIter, stopValue, true, 0,
 //                0, new MersenneTwister(3), true, null);
 //        PointValuePair r = optim.optimize(new MaxEval(maxIterations),
@@ -123,14 +126,23 @@ public class Optimize<X> {
 //                new CMAESOptimizer.Sigma(sigma),
 //                new CMAESOptimizer.PopulationSize(pop));
 
-        int dim = start.length;
-        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
-        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, 1.0D, 1.0E-8D)
-                    .optimize(new MaxEval(maxIterations),
-                        func,
-                        GoalType.MAXIMIZE,
-                        new SimpleBounds(min, max),
-                        new InitialGuess(start));
+
+//        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
+//        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, dim * 2.0, 1.0E-8D)
+//                    .optimize(new MaxEval(maxIterations),
+//                        func,
+//                        GoalType.MAXIMIZE,
+//                        new SimpleBounds(min, max),
+//                        new InitialGuess(start));
+
+        PointValuePair r = new SimplexOptimizer(1e-10, 1e-30).optimize(
+                new MaxEval(maxIterations),
+                func,
+                GoalType.MAXIMIZE,
+                new InitialGuess(mid),
+                //new NelderMeadSimplex(inc)
+                new MultiDirectionalSimplex(inc)
+        );
 
         return new Result(r);
 

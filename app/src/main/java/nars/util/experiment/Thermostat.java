@@ -3,6 +3,7 @@ package nars.util.experiment;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.util.Agent;
 import nars.util.NAgent;
@@ -18,8 +19,8 @@ import static java.lang.System.out;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 180;
-    public final float speed = 0.01f;
+    public float targetPeriod = 20;
+    public final float speed = 0.07f;
     boolean print = false;
     private MutableFloat yHidden;
     private MutableFloat yEst;
@@ -130,25 +131,29 @@ public class Thermostat implements Environment {
 
         Optimize.Result r = new Optimize<NAR>(() -> new Default())
 
-                .call("beliefConf", 0.1f, 0.95f, 0.05f, "beliefConfidence(#x)")
-                .call("goalConf", 0.1f, 0.95f, 0.05f, "goalConfidence(#x)")
+                .call("beliefConf", 0.1f, 0.95f, 0.1f, "beliefConfidence(#x)")
+                .call("goalConf", 0.1f, 0.95f, 0.1f, "goalConfidence(#x)")
 
 
                 .call("conceptsPerCyc", 2, 3, 1f, "core.conceptsFiredPerCycle.setValue(#i)")
                 .call("termLinksPerConcept", 1, 3, 1f, "premiser.termlinksFiredPerFiredConcept.setValue(#i)")
 
-                .call("cycPerFrame", 2, 4, 1f, "cyclesPerFrame.setValue(#i)")
+                .call("cycPerFrame", 4, 8, 1f, "cyclesPerFrame.setValue(#i)")
 
+                .call("conceptBeliefs", 2f, 16f, 1, "conceptBeliefsMax.set(#i)")
+                .call("conceptGoals", 2f, 16f, 1, "conceptGoalsMax.set(#i)")
 
                 .call("conceptRem", 4f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
                 .call("taskRem",    2f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
                 .call("termRem",    2f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
 
+                //((DefaultConceptBuilder)new Default(512, 1, 1, 3).index.conceptBuilder()).termLinkBagSize
+
                 .call("conceptAct", 0.5f, 0.8f, 0.1f,  "conceptActivation.setValue(#x)")
 
-
-
-                .run(2500, (x) -> new Thermostat().run(new NAgent(x), 15000));
+                .run(2500, (x) ->
+                    new Thermostat().run(new NAgent(x), 500)
+                );
 
         System.out.println();
         r.print();
@@ -159,7 +164,8 @@ public class Thermostat implements Environment {
 //            System.out.println("concept remembering: " + cRem );
 //            //System.out.println("cycperFrame: " + cycPerFrame );
 //
-//            Default n = new Default(512, 1, 1, 3);
+
+
 //            //n.cyclesPerFrame.setValue(cycPerFrame);
 //            //n.conceptRemembering.setValue(cRem);
 //            //n.conceptActivation.setValue(0.5);
