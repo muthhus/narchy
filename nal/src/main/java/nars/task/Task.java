@@ -880,4 +880,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         return false;
     }
+
+    default void delete(@Nullable Object removalReason) {
+        if (removalReason!=null)
+            log(removalReason);
+        delete();
+    }
 }

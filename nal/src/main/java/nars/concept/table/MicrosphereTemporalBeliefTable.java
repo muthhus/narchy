@@ -134,7 +134,12 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     @Override public Task weakest() {
         if (lastUpdate == Tense.TIMELESS)
             throw new RuntimeException("unable to measure weakest without knowing current time");
-        return weakest(lastUpdate, null, 0);
+        return weakest(lastUpdate, null, Float.POSITIVE_INFINITY);
+    }
+
+    @Override
+    protected final void removeWeakest(@Nullable Object reason) {
+        remove(weakest()).delete(reason);
     }
 
     @Nullable

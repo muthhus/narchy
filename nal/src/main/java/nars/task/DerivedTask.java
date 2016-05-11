@@ -51,7 +51,17 @@ public final class DerivedTask extends MutableTask {
         BLink<? extends Task> tLink = premise.taskLink;
         if (tLink.isDeleted()) {
             //System.out.println(premise.taskLink + " should delete " + this + "?");
-            premise.nar().remove(this, "Premise TaskLink Deleted");
+
+            delete("Premise TaskLink Deleted");
+
+
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
+
+            //eventTaskRemoved.emit(task);
+
+        /* else: a more destructive cleanup of the discarded task? */
+
             return false;
         } else {
             //TODO check this Question case is right

@@ -189,7 +189,17 @@ public class Default extends AbstractNAR {
 
         Concept c = concept(input, true);
         if (c == null) {
-            remove(input, "Inconceivable");
+
+            input.delete("Inconceivable");
+
+
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
+
+            //eventTaskRemoved.emit(task);
+
+        /* else: a more destructive cleanup of the discarded task? */
+
             return null;
         }
 

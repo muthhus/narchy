@@ -28,6 +28,13 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
         setCapacity(1);
     }
 
+    @Override
+    protected final void removeWeakest(Object reason) {
+        Task x = remove(weakest());
+        if (!x.isDeleted())
+            x.delete(reason);
+    }
+
     @Nullable
     @Override
     public final Task key(Task task) {

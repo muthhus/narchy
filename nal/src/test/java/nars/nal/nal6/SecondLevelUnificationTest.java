@@ -16,9 +16,9 @@ public class SecondLevelUnificationTest {
         NAR n = new Default(512, 1, 2, 3);
 
         //n.log();
-        n.eventTaskRemoved.on(t -> {
-           //System.err.println("rm: " + t + " " + t.getLogLast());
-        });
+//        n.eventTaskRemoved.on(t -> {
+//           //System.err.println("rm: " + t + " " + t.getLogLast());
+//        });
 
         n.believe("<<$1 --> x> ==> (&&,<#2 --> y>,<$1 --> (/,open,#2,_)>)>", 1.00f, 0.90f); //en("all xs are opened by some y");
         n.believe("<{z} --> y>", 1.00f, 0.90f); //en("z is a y");
@@ -30,9 +30,9 @@ public class SecondLevelUnificationTest {
         NAR n = new Default(512, 1, 2, 3);
 
         //n.log();
-        n.eventTaskRemoved.on(t -> {
-            //System.err.println("rm: " + t + " " + t.getLogLast());
-        });
+//        n.eventTaskRemoved.on(t -> {
+//            //System.err.println("rm: " + t + " " + t.getLogLast());
+//        });
 
         n.believe("<<$1 --> x> ==> (&&,<#2 --> y>,<$1 --> #2>)>", 1.00f, 0.90f); //en("all xs are opened by some y");
         n.believe("<{z} --> y>", 1.00f, 0.90f); //en("z is a y");

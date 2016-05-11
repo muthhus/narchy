@@ -20,7 +20,7 @@ public interface TaskTable extends Iterable<Task> {
 
     static void removeTask(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
         if (!t.isDeleted())
-            memory.remove(t, reason);
+            t.delete(reason);
     }
 
     int capacity();

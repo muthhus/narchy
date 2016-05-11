@@ -55,9 +55,7 @@ public class Memory extends Param {
 
     @NotNull public final Random random;
 
-    public final transient Topic<Task> eventTaskRemoved = new DefaultTopic<>();
     public final transient Topic<ConceptProcess> eventConceptProcess = new DefaultTopic<>();
-    //public final transient Topic<Task> eventRevision = new DefaultTopic<>();
 
     public final transient Topic<Memory> eventReset = new DefaultTopic<>();
 
@@ -89,15 +87,12 @@ public class Memory extends Param {
 
 
 
-    //TODO move these to separate components, not part of Memory:
-    @NotNull
-    public final transient Emotion emotion;
+    @NotNull public final transient Emotion emotion;
 
-    @NotNull
-    public final Clock clock;
+    @NotNull public final Clock clock;
 
     /** holds known Term's and Concept's */
-    public final TermIndex index;
+    @NotNull public final TermIndex index;
 
 
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
@@ -105,10 +100,6 @@ public class Memory extends Param {
 
     private final AtomicLong currentStampSerial = new AtomicLong(1);
 
-
-    public Memory(@NotNull Clock clock, TermIndex index) {
-        this(clock, new XorShift128PlusRandom(1), index);
-    }
 
     /**
      * Create a new memory
@@ -130,9 +121,7 @@ public class Memory extends Param {
 
         emotion = new Emotion();
 
-
     }
-
 
 
     @Override
@@ -163,16 +152,11 @@ public class Memory extends Param {
 //        //return goalConcepts;
 //    }
 
-
-
-
-
 //    public void delete() {
 //        clear();
 //
 //        event.delete();
 //    }
-
 
     @Override
     public void clear() {
@@ -183,48 +167,7 @@ public class Memory extends Param {
 
         index.clear();
 
-        //emotion.clear();
-
     }
-
-
-
-
-
-    /* ---------- new task entries ---------- */
-
-    /**
-     * called anytime a task has been removed, Deleted, discarded, ignored, etc.
-     */
-    public final void remove(@NotNull Task task, @Nullable Object removalReason) {
-
-        task.delete();
-
-        if (removalReason!=null)
-            task.log(removalReason);
-
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-        eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
-
-    }
-
-//    /**
-//     * sends an event signal to listeners subscribed to channel 'c'
-//     */
-//    final public void emit(final Class c, final Object... signal) {
-//        event.emit(c, signal);
-//    }
-
-//    /**
-//     * sends an event signal to listeners subscribed to channel 'c'
-//     */
-//    final public void emit(final Class c) {
-//        event.emit(c);
-//    }
 
 
     /**
@@ -234,7 +177,15 @@ public class Memory extends Param {
         //TODO maybe AtomicLong ?
         return currentStampSerial.getAndIncrement();
     }
+    public final long time() {
+        return clock.time();
+    }
 
+    @NotNull
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ':' + nal() + "[@" + time() +  ']';
+    }
 //    /** whether the NAR is currently accepting new inputs */
 //    public boolean isInputting() {
 //        if (inputPausedUntil == -1) return true;
@@ -344,9 +295,6 @@ public class Memory extends Param {
 //        return true;
 //    }
 
-    public final long time() {
-        return clock.time();
-    }
 
 //    public final void put(final Concept c) {
 //        concepts.put(c);
@@ -410,15 +358,7 @@ public class Memory extends Param {
 //                + item.toString();
 //    }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ':' + nal() + "[@" + time() + ",C=" + size() + ']';
-    }
 
-    public final int size() {
-        return index.size();
-    }
 
 //    /**
 //     * identifies the type of memory as a string

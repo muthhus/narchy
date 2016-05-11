@@ -128,12 +128,12 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
         if (newCapacity!=currentCap) {
             this.capacity = newCapacity;
             int excess = size() - newCapacity;
-            for (int i = 0; i < excess; i++) {
-                remove(weakest());
-            }
+            while (excess-- > 0)
+                removeWeakest("Shrink");
         }
-
     }
+
+    protected abstract void removeWeakest(Object reason);
 
     abstract public V weakest();
 

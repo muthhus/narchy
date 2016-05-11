@@ -45,6 +45,10 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         super(items, map);
     }
 
+    @Override
+    protected void removeWeakest(Object reason) {
+        remove(weakest()).delete(reason);
+    }
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {

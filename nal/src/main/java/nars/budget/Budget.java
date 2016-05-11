@@ -295,7 +295,7 @@ public abstract class Budget implements Budgeted {
         return toString(this);
     }
 
-    public void set(@NotNull Budgeted b) {
+    public final void set(@NotNull Budgeted b) {
         budget(b.pri(), b.dur(), b.qua());
     }
 
@@ -303,12 +303,13 @@ public abstract class Budget implements Budgeted {
     public static Ansi.Color budgetSummaryColor(@NotNull Task tv) {
         int s = (int)Math.floor(tv.summary()*5);
         switch (s) {
+            default: return Ansi.Color.DEFAULT;
+
             case 1: return Ansi.Color.MAGENTA;
             case 2: return Ansi.Color.GREEN;
             case 3: return Ansi.Color.YELLOW;
             case 4: return Ansi.Color.RED;
 
-            default: return Ansi.Color.DEFAULT;
         }
     }
 
@@ -325,5 +326,9 @@ public abstract class Budget implements Budgeted {
         public BudgetException(String reason) {
             super(reason);
         }
+    }
+
+    public void delete(@Nullable Object reason /* ignored */) {
+        delete();
     }
 }

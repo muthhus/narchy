@@ -30,9 +30,6 @@ public class ArrayQuestionTable implements QuestionTable {
     @NotNull
     private final List<Task> list;
 
-    public ArrayQuestionTable() {
-        this(1);
-    }
 
     public ArrayQuestionTable(int capacity) {
         super();
@@ -48,19 +45,18 @@ public class ArrayQuestionTable implements QuestionTable {
         return capacity;
     }
 
-    @Override public void setCapacity(int newCapacity) {
-        //TODO when tasks are removed, they need to be deleted and notify the NAR
-        throw new UnsupportedOperationException();
-//        if (this.capacity==newCapacity) return;
-//
-//        capacity = newCapacity;
-//
-//        int s = list.size();
-//
-//        int toRemove = s - capacity;
-//        while (toRemove-- > 0)
-//            list.remove( --s ); //last element
+    @Override public final void setCapacity(int newCapacity) {
 
+        if (this.capacity==newCapacity)
+            return;
+
+        this.capacity = newCapacity;
+
+        int s = size();
+
+        int toRemove = s - newCapacity;
+        while (toRemove-- > 0)
+            list.remove( --s ); //last element
     }
 
     @Override
@@ -117,7 +113,7 @@ public class ArrayQuestionTable implements QuestionTable {
         int siz = size();
         if (siz + 1 > capacity) {
             // FIFO, remove oldest question (last)
-            remove(siz-1, m, "FIFO Forgot");
+            remove(siz-1, "FIFO Forgot");
         }
 
         insert(t);
@@ -129,9 +125,18 @@ public class ArrayQuestionTable implements QuestionTable {
         list.add(0, t);
     }
 
-    public void remove(int n, @NotNull Memory m, String reason) {
+    public void remove(int n, Object reason) {
         Task removed = list.remove(n);
-        m.remove(removed, reason);
+
+        removed.delete(reason);
+
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
+
+        //eventTaskRemoved.emit(task);
+
+        /* else: a more destructive cleanup of the discarded task? */
+
     }
 
     /** returns the original, "revised", or null question to input
@@ -146,7 +151,17 @@ public class ArrayQuestionTable implements QuestionTable {
 
             if (existing != t) {
                 merge.merge(existing.budget(), t, 1f);
-                m.remove(t, "Duplicate Question");
+
+                t.delete("Duplicate Question");
+
+
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
+
+                //eventTaskRemoved.emit(task);
+
+        /* else: a more destructive cleanup of the discarded task? */
+
             }
 
             return null;
@@ -173,8 +188,17 @@ public class ArrayQuestionTable implements QuestionTable {
                     m.time(), occ,
                     zipped, merge);
 
-            remove(i, m, "Merged");
-            m.remove(t, "Merged");
+            remove(i, "Merged");
+
+            t.delete("Merged");
+
+
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
+
+            //eventTaskRemoved.emit(task);
+
+        /* else: a more destructive cleanup of the discarded task? */
 
             //insert quietly, pretending as if already existed
             insert(te);
