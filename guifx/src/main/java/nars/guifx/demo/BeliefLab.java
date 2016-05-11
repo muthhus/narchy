@@ -29,13 +29,13 @@ public class BeliefLab {
 	static int stmInduction = 0;
 
 	public static void main(String[] args) {
-        NAR nar = new Default();
+        Default nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
 
 
         nar.shortTermMemoryHistory.set(stmInduction);
-        nar.conceptBeliefsMax.set(beliefCapacity);
+        nar.conceptWarm.beliefsMaxEteOrTemp.set(beliefCapacity);
         nar.run(2);
 
         Concept c = nar.concept("y:x");

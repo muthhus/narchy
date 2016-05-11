@@ -1,6 +1,7 @@
 package nars.concept.table;
 
 import nars.bag.impl.ListTable;
+import nars.task.Task;
 import nars.util.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,9 +123,19 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
     }
 
     @Override
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setCapacity(int newCapacity) {
+        int currentCap = this.capacity;
+        if (newCapacity!=currentCap) {
+            this.capacity = newCapacity;
+            int excess = size() - newCapacity;
+            for (int i = 0; i < excess; i++) {
+                remove(weakest());
+            }
+        }
+
     }
+
+    abstract public V weakest();
 
     @Override
     public final void forEach(@NotNull Consumer<? super L> action) {

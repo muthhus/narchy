@@ -40,7 +40,7 @@ public class ControlFlowTest {
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
     @Test public void testSequence4()   { testSequence(n, 4, 30);    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
-    @Test public void testSequence10()  { testSequence(n, 10, 50);     }
+    //@Test public void testSequence10()  { testSequence(n, 10, 50);     }
 
 
     abstract public static class Sequence extends ConceptGroup {

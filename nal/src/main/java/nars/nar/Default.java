@@ -530,7 +530,18 @@ public class Default extends AbstractNAR {
             @Override
             protected BLink<Concept> putNew(Concept i, BLink<Concept> b) {
                 BLink<Concept> displaced = super.putNew(i, b);
-                warm(i);
+                if (displaced!=null) {
+
+                    Concept dd = displaced.get();
+                    if (dd != i)
+                        warm(i);
+
+                    cold(dd);
+
+                } else {
+                    warm(i);
+                }
+
                 return displaced;
             }
 

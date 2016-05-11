@@ -51,6 +51,11 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
     abstract public V key(L l);
 
 
+    @Override
+    public V weakest() {
+        return key(bottom());
+    }
+
     @Nullable
     @Override
     protected L addItem(L i) {

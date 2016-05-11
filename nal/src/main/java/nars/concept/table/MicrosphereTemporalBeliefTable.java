@@ -4,6 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
+import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
@@ -35,6 +36,8 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
      */
     private final float historyFactor = 1.5f;
 
+    private long lastUpdate = Tense.TIMELESS;
+
     public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task,Task> eternal) {
         super(mp, Global.newArrayList(1));
         setCapacity(1);
@@ -48,11 +51,15 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 //        super.setCapacity(c);
 //    }
 
+
+
+
     @Nullable
     @Override
     public Task ready(@NotNull Task input, @NotNull NAR nar) {
         int cap = capacity();
 
+        this.lastUpdate = nar.time();
         if (cap == 0)
             return null;
 
@@ -122,6 +129,12 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 
     private void invalidateRange() {
         min = max = ETERNAL;
+    }
+
+    @Override public Task weakest() {
+        if (lastUpdate == Tense.TIMELESS)
+            throw new RuntimeException("unable to measure weakest without knowing current time");
+        return weakest(lastUpdate, null, 0);
     }
 
     @Nullable

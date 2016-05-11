@@ -289,41 +289,41 @@ public class Thermostat6DQN {
         });
     }
 
-    private static class Motor1D extends MotorConcept implements MotorConcept.MotorFunction {
-
-        final boolean up;
-        private final MutableFloat yEst;
-
-        public Motor1D(NAR n, boolean up, MutableFloat yEst) throws Narsese.NarseseException {
-            //super((up ? "up" : "down") + "()", n, null);
-            super("(" + (up ? "up" : "down") + ")", n, null);
-            this.up = up;
-            this.yEst = yEst;
-
-            setMotor(this);
-        }
-
-        @Override
-        protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
-            return eternalOrTemporal ? 0 : cap; //no eternal
-        }
-
-        @Override
-        public float motor(float b, float d) {
-
-            if (d < 0.51f) return Float.NaN;
-            if (d < b) return Float.NaN;
-            //if (d < 0.5f && b < d) return Float.NaN;
-
-            float current = Util.clamp(yEst.floatValue());
-            float delta = speed * (up ? 1 : -1) * (d - b);
-            float next = Util.clamp(delta + current);
-            yEst.setValue(next);
-
-            return (d-b)*0.5f; //0.5f + desired/2f;
-
-
-        }
-
-    }
+//    private static class Motor1D extends MotorConcept implements MotorConcept.MotorFunction {
+//
+//        final boolean up;
+//        private final MutableFloat yEst;
+//
+//        public Motor1D(NAR n, boolean up, MutableFloat yEst) throws Narsese.NarseseException {
+//            //super((up ? "up" : "down") + "()", n, null);
+//            super("(" + (up ? "up" : "down") + ")", n, null);
+//            this.up = up;
+//            this.yEst = yEst;
+//
+//            setMotor(this);
+//        }
+//
+//        @Override
+//        protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
+//            return eternalOrTemporal ? 0 : cap; //no eternal
+//        }
+//
+//        @Override
+//        public float motor(float b, float d) {
+//
+//            if (d < 0.51f) return Float.NaN;
+//            if (d < b) return Float.NaN;
+//            //if (d < 0.5f && b < d) return Float.NaN;
+//
+//            float current = Util.clamp(yEst.floatValue());
+//            float delta = speed * (up ? 1 : -1) * (d - b);
+//            float next = Util.clamp(delta + current);
+//            yEst.setValue(next);
+//
+//            return (d-b)*0.5f; //0.5f + desired/2f;
+//
+//
+//        }
+//
+//    }
 }

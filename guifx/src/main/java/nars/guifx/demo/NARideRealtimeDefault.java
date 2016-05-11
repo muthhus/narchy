@@ -10,6 +10,7 @@ import nars.op.mental.Inperience;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XORShiftRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -36,7 +37,6 @@ public enum NARideRealtimeDefault {
         //nar.spawnThread(1000/60);
 
 
-
         NARide.show(nar.loop(), (i) -> {
             /*try {
                 i.nar.input(new File("/tmp/h.nal"));
@@ -50,27 +50,28 @@ public enum NARideRealtimeDefault {
 
     @NotNull
     public static Default newRealtimeNAR() {
-        Memory mem = new Memory(new RealtimeMSClock(),
-                new MapIndex2(
-                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
-                )
-            //new MapCacheBag(
-                    //new WeakValueHashMap<>()
+        XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
+//        Memory mem = new Memory(,
 
-                //GuavaCacheBag.make(1024*1024)
+        //new MapCacheBag(
+        //new WeakValueHashMap<>()
+
+        //GuavaCacheBag.make(1024*1024)
                 /*new InfiniCacheBag(
                     InfiniPeer.tmp().getCache()
                 )*/
-            //)
-        );
+        //)
+        //);
 
-        Default nar = new Default(1024, 3, 2, 2) {
-        };
+        Default nar = new Default(1024, 3, 2, 2, rng, new MapIndex2(
+                new SoftValueHashMap(128 * 1024), new DefaultConceptBuilder(rng)
+        ), new RealtimeMSClock());
+
         nar.with(
                 Anticipate.class,
                 Inperience.class
         );
-        nar.with(new Abbreviation(nar,"is"));
+        nar.with(new Abbreviation(nar, "is"));
         nar.conceptRemembering.setValue(1000 * 10);
         nar.termLinkRemembering.setValue(1000 * 25);
         nar.taskLinkRemembering.setValue(1000 * 15);
