@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
-import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;

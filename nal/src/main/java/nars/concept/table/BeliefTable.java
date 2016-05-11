@@ -41,6 +41,11 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
+        public void capacity(int eternals, int temporals) {
+
+        }
+
+        @Override
         public int size() {
             return 0;
         }
@@ -86,6 +91,8 @@ public interface BeliefTable extends TaskTable {
 
     };
 
+    void capacity(int eternals, int temporals);
+
 
 //    /**
 //     * projects to a new task at a given time
@@ -104,10 +111,10 @@ public interface BeliefTable extends TaskTable {
         return or(conf, 1.0f / (hypotheticalEvidenceLength + 1));
     }
 
-    /** returns value <= 1f */
-    static float relevance(@NotNull Task t, long time, float ageFactor) {
-        return relevance(t.occurrence(), time, ageFactor);
-    }
+//    /** returns value <= 1f */
+//    static float relevance(@NotNull Task t, long time, float ageFactor) {
+//        return relevance(t.occurrence(), time, ageFactor);
+//    }
 
 //    default Task top(Task query, long now) {
 //
@@ -121,14 +128,14 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    /** temporal relevance; returns a value <= 1.0f; */
-    static float relevance(long from, long to, float ageFactor) {
-        //assert(from!=Tense.ETERNAL);
-        /*if (from == Tense.ETERNAL)
-            return Float.NaN;*/
-
-        return relevance(Math.abs(from - to), ageFactor);
-    }
+//    /** temporal relevance; returns a value <= 1.0f; */
+//    static float relevance(long from, long to, float ageFactor) {
+//        //assert(from!=Tense.ETERNAL);
+//        /*if (from == Tense.ETERNAL)
+//            return Float.NaN;*/
+//
+//        return relevance(Math.abs(from - to), ageFactor);
+//    }
 
     /** returns a value <= 1.0 */
     static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
@@ -384,6 +391,7 @@ public interface BeliefTable extends TaskTable {
 
         return belief;
     }
+
 
 
 

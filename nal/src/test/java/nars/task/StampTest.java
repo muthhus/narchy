@@ -7,8 +7,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static java.util.Arrays.*;
-
 import static junit.framework.TestCase.assertTrue;
 import static nars.truth.Stamp.*;
 import static org.junit.Assert.*;

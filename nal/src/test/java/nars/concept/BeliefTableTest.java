@@ -127,7 +127,7 @@ public class BeliefTableTest  {
 
         Global.DEBUG = true;
 
-        int maxBeliefs = 6; //includes 3 eternal beliefs we arent using:
+        int maxBeliefs = 4; //includes 3 eternal beliefs we arent using:
         NAR n = newNAR(maxBeliefs);
 
 
@@ -153,7 +153,7 @@ public class BeliefTableTest  {
 
         n.step().step().step();
         b.print();
-        assertEquals(3, b.size());
+        assertEquals(4, b.size());
 
         assertEquals(5, b.wave().start());
         assertEquals(12, b.wave().end());

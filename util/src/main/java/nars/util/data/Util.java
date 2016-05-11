@@ -20,9 +20,9 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import jdk.internal.misc.Unsafe;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
-import sun.misc.Unsafe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ public enum Util {
             fld.setAccessible(true);
             return (Unsafe) fld.get(Util.class);
         } catch (Exception e) {
-            throw new RuntimeException("Could not obtain access to sun.misc.Unsafe", e);
+            throw new RuntimeException("Could not obtain access to Unsafe", e);
         }
     }
 

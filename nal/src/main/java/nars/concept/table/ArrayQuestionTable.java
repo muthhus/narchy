@@ -3,7 +3,7 @@ package nars.concept.table;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.truth.Stamp;
@@ -29,6 +29,10 @@ public class ArrayQuestionTable implements QuestionTable {
 
     @NotNull
     private final List<Task> list;
+
+    public ArrayQuestionTable() {
+        this(1);
+    }
 
     public ArrayQuestionTable(int capacity) {
         super();

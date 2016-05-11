@@ -2,6 +2,7 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
@@ -13,7 +14,6 @@ import nars.op.mental.*;
 import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.reset;
-import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.time.Clock;
@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 /**
@@ -34,6 +33,8 @@ import java.util.function.Function;
  */
 public abstract class AbstractNAR extends NAR {
 
+    public final DefaultConceptPolicy conceptWarm, conceptCold;
+
 
     public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random random) {
         this(clock, index, random, Global.DEFAULT_SELF);
@@ -42,7 +43,27 @@ public abstract class AbstractNAR extends NAR {
     public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
-        initDefaults();
+        /*this.conceptBeliefsMax.set(12);
+        this.conceptGoalsMax.set(9);
+        this.conceptQuestionsMax.set(3);*/
+        conceptWarm = new DefaultConceptPolicy(8, 8, 3, 24, 8);
+        conceptCold = new DefaultConceptPolicy(4, 4, 1, 12, 4);
+
+        conceptRemembering.setValue(4);
+        termLinkRemembering.setValue(16);
+        taskLinkRemembering.setValue(8);
+
+        derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
+
+        taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
+
+        //budget propagation thresholds
+        termLinkThreshold.setValue(Global.BUDGET_EPSILON);
+        taskLinkThreshold.setValue(Global.BUDGET_EPSILON);
+
+        executionThreshold.setValue(Global.TRUTH_EPSILON);
+
+        shortTermMemoryHistory.set(2);
 
     }
 
@@ -103,32 +124,6 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    protected void initDefaults() {
-
-
-        this.conceptBeliefsMax.set(12);
-        this.conceptGoalsMax.set(9);
-        this.conceptQuestionsMax.set(3);
-
-        this.conceptRemembering.setValue(4);
-        this.termLinkRemembering.setValue(16);
-        this.taskLinkRemembering.setValue(8);
-
-        this.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
-
-        this.taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
-
-        //budget propagation thresholds
-        this.termLinkThreshold.setValue(Global.BUDGET_EPSILON);
-        this.taskLinkThreshold.setValue(Global.BUDGET_EPSILON);
-
-        this.executionThreshold.setValue(Global.TRUTH_EPSILON);
-
-        this.shortTermMemoryHistory.set(2);
-
-
-
-    }
 
 
 //    public static final AbstractOperator[] exampleOperators = {

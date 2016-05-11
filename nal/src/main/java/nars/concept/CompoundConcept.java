@@ -5,6 +5,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.*;
 import nars.task.Task;
 import nars.term.Compound;
@@ -45,13 +46,13 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable List<TermTemplate> termLinkTemplates;
 
     @Nullable
-    protected QuestionTable questions;
+    protected final QuestionTable questions;
     @Nullable
-    protected QuestionTable quests;
+    protected final QuestionTable quests;
     @Nullable
-    protected BeliefTable beliefs;
+    protected final BeliefTable beliefs;
     @Nullable
-    protected BeliefTable goals;
+    protected final BeliefTable goals;
 
     //    public DefaultConcept(Term term, Memory p) {
 //        this(term, new NullBag(), new NullBag(), p);
@@ -65,6 +66,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      */
     public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
+
+        beliefs = newBeliefTable();
+        goals = newGoalTable();
+        questions = new ArrayQuestionTable(1);
+        quests = new ArrayQuestionTable(1);
     }
 
 //    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
@@ -89,21 +95,21 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable
     @Override
     public final QuestionTable quests() {
-        return tableOrEmpty(quests);
+        return (quests);
     }
 
     @NotNull
     @Override
     public final QuestionTable questions() {
-        return tableOrEmpty(questions);
+        return (questions);
     }
 
-    @NotNull private static QuestionTable tableOrEmpty(@Nullable QuestionTable q) {
-        return q == null ? TaskTable.EMPTY : q;
-    }
-    @NotNull private static BeliefTable tableOrEmpty(@Nullable BeliefTable q) {
-        return q == null ? BeliefTable.EMPTY : q;
-    }
+//    @NotNull private static QuestionTable tableOrEmpty(@Nullable QuestionTable q) {
+//        return q == null ? TaskTable.EMPTY : q;
+//    }
+//    @NotNull private static BeliefTable tableOrEmpty(@Nullable BeliefTable q) {
+//        return q == null ? BeliefTable.EMPTY : q;
+//    }
 
 
     /**
@@ -113,7 +119,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @NotNull
     @Override
     public BeliefTable beliefs() {
-        return tableOrEmpty(beliefs);
+        return (beliefs);
     }
 
     /**
@@ -122,7 +128,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @NotNull
     @Override
     public BeliefTable goals() {
-        return tableOrEmpty(goals);
+        return (goals);
     }
 
     @Override
@@ -208,8 +214,8 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //float successBefore = hasGoals ? getSuccess(now) : 0;
 
         BeliefTable beliefs = this.beliefs;
-        if (beliefs == null)
-            beliefs = this.beliefs = newBeliefTable(nar.conceptBeliefsMax.intValue());
+//        if (beliefs == null)
+//            beliefs = this.beliefs = newBeliefTable(nar.conceptBeliefsMax.intValue());
 
         belief = beliefs.add(belief, nar);
 
@@ -247,18 +253,30 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //        }
     }
 
-    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        return Math.max(maxBeliefs/2, 2);
-    }
+//    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
+//        return Math.max(maxBeliefs/2, 2);
+//    }
 
     @NotNull
-    protected BeliefTable newBeliefTable(int cap) {
-        return new DefaultBeliefTable(capacity(cap, true, true), capacity(cap, true, false));
+    protected BeliefTable newBeliefTable() {
+        return new DefaultBeliefTable();
     }
     @NotNull
-    protected BeliefTable newGoalTable(int cap) {
-        return new DefaultBeliefTable(capacity(cap, false, true), capacity(cap, false, false));
+    protected BeliefTable newGoalTable() {
+        return new DefaultBeliefTable();
     }
+
+
+    @Override public void capacity(ConceptPolicy p) {
+        linkCapacity(p);
+        beliefCapacity(p);
+    }
+
+    protected void beliefCapacity(ConceptPolicy p) {
+        beliefs().capacity(p.beliefCap(this, true, true), p.beliefCap(this, true, false));
+        goals().capacity(p.beliefCap(this, false, true), p.beliefCap(this, false, false));
+    }
+
 
 //    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {
 //        /** update happiness meter on solution  TODO revise */
@@ -287,9 +305,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
         BeliefTable g = this.goals;
-        if (g == null) {
-            g = this.goals = newGoalTable(nar.conceptGoalsMax.intValue());
-        }
+//        if (g == null) {
+//            g = this.goals = newGoalTable(nar.conceptGoalsMax.intValue());
+//        }
 
         return g.add(inputGoal, nar);
     }
@@ -395,10 +413,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         final QuestionTable questionTable;
         if (q.isQuestion()) {
-            if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
+            //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = questions();
         } else { // else if (q.isQuest())
-            if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
+            //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = quests();
         }
 

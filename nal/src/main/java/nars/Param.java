@@ -89,14 +89,14 @@ public abstract class Param extends Container implements Level {
 
 
 
-    /** Maximum number of beliefs kept in a Concept */
-    public final AtomicInteger conceptBeliefsMax = new AtomicInteger();
-    
-    /** Maximum number of questions, and max # of quests kept in a Concept */
-    public final AtomicInteger conceptQuestionsMax = new AtomicInteger();
-
-    /** Maximum number of goals kept in a Concept */
-    public final AtomicInteger conceptGoalsMax = new AtomicInteger();
+//    /** Maximum number of beliefs kept in a Concept */
+//    public final AtomicInteger conceptBeliefsMax = new AtomicInteger();
+//
+//    /** Maximum number of questions, and max # of quests kept in a Concept */
+//    public final AtomicInteger conceptQuestionsMax = new AtomicInteger();
+//
+//    /** Maximum number of goals kept in a Concept */
+//    public final AtomicInteger conceptGoalsMax = new AtomicInteger();
 
     public float confidenceDefault(char punctuation) {
 

@@ -10,8 +10,6 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 /** substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
  * */

@@ -16,14 +16,18 @@ import java.util.Iterator;
  */
 abstract public class DynamicBeliefTable implements BeliefTable {
 
-    private final Concept concept;
     private final NAR nar;
     @Nullable
     Task current;
 
-    public DynamicBeliefTable(Concept concept, NAR nar) {
-        this.concept = concept;
+    public DynamicBeliefTable(NAR nar) {
+        //this.concept = concept;
         this.nar = nar;
+    }
+
+    @Override
+    public void capacity(int eternals, int temporals) {
+        //ignored
     }
 
     @Nullable

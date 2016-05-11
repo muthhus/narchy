@@ -23,9 +23,9 @@ import java.util.Map;
  */
 public class EternalTable extends SortedArrayTable<Task,Task> {
 
-    public EternalTable(Map<Task, Task> index, int capacity) {
-        super(Global.newArrayList(capacity), index, SortedList_1x4.SearchType.BinarySearch);
-        setCapacity(capacity);
+    public EternalTable(Map<Task, Task> index) {
+        super(Global.newArrayList(1), index, SortedList_1x4.SearchType.BinarySearch);
+        setCapacity(1);
     }
 
     @Nullable

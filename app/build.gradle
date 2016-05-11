@@ -28,7 +28,7 @@ dependencies {
     compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version: '2.3.3'
     compile group: 'org.apache.commons', name: 'commons-vfs2', version: '2.0'
 
-    compile 'org.objenesis:objenesis:2.2'
+    compile 'org.objenesis:objenesis:2.3'
     compile('org.xeustechnologies:jcl-core:2.7') {
         exclude(module:'objenesis')
     }

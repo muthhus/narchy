@@ -1,7 +1,8 @@
-package nars.budget;
+package nars.budget.forget;
 
 import nars.NAR;
 import nars.bag.BLink;
+import nars.budget.Budgeted;
 import nars.nal.Tense;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

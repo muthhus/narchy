@@ -3,7 +3,6 @@ package nars.util.experiment;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
-import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.util.Agent;
 import nars.util.NAgent;

@@ -3,7 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;

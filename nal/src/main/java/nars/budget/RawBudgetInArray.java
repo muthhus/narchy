@@ -5,18 +5,17 @@ package nars.budget;
  */
 public abstract class RawBudgetInArray extends Budget {
 
-    private final boolean includeTimestamp;
+    final static int fieldSize = 4;
     private int i;
     private final float[] array;
 
-    public RawBudgetInArray(float[] array, int offset, boolean includeTimestamp /* long <-> float converted */) {
+    public RawBudgetInArray(float[] array, int offset) {
         this.array = array;
-        this.includeTimestamp = includeTimestamp;
         seek(offset);
     }
 
     public void seek(int offset) {
-        int fieldSize = (includeTimestamp ? 4 : 3);
+        //int fieldSize = (4 : 3);
 
         this.i = offset * fieldSize;
     }

@@ -4,7 +4,6 @@ import nars.Global;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
-import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.data.Util.clamp;

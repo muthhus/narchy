@@ -54,7 +54,7 @@ public class EllipsisTest {
             TermIndex index =
                     new MapIndex2(new HashMap(),
                             new DefaultConceptBuilder(
-                                    new XorShift128PlusRandom(2), 32, 32
+                                    new XorShift128PlusRandom(2)
                             ));
 
             Compound y = getMatchable(arity);

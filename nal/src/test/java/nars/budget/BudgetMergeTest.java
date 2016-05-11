@@ -1,5 +1,6 @@
 package nars.budget;
 
+import nars.budget.merge.BudgetMerge;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

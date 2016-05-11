@@ -1,4 +1,4 @@
-package nars.budget;
+package nars.budget.forget;
 
 import nars.NAR;
 import nars.bag.BLink;

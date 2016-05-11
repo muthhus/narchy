@@ -20,7 +20,7 @@ public class RevisionTest {
 
     @NotNull
     public static AbstractNAR newNAR(int maxBeliefs) {
-        AbstractNAR d = new Default(256, 1, 2, 3);
+        Default d = new Default(256, 1, 2, 3);
         d.nal(7);// {
 
         /*
@@ -34,7 +34,7 @@ public class RevisionTest {
         */
 
         //}
-        d.conceptBeliefsMax.set(maxBeliefs);
+        d.conceptWarm.beliefsMaxEteOrTemp.set(maxBeliefs);
         return d;
     }
 

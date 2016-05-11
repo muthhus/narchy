@@ -9,7 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import nars.NAR;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.guifx.NARfx;
 import nars.guifx.nars.SubButton;
 import nars.guifx.nars.TaskButton;

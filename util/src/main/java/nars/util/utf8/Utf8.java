@@ -1,7 +1,6 @@
 package nars.util.utf8;
 
 import com.google.common.primitives.Chars;
-import sun.nio.cs.ThreadLocalCoders;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,12 +29,12 @@ public class Utf8 implements CharSequence, Comparable<Utf8>, Byted {
 //            .onMalformedInput(CodingErrorAction.REPLACE)
 //            .onUnmappableCharacter(CodingErrorAction.REPLACE);
 
-    public static CharsetEncoder utf8Encoder() {
-        return ThreadLocalCoders.encoderFor(utf8Charset);
-    }
-    public static CharsetDecoder utf8Decoder() {
-        return ThreadLocalCoders.decoderFor(utf8Charset);
-    }
+//    public static CharsetEncoder utf8Encoder() {
+//        return ThreadLocalCoders.encoderFor(utf8Charset);
+//    }
+//    public static CharsetDecoder utf8Decoder() {
+//        return ThreadLocalCoders.decoderFor(utf8Charset);
+//    }
 
     byte[] bytes;
     final int start;
@@ -68,22 +67,22 @@ public class Utf8 implements CharSequence, Comparable<Utf8>, Byted {
     }
 
 
-    /**
-     * use this method when possible, because fromUtf8 creates a String
-     * which creates an unnecessary duplicate of the decode buffer
-     */
-    public static char[] fromUtf8ToCharsJDK(byte[] bytes, int length) {
-        CharsetDecoder uu = utf8Decoder();
-        uu.reset();
-        try {
-            int n = (int)(length * uu.averageCharsPerByte());
-            CharBuffer d = CharBuffer.allocate(n);
-            uu.decode(ByteBuffer.wrap(bytes, 0, length), d, true);
-            return trim(d);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    /**
+//     * use this method when possible, because fromUtf8 creates a String
+//     * which creates an unnecessary duplicate of the decode buffer
+//     */
+//    public static char[] fromUtf8ToCharsJDK(byte[] bytes, int length) {
+//        CharsetDecoder uu = utf8Decoder();
+//        uu.reset();
+//        try {
+//            int n = (int)(length * uu.averageCharsPerByte());
+//            CharBuffer d = CharBuffer.allocate(n);
+//            uu.decode(ByteBuffer.wrap(bytes, 0, length), d, true);
+//            return trim(d);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 
 
@@ -141,16 +140,16 @@ public class Utf8 implements CharSequence, Comparable<Utf8>, Byted {
         return x;
     }
 
-    public static byte[] toUtf8JDK(CharBuffer c) {
-        CharsetEncoder uu = utf8Encoder();
-        uu.reset();
-        try {
-            ByteBuffer e = uu.encode(c);
-            return trim(e);
-        } catch (CharacterCodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public static byte[] toUtf8JDK(CharBuffer c) {
+//        CharsetEncoder uu = utf8Encoder();
+//        uu.reset();
+//        try {
+//            ByteBuffer e = uu.encode(c);
+//            return trim(e);
+//        } catch (CharacterCodingException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private static final ThreadLocal<StringEncoder> sbbe =
             ThreadLocal.withInitial(StringEncoder::new);
@@ -223,16 +222,16 @@ public class Utf8 implements CharSequence, Comparable<Utf8>, Byted {
     public static void fromUtf8ToStringBuilder(byte[] bytes, int length, StringBuilder a)  {
         sbbd.get().appendChars(bytes, 0, length, a);
     }
-    public static void fromUtf8ToStringBuilder(byte[] bytes, StringBuilder a)  {
-        fromUtf8ToStringBuilder(bytes, bytes.length, a);
-    }
-
-    public static byte[] toUtf8JDK(String str) {
-        return toUtf8JDK(CharBuffer.wrap(str));
-
-        //unsafe version;
-        //return toUtf8(StringHack.chars(str));
-    }
+//    public static void fromUtf8ToStringBuilder(byte[] bytes, StringBuilder a)  {
+//        fromUtf8ToStringBuilder(bytes, bytes.length, a);
+//    }
+//
+//    public static byte[] toUtf8JDK(String str) {
+//        return toUtf8JDK(CharBuffer.wrap(str));
+//
+//        //unsafe version;
+//        //return toUtf8(StringHack.chars(str));
+//    }
 
 
 //    public static final byte[] toUtf8(byte prefix, final String str) {

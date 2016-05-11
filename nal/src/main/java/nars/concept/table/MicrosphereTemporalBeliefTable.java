@@ -3,7 +3,7 @@ package nars.concept.table;
 import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
@@ -35,24 +35,27 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
      */
     private final float historyFactor = 1.5f;
 
-    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, int cap, SortedTable<Task,Task> eternal) {
-        super(mp, Global.newArrayList(cap));
-        setCapacity(cap);
+    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task,Task> eternal) {
+        super(mp, Global.newArrayList(1));
+        setCapacity(1);
         this.eternal = eternal;
     }
 
-    @Override
-    public void setCapacity(int c) {
-        if (c!=0 && (c < 3))
-            throw new RuntimeException("temporal capacity must be > 2");
-        super.setCapacity(c);
-    }
+//    @Override
+//    public void setCapacity(int c) {
+////        if (c!=0 && (c < 3))
+////            throw new RuntimeException("temporal capacity must be > 2");
+//        super.setCapacity(c);
+//    }
 
     @Nullable
     @Override
     public Task ready(@NotNull Task input, @NotNull NAR nar) {
-        if (capacity() == 0)
+        int cap = capacity();
+
+        if (cap == 0)
             return null;
+
 
         //removeDeleted();
 

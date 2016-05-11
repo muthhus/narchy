@@ -25,6 +25,7 @@ public interface TaskTable extends Iterable<Task> {
 
     int capacity();
 
+
     /**
      * number of items in this collection
      */
@@ -91,6 +92,7 @@ public interface TaskTable extends Iterable<Task> {
         public int capacity() {
             return 0;
         }
+
 
         @Override
         public void setCapacity(int newCapacity) {

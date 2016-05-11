@@ -1,7 +1,5 @@
 package nars.util.signal;
 
-import com.gs.collections.api.block.procedure.primitive.ObjectBooleanProcedure;
-import nars.concept.Concept;
 import nars.util.meter.event.FloatGuage;
 import org.jetbrains.annotations.NotNull;
 import org.nustaq.serialization.FSTConfiguration;
@@ -37,7 +35,6 @@ public final class Emotion implements Serializable {
     /** # concepts enter + exit */
     public final FloatGuage focusChange;
 
-    public BiConsumer conceptFocus;
 
     public Emotion() {
         super();
@@ -50,27 +47,6 @@ public final class Emotion implements Serializable {
         this.frustration = new FloatGuage("frustration");
         this.focusChange = new FloatGuage("focusChange");
 
-        conceptFocus = (incoming, outgoing) -> {
-            if (outgoing == null) {
-                //new item, nothing displaced
-                //focusChange.accept(1);
-            } else {
-                if (incoming == null) {
-                    //removal
-                    //focusChange.accept(1);
-                } else {
-
-                    if (incoming == outgoing) {
-                        //input rejected
-                        //
-                    } else {
-                        //insert and displaced
-                        focusChange.accept(1);
-                    }
-                }
-            }
-
-        };
     }
 
 

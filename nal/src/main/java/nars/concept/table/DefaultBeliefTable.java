@@ -5,7 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.Table;
 import nars.bag.impl.SortedTable;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -30,19 +30,16 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQDominant;
 
-    public DefaultBeliefTable(int eternalCapacity, int temporalCapacity) {
+    public DefaultBeliefTable() {
 
         Map<Task, Task> mp;
         this.map = mp =
             //Global.newHashMap(eternalCapacity + temporalCapacity);
-            new HashMap(eternalCapacity + temporalCapacity);
+            new HashMap(1);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = eternalCapacity > 0 ? new EternalTable(mp, eternalCapacity) : SortedTable.Empty;
-
-
-        temporal = temporalCapacity > 0 ? new MicrosphereTemporalBeliefTable(mp, temporalCapacity, eternal) : TemporalBeliefTable.Empty;
-
+        eternal = new EternalTable(mp);
+        temporal = new MicrosphereTemporalBeliefTable(mp, eternal);
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
@@ -90,6 +87,10 @@ public class DefaultBeliefTable implements BeliefTable {
         return eternal.capacity() + temporal.capacity();
     }
 
+    public void capacity(int eternals, int temporals) {
+        eternal.setCapacity(eternals);
+        temporal.setCapacity(temporals);
+    }
 
     @Override
     public void remove(@NotNull Task belief, @NotNull NAR nar) {
@@ -131,6 +132,9 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
+
+        if (eternal.capacity() == 0)
+            return input;
 
         //HACK
         @NotNull SortedTable<Task, Task> et = this.eternal;

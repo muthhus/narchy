@@ -155,8 +155,6 @@ public class NAgent implements Agent {
     @Override
     public String summary() {
         return Texts.n2(motivation) + "\t "
-                //reward.belief(nar.time()) +
-                //" busyAvg=" + Texts.n4(nar.emotion.busy.getAverage()) +
                 /*" busySum="*/ + Texts.n4(nar.emotion.busy.getSum()) + " "
                 /*" frstSum="*/ + Texts.n4(nar.emotion.learning()) + " "
                 /*" strsSum="*/ + Texts.n4(nar.emotion.stress.getSum()) + " "

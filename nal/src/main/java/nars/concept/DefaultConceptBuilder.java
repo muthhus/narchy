@@ -3,7 +3,7 @@ package nars.concept;
 import nars.Op;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -55,15 +55,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Override public Bag<Task> taskbag() {
-        return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
-                .merge(mergeDefault());
+        return new CurveBag<Task>(rng).merge(mergeDefault());
     }
 
 
     @NotNull
     @Override public Bag<Termed> termbag() {
-        return new CurveBag<Termed>(termLinkBagSize.intValue(), rng)
-                .merge(mergeDefault());
+        return new CurveBag<Termed>(rng).merge(mergeDefault());
     }
 
     @NotNull
@@ -76,26 +74,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
 
 
-    /**
-     * default for new concepts
-     */
-    public final MutableInt taskLinkBagSize = new MutableInt(16);
-
-    /**
-     * default for new concepts
-     */
-    public final MutableInt termLinkBagSize = new MutableInt(16);
-
-
     @NotNull
     public final Random rng;
 
 
-    public DefaultConceptBuilder(@NotNull Random r, int tasklinkBagSize, int termlinkBagSize) {
-
+    public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
-        this.taskLinkBagSize.setValue(tasklinkBagSize);
-        this.termLinkBagSize.setValue(termlinkBagSize);
     }
 
 

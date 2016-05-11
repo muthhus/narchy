@@ -155,25 +155,25 @@ public class BooleanConcept extends OperationConcept {
         return false;
     }
 
-    @NotNull
-    @Override
-    public BeliefTable beliefs() {
-        if (beliefs == null) {
-            beliefs = newBeliefTable(0);
-        }
-        executeLater(nar);
-        return beliefs;
-    }
-
-    @NotNull
-    @Override
-    public BeliefTable goals() {
-        if (goals == null) {
-            goals = newGoalTable(0);
-        }
-        executeLater(nar);
-        return goals;
-    }
+//    @NotNull
+//    @Override
+//    public BeliefTable beliefs() {
+//        if (beliefs == null) {
+//            beliefs = newBeliefTable(0);
+//        }
+//        executeLater(nar);
+//        return beliefs;
+//    }
+//
+//    @NotNull
+//    @Override
+//    public BeliefTable goals() {
+//        if (goals == null) {
+//            goals = newGoalTable(0);
+//        }
+//        executeLater(nar);
+//        return goals;
+//    }
 
     @Override
     public void run() {
@@ -186,13 +186,13 @@ public class BooleanConcept extends OperationConcept {
 
     @NotNull
     @Override
-    protected BeliefTable newBeliefTable(int cap) {
+    protected BeliefTable newBeliefTable() {
         return new BooleanConceptTable(true);
     }
 
     @NotNull
     @Override
-    protected BeliefTable newGoalTable(int cap) {
+    protected BeliefTable newGoalTable() {
         return new BooleanConceptTable(false);
     }
 
@@ -200,7 +200,7 @@ public class BooleanConcept extends OperationConcept {
         private final boolean beliefOrGoal; //or goals
 
         public BooleanConceptTable(boolean beliefOrGoal) {
-            super(BooleanConcept.this, nar);
+            super(nar);
             this.beliefOrGoal = beliefOrGoal;
         }
 

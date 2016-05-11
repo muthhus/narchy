@@ -5,7 +5,6 @@
  */
 package nars.util.meter;
 
-import java.io.PrintStream;
 import java.util.List;
 import java.util.stream.Collectors;
 

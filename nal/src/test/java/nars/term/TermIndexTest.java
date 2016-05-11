@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class TermIndexTest {
 
     public static final DefaultConceptBuilder defaultConceptBuilder = new DefaultConceptBuilder(
-            new XorShift128PlusRandom(2), 32, 32
+            new XorShift128PlusRandom(2)
     );
 
     @Test
@@ -65,14 +65,14 @@ public class TermIndexTest {
     @Test public void testTermSharing5a() {
         testIndex(new MapIndex2(new HashMap<>(),
                 new DefaultConceptBuilder(
-                    new XorShift128PlusRandom(2), 32, 32
+                    new XorShift128PlusRandom(2)
                 )));
     }
     @Test public void testTermSharing5b() {
         testIndex(
                 new MapIndex2(Global.newHashMap(),
                     new DefaultConceptBuilder(
-                        new XorShift128PlusRandom(2), 32, 32
+                        new XorShift128PlusRandom(2)
                     ))
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));

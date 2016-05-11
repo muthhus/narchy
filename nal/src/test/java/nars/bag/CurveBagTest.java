@@ -4,7 +4,7 @@ import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nar.Default;

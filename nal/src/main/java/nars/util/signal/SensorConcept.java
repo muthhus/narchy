@@ -5,7 +5,8 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Symbols;
+import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -93,14 +94,10 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         return this;
     }
 
-    @Override
-    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        boolean forBeliefs = sensor.punc() == Symbols.BELIEF;
-        if (forBeliefs == beliefOrGoal)
-            return eternalOrTemporal ? 0 : maxBeliefs; //no eternal for tasks of the type managed by this sensor
-        else
-            return super.capacity(maxBeliefs, beliefOrGoal, eternalOrTemporal);
+    protected void beliefCapacity(ConceptPolicy p) {
+        DefaultConceptPolicy.beliefCapacityNonEternal(this, p);
     }
+
 
     public void setInput(FloatSupplier input) {
         this.input = input;

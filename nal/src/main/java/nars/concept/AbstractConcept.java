@@ -4,14 +4,13 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptPolicy;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -171,6 +170,15 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     public final boolean isConceptOf(@NotNull Termed t) {
         return t == this || t.equalsAnonymously(term());
+    }
+
+    public void capacity(ConceptPolicy p) {
+        linkCapacity(p);
+    }
+
+    public void linkCapacity(ConceptPolicy p) {
+        termlinks().setCapacity( p.linkCap(this, true) );
+        tasklinks().setCapacity( p.linkCap(this, false) );
     }
 
     /**

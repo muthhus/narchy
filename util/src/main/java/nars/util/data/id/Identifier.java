@@ -25,9 +25,9 @@ import static nars.util.utf8.Utf8.trim;
  */
 public abstract class Identifier<E extends Identifier> implements Comparable, Serializable {
 
-    public static byte[] toUtf8(char[] str) {
-        return Utf8.toUtf8JDK(CharBuffer.wrap(str));
-    }
+//    public static byte[] toUtf8(char[] str) {
+//        return Utf8.toUtf8JDK(CharBuffer.wrap(str));
+//    }
 
     /** produces the character array by invoking the append()
      *  method that certain subclasses use to form their
@@ -47,14 +47,14 @@ public abstract class Identifier<E extends Identifier> implements Comparable, Se
         return trim(caw.toCharArray());
     }
 
-    /** use this if the input is constant and already known (static).
-     * avoids calling the writer and just decodes the utf8 representation directly
-     * this is why it does not use the 'pretty' parameter because it would have
-     * no effect
-     * */
-    public char[] charsByName() {
-        return Utf8.fromUtf8ToChars(bytes());
-    }
+//    /** use this if the input is constant and already known (static).
+//     * avoids calling the writer and just decodes the utf8 representation directly
+//     * this is why it does not use the 'pretty' parameter because it would have
+//     * no effect
+//     * */
+//    public char[] charsByName() {
+//        return Utf8.fromUtf8ToChars(bytes());
+//    }
 
 
     /** use this when this class must generate an output by a writer
@@ -170,26 +170,26 @@ public abstract class Identifier<E extends Identifier> implements Comparable, Se
         return c;
     }
 
-    /** inefficient and potentially circularly recursive
-     *  override either bytes() or chars() in subclasses please */
-    public byte[] bytes() {
-        System.err.println(this + " wasteful String generation");
-        return toUtf8(chars(false));
-    }
+//    /** inefficient and potentially circularly recursive
+//     *  override either bytes() or chars() in subclasses please */
+//    public byte[] bytes() {
+//        System.err.println(this + " wasteful String generation");
+//        return toUtf8(chars(false));
+//    }
 
-    public byte byteAt(int i) {
-        byte[] b = bytes();
-        if (b == null) return 0;
-        if (b.length <= i) return 0;
-        return b[i];
-    }
+//    public byte byteAt(int i) {
+//        byte[] b = bytes();
+//        if (b == null) return 0;
+//        if (b.length <= i) return 0;
+//        return b[i];
+//    }
 
-
-    @Override
-    public String toString() {
-        return Utf8.fromUtf8toString(bytes());
-        //return toString(true);
-    }
+//
+//    @Override
+//    public String toString() {
+//        return Utf8.fromUtf8toString(bytes());
+//        //return toString(true);
+//    }
 
     abstract int charsEstimated();
 

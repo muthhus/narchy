@@ -1,7 +1,7 @@
 package nars.task.flow;
 
 import nars.Memory;
-import nars.budget.BudgetMerge;
+import nars.budget.merge.BudgetMerge;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 

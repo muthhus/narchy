@@ -1,6 +1,5 @@
 package nars.nar;
 
-import com.gs.collections.api.block.procedure.primitive.ObjectBooleanProcedure;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
@@ -8,10 +7,13 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.BudgetForget;
-import nars.budget.BudgetMerge;
+import nars.budget.forget.BudgetForget;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.Forget;
+import nars.budget.forget.Forget;
+import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.DefaultConceptPolicy;
+import nars.concept.AbstractConcept;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
 import nars.concept.PremiseGenerator;
@@ -38,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -59,8 +60,6 @@ public class Default extends AbstractNAR {
 //
 //    @Range(min = 0.01f, max = 8, unit = "Duration")
 //    public final MutableFloat taskLinkRemembering;
-
-
 
     @Deprecated
     public Default() {
@@ -100,6 +99,7 @@ public class Default extends AbstractNAR {
         the("premiser", premiser = newPremiseGenerator());
         premiser.confMin.setValue(Global.TRUTH_EPSILON);
 
+
         the("core", core = initCore(
                 activeConcepts,
                 conceptsFirePerCycle,
@@ -131,7 +131,7 @@ public class Default extends AbstractNAR {
 
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
-                    new DefaultConceptBuilder(random, 8, 24),
+                    new DefaultConceptBuilder(random),
                     new HashMap(capacity, 0.9f)
                     //new ConcurrentHashMapUnsafe(capacity)
             );
@@ -142,7 +142,7 @@ public class Default extends AbstractNAR {
 
         public WeakTermIndex2(int capacity, @NotNull Random random) {
             super(new WeakHashMap<>(capacity),
-                    new DefaultConceptBuilder(random, 32, 32));
+                    new DefaultConceptBuilder(random));
 
         }
     }
@@ -150,7 +150,7 @@ public class Default extends AbstractNAR {
 
         public WeakTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
-                    new DefaultConceptBuilder(random, 32, 32),
+                    new DefaultConceptBuilder(random),
                     //new SoftValueHashMap(capacity)
                     new WeakHashMap<>(capacity)
             );
@@ -162,7 +162,7 @@ public class Default extends AbstractNAR {
 
         public SoftTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
-                    new DefaultConceptBuilder(random, 32, 32),
+                    new DefaultConceptBuilder(random),
                     new SoftValueHashMap(capacity)
                     //new WeakHashMap<>(capacity)
             );
@@ -173,7 +173,7 @@ public class Default extends AbstractNAR {
 //
 //        public SoftTermIndex(int capacity, @NotNull Random random) {
 //            super(new SoftValueHashMap(capacity),
-//                    new DefaultConceptBuilder(random, 32, 32)
+//                    new DefaultConceptBuilder(random)
 //
 //                    //new WeakHashMap<>(capacity)
 //            );
@@ -247,8 +247,7 @@ public class Default extends AbstractNAR {
     @NotNull
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
-
-        DefaultCycle c = new DefaultCycle(this, pg, activeConcepts);
+        DefaultCycle c = new DefaultCycle(this, pg, activeConcepts, conceptWarm, conceptCold);
 
         //TODO move these to a PremiseGenerator which supplies
         c.premiser.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
@@ -503,45 +502,63 @@ public class Default extends AbstractNAR {
      */
     public static class DefaultCycle extends AbstractCycle {
 
-
-        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, int activeConcepts) {
-            super(nar, newConceptBag(nar, activeConcepts), premiseGenerator);
+        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, int activeConcepts, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+            super(nar,
+                    new MonitoredCurveBag(nar, activeConcepts, nar.random, warm, cold)
+                            .merge(BudgetMerge.plusDQDominant),
+                    premiseGenerator
+            );
         }
 
 
         /** extends CurveBag to invoke entrance/exit event handler lambda */
-        public static class MonitoredCurveBag<C> extends CurveBag<C> {
+        public static class MonitoredCurveBag extends CurveBag<Concept> {
 
-            private final BiConsumer event;
+            private final ConceptPolicy cold, warm;
+            final NAR nar;
 
-            public MonitoredCurveBag(int capacity, Random rng, BiConsumer event) {
+            public MonitoredCurveBag(NAR nar, int capacity, Random rng, ConceptPolicy warm, ConceptPolicy cold) {
                 super(capacity, rng);
-                this.event = event;
+                this.nar = nar;
+                setCapacity(capacity);
+                this.warm = warm;
+                this.cold = cold;
             }
+
 
             @Nullable
             @Override
-            protected BLink<C> putNew(C i, BLink<C> b) {
-                BLink<C> displaced = super.putNew(i, b);
-                event.accept(b, displaced);
+            protected BLink<Concept> putNew(Concept i, BLink<Concept> b) {
+                BLink<Concept> displaced = super.putNew(i, b);
+                warm(i);
                 return displaced;
             }
 
             @Nullable
             @Override
-            public BLink<C> remove(C x) {
-                BLink<C> removed = super.remove(x);
-                event.accept(null, removed);
+            public BLink<Concept> remove(Concept x) {
+                BLink<Concept> removed = super.remove(x);
+                if (removed!=null) {
+                    cold(removed.get());
+                }
                 return removed;
+            }
+
+
+            /** called when a concept is displaced from the concept bag */
+            protected void cold(Concept c) {
+                ((AbstractConcept)c).capacity(cold);
+                nar.emotion.focusChange.accept(1);
+            }
+
+            /** called when a concept enters the concept bag */
+            protected void warm(Concept c) {
+                ((AbstractConcept)c).capacity(warm);
             }
         }
 
-        @NotNull
-        public static Bag<Concept> newConceptBag(NAR nar, int n) {
-            return new MonitoredCurveBag<Concept>(n, nar.random, nar.emotion.conceptFocus)
-                    .merge(BudgetMerge.plusDQDominant);
-                    //.merge(BudgetMerge.plusDQBlend);
-        }
+
+
 
 
 //        @NotNull

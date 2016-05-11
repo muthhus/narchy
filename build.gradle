@@ -13,6 +13,15 @@ plugins {
 allprojects {
 
     apply plugin: 'java'
+    apply plugin: 'java'
+    compileJava {
+        //enable compilation in a separate daemon process
+        options.fork = true
+
+        //enable incremental compilation
+        options.incremental = true
+
+    }
 
     //apply plugin: 'maven'
     apply plugin: 'build-dashboard'
@@ -38,10 +47,7 @@ allprojects {
 //            // classpath 'org.codehaus.groovy:groovy-backports-compat23:2.3.5' // uncomment if you're using Gradle 1.x
 //        }
 //    }
-//
-    tasks.withType(JavaCompile) {
-        options.incremental = true
-    }
+
 
 
 }
@@ -54,8 +60,8 @@ subprojects {
 
     //apply plugin: 'com.github.ben-manes-versions'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.9
+    targetCompatibility = 1.9
 
 
 
