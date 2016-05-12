@@ -55,14 +55,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				1024, 12, 1, 2, rng,
+				1024, 8, 1, 2, rng,
 				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		nar.beliefConfidence(0.55f);
-		nar.conceptActivation.setValue(0.08f);
-		nar.cyclesPerFrame.set(20);
+		nar.conceptActivation.setValue(0.12f);
+		nar.cyclesPerFrame.set(50);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -102,8 +102,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		int p = 0;
 		if (maze!=null && pac!=null) {
 			int[][] m = maze.iMaze;
-			int pix = pac.iX / 16;
-			int piy = pac.iY / 16;
+//			int pix = pac.iX / 16;
+//			int piy = pac.iY / 16;
+			int pix = Math.round(pac.iX / 16f);
+			int piy = Math.round(pac.iY / 16f);
 			for (int i = -visionRadius; i <= +visionRadius; i++) {
 				for (int j = -visionRadius; j <= +visionRadius; j++) {
 					int px = pix + i;
@@ -127,10 +129,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 						for (cghost g : ghosts) {
-							int ix = g.iX / 16;
-							int iy = g.iY / 16;
-							//int ix = Math.round(g.iX / 16f);
-							//int iy = Math.round(g.iY / 16f);
+							//int ix = g.iX / 16;
+							//int iy = g.iY / 16;
+							int ix = Math.round(g.iX / 16f);
+							int iy = Math.round(g.iY / 16f);
 							if (ix == px && iy == py) {
 								ghost = true;
 								break;

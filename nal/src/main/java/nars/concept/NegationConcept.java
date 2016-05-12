@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * a negation concept will hold no beliefs of its own since all negation input is
- * unwrapped on input.
+ * unwrapped on input.  this allows them to be lightweight
  */
 public final class NegationConcept extends CompoundConcept {
 
@@ -35,6 +35,4 @@ public final class NegationConcept extends CompoundConcept {
         return QuestionTable.EMPTY;
     }
 
-
 }
-

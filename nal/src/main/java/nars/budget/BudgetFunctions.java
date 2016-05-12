@@ -298,11 +298,13 @@ public final class BudgetFunctions extends UtilityFunctions {
         final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get());
 
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-        termLink.orPriority(quality,
-                and(sourceActivation, targetActivation)
-                //or(sourceActivation, targetActivation)
-        ); //was: termLink.orPriority(or(quality, targetActivation));
-        termLink.orDurability(quality);
+        if (!termLink.isDeleted()) {
+            termLink.orPriority(quality,
+                    and(sourceActivation, targetActivation)
+                    //or(sourceActivation, targetActivation)
+            ); //was: termLink.orPriority(or(quality, targetActivation));
+            termLink.orDurability(quality);
+        }
 
 
         //BudgetMerge.avgDQBlend.merge(target, termLink);
