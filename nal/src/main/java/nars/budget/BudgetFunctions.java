@@ -284,7 +284,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         Task task = taskLink.get();
         float priority = task.priIfFiniteElseZero();
         if (priority > Global.BUDGET_EPSILON)
-            priority *= or(taskLink.pri(), termLink.pri());
+            priority *= or(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero());
 
 
         //originaly was 'AND'

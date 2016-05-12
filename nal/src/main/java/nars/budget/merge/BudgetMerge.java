@@ -86,7 +86,7 @@ public interface BudgetMerge {
 
 
     BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
-        float nextPriority = src.pri() * srcScale;
+        float nextPriority = src.priIfFiniteElseZero() * srcScale;
 
         float currentPriority = tgt.priIfFiniteElseZero();
 
