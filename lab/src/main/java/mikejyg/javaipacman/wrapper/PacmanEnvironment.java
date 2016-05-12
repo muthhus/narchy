@@ -41,11 +41,11 @@ import static nars.util.NAgent.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 2;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 8;
+	private int pacmanCyclesPerFrame = 4;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);

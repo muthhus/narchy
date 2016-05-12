@@ -405,11 +405,13 @@ public class Default extends AbstractNAR {
 //        public final MutableFloat perfection;
 
 
-        @NotNull
-        public final Forget.AbstractForget conceptForget;
+        @NotNull public final Forget.AbstractForget conceptForget;
 
 
-        final PremiseGenerator premiser;
+        @NotNull final PremiseGenerator premiser;
+
+        protected final Forget.@NotNull ForgetAndDetectDeletion threshForget;
+
         private float cyclesPerFrame;
         private int cycleNum;
 
@@ -441,6 +443,7 @@ public class Default extends AbstractNAR {
             this.termLinkForget = new Forget.ExpForget(nar.termLinkRemembering, nar.perfection);
             this.taskLinkForget = new Forget.ExpForget(nar.taskLinkRemembering, nar.perfection).withDeletedItemFiltering();
 
+            this.threshForget = new Forget.ThresholdForget(nar.perfection).withDeletedItemFiltering();
         }
 
         protected abstract Bag<Concept> newConceptBag();
@@ -452,6 +455,7 @@ public class Default extends AbstractNAR {
             conceptForget.update(nar);
             taskLinkForget.update(nar);
             termLinkForget.update(nar);
+            threshForget.update(nar);
 
             premiser.frame(nar);
         }
@@ -466,12 +470,10 @@ public class Default extends AbstractNAR {
             taskLinkForget.cycle(subCycle);
 
 
-            Bag<Concept> active1 = this.active;
-
             //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            active1.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
+            active.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
             //active.commit(lastForget != now ? conceptForget : .. );
 
 //            if (!((CurveBag)active).isSorted()) {
@@ -506,15 +508,13 @@ public class Default extends AbstractNAR {
         }
 
         protected final void fireConcept(BLink<Concept> conceptLink) {
-            update(conceptLink);
-            premiser.accept(conceptLink);
-        }
-
-        protected final void update(BLink<Concept> conceptLink) {
             Concept concept = conceptLink.get();
             concept.tasklinks().filter(taskLinkForget).commit();
             concept.termlinks().commit(termLinkForget);
+            premiser.accept(conceptLink);
         }
+
+
 
         @Nullable
         final void activate(@NotNull Concept c, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
@@ -550,8 +550,13 @@ public class Default extends AbstractNAR {
         /** called when a concept is displaced from the concept bag */
         protected void deactivate(BLink<Concept> cl) {
             Concept c = cl.get();
-            update(cl); //apply forgetting so that shrinking capacity will be applied to concept's components fairly
+
+            //apply forgetting so that shrinking capacity will be applied to concept's components fairly
+            c.tasklinks().filter(threshForget).commit();
+            c.termlinks().commit(threshForget);
+
             c.capacity(cold);
+
             nar.emotion.focusChange.accept(1);
         }
 

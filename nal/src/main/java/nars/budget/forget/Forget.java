@@ -20,6 +20,9 @@ public enum Forget { ;
         /** called each frame to update parameters */
         @Override
         void update(@NotNull NAR nar);
+
+
+
     }
 
     /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
@@ -44,7 +47,7 @@ public enum Forget { ;
 
         @Override
         public void accept(BLink bLink) {
-            throw new UnsupportedOperationException();
+            forget.accept(bLink);
         }
 
         @Override
@@ -93,10 +96,6 @@ public enum Forget { ;
             this.now = (this.subFrame = subFrame) + frame;
         }
 
-        @NotNull
-        public ForgetAndDetectDeletion withDeletedItemFiltering() {
-            return new ForgetAndDetectDeletion(this);
-        }
 
     }
 
@@ -203,6 +202,42 @@ public enum Forget { ;
         }
 
     }
+
+    /** reduces priority to the threshold level determined by the quality and perfection (budget threshold) parameter */
+    public final static class ThresholdForget implements BudgetForget {
+
+        private final MutableFloat perfection;
+        private float perfectionCached;
+        private long now;
+
+        public ThresholdForget(@NotNull MutableFloat perfection) {
+            this.perfection = perfection;
+
+        }
+
+        @Override
+        public void accept(@NotNull BLink budget) {
+
+            budget.setLastForgetTime(now);
+
+            float threshold = budget.qua() * perfectionCached;
+
+            budget.setPriority(threshold);
+
+        }
+
+        @Override
+        public void update(@NotNull NAR nar) {
+            this.perfectionCached = perfection.floatValue();
+            this.now = nar.time();
+        }
+
+        @Override
+        public void cycle(float subFrame) {
+
+        }
+    }
+
 
     //TODO implement as a Forgetter:
     public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {

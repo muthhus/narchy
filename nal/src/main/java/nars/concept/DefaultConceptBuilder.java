@@ -43,6 +43,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 if (Op.isOperation(t))
                     return new OperationConcept(t, termbag, taskbag);
                 break;
+            case NEGATE:
+                return new NegationConcept(t, termbag, taskbag);
         }
 
         //default:

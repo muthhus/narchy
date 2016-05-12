@@ -69,8 +69,13 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         beliefs = newBeliefTable();
         goals = newGoalTable();
-        questions = new ArrayQuestionTable(1);
-        quests = new ArrayQuestionTable(1);
+        questions = newQuestionTable();
+        quests = newQuestionTable();
+    }
+
+    /** used for questions and quests */
+    @NotNull protected QuestionTable newQuestionTable() {
+        return new ArrayQuestionTable(1);
     }
 
 //    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {

@@ -18,4 +18,8 @@ public interface BudgetForget extends Consumer<BLink> {
      * @param subFrame time offset to be applied to the last frame time value , 0 <= x < 1
      */
     void cycle(float subFrame);
+
+    @NotNull default Forget.ForgetAndDetectDeletion withDeletedItemFiltering() {
+        return new Forget.ForgetAndDetectDeletion(this);
+    }
 }
