@@ -223,7 +223,7 @@ public class WebServer /*extends PathHandler*/ {
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
                 new MapIndex2(
                     new SoftValueHashMap(256*1024),
-                    new DefaultConceptBuilder(random, 32, 32)),
+                    new DefaultConceptBuilder(random)),
                 new RealtimeMSClock()
         );
 

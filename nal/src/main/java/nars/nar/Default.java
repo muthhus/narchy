@@ -257,7 +257,8 @@ public class Default extends AbstractNAR {
     @NotNull
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
-        DefaultCycle c = new DefaultCycle(this, pg, activeConcepts, conceptWarm, conceptCold);
+        DefaultCycle c = new DefaultCycle(this, pg, conceptWarm, conceptCold);
+        c.active.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
         c.premiser.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
@@ -271,10 +272,7 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
-        return new DefaultPremiseGenerator(this, newDeriver(),
-            new Forget.ExpForget(taskLinkRemembering, perfection).withDeletedItemFiltering(),
-            new Forget.ExpForget(termLinkRemembering, perfection)
-        );
+        return new DefaultPremiseGenerator(this, newDeriver());
     }
 
     protected Deriver newDeriver() {
@@ -374,6 +372,14 @@ public class Default extends AbstractNAR {
 
 
 
+
+        @NotNull
+        public final Forget.BudgetForgetFilter taskLinkForget;
+
+        @NotNull
+        public final BudgetForget termLinkForget;
+
+
         //public final MutableFloat activationFactor = new MutableFloat(1.0f);
 
 //        final Function<Task, Task> derivationPostProcess = d -> {
@@ -414,7 +420,7 @@ public class Default extends AbstractNAR {
 
         /* ---------- Short-term workspace for a single cycle ------- */
 
-        protected AbstractCycle(@NotNull NAR nar, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
+        protected AbstractCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator) {
 
             this.nar = nar;
 
@@ -422,8 +428,8 @@ public class Default extends AbstractNAR {
 
             this.conceptRemembering = nar.conceptRemembering;
 
-            conceptsFiredPerCycle = new MutableInteger(1);
-            active = concepts;
+            this.conceptsFiredPerCycle = new MutableInteger(1);
+            this.active = newConceptBag();
 
             this.handlers = new Active(
                     nar.eventFrameStart.on(this::frame),
@@ -431,15 +437,22 @@ public class Default extends AbstractNAR {
                     nar.eventReset.on(this::reset)
             );
 
-            conceptForget = new Forget.ExpForget(conceptRemembering, nar.perfection);
-
+            this.conceptForget = new Forget.ExpForget(conceptRemembering, nar.perfection);
+            this.termLinkForget = new Forget.ExpForget(nar.termLinkRemembering, nar.perfection);
+            this.taskLinkForget = new Forget.ExpForget(nar.taskLinkRemembering, nar.perfection).withDeletedItemFiltering();
 
         }
 
+        protected abstract Bag<Concept> newConceptBag();
+
         protected void frame(@NotNull NAR nar) {
-            this.cyclesPerFrame = nar.cyclesPerFrame.floatValue();
-            this.cycleNum = 0;
+            cyclesPerFrame = nar.cyclesPerFrame.floatValue();
+            cycleNum = 0;
+
             conceptForget.update(nar);
+            taskLinkForget.update(nar);
+            termLinkForget.update(nar);
+
             premiser.frame(nar);
         }
 
@@ -447,11 +460,11 @@ public class Default extends AbstractNAR {
 
             fireConcepts(conceptsFiredPerCycle.intValue());
 
-
             float subCycle = cycleNum++ / cyclesPerFrame;
             conceptForget.cycle(subCycle);
+            termLinkForget.cycle(subCycle);
+            taskLinkForget.cycle(subCycle);
 
-            premiser.cycle(subCycle);
 
             Bag<Concept> active1 = this.active;
 
@@ -488,8 +501,19 @@ public class Default extends AbstractNAR {
 
             if (conceptsToFire == 0 || b.isEmpty()) return;
 
-            b.sample(conceptsToFire, this.premiser);
+            b.sample(conceptsToFire, this::fireConcept);
 
+        }
+
+        protected final void fireConcept(BLink<Concept> conceptLink) {
+            update(conceptLink);
+            premiser.accept(conceptLink);
+        }
+
+        protected final void update(BLink<Concept> conceptLink) {
+            Concept concept = conceptLink.get();
+            concept.tasklinks().filter(taskLinkForget).commit();
+            concept.termlinks().commit(termLinkForget);
         }
 
         @Nullable
@@ -510,29 +534,47 @@ public class Default extends AbstractNAR {
      * will not consume budget unfairly relative to another premise
      * with less tasks but equal budget.
      */
-    public static class DefaultCycle extends AbstractCycle {
+    public static final class DefaultCycle extends AbstractCycle {
 
-        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, int activeConcepts, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
-            super(nar,
-                    new MonitoredCurveBag(nar, activeConcepts, nar.random, warm, cold)
-                            .merge(BudgetMerge.plusDQDominant),
-                    premiseGenerator
-            );
+        private final DefaultConceptPolicy cold;
+        private final DefaultConceptPolicy warm;
+
+
+        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+            super(nar, premiseGenerator);
+            this.warm = warm;
+            this.cold = cold;
         }
 
 
-        /** extends CurveBag to invoke entrance/exit event handler lambda */
-        public static class MonitoredCurveBag extends CurveBag<Concept> {
+        /** called when a concept is displaced from the concept bag */
+        protected void deactivate(BLink<Concept> cl) {
+            Concept c = cl.get();
+            update(cl); //apply forgetting so that shrinking capacity will be applied to concept's components fairly
+            c.capacity(cold);
+            nar.emotion.focusChange.accept(1);
+        }
 
-            private final ConceptPolicy cold, warm;
+        /** called when a concept enters the concept bag */
+        protected void activate(Concept c) {
+            ((AbstractConcept)c).capacity(warm);
+        }
+
+        @Override
+        protected Bag<Concept> newConceptBag() {
+            return new MonitoredCurveBag(nar, 1, nar.random)
+                    .merge(BudgetMerge.plusDQDominant);
+        }
+
+        /** extends CurveBag to invoke entrance/exit event handler lambda */
+        public final class MonitoredCurveBag extends CurveBag<Concept> {
+
             final NAR nar;
 
-            public MonitoredCurveBag(NAR nar, int capacity, Random rng, ConceptPolicy warm, ConceptPolicy cold) {
+            public MonitoredCurveBag(NAR nar, int capacity, Random rng) {
                 super(capacity, rng);
                 this.nar = nar;
                 setCapacity(capacity);
-                this.warm = warm;
-                this.cold = cold;
             }
 
 
@@ -544,12 +586,12 @@ public class Default extends AbstractNAR {
 
                     Concept dd = displaced.get();
                     if (dd != i)
-                        warm(i);
+                        activate(i);
 
-                    cold(dd);
+                    deactivate(displaced);
 
                 } else {
-                    warm(i);
+                    activate(i);
                 }
 
                 return displaced;
@@ -560,22 +602,12 @@ public class Default extends AbstractNAR {
             public BLink<Concept> remove(Concept x) {
                 BLink<Concept> removed = super.remove(x);
                 if (removed!=null) {
-                    cold(removed.get());
+                    deactivate(removed);
                 }
                 return removed;
             }
 
 
-            /** called when a concept is displaced from the concept bag */
-            protected void cold(Concept c) {
-                ((AbstractConcept)c).capacity(cold);
-                nar.emotion.focusChange.accept(1);
-            }
-
-            /** called when a concept enters the concept bag */
-            protected void warm(Concept c) {
-                ((AbstractConcept)c).capacity(warm);
-            }
         }
 
 
@@ -629,21 +661,17 @@ public class Default extends AbstractNAR {
 //            this(nar, deriver, Global.newHashSet(64));
 //        }
 
-        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter taskLinkForget, @NotNull BudgetForget termLinkForget) {
-            super(nar, new PremiseEval(nar.index, nar.random, deriver), taskLinkForget, termLinkForget);
+        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver) {
+            super(nar, new PremiseEval(nar.index, nar.random, deriver));
 
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
-
         }
 
         /**
          * update derivation parameters (each frame)
          */
         @Override public final void frame(@NotNull NAR nar) {
-            super.frame(nar);
             matcher.setMinConfidence(confMin.floatValue());
-            taskLinkForget.update(nar);
-            termLinkForget.update(nar);
         }
 
 

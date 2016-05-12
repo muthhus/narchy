@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNull;
 public class VersioningTest {
 
     @NotNull
-    Versioning v = new Versioning(10);
+    Versioning v = new HeapVersioning(10,10);
     @NotNull
     Versioned a = new Versioned(v);
     @NotNull
@@ -22,8 +22,8 @@ public class VersioningTest {
 
     @Test
     public void test1() {
-        Versioning w = new Versioning(10);
-        VersionMap m = new VersionMap(w);
+        Versioning w = new HeapVersioning(10,10);
+        VersionMap m = new VersionMap(w,10);
         m.put("x", "a");
         assertEquals("{x=a}", m.toString());
         assertEquals(1, w.now());

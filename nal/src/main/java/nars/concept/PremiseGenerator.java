@@ -61,11 +61,6 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     //private final Map<Term, Task> beliefCache = Global.newHashMap();
     //long lastMatch = Tense.TIMELESS;
 
-    @NotNull
-    public final Forget.BudgetForgetFilter taskLinkForget;
-    @NotNull
-    public final BudgetForget termLinkForget;
-
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
@@ -75,12 +70,10 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter taskLinkForget, @NotNull BudgetForget termLinkForget) {
+    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher) {
 
         this.nar = nar;
         this.matcher = matcher;
-        this.taskLinkForget = taskLinkForget;
-        this.termLinkForget = termLinkForget;
     }
 
     /**
@@ -112,13 +105,9 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     }
 
     /** to be overridden by subclasses, called on each frame to update parameters */
-    public void frame(NAR nar) {
-    }
+    abstract public void frame(NAR nar);
 
-    public void cycle(float subCycle) {
-        termLinkForget.cycle(subCycle);
-        taskLinkForget.cycle(subCycle);
-    }
+
 
     /**
      * main entry point:
@@ -129,27 +118,21 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks) {
 
-        Concept concept = conceptLink.get();
 
-        Bag<Task> taskLinks = concept.tasklinks();
-        if (taskLinks.filter(taskLinkForget).commit().isEmpty())
-            return; //no tasklinks
 
-        Bag<Termed> termLinks = concept.termlinks();
-        if (termLinks.commit(termLinkForget).isEmpty())
-            return; //no termlinks
+        Concept c = conceptLink.get();
 
         Collection<BLink<? extends Termed>> termsBuffer;
         termsBuffer = this.terms;
         termsBuffer.clear();
-        termLinks.sample(termlinks, termsBuffer::add);
+        c.termlinks().sample(termlinks, termsBuffer::add);
         assert (!termsBuffer.isEmpty());
 
 
         Collection<BLink<Task>> tasksBuffer;
         tasksBuffer = this.tasks;
         tasksBuffer.clear();
-        taskLinks.sample(tasklinks, tasksBuffer::add);
+        c.tasklinks().sample(tasklinks, tasksBuffer::add);
         assert (!tasksBuffer.isEmpty());
 
 
