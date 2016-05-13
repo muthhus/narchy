@@ -22,19 +22,19 @@ import org.jbox2d.dynamics.World2D;
  */
 public class VisionRay extends Component implements LayerDraw {
 
-    protected final int resolution;
-    protected final float arc;
-    final Vec2 point; //where the retina receives vision at
-    public final float angle;
-    private final Body base;
-    private final FloatObjectProcedure<Color3f> colorizer;
+    protected int resolution;
+    protected float arc;
+    Vec2 point; //where the retina receives vision at
+    public float angle;
+    private Body base;
+    private FloatObjectProcedure<Color3f> colorizer;
 
     public float seenDist;
 
     protected float distance;
 
 
-    public final RayDrawer[] rayDrawers;
+    public RayDrawer[] rayDrawers;
 
     float biteDistanceThreshold = 0.03f;
     private boolean eats;
@@ -45,6 +45,9 @@ public class VisionRay extends Component implements LayerDraw {
 
     //final Sensor sensor;
 
+    public VisionRay() {
+
+    }
     public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution, FloatObjectProcedure<Color3f> colorizer) {
         this.base = base;
 

@@ -630,15 +630,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         return appendTo(null, null).toString();
     }
 
-    @Override
-    public long start() {
-        return occurrenceTime;
-    }
-
-    @Override
-    public long end() {
-        return occurrenceTime;// + duration;
-    }
 
 
 }

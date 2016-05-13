@@ -15,6 +15,8 @@ public class Health extends Component {
     public String[] damageSfxId;
     public String woundParticle;*/
 
+    public Health() { }
+
     public Health(float nutrition) {
         this.nutrition = nutrition;
     }

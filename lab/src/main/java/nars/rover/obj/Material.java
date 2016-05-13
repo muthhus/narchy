@@ -10,9 +10,11 @@ import nars.term.Term;
 public class Material extends Component {
 
 
-	public final Term term;
+	public Term term;
 
-	JoglAbstractDraw.DrawProperty renderer = null;
+	//JoglAbstractDraw.DrawProperty renderer = null;
+
+	public Material() { }
 
 	public Material(Term term) {
 		this.term = term;

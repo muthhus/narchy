@@ -8,7 +8,11 @@ import nars.NAR;
  */
 public class RunNAR extends Component {
 
-    public final NAR nar;
+    public NAR nar;
+
+    public RunNAR() {
+
+    }
 
     public RunNAR(NAR nar) {
         this.nar = nar;

@@ -1,0 +1,32 @@
+//truth-relation to NAL4-relation
+//https://gist.github.com/patham9/90f6593d644e8c6b5e68a4dc73284039
+//TODO translate the NAL7 notation
+
+(A =/> B), A |- ((B,A) --> imp_after), (Truth:Identity)
+(A =/> B), B |- ((B,A) --> imp_after), (Truth:Identity)
+
+(A =\> B), A |- ((B,A) --> imp_before), (Truth:Identity)
+(A =\> B), B |- ((B,A) --> imp_before), (Truth:Identity)
+
+(A =|> B), A |- ((B,A) --> imp_concurrent), (Truth:Identity)
+(A =|> B), B |- ((B,A) --> imp_concurrent), (Truth:Identity)
+((B,A) --> imp_concurrent), A |- (A =|> B), (Truth:Identity)
+((B,A) --> imp_concurrent), B |- (A =|> B), (Truth:Identity)
+
+(A ==> B), A |- ((B,A) --> imp_orderless), (Truth:Identity)
+(A ==> B), B |- ((B,A) --> imp_orderless), (Truth:Identity)
+((B,A) --> imp_orderless), A |- (A ==> B), (Truth:Identity)
+((B,A) --> imp_orderless), B |- (A ==> B), (Truth:Identity)
+
+(A <|> B), A |- ((B,A) --> eq_concurrent), (Truth:Identity)
+(A <|> B), B |- ((B,A) --> eq_concurrent), (Truth:Identity)
+((B,A) --> eq_concurrent), A |- (A <|> B), (Truth:Identity)
+((B,A) --> eq_concurrent), B |- (A <|> B), (Truth:Identity)
+
+(A </> B), A |- ((B,A) --> eq_after), (Truth:Identity)
+(A </> B), B |- ((B,A) --> eq_after), (Truth:Identity)
+
+(A <=> B), A |- ((B,A) --> eq_orderless), (Truth:Identity)
+(A <=> B), B |- ((B,A) --> eq_orderless), (Truth:Identity)
+((B,A) --> eq_orderless), A |- (A <=> B), (Truth:Identity)
+((B,A) --> eq_orderless), B |- (A <=> B), (Truth:Identity)

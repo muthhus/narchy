@@ -15,6 +15,10 @@ public class Physical extends Component {
     public Fixture fixture;
     public float density = 10;
 
+    public Physical() {
+
+    }
+
     public Physical(BodyDef b, Shape s) {
         this.bodyDef = b;
         this.shape = s;

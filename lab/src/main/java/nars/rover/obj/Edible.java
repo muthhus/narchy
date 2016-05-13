@@ -9,6 +9,10 @@ public class Edible extends Component {
     public float nutrients;
     public float poison;
 
+    public Edible() {
+
+    }
+
     public Edible(float nutrients, float poison) {
         this.nutrients = nutrients;
         this.poison = poison;

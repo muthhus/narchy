@@ -10,6 +10,8 @@ public class DrawAbove extends Component {
 
     public LayerDraw drawer;
 
+    public DrawAbove() { }
+
     public DrawAbove(LayerDraw l) {
         this.drawer = l;
     }

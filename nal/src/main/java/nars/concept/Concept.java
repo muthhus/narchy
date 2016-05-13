@@ -292,8 +292,8 @@ public interface Concept extends Termed, Comparable {
 
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
         if (initialScale <= 0 || b.isDeleted())
-            throw new Budget.BudgetException();
-            //return false;
+            //throw new Budget.BudgetException();
+            return false;
 
         float minScale =
                 nar.taskLinkThreshold.floatValue() / b.pri();

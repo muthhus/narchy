@@ -27,8 +27,7 @@ public interface Temporal extends Tasked {
 //        return (int)(start - other_end); //TODO long/int
 //    }
 
-    long start();
-    long end();
+
 
 //    default long getLifespan(Memory memory) {
 //        long createdAt = getCreationTime();

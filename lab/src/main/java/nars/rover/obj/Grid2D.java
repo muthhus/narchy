@@ -16,11 +16,14 @@ import java.util.Random;
  */
 public class Grid2D extends Component implements LayerDraw {
 
-    final Cell[][] cells;
-    private final int w, h;
+    Cell[][] cells;
+    private int w, h;
     private JoglAbstractDraw draw;
     float cw, ch;
 
+    public Grid2D() {
+
+    }
     public Grid2D(int w, int h, float scale /* meters per cell */) {
         this.cells = (Cell[][]) Array.newInstance(Cell.class, w, h);
         for (int i = 0; i < w; i++) {

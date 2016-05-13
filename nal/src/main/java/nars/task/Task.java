@@ -775,13 +775,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return Tense.ETERNAL;
     }
 
-    default long start() { return occurrence(); }
-    default long end() {
-        return start() + duration();
-    }
-    default int duration() {
-        return 0;
-    }
 
 
 

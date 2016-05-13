@@ -562,7 +562,9 @@ public class Default extends AbstractNAR {
 
         /** called when a concept enters the concept bag */
         protected void activate(Concept c) {
-            ((AbstractConcept)c).capacity(warm);
+            c.tasklinks().filter(threshForget).commit(); //clean out any deleted tasklinks since it was deactivated
+
+            c.capacity(warm);
         }
 
         @Override
