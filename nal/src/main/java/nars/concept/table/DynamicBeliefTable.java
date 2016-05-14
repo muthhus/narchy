@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
-import nars.concept.Concept;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

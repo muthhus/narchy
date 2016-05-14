@@ -172,6 +172,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         return t == this || t.equalsAnonymously(term());
     }
 
+    @Override
     public void capacity(ConceptPolicy p) {
         linkCapacity(p);
     }

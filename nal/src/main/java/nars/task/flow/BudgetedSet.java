@@ -2,8 +2,8 @@ package nars.task.flow;
 
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import nars.budget.merge.BudgetMerge;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

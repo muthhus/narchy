@@ -170,7 +170,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
             new Term[] { r, s },
-            ((Compound)TermContainer.difference(Op.SET_EXT, sete(r, p, q, s), sete(p, q))).terms()
+            TermContainer.difference(Op.SET_EXT, sete(r, p, q, s), sete(p, q)).terms()
         );
     }
     @Test public void testDifferenceSortedEmpty() {

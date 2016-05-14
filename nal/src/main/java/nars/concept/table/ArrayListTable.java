@@ -1,7 +1,6 @@
 package nars.concept.table;
 
 import nars.bag.impl.ListTable;
-import nars.task.Task;
 import nars.util.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

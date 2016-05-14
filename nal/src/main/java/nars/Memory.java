@@ -27,12 +27,10 @@ import nars.task.Task;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.time.Clock;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Random;

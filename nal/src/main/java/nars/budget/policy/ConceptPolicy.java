@@ -2,7 +2,6 @@ package nars.budget.policy;
 
 import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
-import nars.util.data.MutableInteger;
 
 
 public interface ConceptPolicy  {

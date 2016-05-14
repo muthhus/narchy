@@ -261,9 +261,7 @@ public enum Op {
 
     public static boolean isTemporal(Op o, int dt, int arity) {
         if (o.isTemporal()) {
-            if (o == Op.CONJUNCTION && dt!=0 && dt!=DTERNAL && arity > 2)
-                return false;
-            return true;
+            return !(o == Op.CONJUNCTION && dt != 0 && dt != DTERNAL && arity > 2);
         }
         return false;
     }

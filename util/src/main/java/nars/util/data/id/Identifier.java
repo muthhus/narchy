@@ -1,10 +1,8 @@
 package nars.util.data.id;
 
 import nars.util.data.rope.impl.CharArrayRope;
-import nars.util.utf8.Utf8;
 
 import java.io.*;
-import java.nio.CharBuffer;
 
 import static nars.util.utf8.Utf8.trim;
 

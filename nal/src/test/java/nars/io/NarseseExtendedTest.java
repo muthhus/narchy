@@ -169,7 +169,7 @@ public class NarseseExtendedTest {
 
             Term tt = t.term();
             assertEquals(Op.INHERIT, tt.op());
-            assertTrue("(negated-->a)".equals(((Compound) tt).toString()));
+            assertTrue("(negated-->a)".equals(tt.toString()));
             assertTrue(t.punc() == Symbols.GOAL);
         }
     }

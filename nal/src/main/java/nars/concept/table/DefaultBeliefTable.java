@@ -87,6 +87,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return eternal.capacity() + temporal.capacity();
     }
 
+    @Override
     public void capacity(int eternals, int temporals) {
         eternal.setCapacity(eternals);
         temporal.setCapacity(temporals);

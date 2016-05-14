@@ -2,7 +2,6 @@ package nars.predict;
 
 import javafx.scene.layout.BorderPane;
 import nars.NAR;
-import nars.Narsese;
 import nars.concept.table.BeliefTable;
 import nars.guifx.NARfx;
 import nars.guifx.chart.MatrixImage;
@@ -13,7 +12,6 @@ import nars.util.HaiQ;
 import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.Autoencoder;
-import nars.util.signal.MotorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,7 +1,6 @@
 package nars.rover.obj;
 
 import com.artemis.Component;
-import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.term.Term;
 
 /**

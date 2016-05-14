@@ -6,9 +6,7 @@ import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * a negation concept will hold no beliefs of its own since all negation input is

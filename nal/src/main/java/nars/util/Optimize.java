@@ -28,7 +28,7 @@ public class Optimize<X> {
     public final Supplier<X> subject;
 
     final List<Tweak> tweaks = new ArrayList();
-    private boolean trace = true;
+    private final boolean trace = true;
 
     public Optimize(Supplier<X> subject) {
         this.subject = subject;
@@ -103,7 +103,7 @@ public class Optimize<X> {
             try {
                 score = eval.floatValueOf(x);
             } catch (Exception e) {
-                e.printStackTrace();;
+                e.printStackTrace();
                 score = Float.NEGATIVE_INFINITY;
             }
 

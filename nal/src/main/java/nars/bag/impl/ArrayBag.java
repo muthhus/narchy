@@ -2,8 +2,8 @@ package nars.bag.impl;
 
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.budget.merge.BudgetMerge;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.happy.collections.lists.decorators.SortedList_1x4;

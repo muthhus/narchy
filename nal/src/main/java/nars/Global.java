@@ -151,7 +151,7 @@ public enum Global {
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
-    public static boolean BACKWARD_QUESTIONS = false;
+    public static boolean BACKWARD_QUESTIONS;
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

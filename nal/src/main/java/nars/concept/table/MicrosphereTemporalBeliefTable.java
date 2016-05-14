@@ -28,7 +28,7 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     private TruthPolation polation;
     private final SortedTable<Task, Task> eternal;
 
-    long min = 0, max = 0;
+    long min, max;
 
     /** history factor:
      *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy

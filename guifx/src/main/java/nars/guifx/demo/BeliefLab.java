@@ -1,6 +1,5 @@
 package nars.guifx.demo;
 
-import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
 import nars.nar.Default;

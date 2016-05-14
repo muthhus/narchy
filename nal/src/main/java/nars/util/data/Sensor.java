@@ -52,8 +52,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
     @Nullable
-    private Task next = null;
-    private int dt = 0;
+    private Task next;
+    private int dt;
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
         this(n, t, value,

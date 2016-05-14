@@ -42,7 +42,7 @@ import static nars.term.Terms.terms;
  */
 public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
 
-    int edgeID = 0;
+    int edgeID;
 
     public DerivationGraph(@NotNull PremiseRuleSet rules) {
         super(Integer.class);
@@ -112,7 +112,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
             return x;
     }
 
-    int matches = 0;
+    int matches;
     final PremiseEval p = new PremiseEval(new XorShift128PlusRandom(1), Deriver.getDefaultDeriver()) {
 
         @Override

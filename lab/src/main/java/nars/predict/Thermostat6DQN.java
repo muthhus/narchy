@@ -1,13 +1,11 @@
 package nars.predict;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.util.DQN;
 import nars.util.data.Util;
-import nars.util.signal.MotorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.TreeSet;
