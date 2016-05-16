@@ -50,9 +50,9 @@ public final class BudgetFunctions extends UtilityFunctions {
         float exp = t.expectation();
 
         //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
-        return Math.max(exp, (1.0f - exp) * 0.75f);
+        //return Math.max(exp, (1.0f - exp) * 0.75f);
 
-        //return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
+        return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
     }
 
     // /**

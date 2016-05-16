@@ -378,16 +378,17 @@ public abstract class TermBuilder {
             return null; //throw new InvalidTerm(op, u);
 
 
-        if (negs.size() == s.size()) {
-            //all subterms negated; apply DeMorgan's Law
+        //if all subterms negated; apply DeMorgan's Law
+        if ((dt == DTERNAL) && (negs.size() == s.size())) {
+
             if (op == CONJUNCTION) op = DISJUNCTION;
             else /* (op == DISJUNCTION) */ op = CONJUNCTION;
 
             Term nn = finish(op, -1, dt, TermSet.the(negs));
             return newCompound(NEGATE, nn);
-        } else {
-            return finish(op, -1, dt, TermSet.the(s));
         }
+
+        return finish(op, -1, dt, TermSet.the(s));
 
 
     }
