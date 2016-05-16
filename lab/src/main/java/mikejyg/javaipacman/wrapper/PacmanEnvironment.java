@@ -64,7 +64,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		nar.beliefConfidence(0.55f);
 		nar.conceptActivation.setValue(0.22f);
-		nar.cyclesPerFrame.set(150);
+		nar.cyclesPerFrame.set(50);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -104,10 +104,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		int p = 0;
 		if (maze!=null && pac!=null) {
 			int[][] m = maze.iMaze;
-//			int pix = pac.iX / 16;
-//			int piy = pac.iY / 16;
-			int pix = Math.round(pac.iX / 16f);
-			int piy = Math.round(pac.iY / 16f);
+			int pix = pac.iX / 16;
+			int piy = pac.iY / 16;
+//			int pix = Math.round(pac.iX / 16f);
+//			int piy = Math.round(pac.iY / 16f);
 			for (int i = -visionRadius; i <= +visionRadius; i++) {
 				for (int j = -visionRadius; j <= +visionRadius; j++) {
 					int px = pix + i;
@@ -131,10 +131,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 						for (cghost g : ghosts) {
-							//int ix = g.iX / 16;
-							//int iy = g.iY / 16;
-							int ix = Math.round(g.iX / 16f);
-							int iy = Math.round(g.iY / 16f);
+							int ix = g.iX / 16;
+							int iy = g.iY / 16;
+							//int ix = Math.round(g.iX / 16f);
+							//int iy = Math.round(g.iY / 16f);
 							if (ix == px && iy == py) {
 								ghost = true;
 								break;

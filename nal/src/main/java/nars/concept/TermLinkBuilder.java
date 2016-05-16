@@ -50,11 +50,8 @@ public enum TermLinkBuilder {
             }
 
             Concept ti = growComponent(hti, 0, nar, components);
-            if (ti == null)
-                continue;
-
-
-
+            /*if (ti == null)
+                continue;*/
             /*if ((tEquivalence || (tImplication && (i == 0))) &&
                 (ti.term().isAnyOf(NegationOrConjunction))) {
 
@@ -131,61 +128,61 @@ public enum TermLinkBuilder {
 
     static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
 
-    /**
-     * Collect TermLink templates into a list, go down one level except in
-     * special cases
-     * <p>
-     *
-     * @param t          The CompoundTerm for which to build links
-     * @param components set of components being accumulated, to avoid duplicates
-     */
-    private static void visitComponents(@NotNull Compound t, @NotNull Collection<Termed> components, @NotNull NAR nar) {
-
-        ///** add self link for structural transform: */
-        //components.add(t);
-
-        Op tOp = t.op();
-        boolean tEquivalence = tOp == Op.EQUIV;
-        boolean tImplication = tOp == Op.IMPLICATION;
-
-
-        int ni = t.size();
-        for (int i = 0; i < ni; i++) {
-
-            Concept ti = growComponent(t.term(i), 0, nar, components);
-            if (ti == null)
-                continue;
-
-            //if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {
-
-            if ((tEquivalence || (tImplication && (i == 0))) &&
-                (ti.term().isAnyOf(NegationOrConjunction))) {
-
-                visitComponents((Compound) ti, components, nar);
-
-            } else if (ti instanceof Compound) {
-
-                Compound cti = (Compound) ti;
-                for (int j = 0, nj = cti.size(); j < nj; j++) {
-
-                    Concept tj = growComponent(cti.term(j), 1, nar, components);
-                    if (tj instanceof Compound) {
-
-                        Compound ctj = (Compound) tj;
-                        for (int k = 0, nk = ctj.size(); k < nk; k++) {
-
-                            growComponent(ctj.term(k), 2, nar, components);
-
-                        }
-                    }
-
-
-                }
-            }
-
-
-        }
-    }
+//    /**
+//     * Collect TermLink templates into a list, go down one level except in
+//     * special cases
+//     * <p>
+//     *
+//     * @param t          The CompoundTerm for which to build links
+//     * @param components set of components being accumulated, to avoid duplicates
+//     */
+//    private static void visitComponents(@NotNull Compound t, @NotNull Collection<Termed> components, @NotNull NAR nar) {
+//
+//        ///** add self link for structural transform: */
+//        //components.add(t);
+//
+//        Op tOp = t.op();
+//        boolean tEquivalence = tOp == Op.EQUIV;
+//        boolean tImplication = tOp == Op.IMPLICATION;
+//
+//
+//        int ni = t.size();
+//        for (int i = 0; i < ni; i++) {
+//
+//            Concept ti = growComponent(t.term(i), 0, nar, components);
+//            if (ti == null)
+//                continue;
+//
+//            //if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {
+//
+//            if ((tEquivalence || (tImplication && (i == 0))) &&
+//                (ti.term().isAnyOf(NegationOrConjunction))) {
+//
+//                visitComponents((Compound) ti, components, nar);
+//
+//            } else if (ti instanceof Compound) {
+//
+//                Compound cti = (Compound) ti;
+//                for (int j = 0, nj = cti.size(); j < nj; j++) {
+//
+//                    Concept tj = growComponent(cti.term(j), 1, nar, components);
+//                    if (tj instanceof Compound) {
+//
+//                        Compound ctj = (Compound) tj;
+//                        for (int k = 0, nk = ctj.size(); k < nk; k++) {
+//
+//                            growComponent(ctj.term(k), 2, nar, components);
+//
+//                        }
+//                    }
+//
+//
+//                }
+//            }
+//
+//
+//        }
+//    }
 
 
     /**
