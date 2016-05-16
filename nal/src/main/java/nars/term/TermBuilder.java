@@ -298,6 +298,10 @@ public abstract class TermBuilder {
     public Term junction(@NotNull Op op, int t, @NotNull Term... u) {
 //        if (u.length == 1)
 
+        if (u.length == 0) {
+            return null;
+        }
+
         if (u.length == 1) {
             Term only = u[0];
             //preserve unitary ellipsis
@@ -373,17 +377,19 @@ public abstract class TermBuilder {
         if (negs.anySatisfy(s::contains))
             return null; //throw new InvalidTerm(op, u);
 
-        TermSet cc;
+
         if (negs.size() == s.size()) {
             //all subterms negated; apply DeMorgan's Law
             if (op == CONJUNCTION) op = DISJUNCTION;
             else /* (op == DISJUNCTION) */ op = CONJUNCTION;
-            cc = TermSet.the(negs);
+
+            Term nn = finish(op, -1, dt, TermSet.the(negs));
+            return newCompound(NEGATE, nn);
         } else {
-            cc = TermSet.the(s);
+            return finish(op, -1, dt, TermSet.the(s));
         }
 
-        return newCompound(NEGATE, finish(op, -1, dt, cc));
+
     }
 
     static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull Set<Term> unwrappedNegations) {
