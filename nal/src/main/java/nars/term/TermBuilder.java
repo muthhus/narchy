@@ -355,7 +355,7 @@ public abstract class TermBuilder {
     }
 
     /**
-     * flattening junction builder, don't use with temporal relation
+     * flattening junction builder, for multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
     @NotNull
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
@@ -373,8 +373,17 @@ public abstract class TermBuilder {
         if (negs.anySatisfy(s::contains))
             return null; //throw new InvalidTerm(op, u);
 
-        TermContainer tc = TermSet.the(s);
-        return finish(op, -1, dt, tc);
+        TermSet cc;
+        if (negs.size() == s.size()) {
+            //all subterms negated; apply DeMorgan's Law
+            if (op == CONJUNCTION) op = DISJUNCTION;
+            else /* (op == DISJUNCTION) */ op = CONJUNCTION;
+            cc = TermSet.the(negs);
+        } else {
+            cc = TermSet.the(s);
+        }
+
+        return newCompound(NEGATE, finish(op, -1, dt, cc));
     }
 
     static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull Set<Term> unwrappedNegations) {

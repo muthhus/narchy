@@ -375,4 +375,18 @@ public class TermReductionsTest {
         assertParseException("((&&, a, b, c) ==> a)");
         assertParseException("(a ==> (&&, a, b, c))");
     }
+
+    @Test public void testDemorgan1() {
+        //https://en.wikipedia.org/wiki/De_Morgan%27s_laws
+
+
+        // \neg(P\and Q)\iff(\neg P)\or(\neg Q)
+        assertEquals("(--,((p)&&(q)))",
+                   $("(--(p) || --(q))").toString());
+
+
+        // \neg(P\or Q)\iff(\neg P)\and(\neg Q),
+        assertEquals("(--,((p)||(q)))",
+                   $("(--(p) && --(q))").toString());
+    }
 }
