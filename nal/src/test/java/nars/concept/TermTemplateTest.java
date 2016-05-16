@@ -32,7 +32,7 @@ public class TermTemplateTest {
         DoubleSummaryStatistics ss = templates.stream().mapToDouble(l -> l.strength).summaryStatistics();
         System.out.println(ss);
         assertEquals(1f, ss.getSum(), 0.01f);
-        assertTrue(ss.getMax() - ss.getAverage() > 0.05); //some variation due to repeat subterms
+        assertTrue(ss.getMax() - ss.getAverage() > 0.04); //some variation due to repeat subterms
 
     }
 

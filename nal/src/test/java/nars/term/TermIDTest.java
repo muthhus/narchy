@@ -29,7 +29,7 @@ public class TermIDTest {
 
     @Test
     public void testInternalRepresentation28cc() {
-        testBytesRepresentation("(a&&(--,(b,c))", 5);
+        testBytesRepresentation("(a&&(--,(b,c)))", 5);
     }
 
 //    // '--', 'a'
