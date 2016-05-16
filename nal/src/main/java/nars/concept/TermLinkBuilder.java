@@ -35,26 +35,34 @@ public enum TermLinkBuilder {
         ///** add self link for structural transform: */
         //components.add(t);
 
-        Op tOp = host.op();
-        boolean tEquivalence = tOp == Op.EQUIV;
-        boolean tImplication = tOp == Op.IMPLICATION;
+        //Op tOp = host.op();
+        //boolean tEquivalence = tOp == Op.EQUIV;
+        //boolean tImplication = tOp == Op.IMPLICATION;
 
 
         int ni = host.size();
         for (int i = 0; i < ni; i++) {
 
-            Concept ti = growComponent(host.term(i), 0, nar, components);
+            Term hti = host.term(i);
+            if (hti.op() == Op.NEGATE) {
+                //unwrap negation to its content
+                hti = ((Compound)hti).term(0);
+            }
+
+            Concept ti = growComponent(hti, 0, nar, components);
             if (ti == null)
                 continue;
 
-            //if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {
 
-            if ((tEquivalence || (tImplication && (i == 0))) &&
+
+            /*if ((tEquivalence || (tImplication && (i == 0))) &&
                 (ti.term().isAnyOf(NegationOrConjunction))) {
 
-                visitComponents((Compound) ti, components, nar);
+                //"if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {"
 
-            } else if (ti instanceof Compound) {
+                //visitComponents((Compound) ti, components, nar);
+
+            } else */if (ti instanceof Compound) {
 
                 Compound cti = (Compound) ti;
                 for (int j = 0, nj = cti.size(); j < nj; j++) {

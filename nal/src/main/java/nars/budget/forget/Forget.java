@@ -212,18 +212,12 @@ public enum Forget { ;
 
         public ThresholdForget(@NotNull MutableFloat perfection) {
             this.perfection = perfection;
-
         }
 
-        @Override
-        public void accept(@NotNull BLink budget) {
-
+        @Override public void accept(@NotNull BLink budget) {
             budget.setLastForgetTime(now);
-
             float threshold = budget.qua() * perfectionCached;
-
             budget.setPriority(threshold);
-
         }
 
         @Override

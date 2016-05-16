@@ -9,13 +9,13 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * a negation concept will hold no beliefs of its own since all negation input is
- * unwrapped on input.  this allows them to be lightweight
+ * will be removed soon
  */
-public final class NegationConcept extends CompoundConcept {
+@Deprecated public final class NegationConcept extends CompoundConcept {
 
     public NegationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
+        throw new RuntimeException("REDUNDANT");
     }
 
     @Override

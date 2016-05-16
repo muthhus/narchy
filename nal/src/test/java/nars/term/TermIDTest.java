@@ -27,11 +27,16 @@ public class TermIDTest {
         testBytesRepresentation("(a&&b)", 5);
     }
 
-    // '--', 'a'
     @Test
-    public void testInternalRepresentation29() {
-        testBytesRepresentation("(--,a)", 2);
+    public void testInternalRepresentation28cc() {
+        testBytesRepresentation("(a&&(--,(b,c))", 5);
     }
+
+//    // '--', 'a'
+//    @Test
+//    public void testInternalRepresentation29() {
+//        testBytesRepresentation("(--,a)", 2);
+//    }
 
     // '*' 'a' ',' 'b' ')'
     @Test

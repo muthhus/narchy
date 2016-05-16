@@ -25,6 +25,7 @@ import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
+import nars.Global;
 import nars.nar.Default;
 import nars.time.FrameClock;
 import nars.util.Agent;
@@ -54,15 +55,16 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
+
 		Default nar = new Default(
-				1024, 8, 1, 2, rng,
+				1024, 4, 1, 2, rng,
 				//new Default.WeakTermIndex(128 * 1024, rng),
 				new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		nar.beliefConfidence(0.55f);
-		nar.conceptActivation.setValue(0.12f);
-		nar.cyclesPerFrame.set(50);
+		nar.conceptActivation.setValue(0.22f);
+		nar.cyclesPerFrame.set(150);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

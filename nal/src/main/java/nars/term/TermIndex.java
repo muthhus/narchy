@@ -553,16 +553,17 @@ public interface TermIndex {
             Compound tc = (Compound) term.term();
 
             if (tc.op() == NEGATE) {
-                Term t0 = tc.term(0);
-                if (t0 instanceof Atomic) {
-                    //negations of non-DepVar atomics are invalid
-                    if (t0.op() != Op.VAR_DEP) {
-                        if (Global.DEBUG)
-                            throw new InvalidConceptTerm(term);
-                        else
-                            return null;
-                    }
-                }
+//                Term t0 = tc.term(0);
+//                if (t0 instanceof Atomic) {
+//                    //negations of non-DepVar atomics are invalid
+//                    if (t0.op() != Op.VAR_DEP) {
+//                        if (Global.DEBUG)
+//                            throw new InvalidConceptTerm(term);
+//                        else
+//                            return null;
+//                    }
+//                }
+                return null;
             }
 
             //NORMALIZATION

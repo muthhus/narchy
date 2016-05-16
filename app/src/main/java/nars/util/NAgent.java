@@ -46,7 +46,7 @@ public class NAgent implements Agent {
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.01f;
-    private double epsilonRandom = 0.02f;
+    private double epsilonRandom = 0.005f;
 
     float sensorPriority;
     float rewardPriority;
