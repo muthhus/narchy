@@ -39,7 +39,10 @@ public class NAgent implements Agent {
     private List<SensorConcept> inputs;
     private SensorConcept reward;
     private int lastAction = -1;
-    private float prevReward = Float.NaN, dReward = 0;
+    private float prevReward = Float.NaN;
+
+    float dReward = 0;
+    private SensorConcept dRewardPos, dRewardNeg;
 
     /** learning rate */
     float alpha;
@@ -68,7 +71,7 @@ public class NAgent implements Agent {
     private float lastMotivation = 0;
 
 
-    //private SensorConcept dRewardPos, dRewardNeg;
+
 
     public NAgent(NAR n) {
         this.nar = n;
@@ -124,14 +127,14 @@ public class NAgent implements Agent {
                 .pri(rewardPriority)
                 .sensorDT(-1); //pertains to the prevoius frame
 
-//        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
-//        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
-//        this.dRewardPos = new SensorConcept("(dRp)", nar,
-//                linearPositive, sensorTruth)
-//                .resolution(0.01f).timing(-1, -1);
-//        this.dRewardNeg = new SensorConcept("(dRn)", nar,
-//                linearNegative, sensorTruth)
-//                .resolution(0.01f).timing(-1, -1);
+        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
+        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
+        this.dRewardPos = new SensorConcept("(dRp)", nar,
+                linearPositive, sensorTruth)
+                .resolution(0.01f).timing(-1, -1);
+        this.dRewardNeg = new SensorConcept("(dRn)", nar,
+                linearNegative, sensorTruth)
+                .resolution(0.01f).timing(-1, -1);
 
         init();
     }

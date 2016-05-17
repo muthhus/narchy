@@ -5,6 +5,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.Agent;
+import nars.util.DQN;
 import nars.util.NAgent;
 import nars.util.Optimize;
 import nars.util.data.Util;
@@ -123,12 +124,13 @@ public class Thermostat implements Environment {
 
     public static void main(String[] args) {
 
+        int cycles = 1500;
 
-//        //baseline
-//        new Thermostat().run(
-//                new DQN(),
-//                cycles
-//        );
+        float b = new Thermostat().run(
+                new DQN(),
+                cycles
+        );
+        System.out.println("DQN baseline = " + b);
 
         Optimize.Result r = new Optimize<NAR>(() -> new Default())
 
@@ -141,9 +143,6 @@ public class Thermostat implements Environment {
 
                 .call("cycPerFrame", 4, 24, 1f, "cyclesPerFrame.setValue(#i)")
 
-                .call("conceptBeliefs", 4f, 16f, 1, "conceptBeliefsMax.set(#i)")
-                .call("conceptGoals", 4f, 16f, 1, "conceptGoalsMax.set(#i)")
-
                 .call("conceptRem", 1f, 6f, 0.25f, "conceptRemembering.setValue(#x)")
                 .call("taskRem",    1f, 8f, 0.25f, "taskLinkRemembering.setValue(#x)")
                 .call("termRem",    1f, 8f, 0.25f, "termLinkRemembering.setValue(#x)")
@@ -153,7 +152,7 @@ public class Thermostat implements Environment {
                 .call("conceptAct", 0.1f, 0.8f, 0.05f,  "conceptActivation.setValue(#x)")
 
                 .run(3500, (x) ->
-                    new Thermostat().run(new NAgent(x), 500)
+                    new Thermostat().run(new NAgent(x), cycles)
                 );
 
         System.out.println();

@@ -46,7 +46,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 4;
+	private int pacmanCyclesPerFrame = 2;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -64,7 +64,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		nar.beliefConfidence(0.55f);
 		nar.conceptActivation.setValue(0.22f);
-		nar.cyclesPerFrame.set(50);
+		nar.cyclesPerFrame.set(30);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

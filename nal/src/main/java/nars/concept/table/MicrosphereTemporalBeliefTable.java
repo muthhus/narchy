@@ -44,16 +44,6 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
         this.eternal = eternal;
     }
 
-//    @Override
-//    public void setCapacity(int c) {
-////        if (c!=0 && (c < 3))
-////            throw new RuntimeException("temporal capacity must be > 2");
-//        super.setCapacity(c);
-//    }
-
-
-
-
     @Nullable
     @Override
     public Task ready(@NotNull Task input, @NotNull NAR nar) {
@@ -283,9 +273,10 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     @Nullable
     @Override
     public Truth truth(long when) {
-        if (polation == null || polation.capacity() < capacity()) {
+        int c = capacity();
+        if (polation == null || polation.capacity() < c) {
             float ecap = eternal.capacity();
-            polation = new TruthPolation(capacity(), ecap / (ecap + capacity()));
+            polation = new TruthPolation(c, ecap / (ecap + c));
         }
 
         //removeDeleted();

@@ -22,6 +22,7 @@ import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import jdk.internal.misc.Unsafe;
 import nars.util.Texts;
+import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -632,7 +633,11 @@ public enum Util {
      * discretizes values to nearest finite resolution real number determined by epsilon spacing
      */
     public static float round(float value, float epsilon) {
-        return clamp(Math.round(value / epsilon) * epsilon);
+
+        return clamp(
+                //Math.round(value / epsilon)
+                FastMath.round(value / epsilon)
+                        * epsilon);
     }
 
     public static int hash(float f, int discretness) {

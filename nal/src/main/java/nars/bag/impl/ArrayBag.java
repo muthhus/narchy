@@ -4,16 +4,14 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
+import nars.util.FastQuickSort;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -29,19 +27,11 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     private final float reinsertionThreshold = 0.01f;
 
     public ArrayBag(int cap) {
-        this(new FasterList(cap), cap);
+        this(new FasterList(cap), new HashMap(cap));
+        setCapacity(cap);
     }
 
-    public ArrayBag(@NotNull List<BLink<V>> items, int capacity) {
-        this(items,
-                //Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
-                new HashMap(capacity/2, 0.5f)
-        );
-
-        setCapacity(capacity);
-    }
-
-    public ArrayBag(@NotNull List<BLink<V>> items, Map<V, BLink<V>> map) {
+    protected ArrayBag(@NotNull List<BLink<V>> items, Map<V, BLink<V>> map) {
         super(items, map);
     }
 
@@ -52,6 +42,16 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
+        float f1 = o1.priIfFiniteElseZero();
+        float f2 = o2.priIfFiniteElseZero();
+        if (f1 < f2)
+            return 1;           // Neither val is NaN, thisVal is smaller
+        if (f1 > f2)
+            return -1;            // Neither val is NaN, thisVal is larger
+        return 0;
+    }
+
+    static final int cmp(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = o1.priIfFiniteElseZero();
         float f2 = o2.priIfFiniteElseZero();
         if (f1 < f2)
@@ -347,12 +347,93 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                 return this;
             }
 
-            ((FasterList) itemList).sortThis(this);
+            //((FasterList) itemList).sortThis(this);
+
+
+            qsort( qsortStack, ((FasterList) itemList).array(), dirtyStart-1, itemList.size() );
         }
 
         return this;
     }
 
+    final private int[] qsortStack = new int[32];
+
+
+
+    public static int cmp(Object x, Object y) {
+        return cmp((BLink)x, (BLink)y);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static void qsort(int[] stack, Object[] c, int start, int size) {
+        int left = start, right = size - 1, stack_pointer = -1;
+        while (true) {
+            int i;
+            int j;
+            Object swap;
+            if (right - left <= 7) {
+                for (j = left + 1; j <= right; j++) {
+                    swap = c[j];
+                    i = j - 1;
+                    while (i >= left && cmp(c[i], swap) > 0) {
+                        c[i + 1] = c[i--];
+                    }
+                    c[i + 1] = swap;
+                }
+                if (stack_pointer == -1) {
+                    break;
+                }
+                right = stack[stack_pointer--];
+                left = stack[stack_pointer--];
+            } else {
+                int median = (left + right) >> 1;
+                i = left + 1;
+                j = right;
+                swap = c[median];
+                c[median] = c[i];
+                c[i] = swap;
+                if (cmp(c[left], c[right]) > 0) {
+                    swap = c[left];
+                    c[left] = c[right];
+                    c[right] = swap;
+                }
+                if (cmp(c[i], c[right]) > 0) {
+                    swap = c[i];
+                    c[i] = c[right];
+                    c[right] = swap;
+                }
+                if (cmp(c[left], c[i]) > 0) {
+                    swap = c[left];
+                    c[left] = c[i];
+                    c[i] = swap;
+                }
+                Object temp = c[i];
+                while (true) {
+                    //noinspection ControlFlowStatementWithoutBraces,StatementWithEmptyBody
+                    while (cmp(c[++i], temp) < 0) ;
+                    //noinspection ControlFlowStatementWithoutBraces,StatementWithEmptyBody
+                    while (cmp(c[--j], temp) > 0) ;
+                    if (j < i) {
+                        break;
+                    }
+                    swap = c[i];
+                    c[i] = c[j];
+                    c[j] = swap;
+                }
+                c[left + 1] = c[j];
+                c[j] = temp;
+                if (right - i + 1 >= j - left) {
+                    stack[++stack_pointer] = i;
+                    stack[++stack_pointer] = right;
+                    right = j - 1;
+                } else {
+                    stack[++stack_pointer] = left;
+                    stack[++stack_pointer] = j - 1;
+                    left = i;
+                }
+            }
+        }
+    }
 
     //    final Comparator<? super BLink<V>> comparator = (a, b) -> {
 //        return Float.compare(items.score(b), items.score(a));
