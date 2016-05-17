@@ -65,11 +65,19 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 
         int s1 = size();
         if (s1 == cap) {
-            removeDeleted();
+            removeAlreadyDeleted();
 
             if (size() == s1) {
-                //nothing removed
-                return compress(input, nar.time(), nar);
+
+                //the result of compression is processed separately
+                Task merged = compress(input, nar.time(), nar);
+                if (merged == null) {
+                    //not compressible
+                    return null;
+                }
+
+                // else: the result of compression has freed a space for the incoming input
+
             }
         }
 
@@ -172,7 +180,7 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     }
 
 
-    /** frees one slot by removing 2 and projecting a new belief to their midpoint */
+    /** frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task */
     @Nullable
     protected Task compress(@NotNull Task input, long now, @NotNull NAR nar) {
 
@@ -286,7 +294,7 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     }
 
 
-    private final void removeDeleted() {
+    private final void removeAlreadyDeleted() {
         int s = size();
         for (int i = 0; i < s; ) {
             Task x = get(i);
