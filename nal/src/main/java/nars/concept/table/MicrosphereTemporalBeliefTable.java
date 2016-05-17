@@ -63,29 +63,16 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
         if (cap == 0)
             return null;
 
+        int s1 = size();
+        if (s1 == cap) {
+            removeDeleted();
 
-        //removeDeleted();
-
-        if (isFull() /*&& temporal.capacity() > 1*/) {
-
-            if (null == compress(input, nar.time(), nar)) {
-                return null; //reject input because it didnt rank
+            if (size() == s1) {
+                //nothing removed
+                return compress(input, nar.time(), nar);
             }
-
-            /*if (!Revection.revect(input, this, nar)) {
-                return null; //rejected input
-            }*/
-
-//            Task w = weakest(input, nar);
-//            if (w == null)
-//                throw new RuntimeException("no weakest task determined");
-//            remove(w);
-//            nar.remove(w, "Temporal Forget");
-
         }
 
-
-        //proceed with this task now that there is room
         return input;
     }
 
@@ -299,18 +286,18 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     }
 
 
-//    private final void removeDeleted() {
-//        int s = size();
-//        for (int i = 0; i < s; ) {
-//            Task x = get(i);
-//            if (x.isDeleted()) {
-//                removeItem(i);
-//                s--;
-//            } else {
-//                i++;
-//            }
-//        }
-//    }
+    private final void removeDeleted() {
+        int s = size();
+        for (int i = 0; i < s; ) {
+            Task x = get(i);
+            if (x.isDeleted()) {
+                removeItem(i);
+                s--;
+            } else {
+                i++;
+            }
+        }
+    }
 
 //    public Task weakest(Task input, NAR nar) {
 //

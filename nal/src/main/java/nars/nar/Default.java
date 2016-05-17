@@ -130,7 +130,7 @@ public class Default extends AbstractNAR {
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
                     new DefaultConceptBuilder(random),
-                    new HashMap(capacity, 0.9f)
+                    new HashMap(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)
             );
         }

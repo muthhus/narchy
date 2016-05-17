@@ -319,14 +319,14 @@ public abstract class Budget implements Budgeted {
         setQuality(qua()*qf);
     }
 
-    public static class BudgetException extends RuntimeException {
-        public BudgetException() {
-            super();
-        }
-        public BudgetException(String reason) {
-            super(reason);
-        }
-    }
+//    public static class BudgetException extends RuntimeException {
+//        public BudgetException() {
+//            super();
+//        }
+//        public BudgetException(String reason) {
+//            super(reason);
+//        }
+//    }
 
     public void delete(@Nullable Object reason /* ignored */) {
         delete();
