@@ -7,6 +7,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.util.FastQuickSort;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.happy.collections.lists.SortedArray;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +28,12 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     private final float reinsertionThreshold = 0.01f;
 
     public ArrayBag(int cap) {
-        this(new FasterList(cap), new HashMap(cap));
+        this(new HashMap<>(cap));
         setCapacity(cap);
     }
 
-    protected ArrayBag(@NotNull List<BLink<V>> items, Map<V, BLink<V>> map) {
-        super(items, map);
+    protected ArrayBag(Map<V, BLink<V>> map) {
+        super(BLink[]::new, map, SortedArray.SearchType.BinarySearch);
     }
 
     @Override
@@ -122,15 +123,16 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     @NotNull
     @Override
     public Bag<V> filter(@NotNull Predicate<BLink> forEachIfFalseThenRemove) {
-        List<BLink<V>> l = items;
-        int n = l.size();
+
+        int n = items.size();
+        BLink<V>[] l = items.array();
         if (n > 0) {
             for (int i = 0; i < n; i++) {
-                BLink<V> h = l.get(i);
+                BLink<V> h = l[i];
                 if (!forEachIfFalseThenRemove.test(h)) {
                     removeKeyForValue(h); //only remove key, we remove the item here
                     h.delete();
-                    l.remove(i--);
+                    items.remove(i--);
                     n--;
                 }
             }
@@ -324,33 +326,33 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
             //Special case: only one unordered item; remove and reinsert
             int dirtyRange = 1 + dirtyEnd - dirtyStart;
-            SortedList_1x4<BLink<V>> items = this.items;
-            List<BLink<V>> itemList = items.list;
-
-            if (dirtyRange == 1) {
-                //TODO
-                BLink<V> x = itemList.remove(dirtyStart); //remove directly from the decorated list
-                items.add(x); //add using the sorted list
-                return this;
-            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
-                BLink<V>[] tmp = new BLink[dirtyRange];
-
-                for (int k = 0; k < dirtyRange; k++) {
-                    tmp[k] = itemList.remove( dirtyStart /* removal position remains at the same index as items get removed */);
-                }
-
-                //TODO items.get(i) and
-                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
-
-                Collections.addAll(items, tmp);
-
-                return this;
-            }
+//            SortedList_1x4<BLink<V>> items = this.items;
+            //List<BLink<V>> itemList = items.list;
+//
+//            if (dirtyRange == 1) {
+//                //TODO
+//                BLink<V> x = itemList.remove(dirtyStart); //remove directly from the decorated list
+//                items.add(x); //add using the sorted list
+//                return this;
+//            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
+//                BLink<V>[] tmp = new BLink[dirtyRange];
+//
+//                for (int k = 0; k < dirtyRange; k++) {
+//                    tmp[k] = itemList.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+//                }
+//
+//                //TODO items.get(i) and
+//                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
+//
+//                Collections.addAll(items, tmp);
+//
+//                return this;
+//            }
 
             //((FasterList) itemList).sortThis(this);
 
 
-            qsort( qsortStack, ((FasterList) itemList).array(), dirtyStart-1, itemList.size() );
+            qsort( qsortStack, items.array(), dirtyStart-1, items.size() );
         }
 
         return this;
@@ -478,12 +480,12 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
     @Override
     public float priMax() {
-        return isEmpty() ? 0 : items.get(0).pri();
+        return isEmpty() ? 0 : items.first().pri();
     }
 
     @Override
     public float priMin() {
-        return isEmpty() ? 0 : items.get(items.size()-1).pri();
+        return isEmpty() ? 0 : items.last().pri();
     }
 
 //    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {

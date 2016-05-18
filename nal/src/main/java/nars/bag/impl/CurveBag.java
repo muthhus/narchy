@@ -129,13 +129,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             end = begin + n;
         }
 
-        //BLink<V>[] ll = ((FasterList<BLink<V>>) arrayBag.items.list()).array();
-        List<BLink<V>> l = items;
+
+        BLink<V>[] l = items.array();
         for (int i = begin; i < end; i++) {
-            target.accept(
-                //ll[i]
-                l.get(i)
-            );
+            target.accept( l[i] );
         }
 
         return this;

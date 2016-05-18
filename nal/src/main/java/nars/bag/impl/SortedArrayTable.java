@@ -1,13 +1,16 @@
 package nars.bag.impl;
 
 import nars.concept.table.ArrayListTable;
+import nars.task.Task;
+import nars.util.data.DirectCopyOnWriteArrayList;
+import org.happy.collections.lists.SortedArray;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
 
 
 /**
@@ -18,21 +21,119 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
     /**
      * array of lists of items, for items on different level
      */
-    @NotNull
-    protected final SortedList_1x4<L> items;
+    //protected final SortedList_1x4<L> items;
+    protected final @NotNull SortedArray<L> items;
 
 
-    public SortedArrayTable(List<L> items, Map<V, L> map) {
-        this(items, map, SortedList_1x4.SearchType.BinarySearch);
+    public SortedArrayTable(IntFunction<L[]> builder, Map<V, L> map, SortedArray.SearchType searchType) {
+        super(map);
+        //this.items = new SortedList_1x4<>(items, this, searchType, false);
+        this.items = new SortedArray<>(builder, this, searchType, 1);
     }
 
-    public SortedArrayTable(List<L> items, Map<V, L> map, SortedList_1x4.SearchType searchType) {
-        super(map, items);
-        this.items = new SortedList_1x4<>(items, this, searchType, false);
+    @Override
+    public Iterator<L> iterator() {
+        //throw new UnsupportedOperationException();
+        return new ArrayIterator(items.array(), 0, items.size());
     }
 
+    static class ArrayIterator<E> implements ListIterator<E> {
+        private final E[] array;
+        private final int size;
+        private int next;
+        private int lastReturned;
 
+        protected ArrayIterator( E[] array, int index, int size ) {
+            this.array = array;
+            next = index;
+            lastReturned = -1;
+            this.size = size;
+        }
 
+        @Override
+        public boolean hasNext() {
+            return next != size;
+        }
+
+        @Override
+        public E next() {
+            if( !hasNext() )
+                throw new NoSuchElementException();
+            lastReturned = next++;
+            return array[lastReturned];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return next != 0;
+        }
+
+        @Override
+        public E previous() {
+            if( !hasPrevious() )
+                throw new NoSuchElementException();
+            lastReturned = --next;
+            return array[lastReturned];
+        }
+
+        @Override
+        public int nextIndex() {
+            return next;
+        }
+
+        @Override
+        public int previousIndex() {
+            return next - 1;
+        }
+
+        @Override
+        public void remove() {
+            // This operation is not so easy to do but we will fake it.
+            // The issue is that the backing list could be completely
+            // different than the one this iterator is a snapshot of.
+            // We'll just remove(element) which in most cases will be
+            // correct.  If the list had earlier .equals() equivalent
+            // elements then we'll remove one of those instead.  Either
+            // way, none of those changes are reflected in this iterator.
+            //DirectCopyOnWriteArrayList.this.remove(array[lastReturned]);
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(E e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public L get(int i) {
+        return items.array()[i];
+    }
+
+    @Override
+    public int size() {
+        return items.size();
+    }
+
+    @Override
+    protected boolean listRemove(L removed) {
+        return items.remove(removed);
+    }
+
+    @Override
+    protected void listAdd(L i) {
+        items.add(i);
+    }
+
+    @Override
+    protected void listClear() {
+        items.clear();
+    }
 
     @Override @Nullable
     public L top() {
@@ -70,7 +171,7 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
                 return i;
             }
 
-            displaced = items.remove(size - 1); //remove last
+            displaced = items.removeLast(); //remove last
         }
 
         items.add(i);
@@ -78,6 +179,11 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
         return displaced;
     }
 
+    @Deprecated public List<L> list() {
+        List<L> l = new ArrayList(size());
+        forEach(x -> l.add(x));
+        return l;
+    }
 
 
 //    protected final class ArrayMapping extends CollectorMap<V, L> {

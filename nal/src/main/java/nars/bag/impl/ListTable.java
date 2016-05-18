@@ -16,82 +16,81 @@ public interface ListTable<V, L> extends Table<V, L> {
 
 
 
-    /** returns a list of the values */
-    List<L> list();
 
 
-    default L get(int i) {
+    /*default L get(int i) {
         return list().get(i);
-    }
+    }*/
+    L get(int i);
 
-    @Override default Iterator<L> iterator() {
-        return list().iterator();
-    }
-
-
-    @Override
-    default int size() {
-        return list().size();
-    }
-
-
-    @Nullable ListTable Empty = new ListTable() {
+//    @Override default Iterator<L> iterator() {
+//        return list().iterator();
+//    }
+//
+//
+//    @Override
+//    default int size() {
+//        return list().size();
+//    }
 
 
-        @Override
-        public void clear() {
-
-        }
-
-        @Nullable
-        @Override
-        public Object get(Object key) {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public Object remove(Object key) {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public Object put(Object Object, Object Object2) {
-            return null;
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public void forEachKey(Consumer each) {
-
-        }
-
-        @Override
-        public void topWhile(Predicate each) {
-
-        }
-
-
-        @Override
-        public int capacity() {
-            return 0;
-        }
-
-        @Override
-        public void setCapacity(int i) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<Object> list() {
-            return Collections.emptyList();
-        }
-    };
+//    @Nullable ListTable Empty = new ListTable() {
+//
+//
+//        @Override
+//        public void clear() {
+//
+//        }
+//
+//        @Nullable
+//        @Override
+//        public Object get(Object key) {
+//            return null;
+//        }
+//
+//        @Nullable
+//        @Override
+//        public Object remove(Object key) {
+//            return null;
+//        }
+//
+//        @Nullable
+//        @Override
+//        public Object put(Object Object, Object Object2) {
+//            return null;
+//        }
+//
+//        @Override
+//        public int size() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public void forEachKey(Consumer each) {
+//
+//        }
+//
+//        @Override
+//        public void topWhile(Predicate each) {
+//
+//        }
+//
+//
+//        @Override
+//        public int capacity() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public void setCapacity(int i) {
+//            throw new UnsupportedOperationException();
+//        }
+//
+//        @Override
+//        public List<Object> list() {
+//            return Collections.emptyList();
+//        }
+//    };
 
 
 

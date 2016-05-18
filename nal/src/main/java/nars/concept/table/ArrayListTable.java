@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.bag.impl.ListTable;
 import nars.util.CollectorMap;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,35 +18,27 @@ import java.util.function.Predicate;
 abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements ListTable<V,L>, Iterable<L> {
 
 
-    private final List<L> list;
-    private int capacity;
+    private int capacity = -1;
 
-    public ArrayListTable(Map<V,L> map, List<L> l) {
+    public ArrayListTable(Map<V,L> map) {
         super(map);
-        this.list = l;
     }
 
     @Override
-    public final int size() {
-        return list.size();
-    }
+    abstract public int size();
 
     @Override
     public final void forEachKey(@NotNull Consumer<? super V> each) {
         forEach(t -> each.accept(key(t)));
     }
 
-    @NotNull
-    @Override public Iterator<L> iterator() {
-        return list.iterator();
-    }
+    abstract public Iterator<L> iterator();
 
     @Override
     public void topWhile(@NotNull Predicate<L> action) {
-        List<L> l = list();
-        int n = l.size();
+        int n = size();
         for (int i = 0; i < n; i++) {
-            if (!action.test(l.get(i)))
+            if (!action.test(get(i)))
                 break;
         }
     }
@@ -53,8 +46,10 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
     @Override
     public final void clear() {
         super.clear();
-        list().clear();
+        listClear();
     }
+
+    abstract protected void listClear();
 
     /**
      * Check if an item is in the bag
@@ -67,16 +62,13 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
     }
 
 
-    @Override
-    public final List<L> list() {
-        return list;
-    }
-
     @Nullable
     @Override
     protected L removeItem(L removed) {
-        return list.remove(removed) ? removed : null;
+        return listRemove(removed) ? removed : null;
     }
+
+    protected abstract boolean listRemove(L removed);
 
 
     @Nullable
@@ -85,13 +77,15 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
         if (isFull())
             throw new RuntimeException("table full");
 
-        list.add(i);
+        listAdd(i);
         return null;
     }
 
+    protected abstract void listAdd(L i);
+
     @NotNull
     public final L item(int index) {
-        return list().get(index);
+        return get(index);
     }
 
     /**
@@ -136,32 +130,31 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
 
     abstract public V weakest();
 
-    @Override
-    public final void forEach(@NotNull Consumer<? super L> action) {
-
-        list().forEach(action);
-
-//        //items.forEach(b -> action.accept(b.get()));
+//    @Override
+//    public final void forEach(@NotNull Consumer<? super L> action) {
 //
-//        final List<? extends L> l = items.getList();
+//        list().forEach(action);
 //
-//        int n = l.size();
-//        for (int i = 0; i < n; i++) {
-//        //for (int i = l.size()-1; i >= 0; i--){
-//            action.accept(l.get(i));
-//        }
-
-    }
+////        //items.forEach(b -> action.accept(b.get()));
+////
+////        final List<? extends L> l = items.getList();
+////
+////        int n = l.size();
+////        for (int i = 0; i < n; i++) {
+////        //for (int i = l.size()-1; i >= 0; i--){
+////            action.accept(l.get(i));
+////        }
+//
+//    }
 
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
     public void forEach(int max, @NotNull Consumer<? super L> action) {
-        List<? extends L> l = list();
-        int n = Math.min(l.size(), max);
+        int n = Math.min(size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
         for (int i = 0; i < n; i++) {
-            action.accept(l.get(i));
+            action.accept(get(i));
         }
     }
 

@@ -11,9 +11,11 @@ import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,23 +27,26 @@ import static nars.truth.TruthFunctions.c2w;
 /** stores the items unsorted; revection manages their ranking and removal */
 public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
 
-    private TruthPolation polation;
+    private final FasterList<Task> list;
     private final SortedTable<Task, Task> eternal;
-
-    long min, max;
-
     /** history factor:
      *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
      *      lower means more accuracy at the expense of shorter memory span
      */
     private final float historyFactor = 1.5f;
-
+    long min, max;
+    private TruthPolation polation;
     private long lastUpdate = Tense.TIMELESS;
 
     public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task,Task> eternal) {
-        super(mp, Global.newArrayList(1));
+        super(mp);
+        this.list = new FasterList<>(0);
         setCapacity(1);
         this.eternal = eternal;
+    }
+
+    public static float rank(@NotNull Task t, long when, float ageFactor) {
+        return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
     }
 
     @Nullable
@@ -104,12 +109,37 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     }
 
     @Override
+    protected void listAdd(Task i) {
+        list.add(i);
+    }
+
+    @Override
+    public int size() {
+        return list.size();
+    }
+
+    @Override
+    public Iterator<Task> iterator() {
+        return list.iterator();
+    }
+
+    @Override
+    protected void listClear() {
+        list.clear();
+    }
+
+    @Override
     protected Task removeItem(@NotNull Task removed) {
         long occ = removed.occurrence();
         if ((occ == min) || (occ == max)) {
             invalidateRange();
         }
         return super.removeItem(removed);
+    }
+
+    @Override
+    protected boolean listRemove(Task removed) {
+        return list.remove(removed);
     }
 
     private void invalidateRange() {
@@ -157,9 +187,6 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
     public float rank(@NotNull Task t, long when) {
         return rank(t, when, ageFactor());
 
-    }
-    public static float rank(@NotNull Task t, long when, float ageFactor) {
-        return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
     }
 
     public float ageFactor() {
@@ -244,12 +271,11 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 
         //removeDeleted();
 
-        List<? extends Task> l = list();
 
         //find the best balance of temporal proximity and confidence
-        int ls = l.size();
+        int ls = size();
         if (ls == 1)
-            return l.get(0); //the only task
+            return get(0); //the only task
 
         Task best = null;
 
@@ -258,7 +284,7 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
         float bestRank = -1;
 
         for (int i = 0; i < ls; i++) {
-            Task x = l.get(i);
+            Task x = get(i);
             float r = rank(x, when, ageFactor);
             if (r > bestRank) {
                 best = x;
@@ -281,8 +307,10 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 
         //removeDeleted();
 
-        return polation.truth(when, list(), eternal.top());
+        return polation.truth(when, list, eternal.top());
     }
+
+
 
 
     private final void removeAlreadyDeleted() {
@@ -296,6 +324,11 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
                 i++;
             }
         }
+    }
+
+    @Override
+    public Task get(int i) {
+        return list.get(i);
     }
 
 //    public Task weakest(Task input, NAR nar) {

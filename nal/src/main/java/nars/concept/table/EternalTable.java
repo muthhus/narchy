@@ -11,6 +11,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Terms;
 import nars.truth.Truth;
+import org.happy.collections.lists.SortedArray;
 import org.happy.collections.lists.decorators.SortedList_1x4;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ import java.util.Map;
 public class EternalTable extends SortedArrayTable<Task,Task> {
 
     public EternalTable(Map<Task, Task> index) {
-        super(Global.newArrayList(1), index, SortedList_1x4.SearchType.BinarySearch);
+        super((i) -> new Task[i], index, SortedArray.SearchType.BinarySearch);
         setCapacity(1);
     }
 
@@ -54,8 +55,8 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
 
     @Nullable
     public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar) {
-        List<Task> beliefs = list();
-        int bsize = beliefs.size();
+
+        int bsize = size();
         if (bsize == 0)
             return null; //nothing to revise with
 
@@ -71,7 +72,7 @@ public class EternalTable extends SortedArrayTable<Task,Task> {
         Truth newBeliefTruth = newBelief.truth();
 
         for (int i = 0; i < bsize; i++) {
-            Task x = beliefs.get(i);
+            Task x = get(i);
 
             if (!LocalRules.isRevisible(newBelief, x))
                 continue;
