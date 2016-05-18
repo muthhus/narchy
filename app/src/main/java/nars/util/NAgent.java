@@ -127,8 +127,12 @@ public class NAgent implements Agent {
                 .pri(rewardPriority)
                 .sensorDT(-1); //pertains to the prevoius frame
 
-        FloatSupplier linearPositive = () -> dReward > 0 ? 1 : 0;
-        FloatSupplier linearNegative = () -> dReward < 0 ? 1 : 0;
+        final float dRewardThresh = 0.1f; //bigger than a change in X%
+        FloatSupplier linearPositive = () -> {
+            if (dReward > dRewardThresh) return 1;
+            else return 0;
+        };
+        FloatSupplier linearNegative = () -> dReward < -dRewardThresh ? 1 : 0;
         this.dRewardPos = new SensorConcept("(dRp)", nar,
                 linearPositive, sensorTruth)
                 .resolution(0.01f).timing(-1, -1);
@@ -232,7 +236,7 @@ public class NAgent implements Agent {
 
         //TODO specify goal via a method in the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
-        //nar.goal("(dRp)", Tense.Eternal, 0.95f, 1f); //prefer increase
+        nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Eternal, 0.05f, 1f); //avoid decrease
     }
 
@@ -269,7 +273,7 @@ public class NAgent implements Agent {
     private void learn(float[] input, int action, float reward) {
 
         if (Float.isFinite(prevReward))
-            this.dReward = reward - prevReward;
+            this.dReward = (reward - prevReward);
         else
             this.dReward = 0;
 

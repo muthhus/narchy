@@ -46,7 +46,7 @@ import java.util.function.IntFunction;
 public final class SortedArray<E> {
 
 
-    protected final int binarySearchThreshold = 1000;//8;
+    protected final int binarySearchThreshold = 8;
     private final IntFunction<E[]> builder;
     private E[] list;
     private int size;
@@ -403,13 +403,16 @@ public final class SortedArray<E> {
         final int[] rightBorder = new int[] { 0 };
 		final int left = this.findInsertionIndex_TypeArray(element, 0, size, rightBorder);
 
+        E[] l = this.list;
 		for (int index = left; index < rightBorder[0]; index++) {
-			if (element.equals(list[index])) {
+            if (element.equals(l[index])) {
 				return index;// element is found
 			}
 		}
 
-		return -1;
+		//return -1;
+        //worst case, not found because not sorted:
+        return indexOfInternal(element);
 
 	}
 

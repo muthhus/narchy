@@ -57,9 +57,9 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         float f2 = o2.priIfFiniteElseZero();
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
-        if (f1 > f2)
+        else if (f1 > f2)
             return -1;            // Neither val is NaN, thisVal is larger
-        return 0;
+        else return 0;
     }
 
     @NotNull
@@ -362,17 +362,18 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
 
 
-    public static int cmp(Object x, Object y) {
+    /*public static int cmp(Object x, Object y) {
+
         return cmp((BLink)x, (BLink)y);
-    }
+    }*/
 
     @SuppressWarnings({"unchecked"})
-    public static void qsort(int[] stack, Object[] c, int start, int size) {
+    public static void qsort(int[] stack, BLink[] c, int start, int size) {
         int left = start, right = size - 1, stack_pointer = -1;
         while (true) {
             int i;
             int j;
-            Object swap;
+            BLink swap;
             if (right - left <= 7) {
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
@@ -409,7 +410,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                     c[left] = c[i];
                     c[i] = swap;
                 }
-                Object temp = c[i];
+                BLink temp = c[i];
                 while (true) {
                     //noinspection ControlFlowStatementWithoutBraces,StatementWithEmptyBody
                     while (cmp(c[++i], temp) < 0) ;
