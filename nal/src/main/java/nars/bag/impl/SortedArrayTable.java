@@ -1,15 +1,11 @@
 package nars.bag.impl;
 
 import nars.concept.table.ArrayListTable;
-import nars.task.Task;
-import nars.util.data.DirectCopyOnWriteArrayList;
-import org.happy.collections.lists.SortedArray;
-import org.happy.collections.lists.decorators.SortedList_1x4;
+import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
 

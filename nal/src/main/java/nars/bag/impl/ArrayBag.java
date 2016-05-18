@@ -4,11 +4,8 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
-import nars.util.FastQuickSort;
-import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.happy.collections.lists.SortedArray;
-import org.happy.collections.lists.decorators.SortedList_1x4;
+import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,4 +1,4 @@
-package org.happy.collections.lists;
+package nars.util.data.sorted;
 
 import com.gs.collections.impl.block.factory.*;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedArrayTable;
 import nars.budget.Budget;
@@ -11,12 +10,10 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Terms;
 import nars.truth.Truth;
-import org.happy.collections.lists.SortedArray;
-import org.happy.collections.lists.decorators.SortedList_1x4;
+import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Map;
 
 /**
