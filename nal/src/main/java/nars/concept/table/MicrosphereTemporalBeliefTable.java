@@ -5,6 +5,7 @@ import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.Tense;
 import nars.task.MutableTask;
+import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.term.Compound;
@@ -55,20 +56,19 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             return null;
 
         int s1 = size();
-        if (s1 == cap) {
-            removeAlreadyDeleted();
+        if (s1 >= cap) {
 
-            if (size() == s1) {
+            if (removeAlreadyDeleted() >= cap) {
 
                 //the result of compression is processed separately
                 Task merged = compress(input, nar.time(), nar);
                 if (merged == null) {
-                    //not compressible
+                    //not compressible with respect to this input, so reject the input
                     return null;
                 }
 
                 // else: the result of compression has freed a space for the incoming input
-
+                nar.process(merged);
             }
         }
 
@@ -184,6 +184,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             return null;
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
+        assert(a!=b);
 
         Task merged = null;
         if (b!=null) {
@@ -221,14 +222,11 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                     .log("Revection Merge");
 
             remove(b);
-            TaskTable.removeTask(b, "Revection Forget", nar);
+            TaskTable.removeTask(b, "Revection Revision", nar);
         }
 
         remove(a);
-        TaskTable.removeTask(a, "Revection Forget", nar);
-
-        if (merged!=null)
-            nar.process(merged);
+        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", nar);
 
         return merged;
     }
@@ -287,7 +285,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
 
 
-    private final void removeAlreadyDeleted() {
+    private final int removeAlreadyDeleted() {
         int s = size();
         for (int i = 0; i < s; ) {
             Task x = get(i);
@@ -298,6 +296,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                 i++;
             }
         }
+        return s;
     }
 
 //    public Task weakest(Task input, NAR nar) {

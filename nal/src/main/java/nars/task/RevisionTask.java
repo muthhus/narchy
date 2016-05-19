@@ -3,6 +3,7 @@ package nars.task;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -21,16 +22,19 @@ import org.jetbrains.annotations.NotNull;
 public class RevisionTask extends MutableTask {
 
     public RevisionTask(@NotNull Termed<Compound> term, Budget revisionBudget, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
-        super(term, newBelief.punc(), conclusion);
+        super(term, newBelief.punc(), conclusion, newBelief, oldBelief);
 
         budget(revisionBudget);
-        parent(newBelief, oldBelief);
         time(creationTime, occTime);
         because("Insertion Revision");
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
                 ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
     }
+
+//    public RevisionTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
+//        super(newTerm, taskToClone, otherTask, now, occ, newEvidence, newTruth, budgetMerge);
+//    }
 
     @Override
     public boolean onConcept(@NotNull Concept c) {
