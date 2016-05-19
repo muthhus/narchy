@@ -68,8 +68,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                 }
 
                 // else: the result of compression has freed a space for the incoming input
-                nar.process(merged);
+                if (merged!=input)
+                    nar.process(merged);
+                else {
+                    //only one space has been freed for the input, no merging resulted
+                }
             }
+
         }
 
         return input;
@@ -228,7 +233,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
         remove(a);
         TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", nar);
 
-        return merged;
+        return merged!=null ? merged : input;
     }
 
 
