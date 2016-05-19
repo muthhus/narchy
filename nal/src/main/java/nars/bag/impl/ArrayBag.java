@@ -9,7 +9,9 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -23,7 +25,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
 
-    private final float reinsertionThreshold = 0.01f;
+    private static final float reinsertionThreshold = 0.02f;
 
     public ArrayBag(int cap) {
         this(new HashMap<>(cap));
@@ -50,15 +52,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         return 0;
     }
 
-    static final int cmp(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseNeg1();
-        float f2 = o2.priIfFiniteElseNeg1();
-        if (f1 < f2)
-            return 1;           // Neither val is NaN, thisVal is smaller
-        else if (f1 > f2)
-            return -1;            // Neither val is NaN, thisVal is larger
-        else return 0;
-    }
+
 
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = o1.priIfFiniteElseNeg1();
@@ -315,7 +309,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
             each.accept(b);
 
-            if (b.commit() && compare(b, prev) < 0) {
+            if (b.commit() && cmpLT(b, prev)) {
                 //detected out-of-order
 
                 if (dirtyStart == -1) {
@@ -328,40 +322,34 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
             prev = b;
         }
 
-        if (dirtyStart == -1) {
-            //already sorted
-            return this;
-        } else {
+        if (dirtyStart != -1) {
+            //Needs sorted
 
-            //Special case: only one unordered item; remove and reinsert
             int dirtyRange = 1 + dirtyEnd - dirtyStart;
-//            SortedList_1x4<BLink<V>> items = this.items;
-            //List<BLink<V>> itemList = items.list;
-//
-//            if (dirtyRange == 1) {
-//                //TODO
-//                BLink<V> x = itemList.remove(dirtyStart); //remove directly from the decorated list
-//                items.add(x); //add using the sorted list
-//                return this;
-//            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
-//                BLink<V>[] tmp = new BLink[dirtyRange];
-//
-//                for (int k = 0; k < dirtyRange; k++) {
-//                    tmp[k] = itemList.remove( dirtyStart /* removal position remains at the same index as items get removed */);
-//                }
-//
-//                //TODO items.get(i) and
-//                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
-//
-//                Collections.addAll(items, tmp);
-//
-//                return this;
-//            }
 
-            //((FasterList) itemList).sortThis(this);
+            if (dirtyRange == 1) {
+                //Special case: only one unordered item; remove and reinsert
+                BLink<V> x = items.remove(dirtyStart); //remove directly from the decorated list
+                items.add(x); //add using the sorted list
 
+            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
+                //Special case: a limited number of unordered items
+                BLink<V>[] tmp = new BLink[dirtyRange];
 
-            qsort( qsortStack, items.array(), dirtyStart-1, items.size() );
+                for (int k = 0; k < dirtyRange; k++) {
+                    tmp[k] = items.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+                }
+
+                //TODO items.get(i) and
+                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
+
+                for (BLink i : tmp) {
+                    items.add(i);
+                }
+
+            } else {
+                qsort(qsortStack, items.array(), dirtyStart - 1, items.size());
+            }
         }
 
         return this;
@@ -372,7 +360,6 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
 
 
-    @SuppressWarnings({"unchecked"})
     public static void qsort(int[] stack, BLink[] c, int start, int size) {
         int left = start, right = size - 1, stack_pointer = -1;
         while (true) {
