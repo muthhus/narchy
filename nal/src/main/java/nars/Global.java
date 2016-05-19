@@ -22,6 +22,7 @@ package nars;
 
 
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.data.Util;
@@ -217,20 +218,33 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                new SoftReference<>(s);
+                //new SoftReference<>(s);
                 //new WeakReference<>(s);
-                //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
+                Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 
 
     @Nullable
-    public static <C> Reference<C[]> reference(@Nullable C... s) {
-        return Util.hasNonNull(s) ?
-                new SoftReference<>(s)
-                //new WeakReference<>(s);
-                //(Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s))
-                :
-                null;
+    public static <C> Reference<C>[] reference(@Nullable C... s) {
+        int l = Util.lastNonNull(s);
+        if (l > -1) {
+            l++;
+            Reference<C>[] rr = new Reference[l];
+            for (int i = 0; i < l; i++) {
+                rr[i] = reference(s[i]);
+            }
+            return rr;
+        }
+        return null;
+    }
+
+    public static void unreference(Reference[] p) {
+        for (int i = 0; i < p.length; i++) {
+            Reference x = p[i];
+            if (x != null)
+                x.clear();
+            p[i] = null;
+        }
     }
 
     @Nullable
@@ -239,9 +253,9 @@ public enum Global {
     }
 
     @Nullable
-    public static <C> C dereference(@Nullable Reference<C[]> s, int index) {
-        C[] x = (s == null) ? null : s.get();
-        return x != null ? x[index] : null;
+    public static <C> C dereference(@Nullable Reference<C>[] s, int index) {
+        if (s == null || index >= s.length) return null;
+        return dereference(s[index]);
     }
 
 
@@ -297,6 +311,7 @@ public enum Global {
         return valid;
 
     }
+
 
 
 }

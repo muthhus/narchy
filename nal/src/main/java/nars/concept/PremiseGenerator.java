@@ -121,14 +121,12 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
         Collection<BLink<? extends Termed>> termsBuffer;
         termsBuffer = this.terms;
-        termsBuffer.clear();
         c.termlinks().sample(termlinks, termsBuffer::add);
         assert (!termsBuffer.isEmpty());
 
 
         Collection<BLink<Task>> tasksBuffer;
         tasksBuffer = this.tasks;
-        tasksBuffer.clear();
         c.tasklinks().sample(tasklinks, tasksBuffer::add);
         assert (!tasksBuffer.isEmpty());
 
@@ -145,6 +143,9 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             premiseTask(termsArray, taskLink);
 
         }
+
+        termsBuffer.clear();
+        tasksBuffer.clear();
 
     }
 

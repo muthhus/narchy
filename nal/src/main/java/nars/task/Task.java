@@ -143,11 +143,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     default Task task() { return this; }
 
-    @Nullable Reference<Task[]> getParentsRef();
+    @Nullable Reference<Task>[] getParentsRef();
 
-    @Nullable default Task[] getParents() {
+    /*@Nullable default Task[] getParents() {
         return dereference(getParentsRef());
-    }
+    }*/
     @Nullable default Task getParentTask() {
         return dereference(getParentsRef(), 0);
     }

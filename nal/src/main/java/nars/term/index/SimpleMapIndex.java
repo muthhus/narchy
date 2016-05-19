@@ -11,12 +11,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/** implements AbstractMapIndex with one ordinary map implementation */
-public class MapIndex1 extends AbstractMapIndex {
+/** implements AbstractMapIndex with one ordinary map implementation. does not cache subterm vectors */
+public class SimpleMapIndex extends AbstractMapIndex {
 
     public final Map<Termed,Termed> data;
 
-    public MapIndex1(TermBuilder termBuilder, ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
+    public SimpleMapIndex(TermBuilder termBuilder, ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
         super(termBuilder, conceptBuilder);
         this.data = compounds;
     }
@@ -36,7 +36,7 @@ public class MapIndex1 extends AbstractMapIndex {
         return create ?
                 data.computeIfAbsent(x, (X) -> {
                     Compound XX = (Compound) X; //??
-                    return internCompound(internSubterms(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
+                    return internCompound(internCompound(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
                 }) :
                 data.get(x);
     }

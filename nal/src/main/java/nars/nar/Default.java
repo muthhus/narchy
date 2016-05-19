@@ -24,8 +24,9 @@ import nars.task.flow.TaskPerception;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.index.MapIndex1;
-import nars.term.index.MapIndex2;
+import nars.term.index.SimpleMapIndex;
+import nars.term.index.GroupedMapIndex;
+import nars.term.index.SimpleMapIndex2;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
@@ -125,18 +126,19 @@ public class Default extends AbstractNAR {
 //
 //        }
 //    }
-    public static class DefaultTermIndex extends MapIndex1 {
+    public static class DefaultTermIndex extends SimpleMapIndex2 {
 
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
                     new DefaultConceptBuilder(random),
+                    new HashMap(capacity),
                     new HashMap(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)
             );
         }
     }
 
-    public static class WeakTermIndex2 extends MapIndex2  {
+    public static class WeakTermIndex2 extends GroupedMapIndex {
 
         public WeakTermIndex2(int capacity, @NotNull Random random) {
             super(new WeakHashMap<>(capacity),
@@ -144,24 +146,26 @@ public class Default extends AbstractNAR {
 
         }
     }
-    public static class WeakTermIndex extends MapIndex1 {
+    public static class WeakTermIndex extends SimpleMapIndex2 {
 
         public WeakTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
                     new DefaultConceptBuilder(random),
                     //new SoftValueHashMap(capacity)
+                    new WeakHashMap<>(capacity),
                     new WeakHashMap<>(capacity)
             );
 
         }
     }
 
-    public static class SoftTermIndex extends MapIndex1 {
+    public static class SoftTermIndex extends SimpleMapIndex2 {
 
         public SoftTermIndex(int capacity, @NotNull Random random) {
             super(Terms.terms,
                     new DefaultConceptBuilder(random),
-                    new SoftValueHashMap(capacity)
+                    new SoftValueHashMap(capacity),
+                    new WeakHashMap(capacity)
                     //new WeakHashMap<>(capacity)
             );
 

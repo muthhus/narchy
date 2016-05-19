@@ -161,7 +161,7 @@ abstract public class ConceptProcess implements Premise {
                 single = false;
         }
 
-        Reference<Task[]> parents = parentRef(single); //shared by eternalized also
+        Reference<Task>[] parents = parentRef(single); //shared by eternalized also
 
         Task derived = newDerivedTask(c, punct, truth, parents)
                 .time(now, occ)
@@ -195,12 +195,12 @@ abstract public class ConceptProcess implements Premise {
 
     }
 
-    public Reference<Task[]> parentRef(boolean single) {
+    public Reference<Task>[] parentRef(boolean single) {
         return MutableTask.parentRef(task(), !single ? belief() : null);
     }
 
     @NotNull
-    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task[]> parents) {
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task>[] parents) {
         return new DerivedTask(c, punct, truth, this, parents);
     }
 

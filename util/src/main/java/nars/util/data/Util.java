@@ -929,12 +929,15 @@ public enum Util {
         return (x - min) / (max - min);
     }
 
-    public static boolean hasNonNull(Object... x) {
+    public static int lastNonNull(Object... x) {
+        int j = -1;
         if (x!=null) {
-            for (Object y : x)
-                if (y!=null)
-                    return true;
+            int k = x.length;
+            for (int i = 0; i < k; i++) {
+                if (x[i] != null)
+                    j = i;
+            }
         }
-        return false;
+        return j;
     }
 }

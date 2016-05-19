@@ -13,7 +13,7 @@ import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.index.MapIndex2;
+import nars.term.index.GroupedMapIndex;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.Variable;
@@ -52,7 +52,7 @@ public class EllipsisTest {
             Set<Term> selectedFixed = Global.newHashSet(arity);
 
             TermIndex index =
-                    new MapIndex2(new HashMap(),
+                    new GroupedMapIndex(new HashMap(),
                             new DefaultConceptBuilder(
                                     new XorShift128PlusRandom(2)
                             ));

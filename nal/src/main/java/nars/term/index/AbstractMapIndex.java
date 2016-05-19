@@ -64,9 +64,9 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
     @NotNull
-    protected final Termed internSubterms(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
-        Termed interned = termBuilder.make(op, rel, subs, dt);
-        assert(interned!=null); //should not fail unless the input was invalid to begin with
+    protected final Termed internCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+        Termed interned = termBuilder.make(op, rel, theSubterms(subs), dt);
+        //assert(interned!=null); //should not fail unless the input was invalid to begin with
         return interned;
     }
 

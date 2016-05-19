@@ -20,7 +20,7 @@ import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
 import nars.term.Termed;
-import nars.term.index.MapIndex2;
+import nars.term.index.GroupedMapIndex;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -221,7 +221,7 @@ public class WebServer /*extends PathHandler*/ {
         int numConceptsPerCycle = 32;
 
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
-                new MapIndex2(
+                new GroupedMapIndex(
                     new SoftValueHashMap(256*1024),
                     new DefaultConceptBuilder(random)),
                 new RealtimeMSClock()

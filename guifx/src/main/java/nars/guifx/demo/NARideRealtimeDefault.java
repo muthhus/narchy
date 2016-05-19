@@ -6,7 +6,7 @@ import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
-import nars.term.index.MapIndex2;
+import nars.term.index.GroupedMapIndex;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +61,7 @@ public enum NARideRealtimeDefault {
         //)
         //);
 
-        Default nar = new Default(1024, 3, 2, 2, rng, new MapIndex2(
+        Default nar = new Default(1024, 3, 2, 2, rng, new GroupedMapIndex(
                 new SoftValueHashMap(128 * 1024), new DefaultConceptBuilder(rng)
         ), new RealtimeMSClock());
 

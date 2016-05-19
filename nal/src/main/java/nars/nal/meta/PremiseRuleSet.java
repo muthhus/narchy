@@ -66,7 +66,7 @@ public class PremiseRuleSet  {
 
 
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
-        this.rules = Global.newArrayList();
+        this.rules = Global.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             this.rules.add(normalize ? p.normalizeRule(patterns) : p);
         }

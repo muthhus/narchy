@@ -38,7 +38,8 @@ public class MutableTask extends AbstractTask {
         super(term.term(), punct, truth,
             /* budget: */ 0, Float.NaN, Float.NaN, parents);
     }
-    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Reference<Task[]> parents) {
+
+    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Reference<Task>[] parents) {
         super(term.term(), punct, truth,
             /* budget: */ 0, Float.NaN, Float.NaN, parents);
     }
@@ -235,7 +236,7 @@ public class MutableTask extends AbstractTask {
 
     }
 
-    public static Reference<Task[]> parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
+    public static Reference<Task>[] parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
         return Global.reference(
                 (parentTask.isCommand()) ? null : parentTask,
                 (parentBelief == null || parentBelief.isCommand()) ? null : parentBelief
@@ -243,7 +244,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public final MutableTask parent(Reference<Task[]> parents) {
+    public final MutableTask parent(Reference<Task>[] parents) {
 
         //ensureParentNonLoop(parentTask, parentBelief);
 

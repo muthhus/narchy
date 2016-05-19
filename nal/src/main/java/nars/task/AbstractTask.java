@@ -53,7 +53,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      * @return The task from which the task is derived, or
      * null if it has been forgotten
      */
-    @Nullable protected transient Reference<Task[]> parents;
+    @Nullable protected transient Reference<Task>[] parents;
 
 //    /** Belief from which the Task is derived, or null if derived from a theorem     */
 //    @Nullable protected transient Reference<Task> parentBelief;
@@ -91,7 +91,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public AbstractTask(@NotNull Task task) {
         this(task, task.punc(), task.truth(),
                 task.pri(), task.dur(), task.qua(),
-                task.getParents());
+                task.getParentsRef());
         setEvidence(task.evidence());
         setOccurrenceTime(task.occurrence());
     }
@@ -115,7 +115,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
-                        @Nullable Reference<Task[]> parents) {
+                        @Nullable Reference<Task>[] parents) {
         super(p, d, q);
 
         this.punctuation = punctuation;
@@ -259,7 +259,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     @Override
-    public @Nullable Reference<Task[]> getParentsRef() {
+    public @Nullable Reference<Task>[] getParentsRef() {
         return parents;
     }
 
@@ -455,9 +455,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Override
     public void delete() {
         super.delete();
-        Reference<Task[]> p = this.parents;
+        Reference<Task>[] p = this.parents;
         if (p !=null) {
-            p.clear();
+            Global.unreference(p);
             this.parents = null;
         }
         if (!Global.DEBUG)

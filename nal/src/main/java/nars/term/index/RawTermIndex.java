@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Term index which stores raw terms (no concepts/conceptualization)
  */
-public abstract class RawTermIndex extends MapIndex2 implements Serializable {
+public abstract class RawTermIndex extends GroupedMapIndex implements Serializable {
 
     public RawTermIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super(symbolMap, data, termBuilder, conceptBuilder);

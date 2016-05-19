@@ -67,7 +67,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //public Tense tense = Tense.Eternal;
 
 
-    public final List<Task> matched = Global.newArrayList();
+    public final List<Task> matched = Global.newArrayList(1);
 
 
     final transient int maxSimilars = 3;

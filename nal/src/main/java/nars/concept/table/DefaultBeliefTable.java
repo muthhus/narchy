@@ -193,6 +193,9 @@ public class DefaultBeliefTable implements BeliefTable {
 
         input = temporal.ready(input, nar);
         if (input != null) {
+            if (temporal.isFull()) //TEMPORARY
+                throw new RuntimeException("table full");
+
             //inserting this task.  should be successful
             boolean ii = insert(input, temporal, nar);
             assert (ii);

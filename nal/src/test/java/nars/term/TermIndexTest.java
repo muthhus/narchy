@@ -11,7 +11,7 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.AbstractMapIndex;
-import nars.term.index.MapIndex2;
+import nars.term.index.GroupedMapIndex;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -63,14 +63,14 @@ public class TermIndexTest {
 
 
     @Test public void testTermSharing5a() {
-        testIndex(new MapIndex2(new HashMap<>(),
+        testIndex(new GroupedMapIndex(new HashMap<>(),
                 new DefaultConceptBuilder(
                     new XorShift128PlusRandom(2)
                 )));
     }
     @Test public void testTermSharing5b() {
         testIndex(
-                new MapIndex2(Global.newHashMap(),
+                new GroupedMapIndex(Global.newHashMap(),
                     new DefaultConceptBuilder(
                         new XorShift128PlusRandom(2)
                     ))
@@ -79,7 +79,7 @@ public class TermIndexTest {
     }
     @Test public void testTermSharing5c() {
         testIndex(
-                new MapIndex2(Global.newHashMap(), defaultConceptBuilder)
+                new GroupedMapIndex(Global.newHashMap(), defaultConceptBuilder)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

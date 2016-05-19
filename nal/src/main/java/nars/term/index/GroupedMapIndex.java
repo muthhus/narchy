@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Created by me on 1/2/16.
  */
-public class MapIndex2 extends AbstractMapIndex {
+public class GroupedMapIndex extends AbstractMapIndex {
 
 
     public static class SubtermNode extends IntObjectHashMap<Termed> {
@@ -78,16 +78,16 @@ public class MapIndex2 extends AbstractMapIndex {
     public final Map<TermContainer, SubtermNode> data;
     int count;
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, ConceptBuilder conceptBuilder) {
         this(data, Terms.terms, conceptBuilder);
     }
 
-    public MapIndex2(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super(symbolMap, termBuilder, conceptBuilder);
         this.data = data;
     }
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         this(new HashSymbolMap(), data, termBuilder, conceptBuilder);
     }
 
@@ -125,7 +125,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
-                if ((interned = internSubterms(subsAfter, t.op(), t.relation(), t.dt())) == null)
+                if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
                     throw new InvalidTerm(t);
                     //return null;
             } else {

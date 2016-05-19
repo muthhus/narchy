@@ -14,11 +14,11 @@ import java.util.HashMap;
 /**
  * see: https://github.com/ben-manes/caffeine/wiki
  */
-public class MapIndex3 extends MapIndex2 {
+public class MapIndex3 extends GroupedMapIndex {
 
     //final RUCache<Termed,Termed> front = new RUCache(256);
 
-    final Cache<TermContainer, MapIndex2.SubtermNode> cache;
+    final Cache<TermContainer, GroupedMapIndex.SubtermNode> cache;
 
     public MapIndex3(int capacity, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super(
@@ -62,16 +62,14 @@ public class MapIndex3 extends MapIndex2 {
 //    }
 
     @Override
-    public
-    @Nullable
-    MapIndex2.SubtermNode getNode(TermContainer s) {
+    public @Nullable
+    GroupedMapIndex.SubtermNode getNode(TermContainer s) {
         return cache.getIfPresent(s);
     }
 
     @Override
-    public
-    @NotNull
-    MapIndex2.SubtermNode getOrAddNode(TermContainer s) {
+    public @NotNull
+    GroupedMapIndex.SubtermNode getOrAddNode(TermContainer s) {
         @Nullable TermContainer kk = normalize(s);
         return cache.get(kk, k -> {
             return new SubtermNodeWithArray(k);
