@@ -34,11 +34,24 @@ public class SimpleMapIndex extends AbstractMapIndex {
 //            data.put(c, c);
 //            return c;
         return create ?
-                data.computeIfAbsent(x, (X) -> {
-                    Compound XX = (Compound) X; //??
-                    return internCompound(internCompound(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
-                }) :
+                theCompoundCreated(x) :
                 data.get(x);
+    }
+
+    private final Termed theCompoundCreated(@NotNull Compound x) {
+
+        Termed y = data.get(x);
+        if (y == null) {
+            y = internCompound(internCompound(x.subterms(), x.op(), x.relation(), x.dt()));
+            data.put(y, y);
+        }
+        return y;
+
+        //doesnt work due to recursive concurrent modification exception:
+//        return data.computeIfAbsent(x, (X) -> {
+//            Compound XX = (Compound) X; //??
+//            return internCompound(internCompound(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
+//        });
     }
 
     @Nullable

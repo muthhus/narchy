@@ -103,8 +103,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
     protected final void setTerm(@NotNull Termed<Compound> t) {
-        if (!term.equals(t)) {
-            term = t;
+        Termed existing = term;
+        term = t; //use the provided instance even if equals
+        if (!existing.equals(t)) {
             invalidate();
         }
     }

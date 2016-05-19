@@ -83,9 +83,6 @@ public enum Op {
     /** Image index ("imdex") symbol */
     public static final Atom Imdex = $.the("_");
 
-
-
-
     /**
      * symbol representation of this getOperator
      */
@@ -338,7 +335,7 @@ public enum Op {
     public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
     public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPLICATION);
-    public static final int ConjImplOrEquivBits = or(Op.CONJUNCTION, Op.EQUIV, Op.IMPLICATION);
+    public static final int TemporalBits = or(Op.CONJUNCTION, Op.EQUIV, Op.IMPLICATION);
 
     public static final int ImageBits =
         Op.or(Op.IMAGE_EXT,Op.IMAGE_INT);

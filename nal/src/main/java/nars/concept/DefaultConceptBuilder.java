@@ -33,21 +33,19 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             (Variable v) -> new VariableConcept(v, termbag(), taskbag());
 
     @Nullable
-    final Function<Compound, CompoundConcept> compoundBuilder = (Compound t) -> {
+    final Function<Compound, Termed> compoundBuilder = (Compound t) -> {
 
-        Bag<Termed> termbag = termbag();
-        Bag<Task> taskbag = taskbag();
         switch (t.op()) {
             case INHERIT:
                 if (Op.isOperation(t))
-                    return new OperationConcept(t, termbag, taskbag);
+                    return new OperationConcept(t, termbag(), taskbag());
                 break;
             case NEGATE:
-                return new NegationConcept(t, termbag, taskbag);
+                return t; //return new NegationConcept(t, termbag, taskbag);
         }
 
         //default:
-        return new CompoundConcept(t, termbag, taskbag);
+        return new CompoundConcept(t, termbag(), taskbag());
     };
 
 
@@ -86,14 +84,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     @Nullable
-    public Concept apply(@NotNull Term term) {
+    public Termed apply(@NotNull Term term) {
 
         //already a concept, assume it is from here
         if (term instanceof Concept) {
             return (Concept) term;
         }
 
-        Concept result = null;
+        Termed result = null;
         if (term instanceof Compound) {
             result = compoundBuilder.apply((Compound) term);
         } else {

@@ -2,9 +2,12 @@ package nars.term.index;
 
 import nars.concept.ConceptBuilder;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +29,27 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
    @Nullable
     @Override
     public final TermContainer theSubterms(TermContainer s) {
+       int ss = s.size();
+       Term[] bb = new Term[ss];
+       boolean changed = false;
+       for (int i = 0; i < ss; i++) {
+           Term a = s.term(i);
+           Term b;
+           if (a instanceof Compound) {
+               b = theCompound((Compound)a, true).term();
+           } else {
+               b = theAtom((Atomic)a, true).term();
+           }
+           if (a!=b) {
+               changed = true;
+           }
+           bb[i] = b;
+       }
+
+       if (changed) {
+           s = TermVector.the(bb);
+       }
+
        TermContainer prev = subterms.putIfAbsent(s, s);
        if (prev == null)
            prev = s;

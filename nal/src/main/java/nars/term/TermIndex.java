@@ -420,24 +420,29 @@ public interface TermIndex {
     default Termed normalized(@NotNull Termed t) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
+            int numVars = ct.vars();
             t = transform(ct,
-                    (ct.vars() == 1) ?
+                    (numVars == 1) ?
                             VariableNormalization.singleVariableNormalization :
-                            new VariableNormalization()
+                            new VariableNormalization(numVars)
             );
 
-            if (t != null) {
-                ((GenericCompound) t).setNormalized();
-            }
-        } else {
+            if (t == null)
+                return null;
 
-            //fast access to concept:
-            if (!t.op().isTemporal()) {
-                Termed existing = get(t);
-                if (existing != null)
-                    return existing;
-            }
+            ((GenericCompound) t).setNormalized();
+
         }
+
+
+        //fast access to concept:
+        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
+        if (!t.term().hasAny(Op.TemporalBits)) {
+            Termed existing = get(t);
+            if (existing != null)
+                return existing;
+        }
+
         return t;
     }
 

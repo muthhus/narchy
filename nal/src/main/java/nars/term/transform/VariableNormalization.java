@@ -25,6 +25,18 @@ import java.util.function.Function;
  */
 public class VariableNormalization extends VariableTransform implements Function<Term,Variable> {
 
+    final Map<Term, Variable /*Variable*/> rename;
+
+    boolean renamed;
+
+    public VariableNormalization() {
+        this(0);
+    }
+
+    public VariableNormalization(int size) {
+        rename = Global.newHashMap(size);
+    }
+
 //    final static Comparator<Map.Entry<Variable, Variable>> comp = new Comparator<Map.Entry<Variable, Variable>>() {
 //        @Override
 //        public int compare(Map.Entry<Variable, Variable> c1, Map.Entry<Variable, Variable> c2) {
@@ -73,10 +85,6 @@ public class VariableNormalization extends VariableTransform implements Function
             //return _newVariable(current, 1);
         }
     };
-
-    final Map<Term, Variable /*Variable*/> rename = Global.newHashMap();
-
-    boolean renamed;
 
 
     @NotNull

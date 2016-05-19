@@ -207,7 +207,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     @Nullable
     public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
-                                         @NotNull Term content, @NotNull ConceptProcess nal) {
+                                         @NotNull Termed content, @NotNull ConceptProcess nal) {
         return budgetInference(
                 target,
                 truthToQuality(truth),
@@ -222,7 +222,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundBackward(@NotNull Term content, @NotNull ConceptProcess nal) {
+    public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
         return budgetInference(1.0f, content, nal);
     }
 
@@ -240,13 +240,13 @@ public final class BudgetFunctions extends UtilityFunctions {
 //    }
 
     @Nullable
-    static Budget budgetInference(float qual, @NotNull Term derived, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess nal) {
         return budgetInference(new UnitBudget(), qual, derived, nal);
     }
 
 
     @Nullable
-    static Budget budgetInference(@NotNull Budget target, float qualRaw, @NotNull Term derived, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(@NotNull Budget target, float qualRaw, @NotNull Termed derived, @NotNull ConceptProcess nal) {
 
         //BLink<? extends Task> taskLink = nal.taskLink;
 
@@ -269,7 +269,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
 
-        float volRatioScale = 1f / derived.volume();
+        float volRatioScale = 1f / derived.term().volume();
 
         /*
         int tasktermVol = nal.task().term().volume();
@@ -342,7 +342,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Term content, @NotNull ConceptProcess nal) {
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
         return compoundForward(new UnitBudget(), truth, content, nal);
     }
 

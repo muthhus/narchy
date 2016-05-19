@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * Created by me on 3/23/16.
  */
-public interface ConceptBuilder extends Function<Term, Concept> {
+public interface ConceptBuilder extends Function<Term, Termed> {
 
     @NotNull
     Bag<Task> taskbag();
