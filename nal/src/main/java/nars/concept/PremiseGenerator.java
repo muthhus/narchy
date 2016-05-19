@@ -179,7 +179,22 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     @NotNull
     protected ConceptProcess newPremise(BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-        return new DefaultConceptProcess(nar, taskLink, termLink, belief, nar::process);
+        return new DirectConceptProcess(nar, taskLink, termLink, belief);
+    }
+
+    public final static class DirectConceptProcess extends ConceptProcess {
+
+        public DirectConceptProcess(NAR nar,
+                                    BLink<? extends Task> taskLink,
+                                    BLink<? extends Termed> termLink, @Nullable Task belief) {
+            super(nar, taskLink, termLink, belief);
+        }
+
+        @Override
+        protected final void accept(Task derivation) {
+            nar.process(derivation);
+        }
+
     }
 
     /** resolves the most relevant belief of a given term/concept */

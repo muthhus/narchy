@@ -36,7 +36,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private Truth truth;
 
     @Nullable
-    private long[] evidentialSet;
+    private long[] evidence;
 
     private long creationTime = Tense.TIMELESS;
     private long occurrenceTime = Tense.ETERNAL;
@@ -217,9 +217,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
         //finally, assign a unique stamp if none specified (input)
-        if (evidence() == null) {
+        if (evidence == null) {
 
-            assert(isInput()); //throw new RuntimeException("derived task without evidence: " + this);
+            //assert(isInput()); //throw new RuntimeException("derived task without evidence: " + this);
+            if (!isInput())
+                throw new RuntimeException("derived task without evidence: " + this);
+
 
             setEvidence(memory.newStampSerial());
 
@@ -350,8 +353,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     /** the evidence should be sorted and de-duplicaed prior to calling this */
     @NotNull protected Task setEvidence(@Nullable long... evidentialSet) {
-        if (this.evidentialSet!=evidentialSet) {
-            this.evidentialSet = evidentialSet;
+        if (this.evidence !=evidentialSet) {
+            this.evidence = evidentialSet;
             invalidate();
         }
         return this;
@@ -370,10 +373,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Nullable
     @Override
     public final long[] evidence() {
-        long[] e = this.evidentialSet;
+        long[] e = this.evidence;
         if (e == null) {
             updateEvidence();
-            e = this.evidentialSet;
+            e = this.evidence;
+//            if (e == null)
+//                throw new NullPointerException();
         }
         return e;
     }

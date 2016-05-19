@@ -217,23 +217,22 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                //new SoftReference<>(s);
+                new SoftReference<>(s);
                 //new WeakReference<>(s);
-                Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
-
+                //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 
 
     @Nullable
     public static <C> Reference<C[]> reference(@Nullable C... s) {
         return Util.hasNonNull(s) ?
-                //new SoftReference<>(s);
+                new SoftReference<>(s)
                 //new WeakReference<>(s);
-                (Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s))
+                //(Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s))
                 :
                 null;
-
     }
+
     @Nullable
     public static <C> C dereference(@Nullable Reference<C> s) {
         return s == null ? null : s.get();

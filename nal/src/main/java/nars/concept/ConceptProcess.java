@@ -180,9 +180,9 @@ abstract public class ConceptProcess implements Premise {
 //                //TODO maybe ignore the eternalized if the non-eternalized wasnt immediately accepted
 //            }
 
-            /* if parents are null it means the previous task was rejected (deleted) already  */
-            if (parents.get()!=null) {
 
+
+            if (!derived.isDeleted()) {
                 accept(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
                         .time(now, ETERNAL)
                         .budgetCompoundForward(budget, this)

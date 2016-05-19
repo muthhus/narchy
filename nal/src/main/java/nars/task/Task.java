@@ -280,9 +280,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     char punc();
 
-    @Nullable
-    @Override
-    long[] evidence();
+//    @Nullable
+//    @Override
+//    long[] evidence();
 
     @Override
     long creation();

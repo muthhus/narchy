@@ -22,6 +22,7 @@ package mikejyg.javaipacman.pacman;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * the main class of the pacman game
@@ -77,6 +78,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	Image imgHiScore;
 	Graphics imgHiScoreG;
 
+	final AtomicBoolean ready = new AtomicBoolean(true);
 	// game status
 	final int INITIMAGE=100;  // need to wait before paint anything
 	final int STARTWAIT=0;  // wait before running
@@ -123,7 +125,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 	public void init() {
 
-		setIgnoreRepaint(true);
+		//setIgnoreRepaint(true);
 
 		// init variables
 		hiScore=0;
@@ -373,6 +375,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 			changePacRemain=0;
 		}
+
+		ready.set(true);
 	}
 
 	////////////////////////////////////////////////////////////
@@ -613,7 +617,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 			//key=NONE;
 		}
 
-		SwingUtilities.invokeLater(this::repaint);
+		if (ready.compareAndSet(true,false))
+			SwingUtilities.invokeLater(this::repaint);
 
 
 
