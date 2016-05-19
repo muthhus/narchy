@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;

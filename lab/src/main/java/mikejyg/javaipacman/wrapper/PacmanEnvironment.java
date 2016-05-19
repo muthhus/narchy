@@ -25,7 +25,6 @@ import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
-import nars.Global;
 import nars.nar.Default;
 import nars.time.FrameClock;
 import nars.util.Agent;

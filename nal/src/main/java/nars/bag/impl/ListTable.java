@@ -1,13 +1,6 @@
 package nars.bag.impl;
 
 import nars.bag.Table;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * adds list selection and ranking methods to the Table interface

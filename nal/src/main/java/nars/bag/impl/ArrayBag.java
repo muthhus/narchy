@@ -4,12 +4,13 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import nars.util.data.sorted.SortedArray;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -40,8 +41,8 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseZero();
-        float f2 = o2.priIfFiniteElseZero();
+        float f1 = o1.priIfFiniteElseNeg1();
+        float f2 = o2.priIfFiniteElseNeg1();
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
         if (f1 > f2)
@@ -50,13 +51,24 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     }
 
     static final int cmp(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseZero();
-        float f2 = o2.priIfFiniteElseZero();
+        float f1 = o1.priIfFiniteElseNeg1();
+        float f2 = o2.priIfFiniteElseNeg1();
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
         else if (f1 > f2)
             return -1;            // Neither val is NaN, thisVal is larger
         else return 0;
+    }
+
+    static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
+        float f1 = o1.priIfFiniteElseNeg1();
+        float f2 = o2.priIfFiniteElseNeg1();
+        return (f1 < f2);
+    }
+    static final boolean cmpLT(@NotNull BLink o1, @NotNull BLink o2) {
+        float f1 = o1.priIfFiniteElseNeg1();
+        float f2 = o2.priIfFiniteElseNeg1();
+        return (f1 > f2);
     }
 
     @NotNull
@@ -355,14 +367,10 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
         return this;
     }
 
-    final private int[] qsortStack = new int[32];
+    final private int[] qsortStack = new int[16];
 
 
 
-    /*public static int cmp(Object x, Object y) {
-
-        return cmp((BLink)x, (BLink)y);
-    }*/
 
     @SuppressWarnings({"unchecked"})
     public static void qsort(int[] stack, BLink[] c, int start, int size) {
@@ -375,7 +383,7 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
                     i = j - 1;
-                    while (i >= left && cmp(c[i], swap) > 0) {
+                    while (i >= left && cmpGT(c[i], swap)) {
                         c[i + 1] = c[i--];
                     }
                     c[i + 1] = swap;
@@ -392,27 +400,26 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                 swap = c[median];
                 c[median] = c[i];
                 c[i] = swap;
-                if (cmp(c[left], c[right]) > 0) {
+                if (cmpGT(c[left], c[right])) {
                     swap = c[left];
                     c[left] = c[right];
                     c[right] = swap;
                 }
-                if (cmp(c[i], c[right]) > 0) {
+                if (cmpGT(c[i], c[right])) {
                     swap = c[i];
                     c[i] = c[right];
                     c[right] = swap;
                 }
-                if (cmp(c[left], c[i]) > 0) {
+                if (cmpGT(c[left], c[i])) {
                     swap = c[left];
                     c[left] = c[i];
                     c[i] = swap;
                 }
                 BLink temp = c[i];
+
                 while (true) {
-                    //noinspection ControlFlowStatementWithoutBraces,StatementWithEmptyBody
-                    while (cmp(c[++i], temp) < 0) ;
-                    //noinspection ControlFlowStatementWithoutBraces,StatementWithEmptyBody
-                    while (cmp(c[--j], temp) > 0) ;
+                    while (cmpLT(c[++i], temp)) ;
+                    while (cmpGT(c[--j], temp)) ;
                     if (j < i) {
                         break;
                     }
@@ -420,17 +427,23 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
                     c[i] = c[j];
                     c[j] = swap;
                 }
+
                 c[left + 1] = c[j];
                 c[j] = temp;
+
+                int a, b;
                 if (right - i + 1 >= j - left) {
-                    stack[++stack_pointer] = i;
-                    stack[++stack_pointer] = right;
+                    a = i;
+                    b = right;
                     right = j - 1;
                 } else {
-                    stack[++stack_pointer] = left;
-                    stack[++stack_pointer] = j - 1;
+                    a = left;
+                    b = j - 1;
                     left = i;
                 }
+
+                stack[++stack_pointer] = a;
+                stack[++stack_pointer] = b;
             }
         }
     }

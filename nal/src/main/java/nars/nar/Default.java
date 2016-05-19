@@ -408,7 +408,7 @@ public class Default extends AbstractNAR {
 
         @NotNull final PremiseGenerator premiser;
 
-        protected final Forget.@NotNull ForgetAndDetectDeletion threshForget;
+        @NotNull protected final Forget.ForgetAndDetectDeletion threshForget;
 
         private float cyclesPerFrame;
         private int cycleNum;
@@ -418,7 +418,6 @@ public class Default extends AbstractNAR {
 //        @Deprecated
 //        int termlinks = 3; //TODO use MutableInteger for this
 
-        /* ---------- Short-term workspace for a single cycle ------- */
 
         protected AbstractCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator) {
 

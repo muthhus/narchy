@@ -6,11 +6,6 @@ import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 /**
  * Created by me on 5/7/16.
  */
