@@ -11,6 +11,7 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -68,5 +69,16 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
                 data.size() + " concepts, " +
                 subterms.size() + " subterms, " +
                 ((HashSymbolMap)atoms).map.size() + " atoms";
+    }
+
+    @Override
+    public void print(@NotNull PrintStream out) {
+
+        super.print(out);
+
+        subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
+        //data.forEach((k,v) -> System.out.println(k + "\t" + v));
+        System.out.println(data);
+
     }
 }

@@ -40,6 +40,9 @@ public class SimpleMapIndex extends AbstractMapIndex {
 
     private final Termed theCompoundCreated(@NotNull Compound x) {
 
+        if (x.isTemporal())
+            return x;
+
         Termed y = data.get(x);
         if (y == null) {
             y = internCompound(internCompound(x.subterms(), x.op(), x.relation(), x.dt()));

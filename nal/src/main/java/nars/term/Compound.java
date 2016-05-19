@@ -28,6 +28,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
+import nars.term.transform.CompoundTransform;
 import nars.term.transform.subst.FindSubst;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
@@ -237,8 +238,26 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     @Override
     default Compound anonymous() {
-        return this.dt(DTERNAL);
+        if (isTemporal()) {
+            return (Compound) Terms.terms.transform(dt(DTERNAL), CompoundAnonymizer);
+        }
+        return this;
     }
+
+    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound, Term>() {
+
+        @Override
+        public boolean test(Term term) {
+            return true;
+        }
+
+        @NotNull
+        @Override
+        public Termed apply(Compound parent, @NotNull Term subterm) {
+            return subterm.anonymous();
+        }
+    };
+
 
     /** whether the anonymized form of this term equals x */
     @Override default boolean equalsAnonymously(@NotNull Term x) {
@@ -331,6 +350,10 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
             return true;
         }
         return false;
+    }
+
+    default boolean isTemporal() {
+        return hasAny(Op.TemporalBits) && ((dt() != DTERNAL) || or(Term::isTemporal));
     }
 
 //    public int countOccurrences(final Term t) {

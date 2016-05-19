@@ -72,10 +72,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				35000);
+				350);
 
-		printTasks(new NAgent(nar).nar, true);
-		printTasks(new NAgent(nar).nar, false);
+		printTasks(nar, true);
+		printTasks(nar, false);
+		nar.index.print(System.out);
 	}
 
 	@Override

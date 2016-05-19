@@ -435,31 +435,20 @@ public interface TermIndex {
         }
 
 
-        //fast access to concept:
-        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
-        if (!t.term().hasAny(Op.TemporalBits)) {
-            Termed existing = get(t);
-            if (existing != null)
-                return existing;
-        }
 
-        return t;
+        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
+        if (t instanceof Compound && ((Compound)t).isTemporal())
+            return t;
+
+        //fast access to concept if not temporal:
+        Termed existing = get(t);
+        if (existing != null)
+            return existing;
+        else
+            return t;
     }
 
 
-    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound, Term>() {
-
-        @Override
-        public boolean test(Term term) {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm) {
-            return subterm.anonymous();
-        }
-    };
 
 
     @Nullable
@@ -576,22 +565,26 @@ public interface TermIndex {
             if ((term = normalized(term)) == null)
                 throw new InvalidTerm(prenormalized);
 
-            //ANONYMIZATION
-            //TODO ? put the unnormalized term for cached future normalizations?
-            Termed anonymizedTerm = term.anonymous();
-            if (anonymizedTerm != term) {
-                //complete anonymization process
-                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer))) {
-                    if (Global.DEBUG)
-                        throw new InvalidTerm((Compound) term);
-                    else
-                        return null;
-                }
-
-                term = anonymizedTerm;
-            }
-
-            return term;
+            return term.anonymous();
+//            //ANONYMIZATION
+//            //TODO ? put the unnormalized term for cached future normalizations?
+//            Termed anonymizedTerm = term.anonymous();
+//            if (anonymizedTerm != term) {
+//                //complete anonymization process
+//                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer))) {
+//                    if (Global.DEBUG)
+//                        throw new InvalidTerm((Compound) term);
+//                    else
+//                        return null;
+//                }
+//
+//                term = anonymizedTerm;
+//            }
+//
+//            if (term.term().isTemporal())
+//                throw new RuntimeException("anonymization failure");
+//
+//            return term;
         }
 
     }

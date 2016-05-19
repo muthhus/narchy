@@ -55,6 +55,11 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         }
     }
 
+    @Override
+    public boolean isTemporal() {
+        return false;
+    }
+
     /** HACK */
     @NotNull
     static Term[] expand(Term raw) {

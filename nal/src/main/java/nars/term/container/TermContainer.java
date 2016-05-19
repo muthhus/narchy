@@ -433,8 +433,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
      * @param p*/
     @Override
     default boolean or(@NotNull Predicate<? super Term> p) {
-        for (Term t : terms()) {
-            if (t.or(p))
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            Term t = term(i);
+            //if (t.or(p))
+            if (p.test(t))
                 return true;
         }
         return false;
@@ -444,7 +447,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
      * @param p*/
     @Override
     default boolean and(@NotNull Predicate<? super Term> p) {
-        for (Term t : terms()) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            Term t = term(i);
             if (!p.test(t)) {
                 return false;
             }

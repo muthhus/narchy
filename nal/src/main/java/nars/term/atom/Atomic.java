@@ -38,6 +38,10 @@ public interface Atomic extends Term {
 //        return toString();
 //    }
 
+    default boolean isTemporal() {
+        return false;
+    }
+
     @NotNull
     default String toStringUnquoted() {
         return toUnquoted(toString());
