@@ -13,6 +13,7 @@ import nars.budget.Budget;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -21,6 +22,8 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.ref.Reference;
 
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
@@ -37,9 +40,11 @@ abstract public class ConceptProcess implements Premise {
 
     public final NAR nar;
     public final BLink<? extends Task> taskLink;
-    //public final BLink<? extends Concept> conceptLink;
+
     public final BLink<? extends Termed> termLink;
-    @Nullable private final Task belief;
+    @Nullable public final Task belief;
+
+    //public final BLink<? extends Concept> conceptLink;
 
     /** lazily cached value :=
      *      -1: unknown
@@ -53,6 +58,7 @@ abstract public class ConceptProcess implements Premise {
      *      1: cyclic
      */
     private transient byte cyclic = -1;
+
 
     public ConceptProcess(NAR nar,
                           BLink<? extends Task> taskLink,
@@ -100,32 +106,6 @@ abstract public class ConceptProcess implements Premise {
         return taskLink.get();
     }
 
-//    /**
-//     * @return the current termLink aka BeliefLink
-//     */
-//    @Override
-//    public final BagBudget<Termed> getTermLink() {
-//        return termLink;
-//    }
-
-
-//    protected void beforeFinish(final long now) {
-//
-//        Memory m = nar.memory();
-//        m.logic.TASKLINK_FIRE.hit();
-//        m.emotion.busy(getTask(), this);
-//
-//    }
-
-//    @Override
-//    final protected Collection<Task> afterDerive(Collection<Task> c) {
-//
-//        final long now = nar.time();
-//
-//        beforeFinish(now);
-//
-//        return c;
-//    }
 
     @NotNull
     @Override
@@ -181,9 +161,10 @@ abstract public class ConceptProcess implements Premise {
                 single = false;
         }
 
-        Task derived = newDerivedTask(c, punct, truth)
+        Reference<Task[]> parents = parentRef(single); //shared by eternalized also
+
+        Task derived = newDerivedTask(c, punct, truth, parents)
                 .time(now, occ)
-                .parent(task(), !single ? belief() : null)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
@@ -192,28 +173,35 @@ abstract public class ConceptProcess implements Premise {
 
         //ETERNALIZE:
 
-        if ((occ != ETERNAL) && (truth != null) && d.eternalize) {
+        if ((occ != ETERNAL) && (truth != null) && d.eternalize  ) {
 
-            accept(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())))
+//            if (parents.get()==null) /* if parents are null it means the previous task was deleted already but we need this for the eternalized version  */ {
+//                parents = parentRef(single);
+//                //TODO maybe ignore the eternalized if the non-eternalized wasnt immediately accepted
+//            }
 
-                    .time(now, ETERNAL)
+            /* if parents are null it means the previous task was rejected (deleted) already  */
+            if (parents.get()!=null) {
 
-                    //.parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief) MAYBE WRONG wrt cyclicity
-                    .parent(task(), !single ? belief() : null)
+                accept(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
+                        .time(now, ETERNAL)
+                        .budgetCompoundForward(budget, this)
+                        .log("Immediaternalized") //Immediate Eternalization
 
-                    .budgetCompoundForward(budget, this)
-
-                    .log("Immediaternalized") //Immediate Eternalization
-
-            );
+                );
+            }
 
         }
 
     }
 
+    public Reference<Task[]> parentRef(boolean single) {
+        return MutableTask.parentRef(task(), !single ? belief() : null);
+    }
+
     @NotNull
-    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth) {
-        return new DerivedTask(c, punct, truth, this);
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task[]> parents) {
+        return new DerivedTask(c, punct, truth, this, parents);
     }
 
 

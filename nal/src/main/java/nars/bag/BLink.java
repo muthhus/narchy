@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import static nars.util.data.Util.clamp;
 
 /**
- * Budgeted Link (an entry in a bag)
+ * Buffered/Budgeted Link (an entry in a bag)
  * equalsTo/hashCode proxies to the wrapped element, X id
  *
  * Acts as a "budget vector" containing an accumulating delta
@@ -59,8 +59,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     public BLink(X id, @NotNull Budgeted b) {
-        this(id);
-        init(b, 1f);
+        this(id, b, 1f);
     }
 
     public BLink(X id, @NotNull Budgeted b, float scale) {
@@ -106,12 +105,12 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final float pri() {
-        return b[PRI];
+        return b[0 /*PRI*/];
     }
 
     @Override
     public final boolean isDeleted() {
-        float p = b[PRI];
+        float p = pri(); //b[PRI];
         return (p!=p); //fast NaN test
     }
 

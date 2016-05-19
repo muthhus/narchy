@@ -200,7 +200,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	public void initImages()
 	{
 		// initialize off screen drawing canvas
-		offScreen=createImage(cmaze.iWidth, cmaze.iHeight); 
+		offScreen=createVolatileImage(cmaze.iWidth, cmaze.iHeight);
 		if (offScreen==null)
 			System.out.println("createImage failed");
 		offScreenG=offScreen.getGraphics();

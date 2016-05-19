@@ -24,6 +24,7 @@ package nars;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
@@ -221,9 +222,27 @@ public enum Global {
                 Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
 
     }
+
+
+    @Nullable
+    public static <C> Reference<C[]> reference(@Nullable C... s) {
+        return Util.hasNonNull(s) ?
+                //new SoftReference<>(s);
+                //new WeakReference<>(s);
+                (Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s))
+                :
+                null;
+
+    }
     @Nullable
     public static <C> C dereference(@Nullable Reference<C> s) {
         return s == null ? null : s.get();
+    }
+
+    @Nullable
+    public static <C> C dereference(@Nullable Reference<C[]> s, int index) {
+        C[] x = (s == null) ? null : s.get();
+        return x != null ? x[index] : null;
     }
 
 

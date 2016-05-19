@@ -23,9 +23,8 @@ import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
 /** stores the items unsorted; revection manages their ranking and removal */
-public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> implements TemporalBeliefTable {
 
-    private final FasterList<Task> list;
     private final SortedTable<Task, Task> eternal;
     /** history factor:
      *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
@@ -38,7 +37,6 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
 
     public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task,Task> eternal) {
         super(mp);
-        this.list = new FasterList<>(0);
         setCapacity(1);
         this.eternal = eternal;
     }
@@ -106,25 +104,6 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
         return super.addItem(i);
     }
 
-    @Override
-    protected void listAdd(Task i) {
-        list.add(i);
-    }
-
-    @Override
-    public int size() {
-        return list.size();
-    }
-
-    @Override
-    public Iterator<Task> iterator() {
-        return list.iterator();
-    }
-
-    @Override
-    protected void listClear() {
-        list.clear();
-    }
 
     @Override
     protected Task removeItem(@NotNull Task removed) {
@@ -135,10 +114,7 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
         return super.removeItem(removed);
     }
 
-    @Override
-    protected boolean listRemove(Task removed) {
-        return list.remove(removed);
-    }
+
 
     private void invalidateRange() {
         min = max = ETERNAL;
@@ -322,11 +298,6 @@ public class MicrosphereTemporalBeliefTable extends ArrayListTable<Task,Task> im
                 i++;
             }
         }
-    }
-
-    @Override
-    public Task get(int i) {
-        return list.get(i);
     }
 
 //    public Task weakest(Task input, NAR nar) {

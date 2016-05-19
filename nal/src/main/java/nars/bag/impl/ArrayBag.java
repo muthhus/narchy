@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -9,9 +10,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -20,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V> {
+public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> {
 
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
@@ -28,12 +27,10 @@ public class ArrayBag<V> extends SortedArrayTable<V, BLink<V>> implements Bag<V>
     private static final float reinsertionThreshold = 0.02f;
 
     public ArrayBag(int cap) {
-        this(new HashMap<>(cap));
+        super(BLink[]::new,
+                new HashMap<>(cap), //Global.newHashMap(cap),
+                SortedArray.SearchType.BinarySearch);
         setCapacity(cap);
-    }
-
-    protected ArrayBag(Map<V, BLink<V>> map) {
-        super(BLink[]::new, map, SortedArray.SearchType.BinarySearch);
     }
 
     @Override

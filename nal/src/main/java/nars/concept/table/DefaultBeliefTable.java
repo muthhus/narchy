@@ -137,10 +137,8 @@ public class DefaultBeliefTable implements BeliefTable {
         if (eternal.capacity() == 0)
             return input;
 
-        //HACK
+
         @NotNull SortedTable<Task, Task> et = this.eternal;
-        if (et == SortedTable.Empty)
-            return null;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
         Task revised = ((EternalTable) et).tryRevision(input, nar);

@@ -41,17 +41,29 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private long creationTime = Tense.TIMELESS;
     private long occurrenceTime = Tense.ETERNAL;
 
-    /** Task from which the Task is derived, or null if input   */
-    @Nullable protected transient Reference<Task> parentTask;
-    /** Belief from which the Task is derived, or null if derived from a theorem     */
-    @Nullable protected transient Reference<Task> parentBelief;
+    /** Array of tasks from which the Task is derived, or null if input
+     *
+     * These are not guaranteed to remain because it is
+     * stored as a Soft or Weak reference so that
+     * task ancestry does not grow uncontrollably;
+     *
+     * instead, we rely on the JVM garbage collector
+     * to serve as an enforcer of AIKR
+     *
+     * @return The task from which the task is derived, or
+     * null if it has been forgotten
+     */
+    @Nullable protected transient Reference<Task[]> parents;
+
+//    /** Belief from which the Task is derived, or null if derived from a theorem     */
+//    @Nullable protected transient Reference<Task> parentBelief;
 
     private transient int hash;
 
 
 
     @Nullable
-    private Reference<List> log;
+    private List log;
 
 
 //    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
@@ -67,19 +79,19 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         this(term, punc, truth, p, d, q, (Task) null, null);
     }
 
-    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief) {
-        this(term, punc, truth,
-                p, d, q,
-                Global.reference(parentTask),
-                reference(parentBelief)
-        );
-    }
+//    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief) {
+//        this(term, punc, truth,
+//                p, d, q,
+//                parentTask,
+//                parentBelief
+//        );
+//    }
 
     /** copy/clone constructor */
     public AbstractTask(@NotNull Task task) {
         this(task, task.punc(), task.truth(),
                 task.pri(), task.dur(), task.qua(),
-                task.getParentTaskRef(), task.getParentBeliefRef());
+                task.getParents());
         setEvidence(task.evidence());
         setOccurrenceTime(task.occurrence());
     }
@@ -97,9 +109,13 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
     }
 
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
+                        @Nullable Task... parentTasks) {
+        this(term, punctuation, truth, p, d, q, Global.reference(parentTasks));
+    }
 
     public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
-                        @Nullable Reference<Task> parentTask, @Nullable Reference<Task> parentBelief) {
+                        @Nullable Reference<Task[]> parents) {
         super(p, d, q);
 
         this.punctuation = punctuation;
@@ -119,10 +135,11 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         this.truth = truth;
         this.term = term;
-        this.parentTask = parentTask;
-        this.parentBelief = parentBelief;
+        this.parents = parents;
         updateEvidence();
     }
+
+
 
     @Override @NotNull
     public final Task normalize(@NotNull Memory memory) {
@@ -236,6 +253,11 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      * */
     @Override public void execute(@NotNull Concept c, @NotNull NAR n) {
 
+    }
+
+    @Override
+    public @Nullable Reference<Task[]> getParentsRef() {
+        return parents;
     }
 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
@@ -428,10 +450,13 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Override
     public void delete() {
         super.delete();
-        Reference<Task> p = this.parentTask;
-        if (p !=null) p.clear();
-        Reference<Task> b = this.parentBelief;
-        if (b !=null) b.clear();
+        Reference<Task[]> p = this.parents;
+        if (p !=null) {
+            p.clear();
+            this.parents = null;
+        }
+        if (!Global.DEBUG)
+            this.log = null; //.clear();
     }
 
     protected final void invalidate() {
@@ -531,21 +556,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
 
-    @Nullable
-    @Override
-    public Reference<Task> getParentTaskRef() {
-        return parentTask;
-    }
-
-    @Nullable
-    @Override
-    public Reference<Task> getParentBeliefRef() {
-        return parentBelief;
-    }
-
-
-
-
     @NotNull
     @Override
     public Task log(@Nullable List historyToCopy) {
@@ -577,7 +587,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Nullable
     @Override
     public final List log() {
-        return dereference(log);
+        return (log);
     }
 
 
@@ -585,7 +595,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     final List getOrCreateLog() {
         List exist = log();
         if (exist == null) {
-            this.log = reference(exist = Global.newArrayList(1));
+            this.log = (exist = Global.newArrayList(1));
         }
         return exist;
     }
@@ -605,16 +615,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
 
-    /**
-     * Get the parent belief of a task
-     *
-     * @return The belief from which the task is derived
-     */
-    @Nullable
-    @Override
-    public final Task getParentBelief() {
-        return dereference(parentBelief);
-    }
 
 
     @NotNull

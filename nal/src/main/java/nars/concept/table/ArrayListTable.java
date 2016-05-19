@@ -1,6 +1,6 @@
 package nars.concept.table;
 
-import nars.bag.impl.ListTable;
+import nars.bag.Table;
 import nars.util.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Created by me on 5/7/16.
+ * Items are available by an integer index
  */
-abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements ListTable<V,L>, Iterable<L> {
+abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements Table<V,L>, Iterable<L> {
 
 
     private int capacity = -1;
@@ -21,6 +21,8 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements L
     public ArrayListTable(Map<V,L> map) {
         super(map);
     }
+
+    abstract public L get(int i);
 
     @Override
     abstract public int size();

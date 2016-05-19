@@ -190,7 +190,7 @@ public interface Stamp {
         if (Global.DEBUG) {
 //            if (a == null || b == null)
 //                throw new RuntimeException("null evidence");
-            if (a.length == 0 || b.length == 0) {
+            if (a == null || b == null || a.length == 0 || b.length == 0) {
                 throw new RuntimeException("missing evidence");
             }
         }

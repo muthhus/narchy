@@ -13,7 +13,8 @@ plugins {
 allprojects {
 
     apply plugin: 'java'
-    apply plugin: 'java'
+    apply plugin: 'maven'
+
     compileJava {
         //enable compilation in a separate daemon process
         options.fork = true
@@ -23,7 +24,6 @@ allprojects {
 
     }
 
-    //apply plugin: 'maven'
     apply plugin: 'build-dashboard'
     apply plugin: 'jdepend'
     apply plugin: 'project-report'
@@ -34,7 +34,7 @@ allprojects {
     //https://github.com/evant/gradle-retrolambda
 
     group = 'opennars'
-    version = '1.7-SNAPSHOT'
+    version = '1.8-SNAPSHOT'
 
 //    buildscript {
 //        repositories {
@@ -60,11 +60,8 @@ subprojects {
 
     //apply plugin: 'com.github.ben-manes-versions'
 
-    sourceCompatibility = 1.9
-    targetCompatibility = 1.9
-
-
-
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
     repositories {
         mavenLocal()
@@ -90,6 +87,17 @@ task testReport(type: TestReport) {
     reportOn subprojects*.test
 }
 
-
-
-
+task pom << {
+    pom {
+        project {
+            inceptionYear '2016'
+            licenses {
+                license {
+                    name 'GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)'
+                    url 'https://www.gnu.org/licenses/agpl.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("$buildDir/pom.xml")
+}

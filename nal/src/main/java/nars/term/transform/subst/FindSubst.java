@@ -70,7 +70,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     @NotNull
     public final Versioned<MatchConstraint> constraints;
     @NotNull
-    public final VersionMap.Reassigner<Term,Term> reassigner;
+    public final VersionMap.Reassigner<Term,Term> reassignerXY, reassignerYX;
 
 
     @NotNull
@@ -133,7 +133,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         this.versioning = versioning;
         xy = new VersionMap(versioning, 12);
         yx = new VersionMap(versioning, 4);
-        reassigner = new VersionMap.Reassigner<>(this::assignable );
+        reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
+        reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
         parent = new Versioned(versioning);
         constraints = new Versioned(versioning, new int[2], new FasterList(0, new MatchConstraint[2]));
 
@@ -831,14 +832,14 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putYX(@NotNull Term y /* usually a Variable */, @NotNull Term x) {
-        return reassigner.compute(yx, x, y);
+        return reassignerYX.compute(x, y);
     }
 
     /**
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        return reassigner.compute(xy, x, y);
+        return reassignerXY.compute(x, y);
     }
 
 

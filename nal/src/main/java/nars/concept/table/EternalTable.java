@@ -1,7 +1,7 @@
 package nars.concept.table;
 
 import nars.NAR;
-import nars.bag.impl.SortedArrayTable;
+import nars.bag.impl.SortedListTable;
 import nars.budget.Budget;
 import nars.nal.LocalRules;
 import nars.task.Revision;
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by me on 5/7/16.
  */
-public class EternalTable extends SortedArrayTable<Task,Task> {
+public class EternalTable extends SortedListTable<Task,Task> {
 
     public EternalTable(Map<Task, Task> index) {
         super((i) -> new Task[i], index, SortedArray.SearchType.BinarySearch);

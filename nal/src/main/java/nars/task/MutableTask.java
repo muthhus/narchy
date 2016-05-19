@@ -34,9 +34,13 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth) {
+    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Task... parents) {
         super(term.term(), punct, truth,
-            /* budget: */ 0, Float.NaN, Float.NaN);
+            /* budget: */ 0, Float.NaN, Float.NaN, parents);
+    }
+    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Reference<Task[]> parents) {
+        super(term.term(), punct, truth,
+            /* budget: */ 0, Float.NaN, Float.NaN, parents);
     }
 
 //    @NotNull
@@ -76,11 +80,9 @@ public class MutableTask extends AbstractTask {
         this(taskToClone, taskToClone, otherTask, now, occ, newEvidence, newTruth, budgetMerge);
     }
 
-    /** used by QuestionTable */
     public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
-        this(newTerm, taskToClone.punc(), newTruth);
+        this(newTerm, taskToClone.punc(), newTruth, taskToClone, otherTask);
 
-        this.parentBelief = Global.reference(otherTask);
         setEvidence(newEvidence);
 
         time(now, occ);
@@ -229,14 +231,29 @@ public class MutableTask extends AbstractTask {
 
         ensureParentNonLoop(parentTask, parentBelief);
 
-        this.parentTask = (/*(parentTask != null) &&*/ !parentTask.isCommand()) ? reference(parentTask) : null;
+        return parent(parentRef(parentTask, parentBelief));
 
-        this.parentBelief = ((parentBelief != null) && !parentBelief.isCommand()) ? reference(parentBelief) : null;
+    }
+
+    public static Reference<Task[]> parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
+        return Global.reference(
+                (parentTask.isCommand()) ? null : parentTask,
+                (parentBelief == null || parentBelief.isCommand()) ? null : parentBelief
+        );
+    }
+
+    @NotNull
+    public final MutableTask parent(Reference<Task[]> parents) {
+
+        //ensureParentNonLoop(parentTask, parentBelief);
+
+        this.parents = parents;
 
         updateEvidence();
 
         return this;
     }
+
 
     private void ensureParentNonLoop(@NotNull Task parentTask, @Nullable Task parentBelief) {
         if (Global.DEBUG) {
@@ -247,21 +264,21 @@ public class MutableTask extends AbstractTask {
         }
     }
 
-    @NotNull
-    public MutableTask parent(Reference<Task> rt, Reference<Task> rb) {
-
-        Task pt = dereference(rt);
-        this.parentTask = ((pt != null) && !pt.isCommand()) ? rt : null ;
-
-        Task pb = dereference(rb);
-        this.parentBelief = ((pb != null) && !pb.isCommand()) ? rb : null;
-
-        ensureParentNonLoop(pt, pb);
-
-        updateEvidence();
-
-        return this;
-    }
+//    @NotNull
+//    public MutableTask parent(Reference<Task> rt, Reference<Task> rb) {
+//
+//        Task pt = dereference(rt);
+//        this.parentTask = ((pt != null) && !pt.isCommand()) ? rt : null ;
+//
+//        Task pb = dereference(rb);
+//        this.parentBelief = ((pb != null) && !pb.isCommand()) ? rb : null;
+//
+//        ensureParentNonLoop(pt, pb);
+//
+//        updateEvidence();
+//
+//        return this;
+//    }
 
 
     @NotNull

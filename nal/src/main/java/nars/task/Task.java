@@ -143,31 +143,20 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     default Task task() { return this; }
 
+    @Nullable Reference<Task[]> getParentsRef();
 
-    /**
-     * Get the parent task of a task.
-     * It is not guaranteed to remain because it is
-     * stored as a Soft or Weak reference so that
-     * task ancestry does not grow uncontrollably;
-     *
-     * instead, we rely on the JVM garbage collector
-     * to serve as an enforcer of AIKR
-     *
-     * @return The task from which the task is derived, or
-     * null if it has been forgotten
-     */
-    @Nullable
-    default Task getParentTask() {
-        return dereference(getParentTaskRef());
+    @Nullable default Task[] getParents() {
+        return dereference(getParentsRef());
+    }
+    @Nullable default Task getParentTask() {
+        return dereference(getParentsRef(), 0);
+    }
+    @Nullable default Task getParentBelief() {
+        return dereference(getParentsRef(), 1);
     }
 
-    @Nullable Reference<Task> getParentTaskRef();
 
 
-    @Nullable
-    Task getParentBelief();
-
-    @Nullable Reference<Task> getParentBeliefRef();
 
     /**
      * Check whether different aspects of sentence are equivalent to another one

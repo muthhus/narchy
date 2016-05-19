@@ -191,31 +191,35 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     public final Versioned<Y> version(X key) {
-        return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
+        //return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
+        return map.get(key);
     }
 
     public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
 
         private Y y;
-        private VersionMap map;
+        private final VersionMap map;
         private final BiPredicate<X, Y> assigner;
 
-        public Reassigner(BiPredicate<X, Y> assigner) {
+        public Reassigner(BiPredicate<X, Y> assigner, final VersionMap map) {
+            this.map = map;
             this.assigner = assigner;
         }
 
         @Override
         public Versioned<Y> apply(X X, @Nullable Versioned<Y> py) {
+            final Y y = this.y;
+            BiPredicate<X, Y> a = this.assigner;
             if (py == null) {
-                return assigner.test(X, y) ? map.newEntry(X).set(y) : null;
+                return a.test(X, y) ? map.newEntry(X).set(y) : null;
             } else {
                 Y yy = py.get();
                 if (yy == null) {
-                    if (assigner.test(X, y))
-                        py.set(this.y);
+                    if (a.test(X, y))
+                        py.set(y);
                     else
                         return null;
-                } else if (!yy.equals(this.y)) {
+                } else if (!yy.equals(y)) {
                     return null; //conflict
                 }
                 return py;
@@ -223,10 +227,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         }
 
         /** should not be used by multiple threads at once! */
-        public final boolean compute(@NotNull VersionMap xy, @NotNull X x, @NotNull Y y) {
+        public final boolean compute(@NotNull X x, @NotNull Y y) {
             this.y = y;
-            this.map = xy;
-            boolean b = xy.computeAssignable(x, this);
+            boolean b = map.computeAssignable(x, this);
             this.y = null;
             return b;
         }

@@ -12,7 +12,7 @@ import java.util.function.IntFunction;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, Comparator<L> {
+abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, Comparator<L> {
 
     /**
      * array of lists of items, for items on different level
@@ -21,7 +21,7 @@ abstract public class SortedArrayTable<V, L> extends ArrayListTable<V,L> impleme
     protected final @NotNull SortedArray<L> items;
 
 
-    public SortedArrayTable(IntFunction<L[]> builder, Map<V, L> map, SortedArray.SearchType searchType) {
+    public SortedListTable(IntFunction<L[]> builder, Map<V, L> map, SortedArray.SearchType searchType) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
         this.items = new SortedArray<>(builder, this, searchType, 1);

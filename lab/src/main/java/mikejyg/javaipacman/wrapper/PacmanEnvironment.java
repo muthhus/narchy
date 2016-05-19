@@ -45,7 +45,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 2;
+	private int pacmanCyclesPerFrame = 4;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
