@@ -349,11 +349,7 @@ public class TermTest {
 
     }
 
-    @Test public void testParseOperationInFunctionalForm2() {
-        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
-        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(((that)-->^do) &&+0 ((a)&&(b)))").toString());
-        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.conceptualize(n.term("(((that)-->^do) &&+0 ((a)&&(b)))"), UnitBudget.One).toString());
-    }
+
 
 //    public void nullCachedName(String term) {
 //        NAR n = new Terminal();
@@ -644,8 +640,8 @@ public class TermTest {
         assertTrue( $("(/,_,X,Y)").op().isImage() );
         assertFalse( $("(X,Y)").op().isImage() );
 
-        assertInvalidTerm(()->imageExt($("X"), $("Y")));
-        assertInvalidTerm(()->imageInt($("X"), $("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageExt($("X"), $("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageInt($("X"), $("Y")));
 
         assertEquals("(/,X,_)", $("(/,X,_)").toString());
         assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
@@ -664,13 +660,18 @@ public class TermTest {
         assertNotNull(o);
     }
 
-    public static void assertInvalidTerm(Supplier<Term> o) {
+    public static void assertValidTermValidConceptInvalidTaskContent(Supplier<Term> o) {
         try {
-            o.get();
+            Term x = o.get();
+            assertNotNull(x);
+
+            Terminal t = new Terminal(8);
+            t.believe(x);
+
             assertTrue(false);
-        } catch (InvalidTerm e) {
-            //correct if happens here
-        } catch (Narsese.NarseseException e) {
+
+
+        } catch (Exception e) {
             //correct if happens here
         }
     }
@@ -814,9 +815,7 @@ public class TermTest {
                 )
         );
         assertTrue(
-                n.term("<a --> b>").term().impossibleStructureMatch(
-                        n.term("<a-->#b>").term().structure()
-                )
+                !Termlike.hasAll(n.term("<a --> b>").term().structure(), n.term("<a-->#b>").term().structure())
         );
 
     }
@@ -873,8 +872,8 @@ public class TermTest {
         //any commutive terms with both a subterm and its negative are invalid
 
 
-        assertInvalidTerm( () -> $("((--,(a1)) && (a1))") );
-        assertInvalidTerm( () -> $("((--,(a1)) &&+0 (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) && (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) &&+0 (a1))") );
         assertValidTerm(         $("((--,(a1)) &&+1 (a1))") );
 
         assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
@@ -882,9 +881,19 @@ public class TermTest {
 
 
         //invalid because of ordinary common subterm:
-        assertInvalidTerm( ()->   $("((--,(a1)) ==> (a1))") );
-        assertInvalidTerm( ()->   $("((--,(a1)) <-> (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) ==> (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) <-> (a1))") );
 
     }
 
+    public static void assertInvalidTerm(Supplier<Term> o) {
+        try {
+            o.get();
+            assertTrue(false);
+        } catch (InvalidTerm e) {
+            //correct if happens here
+        } catch (Narsese.NarseseException e) {
+            //correct if happens here
+        }
+    }
 }

@@ -78,7 +78,8 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
 
         subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
         //data.forEach((k,v) -> System.out.println(k + "\t" + v));
-        System.out.println(data);
+
+        data.keySet().forEach(System.out::println);
 
     }
 }

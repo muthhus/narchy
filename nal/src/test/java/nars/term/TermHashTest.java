@@ -1,9 +1,11 @@
 package nars.term;
 
 import nars.Op;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static nars.$.*;
+import static nars.Op.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -17,17 +19,25 @@ public class TermHashTest {
 
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
         assertTrue(inh(p("a"), $("b"))
-                .hasAny(Op.or(Op.ATOM, Op.PRODUCT)));
+                .hasAny(or(Op.ATOM, Op.PRODUCT)));
 
         assertFalse(inh(p("a"), $("b"))
-                .isAnyOf(Op.or(Op.SIMILAR, Op.PRODUCT)));
+                .isAnyOf(or(SIMILAR, Op.PRODUCT)));
         assertFalse(inh(p("a"), $("b"))
                 .op() == Op.PRODUCT);
 
-        assertTrue(inh("a", "b").op() == Op.INHERIT);
-        assertTrue(inh("a", "b").hasAny(Op.INHERIT));
+        assertTrue(inh("a", "b").op() == INHERIT);
+        assertTrue(inh("a", "b").hasAny(INHERIT));
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
-        assertFalse(inh("a", "b").hasAny(Op.SIMILAR));
+        assertFalse(inh("a", "b").hasAny(SIMILAR));
+    }
+
+    @Test public void testHasAnyVSAll() {
+        @Nullable Compound iii = impl(inh("a", "b"), $("c"));
+        assertTrue(iii.hasAll(or(IMPLICATION, INHERIT)));
+        assertFalse(iii.hasAll(or(IMPLICATION, SIMILAR)));
+        assertTrue(iii.hasAny(or(IMPLICATION, INHERIT)));
+
     }
 
 //    @Test

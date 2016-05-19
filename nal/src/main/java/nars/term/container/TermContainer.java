@@ -432,7 +432,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** returns true if evaluates true for any terms
      * @param p*/
     @Override
-    default boolean or(@NotNull Predicate<? super Term> p) {
+    default boolean or(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
             Term t = term(i);
@@ -446,7 +446,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** returns true if evaluates true for all terms
      * @param p*/
     @Override
-    default boolean and(@NotNull Predicate<? super Term> p) {
+    default boolean and(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
             Term t = term(i);

@@ -22,6 +22,14 @@ public interface Termlike  {
     boolean containsTerm(Term t);
 
 
+    default boolean hasAll(int structuralVector) {
+        int s = structure();
+        return hasAll(s, structuralVector);
+    }
+
+    static boolean hasAll(int existing, int possiblyIncluded) {
+        return ((existing | possiblyIncluded) == existing);
+    }
 
     default boolean hasAny(int structuralVector) {
         return (structure() & structuralVector) != 0;
@@ -35,22 +43,12 @@ public interface Termlike  {
         return hasAny(op.bit());
     }
 
-    default boolean impossibleStructureMatch(int possibleSubtermStructure) {
-        return impossibleStructureMatch(
-                structure(),
-                possibleSubtermStructure
-        );
-    }
-
-    static boolean impossibleStructureMatch(int existingStructure, int possibleSubtermStructure) {
+    default boolean impossibleSubterm(@NotNull Term target) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
-        return ((possibleSubtermStructure | existingStructure) != existingStructure);
-    }
-
-    default boolean impossibleSubterm(@NotNull Term target) {
+        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
         return  this==target ||
-                ((impossibleStructureMatch(structure(), target.structure()))) ||
+                ((!hasAll(structure(), target.structure()))) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 
@@ -77,7 +75,7 @@ public interface Termlike  {
 
 
     default boolean impossibleSubTermOrEquality(@NotNull Term target) {
-        return ((impossibleStructureMatch(target.structure())) ||
+        return ((!hasAll(structure(), target.structure())) ||
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }
 
@@ -85,13 +83,13 @@ public interface Termlike  {
      *  returns true if all true
      *
      * @param v*/
-    boolean and(Predicate<? super Term> v);
+    boolean and(Predicate<Term> v);
 
     /** recurses all subterms until the result of the predicate becomes true;
      *  returns true if any true
      *
      * @param v*/
-    boolean or(Predicate<? super Term> v);
+    boolean or(Predicate<Term> v);
 
 
 

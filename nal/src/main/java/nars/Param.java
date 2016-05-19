@@ -158,7 +158,7 @@ public abstract class Param extends Container implements Level {
 
     public float priorityDefault(char punctuation) {
         switch (punctuation) {
-            case Symbols.BELIEF:
+            case BELIEF:
                 return DEFAULT_JUDGMENT_PRIORITY;
 
             case QUEST:
@@ -167,21 +167,24 @@ public abstract class Param extends Container implements Level {
             case QUESTION:
                 return DEFAULT_QUESTION_PRIORITY;
 
-            case Symbols.GOAL:
+            case GOAL:
                 return DEFAULT_GOAL_PRIORITY;
+
+            case COMMAND:
+                return 0;
         }
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
 
     public float durabilityDefault(char punctuation) {
         switch (punctuation) {
-            case Symbols.BELIEF:
+            case BELIEF:
                 return DEFAULT_JUDGMENT_DURABILITY;
             case QUEST:
                 return DEFAULT_QUEST_DURABILITY;
             case QUESTION:
                 return DEFAULT_QUESTION_DURABILITY;
-            case Symbols.GOAL:
+            case GOAL:
                 return DEFAULT_GOAL_DURABILITY;
         }
         throw new RuntimeException("Unknown sentence type: " + punctuation);

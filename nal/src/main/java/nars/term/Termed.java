@@ -25,20 +25,9 @@ public interface Termed<T extends Term>  {
         return term().isNormalized();
     }
 
-
-    /** provides the "anonymized" form of the compound which is used to reference the concept it would be associated with */
-    @NotNull default Termed<T> anonymous() {
-        return this;
-    }
-
     @Nullable
     static Term termOrNull(@Nullable Termed x) {
         return x == null ? null : x.term();
-    }
-
-    /** whether the anonymized form of this term equals x */
-    default boolean equalsAnonymously(@NotNull Term x) {
-        return x.equals(this);
     }
 
 }

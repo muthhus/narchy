@@ -274,11 +274,11 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         return obj instanceof TermContainer && TermContainer.equals(this, (TermContainer) obj);
     }
 
-    @Override public boolean equalTerms(@NotNull TermContainer c) {
+    @Override public final boolean equalTerms(@NotNull TermContainer c) {
         T[] tt = this.term;
 
         int s = tt.length;
@@ -316,17 +316,17 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
 
-    /** thrown if a compound term contains itself as an immediate subterm */
-    public static final class RecursiveTermContentException extends RuntimeException {
-
-        @NotNull
-        public final Term term;
-
-        public RecursiveTermContentException(@NotNull Term t) {
-            super(t.toString());
-            this.term = t;
-        }
-    }
+//    /** thrown if a compound term contains itself as an immediate subterm */
+//    public static final class RecursiveTermContentException extends RuntimeException {
+//
+//        @NotNull
+//        public final Term term;
+//
+//        public RecursiveTermContentException(@NotNull Term t) {
+//            super(t.toString());
+//            this.term = t;
+//        }
+//    }
 
     /** creates a copy if changed */
     @NotNull

@@ -32,7 +32,7 @@ public class MotivationTest {
         FloatConcept x = new FloatConcept("(x)", n).punc('!');
         MotorConcept y = new MotorConcept("(y)", n, (b,d)->{
 
-            float thresh = 0f;
+            float thresh = 0.1f;
             if (d < 0.5f) return Float.NaN;
             if (d > 0.5f && d - b < thresh) return Float.NaN;
             //if (d < 0.5f && b < d) return Float.NaN;
@@ -54,17 +54,17 @@ public class MotivationTest {
         x.set(1);
 
         n.run(4);
-        assertEquals(2, execs.get());
+        assertEquals(1, execs.get());
 
         n.run(16); //remains stable with one execution
-        assertEquals(2, execs.get());
+        assertEquals(1, execs.get());
 
         //OFF
         x.set(0);
 
         n.run(16);
 
-        assertEquals(2, execs.get());
+        assertEquals(1, execs.get());
 
     }
 

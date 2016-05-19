@@ -24,12 +24,12 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean and(@NotNull Predicate<? super Term> v) {
+    default boolean and(@NotNull Predicate<Term> v) {
         return v.test(this);
     }
 
     @Override
-    default boolean or(@NotNull Predicate<? super Term> v) {
+    default boolean or(@NotNull Predicate<Term> v) {
         return and(v); //re-use and, even though it's so similar
     }
 
@@ -38,7 +38,7 @@ public interface Atomic extends Term {
 //        return toString();
 //    }
 
-    default boolean isTemporal() {
+    default boolean hasTemporal() {
         return false;
     }
 

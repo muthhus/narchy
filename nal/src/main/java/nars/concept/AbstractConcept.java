@@ -169,7 +169,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
     public final boolean isConceptOf(@NotNull Termed t) {
-        return t == this || (t.term() == this) || t.equalsAnonymously(term());
+        return t == this || (t.term() == this);
+        //t.equalsAnonymously(term());
     }
 
     @Override
@@ -196,7 +197,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
     public void linkTask(@NotNull Task t, float scale) {
-        if (term.vars()==0 || !isConceptOf(t)) { //insert tasklink to its terms own concept only if no variables
+        if (term.vars()==0 /*|| !isConceptOf(t)*/) { //insert tasklink to its terms own concept only if no variables
             taskLinks.put(t, t/*.budget()*/, scale, null);
         }
     }

@@ -43,6 +43,8 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         }
     }
 
+
+
     public static Term match(@NotNull Compound y, int from, int to) {
         return match(Terms.subRange(y, from, to));
     }
@@ -56,7 +58,7 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
     }
 
     @Override
-    public boolean isTemporal() {
+    public boolean hasTemporal() {
         return false;
     }
 

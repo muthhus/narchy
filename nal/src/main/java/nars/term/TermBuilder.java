@@ -373,9 +373,10 @@ public abstract class TermBuilder {
 
         flatten(op, u, dt, s, negs);
 
-        //any commutive terms with both a subterm and its negative are invalid
-        if (negs.anySatisfy(s::contains))
+        //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
+        if (op == DISJUNCTION && negs.anySatisfy(s::contains))
             return null; //throw new InvalidTerm(op, u);
+        //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
 
 
         //if all subterms negated; apply DeMorgan's Law

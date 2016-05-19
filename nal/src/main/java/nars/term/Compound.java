@@ -28,7 +28,6 @@ import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
-import nars.term.transform.CompoundTransform;
 import nars.term.transform.subst.FindSubst;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
@@ -235,40 +234,16 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @Override
     boolean isNormalized();
 
-    @NotNull
-    @Override
-    default Compound anonymous() {
-        if (isTemporal()) {
-            return (Compound) Terms.terms.transform(dt(DTERNAL), CompoundAnonymizer);
-        }
-        return this;
-    }
-
-    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound, Term>() {
-
-        @Override
-        public boolean test(Term term) {
-            return true;
-        }
-
-        @NotNull
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm) {
-            return subterm.anonymous();
-        }
-    };
-
-
-    /** whether the anonymized form of this term equals x */
-    @Override default boolean equalsAnonymously(@NotNull Term x) {
-
-        if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
-
-            return anonymous().equals(x);
-        }
-
-        return false;
-    }
+//    /** whether the anonymized form of this term equals x */
+//    @Override default boolean equalsAnonymously(@NotNull Term x) {
+//
+//        if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
+//
+//            return anonymous().equals(x);
+//        }
+//
+//        return false;
+//    }
 
     /** sets temporal relation value (TEMPORARY). returns new value */
     @NotNull
@@ -352,8 +327,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
-    default boolean isTemporal() {
-        return hasAny(Op.TemporalBits) && ((dt() != DTERNAL) || or(Term::isTemporal));
+    default boolean hasTemporal() {
+        return hasAny(Op.TemporalBits) && ((dt() != DTERNAL) || or(Term::hasTemporal));
     }
 
 //    public int countOccurrences(final Term t) {

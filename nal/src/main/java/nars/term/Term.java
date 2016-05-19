@@ -294,7 +294,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return (this instanceof Variable) || (other instanceof Variable) || equals(other);
     }
 
-    boolean isTemporal();
+    boolean hasTemporal();
 
 //    default public boolean hasAll(final Op... op) {
 //        //TODO

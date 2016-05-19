@@ -35,10 +35,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
+import static nars.Op.CONJUNCTION;
+import static nars.Op.NEGATE;
+import static nars.Op.or;
 import static nars.nal.LocalRules.solutionBudget;
+import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.truthProjection;
@@ -52,6 +57,8 @@ import static nars.truth.TruthFunctions.truthProjection;
  * TODO decide if the Sentence fields need to be Reference<> also
  */
 public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked, Supplier<Task> {
+
+    int CONJUNCTION_WITH_NEGATION = or(Op.CONJUNCTION, NEGATE);
 
     static void explanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
@@ -102,7 +109,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed t, char punc, @NotNull Memory memory, boolean input) {
+    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean input) {
 
         Op op = t.op();
 
@@ -112,8 +119,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
             if (subjectOrPredicateIsIndependentVar(cc))
                 throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
+        }
 
-
+        if (hasCoNegatedAtemporalConjunction(t.term())) {
+            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
         }
 
         Termed normalizedTerm = memory.index.normalized(t);
@@ -127,6 +136,33 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
         return normalizedTerm;
+    }
+
+    static boolean hasCoNegatedAtemporalConjunction(Term term) {
+        if (term instanceof Compound) {
+
+            Compound cterm = ((Compound) term);
+
+            int dt = cterm.dt();
+            if (term.op() == CONJUNCTION && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEGATE)) {
+                if (cterm.subterms().or(new Predicate<Term>() {
+                    @Override
+                    public boolean test(Term p) {
+                        if (p.op() == NEGATE) {
+                            return cterm.contains(((Compound) p).term(0));
+                        }
+                        return false;
+                    }
+                }))
+                    return true;
+            }
+
+            if (term.hasAll(CONJUNCTION_WITH_NEGATION)) {
+                return term.or(Task::hasCoNegatedAtemporalConjunction);
+            }
+        }
+        return false;
+
     }
 
 //    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {

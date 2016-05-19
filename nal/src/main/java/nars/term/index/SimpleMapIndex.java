@@ -40,13 +40,18 @@ public class SimpleMapIndex extends AbstractMapIndex {
 
     private final Termed theCompoundCreated(@NotNull Compound x) {
 
-        if (x.isTemporal())
-            return x;
+//        if (x.hasTemporal()) {
+//            x = theTemporalCompound(x);
+//            return x;
+//        }
 
         Termed y = data.get(x);
         if (y == null) {
-            y = internCompound(internCompound(x.subterms(), x.op(), x.relation(), x.dt()));
-            data.put(y, y);
+            y = internCompound(x.subterms(), x.op(), x.relation(), x.dt());
+            if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
+                y = internCompound(y);
+                data.put(y, y);
+            }
         }
         return y;
 

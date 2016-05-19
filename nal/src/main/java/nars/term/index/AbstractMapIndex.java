@@ -2,17 +2,17 @@ package nars.term.index;
 
 import nars.Op;
 import nars.concept.ConceptBuilder;
-import nars.term.Compound;
-import nars.term.TermBuilder;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
+
+import static nars.nal.Tense.DTERNAL;
 
 
 public abstract class AbstractMapIndex implements TermIndex {
@@ -85,5 +85,31 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     @Override
     public abstract void forEach(Consumer<? super Termed> c);
+
+
+    public Compound atemporalize(Compound c) {
+        return (Compound)transform(c.dt(DTERNAL), CompoundAtemporalizer);
+    }
+
+
+
+    final CompoundTransform CompoundAtemporalizer = new CompoundTransform<Compound, Term>() {
+
+        @Override
+        public boolean test(Term term) {
+            return true; // term.hasTemporal();
+        }
+
+        @NotNull
+        @Override
+        public Termed apply(Compound parent, @NotNull Term subterm) {
+            if (subterm instanceof Compound) {
+                Compound csub = (Compound) subterm;
+                if (csub.hasTemporal())
+                    return the(atemporalize(csub));
+            }
+            return the(subterm);
+        }
+    };
 
 }

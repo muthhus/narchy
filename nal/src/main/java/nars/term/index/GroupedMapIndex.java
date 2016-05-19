@@ -104,6 +104,9 @@ public class GroupedMapIndex extends AbstractMapIndex {
     @Nullable
     @Override protected Termed theCompound(@NotNull Compound t, boolean create) {
 
+        if (t.hasTemporal())
+            return t;
+
         TermContainer subsBefore = t.subterms();
 
         SubtermNode node = create ?

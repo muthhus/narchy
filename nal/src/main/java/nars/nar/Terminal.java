@@ -39,7 +39,7 @@ public class Terminal extends AbstractNAR {
 
     @Override
     public Concept conceptualize(@NotNull Termed termed, Budgeted activation, float conceptActivation, float linkActivation, MutableFloat overflow) {
-        return concept(termed); //ignore activation
+        return concept(termed, true); //ignore activation
     }
 
 

@@ -192,13 +192,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     @Nullable
     public Task task(@NotNull String taskText) throws NarseseException {
-        return Narsese.the().task(taskText, this);
+        return Narsese.the().task(taskText, this).normalize(this);
     }
 
     @NotNull
     public List<Task> tasks(@NotNull String parse) throws NarseseException {
         List<Task> result = Global.newArrayList(1);
         Narsese.the().tasks(parse, result, this);
+        result.forEach(c->c.normalize(this));
         return result;
     }
 

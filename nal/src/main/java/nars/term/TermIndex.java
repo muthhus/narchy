@@ -436,12 +436,12 @@ public interface TermIndex {
 
 
 
-        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
-        if (t instanceof Compound && ((Compound)t).isTemporal())
-            return t;
+//        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
+//        if (t instanceof Compound && ((Compound)t).hasTemporal())
+//            return t;
 
         //fast access to concept if not temporal:
-        Termed existing = get(t);
+        Termed existing = the(t);
         if (existing != null)
             return existing;
         else
@@ -453,7 +453,7 @@ public interface TermIndex {
 
     @Nullable
     default Term theTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
-        return theTransformed(src, TermContainer.the(src.op(), newSubs));
+        return theTransformed(src, theSubterms(  TermContainer.the(src.op(), newSubs) ) );
     }
 
 
@@ -565,7 +565,8 @@ public interface TermIndex {
             if ((term = normalized(term)) == null)
                 throw new InvalidTerm(prenormalized);
 
-            return term.anonymous();
+            return atemporalize((Compound)term);
+
 //            //ANONYMIZATION
 //            //TODO ? put the unnormalized term for cached future normalizations?
 //            Termed anonymizedTerm = term.anonymous();
@@ -631,5 +632,7 @@ public interface TermIndex {
             return getMessage() + ": " + term;
         }
     }
+
+    Compound atemporalize(Compound c);
 
 }

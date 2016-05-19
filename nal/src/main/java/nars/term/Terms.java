@@ -173,7 +173,8 @@ public class Terms extends TermBuilder implements TermIndex {
 
         if (A.equals(B)) {
             return true;
-        } else if (!A.hasAny(Op.ProductOrImageBits) || !B.hasAny(Op.ProductOrImageBits)) {
+        } else if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
+            //product and one of either image types
             return false; //the remaining comparisons are unnecessary
         }
 
@@ -569,6 +570,11 @@ public class Terms extends TermBuilder implements TermIndex {
     @Override
     public int subtermsCount() {
         return 0;
+    }
+
+    @Override
+    public Compound atemporalize(Compound c) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

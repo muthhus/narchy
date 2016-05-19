@@ -227,14 +227,23 @@ public class PremiseEval extends FindSubst {
 
     /** @param subterm 0 or 1, indicating task or belief */
     public final boolean subTermMatch(int subterm, int bits) {
-        return !Termlike.impossibleStructureMatch(
-                    (subterm == 0 ? termSub1Struct : termSub2Struct), bits);
+        int existingStructure = (subterm == 0 ? termSub1Struct : termSub2Struct);
+        //if the OR produces a different result compared to subterms,
+        // it means there is some component of the other term which is not found
+        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
+        return Termlike.hasAll(existingStructure, bits);
     }
 
     /** both */
     public final boolean subTermsMatch(int bits) {
-        return !Termlike.impossibleStructureMatch(termSub1Struct, bits) &&
-               !Termlike.impossibleStructureMatch(termSub2Struct, bits);
+        //if the OR produces a different result compared to subterms,
+        // it means there is some component of the other term which is not found
+        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
+        //if the OR produces a different result compared to subterms,
+        // it means there is some component of the other term which is not found
+        //return ((possibleSubtermStructure | existingStructure) != existingStructure);
+        return Termlike.hasAll(termSub1Struct, bits) &&
+               Termlike.hasAll(termSub2Struct, bits);
     }
 
 //    /** returns whether the put operation was successful */
