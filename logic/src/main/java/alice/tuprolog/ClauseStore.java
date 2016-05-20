@@ -26,14 +26,14 @@ public class ClauseStore {
     }
 
 
-    /**
-     * Carica una famiglia di clausole
-     * <p>
-     * Reviewed by Paolo Contessi:
-     * OneWayList.transform(List) -> OneWayList.transform2(List)
-     *
-     * @param familyClauses
-     */
+//    /**
+//     * Carica una famiglia di clausole
+//     * <p>
+//     * Reviewed by Paolo Contessi:
+//     * OneWayList.transform(List) -> OneWayList.transform2(List)
+//     *
+//     * @param familyClauses
+//     */
     public static ClauseStore build(Term goal, List<Var> vars, List<ClauseInfo> familyClauses) {
         ClauseStore clauseStore = new ClauseStore(goal, vars);
         clauseStore.clauses = OneWayList.transform2(familyClauses);

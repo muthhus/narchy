@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>opennars</groupId>
+  <artifactId>narchy</artifactId>
+  <version>1.8-SNAPSHOT</version>
+
+  <packaging>pom</packaging>
+
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <verbose>true</verbose>
+          <useIncrementalCompilation>true</useIncrementalCompilation>
+
+          <!--<fork>true</fork>-->
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
+  <modules>
+    <module>util</module>
+    <module>app</module>
+    <module>logic</module>
+    <module>nal</module>
+    <module>lab</module>
+    <module>guifx</module>
+    <module>web</module>
+    <module>perf</module>
+  </modules>
+</project>

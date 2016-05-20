@@ -1,12 +1,12 @@
 package objenome.evolve;
 
 import com.google.common.collect.Lists;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import objenome.goal.DefaultProblemSTGP;
 import objenome.goal.DoubleFitness;
 import objenome.goal.TypedFitnessFunction;
 import objenome.op.Variable;
 import objenome.solver.evolve.*;
+import org.junit.Ignore;
 
 import java.util.List;
 

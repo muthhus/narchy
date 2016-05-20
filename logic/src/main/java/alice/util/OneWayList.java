@@ -25,7 +25,7 @@ public final class OneWayList<E> {
     /**
      * Transforms given list into a OneWayList without any modification
      * to it
-     * 
+     *
      * Method introduced during revision by Paolo Contessi
      *
      * @param list  Input list to be transformed
@@ -35,17 +35,17 @@ public final class OneWayList<E> {
         if (list.isEmpty())
             return null;
 
-        OneWayList<T> result = null;
+        //OneWayList<T> result = null;
         OneWayList<T> p = null;
 
         for(T obj : list){
-            OneWayList<T> l = new OneWayList<T>(obj, null);
-
-            p = ((result == null ? result : p.tail = l));
+            p = new OneWayList<T>(obj, p.tail);
+            //result = l;
+            //p = ((result == null ? result : p.tail = l));
 
         }
 
-        return result;
+        return p;
     }
     
     public E getHead() {

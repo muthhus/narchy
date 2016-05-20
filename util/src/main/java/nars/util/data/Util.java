@@ -20,7 +20,6 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import jdk.internal.misc.Unsafe;
 import nars.util.Texts;
 import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
@@ -59,21 +58,21 @@ public enum Util {
     }
 
 
-    /**
-     * Fetch the Unsafe.  Use With Caution.
-     */
-    public static Unsafe getUnsafe() {
-        // Not on bootclasspath
-        if (Util.class.getClassLoader() == null)
-            return Unsafe.getUnsafe();
-        try {
-            Field fld = Unsafe.class.getDeclaredField("theUnsafe");
-            fld.setAccessible(true);
-            return (Unsafe) fld.get(Util.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not obtain access to Unsafe", e);
-        }
-    }
+//    /**
+//     * Fetch the Unsafe.  Use With Caution.
+//     */
+//    public static Unsafe getUnsafe() {
+//        // Not on bootclasspath
+//        if (Util.class.getClassLoader() == null)
+//            return Unsafe.getUnsafe();
+//        try {
+//            Field fld = Unsafe.class.getDeclaredField("theUnsafe");
+//            fld.setAccessible(true);
+//            return (Unsafe) fld.get(Util.class);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Could not obtain access to Unsafe", e);
+//        }
+//    }
 
     public static String UUIDbase64() {
         long low = UUID.randomUUID().getLeastSignificantBits();
