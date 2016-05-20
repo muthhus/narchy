@@ -61,7 +61,7 @@ public final class DerivedTask extends MutableTask {
         /* else: a more destructive cleanup of the discarded task? */
 
             return false;
-        } else {
+        } //else {
             //TODO check this Question case is right
             Truth tLinkTruth = tLink.get().truth();
             if (tLinkTruth != null) {
@@ -69,7 +69,7 @@ public final class DerivedTask extends MutableTask {
                 tLink.andPriority(oneMinusDifT);
                 tLink.andDurability(oneMinusDifT);
             }
-        }
+
 
         Task belief = t.getParentBelief();
         if (belief != null) {

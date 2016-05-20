@@ -20,7 +20,6 @@ import nars.Global;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

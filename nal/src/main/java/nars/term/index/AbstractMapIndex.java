@@ -94,7 +94,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
 
 
-    final CompoundTransform CompoundAtemporalizer = new CompoundTransform<Compound, Term>() {
+    final CompoundTransform CompoundAtemporalizer = new CompoundTransform<>() {
 
         @Override
         public boolean test(Term term) {

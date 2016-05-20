@@ -18,7 +18,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
     public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
 
     @Nullable
-    public static final AtomicBooleanCondition<PremiseEval> TaskQuestion = new AtomicBooleanCondition<PremiseEval>() {
+    public static final AtomicBooleanCondition<PremiseEval> TaskQuestion = new AtomicBooleanCondition<>() {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval o) {

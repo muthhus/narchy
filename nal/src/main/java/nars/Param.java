@@ -40,8 +40,6 @@ public abstract class Param extends Container implements Level {
     public final MutableFloat perfection = new MutableFloat(0.1f);
 
 
-    //TODO move this to STMTemporalLinkage
-    @Deprecated public final MutableInteger shortTermMemoryHistory = new MutableInteger();
 
     public final MutableFloat termLinkRemembering = new MutableFloat();
 

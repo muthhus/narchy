@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

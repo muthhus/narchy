@@ -24,7 +24,6 @@ import nars.task.flow.TaskPerception;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.index.SimpleMapIndex;
 import nars.term.index.GroupedMapIndex;
 import nars.term.index.SimpleMapIndex2;
 import nars.time.Clock;

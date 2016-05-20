@@ -1,65 +1,46 @@
-package nars.op.mental;
+package nars.op.time;
 
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.Task;
+import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.function.Consumer;
 
 /**
- * Short-term memory Event Induction.
+ * Short-term Memory Belief Event Induction.
  * Creates links between sequences of perceived events
  * Empties task buffer when plugin is (re)started.
  */
-public final class STMTemporalLinkage implements Consumer<Task> {
+public final class STMTemporalLinkage extends STM {
 
     @NotNull public final Deque<Task> stm;
 
-    @NotNull private final NAR nar;
 
-    final boolean beliefs = true;
-    final boolean goals = false;
+    public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
+        super(nar, new MutableInteger(capacity));
 
-    public STMTemporalLinkage(@NotNull NAR nar) {
+        stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
 
-        this.nar = nar;
-
-        stm = Global.THREADS == 1 ? new ArrayDeque(capacity()) : new ConcurrentLinkedDeque<>();
-
-        nar.eventTaskProcess.on(this);
-        nar.eventReset.on(n -> stm.clear());
+        start();
 
     }
 
-    public int capacity() {
-        return nar.shortTermMemoryHistory.intValue();
+    @Override
+    public void clear() {
+        stm.clear();
     }
-
-
-    public boolean temporallyInductable(@NotNull Task newEvent) {
-        if ((!newEvent.isDeleted() && newEvent.isInput() && !newEvent.isEternal())) {
-            switch (newEvent.punc()) {
-                case Symbols.BELIEF: return beliefs;
-                case Symbols.GOAL: return goals;
-            }
-        }
-        return false;
-
-        //if (Tense.containsMentalOperator(newEvent)) return true;
-    }
-
 
     @Override
     public final void accept(@NotNull Task t) {
 
-        if (!temporallyInductable(t)) {
+        if (!temporallyInductable(t) || t.punc() != Symbols.BELIEF) {
             return;
         }
 
@@ -68,7 +49,7 @@ public final class STMTemporalLinkage implements Consumer<Task> {
         if (concept == null)
             return;
 
-        int stmSize = capacity();
+        int stmSize = capacity.intValue();
 
 
 //        if (!currentTask.isTemporalInductable() && !anticipation) { //todo refine, add directbool in task

@@ -1,11 +1,12 @@
-package nars.rl.gng;
+package nars.util.gng;
 
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**
  * Created by Scadgek on 11/3/2014.
  */
-public class Node extends ArrayRealVector implements Named<String> {
+public class Node extends ArrayRealVector  {
 
     private double localError;
     public final int id;
@@ -29,8 +30,8 @@ public class Node extends ArrayRealVector implements Named<String> {
     }
 
     /** create a node from two existing nodes */
-    public Node(int id, Node maxErrorNode, Node maxErrorNeighbour) {
-        this(id, maxErrorNode.getDimension());
+    public void set(Node maxErrorNode, Node maxErrorNeighbour) {
+
         setLocalError(maxErrorNode.getLocalError());
         double[] d= getDataRef();
         for (int i = 0; i < getDimension(); i++) {
@@ -107,10 +108,7 @@ public class Node extends ArrayRealVector implements Named<String> {
     }
     public double getLocalDistance() { return Math.sqrt(localDistanceSq); }
 
-    @Override
-    public String name() {
-        return Integer.toString(id);
-    }
+
 
     public double getDistanceSq(Node b) {
         return getDistanceSq(b.getDataRef());

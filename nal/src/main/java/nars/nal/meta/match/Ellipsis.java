@@ -147,7 +147,7 @@ public abstract class Ellipsis extends AbstractVariable {
                 Term y = x.term(i);
                 if (y instanceof Ellipsis) return true;
                 if (y instanceof Compound) {
-                    if (containsEllipsis((Compound) y))
+                    if (containsEllipsis(y))
                         return true;
                 }
             }

@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
@@ -121,7 +120,7 @@ public class PremiseRule extends GenericCompound {
     @Nullable
     private Temporalize temporalize = Temporalize.Auto;
     @Nullable
-    private static final CompoundTransform truthSwap = new CompoundTransform<Compound,Term>() {
+    private static final CompoundTransform truthSwap = new CompoundTransform<>() {
 
         final Atom belief = $.the("Belief");
         final Atom desire = $.the("Desire");
@@ -130,7 +129,7 @@ public class PremiseRule extends GenericCompound {
         @Override
         public Termed<?> apply(Compound parent, Term subterm) {
 
-            Compound tf = (Compound)subterm;
+            Compound tf = (Compound) subterm;
             Term func = tf.term(0);
             Term mode = tf.term(1);
 
@@ -144,8 +143,8 @@ public class PremiseRule extends GenericCompound {
 
         @Override
         public boolean test(@NotNull Term o) {
-            if (o.op() == INHERIT){
-                Term pred = ((Compound)o).term(1);
+            if (o.op() == INHERIT) {
+                Term pred = ((Compound) o).term(1);
                 return pred.equals(belief) || pred.equals(desire);
             }
             return false;

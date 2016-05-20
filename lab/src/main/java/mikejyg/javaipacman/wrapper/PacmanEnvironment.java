@@ -56,14 +56,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 8, 2, 2, rng,
+				1024, 4, 2, 2, rng,
 				new Default.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		nar.beliefConfidence(0.51f);
-		nar.conceptActivation.setValue(0.1f);
-		nar.cyclesPerFrame.set(16);
+		nar.conceptActivation.setValue(0.2f);
+		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -72,7 +72,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				15000);
+				100);
 
 		printTasks(nar, true);
 		printTasks(nar, false);

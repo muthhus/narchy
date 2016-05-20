@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /** additionally caches subterm vectors */
 public class SimpleMapIndex2 extends SimpleMapIndex {

@@ -1,21 +1,20 @@
-package nars.rl.gng;
+package nars.util.gng;
 
-import nars.util.data.id.Named;
 
 import java.util.Objects;
 
 /**
  * Created by Scadgek on 11/3/2014.
  */
-public class Connection implements Named<String> {
-    public final Node from;
-    public final Node to;
+public class Connection<N extends Node>  {
+    public final N from;
+    public final N to;
     private int age;
 
-    public Connection(Node from, Node to) {
+    public Connection(N from, N to) {
         //sort by id
         if (from.id > to.id) {
-            Node t = to;
+            N t = to;
             to = from;
             from = t;
         }
@@ -49,7 +48,7 @@ public class Connection implements Named<String> {
     }
 
     @Override
-    public String name() {
+    public String toString() {
         return from.id + ":" + to.id;
     }
 }

@@ -48,7 +48,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
     private final float[] b = new float[7];
 
-    public static final class StrongBLink<X> extends BLink<X> {
+    public static class StrongBLink<X> extends BLink<X> {
 
         ///** the referred item */
         public final X id;

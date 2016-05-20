@@ -33,20 +33,15 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         if (y instanceof Compound) {
 
             Compound C = (Compound) y;
-            if (B instanceof Compound) {
-                return commonSubterms((Compound) B, C,
-                        subtermIsCommon //variables are excluded by the
-                        //nonVarSubtermIsCommon
-                );
-            } else {
-                return C.containsTermRecursively(B);
-            }
+            //variables are excluded by the nonVarSubtermIsCommon
+            return B instanceof Compound ?
+                    commonSubterms((Compound) B, C, subtermIsCommon) :
+                    C.containsTermRecursively(B);
 
-        } else if (B instanceof Compound) {
-            return ((Compound)B).containsTermRecursively(y);
         }
 
-        return B.equals(y);
+        return B instanceof Compound ? ((Compound) B).containsTermRecursively(y) : B.equals(y);
+
     }
 
     @NotNull

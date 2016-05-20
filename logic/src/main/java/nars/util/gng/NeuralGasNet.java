@@ -1,5 +1,9 @@
-package nars.rl.gng;
+package nars.util.gng;
 
+import jdk.nashorn.internal.objects.Global;
+import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
+import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.SimpleGraph;
 
 import java.util.ArrayList;
@@ -10,7 +14,7 @@ import java.util.List;
  * from: https://github.com/scadgek/NeuralGas
  * TODO use a graph for incidence structures to avoid some loops
  */
-public class NeuralGasNet extends SimpleGraph<Node,Connection> {
+abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connection<N>> {
     private final int dimension;
 
     private int iteration;
@@ -77,7 +81,9 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
 
     public NeuralGasNet(int dimension, int maxNodes) {
 
-        super(Connection.class);
+        super((sourceVertex, targetVertex) -> {
+            throw new UnsupportedOperationException();
+        });
 
         this.iteration = 0;
         this.dimension = dimension;
@@ -96,7 +102,7 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
 
 
         for (int i = 0; i < maxNodes; i++) {
-            addVertex(new Node(i, dimension).randomizeUniform(-1.0, 1.0));
+            addVertex((N)newNode(dimension, i).randomizeUniform(-1.0, 1.0));
         }
 
 
@@ -109,11 +115,14 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
 //        pw.println("*");
     }
 
-    public Node closest(double... x) {
+    @NotNull
+    abstract public N newNode(int dimension, int i);
+
+    public N closest(double... x) {
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
-        Node closest = null;
-        for (Node node : vertexSet()) {
+        N closest = null;
+        for (N node : vertexSet()) {
             if (node.getDistanceSq(x) < minDist)
                 closest = node;
         }
@@ -127,16 +136,16 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
         }
     }
 
-    public Node learn(double... x) {
+    public N learn(double... x) {
 
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
         double minDist2 = Double.POSITIVE_INFINITY;
         double maxDist = Double.NEGATIVE_INFINITY;
-        Node closest = null;
-        Node nextClosestNode = null;
-        Node furthest = null;
-        for (Node node : vertexSet()) {
+        N closest = null;
+        N nextClosestNode = null;
+        N furthest = null;
+        for (N node : vertexSet()) {
             double dd = node.updateDistanceSq(x);
 
             if (dd > maxDist) {
@@ -149,7 +158,7 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
             }
 
         }
-        for (Node node : vertexSet()) {
+        for (N node : vertexSet()) {
             if (node == closest) continue;
             double dd = node.getLocalDistanceSq(); //TODO cache this localDist
             if (dd < minDist2) {
@@ -185,7 +194,7 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
         }
 
         //remove connections with age > maxAge
-        List<Connection> toRemove = new ArrayList(1);
+        List<Connection<N>> toRemove = new FasterList(1);
         for (Connection c : edgeSet()) {
             if (c.getAge() > getMaxAge()) {
                 toRemove.add(c);
@@ -209,8 +218,8 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
 
             //find node with maximal local error
             double maxError = Double.NEGATIVE_INFINITY;
-            Node maxErrorNode = null;
-            for (Node node : vertexSet()) {
+            N maxErrorNode = null;
+            for (N node : vertexSet()) {
                 if (node.getLocalError() > maxError) {
                     maxErrorNode = node;
                     maxError = node.getLocalError();
@@ -223,11 +232,11 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
 
             //find max error neighbour of the mentioned node
             maxError = Double.NEGATIVE_INFINITY;
-            Node maxErrorNeighbour = null;
+            N maxErrorNeighbour = null;
 
-            for (Connection connection : edgesOf(maxErrorNode)) {
+            for (Connection<N> connection : edgesOf(maxErrorNode)) {
 
-                Node otherNode = connection.to == maxErrorNode ? connection.from : connection.to;
+                N otherNode = connection.to == maxErrorNode ? connection.from : connection.to;
 
                 if (otherNode.getLocalError() > maxError) {
                     maxErrorNeighbour = otherNode;
@@ -247,7 +256,8 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
             //System.out.println("creating new node " + nextID + " in: " + vertexSet());
 
             //create node between errorest nodes
-            Node newNode = new Node(nextID, maxErrorNode, maxErrorNeighbour);
+            N newNode = newNode(dimension, nextID);
+            newNode.set(maxErrorNode, maxErrorNeighbour);
             addVertex(newNode);
 
             if (maxErrorNode.id == newNode.id) {
@@ -290,7 +300,7 @@ public class NeuralGasNet extends SimpleGraph<Node,Connection> {
         return closest;
     }
 
-    private void addEdge(Connection connection) {
+    private void addEdge(Connection<N> connection) {
 
         addEdge(connection.from, connection.to, connection);
     }

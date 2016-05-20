@@ -14,7 +14,7 @@
 //import nars.nal.nal7.TemporalRules;
 //import nars.nal.nal7.Tense;
 //import nars.nar.experimental.Equalized;
-//import nars.rl.gng.NeuralGasNet;
+//import nars.rl.NeuralGasNet;
 //import nars.task.Task;
 //import nars.term.Atom;
 //import nars.term.Compound;

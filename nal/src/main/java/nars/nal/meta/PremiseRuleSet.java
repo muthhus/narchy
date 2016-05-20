@@ -275,7 +275,7 @@ public class PremiseRuleSet  {
             r.backwardPermutation((q, reason) -> {
 
                 //System.err.println("  q: " + q + " " + reason);
-                PremiseRule b = add(ur, q, src + ":" + reason, index);
+                PremiseRule b = add(ur, q, src + ':' + reason, index);
 
                 if (forwardPermutes(b)) {
                     permuteForward(index, ur, src, b, r.allowBackward);

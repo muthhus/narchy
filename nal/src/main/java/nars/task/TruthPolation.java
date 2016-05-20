@@ -2,7 +2,6 @@ package nars.task;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.Global;
 import nars.truth.DefaultTruth;

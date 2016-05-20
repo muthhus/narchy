@@ -46,7 +46,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      */
     public final int minNAL;
 
-    public static final Set<Atom> reservedMetaInfoCategories = new HashSet<Atom>() {{
+    public static final Set<Atom> reservedMetaInfoCategories = new HashSet<>() {{
         add(the("Belief"));
         add(the("Stamp"));
         add(the("Desire"));
@@ -55,7 +55,8 @@ public class PostCondition implements Serializable, Level //since there can be m
         add(the("Info"));
         add(the("Event"));
         add(the("Punctuation"));
-        /*@Deprecated*/ add(the("SequenceIntervals"));
+        /*@Deprecated*/
+        add(the("SequenceIntervals"));
         add(the("Eternalize"));
     }};
 
