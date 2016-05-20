@@ -24,7 +24,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 
 
     public AtomConcept(@NotNull E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
-        super(atom, taskLinks, termLinks);
+        super(atom, termLinks, taskLinks);
     }
 
     /** the atom in this case is the concept itself, exposing this and not the internal 'term' field */

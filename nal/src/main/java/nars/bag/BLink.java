@@ -6,6 +6,8 @@ import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.ref.WeakReference;
+
 import static nars.util.data.Util.clamp;
 
 /**
@@ -15,10 +17,8 @@ import static nars.util.data.Util.clamp;
  * Acts as a "budget vector" containing an accumulating delta
  * that can be commit()'d on the next udpate
  */
-public final class BLink<X> extends Budget implements Link<X> {
+abstract public class BLink<X> extends Budget implements Link<X> {
 
-    /** the referred item */
-    public final X id;
 
 
     /** changed status bit */
@@ -47,14 +47,57 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     private final float[] b = new float[7];
 
+    public static final class StrongBLink<X> extends BLink<X> {
 
+        ///** the referred item */
+        public final X id;
 
-    private BLink(X id) {
-        this.id = id;
+        public StrongBLink(X id, @NotNull Budgeted b, float scal) {
+            super(id, b, scal);
+            this.id = id;
+        }
+
+        @NotNull @Override
+        public X get() {
+            return id;
+        }
+
+    }
+    public static final class WeakBLink<X> extends BLink<X> {
+
+        ///** the referred item */
+        public final WeakReference<X> id;
+
+        public WeakBLink(X id, @NotNull Budgeted b, float scal) {
+            super(id, b, scal);
+            this.id = new WeakReference<X>(id);
+        }
+
+        @NotNull @Override
+        public X get() {
+            return id.get();
+        }
+
+        @Override
+        public boolean isDeleted() {
+            if (super.isDeleted()) {
+                id.clear();
+                return true;
+            }
+
+            if (id.get()==null) {
+                super.delete();
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
+
     public BLink(X id, float p, float d, float q) {
-        this(id);
+
         init(p, d, q);
     }
 
@@ -63,14 +106,13 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     public BLink(X id, @NotNull Budgeted b, float scale) {
-        this(id);
+
         init(b, scale);
     }
 
-    @NotNull @Override
-    public X get() {
-        return id;
-    }
+
+
+    abstract public X get();
 
     private void init(@NotNull Budgeted c, float scale) {
         init(c.pri() * scale, c.dur(), c.qua());
@@ -109,7 +151,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final boolean isDeleted() {
+    public boolean isDeleted() {
         float p = pri(); //b[PRI];
         return (p!=p); //fast NaN test
     }
@@ -178,13 +220,13 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override public int hashCode() {
-        return id.hashCode();
+        return get().hashCode();
     }
 
     @NotNull
     @Override
     public String toString() {
-        return id + "=" + getBudgetString();
+        return get() + "=" + getBudgetString();
     }
 
 

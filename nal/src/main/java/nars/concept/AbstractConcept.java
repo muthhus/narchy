@@ -30,7 +30,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Nullable
     protected Map meta;
 
-    protected AbstractConcept(@NotNull T term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+    protected AbstractConcept(@NotNull T term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         this.term = term;
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;

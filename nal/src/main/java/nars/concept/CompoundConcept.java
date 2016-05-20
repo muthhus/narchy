@@ -68,7 +68,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * @param taskLinks
      */
     public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
-        super(term, taskLinks, termLinks);
+        super(term, termLinks, taskLinks);
 
         beliefs = newBeliefTable();
         goals = newGoalTable();

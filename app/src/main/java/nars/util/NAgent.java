@@ -370,9 +370,9 @@ public class NAgent implements Agent {
 
     private String inputConceptName(int i) {
         //return inputConceptName(i, -1);
-        //return "I:i" + i;
+        return "I:i" + i;
         //return "I:{i" + i + "}";
-        return "{i" + i + "}";
+        //return "{i" + i + "}";
     }
 
     private String inputConceptName(int i, int component) {

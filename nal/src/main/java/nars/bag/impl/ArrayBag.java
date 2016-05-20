@@ -264,7 +264,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             return (BLink)b;
         if (i instanceof BLink)
             return (BLink)i;
-        return new BLink<>(i, b, scale);
+        return newLink(i, b, scale);
+    }
+
+    protected BLink<V> newLink(V i, Budgeted b, float scale) {
+        return new BLink.StrongBLink(i, b, scale);
     }
 
     @Nullable
