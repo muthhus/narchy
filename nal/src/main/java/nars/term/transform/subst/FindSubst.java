@@ -250,7 +250,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         Op xOp = x.op();
         Op yOp = y.op();
 
-        if ((x instanceof Compound) && (xOp == yOp)) {
+        boolean opEqual = xOp == yOp;
+        if ((x instanceof Compound) && opEqual) {
             //Compound cx = (Compound)x;
             //Compound cy = (Compound)y;
             //if (hasAnyVar(cx) || hasAnyVar(cy))
@@ -260,18 +261,14 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
             Op t = type;
 
             if (xOp == t) {
-                if (yOp == t) {
-                    //both are variables of the target type, but different; these need to be common variable
-                    return matchVarCommon(x, y);
-                }
-
-                return matchVarX(x, y);
+                //if both are variables of the target type, but different; they need to be common variable
+                return opEqual ? matchVarCommon(x, y, xOp, true) : matchVarX(x, y);
             } else if (yOp == t) {
                 return matchVarY(x, y);
             }
 
             if (xOp.isVar() && yOp.isVar()) {
-                return matchVarCommon( x, y);
+                return matchVarCommon( x, y, xOp, opEqual);
             }
         }
 
@@ -282,9 +279,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
 //    }
 
-    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
-        Op xOp = xVar.op();
-        return (y.op() == xOp) ?
+    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y, Op xOp, boolean equalOp) {
+        return (equalOp) ?
                 putCommon((Variable)xVar, (Variable)y) :
                 (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
                     &&
@@ -303,6 +299,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return (t != null) ?
                 match(t, y) :
                 matchVarCommon(x, y);
+    }
+
+    private final boolean matchVarCommon(Term x, Term y) {
+        return matchVarCommon(x, y, x.op(), x.op()==y.op());
     }
 
     private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
@@ -396,65 +396,74 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
 
-
         if (e instanceof EllipsisTransform) {
-            //this involves a special "image ellipsis transform"
-
-            EllipsisTransform et = (EllipsisTransform) e;
-            if (et.from.equals(Op.Imdex)) {
-                Term n = resolve(et.to);
-                if (n != Y) {
-
-                    //the indicated term should be inserted
-                    //at the index location of the image
-                    //being processed. (this is the opposite
-                    //of the other condition of this if { })
-                    if (matchEllipsedLinear(X, e, Y)) {
-                        return replaceXY(e, ImageMatch.put(term(e), n, Y));
-                    }
-                }
-            } else {
-                Term n = resolve(et.from);
-                if (n!=null && n.op() != type) {
-                    int imageIndex = Y.indexOf(n);
-                    if (imageIndex != -1)
-                        return (matchEllipsedLinear(X, e, Y)) &&
-                                replaceXY(e, ImageMatch.take(term(e), imageIndex));
-                }
-            }
-            return false;
+            return matchCompoundWithEllipsisTransform(X, Y, (EllipsisTransform) e);
         }
 
         /** if they are images, they must have same relationIndex */
-        if (X.op().isImage()) { //TODO this is precomputable
-
-            //if the ellipsis is normal, then interpret the relationIndex as it is
-            if (countNumNonEllipsis(X) > 0) {
-
-                int xEllipseIndex = X.indexOf(e);
-                assert(xEllipseIndex!=-1);
-
-                int xRelationIndex = X.relation();
-                int yRelationIndex = Y.relation();
-
-
-                if (xEllipseIndex >= xRelationIndex) {
-                    //compare relation from beginning as in non-ellipsis case
-                    if (xRelationIndex != yRelationIndex)
-                        return false;
-                } else {
-                    //compare relation from end
-                    if ((X.size() - xRelationIndex) != (Y.size() - yRelationIndex))
-                        return false;
-                }
-            } else {
-                //ignore the location of imdex in the pattern and match everything
-
-            }
-
-        }
+        if (X.op().isImage() && !matchEllipsisWithImage(X, Y, e))
+                return false;
 
         return matchEllipsedLinear(X, e, Y);
+    }
+
+    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
+        //if the ellipsis is normal, then interpret the relationIndex as it is
+        if (countNumNonEllipsis(X) > 0) {
+
+            int xEllipseIndex = X.indexOf(e);
+            assert(xEllipseIndex!=-1);
+
+            int xRelationIndex = X.relation();
+            int yRelationIndex = Y.relation();
+
+
+            if (xEllipseIndex >= xRelationIndex) {
+                //compare relation from beginning as in non-ellipsis case
+                if (xRelationIndex != yRelationIndex)
+                    return false;
+            } else {
+                //compare relation from end
+                if ((X.size() - xRelationIndex) != (Y.size() - yRelationIndex))
+                    return false;
+            }
+        } else {
+            //ignore the location of imdex in the pattern and match everything
+
+        }
+        return true;
+    }
+
+    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull Compound Y, EllipsisTransform et) {
+        if (et.from.equals(Op.Imdex)) {
+            Term n = resolve(et.to);
+            if (!n.equals(Y)) {
+
+                //the indicated term should be inserted
+                //at the index location of the image
+                //being processed. (this is the opposite
+                //of the other condition of this if { })
+                if (matchEllipsedLinear(X, et, Y)) {
+                    return replaceXY(et, ImageMatch.put(term(et), n, Y));
+                }
+            }
+        } else {
+            Term n = resolve(et.from);
+//                if (n == null) {
+//                    //select at random TODO make termutator
+//                    int imageIndex = random.nextInt(Y.size());
+//                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
+//                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
+//                }
+
+            if (n!=null && n.op() != type) {
+                int imageIndex = Y.indexOf(n);
+                if (imageIndex != -1)
+                    return (matchEllipsedLinear(X, et, Y)) &&
+                            replaceXY(et, ImageMatch.take(term(et), imageIndex));
+            }
+        }
+        return false;
     }
 
     //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {

@@ -63,20 +63,31 @@ public class NAL8Test extends AbstractNALTest {
 
 
 
-    @Test public void subsent_1_even_simpler_simplerBeliefEternal()  {
+    @Test public void subsent_1_even_simpler_simplerBeliefTemporal()  {
         test()
                 .log()
-                .input("(open(t1) &&+5 [opened]:t1).")
-                .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f) //only eternal
-                .mustNotOutput(cycles, "open(t1)", '.',  0) //no temporal
+                .input("(open(t1) &&+5 [opened]:t1). :|:")
+                .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles, "[opened]:t1", 1.0f, 0.81f, 5)
+                .mustNotOutput(cycles, "open(t1)", '.', ETERNAL)
+                .mustNotOutput(cycles, "[opened]:t1", '.', ETERNAL)
         ;
     }
     @Test public void subsent_1_even_simpler_simplerGoalEternal()  {
         test()
                 .log()
-                .input("(open(t1) &&+5 [opened]:t1)!")
-                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f) //only eternal
-                .mustNotOutput(cycles, "open(t1)", '!',  0) //no temporal
+                .input("(open(t1) && [opened]:t1)!")
+                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, ETERNAL)
+                .mustNotOutput(cycles, "open(t1)", '!', 0)
+        ;
+
+    }
+    @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
+        test()
+                .log()
+                .input("(open(t1) &&+5 [opened]:t1)! :|:")
+                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
+                .mustNotOutput(cycles, "open(t1)", '!',  ETERNAL) //no eternal
         ;
     }
 
@@ -159,9 +170,9 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void goal_deduction()  {
         TestNAR tester = test();
-        tester.input("x:y!");
+        tester.input("x:y! :|:");
         tester.input("(goto(z) ==>+5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f);
+        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, -5);
     }
 
     @Test
@@ -169,8 +180,8 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test();
 
         tester.input("x:y!");
-        tester.inputAt(10, "(goto(z) ==>+5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f);
+        tester.inputAt(10, "(goto(z) ==>+5 x:y). :|:");
+        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, 10);
     }
 
     @Test public void goal_deduction_tensed_conseq_noVar()  {
@@ -192,13 +203,26 @@ public class NAL8Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "[opened]:{t001}", 1.0f, 0.81f, 15);
 
     }
+
     @Test
     public void condition_goal_deduction2()  {
         test()
             //.log()
-            .input("a:b!")
+            .input("a:b! :|:")
             .inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).")
-            .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f);
+            .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "( c:d &&+5 e:f)", '!', ETERNAL)
+        ;
+    }
+    @Test
+    public void condition_goal_deductionEternal()  {
+        test()
+                //.log()
+                .input("a:b!")
+                .inputAt(10, "(( c:d &&+5 e:f ) ==> a:b).")
+                .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, ETERNAL)
+                .mustNotOutput(cycles, "( c:d &&+5 e:f)", '!', 0)
+        ;
     }
 
     @Test
@@ -237,11 +261,18 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
+    @Test public void testExecutionResultConstant() {
+        test()
+            .log()
+            .input("<z --> (/,^exe,x,_)>! :|:")
+            .mustDesire(64, "exe(x, z)", 1.0f, 0.9f, 0);
+    }
+
     @Test public void testExecutionResult()  {
         test()
-            //.log()
-            .input("<#y --> (/,^exe,x,_)>! :|:")
-            .mustDesire(16, "exe(x, #1)", 1.0f, 0.9f, 0);
+            .log()
+            .input("<#1 --> (/,^exe,x,_)>! :|:")
+            .mustDesire(64, "exe(x, #1)", 1.0f, 0.9f, 0);
 
         //if (!(tester.nar instanceof SingleStepNAR)) {
         //tester.nar.log();
@@ -299,10 +330,10 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deduction_3simplerReverse()  {
         test()
 //                .log()
-                .inputAt(1, "at:t003!")
+                .inputAt(1, "at:t003! :|:")
                 .inputAt(1, "(at:$1 ==>+5 goto:$1).")
 
-                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f);
+                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f, 6);
 
     }
     public void condition_goal_deduction_3simpler()  {
@@ -340,10 +371,18 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subgoal_2()  {
         test()
-            .log()
-            .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))!")
-            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f);
-
+            //.log()
+            .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))! :|:")
+            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0);
+    }
+    @Test
+    public void subbelief_2()  {
+        test()
+                //.log()
+                .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))). :|:")
+                .mustBelieve(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles*2, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
+        ;
     }
 
 

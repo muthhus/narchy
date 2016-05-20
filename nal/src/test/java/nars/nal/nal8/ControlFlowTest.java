@@ -43,7 +43,7 @@ public class ControlFlowTest {
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
     @Test public void testSequence4()   { testSequence(n, 4, 30);    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
-    @Test public void testSequence10()  { testSequence(n, 10, 50);     }
+    //@Test public void testSequence10()  { testSequence(n, 10, 50);     }
 
 
     abstract public static class Sequence extends ConceptGroup {
@@ -130,7 +130,7 @@ public class ControlFlowTest {
 
     @Test public void testBranchThen()  {
         Global.DEBUG = true;
-        testBranch(n, 50, 1f);
+        testBranch(n, 25, 1f);
     }
 
     @Test public void testBranchElse()  {
@@ -183,24 +183,25 @@ public class ControlFlowTest {
             newExeState(n, s(PRE, i), exeTracker);
         }
         for (int i = 0; i < beforeBranchLength - 1; i++) {
-            n.believe($.conj(delay, s(PRE, i), s(PRE, i + 1)));
+            n.goal($.conj(delay, s(PRE, i), s(PRE, i + 1)));
         }
 
-        Term condition = b(0); //newExeState(n, b(0), exeTracker).term();
+        Term condition = b(0);
+                        //newExeState(n, b(0), exeTracker, 0.01f /* low thresh = pass thru */).term();
 
-        $.conj(delay, s(PRE, beforeBranchLength-1), condition);
+        //n.goal($.conj(delay, s(PRE, beforeBranchLength-1), condition));
 
         for (int i = 0; i < afterBranchLength; i++) {
             newExeState(n, s(THEN, i), exeTracker);
             newExeState(n, s(ELSE, i), exeTracker);
         }
         for (int i = 0; i < afterBranchLength - 1; i++) {
-            n.believe($.conj(delay, s(THEN, i), s(THEN, i + 1)));
-            n.believe($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
+            n.goal($.conj(delay, s(THEN, i), s(THEN, i + 1)));
+            n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
         }
 
-        n.believe($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
-        n.believe($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
+        n.goal($.conj( delay, $.conj(  condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
+        n.goal($.conj( delay, $.conj(  $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
 
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
@@ -247,7 +248,7 @@ public class ControlFlowTest {
         x.onCycle(c -> {
             ts.update(c.time());
         });
-        x.cyclesPerFrame.set(1);
+        x.cyclesPerFrame.set(4);
         return x;
     };
 
@@ -297,10 +298,13 @@ public class ControlFlowTest {
     }
 
 
-
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
 
-        float exeThresh = 0.3f;
+        return newExeState(n, term, e, 0.25f);
+    }
+
+    public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e, float exeThresh) {
+
 
         CompoundConcept c = new MotorConcept(term, n, (b, d) -> {
             if (d > 0.5f && (d > b + exeThresh)) {

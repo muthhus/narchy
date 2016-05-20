@@ -131,7 +131,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
         BLink<V>[] l = items.array();
         for (int i = begin; i < end; i++) {
-            target.accept( l[i] );
+            BLink<V> b = l[i];
+            if (!b.isDeleted())
+                target.accept(b);
         }
 
         return this;

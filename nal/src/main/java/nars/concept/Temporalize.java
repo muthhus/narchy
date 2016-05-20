@@ -263,6 +263,14 @@ public interface Temporalize {
                     shift = -dtDecomposed; //shift negative
                 } else if (d1.equals(derived) && d0.equals(otherTerm)) {
                     shift = dtDecomposed; //shift positive
+                } else {
+                    if (otherTerm.equals(decomposedTerm)) {
+                        if (d0.equals(derived)) {
+                            shift = 0; //beginning, assume its relative to the occurrenc
+                        } else {
+                            shift = dtDecomposed;
+                        }
+                    }
                 }
 
                 if (shift == ETERNAL) {

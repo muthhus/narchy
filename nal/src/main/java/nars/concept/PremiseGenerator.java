@@ -128,24 +128,24 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
         Collection<BLink<Task>> tasksBuffer;
         tasksBuffer = this.tasks;
         c.tasklinks().sample(tasklinks, tasksBuffer::add);
-        assert (!tasksBuffer.isEmpty());
 
+        //assert (!tasksBuffer.isEmpty());
+        if (tasksBuffer.isEmpty() || termsBuffer.isEmpty()) return;
+
+
+        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
 
         //convert to array for fast for-within-for iterations
         BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
-        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
-
         for (BLink<Task> taskLink : tasksArray) {
             if (taskLink == null) break; //null-terminated array, ends
 
-
             premiseTask(termsArray, taskLink);
-
         }
 
-        termsBuffer.clear();
         tasksBuffer.clear();
+        termsBuffer.clear();
 
     }
 

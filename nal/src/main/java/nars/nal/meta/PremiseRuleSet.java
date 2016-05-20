@@ -314,7 +314,7 @@ public class PremiseRuleSet  {
                 (x.contains("time(")) ||
                 (x.contains("Punctuation"))  ||
                 //(x.contains("Structural")) ||
-                //(x.contains("Identity")) ||
+                (x.contains("Identity")) ||
                 //(x.contains("substitute")) || //TESTING THIS
                 (x.contains("Negation"))
 

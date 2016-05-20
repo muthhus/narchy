@@ -752,10 +752,10 @@ public class UnificationTest {
         test(Op.VAR_PATTERN,
                 "<A --> (/, _, %X)>",
                 "<A --> (/, _, B)>", true);
+
         test(Op.VAR_PATTERN,
                 "<A --> (/, %X, _)>",
                 "<A --> (/, B, _)>", true);
-
 
         test(Op.VAR_PATTERN,
                 "<A --> (/, %X, _)>",
@@ -773,7 +773,15 @@ public class UnificationTest {
                 "(&&,<F --> A>,<D --> (/,C,E, _)>)", true);
 
     }
-
+    @Test
+    public void depvarImage() {
+        test(Op.VAR_PATTERN,
+                "<A --> (/, _, %X)>",
+                "<A --> (/, _, #B)>", true);
+        test(Op.VAR_PATTERN,
+                "<%A --> (/, _, B)>",
+                "<#A --> (/, _, B)>", true);
+    }
     @Test
     public void testImage2ShouldNotMatch() {
         test(Op.VAR_PATTERN,

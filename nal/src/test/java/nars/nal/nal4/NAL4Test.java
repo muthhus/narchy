@@ -24,14 +24,21 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void structural_transformation()  {
+    public void structural_transformation1()  {
         TestNAR t = test();
-        t.nar.log();
         t.believe("<(acid,base) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,base)>", 1.0f, 0.9f); //en("Acid can react with base.");
         t.mustBelieve(CYCLES, "<base --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
-
     }
+    @Test
+    public void structural_transformation1_DepVar()  {
+        TestNAR t = test();
+        t.log();
+        t.believe("<(acid,#1) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
+        t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
+        t.mustBelieve(CYCLES, "<#1 --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
+    }
+
 
     @Test
      public void structural_transformation2()  {
@@ -92,7 +99,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation5_extended2a()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<(\\,neutralization,substance,_,base,reaction) --> acid>",1.0f,0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
@@ -204,7 +211,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
         test()
-            .log()
+            //.log()
             .believe("(x-->(/,y,_,z))")
             .ask("((x,z)-->?a)")
             .mustBelieve(164, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)

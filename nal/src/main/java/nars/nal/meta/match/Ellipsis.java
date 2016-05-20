@@ -137,20 +137,23 @@ public abstract class Ellipsis extends AbstractVariable {
     }
 
 
-//    /** recursively */
-//    public static boolean containsEllipsis(Compound x) {
-//        int xs = x.size();
-//
-//        for (int i = 0; i < xs; i++) {
-//            Term y = x.term(i);
-//            if (y instanceof Ellipsis) return true;
-//            if (y instanceof Compound) {
-//                if (containsEllipsis((Compound)y))
-//                    return true;
-//            }
-//        }
-//        return false;
-//    }
+    /** recursively */
+    public static boolean containsEllipsis(Term _x) {
+        if (_x instanceof Compound) {
+            Compound x = (Compound)_x;
+            int xs = x.size();
+
+            for (int i = 0; i < xs; i++) {
+                Term y = x.term(i);
+                if (y instanceof Ellipsis) return true;
+                if (y instanceof Compound) {
+                    if (containsEllipsis((Compound) y))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
 
 //    public static int numUnmatchedEllipsis(Compound x, FindSubst ff) {
 //

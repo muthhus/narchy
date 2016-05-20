@@ -15,6 +15,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -181,7 +182,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             //match both
             //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
 
-            if (task.volume() <= belief.volume()) {
+            if (taskFirst(task, belief)) {
                 //task first
                 code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
                 code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
@@ -204,6 +205,21 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
 
+    }
+
+    private static boolean taskFirst(@Nullable Term task, @Nullable Term belief) {
+
+        //order by ellipsis content
+        //
+//                if (Ellipsis.containsEllipsis(task.term())) {
+//                    return false;
+//                }
+//                if (Ellipsis.containsEllipsis(belief.term())) {
+//                    return true;
+//                }
+
+        return task.volume() <= belief.volume();
+        //return task.varPattern() <= belief.varPattern();
     }
 
 

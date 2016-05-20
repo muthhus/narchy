@@ -886,19 +886,13 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     default boolean cyclic() {
         Task parent = getParentTask();
-        if (parent == null) return false;
-
+        return parent != null && Stamp.overlapping(evidence(), parent.evidence());
         //return Arrays.equals(evidence(), parent.evidence());
-
-        if (Stamp.overlapping(evidence(), parent.evidence()))
-            return true;
-
 
 //        Task belief = getParentBelief();
 //        if (belief!=null && Stamp.overlapping(evidence(),belief.evidence()))
 //            return true;
 
-        return false;
     }
 
     default void delete(@Nullable Object removalReason) {
