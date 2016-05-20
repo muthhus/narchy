@@ -710,7 +710,7 @@ public class Narsese extends BaseParser<Object> {
 
 
     Rule QuotedLiteral() {
-        return sequence(dquote(), AnyString(), push('\"' + match() + '\"'), dquote());
+        return sequence(dquote(), AnyString(), push($.quote(match())), dquote());
     }
 
     Rule QuotedMultilineLiteral() {

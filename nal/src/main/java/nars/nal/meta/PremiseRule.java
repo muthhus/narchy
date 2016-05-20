@@ -723,7 +723,7 @@ public class PremiseRule extends GenericCompound {
                             preNext = TaskPunctuation.TaskGoal;
                             break;
                         default:
-                            throw new RuntimeException("Unknown task punctuation type: " + predicate.term(0));
+                            throw new RuntimeException("Unknown task punctuation type: " + arg1.toString());
                     }
                     break;
 

@@ -382,9 +382,13 @@ public class NarseseTest {
     }
 
     @Test
-    public void testEscape() throws Narsese.NarseseException {
-        taskParses("<a --> \"a\">.");
-        assertTrue(task("<a --> \"a\">.").toString().contains("(a-->\"a\")."));
+    public void testQuoteEscape() throws Narsese.NarseseException {
+        assertEquals("\"ab c\"", term("\"ab c\"").toString());
+
+        for (String x : new String[] { "a", "a b" }) {
+            taskParses("<a --> \"" + x + "\">.");
+            assertTrue(task("<a --> \"" + x + "\">.").toString().contains("(a-->\"" + x + "\")."));
+        }
     }
 
     @Test
