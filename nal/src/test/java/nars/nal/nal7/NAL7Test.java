@@ -186,9 +186,7 @@ public class NAL7Test extends AbstractNALTest {
             .inputAt(1, "(S:s &&+1 (Y:y &&+1 Z:z)). :|:")
             .mustBelieve(time, "S:s.", 1.00f, 0.81f, 1)
             .mustBelieve(time, "(Y:y &&+1 Z:z).", 1.00f, 0.43f, 2);
-            /*.mustBelieve(time, "(Y:y &&+1 Z:z).", 1.00f, 0.81f, 2)
-            .mustBelieve(time, "Y:y.", 1.00f, 0.39f, 2)
-            .mustBelieve(time, "Z:z.", 1.00f, 0.39f, 3);*/
+
     }
 
 
@@ -544,6 +542,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test public void testImplicationDecompositionIsntEternalSwap() {
         //same as the other impl decomp test, except the predicate is matched
         test()
+                .log()
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", '.', ETERNAL)

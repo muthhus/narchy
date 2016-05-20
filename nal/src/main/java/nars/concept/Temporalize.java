@@ -251,8 +251,10 @@ public interface Temporalize {
             if (decomposedTerm.size() != 2)
                 throw new UnsupportedOperationException(); //this may be valid for (&|,.. ) with arity > 2
 
-            if (occDecomposed == ETERNAL && occOther != ETERNAL) {
-                long shift = ETERNAL; //TODO
+            /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
+            //if both offer an occurrence time, by default, use occOther
+            if (occOther != ETERNAL) {
+                long shift = ETERNAL;
 
                 Term d0 = p.resolve(decomposedTerm.term(0));
                 Term d1 = p.resolve(decomposedTerm.term(1));
@@ -270,17 +272,16 @@ public interface Temporalize {
 
                 occ = occOther + shift;
             } else /*if (occDecomposed != ETERNAL && occOther == ETERNAL)*/ {
-                /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
-                //if both offer an occurrence time, by default, use occDecomposed
 
-                long shift = ETERNAL; //TODO
+
+                long shift = ETERNAL;
 
                 Term d0 = p.resolve(decomposedTerm.term(0));
                 Term d1 = p.resolve(decomposedTerm.term(1));
 
-                if (d0.equals(derived) && d1.equals(otherTerm)) {
+                if (d0.equals(derived)) {
                     shift = 0; //beginning
-                } else if (d1.equals(derived) && d0.equals(otherTerm)) {
+                } else if (d1.equals(derived)) {
                     shift = dtDecomposed; //offset
                 }
 
