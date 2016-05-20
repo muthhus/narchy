@@ -24,7 +24,7 @@ public class TermTemplateTest {
         n.step();
         Concept c = t.concept(n);
         List<TermTemplate> templates = ((CompoundConcept)c).termLinkTemplates;
-        assertEquals(7, templates.size());
+        assertEquals(8, templates.size());
 
         String s = Joiner.on('\n').join(templates);
         System.out.println(s);
@@ -32,7 +32,7 @@ public class TermTemplateTest {
         DoubleSummaryStatistics ss = templates.stream().mapToDouble(l -> l.strength).summaryStatistics();
         System.out.println(ss);
         assertEquals(1f, ss.getSum(), 0.01f);
-        assertTrue(ss.getMax() - ss.getAverage() > 0.03); //some variation due to repeat subterms
+        assertTrue(ss.getMax() - ss.getAverage() > 0.02); //some variation due to repeat subterms
 
     }
 
