@@ -65,12 +65,12 @@
               <goal>report</goal>
             </goals>
           </execution>
-          <execution>
-            <id>default-check</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <configuration>
+          <!--<execution>-->
+            <!--<id>default-check</id>-->
+            <!--<goals>-->
+              <!--<goal>check</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
               <!--<rules>-->
               <!--&lt;!&ndash;  implementation is needed only for Maven 2  &ndash;&gt;-->
               <!--<rule implementation="org.jacoco.maven.RuleConfiguration">-->
@@ -85,8 +85,8 @@
               <!--</limits>-->
               <!--</rule>-->
               <!--</rules>-->
-            </configuration>
-          </execution>
+            <!--</configuration>-->
+          <!--</execution>-->
         </executions>
       </plugin>
     </plugins>

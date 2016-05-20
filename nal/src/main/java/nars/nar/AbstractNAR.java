@@ -46,8 +46,8 @@ public abstract class AbstractNAR extends NAR {
         /*this.conceptBeliefsMax.set(12);
         this.conceptGoalsMax.set(9);
         this.conceptQuestionsMax.set(3);*/
-        conceptWarm = new DefaultConceptPolicy(10, 10, 3, 24, 8);
-        conceptCold = new DefaultConceptPolicy(8, 8, 1, 12, 6);
+        conceptWarm = new DefaultConceptPolicy(10, 10, 3, 16, 8);
+        conceptCold = new DefaultConceptPolicy(8, 8, 1, 8, 4);
 
         conceptRemembering.setValue(4);
         termLinkRemembering.setValue(16);

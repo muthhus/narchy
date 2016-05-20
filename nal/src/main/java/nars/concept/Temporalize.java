@@ -48,7 +48,7 @@ public interface Temporalize {
      * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
      * @return
      */
-    @NotNull
+    @Nullable
     Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
     /**
@@ -229,104 +229,159 @@ public interface Temporalize {
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
         ConceptProcess prem = p.premise;
 
-        Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.beliefTerm();
         Task premBelief = prem.belief();
-        long dOcc = decomposeTask ? prem.task().occurrence() : (premBelief !=null ? premBelief.occurrence() : ETERNAL);
 
-        //if ((tOcc == ETERNAL) && (prem.belief()!=null))
-        //    tOcc = prem.belief().occurrence(); //use occurrence from belief
+        Compound decomposedTerm = (Compound) (decomposeTask ? prem.task() : prem.beliefTerm()).term();
+        int dtDecomposed = decomposedTerm.dt();
+        long occDecomposed = decomposeTask ? prem.task().occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
-
-        //assert (decomposed != null);
-        //decomposed = prem.beliefTerm();
-        //tOcc = ETERNAL;
-        //} else {
-        //tOcc = ((Task)decomposed).occurrence();
-        //}
-
-        Compound decTerm = decomposed.term();
-        Compound dtt = decTerm;
-        int ddt = dtt.dt();
-
-        Task other = decomposeTask ? premBelief : prem.task();
+        //the non-decomposed counterpart of the premise
+        Task otherTask = decomposeTask ? premBelief : prem.task();
         Term otherTerm = decomposeTask ? prem.beliefTerm().term() : prem.task().term();
-
-        long oOcc = ETERNAL;
-        if (other != null && !other.isEternal()) {
-            oOcc = other.occurrence();
-        }
+        long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : ETERNAL;
 
 
-        if ((dOcc != ETERNAL) || (oOcc != ETERNAL)) {
+        if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
+            //no temporal basis that can apply. only derive an eternal result if there is no actual temporal relation in the decomposition
+            return dtDecomposed == DTERNAL ? derived : null;
+        } else {
 
-            int shift = 0;
+            long occ;
 
-            int matchedDerived = -1, matchedOther = -1;
+            if (decomposedTerm.size() != 2)
+                throw new UnsupportedOperationException(); //this may be valid for (&|,.. ) with arity > 2
 
-            if (ddt != DTERNAL) {
+            if (occDecomposed == ETERNAL && occOther != ETERNAL) {
+                long shift = ETERNAL; //TODO
 
+                Term d0 = p.resolve(decomposedTerm.term(0));
+                Term d1 = p.resolve(decomposedTerm.term(1));
 
-                //shift to occurrence time of the subterm within the decomposed term's task
-
-
-                for (int i = 0; i < decTerm.size(); i++) {
-                    Term dct = decTerm.term(i);
-                    Term rdt = p.resolve(dct);
-                    if (rdt==null)
-                        continue;
-
-                    if (rdt.equals(derived)) {
-                        int st = decTerm.subtermTime(dct);
-                        if (st != DTERNAL) {
-                            shift += st;
-                            matchedDerived = i;
-                        }
-                    }
-
-                    if (rdt.equals(otherTerm)) {
-                        int st = decTerm.subtermTime(dct);
-                        if (st != DTERNAL) {
-                            shift -= st;
-                            matchedOther = i;
-                        }
-                    }
+                if (d0.equals(derived) && d1.equals(otherTerm)) {
+                    shift = -dtDecomposed; //shift negative
+                } else if (d1.equals(derived) && d0.equals(otherTerm)) {
+                    shift = dtDecomposed; //shift positive
                 }
 
-            }
-
-            //long rOcc = ETERNAL;
-
-            /*if (dOcc == ETERNAL) {
-                //rOcc = oOcc;
-            }
-            else*/ if (dOcc!=ETERNAL && oOcc == ETERNAL) {
-
-
-                if (shift < 0) {
-                    if (((ddt > 0) && (matchedDerived < matchedOther))||
-                            ((ddt < 0) && (matchedDerived > matchedOther))){
-                        shift *= -1;
-                    }
+                if (shift == ETERNAL) {
+                    //there is no basis for relating other occurrence to derived
+                    return null;
                 }
 
-                oOcc = dOcc;
-            } /*else if (dOcc!=ETERNAL && oOcc!=ETERNAL && dOcc!=oOcc) {
-                //both specify a possible occurrence time to use; base occurrence time according to the most confident
-                //float dConf = decomposeTask ? prem.task().conf() : (premBelief !=null ? premBelief.conf() : 0);
-                //if (dConf > other.conf())
-                    oOcc = (oOcc + dOcc)/2; //TODO interpolate?
-            }*/
+                occ = occOther + shift;
+            } else /*if (occDecomposed != ETERNAL && occOther == ETERNAL)*/ {
+                /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
+                //if both offer an occurrence time, by default, use occDecomposed
 
+                long shift = ETERNAL; //TODO
 
+                Term d0 = p.resolve(decomposedTerm.term(0));
+                Term d1 = p.resolve(decomposedTerm.term(1));
 
-            if (oOcc!=ETERNAL) {
-                occReturn[0] = oOcc + shift;
+                if (d0.equals(derived) && d1.equals(otherTerm)) {
+                    shift = 0; //beginning
+                } else if (d1.equals(derived) && d0.equals(otherTerm)) {
+                    shift = dtDecomposed; //offset
+                }
 
+                if (shift == ETERNAL) {
+                    //there is no basis for relating other occurrence to derived
+                    return null;
+                }
+
+                occ = occDecomposed + shift;
             }
+
+            occReturn[0] = occ;
+            return derived;
+
         }
 
-        return derived;
     }
+
+
+
+//        int shift = 0;
+//        int matchedDerived = -1, matchedOther = -1;
+//
+//        if (dtDecomposed != DTERNAL) {
+//
+//
+//            //shift to occurrence time of the subterm within the decomposed term's task
+//
+//
+//            for (int i = 0; i < decomposedTerm.size(); i++) {
+//                Term dct = decomposedTerm.term(i);
+//                Term rdt = p.resolve(dct);
+//                if (rdt==null)
+//                    continue;
+//
+//                if (rdt.equals(derived)) {
+//                    int st = decomposedTerm.subtermTime(dct);
+//                    if (st != DTERNAL) {
+//                        shift += st;
+//                        matchedDerived = i;
+//                    }
+//                }
+//
+//                if (rdt.equals(otherTerm)) {
+//                    int st = decomposedTerm.subtermTime(dct);
+//                    if (st != DTERNAL) {
+//                        shift -= st;
+//                        matchedOther = i;
+//                    }
+//                }
+//            }
+//
+//        }
+//
+////        long occ;
+////        //long rOcc = ETERNAL;
+////
+////            /*if (dOcc == ETERNAL) {
+////                //rOcc = oOcc;
+////            }
+////
+////            else*/
+////        if (occOther!=ETERNAL && occDecomposed!=ETERNAL) {
+////            //conflict, use dOcc by default
+////            occ = occDecomposed;
+////        }
+////        else if (occOther != ETERNAL && occDecomposed == ETERNAL) {
+////            occ = occOther;
+////        }
+////        else if (occDecomposed != ETERNAL && occOther == ETERNAL) {
+////
+////
+////            if (shift < 0) {
+////                if (((dtDecomposed > 0) && (matchedDerived < matchedOther))||
+////                        ((dtDecomposed < 0) && (matchedDerived > matchedOther))){
+////                    shift *= -1;
+////                }
+////            }
+////
+////            occ = occDecomposed;
+////        } else {
+////            //should not happen, prevented by condition above
+////            occ = ETERNAL;
+////            shift = 0;
+////        }
+////
+////            /*else if (dOcc!=ETERNAL && oOcc!=ETERNAL && dOcc!=oOcc) {
+////                //both specify a possible occurrence time to use; base occurrence time according to the most confident
+////                //float dConf = decomposeTask ? prem.task().conf() : (premBelief !=null ? premBelief.conf() : 0);
+////                //if (dConf > other.conf())
+////                    oOcc = (oOcc + dOcc)/2; //TODO interpolate?
+////            }*/
+////
+////
+////        if (occOther!=ETERNAL) {
+////            occReturn[0] = occ + shift;
+////
+////        }
+//
+//        return derived;
+//    }
 
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, boolean taskOrBelief) {

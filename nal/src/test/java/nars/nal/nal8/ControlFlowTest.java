@@ -33,6 +33,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class ControlFlowTest {
 
+    private static final boolean METER = false;
+
+
     private final List<CompoundConcept> states = new ArrayList();
     private final TemporalMetrics ts = new TemporalMetrics<>(8192);
 
@@ -40,7 +43,7 @@ public class ControlFlowTest {
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
     @Test public void testSequence4()   { testSequence(n, 4, 30);    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
-    //@Test public void testSequence10()  { testSequence(n, 10, 50);     }
+    @Test public void testSequence10()  { testSequence(n, 10, 50);     }
 
 
     abstract public static class Sequence extends ConceptGroup {
@@ -116,14 +119,17 @@ public class ControlFlowTest {
 
         exeTracker.assertLength(length, delay);
 
-        ts.printCSV4(System.out);
-        ts.clear();
+        if (METER) {
+            ts.printCSV4(System.out);
+            ts.clear();
+        }
 
         return exeTracker;
 
     }
 
     @Test public void testBranchThen()  {
+        Global.DEBUG = true;
         testBranch(n, 50, 1f);
     }
 
@@ -177,7 +183,7 @@ public class ControlFlowTest {
             newExeState(n, s(PRE, i), exeTracker);
         }
         for (int i = 0; i < beforeBranchLength - 1; i++) {
-            n.goal($.conj(delay, s(PRE, i), s(PRE, i + 1)));
+            n.believe($.conj(delay, s(PRE, i), s(PRE, i + 1)));
         }
 
         Term condition = b(0); //newExeState(n, b(0), exeTracker).term();
@@ -189,12 +195,12 @@ public class ControlFlowTest {
             newExeState(n, s(ELSE, i), exeTracker);
         }
         for (int i = 0; i < afterBranchLength - 1; i++) {
-            n.goal($.conj(delay, s(THEN, i), s(THEN, i + 1)));
-            n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
+            n.believe($.conj(delay, s(THEN, i), s(THEN, i + 1)));
+            n.believe($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
         }
 
-        n.goal($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
-        n.goal($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
+        n.believe($.conj( delay, $.conj(  delay, condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
+        n.believe($.conj( delay, $.conj(  delay, $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
 
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
@@ -313,7 +319,8 @@ public class ControlFlowTest {
             //return 1f;
         });
 
-        ts.add(new ConceptBeliefGoalPriorityMeter(c, n));
+        if (METER)
+            ts.add(new ConceptBeliefGoalPriorityMeter(c, n));
 
         states.add(c);
 

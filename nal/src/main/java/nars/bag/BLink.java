@@ -5,6 +5,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 
@@ -70,41 +71,58 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
         public WeakBLink(X id, @NotNull Budgeted b, float scal) {
             super(id, b, scal);
-            this.id = new WeakReference<X>(id);
+            this.id = new WeakReference<>(id);
         }
+
 
         @Override
-        public float pri() {
-            float p = super.pri();
+        public void delete() {
+            float p = pri();
             if (p==p) {
-                //check existence
-                if (get() == null) {
-                    delete();
-                    return Float.NaN;
-                }
+                //if not already deleted HACK
+                id.clear();
             }
-            return p;
-        }
 
-        @NotNull @Override
-        public X get() {
-            return id.get();
+            super.delete();
         }
 
         @Override
         public boolean isDeleted() {
-            if (super.isDeleted()) {
-                id.clear();
+
+            if (!super.isDeleted()) {
+                if (get() == null) {
+                    delete();
+                    return true;
+                }
+                return false;
+            } else {
                 return true;
             }
-
-            if (id.get()==null) {
-                super.delete();
-                return true;
-            }
-
-            return false;
         }
+
+        @Override
+        public boolean commit() {
+            //check existence
+            X val = get();
+            if (val == null) {
+                delete();
+            } else {
+                if (val instanceof Budgeted) {
+                    if (((Budgeted) val).isDeleted())
+                        delete();
+                }
+            }
+
+            return super.commit();
+        }
+
+        @Nullable
+        @Override
+        public X get() {
+            return id.get();
+        }
+
+
 
     }
 
@@ -141,7 +159,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final void delete() {
+    public void delete() {
         float p = pri();
         if (p==p) {
             //not already deleted
@@ -150,8 +168,8 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         }
     }
 
-    /** TODO return false to signal to the bag to remove this item */
-    public final boolean commit() {
+
+    public boolean commit() {
         if (changed) {
             float[] b = this.b;
             b[PRI] = clamp(b[PRI] + b[DPRI]); b[DPRI] = 0;
@@ -164,7 +182,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public float pri() {
+    public final float pri() {
         return b[0 /*PRI*/];
     }
 

@@ -59,7 +59,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return new CurveBag<Task>(rng) {
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
-                return new BLink.WeakBLink<Task>(i, b, scale);
+                return new BLink.WeakBLink<>(i, b, scale);
             }
         }.merge(mergeDefault());
     }
@@ -67,7 +67,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Override public Bag<Termed> termbag() {
-        return new CurveBag<Termed>(rng).merge(mergeDefault());
+
+        return new CurveBag<Termed>(rng) {
+            @Override
+            protected BLink<Termed> newLink(Termed i, Budgeted b, float scale) {
+                return new BLink.WeakBLink<>(i, b, scale);
+            }
+        }.merge(mergeDefault());
     }
 
     @NotNull

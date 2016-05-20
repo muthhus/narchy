@@ -166,15 +166,16 @@ public class NAL7Test extends AbstractNALTest {
 //        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
 //    }
 
-    @Test
-    public void intervalPreserve_and_shift_occurence_corner_case() {
-        TestNAR tester = test();
-        //tester.log();
-        tester.input("S:s.");
-        tester.inputAt(3, "(S:s &&+3 Z:z). :|:");
-        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 3);
-        tester.mustBelieve(cycles, "Z:z.", 1.00f, 0.81f /* 0.42? */, 6);
-    }
+//    @Test
+//    public void intervalPreserve_and_shift_occurence_corner_case() {
+//        TestNAR tester = test();
+//        //tester.log();
+//        tester.input("S:s.");
+//        tester.inputAt(3, "(S:s &&+3 Z:z). :|:");
+//        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 3);
+//        tester.mustBelieve(cycles, "Z:z.", 1.00f, 0.81f /* 0.42? */, 6);
+//        tester.mustNotOutput(cycles,"Z:z",'.',3);
+//    }
 
     @Test
     public void intervalPreserve_and_shift_occurence() {

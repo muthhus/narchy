@@ -170,8 +170,7 @@ public abstract class Param extends Container implements Level {
             case GOAL:
                 return DEFAULT_GOAL_PRIORITY;
 
-            case COMMAND:
-                return 0;
+            case COMMAND: return 0;
         }
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
@@ -186,6 +185,8 @@ public abstract class Param extends Container implements Level {
                 return DEFAULT_QUESTION_DURABILITY;
             case GOAL:
                 return DEFAULT_GOAL_DURABILITY;
+
+            case COMMAND: return 0;
         }
         throw new RuntimeException("Unknown sentence type: " + punctuation);
     }
