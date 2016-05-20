@@ -62,6 +62,7 @@ public class PremiseRule extends GenericCompound {
             union.class,
             substitute.class,
             substituteIfUnifies.class,
+            ifUnifies.class
 //        occurrsForward.class,
 //        occurrsBackward.class
     };

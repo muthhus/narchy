@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /** substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
  * */
-public final class substituteIfUnifies extends substitute {
+public class substituteIfUnifies extends substitute {
 
     /** recycled
      *  TODO initialize in construtor
@@ -76,4 +76,5 @@ public final class substituteIfUnifies extends substitute {
         }
 
     }
+
 }

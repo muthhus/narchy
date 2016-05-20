@@ -256,8 +256,8 @@ public interface Temporalize {
             if (occOther != ETERNAL) {
                 long shift = ETERNAL;
 
-                Term d0 = p.resolve(decomposedTerm.term(0));
-                Term d1 = p.resolve(decomposedTerm.term(1));
+                Term d0 = p.resolveNormalized(decomposedTerm.term(0));
+                Term d1 = p.resolveNormalized(decomposedTerm.term(1));
 
                 if (d0.equals(derived) && d1.equals(otherTerm)) {
                     shift = -dtDecomposed; //shift negative

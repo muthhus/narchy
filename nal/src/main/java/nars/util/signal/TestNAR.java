@@ -383,8 +383,10 @@ public class TestNAR  {
     }
 
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, long occ) {
-        return mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, long... occs) {
+        for (long occ : occs)
+            mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
+        return this;
     }
 
     @NotNull

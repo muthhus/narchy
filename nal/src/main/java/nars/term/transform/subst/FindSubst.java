@@ -380,6 +380,14 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         //TODO make a half resolve that only does xy?
         return resolve(t, this);
     }
+    @Nullable
+    public final Term resolveNormalized(@NotNull Term t) {
+        //TODO make a half resolve that only does xy?
+        t = resolve(t);
+        if (t instanceof Compound)
+            t = this.index.normalized((Compound)t).term();
+        return t;
+    }
 
     @Nullable
     public final Term resolve(@NotNull Term t, Subst subst) {

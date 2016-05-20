@@ -38,7 +38,7 @@ public class NAL8Test extends AbstractNALTest {
 
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold:({t002}) &&+5 at:({t001})) &&+5 open({t001}))",
-                1.0f, 0.81f,
+                1.0f, 0.43f,
                 -5);
 
 
@@ -133,13 +133,27 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void condition_goal_deductionWithVariableElimination()  {
+
         test()
-                .input("at:(SELF,{t003})!")
-                .inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).")
+                .log()
+                .input("at:(SELF,{t003}). :|:")
+                //.input("goto({t003}). :|:")
+                .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
 
-                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "goto({t003})", '!', -5); //??
+                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5)
+                //.mustNotOutput(cycles, "goto({t003})", '!', -5) //??
+                ;
+    }
+    @Test
+    public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
+        test()
+                .log()
+                .input("goto({t003}). :|:")
+                .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
+
+                .mustDesire(cycles, "at:(SELF,{t003})", 1.0f, 0.81f, 5)
+        ;
     }
 
     @Test
@@ -216,9 +230,10 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deduction()  {
         test()
             .log()
-            .input("<(SELF,{t002}) --> reachable>!")
+            .input("<(SELF,{t002}) --> reachable>! :|:")
             .inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).")
-            .mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f);
+            .mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", '!', ETERNAL, 10);
 
     }
 
@@ -382,17 +397,32 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void temporal_goal_detachment_1()  {
-        TestNAR tester = test();
-
-
-        tester.input("<(SELF,{t002}) --> hold>.");
-        tester.inputAt(10, "(<(SELF,{t002}) --> hold> &&+5 (at:(SELF,{t001}) &&+5 open({t001}) ))!");
-
-        tester.mustDesire(cycles, "( at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f);
-
+        test()
+                //.log()
+                .input("(hold). :|:")
+                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) )!")
+                .mustDesire(cycles, "((at) &&+5 (open))", 1.0f, 0.81f, 5)
+                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL, 7)
+        ;
     }
-
-
+    @Test
+    public void temporal_goal_detachment_2()  {
+        test()
+                //.log()
+                .input("(hold)! :|:")
+                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
+                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
+        ;
+    }
+    @Test
+    public void temporal_goal_detachment_3()  {
+        test()
+                //.log()
+                .input("(hold)! :|:")
+                .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) )!") //should not decomposed by the goal task
+                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
+        ;
+    }
 
 
     @Test
