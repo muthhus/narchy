@@ -77,7 +77,7 @@ public class ArrayQuestionTable implements QuestionTable {
     @Override
     public void remove(@NotNull Task belief, @NotNull NAR nar) {
         if (list.remove(belief)) {
-            TaskTable.removeTask(belief, null, nar);
+            TaskTable.removeTask(belief, null);
         }
     }
 

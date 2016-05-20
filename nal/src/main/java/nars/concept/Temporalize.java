@@ -248,54 +248,63 @@ public interface Temporalize {
 
             long occ;
 
-            if (decomposedTerm.size() != 2)
-                throw new UnsupportedOperationException(); //this may be valid for (&|,.. ) with arity > 2
 
             /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
             //if both offer an occurrence time, by default, use occOther
             if (occOther != ETERNAL) {
+
+
                 long shift = ETERNAL;
 
-                Term d0 = p.resolveNormalized(decomposedTerm.term(0));
-                Term d1 = p.resolveNormalized(decomposedTerm.term(1));
-
-                if (d0.equals(derived) && d1.equals(otherTerm)) {
-                    shift = -dtDecomposed; //shift negative
-                } else if (d1.equals(derived) && d0.equals(otherTerm)) {
-                    shift = dtDecomposed; //shift positive
+                if (decomposedTerm.size() > 2) {
+                    shift = 0;
                 } else {
+
+                    Term d0 = p.resolveNormalized(decomposedTerm.term(0));
+                    Term d1 = p.resolveNormalized(decomposedTerm.term(1));
+
                     if (otherTerm.equals(decomposedTerm)) {
                         if (d0.equals(derived)) {
                             shift = 0; //beginning, assume its relative to the occurrenc
                         } else {
                             shift = dtDecomposed;
                         }
+                    } else {
+                        if (d0.equals(derived) && d1.equals(otherTerm)) {
+                            shift = -dtDecomposed; //shift negative
+                        } else if (d1.equals(derived) && d0.equals(otherTerm)) {
+                            shift = dtDecomposed; //shift positive
+                        }
                     }
-                }
 
-                if (shift == ETERNAL) {
-                    //there is no basis for relating other occurrence to derived
-                    return null;
+                    if (shift == ETERNAL) {
+                        //there is no basis for relating other occurrence to derived
+                        return null;
+                    }
                 }
 
                 occ = occOther + shift;
             } else /*if (occDecomposed != ETERNAL && occOther == ETERNAL)*/ {
 
-
                 long shift = ETERNAL;
 
-                Term d0 = p.resolve(decomposedTerm.term(0));
-                Term d1 = p.resolve(decomposedTerm.term(1));
+                if (decomposedTerm.size() > 2) {
+                    shift = 0;
+                } else {
 
-                if (d0.equals(derived)) {
-                    shift = 0; //beginning
-                } else if (d1.equals(derived)) {
-                    shift = dtDecomposed; //offset
-                }
+                    Term d0 = p.resolve(decomposedTerm.term(0));
+                    Term d1 = p.resolve(decomposedTerm.term(1));
 
-                if (shift == ETERNAL) {
-                    //there is no basis for relating other occurrence to derived
-                    return null;
+                    if (d0.equals(derived)) {
+                        shift = 0; //beginning
+                    } else if (d1.equals(derived)) {
+                        shift = dtDecomposed; //offset
+                    }
+
+                    if (shift == ETERNAL) {
+                        //there is no basis for relating other occurrence to derived
+                        return null;
+                    }
                 }
 
                 occ = occDecomposed + shift;

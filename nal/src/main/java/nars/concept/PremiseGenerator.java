@@ -87,10 +87,9 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             Global.newArrayList();
             //Global.newHashSet(1);
 
-    @NotNull
-    private BLink[] termsArray = new BLink[0];
-    @NotNull
-    private BLink[] tasksArray = new BLink[0];
+    @NotNull private BLink[] termsArray = new BLink[0];
+
+    //@NotNull private BLink[] tasksArray = new BLink[0];
 
     @Override
     public final void accept(@NotNull BLink<? extends Concept> c) {
@@ -115,8 +114,6 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks) {
 
-
-
         Concept c = conceptLink.get();
 
         Collection<BLink<? extends Termed>> termsBuffer;
@@ -136,13 +133,16 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
         BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
 
         //convert to array for fast for-within-for iterations
-        BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
+        //BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
-        for (BLink<Task> taskLink : tasksArray) {
-            if (taskLink == null) break; //null-terminated array, ends
+        tasksBuffer.forEach(taskLink -> {
+        //for (BLink<Task> taskLink : tasksArray) {
+            //if (taskLink == null) break; //null-terminated array, ends
 
-            premiseTask(termsArray, taskLink);
-        }
+            Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
+            if (task!=null)
+                premiseTask(termsArray, taskLink, task);
+        });
 
         tasksBuffer.clear();
         termsBuffer.clear();
@@ -150,9 +150,8 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink) {
+    private void premiseTask(@Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink, @NotNull Task task) {
 
-        Task task = taskLink.get();
 
         long occ = task.occurrence();
 
@@ -164,8 +163,10 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                 break; //end of termsArray, or task has become deleted in the previous iteration, cancel
 
             Termed tl = termLink.get();
-            Term termLinkTerm  = tl.term();
+            if (tl == null)
+                continue;
 
+            Term termLinkTerm  = tl.term();
 
             if (!Terms.equalSubTermsInRespectToImageAndProduct( taskTerm, termLinkTerm )) {
 

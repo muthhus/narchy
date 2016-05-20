@@ -35,8 +35,12 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
        boolean changed = false;
        for (int i = 0; i < ss; i++) {
            Term a = s.term(i);
+
            Term b;
            if (a instanceof Compound) {
+               if (a.hasTemporal())
+                   return s; //dont store subterm arrays containing temporal compounds
+
                b = theCompound((Compound)a, true).term();
            } else {
                b = theAtom((Atomic)a, true).term();

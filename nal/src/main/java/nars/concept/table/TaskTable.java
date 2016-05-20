@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  */
 public interface TaskTable extends Iterable<Task> {
 
-    static void removeTask(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
+    static void removeTask(@NotNull Task t, @Nullable String reason) {
         if (!t.isDeleted())
             t.delete(reason);
     }

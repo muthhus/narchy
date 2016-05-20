@@ -97,7 +97,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public void remove(@NotNull Task belief, @NotNull NAR nar) {
         Object removed = ((belief.isEternal()) ? eternal : temporal).remove(belief);
         assert(removed == belief);
-        TaskTable.removeTask(belief, null, nar);
+        TaskTable.removeTask(belief, null);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class DefaultBeliefTable implements BeliefTable {
             //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
             //1. clear the corresponding table, set capacity to one, and insert this task
             Consumer<Task> overridden = t -> {
-                TaskTable.removeTask(t, "Overridden", nar);
+                TaskTable.removeTask(t, "Overridden");
             };
             et.forEach(overridden);
             et.clear();
@@ -185,7 +185,7 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        return insert(input, et, nar) ? input : null;
+        return insert(input, et) ? input : null;
     }
 
     @NotNull
@@ -193,11 +193,8 @@ public class DefaultBeliefTable implements BeliefTable {
 
         input = temporal.ready(input, nar);
         if (input != null) {
-            if (temporal.isFull()) //TEMPORARY
-                throw new RuntimeException("table full");
-
             //inserting this task.  should be successful
-            boolean ii = insert(input, temporal, nar);
+            boolean ii = insert(input, temporal);
             assert (ii);
         }
 
@@ -241,7 +238,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private boolean insert(@NotNull Task incoming, @NotNull Table<Task,Task> table, @NotNull NAR nar) {
+    private boolean insert(@NotNull Task incoming, @NotNull Table<Task, Task> table) {
 
         Task displaced = table.put(incoming, incoming);
 
@@ -249,9 +246,9 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (displaced!=null && !displaced.isDeleted()) {
             TaskTable.removeTask(displaced,
-                    "Displaced",
+                    "Displaced"
                     //"Displaced by " + incoming,
-                    nar);
+            );
         }
 
         return inserted;

@@ -5,17 +5,14 @@ import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.Tense;
 import nars.task.MutableTask;
-import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
@@ -61,21 +58,28 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             if (removeAlreadyDeleted() >= cap) {
 
                 //the result of compression is processed separately
-                Task merged = compress(input, nar.time(), nar);
+                Task merged = compress(input, nar.time());
                 if (merged == null) {
                     //not compressible with respect to this input, so reject the input
                     return null;
-                }
-
-                // else: the result of compression has freed a space for the incoming input
-                if (merged!=input)
+                } else if (merged!=input) {
+                    // else: the result of compression has freed a space for the incoming input
                     nar.process(merged);
+
+                }
                 else {
                     //only one space has been freed for the input, no merging resulted
+
                 }
             }
 
         }
+
+        if (isFull()) {
+            //WHY DOES THIS HAPPEN, IS IT DANGEROUS
+            return null;
+        }
+
 
         return input;
     }
@@ -178,7 +182,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     /** frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task */
     @Nullable
-    protected Task compress(@NotNull Task input, long now, @NotNull NAR nar) {
+    protected Task compress(@NotNull Task input, long now) {
 
         updateRange();
 
@@ -189,9 +193,10 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             return null;
 
         Task b = weakest(now, a, Float.POSITIVE_INFINITY);
-        assert(a!=b);
+        if (a == b)
+            throw new RuntimeException();
 
-        Task merged = null;
+        Task merged;
         if (b!=null) {
 
             //TODO proper iterpolate: truth, time, dt
@@ -227,11 +232,14 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                     .log("Revection Merge");
 
             remove(b);
-            TaskTable.removeTask(b, "Revection Revision", nar);
+            TaskTable.removeTask(b, "Revection Revision");
+        } else {
+            merged = null;
         }
 
         remove(a);
-        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", nar);
+        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision");
+
 
         return merged!=null ? merged : input;
     }
