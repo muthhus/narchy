@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -524,8 +523,10 @@ public class TestNAR  {
     @NotNull
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
 
-        if (requireConditions())
-            assertTrue("No conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
+        if (requireConditions()) {
+            //"No conditions tested",
+            assert (!requires.isEmpty() || !disqualifies.isEmpty());
+        }
 
 
         //TODO cache requires & logger, it wont change often
@@ -602,7 +603,7 @@ public class TestNAR  {
 
         }
 
-        assertTrue(success);
+        assert(success);
 
         return this;
     }

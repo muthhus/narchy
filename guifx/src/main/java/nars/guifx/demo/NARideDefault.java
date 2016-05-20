@@ -9,7 +9,7 @@ public enum NARideDefault {
 
     public static void main(String[] arg) {
 
-        Global.DEBUG = true;
+        //Global.DEBUG = true;
 
         Default n = new Default(
                 //TermIndex.memoryGuava(clock, 100)),

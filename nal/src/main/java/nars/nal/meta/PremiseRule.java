@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
@@ -467,7 +468,10 @@ public class PremiseRule extends GenericCompound {
         //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
-        ListMultimap<Term, MatchConstraint> constraints = MultimapBuilder.treeKeys().arrayListValues().build();
+        ListMultimap<Term, MatchConstraint> constraints =
+                MultimapBuilder.treeKeys().arrayListValues().build();
+
+
 
         //additional modifiers: either preConditionsList or beforeConcs, classify them here
         for (int i = 2; i < precon.length; i++) {
