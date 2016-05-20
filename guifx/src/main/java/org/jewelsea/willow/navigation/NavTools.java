@@ -59,18 +59,18 @@ public enum NavTools {
         //backGraphic.setPreserveRatio(true);
         //backGraphic.setFitHeight(buttonHeight);        
 
-        backButton.onActionProperty().set(actionEvent -> {
-            if (chrome.getBrowser().getHistory()!=null)
-                if (chrome.getBrowser().getHistory().canNavBack()) {
-                    chrome.getBrowser().go(chrome.getBrowser().getHistory().requestNavBack());
-                }
-        });
-        backButton.setOnMouseReleased(mouseEvent -> {
-            if (chrome.getBrowser().getHistory()!=null)
-                if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-                    chrome.getBrowser().getHistory().showMenu(backButton);
-                }
-        });
+//        backButton.onActionProperty().set(actionEvent -> {
+//            if (chrome.getBrowser().getHistory()!=null)
+//                if (chrome.getBrowser().getHistory().canNavBack()) {
+//                    chrome.getBrowser().go(chrome.getBrowser().getHistory().requestNavBack());
+//                }
+//        });
+//        backButton.setOnMouseReleased(mouseEvent -> {
+//            if (chrome.getBrowser().getHistory()!=null)
+//                if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+//                    chrome.getBrowser().getHistory().showMenu(backButton);
+//                }
+//        });
 
         // create a forward button.
         Button forwardButton = new Button();
@@ -87,18 +87,18 @@ public enum NavTools {
 //        forwardGraphic.setFitHeight(buttonHeight);
 //        forwardButton.setGraphic(forwardGraphic);
         forwardButton.setTooltip(new Tooltip(getString("nav-toolbar.forward.tooltip")));
-        forwardButton.onActionProperty().set(actionEvent -> {
-            if (chrome.getBrowser().getHistory()!=null) 
-                if (chrome.getBrowser().getHistory().canNavForward()) {
-                    chrome.getBrowser().go(chrome.getBrowser().getHistory().requestNavForward());
-                }
-        });
-        forwardButton.setOnMouseReleased(mouseEvent -> {
-            if (chrome.getBrowser().getHistory()!=null)
-                if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-                    chrome.getBrowser().getHistory().showMenu(backButton);
-                }
-        });
+//        forwardButton.onActionProperty().set(actionEvent -> {
+//            if (chrome.getBrowser().getHistory()!=null)
+//                if (chrome.getBrowser().getHistory().canNavForward()) {
+//                    chrome.getBrowser().go(chrome.getBrowser().getHistory().requestNavForward());
+//                }
+//        });
+//        forwardButton.setOnMouseReleased(mouseEvent -> {
+//            if (chrome.getBrowser().getHistory()!=null)
+//                if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+//                    chrome.getBrowser().getHistory().showMenu(backButton);
+//                }
+//        });
 
         // create a navigate button.
         Button navButton = new Button();

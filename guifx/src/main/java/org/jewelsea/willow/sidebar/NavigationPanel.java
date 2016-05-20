@@ -85,9 +85,9 @@ public class NavigationPanel extends TitledPane {
                 getString("nav-panel.history.tooltip"),
                 null
         );
-        historyButton.setOnAction(e ->
-                chrome.getBrowser().getHistory().showMenu(historyButton)
-        );
+//        historyButton.setOnAction(e ->
+//                chrome.getBrowser().getHistory().showMenu(historyButton)
+//        );
 
         // create a bookmarksButton.
         ContextMenu bookmarksMenu = new ContextMenu();

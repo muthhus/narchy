@@ -45,7 +45,6 @@ import javafx.scene.web.WebView;
 import org.jewelsea.willow.dialogs.DialogFactory;
 import org.jewelsea.willow.helpers.FavIconHandler;
 import org.jewelsea.willow.helpers.LocationHandler;
-import org.jewelsea.willow.navigation.History;
 
 import static org.jewelsea.willow.util.ResourceUtil.copyImageView;
 import static org.jewelsea.willow.util.ResourceUtil.getString;
@@ -55,7 +54,7 @@ import static org.jewelsea.willow.util.ResourceUtil.getString;
  */
 public class BrowserWindow {
     private final WebView view;
-    private final History history = new History(this);
+    //private final History history = new History(this);
     private final ReadOnlyStringWrapper status = new ReadOnlyStringWrapper();
     private final ReadOnlyObjectWrapper<ImageView> favicon = new ReadOnlyObjectWrapper<>();
     private final FavIconHandler favIconHandler = FavIconHandler.getInstance();
@@ -96,7 +95,7 @@ public class BrowserWindow {
         // monitor the web view for when it's location changes, so we can update the history lists and other items correctly.
         WebEngine engine = getView().getEngine();
         engine.locationProperty().addListener((observableValue3, oldLoc1, newLoc) -> {
-            getHistory().executeNav(newLoc); // update the history lists.
+            //getHistory().executeNav(newLoc); // update the history lists.
             getLocField().setText(newLoc);   // update the location field.
             favicon.set(copyImageView(favIconHandler.fetchFavIcon(newLoc)));
         });
@@ -156,9 +155,9 @@ public class BrowserWindow {
         return favicon.getReadOnlyProperty();
     }
 
-    public History getHistory() {
+    /*public History getHistory() {
         return history;
-    }
+    }*/
 
     public WebView getView() {
         return view;

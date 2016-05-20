@@ -442,14 +442,14 @@ public class WebBrowser extends BorderPane {
             Button forwardButton = (Button) mainLayout.lookup("#forwardButton");
             if (forwardButton != null) {
                 forwardButton.disableProperty().unbind();
-                forwardButton.disableProperty().bind(newBrowser.getHistory().canNavForwardProperty().not());
+                //forwardButton.disableProperty().bind(newBrowser.getHistory().canNavForwardProperty().not());
             }
             Button backButton = (Button)mainLayout.lookup("#backButton");
 
 
             if (forwardButton != null) {
                 backButton.disableProperty().unbind();
-                backButton.disableProperty().bind(newBrowser.getHistory().canNavBackwardProperty().not());
+                //backButton.disableProperty().bind(newBrowser.getHistory().canNavBackwardProperty().not());
             }
 
             // display the selected browser.

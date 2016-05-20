@@ -36,7 +36,6 @@ import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.nars.LoopPane;
 import nars.guifx.nars.SubButton;
 import nars.guifx.remote.VncClientApp;
-import nars.guifx.terminal.LocalTerminal;
 import nars.guifx.util.*;
 import nars.nar.Default;
 import nars.term.Term;
@@ -200,7 +199,7 @@ public class NARide extends StackPane {
         ni.addTool("Webcam", WebcamFX::new);
 
 
-        ni.addTool("Terminal (bash)", LocalTerminal::new);
+        //ni.addTool("Terminal (bash)", LocalTerminal::new);
         //ni.addTool("Status", () -> new StatusPane(nar, 320));
         ni.addTool("VNC/RDP Remote", () -> (VncClientApp.newView()));
         ni.addTool("Web Browser", WebBrowser::new);

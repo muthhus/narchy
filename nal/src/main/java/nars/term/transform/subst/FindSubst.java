@@ -496,7 +496,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull Compound y) {
         //detect special case of no variables
-        boolean actuallyCommutative = (type == Op.VAR_PATTERN) ? (x.varPattern() == 0) : !x.hasAny(type.bit());
+        boolean actuallyCommutative = (type == Op.VAR_PATTERN) ? (x.varPattern() == 0) : !x.hasAny(type);
 
         return actuallyCommutative ? matchLinear(x, y) : addTermutator(new CommutivePermutations(this, x, y));
     }

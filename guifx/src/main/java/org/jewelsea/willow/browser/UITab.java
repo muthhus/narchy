@@ -8,7 +8,6 @@ package org.jewelsea.willow.browser;
 
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
-import org.jewelsea.willow.navigation.History;
 
 /**
  *
@@ -29,9 +28,10 @@ public class UITab<N extends Node> extends Tab {
     
     protected void init() {   }
     
-    public History getHistory() {
+    /*public History getHistory() {
         return null;
-    }
+    }*/
+
     public void go(String loc) {
         //...
     }

@@ -23,9 +23,9 @@ package automenta.vivisect.swing;
  * the License.
  */
 
-import automenta.vivisect.swing.property.propertysheet.Property;
-import automenta.vivisect.swing.property.propertysheet.PropertySheet;
-import automenta.vivisect.swing.property.propertysheet.PropertySheetPanel;
+//import automenta.vivisect.swing.property.propertysheet.Property;
+//import automenta.vivisect.swing.property.propertysheet.PropertySheet;
+//import automenta.vivisect.swing.property.propertysheet.PropertySheetPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,61 +37,61 @@ import java.beans.*;
 public class ReflectPanel<O> extends JPanel {
 
 
-    public static void main(String[] args) throws Exception {
-        
-        //Example
-        JFrame frame = new JFrame("PropertySheet");
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add("Center", new ReflectPanel(frame));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocation(100, 100);
-        frame.setVisible(true);
-    }
-
-    public ReflectPanel(O instance) {
-        super(new BorderLayout());
-        
-        BeanInfo beanInfo = new SimpleBeanInfo();
-        try {
-            beanInfo = Introspector.getBeanInfo(instance.getClass());
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
-        }
-        PropertySheetPanel sheet = new PropertySheetPanel();
-        sheet.setMode(PropertySheet.VIEW_AS_FLAT_LIST);
-        sheet.setToolBarVisible(false);
-        sheet.setDescriptionVisible(false);
-        sheet.setBeanInfo(beanInfo);
-
-        sheet.setPreferredSize(new Dimension(100,100));
-        
-        // initialize the properties with the value from the object
-        // one can use sheet.readFromObject(button)
-        // but I encountered some issues with Java Web Start. The method
-        // getLocationOnScreen on the button is throwing an exception, it
-        // does not happen when not using Web Start. Load properties one
-        // by one as follow will do the trick
-        Property[] properties = sheet.getProperties();
-        for (Property property : properties) {
-            try {
-                property.readFromObject(instance);
-            } catch (Exception e) {
-                ///e.printStackTrace();
-            }
-        }
-
-        // everytime a property change, update the button with it
-        PropertyChangeListener listener = evt -> {
-            Property prop = (Property) evt.getSource();
-            prop.writeToObject(instance);
-
-
-            //button.repaint();
-        };
-        sheet.addPropertySheetChangeListener(listener);
-
-        add(sheet, BorderLayout.CENTER);
-    }
+//    public static void main(String[] args) throws Exception {
+//
+//        //Example
+//        JFrame frame = new JFrame("PropertySheet");
+//        frame.getContentPane().setLayout(new BorderLayout());
+//        frame.getContentPane().add("Center", new ReflectPanel(frame));
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.pack();
+//        frame.setLocation(100, 100);
+//        frame.setVisible(true);
+//    }
+//
+//    public ReflectPanel(O instance) {
+//        super(new BorderLayout());
+//
+//        BeanInfo beanInfo = new SimpleBeanInfo();
+//        try {
+//            beanInfo = Introspector.getBeanInfo(instance.getClass());
+//        } catch (IntrospectionException e) {
+//            e.printStackTrace();
+//        }
+//        PropertySheetPanel sheet = new PropertySheetPanel();
+//        sheet.setMode(PropertySheet.VIEW_AS_FLAT_LIST);
+//        sheet.setToolBarVisible(false);
+//        sheet.setDescriptionVisible(false);
+//        sheet.setBeanInfo(beanInfo);
+//
+//        sheet.setPreferredSize(new Dimension(100,100));
+//
+//        // initialize the properties with the value from the object
+//        // one can use sheet.readFromObject(button)
+//        // but I encountered some issues with Java Web Start. The method
+//        // getLocationOnScreen on the button is throwing an exception, it
+//        // does not happen when not using Web Start. Load properties one
+//        // by one as follow will do the trick
+//        Property[] properties = sheet.getProperties();
+//        for (Property property : properties) {
+//            try {
+//                property.readFromObject(instance);
+//            } catch (Exception e) {
+//                ///e.printStackTrace();
+//            }
+//        }
+//
+//        // everytime a property change, update the button with it
+//        PropertyChangeListener listener = evt -> {
+//            Property prop = (Property) evt.getSource();
+//            prop.writeToObject(instance);
+//
+//
+//            //button.repaint();
+//        };
+//        sheet.addPropertySheetChangeListener(listener);
+//
+//        add(sheet, BorderLayout.CENTER);
+//    }
 
 }
