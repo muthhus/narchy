@@ -161,11 +161,11 @@ public class NEHEBitmapFont implements GLEventListener {
     @Override
     public void init(GLAutoDrawable glDrawable) {
         GL2 gl = glDrawable.getGL().getGL2();
-        try {
+        //try {
             loadGLTextures(gl);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
  
 
         gl.glShadeModel(GL2.GL_SMOOTH);                 // Enables Smooth Color Shading

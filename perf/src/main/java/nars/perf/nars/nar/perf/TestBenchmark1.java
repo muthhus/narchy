@@ -1,7 +1,6 @@
 package nars.perf.nars.nar.perf;
 
 
-import clojure.lang.Dynajure;
 import nars.NAR;
 import nars.nar.Default;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -11,7 +10,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import static nars.perf.Main.perf;
 
-public class ClojureBenchmark {
+public class TestBenchmark1 {
 
 //    static String eval(String script) {
 //        // We don't actually need the context object here, but we need it to have
@@ -22,21 +21,20 @@ public class ClojureBenchmark {
 //
 //        return RT.printString(result) + " (" +result.getClass() + ")";
 //    }
-
-    @Benchmark
-    @BenchmarkMode(value = Mode.SingleShotTime)
-    public void eval1() {
-
-        new Dynajure().eval("(+ 1 1)");
-    }
-
-    @Benchmark
-    @BenchmarkMode(value = Mode.SingleShotTime)
-    public void eval2() {
-        new Dynajure().eval("(* (+ 1 1) 8)");
-        //out.println(eval("'(inh a b)") );
-        //out.println(eval("'[inh a b]") );
-    }
+//    @Benchmark
+//    @BenchmarkMode(value = Mode.SingleShotTime)
+//    public void eval1() {
+//
+//        new Dynajure().eval("(+ 1 1)");
+//    }
+//
+//    @Benchmark
+//    @BenchmarkMode(value = Mode.SingleShotTime)
+//    public void eval2() {
+//        new Dynajure().eval("(* (+ 1 1) 8)");
+//        //out.println(eval("'(inh a b)") );
+//        //out.println(eval("'[inh a b]") );
+//    }
 
     @Benchmark
     @BenchmarkMode(value = Mode.SingleShotTime)
@@ -50,7 +48,7 @@ public class ClojureBenchmark {
     }
 
     public static void main(String[] args) throws RunnerException {
-        perf(ClojureBenchmark.class, 6, 10);
+        perf(TestBenchmark1.class, 6, 10);
 
     }
 }

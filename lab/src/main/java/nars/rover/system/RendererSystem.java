@@ -43,11 +43,11 @@ public class RendererSystem extends EntitySystem {
             @Override
             public void init(GLAutoDrawable drawable) {
                 super.init(drawable);
-                try {
+                //try {
                     NEHEBitmapFont.loadGLTextures(drawable.getGL().getGL2());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
 
             @Override

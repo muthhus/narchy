@@ -21,7 +21,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
-          <verbose>true</verbose>
+          <!--<verbose>true</verbose>-->
           <useIncrementalCompilation>true</useIncrementalCompilation>
 
           <!--<fork>true</fork>-->

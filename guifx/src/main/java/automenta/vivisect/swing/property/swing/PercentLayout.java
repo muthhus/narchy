@@ -338,7 +338,7 @@ public class PercentLayout implements LayoutManager2 {
     }
     
     // finally share the remaining space between the other components    
-    ArrayList remaining = new ArrayList();
+    ArrayList<Integer> remaining = new ArrayList();
     for (int i = 0, c = components.length; i < c; i++) {
       if (components[i].isVisible()) {
         Constraint constraint =
@@ -352,7 +352,7 @@ public class PercentLayout implements LayoutManager2 {
 
     if (!remaining.isEmpty()) {
       int rest = availableSize / remaining.size();
-      for (Object aRemaining : remaining) {
+      for (Integer aRemaining : remaining) {
         sizes[aRemaining] = rest;
       }
     }

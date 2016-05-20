@@ -80,7 +80,7 @@ public class PhysicsModel extends Bodies implements ContactListener, Runnable {
 //    protected TestbedState model;
     protected DestructionListener destructionListener;
 
-    private final String title;
+    private final String title = "";
     protected int m_textLine;
     private final LinkedList<String> textList = new LinkedList<>();
 
