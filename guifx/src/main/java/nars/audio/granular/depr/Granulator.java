@@ -17,7 +17,7 @@ public class Granulator extends Wave {
     private int REPEAT = 1;
     private final ArrayList<String> samples;
     private List<int[][]> grains;
-    private int wavetableIndex = 0;
+    private int wavetableIndex;
 
     public Granulator(int sc, int bps, int c, int sr, int f, ArrayList<String> l,
             String n) {

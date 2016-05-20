@@ -16,7 +16,7 @@ import java.util.Stack;
  * @author maurizio
  */
 public class Tokenizer {
-    private Stack<Character> charBuffer;    
+    private final Stack<Character> charBuffer;
     private String value;    
     private Token lastToken;    
     
@@ -82,6 +82,7 @@ public class Tokenizer {
     }
 
     public static final Token TK_COMMA = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == ',') {
                 t.charBuffer.pop();
@@ -93,6 +94,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_PAR_OPEN = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '(') {
                 t.charBuffer.pop();
@@ -104,6 +106,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_PAR_CLOSE = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == ')') {
                 t.charBuffer.pop();
@@ -115,6 +118,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_BRA_OPEN = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '{') {
                 t.charBuffer.pop();
@@ -126,6 +130,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_BRA_CLOSE = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '}') {
                 t.charBuffer.pop();
@@ -137,6 +142,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_RET = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '-' && t.charBuffer.get(t.charBuffer.size() - 2) == '>') {
                 t.charBuffer.pop();
@@ -149,6 +155,7 @@ public class Tokenizer {
     };    
 
     public static final Token TK_MINUS = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '-' && t.charBuffer.get(t.charBuffer.size() - 2) != '>') {                
                 t.charBuffer.pop();
@@ -160,6 +167,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_PLUS = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '+') {
                 t.charBuffer.pop();
@@ -171,6 +179,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_AT = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '@') {
                 t.charBuffer.pop();
@@ -182,6 +191,7 @@ public class Tokenizer {
     };
 
     public static final Token TK_INOUT = new Token() { 
+        @Override
         public boolean accept(Tokenizer t) {
             if (t.charBuffer.peek() == '?') {
                 t.charBuffer.pop();

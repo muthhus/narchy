@@ -400,7 +400,7 @@ public class OOLibrary extends Library {
             	 * On Dalvik VM we can only use the DexClassLoader.
             	 */
 
-                the_class = System.getProperty("java.vm.name").equals("Dalvik") ? Class.forName(fullClassName, true, dynamicLoader) : Class.forName(fullClassName, true, new ClassLoader());
+                the_class = Class.forName(fullClassName, true, System.getProperty("java.vm.name").equals("Dalvik") ? dynamicLoader : new ClassLoader());
                 
                 if (bindDynamicObject(id, the_class))
                     return true;
@@ -839,7 +839,7 @@ public class OOLibrary extends Library {
                     Array.setChar(obj, index.intValue(), s.charAt(0));
                     break;
                 }
-                case "class [Z": {
+                case "class [Z":
                     String s = what.toString();
                     switch (s) {
                         case "true":
@@ -853,7 +853,6 @@ public class OOLibrary extends Library {
                                     .toString()));
                     }
                     break;
-                }
                 case "class [B": {
                     if (!(what instanceof Number)) {
                         throw new JavaException(new IllegalArgumentException(what
@@ -863,7 +862,7 @@ public class OOLibrary extends Library {
                     Array.setByte(obj, index.intValue(), (byte) v);
                     break;
                 }
-                case "class [S": {
+                case "class [S":
                     if (!(what instanceof Number)) {
                         throw new JavaException(new IllegalArgumentException(what
                                 .toString()));
@@ -871,7 +870,6 @@ public class OOLibrary extends Library {
                     short v = (short) ((Number) what).intValue();
                     Array.setShort(obj, index.intValue(), v);
                     break;
-                }
                 default:
                     throw new JavaException(new Exception());
             }
@@ -979,7 +977,7 @@ public class OOLibrary extends Library {
                         throw new JavaException(new IllegalArgumentException(what
                                 .toString()));
                 }
-                case "class [S": {
+                case "class [S":
                     Term value = new Int(Array.getInt(obj, index
                             .intValue()));
                     if (unify(what, value))
@@ -987,7 +985,6 @@ public class OOLibrary extends Library {
                     else
                         throw new JavaException(new IllegalArgumentException(what
                                 .toString()));
-                }
                 default:
                     throw new JavaException(new Exception());
             }
@@ -1345,7 +1342,7 @@ public class OOLibrary extends Library {
         }
         try {
             if (Boolean.class.isInstance(obj)) {
-                return (Boolean) obj ? unify(id, Term.TRUE) : unify(id, Term.FALSE);
+                return unify(id, (Boolean) obj ? Term.TRUE : Term.FALSE);
             } else if (Byte.class.isInstance(obj)) {
                 return unify(id, new Int(((Byte) obj).intValue()));
             } else if (Short.class.isInstance(obj)) {

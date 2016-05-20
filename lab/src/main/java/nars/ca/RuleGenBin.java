@@ -182,14 +182,14 @@ public class RuleGenBin {
 		// survivals
 		sTmp = "";
 		for (i = 0; i < maxIdx; i++) {
-			sTmp = rulesS[i] ? sTmp + '1' : sTmp + '0';
+			sTmp = sTmp + (rulesS[i] ? '1' : '0');
 		}
 		sBff = sBff + ",S" + CompactIt(sTmp);
 
 		// births
 		sTmp = "";
 		for (i = 0; i < maxIdx; i++) {
-			sTmp = rulesB[i] ? sTmp + '1' : sTmp + '0';
+			sTmp = sTmp + (rulesB[i] ? '1' : '0');
 		}
 		sBff = sBff + ",B" + CompactIt(sTmp);
 
@@ -329,9 +329,7 @@ public class RuleGenBin {
 						{
 							if (ColoringMethod == 1) // standard
 							{
-								bNewVal = bOldVal < (mjb.StatesCount - 1)
-										? (short) (bOldVal + 1)
-										: (short) (mjb.StatesCount - 1);
+								bNewVal = (short) (bOldVal < mjb.StatesCount - 1 ? bOldVal + 1 : mjb.StatesCount - 1);
 							} else {
 								// alternate coloring - cells remain not changed
 							}

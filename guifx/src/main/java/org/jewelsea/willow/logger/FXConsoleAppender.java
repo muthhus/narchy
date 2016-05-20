@@ -5,7 +5,7 @@ import ch.qos.logback.core.AppenderBase;
 
 abstract public class FXConsoleAppender extends AppenderBase<ILoggingEvent> {
   static int DEFAULT_LIMIT = 10;
-  int counter = 0;
+  int counter;
   int limit = DEFAULT_LIMIT;
   
   //PatternLayoutEncoder encoder;
@@ -32,6 +32,7 @@ abstract public class FXConsoleAppender extends AppenderBase<ILoggingEvent> {
     super.start();
   }
 
+  @Override
   abstract public void append(ILoggingEvent event);
 
 //    if (counter >= limit) {

@@ -32,7 +32,7 @@ public abstract class TimeControl extends NPanel implements ActionListener {
 
 
 
-    protected float currentSpeed = 0.0f;
+    protected float currentSpeed;
     //protected float lastSpeed = 0f;
 
     @SuppressWarnings("ConstructorNotProtectedInAbstractClass")

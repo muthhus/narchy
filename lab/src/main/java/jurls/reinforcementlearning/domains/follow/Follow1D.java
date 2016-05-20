@@ -99,10 +99,10 @@ public class Follow1D implements RLEnvironment {
     private final double maxPos = 1.0;
     private double myPos = 0.5;
     private double targetPos = 0.5;
-    private double myV = 0;
-    private double targetV = 0;
+    private double myV;
+    private double targetV;
     private final RenderComponent renderComponent = new RenderComponent();
-    int time = 0;
+    int time;
 
     double[] observation;
     @Override

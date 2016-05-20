@@ -26,6 +26,7 @@ public final class PooledVersioning extends Versioning {
         }
     }
 
+    @Override
     public final <X> FasterList<X> newValueStack() {
         //from heap:
         //return new FasterList(16);
@@ -34,6 +35,7 @@ public final class PooledVersioning extends Versioning {
         return valueStackPool.get();
     }
 
+    @Override
     public final int[] newIntStack() {
         return intStackPool.get();
     }

@@ -12,7 +12,7 @@ public class SineSource implements WaveSource {
 
     private final double freq;
     int samples;
-    private float t = 0;
+    private float t;
 
     public SineSource(double freq) {
         this.freq = freq;

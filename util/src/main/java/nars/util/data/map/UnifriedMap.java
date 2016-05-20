@@ -150,8 +150,8 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         this(Math.max(pairs.length, DEFAULT_INITIAL_CAPACITY), DEFAULT_LOAD_FACTOR);
         ArrayIterate.forEach(pairs, new MapCollectProcedure<Pair<K, V>, K, V>(
                 this,
-                Functions.<K>firstOfPair(),
-                Functions.<V>secondOfPair()));
+                Functions.firstOfPair(),
+                Functions.secondOfPair()));
     }
 
     public static <K, V> UnifriedMap<K, V> newMap() {
@@ -234,6 +234,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return new UnifriedMap<>(this);
     }
 
+    @Override
     public MutableMap<K, V> newEmpty() {
         return new UnifriedMap<>();
     }
@@ -294,6 +295,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return (h & (tl >> 1) - 1) << 1;
     }
 
+    @Override
     public final void clear() {
 
         if (occupied == 0)
@@ -786,6 +788,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
     }
 
+    @Override
     public final V get(Object key) {
 
         Object[] t = table;
@@ -824,6 +827,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return null;
     }
 
+    @Override
     public boolean containsKey(Object key) {
         Object[] t = table;
         int index = index(key, t.length);
@@ -855,6 +859,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return false;
     }
 
+    @Override
     public boolean containsValue(Object value) {
         Object[] t = table;
         int tl = t.length;
@@ -900,6 +905,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return false;
     }
 
+    @Override
     public void forEachKeyValue(Procedure2<? super K, ? super V> procedure) {
         if (isEmpty())
             return;
@@ -915,6 +921,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
     }
 
+    @Override
     public <E> MutableMap<K, V> collectKeysAndValues(
             Iterable<E> iterable,
             Function<? super E, ? extends K> keyFunction,
@@ -923,6 +930,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return this;
     }
 
+    @Override
     public final V removeKey(K key) {
         return remove(key);
     }
@@ -937,10 +945,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
     }
 
+    @Override
     public final int getBatchCount(int batchSize) {
         return Math.max(1, table.length / 2 / batchSize);
     }
 
+    @Override
     public void batchForEach(Procedure<? super V> procedure, int sectionIndex, int sectionCount) {
         Object[] t = table;
         int tl = t.length;
@@ -1023,6 +1033,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return occupied == 0;
     }
 
+    @Override
     public final void putAll(Map<? extends K, ? extends V> map) {
         if (map instanceof UnifriedMap<?, ?>) {
 
@@ -1097,6 +1108,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
     }
 
+    @Override
     public V remove(Object key) {
         int index = index(key);
         Object[] t = table;
@@ -1151,18 +1163,22 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         occupied--;
     }
 
+    @Override
     public final int size() {
         return occupied;
     }
 
+    @Override
     public final Set<Entry<K, V>> entrySet() {
         return new EntrySet();
     }
 
+    @Override
     public final Set<K> keySet() {
         return new KeySet();
     }
 
+    @Override
     public final Collection<V> values() {
         return new ValuesCollection();
     }
@@ -1280,6 +1296,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         forEachKeyValue(new Procedure2<K, V>() {
             private boolean first = true;
 
+            @Override
             public void value(K key, V value) {
                 if (first) {
                     first = false;
@@ -1297,6 +1314,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return builder.toString();
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         int size = in.readInt();
         loadFactor = in.readFloat();
@@ -1307,6 +1325,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(size());
         out.writeFloat(loadFactor);
@@ -1631,22 +1650,27 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     protected class KeySet implements Set<K>, Serializable, BatchIterable<K> {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public boolean add(K key) {
             throw new UnsupportedOperationException("Cannot call add() on " + getClass().getSimpleName());
         }
 
+        @Override
         public boolean addAll(Collection<? extends K> collection) {
             throw new UnsupportedOperationException("Cannot call addAll() on " + getClass().getSimpleName());
         }
 
+        @Override
         public void clear() {
             UnifriedMap.this.clear();
         }
 
+        @Override
         public boolean contains(Object o) {
             return containsKey(o);
         }
 
+        @Override
         public boolean containsAll(Collection<?> collection) {
             for (Object aCollection : collection) {
                 if (!containsKey(aCollection)) {
@@ -1656,20 +1680,24 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return true;
         }
 
+        @Override
         public boolean isEmpty() {
             return UnifriedMap.this.isEmpty();
         }
 
+        @Override
         public Iterator<K> iterator() {
             return new KeySetIterator();
         }
 
+        @Override
         public boolean remove(Object key) {
             int oldSize = occupied;
             UnifriedMap.this.remove(key);
             return occupied != oldSize;
         }
 
+        @Override
         public boolean removeAll(Collection<?> collection) {
             int oldSize = occupied;
             collection.forEach(UnifriedMap.this::remove);
@@ -1685,7 +1713,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
                     putIfFoundFromChain((Object[]) val, (K) key, other);
                     return;
                 }
-                if (nonNullTableObjectEquals(cur, (K) key)) {
+                if (nonNullTableObjectEquals(cur, key)) {
                     other.put((K) nonSentinel(cur), (V) val);
                 }
             }
@@ -1703,6 +1731,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             }
         }
 
+        @Override
         public boolean retainAll(Collection<?> collection) {
             int retainedSize = collection.size();
             UnifriedMap<K, V> retainedCopy = new UnifriedMap<>(retainedSize, loadFactor);
@@ -1718,18 +1747,22 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return false;
         }
 
+        @Override
         public int size() {
             return UnifriedMap.this.size();
         }
 
+        @Override
         public void forEach(Procedure<? super K> procedure) {
             forEachKey(procedure);
         }
 
+        @Override
         public int getBatchCount(int batchSize) {
             return UnifriedMap.this.getBatchCount(batchSize);
         }
 
+        @Override
         public void batchForEach(Procedure<? super K> procedure, int sectionIndex, int sectionCount) {
             Object[] map = table;
             int sectionSize = map.length / sectionCount;
@@ -1810,6 +1843,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return Iterate.makeString(this, "[", ", ", "]");
         }
 
+        @Override
         public Object[] toArray() {
             int size = UnifriedMap.this.size();
             Object[] result = new Object[size];
@@ -1817,6 +1851,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return result;
         }
 
+        @Override
         public <T> T[] toArray(T[] result) {
             int size = UnifriedMap.this.size();
             if (result.length < size) {
@@ -1859,10 +1894,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         protected int chainPosition;
         protected boolean lastReturned;
 
+        @Override
         public final boolean hasNext() {
             return count < size();
         }
 
+        @Override
         public void remove() {
             if (!lastReturned) {
                 throw new IllegalStateException("next() must be called as many times as remove()");
@@ -1932,6 +1969,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return (K) nonSentinel(cur);
         }
 
+        @Override
         public K next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("next() called, but the iterator is exhausted");
@@ -1960,14 +1998,17 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
 
         private final transient WeakReference<UnifriedMap<K, V>> holder = new WeakReference<>(UnifriedMap.this);
 
+        @Override
         public boolean add(Entry<K, V> entry) {
             throw new UnsupportedOperationException("Cannot call add() on " + getClass().getSimpleName());
         }
 
+        @Override
         public boolean addAll(Collection<? extends Entry<K, V>> collection) {
             throw new UnsupportedOperationException("Cannot call addAll() on " + getClass().getSimpleName());
         }
 
+        @Override
         public final void clear() {
             UnifriedMap.this.clear();
         }
@@ -2026,10 +2067,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return null;
         }
 
+        @Override
         public boolean contains(Object o) {
             return o instanceof Entry && containsEntry((Entry<?, ?>) o);
         }
 
+        @Override
         public boolean containsAll(Collection<?> collection) {
             for (Object obj : collection) {
                 if (!contains(obj)) {
@@ -2039,14 +2082,17 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return true;
         }
 
+        @Override
         public boolean isEmpty() {
             return UnifriedMap.this.isEmpty();
         }
 
+        @Override
         public Iterator<Entry<K, V>> iterator() {
             return new EntrySetIterator(holder);
         }
 
+        @Override
         public boolean remove(Object e) {
             if (!(e instanceof Entry)) {
                 return false;
@@ -2106,6 +2152,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return false;
         }
 
+        @Override
         public boolean removeAll(Collection<?> collection) {
             boolean changed = false;
             for (Object obj : collection) {
@@ -2116,6 +2163,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return changed;
         }
 
+        @Override
         public boolean retainAll(Collection<?> collection) {
             int retainedSize = collection.size();
             UnifriedMap<K, V> retainedCopy = new UnifriedMap<>(retainedSize, loadFactor);
@@ -2136,10 +2184,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return false;
         }
 
+        @Override
         public final int size() {
             return UnifriedMap.this.size();
         }
 
+        @Override
         public final void forEach(Procedure<? super Entry<K, V>> procedure) {
             Object[] tt = table;
             int len = tt.length;
@@ -2165,10 +2215,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             }
         }
 
+        @Override
         public final int getBatchCount(int batchSize) {
             return UnifriedMap.this.getBatchCount(batchSize);
         }
 
+        @Override
         public final void batchForEach(Procedure<? super Entry<K, V>> procedure, int sectionIndex, int sectionCount) {
             Object[] map = table;
             int sectionSize = map.length / sectionCount;
@@ -2210,12 +2262,14 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             }
         }
 
+        @Override
         public Object[] toArray() {
             Object[] result = new Object[UnifriedMap.this.size()];
             copyEntries(result);
             return result;
         }
 
+        @Override
         public <T> T[] toArray(T[] result) {
             int size = UnifriedMap.this.size();
             if (result.length < size) {
@@ -2276,6 +2330,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return new WeakBoundEntry<>((K) nonSentinel(cur), (V) value, holder);
         }
 
+        @Override
         public Entry<K, V> next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("next() called, but the iterator is exhausted");
@@ -2310,14 +2365,17 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             this.holder = holder;
         }
 
+        @Override
         public K getKey() {
             return key;
         }
 
+        @Override
         public V getValue() {
             return value;
         }
 
+        @Override
         public V setValue(V value) {
             this.value = value;
             UnifriedMap<K, V> map = holder.get();
@@ -2371,27 +2429,33 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             implements Serializable, BatchIterable<V> {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void clear() {
             UnifriedMap.this.clear();
         }
 
+        @Override
         public boolean contains(Object o) {
             return containsValue(o);
         }
 
+        @Override
         public boolean containsAll(Collection<?> collection) {
             // todo: this is N^2. if c is large, we should copy the values to a set.
             return Iterate.allSatisfy(collection, Predicates.in(this));
         }
 
+        @Override
         public boolean isEmpty() {
             return UnifriedMap.this.isEmpty();
         }
 
+        @Override
         public Iterator<V> iterator() {
             return new ValuesIterator();
         }
 
+        @Override
         public boolean remove(Object o) {
             // this is so slow that the extra overhead of the iterator won't be noticeable
             if (o == null) {
@@ -2413,6 +2477,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return false;
         }
 
+        @Override
         public boolean removeAll(Collection<?> collection) {
             // todo: this is N^2. if c is large, we should copy the values to a set.
             boolean changed = false;
@@ -2425,6 +2490,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return changed;
         }
 
+        @Override
         public boolean retainAll(Collection<?> collection) {
             boolean modified = false;
             Iterator<V> e = iterator();
@@ -2437,18 +2503,22 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return modified;
         }
 
+        @Override
         public int size() {
             return UnifriedMap.this.size();
         }
 
+        @Override
         public void forEach(Procedure<? super V> procedure) {
             forEachValue(procedure);
         }
 
+        @Override
         public int getBatchCount(int batchSize) {
             return UnifriedMap.this.getBatchCount(batchSize);
         }
 
+        @Override
         public void batchForEach(Procedure<? super V> procedure, int sectionIndex, int sectionCount) {
             UnifriedMap.this.batchForEach(procedure, sectionIndex, sectionCount);
         }
@@ -2474,6 +2544,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             }
         }
 
+        @Override
         public Object[] toArray() {
             int size = UnifriedMap.this.size();
             Object[] result = new Object[size];
@@ -2481,6 +2552,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return result;
         }
 
+        @Override
         public <T> T[] toArray(T[] result) {
             int size = UnifriedMap.this.size();
             if (result.length < size) {
@@ -2536,6 +2608,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
             return val;
         }
 
+        @Override
         public V next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("next() called, but the iterator is exhausted");

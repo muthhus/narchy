@@ -14,7 +14,7 @@ import jurls.core.utils.Utils;
 public class OutputNormalizer implements ParameterizedFunction {
 
     private final ParameterizedFunction parameterizedFunction;
-    private double minOutput = 0;
+    private double minOutput;
     private double maxOutput = 1;
 
     public OutputNormalizer(ParameterizedFunction parameterizedFunction) {

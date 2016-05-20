@@ -50,6 +50,7 @@ implements MouseListener
 		addMouseListener(this);
 	}
 
+	@Override
 	public void paint(Graphics g)
 	{
 		g.setColor(Color.black);
@@ -58,18 +59,23 @@ implements MouseListener
 			g.drawString(about[i], 6, (i+1)*18);
 	}
 
+	@Override
 	public void mouseClicked(MouseEvent e)
 	{
 		dispose();
 		// e.consume();
 	}
 
-	public void mousePressed(MouseEvent e) 
+	@Override
+	public void mousePressed(MouseEvent e)
 	{}
 
-	public void mouseReleased(MouseEvent e) 
+	@Override
+	public void mouseReleased(MouseEvent e)
 	{}
+	@Override
 	public void mouseEntered(MouseEvent e) {}
+	@Override
 	public void mouseExited(MouseEvent e) {}
 
 }

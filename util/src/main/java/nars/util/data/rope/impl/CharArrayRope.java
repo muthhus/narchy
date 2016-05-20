@@ -40,7 +40,7 @@ public final class CharArrayRope extends AbstractRope implements FlatRope {
 
     public final char[] sequence;
     int len;
-    int hash = 0;
+    int hash;
 
     /**
      * Constructs a new rope from a character array. Does not make a copy but

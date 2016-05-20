@@ -16,7 +16,7 @@ import nars.guifx.util.Animate;
 public class Tangible {
 
 	private final Node node;
-	Spacegraph parent = null;
+	Spacegraph parent;
 	private Overlay ww;
 	private Bounds currentBounds;
 

@@ -78,7 +78,7 @@ public class PoleBalancing2D implements RLEnvironment {
 //    }
 
     /* -1, 0, +1 */
-    double dvx = 0;
+    double dvx;
 
     public void takeAction3(int action) {
         action--;

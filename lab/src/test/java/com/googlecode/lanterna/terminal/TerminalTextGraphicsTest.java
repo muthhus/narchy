@@ -36,7 +36,7 @@ public class TerminalTextGraphicsTest {
         TextGraphics textGraphics = terminal.newTextGraphics();
         if((args.length > 0 && args[0].equals("--square")) ||
                 (args.length > 1 && args[1].equals("--square"))) {
-            textGraphics = new DoublePrintingTextGraphics((AbstractTextGraphics)textGraphics);
+            textGraphics = new DoublePrintingTextGraphics(textGraphics);
         }
         textGraphics.setForegroundColor(TextColor.ANSI.BLUE);
         textGraphics.putString(3, 3, "Hello World!");

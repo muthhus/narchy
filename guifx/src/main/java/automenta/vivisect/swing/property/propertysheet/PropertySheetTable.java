@@ -57,7 +57,7 @@ public class PropertySheetTable extends JTable {
 
   private final TableCellRenderer nameRenderer;
   
-  private boolean wantsExtraIndent = false;
+  private boolean wantsExtraIndent;
   
   /**
    * Cancel editing when editing row is changed
@@ -618,7 +618,7 @@ public class PropertySheetTable extends JTable {
         indent = table.getWantsExtraIndent()?HOTSPOT_SIZE:0;
       } else {
         // it is a property with children
-        indent = item.hasToggle() ? item.getDepth() * HOTSPOT_SIZE : (item.getDepth() + 1) * HOTSPOT_SIZE;
+        indent = (item.hasToggle() ? item.getDepth() : item.getDepth() + 1) * HOTSPOT_SIZE;
       }
       
       if (table.getSheetModel().getMode() == PropertySheet.VIEW_AS_CATEGORIES

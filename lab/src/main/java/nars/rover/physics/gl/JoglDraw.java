@@ -100,6 +100,7 @@ public class JoglDraw extends JoglAbstractDraw {
     }
 
 
+    @Override
     public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
         GL2 gl = this.gl;
         //gl.glPushMatrix();

@@ -39,7 +39,7 @@ public final class LabelListFunnel
     implements Funnel<Label>
 {
     private final Set<Label> labels = Sets.newHashSet();
-    private int index = 0;
+    private int index;
 
     @Override
     public void funnel(Label from, PrimitiveSink into)

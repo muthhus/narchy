@@ -21,10 +21,10 @@ public class Thermostat implements Environment {
 
     public float targetPeriod = 15;
     public final float speed = 0.17f;
-    boolean print = false;
+    boolean print;
     private MutableFloat yHidden;
     private MutableFloat yEst;
-    boolean enableAbsolute = false; //additional inputs
+    boolean enableAbsolute; //additional inputs
 
     @Override public Twin<Integer> start() {
 

@@ -66,7 +66,7 @@ public class DockingRegionSplit extends JSplitPane
 
         DockingRegionSplit split = new DockingRegionSplit(splitLeftChild, splitRightChild);
         split.setOrientation(vertical ? JSplitPane.VERTICAL_SPLIT : JSplitPane.HORIZONTAL_SPLIT);
-        split.setDividerLocation(vertical ? getHeight() / 2 : getWidth() / 2);
+        split.setDividerLocation((vertical ? getHeight() : getWidth()) / 2);
         split.setDockParent(this);
 
         int oldDivide = getDividerLocation();

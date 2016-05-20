@@ -14,7 +14,7 @@ import java.awt.*;
  */
 public class FunctionRenderer2D extends JPanel {
 
-    private RenderFunction2D renderFunction2D = null;
+    private RenderFunction2D renderFunction2D;
     private final int n = 20;
 
     public void setRenderFunction2D(RenderFunction2D renderFunction2D) {

@@ -10,7 +10,7 @@ import java.util.Random;
 public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	private final float[] sourceBuffer;
-	private float now = 0L;
+	private float now;
 
     /** this actually represents the target amplitude which the current amplitude will continuously interpolate towards */
     public final MutableDouble amplitude = new MutableDouble(1.0);
@@ -21,12 +21,12 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
     public final MutableDouble pitchFactor = new MutableDouble(1.0);
 
     /** grains are represented as a triple of long integers (see Granulator.createGrain() which constructs these) */
-	private long[] currentGrain = null;
-	private long[] fadingGrain = null;
+	private long[] currentGrain;
+	private long[] fadingGrain;
 
 	private final Granulator granulator;
-	private boolean isPlaying = false;
-	private float playTime = 0L;
+	private boolean isPlaying;
+	private float playTime;
 	private int playOffset = -1;
 
 

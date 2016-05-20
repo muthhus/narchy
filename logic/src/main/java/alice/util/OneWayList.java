@@ -41,7 +41,7 @@ public final class OneWayList<E> {
         for(T obj : list){
             OneWayList<T> l = new OneWayList<T>(obj, null);
 
-            p = (result == null) ? ((result = l)) : ((p.tail = l));
+            p = ((result == null ? result : p.tail = l));
 
         }
 

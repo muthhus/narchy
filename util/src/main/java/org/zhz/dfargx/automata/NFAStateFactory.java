@@ -5,7 +5,7 @@ package org.zhz.dfargx.automata;
  */
 public enum NFAStateFactory {
     ;
-    private static int nextID = 0;
+    private static int nextID;
 
     public static NFAState create() {
         return new NFAState(nextID++);

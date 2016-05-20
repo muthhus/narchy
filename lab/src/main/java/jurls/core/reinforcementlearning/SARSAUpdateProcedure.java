@@ -15,9 +15,9 @@ import jurls.core.utils.Utils;
  */
 public class SARSAUpdateProcedure implements UpdateProcedure {
 
-    private double[] deltas = null;
-    private double[] gradient = null;
-    private double[] stateAction = null;
+    private double[] deltas;
+    private double[] gradient;
+    private double[] stateAction;
 
     @Override
     public void update(

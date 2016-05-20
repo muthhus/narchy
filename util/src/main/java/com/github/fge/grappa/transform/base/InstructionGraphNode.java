@@ -53,7 +53,7 @@ public final class InstructionGraphNode
     private boolean isActionRoot;
     private final int id;
 
-    private static volatile int nextID = 0;
+    private static volatile int nextID;
     private static int nextID() {
         return nextID++;
     }

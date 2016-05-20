@@ -32,12 +32,12 @@ public class NeuroMap {
 
     public final ParameterizedFunction[] functions;
     public final InputOutput[] memory;
-    private int numElements = 0;
+    private int numElements;
     private final Random random = new Random();
-    private int iterations = 0;
+    private int iterations;
     private boolean running = true;
-    private int iterationsPerSecondCounter = 0;
-    private int iterationsPerSecond = 0;
+    private int iterationsPerSecondCounter;
+    private int iterationsPerSecond;
     private long t0 = System.currentTimeMillis();
 
     public int getCapacity() { return memory.length; }

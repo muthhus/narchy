@@ -322,5 +322,6 @@ public interface Window extends BasePane {
      * @param position Position expressed in global coordinates to translate to local coordinates of this Window
      * @return The global coordinates expressed as local coordinates
      */
+    @Override
     TerminalPosition fromGlobal(TerminalPosition position);
 }

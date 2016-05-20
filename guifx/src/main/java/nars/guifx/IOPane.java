@@ -25,7 +25,7 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 
     public class DefaultTracePane extends TracePane {
 
-        private boolean showTime = false;
+        private final boolean showTime;
 
         public DefaultTracePane(NAR nar, DoubleProperty volume) {
             super(nar, volume);

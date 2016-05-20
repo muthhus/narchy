@@ -41,7 +41,7 @@ public class TetrisState {
     public boolean blockMobile = true;
     public int currentBlockId;/*which block we're using in the block table*/
 
-    public int currentRotation = 0;
+    public int currentRotation;
     public int currentX;/* where the falling block is currently*/
 
     public int currentY;

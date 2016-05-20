@@ -121,7 +121,7 @@ public class JCollapsiblePane extends JPanel {
   /**
    * Indicates whether the component is collapsed or expanded
    */
-  private boolean collapsed = false;
+  private boolean collapsed;
 
   /**
    * Timer used for doing the transparency animation (fade-in)
@@ -460,12 +460,12 @@ public class JCollapsiblePane extends JPanel {
      * animation is going to be to scroll up the component. If it is < then
      * finalHeight, then the animation will scroll down the component.
      */
-    private int startHeight = 0;
+    private int startHeight;
     /**
      * This is the final height that the content container is going to be when
      * scrolling is finished.
      */
-    private int finalHeight = 0;
+    private int finalHeight;
     /**
      * The current alpha setting used during "animation" (fade-in/fade-out)
      */

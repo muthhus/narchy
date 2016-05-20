@@ -107,7 +107,7 @@ public class TruthPolation {
         }, times, freq, conf, exp,
                 //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
                 s);
-        return new DefaultTruth( (float)v[0], Math.max(Global.TRUTH_EPSILON, w2c( (float) v[1])));
+        return new DefaultTruth(v[0], Math.max(Global.TRUTH_EPSILON, w2c(v[1])));
 
     }
 

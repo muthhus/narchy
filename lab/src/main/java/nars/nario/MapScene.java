@@ -28,15 +28,15 @@ public class MapScene extends Scene
     private final Image staticBg;
     private final Graphics staticGr;
     private Random random = new Random();
-    private int moveTime = 0;
+    private int moveTime;
     private final MarioComponent marioComponent;
     private long seed;
     private int worldNumber;
 
-    private int levelId = 0;
-    private int farthest = 0;
-    private int xFarthestCap = 0;
-    private int yFarthestCap = 0;
+    private int levelId;
+    private int farthest;
+    private int xFarthestCap;
+    private int yFarthestCap;
 
     public MapScene(GraphicsConfiguration graphicsConfiguration, MarioComponent marioComponent, long seed)
     {
@@ -493,7 +493,7 @@ public class MapScene extends Scene
         return true;
     }
 
-    private boolean canEnterLevel = false;
+    private boolean canEnterLevel;
 
     @Override
     public void tick()

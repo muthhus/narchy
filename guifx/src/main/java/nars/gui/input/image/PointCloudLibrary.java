@@ -80,7 +80,7 @@ import static nars.gui.input.image.PointCloudPoint.pcp;
 public class PointCloudLibrary
 {
   private static final double CLOSE_ENOUGH = 0.3;
-  private static PointCloudLibrary demoLibrary = null;
+  private static PointCloudLibrary demoLibrary;
   private ArrayList<PointCloud> _pointClouds =  new ArrayList<>();
 
   public PointCloudLibrary()

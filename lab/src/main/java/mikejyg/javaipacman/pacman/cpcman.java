@@ -36,7 +36,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	int timerPeriod=12;  // in miliseconds
 
 	// the timer will increment this variable to signal a frame
-	protected int signalMove=0;
+	protected int signalMove;
 
 	// for graphics
 	final int canvasWidth=368;
@@ -103,7 +103,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 
 	// the direction specified by key
 	protected int pacKeyDir;
-	int key=0;
+	int key;
 	final int NONE=0;
 	final int SUSPEND=1;  // stop/start
 	final int BOSS=2;      // boss
@@ -462,6 +462,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	///////////////////////////////////////////
 	// this is the routine draw each frames
 	///////////////////////////////////////////
+	@Override
 	public void update(Graphics g)
 	{
 
@@ -471,6 +472,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	///////////////////////////////////////
 	// process key input
 	///////////////////////////////////////
+	@Override
 	public void keyPressed(KeyEvent e)
 	{
 		switch (e.getKeyCode())
@@ -501,12 +503,15 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 		}
 	}
 
+	@Override
 	public void keyTyped(KeyEvent e) {}
+	@Override
 	public void keyReleased(KeyEvent e) {}
 
 	/////////////////////////////////////////////////
 	// handles menu event
 	/////////////////////////////////////////////////
+	@Override
 	public void actionPerformed(ActionEvent e)
 	{
 		if (gameState==RUNNING)
@@ -518,32 +523,40 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	///////////////////////////////////////////////////
 	// handles window event
 	///////////////////////////////////////////////////
+	@Override
 	public void windowOpened(WindowEvent e)
 	{}
 
+	@Override
 	public void windowClosing(WindowEvent e)
 	{
 		dispose();
 	}
 
+	@Override
 	public void windowClosed(WindowEvent e)
 	{}
 
+	@Override
 	public void windowIconified(WindowEvent e)
 	{}
 
+	@Override
 	public void windowDeiconified(WindowEvent e)
 	{}
 
+	@Override
 	public void windowActivated(WindowEvent e)
 	{}
 
+	@Override
 	public void windowDeactivated(WindowEvent e)
 	{}
 
 	/////////////////////////////////////////////////
 	// the timer
 	/////////////////////////////////////////////////
+	@Override
 	public void run()
 	{
 //		while (true)
@@ -625,8 +638,9 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	}
 
 	// for applet the check state
-	boolean finalized=false;
+	boolean finalized;
 
+	@Override
 	public void dispose()
 	{
 		//      timer.stop();	// deprecated

@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractRope implements Rope {
 
-    protected int hashCode = 0;
+    protected int hashCode;
 
     @Override
     public Rope append(char c) {
@@ -270,7 +270,7 @@ public abstract class AbstractRope implements Rope {
 
     @Override
     public Rope insert(int dstOffset, CharSequence s) {
-        Rope r = (s == null) ? Rope.build("null") : Rope.build(s);
+        Rope r = Rope.build(s == null ? "null" : s);
         if (dstOffset == 0) {
             return r.append(this);
         }

@@ -31,9 +31,9 @@ public final class MatcherContextBuilder
 {
     private static final ValueStack<Object> STACK
         = new DefaultValueStack<>();
-    private InputBuffer buffer = null;
-    private Matcher matcher = null;
-    private int index = 0;
+    private InputBuffer buffer;
+    private Matcher matcher;
+    private int index;
 
     public MatcherContextBuilder withInput(@Nonnull String input)
     {

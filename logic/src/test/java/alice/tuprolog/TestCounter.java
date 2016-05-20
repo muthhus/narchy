@@ -2,7 +2,7 @@ package alice.tuprolog;
 
 public class TestCounter {
 	
-	private int value = 0;
+	private int value;
 	
 	public void update() {
 		value++;

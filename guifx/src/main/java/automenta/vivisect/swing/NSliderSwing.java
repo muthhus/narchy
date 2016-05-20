@@ -38,7 +38,7 @@ public class NSliderSwing extends JLabel implements MouseListener, MouseMotionLi
     public final AtomicDouble value;
     protected float min;
     protected float max;
-    protected Color barColor = null;
+    protected Color barColor;
     protected Color barBgColor = Color.BLACK;
     protected Color backgroundColor = Color.BLACK;
     protected boolean dragging;

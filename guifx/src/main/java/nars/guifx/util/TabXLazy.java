@@ -17,7 +17,7 @@ public class TabXLazy extends TabX implements Runnable {
     static final ExecutorService exe = Executors.newCachedThreadPool();
 
     private final Supplier<Node> contentBuilder;
-    private Node map = null;
+    private Node map;
 
     public TabXLazy(String label, Supplier<Node> contentBuilder) {
         super(label, new Label(" "));

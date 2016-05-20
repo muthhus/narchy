@@ -5,7 +5,7 @@ import nars.audio.SoundProducer;
 
 public class SamplePlayer implements SoundProducer {
     private final SonarSample sample;
-    private float pos = 0;
+    private float pos;
     public boolean alive = true;
     private final float rate;
 

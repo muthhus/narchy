@@ -17,7 +17,7 @@ public class EnumEditor extends ComboBoxPropertyEditor {
 	 */
 	private static final class EnumWrapper {
 
-		private Enum<?> value = null;
+		private Enum<?> value;
 
 		public EnumWrapper(Enum<?> value) {
 			this.value = value;
@@ -33,7 +33,7 @@ public class EnumEditor extends ComboBoxPropertyEditor {
 		}
 	}
 
-	private Class<? extends Enum<?>> enumeration = null;
+	private Class<? extends Enum<?>> enumeration;
 
 	public EnumEditor(Object property) {
 

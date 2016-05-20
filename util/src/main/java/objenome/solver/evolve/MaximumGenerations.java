@@ -40,7 +40,7 @@ public class MaximumGenerations implements PopulationTermination, Listener<EndGe
     /**
      * The generation counter.
      */
-    private int generation = 0;
+    private int generation;
 
     /**
      * Constructs a <code>MaximumGenerations</code>.

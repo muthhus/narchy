@@ -8,8 +8,8 @@ public class Recorder {
 	private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	private final DataOutputStream dos = new DataOutputStream(baos);
 
-	private byte lastTick = 0;
-	private int tickCount = 0;
+	private byte lastTick;
+	private int tickCount;
 
 	public void addLong(long val) {
 		try {

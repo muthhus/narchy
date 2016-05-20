@@ -109,6 +109,7 @@ abstract public class Versioning extends FasterList<Versioned> {
     abstract public int[] newIntStack();
 
 
+    @Override
     public void clear() {
         revert(0);
     }

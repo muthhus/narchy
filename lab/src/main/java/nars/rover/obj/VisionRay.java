@@ -40,7 +40,7 @@ public class VisionRay extends Component implements LayerDraw {
     private boolean eats;
     protected Body hitNext;
 
-    private Term hitMaterial = null;
+    private Term hitMaterial;
     //public float hitDist;
 
     //final Sensor sensor;

@@ -15,9 +15,9 @@ class MJBoard extends Panel implements Runnable {
 	public static final int MAX_Y = 600;
 	public static final int MAX_CLO = 255; // max. state
 	public static final int MAX_CELLSIZE = 32; // max. cell size, in pixels
-	public Thread caThread = null;
+	public Thread caThread;
 	public final MJPalette mjPal; // color palette
-	private boolean InitDone = false;
+	private boolean InitDone;
 	private final MJCellUI mjUI; // the user interface object (parent)
 	public int AnimDelay = 100; // default delay between cycles
 	public int RefreshStep = 1; // refresh every 1 cycle
@@ -30,15 +30,15 @@ class MJBoard extends Panel implements Runnable {
 	public int Population; // count of alive cells
 	public final int[] Populations = new int[MAX_CLO + 1]; // count of cells in each
 	// state
-	private int lastX = 0, lastY = 0; // mouse handling
-	public boolean IsRunning = false; // is an animation running?
+	private int lastX, lastY; // mouse handling
+	public boolean IsRunning; // is an animation running?
 	public boolean DrawGrid = true; // draw grid
 	public int ColoringMethod = 1; // 1 - standard, 2 - alternate
 	public int CrrState = 1; // active state (color)
 
 	// local controls
 	private final Panel pnlBotm; // bottom panel, for scrollbar and buttons
-	private Scrollbar hSbar = null, vSbar = null; // scrollbars
+	private Scrollbar hSbar, vSbar; // scrollbars
 	private final int sbarWidth = 16; // scrollbars width
 	private final Button btnZoomIn = new Button("+");
 	private final Button btnZoomOut = new Button("-");
@@ -61,8 +61,8 @@ class MJBoard extends Panel implements Runnable {
 
 	//private Graphics offGrx; // the image's graphics
 	private MemoryImageSource offSrs;
-	private int OfsX = 0;
-	private int OfsY = 0;
+	private int OfsX;
+	private int OfsY;
 
 	// Rules
 	public boolean WrapAtEdges = true; // wrap at edges
@@ -856,8 +856,8 @@ class MJBoard extends Panel implements Runnable {
 								for (jc = 0; jc < CellSize; jc++) {
 									if (fDrawGrid
 											&& ((ic == CellSize - 1) || (jc == CellSize - 1))) {
-										screen[iTmpCol++] = ((ic == CellSize - 1) && ((ViewOrg.y + j) % 5 == 0))
-												|| ((jc == CellSize - 1) && ((ViewOrg.x + i) % 5 == 0)) ? mjPal.GridColor[1] : mjPal.GridColor[0];
+										screen[iTmpCol++] = mjPal.GridColor[ic == CellSize - 1 && (ViewOrg.y + j) % 5 == 0
+												|| jc == CellSize - 1 && (ViewOrg.x + i) % 5 == 0 ? 1 : 0];
 										// grid
 										// line
 									} else {

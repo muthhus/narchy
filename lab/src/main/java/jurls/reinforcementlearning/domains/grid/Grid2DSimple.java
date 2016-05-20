@@ -43,7 +43,7 @@ public class Grid2DSimple implements World {
     @Override    public int getNumActions() {     return size;    }
     @Override    public boolean isActive()  {     return time < totalTime;   }
 
-    double[] action2 = null;
+    double[] action2;
 
     double get(double[] d, int x, int y) {
         return d[y * h + x];

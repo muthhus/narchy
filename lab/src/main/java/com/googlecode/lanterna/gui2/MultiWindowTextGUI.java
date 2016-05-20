@@ -175,6 +175,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
                 return localPosition;
             }
 
+            @Override
             public TerminalPosition fromGlobal(TerminalPosition globalPosition) {
                 return globalPosition;
             }
@@ -456,6 +457,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
      * @param reverse Direction to cycle through the windows
      * @return Itself
      */
+    @Override
     public synchronized WindowBasedTextGUI cycleActiveWindow(boolean reverse) {
         if(windows.isEmpty() || windows.size() == 1 || activeWindow.getHints().contains(Window.Hint.MODAL)) {
             return this;

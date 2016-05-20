@@ -74,10 +74,12 @@ public class MotorJoint extends Joint {
     out.set(m_bodyB.getPosition());
   }
 
+  @Override
   public void getReactionForce(float inv_dt, Vec2 out) {
     out.set(m_linearImpulse).mulLocal(inv_dt);
   }
 
+  @Override
   public float getReactionTorque(float inv_dt) {
     return m_angularImpulse * inv_dt;
   }

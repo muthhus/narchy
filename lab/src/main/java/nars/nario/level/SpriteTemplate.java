@@ -8,7 +8,7 @@ import nars.nario.sprites.Sprite;
 public class SpriteTemplate {
 	public int lastVisibleTick = -1;
 	public Sprite sprite;
-	public boolean isDead = false;
+	public boolean isDead;
 	private final boolean winged;
 
 	private final int type;

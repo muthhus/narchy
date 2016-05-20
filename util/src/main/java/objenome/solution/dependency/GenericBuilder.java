@@ -15,7 +15,7 @@ public class GenericBuilder<E> implements Builder, Interceptor<E> {
 
     private final Class<?> type;
 
-    private Interceptor<E> interceptor = null;
+    private Interceptor<E> interceptor;
 
     public GenericBuilder(Object factory, String methodName) {
 

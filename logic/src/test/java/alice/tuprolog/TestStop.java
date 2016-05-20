@@ -8,6 +8,7 @@ class PrologThread extends Thread {
 		this.goal = goal;
 	}
 
+	@Override
 	public void run(){
 		try {
 			System.out.println("STARTING...");

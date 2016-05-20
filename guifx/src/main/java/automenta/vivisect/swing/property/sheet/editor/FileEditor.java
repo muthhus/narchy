@@ -26,9 +26,9 @@ public class FileEditor extends AbstractPropertyEditor {
 
 		private static final long serialVersionUID = 411604969565728959L;
 
-		private JTextField textfield = null;
-		private JButton button = null;
-		private JButton cancelButton = null;
+		private JTextField textfield;
+		private JButton button;
+		private JButton cancelButton;
 
 		@SuppressWarnings("HardcodedFileSeparator")
 		public FileEditorComponent() {
@@ -152,7 +152,7 @@ public class FileEditor extends AbstractPropertyEditor {
 		}
 	}
 
-	protected FileEditorComponent fileEditor = null;
+	protected FileEditorComponent fileEditor;
 
 	public FileEditor() {
 		editor = fileEditor = new FileEditorComponent();

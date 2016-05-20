@@ -33,8 +33,8 @@ public class LevelScene extends Scene implements SpriteContext
 
     private final GraphicsConfiguration graphicsConfiguration;
 
-    public boolean paused = false;
-    public int startTime = 0;
+    public boolean paused;
+    public int startTime;
     private int timeLeft;
 
     //    private Recorder recorder = new Recorder();
@@ -112,7 +112,7 @@ public class LevelScene extends Scene implements SpriteContext
     }
     
 
-    public int fireballsOnScreen = 0;
+    public int fireballsOnScreen;
 
     List<Shell> shellsToCheck = new ArrayList<>();
 

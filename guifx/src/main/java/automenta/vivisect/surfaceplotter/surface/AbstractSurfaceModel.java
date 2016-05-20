@@ -116,7 +116,7 @@ public abstract class AbstractSurfaceModel implements SurfaceModel{
 	 * 
 	 * @return <code>true</code> if the checkbox is checked, <code>false</code> otherwise
 	 */
-	protected boolean expectDelay = false;
+	protected boolean expectDelay;
 
 	/**
 	 * Determines whether the first function is selected.

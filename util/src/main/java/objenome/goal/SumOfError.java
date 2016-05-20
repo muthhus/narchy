@@ -226,7 +226,7 @@ public class SumOfError<I,O> extends TypedFitnessFunction implements Listener<Co
 
 
     double minError = Double.MAX_VALUE;
-    TypedOrganism best = null;
+    TypedOrganism best;
 
     protected void onEvaluate(TypedOrganism i, double error) {
         if (minError > error) {

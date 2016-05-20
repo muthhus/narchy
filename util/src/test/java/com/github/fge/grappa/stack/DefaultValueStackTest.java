@@ -224,23 +224,23 @@ public final class DefaultValueStackTest
         List<Object> l;
 
         n = 2;
-        l = Arrays.<Object>asList(2, 1, 3, 4, 5, 6);
+        l = Arrays.asList(2, 1, 3, 4, 5, 6);
         list.add(new Object[] { n, l });
 
         n = 3;
-        l = Arrays.<Object>asList(3, 2, 1, 4, 5, 6);
+        l = Arrays.asList(3, 2, 1, 4, 5, 6);
         list.add(new Object[] { n, l });
 
         n = 4;
-        l = Arrays.<Object>asList(4, 3, 2, 1, 5, 6);
+        l = Arrays.asList(4, 3, 2, 1, 5, 6);
         list.add(new Object[] { n, l });
 
         n = 5;
-        l = Arrays.<Object>asList(5, 4, 3, 2, 1, 6);
+        l = Arrays.asList(5, 4, 3, 2, 1, 6);
         list.add(new Object[] { n, l });
 
         n = 6;
-        l = Arrays.<Object>asList(6, 5, 4, 3, 2, 1);
+        l = Arrays.asList(6, 5, 4, 3, 2, 1);
         list.add(new Object[] { n, l });
 
         return list.iterator();
@@ -249,7 +249,7 @@ public final class DefaultValueStackTest
     @Test(dataProvider = "getSwapData")
     public void swappingWorks(int n, List<Object> expected)
     {
-        List<Object> orig = Arrays.<Object>asList(1, 2, 3, 4, 5, 6);
+        List<Object> orig = Arrays.asList(1, 2, 3, 4, 5, 6);
         SoftAssertions soft = new SoftAssertions();
 
         List<Object> l = new ArrayList<>(orig);
@@ -287,8 +287,8 @@ public final class DefaultValueStackTest
     @Test
     public void snapshotAndRestoreWorksAsExpected()
     {
-        List<Object> orig = Arrays.<Object>asList(1, 2, 3);
-        List<Object> replace = Arrays.<Object>asList(4, 5, 6);
+        List<Object> orig = Arrays.asList(1, 2, 3);
+        List<Object> replace = Arrays.asList(4, 5, 6);
         SoftAssertions soft = new SoftAssertions();
 
         stack.push(3);

@@ -235,6 +235,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
   /**
    * This is called from DynamicTree::query when we are gathering pairs.
    */
+  @Override
   public final boolean treeCallback(int proxyId) {
     // A proxy cannot form a pair with itself.
     if (proxyId == m_queryProxyId) {

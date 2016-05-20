@@ -26,7 +26,7 @@ public class ApproximationDemo1D extends JFrame {
 
     private final ApproxParameters approxParameters = new ApproxParameters(0.01, 0.1);
     private final RenderParameterizedFunction1D renderParameterizedFunction = new RenderParameterizedFunction1D(Color.yellow);
-    private int numIterations = 0;
+    private int numIterations;
     private int numIterationsPerLoop = 1;
     private final ApproximatorMenu approximatorMenu = new ApproximatorMenu(false);
     private final ObjectListMenu iterationsMenu = new ObjectListMenu(

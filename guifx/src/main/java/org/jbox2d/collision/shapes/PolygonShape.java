@@ -83,6 +83,7 @@ public class PolygonShape extends Shape {
     m_centroid.setZero();
   }
 
+  @Override
   public final Shape clone() {
     PolygonShape shape = new PolygonShape();
     shape.m_centroid.set(this.m_centroid);
@@ -282,6 +283,7 @@ public class PolygonShape extends Shape {
     }
   }
 
+  @Override
   public int getChildCount() {
     return 1;
   }
@@ -523,7 +525,7 @@ public class PolygonShape extends Shape {
       // Triangle vertices.
       final Vec2 p1 = pRef;
       final Vec2 p2 = vs[i];
-      final Vec2 p3 = i + 1 < count ? vs[i + 1] : vs[0];
+      final Vec2 p3 = vs[i + 1 < count ? i + 1 : 0];
 
       e1.set(p2).subLocal(p1);
       e2.set(p3).subLocal(p1);
@@ -543,6 +545,7 @@ public class PolygonShape extends Shape {
     out.mulLocal(1.0f / area);
   }
 
+  @Override
   public void computeMass(final MassData massData, float density) {
     // Polygon mass, centroid, and inertia.
     // Let rho be the polygon density in mass per unit area.
@@ -593,7 +596,7 @@ public class PolygonShape extends Shape {
     for (int i = 0; i < m_count; ++i) {
       // Triangle vertices.
       e1.set(m_vertices[i]).subLocal(s);
-      e2.set(s).negateLocal().addLocal(i + 1 < m_count ? m_vertices[i + 1] : m_vertices[0]);
+      e2.set(s).negateLocal().addLocal(m_vertices[i + 1 < m_count ? i + 1 : 0]);
 
       final float D = Vec2.cross(e1, e2);
 

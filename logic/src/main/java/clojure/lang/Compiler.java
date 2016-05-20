@@ -348,8 +348,9 @@ static final public Var CLEAR_SITES = Var.create(null).setDynamic();
 	EVAL
 }
 
-private class Recur {};
-static final public Class RECUR_CLASS = Recur.class;
+private class Recur {}
+
+	static final public Class RECUR_CLASS = Recur.class;
     
 interface Expr{
 	Object eval() ;
@@ -363,10 +364,12 @@ interface Expr{
 
 public static abstract class UntypedExpr implements Expr{
 
+	@Override
 	public Class getJavaClass(){
 		throw new IllegalArgumentException("Has no Java class");
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return false;
 	}
@@ -447,7 +450,8 @@ static class DefExpr implements Expr{
         return false;
     }
 
-    public Object eval() {
+    @Override
+	public Object eval() {
 		try
 			{
 			if(initProvided)
@@ -474,6 +478,7 @@ static class DefExpr implements Expr{
 			}
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		objx.emitVar(gen, var);
 
@@ -519,15 +524,18 @@ static class DefExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass(){
 		return Var.class;
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object form) {
 			//(def x) or (def x initexpr) or (def x "docstring" initexpr)
 			String docstring = null;
@@ -609,23 +617,28 @@ public static class AssignExpr implements Expr{
 		this.val = val;
 	}
 
+	@Override
 	public Object eval() {
 		return target.evalAssign(val);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		target.emitAssign(context, objx, gen, val);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return val.hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return val.getJavaClass();
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			if(RT.length(form) != 3)
@@ -649,10 +662,12 @@ public static class VarExpr implements Expr, AssignableExpr{
 		this.tag = tag != null ? tag : var.getTag();
 	}
 
+	@Override
 	public Object eval() {
 		return var.deref();
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		objx.emitVarValue(gen,var);
 		if(context == C.STATEMENT)
@@ -661,20 +676,24 @@ public static class VarExpr implements Expr, AssignableExpr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return tag != null;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return HostExpr.tagToClass(tag);
 	}
 
+	@Override
 	public Object evalAssign(Expr val) {
 		return var.set(val.eval());
 	}
 
+	@Override
 	public void emitAssign(C context, ObjExpr objx, GeneratorAdapter gen,
-	                       Expr val){
+						   Expr val){
 		objx.emitVar(gen, var);
 		val.emit(C.EXPRESSION, objx, gen);
 		gen.invokeVirtual(VAR_TYPE, setMethod);
@@ -690,25 +709,30 @@ public static class TheVarExpr implements Expr{
 		this.var = var;
 	}
 
+	@Override
 	public Object eval() {
 		return var;
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		objx.emitVar(gen, var);
 		if(context == C.STATEMENT)
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return Var.class;
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object form) {
 			Symbol sym = (Symbol) RT.second(form);
 			Var v = lookupVar(sym, false);
@@ -726,14 +750,17 @@ public static class KeywordExpr extends LiteralExpr{
 		this.k = k;
 	}
 
+	@Override
 	Object val(){
 		return k;
 	}
 
+	@Override
 	public Object eval() {
 		return k;
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		objx.emitKeyword(gen, k);
 		if(context == C.STATEMENT)
@@ -741,10 +768,12 @@ public static class KeywordExpr extends LiteralExpr{
 
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return Keyword.class;
 	}
@@ -760,12 +789,14 @@ public static class ImportExpr implements Expr{
 		this.c = c;
 	}
 
+	@Override
 	public Object eval() {
 		Namespace ns = (Namespace) RT.CURRENT_NS.deref();
 		ns.importClass(RT.classForNameNonLoading(c));
 		return null;
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		gen.getStatic(RT_TYPE,"CURRENT_NS",VAR_TYPE);
 		gen.invokeVirtual(VAR_TYPE, derefMethod);
@@ -777,15 +808,18 @@ public static class ImportExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return false;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		throw new IllegalArgumentException("ImportExpr has no Java class");
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object form) {
 			return new ImportExpr((String) RT.second(form));
 		}
@@ -795,20 +829,21 @@ public static class ImportExpr implements Expr{
 public static abstract class LiteralExpr implements Expr{
 	abstract Object val();
 
+	@Override
 	public Object eval(){
 		return val();
 	}
 }
 
-static interface AssignableExpr{
+interface AssignableExpr{
 	Object evalAssign(Expr val) ;
 
 	void emitAssign(C context, ObjExpr objx, GeneratorAdapter gen, Expr val);
 }
 
-static public interface MaybePrimitiveExpr extends Expr{
-	public boolean canEmitPrimitive();
-	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen);
+public interface MaybePrimitiveExpr extends Expr{
+	boolean canEmitPrimitive();
+	void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen);
 }
 
 static public abstract class HostExpr implements Expr, MaybePrimitiveExpr{
@@ -963,6 +998,7 @@ static public abstract class HostExpr implements Expr, MaybePrimitiveExpr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			//(. x fieldname-sym) or
@@ -1175,15 +1211,18 @@ static class InstanceFieldExpr extends FieldExpr implements AssignableExpr{
 			}
 	}
 
+	@Override
 	public Object eval() {
 		return Reflector.invokeNoArgInstanceMember(target.eval(), fieldName, requireField);
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return targetClass != null && field != null &&
 		       Util.isPrimitive(field.getType());
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(targetClass != null && field != null)
 			{
@@ -1196,6 +1235,7 @@ static class InstanceFieldExpr extends FieldExpr implements AssignableExpr{
 			throw new UnsupportedOperationException("Unboxed emit of unknown member");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(targetClass != null && field != null)
 			{
@@ -1222,20 +1262,24 @@ static class InstanceFieldExpr extends FieldExpr implements AssignableExpr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return field != null || tag != null;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return tag != null ? HostExpr.tagToClass(tag) : field.getType();
 	}
 
+	@Override
 	public Object evalAssign(Expr val) {
 		return Reflector.setInstanceField(target.eval(), fieldName, val.eval());
 	}
 
+	@Override
 	public void emitAssign(C context, ObjExpr objx, GeneratorAdapter gen,
-	                       Expr val){
+						   Expr val){
 		if(targetClass != null && field != null)
 			{
 			target.emit(C.EXPRESSION, objx, gen);
@@ -1288,14 +1332,17 @@ static class StaticFieldExpr extends FieldExpr implements AssignableExpr{
 		this.tag = tag;
 	}
 
+	@Override
 	public Object eval() {
 		return Reflector.getStaticField(c, fieldName);
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return Util.isPrimitive(field.getType());
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		gen.visitLineNumber(line, gen.mark());
 		gen.getStatic(Type.getType(c), fieldName, Type.getType(field.getType()));
@@ -2311,8 +2358,8 @@ public static class TryExpr implements Expr{
 							{
 							Var.pushThreadBindings(dynamicBindings);
 							LocalBinding lb = registerLocal(sym,
-							                                (Symbol) (RT.second(f) instanceof Symbol ? RT.second(f)
-							                                                                         : null),
+									RT.second(f) instanceof Symbol ? RT.second(f)
+                                                                             : null,
 							                                null,false);
 							Expr handler = (new BodyExpr.Parser()).parse(C.EXPRESSION, RT.next(RT.next(RT.next(f))));
 							catches = catches.cons(new CatchClause(c, lb, handler));
@@ -2422,10 +2469,12 @@ static class ThrowExpr extends UntypedExpr{
 	}
 
 
+	@Override
 	public Object eval() {
 		throw Util.runtimeException("Can't eval throw");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		excExpr.emit(C.EXPRESSION, objx, gen);
 		gen.checkCast(THROWABLE_TYPE);
@@ -2433,9 +2482,10 @@ static class ThrowExpr extends UntypedExpr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object form) {
 			if(context == C.EVAL)
-				return analyze(context, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
+				return analyze(C.EVAL, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
 			else if(RT.count(form) == 1)
 				throw Util.runtimeException("Too few arguments to throw, throw expects a single Throwable instance");
 			else if(RT.count(form) > 2)
@@ -2576,6 +2626,7 @@ public static class NewExpr implements Expr{
 			}
 	}
 
+	@Override
 	public Object eval() {
 		Object[] argvals = new Object[args.count()];
 		for(int i = 0; i < args.count(); i++)
@@ -2594,6 +2645,7 @@ public static class NewExpr implements Expr{
 		return Reflector.invokeConstructor(c, argvals);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(this.ctor != null)
 			{
@@ -2624,15 +2676,18 @@ public static class NewExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return c;
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			int line = lineDeref();
 			int column = columnDeref();
@@ -2664,10 +2719,12 @@ public static class MetaExpr implements Expr{
 		this.meta = meta;
 	}
 
+	@Override
 	public Object eval() {
 		return ((IObj) expr.eval()).withMeta((IPersistentMap) meta.eval());
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		expr.emit(C.EXPRESSION, objx, gen);
 		gen.checkCast(IOBJ_TYPE);
@@ -2680,10 +2737,12 @@ public static class MetaExpr implements Expr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return expr.hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return expr.getJavaClass();
 	}
@@ -2705,6 +2764,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 		this.column = column;
 	}
 
+	@Override
 	public Object eval() {
 		Object t = testExpr.eval();
 		if(t != null && t != Boolean.FALSE)
@@ -2712,10 +2772,12 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 		return elseExpr.eval();
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		doEmit(context, objx, gen,false);
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		doEmit(context, objx, gen, true);
 	}
@@ -2734,7 +2796,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 		else if(maybePrimitiveType(testExpr) == boolean.class)
 			{
 			((MaybePrimitiveExpr) testExpr).emitUnboxed(C.EXPRESSION, objx, gen);
-			gen.ifZCmp(gen.EQ, falseLabel);
+			gen.ifZCmp(GeneratorAdapter.EQ, falseLabel);
 			}
 		else
 			{
@@ -2759,6 +2821,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 		gen.mark(endLabel);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return thenExpr.hasJavaClass()
 		       && elseExpr.hasJavaClass()
@@ -2770,6 +2833,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 		        || (elseExpr.getJavaClass() == null && !thenExpr.getJavaClass().isPrimitive()));
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		try
 			{
@@ -2787,6 +2851,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 			}
 	}
 
+	@Override
 	public Class getJavaClass() {
 		Class thenClass = thenExpr.getJavaClass();
 		if(thenClass != null && thenClass != RECUR_CLASS)
@@ -2795,6 +2860,7 @@ public static class IfExpr implements Expr, MaybePrimitiveExpr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			//(if test then) or (if test then else)
@@ -2886,7 +2952,8 @@ static {
 	// prefixes of others.
 	Object[] mungeStrs = RT.toArray(RT.keys(m));
 	Arrays.sort(mungeStrs, new Comparator() {
-                public int compare(Object s1, Object s2) {
+                @Override
+				public int compare(Object s1, Object s2) {
                     return ((String) s2).length() - ((String) s1).length();
                 }});
 	StringBuilder sb = new StringBuilder();
@@ -2958,10 +3025,12 @@ public static class EmptyExpr implements Expr{
 		this.coll = coll;
 	}
 
+	@Override
 	public Object eval() {
 		return coll;
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(coll instanceof IPersistentList)
 			gen.getStatic(LIST_TYPE, "EMPTY", EMPTY_LIST_TYPE);
@@ -2979,10 +3048,12 @@ public static class EmptyExpr implements Expr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		if(coll instanceof IPersistentList)
 			return IPersistentList.class;
@@ -3006,13 +3077,15 @@ public static class ListExpr implements Expr{
 		this.args = args;
 	}
 
+	@Override
 	public Object eval() {
 		IPersistentVector ret = PersistentVector.EMPTY;
 		for(int i = 0; i < args.count(); i++)
-			ret = (IPersistentVector) ret.cons(((Expr) args.nth(i)).eval());
+			ret = ret.cons(((Expr) args.nth(i)).eval());
 		return ret.seq();
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		MethodExpr.emitArgsAsArray(args, objx, gen);
 		gen.invokeStatic(RT_TYPE, arrayToListMethod);
@@ -3020,10 +3093,12 @@ public static class ListExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return IPersistentList.class;
 	}
@@ -3040,6 +3115,7 @@ public static class MapExpr implements Expr{
 		this.keyvals = keyvals;
 	}
 
+	@Override
 	public Object eval() {
 		Object[] ret = new Object[keyvals.count()];
 		for(int i = 0; i < keyvals.count(); i++)
@@ -3047,6 +3123,7 @@ public static class MapExpr implements Expr{
 		return RT.map(ret);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		boolean allKeysConstant = true;
 		boolean allConstantKeysUnique = true;
@@ -3074,10 +3151,12 @@ public static class MapExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return IPersistentMap.class;
 	}
@@ -3094,8 +3173,8 @@ public static class MapExpr implements Expr{
 			IMapEntry e = (IMapEntry) s.first();
 			Expr k = analyze(context == C.EVAL ? context : C.EXPRESSION, e.key());
 			Expr v = analyze(context == C.EVAL ? context : C.EXPRESSION, e.val());
-			keyvals = (IPersistentVector) keyvals.cons(k);
-			keyvals = (IPersistentVector) keyvals.cons(v);
+			keyvals = keyvals.cons(k);
+			keyvals = keyvals.cons(v);
 			if(k instanceof LiteralExpr)
 				{
 				Object kval = k.eval();
@@ -3146,6 +3225,7 @@ public static class SetExpr implements Expr{
 		this.keys = keys;
 	}
 
+	@Override
 	public Object eval() {
 		Object[] ret = new Object[keys.count()];
 		for(int i = 0; i < keys.count(); i++)
@@ -3153,6 +3233,7 @@ public static class SetExpr implements Expr{
 		return RT.set(ret);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		MethodExpr.emitArgsAsArray(keys, objx, gen);
 		gen.invokeStatic(RT_TYPE, setMethod);
@@ -3160,10 +3241,12 @@ public static class SetExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return IPersistentSet.class;
 	}
@@ -3177,7 +3260,7 @@ public static class SetExpr implements Expr{
 			{
 			Object e = s.first();
 			Expr expr = analyze(context == C.EVAL ? context : C.EXPRESSION, e);
-			keys = (IPersistentVector) keys.cons(expr);
+			keys = keys.cons(expr);
 			if(!(expr instanceof LiteralExpr))
 				constant = false;
 			}
@@ -3209,13 +3292,15 @@ public static class VectorExpr implements Expr{
 		this.args = args;
 	}
 
+	@Override
 	public Object eval() {
 		IPersistentVector ret = PersistentVector.EMPTY;
 		for(int i = 0; i < args.count(); i++)
-			ret = (IPersistentVector) ret.cons(((Expr) args.nth(i)).eval());
+			ret = ret.cons(((Expr) args.nth(i)).eval());
 		return ret;
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
         if(args.count() <= Tuple.MAX_SIZE)
             {
@@ -3235,10 +3320,12 @@ public static class VectorExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return IPersistentVector.class;
 	}
@@ -3250,7 +3337,7 @@ public static class VectorExpr implements Expr{
 		for(int i = 0; i < form.count(); i++)
 			{
 			Expr v = analyze(context == C.EVAL ? context : C.EXPRESSION, form.nth(i));
-			args = (IPersistentVector) args.cons(v);
+			args = args.cons(v);
 			if(!(v instanceof LiteralExpr))
 				constant = false;
 			}
@@ -3295,6 +3382,7 @@ static class KeywordInvokeExpr implements Expr{
 		this.siteIndex = registerKeywordCallsite(kw.k);
 	}
 
+	@Override
 	public Object eval() {
 		try
 			{
@@ -3309,7 +3397,8 @@ static class KeywordInvokeExpr implements Expr{
 			}
 	}
 
-    public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
+    @Override
+	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
         Label endLabel = gen.newLabel();
         Label faultLabel = gen.newLabel();
 
@@ -3343,10 +3432,12 @@ static class KeywordInvokeExpr implements Expr{
             gen.pop();
     }
 
+	@Override
 	public boolean hasJavaClass() {
 		return tag != null;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return HostExpr.tagToClass(tag);
 	}
@@ -3416,21 +3507,25 @@ public static class InstanceOfExpr implements Expr, MaybePrimitiveExpr{
 		this.c = c;
 	}
 
+	@Override
 	public Object eval() {
 		if(c.isInstance(expr.eval()))
 			return RT.T;
 		return RT.F;
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return true;
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		expr.emit(C.EXPRESSION, objx, gen);
 		gen.instanceOf(getType(c));
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		emitUnboxed(context,objx,gen);
 		HostExpr.emitBoxReturn(objx,gen,Boolean.TYPE);
@@ -3438,10 +3533,12 @@ public static class InstanceOfExpr implements Expr, MaybePrimitiveExpr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return Boolean.TYPE;
 	}
@@ -3468,10 +3565,12 @@ static class StaticInvokeExpr implements Expr, MaybePrimitiveExpr{
 		this.tag = tag;
 	}
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval StaticInvokeExpr");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		emitUnboxed(context, objx, gen);
 		if(context != C.STATEMENT)
@@ -3485,18 +3584,22 @@ static class StaticInvokeExpr implements Expr, MaybePrimitiveExpr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
         return retType((tag!=null)?HostExpr.tagToClass(tag):null, retClass);
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return retClass.isPrimitive();
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		Method ms = new Method("invokeStatic", getReturnType(), paramtypes);
 		if(variadic)
@@ -3596,8 +3699,8 @@ static class InvokeExpr implements Expr{
 	public final int line;
 	public final int column;
 	public final String source;
-	public boolean isProtocol = false;
-	public boolean isDirect = false;
+	public boolean isProtocol;
+	public boolean isDirect;
 	public int siteIndex = -1;
 	public Class protocolOn;
 	public java.lang.reflect.Method onMethod;
@@ -3666,6 +3769,7 @@ static class InvokeExpr implements Expr{
 		}
 	}
 
+	@Override
 	public Object eval() {
 		try
 			{
@@ -3684,6 +3788,7 @@ static class InvokeExpr implements Expr{
 			}
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(isProtocol)
 			{
@@ -3776,10 +3881,12 @@ static class InvokeExpr implements Expr{
 		                                                                                   args.count())]));
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return tag != null;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return HostExpr.tagToClass(tag);
 	}
@@ -3880,7 +3987,7 @@ static public class FnExpr extends ObjExpr{
 	final static Type aFnType = Type.getType(AFunction.class);
 	final static Type restFnType = Type.getType(RestFn.class);
 	//if there is a variadic overload (there can only be one) it is stored here
-	FnMethod variadicMethod = null;
+	FnMethod variadicMethod;
 	IPersistentCollection methods;
 	private boolean hasPrimSigs;
 	private boolean hasMeta;
@@ -3891,18 +3998,22 @@ static public class FnExpr extends ObjExpr{
 		super(tag);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	boolean supportsMeta(){
 		return hasMeta;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return tag != null ? HostExpr.tagToClass(tag) : AFunction.class;
 	}
 
+	@Override
 	protected void emitMethods(ClassVisitor cv){
 		//override of invoke/doInvoke for each method
 		for(ISeq s = RT.seq(methods); s != null; s = s.next())
@@ -4140,7 +4251,7 @@ static public class ObjExpr implements Expr{
 	IPersistentSet volatiles = PersistentHashSet.EMPTY;
 
 	//symbol->lb
-	IPersistentMap fields = null;
+	IPersistentMap fields;
 
 	//hinted fields
 	IPersistentVector hintedFields = PersistentVector.EMPTY;
@@ -4155,12 +4266,12 @@ static public class ObjExpr implements Expr{
     IPersistentSet usedConstants = PersistentHashSet.EMPTY;
 
 	int constantsID;
-	int altCtorDrops = 0;
+	int altCtorDrops;
 
 	IPersistentVector keywordCallsites;
 	IPersistentVector protocolCallsites;
 	IPersistentSet varCallsites;
-	boolean onceOnly = false;
+	boolean onceOnly;
 
 	Object src;
 
@@ -4299,7 +4410,7 @@ static public class ObjExpr implements Expr{
 			              "*S Clojure\n" +
 			              "*F\n" +
 			              "+ 1 " + source + "\n" +
-			              (String) SOURCE_PATH.deref() + "\n" +
+					SOURCE_PATH.deref() + "\n" +
 			              "*L\n" +
 			              String.format("%d#1,%d:%d\n", lineBefore, lineAfter - lineBefore, lineBefore) +
 			              "*E";
@@ -4933,6 +5044,7 @@ static public class ObjExpr implements Expr{
 		return compiledClass;
 	}
 
+	@Override
 	public Object eval() {
 		if(isDeftype())
 			return null;
@@ -4973,6 +5085,7 @@ static public class ObjExpr implements Expr{
 
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		//emitting a Fn means constructing an instance, feeding closed-overs from enclosing scope, if any
 		//objx arg is enclosing objx, not this
@@ -5002,10 +5115,12 @@ static public class ObjExpr implements Expr{
 			gen.pop();
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return (compiledClass != null) ? compiledClass
 			: (tag != null) ? HostExpr.tagToClass(tag)
@@ -5212,7 +5327,7 @@ static public class ObjExpr implements Expr{
 }
 
 enum PATHTYPE {
-    PATH, BRANCH;
+    PATH, BRANCH
 }
 
 static class PathNode{
@@ -5236,7 +5351,7 @@ enum PSTATE{
 public static class FnMethod extends ObjMethod{
 	//localbinding->localbinding
 	PersistentVector reqParms = PersistentVector.EMPTY;
-	LocalBinding restParm = null;
+	LocalBinding restParm;
 	Type[] argtypes;
 	Class[] argclasses;
 	Class retClass;
@@ -5414,6 +5529,7 @@ public static class FnMethod extends ObjMethod{
 			}
 	}
 
+	@Override
 	public void emit(ObjExpr fn, ClassVisitor cv){
 		if(fn.canBeDirect)
 			{
@@ -5651,20 +5767,24 @@ public static class FnMethod extends ObjMethod{
 		return restParm != null;
 	}
 
+	@Override
 	int numParams(){
 		return reqParms.count() + (isVariadic() ? 1 : 0);
 	}
 
+	@Override
 	String getMethodName(){
 		return isVariadic()?"doInvoke":"invoke";
 	}
 
+	@Override
 	Type getReturnType(){
 		if(prim != null) //objx.isStatic)
 			return Type.getType(retClass);
 		return OBJECT_TYPE;
 	}
 
+	@Override
 	Type[] getArgTypes(){
 		if(isVariadic() && reqParms.count() == MAX_POSITIONAL_ARITY)
 			{
@@ -5676,6 +5796,7 @@ public static class FnMethod extends ObjMethod{
 		return  ARG_TYPES[numParams()];
 	}
 
+	@Override
 	void emitClearLocals(GeneratorAdapter gen){
 //		for(int i = 1; i < numParams() + 1; i++)
 //			{
@@ -5709,16 +5830,16 @@ abstract public static class ObjMethod{
 	//the closed over locals need to be propagated to the enclosing objx
 	public final ObjMethod parent;
 	//localbinding->localbinding
-	IPersistentMap locals = null;
+	IPersistentMap locals;
 	//num->localbinding
-	IPersistentMap indexlocals = null;
-	Expr body = null;
+	IPersistentMap indexlocals;
+	Expr body;
 	ObjExpr objx;
 	PersistentVector argLocals;
-	int maxLocal = 0;
+	int maxLocal;
 	int line;
 	int column;
-	boolean usesThis = false;
+	boolean usesThis;
 	PersistentHashSet localsUsedInCatchFinally = PersistentHashSet.EMPTY;
 	protected IPersistentMap methodMeta;
 
@@ -5885,7 +6006,7 @@ public static class LocalBinding{
 	public final boolean isArg;
     public final PathNode clearPathRoot;
 	public boolean canBeCleared = !RT.booleanCast(getCompilerOption(disableLocalsClearingKey));
-	public boolean recurMistmatch = false;
+	public boolean recurMistmatch;
 
     public LocalBinding(int num, Symbol sym, Symbol tag, Expr init, boolean isArg,PathNode clearPathRoot)
                 {
@@ -5925,7 +6046,7 @@ public static class LocalBindingExpr implements Expr, MaybePrimitiveExpr, Assign
 
     public final PathNode clearPath;
     public final PathNode clearRoot;
-    public boolean shouldClear = false;
+    public boolean shouldClear;
 
 
 	public LocalBindingExpr(LocalBinding b, Symbol tag)
@@ -5967,37 +6088,45 @@ public static class LocalBindingExpr implements Expr, MaybePrimitiveExpr, Assign
             }
  	    }
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval locals");
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return b.getPrimitiveType() != null;
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		objx.emitUnboxedLocal(gen, b);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		if(context != C.STATEMENT)
 			objx.emitLocal(gen, b, shouldClear);
 	}
 
+	@Override
 	public Object evalAssign(Expr val) {
 		throw new UnsupportedOperationException("Can't eval locals");
 	}
 
+	@Override
 	public void emitAssign(C context, ObjExpr objx, GeneratorAdapter gen, Expr val){
 		objx.emitAssignLocal(gen, b,val);
 		if(context != C.STATEMENT)
 			objx.emitLocal(gen, b, false);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return tag != null || b.hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		if(tag != null)
 			return HostExpr.tagToClass(tag);
@@ -6019,6 +6148,7 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frms) {
 			ISeq forms = (ISeq) frms;
 			if(Util.equals(RT.first(forms), DO))
@@ -6026,11 +6156,8 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 			PersistentVector exprs = PersistentVector.EMPTY;
 			for(; forms != null; forms = forms.next())
 				{
-				Expr e = (context != C.EVAL &&
-				          (context == C.STATEMENT || forms.next() != null)) ?
-				         analyze(C.STATEMENT, forms.first())
-				                                                            :
-				         analyze(context, forms.first());
+				Expr e = analyze(context != C.EVAL &&
+						(context == C.STATEMENT || forms.next() != null) ? C.STATEMENT : context, forms.first());
 				exprs = exprs.cons(e);
 				}
 			if(exprs.count() == 0)
@@ -6039,6 +6166,7 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 		}
 	}
 
+	@Override
 	public Object eval() {
 		Object ret = null;
 		for(Object o : exprs)
@@ -6049,10 +6177,12 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 		return ret;
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return lastExpr() instanceof MaybePrimitiveExpr && ((MaybePrimitiveExpr)lastExpr()).canEmitPrimitive();
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		for(int i = 0; i < exprs.count() - 1; i++)
 			{
@@ -6063,6 +6193,7 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 		last.emitUnboxed(context, objx, gen);
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		for(int i = 0; i < exprs.count() - 1; i++)
 			{
@@ -6073,10 +6204,12 @@ public static class BodyExpr implements Expr, MaybePrimitiveExpr{
 		last.emit(context, objx, gen);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return lastExpr().hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return lastExpr().getJavaClass();
 	}
@@ -6114,6 +6247,7 @@ public static class LetFnExpr implements Expr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			//(letfns* [var (fn [args] body) ...] body...)
@@ -6127,7 +6261,7 @@ public static class LetFnExpr implements Expr{
 			ISeq body = RT.next(RT.next(form));
 
 			if(context == C.EVAL)
-				return analyze(context, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
+				return analyze(C.EVAL, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
 
 			IPersistentMap dynamicBindings = RT.map(LOCAL_ENV, LOCAL_ENV.deref(),
 			                                        NEXT_LOCAL_NUM, NEXT_LOCAL_NUM.deref());
@@ -6169,10 +6303,12 @@ public static class LetFnExpr implements Expr{
 		}
 	}
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval letfns");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		for(int i = 0; i < bindingInits.count(); i++)
 			{
@@ -6220,10 +6356,12 @@ public static class LetFnExpr implements Expr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return body.hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return body.getJavaClass();
 	}
@@ -6241,6 +6379,7 @@ public static class LetExpr implements Expr, MaybePrimitiveExpr{
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			//(let [var val var2 val2 ...] body...)
@@ -6372,14 +6511,17 @@ public static class LetExpr implements Expr, MaybePrimitiveExpr{
 		}
 	}
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval let/loop");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		doEmit(context, objx, gen, false);
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		doEmit(context, objx, gen, true);
 	}
@@ -6443,14 +6585,17 @@ public static class LetExpr implements Expr, MaybePrimitiveExpr{
 			}
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return body.hasJavaClass();
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return body.getJavaClass();
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return body instanceof MaybePrimitiveExpr && ((MaybePrimitiveExpr)body).canEmitPrimitive();
 	}
@@ -6473,10 +6618,12 @@ public static class RecurExpr implements Expr, MaybePrimitiveExpr{
 		this.source = source;
 	}
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval recur");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		Label loopLabel = (Label) LOOP_LABEL.deref();
 		if(loopLabel == null)
@@ -6550,15 +6697,18 @@ public static class RecurExpr implements Expr, MaybePrimitiveExpr{
 		gen.goTo(loopLabel);
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return true;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return RECUR_CLASS;
 	}
 
 	static class Parser implements IParser{
+		@Override
 		public Expr parse(C context, Object frm) {
 			int line = lineDeref();
 			int column = columnDeref();
@@ -6620,10 +6770,12 @@ public static class RecurExpr implements Expr, MaybePrimitiveExpr{
 		}
 	}
 
+	@Override
 	public boolean canEmitPrimitive() {
 		return true;
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen) {
 		emit(context, objx, gen);
 	}
@@ -7687,6 +7839,7 @@ static public class NewInstanceExpr extends ObjExpr{
 	}
 
 	static class DeftypeParser implements IParser{
+		@Override
 		public Expr parse(C context, final Object frm) {
 			ISeq rform = (ISeq) frm;
 			//(deftype* tagname classname [fields] :implements [interfaces] :tag tagname methods*)
@@ -7711,13 +7864,12 @@ static public class NewInstanceExpr extends ObjExpr{
 	}
 
 	static class ReifyParser implements IParser{
+	@Override
 	public Expr parse(C context, Object frm) {
 		//(reify this-name? [interfaces] (method-name [args] body)*)
 		ISeq form = (ISeq) frm;
 		ObjMethod enclosingMethod = (ObjMethod) METHOD.deref();
-		String basename = enclosingMethod != null ?
-		                  (trimGenID(enclosingMethod.objx.name) + "$")
-		                 : (munge(currentNS().name.name) + "$");
+		String basename = ((enclosingMethod != null ? trimGenID(enclosingMethod.objx.name) : munge(currentNS().name.name)) + "$");
 		String simpleName = "reify__" + RT.nextID();
 		String classname = basename + simpleName;
 
@@ -7949,6 +8101,7 @@ static public class NewInstanceExpr extends ObjExpr{
 		return c.getName().replace('.', '/');
 	}
 
+	@Override
 	protected void emitStatics(ClassVisitor cv) {
 		if(this.isDeftype())
 			{
@@ -8027,6 +8180,7 @@ static public class NewInstanceExpr extends ObjExpr{
 			}
 	}
 
+	@Override
 	protected void emitMethods(ClassVisitor cv){
 		for(ISeq s = RT.seq(methods); s != null; s = s.next())
 			{
@@ -8146,18 +8300,22 @@ public static class NewInstanceMethod extends ObjMethod{
 		super(objx, parent);
 	}
 
+	@Override
 	int numParams(){
 		return argLocals.count();
 	}
 
+	@Override
 	String getMethodName(){
 		return name;
 	}
 
+	@Override
 	Type getReturnType(){
 		return retType;
 	}
 
+	@Override
 	Type[] getArgTypes(){
 		return argTypes;
 	}
@@ -8326,6 +8484,7 @@ public static class NewInstanceMethod extends ObjMethod{
 		return ret;
 	}
 
+	@Override
 	public void emit(ObjExpr obj, ClassVisitor cv){
 		Method m = new Method(getMethodName(), getReturnType(), getArgTypes());
 
@@ -8470,26 +8629,32 @@ static public class MethodParamExpr implements Expr, MaybePrimitiveExpr{
 		this.c = c;
 	}
 
+	@Override
 	public Object eval() {
 		throw Util.runtimeException("Can't eval");
 	}
 
+	@Override
 	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
 		throw Util.runtimeException("Can't emit");
 	}
 
+	@Override
 	public boolean hasJavaClass() {
 		return c != null;
 	}
 
+	@Override
 	public Class getJavaClass() {
 		return c;
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 		return Util.isPrimitive(c);
 	}
 
+	@Override
 	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
 		throw Util.runtimeException("Can't emit");
 	}
@@ -8550,27 +8715,33 @@ public static class CaseExpr implements Expr, MaybePrimitiveExpr{
             }
 	}
 
+	@Override
 	public boolean hasJavaClass(){
 	    return returnType != null;
 	}
 
+	@Override
 	public boolean canEmitPrimitive(){
 	return Util.isPrimitive(returnType);
 	}
 
+	@Override
 	public Class getJavaClass(){
 	    return returnType;
 	}
 
+	@Override
 	public Object eval() {
 		throw new UnsupportedOperationException("Can't eval case");
 	}
 
-    public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
+    @Override
+	public void emit(C context, ObjExpr objx, GeneratorAdapter gen){
         doEmit(context, objx, gen, false);
     }
 
-    public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
+    @Override
+	public void emitUnboxed(C context, ObjExpr objx, GeneratorAdapter gen){
         doEmit(context, objx, gen, true);
     }
 
@@ -8746,10 +8917,11 @@ public static class CaseExpr implements Expr, MaybePrimitiveExpr{
 		//prepared by case macro and presumed correct
 		//case macro binds actual expr in let so expr is always a local,
 		//no need to worry about multiple evaluation
+		@Override
 		public Expr parse(C context, Object frm) {
 			ISeq form = (ISeq) frm;
 			if(context == C.EVAL)
-				return analyze(context, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
+				return analyze(C.EVAL, RT.list(RT.list(FNONCE, PersistentVector.EMPTY, form)));
 			IPersistentVector args = LazilyPersistentVector.create(form.next());
 
 			Object exprForm = args.nth(0);

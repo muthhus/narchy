@@ -27,10 +27,10 @@ public class Camara extends Application {
         launch(args);
     }
 
-    BufferedImage bfi = null;
-    ImageView view = null;
-    ObjectProperty<Image> img = null;
-    Webcam cam = null;
+    BufferedImage bfi;
+    ImageView view;
+    ObjectProperty<Image> img;
+    Webcam cam;
 
     @Override
     public void start(Stage win) throws Exception {

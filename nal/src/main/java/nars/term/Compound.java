@@ -327,6 +327,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return false;
     }
 
+    @Override
     default boolean hasTemporal() {
         return hasAny(Op.TemporalBits) && ((dt() != DTERNAL) || or(Term::hasTemporal));
     }

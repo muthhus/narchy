@@ -128,5 +128,6 @@ public abstract class Shape {
    */
   public abstract float computeDistanceToOut(Transform xf, Vec2 p, int childIndex, Vec2 normalOut);
 
+  @Override
   public abstract Shape clone();
 }

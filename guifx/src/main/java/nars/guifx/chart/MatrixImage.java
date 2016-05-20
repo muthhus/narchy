@@ -56,7 +56,7 @@ public class MatrixImage extends ImageView {
     }
 
     @FunctionalInterface  public interface MatrixRGBA {
-        public int draw(int x, int y);
+        int draw(int x, int y);
     }
 
     public void set(int w, int h, MatrixRGBA f) {

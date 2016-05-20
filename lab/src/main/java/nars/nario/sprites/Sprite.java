@@ -18,8 +18,8 @@ public class Sprite implements SoundSource
     public int wPic = 32;
     public int hPic = 32;
     public int xPicO, yPicO;
-    public boolean xFlipPic = false;
-    public boolean yFlipPic = false;
+    public boolean xFlipPic;
+    public boolean yFlipPic;
     public Image[][] sheet;
     public boolean visible = true;
     

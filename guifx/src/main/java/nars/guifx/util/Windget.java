@@ -67,7 +67,7 @@ public class Windget extends DefaultWindow  {
     public static class RectPort extends Rectangle implements Port {
 
         private final Windget win;
-        TriangleEdge dragging = null;
+        TriangleEdge dragging;
 
         public RectPort(Windget win, boolean incoming, double rx, double ry, double w, double h) {
             super(rx * win.content.getWidth(), ry * win.content.getHeight(), w, h);

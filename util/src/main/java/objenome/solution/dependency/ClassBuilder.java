@@ -26,17 +26,17 @@ public class ClassBuilder implements ConfigurableBuilder {
 
     private final Class<?> klass;
 
-    private Map<String, Object> props = null;
+    private Map<String, Object> props;
 
-    private List<Object> initValues = null;
+    private List<Object> initValues;
 
-    private List<Class<?>> initTypes = null;
+    private List<Class<?>> initTypes;
 
-    private Constructor<?> constructor = null;
+    private Constructor<?> constructor;
 
-    private Map<String, Method> cache = null;
+    private Map<String, Method> cache;
 
-    private boolean useZeroArgumentsConstructor = false;
+    private boolean useZeroArgumentsConstructor;
 
     public final Set<ConstructorDependency> constructorDependencies;
     private List<Parameter> initPrimitives;

@@ -31,7 +31,8 @@ public class ScreenInfoCharacterPattern extends EscapeSequenceCharacterPattern {
     public ScreenInfoCharacterPattern() {
         useEscEsc = false; // stdMap and finMap don't matter here.
     }
-    protected KeyStroke getKeyStrokeRaw(char first,int num1,int num2,char last,boolean bEsc) {
+    @Override
+    protected KeyStroke getKeyStrokeRaw(char first, int num1, int num2, char last, boolean bEsc) {
         if (first != '[' || last != 'R' || num1 == 0 || num2 == 0 || bEsc) {
             return null; // nope
         }

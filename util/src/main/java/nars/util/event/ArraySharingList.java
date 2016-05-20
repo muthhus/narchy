@@ -29,7 +29,7 @@ public class ArraySharingList<C> implements Iterable<C> {
 
     protected final FasterList<C> data = new FasterList();
     private final IntFunction<C[]> arrayBuilder;
-    protected transient C[] array = null;
+    protected transient C[] array;
     private final transient AtomicBoolean change = new AtomicBoolean(true);
 
     public ArraySharingList(IntFunction<C[]> arrayBuilder) {
@@ -174,7 +174,7 @@ public class ArraySharingList<C> implements Iterable<C> {
             public C next;
             final C[] array = a;
 
-            int i = 0;
+            int i;
 
             @Override
             public boolean hasNext() {

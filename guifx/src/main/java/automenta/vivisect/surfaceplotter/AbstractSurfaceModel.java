@@ -45,11 +45,11 @@ public class AbstractSurfaceModel implements SurfaceModel {
 		int calcDivisions;
 		boolean f1, f2;
 		int i, j, total;
-		int imgheight = 0;
-		int imgwidth = 0;
+		int imgheight;
+		int imgwidth;
 
 		float min1, max1, min2, max2;
-		int[] pixels = null;
+		int[] pixels;
 		float stepx, stepy;
 		float xfactor;
 		float xi, xx, yi, yx;
@@ -270,7 +270,7 @@ public class AbstractSurfaceModel implements SurfaceModel {
 	 * 
 	 * @return <code>true</code> if the checkbox is checked, <code>false</code> otherwise
 	 */
-	protected boolean expectDelay = false;
+	protected boolean expectDelay;
 
 	/**
 	 * Determines whether the first function is selected.

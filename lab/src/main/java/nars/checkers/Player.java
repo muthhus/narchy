@@ -12,7 +12,7 @@ public abstract class Player
 {
 	private final String name;
 	private Board board;
-	private boolean hasTurn = false;
+	private boolean hasTurn;
 	private final ArrayList<PlayerListener> listeners = new ArrayList<>();
 
 	/**

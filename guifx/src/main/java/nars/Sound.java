@@ -16,9 +16,9 @@ public class Sound implements SoundSource, Comparable
     private final float priority;
     
     private float x, y, z;
-    private float score = 0;
+    private float score;
     
-    public float pan = 0;
+    public float pan;
     public float amplitude;
     
     public Sound(SoundProducer producer, SoundSource source, float volume, float priority)

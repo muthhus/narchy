@@ -32,7 +32,7 @@ public class MovieGenerator {
     protected String baseFilename;
 
     /** The current frame index (used to obtain the PNG filename) */
-    protected int pngIndex = 0;
+    protected int pngIndex;
 
     /** How many digits to use in generating the filename */
     protected final int indexDigits = 6;

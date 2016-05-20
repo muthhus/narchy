@@ -121,6 +121,7 @@ public class NewSwingTerminalTest extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new NewSwingTerminalTest().setVisible(true);
             }

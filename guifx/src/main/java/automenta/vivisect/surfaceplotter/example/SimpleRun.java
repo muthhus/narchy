@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class SimpleRun {
 
-	double t = 0;
+	double t;
 
 	public void testSomething() {
         JSurfacePanel jsp = new JSurfacePanel();

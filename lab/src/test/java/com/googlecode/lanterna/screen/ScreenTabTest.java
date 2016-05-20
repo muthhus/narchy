@@ -33,7 +33,7 @@ public class ScreenTabTest {
         new ScreenTabTest(args);
     }
 
-    private Screen screen;
+    private final Screen screen;
 
     public ScreenTabTest(String[] args) throws InterruptedException, IOException {
         screen = new TestTerminalFactory(args).createScreen();

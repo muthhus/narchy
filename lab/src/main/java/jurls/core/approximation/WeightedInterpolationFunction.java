@@ -37,7 +37,7 @@ public class WeightedInterpolationFunction implements ParameterizedFunction {
 
         final ArrayRealVector xs = new ArrayRealVector(numberOfInputs());
         final ArrayRealVector velocity = new ArrayRealVector(numberOfInputs());
-        double y = 0;
+        double y;
 
         public Point() {
             for (int i = 0; i < numberOfInputs(); ++i) {

@@ -74,8 +74,8 @@ import java.util.ArrayList;
 public class PointCloud
 {
   public static final int NUM_POINTS = 32; 
-  private String _name = null;
-  private ArrayList<PointCloudPoint> _points = null;
+  private String _name;
+  private ArrayList<PointCloudPoint> _points;
   
   // the following is NOT part of the originally published javascript implementation
   // and has been added to support addition of directional testing for point clouds

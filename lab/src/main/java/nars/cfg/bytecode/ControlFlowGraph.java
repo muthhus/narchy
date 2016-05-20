@@ -285,7 +285,7 @@ public class ControlFlowGraph {
 
     // ---- For debugging only ----
 
-    private static Map<Object, String> sIds = null;
+    private static Map<Object, String> sIds;
     private static int sNextId = 1;
     private static String getId(Object object) {
         if (sIds == null) {

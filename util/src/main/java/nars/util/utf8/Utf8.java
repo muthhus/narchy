@@ -37,7 +37,7 @@ public class Utf8 implements CharSequence, Comparable<Utf8>, Byted {
     final int start;
     final int end;
     int length = -1;
-    int hash = 0;
+    int hash;
 
 
     protected Utf8(byte[] bytes, int start, int end, int length) {

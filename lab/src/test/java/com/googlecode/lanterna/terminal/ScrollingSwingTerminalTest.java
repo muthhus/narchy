@@ -73,6 +73,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         buttonPrint100Lines.setText("Print 100 lines");
         buttonPrint100Lines.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonPrint100LinesActionPerformed(evt);
             }
@@ -80,6 +81,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         buttonPrint10Lines.setText("Print 10 lines");
         buttonPrint10Lines.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonPrint10LinesActionPerformed(evt);
             }
@@ -87,6 +89,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         buttonPrint1Line.setText("Print 1 line");
         buttonPrint1Line.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonPrint1LineActionPerformed(evt);
             }
@@ -94,6 +97,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         buttonMoveCursor.setText("Move cursor");
         buttonMoveCursor.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonMoveCursorActionPerformed(evt);
             }
@@ -101,6 +105,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         jButton1.setText("Clear");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
@@ -211,6 +216,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new ScrollingSwingTerminalTest().setVisible(true);
             }

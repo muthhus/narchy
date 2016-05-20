@@ -38,7 +38,7 @@ public class LogPane extends BorderPane  {
 
     //NSliderSet filter = new NSliderSet();
 
-    ScrollPane scrollParent = null;
+    ScrollPane scrollParent;
 
 
 //    public void commit(Node[] c) {

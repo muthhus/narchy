@@ -16,7 +16,7 @@ public class FastPutsArrayMap<K, V> extends AbstractMap<K, V> implements Seriali
 
     protected final ArrayList<Entry<K, V>> entries;
     protected transient int size = UNKNOWN_SIZE;
-    protected transient Set<Entry<K, V>> entrySet = null;
+    protected transient Set<Entry<K, V>> entrySet;
 
     public FastPutsArrayMap() {
         this(4);

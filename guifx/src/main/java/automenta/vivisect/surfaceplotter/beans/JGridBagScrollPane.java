@@ -16,8 +16,8 @@ import java.awt.*;
  */
 public class JGridBagScrollPane extends JScrollPane{
 
-	private boolean widthFixed =false;
-	private boolean heightFixed = false;
+	private boolean widthFixed;
+	private boolean heightFixed;
 
 	
 	

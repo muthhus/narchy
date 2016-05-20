@@ -16,7 +16,7 @@ public class LevelRenderer {
 	private Level level;
 
 	private final Random random = new XORShiftRandom();
-	public boolean renderBehaviors = false;
+	public boolean renderBehaviors;
 
 	int width;
 	int height;

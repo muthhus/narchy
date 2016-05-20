@@ -15,7 +15,7 @@ public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 	protected World2D world;
 	public float standard_friction;
 	public float standard_density;
-	public float standard_restitution = 0;
+	public float standard_restitution;
 
 	public interface CollisionManager {
 
@@ -51,7 +51,7 @@ public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 	public static class FixtureData {
 		public CollisionManager collision_manager;
 		public Object game_specific;
-		public int filterindex = 0;
+		public int filterindex;
 
 		public FixtureData() {
 		}

@@ -15,8 +15,8 @@ public class FastPutsLinkedMap<K, V> extends AbstractMap<K, V> implements Serial
         header.prev = header;
     }
 
-    private transient int size = 0;
-    private transient Set<Map.Entry<K, V>> entrySet = null;
+    private transient int size;
+    private transient Set<Map.Entry<K, V>> entrySet;
 
     public FastPutsLinkedMap() {
     }

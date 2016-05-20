@@ -50,10 +50,10 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
  
 
     
-   private static volatile boolean hasSetContentionMonitoringEnabled = false;
-    private static volatile boolean hasSetCPUTimeMonitoringEnabled = false;
+   private static volatile boolean hasSetContentionMonitoringEnabled;
+    private static volatile boolean hasSetCPUTimeMonitoringEnabled;
 
-    private static boolean contentionMonitoringEnabled = false;
+    private static boolean contentionMonitoringEnabled;
     private static boolean cpuTimeMonitoringEnabled = true;
 
     private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();    

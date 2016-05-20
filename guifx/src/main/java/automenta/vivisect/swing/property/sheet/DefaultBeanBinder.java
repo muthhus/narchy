@@ -18,9 +18,9 @@ import java.beans.PropertyVetoException;
  */
 public class DefaultBeanBinder implements PropertyChangeListener {
 
-	private Object object = null;
-	private BeanInfo info = null;
-	private PropertySheetPanel sheet = null;
+	private Object object;
+	private BeanInfo info;
+	private PropertySheetPanel sheet;
 
 	public DefaultBeanBinder(Object object, PropertySheetPanel sheet) {
 		this(object, sheet, new DefaultBeanInfoResolver().getBeanInfo(object));

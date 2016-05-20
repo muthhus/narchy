@@ -141,6 +141,7 @@ public class HighDim<T> extends Spacegraph {
         }
 
 
+        @Override
         public abstract float[] vectorize(C clink, float[] x);
 
         @Override
@@ -172,7 +173,7 @@ public class HighDim<T> extends Spacegraph {
             getChildren().add(l);
         }
 
-        boolean needsLabeled = false;
+        boolean needsLabeled;
 
         public TermGroup set(@NotNull T next) {
 

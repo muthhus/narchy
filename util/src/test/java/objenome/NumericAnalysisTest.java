@@ -52,7 +52,7 @@ public class NumericAnalysisTest {
         
         
         public double output(double x) {
-            return b ? Math.sin(a * x) * (x - a) * (x - a) : Math.tanh(a * -x) * (x - a) * (x - a);
+            return (b ? Math.sin(a * x) : Math.tanh(a * -x)) * (x - a) * (x - a);
         }
 
         @Override

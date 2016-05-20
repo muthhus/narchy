@@ -93,7 +93,7 @@ public class EngineManager implements java.io.Serializable {
 
     public boolean hasNext(int id) {
         EngineRunner er = runner(id);
-        return er == null || er.isDetached() ? false : er.hasOpenAlternatives();
+        return !(er == null || er.isDetached()) && er.hasOpenAlternatives();
     }
 
     public boolean nextSolution(int id) {
@@ -101,7 +101,7 @@ public class EngineManager implements java.io.Serializable {
         /*toSPY
          * System.out.println("Thread id "+runnerId()+" - next_solution: risveglio il thread di id: "+er.getId());
          */
-        return er == null || er.isDetached() ? false : er.nextSolution();
+        return !(er == null || er.isDetached()) && er.nextSolution();
     }
 
     public void detach(int id) {
@@ -356,7 +356,7 @@ public class EngineManager implements java.io.Serializable {
 
     public boolean mutexTryLock(String name) {
         ReentrantLock mutex = locks.get(name);
-        return mutex == null ? false : mutex.tryLock();
+        return mutex != null && mutex.tryLock();
         /*toSPY
 		 * System.out.println("Thread id "+runnerId()+ " - provo ad impossessarmi del lock");
 		 */
@@ -378,7 +378,7 @@ public class EngineManager implements java.io.Serializable {
 
     public boolean isLocked(String name) {
         ReentrantLock mutex = locks.get(name);
-        return mutex == null ? false : mutex.isLocked();
+        return mutex != null && mutex.isLocked();
     }
 
     public void unlockAll() {

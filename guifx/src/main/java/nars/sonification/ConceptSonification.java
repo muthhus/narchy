@@ -48,7 +48,7 @@ public class ConceptSonification extends FrameReaction {
     }
     //Global.newHashMap();
 
-    float audiblePriorityThreshold = 0.0f;
+    float audiblePriorityThreshold;
 
     public ConceptSonification(NAR nar, Audio sound) throws IOException {
         super(nar);

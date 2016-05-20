@@ -38,7 +38,7 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
     private On reg;
     protected Node prev; //last node added
     //Pane cycleSet = null; //either displays one cycle header, or a range of cycles, including '...' waiting for next output while they queue
-    boolean trace = false;
+    boolean trace;
     ArraySharingList<Node> pending;
 
     final CircularArrayList<Node> toShow = new CircularArrayList<>(maxLines);

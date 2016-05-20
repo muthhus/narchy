@@ -508,13 +508,12 @@ public class ISOIOLibrary extends Library{
                 Struct result = new Struct(resultList.toArray(new Struct[1]));
                 return unify(list, result);
             }
-            case "output": {
+            case "output":
                 for (Map.Entry<OutputStream, Hashtable<String, Term>> stream : outputStreams.entrySet()) {
                     resultList.add(new Struct(stream.getKey().toString()));
                 }
                 Struct result = new Struct(resultList.toArray(new Struct[1]));
                 return unify(list, result);
-            }
             default:
                 for (Map.Entry<InputStream, Hashtable<String, Term>> currentElement : inputStreams.entrySet()) {
                     for (Map.Entry<String, Term> currentElement2 : currentElement.getValue().entrySet()) {
@@ -804,7 +803,7 @@ public class ISOIOLibrary extends Library{
                                     e.getMessage()));
                 }
 
-            return value == -1 ? unify(char_code, new Int(-1)) : unify(char_code, new Int(value));
+            return unify(char_code, new Int(value == -1 ? -1 : value));
         }
         
         //se invece lo stream e' un normale file, devo controllare tutte le opzioni decise in apertura.

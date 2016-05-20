@@ -27,8 +27,8 @@ import java.net.URL;
 
 public class Tetris implements RLEnvironment {
 
-    private double currentScore = 0;
-    public TetrisState gameState = null;
+    private double currentScore;
+    public TetrisState gameState;
     
     private int nextAction;
     private TetrisVisualizer vis;

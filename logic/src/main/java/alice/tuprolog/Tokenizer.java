@@ -195,7 +195,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
                     //typea = super.nextToken();
                     typea = other.tokenConsume();
                 /**/
-                } while (typea != '\r' && typea != '\n' && typea != other.TT_EOF);
+                } while (typea != '\r' && typea != '\n' && typea != TT_EOF);
             /*Castagna 06/2011*/
                 //pushBack();  // pushes back \r or \n. These are whitespace, so when readNextToken() finds them, they are marked as whitespace
                 other.tokenPushBack();  // pushes back \r or \n. These are whitespace, so when readNextToken() finds them, they are marked as whitespace
@@ -234,7 +234,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
         /**/
 
             // syntactic charachters
-            if (typea == other.TT_EOF) return new Token("", Tokenizer.EOF);
+            if (typea == TT_EOF) return new Token("", Tokenizer.EOF);
             if (typea == '(') return new Token("(", Tokenizer.LPAR);
             if (typea == ')') return new Token(")", Tokenizer.RPAR);
             if (typea == '{') return new Token("{", Tokenizer.LBRA2);
@@ -263,7 +263,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
             boolean isNumber = false;
 
             // variable, atom or number
-            if (typea == other.TT_WORD) {
+            if (typea == TT_WORD) {
                 char firstChar = svala.charAt(0);
                 // variable
                 if (Character.isUpperCase(firstChar) || '_' == firstChar)
@@ -360,10 +360,10 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
 
                 String quoteBody = quote.toString();
 
-                qType = qType == '\'' ? other.SQ_SEQUENCE : qType == '\"' ? other.DQ_SEQUENCE : other.SQ_SEQUENCE;
-                if (qType == other.SQ_SEQUENCE) {
+                qType = qType == '\'' ? SQ_SEQUENCE : qType == '\"' ? DQ_SEQUENCE : SQ_SEQUENCE;
+                if (qType == SQ_SEQUENCE) {
                     if (Parser.isAtom(quoteBody))
-                        qType = other.ATOM;
+                        qType = ATOM;
                 /*Castagna 06/2011*/
                     //int typeb = super.nextToken(); // lookahead 1 to identify what type of quote
                     //pushBack();                    // nextToken() does not skip whitespaces, only readNext does so.
@@ -371,7 +371,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
                     other.tokenPushBack();                    // nextToken() does not skip whitespaces, only readNext does so.
                 /**/
                     if (typeb == '(')
-                        return new Token(quoteBody, qType | other.FUNCTOR);
+                        return new Token(quoteBody, qType | FUNCTOR);
                 }
                 return new Token(quoteBody, qType);
             }
@@ -453,7 +453,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
                 	/**/
                         String svalc = other.sval;
                         int intVal;
-                        if ((intVal = other.isCharacterCodeConstantToken(typec, svalc)) != -1)
+                        if ((intVal = isCharacterCodeConstantToken(typec, svalc)) != -1)
                             return new Token(String.valueOf(intVal), Tokenizer.INTEGER);
 
                         // this is an invalid character code constant int
@@ -481,13 +481,13 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
                     String svalc = other.sval;
 
                     // 2.c check that the next token after '.' is a possible fraction
-                    if (typec != other.TT_WORD) { // if its not, the period is an End period
+                    if (typec != TT_WORD) { // if its not, the period is an End period
                 	/*Castagna 06/2011*/
                         //pushBack(); // pushback 1 the token after period
                         other.tokenPushBack(); // pushback 1 the token after period
                 	/**/
                         other.pushBack2 = new PushBack(typeb, svalb); // pushback 2 the period token
-                        return new Token(svala, other.INTEGER); // return what must be an int
+                        return new Token(svala, INTEGER); // return what must be an int
                     }
 
                     // 2.d checking for exponent
@@ -507,7 +507,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
                                 int typec2 = other.tokenConsume();
                         	/**/
                                 String svalc2 = other.sval;
-                                if (typec2 == other.TT_WORD) {
+                                if (typec2 == TT_WORD) {
                                     // verify the remaining parts of the float and return
                                     java.lang.Long.parseLong(svalc.substring(0, exponent));
                                     Integer.parseInt(svalc2);

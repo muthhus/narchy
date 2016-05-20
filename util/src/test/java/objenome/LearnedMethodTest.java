@@ -17,7 +17,7 @@ import static objenome.solver.Behaviors.Behavior.DONT;
  */
 public class LearnedMethodTest {
  
-    public static enum BooleanMath {
+    public enum BooleanMath {
         ;
 
 

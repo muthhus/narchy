@@ -95,7 +95,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         //already a concept, assume it is from here
         if (term instanceof Concept) {
-            return (Concept) term;
+            return term;
         }
 
         Termed result = null;

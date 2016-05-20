@@ -38,7 +38,7 @@ public class WeaponSystem extends EntityProcessingSystem {
         super(Aspect.all(Weapon.class, Physical.class));
     }
 
-    private Vec2 vTmp = new Vec2();
+    private final Vec2 vTmp = new Vec2();
 
     @Override
     protected void begin() {

@@ -41,7 +41,7 @@ public class NAgent implements Agent {
     private int lastAction = -1;
     private float prevReward = Float.NaN;
 
-    float dReward = 0;
+    float dReward;
     private SensorConcept dRewardPos, dRewardNeg;
 
     /** learning rate */
@@ -49,7 +49,7 @@ public class NAgent implements Agent {
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.01f;
-    private double epsilonRandom = 0.005f;
+    private final double epsilonRandom = 0.005f;
 
     float sensorPriority;
     float rewardPriority;
@@ -67,8 +67,8 @@ public class NAgent implements Agent {
 
 
 
-    private int discretization = 1;
-    private float lastMotivation = 0;
+    private final int discretization = 1;
+    private float lastMotivation;
 
 
 

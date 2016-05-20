@@ -1194,7 +1194,7 @@ public enum IntArrays {
 		}
 		// Merge sorted halves (now in supp) into a
 		for ( int i = from, p = from, q = mid; i < to; i++ ) {
-			a[i] = q >= to || p < mid && ((supp[p]) <= (supp[q])) ? supp[p++] : supp[q++];
+			a[i] = supp[q >= to || p < mid && supp[p] <= supp[q] ? p++ : q++];
 		}
 	}
 
@@ -1246,7 +1246,7 @@ public enum IntArrays {
 		}
 		// Merge sorted halves (now in supp) into a
 		for ( int i = from, p = from, q = mid; i < to; i++ ) {
-			a[i] = q >= to || p < mid && comp.compare(supp[p], supp[q]) <= 0 ? supp[p++] : supp[q++];
+			a[i] = supp[q >= to || p < mid && comp.compare(supp[p], supp[q]) <= 0 ? p++ : q++];
 		}
 	}
 

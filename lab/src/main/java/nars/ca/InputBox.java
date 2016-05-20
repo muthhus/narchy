@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class InputBox extends Dialog implements ActionListener {
-	boolean isAccepted = false;
+	boolean isAccepted;
 	final Button btnOk;
     final Button btnCcl;
 	final TextField txtFld;

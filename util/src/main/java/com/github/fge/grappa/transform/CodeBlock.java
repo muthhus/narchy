@@ -36,8 +36,8 @@ public final class CodeBlock
     private final List<TryCatchBlockNode> tryCatchBlockList = new ArrayList<>();
     private final List<LocalVariableNode> localVariableList = new ArrayList<>();
     private final List<VisibleAnnotation> annotations = new ArrayList<>();
-    private int arity = 0;
-    private boolean returns = false;
+    private int arity;
+    private boolean returns;
 
     public CodeBlock()
     {

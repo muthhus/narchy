@@ -80,9 +80,7 @@ public class SequenceTest {
 
         n.run(wordTime*4);
 
-        {
-            hallucinate(n, s, wordTime);
-        }
+        hallucinate(n, s, wordTime);
 
         TreeSet<Task> beliefs = new TreeSet(Truth.compareConfidence);
 

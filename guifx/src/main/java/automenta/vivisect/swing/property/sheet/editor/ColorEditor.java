@@ -22,9 +22,9 @@ public class ColorEditor extends AbstractPropertyEditor {
 
 		private static final long serialVersionUID = 411604969565728959L;
 
-		private ColorCellRenderer label = null;
-		private JButton button = null;
-		private JButton cancelButton = null;
+		private ColorCellRenderer label;
+		private JButton button;
+		private JButton cancelButton;
 
 		@SuppressWarnings("HardcodedFileSeparator")
 		public ColorEditorComponent() {
@@ -102,7 +102,7 @@ public class ColorEditor extends AbstractPropertyEditor {
 		}
 	}
 
-	private ColorEditorComponent colorEditor = null;
+	private ColorEditorComponent colorEditor;
 	private Color color;
 
 	public ColorEditor() {

@@ -30,17 +30,14 @@ public class TestMessageFileSystem  {
             });
         }
 //
-        {
-            /*
-             * client registers rpc endpoint in mesh filespace: /rpc.test/one.rpc
-             */
-            FileSource files = new FileSource(c, new String[]{"/rpc.test/*.rpc"});
-            files.waitComplete();
-            Map<String, FileReference> map = files.getFileMap();
+        /*
+         * client registers rpc endpoint in mesh filespace: /rpc.test/one.rpc
+         */
+        FileSource files = new FileSource(c, new String[]{"/rpc.test/*.rpc"});
+        files.waitComplete();
+        Map<String, FileReference> map = files.getFileMap();
 
-            System.out.println("files = " + map);
-        }
-
+        System.out.println("files = " + map);
 
 
 //        /*

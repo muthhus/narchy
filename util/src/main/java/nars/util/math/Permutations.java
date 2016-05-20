@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 /** from http://stackoverflow.com/questions/2920315/permutation-of-array */
 public class Permutations {
 
-	int size = 0;
+	int size;
 
 	/** total possible */
 	int num;

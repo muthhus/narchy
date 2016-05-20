@@ -20,6 +20,6 @@ public class World {
     public final Player opponentPlayer = new Player();
     public final int width = 800;
     public final int height = 600;
-    public BufferedImage background = null;
+    public BufferedImage background;
     public final List<Hit> hits = Collections.synchronizedList(new ArrayList<>());
 }

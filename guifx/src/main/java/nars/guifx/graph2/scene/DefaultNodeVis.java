@@ -43,7 +43,7 @@ public class DefaultNodeVis implements NodeVis {
     @Range(min = 0, max = 4)
     public final SimpleDoubleProperty nodeScale = new SimpleDoubleProperty(1.0);
 
-    private SpaceGrapher graph = null;
+    private SpaceGrapher graph;
     final Rectangle hoverPanel = new Rectangle();
     private NAR nar;
 
@@ -284,7 +284,7 @@ public class DefaultNodeVis implements NodeVis {
 
         protected final Node base;
 
-        private GraphicsContext g = null;
+        private GraphicsContext g;
 
         public LabeledCanvasNode(NAR n, N t, int maxEdges, EventHandler<MouseEvent> mouseActivity, EventHandler<MouseEvent> mouseUntivity) {
             super(t, maxEdges);

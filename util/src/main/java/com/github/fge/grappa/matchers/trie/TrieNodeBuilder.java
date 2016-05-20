@@ -36,7 +36,7 @@ import java.util.TreeMap;
 @Beta
 public final class TrieNodeBuilder
 {
-    private boolean fullWord = false;
+    private boolean fullWord;
 
     private final Map<Character, TrieNodeBuilder> subnodes = new TreeMap<>();
 

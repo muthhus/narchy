@@ -30,7 +30,7 @@ import java.awt.*;
  */
 public class VerticalLayout implements LayoutManager {
 
-    private int gap = 0;
+    private int gap;
 
     public VerticalLayout() {
     }

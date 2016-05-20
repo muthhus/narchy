@@ -47,7 +47,7 @@ class TerminalTextGraphics extends AbstractTextGraphics {
 
     private final Map<TerminalPosition, TextCharacter> writeHistory;
 
-    private AtomicInteger manageCallStackSize;
+    private final AtomicInteger manageCallStackSize;
     private TextCharacter lastCharacter;
     private TerminalPosition lastPosition;
 

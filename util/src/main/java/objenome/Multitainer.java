@@ -80,33 +80,31 @@ public class Multitainer extends AbstractPrototainer implements AbstractMultitai
     protected List<Problem> getProblems(ClassBuilder cb, List<Object> path, List<Problem> problems) {
         
         //handle primitive value parameters
-        {
-            cb.updateConstructorDependencies(false);
+        cb.updateConstructorDependencies(false);
 
-            if (cb.getInitPrimitives()!=null) {
-                for (Parameter p : cb.getInitPrimitives()) {
-                    List nextPath = new ArrayList(path);
-                    nextPath.add(p);
+        if (cb.getInitPrimitives()!=null) {
+            for (Parameter p : cb.getInitPrimitives()) {
+                List nextPath = new ArrayList(path);
+                nextPath.add(p);
 
-                    if (p.getType() == int.class) {
-                        problems.add(new DecideIntegerValue(p, nextPath, 
-                                getIntMinDefault(), getIntMaxDefault()));
-                    }
-                    else if (p.getType() == double.class) {
-                        problems.add(new DecideDoubleValue(p, nextPath, 
-                                getDoubleMinDefault(), getDoubleMaxDefault()) );
-                    }
-                    else if (p.getType() == boolean.class) {
-                        problems.add(new DecideBooleanValue(p, nextPath) );    
-                    }
-                    else {
-                        throw new RuntimeException("primitive Parameter " + nextPath + ' ' + p + " not yet supported");
-                    }
+                if (p.getType() == int.class) {
+                    problems.add(new DecideIntegerValue(p, nextPath,
+                            getIntMinDefault(), getIntMaxDefault()));
+                }
+                else if (p.getType() == double.class) {
+                    problems.add(new DecideDoubleValue(p, nextPath,
+                            getDoubleMinDefault(), getDoubleMaxDefault()) );
+                }
+                else if (p.getType() == boolean.class) {
+                    problems.add(new DecideBooleanValue(p, nextPath) );
+                }
+                else {
+                    throw new RuntimeException("primitive Parameter " + nextPath + ' ' + p + " not yet supported");
                 }
             }
         }
 
-        
+
         //Handle Abstract Methods
         Class c = cb.type();
         for (Method m : c.getMethods()) {

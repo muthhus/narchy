@@ -37,10 +37,12 @@ final IPersistentMap _meta;
 public final static PersistentVector EMPTY = new PersistentVector(0, 5, EMPTY_NODE, new Object[]{});
 
 private static final IFn TRANSIENT_VECTOR_CONJ = new AFn() {
-    public Object invoke(Object coll, Object val) {
+    @Override
+	public Object invoke(Object coll, Object val) {
         return ((ITransientVector)coll).conj(val);
     }
-    public Object invoke(Object coll) {
+    @Override
+	public Object invoke(Object coll) {
         return coll;
     }
 };
@@ -123,6 +125,7 @@ PersistentVector(IPersistentMap meta, int cnt, int shift, Node root, Object[] ta
 	this.tail = tail;
 }
 
+@Override
 public TransientVector asTransient(){
 	return new TransientVector(this);
 }
@@ -146,17 +149,20 @@ public Object[] arrayFor(int i){
 	throw new IndexOutOfBoundsException();
 }
 
+@Override
 public Object nth(int i){
 	Object[] node = arrayFor(i);
 	return node[i & 0x01f];
 }
 
+@Override
 public Object nth(int i, Object notFound){
 	if(i >= 0 && i < cnt)
 		return nth(i);
 	return notFound;
 }
 
+@Override
 public PersistentVector assocN(int i, Object val){
 	if(i >= 0 && i < cnt)
 		{
@@ -190,19 +196,23 @@ private static Node doAssoc(int level, Node node, int i, Object val){
 	return ret;
 }
 
+@Override
 public int count(){
 	return cnt;
 }
 
+@Override
 public PersistentVector withMeta(IPersistentMap meta){
 	return new PersistentVector(meta, cnt, shift, root, tail);
 }
 
+@Override
 public IPersistentMap meta(){
 	return _meta;
 }
 
 
+@Override
 public PersistentVector cons(Object val){
 	//room in tail?
 //	if(tail.length < 32)
@@ -267,6 +277,7 @@ public IChunkedSeq chunkedSeq(){
 	return new ChunkedSeq(this,0,0);
 }
 
+@Override
 public ISeq seq(){
 	return chunkedSeq();
 }
@@ -278,10 +289,12 @@ Iterator rangedIterator(final int start, final int end){
 		int base = i - (i%32);
 		Object[] array = (start < count())?arrayFor(i):null;
 
+		@Override
 		public boolean hasNext(){
 			return i < end;
 			}
 
+		@Override
 		public Object next(){
 			if(i < end) {
 				if(i-base == 32){
@@ -294,14 +307,17 @@ Iterator rangedIterator(final int start, final int end){
 			}
 		}
 
+		@Override
 		public void remove(){
 			throw new UnsupportedOperationException();
 		}
 	};
 }
 
+@Override
 public Iterator iterator(){return rangedIterator(0,count());}
 
+@Override
 public Object reduce(IFn f){
     Object init;
     if (cnt > 0)
@@ -321,6 +337,7 @@ public Object reduce(IFn f){
     return init;
 }
 
+@Override
 public Object reduce(IFn f, Object init){
     int step = 0;
     for(int i=0;i<cnt;i+=step){
@@ -335,6 +352,7 @@ public Object reduce(IFn f, Object init){
     return init;
 }
 
+@Override
 public Object kvreduce(IFn f, Object init){
     int step = 0;
     for(int i=0;i<cnt;i+=step){
@@ -378,16 +396,19 @@ static public final class ChunkedSeq extends ASeq implements IChunkedSeq,Counted
 		this.offset = offset;
 	}
 
+	@Override
 	public IChunk chunkedFirst() {
 		return new ArrayChunk(node, offset);
 		}
 
+	@Override
 	public ISeq chunkedNext(){
 		if(i + node.length < vec.cnt)
 			return new ChunkedSeq(vec,i+ node.length,0);
 		return null;
 		}
 
+	@Override
 	public ISeq chunkedMore(){
 		ISeq s = chunkedNext();
 		if(s == null)
@@ -395,27 +416,32 @@ static public final class ChunkedSeq extends ASeq implements IChunkedSeq,Counted
 		return s;
 	}
 
+	@Override
 	public Obj withMeta(IPersistentMap meta){
 		if(meta == this._meta)
 			return this;
 		return new ChunkedSeq(meta, vec, node, i, offset);
 	}
 
+	@Override
 	public Object first(){
 		return node[offset];
 	}
 
+	@Override
 	public ISeq next(){
 		if(offset + 1 < node.length)
 			return new ChunkedSeq(vec, node, i, offset + 1);
 		return chunkedNext();
 	}
 
+	@Override
 	public int count(){
 		return vec.cnt - (i + offset);
 	}
 }
 
+@Override
 public IPersistentCollection empty(){
 	return EMPTY.withMeta(meta());
 }
@@ -451,6 +477,7 @@ public IPersistentCollection empty(){
 //	return ret;
 //}
 
+@Override
 public PersistentVector pop(){
 	if(cnt == 0)
 		throw new IllegalStateException("Can't pop empty vector");
@@ -520,6 +547,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		this(v.cnt, v.shift, editableRoot(v.root), editableTail(v.tail));
 	}
 
+	@Override
 	public int count(){
 		ensureEditable();
 		return cnt;
@@ -543,6 +571,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		return new Node(new AtomicReference<Thread>(Thread.currentThread()), node.array.clone());
 	}
 
+	@Override
 	public PersistentVector persistent(){
 		ensureEditable();
 //		Thread owner = root.edit.get();
@@ -562,6 +591,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		return ret;
 	}
 
+	@Override
 	public TransientVector conj(Object val){
 		ensureEditable();
 		int i = cnt;
@@ -650,11 +680,13 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		throw new IndexOutOfBoundsException();
 	}
 
+	@Override
 	public Object valAt(Object key){
 		//note - relies on ensureEditable in 2-arg valAt
 		return valAt(key, null);
 	}
 
+	@Override
 	public Object valAt(Object key, Object notFound){
 		ensureEditable();
 		if(Util.isInteger(key))
@@ -666,6 +698,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		return notFound;
 	}
 
+	@Override
 	public Object invoke(Object arg1) {
 		//note - relies on ensureEditable in nth
 		if(Util.isInteger(arg1))
@@ -673,18 +706,21 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		throw new IllegalArgumentException("Key must be integer");
 	}
 
+	@Override
 	public Object nth(int i){
 		ensureEditable();
 		Object[] node = arrayFor(i);
 		return node[i & 0x01f];
 	}
 
+	@Override
 	public Object nth(int i, Object notFound){
 		if(i >= 0 && i < count())
 			return nth(i);
 		return notFound;
 	}
 
+	@Override
 	public TransientVector assocN(int i, Object val){
 		ensureEditable();
 		if(i >= 0 && i < cnt)
@@ -703,6 +739,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		throw new IndexOutOfBoundsException();
 	}
 
+	@Override
 	public TransientVector assoc(Object key, Object val){
 		//note - relies on ensureEditable in assocN
 		if(Util.isInteger(key))
@@ -728,6 +765,7 @@ static final class TransientVector extends AFn implements ITransientVector, Coun
 		return ret;
 	}
 
+	@Override
 	public TransientVector pop(){
 		ensureEditable();
 		if(cnt == 0)

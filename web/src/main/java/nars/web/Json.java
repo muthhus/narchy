@@ -149,7 +149,7 @@ public class Json {
         public static final SerializedString VAL_S = new SerializedString(VAL);
         public static final SerializedString REF_S = new SerializedString(REF);
 
-        boolean typing = false;
+        boolean typing;
 
         JsonFactory fac;
         FSTConfiguration conf;
@@ -306,7 +306,7 @@ public class Json {
             try {
                 createGenerator();
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
         }
 
@@ -326,7 +326,7 @@ public class Json {
             try {
                 gen.flush();
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
             return out.getBuf();
         }
@@ -493,7 +493,7 @@ public class Json {
                     gen.writeString(classToString(clz));
                 }
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
         }
 
@@ -516,7 +516,7 @@ public class Json {
                     gen.writeFieldName(bufferedName);
                 }
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
         }
 
@@ -538,7 +538,7 @@ public class Json {
                 if ( gen.getOutputContext().inObject() )
                     gen.writeEndObject();
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
         }
 
@@ -575,7 +575,7 @@ public class Json {
                 if ( gen.getOutputContext().inObject() )
                     gen.writeEndObject();
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
             }
         }
 
@@ -591,7 +591,7 @@ public class Json {
                 if ( outputContext.inObject() )
                     gen.writeEndObject();
             } catch (IOException e) {
-                FSTUtil.<RuntimeException>rethrow(e);
+                FSTUtil.rethrow(e);
                 try {
                     gen.flush();
                 } catch (IOException e1) {

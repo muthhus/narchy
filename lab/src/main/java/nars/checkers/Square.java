@@ -12,9 +12,9 @@ import java.awt.*;
 public class Square extends JComponent
 {
 	private final Color color;
-	private Piece piece = null;
-	private boolean selected = false;
-	private boolean targeted = false;
+	private Piece piece;
+	private boolean selected;
+	private boolean targeted;
 
     // the matching coordinates on the board
     private final int x;

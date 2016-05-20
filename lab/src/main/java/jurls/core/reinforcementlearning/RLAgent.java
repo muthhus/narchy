@@ -30,16 +30,16 @@ public class RLAgent extends LearnerAndActor {
     private final ActionSelector actionSelector;
     private final double[] stateAction;
     private final double[][] memory;
-    private int memoryIndex = 0;
+    private int memoryIndex;
     private final double[] stateMax;
     private final double[] stateMin;
     private final double[] normalizedState;
     private double rewardMin = Double.POSITIVE_INFINITY;
     private double rewardMax = Double.NEGATIVE_INFINITY;
-    private double factor1 = 0;
-    private double factor2 = 0;
-    private double rSum = 0;
-    private double epsilon = 0;
+    private double factor1;
+    private double factor2;
+    private double rSum;
+    private double epsilon;
     private final double factor1ComponentDivisor = 1000;
 
     public RLAgent(

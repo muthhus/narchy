@@ -49,13 +49,11 @@ public class KeyTest {
             assertEquals(false, k.isCtrlDown());
             assertEquals(true, k.isAltDown());
         }
-        {
-            KeyStroke k = KeyStroke.fromString("<c-a-a>");
-            assertEquals(k.getKeyType(), KeyType.Character);
-            assertEquals(new Character('a'), k.getCharacter());
-            assertEquals(true, k.isCtrlDown());
-            assertEquals(true, k.isAltDown());
-        }
+        KeyStroke k = KeyStroke.fromString("<c-a-a>");
+        assertEquals(k.getKeyType(), KeyType.Character);
+        assertEquals(new Character('a'), k.getCharacter());
+        assertEquals(true, k.isCtrlDown());
+        assertEquals(true, k.isAltDown());
         assertEquals(KeyType.ReverseTab, KeyStroke.fromString("<s-tab>").getKeyType());
         assertEquals(KeyType.ReverseTab, KeyStroke.fromString("<S-tab>").getKeyType());
         assertEquals(KeyType.ReverseTab, KeyStroke.fromString("<S-Tab>").getKeyType());

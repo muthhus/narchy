@@ -316,7 +316,7 @@ public class TheoryManager {
 			try {
 				engine.solve(s);
 			} catch (Exception ex) {
-				engine.logger.error("solveTheoryGoal {}", ex);
+				Prolog.logger.error("solveTheoryGoal {}", ex);
 				//ex.printStackTrace();
 			}
 		}

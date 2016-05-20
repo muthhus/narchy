@@ -310,7 +310,7 @@ public abstract class Civilization extends GPContainer<Civilized> implements Run
     }
 
 
-    int cycle = 0;
+    int cycle;
     protected void updatePopulation() {
 
 

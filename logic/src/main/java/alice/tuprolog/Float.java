@@ -170,7 +170,7 @@ public class Float extends Number {
     @Override
     public boolean isEqual(Term t) {
         t = t.getTerm();
-        return t instanceof Number ? value == ((Number) t).floatValue() : false;
+        return t instanceof Number && value == ((Number) t).floatValue();
     }
     
     /**

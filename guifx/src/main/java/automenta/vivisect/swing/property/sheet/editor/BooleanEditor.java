@@ -16,8 +16,8 @@ import java.awt.event.FocusListener;
  */
 public class BooleanEditor extends AbstractPropertyEditor {
 
-	private JCheckBox checkbox = null;
-	private JPanel panel = null;
+	private JCheckBox checkbox;
+	private JPanel panel;
 
 	public BooleanEditor(Object property) {
 

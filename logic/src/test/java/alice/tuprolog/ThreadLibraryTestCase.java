@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 public class ThreadLibraryTestCase {
 	
-	Prolog engine = null;
+	Prolog engine;
 	String theory;
 	
 	@Before

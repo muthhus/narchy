@@ -19,7 +19,7 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
     protected final MutableInteger maxConcepts;
 
     final AtomicBoolean ready = new AtomicBoolean(true);
-    private List<O> lPrev = null;
+    private List<O> lPrev;
     protected long now;
 
     public TopConceptService(NAR nar, int updatePeriodMS, int maxConcepts) {
@@ -56,7 +56,7 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
 
                     lPrev = l;
 
-                    nar.runAsync(() -> {
+                    NAR.runAsync(() -> {
                         send(l.toArray(new Object[l.size()]));
                         ready.set(true);
                     });

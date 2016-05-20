@@ -157,7 +157,7 @@ public enum NarseseTemplatePanel {
         t.forms.keySet().forEach(formSelect::addItem);
         
         ActionListener change = new ActionListener() {
-            JPanel r = null;
+            JPanel r;
             @Override public void actionPerformed(ActionEvent e) {
                 if (r!=null) {
                     p.remove(r);                    
@@ -200,7 +200,7 @@ public enum NarseseTemplatePanel {
 
         //noinspection OverlyComplexAnonymousInnerClass
         ActionListener change = new ActionListener() {
-            JPanel r = null;
+            JPanel r;
             @Override public void actionPerformed(ActionEvent e) {
                 if (t.getSelectionModel().isSelectionEmpty()) return;
                 Object o = 

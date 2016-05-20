@@ -31,11 +31,11 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
         }
     );*/
 
-    Canvas floorCanvas = null;
-    protected GraphicsContext gfx = null;
-    private double tx = 0.0;
-    private double ty = 0.0;
-    private double s = 0.0;
+    Canvas floorCanvas;
+    protected GraphicsContext gfx;
+    private double tx;
+    private double ty;
+    private double s;
 
 
 

@@ -73,7 +73,7 @@ public class STGPFunctionApproximation extends DefaultProblemSTGP {
         return Collections.singleton(doubleVariable("X"));
     }
 
-    TypedOrganism nextBest = null;
+    TypedOrganism nextBest;
     double nextBestError = Double.NaN;
 
     public double getBestError() {

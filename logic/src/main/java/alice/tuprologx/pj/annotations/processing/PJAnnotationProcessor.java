@@ -88,7 +88,8 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
     private SignatureExpr signature;
     
 
-    public Void visitType(TypeElement d, Void v) {                 
+    @Override
+    public Void visitType(TypeElement d, Void v) {
         TypeElement oldDecl = enclosingDeclaration;
         enclosingDeclaration = d;        
         String theory="";

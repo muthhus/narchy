@@ -13,7 +13,7 @@ public class Hit {
 	public final int x;
 	public final int y;
 	public final int reward;
-	public int progress = 0;
+	public int progress;
 
 	public Hit(int x, int y, int reward) {
 		this.x = x;

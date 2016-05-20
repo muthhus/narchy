@@ -18,9 +18,9 @@ public class Enemy extends Sprite
     private static final float AIR_INERTIA = 0.89f;
 
     private float runTime;
-    private boolean onGround = false;
-    private boolean mayJump = false;
-    private int jumpTime = 0;
+    private boolean onGround;
+    private boolean mayJump;
+    private int jumpTime;
     private float xJumpSpeed;
     private float yJumpSpeed;
 
@@ -29,14 +29,14 @@ public class Enemy extends Sprite
 
     private final LevelScene world;
     public int facing;
-    public int deadTime = 0;
-    public boolean flyDeath = false;
+    public int deadTime;
+    public boolean flyDeath;
 
     public boolean avoidCliffs = true;
     private final int type;
 
     public boolean winged = true;
-    private int wingTime = 0;
+    private int wingTime;
     
     public boolean noFireballDeath;
 

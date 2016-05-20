@@ -49,7 +49,7 @@ public class WebcamShapes<T extends ImageBase> extends JPanel
     Point2D_I32 point1 = new Point2D_I32();
 
     int desiredWidth,desiredHeight;
-    volatile int mode = 0;
+    volatile int mode;
 
     BufferedImage workImage;
 

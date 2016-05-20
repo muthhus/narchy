@@ -37,7 +37,7 @@ public final class SurfaceVertex {
 	private Point projection;
 	private int project_index;
 
-	private static int master_project_index = 0; // over 4 billion times to
+	private static int master_project_index; // over 4 billion times to
 													// reset
 
 	/**

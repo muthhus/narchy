@@ -12,9 +12,9 @@ import java.awt.image.BufferedImage;
  * @author thorsten
  */
 public class Move {
-	public BufferedImage[] images = null;
+	public BufferedImage[] images;
 
-	public int hitIndex = 0;
-	public int hitX = 0;
-	public int hitY = 0;
+	public int hitIndex;
+	public int hitX;
+	public int hitY;
 }

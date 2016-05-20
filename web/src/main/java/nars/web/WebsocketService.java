@@ -28,7 +28,6 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 
             //.setForceSerializable(true)
             //.setForceClzInit(true)
-            ;
 
     public WebsocketService() {
 
@@ -58,7 +57,7 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
         } else if (object instanceof String) {
             WebSockets.sendText((String)object, socket, this);
         } else if (object instanceof StringBuilder) {
-            WebSockets.sendText(((StringBuilder)object).toString(), socket, this);
+            WebSockets.sendText(object.toString(), socket, this);
         } else if (object instanceof ByteBuffer) {
             WebSockets.sendText((ByteBuffer)object, socket, this);
         } else {

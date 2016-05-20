@@ -20,9 +20,9 @@ public class Civilized<I> extends TypedOrganism implements Runnable {
     private final Iterable<EGoal> goalSequence;
     private final ExecutorService exe;
 
-    double age = 0;
+    double age;
 
-    private double totalCost = 0;
+    private double totalCost;
     private boolean running;
 
     public Civilized(TypedOrganism root, Iterable<EGoal> goalSequence, ExecutorService exe) {

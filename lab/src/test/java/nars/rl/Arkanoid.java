@@ -42,13 +42,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	/* GAME VARIABLES */
 
-	private boolean tryAgain = false;
-	private boolean running = false;
+	private boolean tryAgain;
+	private boolean running;
 
-	private Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
-	private Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-	private List<Brick> bricks = new ArrayList<Arkanoid.Brick>();
-	private ScoreBoard scoreboard = new ScoreBoard();
+	private final Paddle paddle = new Paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
+	private final Ball ball = new Ball(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	private final List<Brick> bricks = new ArrayList<Arkanoid.Brick>();
+	private final ScoreBoard scoreboard = new ScoreBoard();
 
 	private double lastFt;
 	private double currentSlice;
@@ -69,18 +69,22 @@ public class Arkanoid extends JFrame implements KeyListener {
 		double sizeX;
 		double sizeY;
 
+		@Override
 		double left() {
 			return x - sizeX / 2.0;
 		}
 
+		@Override
 		double right() {
 			return x + sizeX / 2.0;
 		}
 
+		@Override
 		double top() {
 			return y - sizeY / 2.0;
 		}
 
+		@Override
 		double bottom() {
 			return y + sizeY / 2.0;
 		}
@@ -89,10 +93,10 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class ScoreBoard {
 
-		int score = 0;
+		int score;
 		int lives = PLAYER_LIVES;
-		boolean win = false;
-		boolean gameOver = false;
+		boolean win;
+		boolean gameOver;
 		String text = "";
 
 		Font font;
@@ -160,7 +164,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Paddle extends Rectangle {
 
-		double velocity = 0.0;
+		double velocity;
 
 		public Paddle(double x, double y) {
 			this.x = x;
@@ -202,7 +206,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 	class Brick extends Rectangle {
 
-		boolean destroyed = false;
+		boolean destroyed;
 
 		Brick(double x, double y) {
 			this.x = x;
@@ -254,18 +258,22 @@ public class Arkanoid extends JFrame implements KeyListener {
 
 		}
 
+		@Override
 		double left() {
 			return x - radius;
 		}
 
+		@Override
 		double right() {
 			return x + radius;
 		}
 
+		@Override
 		double top() {
 			return y - radius;
 		}
 
+		@Override
 		double bottom() {
 			return y + radius;
 		}

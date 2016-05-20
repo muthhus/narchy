@@ -25,6 +25,7 @@ public class RUCache<K, V> {
         LRUdata = new WeakHashMap<K, V>();
 
         MRUdata = new LinkedHashMap<K, V>(capacity + 1, 1.0f, true) {
+            @Override
             protected boolean removeEldestEntry(Map.Entry<K, V> entry) {
                 if (this.size() > capacity) {
                     LRUdata.put(entry.getKey(), entry.getValue());

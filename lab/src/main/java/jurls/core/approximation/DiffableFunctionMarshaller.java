@@ -33,7 +33,7 @@ public class DiffableFunctionMarshaller implements ParameterizedFunction {
     private final Scalar[] inputScalars;
     private final double[] inputValues;
     private final int numInputs;
-    private static int COMPILED_CLASS_INDEX = 0;
+    private static int COMPILED_CLASS_INDEX;
     private final boolean debug = true;
 
     private static final class JaninoRestrictedClassLoader extends

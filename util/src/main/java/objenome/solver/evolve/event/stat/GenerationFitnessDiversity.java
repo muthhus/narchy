@@ -34,7 +34,7 @@ public class GenerationFitnessDiversity extends AbstractStat<EndGeneration> {
     /**
      * The number of different fitness values.
      */
-    private int diversity = 0;
+    private int diversity;
 
     /**
      * Constructs a <code>GenerationFitnessDiversity</code>.

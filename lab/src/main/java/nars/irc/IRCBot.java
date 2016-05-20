@@ -16,7 +16,7 @@ public abstract class IRCBot {
 
     static final String pingHead = "PING ";
 
-    protected BufferedWriter writer = null;
+    protected BufferedWriter writer;
 
     public void setOutputting(boolean outputting) {
         this.outputting = outputting;

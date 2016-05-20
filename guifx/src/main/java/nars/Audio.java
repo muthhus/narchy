@@ -33,7 +33,7 @@ public class Audio implements Runnable
     //private float amplitude = 1;
     //private float targetAmplitude = 1;
     private boolean alive = true;
-    private float alpha = 0;
+    private float alpha;
 
 
     private FileOutputStream rec;

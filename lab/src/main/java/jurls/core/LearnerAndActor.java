@@ -15,10 +15,10 @@ import nars.util.Texts;
  */
 public abstract class LearnerAndActor {
 
-    private int numIterations = 0;
-    private int iterationsPerSecond = 0;
-    private int iterationsPerSecondCounter = 0;
-    protected ParameterizedFunction parameterizedFunction = null;
+    private int numIterations;
+    private int iterationsPerSecond;
+    private int iterationsPerSecondCounter;
+    protected ParameterizedFunction parameterizedFunction;
     private long t0 = System.currentTimeMillis();
     private final StringBuilder stringBuilder = new StringBuilder();
 

@@ -542,7 +542,7 @@ public class FastBitSet {
         _length = newLength;
     }
 
-    public static enum MathLib {
+    public enum MathLib {
         ;
 
         public static int min(int x, int y) {

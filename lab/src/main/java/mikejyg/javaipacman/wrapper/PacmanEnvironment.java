@@ -45,7 +45,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private int pacmanCyclesPerFrame = 4;
+	private final int pacmanCyclesPerFrame = 4;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -92,11 +92,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//managed by this class
 	}
 
+	@Override
 	protected void initInput() {
 		//managed by this class
 	}
 
-	float lastScore = 0;
+	float lastScore;
 
 	@Override
 	public float cycle(int t, int action, float[] ins, Agent a) {
@@ -199,7 +200,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		return ds;
 	}
 
-	float interScore = 0;
+	float interScore;
 	@Override
 	public void killedByGhost() {
 		super.killedByGhost();

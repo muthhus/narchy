@@ -13,7 +13,7 @@ import java.util.Iterator;
  */
 public class FastConcatenationRope extends ConcatenationRope {
 
-    private int hash = 0;
+    private int hash;
 
     public FastConcatenationRope(Rope left, Rope right) {
         super(left, right);

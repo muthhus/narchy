@@ -62,7 +62,7 @@ import java.util.Map;
      */
     public final Map<Class<?>, Object> stat = new HashMap<>();
     protected Pipeline pipeline;
-    protected Population<I> population = null;
+    protected Population<I> population;
 
     /**
      * The key -&gt; value mapping.

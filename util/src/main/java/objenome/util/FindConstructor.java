@@ -41,7 +41,7 @@ public enum FindConstructor {
             throws NoSuchMethodException {
         return internalFind(source.getDeclaredConstructors(),
                 parameterTypes,
-                Collections.<Parameter, Object>emptyMap());
+                Collections.emptyMap());
     }
 
     

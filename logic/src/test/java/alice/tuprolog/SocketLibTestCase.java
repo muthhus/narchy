@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class SocketLibTestCase {
 	
-	Prolog engine = null;
+	Prolog engine;
 	String theory;
 	
 	

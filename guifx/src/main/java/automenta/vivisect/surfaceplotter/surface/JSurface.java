@@ -65,7 +65,7 @@ public class JSurface extends JComponent {
 	private int printwidth, printheight; // print size
 	private SurfaceVertex cop; // center of projection
 
-	private int curve = 0;
+	private int curve;
 
 	private Graphics graphics; // the actual graphics used by all private
 								// methods
@@ -169,7 +169,7 @@ public class JSurface extends JComponent {
 
 	class JSurfaceMouseListener extends MouseAdapter {
 
-		int i = 0;
+		int i;
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
@@ -854,7 +854,7 @@ public class JSurface extends JComponent {
 						if (isDisplayGrids && (i % t_y == 0))
 							projection = projector.project(-factor_x * 10, i, -10);
 						else {
-							projection = i % t_y != 0 ? projector.project(factor_x * 9.8f, i, -10) : projector.project(factor_x * 9.5f, i, -10);
+							projection = projector.project(factor_x * (i % t_y != 0 ? 9.8f : 9.5f), i, -10);
 						}
 						tickpos = projector.project(factor_x * 10, i, -10);
 						g.drawLine(projection.x, projection.y, tickpos.x, tickpos.y);
@@ -870,7 +870,7 @@ public class JSurface extends JComponent {
 						if (isDisplayGrids && (i % t_x == 0))
 							projection = projector.project(i, -factor_y * 10, -10);
 						else {
-							projection = i % t_x != 0 ? projector.project(i, factor_y * 9.8f, -10) : projector.project(i, factor_y * 9.5f, -10);
+							projection = projector.project(i, factor_y * (i % t_x != 0 ? 9.8f : 9.5f), -10);
 						}
 						tickpos = projector.project(i, factor_y * 10, -10);
 						g.drawLine(projection.x, projection.y, tickpos.x, tickpos.y);
@@ -899,7 +899,7 @@ public class JSurface extends JComponent {
 							projection = projector.project(-factor_x * 10, -factor_y * 10, i);
 							tickpos = projector.project(-factor_x * 10, factor_y * 10, i);
 						} else {
-							projection = i % t_z == 0 ? projector.project(-factor_x * 10, factor_y * 9.5f, i) : projector.project(-factor_x * 10, factor_y * 9.8f, i);
+							projection = projector.project(-factor_x * 10, factor_y * (i % t_z == 0 ? 9.5f : 9.8f), i);
 							tickpos = projector.project(-factor_x * 10, factor_y * 10, i);
 						}
 						g.drawLine(projection.x, projection.y, tickpos.x, tickpos.y);
@@ -916,7 +916,7 @@ public class JSurface extends JComponent {
 							projection = projector.project(-factor_x * 10, -factor_y * 10, i);
 							tickpos = projector.project(factor_x * 10, -factor_y * 10, i);
 						} else {
-							projection = i % t_z == 0 ? projector.project(factor_x * 9.5f, -factor_y * 10, i) : projector.project(factor_x * 9.8f, -factor_y * 10, i);
+							projection = projector.project(factor_x * (i % t_z == 0 ? 9.5f : 9.8f), -factor_y * 10, i);
 							tickpos = projector.project(factor_x * 10, -factor_y * 10, i);
 						}
 						g.drawLine(projection.x, projection.y, tickpos.x, tickpos.y);
@@ -1138,7 +1138,7 @@ public class JSurface extends JComponent {
 					float ratio = (result - vertex[index].z) / (vertex[loop].z - vertex[index].z);
 					float new_x = ratio * (vertex[loop].x - vertex[index].x) + vertex[index].x;
 					float new_y = ratio * (vertex[loop].y - vertex[index].y) + vertex[index].y;
-					projection = low1 ? projector.project(new_x, new_y, -10) : projector.project(new_x, new_y, 10);
+					projection = projector.project(new_x, new_y, low1 ? -10 : 10);
 					poly_x[count] = projection.x;
 					poly_y[count] = projection.y;
 					count++;
@@ -1155,7 +1155,7 @@ public class JSurface extends JComponent {
 					float ratio = (result - vertex[loop].z) / (vertex[index].z - vertex[loop].z);
 					float new_x = ratio * (vertex[index].x - vertex[loop].x) + vertex[loop].x;
 					float new_y = ratio * (vertex[index].y - vertex[loop].y) + vertex[loop].y;
-					projection = low2 ? projector.project(new_x, new_y, -10) : projector.project(new_x, new_y, 10);
+					projection = projector.project(new_x, new_y, low2 ? -10 : 10);
 					poly_x[count] = projection.x;
 					poly_y[count] = projection.y;
 					count++;
@@ -1343,7 +1343,7 @@ public class JSurface extends JComponent {
 				 * :)
 				 */
 
-				upper_first = values1[1].x == values1[2].x ? (values1[2].z - values1[3].z) * (cop.x - values1[3].x) / (values1[2].x - values1[3].x) + values1[3].z + (values1[2].z - values1[1].z) * (cop.y - values1[1].y) / (values1[2].y - values1[1].y) + values1[1].z - values1[2].z > cop.z : (values1[2].z - values1[1].z) * (cop.x - values1[1].x) / (values1[2].x - values1[1].x) + values1[1].z + (values1[2].z - values1[3].z) * (cop.y - values1[3].y) / (values1[2].y - values1[3].y) + values1[3].z - values1[2].z > cop.z;
+				upper_first = (values1[1].x == values1[2].x ? (values1[2].z - values1[3].z) * (cop.x - values1[3].x) / (values1[2].x - values1[3].x) + values1[3].z + (values1[2].z - values1[1].z) * (cop.y - values1[1].y) / (values1[2].y - values1[1].y) + values1[1].z : (values1[2].z - values1[1].z) * (cop.x - values1[1].x) / (values1[2].x - values1[1].x) + values1[1].z + (values1[2].z - values1[3].z) * (cop.y - values1[3].y) / (values1[2].y - values1[3].y) + values1[3].z) - values1[2].z > cop.z;
 			}
 
 			// there is a problem in drawing two curves in the same render only
@@ -1603,26 +1603,26 @@ public class JSurface extends JComponent {
 			drawBoundingBox();
 	}
 
-	private int contour_center_x = 0;
-	private int contour_center_y = 0;
-	private int contour_space_x = 0;
-	private int legend_width = 0;
-	private int legend_space = 0;
-	private int legend_length = 0;
-	private String[] legend_label = null;
+	private int contour_center_x;
+	private int contour_center_y;
+	private int contour_space_x;
+	private int legend_width;
+	private int legend_space;
+	private int legend_length;
+	private String[] legend_label;
 
-	private float contour_width_x = 0.0f;
-	private float contour_width_y = 0.0f;
+	private float contour_width_x;
+	private float contour_width_y;
 
-	private Color[] contour_color = null;
-	private String[] ylabels = null;
+	private Color[] contour_color;
+	private String[] ylabels;
 
 	private final int[] xpoints = new int[8];
 	private final int[] ypoints = new int[8];
 
 	private final int[] contour_x = new int[8];
 	private final int[] contour_y = new int[8];
-	private int contour_n = 0;
+	private int contour_n;
 
 	private int contour_lines = 10;
 	private final float[] delta = new float[4];
@@ -1788,7 +1788,7 @@ public class JSurface extends JComponent {
 
 		int fontsize = 0;
 
-		fontsize = width < height ? (int) (width / 48) : (int) (height / 48);
+		fontsize = (int) ((width < height ? width : height) / 48);
 		graphics.setFont(new Font("Helvetica", Font.PLAIN, fontsize));
 
 		FontMetrics fm = graphics.getFontMetrics();

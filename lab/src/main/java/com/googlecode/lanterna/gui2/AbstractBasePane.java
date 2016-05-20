@@ -236,6 +236,7 @@ public abstract class AbstractBasePane implements BasePane {
             }
         }
 
+        @Override
         public boolean removeComponent(Component component) {
             boolean removed = super.removeComponent(component);
             if (removed) {

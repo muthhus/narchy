@@ -46,15 +46,15 @@ public class HumanAgent extends AbstractAgent {
     protected long lastFrameTime;
     protected long lastWaitTime;
     protected final int framesPerSecond = 60;
-    protected long millisFraction = 0;
-    protected long timeError = 0;
+    protected long millisFraction;
+    protected long timeError;
 
     /** Variables to display relevant RL information */
-    protected int rewardDisplayCounter = 0;
-    protected int lastReward = 0;
+    protected int rewardDisplayCounter;
+    protected int lastReward;
 
     /** Keep track of whether we told the user that the game is over */
-    protected boolean displayedGameOver = false;
+    protected boolean displayedGameOver;
     
     protected int numFramesToDisplayRewardFor = framesPerSecond * 1;
 

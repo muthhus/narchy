@@ -127,7 +127,7 @@ public class Grid2DRelative implements World {
         return time < totalTime;
     }
 
-    double[] action2 = null;
+    double[] action2;
 
     @Override
     public double step(double[] action, double[] sensor) {

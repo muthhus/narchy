@@ -28,8 +28,8 @@ import nars.term.Term;
 public class SubButton extends HBox {
 
 
-    NAR nar = null;
-    Object value = null;
+    NAR nar;
+    Object value;
     public static final float paddingDefault = 0.5f;
 
     public void setNAR(NAR nar) {

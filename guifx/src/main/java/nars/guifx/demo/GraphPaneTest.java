@@ -96,7 +96,7 @@ public enum GraphPaneTest {
         int n = 16;
         new ScaleFreeGraphGenerator(n).generateGraph(g,
                 new VertexFactory<Term>() {
-                    int i = 0;
+                    int i;
 
                     @Override
                     public Term createVertex() {

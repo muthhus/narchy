@@ -34,8 +34,9 @@ implements ActionListener
 {
 	private static final long serialVersionUID = -749993332452315528L;
 
-	static cpcman pacMan=null;
+	static cpcman pacMan;
 
+	@Override
 	public void init()
 	{
 		setSize(50,50);
@@ -57,6 +58,7 @@ implements ActionListener
 	/////////////////////////////////////////////////
 	// handles button event
 	/////////////////////////////////////////////////
+	@Override
 	public void actionPerformed(ActionEvent e)
 	{
 		if ( pacMan != null && ! pacMan.isFinalized() )

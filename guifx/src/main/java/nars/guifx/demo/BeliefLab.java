@@ -23,9 +23,9 @@ public class BeliefLab {
 												// prediction
 	static float pastProbability = 0.1f; // how often to ask for a prediction
 	static final float fps = 45f;
-	static boolean enableEternals = false;
+	static boolean enableEternals;
 	static boolean enableTemporals = true;
-	static int stmInduction = 0;
+	static int stmInduction;
 
 	public static void main(String[] args) {
         Default nar = new Default();

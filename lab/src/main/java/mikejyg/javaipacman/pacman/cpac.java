@@ -151,9 +151,7 @@ public class cpac
 
 	boolean mazeOK(int iRow, int icol)
 	{
-		if ( (maze.iMaze[icol][iRow] & ( cmaze.WALL | cmaze.DOOR)) ==0)
-			return(true);
-		return(false);
+		return (maze.iMaze[icol][iRow] & (cmaze.WALL | cmaze.DOOR)) == 0;
 	}
 }
 

@@ -182,7 +182,7 @@ public class ConstantVolumeJoint extends Joint {
     final Vec2[] d = pool.getVec2Array(bodies.length);
 
     for (int i = 0; i < bodies.length; ++i) {
-      final int prev = (i == 0) ? bodies.length - 1 : i - 1;
+      final int prev = (i == 0 ? bodies.length : i) - 1;
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
       d[i].set(positions[bodies[next].m_islandIndex].c);
       d[i].subLocal(positions[bodies[prev].m_islandIndex].c);
@@ -219,7 +219,7 @@ public class ConstantVolumeJoint extends Joint {
     final Vec2 d[] = pool.getVec2Array(bodies.length);
 
     for (int i = 0; i < bodies.length; ++i) {
-      final int prev = (i == 0) ? bodies.length - 1 : i - 1;
+      final int prev = (i == 0 ? bodies.length : i) - 1;
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
       d[i].set(positions[bodies[next].m_islandIndex].c);
       d[i].subLocal(positions[bodies[prev].m_islandIndex].c);

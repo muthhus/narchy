@@ -12,7 +12,7 @@ public class FireFlower extends Sprite
     private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     private int life;
 
     public FireFlower(LevelScene world, int x, int y)

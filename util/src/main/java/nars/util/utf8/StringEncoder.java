@@ -36,7 +36,7 @@ final class StringEncoder {
 	private final ByteBuffer byteTemp = ByteBuffer.allocate(BYTE_BUFFER_SIZE);
 	private final CharsetEncoder encoder = Utf8.utf8Charset.newEncoder();
 
-	private int readOffset = 0;
+	private int readOffset;
 
 	public StringEncoder() {
 		// set the buffer to "filled" so it gets filled by encode()

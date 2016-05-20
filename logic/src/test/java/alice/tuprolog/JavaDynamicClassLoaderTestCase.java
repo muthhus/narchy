@@ -26,7 +26,7 @@ public class JavaDynamicClassLoaderTestCase {
 	String[] paths = new String[PATHS_NUMBER];
 	
 	@Test
-	public void ConstructorTest() throws MalformedURLException, IOException, ClassNotFoundException{
+	public void ConstructorTest() throws IOException, ClassNotFoundException{
 		JavaDynamicClassLoader loader = new JavaDynamicClassLoader();
 		assertNotNull(loader);
 		
@@ -37,8 +37,8 @@ public class JavaDynamicClassLoaderTestCase {
 	}
 	
 	@Ignore @Test
-	public void LoadClassTest() throws MalformedURLException, 
-		IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
+	public void LoadClassTest() throws
+			IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		JavaDynamicClassLoader loader = null;
 		setPath(true);
@@ -48,13 +48,13 @@ public class JavaDynamicClassLoaderTestCase {
 		
 		Class<?> cl = loader.loadClass("Counter");
 		assertNotNull(cl);
-		Method m = cl.getMethod("inc", new Class[]{});
+		Method m = cl.getMethod("inc");
 		m.setAccessible(true);
 		Object obj = cl.newInstance();
-		m.invoke(obj, new Object[]{});
-		Method m1 = cl.getMethod("getValue", new Class[]{});
+		m.invoke(obj);
+		Method m1 = cl.getMethod("getValue");
 		m1.setAccessible(true);
-		Object res_obj = m1.invoke(obj, new Object[]{});
+		Object res_obj = m1.invoke(obj);
 		int res = new Integer(res_obj.toString()).intValue();
 		assertEquals(1, res);
 	}
@@ -80,7 +80,7 @@ public class JavaDynamicClassLoaderTestCase {
 	
 	@Ignore
 	@Test
-	public void URLHandling() throws ClassNotFoundException, MalformedURLException, IOException
+	public void URLHandling() throws ClassNotFoundException, IOException
 	{
 		JavaDynamicClassLoader loader = null;
 		URL url = new File(".").toURI().toURL();

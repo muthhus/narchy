@@ -20,7 +20,7 @@ public class Sim {
     public final World2D world;
     private long delayMS;
     private float fps;
-    private boolean running = false;
+    private boolean running;
 
     public Sim(World2D world) {
         super();

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class GeneratorContext {
 
-    private int parameterIndex = 0;
+    private int parameterIndex;
     private final List<Scalar> parameterScalars = new ArrayList<>();
     private final List<Double> parameterData = new ArrayList<>();
     private DiffableFunctionSource diffableFunctionSource;

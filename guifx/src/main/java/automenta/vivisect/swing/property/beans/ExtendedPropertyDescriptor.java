@@ -29,7 +29,7 @@ import java.util.Comparator;
  */
 public class ExtendedPropertyDescriptor extends PropertyDescriptor {
 
-	private Class<?> tableCellRendererClass = null;
+	private Class<?> tableCellRendererClass;
 	private String category = "";
 
 	public ExtendedPropertyDescriptor(String propertyName, Class<?> beanClass) throws IntrospectionException {

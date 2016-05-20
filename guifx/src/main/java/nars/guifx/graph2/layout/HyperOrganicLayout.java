@@ -118,7 +118,7 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	 * as an energy cost function. This function is CPU intensive and is best
 	 * only used in the fine tuning phase.
 	 */
-	protected boolean isOptimizeEdgeDistance = false;
+	protected boolean isOptimizeEdgeDistance;
 
 	/**
 	 * Whether or not edges crosses will be calculated as an energy cost
@@ -127,13 +127,13 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	 * of the algorithm using it, then use it intermittantly through the rest
 	 * of the layout.
 	 */
-	protected boolean isOptimizeEdgeCrossing = false;
+	protected boolean isOptimizeEdgeCrossing;
 
 	/**
 	 * Whether or not edge lengths will be calculated as an energy cost
 	 * function. This function not CPU intensive.
 	 */
-	protected boolean isOptimizeEdgeLength = false;
+	protected boolean isOptimizeEdgeLength;
 
 	/**
 	 * Whether or not nodes will contribute an energy cost as they approach
@@ -141,7 +141,7 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	 * border and stays constant outside the bounds of the graph. This function
 	 * is not CPU intensive
 	 */
-	protected boolean isOptimizeBorderLine = false;
+	protected boolean isOptimizeBorderLine;
 
 //	/**
 //	 * Whether or not node distribute will contribute an energy cost where
@@ -158,13 +158,13 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	 * The current radius around each node where the next position energy
 	 * values will be calculated for a possible move
 	 */
-	protected float moveRadius = 0.0F;
+	protected float moveRadius;
 
 	/**
 	 * The initial value of <code>moveRadius</code>. If this is set to zero
 	 * the layout will automatically determine a suitable value.
 	 */
-	protected float initialMoveRadius = 0.0f;
+	protected float initialMoveRadius;
 
 	/**
 	 * The factor by which the <code>moveRadius</code> is multiplied by after
@@ -248,27 +248,27 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	/**
 	 * The x coordinate of the final graph
 	 */
-	protected float boundsX = 0.0f;
+	protected float boundsX;
 
 	/**
 	 * The y coordinate of the final graph
 	 */
-	protected float boundsY = 0.0f;
+	protected float boundsY;
 
 	/**
 	 * The width coordinate of the final graph
 	 */
-	protected float boundsWidth = 0.0f;
+	protected float boundsWidth;
 
 	/**
 	 * The height coordinate of the final graph
 	 */
-	protected float boundsHeight = 0.0f;
+	protected float boundsHeight;
 
 	/**
 	 * current iteration number of the layout
 	 */
-	protected int iteration = 0;
+	protected int iteration;
 
 	/**
 	 * prevents from dividing with zero and from creating excessive energy
@@ -293,18 +293,18 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	/**
 	 * cached version of <code>maxDistanceLimit</code> squared
 	 */
-	protected float maxDistanceLimitSquared = 0.0F;
+	protected float maxDistanceLimitSquared;
 
 	/**
 	 * Keeps track of how many consecutive round have passed without any energy
 	 * changes
 	 */
-	protected int unchangedEnergyRoundCount = 0;
+	protected int unchangedEnergyRoundCount;
 
 	@Range(min = 0, max = 0.2)
 	public final SimpleDoubleProperty vertexSpeed = new SimpleDoubleProperty(0.04);
 
-	float vertexMotionThreshold = 0.0f;
+	float vertexMotionThreshold;
 
 
 	/**
@@ -324,7 +324,7 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	/**
 	 * Internal models collection of nodes ( vertices ) to be laid out
 	 */
-	protected CellWrapper<TermNode>[] v = null;
+	protected CellWrapper<TermNode>[] v;
 
 	/**
 	 * Internal models collection of edges to be laid out
@@ -381,7 +381,7 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 	 * before the algorithm runs mean the node to edge cost function
 	 * is always calculated.
 	 */
-	protected boolean isFineTuning = false;
+	protected boolean isFineTuning;
 
 	/**
 	 * Specifies if the STYLE_NOEDGESTYLE flag should be set on edges that are
@@ -1251,46 +1251,46 @@ public class HyperOrganicLayout<V extends TermNode> implements IterativeLayout<V
 		 * All edge that repel this cell, only used for nodes. This array
 		 * is equivalent to all edges unconnected to this node
 		 */
-		protected IntArrayList relevantEdges = null;
+		protected IntArrayList relevantEdges;
 
 		/**
 		 * the index of all connected edges in the <code>e</code> array
 		 * to this node. This is only used for nodes.
 		 */
-		protected IntArrayList connectedEdges = null;
+		protected IntArrayList connectedEdges;
 
 		/**
 		 * The x-coordinate position of this cell, nodes only
 		 */
-		protected float x = 0.0F;
+		protected float x;
 
 		/**
 		 * The y-coordinate position of this cell, nodes only
 		 */
-		protected float y = 0.0F;
+		protected float y;
 
 		/**
 		 * The approximate radius squared of this cell, nodes only. If
 		 * approxNodeDimensions is true on the layout this value holds the
 		 * width of the node squared
 		 */
-		protected float radiusSquared = 0.0F;
+		protected float radiusSquared;
 
 		/**
 		 * The height of the node squared, only used if approxNodeDimensions
 		 * is set to true.
 		 */
-		protected float heightSquared = 0.0F;
+		protected float heightSquared;
 
 		/**
 		 * The index of the node attached to this edge as source, edges only
 		 */
-		protected int source = 0;
+		protected int source;
 
 		/**
 		 * The index of the node attached to this edge as target, edges only
 		 */
-		protected int target = 0;
+		protected int target;
 
 		/**
 		 * Constructs a new CellWrapper

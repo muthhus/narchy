@@ -29,12 +29,12 @@ public class BooleanSATTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BooleanSATTest.class);
     final Map<Termed, Truth> queries = Global.newHashMap();
-    float best = 0f;
-    long bestAt = 0;
+    float best;
+    long bestAt;
 
     public final Truth unknown = new DefaultTruth(0.5f, 0);
     private final NAR nar;
-    private Map<String, BooleanConcept> variables = Global.newHashMap();
+    private final Map<String, BooleanConcept> variables = Global.newHashMap();
 
     public static class BooleanConcept extends MutableBoolean {
 

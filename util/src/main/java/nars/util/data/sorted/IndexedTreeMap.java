@@ -108,17 +108,17 @@ public class IndexedTreeMap<K, V>
      */
     private final Comparator<? super K> comparator;
 
-    private transient Entry<K, V> root = null;
+    private transient Entry<K, V> root;
 
     /**
      * The number of entries in the tree
      */
-    private transient int size = 0;
+    private transient int size;
 
     /**
      * The number of structural modifications to the tree.
      */
-    private transient int modCount = 0;
+    private transient int modCount;
 
     /**
      * Constructs a new, empty tree map, using the natural ordering of its
@@ -921,9 +921,9 @@ public class IndexedTreeMap<K, V>
      * the first time this view is requested.  Views are stateless, so
      * there's no rule to create more than one.
      */
-    private transient EntrySet entrySet = null;
-    private transient KeySet<K> navigableKeySet = null;
-    private transient NavigableMap<K, V> descendingMap = null;
+    private transient EntrySet entrySet;
+    private transient KeySet<K> navigableKeySet;
+    private transient NavigableMap<K, V> descendingMap;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -1749,9 +1749,9 @@ public class IndexedTreeMap<K, V>
         }
 
         // Views
-        transient NavigableMap<K, V> descendingMapView = null;
-        transient EntrySetView entrySetView = null;
-        transient KeySet<K> navigableKeySetView = null;
+        transient NavigableMap<K, V> descendingMapView;
+        transient EntrySetView entrySetView;
+        transient KeySet<K> navigableKeySetView;
 
         @Override
         public final NavigableSet<K> navigableKeySet() {
@@ -2275,11 +2275,11 @@ public class IndexedTreeMap<K, V>
     static final class Entry<K, V> implements Map.Entry<K, V> {
         K key;
         V value;
-        Entry<K, V> left = null;
-        Entry<K, V> right = null;
+        Entry<K, V> left;
+        Entry<K, V> right;
         Entry<K, V> parent;
         boolean color = BLACK;
-        int weight = 0;
+        int weight;
 
         int sumup() {
             int left = this.left == null ? 0 : this.left.sumup();

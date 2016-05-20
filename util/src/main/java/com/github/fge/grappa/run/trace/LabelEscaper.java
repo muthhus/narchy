@@ -55,7 +55,7 @@ public final class LabelEscaper
 
     public LabelEscaper()
     {
-        super(Collections.<Character, String>emptyMap(), 0x80,
+        super(Collections.emptyMap(), 0x80,
             Character.MAX_CODE_POINT, null);
     }
 

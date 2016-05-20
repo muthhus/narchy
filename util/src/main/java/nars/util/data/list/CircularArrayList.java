@@ -12,9 +12,9 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
 
     private final int n; // buffer length
     public final E[] array;
-    private int head = 0;
-    private int tail = 0;
-    private int size = 0;
+    private int head;
+    private int tail;
+    private int size;
 
     public CircularArrayList(int capacity) {
         n = capacity;
@@ -31,7 +31,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
     public Iterator<E> iterator() {
         return new Iterator<E>() {
 
-            int pos = 0;
+            int pos;
             final int max = size;
 
             @Override

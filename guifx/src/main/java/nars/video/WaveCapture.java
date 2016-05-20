@@ -26,10 +26,10 @@ public class WaveCapture implements Runnable {
 
     private int bufferSamples;
 
-    ScheduledThreadPoolExecutor exec = null;
+    ScheduledThreadPoolExecutor exec;
     private float[] samples;
 
-    private WaveSource source = null;
+    private WaveSource source;
 
     /**
      * called when next sample buffer is ready
@@ -78,7 +78,7 @@ public class WaveCapture implements Runnable {
         //noinspection OverlyComplexAnonymousInnerClass
         ChangeListener onParentChange = new ChangeListener() {
 
-            public On observe = null;
+            public On observe;
 
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {

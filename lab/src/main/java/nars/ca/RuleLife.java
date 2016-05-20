@@ -158,7 +158,7 @@ public class RuleLife {
 					{
 						if (ColoringMethod == 1) // standard
 						{
-							bNewVal = bOldVal < (mjb.StatesCount - 1) ? (short) (bOldVal + 1) : (short) (mjb.StatesCount - 1);
+							bNewVal = (short) (bOldVal < mjb.StatesCount - 1 ? bOldVal + 1 : mjb.StatesCount - 1);
 						} else {
 							// alternate coloring - cells remain not changed
 						}

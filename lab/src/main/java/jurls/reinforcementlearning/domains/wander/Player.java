@@ -30,7 +30,7 @@ public class Player {
     private double yOld;
     private double xOld;
 
-    private double vangle = 0;
+    private double vangle;
 
     public Player(World world) {
         this.world = world;

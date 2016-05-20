@@ -44,7 +44,7 @@ public abstract class AbstractTextGUI implements TextGUI {
     private final List<Listener> listeners;
     private boolean blockingIO;
     private boolean dirty;
-    private TextGUIThread textGUIThread;
+    private final TextGUIThread textGUIThread;
     private Theme guiTheme;
 
     /**

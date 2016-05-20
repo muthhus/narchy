@@ -28,8 +28,8 @@ import javax.annotation.Nonnull;
 @Beta
 public final class TrieBuilder
 {
-    int nrWords = 0;
-    int maxLength = 0;
+    int nrWords;
+    int maxLength;
     final TrieNodeBuilder nodeBuilder
         = new TrieNodeBuilder();
 

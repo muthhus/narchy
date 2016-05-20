@@ -281,7 +281,7 @@ class TableSorter extends TableMap {
 		int q = middle;
 
 		for (int i = low; i < high; i++) {
-			to[i] = q >= high || (p < middle && compare(from[p], from[q]) <= 0) ? from[p++] : from[q++];
+			to[i] = from[q >= high || p < middle && compare(from[p], from[q]) <= 0 ? p++ : q++];
 		}
 	}
 

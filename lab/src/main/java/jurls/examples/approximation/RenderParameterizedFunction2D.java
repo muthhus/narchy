@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class RenderParameterizedFunction2D implements RenderFunction2D {
 
-    private ParameterizedFunction parameterizedFunction = null;
+    private ParameterizedFunction parameterizedFunction;
     private final Color color;
     private final double[] xs = new double[2];
 

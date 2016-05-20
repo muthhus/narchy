@@ -36,7 +36,7 @@ public class WordNet {
 
     public static WordNet wn;
     private static String baseDir = "";
-    private static File baseDirFile = null;
+    private static File baseDirFile;
     public static boolean initNeeded = true;
 
     private static final String[][] wnFilenamePatterns
@@ -166,7 +166,7 @@ public class WordNet {
      * This array contains all of the compiled Pattern objects that will be used
      * by methods in this file.
      */
-    private static Pattern[] regexPatterns = null;
+    private static Pattern[] regexPatterns;
 
     /**
      * This method compiles all of the regular expression pattern strings in
@@ -1451,7 +1451,7 @@ public class WordNet {
         //System.out.println("INFO in WordNet.nounRootForm: Checking word : " + mixedCase + " and " + input);
         if ((exceptionNounHash.containsKey(mixedCase))
                 || (exceptionNounHash.containsKey(input))) {
-            result = exceptionNounHash.containsKey(mixedCase) ? (String) exceptionNounHash.get(mixedCase) : (String) exceptionNounHash.get(input);
+            result = (String) exceptionNounHash.get(exceptionNounHash.containsKey(mixedCase) ? mixedCase : input);
         } else {
             // Test all regular plural forms, and correct to singular.
             if (WordNetUtilities.substTest(input, "s$", "", nounSynsetHash)) {
@@ -1525,7 +1525,7 @@ public class WordNet {
 
         if ((exceptionVerbHash.containsKey(mixedCase))
                 || (exceptionVerbHash.containsKey(input))) {
-            result = exceptionVerbHash.containsKey(mixedCase) ? (String) exceptionVerbHash.get(mixedCase) : (String) exceptionVerbHash.get(input);
+            result = (String) exceptionVerbHash.get(exceptionVerbHash.containsKey(mixedCase) ? mixedCase : input);
         } else {
             // Test all regular forms and convert to present tense singular.
             if (WordNetUtilities.substTest(input, "s$", "", verbSynsetHash)) {

@@ -47,8 +47,8 @@ public final class RuleMethodRewriter
     implements RuleMethodProcessor
 {
     private RuleMethod method;
-    private int actionNr = 0;
-    private int varInitNr = 0;
+    private int actionNr;
+    private int varInitNr;
 
     @Override
     public boolean appliesTo(@Nonnull ParserClassNode classNode,

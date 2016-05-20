@@ -23,9 +23,9 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 public class TetrisScoreComponent {
-	private TetrisVisualizer tetVis = null;
+	private TetrisVisualizer tetVis;
 
-	int lastScore = 0;
+	int lastScore;
 
 	public TetrisScoreComponent(TetrisVisualizer ev) {
 		tetVis = ev;

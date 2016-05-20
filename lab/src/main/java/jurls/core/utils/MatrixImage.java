@@ -152,9 +152,9 @@ public class MatrixImage extends JComponent {
     }
 
     /* todo move these variables to a subclass specifically for visualizing neuromap */
-    InputOutput io = null;
+    InputOutput io;
     int lx = -1, ly = -1;
-    int row = 0;
+    int row;
 
     public void draw(NeuroMap m, double minValue, double maxValue, int maxRows) {
 

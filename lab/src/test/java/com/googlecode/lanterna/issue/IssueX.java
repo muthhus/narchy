@@ -38,14 +38,14 @@ class IssueX {
 
     public static class LanternaTerminalWriter {
 
-        private Screen screen;
-        private TextGraphics screenWriter;
+        private final Screen screen;
+        private final TextGraphics screenWriter;
 
-        private int current_y = 1;
-        private int default_x = 3;
+        private final int current_y = 1;
+        private final int default_x = 3;
 
         @SuppressWarnings("unused")
-		private boolean conversionFinished = false;
+		private boolean conversionFinished;
 
         public LanternaTerminalWriter(String[] args) throws IOException {
             screen = new TestTerminalFactory(args).createScreen();

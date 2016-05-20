@@ -23,7 +23,7 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
     static final String DEFAULT_USER_DEFINED_STRING = "";
     int state = GESTURE_PROCESSED;
 
-    int _currentStrokeId = 0;
+    int _currentStrokeId;
     PointCloudLibrary _library = PointCloudLibrary.getDemoLibrary();
     ArrayList<PointCloudPoint> _currentGesture = new ArrayList<>();
     Label caption = new Label();
@@ -35,7 +35,7 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
     TextField userDefinedName = new TextField();
     Choice standardNames = new Choice();
     String name = "";
-    double score = 0;
+    double score;
     Image offScreen;
     Color[] lineColors = new Color[30];
     Color defaultColor = Color.WHITE;
@@ -225,8 +225,8 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
         e.consume();
     }
 
-    int coordx=0;
-    int coordy=0;
+    int coordx;
+    int coordy;
     int lastcoordx=-1;
     int lastcoordy=-1;
     @Override

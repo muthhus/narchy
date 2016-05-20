@@ -63,9 +63,9 @@ public class TextureReader {
     }
 
     public static class Texture {
-        private ByteBuffer pixels;
-        private int width;
-        private int height;
+        private final ByteBuffer pixels;
+        private final int width;
+        private final int height;
 
         public Texture(ByteBuffer pixels, int width, int height) {
             this.height = height;

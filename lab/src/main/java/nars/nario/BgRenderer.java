@@ -14,7 +14,7 @@ public class BgRenderer {
 	private Level level;
 
 	private final Random random = new Random();
-	public boolean renderBehaviors = false;
+	public boolean renderBehaviors;
 
 	private final int width;
 	private final int height;

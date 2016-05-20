@@ -22,8 +22,8 @@ import java.io.IOException;
  */
 public class RendererSystem extends EntitySystem {
 
-    private Sim sim;
-    private FasterList<LayerDraw> toDraw = new FasterList();
+    private final Sim sim;
+    private final FasterList<LayerDraw> toDraw = new FasterList();
 
     /**
      * Creates a new EntityProcessingSystem.

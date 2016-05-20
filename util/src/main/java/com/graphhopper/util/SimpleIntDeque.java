@@ -66,7 +66,7 @@ public class SimpleIntDeque
         frontIndex++;
 
         // removing the empty space of the front if too much is unused        
-        int smallerSize = (int) (arr.length / growFactor);
+        int smallerSize = arr.length / growFactor;
         int frontIndex = this.frontIndex;
         if (frontIndex > smallerSize)
         {

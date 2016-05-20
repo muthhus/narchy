@@ -12,7 +12,7 @@ package nars.util.meter.event;
 public class ObjectMeter<X> extends SourceFunctionMeter<X> {
 
     boolean autoReset;
-    X val = null;
+    X val;
     private final String name;
 
 

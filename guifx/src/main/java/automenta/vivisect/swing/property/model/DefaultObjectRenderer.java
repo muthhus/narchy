@@ -28,7 +28,7 @@ import java.io.File;
  */
 public class DefaultObjectRenderer implements ObjectRenderer {
 
-  private boolean idVisible = false;
+  private boolean idVisible;
 
   public void setIdVisible(boolean b) {
     idVisible = b;
@@ -47,9 +47,7 @@ public class DefaultObjectRenderer implements ObjectRenderer {
     }
 
     if (object instanceof Boolean) {
-      return Boolean.TRUE.equals(object)
-        ? ResourceManager.common().getString("true")
-        : ResourceManager.common().getString("false");
+      return ResourceManager.common().getString(Boolean.TRUE.equals(object) ? "true" : "false");
     }
 
     if (object instanceof File) {

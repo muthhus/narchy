@@ -37,6 +37,7 @@ public class TestBug {
 		
 		Prolog engine = new Prolog();
 		engine.addSpyListener(new SpyListener(){ 
+			@Override
 			public void onSpy(SpyEvent e){
 				System.out.println(e);
 			}

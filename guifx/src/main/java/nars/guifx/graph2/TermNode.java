@@ -22,14 +22,14 @@ public class TermNode<T> extends GraphNode {
     /**
      * copy of termedge values for fast iteration during rendering
      */
-    boolean modified = false;
+    boolean modified;
 
     public T term;
 
     /** priority normalized to visual context */
-    public float priNorm = 0;
+    public float priNorm;
 
-    public Concept c = null;
+    public Concept c;
     public TermEdge[] edges = TermEdge.empty;
 
     /*

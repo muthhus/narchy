@@ -71,7 +71,7 @@ public final class CuckooMap2<K, V> extends AbstractMap<K, V> {
     private final UniversalHashFunction<? super K> mUniversalHashFunction;
 
     /* The number of entries that are filled in. */
-    private int mSize = 0;
+    private int mSize;
 
     /****************************************************************************
      * File: HashFunction.java
@@ -631,10 +631,10 @@ public final class CuckooMap2<K, V> extends AbstractMap<K, V> {
              * and an offset.  The next table index will be 2 if there are no
              * more elements to consider.
              */
-            private int mNextTable = 0, mNextIndex = 0;
+            private int mNextTable, mNextIndex;
 
             /* The last value we visited, so we can call remove(). */
-            private Entry<K, V> mLast = null;
+            private Entry<K, V> mLast;
 
             /**
              * Creates a new MapIterator to traverse the hash map.

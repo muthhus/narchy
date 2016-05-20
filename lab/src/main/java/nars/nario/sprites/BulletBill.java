@@ -12,11 +12,11 @@ public class BulletBill extends Sprite
     private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     public int anim;
 
-    public boolean dead = false;
-    private int deadTime = 0;
+    public boolean dead;
+    private int deadTime;
 
 
     public BulletBill(LevelScene world, float x, float y, int dir)

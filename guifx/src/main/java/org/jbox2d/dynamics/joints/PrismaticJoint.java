@@ -422,16 +422,14 @@ public class PrismaticJoint extends Joint {
     float iA = m_invIA, iB = m_invIB;
 
     // Compute motor Jacobian and effective mass.
-    {
-      Rot.mulToOutUnsafe(qA, m_localXAxisA, m_axis);
-      temp.set(d).addLocal(rA);
-      m_a1 = Vec2.cross(temp, m_axis);
-      m_a2 = Vec2.cross(rB, m_axis);
+    Rot.mulToOutUnsafe(qA, m_localXAxisA, m_axis);
+    temp.set(d).addLocal(rA);
+    m_a1 = Vec2.cross(temp, m_axis);
+    m_a2 = Vec2.cross(rB, m_axis);
 
-      m_motorMass = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
-      if (m_motorMass > 0.0f) {
-        m_motorMass = 1.0f / m_motorMass;
-      }
+    m_motorMass = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
+    if (m_motorMass > 0.0f) {
+      m_motorMass = 1.0f / m_motorMass;
     }
 
     // Prismatic constraint.

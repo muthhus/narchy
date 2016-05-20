@@ -16,7 +16,7 @@ public class SerializableProperty extends DefaultProperty {
 
 	private static final long serialVersionUID = 2246989350132202842L;
 
-	private Object editor = null;
+	private Object editor;
 	
 	public SerializableProperty() {
 	}

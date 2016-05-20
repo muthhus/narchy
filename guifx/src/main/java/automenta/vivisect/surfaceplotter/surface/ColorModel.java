@@ -19,7 +19,7 @@ public class ColorModel {
 	float bright;
 	float min; // hue|sat|bright of z=0
 	float max; // Hue|sat|bright of z=1
-	byte mode = 0;
+	byte mode;
 
 	Color ocolor; // fixed color for opaque mode
 

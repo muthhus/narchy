@@ -34,6 +34,7 @@ public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> 
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public void add(String key, ClauseInfo d, boolean first) {
 		FamilyClausesList family = computeIfAbsent(key, (k)->new FamilyClausesList());
 		family.add(d, first);
@@ -68,6 +69,7 @@ public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> 
 	 * @param headt The goal
 	 * @return  The list of matching-compatible predicates
 	 */
+	@Override
 	public List<ClauseInfo> getPredicates(Term headt) {
 		FamilyClausesList family = get(((Struct) headt).getPredicateIndicator());
 		//new ReadOnlyLinkedList<>();

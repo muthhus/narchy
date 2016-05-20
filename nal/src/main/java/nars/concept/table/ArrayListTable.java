@@ -32,6 +32,7 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements T
         forEach(t -> each.accept(key(t)));
     }
 
+    @Override
     abstract public Iterator<L> iterator();
 
     @Override

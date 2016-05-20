@@ -29,8 +29,8 @@ class TreemapLayout extends Parent {
     private double width;
     private double heightLeft;
     private double widthLeft;
-    private double left = 0.0;
-    private double top = 0.0;
+    private double left;
+    private double top;
     private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
     private final List<TreemapDtoElement> children = new ArrayList<>();
 

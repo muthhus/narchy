@@ -50,7 +50,7 @@ public class Grid1DRelative implements World {
     @Override    public int getNumActions() {     return 2;    }
     @Override    public boolean isActive()  {     return time < totalTime;   }
 
-    double[] action2 = null;
+    double[] action2;
     
     @Override
     public double step(double[] action, double[] sensor) {

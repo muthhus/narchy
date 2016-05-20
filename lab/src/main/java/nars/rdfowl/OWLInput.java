@@ -30,7 +30,7 @@ public class OWLInput  {
 
     private static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
-    private static String parentTagName = null;
+    private static String parentTagName;
 
     private final Map<String, Entity> entities = new HashMap();
     private final NAR nar;

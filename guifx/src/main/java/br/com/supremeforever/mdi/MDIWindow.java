@@ -38,16 +38,16 @@ import static br.com.supremeforever.mdi.MDICanvas.resourceURI;
 
 public class MDIWindow extends BorderPane {
 
-    private double mousex = 0;
-    private double mousey = 0;
-    private double x = 0;
-    private double y = 0;
+    private double mousex;
+    private double mousey;
+    private double x;
+    private double y;
     private Button btnClose;
     private Button btnMinimize;
     private Button btnMaximize;
     @Deprecated private final BorderPane borderPane = this;
-    private boolean isMaximized = false;
-    private BooleanProperty isClosed = new SimpleBooleanProperty(false);
+    private boolean isMaximized;
+    private final BooleanProperty isClosed = new SimpleBooleanProperty(false);
     private ResizeMode resizeMode;
     private AlignPosition alignPosition;
     private boolean RESIZE_TOP;
@@ -61,7 +61,7 @@ public class MDIWindow extends BorderPane {
     private AnchorPane loadingScreen;
     private HBox loadingScreenHBox;
     Label lblTitle;
-    private boolean disableResize = false;
+    private boolean disableResize;
     double lastLeftAnchor;
     double lastRightAnchor;
     double lastTopAnchor;
@@ -192,7 +192,7 @@ public class MDIWindow extends BorderPane {
 
     public void maximizeRestoreMdiWindow() {
 
-        Node parent = (Node) getParent();
+        Node parent = getParent();
         if (isMaximized == false) {
             lastX = getLayoutX();
             lastY = getLayoutY();
@@ -265,7 +265,7 @@ public class MDIWindow extends BorderPane {
                 //again set current Mouse x AND y position
                 mousex = dragEvent.getSceneX();
                 mousey = dragEvent.getSceneY();
-                if (resizeMode == resizeMode.NONE) {
+                if (resizeMode == ResizeMode.NONE) {
                     //set the positon of Node after calculation
                     BorderPane bp = this.borderPane;
                     if (bp.getWidth() < bp.getParent().getLayoutBounds().getWidth()) {//if the panel is not biger then the window: Move

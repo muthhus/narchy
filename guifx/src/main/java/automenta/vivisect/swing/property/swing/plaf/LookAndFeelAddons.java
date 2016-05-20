@@ -64,7 +64,7 @@ public class LookAndFeelAddons {
    */
   private static final Object APPCONTEXT_INITIALIZED = new Object();
 
-  private static boolean trackingChanges = false;
+  private static boolean trackingChanges;
   private static PropertyChangeListener changeListener;    
 
   static {

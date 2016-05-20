@@ -25,7 +25,7 @@ public class ConceptsSource extends GraphSource {
 
 
     public final NAR nar;
-    private Active regs = null;
+    private Active regs;
 
     final int maxNodes = 128;
     final int maxNodeLinks = 8; //per type
@@ -37,9 +37,9 @@ public class ConceptsSource extends GraphSource {
 //    private final BiFunction<TermNode, TermNode, TermEdge> edgeBuilder =
 //            TLinkEdge::new;
 
-    private float _maxPri = 1f, _minPri = 0f;
+    private float _maxPri = 1f, _minPri;
     protected final List<Termed> concepts = Global.newArrayList();
-    private String keywordFilter = null;
+    private String keywordFilter;
     private final ConceptFilter eachConcept = new ConceptFilter();
 
     public ConceptsSource(NAR nar) {

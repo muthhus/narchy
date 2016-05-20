@@ -9,9 +9,9 @@ import nars.nario.level.Level;
 
 public class Mario extends Sprite
 {
-    public static boolean large = false;
-    public static boolean fire = false;
-    public static int coins = 0;
+    public static boolean large;
+    public static boolean fire;
+    public static int coins;
     public static int lives = 3;
     public static String levelString = "none";
 
@@ -36,30 +36,30 @@ public class Mario extends Sprite
 
     public final boolean[] keys;
     private float runTime;
-    boolean wasOnGround = false;
-    boolean onGround = false;
-    private boolean mayJump = false;
-    private boolean ducking = false;
-    private boolean sliding = false;
-    private int jumpTime = 0;
+    boolean wasOnGround;
+    boolean onGround;
+    private boolean mayJump;
+    private boolean ducking;
+    private boolean sliding;
+    private int jumpTime;
     private float xJumpSpeed;
     private float yJumpSpeed;
-    private boolean canShoot = false;
+    private boolean canShoot;
 
     int width = 4;
     int height = 24;
 
     private final LevelScene world;
     public int facing;
-    private int powerUpTime = 0;
+    private int powerUpTime;
 
     public int xDeathPos, yDeathPos;
 
-    public int deathTime = 0;
-    public int winTime = 0;
-    private int invulnerableTime = 0;
+    public int deathTime;
+    public int winTime;
+    private int invulnerableTime;
 
-    public Sprite carried = null;
+    public Sprite carried;
     private static Mario instance;
     private boolean invincible;
 

@@ -70,7 +70,7 @@
 package nars.gui.input.image;
 
 public class PointCloudMatchResult {
-	private String _name = null;
+	private String _name;
 	private double _score = Double.NaN;
 
 	public PointCloudMatchResult(String name, double score) // constructor

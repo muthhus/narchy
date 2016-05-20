@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class SCanvas extends Canvas {
 
     protected RenderingHints renderHints;
-    protected BufferedImage image = null;
+    protected BufferedImage image;
     protected Color backgroundClearColor = Color.BLACK;
     
 

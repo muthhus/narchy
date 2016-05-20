@@ -115,7 +115,7 @@ public class Rule1DTotal {
 		sBff = sBff + ",C" + ih;
 
 		// center cell
-		sBff = isCentr ? sBff + ",M1" : sBff + ",M0";
+		sBff = sBff + (isCentr ? ",M1" : ",M0");
 
 		// S rules
 		for (i = 0; i <= MAX_RANGE * 2 + 1; i++)
@@ -246,9 +246,7 @@ public class Rule1DTotal {
 					{
 						if (ColoringMethod == 1) // standard
 						{
-							bNewVal = bOldVal < (mjb.StatesCount - 1)
-									? (short) (bOldVal + 1)
-									: (short) (mjb.StatesCount - 1);
+							bNewVal = (short) (bOldVal < mjb.StatesCount - 1 ? bOldVal + 1 : mjb.StatesCount - 1);
 						} else {
 							// alternate coloring - cells remain not changed
 						}

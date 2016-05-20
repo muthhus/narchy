@@ -10,9 +10,9 @@ public class Mushroom extends Sprite
     private static final float AIR_INERTIA = 0.89f;
 
     private float runTime;
-    private boolean onGround = false;
-    private boolean mayJump = false;
-    private int jumpTime = 0;
+    private boolean onGround;
+    private boolean mayJump;
+    private int jumpTime;
     private float xJumpSpeed;
     private float yJumpSpeed;
 
@@ -22,7 +22,7 @@ public class Mushroom extends Sprite
     private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     private int life;
 
     public Mushroom(LevelScene world, int x, int y)

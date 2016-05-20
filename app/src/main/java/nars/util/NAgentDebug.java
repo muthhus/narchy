@@ -15,7 +15,7 @@ public class NAgentDebug extends NAgent  {
 
     private final PrintStream log;
 
-    boolean printConflict = false;
+    boolean printConflict;
 
     public NAgentDebug(NAR n) {
         super(n);

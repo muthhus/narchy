@@ -25,10 +25,10 @@ import java.util.function.DoubleFunction;
 // TODO add a dummy histogram.
 public class Histogram  {
     private final int fractionBits;
-    private int powersOf2;
+    private final int powersOf2;
     private long totalCount, overRange;
     private int[] sampleCount;
-    private long floor;
+    private final long floor;
 
     public Histogram() {
         this(42, 4);

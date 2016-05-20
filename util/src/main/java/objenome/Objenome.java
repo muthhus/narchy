@@ -33,7 +33,7 @@ public class Objenome {
         TODO different construction policies other than caching a single Phenotainer
         instance in this instance
         */
-    private Phenotainer pheno = null;
+    private Phenotainer pheno;
 
     public Objenome(Multitainer context, Iterable<Solution> parameters) throws InvalidRepresentationException {
 

@@ -10,7 +10,7 @@ public class Fireball extends Sprite
     private static final float AIR_INERTIA = 0.89f;
 
     private float runTime;
-    private boolean onGround = false;
+    private boolean onGround;
 
     private final int width = 4;
     int height = 24;
@@ -18,11 +18,11 @@ public class Fireball extends Sprite
     private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     public int anim;
 
-    public boolean dead = false;
-    private int deadTime = 0;
+    public boolean dead;
+    private int deadTime;
 
     public Fireball(LevelScene world, float x, float y, int facing)
     {

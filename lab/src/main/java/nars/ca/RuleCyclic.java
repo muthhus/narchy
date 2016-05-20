@@ -85,7 +85,7 @@ public class RuleCyclic {
 		sBff = 'R' + String.valueOf(iRng) + "/T" + iThr + "/C"
 				+ iClo;
 
-		sBff = iNgh == MJRules.NGHTYP_NEUM ? sBff + "/NN" : sBff + "/NM";
+		sBff = sBff + (iNgh == MJRules.NGHTYP_NEUM ? "/NN" : "/NM");
 
 		if (fGH)
 			sBff = sBff + "/GH"; // Greenberg-Hastings Model

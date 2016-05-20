@@ -166,18 +166,16 @@ public class DemoHumanoid {
         }
 
         // foot joint
-        {
-            Vec2 position = lower_leg.getPosition().clone();
-            position.y -= tibia_length / 2f;
-            jd.initialize(lower_leg, foot, position);
-            jd.lowerAngle = (float)-Math.PI / 5f;
-            jd.upperAngle = (float)Math.PI / 6f;
-            jd.enableLimit = true;
-            jd.maxMotorTorque = 70;
-            jd.motorSpeed = 0;
-            jd.enableMotor = true;
-            joints.add(world.createJoint(jd));
-        }
+        Vec2 position = lower_leg.getPosition().clone();
+        position.y -= tibia_length / 2f;
+        jd.initialize(lower_leg, foot, position);
+        jd.lowerAngle = (float)-Math.PI / 5f;
+        jd.upperAngle = (float)Math.PI / 6f;
+        jd.enableLimit = true;
+        jd.maxMotorTorque = 70;
+        jd.motorSpeed = 0;
+        jd.enableMotor = true;
+        joints.add(world.createJoint(jd));
 
         return new Body[] { upper_leg, lower_leg, foot };
     }
@@ -319,17 +317,15 @@ public class DemoHumanoid {
             joints.add(world.createJoint(jd));
         }
 
-        {
-            RevoluteJointDef jd = new RevoluteJointDef();
-            jd.initialize(lower_torso, left_leg[0], position);
-            jd.lowerAngle = (float) -Math.PI / 7;
-            jd.upperAngle = (float) Math.PI / 6;
-            jd.enableLimit = true;
-            jd.maxMotorTorque = 250;
-            jd.motorSpeed = 0;
-            jd.enableMotor = true;
-            joints.add(world.createJoint(jd));
-        }
+        RevoluteJointDef jd = new RevoluteJointDef();
+        jd.initialize(lower_torso, left_leg[0], position);
+        jd.lowerAngle = (float) -Math.PI / 7;
+        jd.upperAngle = (float) Math.PI / 6;
+        jd.enableLimit = true;
+        jd.maxMotorTorque = 250;
+        jd.motorSpeed = 0;
+        jd.enableMotor = true;
+        joints.add(world.createJoint(jd));
     }
 
 }

@@ -43,7 +43,7 @@ public class TabX extends Tab {
 		}
 	}
 
-	boolean closed = false;
+	boolean closed;
 
 	public TabX(String name, Node content) {
         super(name,content);

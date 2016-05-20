@@ -11,21 +11,25 @@ import alice.tuprolog.event.TheoryEvent;
 
 class MyListener extends PrologEventAdapter {
     
+    @Override
     public void theoryChanged(TheoryEvent ev){
         System.out.println("THEORY CHANGED: \n old: \n"+
                 ev.getOldTheory()+"\n new: \n"+ev.getNewTheory());
     }
     
+    @Override
     public void newQueryResultAvailable(QueryEvent ev){
         System.out.println("NEW QUERY RESULT AVAILABLE: \nquery\n "+
                 ev.getSolveInfo().getQuery().toString()+"\nresult\n"+
                 ev.getSolveInfo());
     }
     
+    @Override
     public void libraryLoaded(LibraryEvent ev){
         System.out.println("NEW LIB loaded: "+ev.getLibraryName());
     }
 
+    @Override
     public void libraryUnloaded(LibraryEvent ev){
         System.out.println("LIB unloaded: "+ev.getLibraryName());
     }

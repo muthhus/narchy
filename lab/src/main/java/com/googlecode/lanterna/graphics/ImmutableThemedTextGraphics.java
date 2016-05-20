@@ -66,6 +66,7 @@ public class ImmutableThemedTextGraphics implements ThemedTextGraphics {
      * Returns the theme associated with this {@code ImmutableThemedTextGraphics}
      * @return The theme associated with this {@code ImmutableThemedTextGraphics}
      */
+    @Override
     public Theme getTheme() {
         return theme;
     }

@@ -16,7 +16,7 @@ public class BooleanRenderer extends JPanel implements TableCellRenderer {
 
 	private static final long serialVersionUID = 8848514762273327844L;
 
-	private JCheckBox checkbox = null;
+	private JCheckBox checkbox;
 
 	public BooleanRenderer() {
 

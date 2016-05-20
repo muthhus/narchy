@@ -111,7 +111,7 @@ public class BrowserTab extends UITab<WebView> {
 
     }
     
-    static String prevLocation = null;
+    static String prevLocation;
     
     public void extractAttributes(NamedNodeMap n, Map<String,String> s, String prefix) {
         

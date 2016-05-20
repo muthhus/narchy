@@ -71,7 +71,7 @@ public class TrieNode<S, T> implements Entry<S, T>
    protected S sequence;
    protected final int start;
    protected int end;
-   protected PerfectHashMap<TrieNode<S, T>> children = null;
+   protected PerfectHashMap<TrieNode<S, T>> children;
    protected int size;
 
    /**

@@ -68,9 +68,9 @@ public class DefaultWindow extends GraphNode implements SelectableNode {
 
     private double mouseX;
     private double mouseY;
-    private double nodeX = 0;
-    private double nodeY = 0;
-    private boolean dragging = false;
+    private double nodeX;
+    private double nodeY;
+    private boolean dragging;
     private boolean zoomable = true;
     private double minScale = 0.1;
     private double maxScale = 10;

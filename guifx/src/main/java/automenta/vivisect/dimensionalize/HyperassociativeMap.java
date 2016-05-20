@@ -81,7 +81,7 @@ public abstract class HyperassociativeMap<K,V>  {
     final double minDistance = 0.01;
     //private EdgeWeightToDistanceFunction edgeWeightToDistance = EdgeWeightToDistanceFunction.OneDivSum;
     
-    private DistanceMetric distanceFunction;
+    private final DistanceMetric distanceFunction;
     final double[] zero;
     private double attractionStrength = DEFAULT_ATTRACTION_STRENGTH;
     private double repulsiveWeakness = DEFAULT_REPULSIVE_WEAKNESS;

@@ -12,11 +12,11 @@ import java.util.Map;
 
 @Ignore
 public class JavaLibraryTestCase extends TestCase {
-	String theory = null;
+	String theory;
 	Prolog engine = new Prolog();
-	Solution info = null;
-	String result = null;
-	String paths = null;
+	Solution info;
+	String result;
+	String paths;
 	
 	public void testGetPrimitives() {
 		Library library = new OOLibrary();

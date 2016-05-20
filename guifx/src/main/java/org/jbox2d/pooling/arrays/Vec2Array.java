@@ -33,7 +33,8 @@ import org.jbox2d.common.Vec2;
  */
 public final class Vec2Array extends IntObjectHashMap<Vec2[]> {
 	
-	public Vec2[] get( int argLength){
+	@Override
+	public Vec2[] get(int argLength){
 		//assert(argLength > 0);
 
 

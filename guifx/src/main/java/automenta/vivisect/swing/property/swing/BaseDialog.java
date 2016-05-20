@@ -86,8 +86,7 @@ public class BaseDialog extends JDialog {
   }
 
   public static BaseDialog newBaseDialog(Component parent) {
-    Window window = parent instanceof Window?(Window)parent
-      :(Window)SwingUtilities.getAncestorOfClass(Window.class, parent);
+    Window window = (Window) (parent instanceof Window ? parent : SwingUtilities.getAncestorOfClass(Window.class, parent));
     
     if (window instanceof Frame) {
       return new BaseDialog((Frame)window);

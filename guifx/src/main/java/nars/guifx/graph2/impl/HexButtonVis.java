@@ -39,7 +39,7 @@ public class HexButtonVis extends DefaultNodeVis {
 
         public final X value;
         public final Node base;
-        public Node label = null;
+        public Node label;
 
         //static final float sizeRatio = 6;
         final int maxLabelLength = 32;

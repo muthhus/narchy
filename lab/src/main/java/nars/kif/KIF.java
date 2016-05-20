@@ -104,7 +104,7 @@ public class KIF {
 //    }
 // --Commented out by Inspection STOP (8/15/14 2:38 AM)
     private File file;
-    private int totalLinesForComments = 0;
+    private int totalLinesForComments;
 
     /**
      * ***************************************************************

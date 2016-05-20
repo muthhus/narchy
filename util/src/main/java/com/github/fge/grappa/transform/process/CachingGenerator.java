@@ -119,9 +119,7 @@ public final class CachingGenerator
 
         // if we have no parameters we use a simple Rule field as cache,
         // otherwise a HashMap
-        String cacheFieldDesc = paramTypes.length == 0
-            ? CodegenUtils.ci(Rule.class)
-            : CodegenUtils.ci(HashMap.class);
+        String cacheFieldDesc = CodegenUtils.ci(paramTypes.length == 0 ? Rule.class : HashMap.class);
         FieldNode field = new FieldNode(ACC_PRIVATE, cacheFieldName,
             cacheFieldDesc, null, null);
 

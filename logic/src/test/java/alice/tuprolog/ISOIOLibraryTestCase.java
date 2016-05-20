@@ -14,12 +14,12 @@ import static org.junit.Assert.*;
 @Ignore
 public class ISOIOLibraryTestCase {
 
-	static Prolog engine = null;
-	String theory = null;
-	Solution info = null;
-	static String writePath = null;
-	static String readPath = null;
-	static String binPath = null;
+	static Prolog engine;
+	String theory;
+	Solution info;
+	static String writePath;
+	static String readPath;
+	static String binPath;
 
 	@BeforeClass
 	public static void initTest()
@@ -166,7 +166,7 @@ public class ISOIOLibraryTestCase {
 		//TODO Da rivedere
 		OutputListener listener = new OutputListener() {
 
-			int count = 0;
+			int count;
 
 			@Override
 			public void onOutput(OutputEvent e) 
@@ -272,7 +272,7 @@ public class ISOIOLibraryTestCase {
 		//TODO Da rivedere
 		OutputListener listener = new OutputListener() {
 
-			int count = 0;
+			int count;
 
 			@Override
 			public void onOutput(OutputEvent e) 

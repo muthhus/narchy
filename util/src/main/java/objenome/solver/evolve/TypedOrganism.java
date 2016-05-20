@@ -67,7 +67,7 @@ public class TypedOrganism<X extends Node,Y> extends AbstractOrganism {
     private Node<X,Y> root;
     
     private transient Class dataType; //caches data type
-    private Map<String, ? extends Variable> vars = null;
+    private Map<String, ? extends Variable> vars;
 
     /**
      * Constructs an individual represented by a strongly typed tree, with a

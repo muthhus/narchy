@@ -27,7 +27,7 @@ public class TetrisVisualizer extends ImagePanel {
 
 	private final int blockSize;
 	private final int lastUpdateTimeStep = -1;
-	JCheckBox printGridCheckBox = null;
+	JCheckBox printGridCheckBox;
 	private final Tetris tetris;
 	private final TetrisBlocksComponent blocks;
 

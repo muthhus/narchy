@@ -41,7 +41,7 @@ public class Grid1DDiscrete implements World {
     @Override    public int getNumActions() {     return size;    }
     @Override    public boolean isActive()  {     return time < totalTime;   }
 
-    double[] action2 = null;
+    double[] action2;
     
     @Override
     public double step(double[] action, double[] sensor) {

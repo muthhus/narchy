@@ -6,7 +6,7 @@ public class FlowerEnemy extends Enemy
 {
     private int tick;
     private final int yStart;
-    private int jumpTime = 0;
+    private int jumpTime;
     private final LevelScene world;
     
     public FlowerEnemy(LevelScene world, int x, int y)

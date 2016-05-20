@@ -287,7 +287,7 @@ public class ParticleSystem {
       int childCount = shape.getChildCount();
       for (int childIndex = 0; childIndex < childCount; childIndex++) {
         if (childIndex == 0) {
-          shape.computeAABB(aabb, identity, childIndex);
+          shape.computeAABB(aabb, identity, 0);
         } else {
           AABB childAABB = temp2;
           shape.computeAABB(childAABB, identity, childIndex);
@@ -1835,6 +1835,7 @@ public class ParticleSystem {
 
   // Callback used with VoronoiDiagram.
   static class CreateParticleGroupCallback implements VoronoiDiagramCallback {
+    @Override
     public void callback(int a, int b, int c) {
       final Vec2 pa = system.m_positionBuffer.data[a];
       final Vec2 pb = system.m_positionBuffer.data[b];
@@ -1891,6 +1892,7 @@ public class ParticleSystem {
 
   // Callback used with VoronoiDiagram.
   static class JoinParticleGroupsCallback implements VoronoiDiagramCallback {
+    @Override
     public void callback(int a, int b, int c) {
       // Create a triad if it will contain particles from both groups.
       int countA =

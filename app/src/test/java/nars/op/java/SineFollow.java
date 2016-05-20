@@ -153,26 +153,25 @@ public class SineFollow {
             //float offNext = 0;
 
             //float denom = (offNext + onNext);
-            /*if (denom > 0)*/ {
-                //float delta = (onNext);// - offNext);// / denom;
-                float delta = (onNext-offNext);// - offNext);// / denom;
-                //float delta = eNext - eNow;
-                //e += Texts.n2(eNow) + "+-" + Texts.n4(delta) + "\t";
+            /*if (denom > 0)*/
+            //float delta = (onNext);// - offNext);// / denom;
+            float delta = (onNext-offNext);// - offNext);// / denom;
+            //float delta = eNext - eNow;
+            //e += Texts.n2(eNow) + "+-" + Texts.n4(delta) + "\t";
             /*e += (hp == i ? "*":"_") +
                     //Texts.n1(onNext) + ":" + Texts.n1(offNext) +
                     Texts.n1(delta)
                     + "\t\t";*/
 
 
-                //estimated += delta * i;
-                //estDen += delta;
+            //estimated += delta * i;
+            //estDen += delta;
 
-                if (delta > bestVal) {
-                    bestVal = delta;
-                    best = i;
-                }
-
+            if (delta > bestVal) {
+                bestVal = delta;
+                best = i;
             }
+
         }
 
         /*if (estDen > 0) {

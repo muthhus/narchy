@@ -16,7 +16,7 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 {
 	private static final int SQUARE_WIDTH = 60;
 	private static final int SQUARE_HEIGHT = 60;
-	private Square source = null;
+	private Square source;
 	private Game game;
 	private final Square[][] squares;
 	private boolean mouseListener;
@@ -59,7 +59,7 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 			for(int j = 0; j < HEIGHT; j++)
 			{
 				// decide weather to create a black or white square
-				squares[i][j] = i % 2 == j % 2 ? new Square(new Color(50, 50, 50), i, j) : new Square(new Color(200, 200, 200), i, j);
+				squares[i][j] = new Square(i % 2 == j % 2 ? new Color(50, 50, 50) : new Color(200, 200, 200), i, j);
 
 				// set preferred size per square
 				squares[i][j].setPreferredSize(new Dimension(SQUARE_WIDTH, SQUARE_HEIGHT));

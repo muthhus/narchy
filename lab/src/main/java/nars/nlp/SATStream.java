@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
  */
 public class SATStream {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         Default d = new Default(1000, 1, 1, 3);
 
         d.conceptActivation.setValue(0.2f);

@@ -25,9 +25,7 @@ public enum SmallFloat {
     int bits = Float.floatToRawIntBits(f);
     int smallfloat = bits >> (24-numMantissaBits);
     if (smallfloat <= fzero) {
-      return (bits<=0) ?
-        (byte)0   // negative numbers and zero both map to 0 byte
-       :(byte)1;  // underflow is mapped to smallest non-zero number.
+      return (byte) (bits <= 0 ? 0 : 1);  // underflow is mapped to smallest non-zero number.
     } else if (smallfloat >= fzero + 0x100) {
       return -1;  // overflow maps to largest number
     } else {
@@ -61,7 +59,7 @@ public enum SmallFloat {
     int bits = Float.floatToRawIntBits(f);
     int smallfloat = bits >> (24-3);
     if (smallfloat <= ((63-15)<<3)) {
-      return (bits<=0) ? (byte)0 : (byte)1;
+      return (byte) (bits <= 0 ? 0 : 1);
     }
     if (smallfloat >= ((63-15)<<3) + 0x100) {
       return -1;
@@ -89,7 +87,7 @@ public enum SmallFloat {
     int bits = Float.floatToRawIntBits(f);
     int smallfloat = bits >> (24-5);
     if (smallfloat <= (63-2)<<5) {
-      return (bits<=0) ? (byte)0 : (byte)1;
+      return (byte) (bits <= 0 ? 0 : 1);
     }
     if (smallfloat >= ((63-2)<<5) + 0x100) {
       return -1;

@@ -21,7 +21,7 @@ package jurls.reinforcementlearning.domains.tetris;
 public class TetrisPiece {
 
     int[][][] thePiece = new int[4][5][5];
-    int currentOrientation = 0;
+    int currentOrientation;
 
     public void setShape(int Direction, int[] row0, int[] row1, int[] row2, int[] row3, int[] row4) {
         thePiece[Direction][0] = row0;

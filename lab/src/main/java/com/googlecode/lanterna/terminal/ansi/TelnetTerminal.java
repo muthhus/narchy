@@ -304,11 +304,11 @@ public class TelnetTerminal extends ANSITerminal {
                 case COMMAND_DONT:
                     if(value == OPTION_SUPPRESS_GO_AHEAD) {
                         negotiationState.suppressGoAhead = (command == COMMAND_DO);
-                        eventListener.requestReply(command == COMMAND_DO, value);
+                        eventListener.requestReply(command == COMMAND_DO, OPTION_SUPPRESS_GO_AHEAD);
                     }
                     else if(value == OPTION_EXTEND_ASCII) {
                         negotiationState.extendedAscii = (command == COMMAND_DO);
-                        eventListener.requestReply(command == COMMAND_DO, value);
+                        eventListener.requestReply(command == COMMAND_DO, OPTION_EXTEND_ASCII);
                     }
                     else {
                         negotiationState.onUnsupportedRequestCommand(command == COMMAND_DO, value);

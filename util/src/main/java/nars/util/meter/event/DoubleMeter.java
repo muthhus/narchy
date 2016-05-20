@@ -14,7 +14,7 @@ public class DoubleMeter extends SourceFunctionMeter<Double> implements DoubleCo
     
     boolean autoReset;
     //final AtomicDouble val = new AtomicDouble();
-    double val = 0;
+    double val;
     private final String name;
     
     

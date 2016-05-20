@@ -64,7 +64,7 @@ public abstract class AbstractStat<T extends Event> implements GPContainerAware 
      * The event that trigger the stat to clear its values.
      * TODO make private
      */
-    private Class<T> clearOnEvent = null;
+    private Class<T> clearOnEvent;
 
     
     /**
@@ -89,7 +89,7 @@ public abstract class AbstractStat<T extends Event> implements GPContainerAware 
      */
     @SuppressWarnings("unchecked")
     public AbstractStat(Class<? extends AbstractStat<?>> dependency) {
-        this(Collections.<Class<? extends AbstractStat<?>>>singletonList(dependency));
+        this(Collections.singletonList(dependency));
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class AbstractStat<T extends Event> implements GPContainerAware 
      */
     @SuppressWarnings("unchecked")
     public <E extends Event> AbstractStat(Class<T> clearOn, Class<? extends AbstractStat<?>> dependency) {
-        this(clearOn, Collections.<Class<? extends AbstractStat<?>>>singletonList(dependency));
+        this(clearOn, Collections.singletonList(dependency));
     }
 
     /**

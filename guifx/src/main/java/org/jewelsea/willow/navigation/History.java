@@ -43,8 +43,8 @@ public class History {
     // history items - higher indexed items are later in the history.
     private final ObservableList<String> items = FXCollections.observableArrayList();
     private final BrowserWindow browser;      // browser window (contains WebView) managed by this history.
-    private int pointer = 0;                  // index into the history list for the currently displayed page from the history.
-    private Integer navPointer = null;        // index into the history list for a new page to be displayed page in the history.
+    private int pointer;                  // index into the history list for the currently displayed page from the history.
+    private Integer navPointer;        // index into the history list for a new page to be displayed page in the history.
     private final ReadOnlyBooleanWrapper canNavForward  = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper canNavBackward = new ReadOnlyBooleanWrapper(false);
 

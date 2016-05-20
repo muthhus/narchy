@@ -44,9 +44,9 @@ public class ScreenDisplay extends JPanel {
     int windowWidth;
     int windowHeight;
     /** Variables used to compute the GUI frames per second */
-    int frameCount = 0;
-    double fps = 0;
-    long frameTime = 0;
+    int frameCount;
+    double fps;
+    long frameTime;
     int updateRate = 5; // How often to update FPS, in hertz
     double fpsAlpha = 0.9;
     

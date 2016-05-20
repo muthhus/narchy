@@ -36,7 +36,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
     final int range = 64;
     private final ArrayList<Slider> freqSliders;
     private final ArrayList<Slider> confSliders;
-    private List<Task> tasks;
+    private final List<Task> tasks;
 
     public TruthPolationLab() {
         super();

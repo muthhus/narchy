@@ -34,7 +34,7 @@ import java.util.Random;
  * @author martin
  */
 public class ScreenLineTest {
-    private static TerminalPosition CIRCLE_LAST_POSITION = null;
+    private static TerminalPosition CIRCLE_LAST_POSITION;
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean useAnsiColors = false;
         boolean slow = false;

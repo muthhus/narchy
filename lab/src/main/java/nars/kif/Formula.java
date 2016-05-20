@@ -58,7 +58,7 @@ public class Formula implements Comparable {
      * variable instantiation and row variable expansion might cause theFormula
      * to expand to several TPTP formulas.
      */
-    private ArrayList theTptpFormulas = null;
+    private ArrayList theTptpFormulas;
 
     /**
      * Returns an ArrayList of the TPTP formulas (Strings) that together
@@ -88,7 +88,7 @@ public class Formula implements Comparable {
     /**
      * A list of clausal (resolution) forms generated from this Formula.
      */
-    private ArrayList theClausalForm = null;
+    private ArrayList theClausalForm;
 
     /**
      * Returns a List of the clauses that together constitute the resolution
@@ -1028,7 +1028,7 @@ public class Formula implements Comparable {
         int kappaFnIndex = theFormula.indexOf("(KappaFn ?", startIndex);
         while ((forallIndex != -1) || (existsIndex != -1) || (kappaFnIndex != -1)) {
             tmpIndex = (forallIndex < existsIndex && forallIndex != -1) || existsIndex == -1 ? forallIndex : existsIndex;
-            startIndex = (tmpIndex < kappaFnIndex && tmpIndex != -1) || kappaFnIndex == -1 ? tmpIndex + 9 : kappaFnIndex + 9;
+            startIndex = (tmpIndex < kappaFnIndex && tmpIndex != -1 || kappaFnIndex == -1 ? tmpIndex : kappaFnIndex) + 9;
 
             int i = startIndex;
             while ((theFormula.charAt(i) != ')')
@@ -1820,7 +1820,7 @@ public class Formula implements Comparable {
      * or thousands of times inside KB.preProcess(). The Map is cleared and
      * SORTAL_TYPE_CACHE is set to null after each such use in KB.preProcess().
      */
-    private static HashMap SORTAL_TYPE_CACHE = null;
+    private static HashMap SORTAL_TYPE_CACHE;
 
     /**
      * ***************************************************************
@@ -4763,14 +4763,14 @@ public class Formula implements Comparable {
      * This static variable holds the int value that is used to generate unique
      * variable names.
      */
-    private static int VAR_INDEX = 0;
+    private static int VAR_INDEX;
 
     /**
      * ***************************************************************
      * This static variable holds the int value that is used to generate unique
      * Skolem terms.
      */
-    private static int SKOLEM_INDEX = 0;
+    private static int SKOLEM_INDEX;
 
     /**
      * ***************************************************************

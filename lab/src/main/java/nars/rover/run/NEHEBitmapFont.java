@@ -43,7 +43,7 @@ public class NEHEBitmapFont implements GLEventListener {
     public NEHEBitmapFont() {
     }
  
-    public static void loadGLTextures(GL2 gl) throws IOException {
+    public static void loadGLTextures(GL2 gl) {
          
         String tileNames [] = 
             {"font.png", "bumps.png"};

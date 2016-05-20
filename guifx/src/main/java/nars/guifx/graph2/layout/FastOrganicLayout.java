@@ -24,7 +24,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
      * Specifies if the top left corner of the input cells should be the origin
      * of the layout result. Default is true.
      */
-    protected boolean useInputOrigin = false;
+    protected boolean useInputOrigin;
 
     /**
      * Specifies if all edge points of traversed edge should be removed.
@@ -49,7 +49,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
     /**
      * Cache of <forceConstant>^2 for performance.
      */
-    protected double forceConstantSquared = 0;
+    protected double forceConstantSquared;
 
     /**
      * Minimal distance limit. Default is 2. Prevents of dividing by zero.
@@ -59,7 +59,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
     /**
      * Cached version of <minDistanceLimit> squared.
      */
-    protected double minDistanceLimitSquared = 0;
+    protected double minDistanceLimitSquared;
 
     /**
      * The maximum distance between vertex, beyond which their repulsion no
@@ -75,17 +75,17 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
     /**
      * Temperature to limit displacement at later stages of layout.
      */
-    protected double temperature = 0;
+    protected double temperature;
 
     /**
      * Total number of iterations to run the layout though.
      */
-    protected double maxIterations = 0;
+    protected double maxIterations;
 
     /**
      * Current iteration count.
      */
-    protected double iteration = 0;
+    protected double iteration;
 
     /**
      * An array of all vertex to be laid out.

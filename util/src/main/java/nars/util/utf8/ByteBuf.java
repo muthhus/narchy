@@ -38,7 +38,7 @@ package nars.util.utf8;
  */
 public final class ByteBuf {
 
-	private int length = 0;
+	private int length;
 
 	private byte[] buffer;
 

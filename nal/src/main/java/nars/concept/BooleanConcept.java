@@ -180,8 +180,9 @@ public class BooleanConcept extends OperationConcept {
         super.run();
 
         //TODO only update belief or goal if changed, not both
-        ((DynamicBeliefTable) beliefs).updateTask(nar.time());
-        ((DynamicBeliefTable) goals).updateTask(nar.time());
+        long now = nar.time();
+        ((DynamicBeliefTable) beliefs).updateTask(now);
+        ((DynamicBeliefTable) goals).updateTask(now);
     }
 
     @NotNull

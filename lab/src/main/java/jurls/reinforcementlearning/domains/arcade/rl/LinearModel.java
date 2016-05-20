@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class LinearModel implements Serializable, Cloneable {
 	/** Whether we should use the bias weights as well */
-	protected boolean useBias = false;
+	protected boolean useBias;
 	/** Learning rate for modifying weights */
 	protected double alpha = 0.1;
 

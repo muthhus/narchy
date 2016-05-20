@@ -104,7 +104,7 @@ public enum STGPMultivarTest {
 
 
     static double bestVal = Double.MIN_VALUE;
-    static TypedOrganism best = null;
+    static TypedOrganism best;
 
     protected static void evaluated(TypedOrganism i, double score) {
         if (score > bestVal) {

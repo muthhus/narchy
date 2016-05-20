@@ -54,7 +54,7 @@ public class KB {
      * The location of preprocessed KIF files, suitable for loading into
      * Vampire.
      */
-    public String kbDir = null;
+    public String kbDir;
 
     /**
      * A HashMap of HashSets, which contain all the parent classes of a given
@@ -148,12 +148,12 @@ public class KB {
     /**
      * The natural language formatting strings for relations in the KB.
      */
-    private HashMap formatMap = null;
+    private HashMap formatMap;
 
     /**
      * The natural language strings for terms in the KB.
      */
-    private HashMap termFormatMap = null;
+    private HashMap termFormatMap;
 
     public KIFInference inferenceEngine; //was vampire
 
@@ -738,7 +738,7 @@ public class KB {
         }
     }
 
-    private HashMap relnsWithRelnArgs = null;
+    private HashMap relnsWithRelnArgs;
 
     /**
      * *************************************************************
@@ -1384,7 +1384,7 @@ public class KB {
      */
     public ArrayList ask(String kind, int argnum, String term) {
 
-        return kind.compareTo("arg") == 0 ? (ArrayList) formulas.get(kind + '-' + (new Integer(argnum)).toString() + '-' + term) : (ArrayList) formulas.get(kind + '-' + term);
+        return (ArrayList) formulas.get(kind.compareTo("arg") == 0 ? kind + '-' + new Integer(argnum).toString() + '-' + term : kind + '-' + term);
     }
 
     /**
@@ -2291,7 +2291,7 @@ public class KB {
      * A HashMap for holding compiled regular expression patterns. The map is
      * initialized by calling compilePatterns().
      */
-    private static HashMap REGEX_PATTERNS = null;
+    private static HashMap REGEX_PATTERNS;
 
     /**
      * ***************************************************************
@@ -3552,7 +3552,7 @@ public class KB {
             return valueArgument;
         }
 
-        private boolean isClosureComputed = false;
+        private boolean isClosureComputed;
 
 // --Commented out by Inspection START (8/15/14 2:38 AM):
 //        public boolean getIsClosureComputed() {

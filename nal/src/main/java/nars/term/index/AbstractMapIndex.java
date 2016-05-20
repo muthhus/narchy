@@ -87,6 +87,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     public abstract void forEach(Consumer<? super Termed> c);
 
 
+    @Override
     public Compound atemporalize(Compound c) {
         return (Compound)transform(c.dt(DTERNAL), CompoundAtemporalizer);
     }

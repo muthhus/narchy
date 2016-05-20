@@ -109,39 +109,35 @@ public class TaskTablePane extends HBox implements Runnable {
         }
 
         //render current belief and goal states as crosshairs on eternal grid
-        {
-            Truth bc = beliefs.current;
-            long t = nar.time();
+        Truth bc = beliefs.current;
+        long t = nar.time();
 
-            float angleSpeed = 0.5f;
-            if (bc!=null) {
-                beliefTheta += bc.motivation() * angleSpeed;
-                drawCrossHair(ge, gew, geh, bc, Color.ORANGERED, t, beliefTheta);
-            }
+        float angleSpeed = 0.5f;
+        if (bc!=null) {
+            beliefTheta += bc.motivation() * angleSpeed;
+            drawCrossHair(ge, gew, geh, bc, Color.ORANGERED, t, beliefTheta);
+        }
 
-            Truth gc = goals.current;
-            if (gc!=null) {
-                goalTheta += gc.motivation() * angleSpeed;
-                drawCrossHair(ge, gew, geh, gc, Color.LIMEGREEN, t, goalTheta);
-            }
+        Truth gc = goals.current;
+        if (gc!=null) {
+            goalTheta += gc.motivation() * angleSpeed;
+            drawCrossHair(ge, gew, geh, gc, Color.LIMEGREEN, t, goalTheta);
         }
 
 
         //borders
-        {
-            ge.setStroke(Color.GRAY);
-            gt.setStroke(Color.GRAY);
-            ge.setLineWidth(1);
-            ge.strokeRect(0, 0, gew, geh);
-            gt.strokeRect(0, 0, tew, teh);
-            ge.setStroke(null);
-            gt.setStroke(null);
-        }
+        ge.setStroke(Color.GRAY);
+        gt.setStroke(Color.GRAY);
+        ge.setLineWidth(1);
+        ge.strokeRect(0, 0, gew, geh);
+        gt.strokeRect(0, 0, tew, teh);
+        ge.setStroke(null);
+        gt.setStroke(null);
 
 
     }
 
-    double beliefTheta = 0, goalTheta = PI/2;
+    double beliefTheta, goalTheta = PI/2;
 
     public void drawCrossHair(GraphicsContext ge, float gew, float geh, Truth truth, Color c, long t, double theta) {
         float w = 4;
@@ -216,12 +212,7 @@ public class TaskTablePane extends HBox implements Runnable {
                 x = xTime(tew, padding, minT, maxT, o, pw);
                 g = te;
             }
-            float y = yPos(eh, padding, ph, eternal ?
-                //ETERNAL y = frequency
-                freq :
-                //TIMELINE y = expectation                 (freq * conf)
-                //TIMELINE y = freq
-                freq
+            float y = yPos(eh, padding, ph, freq
             );
             r.renderTask(g, pri, conf, pw, ph, x, y);
 

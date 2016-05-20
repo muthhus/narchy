@@ -38,6 +38,7 @@ public interface Atomic extends Term {
 //        return toString();
 //    }
 
+    @Override
     default boolean hasTemporal() {
         return false;
     }

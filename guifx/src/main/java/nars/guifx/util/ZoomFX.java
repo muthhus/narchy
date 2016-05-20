@@ -44,7 +44,7 @@ public class ZoomFX extends AnchorPane implements Consumer<Animate> {
 
 
 
-    private ArrayRealVector panStart = null;
+    private ArrayRealVector panStart;
 
 
     public final Scale scale = new Scale();

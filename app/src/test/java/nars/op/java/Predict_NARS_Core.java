@@ -21,10 +21,10 @@ import static java.lang.System.out;
  */
 public class Predict_NARS_Core {
 
-    static float signal = 0;
+    static float signal;
 
     static IntervalTree<Long, Task> predictions = new IntervalTree<>();
-    static double maxval = 0;
+    static double maxval;
     private static int last = -1;
 
     public static void main(String[] args) {
@@ -103,7 +103,7 @@ public class Predict_NARS_Core {
             //signal *= 1.0 + (Math.random()-0.5f)* 2f * noiseRate;
 
             int cols = 40;
-            int colActual = (int) Math.round(signal * cols);
+            int colActual = Math.round(signal * cols);
             int val = (int) (((int) ((signal * discretization)) * (10.0 / discretization)));
 
             long windowStart = n.time();

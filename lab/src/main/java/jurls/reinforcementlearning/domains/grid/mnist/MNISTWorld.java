@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class MNISTWorld extends MNIST implements World {
 
-    int currentImage = 0, currentFrame = -1;
-    int cycle = 0;
+    int currentImage, currentFrame = -1;
+    int cycle;
     static final int maxDigit = 2;
     
     @SuppressWarnings("HardcodedFileSeparator")
@@ -52,7 +52,7 @@ public class MNISTWorld extends MNIST implements World {
     MNISTImage blank = new MNISTImage(28,28);
     
     MNISTImage retina = new MNISTImage(28,28);
-    int nextColumn = 0;
+    int nextColumn;
     
     @Override
     public double step(double[] action, double[] sensor) {

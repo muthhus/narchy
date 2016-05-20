@@ -13,12 +13,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class PJ implements MethodHandler {
-    static int reentrant = 0;
+    static int reentrant;
     private PJ() {}
 
-    private static PJ pj = new PJ();
+    private static final PJ pj = new PJ();
 
-    private static ArrayList<PJProlog> _stack = new ArrayList<PJProlog>();
+    private static final ArrayList<PJProlog> _stack = new ArrayList<PJProlog>();
     private static int current = -1;
 
     static {pushEngine();}

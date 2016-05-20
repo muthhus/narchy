@@ -18,8 +18,8 @@ public abstract class AxisPlot {
     protected float plotHeight = 1.0f;
     protected float plotWidth = 1.0f;
     protected boolean overlayEnable = true;
-    float y = 0;
-    float x = 0;
+    float y;
+    float x;
 
     public interface MultiChart {
         List<SignalData> getData();

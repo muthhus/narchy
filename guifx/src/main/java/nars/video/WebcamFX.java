@@ -29,7 +29,7 @@ public class WebcamFX extends StackPane implements Runnable {
     //private SourceDataLine mLine;
     // private ShortBuffer audioSamples;
     public ImageView view;
-    public Webcam webcam = null;
+    public Webcam webcam;
 
     boolean running = true;
 
@@ -98,23 +98,21 @@ public class WebcamFX extends StackPane implements Runnable {
         //ImagePanel gui = new ImagePanel();
         //gui.setPreferredSize(webcam.getViewSize());
 
-        {
-            BorderPane control = new POJOPane(this);
-            //control.setStyle("-fx-background-color: gray");
-            control.setStyle("-fx-text-fill: gray");
-            //control.setBlendMode(BlendMode.EXCLUSION);
-            control.setOpacity(0.92);
+        BorderPane control = new POJOPane(this);
+        //control.setStyle("-fx-background-color: gray");
+        control.setStyle("-fx-text-fill: gray");
+        //control.setBlendMode(BlendMode.EXCLUSION);
+        control.setOpacity(0.92);
 
-            VBox wcon = new VBox(control);
-            wcon.prefWidth(150);
-            wcon.maxWidth(150);
-            wcon.setFillWidth(false);
-            wcon.setAlignment(Pos.CENTER_LEFT);
-            //wcon.(150);
+        VBox wcon = new VBox(control);
+        wcon.prefWidth(150);
+        wcon.maxWidth(150);
+        wcon.setFillWidth(false);
+        wcon.setAlignment(Pos.CENTER_LEFT);
+        //wcon.(150);
 
-            getChildren().add(wcon);
+        getChildren().add(wcon);
 
-        }
         try {
 
             new Thread(this).start();

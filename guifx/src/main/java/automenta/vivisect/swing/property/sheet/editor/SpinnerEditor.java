@@ -25,8 +25,8 @@ public class SpinnerEditor extends AbstractPropertyEditor {
 
 		private static final long serialVersionUID = 11429722436474288L;
 
-		private JComponent component = null;
-		private boolean active = false;
+		private JComponent component;
+		private boolean active;
 
 		public ContainerPanel(JComponent component) {
 
@@ -82,8 +82,8 @@ public class SpinnerEditor extends AbstractPropertyEditor {
 
 	private Object oldValue;
 
-	protected JSpinner spinner = null;
-	protected JPanel panel = null;
+	protected JSpinner spinner;
+	protected JPanel panel;
 
 	public SpinnerEditor() {
 

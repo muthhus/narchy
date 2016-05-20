@@ -176,19 +176,16 @@ public class NARover extends AbstractRover {
             if ((b > l) || (l < 0.5f)) return 0;
             return motor.forward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-        ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
             if ((b > l) || (l < 0.5f)) return 0;
             return motor.backward(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-        ;
 
         MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,l) -> {
             if ((b > l) || (l < 0.5f)) return 0;
             return motor.stop(l-b);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-        ;
 
         MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (b,s) -> {
 
@@ -200,7 +197,6 @@ public class NARover extends AbstractRover {
             return Float.NaN; //unfired;
 
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-        ;
 
 
     }

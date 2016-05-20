@@ -29,7 +29,7 @@ import java.util.*;
  * helper method available to create the classic "spinning bar": {@code createClassicSpinningLine()}
  */
 public class AnimatedLabel extends Label {
-    private static Timer TIMER = null;
+    private static Timer TIMER;
     private static final WeakHashMap<AnimatedLabel, TimerTask> SCHEDULED_TASKS = new WeakHashMap<AnimatedLabel, TimerTask>();
 
     /**

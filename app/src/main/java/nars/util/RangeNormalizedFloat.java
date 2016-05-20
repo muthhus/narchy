@@ -9,7 +9,8 @@ public class RangeNormalizedFloat implements FloatSupplier {
 
     private final FloatSupplier in;
     private float min, max;
-    private float minStart, maxStart;
+    private final float minStart;
+    private final float maxStart;
 
     /** precision threshold */
     static final float epsilon = 0.001f;

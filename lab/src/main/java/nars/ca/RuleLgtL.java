@@ -138,7 +138,7 @@ public class RuleLgtL {
 		sBff = sBff + ",C" + ih;
 
 		// center cell
-		sBff = isCentr ? sBff + ",M1" : sBff + ",M0";
+		sBff = sBff + (isCentr ? ",M1" : ",M0");
 
 		// S rules
 		sBff = sBff + ",S" + iSMin + ".." + iSMax;
@@ -147,7 +147,7 @@ public class RuleLgtL {
 		sBff = sBff + ",B" + iBMin + ".." + iBMax;
 
 		// neighbourhood
-		sBff = iNgh == MJRules.NGHTYP_NEUM ? sBff + ",NN" : sBff + ",NM";
+		sBff = sBff + (iNgh == MJRules.NGHTYP_NEUM ? ",NN" : ",NM");
 
 		return sBff;
 	}
@@ -304,9 +304,7 @@ public class RuleLgtL {
 						{
 							if (ColoringMethod == 1) // standard
 							{
-								bNewVal = bOldVal < (mjb.StatesCount - 1)
-										? (short) (bOldVal + 1)
-										: (short) (mjb.StatesCount - 1);
+								bNewVal = (short) (bOldVal < mjb.StatesCount - 1 ? bOldVal + 1 : mjb.StatesCount - 1);
 							} else {
 								// alternate coloring - cells remain not changed
 							}

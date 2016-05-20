@@ -333,13 +333,13 @@ public class Sokoban extends Applet {
 
     char[] savelevel;
     int savecurrlevel, savew, saveh, savepush, savemove;
-    boolean gamesaved = false;
+    boolean gamesaved;
 
     Font font = new Font("Helvetica", Font.PLAIN, 12);
     Font fontb = new Font("Helvetica", Font.BOLD, 12);
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public Sokoban() throws HeadlessException, IOException {
+    public Sokoban() throws HeadlessException {
         //buzz = getAudioClip(getDocumentBase(), "buzz.au");
         //wow = getAudioClip(getDocumentBase(), "wow.au");
         //MediaTracker tracker = new MediaTracker(this);

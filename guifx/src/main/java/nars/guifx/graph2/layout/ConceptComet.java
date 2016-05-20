@@ -16,11 +16,11 @@ import java.util.Iterator;
 public class ConceptComet extends HyperassociativeMap2D {
 
     private final NAR nar;
-    double axisTheta = 0;
+    double axisTheta;
 
     final double thickness = 250;
     double timeScale = 10.0f;
-    double now = 0; /* center of view */
+    double now; /* center of view */
     double cutoff = 50;
 
     public ConceptComet(NAR nar /* TODO take any clock */) {

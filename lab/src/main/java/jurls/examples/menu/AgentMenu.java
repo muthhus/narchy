@@ -28,8 +28,8 @@ public class AgentMenu extends RLMenu {
 			new MyAction("SARSA(lmabda)"));
 	public JRadioButtonMenuItem qzero = new JRadioButtonMenuItem(new MyAction(
 			"Q(0)"));
-	public JRadioButtonMenuItem brain = null;
-	public AgentMenu soulMenu = null;
+	public JRadioButtonMenuItem brain;
+	public AgentMenu soulMenu;
 
 	// TODO make a menu for this
 	private ActionSelector getActionSelector() {

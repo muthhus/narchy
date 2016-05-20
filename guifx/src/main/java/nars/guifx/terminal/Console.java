@@ -17,7 +17,7 @@ public class Console extends BorderPane {
     protected final TextField textField = new TextField();
 
     protected final List<String> history = new ArrayList<>();
-    protected int historyPointer = 0;
+    protected int historyPointer;
 
     private Consumer<String> onMessageReceivedHandler;
 

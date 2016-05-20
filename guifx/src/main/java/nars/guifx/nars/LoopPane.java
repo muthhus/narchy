@@ -32,7 +32,7 @@ public class LoopPane extends FlowPane {
     private final NSlider cpuSlider;
     private final ComboBox<Integer> multiplier;
 
-    boolean running = false;
+    boolean running;
 
     final ChangeListener<Number> updateLoopOnChange = (s, p, c) -> updateLoop();
 

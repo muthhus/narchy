@@ -12,7 +12,7 @@ import org.jbox2d.dynamics.World2D;
  */
 public class EntityPhysics extends EntityProcessingSystem {
 
-    private Sim sim;
+    private final Sim sim;
 
     public EntityPhysics(Sim sim) {
         super(Aspect.all(Physical.class));

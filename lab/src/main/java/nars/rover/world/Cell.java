@@ -24,17 +24,17 @@ public class Cell {
     }
 
     public String name="";
-    public float light=0.0f;
-    public float charge = 0;
-    public float value=0;
-    public float value2=0;
+    public float light;
+    public float charge;
+    public float value;
+    public float value2;
     public float conductivity = 0.98f;
-    public boolean chargeFront = false;
-    public float height = 0;
+    public boolean chargeFront;
+    public float height;
     public Material material;
     public Logic logic;
     public final CellState state;
-    public boolean is_solid=false;
+    public boolean is_solid;
 
     public boolean isSolid() {
         return is_solid;

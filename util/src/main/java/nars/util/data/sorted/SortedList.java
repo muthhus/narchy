@@ -20,7 +20,7 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
 
     static final Comparator<Comparable> defaultComparator = Comparable::compareTo;
 
-    private boolean allowDuplicate = false;
+    private boolean allowDuplicate;
 
 //    /**
 //     * <p>

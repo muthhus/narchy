@@ -120,8 +120,8 @@ enum ResizeHelper {
         private final Stage stage;
         private Cursor cursorEvent = Cursor.DEFAULT;
         private final int border = 8;
-        private double startX = 0;
-        private double startY = 0;
+        private double startX;
+        private double startY;
 
         public ResizeListener(Stage stage) {
             this.stage = stage;

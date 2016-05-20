@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class Table<V> extends AbstractInteractableComponent<Table<V>> {
     private TableModel<V> tableModel;
-    private TableModel.Listener<V> tableModelListener;  // Used to invalidate the table whenever the model changes
+    private final TableModel.Listener<V> tableModelListener;  // Used to invalidate the table whenever the model changes
     private TableHeaderRenderer<V> tableHeaderRenderer;
     private TableCellRenderer<V> tableCellRenderer;
     private Runnable selectAction;

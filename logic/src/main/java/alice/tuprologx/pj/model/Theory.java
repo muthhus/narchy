@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class Theory extends List<Clause<?,?>> {
     
-    private static alice.tuprolog.Prolog engine;
+    private static final alice.tuprolog.Prolog engine;
       
     static {
         engine = new alice.tuprolog.Prolog();

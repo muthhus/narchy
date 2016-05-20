@@ -16,7 +16,7 @@ public final class ValueStackResetTest
 
     private static final Supplier<Object> SUPPLIER = new Supplier<Object>()
     {
-        private boolean firstConsumed = false;
+        private boolean firstConsumed;
 
         @Override
         public Object get()

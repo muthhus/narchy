@@ -14,9 +14,9 @@ public class Player {
 	public int maxX = Integer.MIN_VALUE;
 	public int minY = Integer.MAX_VALUE;
 	public int maxY = Integer.MIN_VALUE;
-	public int x = 0;
-	public boolean mirror = false;
-	public int moveImageIndex = 0;
+	public int x;
+	public boolean mirror;
+	public int moveImageIndex;
 	public int moveIndex = -1;
-	public Move[] moves = null;
+	public Move[] moves;
 }

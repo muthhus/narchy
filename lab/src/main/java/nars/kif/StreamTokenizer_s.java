@@ -58,8 +58,8 @@ import java.io.Reader;
 public class StreamTokenizer_s {
 
     /* Only one of these will be non-null */
-    private Reader reader = null;
-    private InputStream input = null;
+    private Reader reader;
+    private InputStream input;
 
     private char[] buf = new char[20];
 
@@ -82,9 +82,9 @@ public class StreamTokenizer_s {
      */
     private int LINENO = 1;
 
-    private boolean eolIsSignificantP = false;
-    private boolean slashSlashCommentsP = false;
-    private boolean slashStarCommentsP = false;
+    private boolean eolIsSignificantP;
+    private boolean slashSlashCommentsP;
+    private boolean slashStarCommentsP;
 
     private final byte[] ctype = new byte[256];
     private static final byte CT_WHITESPACE = 1;

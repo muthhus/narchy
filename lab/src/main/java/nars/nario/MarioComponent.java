@@ -17,16 +17,16 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private static final long serialVersionUID = 739318775993206607L;
     public int TICKS_PER_SECOND = 24;
 
-    private boolean running = false;
+    private boolean running;
     GraphicsConfiguration graphicsConfiguration;
     protected Scene scene;
 
-    private boolean focused = false;
+    private boolean focused;
     protected MapScene mapScene;
     private BufferedImage image;
     private int tick;
     private int renderedFrames;
-    boolean antialias = false;
+    boolean antialias;
     private final boolean soundEnabled = false;
     private double time;
     private double now;
@@ -162,7 +162,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     }
 
     int lastTick = -1;
-    int fps = 0;
+    int fps;
 
     @Override
     public void run() {

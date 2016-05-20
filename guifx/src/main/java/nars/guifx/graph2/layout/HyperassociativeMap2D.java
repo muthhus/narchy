@@ -14,7 +14,7 @@ import nars.term.Termed;
  */
 public class HyperassociativeMap2D extends HyperassociativeMap<Termed,TermNode<Termed>> implements IterativeLayout {
     double scaleFactor = 1;
-    private TermNode<Termed>[] termList = null;
+    private TermNode<Termed>[] termList;
 
 
     //TODO equilibrum distance, speed, etc

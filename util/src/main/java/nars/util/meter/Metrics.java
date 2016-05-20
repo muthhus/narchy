@@ -199,7 +199,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         
     }
     
-    private RowKey nextRowKey = null; //TODO use AtomicReference
+    private RowKey nextRowKey; //TODO use AtomicReference
     
     /** the columns of the table */
     private final List<Signals<?>> meters = new ArrayList<>();

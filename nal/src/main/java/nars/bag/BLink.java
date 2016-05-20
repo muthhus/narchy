@@ -73,6 +73,19 @@ abstract public class BLink<X> extends Budget implements Link<X> {
             this.id = new WeakReference<X>(id);
         }
 
+        @Override
+        public float pri() {
+            float p = super.pri();
+            if (p==p) {
+                //check existence
+                if (get() == null) {
+                    delete();
+                    return Float.NaN;
+                }
+            }
+            return p;
+        }
+
         @NotNull @Override
         public X get() {
             return id.get();
@@ -112,6 +125,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
 
 
+    @Override
     abstract public X get();
 
     private void init(@NotNull Budgeted c, float scale) {
@@ -128,8 +142,12 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public final void delete() {
-        b[PRI] = Float.NaN;
-        changed = true;
+        float p = pri();
+        if (p==p) {
+            //not already deleted
+            _setPriority(Float.NaN);
+            changed = true;
+        }
     }
 
     /** TODO return false to signal to the bag to remove this item */
@@ -146,7 +164,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float pri() {
+    public float pri() {
         return b[0 /*PRI*/];
     }
 

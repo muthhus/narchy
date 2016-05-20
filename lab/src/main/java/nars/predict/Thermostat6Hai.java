@@ -177,8 +177,8 @@ public class Thermostat6Hai {
             if (print) {
 
                 int cols = 50;
-                int colActual = (int) Math.round(cols * actual);
-                int colEst = (int) Math.round(cols * estimated);
+                int colActual = Math.round(cols * actual);
+                int colEst = Math.round(cols * estimated);
                 for (int i = 0; i <= cols; i++) {
 
                     char c;

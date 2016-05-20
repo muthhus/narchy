@@ -755,9 +755,9 @@ public class Struct extends Term {
             if (arity > 0) {
                 s = s + '(';
                 for (int c = 1;c < arity;c++) {
-                    s = !(arg[c - 1] instanceof Var) ? s + arg[c - 1].toString() + ',' : s + ((Var) arg[c - 1]).toStringFlattened() + ',';
+                    s = s + (!(arg[c - 1] instanceof Var) ? arg[c - 1].toString() : ((Var) arg[c - 1]).toStringFlattened()) + ',';
                 }
-                s = !(arg[arity - 1] instanceof Var) ? s + arg[arity - 1].toString() + ')' : s + ((Var) arg[arity - 1]).toStringFlattened() + ')';
+                s = s + (!(arg[arity - 1] instanceof Var) ? arg[arity - 1].toString() : ((Var) arg[arity - 1]).toStringFlattened()) + ')';
             }
             return s;
         }
@@ -771,7 +771,7 @@ public class Struct extends Term {
             if (tl.isEmptyList()) {
                 return h.toString();
             }
-            return h instanceof Var ? ((Var) h).toStringFlattened() + ',' + tl.toString0() : h.toString() + ',' + tl.toString0();
+            return (h instanceof Var ? ((Var) h).toStringFlattened() : h.toString()) + ',' + tl.toString0();
         } else {
             String h0;
             String t0;

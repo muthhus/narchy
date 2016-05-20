@@ -33,6 +33,7 @@ public final class Pair implements Comparable<Pair> {
     public int proxyIdA;
     public int proxyIdB;
 
+    @Override
     public int compareTo(Pair pair2) {
         int p1a = this.proxyIdA;
         int p2a = pair2.proxyIdA;

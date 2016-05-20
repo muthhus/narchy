@@ -38,20 +38,20 @@ public final class TracingListener<V>
     @SuppressWarnings("HardcodedFileSeparator")
     private static final String INFO_PATH = "/info.csv";
 
-    private InputBuffer inputBuffer = null;
-    private long startTime = 0L;
-    private int nrLines = 0;
-    private int nrChars = 0;
-    private int nrCodePoints = 0;
+    private InputBuffer inputBuffer;
+    private long startTime;
+    private int nrLines;
+    private int nrChars;
+    private int nrCodePoints;
 
     private final Map<Matcher, MatcherDescriptor> matcherDescriptors
         = new IdentityHashMap<>();
 
     private final Map<Matcher, Integer> matcherIds = new IdentityHashMap<>();
-    private int nextMatcherId = 0;
+    private int nextMatcherId;
 
     private final IntIntHashMap nodeIds = new IntIntHashMap();
-    private int nextNodeId = 0;
+    private int nextNodeId;
 
     private final IntIntHashMap prematchMatcherIds = new IntIntHashMap();
     private final IntIntHashMap prematchIndices = new IntIntHashMap();
