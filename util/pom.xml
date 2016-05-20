@@ -5,6 +5,7 @@
   <groupId>opennars</groupId>
   <artifactId>util</artifactId>
   <version>1.8-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <parent>
     <groupId>opennars</groupId>
     <artifactId>narchy</artifactId>

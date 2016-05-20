@@ -21,32 +21,41 @@ public final class OneWayList<E> {
                     transform(list)
                 );
     }
-    
-    /**
-     * Transforms given list into a OneWayList without any modification
-     * to it
-     *
-     * Method introduced during revision by Paolo Contessi
-     *
-     * @param list  Input list to be transformed
-     * @return      An equivalent OneWayList
-     */
+
     public static <T> OneWayList<T> transform2(List<T> list){
-        if (list.isEmpty())
-            return null;
-
-        //OneWayList<T> result = null;
-        OneWayList<T> p = null;
-
-        for(T obj : list){
-            p = new OneWayList<T>(obj, p.tail);
-            //result = l;
-            //p = ((result == null ? result : p.tail = l));
-
-        }
-
-        return p;
+        return list.isEmpty() ?
+                null :
+                new OneWayList<T>(
+                        list.get(0),
+                        list.size() > 1 ? transform2(list.subList(1, list.size())) : null
+                );
     }
+
+//    /**
+//     * Transforms given list into a OneWayList without any modification
+//     * to it
+//     *
+//     * Method introduced during revision by Paolo Contessi
+//     *
+//     * @param list  Input list to be transformed
+//     * @return      An equivalent OneWayList
+//     */
+//    public static <T> OneWayList<T> transform2(List<T> list){
+//        if (list.isEmpty())
+//            return null;
+//
+//        //OneWayList<T> result = null;
+//        OneWayList<T> p = null;
+//
+//        for(T obj : list){
+//            p = new OneWayList<T>(obj, p);
+//            //result = l;
+//            //p = ((result == null ? result : p.tail = l));
+//
+//        }
+//
+//        return p;
+//    }
     
     public E getHead() {
         return head;
