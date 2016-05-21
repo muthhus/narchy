@@ -188,9 +188,12 @@ public class TrieDeriver extends Deriver {
     }
 
     public void print(@NotNull PrintStream out) {
+        out.println("Fork {");
 
         for (ProcTerm p : roots)
-            print(p, out, 0);
+            print(p, out, 2);
+
+        out.println("}");
     }
 
     /**
