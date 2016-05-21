@@ -4,10 +4,7 @@ import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.PremiseEval;
-import nars.nal.meta.PremiseFork;
-import nars.nal.meta.ProcTerm;
+import nars.nal.meta.*;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.Derive;
 import nars.term.Compound;
@@ -126,7 +123,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
             case 0: throw new RuntimeException("empty result procedure");
             case 1: return derive.iterator().next();
             default:
-                return PremiseFork.the(derive.toArray(new Derive[derive.size()]));
+                return ThenFork.compile(derive.toArray(new Derive[derive.size()]));
         }
     }
 

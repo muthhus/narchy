@@ -3,11 +3,14 @@ package nars.nal.meta;
 import com.google.common.collect.Lists;
 import javassist.*;
 import nars.Global;
+import nars.Op;
 import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.Derive;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.TrieNode;
@@ -73,7 +76,7 @@ public class TrieDeriver extends Deriver {
         //return Collections.unmodifiableList(premiseRules);
         this.trie = new TermPremiseRuleTermTrie(ruleset);
 
-        @NotNull List<ProcTerm> bb = branches(trie.trie.root);
+        @NotNull List<ProcTerm> bb = subtree(trie.trie.root);
         this.roots = bb.toArray(new ProcTerm[bb.size()]);
 
 
@@ -100,26 +103,28 @@ public class TrieDeriver extends Deriver {
     final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<>(null);
 
     @NotNull
-    private List<ProcTerm> branches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    private List<ProcTerm> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
         List<ProcTerm> bb = Global.newArrayList(node.getChildCount());
 
         node.forEach(n -> {
 
-            ProcTerm branch = branch(
-                compileConditions(n.seq().subList(n.start(), n.end()), matchParent),
-                compileActions(branches(n))
+            ProcTerm branch = ifThen(
+                conditions(n.seq().subList(n.start(), n.end()), matchParent),
+                ThenFork.compile(subtree(n))
             );
 
-            if (branch!=Return.the)
+            if (branch!=null)
                 bb.add(branch);
         });
+
+        System.out.println(bb);
 
         return bb;
     }
 
 
-    @NotNull private static List<BoolCondition> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    @NotNull private static List<BoolCondition> conditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BoolCondition) {
@@ -152,35 +157,33 @@ public class TrieDeriver extends Deriver {
 
 
 
-    @NotNull
-    private static ProcTerm compileActions(@NotNull List<ProcTerm> t) {
+//    @NotNull
+//    private static ProcTerm compileActions(@NotNull List<ProcTerm> t) {
+//
+//        switch (t.size()) {
+//            case 0: return null;
+//            case 1:
+//                return t.get(0);
+//            default:
+//                //optimization: find expression prefix types common to all, and see if a switch can be formed
+//
+//        }
+//
+//    }
 
-        switch (t.size()) {
-            case 0: return null;
-            case 1:
-                return t.get(0);
-            default:
-                //optimization: find expression prefix types common to all, and see if a switch can be formed
-                return PremiseFork.the(t.toArray(new ProcTerm[t.size()]));
-        }
 
-    }
+    @Nullable
+    public static ProcTerm ifThen(@NotNull List<BoolCondition> cond, @Nullable ProcTerm conseq) {
 
+        BoolCondition cc = AndCondition.the(cond);
 
-
-    @NotNull
-    public static ProcTerm branch(
-            @NotNull List<BoolCondition> condition,
-            @Nullable ProcTerm conseq) {
-
-        if (conseq == null) {
-            conseq = Return.the;
-        }
-
-        BoolCondition cc = AndCondition.the(condition);
         if (cc!=null) {
-            return new IfThen(cc, conseq);
+
+            return conseq == null ? new If(cc) : new IfThen(cc, conseq);
+
         } else {
+            /*if (conseq!=null)
+                throw new RuntimeException();*/
             return conseq;
         }
     }
@@ -282,4 +285,28 @@ public class TrieDeriver extends Deriver {
         }
 
     }
+
+    /** just evaluates a boolean condition HACK */
+    static final class If extends GenericCompound implements ProcTerm {
+
+
+        public final transient @NotNull BoolCondition cond;
+
+
+        public If(@NotNull BoolCondition cond) {
+            super(Op.IMPLICATION,
+                    TermVector.the( cond, Return.the)
+            );
+
+            this.cond = cond;
+        }
+
+        @Override public void accept(@NotNull PremiseEval m) {
+            final int stack = m.now();
+            cond.booleanValueOf(m);
+            m.revert(stack);
+        }
+
+    }
+
 }

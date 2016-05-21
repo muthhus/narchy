@@ -23,8 +23,8 @@ public final class IfThen extends GenericCompound implements ProcTerm {
             TermVector.the( cond, conseq)
         );
 
-        this.cond = (BoolCondition) term(0);
-        this.conseq = (ProcTerm) term(1);
+        this.cond = cond; //(BoolCondition) term(0);
+        this.conseq = conseq; //(ProcTerm) term(1);
     }
 
     @Override public void accept(@NotNull PremiseEval m) {
