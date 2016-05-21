@@ -36,7 +36,7 @@ import static nars.truth.TruthFunctions.eternalize;
  * Task
  * TermLinks
  */
-abstract public class ConceptProcess implements Premise {
+public class ConceptProcess implements Premise {
 
     public final NAR nar;
     public final BLink<? extends Task> taskLink;
@@ -174,7 +174,7 @@ abstract public class ConceptProcess implements Premise {
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
 
-        accept(derived);
+        nar.process(derived);
 
         //ETERNALIZE:
 
@@ -188,7 +188,7 @@ abstract public class ConceptProcess implements Premise {
 
 
             if (!derived.isDeleted()) {
-                accept(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
+                nar.process(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
                         .time(now, ETERNAL)
                         .budgetCompoundForward(budget, this)
                         .log("Immediaternalized") //Immediate Eternalization
@@ -208,11 +208,6 @@ abstract public class ConceptProcess implements Premise {
     public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task>[] parents) {
         return new DerivedTask(c, punct, truth, this, parents);
     }
-
-
-
-    /** when a derivation is accepted, this is called  */
-    abstract protected void accept(Task derivation);
 
 
 

@@ -171,33 +171,12 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             if (!Terms.equalSubTermsInRespectToImageAndProduct( taskTerm, termLinkTerm )) {
 
                 matcher.run(
-                    newPremise(taskLink, termLink,
-                            match(task, tl, occ) //TODO cache this, if occ is same then the belief probably is also, in same cycle
-                    )
+                    new ConceptProcess(nar, taskLink, termLink, match(task, tl, occ))
                 );
             }
         }
     }
 
-    @NotNull
-    protected ConceptProcess newPremise(BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-        return new DirectConceptProcess(nar, taskLink, termLink, belief);
-    }
-
-    public final static class DirectConceptProcess extends ConceptProcess {
-
-        public DirectConceptProcess(NAR nar,
-                                    BLink<? extends Task> taskLink,
-                                    BLink<? extends Termed> termLink, @Nullable Task belief) {
-            super(nar, taskLink, termLink, belief);
-        }
-
-        @Override
-        protected final void accept(Task derivation) {
-            nar.process(derivation);
-        }
-
-    }
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
