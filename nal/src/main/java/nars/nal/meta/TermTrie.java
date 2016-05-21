@@ -78,7 +78,7 @@ abstract public class TermTrie<K extends Term, V> {
             int to = n.end();
 
 
-            out.print(n.getChildCount() + "|" + n.getSize() + "  ");
+            out.print(n.childCount() + "|" + n.getSize() + "  ");
 
             indent(from * 2);
 

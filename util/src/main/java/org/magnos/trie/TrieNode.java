@@ -55,7 +55,7 @@ import java.util.function.Consumer;
  * </li>
  * </ol>
  * <p>
- * You can tell a valued branch or leaf apart by {@link #getChildCount()}, if it
+ * You can tell a valued branch or leaf apart by {@link #childCount()}, if it
  * returns 0 then it's a leaf, otherwise it's a branch.
  * </p>
  * 
@@ -375,7 +375,7 @@ public class TrieNode<S, T> implements Entry<S, T>
     * 
     * @return The number of direct children in this node.
     */
-   public int getChildCount()
+   public int childCount()
    {
       return (children == null ? 0 : children.size());
    }

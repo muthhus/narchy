@@ -52,11 +52,11 @@ public final class AndCondition extends GenericCompound<BoolCondition> implement
         if (s == 0) return null;
 
 
-        if (cond.get(s - 1) == BoolCondition.TRUE) {
-            cond = cond.subList(0, s - 1);
-            s--;
-            if (s == 0) return null;
-        }
+//        if (cond.get(s - 1) == BoolCondition.TRUE) {
+//            cond = cond.subList(0, s - 1);
+//            s--;
+//            if (s == 0) return null;
+//        }
 
 
         if (s == 1) return cond.get(0);

@@ -44,7 +44,6 @@ import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
-import static nars.nal.meta.BoolCondition.TRUE;
 import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
 
@@ -237,7 +236,6 @@ public class PremiseRule extends GenericCompound {
 
         l.add(truth.derive); //will be linked to and invoked by match callbacks
 
-        l.add(TRUE);
 
         return l;
     }

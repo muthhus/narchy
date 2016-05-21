@@ -12,19 +12,6 @@ import static nars.Op.ATOM;
  */
 public interface BoolCondition extends Term, BooleanFunction<PremiseEval> {
 
-    /** contant TRUE condition */
-    BoolCondition TRUE = new AtomicBoolCondition() {
-
-        @Override
-        public boolean booleanValueOf(PremiseEval o) {
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "TRUE";
-        }
-    };
 
 
 

@@ -42,15 +42,15 @@ public class TrieDeriver extends Deriver {
         }
 
         @Override
-        public void index(@Nullable PremiseRule s) {
+        public void index(@Nullable PremiseRule rule) {
 
-            if (s == null || s.postconditions == null)
+            if (rule == null || rule.postconditions == null)
                 throw new RuntimeException("Null rule");
 
-            for (PostCondition p : s.postconditions) {
+            for (PostCondition result : rule.postconditions) {
 
-                List<Term> c = s.conditions(p);
-                PremiseRule existing = trie.put(c, s);
+                List<Term> c = rule.conditions(result);
+                PremiseRule existing = trie.put(c, rule);
 
                 if (existing!=null)
                     throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
@@ -105,7 +105,7 @@ public class TrieDeriver extends Deriver {
     @NotNull
     private List<ProcTerm> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
-        List<ProcTerm> bb = Global.newArrayList(node.getChildCount());
+        List<ProcTerm> bb = Global.newArrayList(node.childCount());
 
         node.forEach(n -> {
 
