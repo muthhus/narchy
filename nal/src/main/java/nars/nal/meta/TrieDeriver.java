@@ -146,9 +146,52 @@ public class TrieDeriver extends Deriver {
             print(p, out, 0);
     }
 
-    public void build() {
-        print(System.out); //HACK just recurse to find the MatchTerm proc's
+    /** late binding procedures to finalize the built trie deriver */
+    protected void build() {
+        for (ProcTerm p : roots)
+            build(p);
     }
+
+    private void build(Object p) {
+        if (p instanceof IfThen) {
+
+            {
+                IfThen it = (IfThen) p;
+                build(it.cond);
+                build(it.conseq);
+            }
+
+        } else if (p instanceof If) {
+
+            {
+                If it = (If) p;
+                build(it.cond);
+            }
+
+        } else if (p instanceof AndCondition) {
+            {
+                AndCondition ac = (AndCondition) p;
+                for (BoolCondition b : ac.termCache) {
+                    build(b);
+                }
+            }
+        } else if (p instanceof ThenFork) {
+            {
+                ThenFork ac = (ThenFork) p;
+                for (ProcTerm b : ac.termCache) {
+                    build(b);
+                }
+            }
+
+        } else {
+
+            if (p instanceof MatchTerm)
+                ((MatchTerm)p).build();
+
+        }
+
+    }
+
 
     public void print(Object p, @NotNull PrintStream out, int indent) {
 

@@ -38,7 +38,7 @@ public interface Temporalize {
         return ETERNAL;
     }
 
-    nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
+    //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
     nars.Premise.OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
 
     /**
@@ -562,16 +562,16 @@ public interface Temporalize {
         return deriveDT(derived, 1, premise, eventDelta);
     };
 
-    Temporalize AutoSimple = (derived, p, d, occReturn) -> {
-
-        ConceptProcess premise = p.premise;
-
-        long occ = premise.occurrenceTarget((t, b) -> t); //reset
-
-        occReturn[0] = occ;
-
-        return derived;
-    };
+//    Temporalize AutoSimple = (derived, p, d, occReturn) -> {
+//
+//        ConceptProcess premise = p.premise;
+//
+//        long occ = premise.occurrenceTarget((t, b) -> t); //reset
+//
+//        occReturn[0] = occ;
+//
+//        return derived;
+//    };
 
     /**
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
@@ -852,7 +852,6 @@ public interface Temporalize {
 
 
         return derived;
-        //return nar.memory.index.transformRoot(derived, temporalize);
 
     };
 }

@@ -63,7 +63,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         this.id = "Derive(" +
                 Joiner.on(',').join(
                     term,
-                    temporalizer,
+                    "temporalize_" + temporalizer.hashCode(),
                     beliefSingle ? "Bs" : "Bd",
                     goalSingle ? "Gs" : "Gd",
                     eternalize ? "Et" : "_") +
