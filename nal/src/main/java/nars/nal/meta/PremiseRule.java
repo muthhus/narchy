@@ -262,10 +262,10 @@ public class PremiseRule extends GenericCompound {
         put(TaskPunctuation.class, 15);
         put("SubTermOp1", 13);
 
-        put(Solve.class, 12);
-
         put(SubTermsStructure.class, 11);
         put(SubTermStructure.class, 11);
+
+        put(Solve.class, 10);
 
         put(events.class, 9);
 

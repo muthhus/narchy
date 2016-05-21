@@ -26,6 +26,9 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     @Nullable
     public final MatchConstraint constraints;
 
+
+    private final Term pid;
+
     @NotNull
     private Term id;
 
@@ -37,7 +40,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     private @Nullable ProcTerm onMatch;
 
     public MatchTerm(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
-        this.id = id;
+        this.id = this.pid = id;
 
         this.x = pattern;
         this.constraints = constraints!=null ? compile(constraints) : null;
@@ -93,7 +96,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 
     public final @NotNull ProcTerm build() {
         if (this.onMatch == null) {
-            this.id = $.the("MatchTerm(" + id + ",{" + derive + "})");
+            this.id = $.the("MatchTerm(" + pid + ",{" + derive + "})");
 
 
             ProcTerm om;
