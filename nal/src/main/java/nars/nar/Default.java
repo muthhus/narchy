@@ -212,7 +212,7 @@ public class Default extends AbstractNAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            conceptualize(c, t, activation, /*activation*/ 1f, overflow);
+            conceptualize(c, t, activation, activation, overflow);
 
             if (overflow.floatValue() > 0) {
                 emotion.stress(overflow.floatValue());
@@ -314,11 +314,13 @@ public class Default extends AbstractNAR {
 
     @Override
     public final float conceptPriority(@NotNull Termed termed) {
-        Concept cc = concept(termed);
-        if (cc != null) {
-            BLink<Concept> c = core.active.get(cc);
-            if (c != null)
-                return c.priIfFiniteElseZero();
+        if (termed!=null) {
+            Concept cc = concept(termed);
+            if (cc != null) {
+                BLink<Concept> c = core.active.get(cc);
+                if (c != null)
+                    return c.priIfFiniteElseZero();
+            }
         }
         return 0;
     }
@@ -567,7 +569,7 @@ public class Default extends AbstractNAR {
         @Override
         protected Bag<Concept> newConceptBag() {
             return new MonitoredCurveBag(nar, 1, nar.random)
-                    .merge(BudgetMerge.plusDQDominant);
+                    .merge(BudgetMerge.plusDQBlend);
         }
 
         /** extends CurveBag to invoke entrance/exit event handler lambda */

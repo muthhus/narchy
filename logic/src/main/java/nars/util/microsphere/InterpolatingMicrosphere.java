@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nars.task;
+package nars.util.microsphere;
 
-import nars.Global;
+
+import nars.util.data.list.FasterList;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
 import org.apache.commons.math3.util.FastMath;
@@ -96,8 +97,8 @@ public class InterpolatingMicrosphere {
         this.darkThreshold = darkThreshold;
         this.backgroundConfidence = 1.0f;
         this.background = background;
-        microsphere = Global.newArrayList(size);
-        microsphereData = Global.newArrayList(size);
+        microsphere =  new FasterList(size);
+        microsphereData = new FasterList(size);
 
 
     }

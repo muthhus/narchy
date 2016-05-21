@@ -28,7 +28,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull public final TemporalBeliefTable temporal;
     @NotNull final Map<Task,Task> map;
 
-    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQDominant;
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
 
     public DefaultBeliefTable() {
 

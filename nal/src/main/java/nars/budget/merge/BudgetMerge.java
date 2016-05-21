@@ -5,6 +5,9 @@ import nars.budget.Budgeted;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Global.BUDGET_EPSILON;
+import static nars.nal.UtilityFunctions.or;
+
 /**
  * Budget merge function, with input scale factor
  */
@@ -19,7 +22,25 @@ public interface BudgetMerge {
      * */
     float merge(Budget existing, Budgeted incoming, float incomingScale);
 
+    static float dqBlendByOrDurQua(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean plusOrAvg) {
+        float incomingPri = src.priIfFiniteElseZero() * srcScale;
+        float incomingScore = or(src.dur(), src.qua());
 
+        float currentPri = tgt.priIfFiniteElseZero();
+        float currentScore = or(tgt.dur(), tgt.qua());
+
+        float cp;
+        if(currentScore > BUDGET_EPSILON && incomingScore > BUDGET_EPSILON) {
+            cp = currentScore / (currentScore + incomingScore);
+        } else {
+            cp = 0.5f;
+        }
+
+        return dqBlend(tgt, src, plusOrAvg ?
+                    (currentPri + incomingPri) :
+                    ((cp * currentPri) + ((1f-cp) * incomingPri)),
+                cp);
+    }
     static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;
 
@@ -74,12 +95,14 @@ public interface BudgetMerge {
 
     /** sum priority, LERP other components in proportion to the priorities */
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        return dqBlendByPri(tgt, src, srcScale, true);
+        //return dqBlendByPri(tgt, src, srcScale, true);
+        return dqBlendByOrDurQua(tgt, src, srcScale, true);
         //dqBlendBySummary(tgt, src, srcScale, true);
     };
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
+        //return dqBlendByDurQua(tgt, src, srcScale);
         return dqBlendByPri(tgt, src, srcScale, false);
         //dqBlendBySummary(tgt, src, srcScale, false);
     };

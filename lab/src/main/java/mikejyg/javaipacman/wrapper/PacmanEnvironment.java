@@ -65,7 +65,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		nar.beliefConfidence(0.51f);
 		nar.conceptActivation.setValue(0.2f);
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(8);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
