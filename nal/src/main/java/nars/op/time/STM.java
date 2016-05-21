@@ -23,7 +23,7 @@ public abstract class STM implements Consumer<Task> {
 
     /** call this in constructor */
     protected final void start() {
-        nar.eventTaskProcess.on(this);
+        nar.eventTaskProcess.on(t -> { if (temporallyInductable(t)) accept(t); } );
         nar.eventReset.on(n -> clear());
     }
 

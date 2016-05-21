@@ -212,8 +212,8 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         if (iteration != 0 && iteration % getLambda() == 0) {
 
             int nextID = furthest.id;
-            beforeRemove(furthest);
             removeVertex(furthest);
+            removed(furthest);
 
             //find node with maximal local error
             double maxError = Double.NEGATIVE_INFINITY;
@@ -300,7 +300,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
     }
 
     /** called before a node will be removed */
-    protected void beforeRemove(N furthest) {
+    protected void removed(N furthest) {
 
     }
 

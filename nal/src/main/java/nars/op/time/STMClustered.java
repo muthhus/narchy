@@ -1,9 +1,7 @@
 package nars.op.time;
 
 import com.google.common.base.Joiner;
-import nars.$;
-import nars.NAR;
-import nars.Symbols;
+import nars.*;
 import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
@@ -11,7 +9,6 @@ import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.util.data.MutableInteger;
 import nars.util.gng.NeuralGasNet;
@@ -19,9 +16,7 @@ import nars.util.gng.Node;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 
@@ -51,28 +46,41 @@ public class STMClustered extends STM {
 
         @Override
         public String toString() {
-            return id + "<<" + super.toString() + ">>:" + tasks;
+            return super.toString() + ":" + tasks;
         }
 
-        public void enter(TLink x) {
+        public void transfer(TLink x) {
             TasksNode previous = x.node;
             if (previous == this)
                 return; //nothing to do
 
-            if (previous!=null) {
+            if (previous != null) {
                 previous.remove(x);
             }
-            tasks.add(x);
-            x.node = this;
+            insert(x);
         }
 
         protected void remove(TLink x) {
             tasks.remove(x);
         }
 
+        public int size() {
+            return tasks.size();
+        }
+
+        public void insert(TLink x) {
+            tasks.add(x);
+            x.node = this;
+        }
+
+        public void delete() {
+            tasks.clear();
+        }
     }
 
-    /** temporal link, centroid */
+    /**
+     * temporal link, centroid
+     */
     public final class TLink extends BLink.StrongBLink<Task> {
 
         public final double[] coord;
@@ -91,22 +99,33 @@ public class STMClustered extends STM {
                     ">>";
         }
 
-        @Override public boolean commit() {
+        @Override
+        public boolean commit() {
             priSub(cycleCost(id));
-            net.learn(coord).enter(this);
+            nearest().transfer(this);
             return super.commit();
+        }
+
+        public TasksNode nearest() {
+            return net.learn(coord);
         }
 
         @Override
         public void delete() {
-            if (node!=null) {
+            if (node != null) {
                 node.remove(this);
             }
             super.delete();
         }
+
+        public void migrate() {
+            nearest().insert(this);
+        }
     }
 
-    /** amount of priority subtracted from the priority each iteration */
+    /**
+     * amount of priority subtracted from the priority each iteration
+     */
     private float cycleCost(Task id) {
         float dt = Math.abs(id.occurrence() - now);
         return forgetRate * dt / (1f + id.conf());
@@ -120,6 +139,8 @@ public class STMClustered extends STM {
         return c;
     }
 
+    final Deque<TasksNode> removed = new ArrayDeque<>();
+
     public STMClustered(@NotNull NAR nar, MutableInteger capacity) {
         super(nar, capacity);
 
@@ -130,19 +151,22 @@ public class STMClustered extends STM {
             }
         };
         this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
-            @NotNull @Override public STMClustered.TasksNode newNode(int i, int dims) {
+            @NotNull
+            @Override
+            public STMClustered.TasksNode newNode(int i, int dims) {
                 return new TasksNode(i, dims);
             }
 
             @Override
-            protected void beforeRemove(TasksNode furthest) {
-                System.err.println("node being removed: " + furthest);
+            protected void removed(TasksNode furthest) {
+                System.err.println("node removed: " + furthest);
+                removed.add(furthest);
             }
         };
 
         now = nar.time();
 
-        nar.onFrame(n-> {
+        nar.onFrame(n -> {
             //update each frame
             bag.setCapacity(capacity.intValue());
         });
@@ -154,6 +178,16 @@ public class STMClustered extends STM {
     }
 
     private void cycle() {
+
+        int rr = removed.size();
+        for (int i = 0; i < rr; i++) {
+            TasksNode t = removed.pollFirst();
+            t.tasks.forEach(TLink::migrate);
+            t.delete();
+        }
+
+
+
         now = nar.time();
         bag.commit();
 
@@ -167,17 +201,38 @@ public class STMClustered extends STM {
 
     @Override
     public void accept(@NotNull Task t) {
-        bag.put(t, t.budget());
+
+        TLink displaced = (TLink) bag.put(t, t.budget());
+
+        if (displaced != null)
+            drop(displaced);
+
+    }
+
+    protected void drop(TLink displaced) {
+        TasksNode owner = displaced.node;
+        if (owner != null)
+            owner.remove(displaced);
+    }
+
+    public int size() {
+        return bag.size();
     }
 
     public void print(PrintStream out) {
-        out.println(this + " @" + now);
-        bag.forEach(b -> {
+        out.println(this + " @" + now + ", x " + size() + " tasks");
+        out.println("\t" + distributionStatistics() + "\t" + removed.size() + " nodes pending migration ("
+         + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
+        /*bag.forEach(b -> {
             out.println(b);
-        });
+        });*/
         out.println(Joiner.on('\n').join(net.vertexSet()));
         out.println(Joiner.on(' ').join(net.edgeSet()));
         out.println();
+    }
+
+    public IntSummaryStatistics distributionStatistics() {
+        return net.vertexSet().stream().mapToInt(v -> v.size()).summaryStatistics();
     }
 
 
@@ -214,19 +269,20 @@ public class STMClustered extends STM {
 
     public static void main(String[] args) {
         Default n = new Default();
-        STMClustered stm = new STMClustered(n, new MutableInteger(64));
+        STMClustered stm = new STMClustered(n, new MutableInteger(16));
 
-        new EventGenerator(n, 4f, 8) {
+        new EventGenerator(n, 2f, 8) {
 
             Compound term(int u) {
                 return $.sete($.the(u));
             }
 
-            @Override Task task(int u) {
-                return new MutableTask(term(u), '.', new DefaultTruth( (float)Math.random(), 0.5f) ).time(now, now);
+            @Override
+            Task task(int u) {
+                return new MutableTask(term(u), '.', new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
             }
         };
 
-        n.run(16);
+        n.run(24);
     }
 }
