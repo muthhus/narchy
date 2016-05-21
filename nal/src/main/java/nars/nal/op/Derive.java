@@ -63,7 +63,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         this.id = "Derive(" +
                 Joiner.on(',').join(
                     term,
-                    "temporalize_" + temporalizer.hashCode(),
+                    "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
                     beliefSingle ? "Bs" : "Bd",
                     goalSingle ? "Gs" : "Gd",
                     eternalize ? "Et" : "_") +

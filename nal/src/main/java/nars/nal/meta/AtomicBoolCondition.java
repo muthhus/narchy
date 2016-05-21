@@ -22,6 +22,10 @@ public abstract class AtomicBoolCondition extends AtomicStringConstant implement
     public abstract String toString();
 
 
+    /** just attempts to evaluate the condition, causing any desired side effects as a result */
+    @Override public final void accept(PremiseEval m) {
+        BoolCondition.run(this, m);
+    }
 
 //    @NotNull
 //    public String toJavaConditionString() {

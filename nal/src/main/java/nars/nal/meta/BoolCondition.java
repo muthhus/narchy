@@ -10,7 +10,7 @@ import static nars.Op.ATOM;
 /**
  * Created by me on 12/31/15.
  */
-public interface BoolCondition extends Term, BooleanFunction<PremiseEval> {
+public interface BoolCondition extends Term, BooleanFunction<PremiseEval>, ProcTerm {
 
 
 
@@ -19,5 +19,11 @@ public interface BoolCondition extends Term, BooleanFunction<PremiseEval> {
     @Override
     default Op op() {
         return ATOM; //shouldnt this be a product?
+    }
+
+    static void run(BoolCondition b, PremiseEval m) {
+        final int stack = m.now();
+        b.booleanValueOf(m);
+        m.revert(stack);
     }
 }

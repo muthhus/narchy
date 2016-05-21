@@ -3,7 +3,6 @@ package nars.nal.meta.op;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
-import nars.Op;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.Derive;
@@ -107,7 +106,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
                     om = derive.iterator().next();
                     break;
                 default:
-                    om = ThenFork.compile(derive.toArray(new Derive[derive.size()]));
+                    om = Fork.compile(derive.toArray(new Derive[derive.size()]));
                     break;
             }
 

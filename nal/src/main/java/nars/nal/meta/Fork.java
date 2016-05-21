@@ -10,13 +10,13 @@ import java.util.List;
 
 
 /** parallel branching */
-public final class ThenFork extends GenericCompound<ProcTerm> implements ProcTerm {
+public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
     @NotNull
     protected final ProcTerm[] termCache;
 
 
 
-    protected ThenFork(ProcTerm[] actions) {
+    protected Fork(ProcTerm[] actions) {
         super(Op.CONJUNCTION, TermSet.the(actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
@@ -41,7 +41,7 @@ public final class ThenFork extends GenericCompound<ProcTerm> implements ProcTer
         switch (n.length) {
             case 0: return null;
             case 1: return n[0];
-            default: return new ThenFork(n);
+            default: return new Fork(n);
         }
     }
 

@@ -3,14 +3,11 @@ package nars.nal.meta;
 import com.google.common.collect.Lists;
 import javassist.*;
 import nars.Global;
-import nars.Op;
 import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.Derive;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.compound.GenericCompound;
-import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -116,7 +113,7 @@ public class TrieDeriver extends Deriver {
 
             ProcTerm branch = ifThen(
                 conditions(n.seq().subList(n.start(), n.end()), matchParent),
-                ThenFork.compile(subtree(n))
+                Fork.compile(subtree(n))
             );
 
             if (branch!=null)
@@ -161,23 +158,23 @@ public class TrieDeriver extends Deriver {
                 build(it.conseq);
             }
 
-        } else if (p instanceof If) {
+        } //else if (p instanceof If) {
 
-            {
-                If it = (If) p;
-                build(it.cond);
-            }
+//            {
+//                If it = (If) p;
+//                build(it.cond);
+//            }
 
-        } else if (p instanceof AndCondition) {
+        else if (p instanceof AndCondition) {
             {
                 AndCondition ac = (AndCondition) p;
                 for (BoolCondition b : ac.termCache) {
                     build(b);
                 }
             }
-        } else if (p instanceof ThenFork) {
+        } else if (p instanceof Fork) {
             {
-                ThenFork ac = (ThenFork) p;
+                Fork ac = (Fork) p;
                 for (ProcTerm b : ac.termCache) {
                     build(b);
                 }
@@ -208,7 +205,7 @@ public class TrieDeriver extends Deriver {
             }
             indent(indent); out.println("}");
 
-        } else if (p instanceof If) {
+        } /*else if (p instanceof If) {
 
             indent(indent); out.println(Util.className(p) + " {");
             {
@@ -217,7 +214,7 @@ public class TrieDeriver extends Deriver {
             }
             indent(indent); out.println("}");
 
-        } else if (p instanceof AndCondition) {
+        } */ else if (p instanceof AndCondition) {
             indent(indent); out.println(Util.className(p) + " {");
             {
                 AndCondition ac = (AndCondition) p;
@@ -226,10 +223,10 @@ public class TrieDeriver extends Deriver {
                 }
             }
             indent(indent); out.println("}");
-        } else if (p instanceof ThenFork) {
+        } else if (p instanceof Fork) {
             indent(indent); out.println(Util.className(p) + " {");
             {
-                ThenFork ac = (ThenFork) p;
+                Fork ac = (Fork) p;
                 for (ProcTerm b : ac.termCache) {
                     print(b, out, indent + 2);
                 }
@@ -321,7 +318,7 @@ public class TrieDeriver extends Deriver {
 
         if (cc!=null) {
 
-            return conseq == null ? new If(cc) : new IfThen(cc, conseq);
+            return conseq == null ? cc : new IfThen(cc, conseq);
 
         } else {
             /*if (conseq!=null)
@@ -406,49 +403,49 @@ public class TrieDeriver extends Deriver {
 //    }
 
 
-    static final class Return extends Atom implements ProcTerm {
+//    static final class Return extends Atom implements ProcTerm {
+//
+//        public static final ProcTerm the = new Return();
+//
+//        private Return() {
+//            super("return");
+//        }
+//
+//
+//        @Override
+//        public void appendJavaProcedure(@NotNull StringBuilder s) {
+//            s.append("return;");
+//        }
+//
+//        @Override
+//        public void accept(PremiseEval versioneds) {
+//            System.out.println("why call this");
+//            //throw new UnsupportedOperationException("should not be invoked");
+//        }
+//
+//    }
 
-        public static final ProcTerm the = new Return();
-
-        private Return() {
-            super("return");
-        }
-
-
-        @Override
-        public void appendJavaProcedure(@NotNull StringBuilder s) {
-            s.append("return;");
-        }
-
-        @Override
-        public void accept(PremiseEval versioneds) {
-            System.out.println("why call this");
-            //throw new UnsupportedOperationException("should not be invoked");
-        }
-
-    }
-
-    /** just evaluates a boolean condition HACK */
-    static final class If extends GenericCompound implements ProcTerm {
-
-
-        public final transient @NotNull BoolCondition cond;
-
-
-        public If(@NotNull BoolCondition cond) {
-            super(Op.IMPLICATION,
-                    TermVector.the( cond, Return.the)
-            );
-
-            this.cond = cond;
-        }
-
-        @Override public void accept(@NotNull PremiseEval m) {
-            final int stack = m.now();
-            cond.booleanValueOf(m);
-            m.revert(stack);
-        }
-
-    }
+//    /** just evaluates a boolean condition HACK */
+//    static final class If extends GenericCompound implements ProcTerm {
+//
+//
+//        public final transient @NotNull BoolCondition cond;
+//
+//
+//        public If(@NotNull BoolCondition cond) {
+//            super(Op.IMPLICATION,
+//                    TermVector.the( cond, Return.the)
+//            );
+//
+//            this.cond = cond;
+//        }
+//
+//        @Override public void accept(@NotNull PremiseEval m) {
+//            final int stack = m.now();
+//            cond.booleanValueOf(m);
+//            m.revert(stack);
+//        }
+//
+//    }
 
 }
