@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 
 
 public class STMClustered extends STM {
@@ -36,12 +37,35 @@ public class STMClustered extends STM {
 
     final float forgetRate = 0.01f; //TODO tune based on capacity, window size, etc.
 
+    //final float timeResolution = 0.5f;
+
     public final class TasksNode extends Node {
 
         public final Set<TLink> tasks = new HashSet();
 
         public TasksNode(int id, int dimensions) {
             super(id, dimensions);
+            discretize();
+        }
+
+        @Override
+        public void update(double rate, double[] x) {
+            super.update(rate, x);
+            discretize();
+        }
+
+        @Override
+        public void add(double[] x) {
+            super.add(x);
+            discretize();
+        }
+
+        protected void discretize() {
+//            final double[] d = getDataRef();
+//            double t = d[TIME];
+//            d[TIME] = Math.round(t);
+//            double p = d[PUNC];
+//            d[PUNC] = p < 0 ? -1 : 1; //force to polarize -1 (goal) or +1 (belief)
         }
 
         @Override
@@ -221,8 +245,9 @@ public class STMClustered extends STM {
 
     public void print(PrintStream out) {
         out.println(this + " @" + now + ", x " + size() + " tasks");
-        out.println("\t" + distributionStatistics() + "\t" + removed.size() + " nodes pending migration ("
-         + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
+        out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
+            + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
+        out.println("\tBag Priority: " + bagStatistics());
         /*bag.forEach(b -> {
             out.println(b);
         });*/
@@ -231,8 +256,12 @@ public class STMClustered extends STM {
         out.println();
     }
 
-    public IntSummaryStatistics distributionStatistics() {
+    public IntSummaryStatistics nodeStatistics() {
         return net.vertexSet().stream().mapToInt(v -> v.size()).summaryStatistics();
+    }
+
+    public DoubleSummaryStatistics bagStatistics() {
+        return StreamSupport.stream(bag.spliterator(), false).mapToDouble(v -> v.pri()).summaryStatistics();
     }
 
 
@@ -279,7 +308,7 @@ public class STMClustered extends STM {
 
             @Override
             Task task(int u) {
-                return new MutableTask(term(u), '.', new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
+                return new MutableTask(term(u), (Math.random() < 0.5f) ? '.' : '!', new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
             }
         };
 
