@@ -116,7 +116,9 @@ abstract public class TermTrie<K extends Term, V> {
 
     public static <K,V> void costAnalyze(FloatFunction<K> costFn, SummaryStatistics termCost, SummaryStatistics sequenceLength, SummaryStatistics branchFanOut, SummaryStatistics endDepth, int[] currentDepth, TrieNode<List<K>, V> root) {
 
-        branchFanOut.addValue(root.childCount());
+        int nc = root.childCount();
+        if (nc > 0)
+            branchFanOut.addValue(nc);
 
         root.forEach(n -> {
             List<K> seq = n.seq();

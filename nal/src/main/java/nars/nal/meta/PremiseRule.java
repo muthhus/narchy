@@ -34,6 +34,7 @@ import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,10 +54,12 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
+    transient private char taskPunc = 0;
+
     @Override
     public String toString() {
         return "PremiseRule{" +
-                "\t prePreconditions=" + Arrays.toString(prePreconditions) +
+                "\t prePreconditions=" + Arrays.toString(precon) +
                 "\t match=" + match +
                 "\t postconditions=" + Arrays.toString(postconditions) +
                 "\t temporalize=" + temporalize +
@@ -103,7 +106,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before term matching
      */
-    public BoolCondition[] prePreconditions;
+    public BoolCondition[] precon;
 
 
     public PostCondition[] postconditions;
@@ -216,36 +219,48 @@ public class PremiseRule extends GenericCompound {
 
 
     /**
-     * add the sequence of involved conditions to a list, for one given postcondition (ex: called for each this.postconditions)
+     * compiles the conditions which are necessary to activate this rule
      */
     @NotNull
     public List<Term> conditions(@NotNull PostCondition post) {
 
+        Set<Term> s = Global.newHashSet(2); //for ensuring uniqueness / no duplicates
+
+        addAll(s, precon);
+
         Solve truth = solve(post, this, anticipate, eternalize, temporalize );
+        s.add(truth);
+
+        //if no specific task punctuation has been set, then add a Punctuation Guard, early avoidance of Goals being tested in the Solve
+        if (taskPunc==0) {
+            if (truth.desire == null && truth.belief != null)
+                s.add(TaskPunctuation.NotGoal);
+            if (truth.belief == null && truth.desire != null)
+                s.add(TaskPunctuation.NotBelief);
+        }
 
 
-        List<Term> l = Global.newArrayList(prePreconditions.length + 4 /* estimate */);
 
-        addAll(l, prePreconditions);
+        List<Term> l = sort(new FasterList(s));
 
-        l.add(truth);
-
-        sortPreconditions(l);
+        //SUFFIX
 
         addAll(l, match.code);
 
         l.add(truth.derive); //will be linked to and invoked by match callbacks
 
-
         return l;
     }
 
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
+        put(SubTermOp.class, 11);
+
         put(TaskPunctuation.class, 10);
+        put(events.class, 10);
+
         put(TaskNegative.class, 9);
         put(TaskPositive.class, 9);
 
-        put(SubTermOp.class, 7);
         put(SubTermStructure.class, 3);
         put(Solve.class, 1);
 
@@ -257,9 +272,13 @@ public class PremiseRule extends GenericCompound {
     }};
 
     private static Class<? extends Term> preconditionClass(Term b) {
-        if (b == TaskPunctuation.TaskGoal) return TaskPunctuation.class;
-        if (b == TaskPunctuation.TaskJudgment) return TaskPunctuation.class;
-        if (b == TaskPunctuation.TaskQuestion) return TaskPunctuation.class;
+        if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
+        if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
+        if (b == TaskPunctuation.Question) return TaskPunctuation.class;
+
+        if (b == events.after) return events.class;
+        if (b == events.afterOrEternal) return events.class;
+        if (b == events.ifTermLinkIsBefore) return events.class;
 
         if (b instanceof Solve) return Solve.class;
 
@@ -271,7 +290,7 @@ public class PremiseRule extends GenericCompound {
      * the goal of this is to maximally fold subexpressions while also
      * pulling the cheapest and most discriminating tests to the beginning.
      */
-    private static void sortPreconditions(@NotNull List<Term> l) {
+    private static List<Term> sort(@NotNull List<Term> l) {
         Collections.sort(l, (a, b) -> {
             //higher is earlier
             Object bc = preconditionClass(b);
@@ -283,8 +302,7 @@ public class PremiseRule extends GenericCompound {
             if (i != 0) return i;
             return b.compareTo(a);
         });
-
-
+        return l;
     }
 
 
@@ -721,13 +739,16 @@ public class PremiseRule extends GenericCompound {
                             preNext = TaskPositive.the;
                             break;
                         case "\"?\"":
-                            preNext = TaskPunctuation.TaskQuestion;
+                            preNext = TaskPunctuation.Question;
+                            taskPunc = '?';
                             break;
                         case "\".\"":
-                            preNext = TaskPunctuation.TaskJudgment;
+                            preNext = TaskPunctuation.Belief;
+                            taskPunc = '.';
                             break;
                         case "\"!\"":
-                            preNext = TaskPunctuation.TaskGoal;
+                            preNext = TaskPunctuation.Goal;
+                            taskPunc = '!';
                             break;
                         default:
                             throw new RuntimeException("Unknown task punctuation type: " + arg1.toString());
@@ -757,7 +778,7 @@ public class PremiseRule extends GenericCompound {
 
 
         //store to arrays
-        prePreconditions = pres.toArray(new BoolCondition[pres.size()]);
+        this.precon = pres.toArray(new BoolCondition[pres.size()]);
 
 
         List<PostCondition> postConditions = Global.newArrayList();

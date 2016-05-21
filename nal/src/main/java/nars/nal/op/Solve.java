@@ -21,8 +21,8 @@ abstract public class Solve extends AtomicBoolCondition {
 
     public final Derive derive;
 
-    protected final TruthOperator belief;
-    protected final TruthOperator desire;
+    public final TruthOperator belief;
+    public final TruthOperator desire;
 
     public Solve(String id, Derive derive, TruthOperator belief, TruthOperator desire) {
         super();

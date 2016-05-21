@@ -15,34 +15,32 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public final String id;
 
 
-    public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
+    public static final TaskPunctuation Belief = new TaskPunctuation('.');
+    public static final TaskPunctuation Goal = new TaskPunctuation('!');
 
-    public static final @Nullable AtomicBoolCondition TaskQuestion = new AtomicBoolCondition() {
-
-        @Override
-        public boolean booleanValueOf(@NotNull PremiseEval o) {
-            char taskPunc = o.punct.get();
-            return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
+    public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
+        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+            return o.premise.task().isQuestOrQuestion();
         }
-
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return "task:\"?\"";
         }
-
     };
 
-//    public static final TaskPunctuation TaskNotQuestion = new TaskPunctuation(
-//            ' ' /* this char wont be used */, "Punc{.|!}") {
-//        @Override protected final boolean test(char taskPunc) {
-//            return taskPunc != Symbols.QUESTION && taskPunc != Symbols.QUEST;
-//        }
-//
-//    };
+    public static final AtomicBoolCondition NotGoal = new AtomicBoolCondition()  {
+        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+            return (o.premise.task().punc() != Symbols.GOAL);
+        }
+        @Override public String toString() { return "task:\".?@\""; }
+    };
+    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
+        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+            return (o.premise.task().punc() != Symbols.BELIEF);
+        }
+        @Override public String toString() { return "task:\"!?@\""; }
+    };
 
 
-
-    public static final TaskPunctuation TaskGoal = new TaskPunctuation('!');
 
     TaskPunctuation(char p) {
         this(p, "task:\"" + p + '\"');
@@ -61,7 +59,8 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 
     @Override
     public final boolean booleanValueOf(@NotNull PremiseEval m) {
-        return m.punct.get() == punc;
+        return m.premise.task().punc() == punc;
+        //return m.punct.get() == punc;
     }
 
     //    @NotNull
