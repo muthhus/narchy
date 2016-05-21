@@ -1,11 +1,18 @@
 package nars.op.time;
 
+import com.google.common.base.Joiner;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
+import nars.nar.Default;
+import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.truth.DefaultTruth;
 import nars.util.data.MutableInteger;
 import nars.util.gng.NeuralGasNet;
 import nars.util.gng.Node;
@@ -15,6 +22,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 
 public class STMClustered extends STM {
@@ -41,7 +49,10 @@ public class STMClustered extends STM {
             super(id, dimensions);
         }
 
-
+        @Override
+        public String toString() {
+            return id + "<<" + super.toString() + ">>:" + tasks;
+        }
 
         public void enter(TLink x) {
             TasksNode previous = x.node;
@@ -67,8 +78,8 @@ public class STMClustered extends STM {
         public final double[] coord;
         TasksNode node;
 
-        public TLink(Task t, @NotNull Budgeted b, float scal) {
-            super(t, b, scal);
+        public TLink(Task t, @NotNull Budgeted b, float scale) {
+            super(t, b, scale);
             this.coord = getCoord(t);
         }
 
@@ -76,13 +87,13 @@ public class STMClustered extends STM {
         public String toString() {
             return id + "<<" +
                     Arrays.toString(coord) +
-                    "|" + node +
+                    "|" + node.id +
                     ">>";
         }
 
         @Override public boolean commit() {
             priSub(cycleCost(id));
-            net.closest(coord).enter(this);
+            net.learn(coord).enter(this);
             return super.commit();
         }
 
@@ -115,12 +126,17 @@ public class STMClustered extends STM {
         this.bag = new ArrayBag<Task>(1) {
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
-                return super.newLink(i, b, scale);
+                return new TLink(i, b, scale);
             }
         };
         this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
-            @NotNull @Override public STMClustered.TasksNode newNode(int dimension, int i) {
-                return new TasksNode(dimension, i);
+            @NotNull @Override public STMClustered.TasksNode newNode(int i, int dims) {
+                return new TasksNode(i, dims);
+            }
+
+            @Override
+            protected void beforeRemove(TasksNode furthest) {
+                System.err.println("node being removed: " + furthest);
             }
         };
 
@@ -159,5 +175,58 @@ public class STMClustered extends STM {
         bag.forEach(b -> {
             out.println(b);
         });
+        out.println(Joiner.on('\n').join(net.vertexSet()));
+        out.println(Joiner.on(' ').join(net.edgeSet()));
+        out.println();
+    }
+
+
+    abstract static class EventGenerator implements Consumer<NAR> {
+
+        private final NAR n;
+        private final float averageTasksPerFrame;
+        //private final float variation;
+        private final int uniques;
+        protected long now;
+
+        public EventGenerator(NAR n, float averageTasksPerFrame, /*float variation,*/ int uniques) {
+            this.n = n;
+            this.averageTasksPerFrame = averageTasksPerFrame;
+            //this.variation = variation;
+            this.uniques = uniques;
+
+            n.onFrame(this);
+        }
+
+        @Override
+        public void accept(NAR nar) {
+            now = n.time();
+
+            int numInputs = (int) Math.round(Math.random() * averageTasksPerFrame);
+            for (int i = 0; i < numInputs; i++) {
+                int u = (int) Math.floor(Math.random() * uniques);
+                nar.input(task(u));
+            }
+        }
+
+        abstract Task task(int u);
+    }
+
+    public static void main(String[] args) {
+        Default n = new Default();
+        STMClustered stm = new STMClustered(n, new MutableInteger(64));
+
+        new EventGenerator(n, 4f, 8) {
+
+            Compound term(int u) {
+                return $.sete($.the(u));
+            }
+
+            @Override Task task(int u) {
+                return new MutableTask(term(u), '.', new DefaultTruth( (float)Math.random(), 0.5f) ).time(now, now);
+            }
+        };
+
+        n.run(16);
     }
 }

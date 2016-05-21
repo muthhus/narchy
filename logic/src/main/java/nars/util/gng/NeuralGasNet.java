@@ -1,12 +1,9 @@
 package nars.util.gng;
 
-import jdk.nashorn.internal.objects.Global;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.SimpleGraph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,7 +99,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
 
 
         for (int i = 0; i < maxNodes; i++) {
-            addVertex((N)newNode(dimension, i).randomizeUniform(-1.0, 1.0));
+            addVertex((N)newNode(i, dimension).randomizeUniform(-1.0, 1.0));
         }
 
 
@@ -116,7 +113,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
     }
 
     @NotNull
-    abstract public N newNode(int dimension, int i);
+    abstract public N newNode(int i, int dims);
 
     public N closest(double... x) {
         //find closest nodes
@@ -140,7 +137,6 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
 
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
-        double minDist2 = Double.POSITIVE_INFINITY;
         double maxDist = Double.NEGATIVE_INFINITY;
         N closest = null;
         N nextClosestNode = null;
@@ -158,6 +154,8 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
             }
 
         }
+
+        double minDist2 = Double.POSITIVE_INFINITY;
         for (N node : vertexSet()) {
             if (node == closest) continue;
             double dd = node.getLocalDistanceSq(); //TODO cache this localDist
@@ -170,6 +168,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
 
         if (closest == null || nextClosestNode == null) {
             throw new RuntimeException("closest=" + closest + ", nextClosest=" + nextClosestNode);
+            //return lastNode;
         }
 
         //update local error of the "winner"
@@ -213,8 +212,8 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         if (iteration != 0 && iteration % getLambda() == 0) {
 
             int nextID = furthest.id;
+            beforeRemove(furthest);
             removeVertex(furthest);
-
 
             //find node with maximal local error
             double maxError = Double.NEGATIVE_INFINITY;
@@ -256,7 +255,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
             //System.out.println("creating new node " + nextID + " in: " + vertexSet());
 
             //create node between errorest nodes
-            N newNode = newNode(dimension, nextID);
+            N newNode = newNode(nextID, dimension);
             newNode.set(maxErrorNode, maxErrorNeighbour);
             addVertex(newNode);
 
@@ -298,6 +297,11 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         iteration++;
 
         return closest;
+    }
+
+    /** called before a node will be removed */
+    protected void beforeRemove(N furthest) {
+
     }
 
     private void addEdge(Connection<N> connection) {

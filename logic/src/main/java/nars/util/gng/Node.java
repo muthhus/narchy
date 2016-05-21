@@ -34,7 +34,7 @@ public class Node extends ArrayRealVector  {
 
         setLocalError(maxErrorNode.getLocalError());
         double[] d= getDataRef();
-        for (int i = 0; i < getDimension(); i++) {
+        for (int i = 0; i < d.length; i++) {
             d[i] =  (maxErrorNode.getEntry(i) + maxErrorNeighbour.getEntry(i)) / 2;
         }
     }

@@ -64,7 +64,7 @@ public abstract class AbstractNAR extends NAR {
 
         executionThreshold.setValue(Global.TRUTH_EPSILON);
 
-        shortTermMemoryHistory.set(2);
+
 
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractNAR extends NAR {
     /** NAL7 plugins */
     public void initNAL7() {
 
-        the(new STMTemporalLinkage(this));
+        the(new STMTemporalLinkage(this, 2)); //TEMPORARY
     }
 
     /* NAL8 plugins */
