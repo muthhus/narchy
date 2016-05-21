@@ -145,24 +145,43 @@ public class TrieDeriver extends Deriver {
             if (p instanceof IfThen) {
                 IfThen ii = (IfThen) p;
                 BoolCondition cond = ii.cond;
+                ProcTerm cnsq = ii.conseq;
                 if (cond instanceof SubTermOp) {
                     SubTermOp so = (SubTermOp) cond;
                     if (so.subterm == subterm) {
-                        cases.put(so, ii.conseq);
-                        removed.add(p);
-                        return true;
+                        if (null == cases.putIfAbsent(so, cnsq)) {
+                            removed.add(p);
+                            return true;
+                        }
                     }
                 } else if (cond instanceof AndCondition) {
                     //TODO extract it
+                    AndCondition ac = (AndCondition)cond;
+                    for (Term x : ac.terms()) {
+                        if (x instanceof SubTermOp) {
+                            SubTermOp so = (SubTermOp)x;
+                            if (so.subterm == subterm) {
+                                if (null == cases.putIfAbsent(so, new IfThen(ac.without(so), cnsq) )) {
+                                    removed.add(p);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             return false;
         });
 
+
+
         if (cases.size() > minToCreateSwitch) {
+            if (cases.size()!=removed.size()) {
+                throw new RuntimeException("switch fault");
+            }
             bb.add(new SubTermOpSwitch(subterm, cases));
         } else {
-            bb.addAll(removed);
+            bb.addAll(removed); //undo
         }
 
         return bb;
