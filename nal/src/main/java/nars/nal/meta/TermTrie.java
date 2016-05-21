@@ -95,7 +95,8 @@ abstract public class TermTrie<K extends Term, V> {
     }
 
 
-    public SummaryStatistics costAnalyze(FloatFunction<K> costFn, PrintStream o) {
+    //TODO use the compiled rule trie
+    @Deprecated public SummaryStatistics costAnalyze(FloatFunction<K> costFn, PrintStream o) {
 
         SummaryStatistics termCost = new SummaryStatistics();
         SummaryStatistics sequenceLength = new SummaryStatistics();

@@ -158,6 +158,7 @@ public class TrieDeriverTest {
     }
 
     @Test public void printCompiledRuleTree() {
+
         d.print(System.out);
     }
 

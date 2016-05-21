@@ -5,6 +5,7 @@ import javassist.*;
 import nars.Global;
 import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
+import nars.nal.meta.op.SubTermOp;
 import nars.nal.op.Derive;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -18,6 +19,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -125,14 +127,36 @@ public class TrieDeriver extends Deriver {
 
     protected List<ProcTerm> optimize(List<ProcTerm> bb) {
 
-        bb = factorSubOpToSwitch(bb, 0);
-        bb = factorSubOpToSwitch(bb, 1);
+        bb = factorSubOpToSwitch(bb, 0, 3);
+        bb = factorSubOpToSwitch(bb, 1, 3);
 
         return bb;
     }
 
-    private List<ProcTerm> factorSubOpToSwitch(List<ProcTerm> bb, int i) {
+    private List<ProcTerm> factorSubOpToSwitch(List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
+        Map<SubTermOp, ProcTerm> cases = Global.newHashMap();
+        List<ProcTerm> removed = Global.newArrayList(); //in order to undo
+        bb.removeIf(p -> {
+            if (p instanceof IfThen) {
+                IfThen ii = (IfThen)p;
+                BoolCondition cond = ii.cond;
+                if (cond instanceof SubTermOp) {
+                    SubTermOp so = (SubTermOp)cond;
+                    if (so.subterm == subterm) {
+                        cases.put(so, ii.conseq);
+                        removed.add(p);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
 
+        if (cases.size() > minToCreateSwitch) {
+            bb.add(new SubTermOpSwitch(subterm, cases));
+        } else {
+            bb.addAll(removed);
+        }
 
         return bb;
     }

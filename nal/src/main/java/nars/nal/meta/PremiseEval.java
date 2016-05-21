@@ -60,7 +60,7 @@ public class PremiseEval extends FindSubst {
 
 
     /** cached value */
-    private int termSub1Op, termSub2Op;
+    private int termSub0op, termSub1op;
     private int termSub1Struct, termSub2Struct;
 
     /** initializes with the default static term index/builder */
@@ -164,9 +164,9 @@ public class PremiseEval extends FindSubst {
 
         term.set( taskTerm, beliefTerm );
         this.termSub1Struct = taskTerm.structure();
-        this.termSub1Op = taskTerm.op().ordinal();
+        this.termSub0op = taskTerm.op().ordinal();
         this.termSub2Struct = beliefTerm.structure();
-        this.termSub2Op = beliefTerm.op().ordinal();
+        this.termSub1op = beliefTerm.op().ordinal();
 
         //term.set( termPattern );
 
@@ -222,7 +222,10 @@ public class PremiseEval extends FindSubst {
      * @param subterm 0 or 1, indicating task or belief
      * */
     public final boolean subTermIs(int subterm, int op) {
-        return (subterm==0 ? termSub1Op : termSub2Op) == op;
+        return (subterm==0 ? termSub0op : termSub1op) == op;
+    }
+    public final int subOp(int i /* 0 or 1 */) {
+        return (i == 0 ? termSub0op : termSub1op);
     }
 
     /** @param subterm 0 or 1, indicating task or belief */
