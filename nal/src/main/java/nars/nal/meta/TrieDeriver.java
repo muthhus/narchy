@@ -83,6 +83,7 @@ public class TrieDeriver extends Deriver {
         @NotNull List<ProcTerm> bb = subtree(trie.trie.root);
         this.roots = bb.toArray(new ProcTerm[bb.size()]);
 
+        build();
 
         /*
         for (ProcTerm<PremiseMatch> p : roots) {
@@ -144,39 +145,63 @@ public class TrieDeriver extends Deriver {
         for (ProcTerm p : roots)
             print(p, out, 0);
     }
+
+    public void build() {
+        print(System.out); //HACK just recurse to find the MatchTerm proc's
+    }
+
     public void print(Object p, @NotNull PrintStream out, int indent) {
 
-        indent(indent);
-        out.println( '<' + Util.className(p) + '>' );
+
+
 
         if (p instanceof IfThen) {
 
-            IfThen it = (IfThen)p;
-            print(it.cond, out, indent+2);
-            print(it.conseq, out, indent+4);
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                IfThen it = (IfThen) p;
+                print(it.cond, out, indent + 2);
+                print(it.conseq, out, indent + 2);
+            }
+            indent(indent); out.println("}");
+
         } else if (p instanceof If) {
-            If it = (If)p;
-            print(it.cond, out, indent+2);
+
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                If it = (If) p;
+                print(it.cond, out, indent + 2);
+            }
+            indent(indent); out.println("}");
+
         } else if (p instanceof AndCondition) {
-            AndCondition ac = (AndCondition)p;
-            for (BoolCondition b : ac.termCache) {
-                print(b, out, indent + 2);
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                AndCondition ac = (AndCondition) p;
+                for (BoolCondition b : ac.termCache) {
+                    print(b, out, indent + 2);
+                }
             }
+            indent(indent); out.println("}");
         } else if (p instanceof ThenFork) {
-            ThenFork ac = (ThenFork)p;
-            for (ProcTerm b : ac.termCache) {
-                print(b, out, indent + 2);
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                ThenFork ac = (ThenFork) p;
+                for (ProcTerm b : ac.termCache) {
+                    print(b, out, indent + 2);
+                }
             }
+            indent(indent); out.println("}");
+
         } else {
 
-            indent(indent+2);
-            out.println(  p );
+            if (p instanceof MatchTerm)
+                ((MatchTerm)p).build();
 
+            indent(indent);
+            out.println( Util.className(p) + ": " + p );
 
         }
-
-        indent(indent);
-        out.println( "</" + Util.className(p) +">" );
 
 //        node.forEach(n -> {
 //            List<A> seq = n.seq();

@@ -28,9 +28,10 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     public final MatchConstraint constraints;
 
     @NotNull
-    private final Term id;
+    private Term id;
 
     /** derivation handlers; use the array form for fast iteration */
+    //private final Set<Derive> derive = Global.newHashSet(1);
     private final Set<Derive> derive = Global.newHashSet(1);
     public final Term x;
 
@@ -44,7 +45,8 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     }
 
 
-    @Nullable static private Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    @Nullable
+    public static Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         return (constraints == null) ?
                 //no constraints
                 pattern :
@@ -66,32 +68,6 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 //        }
 //    }
 
-    public static final class MatchOneSubterm extends MatchTerm {
-
-        /** either 0 (task) or 1 (belief) */
-        private final int subterm;
-
-        @Nullable
-        private final MatchOneSubterm callback;
-
-        public MatchOneSubterm(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
-            super(
-                (subterm == 0 ?
-                        $.p(id(x,constraints), Op.Imdex) :
-                        $.p(Op.Imdex, id(x,constraints))),
-                x
-                , constraints);
-            this.subterm = subterm;
-            this.callback = finish ? this : null;
-        }
-
-        @Override
-        @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
-            p.matchAll(x, p.term.term(subterm) /* current term */, callback, constraints);
-            return true;
-        }
-    }
-
 
     @NotNull
     @Override
@@ -111,20 +87,33 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 
         //TODO HACK dont lazily instantiate this but do it after the TrieDeriver has finished building the rule trie by iterating all known MatchTerm's (in the LinkGraph)
         ProcTerm o = this.onMatch;
-        if (o == null) {
-            o = this.onMatch = init();
-        }
+
 
         o.accept(m);
     }
 
-    private final @NotNull ProcTerm init() {
-        switch (derive.size()) {
-            case 0: throw new RuntimeException("empty result procedure");
-            case 1: return derive.iterator().next();
-            default:
-                return ThenFork.compile(derive.toArray(new Derive[derive.size()]));
+    public final @NotNull ProcTerm build() {
+        if (this.onMatch == null) {
+            this.id = $.the("MatchTerm(" + id + ",{" + derive + "})");
+
+
+            ProcTerm om;
+
+            switch (derive.size()) {
+                case 0:
+                    om = null;
+                    break;
+                case 1:
+                    om = derive.iterator().next();
+                    break;
+                default:
+                    om = ThenFork.compile(derive.toArray(new Derive[derive.size()]));
+                    break;
+            }
+
+            this.onMatch = om;
         }
+        return this.onMatch;
     }
 
 //    @Override
