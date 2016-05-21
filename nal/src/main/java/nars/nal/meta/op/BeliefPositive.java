@@ -1,12 +1,12 @@
 package nars.nal.meta.op;
 
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 /* freq >= 0.5 */
-public final class BeliefPositive extends AtomicBooleanCondition<PremiseEval> {
+public final class BeliefPositive extends AtomicBoolCondition {
 
     public static final BeliefPositive the = new BeliefPositive();
 

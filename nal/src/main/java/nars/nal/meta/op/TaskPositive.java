@@ -1,12 +1,12 @@
 package nars.nal.meta.op;
 
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /* freq >= 0.5 */
-public final class TaskPositive extends AtomicBooleanCondition<PremiseEval> {
+public final class TaskPositive extends AtomicBoolCondition {
 
     public static final TaskPositive the = new TaskPositive();
 

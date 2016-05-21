@@ -462,12 +462,12 @@ public class TestTrie
       
       for (TrieNode<String, T> node : trie.nodeSetAll())
       {
-         for (int i = 0; i < node.getStart(); i++)
+         for (int i = 0; i < node.start(); i++)
          {
             out.append( ' ' );
          }
          
-         out.append( node.getSequence().substring( node.getStart(), node.getEnd() ) );
+         out.append( node.seq().substring( node.start(), node.end() ) );
          
          if (node.value != null)
          {

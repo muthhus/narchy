@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import com.google.common.collect.Lists;
 import nars.Op;
-import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -16,21 +15,21 @@ import java.util.List;
 /**
  * Created by me on 12/31/15.
  */
-public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> implements BooleanCondition<C> {
+public final class AndCondition extends GenericCompound<BoolCondition> implements BoolCondition {
 
     @NotNull
-    protected final BooleanCondition[] termCache;
+    protected final BoolCondition[] termCache;
 
-    public AndCondition(@NotNull BooleanCondition<C>[] p) {
+    /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
-    }
-    public AndCondition(@NotNull Collection<BooleanCondition<C>> p) {
-        this(new TermVector(p, BooleanCondition.class));
+    }*/
+    public AndCondition(@NotNull Collection<BoolCondition> p) {
+        this(new TermVector(p, BoolCondition.class));
     }
 
     public AndCondition(@NotNull TermContainer conds) {
         super(Op.CONJUNCTION, conds);
-        this.termCache = (BooleanCondition[]) conds.terms();
+        this.termCache = (BoolCondition[]) conds.terms();
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
     }
@@ -38,23 +37,22 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
 
 
     @Override
-    public final boolean booleanValueOf(C m) {
-        for (BooleanCondition x : termCache) {
+    public final boolean booleanValueOf(PremiseEval m) {
+        for (BoolCondition x : termCache) {
             if (!x.booleanValueOf(m))
                 return false;
         }
         return true;
     }
 
-    @Nullable
-    public static BooleanCondition<PremiseEval> the(@NotNull List<BooleanCondition<PremiseEval>> cond) {
+    public static @Nullable BoolCondition the(@NotNull List<BoolCondition> cond) {
 
         //remove suffix 'TRUE'
         int s = cond.size();
         if (s == 0) return null;
 
 
-        if (cond.get(s - 1) == BooleanCondition.TRUE) {
+        if (cond.get(s - 1) == BoolCondition.TRUE) {
             cond = cond.subList(0, s - 1);
             s--;
             if (s == 0) return null;
@@ -65,10 +63,9 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
         return new AndCondition(cond);
     }
 
-    @Nullable
-    public BooleanCondition<PremiseEval> without(BooleanCondition<C> condition) {
+    public @Nullable BoolCondition without(BoolCondition condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        BooleanCondition[] x = ArrayUtils.removeElement(termCache, condition);
+        BoolCondition[] x = ArrayUtils.removeElement(termCache, condition);
         if (x.length == termCache.length)
             throw new RuntimeException("element missing for removal");
 

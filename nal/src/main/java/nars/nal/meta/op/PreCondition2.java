@@ -1,12 +1,12 @@
 package nars.nal.meta.op;
 
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /** tests the resolved terms specified by pattern variable terms */
-public abstract class PreCondition2 extends AtomicBooleanCondition<PremiseEval> {
+public abstract class PreCondition2 extends AtomicBoolCondition {
     public final Term arg1, arg2;
     @NotNull
     private final String str;

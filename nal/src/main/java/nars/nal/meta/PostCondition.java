@@ -25,26 +25,23 @@ public class PostCondition implements Serializable, Level //since there can be m
     public final Term beliefTruth;
     public final Term goalTruth;
 
-    public PostCondition(@NotNull Term term, Term beliefTruth, Term goalTruth, char puncOverride) {
-        this.term = term;
-        //this.modifiers = modifiers;
-        this.beliefTruth = beliefTruth;
-        this.goalTruth = goalTruth;
-        this.puncOverride = puncOverride;
-        this.minNAL = Terms.maxLevel(term);// term.op().minLevel;
-    }
-
     @NotNull
-    public final Term term;
-    //public final Term[] modifiers;
+    public final Term pattern;
 
-    /** steps to apply before initially forming the derived task's term */
-    //public final PreCondition[] beforeConclusions;
 
     /**
      * minimum NAL level necessary to involve this postcondition
      */
     public final int minNAL;
+
+    public PostCondition(@NotNull Term pattern, Term beliefTruth, Term goalTruth, char puncOverride) {
+        this.pattern = pattern;
+        this.beliefTruth = beliefTruth;
+        this.goalTruth = goalTruth;
+        this.puncOverride = puncOverride;
+        this.minNAL = Terms.maxLevel(pattern);// term.op().minLevel;
+    }
+
 
     public static final Set<Atom> reservedMetaInfoCategories = new HashSet<>() {{
         add(the("Belief"));
@@ -204,7 +201,7 @@ public class PostCondition implements Serializable, Level //since there can be m
 
 
     boolean valid(@NotNull PremiseRule rule) {
-        Term term = this.term;
+        Term term = this.pattern;
 
         if (!modifiesPunctuation() && term instanceof Compound) {
             if (rule.getTask().equals(term) ||
@@ -232,7 +229,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     @Override
     public String toString() {
         return "PostCondition{" +
-                "term=" + term +
+                "term=" + pattern +
                 //", modifiers=" + Arrays.toString(modifiers) +
                 ", beliefTruth=" + beliefTruth +
                 ", goalTruth=" + goalTruth +

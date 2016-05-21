@@ -6,8 +6,8 @@ import com.google.common.primitives.Ints;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.Global;
 import nars.Op;
-import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.meta.BooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
+import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.constraint.AndConstraint;
@@ -27,7 +27,7 @@ import static com.gs.collections.impl.factory.Maps.immutable;
 
 
 @Deprecated
-public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
+public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     @NotNull
@@ -49,11 +49,11 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         this.term = pattern;
 
 
-        List<BooleanCondition<PremiseEval>> code = Global.newArrayList();
+        List<BoolCondition> code = Global.newArrayList();
 
         compile(pattern, code, constraints);
 
-        this.code = code.toArray(new BooleanCondition[code.size()]);
+        this.code = code.toArray(new BoolCondition[code.size()]);
 
 
         //Term beliefPattern = pattern.term(1);
@@ -92,7 +92,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
     private static void compile(@NotNull TaskBeliefPair pattern,
-                                @NotNull List<BooleanCondition<PremiseEval>> code,
+                                @NotNull List<BoolCondition> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
@@ -100,7 +100,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         @NotNull Term task = pattern.term(0);
         @NotNull Term belief = pattern.term(1);
 
-        BooleanCondition addToEndOfPreGuards = null;
+        BoolCondition addToEndOfPreGuards = null;
 
         //check for any self similarity
         if (task.equals(belief)) {
@@ -147,7 +147,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
     }
 
     private static void compileTaskBelief(
-            @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+            @NotNull List<BoolCondition> code, @Nullable Term task, @Nullable Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -262,7 +262,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
      * this would in theory be more efficient than performing a complete match for the redundancies
      * which we can determine as a precondition of the particular task/belief pair
      * before even beginning the match. */
-    static final class ComponentCondition extends AtomicBooleanCondition<PremiseEval> {
+    static final class ComponentCondition extends AtomicBoolCondition {
 
         @NotNull
         private final String id;

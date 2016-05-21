@@ -72,10 +72,10 @@ abstract public class TermTrie<K extends Term, V> {
     public static <A, B> void printSummary(@NotNull TrieNode<List<A>,B> node, @NotNull PrintStream out) {
 
         node.forEach(n -> {
-            List<A> seq = n.getSequence();
+            List<A> seq = n.seq();
 
-            int from = n.getStart();
-            int to = n.getEnd();
+            int from = n.start();
+            int to = n.end();
 
 
             out.print(n.getChildCount() + "|" + n.getSize() + "  ");

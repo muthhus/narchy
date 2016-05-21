@@ -58,7 +58,7 @@ public class DeriverTest {
 
         assertEquals("no duplicates", registeredRules, setRules.size());
 
-        Set<BooleanCondition> preconds = new HashSet();
+        Set<BoolCondition> preconds = new HashSet();
         int totalPrecond = 0;
 
         out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());

@@ -2,8 +2,8 @@ package nars.nal.meta.op;
 
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
-import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.meta.BooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
+import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Compound;
@@ -16,7 +16,7 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * True if the premise task and belief are both non-eternal events
  */
-abstract public class events extends AtomicBooleanCondition<PremiseEval> {
+abstract public class events extends AtomicBoolCondition {
 
     /** task is before or simultaneous with belief which follows (T ... B) */
     public static final events after = new events() {
@@ -73,8 +73,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
             }
         }
     };
-    @Nullable
-    public static final BooleanCondition ifTermLinkIsBefore = new events() {
+    public static final @Nullable BoolCondition ifTermLinkIsBefore = new events() {
         @Override
         public String toString() {
             return "ifTermLinkIsBefore";

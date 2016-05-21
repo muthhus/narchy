@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.Symbols;
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 8/27/15.
  */
-final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
+final public class TaskPunctuation extends AtomicBoolCondition {
 
     public final char punc;
     public final String id;
@@ -17,8 +17,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
 
     public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
 
-    @Nullable
-    public static final AtomicBooleanCondition<PremiseEval> TaskQuestion = new AtomicBooleanCondition<>() {
+    public static final @Nullable AtomicBoolCondition TaskQuestion = new AtomicBoolCondition() {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval o) {

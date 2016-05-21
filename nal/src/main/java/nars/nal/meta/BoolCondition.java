@@ -10,13 +10,13 @@ import static nars.Op.ATOM;
 /**
  * Created by me on 12/31/15.
  */
-public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
+public interface BoolCondition extends Term, BooleanFunction<PremiseEval> {
 
     /** contant TRUE condition */
-    BooleanCondition<PremiseEval> TRUE = new AtomicBooleanCondition() {
+    BoolCondition TRUE = new AtomicBoolCondition() {
 
         @Override
-        public boolean booleanValueOf(Object o) {
+        public boolean booleanValueOf(PremiseEval o) {
             return true;
         }
 
@@ -25,6 +25,7 @@ public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
             return "TRUE";
         }
     };
+
 
 
     @NotNull

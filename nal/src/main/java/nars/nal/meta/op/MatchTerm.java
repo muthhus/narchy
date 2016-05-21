@@ -4,7 +4,7 @@ import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseFork;
 import nars.nal.meta.ProcTerm;
@@ -25,7 +25,7 @@ import static nars.nal.meta.op.MatchTaskBelief.compile;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
+abstract public class MatchTerm extends AtomicBoolCondition {
 
     @Nullable
     public final MatchConstraint constraints;

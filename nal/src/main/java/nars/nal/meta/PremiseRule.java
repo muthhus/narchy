@@ -44,7 +44,7 @@ import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
-import static nars.nal.meta.BooleanCondition.TRUE;
+import static nars.nal.meta.BoolCondition.TRUE;
 import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
 
@@ -104,7 +104,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before term matching
      */
-    public BooleanCondition[] prePreconditions;
+    public BoolCondition[] prePreconditions;
 
 
     public PostCondition[] postconditions;
@@ -220,7 +220,7 @@ public class PremiseRule extends GenericCompound {
      * add the sequence of involved conditions to a list, for one given postcondition (ex: called for each this.postconditions)
      */
     @NotNull
-    public List<Term> getConditions(@NotNull PostCondition post) {
+    public List<Term> conditions(@NotNull PostCondition post) {
 
         Solve truth = solver(post, this, anticipate, eternalize, temporalize );
 
@@ -309,7 +309,7 @@ public class PremiseRule extends GenericCompound {
         i += ')';
 
 
-        Derive der = new Derive(rule, p.term,
+        Derive der = new Derive(rule, p.pattern,
                 belief != null && belief.single(),
                 desire != null && desire.single(),
                 anticipate,
@@ -452,11 +452,11 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) term(1)).terms();
 
 
-        Collection<BooleanCondition> pres =
+        Collection<BoolCondition> pres =
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
-        List<BooleanCondition> posts = Global.newArrayList(precon.length);
+        List<BoolCondition> posts = Global.newArrayList(precon.length);
 
 
         //Term taskTermPattern = getTask();
@@ -486,7 +486,7 @@ public class PremiseRule extends GenericCompound {
 
             String predicateNameStr = predicate_name.toString().substring(1);//.replace("^", "");
 
-            BooleanCondition next = null, preNext = null;
+            BoolCondition next = null, preNext = null;
 
             Term[] args;
             Term arg1, arg2;
@@ -759,7 +759,7 @@ public class PremiseRule extends GenericCompound {
 
 
         //store to arrays
-        prePreconditions = pres.toArray(new BooleanCondition[pres.size()]);
+        prePreconditions = pres.toArray(new BoolCondition[pres.size()]);
 
 
         List<PostCondition> postConditions = Global.newArrayList();

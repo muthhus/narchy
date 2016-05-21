@@ -1,14 +1,14 @@
 package nars.nal.meta.op;
 
 import nars.Op;
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * requires a specific subterm to have minimum bit structure
  */
-public final class SubTermStructure extends AtomicBooleanCondition<PremiseEval> {
+public final class SubTermStructure extends AtomicBoolCondition {
     public final int subterm;
     public final int bits;
     @NotNull

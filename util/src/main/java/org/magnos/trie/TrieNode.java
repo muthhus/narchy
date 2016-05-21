@@ -31,25 +31,25 @@ import java.util.function.Consumer;
  * <ol>
  * <li>Root
  * <ul>
- * <li>{@link #getStart()} == {@link #getEnd()} == 0</li>
+ * <li>{@link #start()} == {@link #end()} == 0</li>
  * <li>{@link #getValue()} == null</li>
- * <li>{@link #getKey()} == {@link #getSequence()} == null</li>
+ * <li>{@link #getKey()} == {@link #seq()} == null</li>
  * </ul>
  * </li>
  * <li>Naked Branch
  * <ul>
- * <li>{@link #getStart()} &lt; {@link #getEnd()}</li>
+ * <li>{@link #start()} &lt; {@link #end()}</li>
  * <li>{@link #getValue()} == null</li>
- * <li>{@link #getKey()} == {@link #getSequence()} == (a key of one of it's
+ * <li>{@link #getKey()} == {@link #seq()} == (a key of one of it's
  * children or a past child, ignore)</li>
  * </ul>
  * </li>
  * <li>Valued (Branch or Leaf)
  * <ul>
- * <li>{@link #getStart()} &lt; {@link #getEnd()}</li>
+ * <li>{@link #start()} &lt; {@link #end()}</li>
  * <li>{@link #getValue()} == non-null value passed into
  * {@link Trie#put(Object, Object)}</li>
- * <li>{@link #getKey()} == {@link #getSequence()} == a non-null key passed into
+ * <li>{@link #getKey()} == {@link #seq()} == a non-null key passed into
  * {@link Trie#put(Object, Object)}</li>
  * </ul>
  * </li>
@@ -167,9 +167,7 @@ public class TrieNode<S, T> implements Entry<S, T>
 
       for (Object x : vv) {
          if (x == null) continue;
-         TrieNode<S,T> xx = (TrieNode<S,T>)x;
-         childConsumer.accept(xx);
-         //xx.forEach(childConsumer);
+         childConsumer.accept((TrieNode<S,T>)x);
       }
    }
 
@@ -327,12 +325,12 @@ public class TrieNode<S, T> implements Entry<S, T>
 
    /**
     * The complete sequence of this TrieNode. The actual sequence
-    * is a sub-sequence that starts at {@link #getStart()} (inclusive) and ends
-    * at {@link #getEnd()} (exclusive).
+    * is a sub-sequence that starts at {@link #start()} (inclusive) and ends
+    * at {@link #end()} (exclusive).
     * 
     * @return The complete sequence of this TrieNode.
     */
-   public S getSequence()
+   public S seq()
    {
       return sequence;
    }
@@ -341,10 +339,10 @@ public class TrieNode<S, T> implements Entry<S, T>
     * The start of the sequence in this TrieNode.
     * 
     * @return The start of the sequence in this TrieNode, greater than or equal
-    *         to 0 and less than {@link #getEnd()}. In the case of
-    *         the root node: {@link #getStart()} == {@link #getEnd()}.
+    *         to 0 and less than {@link #end()}. In the case of
+    *         the root node: {@link #start()} == {@link #end()}.
     */
-   public int getStart()
+   public int start()
    {
       return start;
    }
@@ -353,10 +351,10 @@ public class TrieNode<S, T> implements Entry<S, T>
     * The end of the sequence in this TrieNode.
     * 
     * @return The end of the sequence in this TrieNode, greater than
-    *         {@link #getStart()}. In the case of the root node:
-    *         {@link #getStart()} == {@link #getEnd()}.
+    *         {@link #start()}. In the case of the root node:
+    *         {@link #start()} == {@link #end()}.
     */
-   public int getEnd()
+   public int end()
    {
       return end;
    }

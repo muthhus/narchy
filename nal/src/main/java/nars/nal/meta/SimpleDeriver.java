@@ -20,7 +20,7 @@ public class SimpleDeriver extends Deriver {
         //return Collections.unmodifiableList(premiseRules);
         for (PremiseRule r : rules.rules) {
             for (PostCondition p : r.postconditions)
-                u.add( r.getConditions(p) );
+                u.add( r.conditions(p) );
         }
         this.unrolled = u;
 
@@ -35,10 +35,10 @@ public class SimpleDeriver extends Deriver {
         for (List<Term> r : unrolled) {
             for (Term p : r) {
 
-                if (p instanceof BooleanCondition) {
+                if (p instanceof BoolCondition) {
 
                     try {
-                        if (!((BooleanCondition) p).booleanValueOf(m))
+                        if (!((BoolCondition) p).booleanValueOf(m))
                             break;
 
                     } catch (Exception e) {

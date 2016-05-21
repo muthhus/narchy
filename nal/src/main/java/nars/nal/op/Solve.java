@@ -4,7 +4,7 @@ import nars.Global;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.ConceptProcess;
-import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TruthOperator;
 import nars.task.Task;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Evaluates the truth of a premise
  */
-abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
+abstract public class Solve extends AtomicBoolCondition {
 
     private final transient String id;
 
@@ -194,9 +194,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         }
 
         @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return measure(m,
-                    m.punct.get()
-                   );
+            return measure(m, m.punct.get() );
         }
     }
 

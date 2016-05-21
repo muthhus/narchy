@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
  * WARNING: no preconditions should store any state so that their instances may be used by
  * different contexts (ex: NAR's)
  */
-public abstract class AtomicBooleanCondition<C> extends AtomicStringConstant implements BooleanCondition<C> {
+public abstract class AtomicBoolCondition extends AtomicStringConstant implements BoolCondition {
 
-    public AtomicBooleanCondition() {
+    public AtomicBoolCondition() {
         super();
     }
 

@@ -7,6 +7,7 @@ import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.Derive;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.TrieNode;
@@ -31,6 +32,37 @@ public class TrieDeriver extends Deriver {
     /** derivation term graph, gathered for analysis */
     //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
 
+    static final class TermPremiseRuleTermTrie extends TermTrie<Term,PremiseRule> {
+
+        public TermPremiseRuleTermTrie(@NotNull PremiseRuleSet ruleset) {
+            super(ruleset.rules);
+        }
+
+        @Override
+        public void index(@Nullable PremiseRule s) {
+
+            if (s == null || s.postconditions == null)
+                throw new RuntimeException("Null rule");
+
+            for (PostCondition p : s.postconditions) {
+
+                List<Term> c = s.conditions(p);
+                PremiseRule existing = trie.put(c, s);
+
+                if (existing!=null)
+                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
+
+//                    if (existing != null && s != existing && existing.equals(s)) {
+//                        System.err.println("DUPL: " + existing);
+//                        System.err.println("      " + existing.getSource());
+//                        System.err.println("EXST: " + s.getSource());
+//                        System.err.println();
+//                    }
+            }
+        }
+    }
+
+
     public TrieDeriver(String... rule) {
         this(new PremiseRuleSet(Lists.newArrayList(rule)));
     }
@@ -39,29 +71,9 @@ public class TrieDeriver extends Deriver {
         super(ruleset);
 
         //return Collections.unmodifiableList(premiseRules);
-        this.trie = new TermTrie<>(ruleset.rules) {
+        this.trie = new TermPremiseRuleTermTrie(ruleset);
 
-            @Override
-            public void index(@Nullable PremiseRule s) {
-
-                if (s == null || s.postconditions == null)
-                    return;
-
-                for (PostCondition p : s.postconditions) {
-
-                    PremiseRule existing = trie.put(s.getConditions(p), s);
-
-                    if (existing != null && s != existing && existing.equals(s)) {
-                        System.err.println("DUPL: " + existing);
-                        System.err.println("      " + existing.getSource());
-                        System.err.println("EXST: " + s.getSource());
-                        System.err.println();
-                    }
-                }
-            }
-        };
-
-        @NotNull List<ProcTerm> bb = getBranches(trie.trie.root);
+        @NotNull List<ProcTerm> bb = branches(trie.trie.root);
         this.roots = bb.toArray(new ProcTerm[bb.size()]);
 
 
@@ -88,45 +100,29 @@ public class TrieDeriver extends Deriver {
     final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<>(null);
 
     @NotNull
-    private List<ProcTerm> getBranches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    private List<ProcTerm> branches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
         List<ProcTerm> bb = Global.newArrayList(node.getChildCount());
 
-
         node.forEach(n -> {
-            List<Term> seq = n.getSequence();
-
-            int from = n.getStart();
-            int to = n.getEnd();
-
-
-            List<BooleanCondition<PremiseEval>> condition = compileConditions(seq.subList(from, to), matchParent);
-//            if (condition.size() == 1) {
-//                System.out.println(condition);
-//                for (BooleanCondition b : condition) {
-//                    System.out.println("\t" + b);
-//                }
-//                System.out.println();
-//            }
 
             ProcTerm branch = branch(
-                    condition,
-                    compileActions(TrieDeriver.this.getBranches(n)));
+                compileConditions(n.seq().subList(n.start(), n.end()), matchParent),
+                compileActions(branches(n))
+            );
 
             if (branch!=Return.the)
                 bb.add(branch);
         });
 
-
-
         return bb;
     }
 
 
-    @NotNull private static List<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    @NotNull private static List<BoolCondition> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
-            if (x instanceof BooleanCondition) {
+            if (x instanceof BoolCondition) {
                 if (x instanceof MatchTerm) {
                     matchParent.set((MatchTerm) x);
                 }
@@ -151,7 +147,7 @@ public class TrieDeriver extends Deriver {
                 //System.out.println("\tnot boolean condition");
                 //return false;
             }
-        }).map(x -> (BooleanCondition<PremiseEval>)x).collect(Collectors.toList());
+        }).map(x -> (BoolCondition)x).collect(Collectors.toList());
     }
 
 
@@ -171,23 +167,25 @@ public class TrieDeriver extends Deriver {
     }
 
 
+
     @NotNull
     public static ProcTerm branch(
-            @NotNull List<BooleanCondition<PremiseEval>> condition,
+            @NotNull List<BoolCondition> condition,
             @Nullable ProcTerm conseq) {
 
         if (conseq == null) {
             conseq = Return.the;
         }
 
-        BooleanCondition<PremiseEval> cc = AndCondition.the(condition);
+        BoolCondition cc = AndCondition.the(condition);
         if (cc!=null) {
-            return new PremiseBranch(cc, conseq);
+            return new IfThen(cc, conseq);
         } else {
             return conseq;
         }
     }
 
+    //TODO not complete
     protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
         StringBuilder s = new StringBuilder();
 
@@ -232,6 +230,7 @@ public class TrieDeriver extends Deriver {
     }
 
 
+
     //final static Logger logger = LoggerFactory.getLogger(TrieDeriver.class);
 
 
@@ -262,4 +261,25 @@ public class TrieDeriver extends Deriver {
 //    }
 
 
+    static final class Return extends Atom implements ProcTerm {
+
+        public static final ProcTerm the = new Return();
+
+        private Return() {
+            super("return");
+        }
+
+
+        @Override
+        public void appendJavaProcedure(@NotNull StringBuilder s) {
+            s.append("return;");
+        }
+
+        @Override
+        public void accept(PremiseEval versioneds) {
+            System.out.println("why call this");
+            //throw new UnsupportedOperationException("should not be invoked");
+        }
+
+    }
 }
