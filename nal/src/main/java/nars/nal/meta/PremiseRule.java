@@ -265,15 +265,14 @@ public class PremiseRule extends GenericCompound {
         put(SubTermsStructure.class, 11);
         put(SubTermStructure.class, 11);
 
-        put(Solve.class, 10);
-
-        put(events.class, 9);
-
         put(TaskNegative.class, 8);
         put(TaskPositive.class, 8);
         put(BeliefNegative.class, 7);
         put(BeliefPositive.class, 7);
 
+        put(events.class, 6);
+
+        put(Solve.class, 5);
 
 
 

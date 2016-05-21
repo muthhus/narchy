@@ -27,7 +27,7 @@ public final class SubTermStructure extends AtomicBoolCondition {
         //bits &= ~(Op.VariableBits);
 
         this.bits = bits;
-        id = subterm + ":" +
+        id = "SubTermStruct" + subterm + ":" +
                 Integer.toString(bits, 16);
     }
 

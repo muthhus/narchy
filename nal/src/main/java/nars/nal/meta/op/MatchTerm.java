@@ -96,7 +96,6 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 
     public final @NotNull ProcTerm build() {
         if (this.onMatch == null) {
-            this.id = $.the("MatchTerm(" + pid + ",{" + derive + "})");
 
 
             ProcTerm om;
@@ -112,6 +111,10 @@ abstract public class MatchTerm extends AtomicBoolCondition {
                     om = Fork.compile(derive.toArray(new Derive[derive.size()]));
                     break;
             }
+
+            this.id = $.the("MatchTerm(" + pid +
+                    ((om!=null) ? ",  " + om  : "") + ")");
+
 
             this.onMatch = om;
         }

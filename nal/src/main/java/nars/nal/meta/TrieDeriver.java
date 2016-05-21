@@ -197,10 +197,14 @@ public class TrieDeriver extends Deriver {
 
         if (p instanceof IfThen) {
 
-            indent(indent); out.println(Util.className(p) + " {");
+            IfThen it = (IfThen) p;
+
+            indent(indent); out.println(Util.className(p) + " (");
             {
-                IfThen it = (IfThen) p;
                 print(it.cond, out, indent + 2);
+
+                indent(indent); out.println(") ==> {");
+
                 print(it.conseq, out, indent + 2);
             }
             indent(indent); out.println("}");
@@ -215,7 +219,7 @@ public class TrieDeriver extends Deriver {
             indent(indent); out.println("}");
 
         } */ else if (p instanceof AndCondition) {
-            indent(indent); out.println(Util.className(p) + " {");
+            indent(indent); out.println( "and {");
             {
                 AndCondition ac = (AndCondition) p;
                 for (BoolCondition b : ac.termCache) {
@@ -239,7 +243,7 @@ public class TrieDeriver extends Deriver {
                 ((MatchTerm)p).build();
 
             indent(indent);
-            out.println( Util.className(p) + ": " + p );
+            out.println( /*Util.className(p) + ": " +*/ p );
 
         }
 

@@ -20,7 +20,7 @@ public final class SubTermOp extends AtomicBoolCondition {
     public SubTermOp(int subterm, @NotNull Op op) {
         this.subterm = subterm;
         this.op = op.ordinal();
-        id = subterm + ":\"" + op + '"';
+        id = "SubTermOp" + subterm + ":\"" + op + '"';
     }
 
     @NotNull
