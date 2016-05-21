@@ -19,8 +19,8 @@ import java.util.function.Predicate;
  */
 public final class SubTermOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements ProcTerm {
 
-    final ProcTerm[] proc = new ProcTerm[16]; //should be large enough
-    private final int subterm;
+    final ProcTerm[] proc = new ProcTerm[32]; //should be large enough
+    public final int subterm;
 
 
     public SubTermOpSwitch(int subterm, Map<SubTermOp, ProcTerm> cases) {
