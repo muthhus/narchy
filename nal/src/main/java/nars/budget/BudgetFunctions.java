@@ -23,6 +23,7 @@ package nars.budget;
 import nars.Global;
 import nars.Memory;
 import nars.bag.BLink;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
@@ -31,6 +32,8 @@ import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.stream.Stream;
 
 /**
  * Budget functions for resources allocation
@@ -252,7 +255,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
         BLink<? extends Task> taskLink = nal.taskLink;
-        assert(!taskLink.isDeleted());
+        Task task = nal.task();
+
+
 
         BLink<? extends Termed> termLink = nal.termLink;
         assert(!termLink.isDeleted());
@@ -281,7 +286,6 @@ public final class BudgetFunctions extends UtilityFunctions {
         //originally was OR, but this can explode because the result of OR can exceed the inputs
         //float priority = or(taskLink.pri(), termLink.pri());
         //float priority = and(taskLink.pri(), termLink.pri());
-        Task task = taskLink.get();
         float priority = task.priIfFiniteElseZero();
         if (priority > Global.BUDGET_EPSILON)
             priority *= or(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero());
@@ -369,6 +373,19 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         b.setPriority(Math.min(nextB, 1f));
         a.priSub(priToTransfer);
+    }
+
+    /** TODO guarantee balanced input and output */
+    public static Budget taxCollection(Stream<Task> tt, float taskPriMult) {
+        UnitBudget u = new UnitBudget();
+        tt.forEach(t -> {
+            @NotNull Budget tbudget = t.get().budget();
+            if (!tbudget.isDeleted()) {
+                BudgetMerge.plusDQBlend.merge(u, tbudget, 1f);
+                tbudget.priMult(taskPriMult);
+            }
+        });
+        return u;
     }
 
     /**

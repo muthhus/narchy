@@ -28,26 +28,26 @@ import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
+import nars.$;
 import nars.Global;
+import nars.budget.BudgetFunctions;
 import nars.nar.Default;
 import nars.op.time.STMClustered;
 import nars.task.MutableTask;
-import nars.term.Compound;
+import nars.task.Task;
+import nars.term.Term;
 import nars.time.FrameClock;
 import nars.truth.DefaultTruth;
+import nars.truth.Stamp;
 import nars.util.Agent;
 import nars.util.NAgent;
 import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
-import org.bridj.util.Tuple;
-import org.encog.util.ObjectPair;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import static nars.util.NAgent.printTasks;
 
@@ -71,67 +71,33 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 4, 2, 2, rng,
+				1024, 8, 2, 2, rng,
 				new Default.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
-		nar.beliefConfidence(0.15f);
-		nar.conceptActivation.setValue(0.2f);
-		nar.cyclesPerFrame.set(8);
+		nar.beliefConfidence(0.51f);
+		nar.conceptActivation.setValue(0.25f);
+		nar.cyclesPerFrame.set(24);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new STMClustered(nar, new MutableInteger(32), '.') {
-
-			@Override
-			protected void iterate() {
-				super.iterate();
-
-				LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
-
-				nodes().stream().sorted((a,b)-> Float.compare(
-						a.priSum(), b.priSum()) ).forEach(n -> {
-					double[] tc = n.coherence(0);
-					if (tc[1] > 0.95f) {
-						double[] fc = n.coherence(1);
-						if (fc[1] > 0.95f) {
-							selected.put((long)Math.round(tc[0]), PrimitiveTuples.pair(n, (float)fc[0]));
-						}
-					}
-				});
-
-				//Create co-occurrence beliefs containing each centroid's members
-				selected.forEachKeyValue((t, nodeFreq) -> {
-					TasksNode node = nodeFreq.getOne();
-					Compound term = node.termConjunctionParallel(6);
-					if (term!=null) {
-						MutableTask m = new MutableTask(term, punc, new DefaultTruth(nodeFreq.getTwo(), node.confMin()))
-								.time(now, t)
-								.evidence(node.evidence())
-								.budget(node.budgetSum())
-								;
-						System.err.println(m + " " + Arrays.toString(m.evidence()));
-						nar.input(m);
-					}
-				});
-
-				//TODO create temporally inducted relations between centroids of different time indices
-
-			}
-		};
+		new MySTMClustered(nar, 128, '.');
+		new MySTMClustered(nar, 24, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				1000);
+				100000);
 
+		nar.index.print(System.out);
 		printTasks(nar, true);
 		printTasks(nar, false);
-		nar.index.print(System.out);
+
 	}
+
 
 	@Override
 	public Twin<Integer> start() {
@@ -265,6 +231,80 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public void killGhost() {
 		super.killGhost();
 		//interScore += 1f; //DISABLED FOR NOW TO NOT CONFUSE IT
+	}
+
+	public static class MySTMClustered extends STMClustered {
+
+		public MySTMClustered(Default nar, int size, char punc) {
+			super(nar, new MutableInteger(size), punc);
+		}
+
+		@Override
+        protected void iterate() {
+            super.iterate();
+
+            LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
+
+            nodes().stream().sorted((a,b)-> Float.compare(
+                    a.priSum(), b.priSum()) ).forEach(n -> {
+                double[] tc = n.coherence(0);
+
+                float timeCoherenceThresh = 0.98f;
+				float freqCoherenceThresh = 0.9f;
+
+                if (tc[1] >= timeCoherenceThresh) {
+                    double[] fc = n.coherence(1);
+                    if (fc[1] >= freqCoherenceThresh) {
+                        selected.put((long)Math.round(tc[0]), PrimitiveTuples.pair(n, (float)fc[0]));
+                    }
+                }
+            });
+
+            //Create co-occurrence beliefs containing each centroid's members
+            selected.forEachKeyValue((t, nodeFreq) -> {
+                TasksNode node = nodeFreq.getOne();
+                float freq = nodeFreq.getTwo();
+
+                boolean negated;
+                if (freq < 0.5f) {
+                    freq = 1f - freq;
+                    negated = true;
+                } else {
+                    negated = false;
+                }
+
+                float finalFreq = freq;
+                node.termSet(4, (Task[] tt) -> {
+
+
+                    Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
+
+                    float confMin = (float)Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
+
+                    long[] evidence = Stamp.zip(Stream.of(tt), tt.length, Global.STAMP_MAX_EVIDENCE);
+
+                    if (negated)
+                        $.neg(s);
+
+                    Task m = new MutableTask($.conj(0, s), punc,
+                            new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                            .time(now, t)
+                            .evidence(evidence)
+                            .budget(BudgetFunctions.taxCollection(Stream.of(tt), 1f / s.length))
+                            .log("STMCluster CoOccurr");
+
+                    System.err.println(m + " " + Arrays.toString(m.evidence()));
+                    nar.input(m);
+                    node.clear();
+
+                });
+
+
+            });
+
+            //TODO create temporally inducted relations between centroids of different time indices
+
+        }
 	}
 }
 

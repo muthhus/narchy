@@ -133,8 +133,6 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
 
         Task task = p.task();
-        if (task == null)
-            return false;
 
         @Nullable Task belief = p.belief();
 

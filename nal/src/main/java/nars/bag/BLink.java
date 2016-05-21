@@ -89,14 +89,14 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         @Override
         public boolean isDeleted() {
 
-            if (!super.isDeleted()) {
+            if (super.isDeleted()) {
+                return true;
+            } else {
                 if (get() == null) {
                     delete();
                     return true;
                 }
                 return false;
-            } else {
-                return true;
             }
         }
 

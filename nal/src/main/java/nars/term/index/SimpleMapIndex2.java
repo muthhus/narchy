@@ -79,7 +79,7 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
 
         super.print(out);
 
-        subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
+        //subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
         //data.forEach((k,v) -> System.out.println(k + "\t" + v));
 
         data.keySet().forEach(System.out::println);

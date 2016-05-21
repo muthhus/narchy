@@ -22,7 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toSet;
@@ -35,7 +38,7 @@ public class STMClustered extends STM {
     final int FREQ = 1;
 
 
-    final int clusters = 9;
+    final int clusters;
 
     private final ArrayBag<Task> bag;
     private final NeuralGasNet<TasksNode> net;
@@ -128,33 +131,27 @@ public class STMClustered extends STM {
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
-        public Compound termConjunctionParallel(int maxComponents) {
-            Term[] s = tasks.stream().map(t -> t.get().term()).distinct().toArray(Term[]::new);
-            if (s.length > maxComponents ) {
-                System.err.println("too many components: " + s + " for " + this);
-                return null;
-            }
-            if (s.length > 1) {
-                return (Compound) $.conj(0, s);
-            } else {
-                return null;
-            }
-        }
-
-        public float confMin() {
-            return (float)tasks.stream().mapToDouble(t->t.get().conf()).min().getAsDouble();
-        }
-
-        public long[] evidence() {
-            return Stamp.zip(tasks.stream().map(BLink.StrongBLink::get), tasks.size(), Global.STAMP_MAX_EVIDENCE);
-        }
-
-        public Budget budgetSum() {
-            UnitBudget u = new UnitBudget();
-            tasks.forEach(t -> {
-                BudgetMerge.plusDQBlend.merge(u, t.get().budget(), 1f);
+        public void termSet(int maxComponentsPerTerm, Consumer<Task[]> each) {
+            AtomicInteger as = new AtomicInteger();
+            tasks.stream().map(t -> t.get()).distinct().
+                    collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm))).forEach((n,c)->{
+                if (c.size() > 1)
+                    each.accept(c.toArray(new Task[c.size()]));
             });
-            return u;
+
+        }
+
+//        public float confMin() {
+//            return (float)tasks.stream().mapToDouble(t->t.get().conf()).min().getAsDouble();
+//        }
+
+
+
+
+        /** removes all tasks that are part of this node, and removes them from the bag also, effectively flushing these tasks out of this STM unit */
+        public void clear() {
+            tasks.forEach(t -> bag.remove(t.get()));
+            tasks.clear();
         }
     }
 
@@ -181,6 +178,10 @@ public class STMClustered extends STM {
 
         @Override
         public boolean commit() {
+            if (get().isDeleted()) {
+                delete();
+                return true;
+            }
             priSub(cycleCost(id));
             nearest().transfer(this);
             return super.commit();
@@ -220,8 +221,13 @@ public class STMClustered extends STM {
 
     final Deque<TasksNode> removed = new ArrayDeque<>();
 
+    final int expectedTasksPerNode = 4;
+
     public STMClustered(@NotNull NAR nar, MutableInteger capacity, char punc) {
         super(nar, capacity);
+
+        //TODO make this adaptive
+        clusters = Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
 
         this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {

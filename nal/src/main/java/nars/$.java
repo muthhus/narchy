@@ -741,6 +741,13 @@ public enum $ /* TODO: implements TermIndex */ {
         return new DefaultTruth(f, c);
     }
 
+    /** negates each entry in the array */
+    public static void neg(Term[] s) {
+        for (int i = 0; i < s.length; i++) {
+            s[i] = $.neg(s[i]);
+        }
+    }
+
 
     //TODO add this to a '$.printree' command
 

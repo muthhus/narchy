@@ -44,6 +44,10 @@ abstract public class ConceptProcess implements Premise {
     public final BLink<? extends Termed> termLink;
     @Nullable public final Task belief;
 
+
+    //cached here to prevent weakref tasklink from losing the task in the middle of derivation
+    private final transient Task task;
+
     //public final BLink<? extends Concept> conceptLink;
 
     /** lazily cached value :=
@@ -66,6 +70,7 @@ abstract public class ConceptProcess implements Premise {
         this.nar = nar;
 
         this.taskLink = taskLink;
+        this.task = taskLink.get();
         //assert(!task().isDeleted());
 
         //this.conceptLink = conceptLink;
@@ -103,7 +108,7 @@ abstract public class ConceptProcess implements Premise {
 
     @Override
     public final Task task() {
-        return taskLink.get();
+        return task;
     }
 
 

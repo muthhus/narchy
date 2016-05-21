@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import mikejyg.javaipacman.wrapper.PacmanEnvironment;
 import nars.Global;
 import nars.NAR;
 import nars.guifx.NARfx;
@@ -174,6 +175,8 @@ public class DemoRovers {
         boolean gui = true;
 
         Default nar = newNAR();
+
+        new PacmanEnvironment.MySTMClustered(nar, 128, '.');
 
         Entity e = sim.game.createEntity().edit()
                 .add(new Physical(

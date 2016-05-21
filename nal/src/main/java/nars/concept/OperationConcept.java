@@ -148,8 +148,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
         if (isOperation) {
-            float belief = believed.expectation();
-            float desire = desired.expectation();
+            float belief = believed!=null ? believed.expectation() : 0;
+            float desire = desired!=null ? desired.expectation() : 0;
 
             if (isExecutingGoals(belief,desire)) {
 
