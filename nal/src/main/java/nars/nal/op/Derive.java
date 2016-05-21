@@ -42,8 +42,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @NotNull
     public final Term conclusionPattern;
 
-    @NotNull
-    private final BooleanCondition<PremiseEval> postMatch; //TODO use AND condition
 
     /**
      * whether this a single or double premise derivation; necessary in case premise
@@ -52,16 +50,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final boolean beliefSingle, goalSingle;
 
 
-    public Derive(@NotNull PremiseRule rule, @NotNull Term term, @NotNull BooleanCondition[] postMatch,
+    public Derive(@NotNull PremiseRule rule, @NotNull Term term,
                   boolean beliefSingle, boolean goalSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
         this.rule = rule;
         this.temporalizer = temporalizer;
 
-        switch (postMatch.length) {
-            case 0: this.postMatch = BooleanCondition.TRUE;  break;
-            case 1: this.postMatch = postMatch[0]; break;
-            default: this.postMatch = new AndCondition(postMatch);
-        }
 
         this.conclusionPattern = term;
         this.beliefSingle = beliefSingle;
@@ -78,10 +71,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             i += ", {anticipate}";
         }
 
-
-        if (postMatch.length > 0) {
-            i += ", {" + Joiner.on(',').join(postMatch) + '}';
-        }
 
         i += ")";
         this.id = i;
@@ -140,9 +129,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * part 1
      */
     private void derive(@NotNull PremiseEval p, @NotNull Term t) {
-
-        if (!postMatch.booleanValueOf(p))
-            return;
 
         ConceptProcess premise = p.premise;
         NAR nar = premise.nar();

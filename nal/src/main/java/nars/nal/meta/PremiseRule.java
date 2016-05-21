@@ -60,7 +60,6 @@ public class PremiseRule extends GenericCompound {
                 "\t source='" + source + '\'' +
                 "\t prePreconditions=" + Arrays.toString(prePreconditions) +
                 "\t match=" + match +
-                "\t postPreconditions=" + Arrays.toString(postPreconditions) +
                 "\t postconditions=" + Arrays.toString(postconditions) +
                 "\t temporalize=" + temporalize +
                 "\t eternalize=" + eternalize +
@@ -107,10 +106,6 @@ public class PremiseRule extends GenericCompound {
      */
     public BooleanCondition[] prePreconditions;
 
-    /**
-     * conditions which are tested after term matching, including term matching itself
-     */
-    public BooleanCondition[] postPreconditions;
 
     public PostCondition[] postconditions;
 
@@ -227,14 +222,14 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> getConditions(@NotNull PostCondition post) {
 
-        List<Term> l = Global.newArrayList(prePreconditions.length + postPreconditions.length + 4 /* estimate */);
+        List<Term> l = Global.newArrayList(prePreconditions.length + 4 /* estimate */);
 
         addAll(l, prePreconditions);
 
         addAll(l, match.pre);
 
         Solve truth = solver(post,
-                this, anticipate, eternalize, postPreconditions, temporalize
+                this, anticipate, eternalize, temporalize
         );
         l.add(truth);
 
@@ -301,7 +296,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static Solve solver(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                               @NotNull BooleanCondition[] postPreconditions, Temporalize temporalizer) {
+                               Temporalize temporalizer) {
 
 
         char puncOverride = p.puncOverride;
@@ -319,7 +314,6 @@ public class PremiseRule extends GenericCompound {
 
 
         Derive der = new Derive(rule, p.term,
-                postPreconditions,
                 belief != null && belief.single(),
                 desire != null && desire.single(),
                 anticipate,
@@ -770,7 +764,6 @@ public class PremiseRule extends GenericCompound {
 
         //store to arrays
         prePreconditions = pres.toArray(new BooleanCondition[pres.size()]);
-        postPreconditions = posts.toArray(new BooleanCondition[posts.size()]);
 
 
         List<PostCondition> postConditions = Global.newArrayList();

@@ -60,12 +60,7 @@ public class DeriverTest {
 
         Set<BooleanCondition> preconds = new HashSet();
         int totalPrecond = 0;
-        for (PremiseRule t : R) {
-            for (BooleanCondition p : t.postPreconditions) {
-                totalPrecond++;
-                preconds.add(p);
-            }
-        }
+
         out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());
 
         //preconds.forEach(p -> System.out.println(p));
