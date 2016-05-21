@@ -38,6 +38,9 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     @NotNull
     public final Term[] code;
     @NotNull
+    public final Term[] pre;
+
+    @NotNull
     public final Term term;
 
 
@@ -47,12 +50,15 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         //compiled = new TermPattern(pattern, constraints);
 
         this.term = pattern;
+        this.id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
 
 
+        List<BoolCondition> pre = Global.newArrayList();
         List<BoolCondition> code = Global.newArrayList();
 
-        compile(pattern, code, constraints);
+        compile(pattern, pre, code, constraints);
 
+        this.pre = pre.toArray(new BoolCondition[pre.size()]);
         this.code = code.toArray(new BoolCondition[code.size()]);
 
 
@@ -74,7 +80,6 @@ public class MatchTaskBelief extends AtomicBoolCondition {
                         pStructure) + " " + pattern
         );*/
 
-        id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
 
     }
 
@@ -92,7 +97,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     private static void compile(@NotNull TaskBeliefPair pattern,
-                                @NotNull List<BoolCondition> code,
+                                List<BoolCondition> pre, @NotNull List<BoolCondition> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
@@ -100,13 +105,13 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         @NotNull Term task = pattern.term(0);
         @NotNull Term belief = pattern.term(1);
 
-        BoolCondition addToEndOfPreGuards = null;
+        BoolCondition preGuard = null;
 
         //check for any self similarity
         if (task.equals(belief)) {
             //add precondition constraint that task and belief must be equal.
             // assuming this succeeds, only need to test the task half
-            addToEndOfPreGuards = new TaskBeliefEqualCondition();
+            preGuard = new TaskBeliefEqualCondition();
             belief = null;
         }
 
@@ -118,7 +123,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
             if (beliefInTask != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the task half
-                addToEndOfPreGuards = new ComponentCondition(0, beliefInTask, 1);
+                preGuard = new ComponentCondition(0, beliefInTask, 1);
                 belief = null;
             }
         }
@@ -131,22 +136,22 @@ public class MatchTaskBelief extends AtomicBoolCondition {
             if (taskInBelief != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the belief half
-                addToEndOfPreGuards = new ComponentCondition(1, taskInBelief, 0);
+                preGuard = new ComponentCondition(1, taskInBelief, 0);
                 task = null;
             }
         }
 
         //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
-        if (addToEndOfPreGuards!=null)
-            code.add(addToEndOfPreGuards);
+        if (preGuard!=null)
+            pre.add(preGuard);
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(code, task, belief, constraints);
+        compileTaskBelief(pre, code, task, belief, constraints);
 
 
     }
 
-    private static void compileTaskBelief(
+    private static void compileTaskBelief(@NotNull List<BoolCondition> pre,
             @NotNull List<BoolCondition> code, @Nullable Term task, @Nullable Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
@@ -154,14 +159,14 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         boolean belIsPatVar = belief!=null && belief.op() == Op.VAR_PATTERN;
 
         if (task!=null && !taskIsPatVar)
-            code.add(new SubTermOp(0, task.op()));
+            pre.add(new SubTermOp(0, task.op()));
         if (belief!=null && !belIsPatVar)
-            code.add(new SubTermOp(1, belief.op()));
+            pre.add(new SubTermOp(1, belief.op()));
 
         if (task!=null && !taskIsPatVar)
-            code.add(new SubTermStructure(0, task.structure()));
+            pre.add(new SubTermStructure(0, task.structure()));
         if (belief!=null && !belIsPatVar)
-            code.add(new SubTermStructure(1, belief.structure()));
+            pre.add(new SubTermStructure(1, belief.structure()));
 
         //        } else {
         //            if (x0.containsTermRecursively(x1)) {

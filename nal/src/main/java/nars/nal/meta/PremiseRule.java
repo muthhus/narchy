@@ -239,11 +239,18 @@ public class PremiseRule extends GenericCompound {
                 s.add(TaskPunctuation.NotBelief);
         }
 
+        addAll(s, match.pre);
 
 
-        List<Term> l = sort(new FasterList(s));
+        FasterList sl = new FasterList(s);
 
-        //SUFFIX
+        System.out.println(sl);
+
+        List<Term> l = sort(sl);
+
+        System.out.println("\t" + l);
+
+        //SUFFIX (order already determined for matching)
 
         addAll(l, match.code);
 
@@ -252,16 +259,22 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
+    /** higher is earlier */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
-        put(SubTermOp.class, 11);
+        put("SubTermOp0", 12);
+        put(TaskPunctuation.class, 11);
+        put("SubTermOp1", 10);
 
-        put(TaskPunctuation.class, 10);
-        put(events.class, 10);
+        put(events.class, 9);
 
-        put(TaskNegative.class, 9);
-        put(TaskPositive.class, 9);
+        put(TaskNegative.class, 8);
+        put(TaskPositive.class, 8);
+        put(BeliefNegative.class, 8);
+        put(BeliefPositive.class, 8);
 
         put(SubTermStructure.class, 3);
+        put(SubTermsStructure.class, 3);
+
         put(Solve.class, 1);
 
 //        put(SubTermOp.class, 10);
@@ -271,10 +284,15 @@ public class PremiseRule extends GenericCompound {
 //        put(Solve.class, 1);
     }};
 
-    private static Class<? extends Term> preconditionClass(Term b) {
+    private static Object classify(Term b) {
+        if (b instanceof SubTermOp)
+            return "SubTermOp" + (((SubTermOp)b).subterm == 0 ? "0" : "1"); //split
+
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
+        if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
+        if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
@@ -292,14 +310,29 @@ public class PremiseRule extends GenericCompound {
      */
     private static List<Term> sort(@NotNull List<Term> l) {
         Collections.sort(l, (a, b) -> {
-            //higher is earlier
-            Object bc = preconditionClass(b);
-            Object ac = preconditionClass(a);
 
-            int i = Integer.compare(
-                    preconditionScore.getOrDefault(bc, 0),
-                    preconditionScore.getOrDefault(ac, 0));
-            if (i != 0) return i;
+            int ascore = 0, bscore = 0;
+
+            Object ac = classify(a);
+            if (!preconditionScore.containsKey(ac)) {
+                //System.err.println("preconditionRank missing " + a + " classified as: " + ac);
+                ascore = -1;
+            } else {
+                ascore = preconditionScore.get(ac);
+            }
+
+            Object bc = classify(b);
+            if (!preconditionScore.containsKey(bc)) {
+                //System.err.println("preconditionRank missing " + b + " classified as: " + bc);
+                bscore = -1;
+            } else {
+                bscore = preconditionScore.get(bc);
+            }
+
+            if (ascore!=bscore) {
+                return Integer.compare(bscore, ascore);
+            }
+
             return b.compareTo(a);
         });
         return l;

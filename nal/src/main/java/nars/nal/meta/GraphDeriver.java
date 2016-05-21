@@ -127,7 +127,7 @@ public class GraphDeriver extends Deriver {
 
             out.println(r + " " +
                     //g.outDegreeOf(r) + " " + g.outgoingEdgesOf(r)
-                    reach(r) //+ "\t" + cs
+                    "reach=" + reach(r) + " fanOut=" + g.outDegreeOf(r) //+ "\t" + cs
             );
         });
 
