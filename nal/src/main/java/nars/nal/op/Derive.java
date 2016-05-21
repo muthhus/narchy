@@ -29,7 +29,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @NotNull
     public final String id;
 
-    public final boolean anticipate;
     public final boolean eternalize;
 
     @NotNull
@@ -51,35 +50,31 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  boolean beliefSingle, boolean goalSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
+                  boolean beliefSingle, boolean goalSingle, boolean eternalize, Temporalize temporalizer) {
         this.rule = rule;
-        this.temporalizer = temporalizer;
 
 
         this.conclusionPattern = term;
+        this.temporalizer = temporalizer;
         this.beliefSingle = beliefSingle;
         this.goalSingle = goalSingle;
-        this.anticipate = anticipate;
         this.eternalize = eternalize;
 
-        String i = "Derive:(" + term;
-        if (eternalize && anticipate) {
-            i += ", {eternalize,anticipate}";
-        } else if (eternalize) {
-            i += ", {eternalize}";
-        } else if (anticipate) {
-            i += ", {anticipate}";
-        }
+        this.id = "Derive(" +
+                Joiner.on(',').join(
+                    term,
+                    temporalizer,
+                    beliefSingle ? "Bs" : "Bd",
+                    goalSingle ? "Gs" : "Gd",
+                    eternalize ? "Et" : "_") +
+                ')';
 
 
-        i += ")";
-        this.id = i;
     }
 
 
     @Override
-    public @Nullable
-    Op op() {
+    public Op op() {
         return ATOM; //product?
     }
 

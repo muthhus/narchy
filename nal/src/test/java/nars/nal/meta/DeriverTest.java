@@ -29,12 +29,13 @@ public class DeriverTest {
 
     @Test public void printRuleSet() {
 
-        List<PremiseRule> rr = d.rules.rules;
-        System.out.println(rr.size() + " rules");
-        rr.forEach(r -> {
-            System.out.println(r);
-        });
+//        List<PremiseRule> rr = d.rules.rules;
+//        System.out.println(rr.size() + " rules");
+//        rr.forEach(r -> {
+//            System.out.println(r);
+//        });
 
+        d.trie.costAnalyze((t) -> 1, System.out);
     }
 
     @Test

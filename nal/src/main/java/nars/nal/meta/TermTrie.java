@@ -1,8 +1,10 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
+import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.term.Term;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.magnos.trie.Trie;
 import org.magnos.trie.TrieNode;
@@ -75,19 +77,72 @@ abstract public class TermTrie<K extends Term, V> {
             List<A> seq = n.seq();
 
             int from = n.start();
-            int to = n.end();
-
 
             out.print(n.childCount() + "|" + n.getSize() + "  ");
 
-            indent(from * 2);
+            indent(from * 4);
 
-            out.println(Joiner.on(", ").join( seq.subList(from, to)));
+            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())));
 
             printSummary(n, out);
         });
 
+
+
     }
+
+    public SummaryStatistics costAnalyze(FloatFunction<K> costFn, PrintStream o) {
+
+        SummaryStatistics termCost = new SummaryStatistics();
+        SummaryStatistics sequenceLength = new SummaryStatistics();
+        SummaryStatistics branchFanOut = new SummaryStatistics();
+        SummaryStatistics endDepth = new SummaryStatistics();
+        int[] currentDepth = new int[1];
+
+        costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, trie.root);
+
+        if (o!=null) {
+            o.println("termCost: " + s(termCost));
+            o.println("sequenceLength: " + s(sequenceLength));
+            o.println("branchFanOut: " + s(branchFanOut));
+            o.println("endDepth: " + s(endDepth));
+        }
+        return termCost;
+    }
+
+    private String s(SummaryStatistics s) {
+        return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
+    }
+
+    public static <K,V> void costAnalyze(FloatFunction<K> costFn, SummaryStatistics termCost, SummaryStatistics sequenceLength, SummaryStatistics branchFanOut, SummaryStatistics endDepth, int[] currentDepth, TrieNode<List<K>, V> root) {
+
+        branchFanOut.addValue(root.childCount());
+
+        root.forEach(n -> {
+            List<K> seq = n.seq();
+
+            int from = n.start();
+
+            //out.print(n.childCount() + "|" + n.getSize() + "  ");
+
+            List<K> sqn = seq.subList(from, n.end());
+            sequenceLength.addValue(sqn.size());
+
+            for (K k : sqn) {
+                termCost.addValue( costFn.floatValueOf(k) );
+            }
+
+            //indent(from * 4);
+            currentDepth[0]++;
+
+            costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, n);
+
+            currentDepth[0]--;
+
+            endDepth.addValue(currentDepth[0]);
+        });
+    }
+
     public static void indent(int amount) {
         for (int i = 0; i < amount; i++) {
             System.out.print(' ');

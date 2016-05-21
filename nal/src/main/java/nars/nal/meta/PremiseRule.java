@@ -56,7 +56,6 @@ public class PremiseRule extends GenericCompound {
     @Override
     public String toString() {
         return "PremiseRule{" +
-                "\t source='" + source + '\'' +
                 "\t prePreconditions=" + Arrays.toString(prePreconditions) +
                 "\t match=" + match +
                 "\t postconditions=" + Arrays.toString(postconditions) +
@@ -65,6 +64,7 @@ public class PremiseRule extends GenericCompound {
                 "\t anticipate=" + anticipate +
                 "\t backward=" + backward +
                 "\t minNAL=" + minNAL +
+                "\t source='" + source + '\'' +
                 '}';
     }
 
@@ -221,7 +221,7 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> conditions(@NotNull PostCondition post) {
 
-        Solve truth = solver(post, this, anticipate, eternalize, temporalize );
+        Solve truth = solve(post, this, anticipate, eternalize, temporalize );
 
 
         List<Term> l = Global.newArrayList(prePreconditions.length + 4 /* estimate */);
@@ -289,29 +289,29 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public static Solve solver(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                               Temporalize temporalizer) {
+    public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
+                              Temporalize temporalizer) {
 
 
         char puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
-        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
         TruthOperator desire = DesireFunction.get(p.goalTruth);
-        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
-
-        String sn = "Truth:(";
-        String i = puncOverride == 0 ?
-                sn + beliefLabel + ',' + desireLabel :
-                sn + beliefLabel + ',' + desireLabel + ",punc:\"" + puncOverride + '\"';
-        i += ')';
-
 
         Derive der = new Derive(rule, p.pattern,
                 belief != null && belief.single(),
                 desire != null && desire.single(),
-                anticipate,
+                /*anticipate,*/
                 eternalize, temporalizer);
+
+        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
+        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
+
+        String sn = "Truth(";
+        String i = puncOverride == 0 ?
+                sn + beliefLabel + ',' + desireLabel :
+                sn + beliefLabel + ',' + desireLabel + ",punc:\"" + puncOverride + '\"';
+        i += ')';
 
         return puncOverride == 0 ?
                 new Solve.SolvePuncFromTask(i, der, belief, desire) :
