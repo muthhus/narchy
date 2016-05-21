@@ -39,6 +39,11 @@ public class Node extends ArrayRealVector  {
         }
     }
 
+    public Node randomizeUniform(int dim, double min, double max) {
+        setEntry(dim, Math.random() * (max-min) + min);
+        return this;
+    }
+
     public Node randomizeUniform(double min, double max) {
         for (int i = 0; i < getDimension(); i++) {
             setEntry(i, Math.random() * (max-min) + min);

@@ -939,4 +939,37 @@ public enum Util {
         }
         return j;
     }
+
+    public static float variance(float[] population){
+        float average = 0.0f;
+        for(float p: population){
+            average += p;
+        }
+        int n = population.length;
+        average /= n;
+
+        float variance = 0.0f;
+        for(float p: population){
+            float d = p - average;
+            variance += d * d;
+        }
+        return variance / n;
+    }
+    public static double[] avgvar(double[] population){
+        double average = 0.0;
+        for(double p: population){
+            average += p;
+        }
+        int n = population.length;
+        average /= n;
+
+        double variance = 0.0;
+        for(double p: population){
+            double d = p - average;
+            variance += d * d;
+        }
+        variance /= n;
+
+        return new double[] { average, variance };
+    }
 }

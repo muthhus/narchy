@@ -20,13 +20,17 @@
  */
 package nars.truth;
 
+import com.gs.collections.api.set.primitive.LongSet;
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
+import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Global;
 import nars.task.Task;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public interface Stamp {
 
@@ -40,6 +44,7 @@ public interface Stamp {
                 Global.STAMP_MAX_EVIDENCE,
                 true);
     }
+
 
 
     /***
@@ -246,5 +251,20 @@ public interface Stamp {
     }
     static int evidenceLength(@NotNull Task a, @NotNull Task b) {
         return evidenceLength(a.evidence().length, b.evidence().length);
+    }
+
+    public static long[] zip(Stream<Task> s, int num, int maxLen) {
+        final int extra = 1;
+        int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
+        LongHashSet l = new LongHashSet(maxLen);
+        s.forEach( (Task t) -> {
+            long[] e = t.evidence();
+            int el = e.length;
+            for (int i = Math.max(0, el - maxPer); i < el; i++) {
+                l.add(e[i]);
+            }
+        } );
+        int ls = l.size();
+        return ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls -maxLen), ls);
     }
 }

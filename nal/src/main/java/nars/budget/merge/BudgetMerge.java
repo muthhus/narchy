@@ -99,6 +99,11 @@ public interface BudgetMerge {
         return dqBlendByOrDurQua(tgt, src, srcScale, true);
         //dqBlendBySummary(tgt, src, srcScale, true);
     };
+    BudgetMerge plusDQBlendOld = (tgt, src, srcScale) -> {
+        return dqBlendByPri(tgt, src, srcScale, true);
+        //return dqBlendByOrDurQua(tgt, src, srcScale, true);
+        //dqBlendBySummary(tgt, src, srcScale, true);
+    };
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {

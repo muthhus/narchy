@@ -1,16 +1,21 @@
 package nars.op.time;
 
-import com.google.common.base.Joiner;
 import nars.*;
 import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
+import nars.budget.merge.BudgetMerge;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.DefaultTruth;
+import nars.truth.Stamp;
 import nars.util.data.MutableInteger;
+import nars.util.data.Util;
 import nars.util.gng.NeuralGasNet;
 import nars.util.gng.Node;
 import org.jetbrains.annotations.NotNull;
@@ -20,47 +25,55 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toSet;
+
 
 public class STMClustered extends STM {
 
-    static final int DIMENSIONS = 3;
+    static final int DIMENSIONS = 2;
     final int TIME = 0;
     final int FREQ = 1;
-    final int PUNC = 2;
 
 
     final int clusters = 9;
 
     private final ArrayBag<Task> bag;
     private final NeuralGasNet<TasksNode> net;
-    private long now;
+    protected long now;
 
     final float forgetRate = 0.01f; //TODO tune based on capacity, window size, etc.
 
+    public final char punc;
+
     //final float timeResolution = 0.5f;
+
+    private static final double[] EmptyCoherence = new double[] { Double.NaN, Double.NaN };
 
     public final class TasksNode extends Node {
 
         public final Set<TLink> tasks = new HashSet();
 
+
         public TasksNode(int id, int dimensions) {
             super(id, dimensions);
-            discretize();
+            randomizeUniform(0, now-1, now+1);
+            randomizeUniform(1, 0f, 1f);
+            filter();
         }
 
         @Override
         public void update(double rate, double[] x) {
             super.update(rate, x);
-            discretize();
+            filter();
         }
 
         @Override
         public void add(double[] x) {
             super.add(x);
-            discretize();
+            filter();
         }
 
-        protected void discretize() {
+        protected void filter() {
 //            final double[] d = getDataRef();
 //            double t = d[TIME];
 //            d[TIME] = Math.round(t);
@@ -99,6 +112,49 @@ public class STMClustered extends STM {
 
         public void delete() {
             tasks.clear();
+        }
+
+        /** 1f - variance measured from the items for a given vector dimension */
+        public double[] coherence(int dim) {
+            if (size() == 0) return EmptyCoherence;
+            double[] v = Util.avgvar(tasks.stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
+            v[1] = 1f - v[1]; //convert variance to coherence
+            return v;
+        }
+
+        //TODO cache this value
+        public float priSum() {
+            return (float)tasks.stream().mapToDouble(t->t.pri()).sum();
+        }
+
+        /** produces a parallel conjunction term consisting of all the task's terms */
+        public Compound termConjunctionParallel(int maxComponents) {
+            Term[] s = tasks.stream().map(t -> t.get().term()).distinct().toArray(Term[]::new);
+            if (s.length > maxComponents ) {
+                System.err.println("too many components: " + s + " for " + this);
+                return null;
+            }
+            if (s.length > 1) {
+                return (Compound) $.conj(0, s);
+            } else {
+                return null;
+            }
+        }
+
+        public float confMin() {
+            return (float)tasks.stream().mapToDouble(t->t.get().conf()).min().getAsDouble();
+        }
+
+        public long[] evidence() {
+            return Stamp.zip(tasks.stream().map(BLink.StrongBLink::get), tasks.size(), Global.STAMP_MAX_EVIDENCE);
+        }
+
+        public Budget budgetSum() {
+            UnitBudget u = new UnitBudget();
+            tasks.forEach(t -> {
+                BudgetMerge.plusDQBlend.merge(u, t.get().budget(), 1f);
+            });
+            return u;
         }
     }
 
@@ -152,22 +208,22 @@ public class STMClustered extends STM {
      */
     private float cycleCost(Task id) {
         float dt = Math.abs(id.occurrence() - now);
-        return forgetRate * dt / (1f + id.conf());
+        return forgetRate * dt * (1f - id.conf());
     }
 
     public static double[] getCoord(Task t) {
         double[] c = new double[DIMENSIONS];
-        c[0] = t.occurrence();
-        c[1] = 2f * (t.freq() - 0.5f); //-1 .. +1
-        c[2] = (t.punc() == Symbols.BELIEF) ? +1f : -1f;
+        c[0] = t.occurrence(); //time
+        c[1] = t.freq(); //0..+1
         return c;
     }
 
     final Deque<TasksNode> removed = new ArrayDeque<>();
 
-    public STMClustered(@NotNull NAR nar, MutableInteger capacity) {
+    public STMClustered(@NotNull NAR nar, MutableInteger capacity, char punc) {
         super(nar, capacity);
 
+        this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
@@ -183,7 +239,7 @@ public class STMClustered extends STM {
 
             @Override
             protected void removed(TasksNode furthest) {
-                System.err.println("node removed: " + furthest);
+                //System.err.println("node removed: " + furthest);
                 removed.add(furthest);
             }
         };
@@ -194,14 +250,15 @@ public class STMClustered extends STM {
             //update each frame
             bag.setCapacity(capacity.intValue());
         });
-        nar.onCycle(n -> {
-            cycle();
+        nar.onFrame(n -> {
+        //nar.onCycle(n -> {
+            iterate();
         });
 
         start();
     }
 
-    private void cycle() {
+    protected void iterate() {
 
         int rr = removed.size();
         for (int i = 0; i < rr; i++) {
@@ -210,12 +267,10 @@ public class STMClustered extends STM {
             t.delete();
         }
 
-
-
         now = nar.time();
         bag.commit();
 
-        print(System.out);
+        //print(System.out);
     }
 
     @Override
@@ -226,10 +281,13 @@ public class STMClustered extends STM {
     @Override
     public void accept(@NotNull Task t) {
 
-        TLink displaced = (TLink) bag.put(t, t.budget());
+        if (t.punc() == punc) {
 
-        if (displaced != null )
-            drop(displaced);
+            TLink displaced = (TLink) bag.put(t, t.budget());
+
+            if (displaced != null)
+                drop(displaced);
+        }
 
     }
 
@@ -248,13 +306,19 @@ public class STMClustered extends STM {
         out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
             + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
         out.println("\tBag Priority: " + bagStatistics());
+        net.vertexSet().forEach(v -> {
+            out.println(v);
+            out.println("\t[Avg,Coherence]: Temporal=" + Arrays.toString(v.coherence(0)) +
+                        "\tFrequency=" + Arrays.toString(v.coherence(1)));
+        });
+
         /*bag.forEach(b -> {
             out.println(b);
         });*/
-        out.println(Joiner.on('\n').join(net.vertexSet()));
-        out.println(Joiner.on(' ').join(net.edgeSet()));
+        //out.println(Joiner.on(' ').join(net.edgeSet()));
         out.println();
     }
+
 
     public IntSummaryStatistics nodeStatistics() {
         return net.vertexSet().stream().mapToInt(v -> v.size()).summaryStatistics();
@@ -264,6 +328,7 @@ public class STMClustered extends STM {
         return StreamSupport.stream(bag.spliterator(), false).mapToDouble(v -> v.pri()).summaryStatistics();
     }
 
+    public final Set<TasksNode> nodes() { return net.vertexSet(); }
 
     abstract static class EventGenerator implements Consumer<NAR> {
 
@@ -298,7 +363,7 @@ public class STMClustered extends STM {
 
     public static void main(String[] args) {
         Default n = new Default();
-        STMClustered stm = new STMClustered(n, new MutableInteger(16));
+        STMClustered stm = new STMClustered(n, new MutableInteger(16), '.');
 
         new EventGenerator(n, 2f, 8) {
 
@@ -308,7 +373,7 @@ public class STMClustered extends STM {
 
             @Override
             Task task(int u) {
-                return new MutableTask(term(u), (Math.random() < 0.5f) ? '.' : '!', new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
+                return new MutableTask(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
             }
         };
 

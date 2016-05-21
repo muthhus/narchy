@@ -34,10 +34,11 @@ import static org.junit.Assert.assertTrue;
 public class ControlFlowTest {
 
     private static final boolean METER = false;
+    private static final boolean LOG = false;
 
 
     private final List<CompoundConcept> states = new ArrayList();
-    private final TemporalMetrics ts = new TemporalMetrics<>(8192);
+    private final TemporalMetrics ts = new TemporalMetrics<>(4096);
 
     @Test public void testSequence2()   { testSequence(n, 2, 5);     }
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
@@ -130,7 +131,7 @@ public class ControlFlowTest {
 
     @Test public void testBranchThen()  {
         Global.DEBUG = true;
-        testBranch(n, 25, 1f);
+        testBranch(n, 30, 1f);
     }
 
     @Test public void testBranchElse()  {
@@ -173,6 +174,8 @@ public class ControlFlowTest {
 
         ExeTracker exeTracker = new ExeTracker();
         NAR n = nn.get();
+        if (LOG)
+            n.log();
 
         final String PRE = "pre";
         final String THEN = "then";
@@ -200,8 +203,11 @@ public class ControlFlowTest {
             n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
         }
 
-        n.goal($.conj( delay, $.conj(  condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
-        n.goal($.conj( delay, $.conj(  $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
+        //n.goal($.conj( delay, $.conj( condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
+        //n.goal($.conj( delay, $.conj( $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
+        n.goal($.conj( delay, condition, s(THEN, 0)));
+        n.goal($.conj( delay, $.neg(condition), s(ELSE, 0)));
+
 
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), $.neg(condition)), s(ELSE, 0)));
@@ -215,7 +221,6 @@ public class ControlFlowTest {
 
         Compound start = s(PRE, 0);
 
-        n.log();
 
         for (float B : conditionSequence ) {
             System.out.println("Execute Forward branch w/ condition=" + B);
@@ -244,11 +249,11 @@ public class ControlFlowTest {
 
 
     final Supplier<NAR> n = () -> {
-        Default x = new Default(512, 1, 1, 3);
+        Default x = new Default(512, 1, 2, 2);
         x.onCycle(c -> {
             ts.update(c.time());
         });
-        x.cyclesPerFrame.set(4);
+        x.cyclesPerFrame.set(1);
         return x;
     };
 
@@ -300,13 +305,13 @@ public class ControlFlowTest {
 
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
 
-        return newExeState(n, term, e, 0.25f);
+        return newExeState(n, term, e, 0.5f);
     }
 
     public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e, float exeThresh) {
 
 
-        CompoundConcept c = new MotorConcept(term, n, (b, d) -> {
+        MotorConcept c = new MotorConcept(term, n, (b, d) -> {
             if (d > 0.5f && (d > b + exeThresh)) {
                 long now = n.time();
                 System.out.println(term + " at " + now + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
@@ -315,13 +320,17 @@ public class ControlFlowTest {
 
                 //n.goal(term, Tense.Present, 0f); //neutralize
 
-                return 1f;
+                return d;
+                //return (d-b);
+                //return 1f;
             }
             //System.out.println("\t not: " + term + " at " + n.time() + " b=" + b + ", d=" + d + " (d-b)=" + (d - b));
 
             return Float.NaN;
             //return 1f;
         });
+        //n.goal(c, Tense.Present, 0.5f, 0.5f); //initially off
+        //n.believe(c, Tense.Present, 0.5f, 0.5f); //initially off
 
         if (METER)
             ts.add(new ConceptBeliefGoalPriorityMeter(c, n));

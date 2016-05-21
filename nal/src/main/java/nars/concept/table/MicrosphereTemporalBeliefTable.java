@@ -228,7 +228,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                     at = at.dt(newDT);
             }
 
-            merged = new MutableTask(at, a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend)
+            merged = new MutableTask(at, a, b, now, newOcc, newEv, newTruth, BudgetMerge.plusDQBlend)
                     .log("Revection Merge");
 
             remove(b);

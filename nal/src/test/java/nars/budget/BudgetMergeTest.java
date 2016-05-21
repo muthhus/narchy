@@ -18,8 +18,8 @@ public class BudgetMergeTest {
     static final UnitBudget c = new UnitBudget(0.25f, 0.2f, 0.1f);
 
     @Test
-    public void testPlusPQBlend() {
-        BudgetMerge m = BudgetMerge.plusDQBlend;
+    public void testPlusDQBlendOld() {
+        BudgetMerge m = BudgetMerge.plusDQBlendOld;
 
         testMerge(1f, m, z(),  a,   1, 0.7f, 0.3f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(0.5f, m, z(),  a,   0.5f, 0.7f, 0.3f); //scale of half should affect priority only

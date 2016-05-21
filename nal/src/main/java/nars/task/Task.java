@@ -633,7 +633,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      */
     default boolean isInput() {
         //return evidence().length <= 1;
-        return getParentsRef() == null;
+        if (getParentsRef() == null) {
+            @Nullable long[] ee = evidence();
+            return !(ee != null && ee.length > 1);
+        }
+        return false;
         //return (getParentTask() == null);
         //return (evidence().length <= 1) && ;
     }

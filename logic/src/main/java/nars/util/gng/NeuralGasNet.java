@@ -101,8 +101,9 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
         setEpsN(0.02);
 
 
+        /** the node should have randomized coordinates */
         for (int i = 0; i < maxNodes; i++) {
-            addVertex((N) newNode(i, dimension).randomizeUniform(-1.0, 1.0));
+            addVertex((N) newNode(i, dimension));
         }
 
 

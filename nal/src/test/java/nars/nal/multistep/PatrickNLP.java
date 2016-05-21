@@ -10,6 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+/** see Natural_Language_Processing2.md */
 @RunWith(Parameterized.class)
 public class PatrickNLP extends AbstractNALTest {
 
@@ -23,7 +24,7 @@ public class PatrickNLP extends AbstractNALTest {
     }
 
 
-    @Ignore
+    //@Ignore
     @Test public void testExample1() {
         /*
         ////Example 1, REPRESENT relation with lifting
@@ -45,8 +46,11 @@ public class PatrickNLP extends AbstractNALTest {
             .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
             .believe("(/,REPRESENT,_,ANIMAL):cat")
             .believe("(/,REPRESENT,_,EATING):eats")
-            //.askAt(1,"REPRESENT:((eats,cat),?what)")
-            .askAt(1250,"REPRESENT:((cat,eats),(?x, ?y))")
+
+            //WORKS with either of these two questions:
+            .askAt(1250,"REPRESENT:((eats,cat),?what)")
+            //.askAt(1250,"REPRESENT:((cat,eats),(?x, ?y))")
+
             .mustBelieve(1500, "REPRESENT:((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
 
     }
@@ -71,11 +75,15 @@ public class PatrickNLP extends AbstractNALTest {
         //t.nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         t
                 //.log()
-                .believe("(((/,REPR,_,$3):$1 && (/,REPR,_,$4):$2) ==> REPR:(($1,$3)<->($2,$4)))")
-                .believe("(/,REPR,_,ANIMATING):cat")
-                .believe("(/,REPR,_,EATING):eats")
-                //.askAt(30,"REPR:((cat,ANIMATING)<->?what)")
-                .mustBelieve(500, "REPR:((eats,EATING)<->(cat,ANIMATING))", 1f, 0.73f);
+                .believe("(($1:(/,REPR,_,$3) && $2:(/,REPR,_,$4)) ==> REPR:(($1,$3)<->($2,$4)))")
+                .believe("cat:(/,REPR,_,ANIMATING)")
+                .believe("eats:(/,REPR,_,EATING)")
+
+                //WORKS with either of these two questions:
+                .askAt(100,"REPR:((cat,ANIMATING)<->?what)")
+                //.askAt(100,"REPR:((cat,ANIMATING)<->(?x, ?y))")
+
+                .mustBelieve(250, "REPR:((eats,EATING)<->(cat,ANIMATING))", 1f, 0.73f);
         
 
     }

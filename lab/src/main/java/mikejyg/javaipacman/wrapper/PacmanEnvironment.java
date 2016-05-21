@@ -20,20 +20,33 @@
 package mikejyg.javaipacman.wrapper;
 
 import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.api.tuple.primitive.ObjectFloatPair;
+import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.gs.collections.impl.tuple.Tuples;
+import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
+import nars.Global;
 import nars.nar.Default;
 import nars.op.time.STMClustered;
+import nars.task.MutableTask;
+import nars.term.Compound;
 import nars.time.FrameClock;
+import nars.truth.DefaultTruth;
 import nars.util.Agent;
 import nars.util.NAgent;
 import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
+import org.bridj.util.Tuple;
+import org.encog.util.ObjectPair;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static nars.util.NAgent.printTasks;
@@ -63,7 +76,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
-		nar.beliefConfidence(0.51f);
+		nar.beliefConfidence(0.15f);
 		nar.conceptActivation.setValue(0.2f);
 		nar.cyclesPerFrame.set(8);
 //		nar.conceptRemembering.setValue(1f);
@@ -71,14 +84,49 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new STMClustered(nar, new MutableInteger(32)) {
+		new STMClustered(nar, new MutableInteger(32), '.') {
 
+			@Override
+			protected void iterate() {
+				super.iterate();
+
+				LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
+
+				nodes().stream().sorted((a,b)-> Float.compare(
+						a.priSum(), b.priSum()) ).forEach(n -> {
+					double[] tc = n.coherence(0);
+					if (tc[1] > 0.95f) {
+						double[] fc = n.coherence(1);
+						if (fc[1] > 0.95f) {
+							selected.put((long)Math.round(tc[0]), PrimitiveTuples.pair(n, (float)fc[0]));
+						}
+					}
+				});
+
+				//Create co-occurrence beliefs containing each centroid's members
+				selected.forEachKeyValue((t, nodeFreq) -> {
+					TasksNode node = nodeFreq.getOne();
+					Compound term = node.termConjunctionParallel(6);
+					if (term!=null) {
+						MutableTask m = new MutableTask(term, punc, new DefaultTruth(nodeFreq.getTwo(), node.confMin()))
+								.time(now, t)
+								.evidence(node.evidence())
+								.budget(node.budgetSum())
+								;
+						System.err.println(m + " " + Arrays.toString(m.evidence()));
+						nar.input(m);
+					}
+				});
+
+				//TODO create temporally inducted relations between centroids of different time indices
+
+			}
 		};
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				100);
+				1000);
 
 		printTasks(nar, true);
 		printTasks(nar, false);
