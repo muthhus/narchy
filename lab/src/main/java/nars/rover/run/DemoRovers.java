@@ -412,7 +412,7 @@ public class DemoRovers {
         nar.taskLinkRemembering.setValue(8);
 
         nar.cyclesPerFrame.set(32);
-        nar.shortTermMemoryHistory.set(2);
+
 
         //nar.executionThreshold.setValue(0.01f);
         //nar.derivationDurabilityThreshold.setValue(0.01f);

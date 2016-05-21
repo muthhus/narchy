@@ -463,7 +463,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         if (t.isCommand()) {
             t.execute(null, this); //direct execution
         } else {
-            eventInput.emit(t.normalize(this)); //accept into input buffer for eventual processing
+            process(t.normalize(this)); //accept into input buffer for eventual processing
         }
     }
 

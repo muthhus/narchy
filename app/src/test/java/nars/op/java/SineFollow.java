@@ -233,7 +233,7 @@ public class SineFollow {
         Default d = new Default(1024, 16, 3, 3);
         d.conceptActivation.setValue(0.05f);
         d.cyclesPerFrame.set(16);
-        d.shortTermMemoryHistory.set(2);
+
 //        d.log();
 //        d.eventTaskProcess.on(tt -> {
 //            if (tt.lastLogged().toString().equals("Immediaternalized"))

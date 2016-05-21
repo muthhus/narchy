@@ -27,9 +27,9 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_unification1()  {
         TestNAR tester = test();
+        tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> flyer>>", 0.79f, 0.92f); //en("If something is a bird, then usually, it is a flyer.");
         tester.believe("<<$x --> bird> ==> <$x --> flyer>>"); //en("If something is a bird, then it is a flyer.");
         tester.believe("<<$y --> bird> ==> <$y --> flyer>>", 0.00f, 0.70f); //en("If something is a bird, then it is not a flyer.");
-        tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> flyer>>", 0.79f, 0.92f); //en("If something is a bird, then usually, it is a flyer.");
 
     }
 

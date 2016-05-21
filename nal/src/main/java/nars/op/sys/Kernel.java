@@ -51,7 +51,7 @@ public class Kernel {
         schedule.merge(BudgetMerge.avgDQBlend);
         this.schForget = new Forget.ExpForget(rememberTime, new MutableFloat(1) /* TODO use immutablefloat*/)
             .withDeletedItemFiltering();
-        nar.eventInput.on(t->{
+        nar.eventTaskProcess.on(t->{
            if (t.isInput() && (t.isGoal() || t.isCommand()))
                onInput(t);
         });

@@ -19,8 +19,6 @@ import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
-import nars.task.flow.SetTaskPerception;
-import nars.task.flow.TaskPerception;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.Terms;
@@ -92,7 +90,6 @@ public class Default extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
-        the("input", initInput());
 
         the("premiser", premiser = newPremiseGenerator());
         premiser.confMin.setValue(Global.TRUTH_EPSILON);
@@ -231,29 +228,29 @@ public class Default extends AbstractNAR {
     }
 
 
-    @NotNull
-    public TaskPerception initInput() {
-
-        //return new FIFOTaskPerception(this, null, this::process);
-
-        return new SetTaskPerception(
-                this,
-                this::process,
-                //BudgetMerge.plusDQBlend
-                BudgetMerge.plusDQDominant
-        );
-
-
-        //return new SortedTaskPerception(this, 64, 4, BudgetMerge.avgDQBlend);
-
-        /* {
-            @Override
-            protected void onOverflow(Task t) {
-                memory.eventError.emit("Overflow: " + t + " " + getStatistics());
-            }
-        };*/
-        //input.inputsMaxPerCycle.set(conceptsFirePerCycle);;
-    }
+//    @NotNull
+//    public TaskPerception initInput() {
+//
+//        //return new FIFOTaskPerception(this, null, this::process);
+//
+//        return new SetTaskPerception(
+//                this,
+//                this::process,
+//                //BudgetMerge.plusDQBlend
+//                BudgetMerge.plusDQDominant
+//        );
+//
+//
+//        //return new SortedTaskPerception(this, 64, 4, BudgetMerge.avgDQBlend);
+//
+//        /* {
+//            @Override
+//            protected void onOverflow(Task t) {
+//                memory.eventError.emit("Overflow: " + t + " " + getStatistics());
+//            }
+//        };*/
+//        //input.inputsMaxPerCycle.set(conceptsFirePerCycle);;
+//    }
 
     @NotNull
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {

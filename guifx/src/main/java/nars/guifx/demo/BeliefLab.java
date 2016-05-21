@@ -33,7 +33,7 @@ public class BeliefLab {
         //nar.input("y:x. %0%");
 
 
-        nar.shortTermMemoryHistory.set(stmInduction);
+        //nar.shortTermMemoryHistory.set(stmInduction);
         nar.conceptWarm.beliefsMaxEteOrTemp.set(beliefCapacity);
         nar.run(2);
 

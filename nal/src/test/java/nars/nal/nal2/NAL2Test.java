@@ -26,9 +26,9 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void revision() throws Narsese.NarseseException {
         TestNAR tester = test();
+        tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
         tester.believe("<robin <-> swan>") ;//;//Robin is similar to swan.");
         tester.believe("<robin <-> swan>", 0.1f, 0.6f);
-        tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
     }
 
     @Test

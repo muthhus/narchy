@@ -1,17 +1,20 @@
 package nars.util.gng;
 
+import com.google.common.collect.Sets;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.graph.SimpleGraph;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * from: https://github.com/scadgek/NeuralGas
  * TODO use a graph for incidence structures to avoid some loops
  */
-abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connection<N>> {
+abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connection<N>> {
     private final int dimension;
 
     private int iteration;
@@ -29,7 +32,9 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         return lambda;
     }
 
-    /** lifespan of a node */
+    /**
+     * lifespan of a node
+     */
     public void setLambda(int lambda) {
         this.lambda = lambda;
     }
@@ -75,7 +80,6 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
     }
 
 
-
     public NeuralGasNet(int dimension, int maxNodes) {
 
         super((sourceVertex, targetVertex) -> {
@@ -97,9 +101,8 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         setEpsN(0.02);
 
 
-
         for (int i = 0; i < maxNodes; i++) {
-            addVertex((N)newNode(i, dimension).randomizeUniform(-1.0, 1.0));
+            addVertex((N) newNode(i, dimension).randomizeUniform(-1.0, 1.0));
         }
 
 
@@ -126,9 +129,12 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
 
         return closest;
     }
-    /** translates all nodes uniformly */
+
+    /**
+     * translates all nodes uniformly
+     */
     public void addToNodes(double[] x) {
-        for (Node n : vertexSet() ) {
+        for (Node n : vertexSet()) {
             n.add(x);
         }
     }
@@ -187,8 +193,8 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
             }
 
             //if (toUpdate != null) { //should not be null
-                toUpdate.update(getEpsN(), x);
-                connection.age();
+            toUpdate.update(getEpsN(), x);
+            connection.age();
             //}
         }
 
@@ -207,7 +213,6 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         addEdge(nc);
 
 
-
         //if iteration is lambda
         if (iteration != 0 && iteration % getLambda() == 0) {
 
@@ -216,37 +221,46 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
             removed(furthest);
 
             //find node with maximal local error
-            double maxError = Double.NEGATIVE_INFINITY;
+
             N maxErrorNode = null;
-            for (N node : vertexSet()) {
-                if (node.getLocalError() > maxError) {
-                    maxErrorNode = node;
-                    maxError = node.getLocalError();
+            {
+                double maxError = Double.NEGATIVE_INFINITY;
+                for (N node : vertexSet()) {
+                    if (node.getLocalError() > maxError) {
+                        maxErrorNode = node;
+                        maxError = node.getLocalError();
+                    }
+                }
+
+                if (maxErrorNode == null) {
+                    throw new RuntimeException("maxErrorNode=null");
                 }
             }
 
-            if (maxErrorNode == null) {
-                throw new RuntimeException("maxErrorNode=null");
-            }
-
-            //find max error neighbour of the mentioned node
-            maxError = Double.NEGATIVE_INFINITY;
             N maxErrorNeighbour = null;
 
-            for (Connection<N> connection : edgesOf(maxErrorNode)) {
+            Set<Connection<N>> ee = edgesOf(maxErrorNode);
+            if (!ee.isEmpty()) {
+                //find max error neighbour of the mentioned node
+                double maxError = Double.NEGATIVE_INFINITY;
 
-                N otherNode = connection.to == maxErrorNode ? connection.from : connection.to;
+                for (Connection<N> connection : ee) {
 
-                if (otherNode.getLocalError() > maxError) {
-                    maxErrorNeighbour = otherNode;
-                    maxError = otherNode.getLocalError();
+                    N otherNode = connection.to == maxErrorNode ? connection.from : connection.to;
+
+                    if (otherNode.getLocalError() > maxError) {
+                        maxErrorNeighbour = otherNode;
+                        maxError = otherNode.getLocalError();
+                    }
+
                 }
-
+            } else {
+                maxErrorNeighbour = randomNode(maxErrorNode);
             }
 
             if (maxErrorNeighbour == null) {
-                //throw new RuntimeException("maxErrorNeighbor=null");
-                return null;
+                throw new RuntimeException("maxErrorNeighbor=null");
+                //return null;
             }
 
             //remove connection between them
@@ -270,17 +284,28 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
             //update errors of the error nodes
             maxErrorNode.setLocalError(maxErrorNode.getLocalError() * getAlpha());
             maxErrorNeighbour.setLocalError(maxErrorNeighbour.getLocalError() * getAlpha());
-        }
 
 
-        //System.out.println(vertexSet().size() + " nodes, " + edgeSet().size() + " edges in neuralgasnet");
 
-        //update errors of the nodes
-        for (Node node : vertexSet()) {
-            node.setLocalError(node.getLocalError() * getBeta());
+    }
 
-            //System.out.println("  "+ node);
-        }
+
+    //System.out.println(vertexSet().size() + " nodes, " + edgeSet().size() + " edges in neuralgasnet");
+
+    //update errors of the nodes
+    for(
+    Node node
+    :
+
+    vertexSet()
+
+    )
+
+    {
+        node.setLocalError(node.getLocalError() * getBeta());
+
+        //System.out.println("  "+ node);
+    }
 
 //            //save positions
 //            for (Node node : nodes)
@@ -290,16 +315,38 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
 //            pw.println("*");
 
 
-        //System.out.println("Iteration: " + iteration++);
+    //System.out.println("Iteration: " + iteration++);
 
-        //pw.close();
+    //pw.close();
 
-        iteration++;
+    iteration++;
 
-        return closest;
+    return closest;
+}
+
+    private N randomNode(N except) {
+        Set<N> vv = vertexSet();
+        int vs = vv.size();
+        if (vs < 2)
+            throw new UnsupportedOperationException();
+
+
+        while (true) { //HACK
+            int n = (int) Math.floor(Math.random() * vs);
+            Iterator<N> vi = vv.iterator();
+            while (vi.hasNext()) {
+                N v = vi.next();
+                if (n-- == 0) {
+                    if (v != except)
+                        return v;
+                }
+            }
+        }
     }
 
-    /** called before a node will be removed */
+    /**
+     * called before a node will be removed
+     */
     protected void removed(N furthest) {
 
     }
@@ -310,7 +357,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
     }
 
     public double[] getDimensionRange(final int dimension) {
-        final double[] x = new double[] { Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        final double[] x = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
 
         for (Node node : vertexSet()) {
             double v = node.getEntry(dimension);
@@ -321,7 +368,9 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N,Connect
         return x;
     }
 
-    /** pulls a dimension out of all the nodes, as an array, and sorts it  */
+    /**
+     * pulls a dimension out of all the nodes, as an array, and sorts it
+     */
     public double[] getDimension(int dim) {
         double[] d = new double[vertexSet().size()];
         int i = 0;

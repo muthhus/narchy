@@ -43,23 +43,9 @@ public enum TermLinkBuilder {
         int ni = host.size();
         for (int i = 0; i < ni; i++) {
 
-            Term hti = host.term(i);
-            if (hti.op() == Op.NEGATE) {
-                //unwrap negation to its content
-                hti = ((Compound)hti).term(0);
-            }
+            Term ti = growComponent(host.term(i), 0, nar, components);
 
-            Term ti = growComponent(hti, 0, nar, components);
-            /*if (ti == null)
-                continue;*/
-            /*if ((tEquivalence || (tImplication && (i == 0))) &&
-                (ti.term().isAnyOf(NegationOrConjunction))) {
-
-                //"if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {"
-
-                //visitComponents((Compound) ti, components, nar);
-
-            } else */if (ti instanceof Compound) {
+            if (ti instanceof Compound) {
 
                 Compound cti = (Compound) ti;
                 for (int j = 0, nj = cti.size(); j < nj; j++) {
@@ -74,11 +60,16 @@ public enum TermLinkBuilder {
 
                         }
                     }
-
-
                 }
             }
 
+            /*if (ti == null)
+                continue;*/
+            /*if ((tEquivalence || (tImplication && (i == 0))) &&
+                (ti.term().isAnyOf(NegationOrConjunction))) {
+                //"if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {"
+                //visitComponents((Compound) ti, components, nar);
+            } else */
 
         }
         return components;
@@ -126,7 +117,7 @@ public enum TermLinkBuilder {
         return x;
     }
 
-    static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
+    //static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
 
 //    /**
 //     * Collect TermLink templates into a list, go down one level except in
@@ -189,10 +180,17 @@ public enum TermLinkBuilder {
      * determines whether to grow a 1st-level termlink to a subterm
      */
     protected static Term growComponent(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
+
+        if (t.op() == Op.NEGATE) {
+            //unwrap negation to its content
+            t = ((Compound)t).term(0);
+        }
+
         if (t instanceof Variable) {
             target.add(t);
             return t;
         }
+
 
         Concept ct = nar.concept(t, true);
         if (ct == null) {

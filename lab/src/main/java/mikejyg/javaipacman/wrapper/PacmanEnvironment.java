@@ -26,9 +26,11 @@ import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
 import nars.nar.Default;
+import nars.op.time.STMClustered;
 import nars.time.FrameClock;
 import nars.util.Agent;
 import nars.util.NAgent;
+import nars.util.data.MutableInteger;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
@@ -68,6 +70,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
+
+		new STMClustered(nar, new MutableInteger(32)) {
+
+		};
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),

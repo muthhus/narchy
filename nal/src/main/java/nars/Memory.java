@@ -74,7 +74,7 @@ public class Memory extends Param {
 
 
 
-    public final transient Topic<Task> eventInput = new DefaultTopic<>();
+    //public final transient Topic<Task> eventInput = new DefaultTopic<>();
     public final transient Topic<Serializable> eventError = new DefaultTopic<>();
 
 

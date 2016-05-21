@@ -215,7 +215,7 @@ public class RevisionTest {
         assertEquals(0.5f, b.beliefs().topEternalTruth(null).conf(), 0.01f);
 
         b.believe(1.0f, 0.6f).run(1);
-        assertEquals(2, tasklinks.size());
+        assertEquals(3, tasklinks.size());
 
         b.print();
         tasklinks.print();

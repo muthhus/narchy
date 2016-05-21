@@ -23,11 +23,11 @@ public class NAL5Test extends AbstractNALTest {
     final int cycles = 55;
 
     @Test public void revision(){
-        TestNAR tester = test();
-        tester.believe("<<robin --> [flying]> ==> <robin --> bird>>"); //.en("If robin can fly then robin is a type of bird.");
-        tester.believe("<<robin --> [flying]> ==> <robin --> bird>>",0.00f,0.60f); //.en("If robin can fly then robin may not a type of bird.");
-        tester.mustBelieve(cycles,"<<robin --> [flying]> ==> <robin --> bird>>",0.86f,0.91f); //.en("If robin can fly then robin is a type of bird.");
-        
+        test()
+            .mustBelieve(cycles,"<<robin --> [flying]> ==> <robin --> bird>>",0.86f,0.91f) //.en("If robin can fly then robin is a type of bird.");
+            .believe("<<robin --> [flying]> ==> <robin --> bird>>") //.en("If robin can fly then robin is a type of bird.");
+            .believe("<<robin --> [flying]> ==> <robin --> bird>>",0.00f,0.60f); //.en("If robin can fly then robin may not a type of bird.");
+
     }
 
     @Test
@@ -216,7 +216,7 @@ public class NAL5Test extends AbstractNALTest {
 
     @Test public void compound_decomposition_one_premises(){
         test()
-            .log()
+            //.log()
             .believe("(&&,<robin --> swimmer>,<robin --> [flying]>)",0.9f,0.9f) //.en("Robin can fly and swim.");
             .mustBelieve(cycles,"<robin --> swimmer>",0.9f,0.73f) //.en("Robin can swim.");
             .mustBelieve(cycles,"<robin --> [flying]>",0.9f,0.73f); //.en("Robin can fly.");
@@ -235,17 +235,19 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void negation0(){
 
-        TestNAR tester = test();
-        tester.believe("(--,<robin --> [flying]>)",0.9f,0.9f); //.en("It is unlikely that robin cannot fly.");
-        tester.mustBelieve(cycles,"<robin --> [flying]>",0.10f,0.90f); //.en("Robin can fly.");
+        test()
+            .mustBelieve(cycles,"<robin --> [flying]>",0.10f,0.90f) //.en("Robin can fly.");
+            .believe("(--,<robin --> [flying]>)",0.9f,0.9f); //.en("It is unlikely that robin cannot fly.");
+
 
     }
     @Test
     public void negation1(){
 
-        TestNAR tester = test();
-        tester.believe("(--,<robin <-> parakeet>)",0.9f,0.9f);
-        tester.mustBelieve(cycles,"<robin <-> parakeet>",0.10f,0.90f);
+        test()
+                .mustBelieve(cycles,"<robin <-> parakeet>",0.10f,0.90f)
+                .believe("(--,<robin <-> parakeet>)",0.9f,0.9f);
+
 
     }
 

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.task.Task;
-import nars.task.flow.FIFOTaskPerception;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -33,7 +32,6 @@ public class Terminal extends AbstractNAR {
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
         super(c, new Default.DefaultTermIndex(capacity, random), random);
-        the("input", initInput());
     }
 
 
@@ -75,11 +73,5 @@ public class Terminal extends AbstractNAR {
         return null;
     }
 
-    @NotNull
-    public FIFOTaskPerception initInput() {
-        return new FIFOTaskPerception(this,
-                taskFilter,
-                null //TODO
-        );
-    }
+
 }

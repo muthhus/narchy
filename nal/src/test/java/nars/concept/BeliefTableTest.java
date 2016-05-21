@@ -220,20 +220,20 @@ public class BeliefTableTest  {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(2 /* revision */, beliefs.size());
-        assertEquals(0.5, beliefs.topEternal().conf(), 0.001);
+        assertEquals(3 /* revision */, beliefs.size());
+        assertEquals(0.669, beliefs.topEternal().conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(4, beliefs.size());
+        assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
-        assertEquals(0.67, bb.topEternal().conf(), 0.001);
-        assertEquals(0.67, bb.top(n.time()).conf(), 0.001);
+        assertEquals(0.75, bb.topEternal().conf(), 0.001);
+        assertEquals(0.75, bb.top(n.time()).conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.75, beliefs.topEternal().conf(), 0.001);
-        assertEquals(6, beliefs.size());
+        assertEquals(0.79, beliefs.topEternal().conf(), 0.01);
+        assertEquals(7, beliefs.size());
 
         //n.step();
         //b.print();

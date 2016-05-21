@@ -39,7 +39,7 @@ public class SequenceTest {
         n.cyclesPerFrame.set(4);
         n.conceptRemembering.setValue(1);
         n.conceptActivation.setValue(0.05f);
-        n.shortTermMemoryHistory.set(4);
+        //n.shortTermMemoryHistory.set(4);
 
         n.onExec(new TermFunction("vocalize") {
 

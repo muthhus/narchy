@@ -100,7 +100,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
-                .mustBelieve(5, "(z ==>-5 x)", 1.00f, 0.45f);
+                .mustBelieve(cycles, "(z ==>-5 x)", 1.00f, 0.45f);
 
     }
 
@@ -117,9 +117,10 @@ public class NAL7Test extends AbstractNALTest {
     public void testBminT() {
         //(P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
         test()
+                //.log()
+                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
                 .believe("(x ==>+2 y)")
-                .believe("(z ==>+3 y)")
-                .mustBelieve(5, "(z ==>+1 x)", 1.00f, 0.45f);
+                .believe("(z ==>+3 y)");
     }
 
     @Test
@@ -129,7 +130,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
-                .mustBelieve(5*2, "(z ==>+1 x)", 1.00f, 0.45f);
+                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f);
     }
 
     @Test
@@ -152,10 +153,10 @@ public class NAL7Test extends AbstractNALTest {
     public void testImplQueryTenseFuture() {
         test()
                 //.log()
+                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.18f, 2)
                 .input("(y ==>+3 x). :\\:")
-                .inputAt(1, "(y ==>+3 ?z)? :/:")
+                .inputAt(1, "(y ==>+3 ?z)? :/:");
                 //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);
-                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.54f, 2);
     }
 
 //    @Test public void testImplQuery2() {

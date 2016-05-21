@@ -37,7 +37,7 @@ public class Predict_NARS_Core {
 
         NAR n = new Default(1000, 2, 4, 4);
         n.cyclesPerFrame.set(4);
-        n.shortTermMemoryHistory.set(3);
+        //n.shortTermMemoryHistory.set(3);
         //n.param.duration.set(duration);
         //n.param.noiseLevel.set(0);
         //n.param.conceptForgetDurations.set(16);

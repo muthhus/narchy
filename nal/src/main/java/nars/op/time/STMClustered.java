@@ -228,7 +228,7 @@ public class STMClustered extends STM {
 
         TLink displaced = (TLink) bag.put(t, t.budget());
 
-        if (displaced != null)
+        if (displaced != null )
             drop(displaced);
 
     }
