@@ -19,7 +19,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
     private final transient String id;
 
-    private final Derive derive;
+    public final Derive derive;
 
     protected final TruthOperator belief;
     protected final TruthOperator desire;
@@ -184,11 +184,6 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         }
 
         return false;
-    }
-
-
-    public Derive getDerive() {
-        return derive;
     }
 
 

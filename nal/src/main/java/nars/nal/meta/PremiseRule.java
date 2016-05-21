@@ -222,24 +222,20 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> getConditions(@NotNull PostCondition post) {
 
+        Solve truth = solver(post, this, anticipate, eternalize, temporalize );
+
+
         List<Term> l = Global.newArrayList(prePreconditions.length + 4 /* estimate */);
 
         addAll(l, prePreconditions);
 
-        addAll(l, match.pre);
-
-        Solve truth = solver(post,
-                this, anticipate, eternalize, temporalize
-        );
         l.add(truth);
 
         sortPreconditions(l);
 
-        //---
-
         addAll(l, match.code);
 
-        l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
+        l.add(truth.derive); //will be linked to and invoked by match callbacks
 
         l.add(TRUE);
 

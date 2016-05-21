@@ -34,8 +34,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
     final String id;
 
 
-    @NotNull
-    public final Term[] pre;
+
     @NotNull
     public final Term[] code;
     @NotNull
@@ -49,12 +48,11 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
         this.term = pattern;
 
-        List<BooleanCondition<PremiseEval>> pre = Global.newArrayList();
+
         List<BooleanCondition<PremiseEval>> code = Global.newArrayList();
 
-        compile(pattern, pre, code, constraints);
+        compile(pattern, code, constraints);
 
-        this.pre = pre.toArray(new BooleanCondition[pre.size()]);
         this.code = code.toArray(new BooleanCondition[code.size()]);
 
 
@@ -94,7 +92,6 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
     private static void compile(@NotNull TaskBeliefPair pattern,
-                                @NotNull List<BooleanCondition<PremiseEval>> pre,
                                 @NotNull List<BooleanCondition<PremiseEval>> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
@@ -139,17 +136,17 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             }
         }
 
-
-        //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, code, task, belief, constraints);
-
         //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
         if (addToEndOfPreGuards!=null)
-            pre.add(addToEndOfPreGuards);
+            code.add(addToEndOfPreGuards);
+
+        //default case: exhaustively match both, with appropriate pruning guard preconditions
+        compileTaskBelief(code, task, belief, constraints);
+
+
     }
 
     private static void compileTaskBelief(
-            @NotNull List<BooleanCondition<PremiseEval>> pre,
             @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
@@ -157,14 +154,14 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         boolean belIsPatVar = belief!=null && belief.op() == Op.VAR_PATTERN;
 
         if (task!=null && !taskIsPatVar)
-            pre.add(new SubTermOp(0, task.op()));
+            code.add(new SubTermOp(0, task.op()));
         if (belief!=null && !belIsPatVar)
-            pre.add(new SubTermOp(1, belief.op()));
+            code.add(new SubTermOp(1, belief.op()));
 
         if (task!=null && !taskIsPatVar)
-            pre.add(new SubTermStructure(0, task.structure()));
+            code.add(new SubTermStructure(0, task.structure()));
         if (belief!=null && !belIsPatVar)
-            pre.add(new SubTermStructure(1, belief.structure()));
+            code.add(new SubTermStructure(1, belief.structure()));
 
         //        } else {
         //            if (x0.containsTermRecursively(x1)) {
@@ -223,7 +220,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
     @Nullable
-    public static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
+    static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
         if (c.isEmpty()) return null;
 
         Map<Term, MatchConstraint> con = Global.newHashMap(c.size());
@@ -243,7 +240,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
     }
 
     @NotNull
-    static public MatchConstraint compile(@NotNull ImmutableMap<Term, MatchConstraint> mm) {
+    static MatchConstraint compile(@NotNull ImmutableMap<Term, MatchConstraint> mm) {
         switch (mm.size()) {
             case 1:
                 Term z = mm.castToMap().keySet().iterator().next();
@@ -259,24 +256,6 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
                 return new MultiMatchConstraint(mm);
         }
 
-    }
-
-    /** matches the possibility that one half of the premise must be contained within the other.
-     * this would in theory be more efficient than performing a complete match for the redundancies
-     * which we can determine as a precondition of the particular task/belief pair
-     * before even beginning the match. */
-    static final class TaskBeliefEqualCondition extends AtomicBooleanCondition<PremiseEval> {
-
-        @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
-            Term[] x =  m.term.terms();
-            return x[0].equals(x[1]);
-        }
-
-        @Override
-        public String toString() {
-            return "taskbeliefEq";
-        }
     }
 
     /** matches the possibility that one half of the premise must be contained within the other.
