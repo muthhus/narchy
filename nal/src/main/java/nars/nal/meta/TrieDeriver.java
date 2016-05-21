@@ -11,16 +11,20 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.TrieNode;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import static nars.nal.meta.TermTrie.indent;
 
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
@@ -118,9 +122,79 @@ public class TrieDeriver extends Deriver {
                 bb.add(branch);
         });
 
-        System.out.println(bb);
+        return optimize(bb);
+    }
+
+    protected List<ProcTerm> optimize(List<ProcTerm> bb) {
+
+        bb = factorSubOpToSwitch(bb, 0);
+        bb = factorSubOpToSwitch(bb, 1);
 
         return bb;
+    }
+
+    private List<ProcTerm> factorSubOpToSwitch(List<ProcTerm> bb, int i) {
+
+
+        return bb;
+    }
+
+    public void print(@NotNull PrintStream out) {
+
+        for (ProcTerm p : roots)
+            print(p, out, 0);
+    }
+    public void print(Object p, @NotNull PrintStream out, int indent) {
+
+        indent(indent);
+        out.println( '<' + Util.className(p) + '>' );
+
+        if (p instanceof IfThen) {
+
+            IfThen it = (IfThen)p;
+            print(it.cond, out, indent+2);
+            print(it.conseq, out, indent+4);
+        } else if (p instanceof If) {
+            If it = (If)p;
+            print(it.cond, out, indent+2);
+        } else if (p instanceof AndCondition) {
+            AndCondition ac = (AndCondition)p;
+            for (BoolCondition b : ac.termCache) {
+                print(b, out, indent + 2);
+            }
+        } else if (p instanceof ThenFork) {
+            ThenFork ac = (ThenFork)p;
+            for (ProcTerm b : ac.termCache) {
+                print(b, out, indent + 2);
+            }
+        } else {
+
+            indent(indent+2);
+            out.println(  p );
+
+
+        }
+
+        indent(indent);
+        out.println( "</" + Util.className(p) +">" );
+
+//        node.forEach(n -> {
+//            List<A> seq = n.seq();
+//
+//            int from = n.start();
+//
+//            out.print(n.childCount() + "|" + n.getSize() + "  ");
+//
+//            indent(from * 4);
+//
+//            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())
+//                    //.stream().map(x ->
+//                    //'[' + x.getClass().getSimpleName() + ": " + x + "/]").collect(Collectors.toList())
+//            ) );
+//
+//            printSummary(n, out);
+//        });
+
     }
 
 

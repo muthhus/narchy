@@ -225,57 +225,57 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = Global.newHashSet(2); //for ensuring uniqueness / no duplicates
+        Solve truth = solve(post, this, anticipate, eternalize, temporalize);
 
-        addAll(s, precon);
+        //PREFIX
+        {
+            addAll(s, precon);
 
-        Solve truth = solve(post, this, anticipate, eternalize, temporalize );
-        s.add(truth);
+            s.add(truth);
 
-        //if no specific task punctuation has been set, then add a Punctuation Guard, early avoidance of Goals being tested in the Solve
-        if (taskPunc==0) {
-            if (truth.desire == null && truth.belief != null)
-                s.add(TaskPunctuation.NotGoal);
-            if (truth.belief == null && truth.desire != null)
-                s.add(TaskPunctuation.NotBelief);
+            //if no specific task punctuation has been set, then add a Punctuation Guard, early avoidance of Goals being tested in the Solve
+            if (taskPunc == 0) {
+                if (truth.desire == null && truth.belief != null)
+                    s.add(TaskPunctuation.NotGoal);
+                if (truth.belief == null && truth.desire != null)
+                    s.add(TaskPunctuation.NotBelief);
+            }
+
+            addAll(s, match.pre);
         }
 
-        addAll(s, match.pre);
-
-
-        FasterList sl = new FasterList(s);
-
-        System.out.println(sl);
-
-        List<Term> l = sort(sl);
-
-        System.out.println("\t" + l);
+        List<Term> l = sort(new FasterList(s));
 
         //SUFFIX (order already determined for matching)
+        {
+            addAll(l, match.code);
 
-        addAll(l, match.code);
-
-        l.add(truth.derive); //will be linked to and invoked by match callbacks
+            l.add(truth.derive); //will be linked to and invoked by match callbacks
+        }
 
         return l;
     }
 
     /** higher is earlier */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
-        put("SubTermOp0", 12);
-        put(TaskPunctuation.class, 11);
-        put("SubTermOp1", 10);
+        put("SubTermOp0", 20);
+        put(TaskPunctuation.class, 15);
+        put("SubTermOp1", 13);
+
+        put(Solve.class, 12);
+
+        put(SubTermsStructure.class, 11);
+        put(SubTermStructure.class, 11);
 
         put(events.class, 9);
 
         put(TaskNegative.class, 8);
         put(TaskPositive.class, 8);
-        put(BeliefNegative.class, 8);
-        put(BeliefPositive.class, 8);
+        put(BeliefNegative.class, 7);
+        put(BeliefPositive.class, 7);
 
-        put(SubTermStructure.class, 3);
-        put(SubTermsStructure.class, 3);
 
-        put(Solve.class, 1);
+
 
 //        put(SubTermOp.class, 10);
 //        put(TaskPunctuation.class, 9);
@@ -287,6 +287,8 @@ public class PremiseRule extends GenericCompound {
     private static Object classify(Term b) {
         if (b instanceof SubTermOp)
             return "SubTermOp" + (((SubTermOp)b).subterm == 0 ? "0" : "1"); //split
+
+
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
@@ -309,24 +311,27 @@ public class PremiseRule extends GenericCompound {
      * pulling the cheapest and most discriminating tests to the beginning.
      */
     private static List<Term> sort(@NotNull List<Term> l) {
+        HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
+
         Collections.sort(l, (a, b) -> {
 
             int ascore = 0, bscore = 0;
 
             Object ac = classify(a);
-            if (!preconditionScore.containsKey(ac)) {
+
+            if (!ps.containsKey(ac)) {
                 //System.err.println("preconditionRank missing " + a + " classified as: " + ac);
                 ascore = -1;
             } else {
-                ascore = preconditionScore.get(ac);
+                ascore = ps.get(ac);
             }
 
             Object bc = classify(b);
-            if (!preconditionScore.containsKey(bc)) {
+            if (!ps.containsKey(bc)) {
                 //System.err.println("preconditionRank missing " + b + " classified as: " + bc);
                 bscore = -1;
             } else {
-                bscore = preconditionScore.get(bc);
+                bscore = ps.get(bc);
             }
 
             if (ascore!=bscore) {

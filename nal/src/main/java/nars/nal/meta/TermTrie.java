@@ -13,7 +13,7 @@ import org.magnos.trie.TrieSequencer;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 /** indexes sequences of (a perfectly-hashable fixed number
@@ -82,7 +82,10 @@ abstract public class TermTrie<K extends Term, V> {
 
             indent(from * 4);
 
-            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())));
+            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())
+                    //.stream().map(x ->
+                //'[' + x.getClass().getSimpleName() + ": " + x + "/]").collect(Collectors.toList())
+            ) );
 
             printSummary(n, out);
         });
@@ -90,6 +93,7 @@ abstract public class TermTrie<K extends Term, V> {
 
 
     }
+
 
     public SummaryStatistics costAnalyze(FloatFunction<K> costFn, PrintStream o) {
 

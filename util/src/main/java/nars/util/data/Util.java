@@ -972,4 +972,11 @@ public enum Util {
 
         return new double[] { average, variance };
     }
+
+    public static String className(Object p) {
+        String s = p.getClass().getSimpleName();
+        if (s.isEmpty())
+            return p.getClass().toString().replace("class ", "");
+        return s;
+    }
 }

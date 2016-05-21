@@ -18,7 +18,7 @@ import java.util.List;
 public final class AndCondition extends GenericCompound<BoolCondition> implements BoolCondition {
 
     @NotNull
-    protected final BoolCondition[] termCache;
+    public final BoolCondition[] termCache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
