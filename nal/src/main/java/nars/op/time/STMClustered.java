@@ -54,6 +54,7 @@ public class STMClustered extends STM {
 
     public final class TasksNode extends Node {
 
+        /** current members */
         public final Set<TLink> tasks = new HashSet();
 
 
@@ -160,7 +161,10 @@ public class STMClustered extends STM {
      */
     public final class TLink extends BLink.StrongBLink<Task> {
 
+        /** feature vector representing the item as learned by clusterer */
         public final double[] coord;
+
+        /** current centroid */
         TasksNode node;
 
         public TLink(Task t, @NotNull Budgeted b, float scale) {

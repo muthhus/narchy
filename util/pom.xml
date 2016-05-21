@@ -54,12 +54,20 @@
       <version>3.4</version>
       <scope>compile</scope>
     </dependency>
+
+    <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
-      <groupId>org.javabits.jgrapht</groupId>
+      <groupId>org.jgrapht</groupId>
       <artifactId>jgrapht-core</artifactId>
-      <version>0.9.3</version>
-      <scope>compile</scope>
+      <version>0.9.2</version>
     </dependency>
+    <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
+    <dependency>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-ext</artifactId>
+      <version>0.9.2</version>
+    </dependency>
+
     <dependency>
       <groupId>org.codehaus.janino</groupId>
       <artifactId>janino</artifactId>
@@ -93,7 +101,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math3</artifactId>
-      <version>3.6</version>
+      <version>3.6.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

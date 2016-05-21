@@ -265,10 +265,10 @@ public class PremiseRuleSet  {
 
 
         if (forwardPermutes(r)) {
-            permuteForward(index, ur, src, r, r.allowBackward);
+            permuteForward(index, ur, src, r, r.backward);
         }
 
-        if (r.allowBackward) {
+        if (r.backward) {
 
             //System.err.println("r: " + r);
 
@@ -278,7 +278,7 @@ public class PremiseRuleSet  {
                 PremiseRule b = add(ur, q, src + ':' + reason, index);
 
                 if (forwardPermutes(b)) {
-                    permuteForward(index, ur, src, b, r.allowBackward);
+                    permuteForward(index, ur, src, b, r.backward);
                 }
             });
         }

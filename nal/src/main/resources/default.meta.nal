@@ -374,15 +374,15 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction)
-    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
+    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction)
+    (A ==> (M --> P)), (M --> S), neq(S,P), neq(A, (M --> S)), time(dtTaskExact) |- (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
     (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction)
     (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
 //TODO test that this not_equal with a compound parameter works correctly
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction)
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
+    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction)
+    (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
     (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction)
     (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)

@@ -27,6 +27,16 @@ public class DeriverTest {
         assert(d.roots.length > 1);
     }
 
+    @Test public void printRuleSet() {
+
+        List<PremiseRule> rr = d.rules.rules;
+        System.out.println(rr.size() + " rules");
+        rr.forEach(r -> {
+            System.out.println(r);
+        });
+
+    }
+
     @Test
     public void testRuleStatistics() {
         List<PremiseRule> R = d.rules.rules;

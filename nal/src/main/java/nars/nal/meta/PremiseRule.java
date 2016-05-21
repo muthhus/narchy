@@ -54,14 +54,29 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
+    @Override
+    public String toString() {
+        return "PremiseRule{" +
+                "\t source='" + source + '\'' +
+                "\t prePreconditions=" + Arrays.toString(prePreconditions) +
+                "\t match=" + match +
+                "\t postPreconditions=" + Arrays.toString(postPreconditions) +
+                "\t postconditions=" + Arrays.toString(postconditions) +
+                "\t temporalize=" + temporalize +
+                "\t eternalize=" + eternalize +
+                "\t anticipate=" + anticipate +
+                "\t backward=" + backward +
+                "\t minNAL=" + minNAL +
+                '}';
+    }
 
     public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[]{
             intersect.class,
             differ.class,
             union.class,
             substitute.class,
-            substituteIfUnifies.class,
-            ifUnifies.class
+            substituteIfUnifies.class
+//            ifUnifies.class
 //        occurrsForward.class,
 //        occurrsBackward.class
     };
@@ -82,7 +97,7 @@ public class PremiseRule extends GenericCompound {
 //        }
 //    };
 
-    public boolean immediate_eternalize;
+    public boolean eternalize;
 
     public boolean anticipate;
 
@@ -104,7 +119,7 @@ public class PremiseRule extends GenericCompound {
     //it has certain pre-conditions, all given as predicates after the two input premises
 
 
-    boolean allowBackward;
+    boolean backward;
 
     /**
      * maximum of the minimum NAL levels involved in the postconditions of this rule
@@ -219,7 +234,7 @@ public class PremiseRule extends GenericCompound {
         addAll(l, match.pre);
 
         Solve truth = solver(post,
-                this, anticipate, immediate_eternalize, postPreconditions, temporalize
+                this, anticipate, eternalize, postPreconditions, temporalize
         );
         l.add(truth);
 
@@ -798,7 +813,7 @@ public class PremiseRule extends GenericCompound {
 
 
     public final void setAllowBackward() {
-        this.allowBackward = true;
+        this.backward = true;
     }
 
 

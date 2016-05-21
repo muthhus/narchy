@@ -19,8 +19,8 @@ import static java.lang.System.out;
 public class Thermostat implements Environment {
 
 
-    public float targetPeriod = 15;
-    public final float speed = 0.17f;
+    public float targetPeriod = 30;
+    public final float speed = 0.05f;
     boolean print;
     private MutableFloat yHidden;
     private MutableFloat yEst;
@@ -124,7 +124,7 @@ public class Thermostat implements Environment {
 
     public static void main(String[] args) {
 
-        int cycles = 1500;
+        int cycles = 2500;
 
         float b = new Thermostat().run(
                 new DQN(),

@@ -31,7 +31,7 @@ public class PostCondition implements Serializable, Level //since there can be m
         this.beliefTruth = beliefTruth;
         this.goalTruth = goalTruth;
         this.puncOverride = puncOverride;
-        minNAL = Terms.maxLevel(term);// term.op().minLevel;
+        this.minNAL = Terms.maxLevel(term);// term.op().minLevel;
     }
 
     @NotNull
@@ -160,7 +160,7 @@ public class PostCondition implements Serializable, Level //since there can be m
 
                 case "Eternalize":
                     if (which.equals(PostCondition.immediate)) {
-                        rule.immediate_eternalize = true;
+                        rule.eternalize = true;
                     }
                     break;
 
