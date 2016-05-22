@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -19,6 +21,8 @@ public class Shell {
     //private final StreamGobbler errReader;
     public long lastOutput;
 
+    static final Executor exe = Executors.newSingleThreadExecutor();
+
     Shell(String... cmd) throws IOException {
         this.proc = new ProcessBuilder(cmd).redirectErrorStream(true).start();
 
@@ -33,7 +37,10 @@ public class Shell {
 //        errReader.setName("errr");
 
 
-        this.reader = new StreamGobbler(proc.getInputStream(), this::readln);
+        this.reader = new StreamGobbler(proc.getInputStream(), s -> {
+            if (!s.isEmpty())
+                exe.execute(() -> readln(s));
+        });
         reader.setName("read");
 
 

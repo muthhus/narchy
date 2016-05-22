@@ -5,7 +5,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import nars.nar.Default;
 import nars.util.Agent;
-import nars.util.DQN;
 import nars.util.NAgent;
 import nars.util.Texts;
 import nars.util.data.Util;
@@ -14,18 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class AIGymClient extends Shell {
 
     private static final Logger logger = LoggerFactory.getLogger(AIGymClient.class);
 
 
-    private final String envID;
+    private final String environmentID;
     boolean envReady;
     //final AtomicBoolean replReady = new AtomicBoolean(true);
-    private final AtomicReference<Consumer<String>> nextLineConsumer = new AtomicReference(null);
+    private final AtomicReference<Predicate<String>> nextLineConsumer = new AtomicReference(null);
     private int framesRemain;
     private AgentBuilder agentBuilder;
     private Agent agent = null;
@@ -39,49 +40,76 @@ public class AIGymClient extends Shell {
     //public final PrintStream output;
     //private final Future<ProcessResult> future;
 
-    public AIGymClient(String environmentID) throws IOException {
+    public AIGymClient(String environmentID, AgentBuilder a, int frames) throws IOException {
         super("python", "-i" /* interactive */);
 
         input("import gym, logging, json, yaml");
 
-        input("logging.getLogger().setLevel(logging.INFO)");
+        input("logging.getLogger().setLevel(logging.WARN)"); //INFO and LOWER are not yet supported
+
 
         input("def enc(x):\n\treturn json.dumps(x)\n");
         input("def encS(x):\n\tx.pop() ; x[0] = x[0].tolist() ; x[2] = str(x[2])\n\treturn json.dumps(x)\n");
 
 
-        this.envID = environmentID;
-        input("env = gym.make('" + environmentID + "')");
+        this.environmentID = environmentID;
 
+        envReady = false;
+        input("env = gym.make('" + environmentID + "')", (line) -> {
+            if (line.contains("Making new env: " + environmentID)) {
+
+                finished = false;
+
+                framesRemain = frames;
+
+                this.agentBuilder = a;
+
+                //video_callable=None
+                input("env.monitor.start('/tmp/" + this.environmentID + "',force=True)", x -> {
+
+                    if (x.contains("Clearing")) {
+                        //monitor started
+
+                        input("enc([env.observation_space.low.tolist(),env.observation_space.high.tolist(),str(env.action_space),env.reset().tolist()])", line1 -> {
+
+                            envReady = true;
+
+                            onFrame(line1);
+
+                            return true;
+                        });
+                    }
+
+                    return true;
+                });
+
+            }
+            return true;
+        });
+
+        Util.pause(20000);
     }
+
+
 
     @Override
     protected void readln(String line) {
         super.readln(line);
 
-        if (!line.startsWith(">>>")) //ignore input echo
-            return;
-
-        if (!envReady && line.contains("new env:") && line.contains(envID)) {
-            envReady = true;
-        }
 
         if (nextLineConsumer != null) /* since it can be called from super class constructor */ {
-            synchronized (nextLineConsumer) {
-                Consumer<String> c = nextLineConsumer.get();
-                if (c != null) {
-                    try {
-                        c.accept(line);
-                        //nextLineConsumer.set(null);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                synchronized (nextLineConsumer) {
+                    Predicate<String> c = nextLineConsumer.get();
+                    if (c != null) {
+                        c.test(line);
+
+
                     }
-
 
                 }
 
-            }
+
         }
 
 
@@ -91,14 +119,12 @@ public class AIGymClient extends Shell {
         input(line, null);
     }
 
-    protected void input(String line, Consumer<String> result) {
+    protected void input(String line, Predicate<String> result) {
         //if (nextLineConsumer.compareAndSet(null, result) || nextLineConsumer.compareAndSet(result, result)) {
 
         synchronized (nextLineConsumer) {
-            System.out.println(nextLineConsumer.get() + " -> " + result);
 
-            if (result != null)
-                nextLineConsumer.set(result);
+            nextLineConsumer.set(result);
 
             println(line);
         }
@@ -106,44 +132,64 @@ public class AIGymClient extends Shell {
         //throw new RuntimeException("repl interruption");
     }
 
-    protected void waitEnv() {
-        //TODO dont use polling method but a better async interrupt
-        if (envReady)
-            return;
-        logger.info("environment {} starting...", envID);
-        while (!envReady) {
-            Util.pause(20);
-        }
-        logger.info("environment {} ready", envID);
-    }
+//    protected void waitEnv() {
+//        //TODO dont use polling method but a better async interrupt
+//        if (envReady)
+//            return;
+//        logger.info("environment {} starting...", environmentID);
+//        while (!envReady) {
+//            Util.pause(20);
+//        }
+//        logger.info("environment {} ready", environmentID);
+//    }
 
     @FunctionalInterface
     interface AgentBuilder {
         public Agent newAgent(int inputs, float[] inputLow, float[] inputHigh, int outputs);
     }
 
-    public synchronized void run(AgentBuilder a, int frames) {
 
-        finished = false;
-
-        waitEnv();
-
-        //env.monitor.start('/tmp/" + environmentID + "',force=True)");
-
-        framesRemain = frames;
-
-        this.agentBuilder = a;
-
-        //begins chain reaction
-        input("enc([env.observation_space.low.tolist(),env.observation_space.high.tolist(),str(env.action_space),env.reset().tolist()])", this::onFrame);
+    private boolean onFrame(String f) {
 
 
+        if (finished || framesRemain < 0) {
+            System.err.println("FINISHED");
+            return false;
+        }
+        f = f.trim();
+
+        if (f.startsWith(">>> "))
+            f = f.substring(4);
+
+        if (f.startsWith("\'")) {
+            f = f.substring(1, f.length() - 1);
+
+            if (onJSON(f)) {
+                framesRemain--;
+                nextFrame();
+            } else {
+                System.err.println("not json: " + f);
+            }
+            return true;
+        } else {
+            System.err.println("ignored: " + f);
+        }
+        return false;
     }
 
+    private void nextFrame() {
+        if (nextAction == -1) {
+            nextAction = (int) Math.floor(Math.random() * outputs); //HACK
+        }
+        input("encS(list(env.step(" + nextAction + ")))", this::onFrame);
+    }
 
-    private void onFrame(String f) {
+    private boolean onJSON(String f) {
 
         JsonArray j = pyjson(f);
+        if (j == null)
+            return false;
+
 
         if (f.contains("Discrete") || f.contains("Continuous")) {
             //first cycle, determine model parameters
@@ -174,6 +220,7 @@ public class AIGymClient extends Shell {
 
             nextAction = agent.act(0, input);
 
+            return true;
         } else {
 
             //ob, reward, done, _
@@ -185,20 +232,25 @@ public class AIGymClient extends Shell {
             System.out.println(Texts.n4(input) + " |- " + reward);
 
             nextAction = agent.act(reward, input);
+
+            return true;
         }
 
 
-        if (!finished && --framesRemain > 0) {
-            nextFrame();
-        }
     }
 
-    static JsonArray pyjson(String f) {
-        String j = f.substring(5, f.length() - 1);
-        j = j.replace("Infinity", "0");
+    static JsonArray pyjson(String j) {
+        j = j.replace("Infinity", "1");
 
-        //doesnt handle Inf
-        return ((JsonArray) Json.parse(j));
+        try {
+            //doesnt handle Inf
+            return ((JsonArray) Json.parse(j));
+        } catch (Exception e) {
+            System.err.println("can not parse: " + j);
+            e.printStackTrace();
+        }
+        return null;
+
     }
 
     private static double[] asArray(JsonArray j, int index) {
@@ -210,21 +262,15 @@ public class AIGymClient extends Shell {
     }
 
 
-    private void nextFrame() {
-        //ob, reward, done, _
-        input("encS(list(env.step(" + nextAction + ")))", this::onFrame);
-    }
-
     public static void main(String[] args) throws IOException {
         new AIGymClient(
-                "CartPole-v0"
+                "CartPole-v0",
                 //"MountainCar-v0"
                 //"DoomDeathmatch-v0" //2D inputs
-        ).run((i, iLow, iHigh, o) ->
-            //new DQN(i, o)
-            new NAgent(new Default())
-            ,160
-        );
+                (i, iLow, iHigh, o) ->
+                        //new DQN(i, o)
+                        new NAgent(new Default())
+                , 160);
 
 /*
     # The world's simplest agent!
