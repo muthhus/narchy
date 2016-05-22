@@ -3,27 +3,23 @@ package nars;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
-import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import nars.nar.Default;
 import nars.util.Agent;
 import nars.util.DQN;
+import nars.util.NAgent;
 import nars.util.Texts;
 import nars.util.data.Util;
 
-import nars.util.experiment.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public class AIGymClient extends Shell  {
+public class AIGymClient extends Shell {
 
     private static final Logger logger = LoggerFactory.getLogger(AIGymClient.class);
-
 
 
     private final String envID;
@@ -34,6 +30,11 @@ public class AIGymClient extends Shell  {
     private AgentBuilder agentBuilder;
     private Agent agent = null;
     int inputs, outputs;
+    private int nextAction = -1;
+    private double[] low;
+    private double[] high;
+    private double[] input;
+    private boolean finished;
 
     //public final PrintStream output;
     //private final Future<ProcessResult> future;
@@ -48,8 +49,9 @@ public class AIGymClient extends Shell  {
         input("def enc(x):\n\treturn json.dumps(x)\n");
         input("def encS(x):\n\tx.pop() ; x[0] = x[0].tolist() ; x[2] = str(x[2])\n\treturn json.dumps(x)\n");
 
+
         this.envID = environmentID;
-        input("env = gym.make('" + environmentID + "')"); //TODO get initial state
+        input("env = gym.make('" + environmentID + "')");
 
     }
 
@@ -64,10 +66,21 @@ public class AIGymClient extends Shell  {
             envReady = true;
         }
 
-        if (nextLineConsumer!=null) /* since it can be called from super class constructor */ {
-            Consumer<String> c = nextLineConsumer.getAndSet(null);
-            if (c != null) {
-                c.accept(line);
+        if (nextLineConsumer != null) /* since it can be called from super class constructor */ {
+            synchronized (nextLineConsumer) {
+                Consumer<String> c = nextLineConsumer.get();
+                if (c != null) {
+                    try {
+                        c.accept(line);
+                        //nextLineConsumer.set(null);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
             }
         }
 
@@ -79,10 +92,18 @@ public class AIGymClient extends Shell  {
     }
 
     protected void input(String line, Consumer<String> result) {
-        if (!nextLineConsumer.compareAndSet(null, result)) {
-            throw new RuntimeException("repl interruption");
+        //if (nextLineConsumer.compareAndSet(null, result) || nextLineConsumer.compareAndSet(result, result)) {
+
+        synchronized (nextLineConsumer) {
+            System.out.println(nextLineConsumer.get() + " -> " + result);
+
+            if (result != null)
+                nextLineConsumer.set(result);
+
+            println(line);
         }
-        println(line);
+        //}
+        //throw new RuntimeException("repl interruption");
     }
 
     protected void waitEnv() {
@@ -96,13 +117,18 @@ public class AIGymClient extends Shell  {
         logger.info("environment {} ready", envID);
     }
 
-    @FunctionalInterface interface AgentBuilder {
-        public Agent newAgent(int inputs, int outputs);
+    @FunctionalInterface
+    interface AgentBuilder {
+        public Agent newAgent(int inputs, float[] inputLow, float[] inputHigh, int outputs);
     }
 
-    public synchronized void run(int frames, AgentBuilder a) {
+    public synchronized void run(AgentBuilder a, int frames) {
+
+        finished = false;
 
         waitEnv();
+
+        //env.monitor.start('/tmp/" + environmentID + "',force=True)");
 
         framesRemain = frames;
 
@@ -110,58 +136,95 @@ public class AIGymClient extends Shell  {
 
         //begins chain reaction
         input("enc([env.observation_space.low.tolist(),env.observation_space.high.tolist(),str(env.action_space),env.reset().tolist()])", this::onFrame);
-        
+
 
     }
 
 
-    private synchronized void onFrame(String f) {
-        //ob, reward, done, _
+    private void onFrame(String f) {
+
+        JsonArray j = pyjson(f);
 
         if (f.contains("Discrete") || f.contains("Continuous")) {
             //first cycle, determine model parameters
             //model = Tuples.twin()
-            inputs = 1;
-            outputs = 0;
-            agent = agentBuilder.newAgent(inputs, outputs);
+            this.input = asArray(j, 3);
+            this.inputs = input.length;
+
+            this.low = asArray(j, 0);
+            this.high = asArray(j, 1);
+            //restore +-Infinity HACK
+            for (int i = 0; i < inputs; i++) {
+                if (low[i] == high[i]) {
+                    low[i] = Double.NEGATIVE_INFINITY;
+                    high[i] = Double.POSITIVE_INFINITY;
+                }
+            }
+
+            String actionSpace = j.get(2).asString();
+            if (actionSpace.startsWith("Discrete")) {
+                this.outputs = Integer.parseInt(actionSpace.substring(9, actionSpace.length() - 1));
+            } else {
+                throw new UnsupportedOperationException("Unknown action_space type: " + actionSpace);
+            }
+
+
+            agent = agentBuilder.newAgent(inputs, Util.toFloat(low), Util.toFloat(high), outputs);
+            agent.start(inputs, outputs);
+
+            nextAction = agent.act(0, input);
+
         } else {
 
-            String j = f.substring(5, f.length() - 1);
+            //ob, reward, done, _
 
+            input = asArray(j, 0);
+            double reward = asDouble(j, 1);
+            finished = j.get(2).asString().equals("True");
 
-            JsonArray state = ((JsonArray) Json.parse(j));
+            System.out.println(Texts.n4(input) + " |- " + reward);
 
-            JsonArray statePart = (JsonArray) state.get(0);
-            double[] input = statePart.values().stream().mapToDouble(v -> v.asDouble()).toArray();
-            double reward = state.get(1).asDouble();
-            boolean finished = state.get(2).asString().equals("True");
-
-            int a = act(input, reward, finished);
+            nextAction = agent.act(reward, input);
         }
 
 
-        if (--framesRemain > 0) {
+        if (!finished && --framesRemain > 0) {
             nextFrame();
         }
     }
 
-    protected int act(double[] input, double reward, boolean finished) {
+    static JsonArray pyjson(String f) {
+        String j = f.substring(5, f.length() - 1);
+        j = j.replace("Infinity", "0");
 
-        System.out.println(Texts.n4(input) + " |- " + reward);
-        return 0;
+        //doesnt handle Inf
+        return ((JsonArray) Json.parse(j));
     }
+
+    private static double[] asArray(JsonArray j, int index) {
+        return ((JsonArray) j.get(index)).values().stream().mapToDouble(v -> v.asDouble()).toArray();
+    }
+
+    private static double asDouble(JsonArray j, int index) {
+        return j.get(index).asDouble();
+    }
+
 
     private void nextFrame() {
         //ob, reward, done, _
-        input("encS(list(env.step(env.action_space.sample())))", this::onFrame);
+        input("encS(list(env.step(" + nextAction + ")))", this::onFrame);
     }
 
-    public static void main(String[] args) throws Exception {
-        AIGymClient c = new AIGymClient(
+    public static void main(String[] args) throws IOException {
+        new AIGymClient(
                 "CartPole-v0"
-                //"DoomDeathmatch-v0"
+                //"MountainCar-v0"
+                //"DoomDeathmatch-v0" //2D inputs
+        ).run((i, iLow, iHigh, o) ->
+            //new DQN(i, o)
+            new NAgent(new Default())
+            ,160
         );
-        c.run(3, (i,o) -> new DQN(i, o));
 
 /*
     # The world's simplest agent!
@@ -204,8 +267,6 @@ public class AIGymClient extends Shell  {
 
 
     }
-
-
 
 
 //    public static void main(String[] args) throws Exception {

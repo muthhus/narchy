@@ -979,4 +979,20 @@ public enum Util {
             return p.getClass().toString().replace("class ", "");
         return s;
     }
+
+    public static float[] toFloat(double[] d) {
+        int l = d.length;
+        float[] f = new float[l];
+        for (int i = 0; i < l; i++)
+            f[i] = (float)d[i];
+        return f;
+    }
+    public static double[] toDouble(float[] d) {
+        int l = d.length;
+        double[] f = new double[l];
+        for (int i = 0; i < l; i++)
+            f[i] = d[i];
+        return f;
+    }
+
 }
