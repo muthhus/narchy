@@ -505,14 +505,21 @@ public enum Texts {
     }
 
     public static String n2(float[] v) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(v.length * 4 + 2 /* approx */);
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n2(v[i]));
-            if (i!= s -1)
-                sb.append(' ');
+            if (i!= s -1) sb.append(' ');
         }
-
+        return sb.toString();
+    }
+    public static String n4(double[] v) {
+        StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
+        int s = v.length;
+        for (int i = 0; i < s; i++) {
+            sb.append(n4(v[i]));
+            if (i!= s -1) sb.append(' ');
+        }
         return sb.toString();
     }
 
