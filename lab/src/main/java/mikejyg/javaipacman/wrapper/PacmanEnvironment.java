@@ -28,7 +28,7 @@ import mikejyg.javaipacman.pacman.ctables;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
-import nars.util.Agent;
+import nars.learn.Agent;
 import nars.util.NAgent;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;

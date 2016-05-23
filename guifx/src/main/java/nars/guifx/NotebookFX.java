@@ -25,14 +25,14 @@ public class NotebookFX extends Application {
 
         s.getStylesheets().add(Spacegraph.spacegraphCSS);
 
-        StyleClassedTextArea codeArea = new StyleClassedTextArea();
-        codeArea.getStyleClass().add("code-area");
-
-        List<String> ss = Lists.newArrayList("code-area-default");
-        codeArea.setStyle(0, ss);
-
-
-        p.setCenter(codeArea);
+//        StyleClassedTextArea codeArea = new StyleClassedTextArea();
+//        codeArea.getStyleClass().add("code-area");
+//
+//        List<String> ss = Lists.newArrayList("code-area-default");
+//        codeArea.setStyle(0, ss);
+//
+//
+//        p.setCenter(codeArea);
 
 
         primaryStage.setScene(s);

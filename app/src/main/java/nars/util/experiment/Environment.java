@@ -1,7 +1,7 @@
 package nars.util.experiment;
 
 import com.gs.collections.api.tuple.Twin;
-import nars.util.Agent;
+import nars.learn.Agent;
 
 import java.util.Arrays;
 

@@ -12,7 +12,6 @@ import nars.op.time.MySTMClustered;
 import nars.Global;
 import nars.NAR;
 import nars.guifx.NARfx;
-import nars.guifx.NARtop;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
 import nars.nal.Tense;
@@ -295,19 +294,19 @@ public class DemoRovers {
                                 ),
                                 updateMatrices(sensors, nar),
                                 new HBox(
-                                        scrolled(new NARtop(nar).addAll(
-                                                "motor(#x)",
-                                                motorLeft, motorRight,
-                                                motorFore, motorBack,
-                                                motorStop, turretFire)),
-                                        scrolled(new NARtop(nar).addAll(
-                                                EAT_FOOD.toString(),
-                                                EAT_POISON.toString(),
-                                                SPEED_LEFT.toString(),
-                                                SPEED_RIGHT.toString(),
-                                                SPEED_FORE.toString(),
-                                                SPEED_BACK.toString()
-                                        ))
+//                                        scrolled(new NARtop(nar).addAll(
+//                                                "motor(#x)",
+//                                                motorLeft, motorRight,
+//                                                motorFore, motorBack,
+//                                                motorStop, turretFire)),
+//                                        scrolled(new NARtop(nar).addAll(
+//                                                EAT_FOOD.toString(),
+//                                                EAT_POISON.toString(),
+//                                                SPEED_LEFT.toString(),
+//                                                SPEED_RIGHT.toString(),
+//                                                SPEED_FORE.toString(),
+//                                                SPEED_BACK.toString()
+//                                        ))
                                 )
                         )
                 );

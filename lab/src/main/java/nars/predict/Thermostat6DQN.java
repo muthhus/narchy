@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.util.DQN;
+import nars.learn.ql.DQN;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 

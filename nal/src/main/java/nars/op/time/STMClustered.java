@@ -3,21 +3,16 @@ package nars.op.time;
 import nars.*;
 import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.DefaultTruth;
-import nars.truth.Stamp;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
-import nars.util.gng.NeuralGasNet;
-import nars.util.gng.Node;
+import nars.learn.gng.NeuralGasNet;
+import nars.learn.gng.Node;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -25,10 +20,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static java.util.stream.Collectors.toSet;
 
 
 public class STMClustered extends STM {

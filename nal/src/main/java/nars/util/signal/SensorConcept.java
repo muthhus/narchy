@@ -12,7 +12,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.FloatSupplier;
+import nars.util.math.FloatSupplier;
 import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
