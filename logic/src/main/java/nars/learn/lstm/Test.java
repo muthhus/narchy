@@ -1,6 +1,5 @@
 package nars.learn.lstm;
 
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Random;
@@ -11,16 +10,17 @@ public class Test {
 		System.out.println("Test of SimpleLSTM\n");
 		
 		Random r = new XorShift128PlusRandom(1234);
-		DistractedSequenceRecall task = new DistractedSequenceRecall(r, 1000);
 
 
-		int cell_blocks = 5;
-		double learningRate = 0.07;
+		int cell_blocks = 4;
+		double learningRate = 0.05;
 		int epochs = 5000;
 
+		DistractedSequenceRecall task = new DistractedSequenceRecall(r, 12, 3, 22, 1000);
+
 		SimpleLSTM slstm = new SimpleLSTM(r,
-				task.getInputDimension(),
-				task.getOutputDimension(),
+				task.inputs,
+				task.outputs,
 				cell_blocks,
 				learningRate);
 
@@ -31,7 +31,6 @@ public class Test {
 				System.out.println("["+epoch+"] error = " + (1 - fit));
 		}
 		System.out.println("done.");
-		slstm.print(System.out);
 	}
 
 }
