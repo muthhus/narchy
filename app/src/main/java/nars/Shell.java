@@ -21,12 +21,13 @@ public class Shell {
     //private final StreamGobbler errReader;
     public long lastOutput;
 
+
     static final Executor exe = Executors.newSingleThreadExecutor();
 
     Shell(String... cmd) throws IOException {
         this.proc = new ProcessBuilder(cmd).redirectErrorStream(true).start();
 
-        this.writer = new PrintWriter(new OutputStreamWriter(this.proc.getOutputStream(), "UTF-8"));
+        this.writer = new PrintWriter(new OutputStreamWriter(this.proc.getOutputStream(), "UTF-8"), true);
 
 
 
@@ -52,15 +53,17 @@ public class Shell {
     }
 
     protected void readln(String line) {
-        logger.info("OUT: {}", line);
+        logger.trace("OUT: {}", line);
         lastOutput = System.currentTimeMillis();
     }
 
     public void println(String line) {
-        writer.println(line);
-        logger.info(" IN: {}", line);
 
-        writer.flush();
+        logger.trace(" IN: {}", line);
+
+        writer.println(line);
+
+
     }
 
     public void stop() {

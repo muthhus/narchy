@@ -2,6 +2,7 @@ package nars.util;
 
 import nars.data.Range;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.Autoencoder;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +11,7 @@ import java.util.Random;
 /**
  * q-learning + SOM agent, cognitive prosthetic. designed by patham9
  */
-abstract public class HaiQ {
+abstract public class HaiQ implements Agent {
 
 	@NotNull
 	public final Random rng;
@@ -19,11 +20,11 @@ abstract public class HaiQ {
 	//final Hsom som;
 
 	@NotNull
-	public final float[][] q; // state x action
+	public float[][] q; // state x action
 	@NotNull
-	public final float[][] et;
+	public float[][] et;
 
-	final int actions;
+	int actions;
 	int lastState, lastDecidedAction;
 
 	/*
@@ -63,22 +64,11 @@ abstract public class HaiQ {
 	@Range(min=0, max=1f)
 	public final MutableFloat Alpha = new MutableFloat();
 
-	private final int inputs;
+	private int inputs;
 	public float Epsilon;
 
-	public HaiQ(int inputs, int outputs) {
+	public HaiQ() {
 		rng = new XorShift128PlusRandom(1);
-
-		actions = outputs;
-
-
-		this.inputs = inputs;
-
-		//som = new Hsom(inputs, states);
-
-		q = new float[inputs][outputs];
-		et = new float[inputs][outputs];
-		setQ(0.05f, 0.5f, 0.9f, 0.02f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
@@ -157,6 +147,19 @@ abstract public class HaiQ {
 		return maxk != -1 ? maxk : randomAction();
 	}
 
+	public void start(int inputs, int outputs) {
+
+		this.actions = outputs;
+		this.inputs = inputs;
+
+		//som = new Hsom(inputs, states);
+
+		q = new float[inputs][outputs];
+		et = new float[inputs][outputs];
+
+		setQ(0.05f, 0.5f, 0.9f, 0.02f); // 0.1 0.5 0.9
+	}
+
 	public void setQ(float alpha, float gamma, float lambda, float epsilon) {
 		Alpha.setValue( alpha );
 		Gamma = gamma;
@@ -167,7 +170,7 @@ abstract public class HaiQ {
 	/**
 	 * main control function
 	 */
-	public final int act(float[] input, float reward) {
+	public final int act(float reward, float[] input) {
 		return learn(perceive(input), reward);
 	}
 
@@ -193,7 +196,7 @@ abstract public class HaiQ {
 		return inputs;
 	}
 
-    // void hsom_DrawSOM(Hsom somobj,int RenderSize,int x,int y,boolean
+	// void hsom_DrawSOM(Hsom somobj,int RenderSize,int x,int y,boolean
 	// bSpecial,int specialIndex)
 	// {
 	// fill(0);
