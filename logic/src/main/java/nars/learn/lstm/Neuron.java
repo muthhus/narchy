@@ -1,8 +1,8 @@
 package nars.learn.lstm;
 
-public abstract class Neuron
+public interface Neuron
 {
-	public static Neuron Factory(NeuronType neuron_type)
+	static Neuron build(NeuronType neuron_type)
 	{
 		switch (neuron_type) {
 			case Sigmoid:
@@ -16,6 +16,6 @@ public abstract class Neuron
 		}
 	}
 	
-	abstract public double Activate(double x);
-	abstract public double Derivative(double x);
+	double activate(double x);
+	double derivate(double x);
 }

@@ -6,7 +6,8 @@ public class util
 		int result = -1;
 		double max = Double.NEGATIVE_INFINITY;
 
-		for (int i = 0; i < vec.length; i++) {
+		int l = vec.length;
+		for (int i = 0; i < l; i++) {
 			final double v = vec[i];
 			if (v > max)  {
 				max = v;
@@ -19,7 +20,8 @@ public class util
 	public static int argmin(double[] vec) {
 		int result = -1;
 		double min = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < vec.length; i++) {
+		int l = vec.length;
+		for (int i = 0; i < l; i++) {
 			final double v = vec[i];
 			if (v < min)  {
 				min = v;

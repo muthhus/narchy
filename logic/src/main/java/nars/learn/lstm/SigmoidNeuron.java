@@ -1,17 +1,17 @@
 package nars.learn.lstm;
 
-import org.apache.commons.math3.util.FastMath;
-
-public class SigmoidNeuron extends Neuron
+final public class SigmoidNeuron implements Neuron
 {
 	@Override
-	final public double Activate(final double x) {
-		return 1.0 / (1.0 + FastMath.exp(-x));
+	final public double activate(final double x) {
+
+		//return 1.0 / (1.0 + FastMath.exp(-x));
+		return 1.0 / (1.0 + Math.exp(-x));
 	}
 
 	@Override
-	final public double Derivative(final double x) {
-		double act = Activate(x);
+	final public double derivate(final double x) {
+		double act = activate(x);
 		return act * (1.0 - act);
 	}
 

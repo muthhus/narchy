@@ -11,10 +11,10 @@ import java.util.function.Consumer;
 public abstract class AbstractTraining {
     public int batchsize = 400000000;
 
-    public AbstractTraining(Random random, final int inputDimension, final int outputDimension) {
+    public AbstractTraining(Random random, final int inputs, final int outputs) {
         this.random = random;
-        this.inputDimension = inputDimension;
-        this.outputDimension = outputDimension;
+        this.inputs = inputs;
+        this.outputs = outputs;
     }
 
     public double scoreSupervised(AgentSupervised agent)  {
@@ -26,8 +26,9 @@ public abstract class AbstractTraining {
             if (inter.do_reset)
                 agent.clear();
 
-            if (inter.expected == null)
+            if (inter.expected == null) {
                 agent.predict(inter.actual, false);
+            }
             else {
                 double[] actual_output = null;
 
@@ -94,19 +95,11 @@ public abstract class AbstractTraining {
         }
     }
 
-    public int getInputDimension() {
-        return inputDimension;
-    }
-
-    public int getOutputDimension() {
-        return outputDimension;
-    }
-
-    protected Random random;
-    protected int tests; // need to be set by GenerateInteractions()
-    protected boolean validation_mode = false;
+    protected final Random random;
+    protected int batches; // need to be set by GenerateInteractions()
+    protected boolean validation_mode;
     protected abstract void interact(Consumer<Interaction> each);
 
-    private final int inputDimension;
-    private final int outputDimension;
+    public final int inputs;
+    public final int outputs;
 }

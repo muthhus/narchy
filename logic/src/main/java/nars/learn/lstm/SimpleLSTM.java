@@ -1,6 +1,5 @@
 package nars.learn.lstm;
 
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -54,8 +53,8 @@ public class SimpleLSTM extends AgentSupervised {
 		
 		full_input_dimension = input_dimension + cell_blocks + 1; //+1 for bias
 		
-		F = Neuron.Factory(neuron_type_F);
-		G = Neuron.Factory(neuron_type_G);
+		F = Neuron.build(neuron_type_F);
+		G = Neuron.build(neuron_type_G);
 		
 		weightsF = new double[cell_blocks][full_input_dimension];
 		weightsG = new double[cell_blocks][full_input_dimension];
@@ -141,44 +140,40 @@ public class SimpleLSTM extends AgentSupervised {
 			output = new double[output_dimension];
 		}
 		else {
-			Arrays.fill(sumF, (double) 0);
-			Arrays.fill(actF, (double) 0);
-			Arrays.fill(sumG, (double) 0);
-			Arrays.fill(actG, (double) 0);
-			Arrays.fill(actH, (double) 0);
+			//Arrays.fill(sumF, (double) 0); //not necessary since it's completely overwritten below
+			//Arrays.fill(actF, (double) 0);   //not necessary since it's completely overwritten below
+			//Arrays.fill(sumG, (double) 0); //not necessary since it's completely overwritten below
+			//Arrays.fill(actG, (double) 0);  //not necessary since it's completely overwritten below
+			//Arrays.fill(actH, (double) 0); //not necessary since it's completely overwritten below
 		}
 		final double[] full_hidden = this.full_hidden;
 
 		//inputs to cell blocks
-		//TODO may be faster to iterate these loops inside out
-		for (int i = 0; i < full_input_dimension; i++)
-		{
-			final double fi = full_input[i];
-
-			for (int j = 0; j < cell_blocks; j++)
-			{
-				sumF[j] += weightsF[j][i] * fi;
-				sumG[j] += weightsG[j][i] * fi;
+		for (int j = 0; j < cell_blocks; j++) {
+			double[] wj = weightsF[j];
+			double[] wg = weightsG[j];
+			double sf = 0, sg = 0;
+			for (int i = 0; i < full_input_dimension; i++)			{
+				final double fi = full_input[i];
+				sf += wj[i] * fi;
+				sg += wg[i] * fi;
 			}
+			sumF[j] = sf;
+			sumG[j] = sg;
 		}
 		
 		for (int j = 0; j < cell_blocks; j++) {
-			final double actfj = actF[j] = F.Activate(sumF[j]);
-			final double actgj = actG[j] = G.Activate(sumG[j]);
+			final double actfj = actF[j] = F.activate(sumF[j]);
+			final double actgj = actG[j] = G.activate(sumG[j]);
 
 
-			actH[j] = actfj * context[j] + (1.0 - actfj) * actgj;
+			//prepare hidden layer plus bias
+			full_hidden[j] = actH[j] = actfj * context[j] + (1.0 - actfj) * actgj;
 		}
 		
-		//prepare hidden layer plus bias
-		Arrays.fill(full_hidden, (double) 0);
-
-
-		System.arraycopy(actH, 0, full_hidden, 0, cell_blocks);
-		full_hidden[cell_blocks] = 1.0; //bias
+		full_hidden[cell_blocks] = 1.0; //bias in last index
 		
 		//calculate output
-
 		for (int k = 0; k < output_dimension; k++)
 		{
 			double s = (double) 0;
@@ -200,9 +195,9 @@ public class SimpleLSTM extends AgentSupervised {
 		for (int j = 0; j < cell_blocks; j++) {
 			
 			double f = actF[j];
-			double df = F.Derivative(sumF[j]);
+			double df = F.derivate(sumF[j]);
 			double g = actG[j];
-			double dg = G.Derivative(sumG[j]);
+			double dg = G.derivate(sumG[j]);
 			double h_ = context[j]; //prev value of h
 
 			final double[] dsg = dSdG[j];
@@ -228,7 +223,7 @@ public class SimpleLSTM extends AgentSupervised {
 				deltaH = new double[cell_blocks];
 			}
 			else {
-				Arrays.fill(deltaOutput, (double) 0);
+				//Arrays.fill(deltaOutput, (double) 0); //not necessary
 				Arrays.fill(deltaH, (double) 0);
 			}
 
@@ -240,9 +235,11 @@ public class SimpleLSTM extends AgentSupervised {
 
 				final double[] wk = weightsOut[k];
 
+				double[] dh = this.deltaH;
+				double[] ah = this.actH;
 				for (int j = cell_blocks - 1; j >= 0; j--) {
-					deltaH[j] += dok * wk[j];
-					wk[j] += dok * actH[j] * learningRate;
+					dh[j] += dok * wk[j];
+					wk[j] += dok * ah[j] * learningRate;
 				}
 
 				//bias
@@ -252,15 +249,8 @@ public class SimpleLSTM extends AgentSupervised {
 			//input to hidden
 			for (int j = 0; j < cell_blocks; j++) {
 				final double dhj = deltaH[j];
-				final double[] dsj = dSdF[j];
-				final double[] dsd = dSdG[j];
-				final double[] wfj = weightsF[j];
-				final double[] wgj = weightsG[j];
-
-				for (int i = 0; i < full_input_dimension; i++) {
-					wfj[i] += dhj * dsj[i] * learningRate;
-					wgj[i] += dhj * dsd[i] * learningRate;
-				}
+				updateWeights(learningRate * dhj, full_input_dimension, dSdF[j], weightsF[j]);
+				updateWeights(learningRate * dhj, full_input_dimension, dSdG[j], weightsG[j]);
 			}
 		}
 		
@@ -273,6 +263,15 @@ public class SimpleLSTM extends AgentSupervised {
 		return output;
 	}
 
+	public static void updateWeights(double learningRate,
+									 int length,
+									 double[] in,
+									 double[] out) {
+		for (int i = length - 1; i >= 0; i--) {
+			out[i] += in[i] * learningRate;
+		}
+	}
+
 	@Override
 	public double[] learnBatch(List<NonResetInteraction> interactions, boolean requireOutput)  {
 		throw new RuntimeException("TODO");
@@ -282,9 +281,7 @@ public class SimpleLSTM extends AgentSupervised {
 		this.learningRate = learningRate;
 	}
 
-	public void print(PrintStream out) {
 
-	}
 }
 
 
