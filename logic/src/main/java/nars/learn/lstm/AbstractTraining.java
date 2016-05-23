@@ -6,6 +6,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public abstract class AbstractTraining {
     public int batchsize = 400000000;
@@ -16,43 +17,40 @@ public abstract class AbstractTraining {
         this.outputDimension = outputDimension;
     }
 
-    public double EvaluateFitnessSupervised(AgentSupervised agent) throws Exception {
+    public double scoreSupervised(AgentSupervised agent)  {
 
-        List<Interaction> interactions = this.GenerateInteractions(tests);
+        final double[] fit = {0};
+        final double[] max_fit = {0};
 
-        double fit = 0;
-        double max_fit = 0;
-
-        for (Interaction inter : interactions) {
-
+        this.interact(inter -> {
             if (inter.do_reset)
                 agent.clear();
 
-            if (inter.target_output == null)
-                agent.predict(inter.observation, false);
+            if (inter.expected == null)
+                agent.predict(inter.actual, false);
             else {
                 double[] actual_output = null;
 
-                if (validation_mode == true)
-                    actual_output = agent.predict(inter.observation, true);
+                if (validation_mode)
+                    actual_output = agent.predict(inter.actual, true);
                 else
-                    actual_output = agent.learn(inter.observation, inter.target_output, true);
+                    actual_output = agent.learn(inter.actual, inter.expected, true);
 
-                if (util.argmax(actual_output) == util.argmax(inter.target_output))
-                    fit++;
+                if (util.argmax(actual_output) == util.argmax(inter.expected))
+                    fit[0]++;
 
-                max_fit++;
+                max_fit[0]++;
             }
-        }
-        return fit/max_fit;
+        });
+
+        return fit[0] / max_fit[0];
     }
 
     public void supervised(AgentSupervised agent) throws Exception {
-        List<Interaction> interactions = this.GenerateInteractions(tests);
 
         List<AgentSupervised.NonResetInteraction> agentNonResetInteraction = new ArrayList<>();
 
-        for (Interaction inter : interactions) {
+        this.interact(inter -> {
 
             if (inter.do_reset) {
                 agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
@@ -61,20 +59,20 @@ public abstract class AbstractTraining {
             }
 
             AgentSupervised.NonResetInteraction newInteraction = new AgentSupervised.NonResetInteraction();
-            newInteraction.observation = inter.observation;
-            newInteraction.target_output = inter.target_output;
+            newInteraction.observation = inter.actual;
+            newInteraction.target_output = inter.expected;
             agentNonResetInteraction.add(newInteraction);
 
             if( agentNonResetInteraction.size() > batchsize ) {
                 agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
             }
 
-        }
+        });
 
         agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
     }
 
-    private void agentExecuteNonResetInteractionsAndFlush(AgentSupervised agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions) throws Exception {
+    private void agentExecuteNonResetInteractionsAndFlush(AgentSupervised agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions)  {
         agent.learnBatch(nonResetInteractions, false);
 
         nonResetInteractions.clear();
@@ -82,14 +80,16 @@ public abstract class AbstractTraining {
 
 
     public final static class Interaction {
-        public double[] observation;
-        public double[] target_output;
+
+        public double[] actual;
+        public double[] expected;
+
         public boolean do_reset;
 
         @Override
         public String toString() {
-            return ArrayUtils.toString(observation) + " " +
-                    ArrayUtils.toString(target_output) + " " +
+            return ArrayUtils.toString(actual) + " " +
+                    ArrayUtils.toString(expected) + " " +
                     do_reset;
         }
     }
@@ -105,7 +105,7 @@ public abstract class AbstractTraining {
     protected Random random;
     protected int tests; // need to be set by GenerateInteractions()
     protected boolean validation_mode = false;
-    protected abstract List<Interaction> GenerateInteractions(int tests);
+    protected abstract void interact(Consumer<Interaction> each);
 
     private final int inputDimension;
     private final int outputDimension;

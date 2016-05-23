@@ -39,6 +39,10 @@ public class DeductiveChainTest  {
     public static final IndexedStatementBuilder equiv = (int x, int y) ->
             (Compound)$.equiv(a(x), a(y));
 
+    public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
+        this(new TestNAR(n), length, timeLimit, b);
+    }
+
     public DeductiveChainTest(@NotNull TestNAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
 
         beliefs = new Compound[length];
