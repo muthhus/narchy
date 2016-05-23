@@ -1,8 +1,6 @@
 package nars.learn.lstm;
 
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,13 +15,17 @@ public abstract class AbstractTraining {
         this.outputs = outputs;
     }
 
-    public double scoreSupervised(AgentSupervised agent)  {
+    public SimpleLSTM lstm(int cell_blocks, double initialLearningRate) {
+        return new SimpleLSTM(random, inputs, outputs, cell_blocks, initialLearningRate);
+    }
+
+    @Deprecated public double scoreSupervised(AgentSupervised agent)  {
 
         final double[] fit = {0};
         final double[] max_fit = {0};
 
         this.interact(inter -> {
-            if (inter.do_reset)
+            if (inter.reset)
                 agent.clear();
 
             if (inter.expected == null) {
@@ -47,13 +49,13 @@ public abstract class AbstractTraining {
         return fit[0] / max_fit[0];
     }
 
-    public void supervised(AgentSupervised agent) throws Exception {
+    @Deprecated public void supervised(AgentSupervised agent) throws Exception {
 
         List<AgentSupervised.NonResetInteraction> agentNonResetInteraction = new ArrayList<>();
 
         this.interact(inter -> {
 
-            if (inter.do_reset) {
+            if (inter.reset) {
                 agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
 
                 agent.clear();
@@ -80,25 +82,11 @@ public abstract class AbstractTraining {
     }
 
 
-    public final static class Interaction {
-
-        public double[] actual;
-        public double[] expected;
-
-        public boolean do_reset;
-
-        @Override
-        public String toString() {
-            return ArrayUtils.toString(actual) + " " +
-                    ArrayUtils.toString(expected) + " " +
-                    do_reset;
-        }
-    }
-
     protected final Random random;
     protected int batches; // need to be set by GenerateInteractions()
     protected boolean validation_mode;
-    protected abstract void interact(Consumer<Interaction> each);
+
+    @Deprecated protected abstract void interact(Consumer<Interaction> each);
 
     public final int inputs;
     public final int outputs;

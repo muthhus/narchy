@@ -129,6 +129,7 @@ public class SimpleLSTM extends AgentSupervised {
 		}
 		full_input[loc++] = 1.0; //bias
 
+
 		//cell block arrays
 		if ((sumF == null) || (sumF.length!=cell_blocks)) {
 			sumF = new double[cell_blocks];

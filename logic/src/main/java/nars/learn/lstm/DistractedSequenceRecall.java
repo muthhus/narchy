@@ -14,9 +14,7 @@ public class DistractedSequenceRecall extends AbstractTraining {
 	}
 
 	@Override
-	protected void interact(Consumer<Interaction> each) {
-
-
+	protected void interact(Consumer<Interaction> experience) {
 
 
 		for (int i = 0; i < this.batches; i++) {
@@ -47,9 +45,9 @@ public class DistractedSequenceRecall extends AbstractTraining {
 
 				Interaction inter = new Interaction();
 				if (t == 0)
-					inter.do_reset = true;
+					inter.reset = true;
 				inter.actual = input;
-				each.accept(inter);
+				experience.accept(inter);
 
 			}
 
@@ -58,19 +56,14 @@ public class DistractedSequenceRecall extends AbstractTraining {
 			input1[8] = 1.0;
 			double[] target_output1 = new double[outputs];
 			target_output1[target1] = 1.0;
-			Interaction inter1 = new Interaction();
-			inter1.actual = input1;
-			inter1.expected = target_output1;
-			each.accept(inter1);
+			experience.accept( Interaction.the(input1, target_output1) );
 
 			double[] input2 = new double[inputs];
 			input2[9] = 1.0;
 			double[] target_output2 = new double[outputs];
 			target_output2[target2] = 1.0;
-			Interaction inter2 = new Interaction();
-			inter2.actual = input2;
-			inter2.expected = target_output2;
-			each.accept(inter2);
+			experience.accept( Interaction.the(input2, target_output2) );
+
 		}
 
 	}
