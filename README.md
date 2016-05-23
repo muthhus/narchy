@@ -16,7 +16,7 @@ There are several types of __tasks__:
 ### By default, NARS makes *no assumptions* about the belief or desire values of input.
 #### How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users.
 
-![Inference](https://bitbucket.org/seh/narchy/raw/master/doc/derivation_pipeline.png)
+![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet1/doc/derivation_pipeline.png)
 
 As a reasoning system, the [architecture of NARS](http://www.cis.temple.edu/~pwang/Implementation/NARS/architecture.pdf) consists of a **memory**, an **inference engine**, and a **control system**.
 
