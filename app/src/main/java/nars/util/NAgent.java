@@ -240,7 +240,7 @@ public class NAgent implements Agent {
         //TODO specify goal via a method in the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
-        nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
+        //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
     }
 
     private void init(MotorConcept m) {

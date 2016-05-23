@@ -12,6 +12,7 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,9 @@ public enum TermLinkBuilder {
 
     @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
         //HashBag<Termed> components = new HashBag(host.volume());
-        Set<Termed> components = Global.newHashSet(1 + host.volume()/2 /* estimate */);
+        Set<Termed> components =
+                //Global.newHashSet(1 + host.volume()/2 /* estimate */);
+                new LinkedHashSet();
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -88,13 +91,15 @@ public enum TermLinkBuilder {
         Set<Termed> s = components(term, nar);
 
         int total = s.size();
-        int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
+        //int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
 
         List<TermTemplate> sa = Global.newArrayList(total);
-        float fraction = 1f / active;
+        //float fraction = 1f / active;
+        float fraction = 1f / total;
         for (Termed x : s) {
             sa.add(new TermTemplate(x,
-                (x instanceof Variable) ? 0 : fraction
+                //(x instanceof Variable) ? 0 : fraction
+                fraction
             ));
         }
 

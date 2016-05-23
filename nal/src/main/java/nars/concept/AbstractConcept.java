@@ -1,6 +1,7 @@
 package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
+import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -52,7 +53,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
         /** activate concept */
-        Concept target = nar.conceptualize(targetTerm, b, subScale, 0f, conceptOverflow);
+        Concept target = nar.conceptualize(targetTerm, b, subScale,
+                0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
+                conceptOverflow);
+
         if (target == null)
             throw new RuntimeException("termlink to null concept");
 

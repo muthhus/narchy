@@ -27,13 +27,14 @@ public abstract class TermEdge /*implements ChangeListener*/ {
 //    public boolean visible = false;
 
     public final DescriptiveStatistics pri;
+    public static final int PRI_WINDOW_SIZE = 6;
 
 
 
     public TermEdge(TermNode aSrc, TermNode bSrc) {
 
         pri = new DescriptiveStatistics();
-        pri.setWindowSize(32);
+        pri.setWindowSize(PRI_WINDOW_SIZE);
 
 
         //setAutoSizeChildren(true);

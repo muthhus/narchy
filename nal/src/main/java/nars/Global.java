@@ -92,12 +92,6 @@ public enum Global {
     /** how precise unit test results must match expected values to pass */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
-    /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.0001f;
-
-    /** minimum durability and quality necessary for a derivation to form */
-    public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
-
 
 
 
@@ -152,7 +146,16 @@ public enum Global {
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
-    public static boolean BACKWARD_QUESTIONS;
+    public static boolean BACKWARD_QUESTIONS = false;
+
+
+
+    /** minimum difference necessary to indicate a significant modification in budget float number components */
+    public static final float BUDGET_EPSILON = 0.0001f;
+
+    /** minimum durability and quality necessary for a derivation to form */
+    public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
+
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

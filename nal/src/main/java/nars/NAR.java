@@ -929,7 +929,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
 
-    @Nullable
+    @Deprecated @Nullable
     final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b) {
         return conceptualize(termed, b, 1f, 0f, null);
     }
