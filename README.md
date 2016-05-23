@@ -5,13 +5,17 @@
 Theory
 ------
 
-Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/home)) processes tasks imposed by its environment, which may include human users or other computer systems. Tasks can arrive at any time, and there is no restriction on their contents as far as they can be expressed in __Narsese__, the I/O language of NARS.
+Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/home))
+processes **Tasks** imposed by and perceived from its environment,
+which may include human or animal users, and other computer systems.
 
-There are several types of __tasks__:
+Tasks can arrive at any time, and there is no restriction on their contents as far as they can be expressed in __Narsese__, the I/O language of NARS.
 
- * **Judgment** - To process it means to accept it as the system's belief, as well as to derive new beliefs and to revise old beliefs accordingly.
- * **Question** -  To process it means to find the best answer to it according to current beliefs.
- * **Goal** - To process it means to carry out some system operations to realize it.
+##### Beliefs - represent a specified amount of factual evidence with which to revise existing knowledge and derive novel conclusions.
+##### Questions - find the best matching answer(s) according to active beliefs
+##### Goals - invoke system operations in order to realize it.
+
+----
 
 ### By default, NARS makes *no assumptions* about the belief or desire values of input.
 #### How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users.
