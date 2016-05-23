@@ -24,7 +24,7 @@ public interface BudgetMerge {
 
     static float dqBlendByOrDurQua(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean plusOrAvg) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;
-        float incomingScore = or(src.dur(), src.qua());
+        float incomingScore = or(src.dur(), src.qua()) * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
         float currentScore = or(tgt.dur(), tgt.qua());
@@ -32,6 +32,10 @@ public interface BudgetMerge {
         float cp;
         if(currentScore > BUDGET_EPSILON && incomingScore > BUDGET_EPSILON) {
             cp = currentScore / (currentScore + incomingScore);
+        } else if (currentScore < BUDGET_EPSILON) {
+            cp = 0f;
+        } else if (incomingScore < BUDGET_EPSILON) {
+            cp = 1f;
         } else {
             cp = 0.5f;
         }

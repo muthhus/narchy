@@ -27,9 +27,9 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param t The truth value of a judgment
      * @return The quality of the judgment, according to truth value only
      */
-    public static float truthToQuality(@NotNull Truth t) {
+    public static float truthToQuality(@NotNull Truthed t) {
         float exp = t.expectation();
 
         //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
@@ -226,7 +226,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(1.0f, content, nal);
+        return budgetInference(new UnitBudget(), 1.0f, content, nal);
     }
 
 //    /**
@@ -241,11 +241,6 @@ public final class BudgetFunctions extends UtilityFunctions {
 //                                              @NotNull ConceptProcess nal) {
 //        return budgetInference(w2c(1), content.volume(), nal);
 //    }
-
-    @Nullable
-    static Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess nal) {
-        return budgetInference(new UnitBudget(), qual, derived, nal);
-    }
 
 
     @Nullable
@@ -369,7 +364,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         float nextB = b.pri() + priToTransfer;
 
         //cap at 1, and only transfer what is necessary to reach it
-        priToTransfer += Math.min(0, 1f - nextB);
+        priToTransfer += Math.min(0f, 1f - nextB);
 
         b.setPriority(Math.min(nextB, 1f));
         a.priSub(priToTransfer);
@@ -413,13 +408,13 @@ public final class BudgetFunctions extends UtilityFunctions {
             float bPriNext = b.pri() - resultPri * aStrength;
             float aPriNext = a.pri() - resultPri * (1f - aStrength);
 
-            if (aPriNext < 0) {
+            if (aPriNext < 0f) {
                 bPriNext -= -aPriNext; //subtract remainder from the other
-                aPriNext = 0;
+                aPriNext = 0f;
             }
-            if (bPriNext < 0) {
+            if (bPriNext < 0f) {
                 aPriNext -= -bPriNext; //subtract remainder from the other
-                bPriNext = 0;
+                bPriNext = 0f;
             }
 
             //assert (!((aPriNext < 0) || (bPriNext < 0))); //throw new RuntimeException("revision budget underflow");

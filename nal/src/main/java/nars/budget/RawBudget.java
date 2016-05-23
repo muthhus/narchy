@@ -48,7 +48,7 @@ public class RawBudget extends Budget {
      * @return The current priority
      */
     @Override
-    @Deprecated public final float pri() {
+    public final float pri() {
         return priority;
     }
 
