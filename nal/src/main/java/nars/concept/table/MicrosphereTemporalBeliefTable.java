@@ -233,6 +233,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
             remove(b);
             TaskTable.removeTask(b, "Revection Revision");
+
         } else {
             merged = null;
         }

@@ -23,13 +23,10 @@ public class TaskBudgeting {
         //BLink<? extends Task> taskLink = nal.taskLink;
 
 
-        BLink<? extends Task> taskLink = nal.taskLink;
-        Task task = nal.task();
 
 
 
-        BLink<? extends Termed> termLink = nal.termLink;
-        assert(!termLink.isDeleted());
+
         //if (task.isDeleted()) return null;
         //Task task = nal.task();
 
@@ -43,7 +40,6 @@ public class TaskBudgeting {
 
 
 
-        float volRatioScale = 1f / derived.term().volume();
 
         /*
         int tasktermVol = nal.task().term().volume();
@@ -51,19 +47,25 @@ public class TaskBudgeting {
             Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
         */
 
+        BLink<? extends Termed> termLink = nal.termLink;
+        BLink<? extends Task> taskLink = nal.taskLink;
+
 
         //originally was OR, but this can explode because the result of OR can exceed the inputs
         //float priority = or(taskLink.pri(), termLink.pri());
         //float priority = and(taskLink.pri(), termLink.pri());
-        float priority = task.priIfFiniteElseZero();
+
+        Task premiseTask = taskLink.get();
+        float priority = premiseTask.priIfFiniteElseZero();
         if (priority > Global.BUDGET_EPSILON)
             priority *= UtilityFunctions.or(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero());
 
+        float volRatioScale = 1f / derived.term().volume();
 
         //originaly was 'AND'
-        float durability = UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
+        final float durability = UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
 
-        float quality = qualRaw * volRatioScale;
+        final float quality = qualRaw * volRatioScale;
 
 
         //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
@@ -71,7 +73,7 @@ public class TaskBudgeting {
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
         if (!termLink.isDeleted()) {
             final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
-            final float sourceActivation = nal.nar.conceptPriority(nal.task);
+            final float sourceActivation = nal.nar.conceptPriority(nal.task());
 
             termLink.orPriority(quality,
                     UtilityFunctions.and(sourceActivation, targetActivation)

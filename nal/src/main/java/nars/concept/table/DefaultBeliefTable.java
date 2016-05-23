@@ -212,11 +212,10 @@ public class DefaultBeliefTable implements BeliefTable {
                 //Average allows duplicate tasks to not explode like plus would
                 DuplicateMerge.merge(existing.budget(), input, 1f);
                 //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
-                @Nullable Object removalReason = Global.DEBUG ?
-                    input.lastLogged().toString() + ' ' + DUPLICATE_BELIEF_GOAL :
-                    DUPLICATE_BELIEF_GOAL;
+                //@Nullable Object removalReason = Global.DEBUG ?
+                    //input.lastLogged().toString() + ' ' + DUPLICATE_BELIEF_GOAL :
 
-                input.delete(removalReason);
+                input.delete(DUPLICATE_BELIEF_GOAL);
 
 
         /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
