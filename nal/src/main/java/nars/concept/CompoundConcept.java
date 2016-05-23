@@ -695,7 +695,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
             //3. Link the termlink templates
             List<TermTemplate> templates = this.termLinkTemplates;
             if (templates == null) {
-                templates = this.termLinkTemplates = TermLinkBuilder.buildLog(term, nar);
+                templates = this.termLinkTemplates = TermLinkBuilder.buildFlat(term, nar);
             }
 
 //            float subScale;

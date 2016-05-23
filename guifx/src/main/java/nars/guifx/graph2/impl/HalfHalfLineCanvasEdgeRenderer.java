@@ -41,7 +41,7 @@ public class HalfHalfLineCanvasEdgeRenderer extends CanvasEdgeRenderer {
                         DefaultNodeVis.colors,
 
                         0.6 /* baesOpacity */ +
-                        0.4f * 0.5f * (i.pri + t.priNorm) )
+                        0.4f * 0.5f * (i.pri.getMean() /*+ t.priNorm*/) )
             );
         }
 

@@ -116,7 +116,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
                             @Override
                             public double getWeight() {
                                 //return ((Concept)A.term).getPriority();
-                                return pri;
+                                return pri.getMean();
                             }
                         };
                         //return $.pro(A.getTerm(), B.getTerm());

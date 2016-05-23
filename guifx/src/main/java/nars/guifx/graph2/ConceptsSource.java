@@ -60,7 +60,7 @@ public class ConceptsSource extends GraphSource {
                 ((BLink)link).pri(), ee.pri,
                       0.1f);*/
 
-        ee.pri = ((BLink) link).pri();
+        ee.pri.addValue( ((BLink) link).pri() );
     }
 
 

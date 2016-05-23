@@ -182,7 +182,7 @@ public class NARide extends StackPane {
             (A,B) -> {
                 TermEdge te = new TermEdge(A,B) {
                     @Override public double getWeight() {
-                        return pri;
+                        return pri.getMean();
                     }
                 };
                 return te;

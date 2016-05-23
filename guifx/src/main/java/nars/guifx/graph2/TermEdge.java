@@ -6,6 +6,7 @@ package nars.guifx.graph2;
 
 import nars.term.Termed;
 import nars.util.data.Util;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * Created by me on 9/5/15.
@@ -20,14 +21,19 @@ public abstract class TermEdge /*implements ChangeListener*/ {
 
     private final int hash;
 
+
+
 //    //public double len = 0.0;
 //    public boolean visible = false;
 
-    public float pri;
+    public final DescriptiveStatistics pri;
 
 
 
     public TermEdge(TermNode aSrc, TermNode bSrc) {
+
+        pri = new DescriptiveStatistics();
+        pri.setWindowSize(32);
 
 
         //setAutoSizeChildren(true);

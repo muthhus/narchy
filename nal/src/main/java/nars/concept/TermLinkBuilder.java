@@ -2,6 +2,7 @@ package nars.concept;
 
 import com.gs.collections.impl.bag.mutable.HashBag;
 import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static nars.Global.newArrayList;
 
@@ -29,8 +31,9 @@ public enum TermLinkBuilder {
 //    protected float forgetCycles;
 //    protected long now;
 
-    @NotNull public static HashBag<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
-        HashBag<Termed> components = new HashBag(host.volume());
+    @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
+        //HashBag<Termed> components = new HashBag(host.volume());
+        Set<Termed> components = Global.newHashSet(1 + host.volume()/2 /* estimate */);
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -75,47 +78,68 @@ public enum TermLinkBuilder {
         return components;
     }
 
-    /** builds termlink templates with linear weighting according to their occurrence proportion of total subterms */
-    public static @NotNull List<TermTemplate> buildLinear(@NotNull Compound c, @NotNull NAR nar) {
-        return linearWeightedTermLinks(components(c, nar));
-    }
+//    /** builds termlink templates with linear weighting according to their occurrence proportion of total subterms */
+//    public static @NotNull List<TermTemplate> buildLinear(@NotNull Compound c, @NotNull NAR nar) {
+//        return linearWeightedTermLinks(components(c, nar));
+//    }
 
-    @NotNull
-    public static List<TermTemplate> linearWeightedTermLinks(@NotNull HashBag<Termed> s) {
-        float total = s.size();
-        List<TermTemplate> x = newArrayList(s.sizeDistinct());
-        s.forEachWithOccurrences((t,n) ->
-            x.add(new TermTemplate(t,n/total))
-        );
-        return x;
-    }
+    /** termlink templates with equal proportion shared, except variables and anything else which would not have a concept */
+    public static List<TermTemplate> buildFlat(Compound term, NAR nar) {
+        Set<Termed> s = components(term, nar);
 
-    /** builds termlink templates with logarithmic weighting according to their occurrence proportion of total subterms */
-    public static @NotNull List<TermTemplate> buildLog(@NotNull Compound c, @NotNull NAR nar) {
+        int total = s.size();
+        int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
 
-        HashBag<Termed> s = components(c, nar);
-
-
-        List<TermTemplate> x;
-
-        int unique = s.sizeDistinct();
-        if ((unique > 1) && (s.size()!=unique)) {
-            ObjectFloatHashMap<Termed> w = new ObjectFloatHashMap<>(unique);
-
-            s.forEachWithOccurrences((t, n) ->
-                    w.put(t, (float) Math.log1p(n))
-            );
-
-            //normalize the vector
-            float sum = (float) w.sum();
-            x = newArrayList(unique);
-            w.forEachKeyValue((t, n) -> x.add(new TermTemplate(t, n / sum)));
-        } else {
-            x = linearWeightedTermLinks(s);
+        List<TermTemplate> sa = Global.newArrayList(total);
+        float fraction = 1f / active;
+        for (Termed x : s) {
+            sa.add(new TermTemplate(x,
+                (x instanceof Variable) ? 0 : fraction
+            ));
         }
 
-        return x;
+        return sa;
     }
+
+
+//    @NotNull
+//    public static List<TermTemplate> linearWeightedTermLinks(@NotNull HashBag<Termed> s) {
+//        float total = s.size();
+//        List<TermTemplate> x = newArrayList(s.sizeDistinct());
+//        s.forEachWithOccurrences((t,n) ->
+//            x.add(new TermTemplate(t,n/total))
+//        );
+//        return x;
+//    }
+
+//    /** builds termlink templates with logarithmic weighting according to their occurrence proportion of total subterms
+//     *  NOT TESTED may not be good
+//     * */
+//    public static @NotNull List<TermTemplate> buildLog(@NotNull Compound c, @NotNull NAR nar) {
+//
+//        HashBag<Termed> s = components(c, nar);
+//
+//
+//        List<TermTemplate> x;
+//
+//        int unique = s.sizeDistinct();
+//        if ((unique > 1) && (s.size()!=unique)) {
+//            ObjectFloatHashMap<Termed> w = new ObjectFloatHashMap<>(unique);
+//
+//            s.forEachWithOccurrences((t, n) ->
+//                    w.put(t, (float) Math.log1p(n))
+//            );
+//
+//            //normalize the vector
+//            float sum = (float) w.sum();
+//            x = newArrayList(unique);
+//            w.forEachKeyValue((t, n) -> x.add(new TermTemplate(t, n / sum)));
+//        } else {
+//            x = linearWeightedTermLinks(s);
+//        }
+//
+//        return x;
+//    }
 
     //static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
 
@@ -200,6 +224,7 @@ public enum TermLinkBuilder {
             return ct.term();
         }
     }
+
 
 //    static final boolean growLevel1(Term t) {
 //        return growComponent(t) /*&&
