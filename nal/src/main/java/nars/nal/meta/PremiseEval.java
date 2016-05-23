@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
-import static nars.budget.BudgetFunctions.*;
+import static nars.budget.BudgetFunctions.valid;
 
 
 /**

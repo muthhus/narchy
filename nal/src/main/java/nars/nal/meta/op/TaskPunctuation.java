@@ -4,7 +4,6 @@ import nars.Symbols;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 8/27/15.

@@ -6,7 +6,9 @@ import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.concept.Temporalize;
-import nars.nal.meta.*;
+import nars.nal.meta.PremiseEval;
+import nars.nal.meta.PremiseRule;
+import nars.nal.meta.ProcTerm;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -92,24 +94,24 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @Override
     public final void accept(@NotNull PremiseEval m) {
 
-        Term d = m.resolve(conclusionPattern);
-        if (d == null)
+        Term raw = m.resolve(conclusionPattern);
+        if (raw == null)
             return;
 
-        if (d.varPattern() != 0)
+        if (raw.varPattern() != 0)
             return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
 
         ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 
         //pre-filter invalid statements
-        if (!Task.preNormalize(d, nar))
+        if (!Task.preNormalize(raw, nar))
             return;
 
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept
-        Termed<Compound> content = nar.index.normalized(d);
+        Termed<Compound> content = nar.index.normalized(raw);
 
         if (content == null)
             return; //HACK why would this happen?

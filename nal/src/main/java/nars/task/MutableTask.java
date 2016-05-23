@@ -1,12 +1,9 @@
 package nars.task;
 
 import nars.*;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.TaskBudgeting;
-import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -17,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.Objects;
-
-import static nars.Global.dereference;
-import static nars.Global.reference;
 
 /**
  * Mutable task with additional fluent api utility methods

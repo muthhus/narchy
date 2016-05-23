@@ -10,7 +10,6 @@ import nars.Premise;
 import nars.Symbols;
 import nars.bag.BLink;
 import nars.budget.Budget;
-import nars.budget.policy.TaskBudgeting;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
@@ -18,7 +17,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -27,15 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.Reference;
 
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.eternalize;
 
 /**
- * Firing a concept (reasoning event). Derives new Tasks via reasoning rules
- * <p>
- * Concept
- * Task
- * TermLinks
+ * Firing a concept (reasoning event).  Derives new Tasks via reasoning rules.
+ * It is meant to be disposable and should not be kept referenced longer than necessary
+ * to avoid GC loops
  */
 public class ConceptProcess implements Premise {
 
@@ -47,7 +41,7 @@ public class ConceptProcess implements Premise {
 
 
     //cached here to prevent weakref tasklink from losing the task in the middle of derivation
-    public final transient Task task;
+    //public final transient Task task;
 
     //public final BLink<? extends Concept> conceptLink;
 
@@ -71,7 +65,7 @@ public class ConceptProcess implements Premise {
         this.nar = nar;
 
         this.taskLink = taskLink;
-        this.task = taskLink.get();
+        //this.task = taskLink.get();
         //assert(!task().isDeleted());
 
         //this.conceptLink = conceptLink;
@@ -109,7 +103,7 @@ public class ConceptProcess implements Premise {
 
     @Override
     public final Task task() {
-        return task;
+        return taskLink.get();
     }
 
 
@@ -214,7 +208,7 @@ public class ConceptProcess implements Premise {
 
     public final boolean hasTemporality() {
 
-        Task task = this.task;
+        Task task = this.task();
         if (!task.isEternal() || task.term().dt()!= DTERNAL)
             return true;
 

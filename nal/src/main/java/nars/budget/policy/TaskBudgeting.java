@@ -67,11 +67,12 @@ public class TaskBudgeting {
 
 
         //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
-        final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
-        final float sourceActivation = nal.nar.conceptPriority(nal.task);
 
         //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
         if (!termLink.isDeleted()) {
+            final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
+            final float sourceActivation = nal.nar.conceptPriority(nal.task);
+
             termLink.orPriority(quality,
                     UtilityFunctions.and(sourceActivation, targetActivation)
                     //or(sourceActivation, targetActivation)
@@ -80,7 +81,6 @@ public class TaskBudgeting {
         }
 
 
-        //BudgetMerge.avgDQBlend.merge(target, termLink);
 
         return target.budget(priority, durability, quality);
 

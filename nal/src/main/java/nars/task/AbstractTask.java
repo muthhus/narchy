@@ -18,9 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static nars.Global.dereference;
-import static nars.Global.reference;
-
 /**
  * Default Task implementation
  * TODO move all mutable methods to MutableTask and call this ImmutableTask

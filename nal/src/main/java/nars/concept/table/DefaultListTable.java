@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import nars.task.Task;
 import nars.util.data.list.FasterList;
 
 import java.util.Iterator;

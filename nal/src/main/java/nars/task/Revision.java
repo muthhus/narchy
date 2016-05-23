@@ -1,9 +1,5 @@
 package nars.task;
 
-import nars.NAR;
-import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
-import nars.budget.UnitBudget;
 import nars.nal.UtilityFunctions;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

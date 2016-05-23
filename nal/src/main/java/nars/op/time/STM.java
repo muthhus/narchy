@@ -1,7 +1,6 @@
 package nars.op.time;
 
 import nars.NAR;
-import nars.Symbols;
 import nars.task.Task;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;

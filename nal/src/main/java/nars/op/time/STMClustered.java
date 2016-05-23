@@ -1,9 +1,12 @@
 package nars.op.time;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
+import nars.learn.gng.NeuralGasNet;
+import nars.learn.gng.Node;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -11,8 +14,6 @@ import nars.term.Compound;
 import nars.truth.DefaultTruth;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
-import nars.learn.gng.NeuralGasNet;
-import nars.learn.gng.Node;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;

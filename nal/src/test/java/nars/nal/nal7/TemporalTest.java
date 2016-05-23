@@ -1,19 +1,15 @@
 package nars.nal.nal7;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.budget.UnitBudget;
-import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
-import static nars.$.$;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

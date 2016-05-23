@@ -77,21 +77,16 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
         @Override
         public void delete() {
-            float p = pri();
-            if (p==p) {
-                //if not already deleted HACK
-                id.clear();
-            }
-
+            id.clear();
             super.delete();
         }
 
-        @Override
-        public boolean isDeleted() {
+        @Override public boolean isDeleted() {
 
             if (super.isDeleted()) {
                 return true;
             } else {
+                //if the weak ref'd item is lost then delete this link
                 if (get() == null) {
                     delete();
                     return true;
@@ -118,7 +113,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
         @Nullable
         @Override
-        public X get() {
+        public final X get() {
             return id.get();
         }
 

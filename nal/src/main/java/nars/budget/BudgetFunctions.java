@@ -22,12 +22,8 @@ package nars.budget;
 
 import nars.Memory;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.TaskBudgeting;
-import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
-import nars.term.Termed;
-import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

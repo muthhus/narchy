@@ -3,21 +3,10 @@ package nars.util.graph;
 import com.gs.collections.api.tuple.primitive.ObjectIntPair;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
-import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jgrapht.Graph;
-import org.jgrapht.GraphMapping;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
-import org.jgrapht.util.PrefetchIterator;
-import org.junit.Test;
-
-import java.util.*;
-
-import static nars.$.$;
 
 
 public class TermGraphTest {

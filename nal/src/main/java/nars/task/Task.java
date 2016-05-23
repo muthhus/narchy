@@ -39,9 +39,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
-import static nars.Op.CONJUNCTION;
-import static nars.Op.NEGATE;
-import static nars.Op.or;
+import static nars.Op.*;
 import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.TIMELESS;

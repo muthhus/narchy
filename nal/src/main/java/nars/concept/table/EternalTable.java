@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.bag.impl.SortedListTable;
-import nars.budget.Budget;
 import nars.nal.LocalRules;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -28,9 +27,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
 
     @Override
     protected final void removeWeakest(Object reason) {
-        Task x = remove(weakest());
-        if (!x.isDeleted())
-            x.delete(reason);
+        remove(weakest()).delete(reason);
     }
 
     @Nullable

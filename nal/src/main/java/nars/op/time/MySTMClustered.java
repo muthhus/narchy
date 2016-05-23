@@ -7,7 +7,6 @@ import nars.$;
 import nars.Global;
 import nars.budget.BudgetFunctions;
 import nars.nar.Default;
-import nars.op.time.STMClustered;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;

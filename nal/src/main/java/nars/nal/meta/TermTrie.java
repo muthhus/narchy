@@ -13,7 +13,6 @@ import org.magnos.trie.TrieSequencer;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /** indexes sequences of (a perfectly-hashable fixed number

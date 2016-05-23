@@ -9,7 +9,6 @@ import nars.nal.meta.op.MatchTerm;
 import nars.nal.meta.op.SubTermOp;
 import nars.nal.op.Derive;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

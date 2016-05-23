@@ -16,9 +16,7 @@ import java.util.*;
 
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 12/12/15.

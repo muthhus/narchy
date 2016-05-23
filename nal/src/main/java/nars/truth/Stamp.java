@@ -20,7 +20,6 @@
  */
 package nars.truth;
 
-import com.gs.collections.api.set.primitive.LongSet;
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Global;

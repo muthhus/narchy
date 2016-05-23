@@ -22,7 +22,6 @@ package nars;
 
 
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.data.Util;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

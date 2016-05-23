@@ -4,9 +4,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.Global;
+import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.learn.microsphere.InterpolatingMicrosphere;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

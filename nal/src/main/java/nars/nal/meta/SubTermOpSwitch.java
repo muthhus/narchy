@@ -1,18 +1,9 @@
 package nars.nal.meta;
 
-import nars.Op;
 import nars.nal.meta.op.SubTermOp;
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.AtomicString;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * Created by me on 5/21/16.
