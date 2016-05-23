@@ -1,6 +1,6 @@
 **NARchy** derives from [OpenNARS](https://github.com/opennars/opennars2), the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.
 
-![OpenNARS Logo](https://bitbucket.org/seh/narchy/raw/master/doc/narchy.jpg)
+![NARchy Logo](https://bitbucket.org/seh/narchy/raw/master/doc/narchy.jpg)
 
 Theory
 ------
@@ -13,15 +13,18 @@ There are several types of __tasks__:
  * **Question** -  To process it means to find the best answer to it according to current beliefs.
  * **Goal** - To process it means to carry out some system operations to realize it.
 
-> _The design of NARS makes no assumption about the content or desire-value of the given goals. How to choose proper given goals for each application is a problem to be solved in the future by the people responsible for the application._
+### By default, NARS makes *no assumptions* about the belief or desire values of input.
+#### How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users.
 
-As a reasoning system, the [architecture of NARS](http://www.cis.temple.edu/~pwang/Implementation/NARS/architecture.pdf) consists of a **memory**, an **inference engine**, and a **control mechanism**.
+![Inference](https://bitbucket.org/seh/narchy/raw/master/doc/derivation_pipeline.png)
 
-The **memory** contains a collection of concepts, a list of operators, and a buffer for new tasks. Each concept is identified by a term, and contains tasks and beliefs directly on the term, as well as links to related tasks and terms.
+As a reasoning system, the [architecture of NARS](http://www.cis.temple.edu/~pwang/Implementation/NARS/architecture.pdf) consists of a **memory**, an **inference engine**, and a **control system**.
 
-The **inference engine** carries out various type of inference, according to a set of built-in rules. Each inference rule derives certain new tasks from a given task and a belief that are related to the same concept.
+The **memory** manages a collection of concepts, a list of operators, and a buffer for new tasks. Each concept is identified by a term, and contains tasks and beliefs directly on the term, as well as links to related tasks and terms.
 
-The control mechanism repeatedly carries out the **working cycle** of the system, generally consisting of the following steps:
+The **deriver** applies various type of inference, according to a set of built-in rules. Each inference rule derives certain new tasks from a given task and a belief that are related to the same concept.
+
+The **control** determines the cyclical activity of the system:
 
  1. Select tasks in the buffer to insert into the corresponding concepts, which may include the creation of new concepts and beliefs, as well as direct processing on the tasks.
  2. Select a concept from the memory, then select a task and a belief from the concept.
@@ -29,7 +32,18 @@ The control mechanism repeatedly carries out the **working cycle** of the system
  4. Add the derived tasks into the task buffer, and send report to the environment if a task provides a best-so-far answer to an input question, or indicates the realization of an input goal.
  5. Return the processed belief, task, and concept back to memory with feedback.
 
-All the **selections** in steps 1 and 2 are **probabilistic**, in the sense that all the items (tasks, beliefs, or concepts) within the scope of the selection have priority values attached, and the probability for each of them to be selected at the current moment is proportional to its priority value. When an new item is produced, its priority value is determined according to its parent items, as well as the type of mechanism that produces it. At step 5, the priority values of all the involved items are adjusted, according to the immediate feedback of the current cycle.
+All choices in steps 1 and 2 are **probabilistic**,
+in the sense that all the items (tasks, beliefs, or concepts)
+within the scope of the selection are referenced with
+varying priority budgets.
+
+When a new item is produced, its priority value is determined
+according to its parent items and the conditions of the process which
+produces it.
+
+At step 5, the priority values of all the involved items
+are adjusted, according to the immediate feedback of the
+current cycle.
 
 ----
 
