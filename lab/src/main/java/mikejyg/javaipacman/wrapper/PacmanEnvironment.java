@@ -62,6 +62,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
+		nar.premiser.confMin.setValue(0.05f);
 		nar.beliefConfidence(0.51f);
 		nar.conceptActivation.setValue(0.25f);
 		nar.cyclesPerFrame.set(24);

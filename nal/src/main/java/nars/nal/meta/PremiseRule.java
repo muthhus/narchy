@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.Symbols;
 import nars.concept.Temporalize;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
@@ -17,10 +18,7 @@ import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
@@ -248,12 +246,67 @@ public class PremiseRule extends GenericCompound {
 
         //SUFFIX (order already determined for matching)
         {
+            l.add(new Conclusion(this, post));
+
             addAll(l, match.code);
 
             l.add(truth.derive); //will be linked to and invoked by match callbacks
         }
 
         return l;
+    }
+
+    /** pre-match filtering based on conclusion op type and other premise context */
+    public static final class Conclusion extends AtomicBoolCondition {
+
+        /** pattern which determines the concluson term.
+         * this is applied prior to the actual match.
+         * VAR_PATTERN acts as a sort of wildcard / unknown*/
+        private final Term pattern;
+
+        private final String id;
+
+        public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
+
+            Term pattern = post.pattern;
+
+            if (Op.isOperation(pattern)) {
+                //TODO more correctly unwrap certain immediate transform operators to get the actual op
+                //if (p.trans Operator.operator((Compound)pattern) instanceof ImmediateTermTransform) {
+                    this.pattern = $.varPattern(1);
+                //} else {
+                //    this.op = rawPatternOp;
+                //}
+
+            } else {
+                this.pattern = pattern;
+            }
+
+            char puncOverride = post.puncOverride;
+            char puncSrc = puncOverride!=0 ? puncOverride : '_';
+            this.id = "Conclusion(" + puncSrc + ')';
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return id;
+        }
+
+        @Override
+        public boolean booleanValueOf(PremiseEval p) {
+            char punc = p.punct.get();
+            switch (punc) {
+                case Symbols.BELIEF:
+                case Symbols.GOAL:
+                    float conf = p.truth.get().conf();
+                    if (conf < p.confidenceMin(pattern, punc)) {
+                        return false;
+                    }
+                    break;
+            }
+
+            return true;
+        }
     }
 
     /** higher is earlier */

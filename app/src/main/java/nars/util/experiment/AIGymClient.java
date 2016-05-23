@@ -242,7 +242,7 @@ public class AIGymClient extends Shell {
         final int actions;
         private final float deltaSpeed;
         private final float maxSpeed;
-        private final float decay = 0f;
+        private final float decay = 0.9f;
         float f[];
 
         public BoxActionModel(String a, float deltaSpeed, float maxSpeed) {
@@ -318,7 +318,7 @@ public class AIGymClient extends Shell {
             if (a.startsWith("Discrete")) {
                 this.actionModel = new DiscreteActionModel(a);
             } else if (a.startsWith("Box")) {
-                this.actionModel = new BoxActionModel(a, 1f /*default */, 2f);
+                this.actionModel = new BoxActionModel(a, 0.3f /*default */, 4f);
             } else {
                 throw new UnsupportedOperationException("Unknown action_space type: " + a);
             }
@@ -413,7 +413,7 @@ public class AIGymClient extends Shell {
                 //"MountainCar-v0"
                 //"DoomDeathmatch-v0" //2D inputs
                 //"LunarLander-v1"
-                //"Pendulum-v0"
+                "Pendulum-v0"
                 //"InvertedDoublePendulum-v1"
 
                 //"Pong-v0"
@@ -422,7 +422,7 @@ public class AIGymClient extends Shell {
                 //"BipedalWalker-v1"
                 //"Hopper-v1"
                 //"MsPacman-ram-v0"
-                "SpaceInvaders-ram-v0" //<---
+                //"SpaceInvaders-ram-v0" //<---
                 //"Hex9x9-v0"
                 , () -> {
             //new DQN()
@@ -431,14 +431,15 @@ public class AIGymClient extends Shell {
 
                 XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
                 Default nar = new Default(
-                        512, 2, 1, 1, rng,
+                        512, 4, 1, 1, rng,
                         new Default.WeakTermIndex(256 * 1024, rng),
                         //new Default.SoftTermIndex(128 * 1024, rng),
                         //new Default.DefaultTermIndex(128 *1024, rng),
                         new FrameClock());
-                nar.beliefConfidence(0.65f);
-                nar.conceptActivation.setValue(0.45f);
-                nar.cyclesPerFrame.set(256);
+                nar.beliefConfidence(0.3f);
+                nar.premiser.confMin.setValue(0.07f);
+                nar.conceptActivation.setValue(0.2f);
+                nar.cyclesPerFrame.set(32);
 
                 new MySTMClustered(nar, 8, '.');
                 //new MySTMClustered(nar, 24, '!');

@@ -301,6 +301,10 @@ public enum Op {
         return this == IMPLICATION; //in(ImplicationsBits);
     }
 
+    public static boolean hasAny(int structure, Op o) {
+        return ((structure & o.bit()) > 0) ? true : false;
+    }
+
 
     /** top-level Op categories */
     public enum OpType {

@@ -153,7 +153,7 @@ abstract public class Solve extends AtomicBoolCondition {
 
 
 
-        float minConf = m.getMinConfidence();
+        float minConf = m.confidenceMin();
 
 
         Truth truth = tf.apply(

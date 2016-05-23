@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Random;
 
+import static nars.Op.VAR_PATTERN;
 import static nars.budget.BudgetFunctions.*;
 
 
@@ -69,7 +70,7 @@ public class PremiseEval extends FindSubst {
     }
 
     public PremiseEval(TermIndex index, Random r, Deriver deriver) {
-        super(index, Op.VAR_PATTERN, r );
+        super(index, VAR_PATTERN, r );
 
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
             addTransform(c);
@@ -85,7 +86,7 @@ public class PremiseEval extends FindSubst {
 
     private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
         try {
-            transforms.put($.operator(c.getSimpleName()), c.newInstance());
+            transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), c.newInstance());
         } catch (Exception e) {
             throw new RuntimeException(c + ": " + e);
         }
@@ -214,7 +215,23 @@ public class PremiseEval extends FindSubst {
         this.minConfidence = minConfidence;
     }
 
-    public final float getMinConfidence() {
+    /** default minimum confidence */
+    public final float confidenceMin() {
+        return minConfidence;
+    }
+
+    /** specific minimum confidence function for advanced filtering heuristics TODO */
+    public final float confidenceMin(Term pattern, char punc) {
+
+//        //EXAMPLE TEMPORARY HACK
+//        Op o = pattern.op();
+//        if (o!=VAR_PATTERN) {
+//            int str = pattern.structure();
+//
+//            if ((Op.hasAny(str, Op.EQUIV) || (o == Op.INHERIT)))
+//                return minConfidence * 3;
+//        }
+
         return minConfidence;
     }
 

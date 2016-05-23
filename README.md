@@ -12,10 +12,10 @@ which may include human or animal users, and other computer systems.
 Tasks can arrive at any time, and there is no restriction on their contents as far as they can be expressed in __Narsese__, the I/O language of NARS.
 
 ###### Beliefs - represent a specified amount of factual evidence with which to revise existing knowledge and derive novel conclusions.
-###### Questions - find the best matching answer(s) according to active beliefs
-###### Goals - invoke system operations in order to satisfy desire
+###### Questions - find the best matching answer(s) according to active beliefs.
+###### Goals - invoke system operations in order to satisfy desire.
 
-#### By default, NARS makes *no assumptions* about the meanings or truth values of input beliefs and goals.
+#### By default, NARS makes *no assumptions* about the meaning or truth value of input beliefs and goals.
 ###### How to choose proper inputs and interpret possible outputs for each application is an *open problem* to be solved by its users.
 
 ![Inference](https://raw.githubusercontent.com/automenta/narchy/skynet1/doc/derivation_pipeline.png)
