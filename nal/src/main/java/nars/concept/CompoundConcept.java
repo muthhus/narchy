@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.ArrayQuestionTable;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
@@ -275,12 +275,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
 
-    @Override public void capacity(ConceptPolicy p) {
+    @Override public void capacity(ConceptBudgeting p) {
         linkCapacity(p);
         beliefCapacity(p);
     }
 
-    protected void beliefCapacity(ConceptPolicy p) {
+    protected void beliefCapacity(ConceptBudgeting p) {
         beliefs().capacity(p.beliefCap(this, true, true), p.beliefCap(this, true, false));
         goals().capacity(p.beliefCap(this, false, true), p.beliefCap(this, false, false));
     }

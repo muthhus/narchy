@@ -7,7 +7,6 @@ import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.concept.Temporalize;
 import nars.nal.meta.*;
-import nars.nal.meta.match.EllipsisMatch;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -15,7 +14,6 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.ATOM;
 import static nars.nal.Tense.ETERNAL;
@@ -95,89 +93,57 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
         Term d = m.resolve(conclusionPattern);
-        if (d != null && d.varPattern() == 0) {
+        if (d == null)
+            return;
 
-            if ((d instanceof EllipsisMatch)) {
-                //TODO hack prevent this
-                //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
-                EllipsisMatch em = ((EllipsisMatch) d);
-                switch (em.size()) {
-                    case 1:
-                        d = em.term(0); //unwrap the item
-                        break;
-                    case 0:
-                        return;
-                    default:
-                        throw new RuntimeException("invalid ellipsis match: " + em);
-                        //return;
-                }
-            }
+        if (d.varPattern() != 0)
+            return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
 
-            derive(m, d);
-        }
-
-    }
-
-
-
-    /**
-     * part 1
-     */
-    private void derive(@NotNull PremiseEval p, @NotNull Term t) {
-
-        ConceptProcess premise = p.premise;
+        ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 
         //pre-filter invalid statements
-        if (!Task.preNormalize(t, nar))
+        if (!Task.preNormalize(d, nar))
             return;
 
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept
-        Termed tNorm = nar.index.normalized(t);
+        Termed<Compound> content = nar.index.normalized(d);
 
-        //HACK why?
-        if ((tNorm == null) || !(tNorm instanceof Compound))
-            return;
+        if (content == null)
+            return; //HACK why would this happen?
 
-        Truth truth = p.truth.get();
+        Truth truth = m.truth.get();
 
-        Budget budget = p.budget(truth, tNorm.term());
+        Budget budget = m.budget(truth, content);
         if (budget == null)
             return;
 
         long occ;
 
-        Compound ct = (Compound) tNorm.term();
-
-        if ((nar.nal() >= 7) && (!premise.eternal() || premise.hasTemporality())) {
-            //Term cp = this.conclusionPattern;
-
-            //if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
-            //unwrap operation from conclusion pattern; the pattern we want is its first argument
-            //cp = Operator.argArray((Compound) cp)[0];
-            //}
+        if ((nar.nal() >= 7) && (premise.hasTemporality())) {
 
             long[] occReturn = new long[]{ETERNAL};
 
-            ct = this.temporalizer.compute(ct,
-                    p, this, occReturn
+            Compound temporalized = this.temporalizer.compute(content.term(),
+                    m, this, occReturn
             );
 
-            if (ct == null) {
-                //aborted by temporalization
-                return;
-            }
+            if (temporalized == null)
+                return; //aborted by temporalization
 
+            //NOTE: if temporalized, the content term will be the unique Term (NOT Termed)
+            //else it will stay as the Concept itself (Termed<> already stored before)
+            if (temporalized.hasTemporal())
+                content = temporalized;
 
             occ = occReturn[0];
-
         } else {
             occ = ETERNAL;
         }
 
-        premise.derive(ct, truth, budget, nar.time(), occ, p, this);
+        premise.derive(content, truth, budget, nar.time(), occ, m, this);
 
     }
 

@@ -417,7 +417,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Termed normalized(@NotNull Termed t) {
+    default Termed<Compound> normalized(@NotNull Termed t) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();

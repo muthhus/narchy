@@ -2,8 +2,8 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
-import nars.Op;
 import nars.budget.Budget;
+import nars.budget.policy.TaskBudgeting;
 import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -124,7 +124,7 @@ public class PremiseEval extends FindSubst {
     @Override
     public boolean onMatch() {
         if (termutes-- > 0) {
-            pattern.get().onMatch(this);
+            pattern.get().eachMatch.accept(this);
             return true;
         }
         return false;
@@ -204,8 +204,8 @@ public class PremiseEval extends FindSubst {
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
         ConceptProcess p = this.premise;
         return valid(truth != null ?
-                    compoundForward(truth, derived, p) :
-                    compoundBackward(derived, p)
+                    TaskBudgeting.compoundForward(truth, derived, p) :
+                    TaskBudgeting.compoundBackward(derived, p)
                 , p.nar());
     }
 

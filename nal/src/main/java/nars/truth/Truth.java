@@ -90,16 +90,17 @@ public interface Truth extends Truthed {
         return (confidence * (frequency - 0.5f) + 0.5f);
     }
 
-    /**
-     * Calculate the absolute difference of the expectation value and that of a
-     * given truth value
-     *
-     * @param t The given value
-     * @return The absolute difference
-     */
-    default float getExpDifAbs(@NotNull Truth t) {
-        return Math.abs(expectation() - t.expectation());
-    }
+    //DONT USE THIS IT IS BIASED AGAINST NEGATIVE FREQUENCY TRUTH
+//    /**
+//     * Calculate the absolute difference of the expectation value and that of a
+//     * given truth value
+//     *
+//     * @param t The given value
+//     * @return The absolute difference
+//     */
+//    default float getExpDifAbs(@NotNull Truth t) {
+//        return Math.abs(expectation() - t.expectation());
+//    }
 
     /**
      * Check if the truth value is negative

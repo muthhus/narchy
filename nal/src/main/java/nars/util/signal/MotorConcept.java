@@ -5,7 +5,7 @@ import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptBudgeting;
 import nars.concept.OperationConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -15,7 +15,7 @@ import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.$;
-import static nars.budget.policy.DefaultConceptPolicy.beliefCapacityNonEternal;
+import static nars.budget.policy.DefaultConceptBudgeting.beliefCapacityNonEternal;
 
 
 public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
@@ -99,7 +99,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     }
 
-    @Override protected void beliefCapacity(ConceptPolicy p) {
+    @Override protected void beliefCapacity(ConceptBudgeting p) {
         beliefCapacityNonEternal(this, p);
     }
 

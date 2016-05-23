@@ -37,7 +37,8 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     private final Set<Derive> derive = Global.newHashSet(1);
     public final Term x;
 
-    private @Nullable ProcTerm onMatch;
+    @Nullable
+    public ProcTerm eachMatch;
 
     public MatchTerm(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = this.pid = id;
@@ -82,20 +83,8 @@ abstract public class MatchTerm extends AtomicBoolCondition {
         derive.add(x);
     }
 
-    /** delegates a partial or complete match to each of the known derivation handlers */
-    public void onMatch(@NotNull PremiseEval m) {
-//        if (Global.DEBUG && derive.isEmpty())
-//            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
-
-        //TODO HACK dont lazily instantiate this but do it after the TrieDeriver has finished building the rule trie by iterating all known MatchTerm's (in the LinkGraph)
-        ProcTerm o = this.onMatch;
-
-
-        o.accept(m);
-    }
-
     public final @NotNull ProcTerm build() {
-        if (this.onMatch == null) {
+        if (this.eachMatch == null) {
 
 
             ProcTerm om;
@@ -116,9 +105,9 @@ abstract public class MatchTerm extends AtomicBoolCondition {
                     ((om!=null) ? ",  " + om  : "") + ")");
 
 
-            this.onMatch = om;
+            this.eachMatch = om;
         }
-        return this.onMatch;
+        return this.eachMatch;
     }
 
 //    @Override

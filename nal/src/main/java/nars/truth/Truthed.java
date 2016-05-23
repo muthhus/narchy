@@ -3,6 +3,8 @@ package nars.truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.truth.TruthFunctions.c2w;
+
 /** indicates an implementation has, or is associated with a specific TruthValue */
 public interface Truthed  {
 
@@ -57,6 +59,12 @@ public interface Truthed  {
 
         return count == 0 ? 0.5f : t / count;
     }
+
+    /** confidence to weight */
+    default float confWeight() {
+        return c2w(conf());
+    }
+
 
     //void setValue(T v); //move to MutableMetaTruth interface
 

@@ -20,10 +20,9 @@
  */
 package nars.budget;
 
-import nars.Global;
 import nars.Memory;
-import nars.bag.BLink;
 import nars.budget.merge.BudgetMerge;
+import nars.budget.policy.TaskBudgeting;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
@@ -208,28 +207,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 	/* ----- Task derivation in CompositionalRules and StructuralRules ----- */
 
-    @Nullable
-    public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
-                                         @NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(
-                target,
-                truthToQuality(truth),
-                content,
-                nal);
-    }
-
-    /**
-     * Backward logic with CompoundTerm conclusion, stronger case
-     *
-     * @param content The content of the conclusion
-     * @return The budget of the conclusion
-     */
-    @Nullable
-    public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(new UnitBudget(), 1.0f, content, nal);
-    }
-
-//    /**
+    //    /**
 //     * Backward logic with CompoundTerm conclusion, weaker case
 //     *
 //     * @param content The content of the conclusion
@@ -242,108 +220,6 @@ public final class BudgetFunctions extends UtilityFunctions {
 //        return budgetInference(w2c(1), content.volume(), nal);
 //    }
 
-
-    @Nullable
-    static Budget budgetInference(@NotNull Budget target, float qualRaw, @NotNull Termed derived, @NotNull ConceptProcess nal) {
-
-        //BLink<? extends Task> taskLink = nal.taskLink;
-
-
-        BLink<? extends Task> taskLink = nal.taskLink;
-        Task task = nal.task();
-
-
-
-        BLink<? extends Termed> termLink = nal.termLink;
-        assert(!termLink.isDeleted());
-        //if (task.isDeleted()) return null;
-        //Task task = nal.task();
-
-
-        //(taskLink !=null) ? taskLink :  nal.task().budget();
-
-        //Task task = taskLink.get();
-
-
-
-
-
-
-        float volRatioScale = 1f / derived.term().volume();
-
-        /*
-        int tasktermVol = nal.task().term().volume();
-        float volRatioScale =
-            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
-        */
-
-
-        //originally was OR, but this can explode because the result of OR can exceed the inputs
-        //float priority = or(taskLink.pri(), termLink.pri());
-        //float priority = and(taskLink.pri(), termLink.pri());
-        float priority = task.priIfFiniteElseZero();
-        if (priority > Global.BUDGET_EPSILON)
-            priority *= or(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero());
-
-
-        //originaly was 'AND'
-        float durability = and(taskLink.dur() * volRatioScale, termLink.dur());
-
-        float quality = qualRaw * volRatioScale;
-
-
-        //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
-        final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
-        final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get());
-
-        //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-        if (!termLink.isDeleted()) {
-            termLink.orPriority(quality,
-                    and(sourceActivation, targetActivation)
-                    //or(sourceActivation, targetActivation)
-            ); //was: termLink.orPriority(or(quality, targetActivation));
-            termLink.orDurability(quality);
-        }
-
-
-        //BudgetMerge.avgDQBlend.merge(target, termLink);
-
-        return target.budget(priority, durability, quality);
-
-
-        /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java
-            Item t = memory.currentTaskLink;
-            if (t == null) {
-                t = memory.currentTask;
-            }
-            float priority = t.getPriority();
-            float durability = t.getDurability() / complexity;
-            float quality = qual / complexity;
-            TermLink termLink = memory.currentBeliefLink;
-            if (termLink != null) {
-                priority = or(priority, termLink.getPriority());
-                durability = and(durability, termLink.getDurability());
-                float targetActivation = memory.getConceptActivation(termLink.getTarget());
-                termLink.incPriority(or(quality, targetActivation));
-                termLink.incDurability(quality);
-            }
-            return new BudgetValue(priority, durability, quality);
-         */
-    }
-
-
-    /**
-     * Forward logic with CompoundTerm conclusion
-     *
-     * @param truth   The truth value of the conclusion
-     * @param content The content of the conclusion
-     * @param nal     Reference to the memory
-     * @return The budget of the conclusion
-     */
-    @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
-        return compoundForward(new UnitBudget(), truth, content, nal);
-    }
 
     /**
      * tests a budget's validity for a task to be processed by a memory

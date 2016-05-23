@@ -203,14 +203,6 @@ public interface Premise extends Level, Tasked {
         return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
-    /** true if task and belief (if not null) are eternal */
-    default boolean eternal() {
-        if (task().isEternal()) {
-            Task b = belief();
-            return (b == null) || (b.isEternal());
-        }
-        return false;
-    }
 
 
     /** whether overlap exists between the "task" and "belief" tasks. if belief==null, returns false */

@@ -10,6 +10,7 @@ import nars.Premise;
 import nars.Symbols;
 import nars.bag.BLink;
 import nars.budget.Budget;
+import nars.budget.policy.TaskBudgeting;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
@@ -46,7 +47,7 @@ public class ConceptProcess implements Premise {
 
 
     //cached here to prevent weakref tasklink from losing the task in the middle of derivation
-    private final transient Task task;
+    public final transient Task task;
 
     //public final BLink<? extends Concept> conceptLink;
 
@@ -154,7 +155,7 @@ public class ConceptProcess implements Premise {
 
 
     /** part 2 */
-    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
+    public final void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
         char punct = p.punct.get();
 
@@ -176,27 +177,27 @@ public class ConceptProcess implements Premise {
 
         nar.process(derived);
 
-        //ETERNALIZE:
+        //ETERNALIZE: (CURRENTLY DISABLED)
 
-        if ((occ != ETERNAL) && (truth != null) && d.eternalize  ) {
+//        if ((occ != ETERNAL) && (truth != null) && d.eternalize  ) {
 
-//            if (parents.get()==null) /* if parents are null it means the previous task was deleted already but we need this for the eternalized version  */ {
-//                parents = parentRef(single);
-//                //TODO maybe ignore the eternalized if the non-eternalized wasnt immediately accepted
+
+//            if (!derived.isDeleted()) {
+//
+//
+//                nar.process(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
+//                        .time(now, ETERNAL)
+//                        .budgetCompoundForward(budget, this)
+//                        /*
+//                TaskBudgeting.compoundForward(
+//                        budget, truth(),
+//                        term(), premise);*/
+//                        .log("Immediaternalized") //Immediate Eternalization
+//
+//                );
 //            }
 
-
-
-            if (!derived.isDeleted()) {
-                nar.process(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
-                        .time(now, ETERNAL)
-                        .budgetCompoundForward(budget, this)
-                        .log("Immediaternalized") //Immediate Eternalization
-
-                );
-            }
-
-        }
+//        }
 
     }
 
@@ -212,10 +213,16 @@ public class ConceptProcess implements Premise {
 
 
     public final boolean hasTemporality() {
-        if (task().term().dt()!= DTERNAL) return true;
-        @Nullable Task b = belief();
-        if (b == null) return false;
-        return b.term().dt()!= DTERNAL;
+
+        Task task = this.task;
+        if (!task.isEternal() || task.term().dt()!= DTERNAL)
+            return true;
+
+        Task belief = this.belief;
+        if (belief != null && (!belief.isEternal() || belief.term().dt()!= DTERNAL))
+            return true;
+
+        return false;
     }
 
 

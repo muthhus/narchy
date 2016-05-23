@@ -11,7 +11,7 @@ import nars.budget.Budgeted;
 import nars.budget.forget.BudgetForget;
 import nars.budget.forget.Forget;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
 import nars.concept.PremiseGenerator;
@@ -535,11 +535,11 @@ public class Default extends AbstractNAR {
      */
     public static final class DefaultCycle extends AbstractCycle {
 
-        private final DefaultConceptPolicy cold;
-        private final DefaultConceptPolicy warm;
+        private final DefaultConceptBudgeting cold;
+        private final DefaultConceptBudgeting warm;
 
 
-        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
             super(nar, premiseGenerator);
             this.warm = warm;
             this.cold = cold;

@@ -5,6 +5,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
+import nars.budget.policy.TaskBudgeting;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -40,7 +41,7 @@ public class MutableTask extends AbstractTask {
     }
 
     public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Reference<Task>[] parents) {
-        super(term.term(), punct, truth,
+        super(term, punct, truth,
             /* budget: */ 0, Float.NaN, Float.NaN, parents);
     }
 
@@ -317,15 +318,6 @@ public class MutableTask extends AbstractTask {
 //        if (a) state = (TaskState.Anticipated);
 //        return this;
 //    }
-
-    @NotNull
-    public MutableTask budgetCompoundForward(@NotNull Budget input, @NotNull ConceptProcess premise) {
-        budget(input);
-        BudgetFunctions.compoundForward(
-                budget(), truth(),
-                term(), premise);
-        return this;
-    }
 
 
     @NotNull

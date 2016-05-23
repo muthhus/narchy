@@ -2,7 +2,7 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractNAR extends NAR {
 
-    public final DefaultConceptPolicy conceptWarm, conceptCold;
+    public final DefaultConceptBudgeting conceptWarm, conceptCold;
 
 
     public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random random) {
@@ -47,8 +47,8 @@ public abstract class AbstractNAR extends NAR {
         /*this.conceptBeliefsMax.set(12);
         this.conceptGoalsMax.set(9);
         this.conceptQuestionsMax.set(3);*/
-        conceptWarm = new DefaultConceptPolicy(10, 10, 3, 16, 8);
-        conceptCold = new DefaultConceptPolicy(8, 8, 1, 8, 4);
+        conceptWarm = new DefaultConceptBudgeting(10, 10, 3, 16, 8);
+        conceptCold = new DefaultConceptBudgeting(8, 8, 1, 8, 4);
 
         conceptRemembering.setValue(4);
         termLinkRemembering.setValue(16);

@@ -7,13 +7,13 @@ import nars.util.data.MutableInteger;
 /**
  * Created by me on 5/11/16.
  */
-public class DefaultConceptPolicy implements ConceptPolicy {
+public class DefaultConceptBudgeting implements ConceptBudgeting {
 
     public final MutableInteger beliefsMaxEteOrTemp, goalsMaxEteOrTemp;
     public final MutableInteger questionsMax;
     public final MutableInteger termlinksCapacity, taskLinksCapacity;
 
-    public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
+    public DefaultConceptBudgeting(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(new MutableInteger(Math.max(1, beliefsCapTotal / 2)),
                 new MutableInteger(Math.max(1, goalsCapTotal / 2)),
                 new MutableInteger(questionsMax),
@@ -22,7 +22,7 @@ public class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    public DefaultConceptPolicy(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+    public DefaultConceptBudgeting(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
         this.beliefsMaxEteOrTemp = beliefsMaxEteOrTemp;
         this.goalsMaxEteOrTemp = goalsMaxEteOrTemp;
         this.questionsMax = questionsMax;
@@ -31,7 +31,7 @@ public class DefaultConceptPolicy implements ConceptPolicy {
     }
 
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void beliefCapacityNonEternal(CompoundConcept c, ConceptPolicy p) {
+    public static void beliefCapacityNonEternal(CompoundConcept c, ConceptBudgeting p) {
         c.beliefs().capacity(0, p.beliefCap(c, true, true) + p.beliefCap(c, true, false));
         c.goals().capacity(0, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
     }

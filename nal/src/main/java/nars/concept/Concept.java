@@ -26,7 +26,7 @@ import com.google.common.primitives.Longs;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.TaskTable;
 import nars.task.Task;
@@ -339,7 +339,7 @@ public interface Concept extends Termed, Comparable {
         return desire(now, now);
     }
 
-    void capacity(ConceptPolicy cold);
+    void capacity(ConceptBudgeting cold);
 
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);

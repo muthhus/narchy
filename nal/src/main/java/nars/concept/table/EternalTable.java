@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by me on 5/7/16.
  */
-public class EternalTable extends SortedListTable<Task,Task> {
+public class EternalTable extends SortedListTable<Task, Task> {
 
     public EternalTable(Map<Task, Task> index) {
         super((i) -> new Task[i], index, SortedArray.SearchType.BinarySearch);
@@ -117,20 +117,17 @@ public class EternalTable extends SortedListTable<Task,Task> {
             }
         }
 
-        if (oldBelief != null) {
-            Budget revisionBudget = Revision.budgetRevision(conclusion, newBelief, oldBelief, nar);
-            if (revisionBudget != null) {
-                return new RevisionTask(
-                        LocalRules.intermpolate(
-                                newBelief, oldBelief,
-                                newBeliefConf, oldBelief.conf()),
-                        revisionBudget,
-                        newBelief, oldBelief,
-                        conclusion,
-                        nar.time(), newTime);
-            }
-        }
-        return null;
+        return oldBelief != null ?
+                new RevisionTask(
+                    LocalRules.intermpolate(
+                            newBelief, oldBelief,
+                            newBeliefConf, oldBelief.conf()
+                    ),
+                    newBelief, oldBelief,
+                    conclusion,
+                    nar.time(), newTime)
+                :
+                null;
     }
 
 }
