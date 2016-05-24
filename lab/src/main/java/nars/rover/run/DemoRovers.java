@@ -392,7 +392,7 @@ public class DemoRovers {
 //        });
 
 
-        nar.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;

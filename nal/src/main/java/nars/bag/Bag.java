@@ -441,10 +441,6 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     }
 
 
-    @Nullable
-    Bag<V> filter(Predicate<BLink> forEachIfFalseThenRemove);
-
-
 //    @NotNull
 //    default Bag<V> forEachThen(@NotNull Consumer<BLink<? extends V>> each) {
 //        forEach(each);

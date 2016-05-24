@@ -5,7 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
-import nars.concept.table.BeliefTable;
+import nars.budget.UnitBudget;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
@@ -20,11 +20,11 @@ import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.TreeSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * Agent interface wrapping a NAR
@@ -132,8 +132,12 @@ public class NAgent implements Agent {
 
         final float dRewardThresh = 0.1f; //bigger than a change in X%
         FloatSupplier linearPositive = () -> {
-            if (dReward > dRewardThresh) return 1;
-            else return 0;
+            if (dReward < 0)
+                return 0;
+            else if (dReward < dRewardThresh)
+                return 0.5f;
+            else
+                return 1f;
         };
         FloatSupplier linearNegative = () -> dReward < -dRewardThresh ? 1 : 0;
         this.dRewardPos = new SensorConcept("(dRp)", nar,
@@ -239,7 +243,21 @@ public class NAgent implements Agent {
 
         //TODO specify goal via a method in the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
+        nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
         nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
+        nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
+        nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
+        nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
+
+        Task howToReward = nar.ask("(?x && (dRp))", ETERNAL, causeOfIncreasedReward -> {
+            System.out.println(causeOfIncreasedReward.explanation());
+            return true;
+        });
+        howToReward.budget().setPriority(1.0f);
+        howToReward.budget().setDurability(1.0f);
+        howToReward.budget().setQuality(1.0f);
+        nar.conceptualize(howToReward, UnitBudget.Full, 1, 1, null);
+
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
     }
 
@@ -262,6 +280,8 @@ public class NAgent implements Agent {
         observe(nextObservation);
 
         decide(this.lastAction);
+
+
 
         return lastAction;
 

@@ -215,7 +215,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                 //attempt to Unify any Query variables; answer if unifies
                 if (task.term().hasVarQuery()) {
                     matchQueryQuestion(task, belief);
-                } else if (beliefConcept instanceof Compound && nar.index.atemporalize(task.term()).equals(nar.index.atemporalize((Compound)beliefConcept.term()))) {
+                } else if (beliefConcept instanceof Compound && atemporallyEqual(task, beliefConcept)) {
                     answer(task, belief);
                 }
 
@@ -227,6 +227,18 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
         return belief;
 
 
+    }
+
+    public boolean atemporallyEqual(@NotNull Termed term, Concept beliefConcept) {
+        //TODO can be accelerated
+        Term t = term.term();
+        if (t.op() == beliefConcept.op()) {
+            Term b = beliefConcept.term();
+            if (t.structure() == b.structure() && t.volume() == b.volume()) {
+                return nar.index.atemporalize((Compound) t).equals(b);
+            }
+        }
+        return false;
     }
 
     private void answer(Task q, Task a) {

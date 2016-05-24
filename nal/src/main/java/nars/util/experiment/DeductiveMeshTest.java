@@ -10,8 +10,11 @@ import nars.term.atom.Atom;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static nars.nal.Tense.ETERNAL;
 
 
 public class DeductiveMeshTest {
@@ -38,28 +41,45 @@ public class DeductiveMeshTest {
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
                 Compound c = c(x, y);
-                if (x > 0)
-                    n.nar.believe( link(c, c(x-1, y)) );
-                if (y > 0)
-                    n.nar.believe( link(c, c(x, y-1)) );
-                if (x < dims[0]-1)
-                    n.nar.believe( link(c, c(x+1, y)) );
-                if (y < dims[1]-1)
-                    n.nar.believe( link(c, c(x, y+1)) );
+
+
+                List<Term> edges = new ArrayList();
+
+
+                if (x > y) {
+                    if (x > 0)
+                        edges.add(link(x, y, x - 1, y));
+                    if (y > 0)
+                        edges.add(link(x, y, x, y - 1));
+                    if (x < dims[0] - 1)
+                        edges.add(link(x, y, x + 1, y));
+                    if (y < dims[1] - 1)
+                        edges.add(link(x, y, x, y + 1));
+                }
+
+                for (Term e : edges)
+                    n.nar.believe(e);
+//                if (!edges.isEmpty())
+//                    n.nar.believe( $.conj(edges.toArray(new Term[edges.size()])) );// $.sete(c)));
+
 
             }
         }
 
 
-        n.nar.ask( q = (Compound) link(c(0,0), c(dims[0]-1, dims[1]-1)));
+        n.nar.ask( q = (Compound) link(0,0, dims[0]-1, dims[1]-1), ETERNAL, a -> {
+            System.out.println(a.explanation());
+            return true;
+        });
 
 
         n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 
     }
 
-    private Term link(Term a, Term b) {
-        return $.prop($.p(a, b), $.the("X"));
+    private Term link(int x1, int y1, int x2, int y2) {
+        //return $.prop($.p(a, b), $.the("X"));
+        return $.sim( $.p($.the(x1), $.the(y1)), $.p($.the(x2), $.the(y2)) );
     }
 
     public @NotNull Compound c(int x, int y) {
@@ -75,12 +95,13 @@ public class DeductiveMeshTest {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = true;
+        Global.DEBUG = false;
 
 
-        Default n = new Default(1024, 1, 1, 3);
+
+        Default n = new Default(1024, 5, 2, 3);
         //n.nal(5);
-        n.log();
+        n.logSummaryGT(System.out, 0.1f);
 
 
         n.onFrame(x -> {
@@ -91,7 +112,7 @@ public class DeductiveMeshTest {
             }
         });
 
-        test(n, new int[] { 3, 1 }, 2500);
+        test(n, new int[] { 3, 3 }, 2500);
 
 
 
@@ -101,12 +122,7 @@ public class DeductiveMeshTest {
 
 
         TestNAR testnar = new TestNAR(n);
-        DeductiveMeshTest test = new DeductiveMeshTest(testnar, dims, cycles) {
-//            @Override
-//            public TestNAR mustBelieve(long withinCycles, String term, float confidence, float x, float y, float z) throws InvalidInputException {
-//                return this;
-//            }
-        };
+        DeductiveMeshTest test = new DeductiveMeshTest(testnar, dims, cycles);
 
         System.out.print(DeductiveMeshTest.class.getSimpleName() + " test: "
                 + test.q + "?\t");

@@ -26,6 +26,7 @@ import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
 import nars.NAR;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
@@ -43,7 +44,7 @@ import static nars.NAR.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 1;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -58,32 +59,41 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 2, 2, 2, rng,
+				1024, 8, 1, 2, rng,
 				new Default.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
-		nar.premiser.confMin.setValue(0.03f);
+		//nar.premiser.confMin.setValue(0.03f);
 		nar.beliefConfidence(0.25f);
-		nar.conceptActivation.setValue(0.5f);
-		nar.cyclesPerFrame.set(64);
+		//nar.conceptActivation.setValue(0.01f);
+		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
+		nar.cyclesPerFrame.set(24);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new MySTMClustered(nar, 128, '.');
-		new MySTMClustered(nar, 24, '!');
+		//new MySTMClustered(nar, 32, '.');
+		//new MySTMClustered(nar, 8, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
 				1000);
 
-		nar.index.print(System.out);
+		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
-
+		nar.index.forEach(t -> {
+			if (t instanceof Concept) {
+				Concept c = (Concept)t;
+				if (c.hasQuestions()) {
+					System.out.println(c.questions().iterator().next());
+				}
+			}
+		});
 	}
 
 

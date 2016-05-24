@@ -40,15 +40,18 @@ public class TuffySmokesTest {
             //n.input(t + "?");
         }
 
-        //n.input("<?x --> [Cancer]>?");
+        n.ask("<?x --> [Cancer]>", ETERNAL, c -> {
+			System.out.println(c.explanation());
+			return true;
+		});
     }
 	static void input(NAR n) {
-		n.input("<{Anna,Bob} --> Friends>. %1.00;0.99%");
-		n.input("<{Anna,Edward} --> Friends>. %1.00;0.99%");
-		n.input("<{Anna,Frank} --> Friends>. %1.00;0.99%");
-		n.input("<{Edward,Frank} --> Friends>. %1.00;0.99%");
-		n.input("<{Gary,Helen} --> Friends>. %1.00;0.99%");
-		n.input("<{Gary,Frank} --> Friends>. %0.00;0.99%"); //NOT
+		n.input("<(Anna&Bob) --> Friends>. %1.00;0.99%");
+		n.input("<(Anna&Edward) --> Friends>. %1.00;0.99%");
+		n.input("<(Anna&Frank) --> Friends>. %1.00;0.99%");
+		n.input("<(Edward&Frank) --> Friends>. %1.00;0.99%");
+		n.input("<(Gary&Helen) --> Friends>. %1.00;0.99%");
+		n.input("<(Gary&Frank) --> Friends>. %0.00;0.99%"); //NOT
 
 		n.input("<Anna --> [Smokes]>. %1.00;0.99%");
 		n.input("<Edward --> [Smokes]>. %1.00;0.99%");
@@ -67,8 +70,8 @@ public class TuffySmokesTest {
 
 		// !Smokes(a1) || cancer(a1) rewritten: Smokes(a1) => cancer(a1) or
 		// !cancer(a1) => !Smokes(a1)
-		n.input("(<$1 --> [Smokes]> <=> <$1 --> [Cancer]>). %1.00;0.50%");
-		n.input("((--,<$1 --> [Smokes]>) <=> (--, <$1 --> [Cancer]>)). %1.00;0.50%");
+		n.input("(<$1 --> [Smokes]> ==> <$1 --> [Cancer]>). %1.00;0.50%");
+		n.input("((--,<$1 --> [Smokes]>) ==> (--, <$1 --> [Cancer]>)). %1.00;0.50%");
 		//n.input("((--, <$1 --> [Smokes]>) ==> <$1 --> [Cancer]>). %1.00;0.50%");
 
 		//n.input("<(--,<$1 --> [Cancer]>) ==> (--,<$1 --> [Smokes]>)>. %1.00;0.90%");
@@ -77,7 +80,7 @@ public class TuffySmokesTest {
 		// rewritten:
 		// Friends(a1,a2) => (!Smokes(a1) || Smokes(a2)) 1.
 		//n.input("<<{$1,$2} --> Friends> <=> (||,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>))>. %1.00;0.40%");
-		n.input("(<{$1,$2} --> Friends> ==> (<$2 --> [Smokes]> && (--,<$1 --> [Smokes]>))). %1.00;0.40%");
+		n.input("(<($1&$2) --> Friends> ==> (<$2 --> [Smokes]> && (--,<$1 --> [Smokes]>))). %1.00;0.40%");
 
 
 		// and contraposition:
@@ -116,14 +119,14 @@ public class TuffySmokesTest {
 	// public void testReasonableAnswers() {
 	public static void main(String[] args) {
 
-		Global.DEBUG = true;
+		//Global.DEBUG = true;
 
-		NAR n = new Default(1000, 2, 2, 3);
+		NAR n = new Default(1000, 3, 2, 2);
 		//n.conceptActivation.setValue(0.75f);
-		n.conceptRemembering.setValue(12);
+		//n.conceptRemembering.setValue(12);
 
-		n.cyclesPerFrame.set(16);
-		n.logSummaryGT(System.out, 0.05f);
+		n.cyclesPerFrame.set(8);
+		n.logSummaryGT(System.out, 0.15f);
 
 
 
@@ -133,11 +136,11 @@ public class TuffySmokesTest {
 			axioms(n);
 			n.run(50);
 			input(n);
-			n.run(550);
+			n.run(250);
 			question(n);
-			n.run(550);
+			n.run(250);
 		question(n);
-		n.run(550);
+
 		//}
 
 		// NARide.loop(n, true);

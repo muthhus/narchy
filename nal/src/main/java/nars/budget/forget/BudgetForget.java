@@ -19,7 +19,4 @@ public interface BudgetForget extends Consumer<BLink> {
      */
     void cycle(float subFrame);
 
-    @NotNull default Forget.ForgetAndDetectDeletion withDeletedItemFiltering() {
-        return new Forget.ForgetAndDetectDeletion(this);
-    }
 }

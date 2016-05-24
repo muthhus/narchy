@@ -61,7 +61,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
-        this(n, t, value, truthFloatFunction, n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
+        this(n, t, value, truthFloatFunction, n.DEFAULT_BELIEF_PRIORITY, n.DEFAULT_BELIEF_DURABILITY);
     }
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction, float pri, float dur) {
@@ -105,7 +105,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     @Override
     public void accept(@NotNull NAR nar) {
 
-        int timeSinceLastInput = (int) (nar.time() - lastInput);
+        long now = nar.time();
+        int timeSinceLastInput = (int) (now - lastInput);
 
 
         double next = value.floatValueOf(term);
@@ -125,9 +126,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            Task t = input(f);
-            this.lastInput = t.creation();
+            commit(f);
+            this.lastInput = now;
             this.prevF = f;
+
 
         }
 
@@ -147,7 +149,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     @NotNull
-    private Task input(float v) {
+    protected void commit(float v) {
 //        float f, c;
 //        if (v < 0.5f) {
 //            f = 0f;
@@ -159,7 +161,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         long now = nar.time();
 
-        return nar.inputTask(this.next = newInputTask(v, now));
+        nar.inputTask(this.next = newInputTask(v, now));
     }
 
 

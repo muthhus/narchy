@@ -53,8 +53,8 @@ public final class DerivedTask extends MutableTask {
 //                //TODO for Questions?
 //            }
 
-            float deathFactor = 0.5f; //1f - c;
-            multiplyPremise(deathFactor, false);
+//            float deathFactor = 0.5f; //1f - c;
+//            multiplyPremise(deathFactor, false);
 
             super.delete();
         }
@@ -69,8 +69,11 @@ public final class DerivedTask extends MutableTask {
         float n = next.confWeight();
         float t = this.confWeight();
 
-        if (n <= t)
-            throw new RuntimeException("Revision failed to increase confidence");
+        if (n <= t) {
+            if (Global.DEBUG)
+                throw new RuntimeException("Revision failed to increase confidence");
+            return false;
+        }
 
         float factor = n / (n + t);
 

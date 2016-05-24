@@ -53,7 +53,7 @@ public enum Op {
     DISJUNCTION("||", true, 5, Args.GTETwo),
     CONJUNCTION("&&", true, 5, Args.GTETwo),
 
-    SPACE("+", true, 7, Args.GTEOne),
+    //SPACE("+", true, 7, Args.GTEOne),
 
 
     SET_INT("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound

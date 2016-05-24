@@ -76,7 +76,7 @@ public class BudgetMergeTest {
         testMerge(m, b, c, 1, 0.41f, 0.33f, 0.16f); //test correct affect of components; values closer to b since it is dominant
         testMerge(m, b, c, 0.5f, 0.425f, 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
 
-        testMerge(m, a, c, 1f, 0.80f, 0.56f, 0.26f); //priority decrease
+        testMerge(m, a, c, 1f, 0.80f, 0.56f, 0.247f); //priority decrease
 
     }
 

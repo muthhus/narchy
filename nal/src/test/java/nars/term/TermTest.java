@@ -416,7 +416,7 @@ public class TermTest {
         assertEquals(0, b.compareTo(a));
 
         if (normalize) {
-            Concept n2a = n2.conceptualize(a, UnitBudget.One);
+            Concept n2a = n2.conceptualize(a, UnitBudget.Full);
             assertNotNull(a + " should conceptualize", n2a);
             assertNotNull(b);
             assertEquals(n2a.toString(), b.toString());
@@ -679,10 +679,10 @@ public class TermTest {
     @Test
     public void testImageInhConstruction() {
         Compound p = $.p("a", "b", "c");
-        assertEquals("(a-->(/,_,b,c))", $.image(0, p).toString());
+        assertEquals("(a-->(/,_,b,c))", $.imageExt(0, p).toString());
         assertEquals("(a-->(/,_,b,c))", $.image(0, p.terms()).toString());
-        assertEquals("(b-->(/,a,_,c))", $.image(1, p).toString());
-        assertEquals("(c-->(/,a,b,_))", $.image(2, p).toString());
+        assertEquals("(b-->(/,a,_,c))", $.imageExt(1, p).toString());
+        assertEquals("(c-->(/,a,b,_))", $.imageExt(2, p).toString());
 
         assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p).toString());
         assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p.terms()).toString());

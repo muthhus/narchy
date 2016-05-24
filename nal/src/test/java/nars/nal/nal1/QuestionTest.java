@@ -45,7 +45,7 @@ public class QuestionTest {
                 .believe(belief, 1.0f, 0.9f)
                 .step()
                 .ask(question, ETERNAL, b -> {
-                    if (b.term().equals(expectedSolutionTerm))
+                    if (b.punc() == '.' && b.term().equals(expectedSolutionTerm))
                         ok.set(true);
                     return false;
                 });

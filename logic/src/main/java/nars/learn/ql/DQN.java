@@ -29,7 +29,7 @@ public class DQN implements Agent {
     @Override public void start(int inputs, int actions)  {
         try {
             NashornScriptEngine engine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-            engine.eval(new FileReader("/home/me/opennars/app/src/main/java/nars/util/rl.js"));
+            engine.eval(new FileReader("/home/me/opennars/logic/src/main/java/nars/learn/dqn/rl.js"));
 
 
             float alpha = 0.03f;

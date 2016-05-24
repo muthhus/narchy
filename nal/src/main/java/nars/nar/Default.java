@@ -375,8 +375,7 @@ public class Default extends AbstractNAR {
 
 
 
-        @NotNull
-        public final Forget.BudgetForgetFilter taskLinkForget;
+        public final Forget.ExpForget taskLinkForget;
 
         @NotNull
         public final BudgetForget termLinkForget;
@@ -412,8 +411,6 @@ public class Default extends AbstractNAR {
 
         @NotNull final PremiseGenerator premiser;
 
-        @NotNull protected final Forget.ForgetAndDetectDeletion threshForget;
-
         private float cyclesPerFrame;
         private int cycleNum;
 
@@ -442,9 +439,8 @@ public class Default extends AbstractNAR {
 
             this.conceptForget = new Forget.ExpForget(conceptRemembering, nar.perfection);
             this.termLinkForget = new Forget.ExpForget(nar.termLinkRemembering, nar.perfection);
-            this.taskLinkForget = new Forget.ExpForget(nar.taskLinkRemembering, nar.perfection).withDeletedItemFiltering();
+            this.taskLinkForget = new Forget.ExpForget(nar.taskLinkRemembering, nar.perfection);
 
-            this.threshForget = new Forget.ThresholdForget(nar.perfection).withDeletedItemFiltering();
         }
 
         protected abstract Bag<Concept> newConceptBag();
@@ -456,7 +452,6 @@ public class Default extends AbstractNAR {
             conceptForget.update(nar);
             taskLinkForget.update(nar);
             termLinkForget.update(nar);
-            threshForget.update(nar);
 
             premiser.frame(nar);
         }
@@ -474,7 +469,9 @@ public class Default extends AbstractNAR {
             //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            active.commit(conceptForget); //TODO - forgetting may not be necessary if the time has not changed since the last commit, so a method call for each item can be avoided
+            active.commit( active.isFull() ? conceptForget : null );
+
+
             //active.commit(lastForget != now ? conceptForget : .. );
 
 //            if (!((CurveBag)active).isSorted()) {
@@ -510,8 +507,13 @@ public class Default extends AbstractNAR {
 
         protected final void fireConcept(BLink<Concept> conceptLink) {
             Concept concept = conceptLink.get();
-            concept.tasklinks().filter(taskLinkForget).commit();
-            concept.termlinks().commit(termLinkForget);
+
+            Bag<Task> taskl = concept.tasklinks();
+            taskl.commit(taskl.isFull() ? taskLinkForget : null);
+
+            Bag<Termed> terml = concept.termlinks();
+            terml.commit(terml.isFull() ? termLinkForget : null);
+
             premiser.accept(conceptLink);
         }
 
@@ -553,8 +555,8 @@ public class Default extends AbstractNAR {
             Concept c = cl.get();
 
             //apply forgetting so that shrinking capacity will be applied to concept's components fairly
-            c.tasklinks().filter(threshForget).commit();
-            c.termlinks().commit(threshForget);
+            c.tasklinks().commit(Forget.QualityToPriority);
+            c.termlinks().commit(Forget.QualityToPriority);
 
             c.capacity(cold);
 
@@ -563,7 +565,10 @@ public class Default extends AbstractNAR {
 
         /** called when a concept enters the concept bag */
         protected void activate(Concept c) {
-            c.tasklinks().filter(threshForget).commit(); //clean out any deleted tasklinks since it was deactivated
+
+            //clean out any deleted links since having been deactivated
+            c.tasklinks().commit(Forget.QualityToPriority);
+            c.termlinks().commit(Forget.QualityToPriority);
 
             c.capacity(warm);
         }

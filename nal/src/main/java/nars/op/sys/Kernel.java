@@ -42,15 +42,14 @@ public class Kernel {
 
     /** master power control of how much influence this has on the NAR's reasoner budget*/
     final float strength = 0.1f;
-    @NotNull
-    private final Forget.ForgetAndDetectDeletion schForget;
+    private final Forget.ExpForget schForget;
 
     public Kernel(NAR n, int capacity) {
         this.nar = n;
         this.schedule = new CurveBag(capacity, nar.random);
         schedule.merge(BudgetMerge.avgDQBlend);
         this.schForget = new Forget.ExpForget(rememberTime, new MutableFloat(1) /* TODO use immutablefloat*/)
-            .withDeletedItemFiltering();
+            ;
         nar.eventTaskProcess.on(t->{
            if (t.isInput() && (t.isGoal() || t.isCommand()))
                onInput(t);
@@ -64,15 +63,13 @@ public class Kernel {
 
     protected void update() {
 
-        schedule.filter(schForget);
-
-        schedule.commit();
+        schedule.commit(schForget);
 
         NAR n = this.nar;
         schedule.sample(updateRate.floatValue(), cl -> {
             Task t = cl.get();
             if (t.isGoal())
-                n.conceptualize(t, UnitBudget.One, strength(cl), 0f, null);
+                n.conceptualize(t, UnitBudget.Full, strength(cl), 0f, null);
             else /* t.isCommand */
                 n.input(t); //re-input
         });

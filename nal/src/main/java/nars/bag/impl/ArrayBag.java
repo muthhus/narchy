@@ -118,25 +118,25 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         throw new RuntimeException("unimpl");
     }
 
-    @NotNull
-    @Override
-    public Bag<V> filter(@NotNull Predicate<BLink> forEachIfFalseThenRemove) {
-
-        int n = items.size();
-        BLink<V>[] l = items.array();
-        if (n > 0) {
-            for (int i = 0; i < n; i++) {
-                BLink<V> h = l[i];
-                if (!forEachIfFalseThenRemove.test(h)) {
-                    removeKeyForValue(h); //only remove key, we remove the item here
-                    h.delete();
-                    items.remove(i--);
-                    n--;
-                }
-            }
-        }
-        return this;
-    }
+//    @NotNull
+//    @Override
+//    public Bag<V> filter(@NotNull Predicate<BLink> forEachIfFalseThenRemove) {
+//
+//        int n = items.size();
+//        BLink<V>[] l = items.array();
+//        if (n > 0) {
+//            for (int i = 0; i < n; i++) {
+//                BLink<V> h = l[i];
+//                if (!forEachIfFalseThenRemove.test(h)) {
+//                    removeKeyForValue(h); //only remove key, we remove the item here
+//                    h.delete();
+//                    items.remove(i--);
+//                    n--;
+//                }
+//            }
+//        }
+//        return this;
+//    }
 
     //    public void validate() {
 //        int in = ArrayTable.this.size();
@@ -302,11 +302,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         int dirtyStart = -1;
         int dirtyEnd = -1;
+
+        final boolean eachNotNull = each!=null;
+
         @NotNull BLink<V> prev = item(0); //compares with self below to avoid a null check in subsequent iterations
         for (int i = 0; i < s; i++) {
             BLink<V> b = item(i);
 
-            each.accept(b);
+            if (eachNotNull)
+                each.accept(b);
 
             if (b.commit() && cmpLT(b, prev)) {
                 //detected out-of-order
@@ -350,6 +354,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                 qsort(qsortStack, items.array(), dirtyStart - 1, items.size());
             }
         }
+
+        //remove deleted items they will collect at the end
+        int i = size()-1;
+        BLink<V> ii;
+        while (i > 0 && (ii = item(i)).isDeleted()) {
+            removeItem(i); //remove by known index rather than have to search for it by key or something
+            removeKey(ii.get());
+            i--;
+        }
+
 
         return this;
     }

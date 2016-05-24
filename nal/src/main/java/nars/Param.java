@@ -132,9 +132,9 @@ public abstract class Param extends Container implements Level {
 
 
     /** Default priority of input judgment */
-    public float DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+    public float DEFAULT_BELIEF_PRIORITY = 0.5f;
     /** Default durability of input judgment */
-    public float DEFAULT_JUDGMENT_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
+    public float DEFAULT_BELIEF_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
     /** Default priority of input question */
     public float DEFAULT_QUESTION_PRIORITY = 0.5f;
     /** Default durability of input question */
@@ -157,7 +157,7 @@ public abstract class Param extends Container implements Level {
     public float priorityDefault(char punctuation) {
         switch (punctuation) {
             case BELIEF:
-                return DEFAULT_JUDGMENT_PRIORITY;
+                return DEFAULT_BELIEF_PRIORITY;
 
             case QUEST:
                 return DEFAULT_QUEST_PRIORITY;
@@ -176,7 +176,7 @@ public abstract class Param extends Container implements Level {
     public float durabilityDefault(char punctuation) {
         switch (punctuation) {
             case BELIEF:
-                return DEFAULT_JUDGMENT_DURABILITY;
+                return DEFAULT_BELIEF_DURABILITY;
             case QUEST:
                 return DEFAULT_QUEST_DURABILITY;
             case QUESTION:

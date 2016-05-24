@@ -149,7 +149,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             }
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
-            BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
+            //BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
 
         }
 
@@ -170,7 +170,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         q = insert(q);
         if (q!=null) {
             if (!answers.isEmpty()) {
-                Task a = q.isEternal() ? answers.topEternal() : answers.top(q.occurrence());
+                Task a = answers.top(q.occurrence());
                 if (a!=null) {
                     answer(q, a, n);
                 }

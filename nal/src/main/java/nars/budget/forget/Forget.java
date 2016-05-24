@@ -25,42 +25,42 @@ public enum Forget { ;
 
     }
 
-    /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
-    public static final class ForgetAndDetectDeletion implements BudgetForgetFilter {
-
-        final BudgetForget forget;
-
-        public ForgetAndDetectDeletion(BudgetForget forget) {
-            this.forget = forget;
-        }
-
-        @Override
-        public boolean test(@NotNull BLink b) {
-            //assert(!b.isDeleted());
-            if (((Budgeted)b.get()).isDeleted()) {
-                b.delete();
-                return false;
-            }
-            forget.accept(b);
-            return true;
-        }
-
-        @Override
-        public void accept(BLink bLink) {
-            forget.accept(bLink);
-        }
-
-        @Override
-        public final void update(@NotNull NAR nar) {
-            forget.update(nar);
-        }
-
-        @Override
-        public final void cycle(float subFrame) {
-            forget.cycle(subFrame);
-        }
-
-    }
+//    /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
+//    public static final class ForgetAndDetectDeletion implements BudgetForgetFilter {
+//
+//        final BudgetForget forget;
+//
+//        public ForgetAndDetectDeletion(BudgetForget forget) {
+//            this.forget = forget;
+//        }
+//
+//        @Override
+//        public boolean test(@NotNull BLink b) {
+//            //assert(!b.isDeleted());
+//            if (((Budgeted)b.get()).isDeleted()) {
+//                b.delete();
+//                return false;
+//            }
+//            forget.accept(b);
+//            return true;
+//        }
+//
+//        @Override
+//        public void accept(BLink bLink) {
+//            forget.accept(bLink);
+//        }
+//
+//        @Override
+//        public final void update(@NotNull NAR nar) {
+//            forget.update(nar);
+//        }
+//
+//        @Override
+//        public final void cycle(float subFrame) {
+//            forget.cycle(subFrame);
+//        }
+//
+//    }
 
     public abstract static class AbstractForget implements BudgetForget {
 
@@ -203,34 +203,23 @@ public enum Forget { ;
 
     }
 
-    /** reduces priority to the threshold level determined by the quality and perfection (budget threshold) parameter */
-    public final static class ThresholdForget implements BudgetForget {
-
-        private final MutableFloat perfection;
-        private float perfectionCached;
-        private long now;
-
-        public ThresholdForget(@NotNull MutableFloat perfection) {
-            this.perfection = perfection;
-        }
+    /** sets the priority value to the quality value */
+    public final static BudgetForget QualityToPriority = new BudgetForget() {
 
         @Override public void accept(@NotNull BLink budget) {
-            budget.setLastForgetTime(now);
-            float threshold = budget.qua() * perfectionCached;
-            budget.setPriority(threshold);
+            budget.setPriority(budget.qua());
         }
 
         @Override
         public void update(@NotNull NAR nar) {
-            this.perfectionCached = perfection.floatValue();
-            this.now = nar.time();
+
         }
 
         @Override
         public void cycle(float subFrame) {
 
         }
-    }
+    };
 
 
     //TODO implement as a Forgetter:

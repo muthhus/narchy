@@ -141,7 +141,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     }
 
-    public static void printTasks(NAR n, boolean beliefsOrGoals) {
+    @Deprecated public static void printTasks(NAR n, boolean beliefsOrGoals) {
         TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
         n.forEachConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();

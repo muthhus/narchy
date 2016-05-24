@@ -506,6 +506,9 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term esect(Term... x) {
         return the(INTERSECT_EXT, x);
     }
+
+
+
     @Nullable
     public static Term isect(Term... x) { return the(INTERSECT_INT, x); }
 
@@ -726,7 +729,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return (Compound) ( ext ? $.inh(related, img) : $.inh(img, related));
     }
     @Nullable
-    public static Compound image(int relation, @NotNull Compound product) {
+    public static Compound imageExt(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PRODUCT);
         return image(relation, true, product.terms());
     }

@@ -1,9 +1,19 @@
 package nars.bag;
 
+import com.gs.collections.api.block.function.primitive.FloatFunction;
+import nars.$;
+import nars.NAR;
 import nars.nar.Default;
+import nars.task.Task;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.util.data.Sensor;
 import nars.util.experiment.DeductiveChainTest;
+import nars.util.experiment.DeductiveMeshTest;
+import nars.util.signal.Emotion;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +65,22 @@ public class BagRegulator<X> {
         }
     }
 
+
+    public static class FrustrationSensor extends Sensor {
+
+        public FrustrationSensor(@NotNull NAR n) {
+            super(n, $.p($.the("frustration")), (x) -> {
+                @NotNull Emotion emotion = n.emotion;
+                return (float) (emotion.frustration.getSum()  / emotion.busy.getSum());
+            } );
+        }
+
+        @Override
+        protected @NotNull void commit(float v) {
+            System.out.println("frustration=" + v);
+        }
+    }
+
     public static void main(String[] args) {
         Default n = new Default(512, 4, 3, 3);
         n.conceptRemembering.setValue(400f);
@@ -67,9 +93,13 @@ public class BagRegulator<X> {
            }
         });
 
+        FrustrationSensor fr = new FrustrationSensor(n);
+
         n.log();
 
-        DeductiveChainTest test = new DeductiveChainTest(n, 6, 100, DeductiveChainTest.inh);
+
+        //DeductiveChainTest test = new DeductiveChainTest(n, 6, 100, DeductiveChainTest.inh);
+        DeductiveMeshTest test = new DeductiveMeshTest(n, new int[] { 3, 3}, 2500);
         n.run(100);
     }
 }
