@@ -35,8 +35,8 @@ public final class Interaction {
 
     @Override
     public String toString() {
-        return Texts.n4(actual) + "\t" +
-                Texts.n4(expected) + "\t" +
+        return Texts.n4(actual) + "    ||    " +
+                Texts.n4(expected) + "   ||   " +
                 Texts.n4(predicted)
                 //+ (reset ? "RESET" : "")
                 ;
