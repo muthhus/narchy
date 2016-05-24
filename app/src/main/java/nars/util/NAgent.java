@@ -249,7 +249,7 @@ public class NAgent implements Agent {
         nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
-        Task howToReward = nar.ask("(?x && (dRp))", ETERNAL, causeOfIncreasedReward -> {
+        Task howToReward = nar.ask("(?x ==> (dRp))", ETERNAL, causeOfIncreasedReward -> {
             System.out.println(causeOfIncreasedReward.explanation());
             return true;
         });

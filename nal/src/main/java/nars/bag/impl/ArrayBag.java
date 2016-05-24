@@ -291,11 +291,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //        super.commit();
 //        sampler.commit(this);
 //        return this;
-        return commit(n -> {});
+        return commit(null);
     }
 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
-    @Override public Bag<V> commit(@NotNull Consumer<BLink> each) {
+    @Override public Bag<V> commit(@Nullable Consumer<BLink> each) {
         int s = size();
         if (s == 0)
             return this;
@@ -359,14 +359,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         int i = size()-1;
         BLink<V> ii;
         while (i > 0 && (ii = item(i)).isDeleted()) {
+            if (removeKey(ii.get()) == null) {
+                throw new RuntimeException("Bag fault while trying to remove key by item value");
+                //exhaustive removal, since the BLink has lost its key
+                //removeKey((BLink<BLink<V>>) ii);
+            }
+
             removeItem(i); //remove by known index rather than have to search for it by key or something
-            removeKey(ii.get());
             i--;
         }
 
 
         return this;
     }
+
 
     final private int[] qsortStack = new int[16];
 

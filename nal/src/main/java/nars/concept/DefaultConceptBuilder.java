@@ -56,24 +56,22 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Override public Bag<Task> taskbag() {
-        return new CurveBag<Task>(rng) {
-            @Override
-            protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
-                return new BLink.WeakBLink<>(i, b, scale);
-            }
-        }.merge(mergeDefault());
+        return new CurveBag<Task>(rng).merge(mergeDefault());
     }
 
 
     @NotNull
     @Override public Bag<Termed> termbag() {
 
-        return new CurveBag<Termed>(rng) {
-            @Override
-            protected BLink<Termed> newLink(Termed i, Budgeted b, float scale) {
-                return new BLink.WeakBLink<>(i, b, scale);
-            }
-        }.merge(mergeDefault());
+        return new CurveBag<Termed>(rng).merge(mergeDefault());
+
+//        //weak links may be conceptually wrong
+//        return new CurveBag<Termed>(rng) {
+//            @Override
+//            protected BLink<Termed> newLink(Termed i, Budgeted b, float scale) {
+//                return new BLink.WeakBLink<>(i, b, scale);
+//            }
+//        }.merge(mergeDefault());
     }
 
     @NotNull

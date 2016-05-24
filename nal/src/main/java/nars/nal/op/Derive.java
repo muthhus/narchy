@@ -18,6 +18,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
+import static nars.Op.NEGATE;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -104,6 +105,17 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 
+        Truth truth = m.truth.get();
+
+        if (raw.op() == NEGATE) {
+            //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
+            raw = ((Compound)raw).term(0);
+            if (!(raw instanceof Compound))
+                return; //unwrapped to a variable
+            if (truth!=null)
+                truth = truth.negated();
+        }
+
         //pre-filter invalid statements
         if (!Task.preNormalize(raw, nar))
             return;
@@ -116,7 +128,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if (content == null)
             return; //HACK why would this happen?
 
-        Truth truth = m.truth.get();
 
         Budget budget = m.budget(truth, content);
         if (budget == null)
