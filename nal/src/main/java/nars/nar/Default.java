@@ -206,12 +206,8 @@ public class Default extends AbstractNAR {
 
 
         Task t = c.process(input, this);
-        if (t != null) {
+        if (t != null && !t.isDeleted()) {
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-
-            if (t.isDeleted()) {
-                throw new RuntimeException("process should have returned null");
-            }
 
             t.onConcept(c);
 

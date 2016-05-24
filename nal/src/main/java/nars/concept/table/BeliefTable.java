@@ -61,7 +61,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+        public void remove(@NotNull Task belief) {
             throw new UnsupportedOperationException();
         }
 
@@ -375,7 +375,7 @@ public interface BeliefTable extends TaskTable {
      *  TODO apply term's 'dt' in ranking if present
      * */
     @Nullable
-    default Task match(Compound term, long taskOcc, @NotNull NAR nar) {
+    default Task match(Compound term, long taskOcc) {
 
         Task belief;
         do {
@@ -388,7 +388,7 @@ public interface BeliefTable extends TaskTable {
                 return null;
 
             if (belief.isDeleted()) {
-                remove(belief, nar);
+                remove(belief);
             }
 
         } while (belief.isDeleted());

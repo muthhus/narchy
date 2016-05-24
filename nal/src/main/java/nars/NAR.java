@@ -15,7 +15,6 @@ import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
-import nars.nal.nal8.PatternAnswer;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
 import nars.task.MutableTask;
@@ -28,7 +27,6 @@ import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.truth.DefaultTruth;
 import nars.util.TermCodec;
-import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
@@ -800,29 +798,34 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @NotNull
-    public NAR onAnswer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
-        //question punctuation optional
-        if (!(!question.isEmpty() && question.charAt(question.length() - 1) == '?')) question = question + '?';
-        Task qt = task(question);
-        return onAnswer(qt, recvSolution);
+
+    public Task ask(@NotNull String question, long occ, @NotNull Predicate<Task> eachAnswer) throws NarseseException {
+        return ask(term(question), occ, eachAnswer);
     }
 
-    /**
-     * inputs the question and observes answer events for a solution
-     */
-    @NotNull
-    public NAR onAnswer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
-        new AnswerReaction(this, questionOrQuest) {
-
-            @Override
-            public void onSolution(Task belief) {
-                c.accept(belief);
+    public Task ask(Termed<Compound> term, long occ, Predicate<Task> eachAnswer) {
+        return inputTask(new MutableTask(term, Symbols.QUESTION, null) {
+            @Override public boolean onAnswered(Task answer) {
+                return eachAnswer.test(answer);
             }
-
-        };
-        return this;
+        }.occurr(occ));
     }
+
+//    /**
+//     * inputs the question and observes answer events for a solution
+//     */
+//    @NotNull
+//    public NAR onAnswer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
+//        new AnswerReaction(this, questionOrQuest) {
+//
+//            @Override
+//            public void onSolution(Task belief) {
+//                c.accept(belief);
+//            }
+//
+//        };
+//        return this;
+//    }
 
     @NotNull
     public NAR input(@NotNull String... ss) {
@@ -896,12 +899,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //amount boosted will be in proportion to the lack of quality, so that a high quality question will survive longer by not being drained so quickly
         BudgetFunctions.transferPri(question.budget(), solution.budget(), (1f - question.qua()) * solutionConf);
 
+        question.onAnswered(solution);
 
         //TODO use an Answer class which is Runnable, combining that with the Twin info
         if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
             if (!eventAnswer.isEmpty())
                 eventAnswer.emit(Tuples.twin(question, solution));
         }
+
+
 
     }
 
@@ -982,20 +988,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
-    @NotNull
-    public On onQuestion(@NotNull PatternAnswer p) {
-        return eventTaskProcess.on(question -> {
-            if (question.punc() == Symbols.QUESTION) {
-                runLater(() -> {
-                    List<Task> l = p.apply(question);
-                    if (l != null) {
-                        l.forEach(answer -> eventAnswer.emit(Tuples.twin(question, answer)));
-                        input(l);
-                    }
-                });
-            }
-        });
-    }
+
 
     @Override
     public boolean equals(Object obj) {

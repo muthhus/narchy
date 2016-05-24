@@ -215,7 +215,7 @@ public class BooleanConcept extends OperationConcept {
         }
 
         @Override
-        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+        public void remove(@NotNull Task belief) {
             //nothing, maybe force update
         }
     }

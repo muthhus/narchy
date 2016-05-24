@@ -458,7 +458,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //boolean tableAffected = false;
         //boolean newQuestion = table.isEmpty();
 
-        q = questionTable.add(q, nar);
+        q = questionTable.add(q, answerTable, nar);
 
         //TODO if the table was not affected, does the following still need to happen:
 

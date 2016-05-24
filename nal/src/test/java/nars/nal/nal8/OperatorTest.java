@@ -22,10 +22,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
+import static nars.nal.Tense.ETERNAL;
 import static nars.util.Texts.i;
 import static org.junit.Assert.*;
 
 public class OperatorTest {
+
+
+    @Test public void testOperatorEquality() {
+        assertNotNull( $.operator("echo") );
+        assertEquals( $.operator("echo"), $.operator("echo"));
+        assertNotEquals( $.operator("echo"), $.the("echo")); //echo vs. ^echo
+        assertNotEquals( $.operator("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
+    }
 
     @Test public void testMustExecuteSuccess() {
 
@@ -150,111 +159,110 @@ public class OperatorTest {
 //
 //    }
 
-    @Test public void testPatternExecution() {
-        AtomicInteger count = new AtomicInteger();
+//    @Test public void testPatternExecution() {
+//        AtomicInteger count = new AtomicInteger();
+//
+//        PatternOperation f = new PatternOperation("(%A,%B)") {
+//            @Override
+//            public List<Task> run(Task operationTask, Subst map1) {
+//                //System.out.println(this.pattern + " " + operationTask + "\n\t" + map1);
+//                count.getAndIncrement();
+//                return null;
+//            }
+//        };
+//        Terminal t = new Terminal(16);
+//
+//        Task matching = t.task("(x,y)!");
+//        f.apply(matching);
+//
+//        assertEquals(1, count.get());
+//
+//        Task nonMatching = t.task("(x,y,z)!");
+//        f.apply(nonMatching);
+//
+//        //should only be triggered once, by the matching term
+//        assertEquals(1, count.get());
+//    }
 
-        PatternOperation f = new PatternOperation("(%A,%B)") {
-            @Override
-            public List<Task> run(Task operationTask, Subst map1) {
-                //System.out.println(this.pattern + " " + operationTask + "\n\t" + map1);
-                count.getAndIncrement();
-                return null;
-            }
-        };
-        Terminal t = new Terminal(16);
+//    @Test public void testPatternAnswerer() {
+//        AtomicInteger count = new AtomicInteger();
+//
+//        PatternAnswer f = new PatternAnswer("add(%a,%b,#x)") {
+//            @Override
+//            public List<Task> run(Task t, @NotNull Subst s) {
+//
+//                return null;
+//            }
+//        };
+//        Terminal t = new Terminal(16);
+//        t.ask($("add(%a,%b,#x)"), ETERNAL, a-> {
+//            //TODO
+////            System.out.println(t + " " + s);
+////            assertEquals($("x"), s.term($("%a")));
+////            assertEquals($("y"), s.term($("%b")));
+//            count.getAndIncrement();
+//            return true;
+//        });
+//
+//        Task matching = t.task("add(x,y,#x)?");
+//        f.apply(matching);
+//
+//        assertEquals(1, count.get()); //should only be triggered once, by the matching term
+//
+//        Task nonMatching = t.task("add(x)?");
+//        f.apply(nonMatching);
+//
+//        assertEquals(1, count.get()); //should only be triggered once, by the matching term
+//
+//        Task nonMatching3 = t.task("add(x,y,z)?");
+//        f.apply(nonMatching3);
+//
+//        assertEquals(1, count.get()); //should only be triggered once, by the matching term
+//
+//        Task nonMatching2 = t.task("add(x,y,$x)?");
+//        f.apply(nonMatching2);
+//
+//        assertEquals(1, count.get()); //should only be triggered once, by the matching term
+//    }
 
-        Task matching = t.task("(x,y)!");
-        f.apply(matching);
-
-        assertEquals(1, count.get());
-
-        Task nonMatching = t.task("(x,y,z)!");
-        f.apply(nonMatching);
-
-        //should only be triggered once, by the matching term
-        assertEquals(1, count.get());
-    }
-
-    @Test public void testPatternAnswerer() {
-        AtomicInteger count = new AtomicInteger();
-
-        PatternAnswer f = new PatternAnswer("add(%a,%b,#x)") {
-            @Override
-            public List<Task> run(Task t, @NotNull Subst s) {
-                System.out.println(t + " " + s);
-                assertEquals($("x"), s.term($("%a")));
-                assertEquals($("y"), s.term($("%b")));
-                count.getAndIncrement();
-                return null;
-            }
-        };
-        Terminal t = new Terminal(16);
-
-        Task matching = t.task("add(x,y,#x)?");
-        f.apply(matching);
-
-        assertEquals(1, count.get()); //should only be triggered once, by the matching term
-
-        Task nonMatching = t.task("add(x)?");
-        f.apply(nonMatching);
-
-        assertEquals(1, count.get()); //should only be triggered once, by the matching term
-
-        Task nonMatching3 = t.task("add(x,y,z)?");
-        f.apply(nonMatching3);
-
-        assertEquals(1, count.get()); //should only be triggered once, by the matching term
-
-        Task nonMatching2 = t.task("add(x,y,$x)?");
-        f.apply(nonMatching2);
-
-        assertEquals(1, count.get()); //should only be triggered once, by the matching term
-    }
-
-    @Ignore
-    @Test public void testPatternAnswererInNAR() {
-        NAR n = new Default(100,1,1,1);
-
-        PatternAnswer addition = new PatternAnswer("add(%a,%b,#x)") {
-            @Nullable
-            final Term A = $("%a"), B = $("%b");
-            @Override public List<Task> run(@NotNull Task question, @NotNull Subst s) {
-                int a = i(s.term(A).toString());
-                int b = i(s.term(B).toString());
-
-                return Lists.newArrayList(
-                        $.task("add(" + a + ',' + b + ',' + Integer.toString(a+b) + ')',
-                                '.', 1.0f, 0.99f)
-                            .eternal()
-                            .parent(question)
-                            .budget(question)
-                            .because("Addition")
-                );
-            }
-        };
-        n.onQuestion(addition);
-        //n.log();
-
-        TestNAR t = new TestNAR(n);
-        n.input("add(1,2,#x)?");
-        n.input("add(1,1,#x)?");
-        t.mustBelieve(8, "add(1, 1, 2)", 1.0f, 0.99f);
-        t.mustBelieve(8, "add(1, 2, 3)", 1.0f, 0.99f);
-        t.test();
-
-        assertEquals(1, n.concept("add(1, 1, 2)").beliefs().size());
-        assertEquals(1, n.concept("add(1, 1, #x)").questions().size());
-        n.concept("add(1, 1, 2)").print(System.out);
-    }
+//    @Ignore
+//    @Test public void testPatternAnswererInNAR() {
+//        NAR n = new Default(100,1,1,1);
+//
+//        PatternAnswer addition = new PatternAnswer("add(%a,%b,#x)") {
+//            @Nullable
+//            final Term A = $("%a"), B = $("%b");
+//            @Override public List<Task> run(@NotNull Task question, @NotNull Subst s) {
+//                int a = i(s.term(A).toString());
+//                int b = i(s.term(B).toString());
+//
+//                return Lists.newArrayList(
+//                        $.task("add(" + a + ',' + b + ',' + Integer.toString(a+b) + ')',
+//                                '.', 1.0f, 0.99f)
+//                            .eternal()
+//                            .parent(question)
+//                            .budget(question)
+//                            .because("Addition")
+//                );
+//            }
+//        };
+//        n.onQuestion(addition);
+//        //n.log();
+//
+//        TestNAR t = new TestNAR(n);
+//        n.input("add(1,2,#x)?");
+//        n.input("add(1,1,#x)?");
+//        t.mustBelieve(8, "add(1, 1, 2)", 1.0f, 0.99f);
+//        t.mustBelieve(8, "add(1, 2, 3)", 1.0f, 0.99f);
+//        t.test();
+//
+//        assertEquals(1, n.concept("add(1, 1, 2)").beliefs().size());
+//        assertEquals(1, n.concept("add(1, 1, #x)").questions().size());
+//        n.concept("add(1, 1, 2)").print(System.out);
+//    }
 
 
 
-    @Test public void testOperatorEquality() {
-        assertNotNull( $.operator("echo") );
-        assertEquals( $.operator("echo"), $.operator("echo"));
-        assertNotEquals( $.operator("echo"), $.the("echo")); //echo vs. ^echo
-        assertNotEquals( $.operator("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
-    }
 
 //TODO: allow this in a special eval operator
 

@@ -94,7 +94,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public void remove(@NotNull Task belief, @NotNull NAR nar) {
+    public void remove(@NotNull Task belief) {
         Object removed = ((belief.isEternal()) ? eternal : temporal).remove(belief);
         assert(removed == belief);
         TaskTable.removeTask(belief, null);

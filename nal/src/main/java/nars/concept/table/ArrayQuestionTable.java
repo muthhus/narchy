@@ -10,6 +10,8 @@ import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,9 +23,7 @@ import java.util.function.Consumer;
  *
  * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
-public class ArrayQuestionTable implements QuestionTable {
-
-
+public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     protected int capacity;
 
@@ -75,7 +75,7 @@ public class ArrayQuestionTable implements QuestionTable {
     }
 
     @Override
-    public void remove(@NotNull Task belief, @NotNull NAR nar) {
+    public void remove(@NotNull Task belief) {
         if (list.remove(belief)) {
             TaskTable.removeTask(belief, null);
         }
@@ -107,46 +107,75 @@ public class ArrayQuestionTable implements QuestionTable {
         if (listSize == 0)
             return;
 
-        boolean aEtern = a.isEternal();
-
+        boolean modified = false;
         for (int i = 0; i < listSize; i++) {
             Task q = list.get(i);
-            boolean qEtern = q.isEternal();
-            float factor = 1f;
-            if (aEtern) {
-                if (qEtern)
-                    factor = 1f-a.conf();
-            } else {
-                if (!qEtern) {
-                    //TODO BeliefTable.rankTemporalByConfidence()
-                    factor = 1f-a.conf();
-                }
-            }
-            if (factor < 1f) {
-                q.budget().priMult(factor);
-                if (!qEtern) {
-                    //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
-                    q.budget().quaMult(factor);
-                }
-
-            }
-            q.onAnswered(a);
+            modified = answer(q, a);
         }
+        if (modified)
+            sort();
+    }
+
+    protected void sort() {
+        Collections.sort(list, this);
+    }
+
+    /** returns true if a quality was modified as a signal whether the list needs sorted */
+    public boolean answer(Task q, Task a) {
+        boolean aEtern = a.isEternal();
+        boolean qEtern = q.isEternal();
+        float factor = 1f;
+        if (aEtern) {
+            if (qEtern)
+                factor = 1f-a.conf();
+        } else {
+            if (!qEtern) {
+                //TODO BeliefTable.rankTemporalByConfidence()
+                factor = 1f-a.conf();
+            }
+        }
+        boolean modified = false;
+        q.budget().priMult(factor);
+        if (!qEtern) {
+            //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
+            q.budget().quaMult(factor);
+            modified = true;
+        }
+
+        if (!q.onAnswered(a)) {
+            remove(q);
+            modified = true;
+        }
+        return modified;
     }
 
     @Nullable
     @Override
-    public Task add(@NotNull Task t, @NotNull Memory m) {
-        Task existing = get(t);
+    public Task add(@NotNull Task q, BeliefTable answers, @NotNull Memory m) {
+        Task existing = get(q);
         if (existing != null) {
-            if (existing != t) {
-                BudgetMerge.max.merge(existing.budget(), t, 1f);
-                t.delete("Duplicate Question");
+            if (existing != q) {
+                BudgetMerge.max.merge(existing.budget(), q, 1f);
+                q.delete("Duplicate Question");
             }
             return null;
         }
 
-        return insert(t);
+        q = insert(q);
+        if (q!=null) {
+            if (!answers.isEmpty()) {
+                Task a = q.isEternal() ? answers.topEternal() : answers.top(q.occurrence());
+                if (a!=null) {
+                    float qBefore = q.qua();
+                    answer(q, a);
+                    if (q.qua() != qBefore) {
+                        sort();
+                    }
+                }
+            }
+        }
+
+        return q;
     }
 
     public Task last() {
@@ -197,50 +226,50 @@ public class ArrayQuestionTable implements QuestionTable {
 
     }
 
-    /** returns the original, "revised", or null question to input
-     * @param t incoming question which may be unique, overlapping, or equivalent to an existing question in the table
-     * */
-    private Task tryMerge(@NotNull Task t, @NotNull Memory m) {
-
-
-//        List<Task> list1 = this.list;
-//        long[] tEvidence = t.evidence();
-//        long occ = t.occurrence();
-//        for (int i = 0, list1Size = list1.size(); i < list1Size; i++) {
-//            Task e = list1.get(i);
-//
-//            //TODO merge occurrence time if within memory's duration period
-//
-//            if (occ != e.occurrence())
-//                continue;
-//
-//            long[] eEvidence = e.evidence();
-//
-//            long[] zipped = Stamp.zip(tEvidence, eEvidence);
-//
-//            //construct before removing so the budgets arent deleted
-//            MutableTask te = new MutableTask(
-//                    t, e,
-//                    m.time(), occ,
-//                    zipped, BudgetMerge.max);
-//
-//            replace(i, te);
-//
-//            t.delete("Merged");
+//    /** returns the original, "revised", or null question to input
+//     * @param t incoming question which may be unique, overlapping, or equivalent to an existing question in the table
+//     * */
+//    private Task tryMerge(@NotNull Task t, @NotNull Memory m) {
 //
 //
-//        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-//            task.log(Premise.getStack());*/
-//
-//            //eventTaskRemoved.emit(task);
-//
-//        /* else: a more destructive cleanup of the discarded task? */
-//
-//            return null;
-//
-//        }
-        return t;
-    }
+////        List<Task> list1 = this.list;
+////        long[] tEvidence = t.evidence();
+////        long occ = t.occurrence();
+////        for (int i = 0, list1Size = list1.size(); i < list1Size; i++) {
+////            Task e = list1.get(i);
+////
+////            //TODO merge occurrence time if within memory's duration period
+////
+////            if (occ != e.occurrence())
+////                continue;
+////
+////            long[] eEvidence = e.evidence();
+////
+////            long[] zipped = Stamp.zip(tEvidence, eEvidence);
+////
+////            //construct before removing so the budgets arent deleted
+////            MutableTask te = new MutableTask(
+////                    t, e,
+////                    m.time(), occ,
+////                    zipped, BudgetMerge.max);
+////
+////            replace(i, te);
+////
+////            t.delete("Merged");
+////
+////
+////        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+////            task.log(Premise.getStack());*/
+////
+////            //eventTaskRemoved.emit(task);
+////
+////        /* else: a more destructive cleanup of the discarded task? */
+////
+////            return null;
+////
+////        }
+//        return t;
+//    }
 
 
 //    private void replace(int index, @NotNull Task newTask) {
@@ -256,6 +285,11 @@ public class ArrayQuestionTable implements QuestionTable {
     @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
         list.forEach(action);
+    }
+
+    @Override
+    public int compare(Task o1, Task o2) {
+        return Float.compare(o2.qua(), o1.qua());
     }
 
     //    @Override

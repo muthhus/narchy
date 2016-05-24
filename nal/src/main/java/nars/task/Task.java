@@ -382,8 +382,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
-    /** for question tasks: when an answer appears */
-    default void onAnswered(Task answer) { }
+    /** for question tasks: when an answer appears.
+     *  return false if this question is finished and should be removed from a table containing it */
+    default boolean onAnswered(Task answer) { return true; }
 
 
 //    @NotNull

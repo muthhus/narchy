@@ -16,7 +16,7 @@ public interface QuestionTable extends TaskTable {
      * an existing equivalent task if this was a duplicate
      */
     @Nullable
-    Task add(Task t, Memory m);
+    Task add(Task t, BeliefTable answers, Memory m);
 
     void setCapacity(int newCapacity);
 

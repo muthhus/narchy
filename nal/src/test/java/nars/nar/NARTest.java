@@ -2,6 +2,7 @@ package nars.nar;
 
 import nars.NAR;
 import nars.Narsese;
+import nars.task.Task;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -9,6 +10,7 @@ import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static nars.nal.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -102,13 +104,13 @@ public class NARTest {
 
     @Test
     public void testQuery2() throws Narsese.NarseseException {
-        testQueryAnswered(64, 0);
+        testQueryAnswered(64, 1);
     }
 
-//    @Test
-//    public void testQuery1() throws InvalidInputException {
-//        testQueryAnswered(1, 32);
-//    }
+    @Test
+    public void testQuery1()  {
+        testQueryAnswered(1, 32);
+    }
 
 
     @Ignore public void testQueryAnswered(int cyclesBeforeQuestion, int cyclesAfterQuestion) throws Narsese.NarseseException {
@@ -127,13 +129,14 @@ public class NARTest {
 
         NAR nar = new Default(100, 1, 1, 3);
         n.nal(2);
-                //.trace()
-                n.input("<a <-> b>. %1.0;0.5%",
+                n.log()
+                .input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
-                .onAnswer(question, t -> b.set(true) )
-                .stopIf(b::get);
-
-        nar.log();
+                .stopIf(b::get)
+                .ask(question, ETERNAL, (Task t) -> {
+                    b.set(true);
+                    return false;
+                });
 
         nar.run(cyclesAfterQuestion);
 

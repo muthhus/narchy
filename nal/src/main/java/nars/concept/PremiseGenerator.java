@@ -199,7 +199,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             return null;
         }
 
-        Task belief = table.match(task.term(), taskOcc, nar);
+        Task belief = table.match(task.term(), taskOcc);
         if (belief == null)
             return null;
 
