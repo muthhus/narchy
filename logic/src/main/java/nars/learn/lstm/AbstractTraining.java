@@ -19,14 +19,14 @@ public abstract class AbstractTraining {
         return new SimpleLSTM(random, inputs, outputs, cell_blocks, initialLearningRate);
     }
 
-    @Deprecated public double scoreSupervised(AgentSupervised agent)  {
+    @Deprecated public double scoreSupervised(SimpleLSTM agent)  {
 
         final double[] fit = {0};
         final double[] max_fit = {0};
 
         this.interact(inter -> {
-            if (inter.reset)
-                agent.clear();
+            if (inter.forget > 0)
+                agent.forget(inter.forget);
 
             if (inter.expected == null) {
                 agent.predict(inter.actual, false);
@@ -49,33 +49,31 @@ public abstract class AbstractTraining {
         return fit[0] / max_fit[0];
     }
 
-    @Deprecated public void supervised(AgentSupervised agent) throws Exception {
+//    @Deprecated public void supervised(SimpleLSTM agent) throws Exception {
+//
+//        List<AgentSupervised.NonResetInteraction> agentNonResetInteraction = new ArrayList<>();
+//
+//        this.interact(inter -> {
+//
+//            if (inter.forget==1f) {
+//                agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
+//            }
+//
+//            AgentSupervised.NonResetInteraction newInteraction = new AgentSupervised.NonResetInteraction();
+//            newInteraction.observation = inter.actual;
+//            newInteraction.target_output = inter.expected;
+//            agentNonResetInteraction.add(newInteraction);
+//
+//            if( agentNonResetInteraction.size() > batchsize ) {
+//                agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
+//            }
+//
+//        });
+//
+//        agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
+//    }
 
-        List<AgentSupervised.NonResetInteraction> agentNonResetInteraction = new ArrayList<>();
-
-        this.interact(inter -> {
-
-            if (inter.reset) {
-                agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
-
-                agent.clear();
-            }
-
-            AgentSupervised.NonResetInteraction newInteraction = new AgentSupervised.NonResetInteraction();
-            newInteraction.observation = inter.actual;
-            newInteraction.target_output = inter.expected;
-            agentNonResetInteraction.add(newInteraction);
-
-            if( agentNonResetInteraction.size() > batchsize ) {
-                agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
-            }
-
-        });
-
-        agentExecuteNonResetInteractionsAndFlush(agent, agentNonResetInteraction);
-    }
-
-    private void agentExecuteNonResetInteractionsAndFlush(AgentSupervised agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions)  {
+    private void agentExecuteNonResetInteractionsAndFlush(SimpleLSTM agent, final List<AgentSupervised.NonResetInteraction> nonResetInteractions, float forgetRate)  {
         agent.learnBatch(nonResetInteractions, false);
 
         nonResetInteractions.clear();

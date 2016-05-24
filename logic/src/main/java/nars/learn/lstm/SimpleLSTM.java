@@ -1,14 +1,18 @@
 package nars.learn.lstm;
 
+import org.apache.commons.math3.util.MathArrays;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import static org.apache.commons.math3.util.MathArrays.*;
 
 public class SimpleLSTM extends AgentSupervised {
 	
 	private final double init_weight_range = 0.1;
 	public double learningRate;//0.07
-
+	//forgettingRate?
 
 	private final int full_input_dimension;
 	private final int output_dimension;
@@ -78,8 +82,7 @@ public class SimpleLSTM extends AgentSupervised {
 	}
 	
 	@Override
-	public void clear()
-	{
+	public void clear()	{
 
 		Arrays.fill(context, 0.0);
 
@@ -88,6 +91,28 @@ public class SimpleLSTM extends AgentSupervised {
 			Arrays.fill(this.dSdG[c], 0.0);
 			Arrays.fill(this.dSdF[c], 0.0);
 		}
+
+	}
+
+	/** 0 = total forget, 1 = no forget. proportional version of the RESET operation  */
+	public void forget(float forgetRate) {
+
+		float scalingFactor = 1f - forgetRate;
+
+		if (scalingFactor >= 1)
+			return; //do nothing
+
+		if (scalingFactor <= 0) {
+			clear();
+			return;
+		}
+
+		scaleInPlace(scalingFactor, context);
+		for (int c = 0; c < cell_blocks; c++)
+			scaleInPlace(scalingFactor, this.dSdG[c]);
+		for (int c = 0; c < cell_blocks; c++)
+			scaleInPlace(scalingFactor, this.dSdF[c]);
+
 
 	}
 	

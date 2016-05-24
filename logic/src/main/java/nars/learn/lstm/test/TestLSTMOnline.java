@@ -5,9 +5,7 @@ import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.MathUtils;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -42,8 +40,7 @@ public class TestLSTMOnline {
 
             Interaction inter = observe();
 
-            if (inter.reset)
-                agent.clear();
+
 
             double[] predicted;
 
@@ -72,9 +69,11 @@ public class TestLSTMOnline {
 
             }
 
+            if (inter.forget > 0)
+                agent.forget(inter.forget);
+
             errorHistory.addValue(dist);
 
-            //return dist;
             return errorHistory.getMean();
 
         }
@@ -96,7 +95,7 @@ public class TestLSTMOnline {
 
     public static void main(String[] args) throws Exception {
 
-        final int seqPeriod = 7;
+        final int seqPeriod = 12;
 
         int inputs = 7;
         int outputs = 8;
@@ -123,7 +122,9 @@ public class TestLSTMOnline {
                 int tt = t % seqPeriod;
 
 
-                //i.reset = (tt == 0);
+                i.forget =
+                        (tt == 0) ? 0.9f : 0.5f;
+                        //0.1f;
 
 
                 for (int x = 0; x < outputs; x++) {

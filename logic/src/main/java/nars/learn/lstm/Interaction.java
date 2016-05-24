@@ -1,7 +1,6 @@
 package nars.learn.lstm;
 
 import nars.util.Texts;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
@@ -14,7 +13,8 @@ public final class Interaction {
     public double[] expected;
     public double[] predicted = null;
 
-    public boolean reset;
+    /** forget rate, between 0 and 1 */
+    public float forget;
 
 
     public static Interaction the(int numActual, int numExpected) {
@@ -29,7 +29,7 @@ public final class Interaction {
         Interaction i = new Interaction();
         i.actual = actual;
         i.expected = expected;
-        i.reset = reset;
+        i.forget = reset ? 1f : 0f;
         return i;
     }
 
@@ -37,8 +37,8 @@ public final class Interaction {
     public String toString() {
         return Texts.n4(actual) + "\t" +
                 Texts.n4(expected) + "\t" +
-                Texts.n4(predicted) +
-                (reset ? "RESET" : "")
+                Texts.n4(predicted)
+                //+ (reset ? "RESET" : "")
                 ;
     }
 
@@ -46,6 +46,5 @@ public final class Interaction {
         Arrays.fill(actual, 0);
         if (expected!=null)
             Arrays.fill(expected, 0);
-        reset = false;
     }
 }
