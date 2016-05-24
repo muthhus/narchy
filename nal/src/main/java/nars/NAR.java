@@ -804,7 +804,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public Task ask(Termed<Compound> term, long occ, Predicate<Task> eachAnswer) {
-        return inputTask(new MutableTask(term, Symbols.QUESTION, null) {
+        return ask(term, occ, Symbols.QUESTION, eachAnswer);
+    }
+
+    public Task ask(Termed<Compound> term, long occ, char punc /* question or quest */, Predicate<Task> eachAnswer) {
+        return inputTask(new MutableTask(term, punc, null) {
             @Override public boolean onAnswered(Task answer) {
                 return eachAnswer.test(answer);
             }
@@ -885,32 +889,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         return this;
     }
-
-    /** called when a solution is found */
-    public void answer(@NotNull Task question, @NotNull Task solution) {
-
-        float solutionConf = solution.conf();
-
-        Concept q = question.concept(this);
-        if (q!=null) {
-            q.crossLink(question, solution, solutionConf, this);
-        }
-
-        //amount boosted will be in proportion to the lack of quality, so that a high quality question will survive longer by not being drained so quickly
-        BudgetFunctions.transferPri(question.budget(), solution.budget(), (1f - question.qua()) * solutionConf);
-
-        question.onAnswered(solution);
-
-        //TODO use an Answer class which is Runnable, combining that with the Twin info
-        if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-            if (!eventAnswer.isEmpty())
-                eventAnswer.emit(Tuples.twin(question, solution));
-        }
-
-
-
-    }
-
 
     @Nullable
     public final Concept concept(@NotNull Termed t) {

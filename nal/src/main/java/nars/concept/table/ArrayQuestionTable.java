@@ -1,12 +1,11 @@
 package nars.concept.table;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
+import nars.budget.BudgetFunctions;
 import nars.budget.merge.BudgetMerge;
-import nars.task.MutableTask;
+import nars.concept.Concept;
 import nars.task.Task;
-import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,18 +101,15 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
 
     @Override
-    public void answer(Task a) {
+    public void answer(Task a, NAR nar) {
         int listSize = list.size();
         if (listSize == 0)
             return;
 
-        boolean modified = false;
         for (int i = 0; i < listSize; i++) {
             Task q = list.get(i);
-            modified = answer(q, a);
+            answer(q, a, nar);
         }
-        if (modified)
-            sort();
     }
 
     protected void sort() {
@@ -121,7 +117,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     /** returns true if a quality was modified as a signal whether the list needs sorted */
-    public boolean answer(Task q, Task a) {
+    public void answer(Task q, Task a, NAR nar) {
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
         float factor = 1f;
@@ -134,24 +130,34 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                 factor = 1f-a.conf();
             }
         }
-        boolean modified = false;
         q.budget().priMult(factor);
         if (!qEtern) {
             //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
             q.budget().quaMult(factor);
-            modified = true;
         }
 
         if (!q.onAnswered(a)) {
+            //the qustion requested for it to be deleted
             remove(q);
-            modified = true;
+        } else {
+
+            float aConf = a.conf();
+
+            Concept qc = nar.concept(q);
+            if (qc!=null) {
+                qc.crossLink(q, a, aConf, nar);
+            }
+
+            //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
+            BudgetFunctions.transferPri(q.budget(), a.budget(), (1f - q.qua()) * aConf);
+
         }
-        return modified;
+
     }
 
     @Nullable
     @Override
-    public Task add(@NotNull Task q, BeliefTable answers, @NotNull Memory m) {
+    public Task add(@NotNull Task q, BeliefTable answers, @NotNull NAR n) {
         Task existing = get(q);
         if (existing != null) {
             if (existing != q) {
@@ -166,11 +172,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             if (!answers.isEmpty()) {
                 Task a = q.isEternal() ? answers.topEternal() : answers.top(q.occurrence());
                 if (a!=null) {
-                    float qBefore = q.qua();
-                    answer(q, a);
-                    if (q.qua() != qBefore) {
-                        sort();
-                    }
+                    answer(q, a, n);
                 }
             }
         }
@@ -188,7 +190,11 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         float tp = t.pri();
 
+
         if (siz==capacity()) {
+
+            sort(); //sorting only needs to be applied if at capacity
+
             if (last().qua() > tp) {
                 t.delete("Insufficient Priority");
                 return null;

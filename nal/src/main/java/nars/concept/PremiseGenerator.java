@@ -216,7 +216,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                 if (task.term().hasVarQuery()) {
                     matchQueryQuestion(task, belief);
                 } else if (beliefConcept instanceof Compound && nar.index.atemporalize(task.term()).equals(nar.index.atemporalize((Compound)beliefConcept.term()))) {
-                    nar.answer(task, belief);
+                    answer(task, belief);
                 }
 
             }
@@ -229,13 +229,17 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     }
 
+    private void answer(Task q, Task a) {
+        nar.concept(q).questions().answer(a, nar);
+    }
+
     public void matchQueryQuestion(@NotNull Task task, @NotNull Task belief) {
         List<Termed> result = Global.newArrayList(1);
         new UnifySubst(Op.VAR_QUERY, nar, result, 1).matchAll(
                 task.term(), belief.term()
         );
         if (!result.isEmpty()) {
-            nar.answer(task, belief);
+            answer(task, belief);
         }
     }
 

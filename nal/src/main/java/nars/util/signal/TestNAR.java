@@ -76,12 +76,9 @@ public class TestNAR  {
     static final boolean collectTrace = false;
 
     boolean finished;
-    @NotNull
-    final Topic<Task> answerReceiver;
 
     public TestNAR(@NotNull NAR nar) {
 
-        answerReceiver = new DefaultTopic();
 
         this.outputEvents = new Topic[] {
             //nar.memory.eventDerived,
@@ -89,18 +86,9 @@ public class TestNAR  {
             nar.eventTaskProcess,
             //nar.eventTaskRemoved,
             //nar.memory.eventRevision,
-            answerReceiver
         };
 
         this.nar = nar;
-
-        //adapt 'answer' events (Twin<Task>) answer task component to the answerReceiver topic
-        nar.eventAnswer.on(tt -> {
-            Task t = tt.getTwo();
-            //t.log("Answers " + tt.getOne());
-            answerReceiver.emit(t);
-        });
-
 
 
         eventMeters = new EventCount(nar).eventMeters;
@@ -398,17 +386,17 @@ public class TestNAR  {
 
     }
 
-    @NotNull
-    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
-        return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
-    }
+//    @NotNull
+//    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
+//        return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
+//    }
 
-    @NotNull
-    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, long when)  {
-        long ttt = nar.time();
-        return mustEmit(new Topic[] { answerReceiver },
-                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, when);
-    }
+//    @NotNull
+//    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, long when)  {
+//        long ttt = nar.time();
+//        return mustEmit(new Topic[] { answerReceiver },
+//                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, when);
+//    }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, long occTimeAbsolute)  {
         long t = nar.time();

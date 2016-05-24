@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.Bag;
 import nars.concept.table.BeliefTable;
+import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
 import nars.task.Task;
 import nars.term.Termed;
@@ -44,16 +45,15 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
         return BeliefTable.EMPTY;
     }
 
-    @Nullable
     @Override
-    public final TaskTable questions() {
-        return BeliefTable.EMPTY;
+    public final @Nullable QuestionTable questions() {
+        return QuestionTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public final TaskTable quests() {
-        return BeliefTable.EMPTY;
+    public final QuestionTable quests() {
+        return QuestionTable.EMPTY;
     }
 
     

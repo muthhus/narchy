@@ -1,8 +1,13 @@
 package nars.concept.table;
 
 import nars.Memory;
+import nars.NAR;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
@@ -16,7 +21,7 @@ public interface QuestionTable extends TaskTable {
      * an existing equivalent task if this was a duplicate
      */
     @Nullable
-    Task add(Task t, BeliefTable answers, Memory m);
+    Task add(Task t, BeliefTable answers, NAR n);
 
     void setCapacity(int newCapacity);
 
@@ -27,7 +32,7 @@ public interface QuestionTable extends TaskTable {
     Task get(Task t);
 
     /** called when a new answer appears */
-    void answer(Task result);
+    void answer(Task result, NAR nar);
 
 //    {
 //        for (Task a : this) {
@@ -36,4 +41,57 @@ public interface QuestionTable extends TaskTable {
 //        }
 //        return null;
 //    }
+
+    public static QuestionTable EMPTY = new QuestionTable() {
+
+        @Override
+        public Iterator<Task> iterator() {
+            return Collections.emptyIterator();
+        }
+
+        @Override
+        public @Nullable Task add(Task t, BeliefTable answers, NAR n) {
+            return null;
+        }
+
+        @Override
+        public void setCapacity(int newCapacity) {
+
+        }
+
+        @Override
+        public int capacity() {
+            return 0;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public void remove(@NotNull Task belief) {
+
+        }
+
+        @Override
+        public @Nullable Task get(Task t) {
+            return null;
+        }
+
+        @Override
+        public void answer(Task result, NAR nar) {
+
+        }
+    };
 }

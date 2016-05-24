@@ -133,31 +133,31 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f);
     }
 
-    @Test
-    public void testImplQuery() {
-        test()
-                .believe("(y ==>+3 x)")
-                .input("(y ==>+3 ?x)?")
-                .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
-    }
-
-    @Test
-    public void testImplQueryTense() {
-        test()
-                .input("(y ==>+3 x). :|:")
-                .input("(y ==>+3 ?x)? :|:")
-                .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.90f, Tense.Present);
-    }
-
-    @Test
-    public void testImplQueryTenseFuture() {
-        test()
-                //.log()
-                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.18f, 2)
-                .input("(y ==>+3 x). :\\:")
-                .inputAt(1, "(y ==>+3 ?z)? :/:");
-                //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);
-    }
+//    @Test
+//    public void testImplQuery() {
+//        test()
+//                .believe("(y ==>+3 x)")
+//                .input("(y ==>+3 ?x)?")
+//                .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
+//    }
+//
+//    @Test
+//    public void testImplQueryTense() {
+//        test()
+//                .input("(y ==>+3 x). :|:")
+//                .input("(y ==>+3 ?x)? :|:")
+//                .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.90f, Tense.Present);
+//    }
+//
+//    @Test
+//    public void testImplQueryTenseFuture() {
+//        test()
+//                //.log()
+//                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.18f, 2)
+//                .input("(y ==>+3 x). :\\:")
+//                .inputAt(1, "(y ==>+3 ?z)? :/:");
+//                //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);
+//    }
 
 //    @Test public void testImplQuery2() {
 //        TestNAR t = test();

@@ -144,7 +144,7 @@ public class DefaultBeliefTable implements BeliefTable {
                addTemporal(input, nar));
 
         if (result!=null) {
-            questions.answer(result);
+            questions.answer(result, nar);
         }
 
         return result;

@@ -49,7 +49,7 @@ public class QueryVariableTest extends AbstractNALTest {
         test().log()
             .believe(belief)
             .ask(question)
-            .mustAnswer(time, belief, 1f, 0.9f, Tense.ETERNAL);
+            .mustBelieve(time, belief, 1f, 0.9f, Tense.ETERNAL);
 
 //        int[] answers = new int[1];
 //        n.eventTaskProcess.on(d-> {

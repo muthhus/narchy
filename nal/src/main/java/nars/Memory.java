@@ -79,7 +79,7 @@ public class Memory extends Param {
 
 
 
-    public final transient Topic<Twin<Task>> eventAnswer = new DefaultTopic<>();
+    //public final transient Topic<Twin<Task>> eventAnswer = new DefaultTopic<>();
 
 
 

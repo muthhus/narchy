@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.$.$;
 import static nars.nal.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 
@@ -27,14 +28,14 @@ public class QuestTest {
 
         NAR nar = new Default(1, 1, 1, 1);
 
-        //nar.log();
+        nar.log();
 
         nar.goal(nar.term("a:b"), Tense.Eternal, 1.0f, 0.9f);
         nar.step();
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
-        nar.ask("a:?b@", ETERNAL, a -> {
+        nar.ask($("a:?b@"), ETERNAL, '@', a -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
             if (a.toString().contains("(b-->a)!"))

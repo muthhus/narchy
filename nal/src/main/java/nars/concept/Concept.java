@@ -28,6 +28,7 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
+import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
 import nars.task.Task;
 import nars.term.Termed;
@@ -113,8 +114,7 @@ public interface Concept extends Termed, Comparable {
     @Nullable
     BeliefTable goals();
 
-    @Nullable
-    TaskTable questions();
+    @Nullable QuestionTable questions();
 
 
 //    /** debugging utility */
@@ -124,7 +124,7 @@ public interface Concept extends Termed, Comparable {
 //    }
 
     @Nullable
-    TaskTable quests();
+    QuestionTable quests();
 
     @Nullable
     Task processBelief(Task task, NAR nar);
