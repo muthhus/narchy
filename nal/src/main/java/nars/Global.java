@@ -146,7 +146,7 @@ public enum Global {
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
-    public static boolean BACKWARD_QUESTIONS = false;
+    public static boolean BACKWARD_QUESTIONS = true;
 
 
 

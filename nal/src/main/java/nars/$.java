@@ -166,7 +166,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
     }
     @NotNull
-    public static Compound p(@NotNull TermVector t) {
+    public static Compound p(@NotNull TermContainer t) {
         return p((Term[])t.terms());
     }
 

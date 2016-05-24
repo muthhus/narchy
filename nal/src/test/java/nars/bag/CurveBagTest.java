@@ -173,8 +173,8 @@ public class CurveBagTest  {
         //TODO verify the histogram resulting from the above execution is relatively flat:
         //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
         //the tests below assume that it begins with a relatively flat distribution
-        System.out.println(Arrays.toString(bag.getPriorityHistogram(4)));
-        System.out.println(Arrays.toString(bag.getPriorityHistogram(8)));
+        System.out.println(Arrays.toString(bag.priHistogram(4)));
+        System.out.println(Arrays.toString(bag.priHistogram(8)));
 
 
 

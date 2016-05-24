@@ -17,6 +17,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
+import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
@@ -27,6 +28,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -417,7 +419,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Termed<Compound> normalized(@NotNull Termed t) {
+    default Termed<Compound> normalized(@NotNull Termed<Compound> t) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
@@ -427,7 +429,7 @@ public interface TermIndex {
                             new VariableNormalization(numVars)
             );
 
-            if (t == null)
+            if (!(t instanceof Compound)) //includes null test
                 return null;
 
             ((GenericCompound) t).setNormalized();
@@ -596,6 +598,10 @@ public interface TermIndex {
     @NotNull
     default String summary() {
         return "";
+    }
+
+    default Term remap(Map<Term, Term> m, Term src) {
+        return resolve(src, new MapSubst(m)).term();
     }
 
     final class InvalidConceptTerm extends RuntimeException {

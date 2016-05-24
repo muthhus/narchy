@@ -13,6 +13,10 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.aveGeo;
+import static nars.nal.UtilityFunctions.or;
+
 /**
  * Created by me on 5/23/16.
  */
@@ -23,29 +27,13 @@ public class TaskBudgeting {
         //BLink<? extends Task> taskLink = nal.taskLink;
 
 
-
-
-
-
         //if (task.isDeleted()) return null;
-        //Task task = nal.task();
 
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
         //Task task = taskLink.get();
 
-
-
-
-
-
-
-        /*
-        int tasktermVol = nal.task().term().volume();
-        float volRatioScale =
-            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
-        */
 
         BLink<? extends Termed> termLink = nal.termLink;
         BLink<? extends Task> taskLink = nal.taskLink;
@@ -55,15 +43,30 @@ public class TaskBudgeting {
         //float priority = or(taskLink.pri(), termLink.pri());
         //float priority = and(taskLink.pri(), termLink.pri());
 
-        Task premiseTask = taskLink.get();
-        float priority = premiseTask.priIfFiniteElseZero();
-        if (priority > Global.BUDGET_EPSILON)
-            priority *= UtilityFunctions.or(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero());
+        Task task = nal.task;
+        float priority = //UtilityFunctions.aveGeo(
+                //task!=null ? task.priIfFiniteElseZero() : 0,
+                (aveGeo(taskLink.priIfFiniteElseZero(),
+                    termLink.priIfFiniteElseZero()));
 
-        float volRatioScale = 1f / derived.term().volume();
 
-        //originaly was 'AND'
-        final float durability = UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
+        //Penalize by complexity
+        float volRatioScale;
+        {
+            //ORIGINAL METHOD
+            //volRatioScale = 1f / derived.term().volume();
+        }
+        {
+            //RELATIVE SIZE INCREASE METHOD
+            int tasktermVol = task.term().volume();
+            volRatioScale =
+                Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.term().volume() )));
+        }
+
+
+        final float durability =
+                task.dur() * volRatioScale;
+                //UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
 
         final float quality = qualRaw * volRatioScale;
 
@@ -76,7 +79,7 @@ public class TaskBudgeting {
             final float sourceActivation = nal.nar.conceptPriority(nal.task());
 
             termLink.orPriority(quality,
-                    UtilityFunctions.and(sourceActivation, targetActivation)
+                    and(sourceActivation, targetActivation)
                     //or(sourceActivation, targetActivation)
             ); //was: termLink.orPriority(or(quality, targetActivation));
             termLink.orDurability(quality);
@@ -124,8 +127,11 @@ public class TaskBudgeting {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(new UnitBudget(), 1.0f, content, nal);
+    public static Budget compoundQuestion(@NotNull Termed content, @NotNull ConceptProcess nal) {
+        return budgetInference(new UnitBudget(),
+                //1.0f
+                1.0f/content.term().complexity(),
+                content, nal);
     }
 
     /**

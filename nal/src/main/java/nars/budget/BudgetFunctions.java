@@ -217,19 +217,6 @@ public final class BudgetFunctions extends UtilityFunctions {
 //    }
 
 
-    /**
-     * tests a budget's validity for a task to be processed by a memory
-     */
-    @Nullable public static Budget valid(@NotNull Budget budget, @NotNull Memory m) {
-        return //!budget.isDeleted() &&
-                (/*budget!=null && */valid(budget.dur(), m)) ? budget : null;
-    }
-
-    public static boolean valid(/*float p,*/ float d, @NotNull Memory m) {
-        return //!budget.isDeleted() &&
-                d >= m.derivationDurabilityThreshold.floatValue();
-    }
-
     /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
     public static void transferPri(@Nullable Budget a, @Nullable Budget b, float s) {
         float priToTransfer = a.pri() * s;

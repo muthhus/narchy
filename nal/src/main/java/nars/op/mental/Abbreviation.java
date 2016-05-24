@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  */
 public class Abbreviation implements Consumer<Task> {
 
-    public static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
+    static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:

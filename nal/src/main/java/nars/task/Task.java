@@ -382,6 +382,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
+    /** for question tasks: when an answer appears */
+    default void onAnswered(Task answer) { }
+
 
 //    @NotNull
 //    default Task projectTask(long when, long now) {
@@ -903,4 +906,5 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             log(removalReason);
         delete();
     }
+
 }

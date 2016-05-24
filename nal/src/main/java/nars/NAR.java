@@ -10,6 +10,7 @@ import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
+import nars.concept.table.BeliefTable;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -140,6 +141,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         });
 
+    }
+
+    public static void printTasks(NAR n, boolean beliefsOrGoals) {
+        TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
+        n.forEachConcept(c -> {
+            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
+
+            if (!table.isEmpty()) {
+                bt.add(table.top(n.time()));
+                //System.out.println("\t" + c.beliefs().top(n.time()));
+            }
+        });
+        bt.forEach(xt -> {
+            System.out.println(xt);
+        });
     }
 
     private void cycles(@NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {

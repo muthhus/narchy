@@ -39,27 +39,26 @@ public final class DerivedTask extends MutableTask {
             //if a duplicate already existed. then the premise is less likely to be activated
             //in the future having been attenuated.
 
-            if (isBeliefOrGoal()) {
+//            if (isBeliefOrGoal()) {
+//
+//
+//                //more confidence involved makes the penalization more severe
+//                //more evidence involved makes the penalization less severe?
+//
+//                //float c = conf();
+//
+//                //taskLink.clear();
+//                //termLink.clear();
+//            } else {
+//                //TODO for Questions?
+//            }
 
-
-                //more confidence involved makes the penalization more severe
-                //more evidence involved makes the penalization less severe?
-
-                float c = conf();
-
-                float deathFactor = 1f - c;
-                multiplyPremise(deathFactor, false);
-
-                //taskLink.clear();
-                //termLink.clear();
-            } else {
-                //TODO for Questions?
-            }
+            float deathFactor = 0.5f; //1f - c;
+            multiplyPremise(deathFactor, false);
 
             super.delete();
         }
     }
-
 
     /** next = the child which resulted from this and another task being revised */
     @Override public boolean onRevision(@NotNull Task next) {

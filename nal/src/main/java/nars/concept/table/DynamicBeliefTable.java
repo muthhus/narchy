@@ -29,9 +29,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         //ignored
     }
 
-    @Nullable
     @Override
-    public Task add(@NotNull Task input, NAR nar) {
+    public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
         if (input == current) {
             return input;
         } else {
@@ -73,6 +72,10 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Nullable
     abstract protected Task update(long now);
+
+    @Override public Task get(Task t) {
+        return current.equals(t) ? current : null;
+    }
 
     @Nullable
     @Override

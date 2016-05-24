@@ -112,7 +112,7 @@ public interface BudgetMerge {
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
         //return dqBlendByDurQua(tgt, src, srcScale);
-        return dqBlendByPri(tgt, src, srcScale, false);
+        return dqBlendByOrDurQua(tgt, src, srcScale, false);
         //dqBlendBySummary(tgt, src, srcScale, false);
     };
 

@@ -28,7 +28,7 @@ public abstract class Deriver  {
     @NotNull
     public synchronized static TrieDeriver getDefaultDeriver() {
         if (defaultRules == null) {
-            //synchronized(logger) {
+            synchronized(logger) {
                 if (defaultDeriver == null) { //double boiler
                     try {
                         defaultRules = new PremiseRuleSet();
@@ -38,7 +38,7 @@ public abstract class Deriver  {
                         System.exit(1);  //e.printStackTrace();
                     }
                 }
-            //}
+            }
 
         }
         return defaultDeriver;

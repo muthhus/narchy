@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.gs.collections.impl.factory.Sets.immutable;
 import static com.gs.collections.impl.factory.Sets.mutable;
@@ -597,4 +599,14 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         }
         return c; //unchanged
     }
+
+    default TermContainer<T> filter(Predicate<T> p) {
+        if (!(this instanceof TermVector))
+            throw new UnsupportedOperationException("only implemented for TermVector instance currently");
+
+        return TermVector.the(
+                Stream.of(terms()).filter(p).toArray(i -> new Term[i])
+        );
+    }
+
 }

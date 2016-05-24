@@ -25,6 +25,7 @@ import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
+import nars.NAR;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
@@ -35,7 +36,7 @@ import nars.util.experiment.Environment;
 
 import java.util.Random;
 
-import static nars.util.NAgent.printTasks;
+import static nars.NAR.printTasks;
 
 /**
  * the java application class of pacman 
@@ -80,8 +81,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				1000);
 
 		nar.index.print(System.out);
-		printTasks(nar, true);
-		printTasks(nar, false);
+		NAR.printTasks(nar, true);
+		NAR.printTasks(nar, false);
 
 	}
 

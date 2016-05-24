@@ -77,7 +77,7 @@ public class doubt extends AbstractOperator {
         table.clear();
         tt.forEach(t-> {
             t.setTruth(t.truth().confMult(confMultiplied));
-            table.add(t, nar);
+            table.add(t, null, nar);
         });
 
     }

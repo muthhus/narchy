@@ -122,4 +122,8 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
         return term.vars();
     }
 
+    @Override
+    public boolean contains(Task t) {
+        return false;
+    }
 }

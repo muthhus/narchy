@@ -341,6 +341,8 @@ public interface Concept extends Termed, Comparable {
 
     void capacity(ConceptBudgeting cold);
 
+    boolean contains(Task t);
+
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);
 //

@@ -153,7 +153,7 @@ public class NAL7Test extends AbstractNALTest {
     public void testImplQueryTenseFuture() {
         test()
                 //.log()
-                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.30f, 2)
+                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.18f, 2)
                 .input("(y ==>+3 x). :\\:")
                 .inputAt(1, "(y ==>+3 ?z)? :/:");
                 //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);

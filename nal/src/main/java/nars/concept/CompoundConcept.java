@@ -6,10 +6,7 @@ import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
-import nars.concept.table.ArrayQuestionTable;
-import nars.concept.table.BeliefTable;
-import nars.concept.table.DefaultBeliefTable;
-import nars.concept.table.QuestionTable;
+import nars.concept.table.*;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -96,6 +93,21 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
 
+    @Override
+    public boolean contains(Task t) {
+        return tableFor(t.punc()).get(t)!=null;
+    }
+
+    public TaskTable tableFor(char punctuation) {
+        switch(punctuation) {
+            case Symbols.BELIEF: return beliefs();
+            case Symbols.GOAL: return goals();
+            case Symbols.QUESTION: return questions();
+            case Symbols.QUEST: return quests();
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 
     /**
      * Pending Quests to be answered by new desire values
@@ -221,11 +233,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //boolean hasGoals = hasGoals();
         //float successBefore = hasGoals ? getSuccess(now) : 0;
 
-        BeliefTable beliefs = this.beliefs;
+
 //        if (beliefs == null)
 //            beliefs = this.beliefs = newBeliefTable(nar.conceptBeliefsMax.intValue());
 
-        belief = beliefs.add(belief, nar);
+        return beliefs.add(belief, questions, nar);
 
         //TODO only compute updates if belief was actually added, not merged with duplicate
 
@@ -253,8 +265,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //            }
 //
 //        }
-
-        return belief;
 
 //        if (belief.isInput() && !belief.isEternal()) {
 //            this.put(Anticipate.class, true);
@@ -312,12 +322,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
-        BeliefTable g = this.goals;
-//        if (g == null) {
+        //        if (g == null) {
 //            g = this.goals = newGoalTable(nar.conceptGoalsMax.intValue());
 //        }
 
-        return g.add(inputGoal, nar);
+        return this.goals.add(inputGoal, quests, nar);
     }
 
 
@@ -420,12 +429,15 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTable questionTable;
+        final BeliefTable answerTable;
         if (q.isQuestion()) {
             //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = questions();
+            answerTable = beliefs();
         } else { // else if (q.isQuest())
             //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = quests();
+            answerTable = goals();
         }
 
         //if (Global.DEBUG) {
@@ -794,9 +806,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     @Nullable
     public final Task process(@NotNull final Task task, @NotNull NAR nar) {
-
-        if (!task.onConcept(this))
-            return null;
 
         switch (task.punc()) {
             case Symbols.BELIEF:

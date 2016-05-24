@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  */
 public class ArrayQuestionTable implements QuestionTable {
 
-    final BudgetMerge merge = BudgetMerge.plusDQDominant;
+
 
     protected int capacity;
 
@@ -87,7 +87,7 @@ public class ArrayQuestionTable implements QuestionTable {
      */
     @Nullable
     @Override
-    public Task contains(Task t) {
+    public Task get(Task t) {
         if (isEmpty()) return null;
 
         List<Task> ll = this.list;
@@ -101,34 +101,92 @@ public class ArrayQuestionTable implements QuestionTable {
     }
 
 
+    @Override
+    public void answer(Task a) {
+        int listSize = list.size();
+        if (listSize == 0)
+            return;
+
+        boolean aEtern = a.isEternal();
+
+        for (int i = 0; i < listSize; i++) {
+            Task q = list.get(i);
+            boolean qEtern = q.isEternal();
+            float factor = 1f;
+            if (aEtern) {
+                if (qEtern)
+                    factor = 1f-a.conf();
+            } else {
+                if (!qEtern) {
+                    //TODO BeliefTable.rankTemporalByConfidence()
+                    factor = 1f-a.conf();
+                }
+            }
+            if (factor < 1f) {
+                q.budget().priMult(factor);
+                if (!qEtern) {
+                    //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
+                    q.budget().quaMult(factor);
+                }
+
+            }
+            q.onAnswered(a);
+        }
+    }
+
     @Nullable
     @Override
     public Task add(@NotNull Task t, @NotNull Memory m) {
-
-
-        t = tryMerge(t, m);
-        if (t == null)
+        Task existing = get(t);
+        if (existing != null) {
+            if (existing != t) {
+                BudgetMerge.max.merge(existing.budget(), t, 1f);
+                t.delete("Duplicate Question");
+            }
             return null;
-
-        int siz = size();
-        if (siz + 1 > capacity) {
-            // FIFO, remove oldest question (last)
-            remove(siz-1, "FIFO Forgot");
         }
 
-        insert(t);
+        return insert(t);
+    }
 
+    public Task last() {
+        return list.get(list.size()-1);
+    }
+
+    public Task insert(@NotNull Task t) {
+
+        int siz = size();
+
+        float tp = t.pri();
+
+        if (siz==capacity()) {
+            if (last().qua() > tp) {
+                t.delete("Insufficient Priority");
+                return null;
+            } else {
+                // FIFO, remove oldest question (last)
+                float removedPri = remove(siz-1, "Table Pop");
+                t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+            }
+        }
+
+        //insert in sorted order by qua
+        List<Task> list = this.list;
+
+        int i = 0;
+        for (; i < siz-1; i++) {
+            if (list.get(i).qua() < tp)
+                break;
+        }
+        list.add(i, t);
         return t;
     }
 
-    public void insert(@NotNull Task t) {
-        list.add(0, t);
-    }
-
-    public void remove(int n, Object reason) {
+    public float remove(int n, Object reason) {
         Task removed = list.remove(n);
-
+        float p = removed.pri();
         removed.delete(reason);
+        return p;
 
         /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
             task.log(Premise.getStack());*/
@@ -143,71 +201,51 @@ public class ArrayQuestionTable implements QuestionTable {
      * @param t incoming question which may be unique, overlapping, or equivalent to an existing question in the table
      * */
     private Task tryMerge(@NotNull Task t, @NotNull Memory m) {
-        if (isEmpty())
-            return t;
-
-        Task existing = contains(t);
-        if (existing != null) {
-
-            if (existing != t) {
-                merge.merge(existing.budget(), t, 1f);
-
-                t.delete("Duplicate Question");
 
 
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-                //eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
-
-            }
-
-            return null;
-        }
-
-        List<Task> list1 = this.list;
-        long[] tEvidence = t.evidence();
-        long occ = t.occurrence();
-        for (int i = 0, list1Size = list1.size(); i < list1Size; i++) {
-            Task e = list1.get(i);
-
-            //TODO merge occurrence time if within memory's duration period
-
-            if (occ != e.occurrence())
-                continue;
-
-            long[] eEvidence = e.evidence();
-
-            long[] zipped = Stamp.zip(tEvidence, eEvidence);
-
-            //construct before removing so the budgets arent deleted
-            MutableTask te = new MutableTask(
-                    t, e,
-                    m.time(), occ,
-                    zipped, merge);
-
-            remove(i, "Merged");
-
-            t.delete("Merged");
-
-
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-            //eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
-
-            //insert quietly, pretending as if already existed
-            insert(te);
-            return null;
-
-        }
+//        List<Task> list1 = this.list;
+//        long[] tEvidence = t.evidence();
+//        long occ = t.occurrence();
+//        for (int i = 0, list1Size = list1.size(); i < list1Size; i++) {
+//            Task e = list1.get(i);
+//
+//            //TODO merge occurrence time if within memory's duration period
+//
+//            if (occ != e.occurrence())
+//                continue;
+//
+//            long[] eEvidence = e.evidence();
+//
+//            long[] zipped = Stamp.zip(tEvidence, eEvidence);
+//
+//            //construct before removing so the budgets arent deleted
+//            MutableTask te = new MutableTask(
+//                    t, e,
+//                    m.time(), occ,
+//                    zipped, BudgetMerge.max);
+//
+//            replace(i, te);
+//
+//            t.delete("Merged");
+//
+//
+//        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+//            task.log(Premise.getStack());*/
+//
+//            //eventTaskRemoved.emit(task);
+//
+//        /* else: a more destructive cleanup of the discarded task? */
+//
+//            return null;
+//
+//        }
         return t;
     }
 
+
+//    private void replace(int index, @NotNull Task newTask) {
+//        list.set(index, newTask);
+//    }
 
     @NotNull
     @Override

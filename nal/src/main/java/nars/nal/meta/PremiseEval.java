@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
-import static nars.budget.BudgetFunctions.valid;
 
 
 /**
@@ -203,10 +202,11 @@ public class PremiseEval extends FindSubst {
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
         ConceptProcess p = this.premise;
-        return valid(truth != null ?
+        Budget budget = truth != null ?
                     TaskBudgeting.compoundForward(truth, derived, p) :
-                    TaskBudgeting.compoundBackward(derived, p)
-                , p.nar());
+                    TaskBudgeting.compoundQuestion(derived, p);
+        return (budget.dur() >= p.nar().derivationDurabilityThreshold.floatValue()) ?
+                budget : null;
     }
 
 

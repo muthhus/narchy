@@ -26,18 +26,26 @@ final public class TaskPunctuation extends AtomicBoolCondition {
         }
     };
 
-    public static final AtomicBoolCondition NotGoal = new AtomicBoolCondition()  {
+//    /** only belief, not goal or question */
+//    public static final AtomicBoolCondition NotGoal = new AtomicBoolCondition()  {
+//        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+//            return (o.premise.task().punc() != Symbols.GOAL);
+//        }
+//        @Override public String toString() { return "task:\".\""; }
+//    };
+    public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
         @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
-            return (o.premise.task().punc() != Symbols.GOAL);
+            char p = o.premise.task().punc();
+            return (p != Symbols.QUESTION && p!= Symbols.QUEST);
         }
-        @Override public String toString() { return "task:\".?@\""; }
+        @Override public String toString() { return "task:\".!\""; }
     };
-    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
-        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
-            return (o.premise.task().punc() != Symbols.BELIEF);
-        }
-        @Override public String toString() { return "task:\"!?@\""; }
-    };
+//    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
+//        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+//            return (o.premise.task().punc() != Symbols.BELIEF);
+//        }
+//        @Override public String toString() { return "task:\"!?@\""; }
+//    };
 
 
 

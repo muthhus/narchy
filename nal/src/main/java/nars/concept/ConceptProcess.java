@@ -41,7 +41,7 @@ public class ConceptProcess implements Premise {
 
 
     //cached here to prevent weakref tasklink from losing the task in the middle of derivation
-    //public final transient Task task;
+    public final transient Task task;
 
     //public final BLink<? extends Concept> conceptLink;
 
@@ -65,7 +65,7 @@ public class ConceptProcess implements Premise {
         this.nar = nar;
 
         this.taskLink = taskLink;
-        //this.task = taskLink.get();
+        this.task = taskLink.get();
         //assert(!task().isDeleted());
 
         //this.conceptLink = conceptLink;
@@ -103,7 +103,8 @@ public class ConceptProcess implements Premise {
 
     @Override
     public final Task task() {
-        return taskLink.get();
+        //return taskLink.get();
+        return task;
     }
 
 

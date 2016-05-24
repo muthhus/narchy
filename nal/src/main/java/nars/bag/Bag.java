@@ -417,12 +417,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //    }
 
     @NotNull
-    default double[] getPriorityHistogram(int bins) {
-        return getPriorityHistogram(new double[bins]);
+    default double[] priHistogram(int bins) {
+        return priHistogram(new double[bins]);
     }
 
     @NotNull
-    default double[] getPriorityHistogram(@NotNull double[] x) {
+    default double[] priHistogram(@NotNull double[] x) {
         int bins = x.length;
         forEach(budget -> {
             float p = budget.pri();

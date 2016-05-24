@@ -95,7 +95,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
         Term raw = m.resolve(conclusionPattern);
-        if (raw == null)
+        if (!(raw instanceof Compound)) //includes null test
             return;
 
         if (raw.varPattern() != 0)
@@ -128,7 +128,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
             long[] occReturn = new long[]{ETERNAL};
 
-            Compound temporalized = this.temporalizer.compute(content.term(),
+            Term temporalized = this.temporalizer.compute(content.term(),
                     m, this, occReturn
             );
 

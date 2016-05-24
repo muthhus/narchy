@@ -5,58 +5,65 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
 
 
-public class DeductiveChainTest  {
+public class DeductiveMeshTest {
 
     @NotNull
     public final Compound q;
     @NotNull
-    public final Compound[] beliefs;
+    public final List<Compound> coords;
 
-    @FunctionalInterface
-    public interface IndexedStatementBuilder {
-        @NotNull
-        Compound apply(int x, int y);
+
+
+
+
+    public DeductiveMeshTest(@NotNull NAR n, int[] dims, int timeLimit) {
+        this(new TestNAR(n), dims, timeLimit);
     }
 
-    @Nullable
-    public static final IndexedStatementBuilder inh = (int x, int y) ->
-            (Compound)$.inh(a(x), a(y));
-    @Nullable
-    public static final IndexedStatementBuilder sim = (int x, int y) ->
-            (Compound)$.sim(a(x), a(y));
-    @Nullable
-    public static final IndexedStatementBuilder impl = (int x, int y) ->
-            (Compound)$.impl(a(x), a(y));
-    @Nullable
-    public static final IndexedStatementBuilder equiv = (int x, int y) ->
-            (Compound)$.equiv(a(x), a(y));
+    public DeductiveMeshTest(@NotNull TestNAR n, int[] dims, int timeLimit) {
 
-    public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
-        this(new TestNAR(n), length, timeLimit, b);
-    }
+        if (dims.length!=2)
+            throw new UnsupportedOperationException("2-D only implemented");
 
-    public DeductiveChainTest(@NotNull TestNAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
+        coords = Global.newArrayList();
+        for (int x = 0; x < dims[0]; x++) {
+            for (int y = 0; y < dims[1]; y++) {
+                Compound c = c(x, y);
+                if (x > 0)
+                    n.nar.believe( link(c, c(x-1, y)) );
+                if (y > 0)
+                    n.nar.believe( link(c, c(x, y-1)) );
+                if (x < dims[0]-1)
+                    n.nar.believe( link(c, c(x+1, y)) );
+                if (y < dims[1]-1)
+                    n.nar.believe( link(c, c(x, y+1)) );
 
-        beliefs = new Compound[length];
-        for (int x = 0; x < length; x++) {
-            beliefs[x] = b.apply(x, x+1);
+            }
         }
 
-        q = b.apply(0, length);
 
-        for (Compound belief : beliefs) {
-            n.nar.believe(belief);
-        }
-        n.nar.ask( q );
+        n.nar.ask( q = (Compound) link(c(0,0), c(dims[0]-1, dims[1]-1)));
+
 
         n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 
+    }
+
+    private Term link(Term a, Term b) {
+        return $.prop($.p(a, b), $.the("X"));
+    }
+
+    public @NotNull Compound c(int x, int y) {
+        return $.p($.the(x), $.the(y));
     }
 
 
@@ -68,27 +75,40 @@ public class DeductiveChainTest  {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = false;
+        Global.DEBUG = true;
 
-        for (int length = 3; length < 10; length++) {
-            Default n = new Default(1024, 1, 1, 3);
-            n.nal(6);
-            test(n, length, 1000*length, inh);
-        }
+
+        Default n = new Default(1024, 1, 1, 3);
+        //n.nal(5);
+        n.log();
+
+
+        n.onFrame(x -> {
+            if (n.time() == 1000) {
+                NAR.printTasks(n, true);
+                NAR.printTasks(n, false);
+                System.out.println(Arrays.toString(n.core.active.priHistogram(10)));
+            }
+        });
+
+        test(n, new int[] { 3, 1 }, 2500);
+
+
+
     }
 
-    static void test(@NotNull NAR n, int chainLen, int cycles, @NotNull IndexedStatementBuilder statementType) {
+    static void test(@NotNull NAR n, int[] dims, int cycles) {
 
 
         TestNAR testnar = new TestNAR(n);
-        DeductiveChainTest test = new DeductiveChainTest(testnar, chainLen, cycles, statementType) {
+        DeductiveMeshTest test = new DeductiveMeshTest(testnar, dims, cycles) {
 //            @Override
 //            public TestNAR mustBelieve(long withinCycles, String term, float confidence, float x, float y, float z) throws InvalidInputException {
 //                return this;
 //            }
         };
 
-        System.out.print(DeductiveChainTest.class.getSimpleName() + " test: "
+        System.out.print(DeductiveMeshTest.class.getSimpleName() + " test: "
                 + test.q + "?\t");
 
         final long start = System.currentTimeMillis();

@@ -392,20 +392,5 @@ public class NAgent implements Agent {
 
     }
 
-    public static void printTasks(NAR n, boolean beliefsOrGoals) {
-        TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
-        n.forEachConcept(c -> {
-            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
-
-            if (!table.isEmpty()) {
-                bt.add(table.top(n.time()));
-                //System.out.println("\t" + c.beliefs().top(n.time()));
-            }
-        });
-        bt.forEach(xt -> {
-            System.out.println(xt);
-        });
-    }
-
 
 }

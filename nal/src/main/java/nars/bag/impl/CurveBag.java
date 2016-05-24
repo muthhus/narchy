@@ -34,7 +34,10 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     public CurveBag(int capacity, @NotNull Random rng) {
         this(capacity,
-             new NormalizedSampler(power6BagCurve, rng));
+            new DirectSampler(
+            //new NormalizedSampler(
+                 power6BagCurve, rng
+        ));
     }
 
     public CurveBag(@NotNull CurveSampler c) {

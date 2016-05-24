@@ -22,8 +22,13 @@ public class MapSubst implements Subst {
 //    }
 
 
+    public MapSubst(Term x, Term y) {
+        this(Map.of(x,y));
+    }
+
     public MapSubst(Map<Term, Term> xy) {
         this.xy = xy;
+
     }
 
     @Override

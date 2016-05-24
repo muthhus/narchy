@@ -89,7 +89,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     @Override
     public Compound atemporalize(Compound c) {
-        return (Compound)transform(c.dt(DTERNAL), CompoundAtemporalizer);
+        return (Compound) transform(c.dt(DTERNAL), CompoundAtemporalizer);
     }
 
 

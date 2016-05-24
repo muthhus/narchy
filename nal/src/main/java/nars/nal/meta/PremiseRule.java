@@ -18,18 +18,15 @@ import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.PatternIndex;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.transform.subst.MapSubst;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
@@ -234,13 +231,7 @@ public class PremiseRule extends GenericCompound {
 
             s.add(truth);
 
-            //if no specific task punctuation has been set, then add a Punctuation Guard, early avoidance of Goals being tested in the Solve
-            if (taskPunc == 0) {
-                if (truth.desire == null && truth.belief != null)
-                    s.add(TaskPunctuation.NotGoal);
-                if (truth.belief == null && truth.desire != null)
-                    s.add(TaskPunctuation.NotBelief);
-            }
+
 
             addAll(s, match.pre);
         }
@@ -347,9 +338,10 @@ public class PremiseRule extends GenericCompound {
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
+        if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
-        if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
-        if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
+        //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
+        //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
@@ -419,9 +411,9 @@ public class PremiseRule extends GenericCompound {
         String desireLabel = desire != null ? p.goalTruth.toString() : "_";
 
         String sn = "Truth(";
-        String i = puncOverride == 0 ?
-                sn + beliefLabel + ',' + desireLabel :
-                sn + beliefLabel + ',' + desireLabel + ",punc:\"" + puncOverride + '\"';
+        String i =
+                sn + beliefLabel + ',' + desireLabel + ",punc:\"" +
+                        (puncOverride == 0 ? '_' : puncOverride) + '\"';
         i += ')';
 
         return puncOverride == 0 ?
@@ -491,7 +483,7 @@ public class PremiseRule extends GenericCompound {
 
         //TODO include representation of precondition and postconditions
         return $.impl(
-                $.p(getTask(), getBelief()),
+                p(getTask(), getBelief()),
                 getConclusion()
         );
     }
@@ -870,6 +862,11 @@ public class PremiseRule extends GenericCompound {
                 constraints);
 
 
+        if (taskPunc!='?') {
+            //add explicit no-questions rule
+            pres.add(TaskPunctuation.NotQuestion);
+        }
+
         //store to arrays
         this.precon = pres.toArray(new BoolCondition[pres.size()]);
 
@@ -992,6 +989,9 @@ public class PremiseRule extends GenericCompound {
 
     static final Term TaskQuestionTerm = exec("task", "\"?\"");
 
+    static final Term BELIEF = $.the("Belief");
+    static final Term DESIRE = $.the("Desire");
+
     @NotNull
     private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {
 
@@ -1003,18 +1003,34 @@ public class PremiseRule extends GenericCompound {
 
         m.put(getConclusionTermPattern(), newR);
 
-        Compound remapped = (Compound) (terms.resolve(this, new MapSubst(m)).term());
+
+        Compound remapped = (Compound)terms.remap(m, this);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
         Term[] pp = pc.terms(); //premise component
-        Compound newPremise = question ?
-                p(concat(pp, TaskQuestionTerm)) :
-                pc;
+        Compound newPremise;
 
         Compound newConclusion = (Compound) remapped.term(1);
-        if (swapTruth) {
-            newConclusion = (Compound) terms.transform(newConclusion, truthSwap);
+
+        if (question) {
+
+            newPremise = p(concat(pp, TaskQuestionTerm));
+
+            //remove truth values
+//            TermContainer<?> ss = ((Compound)newConclusion.term(1)).subterms();
+//            newConclusion = p(
+//                newConclusion.term(0), p(ss.filter((x) -> {
+//                        return !(((Compound)x).op() == Op.INHERIT && (((Compound) x).term(1).equals(BELIEF) || ((Compound) x).term(1).equals(DESIRE)));
+//                }))
+//            );
+
+        } else {
+            if (swapTruth) {
+                newConclusion = (Compound) terms.transform(newConclusion, truthSwap);
+            }
+
+            newPremise = pc; //same
         }
 
         return new PremiseRule(newPremise, newConclusion);

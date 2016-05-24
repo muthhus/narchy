@@ -204,10 +204,16 @@ public class Default extends AbstractNAR {
         float business = input.pri() * activation;
         emotion.busy(business);
 
+
         Task t = c.process(input, this);
         if (t != null) {
-
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
+
+            if (t.isDeleted()) {
+                throw new RuntimeException("process should have returned null");
+            }
+
+            t.onConcept(c);
 
             //propagate budget
             MutableFloat overflow = new MutableFloat();

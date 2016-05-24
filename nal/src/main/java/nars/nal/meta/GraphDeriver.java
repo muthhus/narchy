@@ -170,7 +170,7 @@ public class GraphDeriver extends Deriver {
 
                 //custom handling
 
-                if ((cc == TaskPunctuation.Belief) || (cc == TaskPunctuation.Goal) || (cc == TaskPunctuation.Question) || (cc == TaskPunctuation.NotBelief)|| (cc == TaskPunctuation.NotGoal)) {
+                if ((cc == TaskPunctuation.Belief) || (cc == TaskPunctuation.Goal) || (cc == TaskPunctuation.Question) || (cc == TaskPunctuation.NotQuestion)) {
                     return ("taskPunc");
                 }
                 if ((cc == TaskPositive.the) || (cc == TaskNegative.the)) {

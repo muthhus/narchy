@@ -28,7 +28,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull public final TemporalBeliefTable temporal;
     @NotNull final Map<Task,Task> map;
 
-    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
     public DefaultBeliefTable() {
 
@@ -118,19 +118,39 @@ public class DefaultBeliefTable implements BeliefTable {
         return temporal.top(when);
     }
 
-
-
-    @Nullable
     @Override
-    public Task add(@NotNull Task input, @NotNull NAR nar) {
+    public Task get(Task t) {
+        return map.get(t);
+    }
+
+    @Override
+    public Task add(@NotNull Task input, QuestionTable questions, @NotNull NAR nar) {
+
+        /** if a duplicate exists, it will merge the incoming task and return true.
+         * otherwise false */
+        Task existing = get(input);
+        if (existing!=null) {
+            if (existing!=input) {
+                DuplicateMerge.merge(existing.budget(), input, 1f);
+                input.delete(DUPLICATE_BELIEF_GOAL);
+            }
+            return null;
+        }
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
-        return filterDuplicate(input, nar) ? null :
-                (input.isEternal() ?
-                        addEternal(input, nar) :
-                        addTemporal(input, nar));
+        Task result = (input.isEternal() ?
+               addEternal(input, nar) :
+               addTemporal(input, nar));
+
+        if (result!=null) {
+            questions.answer(result);
+        }
+
+        return result;
     }
+
+
 
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
 
@@ -203,33 +223,6 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    /** if a duplicate exists, it will merge the incoming task and return true.
-     * otherwise false */
-    private boolean filterDuplicate(@NotNull Task input, @NotNull NAR nar) {
-        Task existing = map.get(input);
-        if (existing!=null) {
-            if (existing!=input) {
-                //Average allows duplicate tasks to not explode like plus would
-                DuplicateMerge.merge(existing.budget(), input, 1f);
-                //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
-                //@Nullable Object removalReason = Global.DEBUG ?
-                    //input.lastLogged().toString() + ' ' + DUPLICATE_BELIEF_GOAL :
-
-                input.delete(DUPLICATE_BELIEF_GOAL);
-
-
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-                //eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
-
-            }
-            return true;
-        }
-        return false;
-    }
 
 
 

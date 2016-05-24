@@ -65,9 +65,13 @@ public interface BeliefTable extends TaskTable {
             throw new UnsupportedOperationException();
         }
 
-        @NotNull
         @Override
-        public Task add(@NotNull Task input, NAR nar) {
+        public Task get(Task t) {
+            return null;
+        }
+
+        @Override
+        public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
             return input;
         }
 
@@ -179,7 +183,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
-    @Nullable Task add(@NotNull Task input, NAR nar);
+    Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar);
 
 
 //    @Nullable

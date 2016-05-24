@@ -24,7 +24,11 @@ public interface QuestionTable extends TaskTable {
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
     @Nullable
-    Task contains(Task t);
+    Task get(Task t);
+
+    /** called when a new answer appears */
+    void answer(Task result);
+
 //    {
 //        for (Task a : this) {
 //            if (e.test(a, t))
