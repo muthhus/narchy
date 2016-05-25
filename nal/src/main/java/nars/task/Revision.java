@@ -3,11 +3,15 @@ package nars.task;
 import com.gs.collections.api.tuple.primitive.FloatObjectPair;
 import com.gs.collections.impl.tuple.Tuples;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import nars.$;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.container.TermVector;
 import nars.truth.*;
 import nars.util.data.Util;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,9 +59,10 @@ public class Revision {
         float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
         float bw = c2w(b.conf());
 
-        long[] newEv = Stamp.zip(a.evidence(), b.evidence(), aw/(aw+bw));
+        float aProp = aw / (aw + bw);
+        long[] newEv = Stamp.zip(a.evidence(), b.evidence(), aProp);
 
-        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term());
+        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aProp);
 
         return new MutableTask(c.getTwo(),
                 a, b, now, newOcc, newEv,
@@ -89,31 +94,20 @@ public class Revision {
      *
      * TODO threshold to stop early
      */
-    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b) {
+    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp) {
         if (a.equals(b)) {
-            return PrimitiveTuples.pair(1f, a);
+            return PrimitiveTuples.pair(0f, a);
         }
-//        Compound c = a.term();
-//        if (c.op().isTemporal()) {
-//
-//            //TODO interpolate the dt() and penalize confidence in proportion to the difference
-//            int newDT;
-//            Compound bt = b.term();
-//            int adt = c.dt();
-//            int bdt = bt.dt();
-//            if (adt!=DTERNAL && bdt!=DTERNAL)
-//                newDT = Math.round(Util.lerp(adt, bdt, aw/(aw+bw)));
-//            else if (bdt != DTERNAL)
-//                newDT = bt.dt();
-//            else if (adt != DTERNAL)
-//                newDT = c.dt();
-//            else
-//                newDT = DTERNAL;
-//
-//            c = c.dt(newDT);
-//        }
 
-        return null;
+        MutableFloat accumulatedDifference = new MutableFloat(0);
+        Compound cc = dtMerge(a, b, aProp, accumulatedDifference, 1f);
+
+        //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
+        float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
+
+        return PrimitiveTuples.pair(accumulatedDifference.floatValue() * weightDivergence, cc);
+
+
 
 
 //            int at = a.dt();
@@ -143,6 +137,36 @@ public class Revision {
 //            }
 //        }
 //        return 1f;
+    }
+
+    private static Compound dtMerge(Compound a, Compound b, float balance, MutableFloat accumulatedDifference, float depth) {
+        int newDT;
+        int adt = a.dt();
+        if (adt !=b.dt()) {
+
+            //TODO maybe choose the eternality based on stronger balance
+
+            int bdt = b.dt();
+            if (adt != DTERNAL && bdt != DTERNAL) {
+                newDT = Math.round(Util.lerp(adt, bdt, balance));
+                accumulatedDifference.add(Math.abs(adt - bdt) * depth);
+            } else if (bdt != DTERNAL)
+                newDT = adt;
+            else if (adt != DTERNAL)
+                newDT = bdt;
+            else {
+                throw new RuntimeException();
+            }
+        } else {
+            newDT = adt;
+        }
+
+        Term a0 = a.term(0);
+        Term a1 = a.term(1);
+        return $.compound(a.op(), new TermVector<>(
+            (a0 instanceof Compound) ? dtMerge( (Compound)a0, (Compound)(b.term(0)), balance, accumulatedDifference, depth/2f) : a0,
+            (a1 instanceof Compound) ? dtMerge( (Compound)a1, (Compound)(b.term(1)), balance, accumulatedDifference, depth/2f) : a1
+        )).dt(newDT);
     }
 }
 

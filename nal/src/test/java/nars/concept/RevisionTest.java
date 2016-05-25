@@ -252,28 +252,47 @@ public class RevisionTest {
     }
 
     @Test public void testTermRelevance() {
-        Compound a = $.$("(a ==>+1 (b ==>+1 c))");
-        Compound b = $.$("(a ==>+0 (b ==>+1 c))");
-        Compound c = $.$("(a ==>+1 (b ==>+0 c))");
-        Compound d = $.$("(a ==>+0 (b ==>+0 c))");
-        Compound e = $.$("(a ==> (b ==>+1 c))");
+        Compound a = $.$("(a &&+3 (b &&+3 c))");
+        Compound b = $.$("(a &&+0 (b &&+3 c))");
+        Compound c = $.$("(a &&+3 (b &&+0 c))");
+        Compound e = $.$("(a && (b &&+3 c))");
 
-        FloatObjectPair<Compound> aa = Revision.dtMerge(a, a);
-        assertEquals(0f, aa.getOne(), 0.01f);
 
-        FloatObjectPair<Compound> cc = Revision.dtMerge(c, c);
+        Compound f = $.$("(a &&+1 (b &&+1 c))");
+        Compound g = $.$("(a &&+10 (b &&-10 c))");
+
+        FloatObjectPair<Compound> cc = Revision.dtMerge(c, c, 0.5f);
         assertEquals(0f, cc.getOne(), 0.01f);
 
-        FloatObjectPair<Compound> ab = Revision.dtMerge(a, b);
-        assertEquals(0.5f, ab.getOne(), 0.01f);
 
-        FloatObjectPair<Compound> ac = Revision.dtMerge(a, c);
-        assertEquals(1f, ac.getOne(), 0.01f);
-
-        FloatObjectPair<Compound> ad = Revision.dtMerge(a, d);
-        assertEquals(1.5f, ad.getOne(), 0.01f);
+        FloatObjectPair<Compound> aa = Revision.dtMerge(a, a, 0.5f);
+        assertEquals(0f, aa.getOne(), 0.01f);
 
 
+        FloatObjectPair<Compound> ab = Revision.dtMerge(a, b, 0.5f);
+        assertEquals("(a &&+2 (b &&+3 c))", ab.getTwo().toString());
+        assertEquals(3.0f, ab.getOne(), 0.01f);
 
+        FloatObjectPair<Compound> ac = Revision.dtMerge(a, c, 0.5f);
+        assertEquals("(a &&+3 (b &&+2 c))", ac.getTwo().toString());
+        assertEquals(1.5f, ac.getOne(), 0.01f);
+
+        //TEST ETERNAL
+        FloatObjectPair<Compound> ae = Revision.dtMerge(a, e, 0.5f);
+        assertEquals("(a&&(b &&+3 c))", ae.getTwo().toString());
+        assertEquals(0f, ae.getOne(), 0.01f);
+
+        //TEST VARIOUS WEIGHTING
+        FloatObjectPair<Compound> fg = Revision.dtMerge(f, g, 0.5f);
+        assertEquals("(a &&+6 (b &&-4 c))", fg.getTwo().toString());
+        assertEquals(14.5, fg.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> Fg = Revision.dtMerge(f, g, 0.1f);
+        assertEquals("(a &&+9 (b &&-9 c))", Fg.getTwo().toString());
+        assertEquals(2.899, Fg.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> fG = Revision.dtMerge(f, g, 0.9f);
+        assertEquals("(a &&+2 (b &&+0 c))", fG.getTwo().toString());
+        assertEquals(2.899, fG.getOne(), 0.01f);
     }
 }
