@@ -60,7 +60,7 @@ public abstract class CollectorMap<K, V>  {
 
 
     @Nullable
-    public final V put(K key, V value) {
+    public V put(K key, V value) {
 
         /*synchronized (nameTable)*/
         V removed = putKey(key, value);

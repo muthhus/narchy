@@ -53,7 +53,11 @@ public class CurveBagTest  {
         assertTrue(c.isEmpty());
 
         //insert an item with zero budget
-        c.put("x"); assertEquals(c.size(), 1);
+        c.put("x");
+        c.commit();
+
+        assertEquals(c.size(), 1);
+
 
         assertEquals(0, c.priMin(), 0.001f);
 
@@ -67,9 +71,9 @@ public class CurveBagTest  {
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
+        a.commit();
         assertEquals(1, a.size());
 
-        a.commit();
 
         assertTrue(new UnitBudget(0.2f, 0.5f, 0.5f).equalsByPrecision(
             a.get("x"), 0.01f));
@@ -83,11 +87,12 @@ public class CurveBagTest  {
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
 
+        a.commit();
+
         Iterator<BLink<String>> ii = a.iterator();
         assertEquals("y", ii.next().get());
         assertEquals("x", ii.next().get());
 
-        a.commit();
 
         assertEquals("[y=$0.2000;0.5000;0.5000$, x=$0.1000;0.5000;0.5000$]", a.list().toString());
 
@@ -127,7 +132,9 @@ public class CurveBagTest  {
         a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
+        a.commit();
         assertEquals(1, a.size());
+
         a.remove("x");
         assertEquals(0, a.size());
         assertTrue(a.isEmpty());

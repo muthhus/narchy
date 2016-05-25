@@ -92,6 +92,7 @@ public class NAL1Test extends AbstractNALTest {
               /*  .en("I guess sport is a type of chess.")
                 .en("sport is possibly a type of chess.")
                 .es("es posible que sport es un tipo de chess.");*/
+                .log()
                 .believe("<sport --> competition>")
                         //.en("sport is a type of competition.");
                 .believe("<chess --> competition>", 0.90f, 0.9f)

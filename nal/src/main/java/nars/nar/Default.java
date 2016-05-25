@@ -458,19 +458,17 @@ public class Default extends AbstractNAR {
 
         protected void cycle(Memory memory) {
 
-            fireConcepts(conceptsFiredPerCycle.intValue());
-
             float subCycle = cycleNum++ / cyclesPerFrame;
             conceptForget.cycle(subCycle);
             termLinkForget.cycle(subCycle);
             taskLinkForget.cycle(subCycle);
-
 
             //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
             active.commit( active.isFull() ? conceptForget : null );
 
+            fireConcepts(conceptsFiredPerCycle.intValue());
 
             //active.commit(lastForget != now ? conceptForget : .. );
 

@@ -4,6 +4,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 
 /**
@@ -72,17 +72,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
 
-    /**
-     * returns amount overflowed
-     */
-    protected final float merge(@NotNull BLink<V> target, @NotNull Budgeted incoming, float scale) {
-        return mergeFunction.merge(target, incoming, scale);
-        /*if (overflow > 0)
-            target.charge(overflow);*/
-    }
-
-
-//    @Override public V put(V k, Budget b) {
+    //    @Override public V put(V k, Budget b) {
 //        //TODO use Map.compute.., etc
 //
 //        BagBudget<V> v = getBudget(k);
@@ -223,8 +213,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         BLink<V> existing = get(i);
 
         return (existing != null) ?
-                putExists(b, scale, existing, overflow) :
-                putNew(i, link(i, b, scale));
+                    putExists(b, scale, existing, overflow) : (
+                       isFull() ?
+                            putQueue(i, b, scale) :
+                            putNew(i, link(i, b, scale))
+                    );
 
 //        //TODO optional displacement until next update, allowing sub-threshold to grow beyond threshold
 //        BagBudget<V> displaced = null;
@@ -248,7 +241,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         if (existing != b) {
 
-            float o = merge(existing, b, scale);
+            /*if (overflow > 0)
+                target.charge(overflow);*/
+            float o = mergeFunction.merge(existing, b, scale);
+
             if (overflow != null)
                 overflow.add(o);
 
@@ -275,6 +271,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return put(i, newBudget);
     }
 
+    private final FasterList<BLink<V>> pending = new FasterList();
+
+    protected BLink<V> putQueue(V x, @NotNull Budgeted b, float scale) {
+        BLink<V> link = link(x, b, scale);
+        pending.add(link);
+        return link;
+    }
 
 //    @Nullable
 //    @Override
@@ -297,9 +300,38 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
     @Override public Bag<V> commit(@Nullable Consumer<BLink> each) {
         int s = size();
-        if (s == 0)
-            return this;
+        if (s > 0) {
+            updateExisting(each, s);
+        }
 
+        if (!pending.isEmpty())
+            addPending();
+
+        return this;
+    }
+
+    private void addPending() {
+        //add pending items now that the bag is updated
+        for (int i1 = 0, pendingSize = pending.size(); i1 < pendingSize; i1++) {
+            BLink<V> link = pending.get(i1);
+            V key = link.get();
+            BLink<V> existing = get(key);
+            if (existing != null) {
+                mergeFunction.merge(existing, link, 1f);
+                if (existing.commit()) {
+                    //reorder
+                    removeItem(existing);
+                    addItem(existing);
+                }
+            }
+            else
+                putNew(key, link);
+
+        }
+        pending.clear0();
+    }
+
+    private void updateExisting(@Nullable Consumer<BLink> each, int s) {
         int dirtyStart = -1;
         int dirtyEnd = -1;
 
@@ -359,6 +391,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             }
         }
 
+        removeDeletedAtBottom();
+    }
+
+    private void removeDeletedAtBottom() {
         //remove deleted items they will collect at the end
         int i = size()-1;
         BLink<V> ii;
@@ -372,9 +408,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             removeItem(i); //remove by known index rather than have to search for it by key or something
             i--;
         }
-
-
-        return this;
     }
 
 

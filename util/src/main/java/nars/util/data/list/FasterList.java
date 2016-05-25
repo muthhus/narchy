@@ -18,6 +18,9 @@ import java.util.function.IntFunction;
  */
 public class FasterList<X> extends FastList<X> {
 
+    static final Object[] ZERO_SIZED_ARRAY = new Object[0];
+
+
     public FasterList() {
         super();
     }
@@ -169,4 +172,8 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
+    public final void clear0() {
+        this.items = (X[]) ZERO_SIZED_ARRAY;
+        this.size = 0;
+    }
 }
