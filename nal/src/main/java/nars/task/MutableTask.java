@@ -53,13 +53,13 @@ public class MutableTask extends AbstractTask {
 //    }
 
 
-    @NotNull
-    public static /* TODO ProjectedTask */ Task project(@NotNull Task t, long now, long occ) {
-        Truth newTruth = t.projectTruth(now, occ, false);
-        if (t.truth().equals(newTruth) && t.occurrence()==occ)
-            return t;
-        return new MutableTask(t, newTruth, now, occ);
-    }
+//    @NotNull
+//    public static /* TODO ProjectedTask */ Task project(@NotNull Task t, long now, long occ) {
+//        Truth newTruth = t.projectTruth(now, occ, false);
+//        if (t.truth().equals(newTruth) && t.occurrence()==occ)
+//            return t;
+//        return new MutableTask(t, newTruth, now, occ);
+//    }
 
     public MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
         super(taskToClone);

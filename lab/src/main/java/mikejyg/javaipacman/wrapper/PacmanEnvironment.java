@@ -44,7 +44,7 @@ import static nars.NAR.printTasks;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 2;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -59,17 +59,19 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 8, 1, 2, rng,
+				1024, 4, 1, 2, rng,
 				new Default.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.beliefConfidence(0.25f);
+		nar.beliefConfidence(0.75f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
-		nar.cyclesPerFrame.set(128);
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+		nar.cyclesPerFrame.set(256);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -81,7 +83,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				5000);
+				150000);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);

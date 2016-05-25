@@ -490,45 +490,6 @@ public class Terms extends TermBuilder implements TermIndex {
         return Texts.levenshteinDistance(a, b) / len;
     }
 
-    /**
-     * heuristic which evaluates the semantic similarity of two terms
-     * returning 1f if there is a complete match, 0f if there is
-     * a totally separate meaning for each, and in-between if
-     * some intermediate aspect is different (ex: temporal relation dt)
-     */
-    public static float termRelevance(@NotNull Compound a, @NotNull Compound b) {
-        Op aop = a.op();
-        if (aop != b.op()) return 0f;
-        if (aop.isTemporal()) {
-            int at = a.dt();
-            int bt = b.dt();
-            if ((at != bt) && (at!=DTERNAL) && (bt!=DTERNAL)) {
-//                if ((at == DTERNAL) || (bt == DTERNAL)) {
-//                    //either is atemporal but not both
-//                    return 0.5f;
-//                }
-
-//                boolean symmetric = aop.isCommutative();
-//
-//                if (symmetric) {
-//                    int ata = Math.abs(at);
-//                    int bta = Math.abs(bt);
-//                    return 1f - (ata / ((float) (ata + bta)));
-//                } else {
-//                    boolean ap = at >= 0;
-//                    boolean bp = bt >= 0;
-//                    if (ap ^ bp) {
-//                        return 0; //opposite direction
-//                    } else {
-//                        //same direction
-                        return 1f - (Math.abs(at - bt) / (1f + Math.abs(at + bt)));
-//                    }
-//                }
-            }
-        }
-        return 1f;
-    }
-
     public static Term empty(@NotNull Op op) {
         switch (op) {
 

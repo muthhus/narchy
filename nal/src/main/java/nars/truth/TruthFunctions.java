@@ -90,21 +90,6 @@ public final class TruthFunctions extends UtilityFunctions {
 //        return temporalIntersection(now, at, bt, 1f);
 //    }
 
-    public static float temporalIntersection(long now, long at, long bt, float window) {
-        return window == 0 ? 1f : BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), window);
-    }
-
-    public static float truthProjection(long sourceTime, long targetTime, long currentTime) {
-        if (sourceTime == targetTime) {
-            return 1f;
-        } else {
-            long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            return den == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) den;
-        }
-    }
-
-
-
 
     /**
      * {M, <M ==> P>} |- P

@@ -218,5 +218,6 @@ public class BooleanConcept extends OperationConcept {
         public void remove(@NotNull Task belief) {
             //nothing, maybe force update
         }
+
     }
 }

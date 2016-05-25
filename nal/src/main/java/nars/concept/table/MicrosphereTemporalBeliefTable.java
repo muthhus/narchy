@@ -5,6 +5,7 @@ import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.Tense;
 import nars.task.MutableTask;
+import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.term.Compound;
@@ -198,42 +199,10 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
         Task merged;
         if (b!=null) {
-
-            //TODO proper iterpolate: truth, time, dt
-            float ac = c2w(a.conf());
-            float bc = c2w(b.conf());
-            long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
-
-            Truth newTruth = truth(newOcc);
-
-            long[] newEv = Stamp.zip(a.evidence(), b.evidence(), ac/(ac+bc));
-
-            Compound at = a.term();
-            if (at.op().isTemporal()) {
-
-                //TODO interpolate the dt()
-                int newDT;
-                Compound bt = b.term();
-                if (bt.dt() != DTERNAL)
-                    newDT = bt.dt();
-                else if (at.dt() != DTERNAL)
-                    newDT = at.dt();
-                else
-                    newDT = DTERNAL;
-
-                if (!at.op().isTemporal(at, newDT))
-                    System.err.println("temporal fault");
-                    //throw new RuntimeException("??");
-                else
-                    at = at.dt(newDT);
-            }
-
-            merged = new MutableTask(at, a, b, now, newOcc, newEv, newTruth, BudgetMerge.plusDQBlend)
-                    .log("Revection Merge");
+            merged = merge(a, b, now);
 
             remove(b);
             TaskTable.removeTask(b, "Revection Revision");
-
         } else {
             merged = null;
         }
@@ -245,6 +214,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
         return merged!=null ? merged : input;
     }
 
+    /** t is the target time of the new merged task */
+    public Task merge(Task a, Task b, long now) {
+        float ac = a.confWeight();
+        float bc = b.confWeight();
+        int mid = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
+        return Revision.merge(a, b, now, mid, truth(mid));
+    }
 
 
     @Override

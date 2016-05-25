@@ -52,7 +52,7 @@ public class NAgent implements Agent {
 
     /** exploration rate - confidence of initial goal for each action */
     float epsilon = 0.05f;
-    private final double epsilonRandom = 0.005f;
+    private final double epsilonRandom = 0.01f;
 
     float sensorPriority;
     float rewardPriority;
@@ -132,10 +132,8 @@ public class NAgent implements Agent {
 
         final float dRewardThresh = 0.1f; //bigger than a change in X%
         FloatSupplier linearPositive = () -> {
-            if (dReward < 0)
-                return 0;
-            else if (dReward < dRewardThresh)
-                return 0.5f;
+            if (dReward < dRewardThresh)
+                return 0f;
             else
                 return 1f;
         };
@@ -246,17 +244,13 @@ public class NAgent implements Agent {
         nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
         nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
         nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
-        nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
-        nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
+        //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
+        //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
         Task howToReward = nar.ask("(?x ==> (dRp))", ETERNAL, causeOfIncreasedReward -> {
             System.out.println(causeOfIncreasedReward.explanation());
             return true;
         });
-        howToReward.budget().setPriority(1.0f);
-        howToReward.budget().setDurability(1.0f);
-        howToReward.budget().setQuality(1.0f);
-        nar.conceptualize(howToReward, UnitBudget.Full, 1, 1, null);
 
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
     }

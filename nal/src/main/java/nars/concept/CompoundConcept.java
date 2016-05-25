@@ -7,6 +7,7 @@ import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.*;
+import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -473,6 +474,14 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //        }
 
         return q;
+    }
+
+    @Override
+    public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
+        long now = nar.time();
+        return Revision.merge(x, y, now, when,
+            ((BeliefTable)tableFor(y.punc())).truth(now, when)
+        );
     }
 
     @Override

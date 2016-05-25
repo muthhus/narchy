@@ -44,7 +44,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     /** TODO this value can be cached per cycle (when,now) etc */
     @Override
-    @Nullable public final Truth truth(long when, long now) {
+    public final Truth truth(long now, long when) {
 
         if (!temporal.isEmpty()) {
             return temporal.truth(when);
@@ -105,6 +105,8 @@ public class DefaultBeliefTable implements BeliefTable {
         eternal.clear();
         temporal.clear();
     }
+
+
 
     @Nullable
     @Override

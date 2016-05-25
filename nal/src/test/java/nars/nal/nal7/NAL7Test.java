@@ -585,11 +585,11 @@ public class NAL7Test extends AbstractNALTest {
             $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
         */
         test()
-                //.log()
+                .log()
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
-                .mustNotOutput(cycles, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
-                .mustBelieve(cycles, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
+                .mustNotOutput(cycles*2, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
+                .mustBelieve(cycles*2, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
     }
 
 

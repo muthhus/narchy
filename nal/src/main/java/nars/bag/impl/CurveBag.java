@@ -34,9 +34,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     public CurveBag(int capacity, @NotNull Random rng) {
         this(capacity,
-            new DirectSampler(
             //new NormalizedSampler(
-                 power6BagCurve, rng
+            new DirectSampler(
+                 power4BagCurve, rng
         ));
     }
 
@@ -44,19 +44,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         this(1, c);
     }
 
-    public CurveBag(int capacity, @NotNull CurveSampler c) {
-        super(capacity);
+    public CurveBag(int initialCapacity, @NotNull CurveSampler c) {
+        super(initialCapacity);
         this.sampler = c;
-            //new DirectSampler(curve, rng)
-            //new NormalizedSampler(curve, rng);
-
-                                /*if (capacity < 128)*/
-        //items = new ArraySortedItemList<>(capacity);
-                /*else  {
-                    //items = new FractalSortedItemList<>(capacity);
-                    //items = new RedBlackSortedItemList<>(capacity);
-                }*/
-
     }
 
 
@@ -78,7 +68,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     @Nullable
     public BLink<V> peekNext(boolean remove) {
-
 
         while (!isEmpty()) {
 

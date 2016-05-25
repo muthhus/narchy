@@ -321,12 +321,12 @@ public interface Concept extends Termed, Comparable {
 
     @Nullable
     default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(when, now) : Truth.Null;
+        return hasBeliefs() ? beliefs().truth(now, when) : Truth.Null;
     }
 
     @Nullable
     default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(when, now) : Truth.Null;
+        return hasGoals() ? goals().truth(now, when) : Truth.Null;
     }
 
     @Nullable
@@ -342,6 +342,14 @@ public interface Concept extends Termed, Comparable {
     void capacity(ConceptBudgeting cold);
 
     boolean contains(Task t);
+
+    /** produce a merge projected belief/goal given the two temporal inputs, both of which are expected
+     * to be of this concept's term.
+     * @param x may be a belief/goal OR question (truth is null)
+     * @param y must be belief/goal
+     * @return
+     */
+    @Nullable Task merge(Task x, Task y, long when, NAR nar);
 
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);

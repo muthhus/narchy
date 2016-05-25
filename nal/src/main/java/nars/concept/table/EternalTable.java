@@ -6,14 +6,14 @@ import nars.nal.LocalRules;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Terms;
 import nars.truth.Truth;
 import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * Created by me on 5/7/16.
@@ -54,10 +54,6 @@ public class EternalTable extends SortedListTable<Task, Task> {
         if (bsize == 0)
             return null; //nothing to revise with
 
-        Compound newBeliefTerm = newBelief.term();
-
-        final long newTime = newBelief.occurrence(); //nar.time();
-
         //Try to select a best revision partner from existing beliefs:
         Task oldBelief = null;
         float bestRank = 0, bestConf = 0;
@@ -71,9 +67,6 @@ public class EternalTable extends SortedListTable<Task, Task> {
             if (!LocalRules.isRevisible(newBelief, x))
                 continue;
 
-            float matchFactor = Terms.termRelevance(newBeliefTerm, x.term());
-            if (matchFactor <= 0)
-                continue;
 
 //
 //            float factor = tRel * freqMatch;
@@ -89,17 +82,14 @@ public class EternalTable extends SortedListTable<Task, Task> {
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c = newBelief.isEternal() ?
-                    Revision.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf) :
-                    Revision.revision(newBelief, x, newTime, matchFactor, bestConf);
-
+            Truth c = Revision.revisionEternal(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
             if (c == null)
                 continue;
 
             //avoid a duplicate truth at the same time
-            if (newTime == x.occurrence() && c.equals(oldBeliefTruth))
+            if (c.equals(oldBeliefTruth))
                 continue;
-            if (newTime == newBelief.occurrence() && c.equals(newBeliefTruth))
+            if (c.equals(newBeliefTruth))
                 continue;
 
             float cconf = c.conf();
@@ -122,7 +112,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
                     ),
                     newBelief, oldBelief,
                     conclusion,
-                    nar.time(), newTime)
+                    nar.time(), ETERNAL)
                 :
                 null;
     }

@@ -123,6 +123,11 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     }
 
     @Override
+    public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean contains(Task t) {
         return false;
     }

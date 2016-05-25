@@ -207,7 +207,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
             //project the belief to the question's time
             if (taskOcc!=ETERNAL) {
-                belief = belief.projectMatched(task /*question*/, nar, Global.TRUTH_EPSILON);
+                belief = nar.concept(belief).merge(belief, task, task.occurrence(), nar);
             }
 
             if (belief!=null) { //may have become null as a result of projection

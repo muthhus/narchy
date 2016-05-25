@@ -1,12 +1,16 @@
 package nars.concept;
 
+import com.gs.collections.api.tuple.primitive.FloatObjectPair;
+import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.task.Revision;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -244,6 +248,32 @@ public class RevisionTest {
         //with balancing: 1.10 - 0.97
         float tolerance = 0.14f; //where does the additional budget come from? but at least the tasklink balancing results in less inflation
         assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), tolerance); //CONSERVED LINK BUDGET
+
+    }
+
+    @Test public void testTermRelevance() {
+        Compound a = $.$("(a ==>+1 (b ==>+1 c))");
+        Compound b = $.$("(a ==>+0 (b ==>+1 c))");
+        Compound c = $.$("(a ==>+1 (b ==>+0 c))");
+        Compound d = $.$("(a ==>+0 (b ==>+0 c))");
+        Compound e = $.$("(a ==> (b ==>+1 c))");
+
+        FloatObjectPair<Compound> aa = Revision.dtMerge(a, a);
+        assertEquals(0f, aa.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> cc = Revision.dtMerge(c, c);
+        assertEquals(0f, cc.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> ab = Revision.dtMerge(a, b);
+        assertEquals(0.5f, ab.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> ac = Revision.dtMerge(a, c);
+        assertEquals(1f, ac.getOne(), 0.01f);
+
+        FloatObjectPair<Compound> ad = Revision.dtMerge(a, d);
+        assertEquals(1.5f, ad.getOne(), 0.01f);
+
+
 
     }
 }

@@ -21,7 +21,6 @@
 package nars.task;
 
 import nars.*;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nal.Tense;
@@ -40,11 +39,10 @@ import java.util.function.Supplier;
 
 import static nars.Global.dereference;
 import static nars.Op.*;
-import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.truthProjection;
+import static nars.task.Revision.truthProjection;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -205,113 +203,108 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** called when a Concept processes this Task; return false to cancel pocessing */
     boolean onConcept(Concept c);
 
-    @Nullable
-    default Task answer(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
-        return term().equals(newTerm) && occurrence() == question.occurrence() ? this : answerProjected(newTerm, question, memory);
-    }
-
-    @Nullable
-    default Task answerProjected(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
-
-
-        float termRelevance = Terms.termRelevance(newTerm, question.term());
-        if (termRelevance == 0)
-            return null;
-
-        long now = memory.time();
-
-        //TODO avoid creating new Truth instances
-        Truth solTruth = projectTruth(question.occurrence(), now, true);
-        if (solTruth == null)
-            return null;
-
-        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-        long solutionOcc = solTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)solTruth).when : occurrence();
-
-        if (solTruth.conf() < conf()) return this;
-
-        solTruth = solTruth.confMult(termRelevance);
-                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
-                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
-
-        if (solTruth.conf() < conf()) return this;
-
-        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-        if (solutionBudget == null)
-            return null;
-
-
-
-
-        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-        Task solution = new MutableTask(newTerm, punc(), solTruth)
-                    .time(now, solutionOcc)
-                    .parent(question, this)
-                    .budget(solutionBudget)
-                    //.state(state())
-                    //.setEvidence(evidence())
-                    .log("Projected Answer")
-                    //.log("Projected from " + this)
-                    ;
-
-        //} else {
-        //    solution = this;
-        //}
-
-
-
-        ////TODO avoid adding repeat & equal Solution instances
-        //solution.log(new Solution(question));
-
-        return solution;
-    }
-
-    /** projects a belief task to match a question */
-    @Nullable default Task projectMatched(@NotNull Task question, @NotNull Memory memory, float minConf) {
-
-        assert(!question.isEternal());
-        if (question.occurrence() == occurrence())
-            return this; //exact time already
-
-        long now = memory.time();
-
-
-        @NotNull Compound theTerm = term();
-
-
-        //TODO avoid creating new Truth instances
-        Truth solTruth = projectTruth(question.occurrence(), now, false);
-        /*if (solTruth == null)
-            return null;*/
-
-        if (solTruth.conf() < minConf)
-            return null;
-
-        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-        long solutionOcc = solTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)solTruth).when : occurrence();
-
-
-
-        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-        /*if (solutionBudget == null)
-            return null;*/
-
-        Task solution;
-        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
-        solution = new MutableTask(theTerm, punc(), solTruth)
-                .time(now, solutionOcc)
-                .parent(this)
-                .budget(solutionBudget)
-                //.state(state())
-                //.setEvidence(evidence())
-                .log("Projected Belief")
-                //.log("Projected from " + this)
-        ;
-
-        return solution;
-    }
+//    @Nullable
+//    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
+//
+//
+//        float termRelevance = Terms.termRelevance(term(), question.term());
+//        if (termRelevance == 0)
+//            return null;
+//
+//        long now = memory.time();
+//
+//        //TODO avoid creating new Truth instances
+//        Truth solTruth = projectTruth(question.occurrence(), now, true);
+//        if (solTruth == null)
+//            return null;
+//
+//        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+//        long solutionOcc = solTruth instanceof ProjectedTruth ?
+//                ((ProjectedTruth)solTruth).when : occurrence();
+//
+//        if (solTruth.conf() < conf()) return this;
+//
+//        solTruth = solTruth.confMult(termRelevance);
+//                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
+//                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
+//
+//        if (solTruth.conf() < conf()) return this;
+//
+//        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+//        if (solutionBudget == null)
+//            return null;
+//
+//
+//
+//
+//        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+//        Task solution = new MutableTask(question.term() /* question term in case it has different temporality */, punc(), solTruth)
+//                    .time(now, solutionOcc)
+//                    .parent(question, this)
+//                    .budget(solutionBudget)
+//                    //.state(state())
+//                    //.setEvidence(evidence())
+//                    .log("Projected Answer")
+//                    //.log("Projected from " + this)
+//                    ;
+//
+//        //} else {
+//        //    solution = this;
+//        //}
+//
+//
+//
+//        ////TODO avoid adding repeat & equal Solution instances
+//        //solution.log(new Solution(question));
+//
+//        return solution;
+//    }
+//
+//    /** projects a belief task to match a question */
+//    @Nullable default Task projectMatched(@NotNull Task question, @NotNull Memory memory, float minConf) {
+//
+//        assert(!question.isEternal());
+//        if (question.occurrence() == occurrence())
+//            return this; //exact time already
+//
+//        long now = memory.time();
+//
+//
+//        @NotNull Compound theTerm = term();
+//
+//
+//        //TODO avoid creating new Truth instances
+//        Truth solTruth = projectTruth(question.occurrence(), now, false);
+//        /*if (solTruth == null)
+//            return null;*/
+//
+//        if (solTruth.conf() < minConf)
+//            return null;
+//
+//        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+//        long solutionOcc = solTruth instanceof ProjectedTruth ?
+//                ((ProjectedTruth)solTruth).when : occurrence();
+//
+//
+//
+//        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+//        /*if (solutionBudget == null)
+//            return null;*/
+//
+//        Task solution;
+//        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+//        solution = new MutableTask(theTerm, punc(), solTruth)
+//                .time(now, solutionOcc)
+//                .parent(this)
+//                .budget(solutionBudget)
+//                //.state(state())
+//                //.setEvidence(evidence())
+//                .log("Projected Belief")
+//                //.log("Projected from " + this)
+//        ;
+//
+//        return solution;
+//    }
 
 
     char punc();

@@ -347,7 +347,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                 //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
 
                 for (BLink i : tmp) {
-                    items.add(i);
+                    if (i.isDeleted()) {
+                        removeKeyForValue(i);
+                    } else {
+                        items.add(i);
+                    }
                 }
 
             } else {
@@ -359,7 +363,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         int i = size()-1;
         BLink<V> ii;
         while (i > 0 && (ii = item(i)).isDeleted()) {
-            if (removeKey(ii.get()) == null) {
+            if (removeKeyForValue(ii) == null) {
                 throw new RuntimeException("Bag fault while trying to remove key by item value");
                 //exhaustive removal, since the BLink has lost its key
                 //removeKey((BLink<BLink<V>>) ii);

@@ -147,7 +147,7 @@ public abstract class Param extends Container implements Level {
     /** Default durability of input judgment */
     public float DEFAULT_GOAL_DURABILITY = 0.5f;
     /** Default priority of input question */
-    float DEFAULT_QUEST_PRIORITY = 0.5f;
+    public float DEFAULT_QUEST_PRIORITY = 0.5f;
     /** Default durability of input question */
     float DEFAULT_QUEST_DURABILITY = 0.5f;
 
