@@ -32,7 +32,7 @@ public class MySTMClustered extends STMClustered {
 
 		LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
-		nodes().stream().sorted((a, b) -> Float.compare(
+		net.nodeStream().sorted((a, b) -> Float.compare(
 				a.priSum(), b.priSum())).forEach(n -> {
 			double[] tc = n.coherence(0);
 

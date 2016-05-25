@@ -70,10 +70,15 @@ public class Node extends ArrayRealVector  {
         this.localError = localError;
     }
 
+    public void mulLocalError(double alpha) {
+        this.localError *= alpha;
+    }
+
     public double getDistanceSq(final double[] x) {
         double s = 0;
         final double[] y = getDataRef();
-        for (int i = 0; i < getDimension(); i++) {
+        int l = y.length;
+        for (int i = 0; i < l; i++) {
             final double d = y[i] - x[i];
             s += d*d;
         }
@@ -121,6 +126,8 @@ public class Node extends ArrayRealVector  {
     public double getDistanceSq(Node b) {
         return getDistanceSq(b.getDataRef());
     }
+
+
 
     //    public double distanceTo(double[] x) {
 //        double retVal = 0;

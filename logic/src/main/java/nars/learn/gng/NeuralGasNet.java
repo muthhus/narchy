@@ -1,25 +1,28 @@
 package nars.learn.gng;
 
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.graph.SimpleGraph;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * from: https://github.com/scadgek/NeuralGas
  * TODO use a graph for incidence structures to avoid some loops
  */
-abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connection<N>> {
+abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Connection<N>>*/ {
+
+
     private final int dimension;
+
+
+    private final SemiDenseIntUndirectedGraph e;
+    private final Node[] node;
 
     private int iteration;
 
 
-    private int maxNodes;
+    private final int maxNodes;
     private int lambda;
     private int maxAge;
     private double alpha;
@@ -62,14 +65,6 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
         return maxAge;
     }
 
-    public double getAlpha() {
-        return alpha;
-    }
-
-    public double getBeta() {
-        return beta;
-    }
-
     public double getEpsW() {
         return epsW;
     }
@@ -79,11 +74,15 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
     }
 
 
-    public NeuralGasNet(int dimension, int maxNodes) {
+    public NeuralGasNet(int dimension, short maxNodes) {
 
-        super((sourceVertex, targetVertex) -> {
-            throw new UnsupportedOperationException();
-        });
+        super();
+
+
+        this.e = new SemiDenseIntUndirectedGraph(maxNodes);
+        this.node = new Node[maxNodes];
+        clear();
+
 
         this.iteration = 0;
         this.dimension = dimension;
@@ -102,7 +101,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
 
         /** nodes should begin with randomized coordinates */
         for (int i = 0; i < maxNodes; i++) {
-            addVertex((N) newNode(i, dimension));
+            node[i] = newNode(i, dimension);
         }
 
 
@@ -115,26 +114,36 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
 //        pw.println("*");
     }
 
+    public void forEachVertex(Consumer<N> each) {
+        for (Node n : node)
+            each.accept((N)n);
+    }
+
+    public void clear() {
+        e.clear();
+        Arrays.fill(node, null);
+    }
+
     @NotNull
     abstract public N newNode(int i, int dims);
 
     public N closest(double... x) {
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
-        N closest = null;
-        for (N node : vertexSet()) {
-            if (node.getDistanceSq(x) < minDist)
-                closest = node;
+        Node closest = null;
+        for (Node n : node) {
+            if (n.getDistanceSq(x) < minDist)
+                closest = n;
         }
 
-        return closest;
+        return (N) closest;
     }
 
     /**
      * translates all nodes uniformly
      */
     public void addToNodes(double[] x) {
-        for (Node n : vertexSet()) {
+        for (Node n : node) {
             n.add(x);
         }
     }
@@ -144,162 +153,155 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
         double maxDist = Double.NEGATIVE_INFINITY;
-        N closest = null;
-        N nextClosestNode = null;
-        N furthest = null;
-        for (N node : vertexSet()) {
-            double dd = node.updateDistanceSq(x);
+        short closest = -1;
+        short nextClosestNode = -1;
+        short furthest = -1;
+
+        final int nodes = maxNodes;
+        for (short j = 0; j < nodes; j++) {
+            double dd = node[j].updateDistanceSq(x);
 
             if (dd > maxDist) {
-                furthest = node;
+                furthest = j;
                 maxDist = dd;
             }
             if (dd < minDist) {
-                closest = node;
+                closest = j;
                 minDist = dd;
             }
-
         }
 
         double minDist2 = Double.POSITIVE_INFINITY;
-        for (N node : vertexSet()) {
-            if (node == closest) continue;
-            double dd = node.getLocalDistanceSq(); //TODO cache this localDist
+        for (short j = 0; j < nodes; j++) {
+            Node n = node[j];
+            if (j == closest) continue;
+            double dd = n.getLocalDistanceSq(); //TODO cache this localDist
             if (dd < minDist2) {
-                nextClosestNode = node;
+                nextClosestNode = j;
                 minDist2 = dd;
             }
         }
 
 
-        if (closest == null || nextClosestNode == null) {
+        if (closest == -1 || nextClosestNode == -1) {
             throw new RuntimeException("closest=" + closest + ", nextClosest=" + nextClosestNode);
             //return lastNode;
         }
 
         //update local error of the "winner"
-        closest.setLocalError(closest.getLocalError() + closest.getLocalDistance());
+        Node closestNode = node[closest];
+        closestNode.setLocalError(closestNode.getLocalError() + closestNode.getLocalDistance());
 
         //update weights for "winner"
-        closest.update(getEpsW(), x);
+        closestNode.update(getEpsW(), x);
 
         //update weights for "winner"'s neighbours
-        for (Connection connection : edgesOf(closest)) {
-            Node toUpdate = null;
-            if (connection.from == closest) {
-                toUpdate = connection.to;
-            } else if (connection.to == closest) {
-                toUpdate = connection.from;
-            }
+        short sc = closest;
+        e.edgesOf(closest, (connection,age) -> {
+            Node toUpdate = node[connection];
 
             //if (toUpdate != null) { //should not be null
             toUpdate.update(getEpsN(), x);
-            connection.age();
-            //}
-        }
+            e.addEdge(sc, connection, +1); //age by one iteration
+        });
+
 
         //remove connections with age > maxAge
-        edgeSet().removeIf(c -> (c.getAge() > getMaxAge()));
+        e.removeEdgeIf(c -> c > maxAge);
 
         //set connection between "winners" to age zero
-        Connection nc = new Connection(closest, nextClosestNode);
-        removeEdge(nc);
-        addEdge(nc);
+        e.setEdge(closest, nextClosestNode, 0);
 
 
         //if iteration is lambda
         if (iteration != 0 && iteration % getLambda() == 0) {
 
-            int nextID = furthest.id;
-            removeVertex(furthest);
-            removed(furthest);
+            e.removeVertex(furthest);
+            removed((N) node[furthest]);
 
             //find node with maximal local error
 
-            N maxErrorNode = null;
+            short maxErrorID = -1;
             {
                 double maxError = Double.NEGATIVE_INFINITY;
-                for (N node : vertexSet()) {
-                    if (node.getLocalError() > maxError) {
-                        maxErrorNode = node;
-                        maxError = node.getLocalError();
+                for (int i = 0, nodeLength = node.length; i < nodeLength; i++) {
+                    Node n = node[i];
+                    if (i == furthest) continue; //skip furthest which was supposed to be removed, and will be replaced below
+                    if (n.getLocalError() > maxError) {
+                        maxErrorID = (short) i;
+                        maxError = n.getLocalError();
                     }
                 }
 
-                if (maxErrorNode == null) {
-                    throw new RuntimeException("maxErrorNode=null");
+                if (maxErrorID == -1) {
+                    throw new RuntimeException("maxErrorID=null");
                 }
             }
 
-            N maxErrorNeighbour = null;
+            short maxErrorNeighborID = -1;
+            {
+                //if (e has edges for maxErrorID..)
+                final double[] maxError = {Double.NEGATIVE_INFINITY};
+                short _maxErrorNeighbour[] = new short[]{-1};
+                e.edgesOf(maxErrorID, (otherNodeID, age) -> {
 
-            Set<Connection<N>> ee = edgesOf(maxErrorNode);
-            if (!ee.isEmpty()) {
-                //find max error neighbour of the mentioned node
-                double maxError = Double.NEGATIVE_INFINITY;
+                    Node otherNode = node[otherNodeID];
 
-                for (Connection<N> connection : ee) {
-
-                    N otherNode = connection.to == maxErrorNode ? connection.from : connection.to;
-
-                    if (otherNode.getLocalError() > maxError) {
-                        maxErrorNeighbour = otherNode;
-                        maxError = otherNode.getLocalError();
+                    if (otherNode.getLocalError() > maxError[0]) {
+                        _maxErrorNeighbour[0] = otherNodeID;
+                        maxError[0] = otherNode.getLocalError();
                     }
+                });
 
+                if (_maxErrorNeighbour[0] != -1) {
+                    maxErrorNeighborID = _maxErrorNeighbour[0];
+                } else {
+
+                    if (maxErrorNeighborID == -1) {
+                        do {
+                            maxErrorNeighborID = randomNode();
+                        } while (maxErrorID == maxErrorNeighborID);
+                    }
                 }
-            } else {
-                maxErrorNeighbour = randomNode(maxErrorNode);
             }
 
-            if (maxErrorNeighbour == null) {
-                throw new RuntimeException("maxErrorNeighbor=null");
-                //return null;
-            }
+//            if (maxErrorNeighborID == -1) {
+//                throw new RuntimeException("maxErrorNeighbor=null");
+//                //return null;
+//            }
 
             //remove connection between them
-            removeEdge(maxErrorNode, maxErrorNeighbour);
+            e.removeEdge(maxErrorID, maxErrorNeighborID);
 
-            //System.out.println("creating new node " + nextID + " in: " + vertexSet());
+            //System.out.println("creating new node " + nextID + " in: " + node);
 
             //create node between errorest nodes
-            N newNode = newNode(nextID, dimension);
-            newNode.set(maxErrorNode, maxErrorNeighbour);
-            addVertex(newNode);
+            N newNode = newNode(furthest, dimension);
+            Node maxErrorNeighbor = node[maxErrorNeighborID];
+            Node maxErrorNode = node[maxErrorID];
+            newNode.set(maxErrorNode, maxErrorNeighbor);
+            node[furthest] = newNode;
 
-            if (maxErrorNode.id == newNode.id) {
+            if (maxErrorID == furthest) {
                 throw new RuntimeException("new node has same id as max error node");
             }
 
             //create connections between them
-            addEdge(new Connection(maxErrorNode, newNode));
-            addEdge(new Connection(maxErrorNeighbour, newNode));
+            e.setEdge(maxErrorID, furthest, 0);
+            e.setEdge(maxErrorNeighborID, furthest, 0);
 
             //update errors of the error nodes
-            maxErrorNode.setLocalError(maxErrorNode.getLocalError() * getAlpha());
-            maxErrorNeighbour.setLocalError(maxErrorNeighbour.getLocalError() * getAlpha());
+            maxErrorNode.mulLocalError(alpha);
+            maxErrorNeighbor.mulLocalError(alpha);
+        }
 
 
+        //System.out.println(node.size() + " nodes, " + edgeSet().size() + " edges in neuralgasnet");
 
-    }
-
-
-    //System.out.println(vertexSet().size() + " nodes, " + edgeSet().size() + " edges in neuralgasnet");
-
-    //update errors of the nodes
-    for(
-    Node node
-    :
-
-    vertexSet()
-
-    )
-
-    {
-        node.setLocalError(node.getLocalError() * getBeta());
-
-        //System.out.println("  "+ node);
-    }
+        //update errors of the nodes
+        for (Node n : node) {
+            n.mulLocalError(beta);
+        }
 
 //            //save positions
 //            for (Node node : nodes)
@@ -309,33 +311,40 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
 //            pw.println("*");
 
 
-    //System.out.println("Iteration: " + iteration++);
+        //System.out.println("Iteration: " + iteration++);
 
-    //pw.close();
+        //pw.close();
 
-    iteration++;
+        iteration++;
 
-    return closest;
-}
-
-    private N randomNode(N except) {
-        Set<N> vv = vertexSet();
-        int vs = vv.size();
-        if (vs < 2)
-            throw new UnsupportedOperationException();
+        return node(closest);
+    }
 
 
-        while (true) { //HACK
-            int n = (int) Math.floor(Math.random() * vs);
-            Iterator<N> vi = vv.iterator();
-            while (vi.hasNext()) {
-                N v = vi.next();
-                if (n-- == 0) {
-                    if (v != except)
-                        return v;
-                }
-            }
-        }
+
+    public final N node(int i) {
+        return (N) node[i];
+    }
+
+    private short randomNode() {
+        return (short) (Math.random() * node.length);
+//        Set<N> vv = node;
+//        int vs = vv.size();
+//        if (vs < 2)
+//            throw new UnsupportedOperationException();
+//
+//
+//        while (true) { //HACK
+//            int n = (int) Math.floor(Math.random() * vs);
+//            Iterator<N> vi = vv.iterator();
+//            while (vi.hasNext()) {
+//                N v = vi.next();
+//                if (n-- == 0) {
+//                    if (v != except)
+//                        return v;
+//                }
+//            }
+//        }
     }
 
     /**
@@ -345,35 +354,39 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
 
     }
 
-    private void addEdge(Connection<N> connection) {
-
-        addEdge(connection.from, connection.to, connection);
+    public Stream<N> nodeStream() {
+        return Stream.of(node).map(n -> (N)n);
     }
 
-    public double[] getDimensionRange(final int dimension) {
-        final double[] x = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+//    private void addEdge(Connection<N> connection) {
+//
+//        addEdge(connection.from, connection.to, connection);
+//    }
 
-        for (Node node : vertexSet()) {
-            double v = node.getEntry(dimension);
-            if (v < x[0]) x[0] = v;
-            if (v > x[1]) x[1] = v;
-        }
+//    public double[] getDimensionRange(final int dimension) {
+//        final double[] x = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+//
+//        for (Node node : node) {
+//            double v = node.getEntry(dimension);
+//            if (v < x[0]) x[0] = v;
+//            if (v > x[1]) x[1] = v;
+//        }
+//
+//        return x;
+//    }
 
-        return x;
-    }
-
-    /**
-     * pulls a dimension out of all the nodes, as an array, and sorts it
-     */
-    public double[] getDimension(int dim) {
-        double[] d = new double[vertexSet().size()];
-        int i = 0;
-        for (Node n : vertexSet()) {
-            d[i++] = n.getEntry(dim);
-        }
-        Arrays.sort(d);
-        return d;
-    }
+//    /**
+//     * pulls a dimension out of all the nodes, as an array, and sorts it
+//     */
+//    public double[] getDimension(int dim) {
+//        double[] d = new double[node.size()];
+//        int i = 0;
+//        for (Node n : node) {
+//            d[i++] = n.getEntry(dim);
+//        }
+//        Arrays.sort(d);
+//        return d;
+//    }
 }
 
 //package nars.rl.gng;

@@ -31,10 +31,10 @@ public class STMClustered extends STM {
     final int FREQ = 1;
 
 
-    final int clusters;
+    final short clusters;
 
-    private final ArrayBag<Task> bag;
-    private final NeuralGasNet<TasksNode> net;
+    public final ArrayBag<Task> bag;
+    public final NeuralGasNet<TasksNode> net;
     protected long now;
 
     final float forgetRate = 0.01f; //TODO tune based on capacity, window size, etc.
@@ -224,7 +224,7 @@ public class STMClustered extends STM {
         super(nar, capacity);
 
         //TODO make this adaptive
-        clusters = Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
+        clusters = (short)Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
 
         this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {
@@ -233,7 +233,7 @@ public class STMClustered extends STM {
                 return new TLink(i, b, scale);
             }
         };
-        this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
+        this.net = new NeuralGasNet<TasksNode>(DIMENSIONS, clusters) {
             @NotNull
             @Override
             public STMClustered.TasksNode newNode(int i, int dims) {
@@ -309,7 +309,7 @@ public class STMClustered extends STM {
         out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
             + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
         out.println("\tBag Priority: " + bagStatistics());
-        net.vertexSet().forEach(v -> {
+        net.forEachVertex(v -> {
             out.println(v);
             out.println("\t[Avg,Coherence]: Temporal=" + Arrays.toString(v.coherence(0)) +
                         "\tFrequency=" + Arrays.toString(v.coherence(1)));
@@ -324,14 +324,13 @@ public class STMClustered extends STM {
 
 
     public IntSummaryStatistics nodeStatistics() {
-        return net.vertexSet().stream().mapToInt(v -> v.size()).summaryStatistics();
+        return net.nodeStream().mapToInt(v -> v.size()).summaryStatistics();
     }
 
     public DoubleSummaryStatistics bagStatistics() {
         return StreamSupport.stream(bag.spliterator(), false).mapToDouble(v -> v.pri()).summaryStatistics();
     }
 
-    public final Set<TasksNode> nodes() { return net.vertexSet(); }
 
     abstract static class EventGenerator implements Consumer<NAR> {
 

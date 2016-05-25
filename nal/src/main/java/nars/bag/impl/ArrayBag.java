@@ -219,18 +219,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                             putNew(i, link(i, b, scale))
                     );
 
-//        //TODO optional displacement until next update, allowing sub-threshold to grow beyond threshold
-//        BagBudget<V> displaced = null;
-//        if (full()) {
-//            if (getPriorityMin() > b.getPriority()) {
-//                //insufficient priority to enter the bag
-//                //remove the key which was put() at beginning of this method
-//                return index.removeKey(i);
-//            }
-//            displaced = removeLowest();
-//        }
-        //now that room is available:
-
     }
 
     /**
@@ -276,7 +264,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     protected BLink<V> putQueue(V x, @NotNull Budgeted b, float scale) {
         BLink<V> link = link(x, b, scale);
         pending.add(link);
-        return link;
+        //return link;
+        return null;
     }
 
 //    @Nullable
