@@ -199,13 +199,7 @@ abstract public class NeuralGasNet<N extends Node> extends SimpleGraph<N, Connec
         }
 
         //remove connections with age > maxAge
-        List<Connection<N>> toRemove = new FasterList(1);
-        for (Connection c : edgeSet()) {
-            if (c.getAge() > getMaxAge()) {
-                toRemove.add(c);
-            }
-        }
-        removeAllEdges(toRemove);
+        edgeSet().removeIf(c -> (c.getAge() > getMaxAge()));
 
         //set connection between "winners" to age zero
         Connection nc = new Connection(closest, nextClosestNode);

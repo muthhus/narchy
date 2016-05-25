@@ -3,6 +3,8 @@ package nars.learn.gng;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 
+import java.util.Objects;
+
 /**
  * Created by Scadgek on 11/3/2014.
  */
@@ -26,6 +28,7 @@ public class Node extends ArrayRealVector  {
     @Override
     public int hashCode() {
         //return Objects.hash(id);
+
         return (id+1)*37;
     }
 

@@ -3,12 +3,11 @@ package nars.learn.gng;
 
 import java.util.Objects;
 
-/**
- * Created by Scadgek on 11/3/2014.
- */
+
 public class Connection<N extends Node>  {
     public final N from;
     public final N to;
+    private final int hash;
     private int age;
 
     public Connection(N from, N to) {
@@ -22,20 +21,23 @@ public class Connection<N extends Node>  {
         this.age = 0;
         this.from = from;
         this.to = to;
+        this.hash = Objects.hash(from.id, to.id);
+
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
+        if (obj == this) return true;
         Connection c = (Connection)obj;
-        return from.id == c.from.id && to.id == c.to.id;
+        return (from.id == c.from.id && to.id == c.to.id);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(from.id, to.id);
+    public final int hashCode() {
+        return hash;
     }
 
-    public int getAge() {
+    public final int getAge() {
         return age;
     }
 
@@ -43,7 +45,7 @@ public class Connection<N extends Node>  {
         this.age = age;
     }
 
-    public void age() {
+    public final void age() {
         age += 1;
     }
 
