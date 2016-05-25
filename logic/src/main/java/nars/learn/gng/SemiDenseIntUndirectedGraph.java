@@ -1,6 +1,7 @@
 package nars.learn.gng;
 
 import com.gs.collections.api.block.predicate.primitive.IntPredicate;
+import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
 import com.gs.collections.api.block.procedure.primitive.IntProcedure;
 import com.gs.collections.api.block.procedure.primitive.ShortIntProcedure;
 import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
@@ -11,26 +12,26 @@ import ognl.IntHashMap;
 /**
  * Created by me on 5/25/16.
  */
-public class SemiDenseIntUndirectedGraph {
+public class SemiDenseIntUndirectedGraph extends ShortIntHashMap {
 
 
     protected final int V; //# of vertices
-    protected final ShortIntHashMap[] adj;  //Array of adjacency lists
+    protected final MyShortIntHashMap[] adj;  //Array of adjacency lists
 
     //Constructor with a pre-supplied number of vertices
     SemiDenseIntUndirectedGraph(short V) {
         this.V = V;
         
-        adj = new ShortIntHashMap[V];
+        adj = new MyShortIntHashMap[V];
 
         for (int i = 0; i < V; i++) {
-            adj[i] = new ShortIntHashMap(V);
+            adj[i] = new MyShortIntHashMap(V);
         }
 
     }
 
     public void clear() {
-        for (ShortIntHashMap a : adj)
+        for (MyShortIntHashMap a : adj)
             a.clear();
     }
 
@@ -46,7 +47,7 @@ public class SemiDenseIntUndirectedGraph {
 
     //Connect two vertices (first to second)
     public void setEdge(short first, short second, int value) {
-        ShortIntHashMap[] e = this.adj;
+        MyShortIntHashMap[] e = this.adj;
         e[first].put(second, value);
         e[second].put(first, value);
     }
@@ -55,31 +56,35 @@ public class SemiDenseIntUndirectedGraph {
         return adj[first].get(second);
     }
 
-    public void addEdge(short first, short second, int deltaValue) {
-        ShortIntHashMap[] e = this.adj;
+    public void addToEdges(short i, int d) {
+        adj[i].addToValues(d); //age by one iteration
+    }
+
+    public void addToEdge(short first, short second, int deltaValue) {
+        MyShortIntHashMap[] e = this.adj;
         e[first].addToValue(second, deltaValue);
         e[second].addToValue(first, deltaValue);
     }
 
     public void removeVertex(short v) {
-        ShortIntHashMap[] e = this.adj;
+        MyShortIntHashMap[] e = this.adj;
         for (int i = 0, eLength = e.length; i < eLength; i++) {
-            ShortIntHashMap ii = e[i];
+            MyShortIntHashMap ii = e[i];
             if (i == v) ii.clear();
             else ii.remove(v);
         }
     }
 
     public void removeEdge(short first, short second) {
-        ShortIntHashMap[] e = this.adj;
+        MyShortIntHashMap[] e = this.adj;
         e[first].remove(second);
         e[second].remove(first);
     }
 
     public void removeEdgeIf(IntPredicate filter) {
-        ShortIntHashMap[] e = this.adj;
+        MyShortIntHashMap[] e = this.adj;
         ShortArrayList toRemove = new ShortArrayList();
-        for (ShortIntHashMap h : e) {
+        for (MyShortIntHashMap h : e) {
             h.forEachKeyValue((k,v) -> {
                 if (filter.accept(v))
                     toRemove.add(k);

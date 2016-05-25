@@ -202,8 +202,8 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
             //if (toUpdate != null) { //should not be null
             toUpdate.update(getEpsN(), x);
-            e.addEdge(sc, connection, +1); //age by one iteration
         });
+        e.addToEdges(sc, +1);
 
 
         //remove connections with age > maxAge
