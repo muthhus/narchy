@@ -4,6 +4,7 @@ import com.gs.collections.api.LazyShortIterable;
 import com.gs.collections.api.RichIterable;
 import com.gs.collections.api.ShortIterable;
 import com.gs.collections.api.block.function.primitive.*;
+import com.gs.collections.api.block.predicate.primitive.IntPredicate;
 import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
 import com.gs.collections.api.block.procedure.Procedure;
 import com.gs.collections.api.block.procedure.Procedure2;
@@ -20,6 +21,7 @@ import com.gs.collections.api.set.primitive.MutableShortSet;
 import com.gs.collections.api.tuple.primitive.ShortIntPair;
 import com.gs.collections.impl.SpreadFunctions;
 import com.gs.collections.impl.lazy.AbstractLazyIterable;
+import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import com.gs.collections.impl.map.mutable.primitive.AbstractMutableIntValuesMap;
 import com.gs.collections.impl.map.mutable.primitive.AbstractSentinelValues;
 import com.gs.collections.impl.map.mutable.primitive.MutableShortKeysMap;
@@ -34,6 +36,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/** accelerated short int hashmap. not thread safe */
 public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements MutableShortIntMap, Externalizable, MutableShortKeysMap {
     private static final int EMPTY_VALUE = 0;
     private static final long serialVersionUID = 1L;
@@ -67,9 +70,9 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     public void addToValues(int d) {
 
         if (sentinelValues!=null) {
-            if (sentinelValues.containsValue(0))
+            if (sentinelValues.containsZeroKey)
                 sentinelValues.zeroValue += d;
-            if (sentinelValues.containsValue(1))
+            if (sentinelValues.containsOneKey)
                 sentinelValues.oneValue += d;
         }
 
@@ -86,25 +89,48 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
+    final ShortArrayList toRemove = new ShortArrayList(0);
 
-    public void filter(ShortIntPredicate predicate) {
-//        if(this.sentinelValues != null) {
-//            if(this.sentinelValues.containsZeroKey && !predicate.accept((short)0, this.sentinelValues.zeroValue)) {
-//                result.put((short)0, this.sentinelValues.zeroValue);
-//            }
-//
-//            if(this.sentinelValues.containsOneKey && !predicate.accept((short)1, this.sentinelValues.oneValue)) {
-//                result.put((short)1, this.sentinelValues.oneValue);
-//            }
-//        }
-//
-//        for(int i = 0; i < this.keys.length; ++i) {
-//            if(isNonSentinel(this.keys[i]) && !predicate.accept(this.keys[i], this.values[i])) {
-//                result.put(this.keys[i], this.values[i]);
-//            }
-//        }
-//
-//        return result;
+    public void filter(IntPredicate toKeep) {
+        if(this.sentinelValues != null) {
+            if (this.sentinelValues.containsZeroKey) {
+                if (!toKeep.accept(this.sentinelValues.zeroValue)) {
+                    removeKey((short) 0);
+                }
+            }
+        }
+        if(this.sentinelValues != null) { //must check again
+            if(this.sentinelValues.containsOneKey) {
+                if (!toKeep.accept(this.sentinelValues.oneValue)) {
+                    removeKey((short)1);
+                }
+            }
+
+        }
+
+        ShortArrayList toRemove = this.toRemove;
+
+        short[] keys = this.keys;
+        int sizeBefore = keys.length;
+        for(int i = 0; i < sizeBefore; ++i) {
+            short k = keys[i];
+            if(isNonSentinel(k)) {
+                if (!toKeep.accept(this.values[i])) {
+                    toRemove.add(k);
+                }
+            }
+        }
+
+        if (!toRemove.isEmpty()) {
+            int s = toRemove.size();
+            for (int i = 0; i < s; i++) {
+                removeKey(toRemove.get(i));
+            }
+            toRemove.clear();
+
+            if (s >= sizeBefore / 2)
+                compact();
+        }
     }
 
 
@@ -135,6 +161,14 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     @Override
     protected final AbstractMutableIntValuesMap.SentinelValues getSentinelValues() {
         throw new UnsupportedOperationException();
+    }
+    public boolean isEmpty() {
+        SentinelValues s = this.sentinelValues;
+        return this.occupiedWithData == 0 && (s == null || s.size() == 0);
+    }
+    public final int size() {
+        SentinelValues s = this.sentinelValues;
+        return this.occupiedWithData + (s == null?0:s.size());
     }
 
 
@@ -809,38 +843,47 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
     public void forEachKey(ShortProcedure procedure) {
-        if(this.sentinelValues != null) {
-            if(this.sentinelValues.containsZeroKey) {
+        SentinelValues s = this.sentinelValues;
+        if(s != null) {
+            if(s.containsZeroKey) {
                 procedure.value((short) 0);
             }
 
-            if(this.sentinelValues.containsOneKey) {
+            if(s.containsOneKey) {
                 procedure.value((short) 1);
             }
         }
 
-        for(int i = 0; i < this.keys.length; ++i) {
-            if(isNonSentinel(this.keys[i])) {
-                procedure.value(this.keys[i]);
+        short[] kk = this.keys;
+        int l = kk.length;
+        for(int i = 0; i < l; ++i) {
+            short k = kk[i];
+            if(isNonSentinel(k)) {
+                procedure.value(k);
             }
         }
 
     }
 
     public void forEachKeyValue(ShortIntProcedure procedure) {
-        if(this.sentinelValues != null) {
-            if(this.sentinelValues.containsZeroKey) {
-                procedure.value((short) 0, this.sentinelValues.zeroValue);
+        SentinelValues s = this.sentinelValues;
+        if(s != null) {
+            if(s.containsZeroKey) {
+                procedure.value((short) 0, s.zeroValue);
             }
 
-            if(this.sentinelValues.containsOneKey) {
-                procedure.value((short) 1, this.sentinelValues.oneValue);
+            if(s.containsOneKey) {
+                procedure.value((short) 1, s.oneValue);
             }
         }
 
-        for(int i = 0; i < this.keys.length; ++i) {
-            if(isNonSentinel(this.keys[i])) {
-                procedure.value(this.keys[i], this.values[i]);
+        short[] kk = this.keys;
+        int[] values = this.values;
+        int l = kk.length;
+        for(int i = 0; i < l; ++i) {
+            short key = kk[i];
+            if(isNonSentinel(key)) {
+                procedure.value(key, values[i]);
             }
         }
 
@@ -1469,7 +1512,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
-    static class SentinelValues extends AbstractSentinelValues {
+    static final class SentinelValues extends AbstractSentinelValues {
 
         public boolean containsZeroKey;
         public boolean containsOneKey;

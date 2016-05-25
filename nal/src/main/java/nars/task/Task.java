@@ -316,10 +316,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return isBelief() || isGoal();
     }
 
-    /** allows for budget feedback that occurrs on revision */
-    default boolean onRevision(Task conclusion) {
-        return true;
-    }
+//    /** allows for budget feedback that occurrs on revision */
+//    default boolean onRevision(Task conclusion) {
+//        return true;
+//    }
 
     /** for question tasks: when an answer appears.
      *  return false if this question is finished and should be removed from a table containing it */

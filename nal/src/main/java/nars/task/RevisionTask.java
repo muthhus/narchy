@@ -1,5 +1,9 @@
 package nars.task;
 
+import nars.Global;
+import nars.bag.Bag;
+import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -32,15 +36,60 @@ public class RevisionTask extends MutableTask {
     @Override public boolean onConcept(@NotNull Concept c) {
         super.onConcept(c);
 
-        Task newBelief = getParentTask();
-        if (newBelief!=null)
-            newBelief.onRevision(this);
+        float resultPri = pri();
+        Task parentNewBelief = getParentTask();
+        Task parentOldBelief = getParentBelief();
+        float newBeliefConf = parentNewBelief.confWeight();
+        float newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
 
-        Task oldBelief = getParentBelief();
-        if (oldBelief!=null)
-            oldBelief.onRevision(this);
+        //Balance Tasks
+        BudgetFunctions.balancePri(
+                parentNewBelief.budget(), parentOldBelief.budget(),
+                resultPri,
+                newBeliefContribution);
+
+        //Balance Tasklinks
+        Bag<Task> tasklinks = c.tasklinks();
+        BudgetFunctions.balancePri(
+                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+                resultPri,
+                newBeliefContribution);
+
+
+//        if (parentNewBelief!=null)
+//            weaken(parentNewBelief);
+//            //parentNewBelief.onRevision(this);
+//
+//        if (parentOldBelief!=null)
+//            weaken(parentOldBelief);
+//            //oldBelief.onRevision(this);
 
         return true;
+    }
+
+    private void weaken(Task parent) {
+        if (parent.isDeleted())
+            return;
+
+        //weaken the premise links inversely proportionally to the amount of increase in truth confidence
+        float n = confWeight();
+        float t = parent.confWeight();
+
+        if (n <= t) {
+            if (Global.DEBUG)
+                throw new RuntimeException("Revision failed to increase confidence");
+            return;
+        }
+
+        float factor = n / (n + t);
+
+        //multiplyPremise(factor, true);
+
+        //weaken this task iself
+        Budget b = parent.budget();
+        b.andPriority(factor);
+        b.andDurability(factor);
+
     }
 
 }

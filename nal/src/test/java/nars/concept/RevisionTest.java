@@ -218,19 +218,25 @@ public class RevisionTest {
 
         assertEquals(0.5f, b.beliefs().topEternalTruth(null).conf(), 0.01f);
 
+        System.out.println("Tasklinks: "); tasklinks.print();
+        System.out.println("--------");
+
         b.believe(1.0f, 0.6f).run(1);
         assertEquals(3, tasklinks.size());
 
-        b.print();
-        tasklinks.print();
+        System.out.println("Beliefs: "); b.print();
+        System.out.println("\tSum Priority: " + b.priSum());
+        System.out.println("Tasklinks: "); tasklinks.print();
+        System.out.println("--------");
 
         float linksBeforeRevisionLink = tasklinks.priSum();
 
-        System.out.println("--------");
-        b.run(1); //process revision after being input
+
 
         float beliefAfter2;
-        assertEquals(0.97, beliefAfter2 = b.priSum(), 0.01f);
+        assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.01f);
+        assertEquals(0.8f, tasklinks.priSum(), 0.01f);
+
         assertEquals(0.71f, b.beliefs().topEternalTruth(null).conf(), 0.01f); //the revised task on top
 
         b.print();

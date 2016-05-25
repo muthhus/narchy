@@ -4,6 +4,7 @@ import com.gs.collections.api.block.predicate.primitive.IntPredicate;
 import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
 import com.gs.collections.api.block.procedure.primitive.IntProcedure;
 import com.gs.collections.api.block.procedure.primitive.ShortIntProcedure;
+import com.gs.collections.api.block.procedure.primitive.ShortProcedure;
 import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import com.gs.collections.impl.map.mutable.primitive.ShortIntHashMap;
 import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
@@ -83,21 +84,16 @@ public class SemiDenseIntUndirectedGraph extends ShortIntHashMap {
 
     public void removeEdgeIf(IntPredicate filter) {
         MyShortIntHashMap[] e = this.adj;
-        ShortArrayList toRemove = new ShortArrayList();
         for (MyShortIntHashMap h : e) {
-            h.forEachKeyValue((k,v) -> {
-                if (filter.accept(v))
-                    toRemove.add(k);
-            });
-            if (!toRemove.isEmpty()) {
-                toRemove.forEach(h::removeKey);
-                toRemove.clear();
-            }
+            h.filter(filter);
         }
     }
 
-    public void edgesOf(short vertex, ShortIntProcedure each) {
-        adj[vertex].forEachKeyValue(each);
+    public void edgesOf(short vertex, ShortIntProcedure eachKeyValue) {
+        adj[vertex].forEachKeyValue(eachKeyValue);
+    }
+    public void edgesOf(short vertex, ShortProcedure eachKey) {
+        adj[vertex].forEachKey(eachKey);
     }
 
 //    public String toString() {

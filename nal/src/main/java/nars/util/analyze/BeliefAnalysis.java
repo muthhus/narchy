@@ -85,7 +85,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		System.out.println((beliefOrGoal ? "Beliefs" : "Goals") + "[@" + nar.time() + "] " + table.size()
 				+ '/' + table.capacity());
 		table.print(System.out);
-		System.out.println();
+		//System.out.println();
 	}
 
 	public int size(boolean beliefOrGoal) {

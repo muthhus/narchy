@@ -461,8 +461,10 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             }
             if (!Global.DEBUG)
                 this.log = null; //.clear();
+
+            super.delete();
         }
-        super.delete();
+
     }
 
     protected final void invalidate() {

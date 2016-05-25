@@ -53,40 +53,24 @@ public final class DerivedTask extends MutableTask {
 //                //TODO for Questions?
 //            }
 
-//            float deathFactor = 0.5f; //1f - c;
-//            multiplyPremise(deathFactor, false);
+            float decayFactor = 1f - ((isBeliefOrGoal() ? conf() : qua() ) *durability);
+            multiplyPremise(decayFactor, false);
 
             super.delete();
+
+
+
         }
     }
 
-    /** next = the child which resulted from this and another task being revised */
-    @Override public boolean onRevision(@NotNull Task next) {
-        if (isDeleted())
-            return false;
+//    /** next = the child which resulted from this and another task being revised */
+//    @Override public boolean onRevision(@NotNull Task next) {
+//
+//
+//        return true;
+//    }
 
-        //weaken the premise links inversely proportionally to the amount of increase in truth confidence
-        float n = next.confWeight();
-        float t = this.confWeight();
-
-        if (n <= t) {
-            if (Global.DEBUG)
-                throw new RuntimeException("Revision failed to increase confidence");
-            return false;
-        }
-
-        float factor = n / (n + t);
-
-        multiplyPremise(factor, true);
-
-        //weaken this task iself
-        andPriority(factor);
-        andDurability(factor);
-
-        return true;
-    }
-
-    public void multiplyPremise(float factor, boolean alsoDurability) {
+    protected void multiplyPremise(float factor, boolean alsoDurability) {
         multiply(factor, taskLink, alsoDurability);
         multiply(factor, termLink, alsoDurability);
     }

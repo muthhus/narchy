@@ -10,15 +10,23 @@ import static org.junit.Assert.*;
 public class MyShortIntHashMapTest {
 
     @Test
-    public void testAddToValues() {
+    public void testAddToValuesAndFilter() {
         MyShortIntHashMap m = new MyShortIntHashMap();
-        for (int i = 0; i < 100; i++) {
-            m.put((short) (Math.random()*1000), 1);
+        for (int c = 0; c < 4; c++) {
+            for (int i = 0; i < 100; i++) {
+                m.put((short) (Math.random() * 1000), 1);
+            }
+
+            m.addToValues(4);
+
+            m.forEachKeyValue((k, v) -> {
+                assertEquals(5, v);
+            });
+
+            m.filter(v -> v == 0);
+
+            assertTrue(m.isEmpty());
         }
-        m.addToValues(4);
-        m.forEachKeyValue((k,v) -> {
-            assertEquals(5, v);
-        });
     }
 
 }
