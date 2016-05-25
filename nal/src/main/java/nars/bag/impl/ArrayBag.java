@@ -332,51 +332,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             b.commit();
 
             if (lowestUnsorted == -1 && cmpGT(b, lower)) {
-                lowestUnsorted = i;
+                lowestUnsorted = i+1;
             }
 
             lower = b;
         }
 
-        if (lowestUnsorted == -1) {
-            //perfectly sorted
-            return;
-        }
+        if (lowestUnsorted != -1)  {
+            qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
+        } // else: perfectly sorted
 
-        qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
-
-//        if (dirtyStart != -1) {
-//            //Needs sorted
-//
-//            int dirtyRange = 1 + dirtyEnd - dirtyStart;
-//
-//            if (dirtyRange == 1) {
-//                //Special case: only one unordered item; remove and reinsert
-//                BLink<V> x = items.remove(dirtyStart); //remove directly from the decorated list
-//                items.add(x); //add using the sorted list
-//
-//            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
-//                //Special case: a limited number of unordered items
-//                BLink<V>[] tmp = new BLink[dirtyRange];
-//
-//                for (int k = 0; k < dirtyRange; k++) {
-//                    tmp[k] = items.remove( dirtyStart /* removal position remains at the same index as items get removed */);
-//                }
-//
-//                //TODO items.get(i) and
-//                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
-//
-//                for (BLink i : tmp) {
-//                    if (i.isDeleted()) {
-//                        removeKeyForValue(i);
-//                    } else {
-//                        items.add(i);
-//                    }
-//                }
-//
-//            } else {
-//            }
-//        }
 
         removeDeletedAtBottom();
     }
@@ -385,14 +350,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         //remove deleted items they will collect at the end
         int i = size()-1;
         BLink<V> ii;
-        while (i > 0 && (ii = item(i)).isDeleted()) {
+        BLink<V>[] l = items.array();
+
+        while (i > 0 && (ii = l[i]).isDeleted()) {
             if (removeKeyForValue(ii) == null) {
                 throw new RuntimeException("Bag fault while trying to remove key by item value");
                 //exhaustive removal, since the BLink has lost its key
                 //removeKey((BLink<BLink<V>>) ii);
             }
 
-            removeItem(i); //remove by known index rather than have to search for it by key or something
+            //remove by known index rather than have to search for it by key or something
+            //different from removeItem which also removes the key, but we have already done that above
+            items.remove(i);
             i--;
         }
     }
@@ -410,6 +379,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             int j;
             BLink swap;
             if (right - left <= 7) {
+                //bubble sort on a region of size less than 8?
                 for (j = left + 1; j <= right; j++) {
                     swap = c[j];
                     i = j - 1;
@@ -418,11 +388,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                     }
                     c[i + 1] = swap;
                 }
-                if (stack_pointer == -1) {
+                if (stack_pointer != -1) {
+                    right = stack[stack_pointer--];
+                    left = stack[stack_pointer--];
+                } else {
                     break;
                 }
-                right = stack[stack_pointer--];
-                left = stack[stack_pointer--];
             } else {
                 int median = (left + right) >> 1;
                 i = left + 1;
@@ -462,7 +433,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                 c[j] = temp;
 
                 int a, b;
-                if (right - i + 1 >= j - left) {
+                if ((right - i + 1) >= (j - left)) {
                     a = i;
                     b = right;
                     right = j - 1;
@@ -562,3 +533,37 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //        }
 //    }
 }
+
+
+//        if (dirtyStart != -1) {
+//            //Needs sorted
+//
+//            int dirtyRange = 1 + dirtyEnd - dirtyStart;
+//
+//            if (dirtyRange == 1) {
+//                //Special case: only one unordered item; remove and reinsert
+//                BLink<V> x = items.remove(dirtyStart); //remove directly from the decorated list
+//                items.add(x); //add using the sorted list
+//
+//            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
+//                //Special case: a limited number of unordered items
+//                BLink<V>[] tmp = new BLink[dirtyRange];
+//
+//                for (int k = 0; k < dirtyRange; k++) {
+//                    tmp[k] = items.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+//                }
+//
+//                //TODO items.get(i) and
+//                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
+//
+//                for (BLink i : tmp) {
+//                    if (i.isDeleted()) {
+//                        removeKeyForValue(i);
+//                    } else {
+//                        items.add(i);
+//                    }
+//                }
+//
+//            } else {
+//            }
+//        }

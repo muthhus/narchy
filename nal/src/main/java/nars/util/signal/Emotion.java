@@ -31,8 +31,8 @@ public final class Emotion implements Serializable {
 
     private transient final Logger logger;
 
-    /** # concepts enter + exit */
-    public final FloatGuage focusChange;
+    /** alertness, % active concepts change per cycle */
+    public final FloatGuage alert;
 
 
     public Emotion() {
@@ -44,7 +44,7 @@ public final class Emotion implements Serializable {
         this.happy = new FloatGuage("happy");
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
-        this.focusChange = new FloatGuage("focusChange");
+        this.alert = new FloatGuage("alert");
 
     }
 
@@ -55,7 +55,7 @@ public final class Emotion implements Serializable {
         busy.clear();
         stress.clear();
         frustration.clear();
-        focusChange.clear();
+        alert.clear();
     }
 
     /** percentage of business which was not frustration */
@@ -64,6 +64,18 @@ public final class Emotion implements Serializable {
         if (b == 0)
             return 0;
         return 1f - (float)(frustration.getSum() / b);
+    }
+
+    /** joy = first derivative of happiness, delta happiness / delta business */
+    public float joy() {
+        double b = busy.getSum();
+        if (b == 0)
+            return 0;
+        return (float)(happy() / b);
+    }
+
+    public float happy() {
+        return (float) happy.getSum();
     }
 
     public void print(@NotNull OutputStream output) {
@@ -118,6 +130,9 @@ public final class Emotion implements Serializable {
     }
     @Deprecated public void frustration(float pri) {
         frustration.accept( pri );
+    }
+    @Deprecated public void alert(float percentFocusChange) {
+        alert.accept( percentFocusChange );
     }
 
 

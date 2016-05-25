@@ -50,7 +50,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 8;
+	private final int pacmanCyclesPerFrame = 4;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -73,7 +73,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.3f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.2f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.2f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -130,8 +130,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public void preStart(Agent a) {
 		if (a instanceof NAgent) {
 			//provide custom sensor input names for the nars agent
+
+			int visionDiameter = 2 * visionRadius + 1;
+
 			((NAgent) a).setSensorNamer((i) -> {
-				int square = i / 3;
+				int cell = i / 3;
 				int type = i % 3;
 				Atom typeTerm;
 				switch (type) {
@@ -141,7 +144,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 					default:
 						throw new RuntimeException();
 				}
-				return $.p($.the(square), typeTerm);
+
+				int dx = cell % visionDiameter;
+				int dy = cell / visionDiameter;
+				Term squareTerm = $.p($.the(dx), $.the(dy));
+				//return $.p(squareTerm, typeTerm);
+				return $.prop(squareTerm, typeTerm);
 				//return (Compound)$.inh($.the(square), typeTerm);
 			});
 		}

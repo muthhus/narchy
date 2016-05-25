@@ -55,6 +55,8 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable
     protected final BeliefTable goals;
 
+    private float satisfaction = 0;
+
     //    public DefaultConcept(Term term, Memory p) {
 //        this(term, new NullBag(), new NullBag(), p);
 //    }
@@ -220,61 +222,47 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
     /**
      * To accept a new judgment as belief, and check for revisions and solutions
-     *
-     * @param belief The task to be processed
-     * @param nar
-     * @return Whether to continue the processing of the task
+     * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     @Nullable
     @Override
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-
-        //long now = nar.time();
-
-        //boolean hasGoals = hasGoals();
-        //float successBefore = hasGoals ? getSuccess(now) : 0;
-
-
-//        if (beliefs == null)
-//            beliefs = this.beliefs = newBeliefTable(nar.conceptBeliefsMax.intValue());
-
-        return beliefs.add(belief, questions, nar);
-
-        //TODO only compute updates if belief was actually added, not merged with duplicate
-
-        //            if (belief!= null && hasQuestions()) {
-//                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-//                final Task solution = belief;
-//                questions().forEach(question -> {
-//                    LocalRules.forEachSolution(question, solution, nar);
-//                });
-//            }
-
-//            if (hasGoals) {
-//                updateSuccess(null, successBefore, memory);
-//            }
-
-//        if (belief!=null) {
-//
-//
-//            Task parentTask = belief.getParentTask();
-//            if (parentTask != null && parentTask.isQuestion()) {
-//
-//                if (parentTask.isInput()) //filter
-//                    nar.eventAnswer.emit(Tuples.twin(parentTask, belief));
-//
-//            }
-//
-//        }
-
-//        if (belief.isInput() && !belief.isEternal()) {
-//            this.put(Anticipate.class, true);
-//        }
+        return processBeliefOrGoal(belief, nar, beliefs, questions);
     }
 
-//    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-//        return Math.max(maxBeliefs/2, 2);
-//    }
+    /**
+     * To accept a new goal, and check for revisions and realization, then
+     * decide whether to actively pursue it
+     * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
+     */
+    @Nullable
+    @Override
+    public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+        return processBeliefOrGoal(goal, nar, goals, quests);
+    }
+
+    /**
+     * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
+     */
+    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, BeliefTable target, QuestionTable questions) {
+        Task b = target.add(belief, questions, nar);
+        if (b!=null)
+            updateSatisfaction(nar);
+        return b;
+    }
+
+    protected final void updateSatisfaction(NAR nar) {
+        BeliefTable b = beliefs();
+        BeliefTable g = goals();
+
+        long now = nar.time();
+
+        float nextSatisfaction = b.truth(now).motivation() - g.truth(now).motivation();
+
+        float deltaSatisfaction = nextSatisfaction - satisfaction;
+        this.satisfaction = nextSatisfaction;
+        nar.emotion.happy(deltaSatisfaction);
+    }
 
     @NotNull
     protected BeliefTable newBeliefTable() {
@@ -311,24 +299,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //    }
 
 
-    /**
-     * To accept a new goal, and check for revisions and realization, then
-     * decide whether to actively pursue it
-     *
-     * @param goal The task to be processed
-     * @param task
-     * @return Whether to continue the processing of the task
-     */
-    @Nullable
-    @Override
-    public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
-        //        if (g == null) {
-//            g = this.goals = newGoalTable(nar.conceptGoalsMax.intValue());
-//        }
-
-        return this.goals.add(inputGoal, quests, nar);
-    }
 
 
     //long then = goal.getOccurrenceTime();

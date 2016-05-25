@@ -558,7 +558,7 @@ public class Default extends AbstractNAR {
 
             c.capacity(cold);
 
-            nar.emotion.focusChange.accept(1);
+            nar.emotion.alert(1f/active.size());
         }
 
         /** called when a concept enters the concept bag */
