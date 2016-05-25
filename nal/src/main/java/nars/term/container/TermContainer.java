@@ -19,7 +19,6 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static com.gs.collections.impl.factory.Sets.immutable;
 import static com.gs.collections.impl.factory.Sets.mutable;

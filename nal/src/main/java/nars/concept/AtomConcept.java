@@ -5,7 +5,6 @@ import nars.Op;
 import nars.bag.Bag;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
-import nars.concept.table.TaskTable;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.term.atom.Atomic;

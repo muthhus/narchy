@@ -204,6 +204,7 @@ public class GraphDeriver extends Deriver {
 
         ComponentAttributeProvider<DefaultWeightedEdge> p4 =
                 new ComponentAttributeProvider<DefaultWeightedEdge>() {
+                    @Override
                     public Map<String, String> getComponentAttributes(DefaultWeightedEdge e) {
                         Map<String, String> map =new UnifriedMap<>(1);
                         map.put("weight", Double.toString(g.getEdgeWeight(e)));

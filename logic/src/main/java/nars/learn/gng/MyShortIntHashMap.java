@@ -25,7 +25,6 @@ import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import com.gs.collections.impl.map.mutable.primitive.AbstractMutableIntValuesMap;
 import com.gs.collections.impl.map.mutable.primitive.AbstractSentinelValues;
 import com.gs.collections.impl.map.mutable.primitive.MutableShortKeysMap;
-import com.gs.collections.impl.map.mutable.primitive.ShortIntHashMap;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.io.Externalizable;

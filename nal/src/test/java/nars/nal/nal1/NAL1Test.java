@@ -4,16 +4,13 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import static nars.nal.Tense.ETERNAL;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {

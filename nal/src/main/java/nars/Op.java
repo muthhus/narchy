@@ -302,7 +302,7 @@ public enum Op {
     }
 
     public static boolean hasAny(int structure, Op o) {
-        return ((structure & o.bit()) > 0) ? true : false;
+        return ((structure & o.bit()) > 0);
     }
 
 

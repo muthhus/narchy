@@ -1,6 +1,8 @@
 package nars.learn.lstm.test;
 
-import nars.learn.lstm.*;
+import nars.learn.lstm.AbstractTraining;
+import nars.learn.lstm.Interaction;
+import nars.learn.lstm.SimpleLSTM;
 import nars.util.Texts;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

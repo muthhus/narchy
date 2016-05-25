@@ -214,10 +214,8 @@ public class ConceptProcess implements Premise {
             return true;
 
         Task belief = this.belief;
-        if (belief != null && (!belief.isEternal() || belief.term().dt()!= DTERNAL))
-            return true;
+        return belief != null && (!belief.isEternal() || belief.term().dt() != DTERNAL);
 
-        return false;
     }
 
 

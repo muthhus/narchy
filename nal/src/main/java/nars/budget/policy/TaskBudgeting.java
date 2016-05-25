@@ -1,12 +1,10 @@
 package nars.budget.policy;
 
-import nars.Global;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
 import nars.concept.ConceptProcess;
-import nars.nal.UtilityFunctions;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -15,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.aveGeo;
-import static nars.nal.UtilityFunctions.or;
 
 /**
  * Created by me on 5/23/16.
@@ -56,12 +53,10 @@ public class TaskBudgeting {
             //ORIGINAL METHOD
             //volRatioScale = 1f / derived.term().volume();
         }
-        {
-            //RELATIVE SIZE INCREASE METHOD
-            int tasktermVol = task.term().volume();
-            volRatioScale =
-                Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.term().volume() )));
-        }
+        //RELATIVE SIZE INCREASE METHOD
+        int tasktermVol = task.term().volume();
+        volRatioScale =
+            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.term().volume() )));
 
 
         final float durability =

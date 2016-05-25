@@ -1,29 +1,16 @@
 package nars.nal.nal8;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.nar.Default;
-import nars.nar.Terminal;
-import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.transform.subst.Subst;
 import nars.util.signal.TestNAR;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static nars.nal.Tense.ETERNAL;
-import static nars.util.Texts.i;
 import static org.junit.Assert.*;
 
 public class OperatorTest {

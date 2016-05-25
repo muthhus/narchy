@@ -285,7 +285,7 @@ public class RevisionTest {
 
         //TEST ETERNAL
         FloatObjectPair<Compound> ae = Revision.dtMerge(a, e, 0.5f);
-        assertEquals("(a&&(b &&+3 c))", ae.getTwo().toString());
+        assertEquals("(a &&+3 (b &&+3 c))", ae.getTwo().toString());
         assertEquals(0f, ae.getOne(), 0.01f);
 
         //TEST VARIOUS WEIGHTING

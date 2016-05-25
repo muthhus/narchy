@@ -175,7 +175,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         return displaced;
     }
 
-    @Deprecated public List<L> list() {
+    @Deprecated public List<L> listCopy() {
         List<L> l = new ArrayList(size());
         forEach(x -> l.add(x));
         return l;

@@ -1,11 +1,10 @@
 package nars.util;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
-import nars.budget.UnitBudget;
+import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
@@ -13,8 +12,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.data.array.Arrays;
-import nars.learn.Agent;
-import nars.util.experiment.Environment;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;

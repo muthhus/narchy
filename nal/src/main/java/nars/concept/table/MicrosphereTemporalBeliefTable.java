@@ -2,13 +2,10 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.bag.impl.SortedTable;
-import nars.budget.merge.BudgetMerge;
 import nars.nal.Tense;
-import nars.task.MutableTask;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
-import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
-import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
 
 /** stores the items unsorted; revection manages their ranking and removal */
 public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> implements TemporalBeliefTable {

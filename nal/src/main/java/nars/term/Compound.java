@@ -26,7 +26,6 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
-import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;

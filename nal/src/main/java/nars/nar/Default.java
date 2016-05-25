@@ -466,7 +466,7 @@ public class Default extends AbstractNAR {
             //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            active.commit( active.isFull() ? conceptForget : null );
+            active.commit( /*active.isFull() ? */conceptForget /*: null*/ );
 
             fireConcepts(conceptsFiredPerCycle.intValue());
 
@@ -507,10 +507,10 @@ public class Default extends AbstractNAR {
             Concept concept = conceptLink.get();
 
             Bag<Task> taskl = concept.tasklinks();
-            taskl.commit(taskl.isFull() ? taskLinkForget : null);
+            taskl.commit(/*taskl.isFull() ? */taskLinkForget/* : null*/);
 
             Bag<Termed> terml = concept.termlinks();
-            terml.commit(terml.isFull() ? termLinkForget : null);
+            terml.commit(/*terml.isFull() ? */termLinkForget/* : null*/);
 
             premiser.accept(conceptLink);
         }
@@ -564,11 +564,12 @@ public class Default extends AbstractNAR {
         /** called when a concept enters the concept bag */
         protected void activate(Concept c) {
 
+            //set capacity first in case there are any queued items, they may join during the commit */
+            c.capacity(warm);
+
             //clean out any deleted links since having been deactivated
             c.tasklinks().commit(Forget.QualityToPriority);
             c.termlinks().commit(Forget.QualityToPriority);
-
-            c.capacity(warm);
         }
 
         @Override

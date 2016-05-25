@@ -21,11 +21,13 @@
 package nars.task;
 
 import nars.*;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nal.Tense;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.truth.ProjectedTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -42,8 +44,8 @@ import static nars.Global.dereference;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.TIMELESS;
-import static nars.truth.TruthFunctions.eternalize;
 import static nars.task.Revision.truthProjection;
+import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.

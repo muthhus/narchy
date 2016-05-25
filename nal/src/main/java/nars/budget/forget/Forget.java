@@ -1,9 +1,10 @@
 package nars.budget.forget;
 
+import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
-import nars.budget.Budgeted;
 import nars.nal.Tense;
+import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,14 +14,18 @@ import java.util.function.Predicate;
 /**
  * Utility methods for Attention Forgetting processes
  */
-public enum Forget { ;
+public enum Forget {
+    ;
 
-    /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
+    /**
+     * acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item
+     */
     public interface BudgetForgetFilter extends Predicate<BLink>, BudgetForget {
-        /** called each frame to update parameters */
+        /**
+         * called each frame to update parameters
+         */
         @Override
         void update(@NotNull NAR nar);
-
 
 
     }
@@ -71,7 +76,9 @@ public enum Forget { ;
 
         //cached values for fast repeated accesses
 
-        /** cached value of # cycles equivalent of the supplied forget durations parameter */
+        /**
+         * cached value of # cycles equivalent of the supplied forget durations parameter
+         */
         protected transient float forgetCyclesCached = Float.NaN;
         protected transient float perfectionCached = Float.NaN;
         protected transient float now = Float.NaN;
@@ -83,16 +90,19 @@ public enum Forget { ;
             this.perfection = perfection;
         }
 
-        @Override public abstract void accept(@NotNull BLink budget);
+        @Override
+        public abstract void accept(@NotNull BLink budget);
 
-        @Override public void update(@NotNull NAR nar) {
+        @Override
+        public void update(@NotNull NAR nar) {
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue();
             perfectionCached = perfection.floatValue();
             this.now = frame = nar.time();
         }
 
-        @Override public void cycle(float subFrame) {
+        @Override
+        public void cycle(float subFrame) {
             this.now = (this.subFrame = subFrame) + frame;
         }
 
@@ -100,7 +110,9 @@ public enum Forget { ;
     }
 
 
-    /** linaer decay in proportion to time since last forget */
+    /**
+     * linaer decay in proportion to time since last forget
+     */
     public static class LinearForget extends AbstractForget {
 
         @NotNull
@@ -109,7 +121,6 @@ public enum Forget { ;
         private float forgetCyclesMaxMinRange;
 
         /**
-         *
          * @param forgetTimeMin minimum forgetting time
          * @param forgetTimeMax maximum forgetting time
          * @param perfection
@@ -139,7 +150,7 @@ public enum Forget { ;
 
             if (currentPriority < minPriorityForgettingCanAffect) {
                 //priority already below threshold, don't decrease any further
-                return ;
+                return;
             }
 
             //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
@@ -169,8 +180,10 @@ public enum Forget { ;
     }
 
 
-    /** exponential decay in proportion to time since last forget.
-     *  provided by TonyLo as used in the ALANN system. */
+    /**
+     * exponential decay in proportion to time since last forget.
+     * provided by TonyLo as used in the ALANN system.
+     */
     public final static class ExpForget extends AbstractForget {
 
         public ExpForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
@@ -180,33 +193,47 @@ public enum Forget { ;
         @Override
         public void accept(@NotNull BLink budget) {
 
-            float dt = budget.setLastForgetTime(now);
+            float p0 = budget.pri();
+            if (p0 != p0) /* NaN, deleted */
+                return;
+
+            float last = budget.getLastForgetTime();
+            if (last!=last)
+                last = now; //NaN, first time
+
+            float dt = now - last;
 
             float threshold = budget.qua() * perfectionCached;
-            //if (dt > 0) {
 
-                float p = budget.priIfFiniteElseZero();
+            float p = p0;
 
+            if (dt > 0 && p > threshold) {
 
-                if (p > threshold) {
+                //Exponential decay
+                p *= (float) Math.exp(
+                        -((1.0f - budget.dur()) / forgetCyclesCached) * dt
+                );
 
-                    //Exponential decay
-                    p *= (float) Math.exp(
-                            -((1.0f - budget.dur()) / forgetCyclesCached) * dt
-                    );
+            }
 
-                }
+            if (p < threshold)
+                p = threshold;
 
-                budget.setPriority(Math.max(threshold, p));
+            if (!Util.equals(p, p0, Global.BUDGET_EPSILON))
+                budget.setPriority(p, now);
+
             //}
         }
 
     }
 
-    /** sets the priority value to the quality value */
+    /**
+     * sets the priority value to the quality value
+     */
     public final static BudgetForget QualityToPriority = new BudgetForget() {
 
-        @Override public void accept(@NotNull BLink budget) {
+        @Override
+        public void accept(@NotNull BLink budget) {
             budget.setPriority(budget.qua());
         }
 
@@ -225,7 +252,7 @@ public enum Forget { ;
     //TODO implement as a Forgetter:
     public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
         float p = b.pri() * 0.95f;
-        if (p > b.qua()*0.1f)
+        if (p > b.qua() * 0.1f)
             b.setPriority(p);
         return true;
     };

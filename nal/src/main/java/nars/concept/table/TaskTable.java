@@ -1,15 +1,11 @@
 package nars.concept.table;
 
-import com.google.common.collect.Iterators;
-import nars.Memory;
-import nars.NAR;
 import nars.task.Task;
 import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**

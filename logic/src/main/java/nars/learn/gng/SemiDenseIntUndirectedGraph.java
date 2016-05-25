@@ -1,14 +1,9 @@
 package nars.learn.gng;
 
 import com.gs.collections.api.block.predicate.primitive.IntPredicate;
-import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
-import com.gs.collections.api.block.procedure.primitive.IntProcedure;
 import com.gs.collections.api.block.procedure.primitive.ShortIntProcedure;
 import com.gs.collections.api.block.procedure.primitive.ShortProcedure;
-import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import com.gs.collections.impl.map.mutable.primitive.ShortIntHashMap;
-import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
-import ognl.IntHashMap;
 
 /**
  * Created by me on 5/25/16.

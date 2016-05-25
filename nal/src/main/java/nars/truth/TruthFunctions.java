@@ -21,14 +21,11 @@
 package nars.truth;
 
 import nars.Global;
-import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static java.lang.StrictMath.abs;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules

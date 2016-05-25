@@ -3,10 +3,8 @@ package nars;
 
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;

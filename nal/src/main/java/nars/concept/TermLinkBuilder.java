@@ -1,7 +1,5 @@
 package nars.concept;
 
-import com.gs.collections.impl.bag.mutable.HashBag;
-import com.gs.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
@@ -15,8 +13,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import static nars.Global.newArrayList;
 
 
 public enum TermLinkBuilder {

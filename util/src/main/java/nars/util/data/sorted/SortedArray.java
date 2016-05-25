@@ -84,7 +84,6 @@ public final class SortedArray<E> {
         }
     }
 
-
     /**
      * defines the sorting strategy for {@link SortedList_1x4}
      *

@@ -1,6 +1,5 @@
 package nars.task;
 
-import nars.Global;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.term.Compound;
@@ -8,10 +7,7 @@ import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.lang.ref.Reference;
-
-import static nars.truth.TruthFunctions.c2w;
 
 
 public final class DerivedTask extends MutableTask {
@@ -70,7 +66,7 @@ public final class DerivedTask extends MutableTask {
 //        return true;
 //    }
 
-    protected void multiplyPremise(float factor, boolean alsoDurability) {
+    public void multiplyPremise(float factor, boolean alsoDurability) {
         multiply(factor, taskLink, alsoDurability);
         multiply(factor, termLink, alsoDurability);
     }

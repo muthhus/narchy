@@ -12,7 +12,6 @@ import nars.util.condition.ExecutionCondition;
 import nars.util.condition.NARCondition;
 import nars.util.condition.TemporalTaskCondition;
 import nars.util.event.CycleReaction;
-import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;

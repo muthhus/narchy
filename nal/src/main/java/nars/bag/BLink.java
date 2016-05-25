@@ -48,6 +48,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
     private final float[] b = new float[7];
 
+
     public static class StrongBLink<X> extends BLink<X> {
 
         ///** the referred item */
@@ -163,6 +164,10 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         }
     }
 
+    public final void setPriority(float p, float now) {
+        setPriority(p);
+        setLastForgetTimeFast(now);
+    }
 
     public boolean commit() {
         if (changed) {
@@ -221,12 +226,18 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float setLastForgetTime(float currentTime) {
+    @Deprecated public final float setLastForgetTime(float currentTime) {
         float[] b = this.b;
         float lastForget = b[LASTFORGET];
         float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
         b[LASTFORGET] = currentTime;
         return diff;
+    }
+
+
+    /** doesnt compute the delta */
+    public final void setLastForgetTimeFast(float currentTime) {
+        b[LASTFORGET] = currentTime;
     }
 
     @Override

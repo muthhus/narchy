@@ -3,8 +3,6 @@ package nars.learn.gng;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 
-import java.util.Objects;
-
 /**
  * Created by Scadgek on 11/3/2014.
  */

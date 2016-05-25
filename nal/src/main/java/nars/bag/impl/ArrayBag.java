@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -49,11 +50,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
 
 
+    /** true iff o1 > o2 */
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = o1.priIfFiniteElseNeg1();
         float f2 = o2.priIfFiniteElseNeg1();
         return (f1 < f2);
     }
+    /** true iff o1 < o2 */
     static final boolean cmpLT(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = o1.priIfFiniteElseNeg1();
         float f2 = o2.priIfFiniteElseNeg1();
@@ -264,19 +267,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     protected BLink<V> putQueue(V x, @NotNull Budgeted b, float scale) {
         BLink<V> link = link(x, b, scale);
         pending.add(link);
-        //return link;
         return null;
     }
 
-//    @Nullable
-//    @Override
-//    public Bag<V> commit() {
-//
-//        forEach(BLink::commit);
-//        ((FasterList)items.list).sortThis(this);
-//
-//        return this;
-//    }
+
     @NotNull
     @Override
     @Deprecated public Bag<V> commit() {
@@ -322,30 +316,34 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     private void updateExisting(@Nullable Consumer<BLink> each, int s) {
 //        int dirtyStart = -1;
-//        int dirtyEnd = -1;
+        int lowestUnsorted = -1;
 
         final boolean eachNotNull = each!=null;
 
-        //@NotNull BLink<V> prev = item(0); //compares with self below to avoid a null check in subsequent iterations
-        for (int i = 0; i < s; i++) {
-            BLink<V> b = item(i);
+        BLink<V>[] l = items.array();
+        int t = s - 1;
+        @NotNull BLink<V> lower = l[t]; //compares with self below to avoid a null check in subsequent iterations
+        for (int i = t; i >= 0; i--) {
+            BLink<V> b = l[i];
 
             if (eachNotNull)
                 each.accept(b);
 
             b.commit();
-            //if (&& cmpLT(b, prev)) {
-                //detected out-of-order
 
-//                if (dirtyStart == -1) {
-//                    dirtyStart = i; //TODO this only happens once
-//                }
-//
-//                dirtyEnd = i;
-            //}
+            if (lowestUnsorted == -1 && cmpGT(b, lower)) {
+                lowestUnsorted = i;
+            }
 
-//            prev = b;
+            lower = b;
         }
+
+        if (lowestUnsorted == -1) {
+            //perfectly sorted
+            return;
+        }
+
+        qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
 
 //        if (dirtyStart != -1) {
 //            //Needs sorted
@@ -377,7 +375,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //                }
 //
 //            } else {
-                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
 //            }
 //        }
 

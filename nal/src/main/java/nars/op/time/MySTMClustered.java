@@ -42,7 +42,7 @@ public class MySTMClustered extends STMClustered {
 			if (tc[1] >= timeCoherenceThresh) {
 				double[] fc = n.coherence(1);
 				if (fc[1] >= freqCoherenceThresh) {
-					selected.put((long) Math.round(tc[0]), PrimitiveTuples.pair(n, (float) fc[0]));
+					selected.put(Math.round(tc[0]), PrimitiveTuples.pair(n, (float) fc[0]));
 				}
 			}
 		});

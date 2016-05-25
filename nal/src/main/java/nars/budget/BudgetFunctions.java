@@ -20,7 +20,6 @@
  */
 package nars.budget;
 
-import nars.Memory;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;

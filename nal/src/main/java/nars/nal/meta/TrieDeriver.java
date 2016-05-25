@@ -288,11 +288,9 @@ public class TrieDeriver extends Deriver {
             out.println("}");
         } else if (p instanceof Fork) {
             indent(indent); out.println(Util.className(p) + " {");
-            {
-                Fork ac = (Fork) p;
-                for (ProcTerm b : ac.termCache) {
-                    print(b, out, indent + 2);
-                }
+            Fork ac = (Fork) p;
+            for (ProcTerm b : ac.termCache) {
+                print(b, out, indent + 2);
             }
             indent(indent); out.println("}");
 

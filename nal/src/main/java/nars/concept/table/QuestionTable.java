@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import nars.Memory;
 import nars.NAR;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +27,7 @@ public interface QuestionTable extends TaskTable {
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
+    @Override
     @Nullable
     Task get(Task t);
 
@@ -42,7 +42,7 @@ public interface QuestionTable extends TaskTable {
 //        return null;
 //    }
 
-    public static QuestionTable EMPTY = new QuestionTable() {
+    QuestionTable EMPTY = new QuestionTable() {
 
         @Override
         public Iterator<Task> iterator() {

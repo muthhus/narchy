@@ -26,7 +26,7 @@ public class cimage
 	public static void drawDot(Image img)
 	{
 		Graphics g=img.getGraphics();
-		g.setColor(Color.yellow);
+		g.setColor(Color.magenta);
 		g.drawRect(0,0,2,2);
 		g.dispose();
 	}
@@ -36,7 +36,7 @@ public class cimage
 		Graphics g=img.getGraphics();
 		g.setColor(Color.black);
 		g.fillRect(0,0,16,16);
-		g.setColor(Color.yellow);
+		g.setColor(Color.red);
 		int iCounter=0;
 		short mask=0x01;
 		for (int i=0; i<16; i++)

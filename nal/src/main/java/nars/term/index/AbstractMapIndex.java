@@ -2,17 +2,17 @@ package nars.term.index;
 
 import nars.Op;
 import nars.concept.ConceptBuilder;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.TermBuilder;
+import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
-
-import static nars.nal.Tense.DTERNAL;
 
 
 public abstract class AbstractMapIndex implements TermIndex {

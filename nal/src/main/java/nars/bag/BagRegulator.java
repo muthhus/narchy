@@ -1,14 +1,9 @@
 package nars.bag;
 
-import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.$;
 import nars.NAR;
 import nars.nar.Default;
-import nars.task.Task;
-import nars.term.Term;
-import nars.term.Termed;
 import nars.util.data.Sensor;
-import nars.util.experiment.DeductiveChainTest;
 import nars.util.experiment.DeductiveMeshTest;
 import nars.util.signal.Emotion;
 import org.apache.commons.lang3.mutable.MutableFloat;

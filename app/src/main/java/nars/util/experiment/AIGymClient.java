@@ -3,19 +3,19 @@ package nars.util.experiment;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
-import nars.util.Shell;
+import nars.learn.Agent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.time.FrameClock;
-import nars.util.*;
+import nars.util.NAgent;
+import nars.util.Shell;
+import nars.util.Texts;
 import nars.util.data.Util;
-
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.learn.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;

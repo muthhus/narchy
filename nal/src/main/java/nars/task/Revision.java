@@ -1,7 +1,6 @@
 package nars.task;
 
 import com.gs.collections.api.tuple.primitive.FloatObjectPair;
-import com.gs.collections.impl.tuple.Tuples;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;

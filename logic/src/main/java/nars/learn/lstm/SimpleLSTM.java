@@ -1,12 +1,10 @@
 package nars.learn.lstm;
 
-import org.apache.commons.math3.util.MathArrays;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static org.apache.commons.math3.util.MathArrays.*;
+import static org.apache.commons.math3.util.MathArrays.scaleInPlace;
 
 public class SimpleLSTM extends AgentSupervised {
 	
