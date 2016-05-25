@@ -26,6 +26,7 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
+import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
@@ -52,6 +53,18 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
             p.append(Symbols.ARGUMENT_SEPARATOR_PRETTY);
         else*/
             p.append(Symbols.ARGUMENT_SEPARATOR);
+    }
+
+    static boolean atemporallyEqual(@NotNull Termed term, Termed<Compound> beliefConcept) {
+        //TODO can be accelerated
+        Term t = term.term();
+        if (t.op() == beliefConcept.op()) {
+            Term b = beliefConcept.term();
+            if (t.structure() == b.structure() && t.volume() == b.volume()) {
+                return Terms.terms.atemporalize((Compound) t).equals(b);
+            }
+        }
+        return false;
     }
 
     /** gets the set of unique recursively contained terms of a specific type

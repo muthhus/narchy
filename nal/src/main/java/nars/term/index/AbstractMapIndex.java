@@ -87,30 +87,5 @@ public abstract class AbstractMapIndex implements TermIndex {
     public abstract void forEach(Consumer<? super Termed> c);
 
 
-    @Override
-    public Compound atemporalize(Compound c) {
-        return (Compound) transform(c.dt(DTERNAL), CompoundAtemporalizer);
-    }
-
-
-
-    final CompoundTransform CompoundAtemporalizer = new CompoundTransform<>() {
-
-        @Override
-        public boolean test(Term term) {
-            return true; // term.hasTemporal();
-        }
-
-        @NotNull
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm) {
-            if (subterm instanceof Compound) {
-                Compound csub = (Compound) subterm;
-                if (csub.hasTemporal())
-                    return the(atemporalize(csub));
-            }
-            return the(subterm);
-        }
-    };
 
 }

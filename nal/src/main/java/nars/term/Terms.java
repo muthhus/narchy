@@ -533,10 +533,6 @@ public class Terms extends TermBuilder implements TermIndex {
         return 0;
     }
 
-    @Override
-    public Compound atemporalize(Compound c) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void clear() {

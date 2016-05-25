@@ -207,7 +207,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
             //project the belief to the question's time
             if (taskOcc!=ETERNAL) {
-                belief = nar.concept(belief).merge(belief, task, task.occurrence(), nar);
+                belief = nar.concept(belief).merge(task, belief, task.occurrence(), nar);
             }
 
             if (belief!=null) { //may have become null as a result of projection
@@ -215,7 +215,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                 //attempt to Unify any Query variables; answer if unifies
                 if (task.term().hasVarQuery()) {
                     matchQueryQuestion(task, belief);
-                } else if (beliefConcept instanceof Compound && atemporallyEqual(task, beliefConcept)) {
+                } else if (beliefConcept instanceof Compound && Compound.atemporallyEqual(task, beliefConcept)) {
                     answer(task, belief);
                 }
 
@@ -227,18 +227,6 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
         return belief;
 
 
-    }
-
-    public boolean atemporallyEqual(@NotNull Termed term, Concept beliefConcept) {
-        //TODO can be accelerated
-        Term t = term.term();
-        if (t.op() == beliefConcept.op()) {
-            Term b = beliefConcept.term();
-            if (t.structure() == b.structure() && t.volume() == b.volume()) {
-                return nar.index.atemporalize((Compound) t).equals(b);
-            }
-        }
-        return false;
     }
 
     private void answer(Task q, Task a) {

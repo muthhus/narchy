@@ -4,6 +4,7 @@ import com.gs.collections.api.tuple.primitive.FloatObjectPair;
 import com.gs.collections.impl.tuple.Tuples;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
+import nars.Global;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
@@ -17,13 +18,13 @@ import org.jetbrains.annotations.Nullable;
 
 import static java.lang.StrictMath.abs;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Revision / Projection / Revection Utilities
  */
 public class Revision {
-
 
 
     /**
@@ -42,8 +43,8 @@ public class Revision {
         float f2 = b.freq();
 
         return new DefaultTruth(
-            (w1 * f1 + w2 * f2) / w,
-            newConf
+                (w1 * f1 + w2 * f2) / w,
+                newConf
         );
     }
 
@@ -53,22 +54,98 @@ public class Revision {
     }
 
 
-    @Nullable public static Task merge(Task a, Task b, long now, long newOcc, Truth newTruth) {
+    @Nullable
+    public static Task merge(Task a, Task b, long now, long newOcc, Truth newTruth) {
+
+        if (Compound.atemporallyEqual(a.term(), b.term())) {
+            float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
+            float bw = c2w(b.conf());
+
+            float aProp = aw / (aw + bw);
+
+            FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aProp);
+            float adjustedDifference = c.getOne();
+
+            float confScale;
+            if (adjustedDifference > 0) {
+                //normalize relative to the total difference involved
+                long aocc = a.occurrence();
+                if (aocc == ETERNAL) aocc = newOcc;
+                long bocc = b.occurrence();
+                if (bocc == ETERNAL) bocc = newOcc;
+                confScale = (1f - (adjustedDifference /
+                        (1 + Math.abs(aocc - newOcc) + Math.abs(bocc - newOcc))));
+            } else {
+                confScale = 1f;
+            }
+
+            float newConf = newTruth.conf() * confScale;
+            if (newConf < Global.TRUTH_EPSILON) {
+                //too weak
+                return null;
+            }
+
+            long[] newEv = Stamp.zip(a.evidence(), b.evidence(), aProp);
+
+            return new MutableTask(c.getTwo(),
+                    a, b, now, newOcc, newEv,
+                    newTruth.withConf(newConf),
+                    BudgetMerge.plusDQBlend)
+                    .log("Revection Merge");
+
+        } else {
+            //just project 'b' to 'a' time
+
+            //    @Nullable
+//    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
+//
+//        float termRelevance = Terms.termRelevance(term(), question.term());
+//        if (termRelevance == 0)
+//            return null;
+//
+//        long now = memory.time();
+//
+//        //TODO avoid creating new Truth instances
+//        Truth solTruth = projectTruth(question.occurrence(), now, true);
+//        if (solTruth == null)
+//            return null;
+//
+//        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+//        long solutionOcc = solTruth instanceof ProjectedTruth ?
+//                ((ProjectedTruth)solTruth).when : occurrence();
+//
+//        if (solTruth.conf() < conf()) return this;
+//
+//        solTruth = solTruth.confMult(termRelevance);
+//                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
+//                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
+//
+//        if (solTruth.conf() < conf())
+//            return this;
+//
+//        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+//        if (solutionBudget == null)
+//            return null;
+//
+            //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+            Task solution = new MutableTask(b.term() /* question term in case it has different temporality */,
+                    b.punc(), newTruth)
+                    .time(now, newOcc)
+                    .parent(b, a)
+                    .budget(b.budget())
+                    //.state(state())
+                    //.setEvidence(evidence())
+                    .log("Projected Answer")
+                    //.log("Projected from " + this)
+                    ;
 
 
-        float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
-        float bw = c2w(b.conf());
+            ////TODO avoid adding repeat & equal Solution instances
+            //solution.log(new Solution(question));
 
-        float aProp = aw / (aw + bw);
-        long[] newEv = Stamp.zip(a.evidence(), b.evidence(), aProp);
+            return solution;
 
-        FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aProp);
-
-        return new MutableTask(c.getTwo(),
-                a, b, now, newOcc, newEv,
-                newTruth.confMult(c.getOne()),
-                BudgetMerge.plusDQBlend)
-                .log("Revection Merge");
+        }
     }
 
 
@@ -82,16 +159,15 @@ public class Revision {
     }
 
     /**
-     *
      * heuristic which evaluates the semantic similarity of two terms
      * returning 1f if there is a complete match, 0f if there is
      * a totally separate meaning for each, and in-between if
      * some intermediate aspect is different (ex: temporal relation dt)
-     *
+     * <p>
      * evaluates the terms recursively to compare internal 'dt'
      * produces a tuple (merged, difference amount), the difference amount
      * can be used to attenuate truth values, etc.
-     *
+     * <p>
      * TODO threshold to stop early
      */
     public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp) {
@@ -106,8 +182,6 @@ public class Revision {
         float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
 
         return PrimitiveTuples.pair(accumulatedDifference.floatValue() * weightDivergence, cc);
-
-
 
 
 //            int at = a.dt();
@@ -142,7 +216,7 @@ public class Revision {
     private static Compound dtMerge(Compound a, Compound b, float balance, MutableFloat accumulatedDifference, float depth) {
         int newDT;
         int adt = a.dt();
-        if (adt !=b.dt()) {
+        if (adt != b.dt()) {
 
             //TODO maybe choose the eternality based on stronger balance
 
@@ -163,14 +237,15 @@ public class Revision {
 
         Term a0 = a.term(0);
         Term a1 = a.term(1);
+        if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {
+            throw new RuntimeException();
+        }
         return $.compound(a.op(), new TermVector<>(
-            (a0 instanceof Compound) ? dtMerge( (Compound)a0, (Compound)(b.term(0)), balance, accumulatedDifference, depth/2f) : a0,
-            (a1 instanceof Compound) ? dtMerge( (Compound)a1, (Compound)(b.term(1)), balance, accumulatedDifference, depth/2f) : a1
+                (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
+                (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
         )).dt(newDT);
     }
 }
-
-
 
 
 //    public static float temporalIntersection(long now, long at, long bt, float window) {
