@@ -13,21 +13,18 @@ import com.gs.collections.api.block.procedure.primitive.ShortProcedure;
 import com.gs.collections.api.collection.primitive.MutableIntCollection;
 import com.gs.collections.api.iterator.MutableIntIterator;
 import com.gs.collections.api.iterator.MutableShortIterator;
-import com.gs.collections.api.iterator.ShortIterator;
 import com.gs.collections.api.map.primitive.ImmutableShortIntMap;
 import com.gs.collections.api.map.primitive.MutableShortIntMap;
 import com.gs.collections.api.map.primitive.ShortIntMap;
 import com.gs.collections.api.set.primitive.MutableShortSet;
 import com.gs.collections.api.tuple.primitive.ShortIntPair;
 import com.gs.collections.impl.SpreadFunctions;
-import com.gs.collections.impl.iterator.UnmodifiableShortIterator;
 import com.gs.collections.impl.lazy.AbstractLazyIterable;
-import com.gs.collections.impl.lazy.primitive.AbstractLazyShortIterable;
 import com.gs.collections.impl.map.mutable.primitive.AbstractMutableIntValuesMap;
+import com.gs.collections.impl.map.mutable.primitive.AbstractSentinelValues;
 import com.gs.collections.impl.map.mutable.primitive.MutableShortKeysMap;
 import com.gs.collections.impl.map.mutable.primitive.ShortIntHashMap;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
-import nars.learn.gng.SentinelValues;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -50,7 +47,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     private int[] values;
     private int occupiedWithData;
     private int occupiedWithSentinels;
-    private nars.learn.gng.SentinelValues sentinelValues;
+    private SentinelValues sentinelValues;
     private boolean copyKeysOnWrite;
 
     public MyShortIntHashMap() {
@@ -68,28 +65,46 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
 
     public void addToValues(int d) {
-        //addToValue()
-    }
 
-    public ShortIntHashMap filter(ShortIntPredicate predicate) {
-        ShortIntHashMap result = new ShortIntHashMap();
-        if(this.sentinelValues != null) {
-            if(this.sentinelValues.containsZeroKey && !predicate.accept((short)0, this.sentinelValues.zeroValue)) {
-                result.put((short)0, this.sentinelValues.zeroValue);
-            }
-
-            if(this.sentinelValues.containsOneKey && !predicate.accept((short)1, this.sentinelValues.oneValue)) {
-                result.put((short)1, this.sentinelValues.oneValue);
-            }
+        if (sentinelValues!=null) {
+            if (sentinelValues.containsValue(0))
+                sentinelValues.zeroValue += d;
+            if (sentinelValues.containsValue(1))
+                sentinelValues.oneValue += d;
         }
 
         for(int i = 0; i < this.keys.length; ++i) {
-            if(isNonSentinel(this.keys[i]) && !predicate.accept(this.keys[i], this.values[i])) {
-                result.put(this.keys[i], this.values[i]);
+            short key = this.keys[i];
+            if(isNonSentinel(key)) {
+                int index = this.probe(key);
+                short keyAtIndex = this.keys[index];
+                if(keyAtIndex == key) {
+                    this.values[index] += d;
+                }
             }
         }
 
-        return result;
+    }
+
+
+    public void filter(ShortIntPredicate predicate) {
+//        if(this.sentinelValues != null) {
+//            if(this.sentinelValues.containsZeroKey && !predicate.accept((short)0, this.sentinelValues.zeroValue)) {
+//                result.put((short)0, this.sentinelValues.zeroValue);
+//            }
+//
+//            if(this.sentinelValues.containsOneKey && !predicate.accept((short)1, this.sentinelValues.oneValue)) {
+//                result.put((short)1, this.sentinelValues.oneValue);
+//            }
+//        }
+//
+//        for(int i = 0; i < this.keys.length; ++i) {
+//            if(isNonSentinel(this.keys[i]) && !predicate.accept(this.keys[i], this.values[i])) {
+//                result.put(this.keys[i], this.values[i]);
+//            }
+//        }
+//
+//        return result;
     }
 
 
@@ -118,7 +133,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
     @Override
-    protected SentinelValues getSentinelValues() {
+    protected final AbstractMutableIntValuesMap.SentinelValues getSentinelValues() {
         throw new UnsupportedOperationException();
     }
 
@@ -286,7 +301,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     private void putForRemovedSentinel(int value) {
         if(this.sentinelValues == null) {
-            this.sentinelValues = new nars.learn.gng.SentinelValues();
+            this.sentinelValues = new SentinelValues();
         }
 
         this.addRemovedKeyValue(value);
@@ -294,7 +309,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     private void putForEmptySentinel(int value) {
         if(this.sentinelValues == null) {
-            this.sentinelValues = new nars.learn.gng.SentinelValues();
+            this.sentinelValues = new SentinelValues();
         }
 
         this.addEmptyKeyValue(value);
@@ -397,7 +412,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     public int getIfAbsentPut(short key, int value) {
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(value);
                 return value;
             } else if(this.sentinelValues.containsZeroKey) {
@@ -408,7 +423,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             }
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(value);
                 return value;
             } else if(this.sentinelValues.containsOneKey) {
@@ -433,7 +448,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.value();
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsZeroKey) {
@@ -446,7 +461,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.value();
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsOneKey) {
@@ -473,7 +488,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.intValueOf(parameter);
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsZeroKey) {
@@ -486,7 +501,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.intValueOf(parameter);
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsOneKey) {
@@ -513,7 +528,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.valueOf(key);
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsZeroKey) {
@@ -526,7 +541,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
                 index = function.valueOf(key);
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(index);
                 return index;
             } else if(this.sentinelValues.containsOneKey) {
@@ -551,7 +566,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     public int addToValue(short key, int toBeAdded) {
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(toBeAdded);
             } else if(this.sentinelValues.containsZeroKey) {
                 this.sentinelValues.zeroValue += toBeAdded;
@@ -562,7 +577,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             return this.sentinelValues.zeroValue;
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(toBeAdded);
             } else if(this.sentinelValues.containsOneKey) {
                 this.sentinelValues.oneValue += toBeAdded;
@@ -622,7 +637,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     public int updateValue(short key, int initialValueIfAbsent, IntToIntFunction function) {
         if(isEmptyKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addEmptyKeyValue(function.valueOf(initialValueIfAbsent));
             } else if(this.sentinelValues.containsZeroKey) {
                 this.sentinelValues.zeroValue = function.valueOf(this.sentinelValues.zeroValue);
@@ -633,7 +648,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             return this.sentinelValues.zeroValue;
         } else if(isRemovedKey(key)) {
             if(this.sentinelValues == null) {
-                this.sentinelValues = new nars.learn.gng.SentinelValues();
+                this.sentinelValues = new SentinelValues();
                 this.addRemovedKeyValue(function.valueOf(initialValueIfAbsent));
             } else if(this.sentinelValues.containsOneKey) {
                 this.sentinelValues.oneValue = function.valueOf(this.sentinelValues.oneValue);
@@ -947,13 +962,17 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     int probe(short element) {
         int index = this.mask(element);
+        short[] keys = this.keys;
         short keyAtIndex = this.keys[index];
+        int kl = keys.length;
         if(keyAtIndex != element && keyAtIndex != 0) {
             int removedIndex = keyAtIndex == 1?index:-1;
 
             for(int i = 1; i < 16; ++i) {
-                int nextIndex = index + i & this.keys.length - 1;
-                keyAtIndex = this.keys[nextIndex];
+
+
+                int nextIndex = index + i & kl - 1;
+                keyAtIndex = keys[nextIndex];
                 if(keyAtIndex == element) {
                     return nextIndex;
                 }
@@ -975,10 +994,13 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     int probeTwo(short element, int removedIndex) {
         int index = this.spreadTwoAndMask(element);
+        short[] keys = this.keys;
+        int kl = keys.length;
 
         for(int i = 0; i < 16; ++i) {
-            int nextIndex = index + i & this.keys.length - 1;
-            short keyAtIndex = this.keys[nextIndex];
+
+            int nextIndex = index + i & kl - 1;
+            short keyAtIndex = keys[nextIndex];
             if(keyAtIndex == element) {
                 return nextIndex;
             }
@@ -999,9 +1021,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         int nextIndex = SpreadFunctions.shortSpreadOne(element);
         int spreadTwo = Integer.reverse(SpreadFunctions.shortSpreadTwo(element)) | 1;
 
+        short[] keys = this.keys;
+
         while(true) {
             nextIndex = this.mask(nextIndex + spreadTwo);
-            short keyAtIndex = this.keys[nextIndex];
+
+            short keyAtIndex = keys[nextIndex];
             if(keyAtIndex == element) {
                 return nextIndex;
             }
@@ -1444,4 +1469,35 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    static class SentinelValues extends AbstractSentinelValues {
+
+        public boolean containsZeroKey;
+        public boolean containsOneKey;
+
+
+        public int size() {
+            return (this.containsZeroKey?1:0) + (this.containsOneKey?1:0);
+        }
+
+        public int zeroValue;
+        public int oneValue;
+
+            SentinelValues() {
+            }
+
+            public boolean containsValue(int value) {
+                boolean valueEqualsZeroValue = this.containsZeroKey && this.zeroValue == value;
+                boolean valueEqualsOneValue = this.containsOneKey && this.oneValue == value;
+                return valueEqualsZeroValue || valueEqualsOneValue;
+            }
+
+    //        public AbstractMutableIntValuesMap.SentinelValues copy() {
+    //            AbstractMutableIntValuesMap.SentinelValues sentinelValues = new AbstractMutableIntValuesMap.SentinelValues();
+    //            sentinelValues.zeroValue = this.zeroValue;
+    //            sentinelValues.oneValue = this.oneValue;
+    //            sentinelValues.containsOneKey = this.containsOneKey;
+    //            sentinelValues.containsZeroKey = this.containsZeroKey;
+    //            return sentinelValues;
+    //        }
+        }
 }
