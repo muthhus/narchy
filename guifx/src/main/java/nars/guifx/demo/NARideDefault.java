@@ -14,7 +14,7 @@ public enum NARideDefault {
         Default n = new Default(
                 //TermIndex.memoryGuava(clock, 100)),
 //                        memoryWeak(1024 * 128)),
-                1024, 1, 2, 3);
+                512, 1, 2, 3);
         n.conceptRemembering.setValue(40f);
         //new Inperience(n);
 

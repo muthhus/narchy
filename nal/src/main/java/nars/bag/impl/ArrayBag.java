@@ -332,64 +332,65 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     private void updateExisting(@Nullable Consumer<BLink> each, int s) {
-        int dirtyStart = -1;
-        int dirtyEnd = -1;
+//        int dirtyStart = -1;
+//        int dirtyEnd = -1;
 
         final boolean eachNotNull = each!=null;
 
-        @NotNull BLink<V> prev = item(0); //compares with self below to avoid a null check in subsequent iterations
+        //@NotNull BLink<V> prev = item(0); //compares with self below to avoid a null check in subsequent iterations
         for (int i = 0; i < s; i++) {
             BLink<V> b = item(i);
 
             if (eachNotNull)
                 each.accept(b);
 
-            if (b.commit() && cmpLT(b, prev)) {
+            b.commit();
+            //if (&& cmpLT(b, prev)) {
                 //detected out-of-order
 
-                if (dirtyStart == -1) {
-                    dirtyStart = i; //TODO this only happens once
-                }
+//                if (dirtyStart == -1) {
+//                    dirtyStart = i; //TODO this only happens once
+//                }
+//
+//                dirtyEnd = i;
+            //}
 
-                dirtyEnd = i;
-            }
-
-            prev = b;
+//            prev = b;
         }
 
-        if (dirtyStart != -1) {
-            //Needs sorted
-
-            int dirtyRange = 1 + dirtyEnd - dirtyStart;
-
-            if (dirtyRange == 1) {
-                //Special case: only one unordered item; remove and reinsert
-                BLink<V> x = items.remove(dirtyStart); //remove directly from the decorated list
-                items.add(x); //add using the sorted list
-
-            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
-                //Special case: a limited number of unordered items
-                BLink<V>[] tmp = new BLink[dirtyRange];
-
-                for (int k = 0; k < dirtyRange; k++) {
-                    tmp[k] = items.remove( dirtyStart /* removal position remains at the same index as items get removed */);
-                }
-
-                //TODO items.get(i) and
-                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
-
-                for (BLink i : tmp) {
-                    if (i.isDeleted()) {
-                        removeKeyForValue(i);
-                    } else {
-                        items.add(i);
-                    }
-                }
-
-            } else {
-                qsort(qsortStack, items.array(), dirtyStart - 1, items.size());
-            }
-        }
+//        if (dirtyStart != -1) {
+//            //Needs sorted
+//
+//            int dirtyRange = 1 + dirtyEnd - dirtyStart;
+//
+//            if (dirtyRange == 1) {
+//                //Special case: only one unordered item; remove and reinsert
+//                BLink<V> x = items.remove(dirtyStart); //remove directly from the decorated list
+//                items.add(x); //add using the sorted list
+//
+//            } else if ( dirtyRange < Math.max(1, reinsertionThreshold * s) ) {
+//                //Special case: a limited number of unordered items
+//                BLink<V>[] tmp = new BLink[dirtyRange];
+//
+//                for (int k = 0; k < dirtyRange; k++) {
+//                    tmp[k] = items.remove( dirtyStart /* removal position remains at the same index as items get removed */);
+//                }
+//
+//                //TODO items.get(i) and
+//                //   ((FasterList) items.list).removeRange(dirtyStart+1, dirtyEnd);
+//
+//                for (BLink i : tmp) {
+//                    if (i.isDeleted()) {
+//                        removeKeyForValue(i);
+//                    } else {
+//                        items.add(i);
+//                    }
+//                }
+//
+//            } else {
+                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
+//            }
+//        }
 
         removeDeletedAtBottom();
     }
