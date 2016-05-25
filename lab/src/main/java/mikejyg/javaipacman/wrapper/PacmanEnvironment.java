@@ -25,10 +25,14 @@ import mikejyg.javaipacman.pacman.cghost;
 import mikejyg.javaipacman.pacman.cmaze;
 import mikejyg.javaipacman.pacman.cpcman;
 import mikejyg.javaipacman.pacman.ctables;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.learn.Agent;
 import nars.util.NAgent;
@@ -36,8 +40,6 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
 import java.util.Random;
-
-import static nars.NAR.printTasks;
 
 /**
  * the java application class of pacman 
@@ -67,7 +69,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		nar.beliefConfidence(0.75f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
@@ -77,13 +79,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		//new MySTMClustered(nar, 32, '.');
+		new MySTMClustered(nar, 64, '.');
 		//new MySTMClustered(nar, 8, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				150000);
+				1500);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
@@ -118,6 +120,33 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	}
 
 	float lastScore;
+
+
+	final Atom PILL = $.the("pill");
+	final Atom WALL = $.the("wall");
+	final Atom GHOST = $.the("ghost");
+
+	@Override
+	public void preStart(Agent a) {
+		if (a instanceof NAgent) {
+			//provide custom sensor input names for the nars agent
+			((NAgent) a).setSensorNamer((i) -> {
+				int square = i / 3;
+				int type = i % 3;
+				Atom typeTerm;
+				switch (type) {
+					case 0: typeTerm = WALL; break;
+					case 1: typeTerm = PILL; break;
+					case 2: typeTerm = GHOST; break;
+					default:
+						throw new RuntimeException();
+				}
+				return $.p($.the(square), typeTerm);
+				//return (Compound)$.inh($.the(square), typeTerm);
+			});
+		}
+	}
+
 
 	@Override
 	public float cycle(int t, int action, float[] ins, Agent a) {

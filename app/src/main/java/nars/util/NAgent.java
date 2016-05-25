@@ -8,11 +8,13 @@ import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.nal.Tense;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.data.array.Arrays;
 import nars.learn.Agent;
+import nars.util.experiment.Environment;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.MotorConcept;
@@ -20,10 +22,12 @@ import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static nars.$.$;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -32,6 +36,8 @@ import static nars.nal.Tense.ETERNAL;
 public class NAgent implements Agent {
 
     public final NAR nar;
+
+    private IntFunction<Compound> sensorNamer = null;
 
     float motivation[];
     int motivationOrder[];
@@ -47,10 +53,14 @@ public class NAgent implements Agent {
     float dReward;
     private SensorConcept dRewardPos, dRewardNeg;
 
-    /** learning rate */
+    /**
+     * learning rate
+     */
     float alpha;
 
-    /** exploration rate - confidence of initial goal for each action */
+    /**
+     * exploration rate - confidence of initial goal for each action
+     */
     float epsilon = 0.05f;
     private final double epsilonRandom = 0.01f;
 
@@ -59,7 +69,7 @@ public class NAgent implements Agent {
     float goalFeedbackPriority;
     float goalPriority;
 
-    final FloatToObjectFunction sensorTruth =  (v) -> {
+    final FloatToObjectFunction sensorTruth = (v) -> {
         /*return new DefaultTruth(
                 v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
 
@@ -69,11 +79,7 @@ public class NAgent implements Agent {
     };
 
 
-
-    private final int discretization = 1;
     private float lastMotivation;
-
-
 
 
     public NAgent(NAR n) {
@@ -82,6 +88,7 @@ public class NAgent implements Agent {
 
     @Override
     public void start(int inputs, int actions) {
+
         nar.reset();
 
         rewardPriority = goalFeedbackPriority = sensorPriority = nar.priorityDefault(Symbols.BELIEF);
@@ -98,15 +105,15 @@ public class NAgent implements Agent {
 
         this.actions = IntStream.range(0, actions).mapToObj(i -> {
 
-            MotorConcept.MotorFunction motorFunc = (b,d) -> {
+            MotorConcept.MotorFunction motorFunc = (b, d) -> {
 
                 motivation[i] =
                         //d;
                         //Math.max(0, d-b);
                         //(1+d)/(1+b);
                         //d / (d+b);
-                        d-b;
-                        //d  / (1f + b);
+                        d - b;
+                //d  / (1f + b);
 
                 /*if (d < 0.5) return 0; //Float.NaN;
                 if (d < b) return 0; //Float.NaN;
@@ -116,13 +123,12 @@ public class NAgent implements Agent {
             };
 
             return new MotorConcept(actionConceptName(i), nar, motorFunc);
-        }).collect( toList());
-
+        }).collect(toList());
 
 
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
-            return getSensorConcepts(sensorTruth, i, discretization);
-        }).flatMap(x -> x).collect( toList());
+            return getSensorConcepts(sensorTruth, i);
+        }).flatMap(x -> x).collect(toList());
 
         this.reward = new SensorConceptDebug("(R)", nar,
                 new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
@@ -148,6 +154,10 @@ public class NAgent implements Agent {
         init();
     }
 
+    public void setSensorNamer(IntFunction<Compound> sensorNamer) {
+        this.sensorNamer = sensorNamer;
+    }
+
     public class SensorConceptDebug extends SensorConcept {
 
         public SensorConceptDebug(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
@@ -171,56 +181,26 @@ public class NAgent implements Agent {
                 /*" frstSum="*/ + Texts.n4(nar.emotion.learning()) + " "
                 /*" strsSum="*/ + Texts.n4(nar.emotion.stress.getSum()) + " "
                 /*" frstSum="*/ + Texts.n4(nar.emotion.focusChange.getSum()) + " "
-                                + "\t" + nar.index.summary()
+                + "\t" + nar.index.summary()
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
-        ;
+                ;
 
     }
 
 
     public
     @NotNull
-    Stream<SensorConcept> getSensorConcepts(FloatToObjectFunction sensorTruth, int i, int bits) {
+    Stream<SensorConcept> getSensorConcepts(FloatToObjectFunction sensorTruth, int i) {
 
 
-
-        return IntStream.range(0, bits).mapToObj(bit -> {
-
-            if (bits == 1) {
-                //single bit case
-                return new SensorConceptDebug(inputConceptName(i), nar,  () -> {
+        return Stream.of(
+                new SensorConcept(inputConceptName(i), nar, () -> {
                     return input[i];
-                }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority);
-            }
+                }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority)
+        );
 
-//
-//            00 0
-//            01 1
-//            10 2
-//            11 3
-//
-//            return new SensorConcept(inputConceptName(i,bit), nar,  () -> {
-//
-//                int v = (( Math.round(input[i] * (1 << bits)) >> (bit)) % 2);
-//                //System.out.println(i + ": " + input[i] + " " + bit + " = " + v);
-//                return v;
-//
-//            }, sensorTruth).resolution(0.01f).timing(-1, -1);
 
-            float min = bit / bits, max = min + (1f/bits);
-
-            return new SensorConceptDebug(inputConceptName(i,bit), nar,  () -> {
-
-                float v = input[i];
-                if (v >= 1f) v = 1f - Global.TRUTH_EPSILON; //clamp below 1.0 for this discretization
-
-                //System.out.println(i + ": " + input[i] + " " + bit + " = " + v);
-                return (v >= min) && (v < max) ? 1f : 0f;
-
-            }, sensorTruth).resolution(0.01f).timing(-1, -1).pri(sensorPriority);
-
-        });
     }
 
     protected void init() {
@@ -234,7 +214,6 @@ public class NAgent implements Agent {
     }
 
     private void seekReward() {
-
 
 
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
@@ -267,14 +246,13 @@ public class NAgent implements Agent {
     @Override
     public int act(float reward, float[] nextObservation) {
 
-        if (lastAction!=-1) {
+        if (lastAction != -1) {
             learn(input, lastAction, reward);
         }
 
         observe(nextObservation);
 
         decide(this.lastAction);
-
 
 
         return lastAction;
@@ -312,7 +290,7 @@ public class NAgent implements Agent {
         nextMotivation = motivation[nextAction];
 
         float on;
-        if (lastAction!=nextAction) {
+        if (lastAction != nextAction) {
             if (lastAction != -1) {
 
 //                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
@@ -327,14 +305,14 @@ public class NAgent implements Agent {
                 nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0f, alpha * off);
             }
 
-            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, alpha );
+            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, alpha);
 
             on = 1f;
         } else {
 
 //            //TWEAK - activate a repeated chosen goal less if reward has decreased
 //            if (dReward >= 0) {
-                on = 1f;
+            on = 1f;
 //            } else {
 //                on = 0.5f;
 //            }
@@ -350,7 +328,7 @@ public class NAgent implements Agent {
     }
 
     private int randomMotivation() {
-        return (int)(Math.random() * actions.size());
+        return (int) (Math.random() * actions.size());
     }
 
     private int decideMotivation() {
@@ -368,7 +346,7 @@ public class NAgent implements Agent {
                 nextAction = i;
                 nextMotivation = m;
             }
-            if (equalToLast && j > 0 && !Util.equals(m, motivation[motivationOrder[j-1]]) ) {
+            if (equalToLast && j > 0 && !Util.equals(m, motivation[motivationOrder[j - 1]])) {
                 equalToLast = false; //there is some variation
             }
 
@@ -387,16 +365,20 @@ public class NAgent implements Agent {
         return "{a" + i + "}";
     }
 
-    private String inputConceptName(int i) {
-        //return inputConceptName(i, -1);
-        //return "I:i" + i;
-        //return "I:{i" + i + "}";
-        return "{i" + i + "}";
+    private Compound inputConceptName(int i) {
+        if (sensorNamer!=null) {
+            return sensorNamer.apply(i);
+        } else {
+            //return inputConceptName(i, -1);
+            //return "I:i" + i;
+            //return "I:{i" + i + "}";
+            return $("{i" + i + "}");
+        }
     }
 
     private String inputConceptName(int i, int component) {
         return "(i" + i +
-                    (component != -1 ? ("_" + component) :"") +
+                (component != -1 ? ("_" + component) : "") +
                 ")";
 
         //return "{i" + i + "}";

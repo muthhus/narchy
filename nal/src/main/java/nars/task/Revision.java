@@ -177,6 +177,9 @@ public class Revision {
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
         Compound cc = dtMerge(a, b, aProp, accumulatedDifference, 1f);
+        if (accumulatedDifference.floatValue() > 0) {
+            System.err.println("OK");
+        }
 
         //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
         float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
@@ -216,18 +219,26 @@ public class Revision {
     private static Compound dtMerge(Compound a, Compound b, float balance, MutableFloat accumulatedDifference, float depth) {
         int newDT;
         int adt = a.dt();
+        if (a.size() != 2) {
+            if (b.size() != a.size())
+                throw new RuntimeException("err");
+            return a;
+        }
+
         if (adt != b.dt()) {
 
-            //TODO maybe choose the eternality based on stronger balance
+
 
             int bdt = b.dt();
             if (adt != DTERNAL && bdt != DTERNAL) {
                 newDT = Math.round(Util.lerp(adt, bdt, balance));
                 accumulatedDifference.add(Math.abs(adt - bdt) * depth);
-            } else if (bdt != DTERNAL)
-                newDT = adt;
-            else if (adt != DTERNAL)
+            } else if (bdt != DTERNAL) {
                 newDT = bdt;
+            }
+            else if (adt != DTERNAL) {
+                newDT = adt;
+            }
             else {
                 throw new RuntimeException();
             }
@@ -235,6 +246,9 @@ public class Revision {
             newDT = adt;
         }
 
+        if (a.size() != 2) {
+            throw new RuntimeException("wtf");
+        }
         Term a0 = a.term(0);
         Term a1 = a.term(1);
         if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {

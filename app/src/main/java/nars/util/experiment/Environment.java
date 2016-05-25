@@ -22,6 +22,7 @@ public interface Environment {
 
         Arrays.fill(ins, 0.5f);
 
+        preStart(a);
         a.start(inputs, x.getTwo());
 
         float reward = 0, rewardSum = 0;
@@ -39,4 +40,5 @@ public interface Environment {
     /** returns reward value */
     float cycle(int t, int action, float[] ins, Agent a);
 
+    default void preStart(Agent a) { }
 }
