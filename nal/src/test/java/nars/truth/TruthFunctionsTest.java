@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Global.TRUTH_EPSILON;
-import static nars.truth.TruthFunctions.andb;
 import static nars.truth.TruthFunctions.xnor;
 import static org.junit.Assert.*;
 
@@ -31,27 +30,19 @@ public class TruthFunctionsTest {
         assertEquals(0.625f, xnor(0.25f,0.25f), 0.01f );
     }
 
-    @Test
-    public void testANDB() {
-        assertEquals(1f, andb(1f,1f), 0.01f );
-        assertEquals(0f, andb(0f,0f), 0.01f );
-        assertEquals(0.5f, andb(0.5f,0.5f), 0.01f );
-        assertEquals(0.5f, andb(0.5f,0.75f), 0.01f );
+//    @Test
+//    public void testANDB() {
+//        assertEquals(1f, andb(1f,1f), 0.01f );
+//        assertEquals(0f, andb(0f,0f), 0.01f );
+//        assertEquals(0.5f, andb(0.5f,0.5f), 0.01f );
+//        assertEquals(0.5f, andb(0.5f,0.75f), 0.01f );
+//
+//        assertEquals(0.5f, andb(0f,1f), 0.01f );
+//
+//    }
 
-        assertEquals(0.5f, andb(0f,1f), 0.01f );
-
-    }
 
 
-    @Test
-    public void testBipolarComparison() {
-        printTruthChart();
-
-        assertEquals(
-            TruthFunctions.comparison( t(1, 0.9f), t(1, 0.9f), TRUTH_EPSILON ),
-            TruthFunctions.comparison( t(0, 0.9f), t(0, 0.9f), TRUTH_EPSILON )
-        );
-    }
 
     public static void printTruthChart() {
         float c = 0.9f;

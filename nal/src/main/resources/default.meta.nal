@@ -361,8 +361,8 @@
     A, B, task(positive), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction)
     A, B, task(negative), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,A) ==> B), (Belief:InductionNeg)
 
-    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
-    //A, B, task(negative), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,A) <=> B), (Belief:ComparisonNeg)
+    A, B, task(positive), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
+    A, B, task(negative), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,A) <=> B), (Belief:ComparisonNeg)
 
     A, B, task(positive), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
     A, B, task(negative), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> (--,A)), (Belief:AbductionNeg)

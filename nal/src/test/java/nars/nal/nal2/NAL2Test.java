@@ -55,7 +55,7 @@ public class NAL2Test extends AbstractNALTest {
                 .believe("<tweety --> bird>", 0.9f, 0.9f)
                 .mustBelieve(cycles, "<worm --> tweety>", 0.10f, 0.42f)
                 .mustBelieve(cycles, "<tweety --> worm>", 0.90f, 0.07f)
-                .mustBelieve(cycles, "<tweety <-> worm>", 0.17f, 0.44f)
+                .mustBelieve(cycles, "<tweety <-> worm>", 0.10f, 0.42f)
         ;
     }
 

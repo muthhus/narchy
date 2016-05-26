@@ -10,8 +10,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.ETERNAL;
-
 @RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
@@ -111,15 +109,7 @@ public class NAL5Test extends AbstractNALTest {
         tester.mustBelieve(cycles,"<<robin --> bird> <=> <robin --> [flying]>>",0.70f,0.45f); //.en("I guess robin is a type of bird if and only if robin can fly.");
     }
 
-    @Test
-    public void comparisonNeg(){
-        TestNAR tester = test();
-        //tester.log();
-        tester.mustNotOutput(cycles,"<a <=> b>",'.',ETERNAL);
-        tester.believe("<a ==> c>", 0.5f, 0.9f);
-        tester.believe("<b ==> c>", 0.5f, 0.9f);
 
-    }
 
     @Test
     public void analogy(){
