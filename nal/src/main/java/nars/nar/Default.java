@@ -135,8 +135,8 @@ public class Default extends AbstractNAR {
         c.active.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
-        c.reasoner.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
-        c.reasoner.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
+        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
 
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 

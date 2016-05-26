@@ -26,7 +26,15 @@ public class AutoBag<V>  {
     }
 
 
-    public Bag<V> update(Bag<V> bag) {
+    /** @param forceCommit - force a commit even if there are no pending items requiring
+    *                      forgetting. this is necessary if the bag involves weak BLink's or other
+     *                     links which can spontaneously get deleted or delete themselves and need
+     *                     to be removed.
+     * @param bag
+     * @param forceCommit
+     * @return
+     */
+    public Bag<V> update(Bag<V> bag, boolean forceCommit) {
 
         BudgetForget f;
         float r = forgetPeriod((ArrayBag<V>) bag);
@@ -35,6 +43,9 @@ public class AutoBag<V>  {
             forget.setForgetCycles(r);
             f = forget;
         } else {
+            if (!forceCommit)
+                return bag;
+
             f = null;
         }
 
@@ -47,11 +58,10 @@ public class AutoBag<V>  {
             return 0;
 
         FasterList<BLink<V>> pending = bag.pending;
-        BLink[] parray = bag.pending.array();
 
         float pendingMass = 0;
         for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
-            BLink<V> v = parray[i];
+            BLink<V> v = pending.get(i);
             pendingMass += v.pri() * v.dur();
         }
 

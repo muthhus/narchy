@@ -70,9 +70,6 @@ public enum NARideRealtimeDefault {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar, "is"));
-        nar.conceptRemembering.setValue(1000 * 10);
-        nar.termLinkRemembering.setValue(1000 * 25);
-        nar.taskLinkRemembering.setValue(1000 * 15);
         return nar;
     }
 }

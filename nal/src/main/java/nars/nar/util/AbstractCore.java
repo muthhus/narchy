@@ -133,7 +133,7 @@ public abstract class AbstractCore {
         //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
         //active.printAll();
 
-        conceptUpdate.update(active);
+        conceptUpdate.update(active, false);
 
         fireConcepts(conceptsFiredPerCycle.intValue());
 
@@ -171,8 +171,8 @@ public abstract class AbstractCore {
     protected final void fireConcept(BLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
-        tasklinkUpdate.update(concept.tasklinks());
-        termlinkUpdate.update(concept.termlinks());
+        tasklinkUpdate.update(concept.tasklinks(), true);
+        termlinkUpdate.update(concept.termlinks(), false);
 
         reasoner.firePremiseSquared(
                 conceptLink,

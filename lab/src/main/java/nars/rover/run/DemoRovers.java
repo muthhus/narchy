@@ -410,9 +410,6 @@ public class DemoRovers {
         nar.conceptActivation.setValue(0.25f);
 
 
-        nar.conceptRemembering.setValue(3f);
-        nar.termLinkRemembering.setValue(12);
-        nar.taskLinkRemembering.setValue(8);
 
         nar.cyclesPerFrame.set(32);
 

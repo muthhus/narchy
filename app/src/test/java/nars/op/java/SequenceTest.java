@@ -37,7 +37,6 @@ public class SequenceTest {
         Default n = new Default(1000, 8, 2, 2);
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
         n.cyclesPerFrame.set(4);
-        n.conceptRemembering.setValue(1);
         n.conceptActivation.setValue(0.05f);
         //n.shortTermMemoryHistory.set(4);
 

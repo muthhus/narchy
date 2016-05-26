@@ -164,9 +164,6 @@ public class CurveBagTest  {
 
     @Test public void testDistribution() {
         Default n = new Default(48, 4, 2, 4);
-        n.conceptRemembering.setValue(100);
-        n.termLinkRemembering.setValue(100);
-        n.taskLinkRemembering.setValue(100);
         n.perfection.setValue(1f);
         n.input("$1$ a:b.");
         n.input("$1$ b:c.");

@@ -53,10 +53,6 @@ public abstract class AbstractNAR extends NAR {
         conceptWarm = new DefaultConceptBudgeting(10, 10, 3, 16, 8);
         conceptCold = new DefaultConceptBudgeting(8, 8, 1, 8, 4);
 
-        conceptRemembering.setValue(4);
-        termLinkRemembering.setValue(16);
-        taskLinkRemembering.setValue(8);
-
         derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
         taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
