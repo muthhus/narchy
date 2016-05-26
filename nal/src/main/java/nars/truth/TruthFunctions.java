@@ -77,8 +77,8 @@ public final class TruthFunctions extends UtilityFunctions {
 //     */
 //    @Nullable
 //    public static Truth contraposition(@NotNull Truth v1, float minConf) {
-//        float f = v1.freq();
-//        float c = w2c(and(1f - f, v1.conf()));
+//        float w = and(1 - v1.freq(), v1.conf());
+//        float c = w2c(w);
 //        return (c < minConf) ? null : new DefaultTruth(0, c);
 //    }
 
@@ -127,8 +127,6 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
-     *
-     * TODO bi-polarize
      */
     @Nullable
     public static Truth analogy(@NotNull Truth a, float bf, float bc, float minConf) {
@@ -145,8 +143,6 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
-     *
-     * TODO bi-polarize
      */
     @NotNull
     public static Truth resemblance(@NotNull Truth a, @NotNull Truth b, float minConf) {
@@ -162,13 +158,10 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
-     *
-     * TODO bi-polarize
      */
     @Nullable
     public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = w2c(and(b.freq(), a.conf(), b.conf()));
-
         return (c < minConf) ? null : new DefaultTruth(a.freq(), c);
     }
 
@@ -228,25 +221,41 @@ public final class TruthFunctions extends UtilityFunctions {
         if (invertA) f1 = 1 - f1;
 
         float f2 = b.freq();
-
-        f1 = bi(f1);
-        f2 = bi(f2);
-
-        float f0 = or(abs(f1), abs(f2));
+        float f0 = or(f1, f2);
         float c = w2c(and(f0, a.conf(), b.conf()));
         if (c < minConf)
             return null;
 
-        float f = (Util.equals(f0, 0f, Global.TRUTH_EPSILON)) ? 0.5f :
-                ((and(f1, f2) / f0)/2f)+0.5f;
-
+        float f = (Util.equals(f0, 0, Global.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
         return new DefaultTruth(f, c);
     }
 
-    /** bipolarize a frequency value to -1..+1 */
-    public static float bi(float f) {
-        return (f - 0.5f) * 2f;
-    }
+//    /**
+//     * {<M ==> S>, <M ==> P>} |- <S <=> P>
+//     * @param a Truth value of the first premise
+//     * @param b Truth value of the second premise
+//     * @return Truth value of the conclusion
+//     */
+//    @Nullable
+//    public static Truth comparisonBalanced(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
+//        float f1 = a.freq();
+//        if (invertA) f1 = 1 - f1;
+//
+//        float f2 = b.freq();
+//
+//        f1 = fb(f1);
+//        f2 = fb(f2);
+//
+//        float f0 = or(abs(f1), abs(f2));
+//        float c = w2c(and(f0, a.conf(), b.conf()));
+//        if (c < minConf)
+//            return null;
+//
+//        float f = (Util.equals(f0, 0f, Global.TRUTH_EPSILON)) ? 0.5f :
+//                ((and(f1, f2) / f0)/2f)+0.5f;
+//
+//        return new DefaultTruth(f, c);
+//    }
 
     /* ----- desire-value functions, called in SyllogisticRules ----- */
     /**
@@ -264,6 +273,41 @@ public final class TruthFunctions extends UtilityFunctions {
         float c = and(c1, c2, f2);
         return (c < minConf) ? null : new DefaultTruth(and(a.freq(), f2), c);
 
+    }
+
+    /** transforms a frequency into a weighting factor symmetric about f=0.5, where f=0.5 is zero and f=0 and f=1 are 1 */
+    public static float f2w(float f) {
+        return Math.abs(fb(f));
+    }
+
+    /** 0..1.0 in proportion to two frequency's multiplied magnitude toward the same polarity */
+    public static float xnor(float a, float b) {
+        return bf( fb(a) * fb(b) );
+    }
+
+//    /** bipolar AND , symmetric about 0.5 */
+//    public static float andb(float a, float b) {
+//        float aa = fb(a);
+//        float bb = fb(b);
+//        float p = aa * bb;
+////        if ((aa < 0 && bb > 0) || ( aa > 0 && bb < 0)) {
+////            //opposite sign
+////        } else {
+////
+////        }
+//        if ((aa < 0) && (bb < 0)) {
+//            p = -p; //invert because
+//        }
+//
+//        return bf(p);
+//    }
+    /** bipolarize a frequency value to -1..+1 */
+    public static float fb(float f) {
+        return (f - 0.5f) * 2f;
+    }
+    /** unipolarize a frequency value to 0..+1 */
+    public static float bf(float f) {
+        return (f/2f)+0.5f;
     }
 
     /**

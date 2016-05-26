@@ -8,12 +8,40 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Global.TRUTH_EPSILON;
+import static nars.truth.TruthFunctions.andb;
+import static nars.truth.TruthFunctions.xnor;
 import static org.junit.Assert.*;
 
 /**
  * Created by me on 5/26/16.
  */
 public class TruthFunctionsTest {
+
+    @Test
+    public void testXNOR() {
+
+        assertEquals(1f, xnor(1f,1f), 0.01f );
+        assertEquals(0.5f, xnor(0.5f,1f), 0.01f );
+        assertEquals(0f, xnor(0f,1f), 0.01f );
+
+        assertEquals(0.5f, xnor(0.5f,0.5f), 0.01f );
+        assertEquals(0.48f, xnor(0.4f,0.6f), 0.01f );
+
+        assertEquals(1f, xnor(0f,0f), 0.01f );
+        assertEquals(0.625f, xnor(0.25f,0.25f), 0.01f );
+    }
+
+    @Test
+    public void testANDB() {
+        assertEquals(1f, andb(1f,1f), 0.01f );
+        assertEquals(0f, andb(0f,0f), 0.01f );
+        assertEquals(0.5f, andb(0.5f,0.5f), 0.01f );
+        assertEquals(0.5f, andb(0.5f,0.75f), 0.01f );
+
+        assertEquals(0.5f, andb(0f,1f), 0.01f );
+
+    }
+
 
     @Test
     public void testBipolarComparison() {
