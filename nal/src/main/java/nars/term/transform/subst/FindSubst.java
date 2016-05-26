@@ -148,7 +148,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * called each time all variables are satisfied in a unique way
      */
-    public abstract boolean onMatch();
+    protected abstract boolean onMatch();
 //    /**
 //     * called each time a match is not fully successful
 //     */

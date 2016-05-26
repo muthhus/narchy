@@ -418,8 +418,8 @@ public class PremiseRule extends GenericCompound {
         i += ')';
 
         return puncOverride == 0 ?
-                new Solve.SolvePuncFromTask(i, der, belief, desire) :
-                new Solve.SolvePuncOverride(i, der, puncOverride, belief, desire);
+                new SolvePuncFromTask(i, der, belief, desire) :
+                new SolvePuncOverride(i, der, puncOverride, belief, desire);
 
 
     }

@@ -4,6 +4,7 @@ import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseEval;
+import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,8 @@ public final class MatchOneSubterm extends MatchTerm {
      */
     private final int subterm;
 
-    private final nars.nal.meta.op.@Nullable MatchOneSubterm callback;
+
+    private final boolean finish;
 
     public MatchOneSubterm(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
         super(
@@ -29,13 +31,13 @@ public final class MatchOneSubterm extends MatchTerm {
                 x
                 , constraints);
         this.subterm = subterm;
-        this.callback = finish ? this : null;
+        this.finish = finish;
     }
 
     @Override
     @Deprecated
     public final boolean booleanValueOf(@NotNull PremiseEval p) {
-        p.matchAll(x, p.taskbelief[subterm] /* current term */, callback, constraints);
+        p.matchAll(x, p.taskbelief[subterm] /* current term */, finish ? this.eachMatch : null, constraints);
         return true;
     }
 }

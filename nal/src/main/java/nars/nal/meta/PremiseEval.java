@@ -40,14 +40,15 @@ public class PremiseEval extends FindSubst {
     @NotNull
     public final Versioned<Character> punct;
 
+
+    /** current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee */
     @NotNull
-    @Deprecated public final Versioned<MatchTerm> pattern;
+    @Deprecated public ProcTerm forEachMatch;
 
+    public final Map<Atomic, ImmediateTermTransform> transforms = Global.newHashMap();
 
+    /** run parameters */
     int termutesPerMatch, termutes;
-
-    public final Map<Atomic, ImmediateTermTransform> transforms =
-            Global.newHashMap();
     private float minConfidence = Global.TRUTH_EPSILON;
 
 
@@ -55,6 +56,8 @@ public class PremiseEval extends FindSubst {
     private int termSub0op, termSub1op;
     private int termSub1Struct, termSub2Struct;
     public final Term[] taskbelief = new Term[2];
+
+
 
     /** initializes with the default static term index/builder */
     public PremiseEval(Random r, Deriver deriver) {
@@ -73,7 +76,6 @@ public class PremiseEval extends FindSubst {
         //tDelta = new Versioned(this);
         truth = new Versioned(versioning);
         punct = new Versioned(versioning);
-        pattern = new Versioned(versioning);
     }
 
     private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
@@ -89,22 +91,26 @@ public class PremiseEval extends FindSubst {
     }
 
     /** only one thread should be in here at a time */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, @Nullable MatchConstraint constraints) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints) {
 
         int t = now();
 
-        boolean finished = callback != null;
+        boolean finish = (eachMatch != null);
 
-        this.pattern.set(callback); //to notify of matches
+        this.forEachMatch = eachMatch; //to notify of matches
 
         if (constraints!=null)
             this.constraints.set( constraints );
 
-        matchAll(x, y, finished);
+        matchAll(x, y, finish);
 
-        if (finished) {
+        this.forEachMatch = null;
+
+        if (finish) {
             versioning.revert(t);
         } //else: allows the set constraints to continue
+
+
     }
 
     @Override
@@ -114,9 +120,9 @@ public class PremiseEval extends FindSubst {
     }
 
     @Override
-    public boolean onMatch() {
+    protected boolean onMatch() {
         if (termutes-- > 0) {
-            pattern.get().eachMatch.accept(this);
+            forEachMatch.accept(this);
             return true;
         }
         return false;
@@ -131,7 +137,7 @@ public class PremiseEval extends FindSubst {
         return "RuleMatch:{" +
                 "premise:" + premise +
                 ", subst:" + super.toString() +
-                (pattern.get()!=null ? (", derived:" + pattern) : "")+
+                (forEachMatch !=null ? (", derived:" + forEachMatch) : "")+
                 (truth.get()!=null ? (", truth:" + truth) : "")+
                 //(!secondary.isEmpty() ? (", secondary:" + secondary) : "")+
                 //(occurrenceShift.get()!=null ? (", occShift:" + occurrenceShift) : "")+

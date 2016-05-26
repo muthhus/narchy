@@ -19,18 +19,12 @@ public final class TaskBeliefPair extends GenericCompound {
 
     public TaskBeliefPair(@NotNull Term a, @NotNull Term b) {
         this();
-        set(a, b);
-    }
-
-
-    public void set(@NotNull Term a, @NotNull Term b) {
         Term[] t = terms();
         t[0] = a;
         t[1] = b;
-
-        //this.actualStructure = a.structure() | b.structure();
-        //subterms.init();
     }
+
+
 
     @Override
     public int structure() {

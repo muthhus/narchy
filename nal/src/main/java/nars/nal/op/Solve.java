@@ -187,31 +187,5 @@ abstract public class Solve extends AtomicBoolCondition {
     }
 
 
-    public static final class SolvePuncFromTask extends Solve {
-
-        public SolvePuncFromTask(String i, Derive der, TruthOperator belief, TruthOperator desire) {
-            super(i, der, belief, desire);
-        }
-
-        @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return measure(m, m.punct.get() );
-        }
-    }
-
-    public static final class SolvePuncOverride extends Solve {
-        private final char puncOverride;
-
-
-        public SolvePuncOverride(String i, Derive der, char puncOverride, TruthOperator belief, TruthOperator desire) {
-            super(i, der, belief, desire);
-            this.puncOverride = puncOverride;
-        }
-
-        @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return measure(m, puncOverride);
-        }
-    }
-
-
 }
 

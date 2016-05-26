@@ -19,10 +19,11 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 
     public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
         @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
-            return o.premise.task().isQuestOrQuestion();
+            char c = o.premise.task().punc();
+            return c == Symbols.QUESTION || c == Symbols.QUEST;
         }
         @Override public String toString() {
-            return "task:\"?\"";
+            return "task:\"?@\"";
         }
     };
 
