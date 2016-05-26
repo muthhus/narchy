@@ -170,21 +170,22 @@ public class Line1D implements Environment {
 
         Default nar = new Default(1024, 8, 1, 3);
 
-        nar.beliefConfidence(0.25f);
+        nar.beliefConfidence(0.35f);
+        nar.goalConfidence(0.35f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         nar.DEFAULT_GOAL_PRIORITY = 0.4f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
 
-        nar.cyclesPerFrame.setValue(64);
+        nar.cyclesPerFrame.setValue(32);
 
         //nar.log();
 
         new MySTMClustered(nar, 64, '.');
         int cycles = 10000;
         float score = new Line1D(8,
-                //random(10)
-                sine(10)
+                random(50)
+                //sine(10)
         ).run(
                 new NAgent(nar),
                 //new DQN(),

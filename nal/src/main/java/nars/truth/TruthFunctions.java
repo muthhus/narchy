@@ -70,17 +70,17 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
 
-    /**
-     * {<A ==> B>} |- <(--, B) ==> (--, A)>
-     * @param v1 Truth value of the premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth contraposition(@NotNull Truth v1, float minConf) {
-        float w = and(1 - v1.freq(), v1.conf());
-        float c = w2c(w);
-        return (c < minConf) ? null : new DefaultTruth(0, c);
-    }
+//    /**
+//     * {<A ==> B>} |- <(--, B) ==> (--, A)>
+//     * @param v1 Truth value of the premise
+//     * @return Truth value of the conclusion
+//     */
+//    @Nullable
+//    public static Truth contraposition(@NotNull Truth v1, float minConf) {
+//        float f = v1.freq();
+//        float c = w2c(and(1f - f, v1.conf()));
+//        return (c < minConf) ? null : new DefaultTruth(0, c);
+//    }
 
     /* ----- double argument functions, called in MatchingRules ----- */
 
@@ -127,6 +127,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
+     *
+     * TODO bi-polarize
      */
     @Nullable
     public static Truth analogy(@NotNull Truth a, float bf, float bc, float minConf) {
@@ -143,6 +145,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
+     *
+     * TODO bi-polarize
      */
     @NotNull
     public static Truth resemblance(@NotNull Truth a, @NotNull Truth b, float minConf) {
@@ -158,10 +162,13 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
+     *
+     * TODO bi-polarize
      */
     @Nullable
     public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = w2c(and(b.freq(), a.conf(), b.conf()));
+
         return (c < minConf) ? null : new DefaultTruth(a.freq(), c);
     }
 
@@ -222,8 +229,8 @@ public final class TruthFunctions extends UtilityFunctions {
 
         float f2 = b.freq();
 
-        f1 = (f1 - 0.5f) * 2f;
-        f2 = (f2 - 0.5f) * 2f;
+        f1 = bi(f1);
+        f2 = bi(f2);
 
         float f0 = or(abs(f1), abs(f2));
         float c = w2c(and(f0, a.conf(), b.conf()));
@@ -234,6 +241,11 @@ public final class TruthFunctions extends UtilityFunctions {
                 ((and(f1, f2) / f0)/2f)+0.5f;
 
         return new DefaultTruth(f, c);
+    }
+
+    /** bipolarize a frequency value to -1..+1 */
+    public static float bi(float f) {
+        return (f - 0.5f) * 2f;
     }
 
     /* ----- desire-value functions, called in SyllogisticRules ----- */

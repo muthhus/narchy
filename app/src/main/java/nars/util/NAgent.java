@@ -4,6 +4,7 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
+import nars.budget.UnitBudget;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -260,8 +261,16 @@ public class NAgent implements Agent {
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
-        Task whatCauseDeltaReward = nar.ask("(?x ==> (dR))", ETERNAL, causeOfIncreasedReward -> {
+        Task whatCauseDeltaReward = nar.ask("(?x ==> (dR))", ETERNAL, (Task causeOfIncreasedReward) -> {
             System.out.println(causeOfIncreasedReward.explanation());
+
+            //BOOST
+            if (causeOfIncreasedReward.expectation() > 0.75f) {
+                Term strategy = causeOfIncreasedReward.term(0);
+                System.err.println("\nSTRATEGY BOOST! :" + strategy);
+                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
+            }
+
             return true;
         });
         Task howToAcheiveDeltaReward = nar.ask($("(dR)"), ETERNAL, '@', how -> {

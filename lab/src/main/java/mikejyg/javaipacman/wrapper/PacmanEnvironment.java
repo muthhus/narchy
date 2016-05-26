@@ -63,19 +63,20 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 16, 1, 3, rng,
+				1024, 16, 1, 2, rng,
 				new Default.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.beliefConfidence(0.15f);
+		nar.beliefConfidence(0.55f);
+		nar.goalConfidence(0.55f);
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(16);
+		nar.cyclesPerFrame.set(8);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

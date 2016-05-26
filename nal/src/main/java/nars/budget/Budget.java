@@ -91,6 +91,12 @@ public abstract class Budget implements Budgeted {
         setPriority(pri() - toSubtract);
     }
 
+    public Budgeted cloneMult(float p, float d, float q) {
+        Budget x = clone();
+        x.mul(p, d, q);
+        return x;
+    }
+
 
     final static class InvalidPriorityException extends RuntimeException {
         public InvalidPriorityException() {

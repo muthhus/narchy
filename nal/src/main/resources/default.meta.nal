@@ -78,9 +78,8 @@
     (P ==> S), (S ==> P), task("?") |- (P ==> S), (Belief:Conversion, Punctuation:Judgment)
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
-
-    ( --S ==> P),   P, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
-    ( --S ==> P), --S, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
+//    ( --S ==> P),   P, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
+//    ( --S ==> P), --S, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
 
 
 

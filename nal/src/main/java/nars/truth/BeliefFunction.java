@@ -130,13 +130,13 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise
-    Contraposition() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
-            return (T == null) ? null : TruthFunctions.contraposition(T, minConf);
-        }
-    },
+//    @SinglePremise
+//    Contraposition() {
+//        @Nullable
+//        @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
+//            return (T == null) ? null : TruthFunctions.contraposition(T, minConf);
+//        }
+//    },
 
     //@AllowOverlap
     Resemblance() {
