@@ -80,6 +80,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         public boolean delete() {
             if (super.delete()) {
                 id.clear();
+                changed = true;
                 return true;
             }
             return false;
@@ -105,10 +106,13 @@ abstract public class BLink<X> extends Budget implements Link<X> {
             X val = get();
             if (val == null) {
                 delete();
+                return true;
             } else {
                 if (val instanceof Budgeted) {
-                    if (((Budgeted) val).isDeleted())
+                    if (((Budgeted) val).isDeleted()) {
                         delete();
+                        return true;
+                    }
                 }
             }
 
@@ -162,7 +166,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         float p = pri();
         if (p==p) {
             //not already deleted
-            _setPriority(Float.NaN);
+            b[PRI] = (Float.NaN);
             changed = true;
             return true;
         }
@@ -177,9 +181,12 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     public boolean commit() {
         if (changed) {
             float[] b = this.b;
-            b[PRI] = clamp(b[PRI] + b[DPRI]); b[DPRI] = 0;
-            b[DUR] = clamp(b[DUR] + b[DDUR]); b[DDUR] = 0;
-            b[QUA] = clamp(b[QUA] + b[DQUA]); b[DQUA] = 0;
+            float p = b[PRI];
+            if (p == p) /* not NaN */ {
+                b[PRI] = clamp(   p   + b[DPRI]); b[DPRI] = 0;
+                b[DUR] = clamp(b[DUR] + b[DDUR]); b[DDUR] = 0;
+                b[QUA] = clamp(b[QUA] + b[DQUA]); b[DQUA] = 0;
+            }
             changed = false;
             return true;
         }
