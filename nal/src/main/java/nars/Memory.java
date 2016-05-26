@@ -21,7 +21,6 @@
 package nars;
 
 
-import nars.concept.ConceptProcess;
 import nars.task.Task;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;

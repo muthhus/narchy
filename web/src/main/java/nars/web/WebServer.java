@@ -237,9 +237,7 @@ public class WebServer /*extends PathHandler*/ {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(100 * 25);
-        nar.termLinkRemembering.setValue(100 * 100);
-        nar.taskLinkRemembering.setValue(100 * 75);
+
         return nar;
     }
 

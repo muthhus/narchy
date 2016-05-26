@@ -1,8 +1,6 @@
 package nars.task;
 
-import nars.Global;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;

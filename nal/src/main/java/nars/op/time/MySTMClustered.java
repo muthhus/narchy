@@ -14,7 +14,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.util.data.MutableInteger;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**

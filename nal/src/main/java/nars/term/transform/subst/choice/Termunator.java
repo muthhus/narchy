@@ -27,7 +27,7 @@ public final class Termunator extends Termutator {
      * should be be synchronized if threadsafe necessary
      */
     @Override
-    public void run(FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
+    public final void run(FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
         if (termutes.isEmpty()) {
             f.onMatch();
         } else {

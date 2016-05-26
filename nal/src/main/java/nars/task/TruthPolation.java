@@ -6,7 +6,6 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.$;
 import nars.Global;
 import nars.learn.microsphere.InterpolatingMicrosphere;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;
-import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals

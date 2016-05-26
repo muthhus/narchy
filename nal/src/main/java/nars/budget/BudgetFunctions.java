@@ -27,8 +27,6 @@ import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.stream.Stream;
-
 /**
  * Budget functions for resources allocation
  */

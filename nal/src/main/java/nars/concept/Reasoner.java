@@ -5,20 +5,17 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
 import nars.concept.table.BeliefTable;
-import nars.data.Range;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -79,7 +76,7 @@ abstract public class Reasoner {
     /**
      * temporary re-usable array for batch firing
      */
-    private final Collection<BLink<Task>> tasks =
+    private final List<BLink<Task>> tasks =
             Global.newArrayList();
             //Global.newHashSet(1);
 
@@ -110,8 +107,7 @@ abstract public class Reasoner {
         assert (!termsBuffer.isEmpty());
 
 
-        Collection<BLink<Task>> tasksBuffer;
-        tasksBuffer = this.tasks;
+        List<BLink<Task>> tasksBuffer = this.tasks;
         c.tasklinks().sample(tasklinks, tasksBuffer::add);
 
         //assert (!tasksBuffer.isEmpty());
@@ -123,14 +119,15 @@ abstract public class Reasoner {
         //convert to array for fast for-within-for iterations
         //BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
-        tasksBuffer.forEach(taskLink -> {
-        //for (BLink<Task> taskLink : tasksArray) {
+        for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
+            BLink<Task> taskLink = tasksBuffer.get(i);
+            //for (BLink<Task> taskLink : tasksArray) {
             //if (taskLink == null) break; //null-terminated array, ends
 
             Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
             if (task!=null)
                 premiseTask(termsArray, taskLink, task);
-        });
+        }
 
         tasksBuffer.clear();
         termsBuffer.clear();

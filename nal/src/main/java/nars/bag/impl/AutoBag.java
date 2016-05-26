@@ -7,7 +7,6 @@ import nars.budget.forget.BudgetForget;
 import nars.budget.forget.Forget;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is

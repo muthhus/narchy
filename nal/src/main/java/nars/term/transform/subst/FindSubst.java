@@ -19,7 +19,10 @@ import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
-import nars.util.version.*;
+import nars.util.version.HeapVersioning;
+import nars.util.version.VersionMap;
+import nars.util.version.Versioned;
+import nars.util.version.Versioning;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
