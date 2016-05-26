@@ -14,6 +14,7 @@ import nars.util.data.Util;
 import nars.util.data.array.Arrays;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
+import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +47,7 @@ public class NAgent implements Agent {
     private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
+    private int clockMultiplier = 16; //introduces extra timing delay between frames
 
     float dReward;
     private SensorConcept dRewardPos, dRewardNeg;
@@ -105,11 +107,14 @@ public class NAgent implements Agent {
             MotorConcept.MotorFunction motorFunc = (b, d) -> {
 
                 motivation[i] =
-                        //d;
+                        //d - b;
+                        (d*d) - (b*b);
                         //Math.max(0, d-b);
                         //(1+d)/(1+b);
                         //d / (d+b);
-                        d - b;
+                        //d;
+                        //d / (1 + b);
+
                 //d  / (1f + b);
 
                 /*if (d < 0.5) return 0; //Float.NaN;
@@ -173,13 +178,18 @@ public class NAgent implements Agent {
 
     @Override
     public String summary() {
-        return /*Texts.n2(motivation) + "\t + "*/
-                /*" busySum="*/   "busy=" + Texts.n4(nar.emotion.busy.getSum()) + " "
-                /*" busySum="*/ + "hapy=" + Texts.n4(nar.emotion.happy()) + " "
-                /*" frstSum="*/ + "lern=" + Texts.n4(nar.emotion.learning()) + " "
-                /*" strsSum="*/ + "strs=" + Texts.n4(nar.emotion.stress.getSum()) + " "
-                /*" frstSum="*/ + "alrt=" + Texts.n4(nar.emotion.alert.getSum()) + " "
-                + "\t" + nar.index.summary()
+
+        @NotNull Emotion emotion = nar.emotion;
+
+        return                    Texts.n2(motivation) + "\t + "
+                 + "rwrd=" + Texts.n4(prevReward) + " "
+                 + "hapy=" + Texts.n4(emotion.happy()) + " "
+                 + "busy=" + Texts.n4(emotion.busy.getSum()) + " "
+                 + "lern=" + Texts.n4(emotion.learning()) + " "
+                 + "strs=" + Texts.n4(emotion.stress.getSum()) + " "
+                 + "alrt=" + Texts.n4(emotion.alert.getSum()) + " "
+                 + "\t" + nar.index.summary()
+
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
                 ;
@@ -219,8 +229,10 @@ public class NAgent implements Agent {
         //TODO specify goal via a method in the sensor/digitizers
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
-        nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
-        nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
+
+        //nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
+        //nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
+
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
@@ -261,7 +273,10 @@ public class NAgent implements Agent {
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
         //nar.conceptualize(reward, UnitBudget.One);
+
         nar.step();
+        nar.clock.tick(clockMultiplier);
+
     }
 
     private void learn(float[] input, int action, float reward) {

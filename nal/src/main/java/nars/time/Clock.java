@@ -16,5 +16,10 @@ public interface Clock extends Serializable {
 	/** called each cycle */
 	void tick();
 
+	default void tick(int ticks) {
+		for (int i = 0; i < ticks; i++)
+			tick();
+	}
+
 	long elapsed();
 }

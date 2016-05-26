@@ -67,8 +67,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.beliefConfidence(0.25f);
 		//nar.conceptActivation.setValue(0.01f);
+		nar.beliefConfidence(0.25f);
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.3f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.2f;

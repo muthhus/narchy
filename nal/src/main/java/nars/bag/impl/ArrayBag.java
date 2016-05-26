@@ -352,19 +352,33 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         BLink<V> ii;
         BLink<V>[] l = items.array();
 
+        int toRemoveFromMap = 0;
         while (i > 0 && (ii = l[i]).isDeleted()) {
             if (removeKeyForValue(ii) == null) {
                 //
                 //throw new RuntimeException("Bag fault while trying to remove key by item value");
 
                 //exhaustive removal, since the BLink has lost its key
-                removeKey((BLink<BLink<V>>) ii);
+                toRemoveFromMap++;
             }
 
             //remove by known index rather than have to search for it by key or something
             //different from removeItem which also removes the key, but we have already done that above
             items.remove(i);
             i--;
+        }
+
+
+        if (toRemoveFromMap > 0) {
+//            int sizeBefore = map.size();
+            map.values().removeIf(b -> b.isDeleted());
+
+            //EXTRA checks but which dont apply if dealing with weak links becaues they can get removed in the middle of checking them (heisenbug):
+//            int currentSize = map.size();
+//            if (sizeBefore - currentSize < toRemoveFromMap)
+//                throw new RuntimeException("bag fault");
+//            if (currentSize!=items.size())
+//                throw new RuntimeException("bag fault");
         }
     }
 

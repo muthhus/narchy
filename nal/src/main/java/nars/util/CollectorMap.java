@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
  */
 public abstract class CollectorMap<K, V>  {
 
-    private final Map<K, V> map;
+    protected final Map<K, V> map;
 
     protected CollectorMap(Map<K, V> map) {
         this.map = map;
@@ -121,7 +121,7 @@ public abstract class CollectorMap<K, V>  {
 
     /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
     protected final void removeKey(BLink<V> item) {
-        boolean removed = map.values().removeIf((v)->(v==item));
+        boolean removed = map.values().remove(item); //removeIf((v)->(v==item));
         if (!removed)
             throw new RuntimeException("Bag fault while trying to remove key by item value");
     }
