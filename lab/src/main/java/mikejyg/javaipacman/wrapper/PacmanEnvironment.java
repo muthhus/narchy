@@ -81,7 +81,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new MySTMClustered(nar, 32, '.');
+		new MySTMClustered(nar, 8, '.');
 		//new MySTMClustered(nar, 8, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

@@ -288,7 +288,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final boolean containsTerm(@NotNull Term target) {
+    public final boolean containsTerm(Termlike target) {
         return subterms.containsTerm(target);
     }
 
@@ -320,14 +320,18 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
-
         int ys = y.size();
-        TermVector<T> st = subterms;
-        if ((st.size() == ys) && (relation == y.relation())) {
+        TermVector<T> xsubs = subterms;
+        if (xsubs.size() == ys)  {
+            @NotNull Op op = this.op;
+            if (op.isImage() && (relation != y.relation()))
+                return false;
+
             //return (isCommutative()) ?
+            @NotNull TermContainer ysubs = y.subterms();
             return (ys > 1 && op.isCommutative()) ?
-                    subst.matchPermute(this, y) :
-                    subst.matchLinear(st, y.subterms());
+                    subst.matchPermute(xsubs, ysubs) :
+                    subst.matchLinear(xsubs, ysubs);
         }
         return false;
 

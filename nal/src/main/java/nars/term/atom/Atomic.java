@@ -3,6 +3,7 @@ package nars.term.atom;
 import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
+import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +67,7 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean containsTerm(Term t) {
+    default boolean containsTerm(Termlike t) {
         return false;
     }
 

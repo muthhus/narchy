@@ -18,8 +18,9 @@ public interface Termlike  {
 
     /** if contained within; doesnt match this term (if it's a term);
      *  false if term is atomic since it can contain nothing
-     * */
-    boolean containsTerm(Term t);
+     *
+     * @param t*/
+    boolean containsTerm(Termlike t);
 
 
     default boolean hasAll(int structuralVector) {
@@ -43,7 +44,7 @@ public interface Termlike  {
         return hasAny(op.bit());
     }
 
-    default boolean impossibleSubterm(@NotNull Term target) {
+    default boolean impossibleSubterm(@NotNull Termlike target) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);

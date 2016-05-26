@@ -310,7 +310,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     public <T> T injectInto(T t, ObjectIntToObjectFunction<? super T, ? extends T> objectIntToObjectFunction) {
         throw new UnsupportedOperationException();    }
 
-    public void put(short key, int value) {
+    public final void put(short key, int value) {
         if(isEmptyKey(key)) {
             this.putForEmptySentinel(value);
         } else if(isRemovedKey(key)) {
@@ -626,7 +626,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
-    private void addKeyValueAtIndex(short key, int value, int index) {
+    private final void addKeyValueAtIndex(short key, int value, int index) {
         if(this.keys[index] == 1) {
             --this.occupiedWithSentinels;
         }

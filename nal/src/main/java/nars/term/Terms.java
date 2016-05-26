@@ -270,7 +270,7 @@ public class Terms extends TermBuilder implements TermIndex {
     /**
      * brute-force equality test
      */
-    public static boolean contains(@NotNull Term[] container, @NotNull Term v) {
+    public static boolean contains(@NotNull Term[] container, @NotNull Termlike v) {
         for (Term e : container)
             if (v.equals(e))
                 return true;

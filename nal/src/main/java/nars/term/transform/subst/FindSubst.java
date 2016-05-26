@@ -496,7 +496,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 else
                     continue;
             }
-            if (xKey.containsTerm((Term) yKey)) {
+            if (xKey.containsTerm((Termlike) yKey)) {
                 //insert b before a since it is more specific
                 t.add(i, x);
                 return true;
@@ -507,11 +507,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
         }
 
-        t.add(x);
-        return true;
+        return t.add(x);
     }
 
-    public final boolean matchPermute(@NotNull TermContainer x, @NotNull Compound y) {
+    public final boolean matchPermute(@NotNull TermContainer x, @NotNull TermContainer y) {
         //detect special case of no variables
         boolean actuallyCommutative = (type == Op.VAR_PATTERN) ? (x.varPattern() == 0) : !x.hasAny(type);
 

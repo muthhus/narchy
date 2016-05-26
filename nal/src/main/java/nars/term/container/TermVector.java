@@ -3,10 +3,7 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
-import nars.term.Terms;
+import nars.term.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -258,7 +255,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
      * @return Whether the target is in the current term
      */
     @Override
-    public final boolean containsTerm(@NotNull Term t) {
+    public final boolean containsTerm(Termlike t) {
         return !impossibleSubterm(t) && Terms.contains(term, t);
     }
 

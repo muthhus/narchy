@@ -2,6 +2,7 @@ package nars.term.container;
 
 import nars.Op;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.Terms;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +83,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 //    }
 
     @Override
-    public boolean containsTerm(Term term) {
+    public boolean containsTerm(Termlike term) {
         return srcsubs.containsTerm(term);
     }
 

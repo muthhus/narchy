@@ -10,10 +10,10 @@ import static nars.Op.ATOM;
 /**
  * Created by me on 12/31/15.
  */
-public interface BoolCondition extends Term, BooleanFunction<PremiseEval>, ProcTerm {
+public interface BoolCondition extends Term/*, BooleanFunction<PremiseEval>*/, ProcTerm {
 
 
-
+    boolean booleanValueOf(PremiseEval var1);
 
     @NotNull
     @Override
@@ -26,4 +26,6 @@ public interface BoolCondition extends Term, BooleanFunction<PremiseEval>, ProcT
         b.booleanValueOf(m);
         m.revert(stack);
     }
+
+
 }

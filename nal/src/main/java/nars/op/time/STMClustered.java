@@ -275,7 +275,7 @@ public class STMClustered extends STM {
         now = nar.time();
         bag.commit();
 
-        net.compact();
+        //net.compact();
 
         //print(System.out);
     }

@@ -12,6 +12,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -848,7 +849,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public final boolean containsTerm(@NotNull Term t) {
+    public final boolean containsTerm(Termlike t) {
         return term.containsTerm(t);
     }
 

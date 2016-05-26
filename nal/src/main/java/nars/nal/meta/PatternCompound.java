@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,10 +94,14 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-            return canMatch(y) &&
-                    ((y.isCommutative()) ?
-                            subst.matchPermute(this, y) :
-                            subst.matchLinear(this, y));
+            @NotNull TermVector subterms = this.subterms;
+            if (canMatch(y)) {
+                TermContainer ysubs = y.subterms();
+                return ((y.isCommutative()) ?
+                        subst.matchPermute(subterms, ysubs) :
+                        subst.matchLinear(subterms, ysubs));
+            }
+            return false;
         }
 
         protected final boolean canMatch(@NotNull Compound y) {
