@@ -219,7 +219,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final int varQuery() {
-        return subterms.varQueries;
+        return subterms.varQuerys;
     }
 
     @Override

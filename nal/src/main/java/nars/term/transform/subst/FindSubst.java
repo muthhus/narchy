@@ -13,18 +13,13 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
-import nars.term.transform.subst.choice.Choose1;
-import nars.term.transform.subst.choice.Choose2;
-import nars.term.transform.subst.choice.CommutivePermutations;
-import nars.term.transform.subst.choice.Termutator;
+import nars.term.transform.subst.choice.*;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
-import nars.util.version.HeapVersioning;
-import nars.util.version.VersionMap;
-import nars.util.version.Versioned;
-import nars.util.version.Versioning;
+import nars.util.data.list.LimitedFasterList;
+import nars.util.version.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,15 +84,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Versioned<Compound> parent;
 
 
-    public final List<Termutator> termutes = new LimitedFasterList();
+    public final List<Termutator> termutes = new LimitedFasterList(Global.UnificationTermutesMax);
 
-    /**
-     * @param x a compound which contains one or more ellipsis terms
-     */
-    public static int countNumNonEllipsis(@NotNull Compound x) {
-        //TODO depending on the expression, determine the sufficient # of terms Y must contain
-        return Ellipsis.numNonEllipsisSubterms(x);
-    }
+
 
 
     @NotNull
@@ -148,7 +137,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * called each time all variables are satisfied in a unique way
      */
-    protected abstract boolean onMatch();
+    public abstract boolean onMatch();
 //    /**
 //     * called each time a match is not fully successful
 //     */
@@ -176,41 +165,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    /**
-     * appended to the end of termuator execution chains to invoke
-     * any accumulated termutations occurring during the match
-     * or onMatch() if it was stable
-     **/
-    private final Termutator termunator = new Termutator(".") {
 
-        /** should be be synchronized if threadsafe necessary*/
-        @Override
-        public void run(FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
-
-            if (termutes.isEmpty()) {
-                onMatch();
-            } else {
-                Termutator.next(FindSubst.this, next(), -1);
-            }
-
-        }
-
-        @NotNull
-        private Termutator[] next() {
-            List<Termutator> t = FindSubst.this.termutes;
-            int n = t.size();
-
-            t.add(termunator);
-            Termutator[] tt = FindSubst.this.termutes.toArray(new Termutator[n]);
-            t.clear();
-            return tt;
-        }
-
-        @Override
-        public int getEstimatedPermutations() {
-            return 0;
-        }
-    };
+    private final Termunator termunator = new Termunator(this);
 
     /**
      * setting finish=false allows matching in pieces before finishing
@@ -218,8 +174,11 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         if (match(x, y) && finish) {
+            if (!termutes.isEmpty())
+                termunator.run(this, null, -1);
+            else
+                onMatch();
 
-            termunator.run(this, null, -1);
             return true;
         }
 
@@ -409,10 +368,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
         //if the ellipsis is normal, then interpret the relationIndex as it is
-        if (countNumNonEllipsis(X) > 0) {
+        int xs = X.size();
+        if (xs > 1) {
 
             int xEllipseIndex = X.indexOf(e);
-            assert(xEllipseIndex!=-1);
 
             int xRelationIndex = X.relation();
             int yRelationIndex = Y.relation();
@@ -424,12 +383,11 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                     return false;
             } else {
                 //compare relation from end
-                if ((X.size() - xRelationIndex) != (Y.size() - yRelationIndex))
+                if ((xs - xRelationIndex) != (Y.size() - yRelationIndex))
                     return false;
             }
         } else {
             //ignore the location of imdex in the pattern and match everything
-
         }
         return true;
     }
@@ -985,31 +943,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //        }
 //    }
 
-    private static final class LimitedFasterList extends FasterList {
-
-        public LimitedFasterList() {
-            super(0); //start empty
-        }
-
-        final void ensureLimit() {
-            if (size()+1 > Global.UnificationTermutesMax) {
-                throw new RuntimeException("Termute limit exceeded");
-                        //+ this + " while trying to add " + x);
-            }
-        }
-
-        @Override
-        public boolean add(Object newItem) {
-            ensureLimit();
-            return super.add(newItem);
-        }
-
-        @Override
-        public void add(int index, Object element) {
-            ensureLimit();
-            super.add(index, element);
-        }
-    }
 }
 
 

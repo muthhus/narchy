@@ -51,7 +51,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
      * this means maximum of 127 variables per compound
      */
     public final byte vars;
-    public final byte varQueries;
+    public final byte varQuerys;
     public final byte varIndeps;
     public final byte varPatterns;
     public final byte varDeps;
@@ -97,7 +97,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         int varTot = 0;
         final int vD = meta[0]; this.varDeps = (byte)vD; varTot+=vD;
         final int vI = meta[1]; this.varIndeps = (byte)vI; varTot+=vI;
-        final int vQ = meta[2]; this.varQueries = (byte)vQ; varTot+=vQ;
+        final int vQ = meta[2]; this.varQuerys = (byte)vQ; varTot+=vQ;
         final int vP = meta[3]; this.varPatterns = (byte)vP; //varTot+=vP;
         this.vars = (byte)(varTot);
 
@@ -200,7 +200,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public final int varQuery() {
-        return varQueries;
+        return varQuerys;
     }
 
     @Override

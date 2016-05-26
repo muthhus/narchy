@@ -62,8 +62,9 @@ public class Terms extends TermBuilder implements TermIndex {
     /** should be consistent with the other hash method(s) */
     public static int hashSubterms(@NotNull TermContainer<?> container) {
         int h = 1;
-        for (Term t : container) {
-            h = 31 /*Util.PRIME1 */ * h + t.hashCode();
+        int s = container.size();
+        for (int i = 0; i < s; i++) {
+            h = container.term(i).hashCode() + h * 31 /*Util.PRIME1 */;
         }
         return h;
     }
