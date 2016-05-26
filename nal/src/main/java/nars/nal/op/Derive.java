@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
-import nars.concept.Temporalize;
+import nars.concept.TimeFunction;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.ProcTerm;
@@ -34,7 +34,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final PremiseRule rule;
-    private final Temporalize temporalizer;
+    private final TimeFunction temporalizer;
 
     /**
      * result pattern
@@ -51,7 +51,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  boolean beliefSingle, boolean goalSingle, boolean eternalize, Temporalize temporalizer) {
+                  boolean beliefSingle, boolean goalSingle, boolean eternalize, TimeFunction temporalizer) {
         this.rule = rule;
 
 
@@ -138,13 +138,18 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if ((nar.nal() >= 7) && (premise.hasTemporality())) {
 
             long[] occReturn = new long[]{ETERNAL};
+            float[] confScale = new float[] { 1f };
 
             Term temporalized = this.temporalizer.compute(content.term(),
-                    m, this, occReturn
+                    m, this, occReturn, confScale
             );
 
             if (temporalized == null)
                 return; //aborted by temporalization
+
+            //apply the confidence scale
+            if (truth!=null)
+                truth = truth.confMult(confScale[0]);
 
             //NOTE: if temporalized, the content term will be the unique Term (NOT Termed)
             //else it will stay as the Concept itself (Termed<> already stored before)

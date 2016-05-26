@@ -7,7 +7,7 @@ import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
-import nars.concept.Temporalize;
+import nars.concept.TimeFunction;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisOneOrMore;
@@ -62,7 +62,7 @@ public class PremiseRule extends GenericCompound {
                 "\t prePreconditions=" + Arrays.toString(precon) +
                 "\t match=" + match +
                 "\t postconditions=" + Arrays.toString(postconditions) +
-                "\t temporalize=" + temporalize +
+                "\t temporalize=" + timeFunction +
                 "\t eternalize=" + eternalize +
                 "\t anticipate=" + anticipate +
                 "\t backward=" + backward +
@@ -129,8 +129,7 @@ public class PremiseRule extends GenericCompound {
     @Nullable
     MatchTaskBelief match;
 
-    @Nullable
-    private Temporalize temporalize = Temporalize.Auto;
+    private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
     @Nullable
     private static final CompoundTransform truthSwap = new CompoundTransform<>() {
 
@@ -225,7 +224,7 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = Global.newHashSet(2); //for ensuring uniqueness / no duplicates
-        Solve truth = solve(post, this, anticipate, eternalize, temporalize);
+        Solve truth = solve(post, this, anticipate, eternalize, timeFunction);
 
         //PREFIX
         {
@@ -395,7 +394,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                              Temporalize temporalizer) {
+                              TimeFunction temporalizer) {
 
 
         char puncOverride = p.puncOverride;
@@ -669,85 +668,85 @@ public class PremiseRule extends GenericCompound {
                             preNext = events.taskPredicate;
                             break;*/
                         case "dt":
-                            temporalize = Temporalize.occForward;
+                            timeFunction = TimeFunction.occForward;
                             break;
 
 
                         case "dtBelief":
-                            temporalize = Temporalize.dtBelief;
+                            timeFunction = TimeFunction.dtBelief;
                             break;
                         case "dtBeliefEnd":
-                            temporalize = Temporalize.dtBeliefEnd;
+                            timeFunction = TimeFunction.dtBeliefEnd;
                             break;
                         case "dtBeliefExact":
-                            temporalize = Temporalize.dtBeliefExact;
+                            timeFunction = TimeFunction.dtBeliefExact;
                             break;
 
                         case "dtTask":
-                            temporalize = Temporalize.dtTask;
+                            timeFunction = TimeFunction.dtTask;
                             break;
                         case "dtTaskEnd":
-                            temporalize = Temporalize.dtTaskEnd;
+                            timeFunction = TimeFunction.dtTaskEnd;
                             break;
                         case "dtTaskExact":
-                            temporalize = Temporalize.dtTaskExact;
+                            timeFunction = TimeFunction.dtTaskExact;
                             break;
 
                         case "decomposeTask":
-                            temporalize = Temporalize.decomposeTask;
+                            timeFunction = TimeFunction.decomposeTask;
                             break;
 
                         //
                         case "decomposeTaskIfBefore":
-                            temporalize = Temporalize.decomposeTask;
+                            timeFunction = TimeFunction.decomposeTask;
                             preNext = events.ifTermLinkIsBefore;
                             break;
 
                         case "decomposeBelief":
-                            temporalize = Temporalize.decomposeBelief;
+                            timeFunction = TimeFunction.decomposeBelief;
                             break;
 
                         case "dtCombine":
-                            temporalize = Temporalize.dtCombine;
+                            timeFunction = TimeFunction.dtCombine;
                             break;
                         case "dtReverse":
-                            temporalize = Temporalize.occReverse;
+                            timeFunction = TimeFunction.occReverse;
                             break;
 //                        case "dtIfEvent":
 //                            temporalize = Temporalize.dtIfEvent;
 //                            break;
                         case "dtAfter":
-                            temporalize = Temporalize.occForward;
+                            timeFunction = TimeFunction.occForward;
                             preNext = events.after;
                             break;
                         case "dtAfterReverse":
-                            temporalize = Temporalize.occReverse;
+                            timeFunction = TimeFunction.occReverse;
                             preNext = events.after;
                             break;
 
                         case "dtAfterOrEternal":
-                            temporalize = Temporalize.occForward;
+                            timeFunction = TimeFunction.occForward;
                             preNext = events.afterOrEternal;
                             break;
                         case "dtAfterOrEternalReverse":
-                            temporalize = Temporalize.occReverse;
+                            timeFunction = TimeFunction.occReverse;
                             preNext = events.afterOrEternal;
                             break;
 
                         case "dtTminB":
-                            temporalize = Temporalize.dtTminB;
+                            timeFunction = TimeFunction.dtTminB;
                             break;
                         case "dtBminT":
-                            temporalize = Temporalize.dtBminT;
+                            timeFunction = TimeFunction.dtBminT;
                             break;
                         case "dtIntersect":
-                            temporalize = Temporalize.dtIntersect;
+                            timeFunction = TimeFunction.dtIntersect;
                             break;
                         case "dtUnion":
-                            temporalize = Temporalize.dtUnion;
+                            timeFunction = TimeFunction.dtUnion;
                             break;
                         case "dtUnionReverse":
-                            temporalize = Temporalize.dtUnionReverse;
+                            timeFunction = TimeFunction.dtUnionReverse;
                             break;
 
                         default:

@@ -584,13 +584,46 @@ public class NAL7Test extends AbstractNALTest {
             $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
         */
         test()
-                .log()
+                //.log()
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles*2, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
                 .mustBelieve(cycles*2, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
     }
 
+    @Test public void testComparison1_Eternal() {
+        /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+           (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
+        test()
+                .log()
+                .input("(p ==>+1 m).")
+                .input("(s ==>+4 m).")
+                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
+    }
+
+    @Test public void testComparison1_Temporal() {
+        /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+           (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
+        test()
+                .log()
+                .input("(p ==>+1 m).")
+                .inputAt(5, "(s ==>+4 m). :|:")
+                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f, 5);
+    }
+
+    @Test public void testComparison2() {
+        test()
+                .log()
+                .input("(m ==>+1 p).")
+                .input("(m ==>+4 s).")
+                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
+    }
+
+    @Test public void testConditionalAbductionByDepVar() {
+        //TODO
+        //conditional abduction by dependent variable
+        //((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), time(dtTask) |- (X --> B), (Belief:Abduction)
+    }
 
     @Test public void testDTTaskEnd() {
         /*

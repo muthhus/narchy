@@ -19,7 +19,18 @@ import static nars.nal.Tense.*;
  * Strategies for solving temporal components of a derivation
  */
 @FunctionalInterface
-public interface Temporalize {
+public interface TimeFunction {
+
+    /**
+     * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
+     * @param p         current match context
+     * @param d         derivation rule being evaluated
+     * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
+     * @param confScale
+     * @return
+     */
+    Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale);
+
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -41,42 +52,34 @@ public interface Temporalize {
     //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
     nars.Premise.OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
 
-    /**
-     * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
-     * @param p         current match context
-     * @param d         derivation rule being evaluated
-     * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
-     * @return
-     */
-    @Nullable
-    Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
     /**
      * early-aligned, difference in dt
      */
-    Temporalize dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    TimeFunction dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, +1);
     };
     /**
      * early-aligned, difference in dt
      */
-    Temporalize dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    TimeFunction dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, -1);
     };
     /**
      * early-aligned, difference in dt
      */
-    Temporalize dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    TimeFunction dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, 0);
     };
+
     /**
      * early-aligned, difference in dt
      */
-    Temporalize dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    TimeFunction dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, 2);
     };
-    Temporalize dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    TimeFunction dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, -2);
     };
@@ -136,10 +139,10 @@ public interface Temporalize {
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    Temporalize occForward = (derived, p, d, occReturn) -> {
+    TimeFunction occForward = (derived, p, d, occReturn, confScale) -> {
         return occBeliefMinTask(derived, p, occReturn, +1);
     };
-    Temporalize occReverse = (derived, p, d, occReturn) -> {
+    TimeFunction occReverse = (derived, p, d, occReturn, confScale) -> {
         return occBeliefMinTask(derived, p, occReturn, -1);
     };
 
@@ -203,11 +206,11 @@ public interface Temporalize {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    Temporalize dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+    TimeFunction dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, prem, true);
     };
-    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+    TimeFunction dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, prem, false);
     };
@@ -216,12 +219,10 @@ public interface Temporalize {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable
-    Temporalize decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    @Nullable TimeFunction decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         return decompose(derived, p, occReturn, true);
     };
-    @Nullable
-    Temporalize decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+    @Nullable TimeFunction decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         return decompose(derived, p, occReturn, false);
     };
 
@@ -436,18 +437,18 @@ public interface Temporalize {
     /**
      * dt is supplied by Task
      */
-    Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+    TimeFunction dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
 
-    Temporalize dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+    TimeFunction dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
 
     /**
      * dt is supplied by Belief
      */
-    Temporalize dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+    TimeFunction dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, false);
-    Temporalize dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+    TimeFunction dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
@@ -522,8 +523,7 @@ public interface Temporalize {
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @Nullable
-    Temporalize dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+    @Nullable TimeFunction dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess premise = p.premise;
 
         Task task = premise.task();
@@ -539,21 +539,27 @@ public interface Temporalize {
 
             Task belief = premise.belief();
 
-            if (belief != null && task.isBeliefOrGoal() && belief.task().isBeliefOrGoal()) {
-                //blend task and belief's DT's weighted by their relative confidence
-                float taskConf = task.conf();
-                eventDelta = Math.round(Util.lerp(
-                        taskDT,
-                        beliefDT,
-                        taskConf / (taskConf + belief.conf())
-                ));
+            if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
+//                //blend task and belief's DT's weighted by their relative confidence
+//                float taskConf = task.confWeight();
+//                eventDelta = Math.round(Util.lerp(
+//                        taskDT,
+//                        beliefDT,
+//                        taskConf / (taskConf + belief.confWeight())
+//                ));
+//
+//                //reduce confidence by the total change proportion
+//                confScale[0] = eventDelta / (Math.abs(eventDelta-taskDT) + Math.abs(eventDelta-beliefDT)
+
+                //choose dt from task with more confidence
+                eventDelta = task.conf() > belief.conf() ?  taskDT : beliefDT;
             } else {
                 eventDelta = taskDT;
             }
 
         } else if (taskDT == DTERNAL) {
             eventDelta = beliefDT;
-        } else /*if (beliefDT == ITERNAL)*/ {
+        } else /*if (beliefDT == DTERNAL)*/ {
             eventDelta = taskDT;
         }
 
@@ -577,8 +583,7 @@ public interface Temporalize {
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
-    @Nullable
-    Temporalize Auto = (derived, p, d, occReturn) -> {
+    @Nullable TimeFunction Auto = (derived, p, d, occReturn, confScale) -> {
 
 
         Term tp = d.rule.getTask();

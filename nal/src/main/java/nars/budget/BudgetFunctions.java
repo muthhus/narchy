@@ -229,15 +229,15 @@ public final class BudgetFunctions extends UtilityFunctions {
     }
 
     /** TODO guarantee balanced input and output */
-    public static Budget taxCollection(Stream<Task> tt, float taskPriMult) {
+    public static Budget taxCollection(Task[] tt, float paymentProportion) {
         UnitBudget u = new UnitBudget();
-        tt.forEach(t -> {
-            @NotNull Budget tbudget = t.get().budget();
+        for (Task t : tt) {
+            @NotNull Budget tbudget = t.budget();
             if (!tbudget.isDeleted()) {
-                BudgetMerge.plusDQBlend.merge(u, tbudget, 1f);
-                tbudget.priMult(taskPriMult);
+                BudgetMerge.plusDQBlend.merge(u, tbudget, paymentProportion);
+                tbudget.priMult(1f-paymentProportion);
             }
-        });
+        }
         return u;
     }
 

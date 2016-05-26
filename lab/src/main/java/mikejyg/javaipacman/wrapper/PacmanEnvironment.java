@@ -71,13 +71,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.beliefConfidence(0.55f);
-		nar.goalConfidence(0.55f);
+		nar.beliefConfidence(0.35f);
+		nar.goalConfidence(0.35f);
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(8);
+		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

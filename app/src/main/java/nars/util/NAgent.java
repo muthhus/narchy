@@ -49,7 +49,7 @@ public class NAgent implements Agent {
     private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
-    private int clockMultiplier = 64; //introduces extra timing delay between frames
+    private int clockMultiplier = 64-1; //introduces extra timing delay between frames
 
     float dReward;
 

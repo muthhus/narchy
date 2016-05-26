@@ -222,10 +222,9 @@
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
-
+    (M ==> P), (M ==> S), neq(S,P), time(dtTminB) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
     (M ==> P), (S <=> M), neq(S,P), time(dtTminB) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
@@ -389,7 +388,7 @@
 
 //conditional abduction by dependent variable
 
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:Abduction)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), time(dtTask) |- (X --> B), (Belief:Abduction)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 

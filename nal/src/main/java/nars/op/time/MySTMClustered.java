@@ -77,7 +77,7 @@ public class MySTMClustered extends STMClustered {
 						new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 						.time(now, t)
 						.evidence(evidence)
-						.budget(BudgetFunctions.taxCollection(Stream.of(tt), 1f / s.length))
+						.budget(BudgetFunctions.taxCollection(tt, 1f / s.length))
 						.log("STMCluster CoOccurr");
 
 				//System.err.println(m + " " + Arrays.toString(m.evidence()));
