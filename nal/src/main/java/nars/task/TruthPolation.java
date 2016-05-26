@@ -3,6 +3,7 @@ package nars.task;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import nars.$;
 import nars.Global;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.DefaultTruth;
@@ -67,10 +68,10 @@ public class TruthPolation {
         this.count = s;
         //this.tasks = tasks;
 
-        float confSum = 0;
+        float confWeightSum = 0;
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
-            confSum += t.conf();
+            confWeightSum += t.confWeight();
         }
 
         for (int i = 0; i < s; i++) {
@@ -85,7 +86,7 @@ public class TruthPolation {
             times[i][0] = t.occurrence() + (window * (-0.5f + (t.hashCode()%increments)/((float)increments)  ));  /* keeps occurrence times unique */
 
             freq[i] = t.freq();
-            conf[i] = c2w(t.conf())/confSum;
+            conf[i] = t.confWeight()/confWeightSum;
 
             //TODO dt
         }
@@ -106,8 +107,8 @@ public class TruthPolation {
         }, times, freq, conf, exp,
                 //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
                 s);
-        return new DefaultTruth(v[0], Math.max(Global.TRUTH_EPSILON, w2c(v[1])));
 
+        return $.t(v[0], w2c(v[1]));
     }
 
 

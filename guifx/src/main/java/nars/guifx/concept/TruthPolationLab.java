@@ -1,5 +1,6 @@
 package nars.guifx.concept;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
@@ -17,6 +18,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +32,20 @@ public class TruthPolationLab extends VBox implements ChangeListener {
 
     public static final int width = 1000;
     public static final int height = 400;
-    private final HBox freqEdit, confEdit;
     private final Canvas polation;
     private final TruthPolation truth;
-    final int range = 64;
-    private final ArrayList<Slider> freqSliders;
-    private final ArrayList<Slider> confSliders;
+    final int range = 32;
+
     private final List<Task> tasks;
+    final ArrayList<Slider> freqSliders;
+    final ArrayList<Slider> confSliders;
 
     public TruthPolationLab() {
         super();
 
+
+        freqSliders = new ArrayList<Slider>(range);
+        confSliders = new ArrayList<Slider>(range);
 
         this.truth = new TruthPolation(range, 0);
 
@@ -50,32 +55,47 @@ public class TruthPolationLab extends VBox implements ChangeListener {
         polation = new Canvas(width, height);
         //polation.autosize();
 
+        VBox v = new VBox(polation, newSliderBank(), newSliderBank());
+        getChildren().add(v);
+
+        System.out.println(freqSliders.size() + " " + confSliders.size());
+
+        updateLater();
+    }
+
+    @NotNull
+    public VBox newSliderBank() {
+        final HBox freqEdit, confEdit;
+
         freqEdit = new HBox();
         confEdit = new HBox();
 
 
-        freqSliders = new ArrayList<Slider>(range);
-        confSliders = new ArrayList<Slider>(range);
         for (int i = 0; i < range; i++) {
             Slider f = new Slider(0, 1, 0);
             f.setOrientation(Orientation.VERTICAL);
             freqSliders.add(f);
+            freqEdit.getChildren().add(f);
+
             f.valueProperty().addListener(this);
 
             Slider c = new Slider(0, 1, 0);
+
             c.setOrientation(Orientation.VERTICAL);
             confSliders.add(c);
+            confEdit.getChildren().add(c);
             c.valueProperty().addListener(this);
 
+            InvalidationListener updateOpac = v -> {
+                c.setOpacity(c.getValue() * 0.5 + 0.5);
+            };
+            c.valueProperty().addListener(updateOpac);
+
+            updateOpac.invalidated(null);
+
         }
-        freqEdit.getChildren().addAll(freqSliders);
-        confEdit.getChildren().addAll(confSliders);
 
-        getChildren().addAll(
-                polation, freqEdit, confEdit
-        );
-
-        updateLater();
+        return new VBox(freqEdit, confEdit);
     }
 
     public void updateLater() {
@@ -91,7 +111,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
 
         tasks.clear();
         int active = 0;
-        for (int i = 0; i < range; i++) {
+        for (int i = 0; i < freqSliders.size(); i++) {
 
             double c = confSliders.get(i).getValue();
             if (c == 0) continue;

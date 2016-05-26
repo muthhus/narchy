@@ -3,6 +3,7 @@ package nars.util.data;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
@@ -57,7 +58,9 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
         this(n, t, value,
-                (v) -> new DefaultTruth(v, n.confidenceDefault(Symbols.BELIEF) ) );
+                (v) -> {
+                    return $.t(1f, v * n.confidenceDefault(Symbols.BELIEF));
+                } );
     }
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
@@ -161,7 +164,9 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         long now = nar.time();
 
-        nar.inputTask(this.next = newInputTask(v, now));
+        @Nullable Task t = this.next = newInputTask(v, now);
+        if (t!=null)
+            nar.inputTask(t);
     }
 
 
@@ -175,10 +180,15 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     @NotNull
     protected Task newInputTask(float v, long now) {
-        return new MutableTask(term(), punc, truthFloatFunction.valueOf(v))
-                .time(now, now + dt())
-                .budget(pri, dur)
-                .log(this);
+        Truth t = truthFloatFunction.valueOf(v);
+        if (t!=null) {
+            return new MutableTask(term(), punc, t)
+                    .time(now, now + dt())
+                    .budget(pri, dur)
+                    .log(this);
+        } else {
+            return null;
+        }
     }
 
     @NotNull

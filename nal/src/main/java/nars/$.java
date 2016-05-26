@@ -741,7 +741,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static Truth t(float f, float c) {
-        return new DefaultTruth(f, c);
+        return c < Global.TRUTH_EPSILON ? null : new DefaultTruth(f, c);
     }
 
     /** negates each entry in the array */

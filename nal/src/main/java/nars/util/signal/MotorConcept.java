@@ -78,7 +78,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
             @Override
             protected Task newInputTask(float v, long now) {
                 Task t = super.newInputTask(v, now);
-                t.log("Motor Feedback");
+                if (t!=null) {
+                    t.log("Motor Feedback");
+                }
                 return t;
             }
 
@@ -155,14 +157,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public void update() {
         super.update();
 
-        float desired =  hasGoals() ?
-                this.desired.expectation()
-                //this.desired.freq() * this.desired.conf()
-                : 0;
-        float believed = hasBeliefs() ?
-                this.believed.expectation()
-                //this.believed.freq() * this.believed.conf()
-                : 0;
+        long now = nar.time();
+        float desired = this.goals.expectation(now);
+        float believed = this.beliefs.expectation(now);
 
         float response = motor.motor(believed, desired);
 

@@ -168,27 +168,27 @@ public class Line1D implements Environment {
     public static void main(String[] args) {
 
 
-        Default nar = new Default(1024, 8, 1, 3);
+        Default nar = new Default(1024, 4, 1, 3);
 
-        nar.beliefConfidence(0.35f);
-        nar.goalConfidence(0.15f);
+        nar.beliefConfidence(0.25f);
+        nar.goalConfidence(0.25f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         nar.DEFAULT_GOAL_PRIORITY = 0.4f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
 
-        nar.cyclesPerFrame.setValue(32);
+        nar.cyclesPerFrame.setValue(4);
 
         //nar.log();
 
-        new MySTMClustered(nar, 64, '.');
+        new MySTMClustered(nar, 4, '.');
         int cycles = 10000;
 
         NAgent nagent = new NAgent(nar);
 
         Line1D line = new Line1D(16,
                 //random(50)
-                sine(300)
+                sine(100)
         );
 
         float score = line.run(

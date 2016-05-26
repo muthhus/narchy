@@ -396,6 +396,10 @@ public interface BeliefTable extends TaskTable {
         return belief;
     }
 
+    default float expectation(long when) {
+        Truth t = truth(when);
+        return t == null ? 0.5f : t.expectation();
+    }
 
 
 

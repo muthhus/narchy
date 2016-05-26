@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class ControlFlowTest {
 
     private static final boolean METER = false;
-    private static final boolean LOG = false;
+    private static boolean LOG = false;
 
 
     private final List<CompoundConcept> states = new ArrayList();
@@ -42,7 +42,10 @@ public class ControlFlowTest {
 
     @Test public void testSequence2()   { testSequence(n, 2, 5);     }
     @Test public void testSequence3()   { testSequence(n, 3, 20);     }
-    @Test public void testSequence4()   { testSequence(n, 4, 30);    }
+    @Test public void testSequence4()   {
+        LOG = true;
+        testSequence(n, 4, 30);
+    }
     @Test public void testSequence8()   { testSequence(n, 8, 30);    }
     //@Test public void testSequence10()  { testSequence(n, 10, 50);     }
 
@@ -104,7 +107,9 @@ public class ControlFlowTest {
 
         ExeTracker exeTracker = new ExeTracker();
         NAR n = nn.get();
-        //n.log();
+
+        if (LOG)
+            n.log();
 
         Sequence seq = new Sequence("(seq)", n, length) {
 
@@ -253,7 +258,7 @@ public class ControlFlowTest {
         x.onCycle(c -> {
             ts.update(c.time());
         });
-        x.cyclesPerFrame.set(1);
+        x.cyclesPerFrame.set(4);
         return x;
     };
 

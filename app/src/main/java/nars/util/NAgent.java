@@ -112,8 +112,8 @@ public class NAgent implements Agent {
             MotorConcept.MotorFunction motorFunc = (b, d) -> {
 
                 motivation[i] =
-                        d / (d+b);
-                        //d - b;
+                        //d / (d+b);
+                        d - b;
                         //d;
                         //(d*d) - (b*b);
                         //Math.max(0, d-b);
@@ -365,15 +365,27 @@ public class NAgent implements Agent {
 
         nextMotivation = motivation[nextAction];
 
-//        if (lastAction != nextAction) {
-//            if (lastAction != -1) {
-//                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, gamma);
-//            }
-//
-//            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, gamma);
-//        }
+        long now = nar.time();
 
-        updateMotors();
+        if (lastAction != nextAction) {
+            if (lastAction != -1) {
+                MotorConcept lastActionMotor = actions.get(lastAction);
+                nar.goal(goalPriority, lastActionMotor, now-1, 1f, gamma); //downward step function top
+                nar.believe(goalPriority, lastActionMotor, now-1, 1f, gamma); //downward step function top
+
+                nar.goal(goalPriority, lastActionMotor, now, 0.5f, gamma); //downward step function bottom
+                nar.believe(goalPriority, lastActionMotor, now, 0.5f, gamma); //downward step function bottom
+            }
+
+            MotorConcept nextAction = actions.get(this.nextAction);
+            nar.goal(goalPriority, nextAction, now-1, 0.5f, gamma); //upward step function bottom
+            nar.believe(goalPriority, nextAction, now-1, 0.5f, gamma); //upward step function bottom
+
+            nar.goal(goalPriority, nextAction, now, 1f, gamma); //upward step function top
+            nar.believe(goalPriority, nextAction, now, 1f, gamma); //upward step function top
+        }
+
+        //updateMotors();
 
         this.lastAction = nextAction;
         this.lastMotivation = nextMotivation;
