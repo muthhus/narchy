@@ -341,7 +341,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** performs the procedure that should happen when this task is invoked due to goal desire */
     void execute(Concept c, NAR nar);
 
-    void delete();
+    boolean delete();
 
 
 //    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */

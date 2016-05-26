@@ -452,8 +452,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     @Override
-    public void delete() {
-        if (!isDeleted()) {
+    public boolean delete() {
+        if (super.delete()) {
             Reference<Task>[] p = this.parents;
             if (p !=null) {
                 Global.unreference(p);
@@ -461,10 +461,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             }
             if (!Global.DEBUG)
                 this.log = null; //.clear();
-
-            super.delete();
+            return true;
         }
-
+        return false;
     }
 
     protected final void invalidate() {

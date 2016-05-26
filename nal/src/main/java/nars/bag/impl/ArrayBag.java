@@ -354,9 +354,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         while (i > 0 && (ii = l[i]).isDeleted()) {
             if (removeKeyForValue(ii) == null) {
-                throw new RuntimeException("Bag fault while trying to remove key by item value");
+                //
+                //throw new RuntimeException("Bag fault while trying to remove key by item value");
+
                 //exhaustive removal, since the BLink has lost its key
-                //removeKey((BLink<BLink<V>>) ii);
+                removeKey((BLink<BLink<V>>) ii);
             }
 
             //remove by known index rather than have to search for it by key or something

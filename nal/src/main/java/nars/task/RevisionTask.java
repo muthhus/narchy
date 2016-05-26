@@ -67,30 +67,30 @@ public class RevisionTask extends MutableTask {
         return true;
     }
 
-    private void weaken(Task parent) {
-        if (parent.isDeleted())
-            return;
-
-        //weaken the premise links inversely proportionally to the amount of increase in truth confidence
-        float n = confWeight();
-        float t = parent.confWeight();
-
-        if (n <= t) {
-            if (Global.DEBUG)
-                throw new RuntimeException("Revision failed to increase confidence");
-            return;
-        }
-
-        float factor = n / (n + t);
-
-        //multiplyPremise(factor, true);
-
-        //weaken this task iself
-        Budget b = parent.budget();
-        b.andPriority(factor);
-        b.andDurability(factor);
-
-    }
+//    private void weaken(Task parent) {
+//        if (parent.isDeleted())
+//            return;
+//
+//        //weaken the premise links inversely proportionally to the amount of increase in truth confidence
+//        float n = confWeight();
+//        float t = parent.confWeight();
+//
+//        if (n <= t) {
+//            if (Global.DEBUG)
+//                throw new RuntimeException("Revision failed to increase confidence");
+//            return;
+//        }
+//
+//        float factor = n / (n + t);
+//
+//        //multiplyPremise(factor, true);
+//
+//        //weaken this task iself
+//        Budget b = parent.budget();
+//        b.andPriority(factor);
+//        b.andDurability(factor);
+//
+//    }
 
 }
 

@@ -73,7 +73,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.3f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.2f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.2f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(128);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -85,7 +85,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				new NAgent(nar),
-				150000);
+				1500);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);

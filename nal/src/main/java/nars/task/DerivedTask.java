@@ -26,8 +26,8 @@ public final class DerivedTask extends MutableTask {
         this.termLink = (premise.termLink);
     }
 
-    @Override public void delete() {
-        if (!isDeleted()) {
+    @Override public boolean delete() {
+        if (super.delete()) {
             //weaken the premise components which formed this in proportion to the confidence.
             //ie, the weaker the conf the less budget penalty because these are more likely and frequently to be removed
 
@@ -52,11 +52,10 @@ public final class DerivedTask extends MutableTask {
             float decayFactor = 1f - ((isBeliefOrGoal() ? conf() : qua() ) *durability);
             multiplyPremise(decayFactor, false);
 
-            super.delete();
-
-
-
+            return true;
         }
+
+        return false;
     }
 
 //    /** next = the child which resulted from this and another task being revised */

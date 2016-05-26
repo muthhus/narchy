@@ -189,11 +189,13 @@ public class STMClustered extends STM {
         }
 
         @Override
-        public void delete() {
-            if (node != null) {
-                node.remove(this);
+        public boolean delete() {
+            if (super.delete()) {
+                if (node!=null)
+                    node.remove(this);
+                return true;
             }
-            super.delete();
+            return false;
         }
 
         public void migrate() {

@@ -1,8 +1,10 @@
 package nars.concept;
 
 import nars.Op;
+import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.task.Task;
 import nars.term.Compound;
@@ -54,7 +56,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Override public Bag<Task> taskbag() {
-        return new CurveBag<Task>(rng).merge(mergeDefault());
+
+        return new CurveBag<Task>(rng) {
+            @Override
+            protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
+                return new BLink.WeakBLink<>(i, b, scale);
+            }
+        }.merge(mergeDefault());
     }
 
 

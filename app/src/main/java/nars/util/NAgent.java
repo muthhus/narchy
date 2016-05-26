@@ -173,9 +173,9 @@ public class NAgent implements Agent {
 
     @Override
     public String summary() {
-        return Texts.n2(motivation) + "\t "
-                /*" busySum="*/ + "busy=" + Texts.n4(nar.emotion.busy.getSum()) + " "
-                /*" busySum="*/ + "hppy=" + Texts.n4(nar.emotion.happy()) + " "
+        return /*Texts.n2(motivation) + "\t + "*/
+                /*" busySum="*/   "busy=" + Texts.n4(nar.emotion.busy.getSum()) + " "
+                /*" busySum="*/ + "hapy=" + Texts.n4(nar.emotion.happy()) + " "
                 /*" frstSum="*/ + "lern=" + Texts.n4(nar.emotion.learning()) + " "
                 /*" strsSum="*/ + "strs=" + Texts.n4(nar.emotion.stress.getSum()) + " "
                 /*" frstSum="*/ + "alrt=" + Texts.n4(nar.emotion.alert.getSum()) + " "

@@ -105,9 +105,13 @@ public class BLinkPool<X> {
         }
 
         @Override
-        public final void delete() {
-            b[PRI] = Float.NaN;
-            setChanged(true);
+        public final boolean delete() {
+            if (!isDeleted()) {
+                b[PRI] = Float.NaN;
+                setChanged(true);
+                return true;
+            }
+            return false;
         }
 
         /** TODO return false to signal to the bag to remove this item */

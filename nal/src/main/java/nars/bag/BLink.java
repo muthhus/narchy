@@ -60,7 +60,7 @@ abstract public class BLink<X> extends Budget implements Link<X> {
         }
 
         @NotNull @Override
-        public X get() {
+        public final X get() {
             return id;
         }
 
@@ -77,9 +77,12 @@ abstract public class BLink<X> extends Budget implements Link<X> {
 
 
         @Override
-        public void delete() {
-            id.clear();
-            super.delete();
+        public boolean delete() {
+            if (super.delete()) {
+                id.clear();
+                return true;
+            }
+            return false;
         }
 
         @Override public boolean isDeleted() {
@@ -155,13 +158,15 @@ abstract public class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void delete() {
+    public boolean delete() {
         float p = pri();
         if (p==p) {
             //not already deleted
             _setPriority(Float.NaN);
             changed = true;
+            return true;
         }
+        return false;
     }
 
     public final void setPriority(float p, float now) {
