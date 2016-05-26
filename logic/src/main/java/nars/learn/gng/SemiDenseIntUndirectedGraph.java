@@ -3,19 +3,21 @@ package nars.learn.gng;
 import com.gs.collections.api.block.predicate.primitive.IntPredicate;
 import com.gs.collections.api.block.procedure.primitive.ShortIntProcedure;
 import com.gs.collections.api.block.procedure.primitive.ShortProcedure;
+import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import com.gs.collections.impl.map.mutable.primitive.ShortIntHashMap;
 
 /**
  * Created by me on 5/25/16.
  */
-public class SemiDenseIntUndirectedGraph extends ShortIntHashMap {
+public class SemiDenseIntUndirectedGraph  {
 
 
     protected final int V; //# of vertices
     protected final MyShortIntHashMap[] adj;  //Array of adjacency lists
+    final ShortArrayList tmp = new ShortArrayList();
 
     //Constructor with a pre-supplied number of vertices
-    SemiDenseIntUndirectedGraph(short V) {
+    public SemiDenseIntUndirectedGraph(short V) {
         this.V = V;
         
         adj = new MyShortIntHashMap[V];
@@ -24,6 +26,11 @@ public class SemiDenseIntUndirectedGraph extends ShortIntHashMap {
             adj[i] = new MyShortIntHashMap(V);
         }
 
+    }
+
+    public void compact() {
+        for (MyShortIntHashMap a : adj)
+            a.compact();
     }
 
     public void clear() {
@@ -77,10 +84,11 @@ public class SemiDenseIntUndirectedGraph extends ShortIntHashMap {
         e[second].remove(first);
     }
 
+
     public void removeEdgeIf(IntPredicate filter) {
         MyShortIntHashMap[] e = this.adj;
         for (MyShortIntHashMap h : e) {
-            h.filter(filter);
+            h.filter(filter, tmp);
         }
     }
 

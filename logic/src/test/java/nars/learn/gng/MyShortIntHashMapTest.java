@@ -1,5 +1,6 @@
 package nars.learn.gng;
 
+import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +25,7 @@ public class MyShortIntHashMapTest {
                 assertEquals(5, v);
             });
 
-            m.filter(v -> v == 0);
+            m.filter(v -> v == 0, new ShortArrayList());
 
             assertTrue(m.isEmpty());
         }

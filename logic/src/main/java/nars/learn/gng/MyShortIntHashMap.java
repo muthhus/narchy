@@ -88,9 +88,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
-    final ShortArrayList toRemove = new ShortArrayList(0);
-
-    public void filter(IntPredicate toKeep) {
+    public void filter(IntPredicate toKeep, ShortArrayList tmp) {
         if(this.sentinelValues != null) {
             if (this.sentinelValues.containsZeroKey) {
                 if (!toKeep.accept(this.sentinelValues.zeroValue)) {
@@ -107,7 +105,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
         }
 
-        ShortArrayList toRemove = this.toRemove;
+
 
         short[] keys = this.keys;
         int sizeBefore = keys.length;
@@ -115,20 +113,17 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             short k = keys[i];
             if(isNonSentinel(k)) {
                 if (!toKeep.accept(this.values[i])) {
-                    toRemove.add(k);
+                    tmp.add(k);
                 }
             }
         }
 
-        if (!toRemove.isEmpty()) {
-            int s = toRemove.size();
+        if (!tmp.isEmpty()) {
+            int s = tmp.size();
             for (int i = 0; i < s; i++) {
-                removeKey(toRemove.get(i));
+                removeKey(tmp.get(i));
             }
-            toRemove.clear();
-
-            if (s >= sizeBefore / 2)
-                compact();
+            tmp.clear();
         }
     }
 

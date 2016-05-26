@@ -358,6 +358,10 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         return Stream.of(node).map(n -> (N)n);
     }
 
+    public void compact() {
+        e.compact();
+    }
+
 //    private void addEdge(Connection<N> connection) {
 //
 //        addEdge(connection.from, connection.to, connection);
