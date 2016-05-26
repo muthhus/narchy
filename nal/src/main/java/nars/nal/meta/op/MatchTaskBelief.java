@@ -185,20 +185,20 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
             if (taskFirst(task, belief)) {
                 //task first
-                code.add(new MatchOneSubterm(task, cc, 0, false));
-                code.add(new MatchOneSubterm(belief, cc, 1, true));
+                code.add(new MatchOneSubtermPrototype(task, cc, 0, false));
+                code.add(new MatchOneSubtermPrototype(belief, cc, 1, true));
             } else {
                 //belief first
-                code.add(new MatchOneSubterm(belief, cc, 1, false));
-                code.add(new MatchOneSubterm(task, cc, 0, true));
+                code.add(new MatchOneSubtermPrototype(belief, cc, 1, false));
+                code.add(new MatchOneSubtermPrototype(task, cc, 0, true));
             }
 
         } else if (belief!=null) {
             //match belief only
-            code.add(new MatchOneSubterm(belief, cc, 1, true));
+            code.add(new MatchOneSubtermPrototype(belief, cc, 1, true));
         } else if (task!=null) {
             //match task only
-            code.add(new MatchOneSubterm(task, cc, 0, true));
+            code.add(new MatchOneSubtermPrototype(task, cc, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }

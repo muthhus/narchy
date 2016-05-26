@@ -5,7 +5,7 @@ import javassist.*;
 import nars.Global;
 import nars.Op;
 import nars.nal.Deriver;
-import nars.nal.meta.op.MatchTerm;
+import nars.nal.meta.op.MatchTermPrototype;
 import nars.nal.meta.op.SubTermOp;
 import nars.nal.op.Derive;
 import nars.term.Term;
@@ -108,7 +108,7 @@ public class TrieDeriver extends Deriver {
      * HACK warning: use of this singular matchParent tracker is not thread-safe. assumes branches will be processed in a linear, depth first order
      */
     @NotNull
-    final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<>(null);
+    final transient AtomicReference<MatchTermPrototype> matchParent = new AtomicReference<>(null);
 
     @NotNull
     private List<ProcTerm> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
@@ -199,50 +199,47 @@ public class TrieDeriver extends Deriver {
      * late binding procedures to finalize the built trie deriver
      */
     protected void build() {
-        for (ProcTerm p : roots)
-            build(p);
+        for (int i = 0; i < roots.length; i++) {
+            roots[i] = build(roots[i]);
+        }
     }
 
-    private void build(Object p) {
+    /** final processing step before finalized usable form */
+    private ProcTerm build(ProcTerm p) {
         if (p instanceof IfThen) {
-
-            {
-                IfThen it = (IfThen) p;
-                build(it.cond);
-                build(it.conseq);
-            }
-
-        } //else if (p instanceof If) {
-
-//            {
-//                If it = (If) p;
-//                build(it.cond);
-//            }
-
-        else if (p instanceof AndCondition) {
+            IfThen it = (IfThen) p;
+            return new IfThen( (BoolCondition)build(it.cond), build(it.conseq) ); //HACK wasteful
+        } else if (p instanceof AndCondition) {
             AndCondition ac = (AndCondition) p;
-            for (BoolCondition b : ac.termCache) {
-                build(b);
+            BoolCondition[] termCache = ac.termCache;
+            for (int i = 0; i < termCache.length; i++) {
+                BoolCondition b = termCache[i];
+                termCache[i] = (BoolCondition) build(b);
             }
         } else if (p instanceof Fork) {
             Fork ac = (Fork) p;
-            for (ProcTerm b : ac.termCache) {
-                build(b);
+            ProcTerm[] termCache = ac.termCache;
+            for (int i = 0; i < termCache.length; i++) {
+                ProcTerm b = termCache[i];
+                termCache[i] = build(b);
             }
 
         } else if (p instanceof SubTermOpSwitch) {
             SubTermOpSwitch sw = (SubTermOpSwitch) p;
-            for (ProcTerm b : sw.proc) {
-                if (b == null) continue;
-                build(b);
+            ProcTerm[] proc = sw.proc;
+            for (int i = 0; i < proc.length; i++) {
+                ProcTerm b = proc[i];
+                if (b != null) proc[i] = build(b);
+                else continue;
             }
         } else {
 
-            if (p instanceof MatchTerm)
-                ((MatchTerm) p).build();
+            if (p instanceof MatchTermPrototype)
+                return ((MatchTermPrototype) p).build();
 
         }
 
+        return p;
     }
 
 
@@ -310,8 +307,8 @@ public class TrieDeriver extends Deriver {
             indent(indent); out.println("}");
         } else {
 
-            if (p instanceof MatchTerm)
-                ((MatchTerm) p).build();
+            if (p instanceof MatchTermPrototype)
+                ((MatchTermPrototype) p).build();
 
             indent(indent);
             out.println( /*Util.className(p) + ": " +*/ p);
@@ -339,19 +336,19 @@ public class TrieDeriver extends Deriver {
 
 
     @NotNull
-    private static List<BoolCondition> conditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    private static List<BoolCondition> conditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTermPrototype> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BoolCondition) {
-                if (x instanceof MatchTerm) {
-                    matchParent.set((MatchTerm) x);
+                if (x instanceof MatchTermPrototype) {
+                    matchParent.set((MatchTermPrototype) x);
                 }
                 return true;
             }
             if (x instanceof Derive) {
                 //link this derivation action to the previous Match,
                 //allowing multiple derivations to fold within a Match's actions
-                MatchTerm mt = matchParent.get();
+                MatchTermPrototype mt = matchParent.get();
                 if (mt == null) {
                     throw new RuntimeException("detached Derive action: " + x + " in branch: " + t);
                     //System.err.println("detached Derive action: " + x + " in branch: " + t);

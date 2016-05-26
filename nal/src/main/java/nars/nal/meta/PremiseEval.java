@@ -7,7 +7,6 @@ import nars.budget.policy.TaskBudgeting;
 import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.*;
