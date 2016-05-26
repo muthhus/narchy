@@ -4,15 +4,11 @@ import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.bag.impl.ArrayBag;
 import nars.bag.impl.AutoBag;
 import nars.budget.Budgeted;
-import nars.budget.forget.BudgetForget;
-import nars.budget.forget.Forget;
 import nars.concept.Concept;
 import nars.concept.Reasoner;
 import nars.data.Range;
-import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.MutableInteger;
@@ -38,15 +34,11 @@ public abstract class AbstractCore {
 
 
 
-    @Range(min = 0.01f, max = 8, unit = "Duration")
-    public final MutableFloat conceptRemembering;
 
 
+    public final @NotNull AutoBag<Task> tasklinkUpdate;
 
-
-    public final Forget.ExpForget taskLinkForget;
-
-    public final @NotNull BudgetForget termLinkForget;
+    public final @NotNull AutoBag<Termed> termlinkUpdate;
 
 
     //public final MutableFloat activationFactor = new MutableFloat(1.0f);
@@ -73,11 +65,17 @@ public abstract class AbstractCore {
 //        public final MutableFloat perfection;
 
 
+    @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
+    public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
+
+    @Range(min = 0, max = 16, unit = "TermLink")
+    public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
 
 
-    public final @NotNull Reasoner premiser;
-    private final AutoBag<Concept> activeAuto;
+
+    public final @NotNull Reasoner reasoner;
+    private final AutoBag<Concept> conceptUpdate;
 
     private float cyclesPerFrame;
     private int cycleNum;
@@ -92,13 +90,13 @@ public abstract class AbstractCore {
 
         this.nar = nar;
 
-        this.premiser = reasoner;
+        this.reasoner = reasoner;
 
-        this.conceptRemembering = nar.conceptRemembering;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
+
         this.active = newConceptBag();
-        this.activeAuto = new AutoBag<>((ArrayBag<Concept>) active);
+        this.conceptUpdate = new AutoBag<>(nar.perfection);
 
         this.handlers = new Active(
                 nar.eventFrameStart.on(this::frame),
@@ -106,8 +104,8 @@ public abstract class AbstractCore {
                 nar.eventReset.on(this::reset)
         );
 
-        this.termLinkForget = new Forget.ExpForget(nar.termLinkRemembering, nar.perfection);
-        this.taskLinkForget = new Forget.ExpForget(nar.taskLinkRemembering, nar.perfection);
+        this.termlinkUpdate = new AutoBag(nar.perfection);
+        this.tasklinkUpdate = new AutoBag(nar.perfection);
 
     }
 
@@ -117,23 +115,25 @@ public abstract class AbstractCore {
         cyclesPerFrame = nar.cyclesPerFrame.floatValue();
         cycleNum = 0;
 
-        taskLinkForget.update(nar);
-        termLinkForget.update(nar);
+        tasklinkUpdate.update(nar);
+        termlinkUpdate.update(nar);
+        conceptUpdate.update(nar);
 
-        premiser.frame(nar);
+        reasoner.frame(nar);
     }
 
     protected final void cycle(Memory memory) {
 
         float subCycle = cycleNum++ / cyclesPerFrame;
 
-        termLinkForget.cycle(subCycle);
-        taskLinkForget.cycle(subCycle);
+        termlinkUpdate.cycle(subCycle);
+        tasklinkUpdate.cycle(subCycle);
+        conceptUpdate.cycle(subCycle);
 
         //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
         //active.printAll();
 
-        activeAuto.autocommit(nar);
+        conceptUpdate.update(active);
 
         fireConcepts(conceptsFiredPerCycle.intValue());
 
@@ -161,25 +161,24 @@ public abstract class AbstractCore {
 
 
     protected final void fireConcepts(int conceptsToFire) {
-
         Bag<Concept> b = this.active;
 
         if (conceptsToFire == 0 || b.isEmpty()) return;
 
         b.sample(conceptsToFire, this::fireConcept);
-
     }
 
     protected final void fireConcept(BLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
-        Bag<Task> taskl = concept.tasklinks();
-        taskl.commit(/*taskl.isFull() ? */taskLinkForget/* : null*/);
+        tasklinkUpdate.update(concept.tasklinks());
+        termlinkUpdate.update(concept.termlinks());
 
-        Bag<Termed> terml = concept.termlinks();
-        terml.commit(/*terml.isFull() ? */termLinkForget/* : null*/);
-
-        premiser.accept(conceptLink);
+        reasoner.firePremiseSquared(
+                conceptLink,
+                tasklinksFiredPerFiredConcept.intValue(),
+                termlinksFiredPerFiredConcept.intValue()
+        );
     }
 
 

@@ -36,7 +36,7 @@ import static nars.nal.Tense.ETERNAL;
  *  may determine the iteration "power" according to
  *       some budgeting feature (ex: Concept BLink)
  */
-abstract public class Reasoner implements Consumer<BLink<? extends Concept>> {
+abstract public class Reasoner {
 
     // Note:  this implementation is not thread safe; call from only one thread at a time */
 
@@ -59,12 +59,6 @@ abstract public class Reasoner implements Consumer<BLink<? extends Concept>> {
 //
     //private final Map<Term, Task> beliefCache = Global.newHashMap();
     //long lastMatch = Tense.TIMELESS;
-
-    @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
-    public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
-
-    @Range(min = 0, max = 16, unit = "TermLink")
-    public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
 
 
@@ -93,14 +87,6 @@ abstract public class Reasoner implements Consumer<BLink<? extends Concept>> {
 
     //@NotNull private BLink[] tasksArray = new BLink[0];
 
-    @Override
-    public final void accept(@NotNull BLink<? extends Concept> c) {
-        firePremiseSquared(
-            c,
-            tasklinksFiredPerFiredConcept.intValue(),
-            termlinksFiredPerFiredConcept.intValue()
-        );
-    }
 
     /** to be overridden by subclasses, called on each frame to update parameters */
     abstract public void frame(NAR nar);
@@ -112,7 +98,7 @@ abstract public class Reasoner implements Consumer<BLink<? extends Concept>> {
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
-    final void firePremiseSquared(
+    public final void firePremiseSquared(
             @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks) {
 

@@ -290,7 +290,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @Override public Bag<V> commit(@Nullable Consumer<BLink> each) {
         int s = size();
         if (s > 0) {
-            updateExisting(each, s);
+            int lowestUnsorted = updateExisting(each, s);
+
+            if (lowestUnsorted != -1)  {
+                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
+            } // else: perfectly sorted
+
+            removeDeletedAtBottom();
         }
 
         if (!pending.isEmpty())
@@ -320,7 +326,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         pending.clear0();
     }
 
-    private void updateExisting(@Nullable Consumer<BLink> each, int s) {
+    /** returns the index of the lowest unsorted item */
+    private int updateExisting(@Nullable Consumer<BLink> each, int s) {
 //        int dirtyStart = -1;
         int lowestUnsorted = -1;
 
@@ -343,13 +350,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             lower = b;
         }
-
-        if (lowestUnsorted != -1)  {
-            qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
-        } // else: perfectly sorted
-
-
-        removeDeletedAtBottom();
+        return lowestUnsorted;
     }
 
     private boolean removeDeletedAtBottom() {

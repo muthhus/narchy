@@ -9,8 +9,6 @@ import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
-
 /**
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is
  * under capacity.
@@ -18,24 +16,23 @@ import java.util.function.Consumer;
 public class AutoBag<V>  {
 
     private final Forget.AbstractForget forget;
-    private final ArrayBag<V> bag;
 
-    public AutoBag(ArrayBag<V> bag) {
-        this(bag, new Forget.ExpForget(new MutableFloat(0), new MutableFloat(0)));
+    public AutoBag(MutableFloat perfection) {
+        this(new Forget.ExpForget(new MutableFloat(0), perfection));
     }
 
-    public AutoBag(ArrayBag<V> bag, Forget.AbstractForget forget) {
-        this.bag = bag;
+    public AutoBag(Forget.AbstractForget forget) {
         this.forget = forget;
     }
 
-    public Bag<V> autocommit(NAR nar) {
+
+    public Bag<V> update(Bag<V> bag) {
 
         BudgetForget f;
-        float r = forgetPeriod();
+        float r = forgetPeriod((ArrayBag<V>) bag);
         if (r > 0) {
-            forget.forgetDurations.setValue(r);
-            forget.update(nar);
+            //forget.forgetDurations.setValue(r); //not necessary unless we want access to this value as a MutableFloat from elsewhere
+            forget.setForgetCycles(r);
             f = forget;
         } else {
             f = null;
@@ -45,22 +42,31 @@ public class AutoBag<V>  {
     }
 
 
-    protected float forgetPeriod() {
+    protected float forgetPeriod(ArrayBag<V> bag) {
         if (!bag.isFull())
             return 0;
 
         FasterList<BLink<V>> pending = bag.pending;
+        BLink[] parray = bag.pending.array();
 
         float pendingMass = 0;
         for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
-            BLink<V> v = pending.get(i);
+            BLink<V> v = parray[i];
             pendingMass += v.pri() * v.dur();
         }
 
-        float baseRate = 1f;
+        float basePeriod = 1f; //TODO formalize some relationship between cycles and priority
 
-        return (pendingMass/baseRate) * bag.capacity();
+        return (pendingMass/basePeriod) * bag.capacity();
 
+    }
+
+    public final void update(NAR nar) {
+        forget.update(nar);
+    }
+
+    public final void cycle(float subCycle) {
+        forget.cycle(subCycle);
     }
 
 }

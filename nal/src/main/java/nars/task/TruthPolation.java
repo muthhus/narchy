@@ -68,10 +68,11 @@ public class TruthPolation {
         this.count = s;
         //this.tasks = tasks;
 
-        float confWeightSum = 0;
+        float sum = 0;
         for (int i = 0; i < s; i++) {
             Task t = tasks.get(i);
-            confWeightSum += t.confWeight();
+            //sum += t.confWeight();
+            sum += t.conf();
         }
 
         for (int i = 0; i < s; i++) {
@@ -86,7 +87,8 @@ public class TruthPolation {
             times[i][0] = t.occurrence() + (window * (-0.5f + (t.hashCode()%increments)/((float)increments)  ));  /* keeps occurrence times unique */
 
             freq[i] = t.freq();
-            conf[i] = t.confWeight()/confWeightSum;
+            conf[i] = t.confWeight()/sum;
+
 
             //TODO dt
         }

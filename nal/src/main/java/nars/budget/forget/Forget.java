@@ -7,6 +7,7 @@ import nars.nal.Tense;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -94,11 +95,12 @@ public enum Forget {
         public abstract void accept(@NotNull BLink budget);
 
         @Override
-        public void update(@NotNull NAR nar) {
+        public void update(@Nullable NAR nar) {
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue();
             perfectionCached = perfection.floatValue();
-            this.now = frame = nar.time();
+            if (nar!=null)
+                this.now = frame = nar.time();
         }
 
         @Override
@@ -107,6 +109,9 @@ public enum Forget {
         }
 
 
+        public void setForgetCycles(float f) {
+            forgetCyclesCached = f;
+        }
     }
 
 
@@ -186,6 +191,9 @@ public enum Forget {
      */
     public final static class ExpForget extends AbstractForget {
 
+        public ExpForget(@NotNull MutableFloat perfection) {
+            this(new MutableFloat(0), perfection);
+        }
         public ExpForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
             super(forgetTime, perfection);
         }

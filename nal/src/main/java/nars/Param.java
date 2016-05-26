@@ -41,11 +41,6 @@ public abstract class Param extends Container implements Level {
 
 
 
-    public final MutableFloat termLinkRemembering = new MutableFloat();
-
-    public final MutableFloat taskLinkRemembering = new MutableFloat();
-
-    public final MutableFloat conceptRemembering = new MutableFloat();
 
     /** factor for concept activation [0 <= c <= 1] */
     public final MutableFloat conceptActivation = new MutableFloat(1f);
