@@ -28,16 +28,14 @@ import mikejyg.javaipacman.pacman.ctables;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.learn.ql.HaiQAgent;
+import nars.index.Indexes;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.learn.Agent;
 import nars.util.NAgent;
-import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
@@ -48,11 +46,11 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 2;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 2;
+	private final int pacmanCyclesPerFrame = 1;
 	float bias = -0.15f; //pain of boredom
 
 	public PacmanEnvironment(int ghosts) {
@@ -64,8 +62,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 16, 1, 2, rng,
-				new Default.WeakTermIndex(128 * 1024, rng),
+				1024, 4, 1, 2, rng,
+				new Indexes.WeakTermIndex(128 * 1024, rng),
 				//new Default.SoftTermIndex(128 * 1024, rng),
 				//new Default.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
@@ -77,20 +75,20 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(64);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
 		//.logSummaryGT(System.out, 0.01f)
 
-		new MySTMClustered(nar, 64, '.');
+		new MySTMClustered(nar, 32, '.');
 		//new MySTMClustered(nar, 8, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				//new HaiQAgent(),
 				new NAgent(nar),
-				5500);
+				25500);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);

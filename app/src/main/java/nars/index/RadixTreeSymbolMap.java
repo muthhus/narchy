@@ -1,4 +1,4 @@
-package nars.term.index;
+package nars.index;
 
 import com.googlecode.concurrenttrees.common.CharSequences;
 import com.googlecode.concurrenttrees.common.PrettyPrinter;

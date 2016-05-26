@@ -11,7 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.index.PatternIndex;
+import nars.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;

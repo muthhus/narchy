@@ -6,7 +6,7 @@ import nars.Narsese;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.index.PatternIndex;
+import nars.index.PatternIndex;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

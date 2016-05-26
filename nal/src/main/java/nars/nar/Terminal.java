@@ -3,6 +3,7 @@ package nars.nar;
 import nars.NAR;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.index.Indexes;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -31,7 +32,7 @@ public class Terminal extends AbstractNAR {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }
     public Terminal(int capacity, @NotNull Random random, @NotNull Clock c) {
-        super(c, new Default.DefaultTermIndex(capacity, random), random);
+        super(c, new Indexes.DefaultTermIndex(capacity, random), random);
     }
 
 

@@ -1,4 +1,4 @@
-package nars.term.index;
+package nars.index;
 
 import nars.concept.AtomConcept;
 import nars.concept.Concept;

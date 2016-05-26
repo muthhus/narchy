@@ -49,7 +49,7 @@ public class NAgent implements Agent {
     private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
-    private int clockMultiplier = 64-1; //introduces extra timing delay between frames
+    private int clockMultiplier = 1; //introduces extra timing delay between frames
 
     float dReward;
 
@@ -289,16 +289,16 @@ public class NAgent implements Agent {
             return true;
         });
         Task howToAcheiveDeltaReward = nar.ask($("(dR)"), ETERNAL, '@', how -> {
-            System.out.println(how.explanation());
+            //System.out.println(how.explanation());
             return true;
         });
         Task howToAcheiveReward = nar.ask($("(R)"), ETERNAL, '@', how -> {
-            System.out.println(how.explanation());
+            //System.out.println(how.explanation());
             return true;
         });
         for (MotorConcept a : actions) {
             nar.ask(a, ETERNAL, '@', how -> {
-                System.out.println(how.explanation());
+                //System.out.println(how.explanation());
                 return true;
             });
         }
@@ -337,7 +337,7 @@ public class NAgent implements Agent {
         //nar.conceptualize(reward, UnitBudget.One);
 
         nar.step();
-        nar.clock.tick(clockMultiplier);
+        nar.clock.tick(clockMultiplier-1);
 
     }
 

@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 import static nars.nal.Tense.ETERNAL;
 
 /**
+ * Entry point for using the NAL+ Internal Reasoner
+ *
  * TODO abstraction for dynamic link iterator / generator allowing a concept to
  *      programmatically supply the tasklinks/termlinks it fires.  bag selection being
  *      the default but overridable on a per-concept basis.
@@ -34,7 +36,7 @@ import static nars.nal.Tense.ETERNAL;
  *  may determine the iteration "power" according to
  *       some budgeting feature (ex: Concept BLink)
  */
-abstract public class PremiseGenerator implements Consumer<BLink<? extends Concept>> {
+abstract public class Reasoner implements Consumer<BLink<? extends Concept>> {
 
     // Note:  this implementation is not thread safe; call from only one thread at a time */
 
@@ -67,7 +69,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher) {
+    public Reasoner(@NotNull NAR nar, @NotNull PremiseEval matcher) {
 
         this.nar = nar;
         this.matcher = matcher;

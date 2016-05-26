@@ -268,7 +268,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return put(i, newBudget);
     }
 
-    private final FasterList<BLink<V>> pending = new FasterList();
+    protected final FasterList<BLink<V>> pending = new FasterList();
 
     protected BLink<V> putQueue(V x, @NotNull Budgeted b, float scale) {
         BLink<V> link = link(x, b, scale);

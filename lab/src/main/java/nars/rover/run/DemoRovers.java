@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nars.index.Indexes;
 import nars.op.time.MySTMClustered;
 import nars.Global;
 import nars.NAR;
@@ -365,7 +366,7 @@ public class DemoRovers {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1200, conceptsFirePerCycle, 2, 3, rng,
-                new Default.WeakTermIndex(256 * 1024, rng),
+                new Indexes.WeakTermIndex(256 * 1024, rng),
                 new FrameClock());
         /*nar.with(
                 Anticipate.class,

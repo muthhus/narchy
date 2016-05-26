@@ -6,7 +6,7 @@ import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
-import nars.term.index.GroupedMapIndex;
+import nars.index.GroupedMapIndex;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;

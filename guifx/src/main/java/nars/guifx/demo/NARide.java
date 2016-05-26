@@ -37,7 +37,8 @@ import nars.guifx.nars.LoopPane;
 import nars.guifx.nars.SubButton;
 import nars.guifx.remote.VncClientApp;
 import nars.guifx.util.*;
-import nars.nar.Default;
+import nars.nar.util.AbstractCore;
+import nars.nar.util.DefaultCore;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.time.FrameClock;
@@ -477,8 +478,8 @@ public class NARide extends StackPane {
         icon(FrameClock.class, (c) -> new NARMenu.CycleClockPane(nar));
         icon(RealtimeMSClock.class, (c) -> new NARMenu.RTClockPane(nar));
         //icon(NARLoop.class, (ll) -> loopPane);
-        icon(Default.DefaultCycle.class, (c) ->
-                new DefaultCyclePane((Default.AbstractCycle) c) //cast is hack
+        icon(DefaultCore.class, (c) ->
+                new DefaultCyclePane((AbstractCore) c) //cast is hack
         );
 
         pp = new WidgetLayer(this);
@@ -624,7 +625,7 @@ public class NARide extends StackPane {
         private final NAR nar;
         //final NSlider activation;
 
-        public DefaultCyclePane(Default.AbstractCycle l) {
+        public DefaultCyclePane(AbstractCore l) {
 
             nar = l.nar;
 

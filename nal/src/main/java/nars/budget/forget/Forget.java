@@ -70,9 +70,9 @@ public enum Forget {
     public abstract static class AbstractForget implements BudgetForget {
 
         @NotNull
-        protected final MutableFloat forgetDurations;
+        public final MutableFloat forgetDurations;
         @NotNull
-        protected final MutableFloat perfection;
+        public final MutableFloat perfection;
 
         //cached values for fast repeated accesses
 

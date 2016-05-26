@@ -1,4 +1,4 @@
-package nars.term.index;
+package nars.index;
 
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;

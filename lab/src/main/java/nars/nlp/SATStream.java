@@ -1,8 +1,7 @@
 package nars.nlp;
 
 import nars.nar.Default;
-
-import java.io.FileNotFoundException;
+import nars.nar.util.DefaultReasoner;
 
 /**
  * Created by me on 2/10/16.
@@ -14,7 +13,8 @@ public class SATStream {
 
         d.conceptActivation.setValue(0.2f);
         d.perfection.setValue(0.5f);
-        d.premiser.confMin.setValue(0.1f);
+        ((DefaultReasoner)d.reasoner).confMin.setValue(0.1f);
+
 
         d.log();
         d.input(

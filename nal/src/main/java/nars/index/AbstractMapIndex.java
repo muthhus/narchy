@@ -1,4 +1,4 @@
-package nars.term.index;
+package nars.index;
 
 import nars.Op;
 import nars.concept.ConceptBuilder;

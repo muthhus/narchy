@@ -7,7 +7,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.index.PatternIndex;
+import nars.index.PatternIndex;
 import nars.term.variable.AbstractVariable;
 import org.junit.Test;
 

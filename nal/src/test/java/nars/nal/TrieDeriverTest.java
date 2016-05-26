@@ -7,7 +7,7 @@ import nars.nal.meta.PremiseRule;
 import nars.nal.meta.TrieDeriver;
 import nars.nar.Default;
 import nars.term.Termed;
-import nars.term.index.PatternIndex;
+import nars.index.PatternIndex;
 import org.apache.commons.math3.stat.Frequency;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -99,7 +99,6 @@ public class TrieDeriverTest {
     @NotNull
     public Default testRuleInputs(@NotNull TrieDeriver d, String... inputs) {
         return (Default) new Default() {
-            @Override
             protected Deriver newDeriver() {
                 return d;
             }

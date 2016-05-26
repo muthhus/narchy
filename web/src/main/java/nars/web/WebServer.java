@@ -20,7 +20,7 @@ import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
 import nars.term.Termed;
-import nars.term.index.GroupedMapIndex;
+import nars.index.GroupedMapIndex;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;

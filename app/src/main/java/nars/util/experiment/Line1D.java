@@ -170,8 +170,8 @@ public class Line1D implements Environment {
 
         Default nar = new Default(1024, 4, 1, 3);
 
-        nar.beliefConfidence(0.25f);
-        nar.goalConfidence(0.25f);
+        nar.beliefConfidence(0.1f);
+        nar.goalConfidence(0.1f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         nar.DEFAULT_GOAL_PRIORITY = 0.4f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
@@ -188,7 +188,7 @@ public class Line1D implements Environment {
 
         Line1D line = new Line1D(16,
                 //random(50)
-                sine(100)
+                sine(200)
         );
 
         float score = line.run(
