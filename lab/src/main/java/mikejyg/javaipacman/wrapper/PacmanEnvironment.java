@@ -37,6 +37,7 @@ import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.learn.Agent;
 import nars.util.NAgent;
+import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
@@ -154,7 +155,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				int dy = cell / visionDiameter;
 				Term squareTerm = $.p($.the(dx), $.the(dy));
 				//return $.p(squareTerm, typeTerm);
-				return $.prop(squareTerm, typeTerm);
+				return $.instprop(squareTerm, typeTerm);
 				//return (Compound)$.inh($.the(square), typeTerm);
 			});
 		}
@@ -214,8 +215,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 					ins[p++] = dotness;
 					ins[p++] = ghost ? 1f : 0f; //TODO attenuate distance
 				}
+
+
 			}
 			//System.out.println(Arrays.toString(ins));
+
+//			//noise
+//			if (Math.random() < 0.1) {
+//				float noiselevel = 0.1f;
+//				for (int i = 0; i < ins.length; i++) {
+//					ins[i] = Util.clamp(ins[i] + (float) ((Math.random() - 0.5) * 2) * noiselevel);
+//				}
+//			}
 		}
 
 

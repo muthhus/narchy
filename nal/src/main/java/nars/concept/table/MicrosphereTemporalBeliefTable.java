@@ -24,7 +24,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
      *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
      *      lower means more accuracy at the expense of shorter memory span
      */
-    private final float historyFactor = 1f;
+    private final float historyFactor = 1.5f;
     long min, max;
     private TruthPolation polation;
     private long lastUpdate = Tense.TIMELESS;

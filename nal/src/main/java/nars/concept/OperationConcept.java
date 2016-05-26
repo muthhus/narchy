@@ -168,6 +168,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
                 if (Global.DEBUG)
                     task.log("execute(b=" + believed + ",d=" + desired + ')');
                 task.execute(this, nar); //call the task's custom event handler
+                task.delete("Executed");
             }
         });
 

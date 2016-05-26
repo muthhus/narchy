@@ -49,7 +49,7 @@ public class NAgent implements Agent {
     private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
-    private int clockMultiplier = 16; //introduces extra timing delay between frames
+    private int clockMultiplier = 64; //introduces extra timing delay between frames
 
     float dReward;
 
@@ -136,9 +136,12 @@ public class NAgent implements Agent {
                     //feedback (belief)
                     if (i == nextAction) {
                         float m = motivation[i];
-                        return 0.5f + 0.5f * (m);
+                        return m;
+                        //return 0.5f + 0.5f * (m);
+                        //return 0.9f;
                     }
-                    return 0.0f; //this motor was not 'executed'
+                    return 0f;
+                    //return 0.5f; //this motor was not 'executed'
                     //return 0.5f;
                 }
             };
@@ -261,15 +264,27 @@ public class NAgent implements Agent {
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
+        Task whatCauseReward = nar.ask("(?x ==> (R))", ETERNAL, (Task causeOfIncreasedReward) -> {
+            System.out.println(causeOfIncreasedReward.explanation());
+
+//            //BOOST
+//            if (causeOfIncreasedReward.expectation() > 0.75f) {
+//                Term strategy = causeOfIncreasedReward.term(0);
+//                System.err.println("\nSTRATEGY BOOST! :" + strategy);
+//                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
+//            }
+
+            return true;
+        });
         Task whatCauseDeltaReward = nar.ask("(?x ==> (dR))", ETERNAL, (Task causeOfIncreasedReward) -> {
             System.out.println(causeOfIncreasedReward.explanation());
 
-            //BOOST
-            if (causeOfIncreasedReward.expectation() > 0.75f) {
-                Term strategy = causeOfIncreasedReward.term(0);
-                System.err.println("\nSTRATEGY BOOST! :" + strategy);
-                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
-            }
+//            //BOOST
+//            if (causeOfIncreasedReward.expectation() > 0.75f) {
+//                Term strategy = causeOfIncreasedReward.term(0);
+//                System.err.println("\nSTRATEGY BOOST! :" + strategy);
+//                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
+//            }
 
             return true;
         });

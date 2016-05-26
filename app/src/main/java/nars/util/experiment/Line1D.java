@@ -171,7 +171,7 @@ public class Line1D implements Environment {
         Default nar = new Default(1024, 8, 1, 3);
 
         nar.beliefConfidence(0.35f);
-        nar.goalConfidence(0.35f);
+        nar.goalConfidence(0.15f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         nar.DEFAULT_GOAL_PRIORITY = 0.4f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
@@ -183,11 +183,16 @@ public class Line1D implements Environment {
 
         new MySTMClustered(nar, 64, '.');
         int cycles = 10000;
-        float score = new Line1D(8,
-                random(50)
-                //sine(10)
-        ).run(
-                new NAgent(nar),
+
+        NAgent nagent = new NAgent(nar);
+
+        Line1D line = new Line1D(16,
+                //random(50)
+                sine(300)
+        );
+
+        float score = line.run(
+                nagent,
                 //new DQN(),
                 //new HaiQAgent(),
                 cycles);
