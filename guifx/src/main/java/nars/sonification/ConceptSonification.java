@@ -10,6 +10,7 @@ import nars.audio.sample.SonarSample;
 import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.nar.Default;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.event.FrameReaction;
@@ -30,10 +31,10 @@ public class ConceptSonification extends FrameReaction {
 
     public final Audio sound;
     //TODO use bag
-    public Map<BLink<? extends Termed>, SoundProducer> playing;
+    public Map<Task, SoundProducer> playing;
     private final int polyphony;
 
-    static class PlayingMap extends LinkedHashMap<BLink<? extends Termed>, SoundProducer> {
+    static class PlayingMap extends LinkedHashMap<Task, SoundProducer> {
         private final int maxSize;
 
         public PlayingMap(int maxSize) {
@@ -42,7 +43,7 @@ public class ConceptSonification extends FrameReaction {
         }
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<BLink<? extends Termed>, SoundProducer> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Task, SoundProducer> eldest) {
             return size() > maxSize;
         }
     }
@@ -68,7 +69,7 @@ public class ConceptSonification extends FrameReaction {
 
         updateSamples();
 
-        nar.eventConceptProcess.on(c -> update(c.taskLink));
+        nar.eventTaskProcess.on(c -> update(c));
         //TODO update all existing concepts on start?
     }
 
@@ -146,7 +147,7 @@ public class ConceptSonification extends FrameReaction {
     /**
      * returns file path to load sample
      */
-    final SonarSample getSample(BLink<? extends Termed> c) {
+    final SonarSample getSample(Task c) {
         List<SonarSample> samples = this.samples;
         int s = samples.size();
         if (s == 1)
@@ -157,7 +158,7 @@ public class ConceptSonification extends FrameReaction {
             return samples.get(Math.abs(c.get().term().hashCode() % s));
     }
 
-    public void update(BLink<? extends Termed> c) {
+    public void update(Task c) {
         boolean audible = audible(c);
         if (!audible) return;
 
@@ -178,7 +179,7 @@ public class ConceptSonification extends FrameReaction {
 
     }
 
-    private SoundProducer sound(BLink<? extends Termed> c) {
+    private SoundProducer sound(Task c) {
         //do {
         //try {
         SonarSample sp = getSample(c);
@@ -246,11 +247,11 @@ public class ConceptSonification extends FrameReaction {
     }
 
     protected void updateConceptsPlaying() {
-        Iterator<Map.Entry<BLink<? extends Termed>, SoundProducer>> ie = playing.entrySet().iterator();
+        Iterator<Map.Entry<Task, SoundProducer>> ie = playing.entrySet().iterator();
         while (ie.hasNext()) {
-            Map.Entry<BLink<? extends Termed>, SoundProducer> e = ie.next();
+            Map.Entry<Task, SoundProducer> e = ie.next();
 
-            BLink<? extends Termed> c = e.getKey();
+            Task c = e.getKey();
             boolean cont = update(c, e.getValue());
             if (!cont) {
                 ie.remove();

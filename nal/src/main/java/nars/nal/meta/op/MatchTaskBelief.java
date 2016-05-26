@@ -286,7 +286,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            Term[] x =  m.term.terms();
+            Term[] x =  m.taskbelief();
             Term maybeContainer = x[this.container];
             if (!(maybeContainer instanceof Compound))
                 return false;

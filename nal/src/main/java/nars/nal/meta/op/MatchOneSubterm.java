@@ -35,7 +35,7 @@ public final class MatchOneSubterm extends MatchTerm {
     @Override
     @Deprecated
     public final boolean booleanValueOf(@NotNull PremiseEval p) {
-        p.matchAll(x, p.term.term(subterm) /* current term */, callback, constraints);
+        p.matchAll(x, p.taskbelief[subterm] /* current term */, callback, constraints);
         return true;
     }
 }

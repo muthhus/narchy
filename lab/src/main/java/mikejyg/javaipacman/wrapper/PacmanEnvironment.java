@@ -63,9 +63,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		Default nar = new Default(
 				1024, 4, 1, 2, rng,
-				new Indexes.WeakTermIndex(128 * 1024, rng),
-				//new Default.SoftTermIndex(128 * 1024, rng),
-				//new Default.DefaultTermIndex(128 *1024, rng),
+				//new Indexes.WeakTermIndex(128 * 1024, rng),
+				new Indexes.SoftTermIndex(128 * 1024, rng),
+				//new Indexes.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);

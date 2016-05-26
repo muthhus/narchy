@@ -157,7 +157,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //    }
 
     @Override
-    public void clear() {
+    public final void clear() {
         versioning.clear();
     }
 

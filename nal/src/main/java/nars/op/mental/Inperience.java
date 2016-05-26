@@ -102,23 +102,23 @@ public class Inperience {
 
         n.eventTaskProcess.on(this::experienceFromTaskInternal);
 
-        n.eventConceptProcess.on(p -> {
-            Task belief = p.belief();
-            if (belief == null) return;
-            Task task = p.task();
-
-            Random r = p.nar().random;
-
-            int vol = Math.max(task.term().volume(), belief.term().volume());
-            if (random(r, INTERNAL_EXPERIENCE_RARE_PROBABILITY, vol)) {
-                nonInnate(task, belief, randomNonInnate(r) );
-            }
-
-            if (belief.op().isImplication() &&
-                    random(r, INTERNAL_EXPERIENCE_PROBABILITY, vol) ) {
-                internalizeImplication(task, belief, p);
-            }
-        });
+//        n.eventConceptProcess.on(p -> {
+//            Task belief = p.belief();
+//            if (belief == null) return;
+//            Task task = p.task();
+//
+//            Random r = p.nar().random;
+//
+//            int vol = Math.max(task.term().volume(), belief.term().volume());
+//            if (random(r, INTERNAL_EXPERIENCE_RARE_PROBABILITY, vol)) {
+//                nonInnate(task, belief, randomNonInnate(r) );
+//            }
+//
+//            if (belief.op().isImplication() &&
+//                    random(r, INTERNAL_EXPERIENCE_PROBABILITY, vol) ) {
+//                internalizeImplication(task, belief, p);
+//            }
+//        });
     }
 
 

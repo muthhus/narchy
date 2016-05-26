@@ -52,7 +52,7 @@ public class Memory extends Param {
 
     @NotNull public final Random random;
 
-    public final transient Topic<ConceptProcess> eventConceptProcess = new DefaultTopic<>();
+    //public final transient Topic<ConceptProcess> eventConceptProcess = new DefaultTopic<>();
 
     public final transient Topic<Memory> eventReset = new DefaultTopic<>();
 

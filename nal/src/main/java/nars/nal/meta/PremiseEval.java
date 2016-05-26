@@ -43,14 +43,6 @@ public class PremiseEval extends FindSubst {
     @NotNull
     @Deprecated public final Versioned<MatchTerm> pattern;
 
-    @NotNull
-    public final TaskBeliefPair term = new TaskBeliefPair();
-
-    //    /**
-    //     * current "y"-term being matched against
-    //     */
-    //public Term term;
-
 
     int termutesPerMatch, termutes;
 
@@ -62,6 +54,7 @@ public class PremiseEval extends FindSubst {
     /** cached value */
     private int termSub0op, termSub1op;
     private int termSub1Struct, termSub2Struct;
+    public final Term[] taskbelief = new Term[2];
 
     /** initializes with the default static term index/builder */
     public PremiseEval(Random r, Deriver deriver) {
@@ -156,13 +149,15 @@ public class PremiseEval extends FindSubst {
 
         Task task = p.task();
         Compound taskTerm = task.term();
-        punct.set(task.punc());
+        this.punct.set(task.punc());
 
         Term beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
 
         this.termutesPerMatch = p.getMaxMatches();
 
-        term.set( taskTerm, beliefTerm );
+        this.taskbelief[0] = taskTerm;
+        this.taskbelief[1] = beliefTerm;
+
         this.termSub1Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();
         this.termSub2Struct = beliefTerm.structure();
@@ -179,7 +174,7 @@ public class PremiseEval extends FindSubst {
 
         //setPower(branchPower.get()); //HACK is this where it should be assigned?
 
-        p.nar.eventConceptProcess.emit(p);
+        //p.nar.eventConceptProcess.emit(p);
 
 
         deriver.run(this);
@@ -292,6 +287,10 @@ public class PremiseEval extends FindSubst {
     }
 
 
+    /** array holding the premise task and belief terms, which does not change during a run() */
+    public Term[] taskbelief() {
+        return taskbelief;
+    }
 }
 
 
