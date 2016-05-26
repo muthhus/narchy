@@ -10,6 +10,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
@@ -98,7 +100,6 @@ public class NAL5Test extends AbstractNALTest {
         tester.believe("<<robin --> bird> ==> <robin --> animal>>"); //.en("If robin is a type of bird then robin is a type of animal.");
         tester.believe("<<robin --> bird> ==> <robin --> [flying]>>",0.8f,0.9f); //.en("If robin is a type of bird then robin can fly.");
         tester.mustBelieve(cycles,"<<robin --> animal> <=> <robin --> [flying]>>",0.80f,0.45f); //.en("I guess robin is a type of animal if and only if robin can fly.");
-
     }
 
 
@@ -108,9 +109,17 @@ public class NAL5Test extends AbstractNALTest {
         tester.believe("<<robin --> bird> ==> <robin --> animal>>",0.7f,0.9f); //.en("If robin is a type of bird then usually robin is a type of animal.");
         tester.believe("<<robin --> [flying]> ==> <robin --> animal>>"); //.en("If robin can fly then robin is a type of animal.");
         tester.mustBelieve(cycles,"<<robin --> bird> <=> <robin --> [flying]>>",0.70f,0.45f); //.en("I guess robin is a type of bird if and only if robin can fly.");
-
     }
 
+    @Test
+    public void comparisonNeg(){
+        TestNAR tester = test();
+        //tester.log();
+        tester.mustNotOutput(cycles,"<a <=> b>",'.',ETERNAL);
+        tester.believe("<a ==> c>", 0.5f, 0.9f);
+        tester.believe("<b ==> c>", 0.5f, 0.9f);
+
+    }
 
     @Test
     public void analogy(){

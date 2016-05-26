@@ -43,7 +43,59 @@ public class Thermostat implements Environment {
     }
 
     @Override
-    public float cycle(int t, int aa, float[] ins, Agent a) {
+    public float pre(int t, float[] ins) {
+
+        float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
+
+        float reward = 1f-dist;
+        //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
+        //float reward = -dist + 0.1f;
+        //float reward = 1f / (1+dist*dist);
+
+
+        yHidden.setValue( Util.clamp(function(t)) );
+
+
+
+
+        float diff = yHidden.floatValue() - yEst.floatValue();
+        ins[0] = Util.clamp(diff);
+        ins[1] = Util.clamp(-diff);
+
+        if (enableAbsolute) {
+            ins[2] = Util.clamp(yHidden.floatValue());
+            ins[3] = Util.clamp(yEst.floatValue());
+        }
+
+
+        return reward;
+
+    }
+
+    @Override
+    public void post(int t, int aa, float[] ins, Agent a) {
+        float de;
+        switch (aa) {
+            case 1:
+                de = 1f * speed;
+                break;
+            case 2:
+                de = -1f * speed;
+                break;
+//                case 3:
+//                    de = 1f * speed/4f;
+//                    break;
+//                case 4:
+//                    de = -1f * speed/4f;
+//                    break;
+            case 0:
+            default:
+                de = 0f; //nothing
+                break;
+        }
+
+        yEst.setValue( Util.clamp(yEst.floatValue() + de) );
+
 
         if (print) {
 
@@ -67,50 +119,6 @@ public class Thermostat implements Environment {
             out.print(a.summary());
             out.println();
         }
-
-
-        float diff = yHidden.floatValue() - yEst.floatValue();
-        ins[0] = Util.clamp(diff);
-        ins[1] = Util.clamp(-diff);
-
-        if (enableAbsolute) {
-            ins[2] = Util.clamp(yHidden.floatValue());
-            ins[3] = Util.clamp(yEst.floatValue());
-        }
-
-        float dist =  Math.abs(yHidden.floatValue() - yEst.floatValue());
-
-        float reward = 1f-dist;
-        //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
-        //float reward = -dist + 0.1f;
-        //float reward = 1f / (1+dist*dist);
-
-        float de;
-        switch (aa) {
-            case 1:
-                de = 1f * speed;
-                break;
-            case 2:
-                de = -1f * speed;
-                break;
-//                case 3:
-//                    de = 1f * speed/4f;
-//                    break;
-//                case 4:
-//                    de = -1f * speed/4f;
-//                    break;
-            case 0:
-            default:
-                de = 0f; //nothing
-                break;
-        }
-
-        yEst.setValue( Util.clamp(yEst.floatValue() + de) );
-
-        yHidden.setValue( Util.clamp(function(t)) );
-
-        return reward;
-
     }
 
     public float function(int t) {

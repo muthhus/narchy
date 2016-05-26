@@ -25,11 +25,13 @@ public interface Environment {
         preStart(a);
         a.start(inputs, x.getTwo());
 
-        float reward = 0, rewardSum = 0;
+        float rewardSum = 0;
 
         for (int t = 0; t < cycles; t++) {
-            reward = cycle(t, a.act(reward, ins), ins, a);
+            float reward = pre(t, ins);
             rewardSum += reward;
+
+            post(t, a.act(reward, ins), ins, a);
         }
 
         float scoreAvg = rewardSum/cycles;
@@ -38,7 +40,9 @@ public interface Environment {
     }
 
     /** returns reward value */
-    float cycle(int t, int action, float[] ins, Agent a);
+    float pre(int t, float[] ins);
+
+    void post(int t, int action, float[] ins, Agent a);
 
     default void preStart(Agent a) { }
 }

@@ -8,6 +8,7 @@ import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
@@ -50,17 +51,16 @@ public class NAgent implements Agent {
     private int clockMultiplier = 16; //introduces extra timing delay between frames
 
     float dReward;
-    private SensorConcept dRewardPos, dRewardNeg;
 
     /**
      * learning rate
      */
-    float alpha;
+    float alpha, gamma;
 
     /**
      * exploration rate - confidence of initial goal for each action
      */
-    float epsilon = 0.05f;
+    float epsilon = 0.02f;
     private final double epsilonRandom = 0.01f;
 
     float sensorPriority;
@@ -78,7 +78,10 @@ public class NAgent implements Agent {
     };
 
 
+
     private float lastMotivation;
+    private int nextAction = -1;
+    private SensorConcept dRewardSensor;
 
 
     public NAgent(NAR n) {
@@ -90,10 +93,11 @@ public class NAgent implements Agent {
 
         nar.reset();
 
-        rewardPriority = goalFeedbackPriority = sensorPriority = nar.priorityDefault(Symbols.BELIEF);
-        goalPriority = nar.priorityDefault(Symbols.GOAL);
+        sensorPriority = nar.priorityDefault(Symbols.BELIEF);
+        rewardPriority = goalFeedbackPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
 
         alpha = nar.confidenceDefault(Symbols.BELIEF);
+        gamma = nar.confidenceDefault(Symbols.GOAL);
 
         motivation = new float[actions];
         motivationOrder = new int[actions];
@@ -107,11 +111,12 @@ public class NAgent implements Agent {
             MotorConcept.MotorFunction motorFunc = (b, d) -> {
 
                 motivation[i] =
+                        d / (d+b);
                         //d - b;
-                        (d*d) - (b*b);
+                        //d;
+                        //(d*d) - (b*b);
                         //Math.max(0, d-b);
                         //(1+d)/(1+b);
-                        //d / (d+b);
                         //d;
                         //d / (1 + b);
 
@@ -124,7 +129,18 @@ public class NAgent implements Agent {
                 return Float.NaN;
             };
 
-            return new MotorConcept(actionConceptName(i), nar, motorFunc);
+            return new MotorConcept(actionConceptName(i), nar, motorFunc) {
+                @Override
+                public float floatValueOf(Term anObject) {
+                    //feedback (belief)
+                    if (i == nextAction) {
+                        float m = motivation[i];
+                        return 0.5f + 0.5f * (m);
+                    }
+                    return 0.0f; //this motor was not 'executed'
+                    //return 0.5f;
+                }
+            };
         }).collect(toList());
 
 
@@ -135,23 +151,27 @@ public class NAgent implements Agent {
         this.reward = new SensorConceptDebug("(R)", nar,
                 new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
                 .resolution(0.01f)
-                .pri(rewardPriority)
-                .sensorDT(-1); //pertains to the prevoius frame
+                .pri(rewardPriority);
+                //.sensorDT(-1); //pertains to the prevoius frame
 
         final float dRewardThresh = 0.1f; //bigger than a change in X%
-        FloatSupplier linearPositive = () -> {
-            if (dReward < dRewardThresh)
-                return 0f;
+        FloatSupplier differential = () -> {
+            if (Math.abs(dReward) < dRewardThresh)
+                return 0.5f;
+            else if (dReward < 0)
+                return 0.0f; //negative
             else
-                return 1f;
+                return 1f; //positive
         };
-        FloatSupplier linearNegative = () -> dReward < -dRewardThresh ? 1 : 0;
-        this.dRewardPos = new SensorConcept("(dRp)", nar,
-                linearPositive, sensorTruth)
-                .resolution(0.01f).timing(-1, -1);
-        this.dRewardNeg = new SensorConcept("(dRn)", nar,
-                linearNegative, sensorTruth)
-                .resolution(0.01f).timing(-1, -1);
+
+        this.dRewardSensor = new SensorConcept("(dR)", nar, differential, sensorTruth)
+                .pri(rewardPriority)
+                .resolution(0.01f);
+
+//        FloatSupplier linearNegative = () -> dReward < -dRewardThresh ? 1 : 0;
+//        this.dRewardNeg = new SensorConcept("(dRn)", nar,
+//                linearNegative, sensorTruth)
+//                .resolution(0.01f).timing(-1, -1);
 
         init();
     }
@@ -213,6 +233,8 @@ public class NAgent implements Agent {
 
     protected void init() {
 
+        updateMotors();
+
         seekReward();
 
         //nar.input("(--,(r))! %0.00;1.00%");
@@ -230,16 +252,32 @@ public class NAgent implements Agent {
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
 
+        nar.goal("(dR)", Tense.Eternal, 1f, 0.5f); //prefer increase usually
+
         //nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
         //nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
 
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
-        Task howToReward = nar.ask("(?x ==> (dRp))", ETERNAL, causeOfIncreasedReward -> {
+        Task whatCauseDeltaReward = nar.ask("(?x ==> (dR))", ETERNAL, causeOfIncreasedReward -> {
             System.out.println(causeOfIncreasedReward.explanation());
             return true;
         });
+        Task howToAcheiveDeltaReward = nar.ask($("(dR)"), ETERNAL, '@', how -> {
+            System.out.println(how.explanation());
+            return true;
+        });
+        Task howToAcheiveReward = nar.ask($("(R)"), ETERNAL, '@', how -> {
+            System.out.println(how.explanation());
+            return true;
+        });
+        for (MotorConcept a : actions) {
+            nar.ask(a, ETERNAL, '@', how -> {
+                System.out.println(how.explanation());
+                return true;
+            });
+        }
 
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease
     }
@@ -291,7 +329,7 @@ public class NAgent implements Agent {
     }
 
     private void decide(int lastAction) {
-        int nextAction = -1;
+        this.nextAction = -1;
         float nextMotivation;
         if (Math.random() < epsilonRandom) {
             nextAction = randomMotivation();
@@ -300,44 +338,28 @@ public class NAgent implements Agent {
             if (nextAction == -1)
                 nextAction = randomMotivation();
         }
+
         nextMotivation = motivation[nextAction];
 
-        float on;
-        if (lastAction != nextAction) {
-            if (lastAction != -1) {
-
-//                //TWEAK - unbelieve/undesire previous action less if its desire was stronger than this different action's current desire
-                float off = 1f;
-//                if (lastMotivation > nextMotivation) {
-//                    off = 0.5f; //partial off
-//                } else {
-//                    off = 1; //full off
-//                }
-
-                nar.believe(goalFeedbackPriority, actions.get(lastAction), Tense.Present, 0, alpha * off);
-                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0f, alpha * off);
-            }
-
-            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, alpha);
-
-            on = 1f;
-        } else {
-
-//            //TWEAK - activate a repeated chosen goal less if reward has decreased
-//            if (dReward >= 0) {
-            on = 1f;
-//            } else {
-//                on = 0.5f;
+//        if (lastAction != nextAction) {
+//            if (lastAction != -1) {
+//                nar.goal(goalPriority, actions.get(lastAction), Tense.Present, 0.5f, gamma);
 //            }
-        }
-        nar.believe(goalFeedbackPriority, actions.get(nextAction), Tense.Present, 1f, alpha * on);
+//
+//            nar.goal(goalPriority, actions.get(nextAction), Tense.Present, 1f, gamma);
+//        }
 
-        /*for (int a = 0; a < actions.size(); a++)
-            nar.believe(actions.get(a), Tense.Present,
-                    (nextAction == a ? 1f : 0f), 0.9f);*/
+        updateMotors();
 
         this.lastAction = nextAction;
         this.lastMotivation = nextMotivation;
+    }
+
+    private void updateMotors() {
+        //update all motors and their feedback
+        for (MotorConcept m : actions) {
+            m.commit();
+        }
     }
 
     private int randomMotivation() {
@@ -383,9 +405,11 @@ public class NAgent implements Agent {
             return sensorNamer.apply(i);
         } else {
             //return inputConceptName(i, -1);
-            //return "I:i" + i;
+            //return $("(i" + i + ")");
+            return $("I:i" + i);
             //return "I:{i" + i + "}";
-            return $("{i" + i + "}");
+            //return $("{i" + i + "}");
+
         }
     }
 

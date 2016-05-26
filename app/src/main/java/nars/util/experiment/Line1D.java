@@ -1,11 +1,14 @@
 package nars.util.experiment;
 
+import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
+import com.gs.collections.api.block.function.primitive.IntToIntFunction;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
+import nars.learn.ql.HaiQAgent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.util.NAgent;
@@ -24,12 +27,17 @@ import static java.lang.System.out;
 public class Line1D implements Environment {
 
 
-    public float targetPeriod = 20;
-    int size = 8;
+    private final IntToFloatFunction targetFunc;
+    int size;
     int speed = 1;
     boolean print = true;
     private int yHidden;
     private int yEst;
+
+    public Line1D(int size, IntToFloatFunction target) {
+        this.size = size;
+        this.targetFunc = target;
+    }
 
     @Override public Twin<Integer> start() {
 
@@ -40,28 +48,56 @@ public class Line1D implements Environment {
         yHidden = size/2; //actual best Y used by loss function
 
 
-        return Tuples.twin(size, 2);
+        return Tuples.twin(size*2, 3);
     }
 
     @Override
-    public float cycle(int t, int aa, float[] ins, Agent a) {
+    public float pre(int t, float[] ins) {
+
+
+        yHidden = Math.round(targetFunc.valueOf(t) * (size-1));
+        yHidden = Math.max(0, yHidden);
+        yHidden = Math.min(size-1, yHidden);
+
+
+        //update perceived state:
+        {
+            //1*size
+            //        Arrays.fill(ins, 0.5f);
+            //        ins[yHidden] += 0.5f;
+            //        ins[yEst] -= 0.5f;
+        }
+        {
+            //2*size
+            Arrays.fill(ins, 0f);
+            ins[yHidden] = 1f;
+            ins[size + yEst] = 1f;
+        }
 
 
 
         float dist =  ((float)Math.abs(yHidden - yEst)) / size;
 
         float closeness = 1f - dist;
-        float reward = ((closeness*closeness) -0.5f)*2f;
+        float reward = ((closeness*closeness*closeness) -0.5f)*2f;
         //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
         //float reward = -dist + 0.1f;
         //float reward = 1f / (1+dist*dist);
 
+
+        return reward;
+    }
+
+    @Override
+    public void post(int t, int aa, float[] ins, Agent a) {
+
+
         float de;
         switch (aa) {
-            case 0:
+            case 1: //right
                 de = 1f*speed;
                 break;
-            case 1:
+            case 0: //left
                 de = -1f*speed;
                 break;
 //                case 3:
@@ -81,14 +117,7 @@ public class Line1D implements Environment {
         if (yEst > size-1) yEst = size-1;
         if (yEst < 0) yEst = 0;
 
-        yHidden = Math.round(function(t) * (size-1));
-        yHidden = Math.max(0, yHidden);
-        yHidden = Math.min(size-1, yHidden);
 
-        //update perceived state:
-        Arrays.fill(ins, 0.5f);
-        ins[yHidden] += 0.5f;
-        ins[yEst] -= 0.5f;
 
 
         if (print) {
@@ -99,10 +128,12 @@ public class Line1D implements Environment {
             for (int i = 0; i < size; i++) {
 
                 char c;
-                if (i == colActual)
+                if (i == colActual && i == colEst) {
+                    c = '@';
+                }else if (i == colActual)
                     c = 'X';
                 else if (i == colEst)
-                    c = '|';
+                    c = '+';
                 else
                     c = '.';
 
@@ -119,36 +150,47 @@ public class Line1D implements Environment {
         }
 
 
-        return reward;
     }
 
-    public float function(int t) {
-        float a = 0.95f;
-        return 0.5f +
-                0.5f * (a * (float)Math.sin(t / (targetPeriod))) +
-                0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
-                ;
+
+    public static IntToFloatFunction sine(float targetPeriod) {
+        return (t) -> 0.5f + 0.5f * (float) Math.sin(t / (targetPeriod));
+        //+ 0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
+        //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
+    }
+    public static IntToFloatFunction random(float targetPeriod) {
+        return (t) -> (((((int)(t/targetPeriod)) * 31) ^ 37) % 256)/256.0f;
+
+        //+ 0.05f * (a * (float)Math.cos(t / (targetPeriod/3f))-1)
         //return 0.5f + 0.5f * (float)Math.tan(t / (targetPeriod)) + (float)Math.random()*0.1f;
     }
 
     public static void main(String[] args) {
 
-        int cycles = 10000;
-        Default nar = new Default();
-        nar.beliefConfidence(0.1f);
-        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.3f;
+
+        Default nar = new Default(1024, 8, 1, 3);
+
+        nar.beliefConfidence(0.25f);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.4f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
 
         nar.cyclesPerFrame.setValue(64);
 
-        new MySTMClustered(nar, 64, '.');
+        //nar.log();
 
-        new Line1D().run(
+        new MySTMClustered(nar, 64, '.');
+        int cycles = 10000;
+        float score = new Line1D(8,
+                //random(10)
+                sine(10)
+        ).run(
                 new NAgent(nar),
                 //new DQN(),
+                //new HaiQAgent(),
                 cycles);
+
 
         System.out.println();
         NAR.printTasks(nar, true);
@@ -161,6 +203,9 @@ public class Line1D implements Environment {
                 }
             }
         });
+
+        System.err.println(score);
+
     }
 
 

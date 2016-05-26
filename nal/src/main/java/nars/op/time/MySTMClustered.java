@@ -80,7 +80,7 @@ public class MySTMClustered extends STMClustered {
 						.budget(BudgetFunctions.taxCollection(Stream.of(tt), 1f / s.length))
 						.log("STMCluster CoOccurr");
 
-				System.err.println(m + " " + Arrays.toString(m.evidence()));
+				//System.err.println(m + " " + Arrays.toString(m.evidence()));
 				nar.input(m);
 				node.clear();
 

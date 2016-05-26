@@ -27,6 +27,8 @@ import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static java.lang.Math.abs;
+
 /**
  * All truth-value (and desire-value) functions used in logic rules
  */
@@ -219,12 +221,18 @@ public final class TruthFunctions extends UtilityFunctions {
         if (invertA) f1 = 1 - f1;
 
         float f2 = b.freq();
-        float f0 = or(f1, f2);
+
+        f1 = (f1 - 0.5f) * 2f;
+        f2 = (f2 - 0.5f) * 2f;
+
+        float f0 = or(abs(f1), abs(f2));
         float c = w2c(and(f0, a.conf(), b.conf()));
         if (c < minConf)
             return null;
 
-        float f = (Util.equals(f0, 0, Global.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
+        float f = (Util.equals(f0, 0f, Global.TRUTH_EPSILON)) ? 0.5f :
+                ((and(f1, f2) / f0)/2f)+0.5f;
+
         return new DefaultTruth(f, c);
     }
 

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class HaiQAgent extends HaiQ {
 
     //Hsom...
-    final static float perceptionAlpha = 0.04f;
+    final static float perceptionAlpha = 0.02f;
     @NotNull Autoencoder ae;
 
     public HaiQAgent() {
@@ -19,7 +19,7 @@ public class HaiQAgent extends HaiQ {
 
     @Override
     public void start(int inputs, int outputs) {
-        int states = 8;
+        int states = (int) (2 + Math.sqrt(inputs*outputs));
         ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         super.start(states, outputs);
     }
@@ -32,7 +32,7 @@ public class HaiQAgent extends HaiQ {
 
     @Override
     protected int perceive(float[] input) {
-        ae.train(input, perceptionAlpha, 0.05f, 0.01f, true);
+        ae.train(input, perceptionAlpha, 0.01f, 0.01f, true);
         int w = ae.max();
         return w;
     }

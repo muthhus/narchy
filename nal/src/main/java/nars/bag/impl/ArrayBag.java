@@ -34,8 +34,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Override
     protected void removeWeakest(Object reason) {
+
+        if (removeDeletedAtBottom()) {
+            return; //
+        }
+
         remove(weakest()).delete(reason);
     }
+
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
@@ -346,12 +352,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         removeDeletedAtBottom();
     }
 
-    private void removeDeletedAtBottom() {
+    private boolean removeDeletedAtBottom() {
         //remove deleted items they will collect at the end
         int i = size()-1;
         BLink<V> ii;
         BLink<V>[] l = items.array();
 
+        int removed = 0;
         int toRemoveFromMap = 0;
         while (i > 0 && (ii = l[i]).isDeleted()) {
             if (removeKeyForValue(ii) == null) {
@@ -360,6 +367,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
                 //exhaustive removal, since the BLink has lost its key
                 toRemoveFromMap++;
+            } else {
+                removed++;
             }
 
             //remove by known index rather than have to search for it by key or something
@@ -371,7 +380,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
-            map.values().removeIf(b -> b.isDeleted());
+            if (map.values().removeIf(b -> b.isDeleted())) {
+                return true;
+            }
+
 
             //EXTRA checks but which dont apply if dealing with weak links becaues they can get removed in the middle of checking them (heisenbug):
 //            int currentSize = map.size();
@@ -380,6 +392,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //            if (currentSize!=items.size())
 //                throw new RuntimeException("bag fault");
         }
+        return removed > 0;
     }
 
 

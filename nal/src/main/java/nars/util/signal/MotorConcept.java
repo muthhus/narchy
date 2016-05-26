@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.$.$;
 import static nars.budget.policy.DefaultConceptBudgeting.beliefCapacityNonEternal;
@@ -36,7 +37,8 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
 
-    @NotNull private final Sensor feedback;
+    @NotNull
+    public final Sensor feedback;
     //private final Logger logger;
 
     @FunctionalInterface  public interface MotorFunction {
@@ -145,10 +147,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
      * returns the last recorded feedback value
      */
     @Override
-    public final float floatValueOf(Term anObject /* ignored */) {
+    public float floatValueOf(Term anObject /* ignored */) {
         return nextFeedback;
     }
-
 
     @Override
     public void update() {
@@ -167,8 +168,36 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
         if (Float.isFinite(response)) {
             nextFeedback = response;
-            feedback.accept(nar);
+            commit();
         }
+
+    }
+
+    /** ot manually commit */
+    public void commit() {
+        feedback.accept(nar);
+    }
+
+    @Override
+    public @Nullable
+    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        //if (belief.evidence().length > 1) {
+
+        //Filter feedback that contradicts the sensor's provided beliefs
+        if (belief!=feedback.next()) {
+            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+
+            //TODO delete its non-input parent tasks?
+            onConflict(belief);
+
+            return null;
+        }
+
+        return super.processBelief(belief, nar);
+    }
+
+    /** called when a conflicting belief has attempted to be processed */
+    protected void onConflict(@NotNull Task belief) {
 
     }
 

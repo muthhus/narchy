@@ -73,6 +73,18 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
+    /** async timing: only commits when value has changed significantly, and as often as necessary */
+    public SensorConcept async() {
+        timing(0, 0);
+        return this;
+    }
+    /** commits every N cycles only */
+    public SensorConcept every(int minCycles) {
+        timing(minCycles, minCycles);
+        return this;
+    }
+
+
     //    float freq(float v) {
 //        return v;
 //    }
@@ -96,6 +108,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     @Override
     protected void beliefCapacity(ConceptBudgeting p) {
+
         DefaultConceptBudgeting.beliefCapacityNonEternal(this, p);
     }
 

@@ -28,6 +28,7 @@ import mikejyg.javaipacman.pacman.ctables;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.learn.ql.HaiQAgent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
@@ -50,7 +51,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 4;
+	private final int pacmanCyclesPerFrame = 2;
+	float bias = -0.15f; //pain of boredom
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -68,12 +70,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.beliefConfidence(0.25f);
+		nar.beliefConfidence(0.15f);
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.3f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.2f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.2f;
-		nar.cyclesPerFrame.set(128);
+		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+		nar.cyclesPerFrame.set(16);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -84,8 +86,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
+				//new HaiQAgent(),
 				new NAgent(nar),
-				1500);
+				5500);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
@@ -126,6 +129,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final Atom WALL = $.the("wall");
 	final Atom GHOST = $.the("ghost");
 
+
 	@Override
 	public void preStart(Agent a) {
 		if (a instanceof NAgent) {
@@ -157,9 +161,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 	@Override
-	public float cycle(int t, int action, float[] ins, Agent a) {
+	public float pre(int t, float[] ins) {
 
 		int p = 0;
+
 		if (maze!=null && pac!=null) {
 			int[][] m = maze.iMaze;
 //			int pix = pac.iX / 16;
@@ -212,30 +217,6 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			//System.out.println(Arrays.toString(ins));
 		}
 
-		switch (action) {
-			case 0: pacKeyDir = ctables.RIGHT; break;
-			case 1: pacKeyDir = ctables.UP; break;
-			case 2: pacKeyDir = ctables.LEFT; break;
-			case 3: pacKeyDir = ctables.DOWN; break;
-		}
-
-		float bias = -0.15f; //pain of boredom
-
-		if (interScore < bias*2f) {
-			//too much pain
-			pacKeyDir = -1;
-		}
-
-
-		cycle(pacmanCyclesPerFrame);
-
-
-		/*static final int BLANK=0;
-		static final int WALL=1;
-		static final int DOOR=2;
-		static final int DOT=4;
-		static final int POWER_DOT=8;*/
-
 
 
 		//delta score from pacman game
@@ -253,8 +234,39 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		if (ds > 1f) ds = 1f;
 		if (ds < -1f) ds = -1f;
 
-		System.out.println(ds + "\t" + a.summary());
+
 		return ds;
+
+	}
+
+	@Override
+	public void post(int t, int action, float[] ins, Agent a) {
+
+
+		switch (action) {
+			case 0: pacKeyDir = ctables.RIGHT; break;
+			case 1: pacKeyDir = ctables.UP; break;
+			case 2: pacKeyDir = ctables.LEFT; break;
+			case 3: pacKeyDir = ctables.DOWN; break;
+		}
+
+
+		if (interScore < bias*2f) {
+			//too much pain
+			pacKeyDir = -1;
+		}
+
+		cycle(pacmanCyclesPerFrame);
+
+
+		System.out.println( a.summary());
+
+		/*static final int BLANK=0;
+		static final int WALL=1;
+		static final int DOOR=2;
+		static final int DOT=4;
+		static final int POWER_DOT=8;*/
+
 	}
 
 	float interScore;
