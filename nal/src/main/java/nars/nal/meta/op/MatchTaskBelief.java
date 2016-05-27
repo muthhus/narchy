@@ -286,12 +286,14 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            Term[] x =  m.taskbelief();
-            Term maybeContainer = x[this.container];
+
+
+            Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;
             if (!(maybeContainer instanceof Compound))
                 return false;
             Compound container = (Compound)maybeContainer;
-            Term contained = x[this.contained];
+
+            Term contained = this.contained == 0 ? m.taskTerm : m.beliefTerm;
             if (!container.impossibleSubterm(contained)) {
                 Term whatsThere = container.subterm(path);
                 if ((whatsThere != null) && contained.equals(whatsThere))

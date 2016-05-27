@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
  */
 abstract public class MatchTerm extends AtomicBoolCondition {
 
-    private final @NotNull Term pid;
 
     @NotNull
     private final Term id;
@@ -27,7 +26,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
     private final String idString;
 
     public MatchTerm(@NotNull Term pid, @NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable ProcTerm eachMatch) {
-        this.pid = pid;
+        //this.pid = pid;
         this.id = id;
         this.idString = id.toString();
         this.pattern = pattern;

@@ -13,8 +13,7 @@ final class TaskBeliefEqualCondition extends AtomicBoolCondition {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
-        Term[] x =  m.taskbelief;
-        return x[0].equals(x[1]);
+        return m.taskTerm.equals(m.beliefTerm);
     }
 
     @Override

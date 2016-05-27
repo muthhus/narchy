@@ -59,7 +59,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
-        if (!op.isTemporal() && dt != DTERNAL)
+        if (!op.temporal && dt != DTERNAL)
             throw new RuntimeException("invalid temporal relation for " + op);
 
 
@@ -104,7 +104,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final boolean isCommutative() {
-        return op.isCommutative() && size() > 1;
+        return op.commutative && size() > 1;
     }
 
 
@@ -279,7 +279,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public int structure() {
-        return subterms.structure() | op.bit();
+        return subterms.structure() | op.bit;
     }
 
     @Override
@@ -329,7 +329,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
             //return (isCommutative()) ?
             @NotNull TermContainer ysubs = y.subterms();
-            return (ys > 1 && op.isCommutative()) ?
+            return (ys > 1 && op.commutative) ?
                     subst.matchPermute(xsubs, ysubs) :
                     subst.matchLinear(xsubs, ysubs);
         }

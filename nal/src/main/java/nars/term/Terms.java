@@ -546,7 +546,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
 
     public static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
-        if (a.op().isTemporal() && (a.opRel() == b.opRel()) && (a.volume() == b.volume())) {
+        if (a.op().temporal && (a.opRel() == b.opRel()) && (a.volume() == b.volume())) {
 
             return equalsAnonymous(a.subterms(), b.subterms());
 

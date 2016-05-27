@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
+import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.concept.ConceptProcess;
@@ -54,8 +55,10 @@ public class PremiseEval extends FindSubst {
     /** cached value */
     private int termSub0op, termSub1op;
     private int termSub1Struct, termSub2Struct;
-    public final Term[] taskbelief = new Term[2];
-
+    public boolean cyclic, overlap;
+    public Truth taskTruth, beliefTruth;
+    public Term taskTerm, beliefTerm;
+    public NAR nar;
 
 
     /** initializes with the default static term index/builder */
@@ -151,17 +154,44 @@ public class PremiseEval extends FindSubst {
     public final void run(@NotNull ConceptProcess p) {
 
         this.premise = p;
+        this.nar = p.nar();
 
         Task task = p.task();
-        Compound taskTerm = task.term();
         this.punct.set(task.punc());
 
-        Term beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
+        Task belief = p.belief();
+
+        Term tt = task.term();
+        Termed bb = p.beliefTerm(); //includes when belief==null, the termlink
+
+        this.taskTruth = task.truth();
+        this.beliefTruth = belief != null ? belief.truth() : null;
+
+        if (taskTruth == null || !taskTruth.isNegative()) {
+            this.taskTerm = tt;
+        }
+        else {
+            this.taskTruth = this.taskTruth.negated();
+            this.taskTerm = $.neg(tt);
+        }
+
+        if (beliefTruth == null || !beliefTruth.isNegative()) {
+            this.beliefTerm = bb.term();
+        } else {
+            this.beliefTruth = this.beliefTruth.negated();
+            this.beliefTerm = $.neg(bb);
+        }
+
+
 
         this.termutesPerMatch = p.getMaxMatches();
 
-        this.taskbelief[0] = taskTerm;
-        this.taskbelief[1] = beliefTerm;
+        this.taskTruth = task.truth();
+        this.beliefTruth = (belief!=null) ? belief.truth() : null;
+
+
+        this.cyclic = p.cyclic();
+        this.overlap = p.overlap();
 
         this.termSub1Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();
@@ -292,10 +322,6 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    /** array holding the premise task and belief terms, which does not change during a run() */
-    public Term[] taskbelief() {
-        return taskbelief;
-    }
 }
 
 

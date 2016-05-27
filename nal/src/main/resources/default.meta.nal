@@ -334,8 +334,7 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M), belief(positive) |- ((&&,M,A..+) ==> C), (Belief:Induction)
-    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M), belief(negative) |- ((&&,(--,M),A..+) ==> C), (Belief:InductionNegB)
+    ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==> C), (Belief:Deduction)
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==> C), (Belief:Abduction)
@@ -357,17 +356,14 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, task(positive), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction)
-    A, B, task(negative), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,A) ==> B), (Belief:InductionNeg)
+    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction)
 
-    A, B, task(positive), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
-    A, B, task(negative), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- ((--,A) <=> B), (Belief:ComparisonNeg)
+    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
 
-    A, B, task(positive), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
-    A, B, task(negative), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> (--,A)), (Belief:AbductionNeg)
+    A, B, time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B, task(positive), time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection)
-    A, B, task(negative), time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- ((--,A) && B), (Belief:IntersectionNeg)
+    A, B, time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection)
+
 
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////

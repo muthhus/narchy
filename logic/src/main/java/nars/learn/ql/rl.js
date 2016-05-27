@@ -3,6 +3,8 @@ var R = {}; // the Recurrent library
 (function (global) {
     "use strict";
 
+
+
     // Utility fun
     function assert(condition, message) {
         // from http://stackoverflow.com/questions/15313418/javascript-assert
@@ -56,7 +58,8 @@ var R = {}; // the Recurrent library
             }
             return arr;
         } else {
-            return new Float64Array(n);
+            //return new Float64Array(n);
+            return new Float32Array(n);
         }
     }
 
@@ -73,13 +76,13 @@ var R = {}; // the Recurrent library
             // slow but careful accessor function
             // we want row-major order
             var ix = (this.d * row) + col;
-            assert(ix >= 0 && ix < this.w.length);
+            //assert(ix >= 0 && ix < this.w.length);
             return this.w[ix];
         },
         set: function (row, col, v) {
             // slow but careful accessor function
             var ix = (this.d * row) + col;
-            assert(ix >= 0 && ix < this.w.length);
+            //assert(ix >= 0 && ix < this.w.length);
             this.w[ix] = v;
         },
         setFrom: function (arr) {
@@ -129,20 +132,30 @@ var R = {}; // the Recurrent library
 
     var updateMat = function (m, alpha) {
         // updates in place
+        var mdw = m.dw;
+        var mw = m.w;
         for (var i = 0, n = m.n * m.d; i < n; i++) {
-            if (m.dw[i] !== 0) {
-                m.w[i] += -alpha * m.dw[i];
-                m.dw[i] = 0;
+            if (mdw[i] !== 0) {
+                mw[i] += -alpha * mdw[i];
+                mdw[i] = 0;
             }
         }
     }
 
-    var updateNet = function (net, alpha) {
+    var compileNet = function(net) {
+        var a = [];
         for (var p in net) {
             if (net.hasOwnProperty(p)) {
-                updateMat(net[p], alpha);
+                a.push(p);
             }
         }
+       net.compiled = a;
+    }
+
+    var updateNet = function (net, alpha) {
+        var a = net.compiled;
+        for (var i = 0; i < a.length; i++)
+            updateMat(a[i], alpha);
     }
 
     var netToJSON = function (net) {
@@ -230,12 +243,19 @@ var R = {}; // the Recurrent library
         // this will store a list of functions that perform backprop,
         // in their forward pass order. So in backprop we will go
         // backwards and evoke each one
+
+        // store in pairs of function refs and argument arrays
         this.backprop = [];
     }
     Graph.prototype = {
         backward: function () {
-            for (var i = this.backprop.length - 1; i >= 0; i--) {
-                this.backprop[i](); // tick!
+            var bp = this.backprop;
+            for (var i = bp.length - 1; i >= 0; ) {
+                var args = bp[i--];
+                var func = bp[i--];
+                func.apply(this, args);
+
+                //bp[i](); // tick!
             }
         },
         rowPluck: function (m, ix) {
@@ -248,14 +268,15 @@ var R = {}; // the Recurrent library
             } // copy over the data
 
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0, n = d; i < n; i++) {
-                        m.dw[d * ix + i] += out.dw[i];
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.rowPluckBack, [m, ix, d, out]);
             }
             return out;
+        },
+        rowPluckBack: function(m, ix, out) {
+            var d = m.d;
+            for (var i = 0, n = d; i < n; i++) {
+                m.dw[d * ix + i] += out.dw[i];
+            }
         },
         tanh: function (m) {
             // tanh nonlinearity
@@ -266,16 +287,17 @@ var R = {}; // the Recurrent library
             }
 
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0; i < n; i++) {
-                        // grad for z = tanh(x) is (1 - z^2)
-                        var mwi = out.w[i];
-                        m.dw[i] += (1.0 - mwi * mwi) * out.dw[i];
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.tanhBack, [m, out]);
             }
             return out;
+        },
+        tanhBack: function(m, out) {
+            var n = m.w.length;
+            for (var i = 0; i < n; i++) {
+                // grad for z = tanh(x) is (1 - z^2)
+                var mwi = out.w[i];
+                m.dw[i] += (1.0 - mwi * mwi) * out.dw[i];
+            }
         },
         sigmoid: function (m) {
             // sigmoid nonlinearity
@@ -286,16 +308,18 @@ var R = {}; // the Recurrent library
             }
 
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0; i < n; i++) {
-                        // grad for z = tanh(x) is (1 - z^2)
-                        var mwi = out.w[i];
-                        m.dw[i] += mwi * (1.0 - mwi) * out.dw[i];
-                    }
-                }
-                this.backprop.push(backward);
+
+                this.backprop.push(this.sigmoidBack, [m, out]);
             }
             return out;
+        },
+        sigmoidBack: function(m, out) {
+            var n = m.w.length;
+            for (var i = 0; i < n; i++) {
+                // grad for z = tanh(x) is (1 - z^2)
+                var mwi = out.w[i];
+                m.dw[i] += mwi * (1.0 - mwi) * out.dw[i];
+            }
         },
         relu: function (m) {
             var out = new Mat(m.n, m.d);
@@ -304,47 +328,68 @@ var R = {}; // the Recurrent library
                 out.w[i] = Math.max(0, m.w[i]); // relu
             }
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0; i < n; i++) {
-                        m.dw[i] += m.w[i] > 0 ? out.dw[i] : 0.0;
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.reluBack, [m, out]);
             }
             return out;
         },
+        reluBack: function(m, out) {
+            var n = m.w.length;
+            for (var i = 0; i < n; i++) {
+                m.dw[i] += m.w[i] > 0 ? out.dw[i] : 0.0;
+            }
+        },
         mul: function (m1, m2) {
             // multiply matrices m1 * m2
-            assert(m1.d === m2.n, 'matmul dimensions misaligned');
+            var m1d = m1.d;
+
+            assert(m1d === m2.n, 'matmul dimensions misaligned: ' + m1d + ' != ' + m2.n);
 
             var n = m1.n;
-            var d = m2.d;
+            var m2d = m2.d;
+            var d = m2d;
+            var m1w = m1.w;
+            var m2w = m2.w;
             var out = new Mat(n, d);
-            for (var i = 0; i < m1.n; i++) { // loop over rows of m1
-                for (var j = 0; j < m2.d; j++) { // loop over cols of m2
+            var outw = out.w;
+            for (var i = 0; i < n; i++) { // loop over rows of m1
+                var m1i = m1d * i;
+                for (var j = 0; j < m2d; j++) { // loop over cols of m2
                     var dot = 0.0;
-                    for (var k = 0; k < m1.d; k++) { // dot product loop
-                        dot += m1.w[m1.d * i + k] * m2.w[m2.d * k + j];
+                    for (var k = 0; k < m1d; k++) { // dot product loop
+                        dot += m1w[m1i + k] * m2w[m2d * k + j];
                     }
-                    out.w[d * i + j] = dot;
+                    outw[d * i + j] = dot;
                 }
             }
 
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0; i < m1.n; i++) { // loop over rows of m1
-                        for (var j = 0; j < m2.d; j++) { // loop over cols of m2
-                            for (var k = 0; k < m1.d; k++) { // dot product loop
-                                var b = out.dw[d * i + j];
-                                m1.dw[m1.d * i + k] += m2.w[m2.d * k + j] * b;
-                                m2.dw[m2.d * k + j] += m1.w[m1.d * i + k] * b;
-                            }
-                        }
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.mulBack, [m1, m2, out]);
             }
             return out;
+        },
+        mulBack: function(m1,m2, out) {
+            var n = m1.n;
+            var m2d = m2.d;
+            var d = m2d;
+            var m1d = m1.d;
+            var outdw = out.dw;
+            var m1w = m1.w;
+            var m2w = m2.w;
+            var m1dw = m1.dw;
+            var m2dw = m2.dw;
+            for (var i = 0; i < n; i++) { // loop over rows of m1
+                for (var j = 0; j < m2d; j++) { // loop over cols of m2
+                    var bb = d * i + j;
+                    for (var k = 0; k < m1d; k++) { // dot product loop
+                        var b = outdw[bb];
+                        var mm1 = m1d * i + k;
+                        var mm2 = m2d * k + j;
+                        m1dw[mm1] += m2w[mm2] * b;
+                        m2dw[mm2] += m1w[mm1] * b;
+                    }
+                }
+            }
+
         },
         add: function (m1, m2) {
             assert(m1.w.length === m2.w.length);
@@ -354,15 +399,16 @@ var R = {}; // the Recurrent library
                 out.w[i] = m1.w[i] + m2.w[i];
             }
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0, n = m1.w.length; i < n; i++) {
-                        m1.dw[i] += out.dw[i];
-                        m2.dw[i] += out.dw[i];
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.addBack, [m1, m2, out]);
             }
             return out;
+        },
+        addBack: function(m1, m2, out) {
+            for (var i = 0, n = m1.w.length; i < n; i++) {
+                m1.dw[i] += out.dw[i];
+                m2.dw[i] += out.dw[i];
+            }
+
         },
         dot: function (m1, m2) {
             // m1 m2 are both column vectors
@@ -374,15 +420,15 @@ var R = {}; // the Recurrent library
             }
             out.w[0] = dot;
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0, n = m1.w.length; i < n; i++) {
-                        m1.dw[i] += m2.w[i] * out.dw[0];
-                        m2.dw[i] += m1.w[i] * out.dw[0];
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.dotBack, [m1, m2, out]);
             }
             return out;
+        },
+        dotBack: function(m1, m2, out) {
+            for (var i = 0, n = m1.w.length; i < n; i++) {
+                m1.dw[i] += m2.w[i] * out.dw[0];
+                m2.dw[i] += m1.w[i] * out.dw[0];
+            }
         },
         eltmul: function (m1, m2) {
             assert(m1.w.length === m2.w.length);
@@ -392,15 +438,15 @@ var R = {}; // the Recurrent library
                 out.w[i] = m1.w[i] * m2.w[i];
             }
             if (this.needs_backprop) {
-                var backward = function () {
-                    for (var i = 0, n = m1.w.length; i < n; i++) {
-                        m1.dw[i] += m2.w[i] * out.dw[i];
-                        m2.dw[i] += m1.w[i] * out.dw[i];
-                    }
-                }
-                this.backprop.push(backward);
+                this.backprop.push(this.eltmulBack, [m1, m2, out]);
             }
             return out;
+        },
+        eltmulBack: function (m1, m2, out) {
+            for (var i = 0, n = m1.w.length; i < n; i++) {
+                m1.dw[i] += m2.w[i] * out.dw[i];
+                m2.dw[i] += m1.w[i] * out.dw[i];
+            }
         }
     }
 
@@ -619,6 +665,7 @@ var R = {}; // the Recurrent library
     // more utils
     global.updateMat = updateMat;
     global.updateNet = updateNet;
+    global.compileNet = compileNet;
     global.copyMat = copyMat;
     global.copyNet = copyNet;
     global.netToJSON = netToJSON;
@@ -633,6 +680,8 @@ var R = {}; // the Recurrent library
 // END OF RECURRENTJS
 
 var RL = {};
+
+
 (function (global) {
     "use strict";
 
@@ -1080,6 +1129,7 @@ var RL = {};
             this.net.b1 = new R.Mat(this.nh, 1, 0, 0.01);
             this.net.W2 = new R.RandMat(this.na, this.nh, 0, 0.01);
             this.net.b2 = new R.Mat(this.na, 1, 0, 0.01);
+            R.compileNet(this.net);
 
             this.exp = []; // experience
             this.expi = 0; // where to insert
@@ -1101,6 +1151,7 @@ var RL = {};
             j.ns = this.ns;
             j.na = this.na;
             j.net = R.netToJSON(this.net);
+            R.compileNet(j.net);
             return j;
         },
         fromJSON: function (j) {
@@ -1109,6 +1160,7 @@ var RL = {};
             this.ns = j.ns;
             this.na = j.na;
             this.net = R.netFromJSON(j.net);
+            R.compileNet(this.net);
         },
         forwardQ: function (net, s, needs_backprop) {
             var G = new R.Graph(needs_backprop);
@@ -1179,10 +1231,10 @@ var RL = {};
 
             var tderror = pred.w[a0] - qmax;
             var clamp = this.tderror_clamp;
-            if (Math.abs(tderror) > clamp) {  // huber loss to robustify
+            //if (Math.abs(tderror) > clamp) {  // huber loss to robustify
                 if (tderror > clamp) tderror = clamp;
                 if (tderror < -clamp) tderror = -clamp;
-            }
+            //}
             pred.dw[a0] = tderror;
             this.lastG.backward(); // compute gradients on net params
 
@@ -1201,6 +1253,18 @@ var RL = {};
         this.env = env;
         this.reset();
     }
+
+
+    function clampAbs(update, v) {
+        if (update > v) {
+            update = v;
+        }
+        if (update < -v) {
+            update = -v;
+        }
+        return update;
+    }
+
     SimpleReinforceAgent.prototype = {
         reset: function () {
             this.ns = this.env.getNumStates();
@@ -1307,21 +1371,11 @@ var RL = {};
                     for (var i = 0; i < this.na; i++) {
                         // [the action delta] * [the desirebility]
                         var update = -(V - b) * (this.actorActions[t].w[i] - this.actorOutputs[t].w[i]);
-                        if (update > 0.1) {
-                            update = 0.1;
-                        }
-                        if (update < -0.1) {
-                            update = -0.1;
-                        }
+                        update = clampAbs(update, 0.1);
                         this.actorOutputs[t].dw[i] += update;
                     }
                     var update = -(V - b);
-                    if (update > 0.1) {
-                        update = 0.1;
-                    }
-                    if (update < 0.1) {
-                        update = -0.1;
-                    }
+                    update = clampAbs(update, 0.1);
                     this.baselineOutputs[t].dw[0] += update;
                     baselineMSE += (V - b) * (V - b);
                     vs.push(V);
@@ -1456,7 +1510,7 @@ var RL = {};
                     if (update > 0.1) {
                         update = 0.1;
                     }
-                    if (update < 0.1) {
+                    if (update < -0.1) {
                         update = -0.1;
                     }
                     this.baselineOutputs[t].dw[0] += update;
@@ -1490,9 +1544,10 @@ var RL = {};
 // Currently buggy implementation, doesnt work
     var DeterministPG = function (env, opt) {
         this.gamma = getopt(opt, 'gamma', 0.5); // future reward discount factor
-        this.epsilon = getopt(opt, 'epsilon', 0.5); // for epsilon-greedy policy
-        this.alpha = getopt(opt, 'alpha', 0.001); // actor net learning rate
+        this.epsilon = getopt(opt, 'epsilon', 0.05); // for epsilon-greedy policy
+        this.alpha = getopt(opt, 'alpha', 0.01); // actor net learning rate
         this.beta = getopt(opt, 'beta', 0.01); // baseline net learning rate
+        this.nh = getopt(opt, 'num_hidden_units', 100);
         this.env = env;
         this.reset();
     }
@@ -1500,7 +1555,6 @@ var RL = {};
         reset: function () {
             this.ns = this.env.getNumStates();
             this.na = this.env.getMaxNumActions();
-            this.nh = 100; // number of hidden units
 
             // actor
             this.actorNet = {};
@@ -1509,6 +1563,7 @@ var RL = {};
             this.actorNet.W2 = new R.RandMat(this.na, this.ns, 0, 0.1);
             this.actorNet.b2 = new R.Mat(this.na, 1, 0, 0.01);
             this.ntheta = this.na * this.ns + this.na; // number of params in actor
+
 
             // critic
             this.criticw = new R.RandMat(1, this.ntheta, 0, 0.01); // row vector
@@ -1523,6 +1578,7 @@ var RL = {};
         forwardActor: function (s, needs_backprop) {
             var net = this.actorNet;
             var G = new R.Graph(needs_backprop);
+
             var a1mat = G.add(G.mul(net.W1, s), net.b1);
             var h1mat = G.tanh(a1mat);
             var a2mat = G.add(G.mul(net.W2, h1mat), net.b2);
@@ -1538,9 +1594,9 @@ var RL = {};
             var amat = ans.a;
             var ag = ans.G;
 
-            // sample action from the stochastic gaussian policy
             var a = R.copyMat(amat);
             if (Math.random() < this.epsilon) {
+                // sample action from the stochastic gaussian policy
                 var gaussVar = 0.02;
                 a.w[0] = R.randn(0, gaussVar);
                 a.w[1] = R.randn(0, gaussVar);
@@ -1622,6 +1678,6 @@ var RL = {};
     global.DQNAgent = DQNAgent;
 //global.SimpleReinforceAgent = SimpleReinforceAgent;
 //global.RecurrentReinforceAgent = RecurrentReinforceAgent;
-//global.DeterministPG = DeterministPG;
+    global.DPGAgent = DeterministPG;
 })(RL);
 

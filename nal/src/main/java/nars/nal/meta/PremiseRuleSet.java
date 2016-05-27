@@ -246,6 +246,7 @@ public class PremiseRuleSet  {
 
             } catch (Exception ex) {
                 logger.error("Invalid TaskRule: {} {}", src, ex.getMessage());
+                ex.printStackTrace();
             }
 
             return ur;

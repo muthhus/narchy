@@ -325,7 +325,7 @@ public abstract class TermBuilder {
                 }
                 //if (x.op(op))
 
-                return x.op().isTemporal() ? x.dt(0) : x;
+                return x.op().temporal ? x.dt(0) : x;
 
                 //return x;
             }

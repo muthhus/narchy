@@ -51,7 +51,7 @@ abstract public class PatternCompound extends GenericCompound {
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
             return canMatch(y) &&
-                    (!ellipsisTransform && op.isCommutative()) ? //currently this is slightly different than Compound.isCommutive because it ignores the size case, which with ellipsis could seem equal to 1 but in fact would be commutive after matching
+                    (!ellipsisTransform && op.commutative) ? //currently this is slightly different than Compound.isCommutive because it ignores the size case, which with ellipsis could seem equal to 1 but in fact would be commutive after matching
                         subst.matchEllipsedCommutative(
                                 this, ellipsis, y
                         ) :
@@ -145,7 +145,7 @@ abstract public class PatternCompound extends GenericCompound {
         sizeCached = seed.size();
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
-                seed.structure() & ~(Op.VAR_PATTERN.bit());
+                seed.structure() & ~(Op.VAR_PATTERN.bit);
         this.volCached = seed.volume();
         this.termsCached = subterms.terms();
     }

@@ -337,6 +337,10 @@ public abstract class Budget implements Budgeted {
         setDurability(dur()*df);
         setQuality(qua()*qf);
     }
+    public Budget multiplied(float pf, float df, float qf) {
+        mul(pf, df, qf);
+        return this;
+    }
 
 //    public static class BudgetException extends RuntimeException {
 //        public BudgetException() {

@@ -497,7 +497,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     static boolean requiresTermSet(@NotNull Op op, int num) {
         return
             /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
-                ((num > 1) && op.isCommutative());
+                ((num > 1) && op.commutative);
     }
 
     default boolean isSorted() {

@@ -1,28 +1,19 @@
 package nars.learn.ql;
 
-import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.learn.Agent;
-
-import javax.script.CompiledScript;
-import javax.script.Invocable;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngineManager;
-import java.io.FileReader;
-
 import static java.lang.System.out;
 
 /**
- * Created by me on 5/3/16.
+ * Deterministic Policy Gradient
  */
-public class DQN extends ReinforceJSAgent {
+public class DPG extends ReinforceJSAgent {
 
     @Deprecated private final float alpha = 0.03f;
 
-    public DQN() {
+    public DPG() {
 
     }
 
-    public DQN(int inputs, int actions) {
+    public DPG(int inputs, int actions) {
         start(inputs, actions);
     }
 
@@ -30,7 +21,7 @@ public class DQN extends ReinforceJSAgent {
     String getAgentInitCode(int inputs, int actions) {
         int hiddens = 3 * inputs * actions; //heuristic
         return "var spec =  { alpha: + " + alpha + ", num_hidden_units: " + hiddens + " }; " +
-               "var agent = new RL.DQNAgent(env, spec); ";
+                "var agent = new RL.DeterministPG(env, spec); ";
     }
 
 

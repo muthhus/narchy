@@ -62,7 +62,7 @@ public final class DefaultCore extends AbstractCore {
     @Override
     protected Bag<Concept> newConceptBag() {
         return new MonitoredCurveBag(nar, 1, nar.random)
-                .merge(BudgetMerge.plusDQBlend);
+                .merge(BudgetMerge.plusDQDominant);
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */

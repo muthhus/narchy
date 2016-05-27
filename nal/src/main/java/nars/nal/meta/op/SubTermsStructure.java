@@ -21,11 +21,8 @@ public final class SubTermsStructure extends AtomicBoolCondition {
 
     public SubTermsStructure(@NotNull Op matchingType, int bits) {
 
-        if (matchingType != Op.VAR_PATTERN)
-            bits &= (~matchingType.bit());
-        //bits &= ~(Op.VariableBits);
+        this.bits = SubTermStructure.filter(matchingType, bits);
 
-        this.bits = bits;
         id = "SubTermsStruct:" +
                 Integer.toString(bits, 16);
     }

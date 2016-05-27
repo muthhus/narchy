@@ -173,12 +173,12 @@ public class GraphDeriver extends Deriver {
                 if ((cc == TaskPunctuation.Belief) || (cc == TaskPunctuation.Goal) || (cc == TaskPunctuation.Question) || (cc == TaskPunctuation.NotQuestion)) {
                     return ("taskPunc");
                 }
-                if ((cc == TaskPositive.the) || (cc == TaskNegative.the)) {
-                    return ("taskFreq");
-                }
-                if ((cc == BeliefPositive.the) || (cc == BeliefNegative.the)) {
-                    return ("beliefFreq");
-                }
+//                if ((cc == TaskPositive.the) || (cc == TaskNegative.the)) {
+//                    return ("taskFreq");
+//                }
+//                if ((cc == BeliefPositive.the) || (cc == BeliefNegative.the)) {
+//                    return ("beliefFreq");
+//                }
                 if ((cc == events.after) || (cc == events.afterOrEternal) || (cc == events.ifTermLinkIsBefore)) {
                     return ("event");
                 }

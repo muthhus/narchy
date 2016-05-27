@@ -258,7 +258,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         long now = nar.time();
 
-        float nextSatisfaction = b.expectation(now) - g.expectation(now);
+        float nextSatisfaction = b.motivation(now) - g.motivation(now);
 
         float deltaSatisfaction = nextSatisfaction - satisfaction;
         this.satisfaction = nextSatisfaction;

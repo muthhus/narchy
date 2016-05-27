@@ -107,8 +107,10 @@ public enum Op {
      */
     public final int minLevel;
 
-    private final boolean commutative;
-    private final boolean temporal;
+    public final boolean commutative;
+    public final boolean temporal;
+    public final int bit;
+    public final boolean var;
 
 
 //    Op(char c, int minLevel) {
@@ -119,9 +121,6 @@ public enum Op {
         this(c, minLevel, type, Args.None);
     }
 
-    Op(@NotNull String s, boolean commutative, int minLevel) {
-        this(s, minLevel, OpType.Other, Args.None);
-    }
     Op(@NotNull String s, boolean commutative, int minLevel, @NotNull IntIntPair size) {
         this(s, commutative, minLevel, OpType.Other, size);
     }
@@ -154,8 +153,13 @@ public enum Op {
         this.minSize= size.getOne();
         this.maxSize = size.getTwo();
 
+        this.var = (type == OpType.Variable);
+
         this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
             //in(or(CONJUNCTION, IMPLICATION, EQUIV));
+
+        //negation does not contribute to structure vector
+        this.bit = (1 << ordinal());
 
     }
 
@@ -219,16 +223,12 @@ public enum Op {
     public static int or(@NotNull Op... o) {
         int bits = 0;
         for (Op n : o)
-            bits |= n.bit();
+            bits |= n.bit;
         return bits;
     }
 
-    public final int bit() {
-        return (1 << ordinal());
-    }
-
     public static int or(int bits, @NotNull Op o) {
-        return bits | o.bit();
+        return bits | o.bit;
     }
 
 
@@ -237,27 +237,13 @@ public enum Op {
      */
     public static final int ANY = 0;
 
-    public final boolean isVar() {
-        return type == OpType.Variable;
-    }
-
-    public boolean isCommutative() {
-        return commutative;
-    }
-
-
-
-    /** whether this op allows temporal relation (true) or ignores it  (false) */
-    public boolean isTemporal() {
-        return temporal;
-    }
 
     public static boolean isTemporal(Term t, int newDT) {
         return isTemporal(t.op(), newDT, t.size());
     }
 
     public static boolean isTemporal(Op o, int dt, int arity) {
-        if (o.isTemporal()) {
+        if (o.temporal) {
             return !(o == Op.CONJUNCTION && dt != 0 && dt != DTERNAL && arity > 2);
         }
         return false;
@@ -286,7 +272,8 @@ public enum Op {
 
     /** true if matches any of the on bits of the vector */
     public boolean in(int vector) {
-        return in(bit(), vector);
+
+        return in(bit, vector);
     }
 
     static boolean in(int needle, int haystack) {
@@ -302,7 +289,7 @@ public enum Op {
     }
 
     public static boolean hasAny(int structure, Op o) {
-        return ((structure & o.bit()) > 0);
+        return ((structure & o.bit) > 0);
     }
 
 
@@ -369,7 +356,7 @@ public enum Op {
             int l = o.minLevel;
             if (l < 0) l = 0; //count special ops as level 0, so they can be detected there
             for (int i = l; i <= 8; i++) {
-                NALLevelEqualAndAbove[i] |= o.bit();
+                NALLevelEqualAndAbove[i] |= o.bit;
             }
         }
     }

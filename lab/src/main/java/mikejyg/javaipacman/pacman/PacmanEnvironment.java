@@ -17,20 +17,20 @@
  * along with javaiPacman.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mikejyg.javaipacman.wrapper;
+package mikejyg.javaipacman.pacman;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import mikejyg.javaipacman.pacman.cghost;
-import mikejyg.javaipacman.pacman.cmaze;
-import mikejyg.javaipacman.pacman.cpcman;
-import mikejyg.javaipacman.pacman.ctables;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.index.Indexes;
+import nars.learn.ql.DPG;
+import nars.learn.ql.DQN;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
+import nars.task.DerivedTask;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
@@ -69,23 +69,32 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.beliefConfidence(0.35f);
-		nar.goalConfidence(0.35f);
+		nar.beliefConfidence(0.25f);
+		nar.goalConfidence(0.45f);
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
-		//.logSummaryGT(System.out, 0.01f)
+		//nar.logSummaryGT(System.out, 0.1f);
+		nar.log(System.err, v -> {
+			if (v instanceof Task) {
+				Task t = (Task)v;
+				if (t instanceof DerivedTask && t.punc() == '!')
+					return true;
+			}
+			return false;
+		});
 
-		new MySTMClustered(nar, 8, '.');
+		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
+				//new DPG(),
 				//new HaiQAgent(),
 				new NAgent(nar),
 				25500);
@@ -93,14 +102,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
-		nar.index.forEach(t -> {
-			if (t instanceof Concept) {
-				Concept c = (Concept)t;
-				if (c.hasQuestions()) {
-					System.out.println(c.questions().iterator().next());
-				}
-			}
-		});
+//		nar.index.forEach(t -> {
+//			if (t instanceof Concept) {
+//				Concept c = (Concept)t;
+//				if (c.hasQuestions()) {
+//					System.out.println(c.questions().iterator().next());
+//				}
+//			}
+//		});
 	}
 
 

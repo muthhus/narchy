@@ -22,11 +22,8 @@ public final class SubTermStructure extends AtomicBoolCondition {
     public SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
         this.subterm = subterm;
 
-        if (matchingType != Op.VAR_PATTERN)
-            bits &= (~matchingType.bit());
-        //bits &= ~(Op.VariableBits);
 
-        this.bits = bits;
+        this.bits = filter(matchingType, bits);
         id = "SubTermStruct" + subterm + ":" +
                 Integer.toString(bits, 16);
     }
@@ -43,5 +40,13 @@ public final class SubTermStructure extends AtomicBoolCondition {
         /*Compound t = ff.term;
         return !t.term(subterm).impossibleStructureMatch(bits);*/
         return ff.subTermMatch(subterm, bits);
+    }
+
+    static int filter(Op matchingType, int bits) {
+        if (matchingType != Op.VAR_PATTERN)
+            bits &= (~matchingType.bit);
+
+        bits &= (~Op.NEGATE.bit); //dont filter based on negation
+        return bits;
     }
 }

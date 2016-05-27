@@ -264,13 +264,43 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
-
         float f2 = b.freq();
         float c1 = a.conf();
         float c2 = b.conf();
         float c = and(c1, c2, f2);
-        return (c < minConf) ? null : new DefaultTruth(and(a.freq(), f2), c);
 
+        return (c < minConf) ? null : new DefaultTruth(and(a.freq(), f2), c);
+    }
+    /**
+     * A function specially designed for desire value [To be refined]
+     * @param a Truth value of the first premise
+     * @param b Truth value of the second premise
+     * @return Truth value of the conclusion
+     */
+    @NotNull
+    public static Truth desireWeak(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
+        float c = and(c1, c2, f2, w2c(1.0f));
+
+        return c < minConf ? null : new DefaultTruth(and(f1, f2), c);
+    }
+
+    static float andPolar(float x, float y) {
+        x = fb(x);
+        y = fb(y);
+
+        float xy = x * y;
+        if (x < 0 && y < 0)
+            xy = -xy;
+        else if (x < 0 && y > 0)
+            xy = 0f;
+        else if (x > 0 && y < 0)
+            xy = 0f;
+
+        return bf(xy);
     }
 
     /** transforms a frequency into a weighting factor symmetric about f=0.5, where f=0.5 is zero and f=0 and f=1 are 1 */
@@ -308,19 +338,7 @@ public final class TruthFunctions extends UtilityFunctions {
         return (f/2f)+0.5f;
     }
 
-    /**
-     * A function specially designed for desire value [To be refined]
-     * @param v1 Truth value of the first premise
-     * @param v2 Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @NotNull
-    public static Truth desireWeak(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        float f1 = v1.freq();
-        float f2 = v2.freq();
-        float c = and(v1.conf(), v2.conf(), f2, w2c(1.0f));
-        return c < minConf ? null : new DefaultTruth(and(f1, f2), c);
-    }
+
 
     /**
      * A function specially designed for desire value [To be refined]

@@ -619,11 +619,11 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
     }
 
-    @Test public void testConditionalAbductionByDepVar() {
-        //TODO
-        //conditional abduction by dependent variable
-        //((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), time(dtTask) |- (X --> B), (Belief:Abduction)
-    }
+//    @Test public void testConditionalAbductionByDepVar() {
+//        //TODO
+//        //conditional abduction by dependent variable
+//        //((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), time(dtTask) |- (X --> B), (Belief:Abduction)
+//    }
 
     @Test public void testDTTaskEnd() {
         /*

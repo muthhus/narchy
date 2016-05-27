@@ -95,7 +95,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
     /** true if the operator bit is included in the enabld bits of the provided vector */
     default boolean isAnyOf(int bitsetOfOperators) {
-        int s = op().bit();
+        int s = op().bit;
         return (s & bitsetOfOperators) == s;
     }
 
@@ -210,7 +210,7 @@ public interface Term extends Termed, Comparable, Termlike {
         if (this.equals(x))
             return 0;
 
-        if (!this.op().isTemporal() || dt == DTERNAL)
+        if (!this.op().temporal || dt == DTERNAL)
             return DTERNAL;
 
         Compound c = ((Compound) this);

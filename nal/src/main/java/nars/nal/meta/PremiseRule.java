@@ -313,10 +313,10 @@ public class PremiseRule extends GenericCompound {
         put(SubTermsStructure.class, 11);
         put(SubTermStructure.class, 11);
 
-        put(TaskNegative.class, 8);
-        put(TaskPositive.class, 8);
-        put(BeliefNegative.class, 7);
-        put(BeliefPositive.class, 7);
+//        put(TaskNegative.class, 8);
+//        put(TaskPositive.class, 8);
+//        put(BeliefNegative.class, 7);
+//        put(BeliefPositive.class, 7);
 
         put(events.class, 6);
 
@@ -606,10 +606,10 @@ public class PremiseRule extends GenericCompound {
 
             switch (predicateNameStr) {
 
-                //postcondition test
-                case "not_equal":
-                    next = NotEqual.make(arg1, arg2);
-                    break;
+//                //postcondition test
+//                case "not_equal":
+//                    next = NotEqual.make(arg1, arg2);
+//                    break;
 
                 case "neq":
                     constraints.put(arg1, new NotEqualsConstraint(arg2));
@@ -633,13 +633,13 @@ public class PremiseRule extends GenericCompound {
                     //assumes arity=2 but arity=1 support can be written
                     constraints.put(arg1, new OpConstraint(Op.SET_EXT));
                     constraints.put(arg2, new OpConstraint(Op.SET_EXT));
-                    preNext = new SubTermsStructure(Op.SET_EXT.bit());
+                    preNext = new SubTermsStructure(Op.SET_EXT.bit);
                     break;
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
                     constraints.put(arg1, new OpConstraint(Op.SET_INT));
                     constraints.put(arg2, new OpConstraint(Op.SET_INT));
-                    preNext = new SubTermsStructure(Op.SET_INT.bit());
+                    preNext = new SubTermsStructure(Op.SET_INT.bit);
                     break;
 
                 case "notConjunction":
@@ -650,7 +650,7 @@ public class PremiseRule extends GenericCompound {
                     constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits));
                     break;
                 case "notImplicationEquivalenceOrConjunction":
-                    constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits | Op.CONJUNCTION.bit()));
+                    constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits | Op.CONJUNCTION.bit));
                     break;
 
                 case "events":
@@ -805,25 +805,25 @@ public class PremiseRule extends GenericCompound {
 ////                    }
 //                    break;
 
-                case "belief":
-                    switch (arg1.toString()) {
-                        case "negative":
-                            preNext = BeliefNegative.the;
-                            break;
-                        case "positive":
-                            preNext = BeliefPositive.the;
-                            break;
-                    }
-                    break;
+//                case "belief":
+//                    switch (arg1.toString()) {
+//                        case "negative":
+//                            preNext = BeliefNegative.the;
+//                            break;
+//                        case "positive":
+//                            preNext = BeliefPositive.the;
+//                            break;
+//                    }
+//                    break;
 
                 case "task":
                     switch (arg1.toString()) {
-                        case "negative":
-                            preNext = TaskNegative.the;
-                            break;
-                        case "positive":
-                            preNext = TaskPositive.the;
-                            break;
+//                        case "negative":
+//                            preNext = TaskNegative.the;
+//                            break;
+//                        case "positive":
+//                            preNext = TaskPositive.the;
+//                            break;
                         case "\"?\"":
                             preNext = TaskPunctuation.Question;
                             taskPunc = '?';

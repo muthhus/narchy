@@ -42,7 +42,7 @@ public class Atom extends AtomicStringConstant {
     }
 
 
-    public static final int AtomBit = Op.ATOM.bit();
+    public static final int AtomBit = Op.ATOM.bit;
 
     @Override
     public final int structure() {

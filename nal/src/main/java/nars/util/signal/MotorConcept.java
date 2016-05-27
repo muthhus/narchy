@@ -154,12 +154,12 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void run() {
+        super.run();
 
         long now = nar.time();
-        float desired = this.goals.expectation(now);
-        float believed = this.beliefs.expectation(now);
+        float desired = this.desire(now).motivation();
+        float believed = this.belief(now).motivation();
 
         float response = motor.motor(believed, desired);
 
@@ -193,9 +193,18 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         return super.processBelief(belief, nar);
     }
 
+//    @Override
+//    public @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+//        //if (!goal.isInput())
+//            //System.err.println(goal.explanation());
+//
+//        return super.processGoal(goal, nar);
+//    }
+
     /** called when a conflicting belief has attempted to be processed */
     protected void onConflict(@NotNull Task belief) {
-
+        //if (!belief.isInput())
+            //System.err.println(belief.explanation());
     }
 
 }

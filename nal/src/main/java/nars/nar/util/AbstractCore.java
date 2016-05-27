@@ -15,7 +15,6 @@ import nars.util.data.MutableInteger;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
@@ -182,16 +181,10 @@ public abstract class AbstractCore {
     }
 
 
-
-    @Nullable
-    protected final void activate(@NotNull Concept c, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
-        active.put(c, b, scale, overflowing);
-    }
-
     public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
-            activate(c, b, conceptActivation, conceptOverflow);
-            if (linkActivation > 0)
-                c.link(b, linkActivation, nar, conceptOverflow);
+        active.put(c, b, conceptActivation, conceptOverflow);
+        if (linkActivation > 0)
+            c.link(b, linkActivation, nar, conceptOverflow);
     }
 
 

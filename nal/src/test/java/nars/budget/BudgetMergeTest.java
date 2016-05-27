@@ -42,7 +42,7 @@ public class BudgetMergeTest {
 
     @Test
     public void testPlusDQBlendOld() {
-        BudgetMerge m = BudgetMerge.plusDQBlendOld;
+        BudgetMerge m = BudgetMerge.plusDQBlend;
 
         testMerge(m, z(), a, 1f, 1, 0.7f, 0.3f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(m, z(), a, 0.5f, 0.5f, 0.7f, 0.3f); //scale of half should affect priority only
@@ -53,10 +53,10 @@ public class BudgetMergeTest {
         testMerge(m, b, c, 1, (c.pri() + b.pri()), 0.33f, 0.16f); //test correct affect of components
         testMerge(m, b, c, 0.5f, (c.pri()/2f + b.pri()), 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
 
-        testMerge(m, a, c, 1f, 1, 0.6f, 0.26f, //priority saturation behavior
+        testMerge(m, a, c, 1f, 1, 0.57f, 0.25f, //priority saturation behavior
             0.25f); //with overflow
 
-        testMerge(m, a, c, 0.5f, 1, 0.65f, 0.277f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(m, a, c, 0.5f, 1, 0.62f, 0.277f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
             0f);  //no overflow
 
         testMerge(m, a, a, 1f, a.pri(), a.dur(), a.qua()); //no change since saturated with the same incoming values

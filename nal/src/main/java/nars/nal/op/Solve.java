@@ -129,24 +129,16 @@ abstract public class Solve extends AtomicBoolCondition {
     private static boolean measure(@NotNull TruthOperator tf, @NotNull PremiseEval m) {
 
 
-        ConceptProcess p = m.premise;
-
-
-        Task task = p.task();
-
-        @Nullable Task belief = p.belief();
-
-
 
         if (!tf.allowOverlap()) {
 
             //single premise
-            if (p.cyclic())
+            if (m.cyclic)
                 return false;
 
             if (!tf.single()) {
                 //double premise
-                if (p.overlap())
+                if (m.overlap)
                     return false;
             }
         }
@@ -157,9 +149,9 @@ abstract public class Solve extends AtomicBoolCondition {
 
 
         Truth truth = tf.apply(
-                task.truth(),
-                belief!=null ? belief.truth() : null,
-                p.nar(),
+                m.taskTruth,
+                m.beliefTruth,
+                m.nar,
                 minConf
         );
 
@@ -167,11 +159,11 @@ abstract public class Solve extends AtomicBoolCondition {
 
         if (truth != null) {
 
-            if (Global.DEBUG) {
-                if (!tf.single() && belief == null) {
-                    throw new RuntimeException("null belief but non-single truth function");
-                }
-            }
+//            if (Global.DEBUG) {
+//                if (!tf.single() && belief == null) {
+//                    throw new RuntimeException("null belief but non-single truth function");
+//                }
+//            }
 
             if ( truth.conf() > minConf) {
                 m.truth.set(truth);

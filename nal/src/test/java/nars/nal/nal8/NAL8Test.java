@@ -336,14 +336,6 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f, 6);
 
     }
-    public void condition_goal_deduction_3simpler()  {
-        test()
-                //.log()
-                .inputAt(1, "at:t003!")
-                .inputAt(1, "(goto:$1 ==>+5 at:$1).")
-
-                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.81f);
-    }
 
 
 
@@ -373,7 +365,8 @@ public class NAL8Test extends AbstractNALTest {
         test()
             //.log()
             .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))! :|:")
-            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0);
+            .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
     }
     @Test
     public void subbelief_2()  {
@@ -390,11 +383,14 @@ public class NAL8Test extends AbstractNALTest {
     public void further_detachment_2()  {
         TestNAR tester = test();
 
+        //tester.log();
         tester.input("reachable:(SELF,{t002}). :|:");
         tester.inputAt(3, "((reachable:(SELF,{t002}) &&+5 pick({t002})) ==>+7 hold:(SELF,{t002})).");
 
-        tester.mustBelieve(cycles, "(pick({t002}) ==>+7 hold:(SELF, {t002}))", 1.0f, 0.81f,
-                0);
+        tester
+            .mustBelieve(cycles, "(pick({t002}) ==>+7 hold:(SELF, {t002}))", 1.0f, 0.81f, 5)
+            .mustNotOutput(cycles, "(pick({t002}) ==>+7 hold:(SELF, {t002}))", '.', 0)
+        ;
                 //5); <- ?? isnt this more correct?
 
     }
@@ -468,10 +464,11 @@ public class NAL8Test extends AbstractNALTest {
     public void detaching_condition()  {
         TestNAR tester = test();
 
+        //tester.log();
         tester.input("( ( hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).");
         tester.inputAt(10, "hold:(SELF,{t002}). :|:");
 
-        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 10);
+        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 15);
 
     }
 
@@ -495,7 +492,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("((hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).");
         tester.inputAt(10, "hold:(SELF,{t002}). :|: ");
 
-        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 10);
+        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 15);
 
     }
 
@@ -624,6 +621,18 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(y)", 1f, 0.81f, (4+3))
                 .mustNotOutput(cycles, "(y)", '!', 3)
                 .mustNotOutput(cycles, "(y)", '!', ETERNAL);
+    }
+
+
+    @Test
+    public void testInhibition()  {
+        TestNAR tester = test();
+        tester.goal("(reward)");
+        tester.believe("((good) ==> (reward))", 1, 0.9f);
+        tester.believe("((--,(bad)) ==> (reward))", 1, 0.9f);
+
+        tester.mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+
     }
 
 }

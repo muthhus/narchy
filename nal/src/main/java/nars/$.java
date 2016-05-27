@@ -152,8 +152,8 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @Nullable
-    public static Term neg(@NotNull Term x) {
-        return the(NEGATE, x);
+    public static Term neg(@NotNull Termed x) {
+        return the(NEGATE, x.term());
     }
 
     @NotNull

@@ -46,13 +46,30 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final Truth truth(long now, long when) {
 
-        if (!temporal.isEmpty()) {
-            return temporal.truth(when);
+
+        boolean hasEternal = !eternal.isEmpty();
+        boolean hasTemporal = !temporal.isEmpty();
+
+        if (hasTemporal) {
+            Truth tt = temporal.truth(when);
+            if (hasEternal) {
+                //higher confidence
+                Truth ee = topEternal().truth();
+                if (ee == null)
+                    return Truth.Null;
+                return ee.conf() > tt.conf() ? ee : tt;
+            } else {
+                return tt;
+            }
         } else {
-            Task eternal = topEternal();
-            //optimization: just return the top eternal truth if no temporal to adjust with
-            return eternal != null ? eternal.truth() : Truth.Null;
+            if (hasEternal) {
+                return topEternal().truth();
+            } else {
+                return Truth.Null;
+            }
+
         }
+
     }
 //    public float rankTemporalByOriginality(@NotNull Task b) {
 //        return BeliefTable.rankTemporalByOriginality(b, lastUpdate);

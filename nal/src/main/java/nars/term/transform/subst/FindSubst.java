@@ -229,7 +229,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 return matchVarY(x, y);
             }
 
-            if (xOp.isVar() && yOp.isVar()) {
+            if (xOp.var && yOp.var) {
                 return matchVarCommon( x, y, xOp, opEqual);
             }
         }

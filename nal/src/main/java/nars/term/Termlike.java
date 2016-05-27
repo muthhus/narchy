@@ -41,7 +41,7 @@ public interface Termlike  {
     default boolean hasAny(@NotNull Op op) {
 //        if (op == Op.VAR_PATTERN)
 //            return Variable.hasPatternVariable(this);
-        return hasAny(op.bit());
+        return hasAny(op.bit);
     }
 
     default boolean impossibleSubterm(@NotNull Termlike target) {

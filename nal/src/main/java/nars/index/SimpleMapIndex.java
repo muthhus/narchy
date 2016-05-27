@@ -77,7 +77,7 @@ public class SimpleMapIndex extends AbstractMapIndex {
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer c) {
         data.forEach((k,v)-> c.accept(v));
     }
 

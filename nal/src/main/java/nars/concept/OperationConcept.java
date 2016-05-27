@@ -29,13 +29,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     /** whether this is a concept for an actual Operation term, ex: x(a,b,c) */
     private final boolean isOperation;
 
-    /**
-     * cache for expectation measurement; set to NaN to invalidate
-     */
-    @Nullable
-    protected transient Truth believed;
-    @Nullable
-    protected transient Truth desired;
+
 
 
     //TODO allocate this only for Operation (not negations)
@@ -95,10 +89,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         //if (op()!=NEGATE) {
 
         if (t.isGoal()) {
-            desired = null; //clear
             pendingGoals.add(t);
         } else {
-            believed = null; //clear
             //pendingBeliefs.add(t);
         }
 
@@ -119,39 +111,15 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         }
     }
 
-    public void update() {
-
-        long now = nar.time();
-
-        if (hasGoals()) {
-            if (desired == null) {
-                desired = desire(now);
-            }
-        } else {
-            desired = Truth.Null;
-        }
-
-        if (hasBeliefs()) {
-            if (believed == null) {
-                believed = belief(now);
-            }
-        } else {
-            believed = Truth.Null;
-        }
-    }
 
     /** called between frames */
     @Override public void run() {
         final NAR nar = this.nar;
 
-        update();
 
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
         if (isOperation) {
-            float belief = believed!=null ? believed.expectation() : 0;
-            float desire = desired!=null ? desired.expectation() : 0;
-
-            if (isExecutingGoals(belief,desire)) {
+            /*if (isExecutingGoals(belief,desire))*/ {
 
                 Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
                 if (tt != null && !tt.isEmpty()) {
@@ -166,7 +134,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         pendingGoals.forEach(task -> {
             if (task.isGoal()) {
                 if (Global.DEBUG)
-                    task.log("execute(b=" + believed + ",d=" + desired + ')');
+                    task.log("executed");
                 task.execute(this, nar); //call the task's custom event handler
             }
         });
@@ -176,11 +144,6 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         pendingRun = false;
     }
 
-
-    //TODO
-    protected boolean isExecutingGoals(float belief, float desire) {
-        return (desire > 0.5f && desire > belief);
-    }
 
 
     //    private final boolean updateNecessary(long now) {

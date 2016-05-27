@@ -187,7 +187,7 @@ public interface TimeFunction {
 
 
         //HACK to handle commutive switching so that the dt is relative to the effective subject
-        if (derived.op().isCommutative()) {
+        if (derived.op().commutative) {
 
             Compound bt = prem.belief().term();
             Term d0 = derived.term(0);
@@ -407,18 +407,23 @@ public interface TimeFunction {
 
         Task t = prem.task();
         Task b = prem.belief();
-        if (!taskOrBelief && b!=null && b.occurrence()!=ETERNAL) {
-            int derivedInT = dtTerm.subtermTime(derived);
-            if (derivedInT == DTERNAL && derived.op() == Op.IMPLICATION) {
-                //try to find the subtermTime of the implication's subject
-                derivedInT = dtTerm.subtermTime( derived.term(0) );
-            }
+        if (!taskOrBelief && b!=null) {
+            //if (b.occurrence()!=ETERNAL) {
+                int derivedInT = dtTerm.subtermTime(derived);
+                if (derivedInT == DTERNAL && derived.op() == Op.IMPLICATION) {
+                    //try to find the subtermTime of the implication's subject
+                    derivedInT = dtTerm.subtermTime(derived.term(0));
+                }
 
-            if (derivedInT == DTERNAL) {
-                derivedInT = 0;
-            }
+                if (derivedInT == DTERNAL) {
+                    derivedInT = 0;
+                }
 
-            occReturn[0] = t.occurrence() + derivedInT;
+                occReturn[0] = t.occurrence() + derivedInT;
+//            } else if (t.occurrence()!=ETERNAL) {
+//                //find the offset of the task term within the belief term, and then add the task term's occurrence
+//                occReturn[0] =
+//            }
         } else {
             occReturn[0] = t.occurrence(); //the original behavior, but may not be right
         }
@@ -513,7 +518,7 @@ public interface TimeFunction {
         if (derived.op() == Op.DISJUNCTION)
             return derived;
 
-        if (!Global.DEBUG && !derived.op().isTemporal())
+        if (!Global.DEBUG && !derived.op().temporal)
             return derived; //disregard dt if not in debug mode
 
         return derived.dt(eventDelta * polarity);
@@ -605,7 +610,7 @@ public interface TimeFunction {
 
         Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
-        if (derived.op().isTemporal() && cp instanceof Compound) {
+        if (derived.op().temporal && cp instanceof Compound) {
 
             Compound ccc = (Compound) cp;
             Term ca = ccc.term(0);
@@ -672,7 +677,7 @@ public interface TimeFunction {
 
                         boolean reversed = false;
                     /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
-                        if (derived.op().isCommutative()) {
+                        if (derived.op().commutative) {
                             if (!p.resolve(((Compound) cp).term(0)).equals(derived.term(0))) {
                                 occDiff = -occDiff;
                                 reversed = true;
