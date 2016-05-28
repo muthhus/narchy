@@ -31,9 +31,12 @@ public enum TermLinkBuilder {
 
     @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
         //HashBag<Termed> components = new HashBag(host.volume());
+
+        int ni = host.size();
+
         Set<Termed> components =
                 //Global.newHashSet(1 + host.volume()/2 /* estimate */);
-                new LinkedHashSet();
+                new LinkedHashSet<>(ni /* estimate */);
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -43,7 +46,6 @@ public enum TermLinkBuilder {
         //boolean tImplication = tOp == Op.IMPLICATION;
 
 
-        int ni = host.size();
         for (int i = 0; i < ni; i++) {
 
             Term ti = growComponent(host.term(i), 0, nar, components);

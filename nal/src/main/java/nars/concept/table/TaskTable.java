@@ -34,20 +34,20 @@ public interface TaskTable extends Iterable<Task> {
 
 
 
-    @Nullable
-    default BivariateGridInterpolator getWaveFrequencyConfidenceTime() {
-        return null;
-    }
-
-    @Nullable
-    default UnivariateInterpolator getWaveFrequencyConfidence() {
-        return null;
-    }
-
-    @Nullable
-    default UnivariateInterpolator getWaveConfidenceTime() {
-        return null;
-    }
+//    @Nullable
+//    default BivariateGridInterpolator getWaveFrequencyConfidenceTime() {
+//        return null;
+//    }
+//
+//    @Nullable
+//    default UnivariateInterpolator getWaveFrequencyConfidence() {
+//        return null;
+//    }
+//
+//    @Nullable
+//    default UnivariateInterpolator getWaveConfidenceTime() {
+//        return null;
+//    }
 
     default void top(int maxPerConcept, @NotNull Consumer<Task> recip) {
         int s = size();

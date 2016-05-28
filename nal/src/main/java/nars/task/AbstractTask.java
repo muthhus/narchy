@@ -394,7 +394,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
 
     @Override
-    public int compareTo(@NotNull Object obj) {
+    public int compareTo(@NotNull Task obj) {
         if (this == obj) return 0;
 
         Task o = (Task)obj;

@@ -150,7 +150,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
 
     @Override
-    public V weakest() {
+    @NotNull public V weakest() {
         return key(bottom());
     }
 

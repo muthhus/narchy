@@ -20,30 +20,32 @@ import java.util.function.BiFunction;
  */
 public abstract class AbstractConcept<T extends Term> implements Concept {
 
-    protected final Bag<Task> taskLinks;
-    protected final Bag<Termed> termLinks;
+    private final Bag<Task> taskLinks;
+    private final Bag<Termed> termLinks;
 
     @NotNull
     public final T term;
+    private transient final int hash;
 
 
     @Nullable
-    protected Map meta;
+    private Map meta;
 
     protected AbstractConcept(@NotNull T term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         this.term = term;
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;
+        this.hash = term.hashCode();
     }
 
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
     /** returns the outgoing component only */
     @Nullable
-    static final Concept linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
-                                              @NotNull Budgeted b, float subScale, boolean alsoReverse,
-                                              @Nullable MutableFloat conceptOverflow,
-                                              @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
+    static Concept linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
+                           @NotNull Budgeted b, float subScale, boolean alsoReverse,
+                           @Nullable MutableFloat conceptOverflow,
+                           @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
 
         /*
         if (!(task.isStructual() && (cLink0.getType() == TermLink.TRANSFORM))) {
@@ -51,7 +53,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         }*/
 
 
-        /** activate concept */
+        /* activate concept */
         Concept target = nar.conceptualize(targetTerm, b, subScale,
                 0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
                 conceptOverflow);
@@ -63,13 +65,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
             throw new RuntimeException("termlink self-loop");
 
 
-        /** insert termlink target to source */
+        /* insert termlink target to source */
         if (alsoReverse) {
             subScale /= 2; //divide among both directions
             target.termlinks().put(source, b, subScale, termlinkOverflow);
         }
 
-        /** insert termlink source to target */
+        /* insert termlink source to target */
         source.termlinks().put(target, b, subScale, termlinkOverflow);
 
         return target;
@@ -86,7 +88,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
      */
     @Nullable
     @Override
-    public final Map<Object, Object> meta() {
+    public final Map meta() {
         return meta;
     }
 
@@ -109,7 +111,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Nullable
     public final Object put(@NotNull Object key, @Nullable Object value) {
 
-        Map<Object, Object> currMeta = meta;
+        Map currMeta = meta;
 
         if (value != null) {
 
@@ -134,7 +136,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     @Override
     public final int hashCode() {
-        return term.hashCode();
+        //return term.hashCode();
+        return hash;
     }
 
     @Override
@@ -171,10 +174,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    public final boolean isConceptOf(@NotNull Termed t) {
-        return t == this || (t.term() == this);
-        //t.equalsAnonymously(term());
-    }
+//    public final boolean isConceptOf(@NotNull Termed t) {
+//        return t == this || (t.term() == this);
+//        //t.equalsAnonymously(term());
+//    }
 
     @Override
     public void capacity(ConceptBudgeting p) {
@@ -205,17 +208,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         }
     }
 
-    @Nullable
-    public abstract Task processBelief(Task task, NAR nar);
 
-    @Nullable
-    public abstract Task processGoal(Task task, NAR nar);
-
-    @Nullable
-    public abstract Task processQuestion(Task task, NAR nar);
-
-    @Nullable
-    public abstract Task processQuest(Task task, NAR nar);
 
 
 //    /**

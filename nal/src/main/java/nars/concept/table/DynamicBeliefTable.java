@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -31,13 +32,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Override
     public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
-        if (input == current) {
-            return input;
-        } else {
-            //TODO trigger update?
-            //TODO measure discrepency?
-            return null; //exclude other beliefs/goals
-        }
+        return input == current ? input : null;
     }
 
     @Nullable
@@ -105,6 +100,6 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @NotNull
     @Override
     public Iterator<Task> iterator() {
-        return !isEmpty() ? Iterators.singletonIterator(current) : Iterators.emptyIterator();
+        return !isEmpty() ? Iterators.singletonIterator(current) : Collections.emptyIterator();
     }
 }

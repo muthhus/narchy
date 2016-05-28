@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -60,9 +61,10 @@ public interface Concept extends Termed, Comparable {
      */
     @Nullable
     default <C> C get(@NotNull Object key) {
-        Map<Object, Object> m;
-        return null == (m = meta()) ? null : (C) m.get(key);
+        Map m = meta();
+        return null == m ? null : (C) m.get(key);
     }
+
     /** follows Map.compute() semantics */
     @NotNull
     <C> C meta(Object key, BiFunction value);
@@ -93,7 +95,7 @@ public interface Concept extends Termed, Comparable {
 
 
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        if (initialScale <= 0 || b.isDeleted())
+        if (initialScale <= 0f || b.isDeleted())
             throw new RuntimeException("invalid budget: " + initialScale + " " + b.toString());
             //return false;
 
@@ -118,8 +120,7 @@ public interface Concept extends Termed, Comparable {
 
         link(otherTask, halfScale, nar, null);
 
-        if (other != null)
-            other.link(thisTask, halfScale, nar, null);
+        other.link(thisTask, halfScale, nar, null);
 
     }
 
@@ -178,10 +179,10 @@ public interface Concept extends Termed, Comparable {
         TaskTable questions = onquestions ? questions() : null;
         TaskTable quests = onquests ? quests() : null;
 
-        Iterator<Task> b1 = beliefs != null ? beliefs.iterator() : Iterators.emptyIterator();
-        Iterator<Task> b2 = goals != null ? goals.iterator() : Iterators.emptyIterator();
-        Iterator<Task> b3 = questions != null ? questions.iterator() : Iterators.emptyIterator();
-        Iterator<Task> b4 = quests != null ? quests.iterator() : Iterators.emptyIterator();
+        Iterator<Task> b1 = beliefs != null ? beliefs.iterator() : Collections.emptyIterator();
+        Iterator<Task> b2 = goals != null ? goals.iterator() : Collections.emptyIterator();
+        Iterator<Task> b3 = questions != null ? questions.iterator() : Collections.emptyIterator();
+        Iterator<Task> b4 = quests != null ? quests.iterator() : Collections.emptyIterator();
         return Iterators.concat(b1, b2, b3, b4);
     }
 

@@ -42,7 +42,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
         //ensureOperation(term);
-        this.isOperation = Op.isOperation(this);
+        this.isOperation = Op.isOperation(term);
 
     }
 
@@ -50,7 +50,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
         super(term, n);
         this.nar = n;
-        this.isOperation = Op.isOperation(this);
+        this.isOperation = Op.isOperation(term);
         //ensureOperation(term);
         n.on(this);
     }

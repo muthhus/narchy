@@ -34,10 +34,10 @@ public class DefaultBeliefTable implements BeliefTable {
 
         Map<Task, Task> mp;
         this.map = mp =
-            //Global.newHashMap(eternalCapacity + temporalCapacity);
-            new HashMap(1);
+            Global.newHashMap(1);
+            //new HashMap<>(1);
 
-        /** Ranking by originality is a metric used to conserve original information in balance with confidence */
+        /* Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new EternalTable(mp);
         temporal = new MicrosphereTemporalBeliefTable(mp, eternal);
     }
@@ -62,11 +62,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 return tt;
             }
         } else {
-            if (hasEternal) {
-                return topEternal().truth();
-            } else {
-                return Truth.Null;
-            }
+            return hasEternal ? topEternal().truth() : Truth.Null;
 
         }
 
@@ -145,8 +141,8 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Task add(@NotNull Task input, QuestionTable questions, @NotNull NAR nar) {
 
-        /** if a duplicate exists, it will merge the incoming task and return true.
-         * otherwise false */
+        /* if a duplicate exists, it will merge the incoming task and return true.
+          otherwise false */
         Task existing = get(input);
         if (existing!=null) {
             if (existing!=input) {
@@ -211,7 +207,7 @@ public class DefaultBeliefTable implements BeliefTable {
             et.setCapacity(1);
 
             //2. clear the other table, set capcity to zero preventing temporal tasks
-            Table<Task, Task> otherTable = (et == et) ? temporal : et;
+            Table<Task, Task> otherTable = temporal;
             otherTable.forEach(overridden);
             otherTable.clear();
             otherTable.setCapacity(0);
@@ -249,7 +245,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private boolean insert(@NotNull Task incoming, @NotNull Table<Task, Task> table) {
+    private static boolean insert(@NotNull Task incoming, @NotNull Table<Task, Task> table) {
 
         Task displaced = table.put(incoming, incoming);
 

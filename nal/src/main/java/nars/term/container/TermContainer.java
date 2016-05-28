@@ -75,7 +75,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     int vars();
 
     /** gets subterm at index i */
-    @Nullable
+    @NotNull
     T term(int i);
 
     /** tests if subterm i is op o */

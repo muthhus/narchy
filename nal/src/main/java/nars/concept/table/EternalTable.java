@@ -21,7 +21,7 @@ import static nars.nal.Tense.ETERNAL;
 public class EternalTable extends SortedListTable<Task, Task> {
 
     public EternalTable(Map<Task, Task> index) {
-        super((i) -> new Task[i], index, SortedArray.SearchType.BinarySearch);
+        super(Task[]::new, index, SortedArray.SearchType.BinarySearch);
         setCapacity(1);
     }
 
@@ -56,7 +56,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
 
         //Try to select a best revision partner from existing beliefs:
         Task oldBelief = null;
-        float bestRank = 0, bestConf = 0;
+        float bestRank = 0f, bestConf = 0f;
         Truth conclusion = null;
         final float newBeliefConf = newBelief.conf();
         Truth newBeliefTruth = newBelief.truth();

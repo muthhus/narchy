@@ -55,7 +55,7 @@ import static nars.truth.TruthFunctions.eternalize;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked, Supplier<Task> {
+public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked, Supplier<Task> {
 
     int CONJUNCTION_WITH_NEGATION = or(Op.CONJUNCTION, NEGATE);
 

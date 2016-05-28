@@ -35,17 +35,6 @@ import static nars.nal.Tense.DTERNAL;
 
 public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
 
-//    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
-//
-//        @Override
-//        public boolean test(@NotNull Task a, Task b) {
-//            return (a.equals(b));
-//        }
-//
-////        //N/
-////        @Override public int compare(Task task, Task t1) {  return 0;        }
-////        @Override public int hashCodeOf(Task task) { return task.hashCode(); }
-//    };
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
@@ -53,19 +42,15 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable Reference<List<TermTemplate>> termLinkTemplates;
 
     @Nullable
-    protected final QuestionTable questions;
+    private final QuestionTable questions;
     @Nullable
-    protected final QuestionTable quests;
+    private final QuestionTable quests;
     @Nullable
-    protected final BeliefTable beliefs;
+    private final BeliefTable beliefs;
     @Nullable
-    protected final BeliefTable goals;
+    private final BeliefTable goals;
 
     private float satisfaction = 0;
-
-    //    public DefaultConcept(Term term, Memory p) {
-//        this(term, new NullBag(), new NullBag(), p);
-//    }
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -160,7 +145,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return (goals);
     }
 
-    @Override
+
     public
     @Nullable
     Task processQuest(@NotNull Task task, @NotNull NAR nar) {
@@ -231,7 +216,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     @Nullable
-    @Override
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
         return processBeliefOrGoal(belief, nar, beliefs, questions);
     }
@@ -242,7 +226,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     @Nullable
-    @Override
     public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
         return processBeliefOrGoal(goal, nar, goals, quests);
     }
@@ -403,7 +386,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * @return the relevant task
      */
     @Nullable
-    @Override
     public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTable questionTable;

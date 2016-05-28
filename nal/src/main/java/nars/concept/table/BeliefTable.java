@@ -313,26 +313,26 @@ public interface BeliefTable extends TaskTable {
                 .mapToDouble(Budgeted::pri).sum();
     }
 
-    /**
-     * get a random belief, weighted by their sentences confidences
-     */
-    @Nullable
-    default Task randomByConf(boolean eternal, @NotNull Random rng) {
-
-        if (isEmpty()) return null;
-
-        float totalConfidence = confSum();
-        float r = rng.nextFloat() * totalConfidence;
-
-
-        for (Task x : this) {
-            r -= x.truth().conf();
-            if (r < 0)
-                return x;
-        }
-
-        return null;
-    }
+//    /**
+//     * get a random belief, weighted by their sentences confidences
+//     */
+//    @Nullable
+//    default Task randomByConf(boolean eternal, @NotNull Random rng) {
+//
+//        if (isEmpty()) return null;
+//
+//        float totalConfidence = confSum();
+//        float r = rng.nextFloat() * totalConfidence;
+//
+//
+//        for (Task x : this) {
+//            r -= x.truth().conf();
+//            if (r < 0)
+//                return x;
+//        }
+//
+//        return null;
+//    }
 
     default float confSum() {
         return Truthed.confSum(this);
@@ -412,7 +412,7 @@ public interface BeliefTable extends TaskTable {
 
 
 
-    /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */
+    /* simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */
     /*default float coherenceAgainst(BeliefTable other) {
         //TODO
         return Float.NaN;

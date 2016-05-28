@@ -9,6 +9,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
@@ -33,7 +34,7 @@ public class BooleanConcept extends OperationConcept {
         @NotNull Operator op();
 
         /** set the truth and evidence on the task before returning */
-        @Nullable MutableTask update(@NotNull NAR nar, long now, Termed content, boolean beliefOrGoal, @NotNull Termed[] args);
+        @Nullable MutableTask update(@NotNull NAR nar, long now, Termed<Compound> content, boolean beliefOrGoal, @NotNull Termed[] args);
     }
 
     static final BooleanModel AND = new DefaultBooleanModel(true);
@@ -50,7 +51,7 @@ public class BooleanConcept extends OperationConcept {
         @NotNull
         @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
 
-        @Override public MutableTask update(@NotNull NAR nar, long now, @NotNull Termed content, boolean beliefOrGoal, @NotNull Termed[] args) {
+        @Override public MutableTask update(@NotNull NAR nar, long now, @NotNull Termed<Compound> content, boolean beliefOrGoal, @NotNull Termed[] args) {
 
             boolean mode = this.mode;
 
@@ -181,8 +182,8 @@ public class BooleanConcept extends OperationConcept {
 
         //TODO only update belief or goal if changed, not both
         long now = nar.time();
-        ((DynamicBeliefTable) beliefs).updateTask(now);
-        ((DynamicBeliefTable) goals).updateTask(now);
+        ((DynamicBeliefTable) beliefs()).updateTask(now);
+        ((DynamicBeliefTable) goals()).updateTask(now);
     }
 
     @NotNull

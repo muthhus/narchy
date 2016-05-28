@@ -52,27 +52,6 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 
     
 
-    @Nullable
-    @Override
-    public Task processBelief(Task task, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
-    @Nullable
-    @Override
-    public Task processGoal(Task task, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
-    @Nullable
-    @Override
-    public Task processQuestion(Task task, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Nullable
-    @Override
-    public final Task processQuest(Task task, NAR nar) {
-        return processQuestion(task, nar );
-    }
 
     @Nullable
     @Override
