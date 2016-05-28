@@ -71,7 +71,7 @@ public enum Forget {
     public abstract static class AbstractForget implements BudgetForget {
 
         @NotNull
-        public final MutableFloat forgetDurations;
+        public final MutableFloat forgetCycles;
         @NotNull
         public final MutableFloat perfection;
 
@@ -86,8 +86,8 @@ public enum Forget {
         protected transient float subFrame = Float.NaN;
         private long frame = Tense.TIMELESS;
 
-        public AbstractForget(@NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
-            this.forgetDurations = forgetDurations;
+        public AbstractForget(@NotNull MutableFloat forgetCycles, @NotNull MutableFloat perfection) {
+            this.forgetCycles = forgetCycles;
             this.perfection = perfection;
         }
 
@@ -97,7 +97,7 @@ public enum Forget {
         @Override
         public void update(@Nullable NAR nar) {
             //same for duration of the cycle
-            forgetCyclesCached = forgetDurations.floatValue();
+            forgetCyclesCached = forgetCycles.floatValue();
             perfectionCached = perfection.floatValue();
             if (nar!=null)
                 this.now = frame = nar.time();
@@ -110,79 +110,80 @@ public enum Forget {
 
 
         public void setForgetCycles(float f) {
+            forgetCycles.setValue(f); //not necessary unless we want access to this value as a MutableFloat from elsewhere
             forgetCyclesCached = f;
         }
     }
 
 
-    /**
-     * linaer decay in proportion to time since last forget
-     */
-    public static class LinearForget extends AbstractForget {
-
-        @NotNull
-        private final MutableFloat forgetMax;
-        protected transient float forgetMaxCyclesCached = Float.NaN;
-        private float forgetCyclesMaxMinRange;
-
-        /**
-         * @param forgetTimeMin minimum forgetting time
-         * @param forgetTimeMax maximum forgetting time
-         * @param perfection
-         */
-        public LinearForget(@NotNull MutableFloat forgetTimeMin, @NotNull MutableFloat forgetTimeMax, @NotNull MutableFloat perfection) {
-            super(forgetTimeMin, perfection);
-            this.forgetMax = forgetTimeMax;
-        }
-
-        @Override
-        public void update(@NotNull NAR nar) {
-            super.update(nar);
-            this.forgetMaxCyclesCached = forgetMax.floatValue();
-            this.forgetCyclesMaxMinRange = forgetMaxCyclesCached - forgetCyclesCached;
-        }
-
-        @Override
-        public void accept(@NotNull BLink budget) {
-
-            final float currentPriority = budget.pri();
-            final float forgetDeltaCycles = budget.setLastForgetTime(now);
-            if (forgetDeltaCycles == 0) {
-                return;
-            }
-
-            float minPriorityForgettingCanAffect = this.perfectionCached * budget.qua(); //relativeThreshold
-
-            if (currentPriority < minPriorityForgettingCanAffect) {
-                //priority already below threshold, don't decrease any further
-                return;
-            }
-
-            //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
-            // lower values approaching 0.0 means will happen at faster rates
-            float forgetProportion = forgetCyclesCached + forgetCyclesMaxMinRange * (1.0f - budget.dur());
-
-
-            float newPriority;
-            if (forgetProportion >= 1.0f) {
-                //total drain; simplification of the complete LERP formula
-                newPriority = minPriorityForgettingCanAffect;
-            } else if (forgetProportion <= 0f) {
-                //??
-                newPriority = currentPriority;
-            } else {
-                //LERP between current value and minimum
-                newPriority = currentPriority * (1.0f - forgetProportion) +
-                        minPriorityForgettingCanAffect * (forgetProportion);
-            }
-
-            //if (Math.abs(newPriority - currentPriority) > Global.BUDGET_EPSILON)
-            budget.setPriority(newPriority);
-
-        }
-
-
-    }
+//    /**
+//     * linaer decay in proportion to time since last forget
+//     */
+//    public static class LinearForget extends AbstractForget {
+//
+//        @NotNull
+//        private final MutableFloat forgetMax;
+//        protected transient float forgetMaxCyclesCached = Float.NaN;
+//        private float forgetCyclesMaxMinRange;
+//
+//        /**
+//         * @param forgetTimeMin minimum forgetting time
+//         * @param forgetTimeMax maximum forgetting time
+//         * @param perfection
+//         */
+//        public LinearForget(@NotNull MutableFloat forgetTimeMin, @NotNull MutableFloat forgetTimeMax, @NotNull MutableFloat perfection) {
+//            super(forgetTimeMin, perfection);
+//            this.forgetMax = forgetTimeMax;
+//        }
+//
+//        @Override
+//        public void update(@NotNull NAR nar) {
+//            super.update(nar);
+//            this.forgetMaxCyclesCached = forgetMax.floatValue();
+//            this.forgetCyclesMaxMinRange = forgetMaxCyclesCached - forgetCyclesCached;
+//        }
+//
+//        @Override
+//        public void accept(@NotNull BLink budget) {
+//
+//            final float currentPriority = budget.pri();
+//            final float forgetDeltaCycles = budget.setLastForgetTime(now);
+//            if (forgetDeltaCycles == 0) {
+//                return;
+//            }
+//
+//            float minPriorityForgettingCanAffect = this.perfectionCached * budget.qua(); //relativeThreshold
+//
+//            if (currentPriority < minPriorityForgettingCanAffect) {
+//                //priority already below threshold, don't decrease any further
+//                return;
+//            }
+//
+//            //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
+//            // lower values approaching 0.0 means will happen at faster rates
+//            float forgetProportion = forgetCyclesCached + forgetCyclesMaxMinRange * (1.0f - budget.dur());
+//
+//
+//            float newPriority;
+//            if (forgetProportion >= 1.0f) {
+//                //total drain; simplification of the complete LERP formula
+//                newPriority = minPriorityForgettingCanAffect;
+//            } else if (forgetProportion <= 0f) {
+//                //??
+//                newPriority = currentPriority;
+//            } else {
+//                //LERP between current value and minimum
+//                newPriority = currentPriority * (1.0f - forgetProportion) +
+//                        minPriorityForgettingCanAffect * (forgetProportion);
+//            }
+//
+//            //if (Math.abs(newPriority - currentPriority) > Global.BUDGET_EPSILON)
+//            budget.setPriority(newPriority);
+//
+//        }
+//
+//
+//    }
 
 
     /**
@@ -191,9 +192,9 @@ public enum Forget {
      */
     public final static class ExpForget extends AbstractForget {
 
-        public ExpForget(@NotNull MutableFloat perfection) {
-            this(new MutableFloat(0), perfection);
-        }
+//        public ExpForget(@NotNull MutableFloat perfection) {
+//            this(new MutableFloat(0), perfection);
+//        }
         public ExpForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
             super(forgetTime, perfection);
         }
@@ -206,8 +207,9 @@ public enum Forget {
                 return;
 
             float last = budget.getLastForgetTime();
-            if (last!=last)
+            if (last!=last) {
                 last = now; //NaN, first time
+            }
 
             float dt = now - last;
 
@@ -227,13 +229,84 @@ public enum Forget {
             if (p < threshold)
                 p = threshold;
 
-            if (!Util.equals(p, p0, Global.BUDGET_EPSILON))
+            if (dt==0 || !Util.equals(p, p0, Global.BUDGET_EPSILON))
                 budget.setPriority(p, now);
 
             //}
         }
 
     }
+
+    /**
+     * exponential decay in proportion to time since last forget.
+     * provided by TonyLo as used in the ALANN system.
+     */
+    public final static class LinearForget extends AbstractForget {
+
+        //        public ExpForget(@NotNull MutableFloat perfection) {
+//            this(new MutableFloat(0), perfection);
+//        }
+        public LinearForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
+            super(forgetTime, perfection);
+        }
+
+        @Override
+        public void accept(@NotNull BLink budget) {
+
+            float p0 = budget.pri();
+            if (p0 != p0) /* NaN, deleted */
+                return;
+
+            float last = budget.getLastForgetTime();
+            if (last!=last) {
+                last = now; //NaN, first time
+            }
+
+            float dt = now - last;
+
+            float threshold = budget.qua() * perfectionCached;
+
+            float p = p0;
+
+            if (dt > 0 && p > threshold) {
+
+
+                float forgetProportion;
+                if (p < threshold) {
+                    forgetProportion = 0;
+                } else {
+
+                    //more durability = slower forgetting; durability near 1.0 means forgetting will happen at slowest decided by the forget rate,
+                    // lower values approaching 0.0 means will happen at faster rates
+                    forgetProportion = dt / forgetCyclesCached * (1.0f - budget.dur());
+                }
+
+
+                if (forgetProportion >= 1.0f) {
+                    //total drain; simplification of the complete LERP formula
+                    p = threshold;
+                } else if (forgetProportion <= 0f) {
+                    //??
+                    //p = p;
+                } else {
+                    //LERP between current value and minimum
+                    p = p * (1.0f - forgetProportion);
+
+
+                }
+            }
+
+            if (p < threshold)
+                p = threshold;
+
+            if (dt==0 || !Util.equals(p, p0, Global.BUDGET_EPSILON))
+                budget.setPriority(p, now);
+
+            //}
+        }
+
+    }
+
 
     /**
      * sets the priority value to the quality value

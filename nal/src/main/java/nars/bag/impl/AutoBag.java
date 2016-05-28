@@ -3,8 +3,8 @@ package nars.bag.impl;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.budget.forget.BudgetForget;
 import nars.budget.forget.Forget;
+import nars.util.data.array.Arrays;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
@@ -17,7 +17,8 @@ public class AutoBag<V>  {
     private final Forget.AbstractForget forget;
 
     public AutoBag(MutableFloat perfection) {
-        this(new Forget.ExpForget(new MutableFloat(0), perfection));
+        //this(new Forget.ExpForget(new MutableFloat(0), perfection));
+        this(new Forget.LinearForget(new MutableFloat(0), perfection));
     }
 
     public AutoBag(Forget.AbstractForget forget) {
@@ -35,12 +36,14 @@ public class AutoBag<V>  {
      */
     public Bag<V> update(Bag<V> bag, boolean forceCommit) {
 
-        BudgetForget f;
+        Forget.AbstractForget f;
         float r = forgetPeriod((ArrayBag<V>) bag);
+
         if (r > 0) {
-            //forget.forgetDurations.setValue(r); //not necessary unless we want access to this value as a MutableFloat from elsewhere
-            forget.setForgetCycles(r);
             f = forget;
+            /*if (bag.size() > 500)
+                System.out.println(bag.size() + " / " + bag.capacity() + " pressurized_forgetRate="  + r);*/
+            f.setForgetCycles(r);
         } else {
             if (!forceCommit)
                 return bag;
@@ -53,20 +56,26 @@ public class AutoBag<V>  {
 
 
     protected float forgetPeriod(ArrayBag<V> bag) {
-        if (!bag.isFull())
+        FasterList<BLink<V>> pending = bag.pending;
+        int pendingSize = pending.size();
+
+        //only calculate forgetting if pending amount may cause an overflow:
+        if (bag.size() + pendingSize <= bag.capacity())
             return 0;
 
-        FasterList<BLink<V>> pending = bag.pending;
-
         float pendingMass = 0;
-        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
+
+        for (int i = 0; i < pendingSize; i++) {
             BLink<V> v = pending.get(i);
             pendingMass += v.pri() * v.dur();
         }
 
-        float basePeriod = 1f; //TODO formalize some relationship between cycles and priority
 
-        return (pendingMass/basePeriod) * bag.capacity();
+        float basePeriod = 0.001f; //"margin of replacement"
+        // TODO formalize some relationship between cycles and priority
+        // TODO estimate based on the min/max priority of existing items and normalize the rate to that
+
+        return (basePeriod) * bag.capacity()/pendingMass;
 
     }
 

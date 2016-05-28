@@ -102,7 +102,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				4500);
+				450);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);

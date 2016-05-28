@@ -309,7 +309,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     private void addPending() {
         //add pending items now that the bag is updated
-        for (int i1 = 0, pendingSize = pending.size(); i1 < pendingSize; i1++) {
+        int pendingSize = pending.size();
+        /*int merged = 0;
+        int added = 0;
+        int rejected = 0;*/
+
+        for (int i1 = 0; i1 < pendingSize; i1++) {
             BLink<V> link = pending.get(i1);
             V key = link.get();
             BLink<V> existing = get(key);
@@ -320,12 +325,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                     removeItem(existing);
                     addItem(existing);
                 }
+                //merged++;
             }
-            else
-                putNew(key, link);
+            else {
+                boolean inserted = link != putNew(key, link);
+                /*if (inserted) {
+                    added++;
+                } else {
+                    rejected++;
+                }*/
+            }
 
         }
         pending.clear0();
+
+        //System.out.println("cap=" + capacity() + ", pending=" + pendingSize + ", merged=" + merged + ", added=" + added + ", rejected=" + rejected);
     }
 
     /** returns the index of the lowest unsorted item */

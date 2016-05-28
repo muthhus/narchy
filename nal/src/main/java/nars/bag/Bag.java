@@ -450,10 +450,6 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         a.forEach(this::put);
     }
 
-    default Bag<V> commit(@NotNull Consumer<BLink> each) {
-        forEach(each);
-        commit();
-        return this;
-    }
+    Bag<V> commit(@NotNull Consumer<BLink> each);
 
 }
