@@ -7,7 +7,7 @@ import nars.bag.Bag;
 import nars.bag.impl.AutoBag;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.Reasoner;
+import nars.nal.Reasoner;
 import nars.data.Range;
 import nars.task.Task;
 import nars.term.Termed;

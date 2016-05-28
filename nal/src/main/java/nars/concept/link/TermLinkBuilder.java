@@ -1,8 +1,9 @@
-package nars.concept;
+package nars.concept.link;
 
 import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

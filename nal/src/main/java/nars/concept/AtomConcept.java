@@ -96,35 +96,32 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
         return term.complexity();
     }
 
+
     @Override
     public int varIndep() {
-        return term.varIndep();
+        return 0;
     }
 
     @Override
     public int varDep() {
-        return term.varDep();
+        return 0;
     }
 
     @Override
     public int varQuery() {
-        return term.varQuery();
+        return 0;
     }
 
     @Override
     public int varPattern() {
-        return term.varPattern();
+        return 0;
     }
 
     @Override
-    public final int vars() {
-        return term.vars();
+    public int vars() {
+        return 0;
     }
 
-    @Override
-    public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public boolean contains(Task t) {

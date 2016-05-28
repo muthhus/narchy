@@ -1,7 +1,7 @@
 package nars.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.*;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -78,16 +78,16 @@ public class GroupedMapIndex extends AbstractMapIndex {
     public final Map<TermContainer, SubtermNode> data;
     int count;
 
-    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, Concept.ConceptBuilder conceptBuilder) {
         this(data, Terms.terms, conceptBuilder);
     }
 
-    public GroupedMapIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(symbolMap, termBuilder, conceptBuilder);
         this.data = data;
     }
 
-    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public GroupedMapIndex(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         this(new HashSymbolMap(), data, termBuilder, conceptBuilder);
     }
 

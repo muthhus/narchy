@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.Reasoner;
+import nars.nal.Reasoner;
 import nars.index.Indexes;
 import nars.nal.Deriver;
 import nars.nar.util.DefaultCore;

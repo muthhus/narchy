@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
-import nars.concept.TimeFunction;
+import nars.nal.TimeFunction;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.ProcTerm;

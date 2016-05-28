@@ -2,7 +2,7 @@ package nars.nal.meta.constraint;
 
 import com.google.common.base.Joiner;
 import nars.term.Term;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

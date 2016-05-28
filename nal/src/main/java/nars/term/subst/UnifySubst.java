@@ -1,11 +1,11 @@
-package nars.concept;
+package nars.term.subst;
 
 import nars.Memory;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.subst.FindSubst;
-import nars.term.transform.subst.MapSubst;
+import nars.term.subst.FindSubst;
+import nars.term.subst.MapSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

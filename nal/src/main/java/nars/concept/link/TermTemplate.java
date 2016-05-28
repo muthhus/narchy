@@ -1,4 +1,4 @@
-package nars.concept;
+package nars.concept.link;
 
 import nars.term.Term;
 import nars.term.Termed;

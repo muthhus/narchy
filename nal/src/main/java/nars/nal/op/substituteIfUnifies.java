@@ -3,7 +3,7 @@ package nars.nal.op;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.subst.OneMatchFindSubst;
+import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

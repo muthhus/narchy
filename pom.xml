@@ -1,107 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>opennars</groupId>
-  <artifactId>narchy</artifactId>
-  <version>1.8-SNAPSHOT</version>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>opennars</groupId>
+    <artifactId>narchy</artifactId>
+    <version>1.8-SNAPSHOT</version>
 
-  <packaging>pom</packaging>
-
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <maven.compiler.source>1.9</maven.compiler.source>
-    <maven.compiler.target>1.9</maven.compiler.target>
-
-  </properties>
+    <packaging>pom</packaging>
 
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-  <build>
-      <pluginManagement>
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
+
+    </properties>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                    <configuration>
+                        <testFailureIgnore>true</testFailureIgnore>
+                        <disableXmlReport>true</disableXmlReport>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.19.1</version>
-            <configuration>
-              <testFailureIgnore>true</testFailureIgnore>
-              <disableXmlReport>true</disableXmlReport>
-            </configuration>
-          </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <!--<verbose>true</verbose>-->
+                    <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+
+                    <!--<fork>true</fork>-->
+                    <source>1.9</source>
+                    <target>1.9</target>
+
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.5.1</version>
+            </plugin>
         </plugins>
-      </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <!--<verbose>true</verbose>-->
-          <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
+    </build>
 
-          <!--<fork>true</fork>-->
-          <source>1.9</source>
-          <target>1.9</target>
-
-
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.5.201505241946</version>
-        <executions>
-          <execution>
-            <id>default-prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-          <!--<execution>-->
-            <!--<id>default-check</id>-->
-            <!--<goals>-->
-              <!--<goal>check</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-              <!--<rules>-->
-              <!--&lt;!&ndash;  implementation is needed only for Maven 2  &ndash;&gt;-->
-              <!--<rule implementation="org.jacoco.maven.RuleConfiguration">-->
-              <!--<element>BUNDLE</element>-->
-              <!--<limits>-->
-              <!--&lt;!&ndash;  implementation is needed only for Maven 2  &ndash;&gt;-->
-              <!--<limit implementation="org.jacoco.report.check.Limit">-->
-              <!--<counter>COMPLEXITY</counter>-->
-              <!--<value>COVEREDRATIO</value>-->
-              <!--<minimum>0.60</minimum>-->
-              <!--</limit>-->
-              <!--</limits>-->
-              <!--</rule>-->
-              <!--</rules>-->
-            <!--</configuration>-->
-          <!--</execution>-->
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <modules>
-    <module>util</module>
-    <module>app</module>
-    <module>logic</module>
-    <module>nal</module>
-    <module>lab</module>
-    <module>guifx</module>
-    <module>web</module>
-    <module>perf</module>
-  </modules>
+    <modules>
+        <module>util</module>
+        <module>app</module>
+        <module>logic</module>
+        <module>nal</module>
+        <module>lab</module>
+        <module>guifx</module>
+        <module>web</module>
+        <module>perf</module>
+    </modules>
 </project>

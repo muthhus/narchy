@@ -3,6 +3,7 @@ package nars.concept.table;
 import nars.Global;
 import nars.NAR;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -153,7 +154,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         }
 
         if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
-            Task ap = nar.concept(a).merge(q, a, q.occurrence(), nar);
+            Task ap = ((CompoundConcept)nar.concept(a)).merge(q, a, q.occurrence(), nar);
             if (ap!=null)
                 nar.process(ap);
         }

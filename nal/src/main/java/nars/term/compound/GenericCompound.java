@@ -6,7 +6,7 @@ import nars.nal.Tense;
 import nars.term.*;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,7 +1,7 @@
 package nars.index;
 
 import javassist.scopedpool.SoftValueHashMap;
-import nars.concept.DefaultConceptBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 

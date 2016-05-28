@@ -12,7 +12,7 @@ import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.*;
 import nars.term.atom.Atomic;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;

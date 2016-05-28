@@ -1,11 +1,11 @@
-package nars.term.transform.subst.choice;
+package nars.term.subst.choice;
 
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;

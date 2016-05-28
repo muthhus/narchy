@@ -1,4 +1,4 @@
-package nars.term.transform.subst;
+package nars.term.subst;
 
 import com.gs.collections.api.set.MutableSet;
 import nars.Global;
@@ -13,7 +13,7 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
-import nars.term.transform.subst.choice.*;
+import nars.term.subst.choice.*;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;

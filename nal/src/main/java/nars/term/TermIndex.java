@@ -4,7 +4,7 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -17,8 +17,8 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.transform.subst.MapSubst;
-import nars.term.transform.subst.Subst;
+import nars.term.subst.MapSubst;
+import nars.term.subst.Subst;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -111,8 +111,7 @@ public interface TermIndex {
 
     TermBuilder builder();
 
-    @Nullable
-    ConceptBuilder conceptBuilder();
+    Concept.@Nullable ConceptBuilder conceptBuilder();
 
 
     @NotNull

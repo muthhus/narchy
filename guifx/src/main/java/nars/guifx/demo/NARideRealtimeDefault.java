@@ -1,7 +1,7 @@
 package nars.guifx.demo;
 
 import javassist.scopedpool.SoftValueHashMap;
-import nars.concept.DefaultConceptBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;

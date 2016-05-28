@@ -12,7 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.index.PatternIndex;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;

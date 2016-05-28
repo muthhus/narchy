@@ -1,7 +1,7 @@
 package nars.index;
 
 import nars.Op;
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.TermIndex;
@@ -19,14 +19,14 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     public final SymbolMap atoms;
     protected final TermBuilder termBuilder;
-    protected final ConceptBuilder conceptBuilder;
+    protected final Concept.ConceptBuilder conceptBuilder;
 
 
-    public AbstractMapIndex(TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public AbstractMapIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         this(new HashSymbolMap(), termBuilder, conceptBuilder);
     }
 
-    public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super();
         this.termBuilder = termBuilder;
         this.atoms = symbolMap;
@@ -79,7 +79,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
     @Override
-    public final ConceptBuilder conceptBuilder() {
+    public final Concept.ConceptBuilder conceptBuilder() {
         return conceptBuilder;
     }
 

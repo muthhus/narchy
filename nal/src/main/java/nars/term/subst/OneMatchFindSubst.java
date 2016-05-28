@@ -1,4 +1,4 @@
-package nars.term.transform.subst;
+package nars.term.subst;
 
 import nars.NAR;
 import nars.Op;

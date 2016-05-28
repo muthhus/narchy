@@ -28,7 +28,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;

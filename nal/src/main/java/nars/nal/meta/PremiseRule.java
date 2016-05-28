@@ -7,7 +7,7 @@ import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
-import nars.concept.TimeFunction;
+import nars.nal.TimeFunction;
 import nars.index.PatternIndex;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;

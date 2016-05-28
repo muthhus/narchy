@@ -2,7 +2,7 @@ package nars.index;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.TermBuilder;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ public class MapIndex3 extends GroupedMapIndex {
 
     final Cache<TermContainer, GroupedMapIndex.SubtermNode> cache;
 
-    public MapIndex3(int capacity, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public MapIndex3(int capacity, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(
                 Collections.unmodifiableMap(new HashMap()) /* dummy */,
                 termBuilder, conceptBuilder);

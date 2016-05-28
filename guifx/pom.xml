@@ -7,6 +7,7 @@
     <artifactId>guifx</artifactId>
     <version>1.8-SNAPSHOT</version>
     <inceptionYear>2016</inceptionYear>
+    <packaging>jar</packaging>
     <parent>
         <groupId>opennars</groupId>
         <artifactId>narchy</artifactId>

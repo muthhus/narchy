@@ -859,16 +859,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    @NotNull
-    public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
-                                  @NotNull Consumer<Task> recip) {
+    public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         forEachConcept(c -> {
-            if (includeConceptBeliefs && c.hasBeliefs()) c.beliefs().forEach(recip);
-            if (includeConceptQuestions && c.hasQuestions()) c.questions().forEach(recip);
-            if (includeConceptGoals && c.hasBeliefs()) c.goals().forEach(recip);
-            if (includeConceptQuests && c.hasQuests()) c.quests().forEach(recip);
+            c.visitTasks(each, includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests);
         });
-
         return this;
     }
 
@@ -1052,7 +1046,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) {
 
-        forEachConceptTask(true, true, true, true, t-> {
+        forEachConceptTask(t-> {
             if (each.test(t)) {
                 try {
                     TermCodec.the.encodeToStream(o, t);
@@ -1062,7 +1056,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     //e.printStackTrace();
                 }
             }
-        });
+        }, true, true, true, true);
 
         try {
             o.flush();

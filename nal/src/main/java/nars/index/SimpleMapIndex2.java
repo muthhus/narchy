@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
@@ -20,7 +20,7 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
 
     private final Map<TermContainer, TermContainer> subterms;
 
-    public SimpleMapIndex2(TermBuilder termBuilder, ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
+    public SimpleMapIndex2(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
         super(termBuilder, conceptBuilder, compounds);
         this.subterms = subterms;
     }

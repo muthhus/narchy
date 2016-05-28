@@ -2,7 +2,7 @@ package nars.nal.meta.constraint;
 
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 

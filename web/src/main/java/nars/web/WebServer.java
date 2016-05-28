@@ -13,7 +13,7 @@ import nars.NARLoop;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.concept.DefaultConceptBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.concept.table.BeliefTable;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;

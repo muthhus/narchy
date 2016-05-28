@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public abstract class RawTermIndex extends GroupedMapIndex implements Serializable {
 
-    public RawTermIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+    public RawTermIndex(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(symbolMap, data, termBuilder, conceptBuilder);
     }
 

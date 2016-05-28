@@ -205,6 +205,18 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         }
     }
 
+    @Nullable
+    public abstract Task processBelief(Task task, NAR nar);
+
+    @Nullable
+    public abstract Task processGoal(Task task, NAR nar);
+
+    @Nullable
+    public abstract Task processQuestion(Task task, NAR nar);
+
+    @Nullable
+    public abstract Task processQuest(Task task, NAR nar);
+
 
 //    /**
 //     * called from {@link NARRun}

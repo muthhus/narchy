@@ -1,4 +1,4 @@
-package nars.concept;
+package nars.nar.util;
 
 import nars.Op;
 import nars.bag.BLink;
@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.*;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,7 +24,7 @@ import java.util.function.Function;
 /**
  * Created by me on 2/24/16.
  */
-public class DefaultConceptBuilder implements ConceptBuilder {
+public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> new AtomConcept(a, termbag(), taskbag());

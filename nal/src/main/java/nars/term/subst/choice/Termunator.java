@@ -1,6 +1,6 @@
-package nars.term.transform.subst.choice;
+package nars.term.subst.choice;
 
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

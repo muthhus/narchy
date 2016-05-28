@@ -15,7 +15,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

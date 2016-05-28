@@ -1,6 +1,6 @@
 package nars.index;
 
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
@@ -16,7 +16,7 @@ public class SimpleMapIndex extends AbstractMapIndex {
 
     public final Map<Termed,Termed> data;
 
-    public SimpleMapIndex(TermBuilder termBuilder, ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
+    public SimpleMapIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
         super(termBuilder, conceptBuilder);
         this.data = compounds;
     }

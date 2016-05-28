@@ -6,8 +6,8 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.transform.subst.MapSubst;
-import nars.term.transform.subst.Subst;
+import nars.term.subst.MapSubst;
+import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

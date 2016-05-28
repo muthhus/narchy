@@ -2,7 +2,7 @@ package nars.nar.util;
 
 import nars.Global;
 import nars.NAR;
-import nars.concept.Reasoner;
+import nars.nal.Reasoner;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;

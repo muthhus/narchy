@@ -6,6 +6,8 @@ import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
+import nars.concept.link.TermLinkBuilder;
+import nars.concept.link.TermTemplate;
 import nars.concept.table.*;
 import nars.task.Revision;
 import nars.task.Task;
@@ -14,7 +16,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
-import nars.term.transform.subst.FindSubst;
+import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -448,7 +450,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return q;
     }
 
-    @Override
+
     public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
         long now = nar.time();
         return Revision.merge(x, y, now, when,

@@ -1,9 +1,13 @@
-package nars.concept;
+package nars.nal;
 
 import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
+import nars.concept.ConceptProcess;
+import nars.term.subst.UnifySubst;
 import nars.concept.table.BeliefTable;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
@@ -193,7 +197,7 @@ abstract public class Reasoner {
 
             //project the belief to the question's time
             if (taskOcc!=ETERNAL) {
-                belief = nar.concept(belief).merge(task, belief, task.occurrence(), nar);
+                belief = ((CompoundConcept)nar.concept(belief)).merge(task, belief, task.occurrence(), nar);
             }
 
             if (belief!=null) { //may have become null as a result of projection

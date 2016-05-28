@@ -4,7 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
-import nars.concept.DefaultConceptBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.atom.Atomic;

@@ -85,8 +85,8 @@ public class TermCodecTest {
         //dump all tasks to a set of sorted strings and compare their equality:
         Set<String> ab = new TreeSet();
         Set<String> bb = new TreeSet();
-        a.forEachConceptTask(true,true,true,true, t->ab.add(t.toString()));
-        b.forEachConceptTask(true,true,true,true, t->bb.add(t.toString()));
+        a.forEachConceptTask(t->ab.add(t.toString()), true,true,true,true);
+        b.forEachConceptTask(t->bb.add(t.toString()), true,true,true,true);
         assertEquals(ab, bb);
     }
 

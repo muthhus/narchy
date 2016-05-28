@@ -1,4 +1,4 @@
-package nars.term.transform.subst;
+package nars.term.subst;
 
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

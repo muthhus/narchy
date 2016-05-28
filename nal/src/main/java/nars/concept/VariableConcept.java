@@ -16,6 +16,32 @@ public class VariableConcept extends AtomConcept<Variable> implements Variable {
     }
 
     @Override
+    public int vars() {
+        return 1;
+    }
+
+    @Override
+    public int varIndep() {
+        return term.varIndep();
+    }
+
+    @Override
+    public int varDep() {
+        return term.varDep();
+    }
+
+    @Override
+    public int varQuery() {
+        return term.varQuery();
+    }
+
+    @Override
+    public int varPattern() {
+        return term.varPattern();
+    }
+
+
+    @Override
     public final int id() {
         return term.id();
     }

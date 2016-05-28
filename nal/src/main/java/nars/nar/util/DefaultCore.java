@@ -8,7 +8,7 @@ import nars.budget.forget.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
-import nars.concept.Reasoner;
+import nars.nal.Reasoner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

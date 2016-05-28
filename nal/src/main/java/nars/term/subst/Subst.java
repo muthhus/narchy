@@ -1,4 +1,4 @@
-package nars.term.transform.subst;
+package nars.term.subst;
 
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Term;

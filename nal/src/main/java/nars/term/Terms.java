@@ -4,7 +4,7 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.concept.ConceptBuilder;
+import nars.concept.Concept;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -120,9 +120,8 @@ public class Terms extends TermBuilder implements TermIndex {
         return this;
     }
 
-    @Nullable
     @Override
-    public ConceptBuilder conceptBuilder() {
+    public Concept.@Nullable ConceptBuilder conceptBuilder() {
         return null;
     }
 
