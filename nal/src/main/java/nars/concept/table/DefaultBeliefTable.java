@@ -57,7 +57,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 Truth ee = topEternal().truth();
                 if (ee == null)
                     return Truth.Null;
-                return ee.conf() > tt.conf() ? ee : tt;
+                return (tt == null || ee.conf() > tt.conf()) ? ee : tt;
             } else {
                 return tt;
             }

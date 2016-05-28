@@ -103,7 +103,7 @@ abstract public class events extends AtomicBoolCondition {
                 } else /*if (ttdt > 0) */{ //time forward
                     targetMatch = 0;
                 }
-                return tt.term(targetMatch).equals(m.premise.beliefTerm().term());
+                return tt.term(targetMatch).equals(m.beliefTerm);
             }
         }
 

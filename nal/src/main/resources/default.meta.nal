@@ -94,7 +94,7 @@
 
 (A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)
 (A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward)
-(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
+(A --> C), (B --> C), neq(A,B) |- (A --> B), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
 (A --> B), (B --> C), neq(C,A) |- (C --> A), (Belief:Exemplification, Desire:Weak, Derive:AllowBackward)
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
@@ -105,11 +105,13 @@
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
     (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward)
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
+    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward)
     (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward)
     (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward)
 
@@ -133,15 +135,26 @@
 //// inheritance-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
-    (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
-    (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
-    (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
-    (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
+         (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
+    (--,(S --> M)), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposeNegativeNegativeNegative)
+         (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
+    (--,(S --> M)), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposePositivePositivePositive)
 
-    (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-    (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
-    (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
-    (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
+         (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
+    (--,(S --> M)), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativePositive)
+         (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
+    (--,(S --> M)), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposePositiveNegativeNegative)
+
+         (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+    (--,(M --> S)), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposeNegativeNegativeNegative)
+         (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
+    (--,(M --> S)), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposePositivePositivePositive)
+
+         (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
+    (--,(M --> S)), (M --> (S - P)) |- (M --> P), (Belief:DecomposeNegativeNegativePositive)
+         (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
+    (--,(M --> S)), (M --> (P - S)) |- (M --> P), (Belief:DecomposePositiveNegativeNegative)
+
 
 //Set comprehension:
 

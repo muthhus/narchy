@@ -48,16 +48,16 @@ public class NAL2Test extends AbstractNALTest {
 
     }
 
-    @Test public void inductionNegation() {
-        //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
-        test().log()
-                .believe("<worm --> bird>", 0.1f, 0.9f)
-                .believe("<tweety --> bird>", 0.9f, 0.9f)
-                .mustBelieve(cycles, "<worm --> tweety>", 0.10f, 0.42f)
-                .mustBelieve(cycles, "<tweety --> worm>", 0.90f, 0.07f)
-                .mustBelieve(cycles, "<tweety <-> worm>", 0.10f, 0.42f)
-        ;
-    }
+//    @Test public void inductionNegation() {
+//        //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
+//        test().log()
+//                .believe("<worm --> bird>", 0.1f, 0.9f)
+//                .believe("<tweety --> bird>", 0.9f, 0.9f)
+//                .mustBelieve(cycles, "<worm --> tweety>", 0.10f, 0.42f)
+//                .mustBelieve(cycles, "<tweety --> worm>", 0.90f, 0.07f)
+//                .mustBelieve(cycles, "<tweety <-> worm>", 0.10f, 0.42f)
+//        ;
+//    }
 
     @Test
     public void analogy() throws Narsese.NarseseException {

@@ -57,6 +57,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test //works, just control related issue (DecomposeNegativeNegativeNegative)
     public void compound_decomposition_two_premises2()  {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<robin --> swimmer>",0.0f,0.9f); //.en("Robin is not a type of swimmer.");
         tester.believe("<robin --> (-,mammal,swimmer)>", 0.0f, 0.9f); //.en("Robin is not a nonswimming mammal.");
         tester.mustBelieve(cycles*3, "<robin --> mammal>", 0.0f ,0.81f); //.en("Robin is not a type of mammal.");

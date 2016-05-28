@@ -54,10 +54,11 @@ public class PremiseEval extends FindSubst {
 
     /** cached value */
     private int termSub0op, termSub1op;
-    private int termSub1Struct, termSub2Struct;
+    private int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
     public Truth taskTruth, beliefTruth;
-    public Term taskTerm, beliefTerm;
+    public Compound taskTerm;
+    public Term beliefTerm;
     public NAR nar;
 
 
@@ -161,7 +162,7 @@ public class PremiseEval extends FindSubst {
 
         Task belief = p.belief();
 
-        Term tt = task.term();
+        Compound tt = task.term();
         Termed bb = p.beliefTerm(); //includes when belief==null, the termlink
 
         this.taskTruth = task.truth();
@@ -169,33 +170,29 @@ public class PremiseEval extends FindSubst {
 
         if (taskTruth == null || !taskTruth.isNegative()) {
             this.taskTerm = tt;
-        }
-        else {
+        } else {
             this.taskTruth = this.taskTruth.negated();
             this.taskTerm = $.neg(tt);
         }
 
-        if (beliefTruth == null || !beliefTruth.isNegative()) {
+        //if (beliefTruth == null || !beliefTruth.isNegative()) {
             this.beliefTerm = bb.term();
-        } else {
-            this.beliefTruth = this.beliefTruth.negated();
-            this.beliefTerm = $.neg(bb);
-        }
+//        } else {
+//            this.beliefTruth = this.beliefTruth.negated();
+//            this.beliefTerm = $.neg(bb);
+//        }
 
 
 
         this.termutesPerMatch = p.getMaxMatches();
 
-        this.taskTruth = task.truth();
-        this.beliefTruth = (belief!=null) ? belief.truth() : null;
-
 
         this.cyclic = p.cyclic();
         this.overlap = p.overlap();
 
-        this.termSub1Struct = taskTerm.structure();
+        this.termSub0Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();
-        this.termSub2Struct = beliefTerm.structure();
+        this.termSub1Struct = beliefTerm.structure();
         this.termSub1op = beliefTerm.op().ordinal();
 
         //term.set( termPattern );
@@ -277,7 +274,7 @@ public class PremiseEval extends FindSubst {
 
     /** @param subterm 0 or 1, indicating task or belief */
     public final boolean subTermMatch(int subterm, int bits) {
-        int existingStructure = (subterm == 0 ? termSub1Struct : termSub2Struct);
+        int existingStructure = (subterm == 0 ? termSub0Struct : termSub1Struct);
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
@@ -292,8 +289,8 @@ public class PremiseEval extends FindSubst {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Termlike.hasAll(termSub1Struct, bits) &&
-               Termlike.hasAll(termSub2Struct, bits);
+        return Termlike.hasAll(termSub0Struct, bits) &&
+               Termlike.hasAll(termSub1Struct, bits);
     }
 
 //    /** returns whether the put operation was successful */

@@ -85,15 +85,19 @@ public class NAL1Test extends AbstractNALTest {
 
         int time = withinCycles;
 
-        test().mustBelieve(time, "<sport --> chess>", 1.0f, 0.42f)
-              /*  .en("I guess sport is a type of chess.")
-                .en("sport is possibly a type of chess.")
-                .es("es posible que sport es un tipo de chess.");*/
+//                .believe("<sport --> competition>")
+//                .believe("<chess --> competition>", 0.90f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
+//                 mustBelieve(time, "<sport --> chess>", 1.0f, 0.42f)
+//                .mustBelieve(time, "<chess --> sport>", 0.90f, 0.45f)
+//        //.en("chess is a type of competition.");
+
+        test()
                 .log()
-                .believe("<sport --> competition>")
-                        //.en("sport is a type of competition.");
+                .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
-                .mustBelieve(time, "<chess --> sport>", 0.90f, 0.45f);
+                .mustBelieve(time, "<chess --> sport>", 1f, 0.42f)
+                .mustBelieve(time, "<sport --> chess>", 0.9f, 0.45f);
+
                 //.en("I guess chess is a type of sport");
     }
 
@@ -117,12 +121,16 @@ public class NAL1Test extends AbstractNALTest {
             ;
     }
 
+
+
     @Test public void induction() {
         //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
         test()
+                .log()
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
                 .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
-                .mustBelieve(withinCycles, "<pteradactyl --> parakeet>", 1, 0.42f)
+                .mustBelieve(withinCycles, "<parakeet --> pteradactyl>", 1, 0.42f)
+                .mustBelieve(withinCycles, "<pteradactyl --> parakeet>", 0.9f, 0.45f)
         ;
     }
 

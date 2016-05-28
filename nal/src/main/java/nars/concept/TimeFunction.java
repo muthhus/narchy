@@ -86,9 +86,9 @@ public interface TimeFunction {
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
         ConceptProcess prem = p.premise;
-        Task task = prem.task();
-        Compound taskTerm = task.term();
-        Termed<Compound> beliefTerm = prem.beliefTerm();
+
+        Compound taskTerm = p.taskTerm;
+        Termed<Compound> beliefTerm = p.beliefTerm;
 
         int dt;
         int ttd = taskTerm.dt();
@@ -206,12 +206,11 @@ public interface TimeFunction {
      * copiesthe 'dt' and the occurence of the task term directly
      */
     TimeFunction dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        ConceptProcess prem = p.premise;
-        return dtExact(derived, occReturn, prem, true);
+        return dtExact(derived, occReturn, p, true);
     };
     TimeFunction dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess prem = p.premise;
-        return dtExact(derived, occReturn, prem, false);
+        return dtExact(derived, occReturn, p, false);
     };
 
 
@@ -231,13 +230,13 @@ public interface TimeFunction {
 
         Task premBelief = prem.belief();
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? prem.task() : prem.beliefTerm()).term();
+        Compound decomposedTerm = (Compound) (decomposeTask ? prem.task() : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
         long occDecomposed = decomposeTask ? prem.task().occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
         Task otherTask = decomposeTask ? premBelief : prem.task();
-        Term otherTerm = decomposeTask ? prem.beliefTerm().term() : prem.task().term();
+        Term otherTerm = decomposeTask ? p.beliefTerm.term() : prem.task().term();
         long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : ETERNAL;
 
 
@@ -402,8 +401,9 @@ public interface TimeFunction {
 //    }
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, boolean taskOrBelief) {
-        Term dtTerm = taskOrBelief ? prem.task().term() : prem.beliefTerm().term();
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull PremiseEval p, boolean taskOrBelief) {
+        ConceptProcess prem = p.premise;
+        Term dtTerm = taskOrBelief ? p.taskTerm : p.beliefTerm;
 
         Task t = prem.task();
         Task b = prem.belief();
@@ -489,9 +489,9 @@ public interface TimeFunction {
             } else {
 
                 //Task belief = premise.belief();
-                Termed<Compound> beliefTerm = premise.beliefTerm();
+                Compound beliefTerm = (Compound)p.beliefTerm;
                 //if (belief != null) {
-                long ddt = beliefTerm.term().dt();
+                long ddt = beliefTerm.dt();
                 if (ddt != DTERNAL) {
                     if (!taskOrBelief && !end) {
                         o -= ddt;
@@ -531,8 +531,8 @@ public interface TimeFunction {
         ConceptProcess premise = p.premise;
 
         Task task = premise.task();
-        int taskDT = task.term().dt();
-        Term bt = premise.beliefTerm().term();
+        int taskDT = p.taskTerm.dt();
+        Term bt = p.beliefTerm;
 
         int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
 
@@ -600,8 +600,8 @@ public interface TimeFunction {
 
         long occ = premise.occurrenceTarget((t, b) -> t); //reset
 
-        Compound tt = task.term();
-        Term bb = premise.beliefTerm().term(); // belief() != null ? belief().term() : null;
+        Compound tt = p.taskTerm;
+        Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 
         int td = tt.dt();
         int bd = bb instanceof Compound ? ((Compound) bb).dt() : DTERNAL;
