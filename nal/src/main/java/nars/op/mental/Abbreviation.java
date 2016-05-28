@@ -22,8 +22,9 @@ import java.util.function.Consumer;
 /**
  * 1-step abbreviation, which calls ^abbreviate directly and not through an added Task.
  * Experimental alternative to Abbreviation plugin.
+ * @param S serial term type
  */
-public class Abbreviation implements Consumer<Task> {
+public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
     static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
@@ -41,7 +42,7 @@ public class Abbreviation implements Consumer<Task> {
     public final MutableFloat abbreviationConfidence = new MutableFloat(0.95f);
     public final MutableFloat abbreviationProbability = new MutableFloat(Inperience.INTERNAL_EXPERIENCE_RARE_PROBABILITY);
     @NotNull
-    private final NAR nar;
+    protected final NAR nar;
     private final String termPrefix;
     private nars.budget.Budgeted NewAbbreviationBudget = UnitBudget.Full.cloneMult(0.9f, 0.5f, 0.5f);
 
@@ -66,7 +67,7 @@ public class Abbreviation implements Consumer<Task> {
     }
 
     @NotNull
-    public Term newSerialTerm() {
+    protected Term newSerialTerm() {
         //TODO base64
         //return Atom.the(Utf8.toUtf8(name));
 
@@ -122,22 +123,26 @@ public class Abbreviation implements Consumer<Task> {
 
                     Term id = newSerialTerm();
 
-                    Concept abbreviation = nar.conceptualize(newAbbreviation(abbreviated, id), NewAbbreviationBudget);
-                    if (abbreviation != null) {
-
-                        abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
-                        abbreviated.put(Abbreviation.class, id); //abbreviated by the serial
-
-                        logger.info("Abbreviation " + abbreviation);
-
-                        nar.input(
-                                new MutableTask(abbreviation, Symbols.BELIEF,
-                                        $.t(1, abbreviationConfidence.floatValue()))
-                        );
-
-                    }
+                    abbreviate(abbreviated, id);
                 }
             }
+        }
+    }
+
+    protected  void abbreviate(Concept abbreviated, Term alias) {
+        Concept abbreviation = nar.conceptualize(newAbbreviation(abbreviated, alias), NewAbbreviationBudget);
+        if (abbreviation != null) {
+
+            abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
+            abbreviated.put(Abbreviation.class, alias); //abbreviated by the serial
+
+            logger.info("Abbreviation " + abbreviation);
+
+            nar.input(
+                    new MutableTask(abbreviation, Symbols.BELIEF,
+                            $.t(1, abbreviationConfidence.floatValue()))
+            );
+
         }
     }
 

@@ -190,18 +190,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         tasklinks().setCapacity( p.linkCap(this, false) );
     }
 
-    /**
-     * when a task is processed, a tasklink
-     * can be created at the concept of its term
-     */
-    @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
 
-        if (b instanceof Task) {
-            linkTask((Task)b, scale);
-        }
-
-        return true;
-    }
 
     public void linkTask(@NotNull Task t, float scale) {
         if (term.vars()==0 /*|| !isConceptOf(t)*/) { //insert tasklink to its terms own concept only if no variables

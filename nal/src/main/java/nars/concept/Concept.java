@@ -91,8 +91,22 @@ public interface Concept extends Termed, Comparable<Termlike> {
     /**
      * attempt insert a tasklink into this concept's tasklink bag
      * return true if successfully inserted
+     *
+     * when a task is processed, a tasklink
+     * can be created at the concept of its term
+     *
+     * @return whether the link successfully was completed
      */
-    boolean link(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow);
+    default boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+
+        if (b instanceof Task) {
+            linkTask((Task)b, scale);
+        }
+
+        return true;
+    }
+
+    void linkTask(@NotNull Task t, float scale);
 
 
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {

@@ -27,6 +27,7 @@ import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;
+import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.task.DerivedTask;
 import nars.task.Task;
@@ -61,8 +62,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		Default nar = new Default(
 				1024, 8, 1, 2, rng,
-				//new Indexes.WeakTermIndex(128 * 1024, rng),
-				new Indexes.SoftTermIndex(128 * 1024, rng),
+				new Indexes.WeakTermIndex(128 * 1024, rng),
+				//new Indexes.SoftTermIndex(128 * 1024, rng),
 				//new Indexes.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
@@ -98,7 +99,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			return false;
 		});
 
-		new Abbreviation(nar, "_");
+		new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 

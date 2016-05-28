@@ -685,7 +685,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                if (this.termLinkTemplates!=null) {
 //                    System.err.println("GC'd");
 //                }
-                this.termLinkTemplates = new WeakReference(templates);
+                this.termLinkTemplates = Global.reference(templates);
             } /*else {
 //                if (this.termLinkTemplates!=null) {
 //                    System.err.println("exist");
@@ -761,7 +761,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
                 if (target!=null && b instanceof Task) {
                     //insert 2nd-order tasklink
-                    ((AbstractConcept)target).linkTask((Task)b, subScale);
+                    target.linkTask((Task)b, subScale);
                 }
             }
         }

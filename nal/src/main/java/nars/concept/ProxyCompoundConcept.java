@@ -65,6 +65,11 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return target.contains(t);
     }
 
+    @Override
+    public void linkTask(@NotNull Task t, float scale) {
+        target.linkTask(t, scale);
+    }
+
     /**
      * Pending Quests to be answered by new desire values
      */
