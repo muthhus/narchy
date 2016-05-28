@@ -9,7 +9,7 @@ import java.util.function.Predicate;
  * Features exhibited by, and which can classify terms
  * and termlike productions
  */
-public interface Termlike  {
+public interface Termlike extends Comparable<Termlike> {
 
     int volume();
     int complexity();
@@ -22,6 +22,7 @@ public interface Termlike  {
      * @param t*/
     boolean containsTerm(Termlike t);
 
+    boolean hasTemporal();
 
     default boolean hasAll(int structuralVector) {
         int s = structure();
@@ -92,7 +93,17 @@ public interface Termlike  {
      * @param v*/
     boolean or(Predicate<Term> v);
 
+    /** total # of variables, excluding pattern variables */
+    int vars();
 
+    /** # of contained independent variables */
+    int varIndep();
+    /** # of contained dependent variables */
+    int varDep();
+    /** # of contained query variables */
+    int varQuery();
+    /** # of contained pattern variables */
+    int varPattern();
 
 
 }

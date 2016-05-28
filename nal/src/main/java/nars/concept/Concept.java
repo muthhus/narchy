@@ -31,6 +31,7 @@ import nars.concept.table.TaskTable;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface Concept extends Termed, Comparable {
+public interface Concept extends Termed, Comparable<Termlike> {
 
     @NotNull Bag<Task> tasklinks();
 

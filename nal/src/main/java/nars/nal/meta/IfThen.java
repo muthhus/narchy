@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.Op;
+import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  < (&&, cond1, cond2, ...) ==> (&|, fork1, fork2, ... ) >
  < (&&, cond1, cond2, ...) ==> end >
  */
-public final class IfThen extends GenericCompound implements ProcTerm {
+public final class IfThen extends GenericCompound<Term> implements ProcTerm {
 
 
     public final transient @NotNull BoolCondition cond;

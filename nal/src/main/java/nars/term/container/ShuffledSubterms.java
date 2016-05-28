@@ -128,7 +128,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public int compareTo(@NotNull Object o) {
+    public int compareTo(@NotNull Termlike o) {
         return TermContainer.compareTo(this, o);
     }
 
@@ -159,7 +159,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
 
     @Override
-    public void addAllTo(@NotNull Collection<Term> set) {
+    public void copyInto(@NotNull Collection<Term> set) {
         forEach(set::add);
     }
 

@@ -261,8 +261,8 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @Override
-    public final void addAllTo(@NotNull Collection<Term> set) {
-        Collections.addAll(set, term);
+    public final void copyInto(@NotNull Collection<Term> target) {
+        Collections.addAll(target, term);
     }
 
     @Override

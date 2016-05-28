@@ -1,33 +1,51 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Op;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
+import nars.term.container.TermContainer;
+import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 /** aliases one concept with another.
  *
  *  in abbreviation/compression cases the target will likely be of higher
  *  volume than the alias which need only be a term or a product-wrapped singleton compound.
  */
-public class ProxyCompoundConcept<T extends Term> implements Concept {
-    private final CompoundConcept target;
-    private final T alias;
+public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Term>> {
 
-    public ProxyCompoundConcept(T alias, CompoundConcept target) {
+    private final CompoundConcept target;
+
+    private final Compound alias;
+
+    public ProxyCompoundConcept(Compound alias, CompoundConcept target) {
         this.alias = alias;
         this.target = target;
+    }
+
+    @Override
+    public final Compound target() {
+        return alias;
+    }
+
+    @NotNull
+    @Override
+    public Compound term() {
+        return alias;
     }
 
     @Override
@@ -46,7 +64,7 @@ public class ProxyCompoundConcept<T extends Term> implements Concept {
 
     @Override
     public @Nullable Task process(@NotNull Task task, @NotNull NAR nar) {
-        return null;
+        return target.process(task, nar);
     }
 
     @NotNull
@@ -110,15 +128,5 @@ public class ProxyCompoundConcept<T extends Term> implements Concept {
         target.capacity(c);
     }
 
-    @Override
-    public int compareTo(Object o) {
-        return alias.compareTo(o);
-    }
-
-    @NotNull
-    @Override
-    public Term term() {
-        return alias;
-    }
 
 }

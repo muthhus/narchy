@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 import static nars.nal.Tense.DTERNAL;
 
 
-public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
+public class CompoundConcept extends AbstractConcept<Compound> implements Compound<Term> {
 
     /**
      * how incoming budget is merged into its existing duplicate quest/question
@@ -914,7 +914,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public void addAllTo(@NotNull Collection set) {
+    public void copyInto(@NotNull Collection set) {
         Collections.addAll(set, term);
     }
 

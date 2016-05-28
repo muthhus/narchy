@@ -134,7 +134,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public int compareTo(@NotNull Object o) {
+    public int compareTo(@NotNull Termlike o) {
         if (this == o) return 0;
         //if (o == null) return -1;
 
@@ -164,8 +164,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     @Override
-    public final void addAllTo(@NotNull Collection<Term> set) {
-        subterms.addAllTo(set);
+    public final void copyInto(@NotNull Collection<Term> set) {
+        subterms.copyInto(set);
     }
 
     @NotNull

@@ -22,8 +22,6 @@ public interface Variable extends Atomic {
     @Override
     int hashCode();
 
-    @Override
-    int compareTo(Object o);
 
     @Override
     boolean equals(Object o);

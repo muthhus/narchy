@@ -8,6 +8,7 @@ import nars.budget.policy.ConceptBudgeting;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -141,7 +142,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
     @Override
-    public final int compareTo(@NotNull Object o) {
+    public final int compareTo(@NotNull Termlike o) {
         return term.compareTo(o);
     }
 

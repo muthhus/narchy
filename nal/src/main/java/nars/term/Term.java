@@ -27,11 +27,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 
 
-public interface Term extends Termed, Comparable, Termlike {
+public interface Term extends Termed, Termlike {
 
 
     @NotNull
@@ -114,18 +115,8 @@ public interface Term extends Termed, Comparable, Termlike {
 //
 
 
-    /** # of contained independent variables */
-    int varIndep();
-    /** # of contained dependent variables */
-    int varDep();
-    /** # of contained query variables */
-    int varQuery();
-    /** # of contained pattern variables */
-    int varPattern();
 
 
-    /** total # of variables, excluding pattern variables */
-    int vars();
 
     default boolean hasVarIndep() {
         return varIndep()!=0;
@@ -294,7 +285,6 @@ public interface Term extends Termed, Comparable, Termlike {
         return (this instanceof Variable) || (other instanceof Variable) || equals(other);
     }
 
-    boolean hasTemporal();
 
 //    default public boolean hasAll(final Op... op) {
 //        //TODO

@@ -1,6 +1,7 @@
 package nars.term.atom;
 
 import nars.term.Termed;
+import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,7 +34,7 @@ public abstract class AtomicString implements Atomic {
     /**
      * @param that The Term to be compared with the current Term
      */
-    @Override public final int compareTo(@NotNull Object that) {
+    @Override public final int compareTo(@NotNull Termlike that) {
         if (that==this) return 0;
 
         Termed t = (Termed)that;

@@ -28,7 +28,7 @@ import static com.gs.collections.impl.factory.Sets.mutable;
  * Methods common to both Term and Subterms
  * T = subterm type
  */
-public interface TermContainer<T extends Term> extends Termlike, Comparable, Iterable<T> {
+public interface TermContainer<T extends Term> extends Termlike, Comparable<Termlike>, Iterable<T> {
 
     @NotNull
     static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
@@ -39,8 +39,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         int bs = b.size();
         int maxSize = Math.max(as, bs);
         TreeSet<Term> t = new TreeSet<>();
-        a.addAllTo(t);
-        b.addAllTo(t);
+        a.copyInto(t);
+        b.copyInto(t);
         if (t.size() == maxSize) {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
@@ -64,15 +64,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
             return (Compound) b.newCompound(o, u);
     }
 
-    int varDep();
 
-    int varIndep();
-
-    int varQuery();
-
-    int varPattern();
-
-    int vars();
 
     /** gets subterm at index i */
     @NotNull
@@ -163,7 +155,10 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return y.anySatisfyWith(subtermIsCommon, (SetIterable<?>)x);
     }
 
-
+    @Override
+    default boolean hasTemporal() {
+        return false;
+    }
 
     /** recursively */
     @NotNull static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
@@ -285,7 +280,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
 
-    void addAllTo(Collection<Term> target);
+    void copyInto(Collection<Term> target);
 
 
 
@@ -512,18 +507,18 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     @Override
-    default int compareTo(@NotNull Object o) {
+    default int compareTo(@NotNull Termlike o) {
         return compareTo(this, o);
     }
 
-    static int compareTo(@NotNull TermContainer a, @NotNull Object b) {
+    static int compareTo(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
 
         int diff;
         if ((diff = Integer.compare(a.hashCode(), b.hashCode())) != 0)
             return diff;
 
-        TermContainer c = (TermContainer) b;
+        Termlike c = (Termlike) b;
         int diff2;
         if ((diff2 = Integer.compare(a.structure(), c.structure())) != 0)
             return diff2;
@@ -532,14 +527,15 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
 
-    static int compareContent(@NotNull TermContainer a, @NotNull TermContainer c) {
+    static int compareContent(@NotNull TermContainer a, @NotNull Termlike c) {
 
         int s = a.size(), diff;
         if ((diff = Integer.compare(s, c.size())) != 0)
             return diff;
 
+        TermContainer cc = (TermContainer)c;
         for (int i = 0; i < s; i++) {
-            int d = a.term(i).compareTo(c.term(i));
+            int d = a.term(i).compareTo(cc.term(i));
 
             /*
             if (Global.DEBUG) {

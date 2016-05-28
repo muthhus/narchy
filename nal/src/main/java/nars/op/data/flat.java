@@ -35,7 +35,7 @@ public abstract class flat extends TermFunction {
     public static List<Term> collect(@NotNull Term[] x, @NotNull List<Term> l) {
         for (Term a : x) {
             if (a.op() == Op.PRODUCT || a.op().isSet() || a.op() == Op.CONJUNCTION) {
-                ((Compound)a).addAllTo(l);
+                ((Compound)a).copyInto(l);
             }
             else
                 l.add(a);

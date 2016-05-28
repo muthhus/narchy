@@ -23,6 +23,7 @@ package nars.term.variable;
 
 import nars.Op;
 import nars.nal.meta.match.VarPattern;
+import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,7 +64,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
     @Override
-    public final int compareTo(Object o) {
+    public final int compareTo(Termlike o) {
         //hashcode can serve as the ordering too
         if (o == this) return 0;
         return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
