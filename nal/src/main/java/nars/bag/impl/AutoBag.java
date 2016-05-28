@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.forget.Forget;
-import nars.util.data.array.Arrays;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 

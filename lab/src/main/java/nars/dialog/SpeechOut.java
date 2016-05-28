@@ -1,9 +1,5 @@
 package nars.dialog;
 
-import edu.cmu.sphinx.api.Configuration;
-import edu.cmu.sphinx.api.LiveSpeechRecognizer;
-import edu.cmu.sphinx.api.SpeechResult;
-import edu.cmu.sphinx.result.WordResult;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.exceptions.MaryConfigurationException;
@@ -11,7 +7,6 @@ import marytts.exceptions.SynthesisException;
 import marytts.util.data.BufferedDoubleDataSource;
 import marytts.util.data.audio.DDSAudioInputStream;
 import marytts.util.data.audio.MaryAudioUtils;
-import nars.util.data.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

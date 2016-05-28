@@ -7,12 +7,10 @@ import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
 import nars.audio.sample.SampleLoader;
 import nars.audio.sample.SonarSample;
-import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.util.event.FrameReaction;
 
 import javax.sound.sampled.LineUnavailableException;

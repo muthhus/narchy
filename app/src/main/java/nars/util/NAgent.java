@@ -6,7 +6,6 @@ import nars.Narsese;
 import nars.Symbols;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
-import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;

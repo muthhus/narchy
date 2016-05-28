@@ -6,7 +6,6 @@ import nars.Op;
 import nars.bag.BLink;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.subst.UnifySubst;
 import nars.concept.table.BeliefTable;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
@@ -14,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

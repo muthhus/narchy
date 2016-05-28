@@ -1,15 +1,11 @@
 package nars.truth;
 
-import nars.$;
-import nars.Global;
-import nars.util.Texts;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static nars.$.*;
+import static nars.$.t;
 import static nars.Global.TRUTH_EPSILON;
 import static nars.truth.TruthFunctions.xnor;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 5/26/16.

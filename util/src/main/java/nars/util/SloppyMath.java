@@ -20,7 +20,6 @@ package nars.util;
 
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * The class <code>SloppyMath</code> contains methods for performing basic

@@ -3,10 +3,10 @@ package nars.nal.meta;
 import com.google.common.base.Joiner;
 import nars.Global;
 import nars.Narsese;
+import nars.index.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.index.PatternIndex;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

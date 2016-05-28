@@ -15,8 +15,6 @@ import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.run.NEHEBitmapFont;
 import nars.util.data.list.FasterList;
 
-import java.io.IOException;
-
 /**
  * Created by me on 3/29/16.
  */

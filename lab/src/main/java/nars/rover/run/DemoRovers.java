@@ -8,15 +8,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nars.index.Indexes;
-import nars.op.time.MySTMClustered;
 import nars.Global;
 import nars.NAR;
 import nars.guifx.NARfx;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
+import nars.index.Indexes;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.op.time.MySTMClustered;
 import nars.rover.Sim;
 import nars.rover.obj.*;
 import nars.rover.run.DemoRovers.ManualControl.ManualOverride;
@@ -36,8 +36,8 @@ import java.util.function.Function;
 
 import static javafx.application.Platform.runLater;
 import static nars.guifx.NARfx.newWindow;
-import static nars.guifx.NARfx.scrolled;
-import static nars.rover.obj.NARover.*;
+import static nars.rover.obj.NARover.EAT_FOOD;
+import static nars.rover.obj.NARover.EAT_POISON;
 
 /**
  * Created by me on 6/20/15.

@@ -1,12 +1,12 @@
 package nars.guifx.demo;
 
 import javassist.scopedpool.SoftValueHashMap;
-import nars.nar.util.DefaultConceptBuilder;
+import nars.index.GroupedMapIndex;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
-import nars.index.GroupedMapIndex;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;

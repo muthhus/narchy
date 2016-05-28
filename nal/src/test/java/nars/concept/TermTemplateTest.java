@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
+import static nars.Global.dereference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -24,7 +25,8 @@ public class TermTemplateTest {
         Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
         n.step();
         Concept c = t.concept(n);
-        List<TermTemplate> templates = ((CompoundConcept)c).termLinkTemplates;
+
+        List<TermTemplate> templates = dereference(((CompoundConcept)c).termLinkTemplates);
         assertEquals(8, templates.size());
 
         String s = Joiner.on('\n').join(templates);

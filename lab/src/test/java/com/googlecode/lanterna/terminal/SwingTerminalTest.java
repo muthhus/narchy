@@ -24,7 +24,6 @@ import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  *

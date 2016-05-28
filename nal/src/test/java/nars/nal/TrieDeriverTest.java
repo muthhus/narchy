@@ -2,12 +2,12 @@ package nars.nal;
 
 import com.google.common.collect.Sets;
 import nars.concept.Concept;
+import nars.index.PatternIndex;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.TrieDeriver;
 import nars.nar.Default;
 import nars.term.Termed;
-import nars.index.PatternIndex;
 import org.apache.commons.math3.stat.Frequency;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

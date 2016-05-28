@@ -5,7 +5,6 @@ import automenta.vivisect.swing.NWindow;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 /**
  * "Sokoban 1.0, Written by Yossie Silverman."

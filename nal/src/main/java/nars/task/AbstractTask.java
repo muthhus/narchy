@@ -456,7 +456,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (super.delete()) {
             Reference<Task>[] p = this.parents;
             if (p !=null) {
-                Global.unreference(p);
+                Global.dereference(p);
                 //NO this.parents = null; //dont remove the array, it is there to indicate it is not an input task
             }
             if (!Global.DEBUG)

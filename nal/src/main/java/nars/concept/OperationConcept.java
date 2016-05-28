@@ -8,7 +8,6 @@ import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.truth.Truth;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.Symbols;
@@ -21,6 +22,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -47,7 +50,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
-    @Nullable List<TermTemplate> termLinkTemplates;
+    @Nullable Reference<List<TermTemplate>> termLinkTemplates;
 
     @Nullable
     protected final QuestionTable questions;
@@ -694,45 +697,48 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         if (super.link(b, scale, minScale, nar, conceptOverflow)) {
 
             //3. Link the termlink templates
-            List<TermTemplate> templates = this.termLinkTemplates;
+            List<TermTemplate> templates = Global.dereference(this.termLinkTemplates);
             if (templates == null) {
-                templates = this.termLinkTemplates = TermLinkBuilder.buildFlat(term, nar);
-            }
+                templates = TermLinkBuilder.buildFlat(term, nar);
+//                if (this.termLinkTemplates!=null) {
+//                    System.err.println("GC'd");
+//                }
+                this.termLinkTemplates = new WeakReference(templates);
+            } /*else {
+//                if (this.termLinkTemplates!=null) {
+//                    System.err.println("exist");
+//                }
+            }*/
 
-//            float subScale;
-//            int numTemplates = templates.size();
-//            switch (numTemplates) {
-//                case 0: return true;
-//                //case 1: subScale = 0.5f; break; //HACK
-//                default:
-//                    subScale = scale / numTemplates;
-//            }
-
-            /*if (subScale >= minScale)*/
-            MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
-
-            //int numUnder = 0;
-
-            linkDistribute(b, scale, minScale, nar, templates, subConceptOverflow);
+            linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
 
 
-            float scOver = subConceptOverflow.floatValue();
-            if (scOver > minScale) {
-                // recursive overflow accumulated to callee's overflow
 
-
-                //Simple method: just dispense equal proportion of the overflow to all template concepts equally
-                linkDistribute(b, scOver, minScale, nar, templates, conceptOverflow);
-
-                //TODO More fair method:
-//                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
-//                    int i = nar.random.nextInt(numTemplates);
-//                    for (int n = 0; n < numTemplates; n++) {
-//                        Termed nt = templates.get((i + n) % numTemplates);
+//            /*if (subScale >= minScale)*/
+//            MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
 //
-//                    }
-
-            }
+//            //int numUnder = 0;
+//
+//            linkDistribute(b, scale, minScale, nar, templates, subConceptOverflow);
+//
+//
+//            float scOver = subConceptOverflow.floatValue();
+//            if (scOver > minScale) {
+//                // recursive overflow accumulated to callee's overflow
+//
+//
+//                //Simple method: just dispense equal proportion of the overflow to all template concepts equally
+//                linkDistribute(b, scOver, minScale, nar, templates, conceptOverflow);
+//
+//                //TODO More fair method:
+////                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
+////                    int i = nar.random.nextInt(numTemplates);
+////                    for (int n = 0; n < numTemplates; n++) {
+////                        Termed nt = templates.get((i + n) % numTemplates);
+////
+////                    }
+//
+//            }
             //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
 
 
@@ -762,7 +768,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
+    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
         for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
             TermTemplate tt = templates.get(i);
             float subScale = scale * tt.strength;
@@ -962,4 +968,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     public Iterator iterator() {
         return term.iterator();
     }
+
+
 }

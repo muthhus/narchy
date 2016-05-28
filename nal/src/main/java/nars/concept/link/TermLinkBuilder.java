@@ -93,11 +93,9 @@ public enum TermLinkBuilder {
         List<TermTemplate> sa = Global.newArrayList(total);
         //float fraction = 1f / active;
         float fraction = 1f / total;
+
         for (Termed x : s) {
-            sa.add(new TermTemplate(x,
-                //(x instanceof Variable) ? 0 : fraction
-                fraction
-            ));
+            sa.add(new TermTemplate(x, fraction));
         }
 
         return sa;

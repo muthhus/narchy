@@ -2,9 +2,9 @@ package nars.nar.util;
 
 import nars.Global;
 import nars.NAR;
-import nars.nal.Reasoner;
 import nars.data.Range;
 import nars.nal.Deriver;
+import nars.nal.Reasoner;
 import nars.nal.meta.PremiseEval;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

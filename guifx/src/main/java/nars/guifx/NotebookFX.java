@@ -1,13 +1,9 @@
 package nars.guifx;
 
-import com.google.common.collect.Lists;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import org.fxmisc.richtext.StyleClassedTextArea;
-
-import java.util.List;
 
 /**
  * Console log with embedded interactive controls

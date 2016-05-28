@@ -10,7 +10,6 @@ import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static nars.rover.physics.gl.Box2DJoglPanel.newDefaultConfig;

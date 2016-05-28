@@ -3,7 +3,6 @@ package nars.nal.meta.op;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.Derive;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

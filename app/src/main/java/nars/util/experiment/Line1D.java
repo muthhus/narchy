@@ -1,21 +1,14 @@
 package nars.util.experiment;
 
 import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
-import com.gs.collections.api.block.function.primitive.IntToIntFunction;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.learn.Agent;
-import nars.learn.ql.DQN;
-import nars.learn.ql.HaiQAgent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
 import nars.util.NAgent;
-import nars.util.Optimize;
-import nars.util.Texts;
-import nars.util.data.Util;
-import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.Arrays;
 

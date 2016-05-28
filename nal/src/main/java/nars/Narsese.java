@@ -11,7 +11,6 @@ import com.github.fge.grappa.run.ParsingResult;
 import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
-
 import nars.nal.Tense;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
@@ -27,7 +26,6 @@ import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +36,6 @@ import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.Symbols.*;
-import static nars.Symbols.VAR_PATTERN;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
