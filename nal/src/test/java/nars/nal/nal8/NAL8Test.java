@@ -65,7 +65,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler_simplerBeliefTemporal()  {
         test()
-                .log()
+                //.log()
                 .input("(open(t1) &&+5 [opened]:t1). :|:")
                 .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "[opened]:t1", 1.0f, 0.81f, 5)
@@ -75,7 +75,7 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void subsent_1_even_simpler_simplerGoalEternal()  {
         test()
-                .log()
+                //.log()
                 .input("(open(t1) && [opened]:t1)!")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, ETERNAL)
                 .mustNotOutput(cycles, "open(t1)", '!', 0)
@@ -84,7 +84,7 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
         test()
-                .log()
+                //.log()
                 .input("(open(t1) &&+5 [opened]:t1)! :|:")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
                 .mustNotOutput(cycles, "open(t1)", '!',  ETERNAL) //no eternal
@@ -146,7 +146,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableElimination()  {
 
         test()
-                .log()
+                //.log()
                 .input("at:(SELF,{t003}). :|:")
                 //.input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
@@ -159,7 +159,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
-                .log()
+                //.log()
                 .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
 
@@ -228,7 +228,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void further_detachment()  {
         test()
-            .log()
+            //.log()
             .input("reachable:(SELF,{t002}). :|:")
             .inputAt(10, "(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
             .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5);
@@ -253,7 +253,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction()  {
         test()
-            .log()
+            //.log()
             .input("<(SELF,{t002}) --> reachable>! :|:")
             .inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).")
             .mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f, 0)
@@ -263,14 +263,14 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testExecutionResultConstant() {
         test()
-            .log()
+            //.log()
             .input("<z --> (/,^exe,x,_)>! :|:")
             .mustDesire(64, "exe(x, z)", 1.0f, 0.9f, 0);
     }
 
     @Test public void testExecutionResult()  {
         test()
-            .log()
+                //.log()
             .input("<#1 --> (/,^exe,x,_)>! :|:")
             .mustDesire(64, "exe(x, #1)", 1.0f, 0.9f, 0);
 
@@ -305,7 +305,7 @@ public class NAL8Test extends AbstractNALTest {
     public void detachingCondition(boolean presentOrEternal) {
         String suffix = "(open({t001}) ==>+5 [opened]:{t001})";
         test()
-            .log()
+                //.log()
             .input("at:(SELF,{t001}). :|: ")
             .inputAt(10, "(at:(SELF,{t001}) &&+5 " + suffix + "). " + (presentOrEternal ? ":|:" : "")) //the occurrence time of this event is ignored; what matter is the task
             .mustBelieve(cycles, suffix, 1.0f, 0.43f, 5)
@@ -410,7 +410,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction_2()  {
         test()
-            .log()
+            //.log()
             .input("<({t002},{t003}) --> on>. :|:")
             .inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>)!")
             .mustDesire(cycles, "<(SELF,{t003}) --> at>", 1.0f, 0.81f, 0);
@@ -422,7 +422,7 @@ public class NAL8Test extends AbstractNALTest {
         int time = 124;
 
         test()
-            .log()
+            //.log()
             .input(              "on:({t002},{t003}). :|:")
             .inputAt(10,         "(on:({t002},#1) &&+0 at:(SELF,#1)).")
             .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.43f, 0)
@@ -443,7 +443,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void temporal_goal_detachment_2()  {
         test()
-                .log()
+                //.log()
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
                 .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
@@ -525,7 +525,7 @@ public class NAL8Test extends AbstractNALTest {
 
         TestNAR t = test();
         t
-                .log()
+                //.log()
                 .goal("(x)")
                 .believe("((x)==>(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f);
@@ -534,8 +534,8 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testDeiredImplDelayed() {
 
 
-        TestNAR t = test();
-        t.log()
+        test()
+                //.log()
                 .believe("(x)", Tense.Present, 1f, 0.9f)
                 .goal("((x)&&+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
@@ -552,8 +552,8 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test public void testGoalConjunctionDecompose() {
-        TestNAR t = test();
-        t.log()
+        test()
+                //.log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 .mustNotOutput(cycles, "(y)", '!', 3)
@@ -614,8 +614,8 @@ public class NAL8Test extends AbstractNALTest {
 
 
     @Test public void testGoalConjunctionDecomposeSuffix() {
-        TestNAR t = test();
-        t.log()
+        test()
+                //.log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .inputAt(4, "(x). :|:")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, (4+3))
@@ -658,5 +658,19 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
+    @Test public void testGoalSimilaritySpreading() {
+        test()
+                //.log()
+                .input("(R)!")
+                .input("((G) <-> (R)).")
+                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
+    }
+    @Test public void testNegatedGoalSimilaritySpreading() {
+        test()
+                //.log()
+                .input("(--,(R))!")
+                .input("((G) <-> (R)).")
+                .mustDesire(cycles, "(G)", 0.0f, 0.81f);
+    }
 
 }

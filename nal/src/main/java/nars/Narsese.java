@@ -5,13 +5,12 @@ import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.parsers.BaseParser;
 import com.github.fge.grappa.rules.Rule;
-import com.github.fge.grappa.run.ListeningParseRunner3;
 import com.github.fge.grappa.run.ParseRunner;
 import com.github.fge.grappa.run.ParsingResult;
 import com.github.fge.grappa.run.context.MatcherContext;
-import com.github.fge.grappa.stack.DefaultValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+
 import nars.nal.Tense;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
@@ -47,9 +46,9 @@ public class Narsese extends BaseParser<Object> {
 
 
     //These should be set to something like RecoveringParseRunner for performance
-    private final ParseRunner inputParser = new ListeningParseRunner3(Input());
-    private final ParseRunner singleTaskParser = new ListeningParseRunner3(Task());
-    private final ParseRunner singleTermParser = new ListeningParseRunner3(Term());
+    private final ParseRunner inputParser = new ParseRunner(Input());
+    private final ParseRunner singleTaskParser = new ParseRunner(Task());
+    private final ParseRunner singleTermParser = new ParseRunner(Term());
     //private final ParseRunner singleTaskRuleParser = new ListeningParseRunner3(TaskRule());
 
     //private final Map<String,Term> termCache = new HashMap();
@@ -428,6 +427,10 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
+    protected Object nonNull(Object o) {
+        return o != null ? o : new NullPointerException();
+    }
+
     //@Cached
     Rule Term(boolean oper, boolean meta) {
         /*
@@ -456,11 +459,11 @@ public class Narsese extends BaseParser<Object> {
                         seq(oper,
 
                                 //Term(false, false), //<-- allows non-atom terms for operator names
-                                Atom(), push($.operator((String)pop())), // <-- allows only atoms for operator names, normal
+                                Atom(), push(nonNull($.operator((String)pop()))), // <-- allows only atoms for operator names, normal
 
                                 COMPOUND_TERM_OPENER, s(),
                                 firstOf(
-                                    seq(COMPOUND_TERM_CLOSER, push( $.exec((Operator)pop()))),
+                                    seq(COMPOUND_TERM_CLOSER, push( nonNull($.exec((Operator)pop())) )),
                                     MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, false, false, true)
                                 )
 
@@ -1166,20 +1169,28 @@ public class Narsese extends BaseParser<Object> {
      */
     @NotNull public Term term(@NotNull CharSequence s) throws NarseseException {
 
-        ParsingResult r = singleTermParser.run(s);
+        Exception errorCause = null;
+        ParsingResult r = null;
 
-        FasterList stack = ((DefaultValueStack) r.getValueStack()).stack;
+        try {
+            r = singleTermParser.run(s);
 
-        if (stack.size() == 1) {
-            Object x = stack.get(0);
+            ValueStack stack = r.getValueStack();
 
-            if (x instanceof String)
-                return $.the((String) x);
-            else if (x instanceof Term)
-                return (Term)x;
+            if (stack.size() == 1) {
+                Object x = stack.pop();
+
+                if (x instanceof String)
+                    return $.the((String) x);
+                else if (x instanceof Term)
+                    return (Term)x;
+            }
+
+        } catch (Exception e) {
+            errorCause = e;
         }
 
-        throw new NarseseException(s.toString(), r, null); //+ sstack);
+        throw new NarseseException(s.toString(), r, errorCause);
     }
 
 
@@ -1317,7 +1328,7 @@ public class Narsese extends BaseParser<Object> {
             this(input, null, cause);
         }
         public NarseseException(String input, @NotNull ParsingResult result, Throwable cause) {
-            super(input + "\n" + result.toString(), cause);
+            super(input + "\n" + result, cause);
             this.result = result;
         }
     }

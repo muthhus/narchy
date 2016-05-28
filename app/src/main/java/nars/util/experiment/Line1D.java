@@ -79,9 +79,9 @@ public class Line1D implements Environment {
         float dist =  ((float)Math.abs(yHidden - yEst)) / size;
 
         float closeness = 1f - dist;
-        float reward = ((closeness*closeness*closeness) -0.5f)*2f;
+        //float reward = ((closeness*closeness*closeness) -0.5f)*2f;
         //float reward = dist < speed ? (0.5f/(1f+dist)) : -dist;
-        //float reward = -dist + 0.1f;
+        float reward = -dist + 0.1f;
         //float reward = 1f / (1+dist*dist);
 
 
@@ -170,10 +170,10 @@ public class Line1D implements Environment {
 
         Default nar = new Default(1024, 4, 1, 3);
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.51f);
+        nar.goalConfidence(0.51f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.3f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
 
@@ -182,13 +182,13 @@ public class Line1D implements Environment {
         //nar.log();
 
         new MySTMClustered(nar, 4, '.');
-        int cycles = 10000;
+        int cycles = 3000;
 
         NAgent nagent = new NAgent(nar);
 
         Line1D line = new Line1D(16,
-                //random(50)
-                sine(200)
+                random(50)
+                //sine(30)
         );
 
         float score = line.run(

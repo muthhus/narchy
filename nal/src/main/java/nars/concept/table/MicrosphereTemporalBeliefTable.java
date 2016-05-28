@@ -214,7 +214,10 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
         float ac = a.confWeight();
         float bc = b.confWeight();
         int mid = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
-        return Revision.merge(a, b, now, mid, truth(mid));
+        Truth truth = truth(mid);
+        if (truth == null)
+            return null;
+        return Revision.merge(a, b, now, mid, truth);
     }
 
 

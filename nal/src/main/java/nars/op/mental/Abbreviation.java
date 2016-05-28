@@ -3,6 +3,7 @@ package nars.op.mental;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -43,6 +44,7 @@ public class Abbreviation implements Consumer<Task> {
     @NotNull
     private final NAR nar;
     private final String termPrefix;
+    private nars.budget.Budgeted NewAbbreviationBudget = UnitBudget.Full.cloneMult(0.9f, 0.5f, 0.5f);
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix) {
@@ -121,7 +123,7 @@ public class Abbreviation implements Consumer<Task> {
 
                     Term id = newSerialTerm();
 
-                    Concept abbreviation = nar.concept(newAbbreviation(abbreviated, id));
+                    Concept abbreviation = nar.conceptualize(newAbbreviation(abbreviated, id), NewAbbreviationBudget);
                     if (abbreviation != null) {
 
                         abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
@@ -131,8 +133,7 @@ public class Abbreviation implements Consumer<Task> {
 
                         nar.input(
                                 new MutableTask(abbreviation, Symbols.BELIEF,
-                                        new DefaultTruth(1, abbreviationConfidence.floatValue()))
-                                        .present(nar)
+                                        $.t(1, abbreviationConfidence.floatValue()))
                         );
 
                     }

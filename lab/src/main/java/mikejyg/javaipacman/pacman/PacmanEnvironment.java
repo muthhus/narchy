@@ -28,6 +28,7 @@ import nars.index.Indexes;
 import nars.learn.ql.DPG;
 import nars.learn.ql.DQN;
 import nars.nar.Default;
+import nars.op.mental.Abbreviation;
 import nars.op.time.MySTMClustered;
 import nars.task.DerivedTask;
 import nars.task.Task;
@@ -46,7 +47,7 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 2;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -70,16 +71,24 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
 
-		nar.beliefConfidence(0.55f);
-		nar.goalConfidence(0.55f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.65f);
+		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(256);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
+
+		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
+		//nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");
+
+		//nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((0,#x),(1,#x)). %1.0;1.0%");
+		//nar.inputAt(20,"$1.0;0.8;1.0$ rightOf:((1,#x),(2,#x)). %1.0;1.0%");
+		//nar.inputAt(20,"$1.0;0.8;1.0$ ( ( (($x,$y)-->$a) && (($x,$y)-->$b) ) ==> samePlace:(($x,$y),$a,$b) ). %1.0;1.0%");
+		//nar.inputAt(100,"$1.0;0.8;1.0$ samePlace:(#x,#y,#a,#b)?");
 
 		//nar.log();
 		//nar.logSummaryGT(System.out, 0.1f);
@@ -92,6 +101,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			return false;
 		});
 
+		new Abbreviation(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 
@@ -153,7 +163,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 			int visionDiameter = 2 * visionRadius + 1;
 
-			((NAgent) a).setSensorNamer((i) -> {
+			NAgent nar = (NAgent) a;
+
+
+			nar.setSensorNamer((i) -> {
 				int cell = i / 3;
 				int type = i % 3;
 				Atom typeTerm;
@@ -169,7 +182,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				int dy = cell / visionDiameter;
 				Term squareTerm = $.p($.the(dx), $.the(dy));
 				//return $.p(squareTerm, typeTerm);
-				return $.instprop(squareTerm, typeTerm);
+				return $.prop(squareTerm, typeTerm);
 				//return (Compound)$.inh($.the(square), typeTerm);
 			});
 		}

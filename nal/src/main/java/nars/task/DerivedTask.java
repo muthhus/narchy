@@ -49,8 +49,8 @@ public final class DerivedTask extends MutableTask {
 //                //TODO for Questions?
 //            }
 
-            float decayFactor = 1f - ((isBeliefOrGoal() ? conf() : qua() ) *durability);
-            multiplyPremise(decayFactor, false);
+//            float decayFactor = 1f - ((isBeliefOrGoal() ? conf() : qua() ) *durability);
+//            multiplyPremise(decayFactor, false);
 
             return true;
         }

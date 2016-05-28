@@ -863,8 +863,8 @@ public class PremiseRule extends GenericCompound {
                 constraints);
 
 
-        if (taskPunc!='?') {
-            //add explicit no-questions rule
+        if (taskPunc==0) {
+            //default: add explicit no-questions rule
             pres.add(TaskPunctuation.NotQuestion);
         }
 

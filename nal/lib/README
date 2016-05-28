@@ -1,0 +1,9 @@
+This is temporary until OW2 ASM releases a maven repo for v6 that fixes the JDK9
+classfile header issue
+
+built with:
+
+svn checkout svn://svn.forge.objectweb.org/svnroot/asm/branches/ASM_6_FUTURE
+ant jar
+
+Once ASM6 is released this folder will be removed
