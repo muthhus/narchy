@@ -144,7 +144,7 @@ public interface Concept extends Termed, Comparable {
         return desire(now, now);
     }
 
-    void capacity(ConceptBudgeting cold);
+    void capacity(ConceptBudgeting c);
 
     boolean contains(Task t);
 
