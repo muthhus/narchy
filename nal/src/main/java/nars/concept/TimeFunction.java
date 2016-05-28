@@ -9,6 +9,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -189,11 +190,13 @@ public interface TimeFunction {
         //HACK to handle commutive switching so that the dt is relative to the effective subject
         if (derived.op().commutative) {
 
-            Compound bt = prem.belief().term();
+            Term bt = p.beliefTerm;
             Term d0 = derived.term(0);
 
-            if (d0.equals(bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
-                     d0.equalsIgnoringVariables(bt)) //last chance: try by ignoring variables to handle variable introduction cases
+            if (Terms.equalOrNegationOf(d0,bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
+                    (d0.equalsIgnoringVariables(bt) || Terms.equalOrNegationOf(d0, bt))
+
+                    ) //last chance: try by ignoring variables to handle variable introduction cases
                 eventDelta *= -1;
         }
 
@@ -230,13 +233,13 @@ public interface TimeFunction {
 
         Task premBelief = prem.belief();
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? prem.task() : p.beliefTerm).term();
+        Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
         long occDecomposed = decomposeTask ? prem.task().occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
         Task otherTask = decomposeTask ? premBelief : prem.task();
-        Term otherTerm = decomposeTask ? p.beliefTerm.term() : prem.task().term();
+        Term otherTerm = decomposeTask ? p.beliefTerm.term() : p.taskTerm;
         long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : ETERNAL;
 
 
@@ -262,16 +265,16 @@ public interface TimeFunction {
                     Term d0 = p.resolveNormalized(decomposedTerm.term(0));
                     Term d1 = p.resolveNormalized(decomposedTerm.term(1));
 
-                    if (otherTerm.equals(decomposedTerm)) {
-                        if (d0.equals(derived)) {
+                    if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
+                        if (Terms.equalOrNegationOf(d0, derived)) {
                             shift = 0; //beginning, assume its relative to the occurrenc
                         } else {
                             shift = dtDecomposed;
                         }
                     } else {
-                        if (d0.equals(derived) && d1.equals(otherTerm)) {
+                        if (Terms.equalOrNegationOf(d0,derived) && Terms.equalOrNegationOf(d1,otherTerm)) {
                             shift = -dtDecomposed; //shift negative
-                        } else if (d1.equals(derived) && d0.equals(otherTerm)) {
+                        } else if (Terms.equalOrNegationOf(d1,derived) && Terms.equalOrNegationOf(d0,otherTerm)) {
                             shift = dtDecomposed; //shift positive
                         }
                     }
@@ -294,9 +297,9 @@ public interface TimeFunction {
                     Term d0 = p.resolve(decomposedTerm.term(0));
                     Term d1 = p.resolve(decomposedTerm.term(1));
 
-                    if (d0.equals(derived)) {
+                    if (Terms.equalOrNegationOf(d0, derived)) {
                         shift = 0; //beginning
-                    } else if (d1.equals(derived)) {
+                    } else if (Terms.equalOrNegationOf(d1, derived)) {
                         shift = dtDecomposed; //offset
                     }
 
@@ -315,7 +318,6 @@ public interface TimeFunction {
         }
 
     }
-
 
 
 //        int shift = 0;
@@ -478,7 +480,7 @@ public interface TimeFunction {
         if (o != ETERNAL) {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-                long ddt = premise.task().term().dt();
+                long ddt = p.taskTerm.dt();
                 if (ddt != DTERNAL)
                     o += ddt;
             } else if (taskOrBelief && !end) {
@@ -638,20 +640,20 @@ public interface TimeFunction {
                     Compound tpp = (Compound) tp;
                     Compound bpp = (Compound) bp;
 
-                    if (tpp.term(1).equals(bpp.term(0))) {
+                    if (Terms.equalOrNegationOf(tpp.term(1),bpp.term(0))) {
                         t = td + bd;
 
                         //chained inner
-                        if (!cb.equals(bpp.term(1))) {
+                        if (!Terms.equalOrNegationOf(cb,bpp.term(1))) {
                             t = -t; //invert direction
                         }
-                    } else if (tpp.term(0).equals(bpp.term(1))) {
+                    } else if (Terms.equalOrNegationOf(tpp.term(0),bpp.term(1))) {
                         //chain outer
                         t = td + bd; //?? CHECK
-                    } else if (tpp.term(0).equals(bpp.term(0))) {
+                    } else if (Terms.equalOrNegationOf(tpp.term(0),bpp.term(0))) {
                         //common left
                         t = td - bd;
-                    } else if (tpp.term(1).equals(bpp.term(1))) {
+                    } else if (Terms.equalOrNegationOf(tpp.term(1),bpp.term(1))) {
                         //common right
                         t = bd - td;
                     } else {
@@ -678,7 +680,9 @@ public interface TimeFunction {
                         boolean reversed = false;
                     /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
                         if (derived.op().commutative) {
-                            if (!p.resolve(((Compound) cp).term(0)).equals(derived.term(0))) {
+                            if (!Terms.equalOrNegationOf(
+                                    p.resolve(((Compound) cp).term(0)),
+                                    derived.term(0))) {
                                 occDiff = -occDiff;
                                 reversed = true;
                             }
@@ -809,7 +813,7 @@ public interface TimeFunction {
                     if (ot != DTERNAL) {
                         if (tp instanceof Compound) {
                             Compound ctp = (Compound) tp;
-                            if (ctp.term(0).equals(cp)) {
+                            if (Terms.equalOrNegationOf(ctp.term(0),cp)) {
                                 ot -= td;
                             }
                         }
@@ -819,7 +823,7 @@ public interface TimeFunction {
                         if (belief.occurrence() != task.occurrence()) { //why?
                             if (bp instanceof Compound) {
                                 Compound cbp = (Compound) bp;
-                                if (!cbp.term(1).equals(cp)) {
+                                if (!Terms.equalOrNegationOf(cbp.term(1), cp)) {
                                     ob -= bd;
                                 }
                             }

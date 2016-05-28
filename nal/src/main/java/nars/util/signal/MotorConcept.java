@@ -11,6 +11,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -158,8 +159,10 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         super.run();
 
         long now = nar.time();
-        float desired = this.desire(now).motivation();
-        float believed = this.belief(now).motivation();
+        @Nullable Truth d = this.desire(now);
+        float desired = d!=null ? d.expectation() : 0.5f;
+        @Nullable Truth b = this.belief(now);
+        float believed = b!=null ? b.expectation() : 0.5f;
 
         float response = motor.motor(believed, desired);
 
@@ -180,15 +183,15 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
         //if (belief.evidence().length > 1) {
 
-        //Filter feedback that contradicts the sensor's provided beliefs
-        if (belief!=feedback.next()) {
-            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
-
-            //TODO delete its non-input parent tasks?
-            onConflict(belief);
-
-            return null;
-        }
+//        //Filter feedback that contradicts the sensor's provided beliefs
+//        if (belief!=feedback.next()) {
+//            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+//
+//            //TODO delete its non-input parent tasks?
+//            onConflict(belief);
+//
+//            return null;
+//        }
 
         return super.processBelief(belief, nar);
     }

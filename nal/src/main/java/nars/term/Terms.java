@@ -84,6 +84,17 @@ public class Terms extends TermBuilder implements TermIndex {
         return l;
     }
 
+    public static boolean equalOrNegationOf(Term a, Term b) {
+        if (a.op() == b.op()) {
+            return a.equals(b);
+        } else if (a.op() == NEGATE) {
+            return ((Compound)a).term(0).equals(b);
+        } else if (b.op() == NEGATE) {
+            return ((Compound)b).term(0).equals(a);
+        }
+        return false;
+    }
+
     @NotNull @Override
     public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
         return new GenericCompound(op, relation, subterms).dt(dt);

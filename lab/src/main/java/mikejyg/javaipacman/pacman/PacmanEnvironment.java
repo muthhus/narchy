@@ -46,11 +46,11 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 1;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 1;
+	private final int pacmanCyclesPerFrame = 8;
 	float bias = -0.15f; //pain of boredom
 
 	public PacmanEnvironment(int ghosts) {
@@ -62,23 +62,26 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 4, 1, 2, rng,
+				1024, 8, 1, 2, rng,
 				//new Indexes.WeakTermIndex(128 * 1024, rng),
 				new Indexes.SoftTermIndex(128 * 1024, rng),
 				//new Indexes.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
-		nar.beliefConfidence(0.25f);
-		nar.goalConfidence(0.45f);
+
+		nar.beliefConfidence(0.55f);
+		nar.goalConfidence(0.55f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(128);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
+
+		//nar.log();
 		//nar.logSummaryGT(System.out, 0.1f);
 		nar.log(System.err, v -> {
 			if (v instanceof Task) {
@@ -92,16 +95,20 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 
+		NAgent n = new NAgent(nar);
+
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
 				//new DPG(),
 				//new HaiQAgent(),
-				new NAgent(nar),
-				25500);
+				n,
+				4500);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
+		n.printActions();
+		nar.core.active.print();
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
 //				Concept c = (Concept)t;

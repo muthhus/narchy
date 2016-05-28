@@ -33,6 +33,9 @@ public class DefaultConceptBudgeting implements ConceptBudgeting {
     /** no eternal; use allocated eternal capacity added to temporals */
     public static void beliefCapacityNonEternal(CompoundConcept c, ConceptBudgeting p) {
         c.beliefs().capacity(0, p.beliefCap(c, true, true) + p.beliefCap(c, true, false));
+    }
+    /** no eternal; use allocated eternal capacity added to temporals */
+    public static void goalCapacityNonEternal(CompoundConcept c, ConceptBudgeting p) {
         c.goals().capacity(0, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
     }
 

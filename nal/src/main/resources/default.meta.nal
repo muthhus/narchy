@@ -317,6 +317,8 @@
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A..+), X, time(decomposeTaskIfBefore), task("!") |- X, (Desire:StructuralStrong)
     (&&,X,A), B, time(decomposeTask), task("!")            |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
+    //B, (&&,X,A), time(decomposeBelief), task("!")          |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
+
         //TODO use ellipsis here?
 
 

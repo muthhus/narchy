@@ -410,8 +410,19 @@ public class NAL5Test extends AbstractNALTest {
 //    }
 
 
-
-
+    @Test public void testNegatedImplicationTerm4() {
+        test()
+                .input("a:b. %0.0;0.90%")
+                .input("((--,a:b) ==> (--,(R))).")
+                //.mustDesire(cycles, "a:b", 0.0f, 0.81f)
+                .mustBelieve(cycles, "(R)", 0.0f, 0.81f);
+    }
+    @Test public void testNegatedImplicationTerm5() {
+        test()
+                .input("(R). %0.0;0.90%")
+                .input("((--,a:b) ==> (--,(R))).")
+                .mustBelieve(cycles, "a:b", 0.0f, 0.81f);
+    }
     //NO	((<(--,p1) ==> p2>, p2), (<(--,p2) ==> p1>, (<Contraposition --> Truth>, <AllowBackward --> Derive>)))
 
 }

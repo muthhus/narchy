@@ -82,7 +82,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     private BudgetMerge mergeDefault() {
-        return BudgetMerge.plusDQBlend;
+        return BudgetMerge.avgDQBlend;
+        //return BudgetMerge.plusDQBlend;
         //return BudgetMerge.plusDQDominant;
     }
 

@@ -13,8 +13,8 @@ public final class MatchOneSubterm extends MatchTerm {
     /** which premise component, 0 (task) or 1 (belief) */
     private final int subterm;
 
-    public MatchOneSubterm(@NotNull Term pid, @NotNull Term id, int subterm, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable ProcTerm eachMatch) {
-        super(pid, id, pattern, constraints, eachMatch);
+    public MatchOneSubterm(@NotNull Term id, int subterm, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable ProcTerm eachMatch) {
+        super(id, pattern, constraints, eachMatch);
         this.subterm = subterm;
     }
 

@@ -170,14 +170,14 @@ public class Line1D implements Environment {
 
         Default nar = new Default(1024, 4, 1, 3);
 
-        nar.beliefConfidence(0.1f);
-        nar.goalConfidence(0.1f);
+        nar.beliefConfidence(0.75f);
+        nar.goalConfidence(0.75f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.4f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.3f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.2f;
 
-        nar.cyclesPerFrame.setValue(4);
+        nar.cyclesPerFrame.setValue(32);
 
         //nar.log();
 
@@ -209,6 +209,7 @@ public class Line1D implements Environment {
                 }
             }
         });
+        nagent.printActions();
 
         System.err.println(score);
 

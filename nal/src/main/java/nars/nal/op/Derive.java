@@ -102,6 +102,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if (raw.varPattern() != 0)
             return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
 
+        derive(m, raw);
+
+    }
+
+    final void derive(@NotNull PremiseEval m, Term raw) {
         ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 
@@ -162,7 +167,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
         premise.derive(content, truth, budget, nar.time(), occ, m, this);
-
     }
 
 

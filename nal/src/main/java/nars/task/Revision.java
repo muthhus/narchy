@@ -176,9 +176,7 @@ public class Revision {
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
         Compound cc = dtMerge(a, b, aProp, accumulatedDifference, 1f);
-        if (accumulatedDifference.floatValue() > 0) {
-            System.err.println("OK");
-        }
+
 
         //how far away from 0.5 the weight point is, reduces the difference value because less will have changed
         float weightDivergence = 1f - (Math.abs(aProp - 0.5f) * 2f);
@@ -245,9 +243,7 @@ public class Revision {
             newDT = adt;
         }
 
-        if (a.size() != 2) {
-            throw new RuntimeException("wtf");
-        }
+
         Term a0 = a.term(0);
         Term a1 = a.term(1);
         if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {

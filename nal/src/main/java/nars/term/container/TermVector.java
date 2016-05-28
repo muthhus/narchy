@@ -141,8 +141,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     @NotNull public final T term(int i) {
-        if (i >= term.length)
-            System.err.println("WTF");
         return term[i];
     }
 

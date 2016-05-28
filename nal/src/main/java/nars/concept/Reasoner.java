@@ -119,6 +119,7 @@ abstract public class Reasoner {
         //convert to array for fast for-within-for iterations
         //BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
+
         for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
             BLink<Task> taskLink = tasksBuffer.get(i);
             //for (BLink<Task> taskLink : tasksArray) {

@@ -46,7 +46,8 @@ public final class SubTermStructure extends AtomicBoolCondition {
         if (matchingType != Op.VAR_PATTERN)
             bits &= (~matchingType.bit);
 
-        bits &= (~Op.NEGATE.bit); //dont filter based on negation
+        //bits &= (~Op.NEGATE.bit); //filter based on negation
+
         return bits;
     }
 }

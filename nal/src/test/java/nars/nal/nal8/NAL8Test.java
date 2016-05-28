@@ -443,7 +443,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void temporal_goal_detachment_2()  {
         test()
-                //.log()
+                .log()
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
                 .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
@@ -626,13 +626,37 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void testInhibition()  {
-        TestNAR tester = test();
-        tester.goal("(reward)");
-        tester.believe("((good) ==> (reward))", 1, 0.9f);
-        tester.believe("((--,(bad)) ==> (reward))", 1, 0.9f);
-
-        tester.mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+        test()
+            .goal("(reward)")
+            .believe("((good) ==> (reward))", 1, 0.9f)
+            .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
+            .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
 
     }
+
+    @Test public void testNegatedImplicationTerm1() {
+
+        test()
+                .goal("(R)")
+                .input("((--,a:b) ==>+0 (R)). :|:")
+                .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
+    }
+
+    @Test public void testNegatedImplicationTerm2() {
+
+        test()
+                .input("(R)! :|:")
+                .input("((--,a:b) ==>+0 (R)).")
+                .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
+
+    }
+    @Test public void testNegatedImplicationTerm3() {
+        test()
+                .input("(R). :|:")
+                .input("((--,a:b) &&+0 (R))!")
+                .mustDesire(cycles, "a:b", 0.0f, 0.81f, 0);
+    }
+
+
 
 }

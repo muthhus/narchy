@@ -10,6 +10,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -293,6 +294,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             if (lowestUnsorted != -1)  {
                 qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
+
+
             } // else: perfectly sorted
 
             removeDeletedAtBottom();
@@ -400,6 +403,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
 
 
+    /** http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java */
 
     public static void qsort(int[] stack, BLink[] c, int start, int size) {
         int left = start, right = size - 1, stack_pointer = -1;
@@ -413,7 +417,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                     swap = c[j];
                     i = j - 1;
                     while (i >= left && cmpGT(c[i], swap)) {
-                        c[i + 1] = c[i--];
+                        BLink x = c[i];
+                        c[i] = c[i+1];
+                        c[i+1] = x;
+                        i--;
                     }
                     c[i + 1] = swap;
                 }

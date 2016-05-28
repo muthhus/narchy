@@ -3,6 +3,7 @@ package nars.nal.meta.op;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.op.Derive;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,7 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 
     private final String idString;
 
-    public MatchTerm(@NotNull Term pid, @NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable ProcTerm eachMatch) {
+    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable ProcTerm eachMatch) {
         //this.pid = pid;
         this.id = id;
         this.idString = id.toString();
