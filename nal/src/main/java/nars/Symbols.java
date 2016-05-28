@@ -21,6 +21,8 @@
 package nars;
 
 
+import com.gs.collections.api.map.ImmutableMap;
+import com.gs.collections.impl.factory.Maps;
 import com.gs.collections.impl.map.mutable.primitive.CharObjectHashMap;
 
 import java.util.Collections;
@@ -159,8 +161,8 @@ public enum Symbols {
         }
     }
 
-    protected static final Map<String,Op> stringToOperator
-            = Collections.unmodifiableMap(_stringToOperator);
+    protected static final ImmutableMap<String,Op> stringToOperator
+            = Maps.immutable.ofMap(_stringToOperator);
 
 //    protected static final CharObjectHashMap<Op> charToOperator
 //            = (_charToOperator);

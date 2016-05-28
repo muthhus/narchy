@@ -1,6 +1,7 @@
 package nars;
 
 import com.github.fge.grappa.Grappa;
+import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.parsers.BaseParser;
@@ -37,6 +38,7 @@ import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.Symbols.*;
+import static nars.Symbols.VAR_PATTERN;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -428,10 +430,10 @@ public class Narsese extends BaseParser<Object> {
 
 
     protected Object nonNull(Object o) {
-        return o != null ? o : new NullPointerException();
+        return o != null ? o : new MiniNullPointerException();
     }
 
-    //@Cached
+    @Cached
     Rule Term(boolean oper, boolean meta) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -486,14 +488,14 @@ public class Narsese extends BaseParser<Object> {
 
                                 firstOf(
                                     EmptyCompound(SET_EXT_CLOSER, SET_EXT),
-                                    MultiArgTerm(SET_EXT, SET_EXT_CLOSER)
+                                    MultiArgTerm(SET_EXT, SET_EXT_CLOSER, false, false, false, false)
                                 )
                         ),
 
                         seq(SET_INT.str,
                                 firstOf(
                                     EmptyCompound(SET_INT_CLOSER, SET_INT),
-                                    MultiArgTerm(SET_INT, SET_INT_CLOSER)
+                                    MultiArgTerm(SET_INT, SET_INT_CLOSER, false, false, false, false)
                                 )
                         ),
 
@@ -783,15 +785,22 @@ public class Narsese extends BaseParser<Object> {
                         | "?"[<word>]                        // query variable in question
                         | "%"[<word>]                        // pattern variable in rule
         */
-        return firstOf(
-                sequence(Symbols.VAR_INDEPENDENT, Atom(), push($.v(VAR_INDEP, (String) pop()))),
-                sequence(Symbols.VAR_DEPENDENT, Atom(), push($.v(VAR_DEP, ((String) pop())))),
-                sequence(Symbols.VAR_QUERY, Atom(), push($.v(Op.VAR_QUERY, (String) pop()))),
-                sequence(Symbols.VAR_PATTERN, Atom(), push($.v(Op.VAR_PATTERN, (String) pop())))
-//                anyOf(variables),
-//                push(match().charAt(0)), Atom(), swap(),
-//                    push($.v((char)pop(), (String) pop())
-//                )
+        return sequence(
+                anyOf(new char[] {
+                        Symbols.VAR_INDEPENDENT,
+                        Symbols.VAR_DEPENDENT,
+                        Symbols.VAR_QUERY,
+                        Symbols.VAR_PATTERN
+                } ),
+                push(match()),
+                Atom(),
+                swap(),
+                push( $.v( ((String)pop()).charAt(0), (String)pop()))
+//
+//                sequence(Symbols.VAR_INDEPENDENT, Atom(), push($.v(VAR_INDEP, (String) pop()))),
+//                sequence(Symbols.VAR_DEPENDENT, Atom(), push($.v(VAR_DEP, ((String) pop())))),
+//                sequence(Symbols.VAR_QUERY, Atom(), push($.v(Op.VAR_QUERY, (String) pop()))),
+//                sequence(Symbols.VAR_PATTERN, Atom(), push($.v(Op.VAR_PATTERN, (String) pop())))
         );
     }
 
@@ -862,19 +871,11 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    //@Cached
-    Rule MultiArgTerm(Op open, char close) {
-        return MultiArgTerm(open, /*open, */close, false, false, false, false);
-    }
-
-//    boolean OperationPrefixTerm() {
-//        return push(new Object[]{termable(pop()), (Operator.class)});
-//    }
 
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    //@Cached
+    @Cached
     Rule MultiArgTerm(Op defaultOp, char close, boolean initialOp, boolean allowInternalOp, @Deprecated boolean spaceSeparates, boolean operatorPrecedes) {
 
 
@@ -1330,6 +1331,14 @@ public class Narsese extends BaseParser<Object> {
         public NarseseException(String input, @NotNull ParsingResult result, Throwable cause) {
             super(input + "\n" + result, cause);
             this.result = result;
+        }
+    }
+
+    private static class MiniNullPointerException extends NullPointerException {
+
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            return null;
         }
     }
 }
