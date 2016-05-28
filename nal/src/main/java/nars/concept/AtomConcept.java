@@ -17,11 +17,6 @@ import org.jetbrains.annotations.Nullable;
 public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements Atomic {
 
 
-//    /** creates with no termlink and tasklink ability */
-//    public AtomConcept(Term atom, Budget budget) {
-//        this(atom, budget, new NullBag(), new NullBag());
-//    }
-
 
     public AtomConcept(@NotNull E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(atom, termLinks, taskLinks);

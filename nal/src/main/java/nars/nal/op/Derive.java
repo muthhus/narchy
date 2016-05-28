@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.ConceptProcess;
+import nars.nal.ConceptProcess;
 import nars.nal.TimeFunction;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;

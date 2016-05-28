@@ -1,7 +1,7 @@
 package nars.task;
 
 import nars.bag.BLink;
-import nars.concept.ConceptProcess;
+import nars.nal.ConceptProcess;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;

@@ -3,7 +3,6 @@ package nars.nal;
 import nars.Global;
 import nars.Op;
 import nars.Premise;
-import nars.concept.ConceptProcess;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.Task;

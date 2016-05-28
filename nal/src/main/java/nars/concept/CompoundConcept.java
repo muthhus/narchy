@@ -451,6 +451,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
 
+//doesnt fully work yet
+//    @Override @NotNull public final CompoundConcept term() {
+//        return this;
+//    }
+
+
     public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
         long now = nar.time();
         return Revision.merge(x, y, now, when,
@@ -936,7 +942,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         if (cycles == DTERNAL)
             return this;
 
-        throw new UnsupportedOperationException();
+        return term.dt(cycles);
     }
 
     @Override

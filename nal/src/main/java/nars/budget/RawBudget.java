@@ -64,7 +64,7 @@ public class RawBudget extends Budget {
      * @return The current durability
      */
     @Override
-    @Deprecated public final float dur() {
+    public final float dur() {
         return durability;
     }
 
@@ -76,7 +76,7 @@ public class RawBudget extends Budget {
      * @return The current quality
      */
     @Override
-    @Deprecated public final float qua() {
+    public final float qua() {
         return quality;
     }
 

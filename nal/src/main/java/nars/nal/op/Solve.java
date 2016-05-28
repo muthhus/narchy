@@ -1,16 +1,12 @@
 package nars.nal.op;
 
-import nars.Global;
 import nars.Op;
 import nars.Symbols;
-import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TruthOperator;
-import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Evaluates the truth of a premise

@@ -63,7 +63,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         super(term, n);
 
-        assert (Op.isOperation(term()));
+        assert (Op.isOperation(this));
 
         //this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 

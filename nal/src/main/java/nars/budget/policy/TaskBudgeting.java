@@ -4,7 +4,7 @@ import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.concept.ConceptProcess;
+import nars.nal.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;

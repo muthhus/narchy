@@ -6,7 +6,6 @@ import nars.Op;
 import nars.bag.BLink;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.ConceptProcess;
 import nars.term.subst.UnifySubst;
 import nars.concept.table.BeliefTable;
 import nars.nal.meta.PremiseEval;
