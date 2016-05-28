@@ -4,6 +4,7 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -64,9 +65,15 @@ public interface TermIndex {
      * set if not absent
      */
     @Nullable
-    Termed set(@NotNull Termed t);
+    Termed set(@NotNull Termed src, Termed target);
 
-    //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+    @Nullable
+    default Termed set(@NotNull Termed t) {
+        return set(t, t);
+    }
+
+
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
     //return builder().make(op, relation, subterms, dt);
     //}
 
@@ -602,6 +609,11 @@ public interface TermIndex {
     default Term remap(Map<Term, Term> m, Term src) {
         return resolve(src, new MapSubst(m)).term();
     }
+
+    default Termed remove(Termed entry) {
+        throw new UnsupportedOperationException();
+    }
+
 
     final class InvalidConceptTerm extends RuntimeException {
 

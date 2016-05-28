@@ -1,7 +1,6 @@
 package nars.concept;
 
 import nars.NAR;
-import nars.Op;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
@@ -9,17 +8,12 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.*;
-import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 /** aliases one concept with another.
  *
@@ -32,9 +26,27 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
     private final Compound alias;
 
-    public ProxyCompoundConcept(Compound alias, CompoundConcept target) {
+    public ProxyCompoundConcept(Compound alias, CompoundConcept target, NAR n) {
         this.alias = alias;
-        this.target = target;
+
+        this.target = (CompoundConcept) n.index.remove(target);
+        n.index.set(target, this);
+        n.index.set(alias, this);
+    }
+
+    @Override
+    public int hashCode() {
+        return alias.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return alias.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return target.toString();
     }
 
     @Override
@@ -45,12 +57,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     @NotNull
     @Override
     public Compound term() {
-        return alias;
+        return this;
     }
 
     @Override
     public boolean contains(Task t) {
-        return target.tableFor(t.punc()).get(t) != null;
+        return target.contains(t);
     }
 
     /**
@@ -128,5 +140,9 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         target.capacity(c);
     }
 
+
+    public String toStringActual() {
+        return getClass().getSimpleName() + "(" + alias + " ===> " + target + ")";
+    }
 
 }

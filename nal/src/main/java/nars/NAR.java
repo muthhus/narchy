@@ -992,11 +992,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         pw.close();
     }
 
-    /** inserts an explicitly specified concept instance */
-    public void on(@NotNull Termed t) {
-        index.set(t);
-    }
-
 
 //    @Nullable
 //    public Term eval(@NotNull String x) throws NarseseException {

@@ -22,6 +22,11 @@ public class SimpleMapIndex extends AbstractMapIndex {
     }
 
 
+    @Override
+    public Termed remove(Termed entry) {
+        return data.remove(entry);
+    }
+
     @Nullable
     @Override
     protected final Termed theCompound(@NotNull Compound x, boolean create) {
@@ -64,11 +69,11 @@ public class SimpleMapIndex extends AbstractMapIndex {
 
     @Nullable
     @Override
-    public final Termed set(@NotNull Termed t) {
-        Termed existing = data.putIfAbsent(t, t);
-        if ((existing !=null) && (existing!=t))
+    public final Termed set(@NotNull Termed src, Termed target) {
+        Termed existing = data.putIfAbsent(src, target);
+        if ((existing !=null) && (existing!=target))
             throw new RuntimeException("pre-existing value");
-        return t;
+        return target;
     }
 
     @Override

@@ -3,6 +3,7 @@ package nars.concept;
 import nars.$;
 import nars.NAR;
 import nars.nar.Default;
+import nars.term.Compound;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
@@ -17,20 +18,27 @@ public class ProxyCompoundConceptTest {
     public void testProxy1() {
         NAR n = new Default();
 
-        String t = "(a --> b)";
-        String p = "(c)";
+        String abString = "(a --> b)";
+        String cString = "(c)";
 
-        n.input(t + ".");
-        CompoundConcept ab = (CompoundConcept) n.concept(t);
+        n.input(abString + ".");
+        CompoundConcept ab = (CompoundConcept) n.concept(abString);
 
-        ProxyCompoundConcept c = new ProxyCompoundConcept($.$(p), ab);
-        n.on(c);
+        Compound cTerm = nars.$.$(cString);
+        ProxyCompoundConcept C = new ProxyCompoundConcept(cTerm, ab, n);
+        assertEquals(cTerm, C);
 
-        @Nullable Concept P = n.concept(p);
-        assertNotNull(P);
-        assertEquals(2, P.termlinks().size());
+        Concept C1 = n.concept(cString);
+        assertNotNull(C1);
+        assertTrue(C1 == C);
+        assertEquals(2, C1.termlinks().size());
 
+        Concept R = n.concept(abString);
+        assertEquals(ProxyCompoundConcept.class, R.getClass());
+        System.out.println(R + " " + ((ProxyCompoundConcept)R).toStringActual());
 
+        assertEquals(ProxyCompoundConcept.class, n.concept(cString).getClass());
+        assertTrue(n.concept(abString) == n.concept(cString));
     }
 
 }

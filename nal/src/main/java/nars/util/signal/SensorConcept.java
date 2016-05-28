@@ -38,7 +38,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         super(term, n);
 
         this.sensor = new Sensor(n, this, this, truth);
-        n.on(this);
+        n.index.set(this);
 
         this.input = input;
 

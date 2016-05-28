@@ -169,15 +169,15 @@ public class GroupedMapIndex extends AbstractMapIndex {
 
     @Nullable
     @Override
-    public Termed set(@NotNull Termed t) {
+    public Termed set(@NotNull Termed src, Termed target) {
         //TODO support Atomic insertion
 
-        SubtermNode node = getOrAddNode(((Compound) t.term()).subterms());
-        Termed existing = node.put(t.opRel(), t);
-        if (existing!=null && existing!=t)
-            throw new RuntimeException(t + " can not be set because " + existing + " already exists");
-        assert(existing==null || existing == t);
-        return t;
+        SubtermNode node = getOrAddNode(((Compound) src.term()).subterms());
+        Termed existing = node.put(src.opRel(), target);
+        if (existing!=null && existing!=target)
+            throw new RuntimeException(target + " can not be set because " + existing + " already exists");
+
+        return target;
     }
 
     @Override

@@ -109,7 +109,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
     @Nullable
     @Override
-    public Termed set(@NotNull Termed t) {
+    public Termed set(@NotNull Termed s, Termed t) {
         throw new UnsupportedOperationException();
     }
 
