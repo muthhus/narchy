@@ -28,6 +28,10 @@ public class Terminal extends AbstractNAR {
     final Predicate<Task> taskFilter =
             Task::isCommand;
 
+    public Terminal() {
+        this(1024);
+    }
+
     public Terminal(int capacity) {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }

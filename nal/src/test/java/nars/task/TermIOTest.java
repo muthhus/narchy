@@ -2,10 +2,10 @@ package nars.task;
 
 import nars.NAR;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import nars.util.IO;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,21 +18,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by me on 3/28/16.
+ * Term serialization
  */
-public class TermCodecTest {
+public class TermIOTest {
 
-
-
-
-    final static FSTConfiguration conf = IO.TermCodec.the;
-
+    final static NAR nar = new Terminal();
+    final static IO.TermCodec codec = new IO.TermCodec(nar.index);
 
     void assertEqualSerialize(@NotNull Object orig) {
-        byte barray[] = conf.asByteArray(orig);
+        byte barray[] = codec.asByteArray(orig);
         out.println(orig + "\n\tserialized: " + barray.length + " bytes " + Arrays.toString(barray));
 
-        Object copy = conf.asObject(barray);
+        Object copy = codec.asObject(barray);
         //if (copy instanceof Task) {
             //((MutableTask)copy).invalidate();
             //((Task)copy).normalize(nar);
@@ -48,20 +45,29 @@ public class TermCodecTest {
         assertEquals(copy.getClass(), orig.getClass());
     }
 
+
     //    /* https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization*/
     @Test
     public void testTermSerialization() {
-        final NAR nar = new Default();
+
         assertEqualSerialize(nar.term("<a-->b>").term() /* term, not the concept */);
         assertEqualSerialize(nar.term("<aa-->b>").term() /* term, not the concept */);
         assertEqualSerialize(nar.term("<aa--><b<->c>>").term() /* term, not the concept */);
+        assertEqualSerialize(nar.term("(a &&+1 b)").term() /* term, not the concept */);
+        assertEqualSerialize(nar.term("(/, x, _, y)").term() /* term, not the concept */);
+        assertEqualSerialize(nar.term("exe(a,b)").term() /* term, not the concept */);
+    }
+    @Test
+    public void testTermSerialization2() {
+        assertEqualSerialize(nar.term("(#a --> b)").term() /* term, not the concept */);
     }
 
     @Test
     public void testTaskSerialization() {
-        final NAR nar = new Default();
         assertEqualSerialize(nar.inputTask("<a-->b>."));
         assertEqualSerialize(nar.inputTask("<a-->(b==>c)>!"));
+        assertEqualSerialize(nar.inputTask("<a-->(b==>c)>?"));
+        assertEqualSerialize(nar.inputTask("$0.3;0.2;0.1$ <a-->(b==>c)>! %1.0;0.8%"));
     }
 
     @Test public void testNARTaskDump() throws Exception {

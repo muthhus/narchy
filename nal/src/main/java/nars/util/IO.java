@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
+import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.task.DerivedTask;
 import nars.task.MutableTask;
@@ -36,7 +37,7 @@ public class IO {
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull ObjectInput in) throws IOException, ClassNotFoundException {
+    public static MutableTask readTask(@NotNull ObjectInput in, TermIndex t) throws IOException, ClassNotFoundException {
         Term term = (Term) in.readObject();
 
         //TODO combine these into one byte
@@ -115,9 +116,9 @@ public class IO {
 
 
     @Nullable
-    public static Atomic readAtomic(@NotNull ObjectInput in, Op o) throws IOException {
+    public static Atomic readAtomic(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
         String s = in.readUTF();
-        return $.$(s);
+        return t.the(s);
     }
 
 
@@ -133,10 +134,6 @@ public class IO {
     }
 
     static void writeCompound(@NotNull ObjectOutput out, Compound a) throws IOException {
-        //TODO include relation and dt if:
-        //      --image
-        //      --temporal (conj, equiv, impl)
-        //  ...
 
         //how many subterms to follow
         int siz = a.size();
@@ -153,13 +150,13 @@ public class IO {
 
     /** TODO make a version which reads directlyinto TermIndex */
     @Nullable
-    public static Compound readCompound(@NotNull ObjectInput in, Op o) throws IOException {
+    public static Compound readCompound(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
 
 
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
-            s[i] = readTerm(in);
+            s[i] = readTerm(in, t);
         }
 
         int relation = -1, dt = Tense.DTERNAL;
@@ -171,22 +168,24 @@ public class IO {
         return (Compound) $.the(o, relation, dt, TermVector.the(s));
     }
 
-    static Term readTerm(ObjectInput in) throws IOException {
+    static Term readTerm(ObjectInput in, TermIndex t) throws IOException {
         Op o = Op.values()[in.readByte()];
         if (o.isAtomic())
-            return readAtomic(in, o);
+            return readAtomic(in, o, t);
         else
-            return readCompound(in, o);
+            return readCompound(in, o, t);
     }
 
 
     /** serialization and deserialization of terms, tasks, etc. */
     public static class TermCodec extends FSTConfiguration {
 
-        public static final TermCodec the = new TermCodec();
+        final TermIndex index;
 
-        TermCodec() {
+        public TermCodec(TermIndex t) {
             super(null);
+
+            this.index = t;
 
             createDefaultConfiguration();
             //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
@@ -214,7 +213,7 @@ public class IO {
                 @NotNull
                 @Override
                 public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
-                    return readTask(in);
+                    return readTask(in, index);
                 }
 
                 @Override
@@ -224,21 +223,15 @@ public class IO {
             }, true);
 
 
-            registerSerializer(Atom.class, TermSerializer.the, true);
-            registerSerializer(Atomic.class, TermSerializer.the, true);
-            registerSerializer(AtomConcept.class, TermSerializer.the, true);
-            registerSerializer(GenericCompound.class, TermSerializer.the, true);
+            registerSerializer(Atom.class, terms, true);
+            registerSerializer(Atomic.class, terms, true);
+            registerSerializer(AtomConcept.class, terms, true);
+            registerSerializer(GenericCompound.class, terms, true);
 
 
         }
 
-        private static class TermSerializer extends FSTBasicObjectSerializer {
-
-            public static FSTObjectSerializer the = new TermSerializer();
-
-            private TermSerializer() {
-
-            }
+        final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {
 
             @Override
             public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
@@ -247,14 +240,14 @@ public class IO {
             @Nullable
             @Override
             public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
-                return readTerm(in);
+                return readTerm(in, index);
             }
 
             @Override
             public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
                 writeTerm(out, (Term) toWrite);
             }
-        }
+        };
 
 
     }

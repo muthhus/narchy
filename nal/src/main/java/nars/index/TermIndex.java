@@ -4,7 +4,6 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -513,17 +512,17 @@ public interface TermIndex {
      */
     @Nullable
     default <T extends Termed> T get(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) get(parse(termToParse));
+        return (T) get(fromString(termToParse));
     }
 
     @NotNull
-    default Term parse(@NotNull String termToParse) throws Narsese.NarseseException {
-        return Narsese.the().term(termToParse, this);
+    default Term fromString(@NotNull String termToParse) throws Narsese.NarseseException {
+        return Narsese.the().term(termToParse, this, true);
     }
 
     @Nullable
     default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) the(parse(termToParse));
+        return (T) the(fromString(termToParse));
     }
 
 
