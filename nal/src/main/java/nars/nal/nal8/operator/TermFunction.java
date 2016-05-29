@@ -12,7 +12,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

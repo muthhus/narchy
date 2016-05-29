@@ -18,7 +18,7 @@ import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.op.time.STMTemporalLinkage;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.atom.Atom;
 import nars.time.Clock;
 import org.jetbrains.annotations.NotNull;

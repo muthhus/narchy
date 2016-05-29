@@ -1,6 +1,9 @@
-package nars.term;
+package nars.term.proxy;
 
 import nars.Op;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;

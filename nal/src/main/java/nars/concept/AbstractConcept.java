@@ -53,14 +53,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
         }*/
 
-
         /* activate concept */
         Concept target = nar.conceptualize(targetTerm, b, subScale,
                 0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
                 conceptOverflow);
 
         if (target == null)
-            throw new RuntimeException("termlink to null concept");
+            throw new RuntimeException("termlink to null concept: " + targetTerm);
 
         if (target == source)
             throw new RuntimeException("termlink self-loop");

@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.index.GroupedMapIndex;
 import nars.index.PatternIndex;
+import nars.index.TermIndex;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;

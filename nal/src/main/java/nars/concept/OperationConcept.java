@@ -118,13 +118,12 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
         if (isOperation) {
-            /*if (isExecutingGoals(belief,desire))*/ {
+            /*if (isExecutingGoals(belief,desire))*/
 
-                Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
-                if (tt != null && !tt.isEmpty()) {
-                    //beforeNextFrame( //<-- enqueue after this frame, before next
-                    tt.emit(this);
-                }
+            Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
+            if (tt != null && !tt.isEmpty()) {
+                //beforeNextFrame( //<-- enqueue after this frame, before next
+                tt.emit(this);
             }
         }
 

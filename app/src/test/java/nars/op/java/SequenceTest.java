@@ -9,7 +9,7 @@ import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.Truth;

@@ -10,7 +10,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.subst.choice.*;

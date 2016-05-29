@@ -26,7 +26,7 @@ import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.truth.ProjectedTruth;
 import nars.truth.Stamp;

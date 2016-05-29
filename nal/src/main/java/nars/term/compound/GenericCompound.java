@@ -327,9 +327,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
             if (op.isImage() && (relation != y.relation()))
                 return false;
 
-            //return (isCommutative()) ?
+
             @NotNull TermContainer ysubs = y.subterms();
-            return (ys > 1 && op.commutative) ?
+            return (isCommutative()) ?
+            //return (ys > 1 && op.commutative) ?
                     subst.matchPermute(xsubs, ysubs) :
                     subst.matchLinear(xsubs, ysubs);
         }

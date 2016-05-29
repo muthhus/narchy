@@ -5,7 +5,7 @@ import nars.budget.UnitBudget;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termed;
 import org.junit.Test;
 

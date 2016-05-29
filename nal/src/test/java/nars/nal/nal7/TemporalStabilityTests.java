@@ -97,13 +97,13 @@ public class TemporalStabilityTests {
         new T1(linkedproductor, 1, 2, 5).test(300, new Default(1024, 8, 4, 3));
     }
     @Test public void testTemporalStabilityLinkedInh() {
-        new T1(linkedinh, 1, 2, 5).test(600, new Default(1024, 8, 4, 3));
+        new T1(linkedinh, 1, 2, 5).test(400, new Default(1024, 8, 4, 3));
     }
     @Test public void testTemporalStabilityLinkedImpl() {
-        new T1(linkedimpl, 1, 2, 5).test(600, new Default(1024, 12, 4, 3));
+        new T1(linkedimpl, 1, 2, 5).test(400, new Default(1024, 12, 4, 3));
     }
     @Test public void testTemporalStabilityLinkedImplExt() {
-        new T1(linkedimpl, 1, 2, 5, 10).test(600, new Default(1024, 12, 4, 3));
+        new T1(linkedimpl, 1, 2, 5, 10).test(400, new Default(1024, 12, 4, 3));
     }
 
 }

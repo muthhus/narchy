@@ -1,6 +1,10 @@
-package nars.term;
+package nars.term.proxy;
 
 import nars.Op;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
+import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

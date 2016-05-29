@@ -1,4 +1,4 @@
-package nars.term;
+package nars.index;
 
 import nars.Global;
 import nars.Narsese;
@@ -12,6 +12,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -44,8 +45,7 @@ public interface TermIndex {
     /**
      * getOrAdd the term
      */
-    @Nullable
-    default Termed the(@NotNull Termed t) {
+    default @Nullable Termed the(@NotNull Termed t) {
         return get(t, true);
     }
 

@@ -11,7 +11,7 @@ import nars.nal.Reasoner;
 import nars.nar.util.DefaultCore;
 import nars.nar.util.DefaultReasoner;
 import nars.task.Task;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;

@@ -11,6 +11,7 @@ import com.github.fge.grappa.run.ParsingResult;
 import com.github.fge.grappa.run.context.MatcherContext;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.Ellipsis;

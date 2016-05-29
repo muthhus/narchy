@@ -4,7 +4,6 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.TermBuilder;
-import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;

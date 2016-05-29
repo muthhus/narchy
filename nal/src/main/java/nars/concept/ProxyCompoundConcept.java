@@ -8,6 +8,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.*;
+import nars.term.proxy.ProxyCompound;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
     @Override
     public boolean equals(Object obj) {
-        return alias.equals(obj);
+        return obj == this || alias.equals(obj);
     }
 
     @Override

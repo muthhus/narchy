@@ -22,7 +22,7 @@ package nars;
 
 
 import nars.task.Task;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.util.event.DefaultTopic;

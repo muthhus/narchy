@@ -196,7 +196,8 @@ abstract public class Reasoner {
 
             //project the belief to the question's time
             if (taskOcc!=ETERNAL) {
-                belief = ((CompoundConcept)nar.concept(belief)).merge(task, belief, task.occurrence(), nar);
+                @Nullable Concept cbel = nar.concept(belief);
+                belief = cbel!=null ? cbel.merge(task, belief, task.occurrence(), nar) : null;
             }
 
             if (belief!=null) { //may have become null as a result of projection

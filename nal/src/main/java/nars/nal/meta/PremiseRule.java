@@ -21,7 +21,7 @@ import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;

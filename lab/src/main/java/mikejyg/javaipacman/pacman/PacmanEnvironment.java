@@ -23,15 +23,19 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
+import nars.index.CaffeineIndex;
 import nars.index.Indexes;
+import nars.index.InfinispanIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.NAgent;
@@ -45,7 +49,7 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 2;
+	final int visionRadius = 1;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -62,7 +66,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		Default nar = new Default(
 				1024, 8, 1, 2, rng,
-				new Indexes.WeakTermIndex(128 * 1024, rng),
+				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng)),
+				new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng)),
+				//new Indexes.WeakTermIndex(128 * 1024, rng),
 				//new Indexes.SoftTermIndex(128 * 1024, rng),
 				//new Indexes.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());

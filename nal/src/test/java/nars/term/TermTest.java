@@ -23,6 +23,7 @@ import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
+import nars.term.compound.Statement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;

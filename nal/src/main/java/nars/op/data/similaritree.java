@@ -4,7 +4,7 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 

@@ -213,6 +213,10 @@ public enum TermLinkBuilder {
         }
 
         if (t instanceof Variable) {
+
+            if (t.op()==Op.VAR_QUERY)
+                return null;
+
             target.add(t);
             return t;
         }

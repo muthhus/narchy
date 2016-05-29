@@ -2,7 +2,7 @@ package nars.op.data;
 
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**

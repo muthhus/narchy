@@ -6,6 +6,7 @@ import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
 import nars.index.AbstractMapIndex;
 import nars.index.GroupedMapIndex;
+import nars.index.TermIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.task.Task;

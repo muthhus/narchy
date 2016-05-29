@@ -2,7 +2,7 @@ package nars.nal.op;
 
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

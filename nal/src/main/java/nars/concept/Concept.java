@@ -22,12 +22,14 @@ package nars.concept;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
+import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -79,6 +81,23 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
     @NotNull QuestionTable quests();
 
+    default TaskTable tableFor(char punctuation) {
+        switch(punctuation) {
+            case Symbols.BELIEF: return beliefs();
+            case Symbols.GOAL: return goals();
+            case Symbols.QUESTION: return questions();
+            case Symbols.QUEST: return quests();
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    default public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
+        long now = nar.time();
+        return Revision.merge(x, y, now, when,
+                ((BeliefTable)tableFor(y.punc())).truth(now, when)
+        );
+    }
 
     /**
      * process a task in this concept

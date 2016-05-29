@@ -31,7 +31,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
     private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
     public final MutableInt abbreviationVolMin = new MutableInt(7);
-    public final MutableInt abbreviationVolMax = new MutableInt(15);
+    public final MutableInt abbreviationVolMax = new MutableInt(1000);
     public final MutableFloat abbreviationQualityMin = new MutableFloat(0.8f);
 
     //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
@@ -90,7 +90,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
         //  }
     }
 
-    final boolean canAbbreviate(@NotNull Task task) {
+    protected boolean canAbbreviate(@NotNull Task task) {
         Term t = task.term();
 
         /*if (t instanceof Similarity) {

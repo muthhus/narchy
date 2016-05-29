@@ -25,41 +25,6 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
         this.subterms = subterms;
     }
 
-
-   @Nullable
-    @Override
-    public final TermContainer theSubterms(TermContainer s) {
-       int ss = s.size();
-       Term[] bb = new Term[ss];
-       boolean changed = false;
-       for (int i = 0; i < ss; i++) {
-           Term a = s.term(i);
-
-           Term b;
-           if (a instanceof Compound) {
-               if (a.hasTemporal())
-                   return s; //dont store subterm arrays containing temporal compounds
-
-               b = theCompound((Compound)a, true).term();
-           } else {
-               b = theAtom((Atomic)a, true).term();
-           }
-           if (a!=b) {
-               changed = true;
-           }
-           bb[i] = b;
-       }
-
-       if (changed) {
-           s = TermVector.the(bb);
-       }
-
-       TermContainer prev = subterms.putIfAbsent(s, s);
-       if (prev == null)
-           prev = s;
-       return prev;
-    }
-
     @Override
     public int subtermsCount() {
         return subterms.size(); //unsupported
@@ -84,5 +49,10 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
 
         data.keySet().forEach(System.out::println);
 
+    }
+
+    @Override
+    protected TermContainer putIfAbsent(TermContainer x, TermContainer y) {
+        return subterms.putIfAbsent(x, y);
     }
 }

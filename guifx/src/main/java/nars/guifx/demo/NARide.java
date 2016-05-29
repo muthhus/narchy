@@ -40,7 +40,7 @@ import nars.guifx.util.*;
 import nars.nar.util.AbstractCore;
 import nars.nar.util.DefaultCore;
 import nars.term.Term;
-import nars.term.TermIndex;
+import nars.index.TermIndex;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.data.Util;

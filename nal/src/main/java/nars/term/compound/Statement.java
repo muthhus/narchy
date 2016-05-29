@@ -18,9 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.term;
+package nars.term.compound;
 
 import nars.Op;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

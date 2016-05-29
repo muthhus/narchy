@@ -92,16 +92,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return tableFor(t.punc()).get(t)!=null;
     }
 
-    public TaskTable tableFor(char punctuation) {
-        switch(punctuation) {
-            case Symbols.BELIEF: return beliefs();
-            case Symbols.GOAL: return goals();
-            case Symbols.QUESTION: return questions();
-            case Symbols.QUEST: return quests();
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
 
     /**
      * Pending Quests to be answered by new desire values
@@ -442,12 +432,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //    }
 
 
-    public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
-        long now = nar.time();
-        return Revision.merge(x, y, now, when,
-            ((BeliefTable)tableFor(y.punc())).truth(now, when)
-        );
-    }
 
     @Override
     public final boolean match(@NotNull Compound y, @NotNull FindSubst subst) {

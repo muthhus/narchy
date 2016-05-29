@@ -3,8 +3,10 @@ package nars.term;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Op;
+import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
+import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -19,8 +21,8 @@ import java.util.TreeSet;
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.term.Statement.pred;
-import static nars.term.Statement.subj;
+import static nars.term.compound.Statement.pred;
+import static nars.term.compound.Statement.subj;
 
 /**
  * Created by me on 1/2/16.
