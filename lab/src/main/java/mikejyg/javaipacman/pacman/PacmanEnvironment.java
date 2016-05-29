@@ -25,7 +25,6 @@ import nars.$;
 import nars.NAR;
 import nars.index.CaffeineIndex;
 import nars.index.Indexes;
-import nars.index.InfinispanIndex2;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -66,11 +65,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Default nar = new Default(
 				1024, 8, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng)),
-				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng)),
-				new InfinispanIndex2(Terms.terms, new DefaultConceptBuilder(rng)),
+				//new InfinispanIndex2(Terms.terms, new DefaultConceptBuilder(rng)),
 				//new Indexes.WeakTermIndex(128 * 1024, rng),
 				//new Indexes.SoftTermIndex(128 * 1024, rng),
-				//new Indexes.DefaultTermIndex(128 *1024, rng),
+				new Indexes.DefaultTermIndex(128 *1024, rng),
 				new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);

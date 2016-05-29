@@ -95,4 +95,24 @@ public class CaffeineIndex extends MaplikeIndex {
     protected TermContainer putIfAbsent(TermContainer s, TermContainer s1) {
         return subterms.get(s, t -> s1);
     }
+
+    protected Termed theCompoundCreated(@NotNull Compound x) {
+
+        if (x.hasTemporal()) {
+            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+        }
+
+        Termed yyy = data.get(x, xx -> {
+            Compound y = (Compound)xx;
+            Termed yy = internCompoundSubterms(y.subterms(), y.op(), y.relation(), y.dt());
+            return internCompound(yy);
+        });
+        return yyy;
+
+    }
+
+    @Override
+    public @NotNull String summary() {
+        return data.estimatedSize() + " concepts, " + subterms.estimatedSize() + " subterms";
+    }
 }
