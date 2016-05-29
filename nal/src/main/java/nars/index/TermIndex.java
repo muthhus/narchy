@@ -61,14 +61,14 @@ public interface TermIndex {
 
 
     /**
-     * set if not absent
+     * set whether absent or not
      */
     @Nullable
-    Termed set(@NotNull Termed src, Termed target);
+    void set(@NotNull Termed src, Termed target);
 
     @Nullable
-    default Termed set(@NotNull Termed t) {
-        return set(t, t);
+    default void set(@NotNull Termed t) {
+        set(t, t);
     }
 
 

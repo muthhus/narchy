@@ -8,6 +8,7 @@ import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.util.IO;
+import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.commons.io.ByteBuffer;
 import org.infinispan.commons.io.ByteBufferImpl;
@@ -98,7 +99,7 @@ public class InfinispanIndex2 extends MaplikeIndex {
 
 
     @Override
-    @Deprecated public @Nullable Termed set(@NotNull Termed src, Termed target) {
+    @Deprecated public @Nullable void set(@NotNull Termed src, Termed target) {
         /*
         3.5.1. DecoratedCache
 
@@ -116,7 +117,6 @@ strictlyLocal.put("local_3", "only");
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
                 .put(key(src.term()), target);
 
-        return target;
     }
 
     @Override
@@ -143,7 +143,6 @@ strictlyLocal.put("local_3", "only");
     protected TermContainer putIfAbsent(TermContainer x, TermContainer y) {
         return subterms
                 .getAdvancedCache()
-                .withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
                 .putIfAbsent(key(x), y);
@@ -151,6 +150,8 @@ strictlyLocal.put("local_3", "only");
 
     @Override
     public @NotNull String summary() {
-        return concepts.size() + " concepts, " + subterms.size() + " subterms";
+        AdvancedCache conceptsLocal = concepts.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD, Flag.CACHE_MODE_LOCAL);
+        AdvancedCache subtermsLocal = subterms.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD, Flag.CACHE_MODE_LOCAL);
+        return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms";
     }
 }

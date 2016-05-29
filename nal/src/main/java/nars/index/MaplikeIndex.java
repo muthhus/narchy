@@ -50,7 +50,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
             if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
                 y = internCompound(y);
 
-                y = set(y);
+                set(y);
             }
         }
         return y;
@@ -69,7 +69,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
     @Override
     @Nullable
-    abstract public Termed set(@NotNull Termed src, Termed target);
+    abstract public void set(@NotNull Termed src, Termed target);
 
     /* default */ protected TermContainer getSubterms(@NotNull TermContainer t) {
         return null;

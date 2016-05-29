@@ -13,9 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-/**
- * Created by me on 5/28/16.
- */
+
 public class CaffeineIndex extends MaplikeIndex {
 
     final Cache<Termed, Termed> data;
@@ -61,8 +59,8 @@ public class CaffeineIndex extends MaplikeIndex {
     }
 
     @Override
-    public @Nullable Termed set(@NotNull Termed src, Termed target) {
-        return data.get(src, s -> target);
+    public @Nullable void set(@NotNull Termed src, Termed target) {
+        data.put(src, target);
         //Termed exist = data.getIfPresent(src);
 
         //data.put(src, target);

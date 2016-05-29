@@ -33,7 +33,7 @@ import static nars.Op.*;
 public class Terms extends TermBuilder implements TermIndex {
 
     @NotNull public static final Terms terms = new Terms();
-    @NotNull public static final int[] ZeroIntArray = new int[0];
+    //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector<?> ZeroSubterms = new TermVector<>((Term[])new Term[] { });
     @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
@@ -111,7 +111,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
     @Nullable
     @Override
-    public Termed set(@NotNull Termed s, Termed t) {
+    public void set(@NotNull Termed s, Termed t) {
         throw new UnsupportedOperationException();
     }
 

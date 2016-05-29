@@ -35,9 +35,9 @@ import java.util.function.Consumer;
 
     @Nullable
     @Override
-    public final Termed set(@NotNull Termed src, Termed target) {
+    public final void set(@NotNull Termed src, Termed target) {
         data.put(src, target);
-        return target;
+
 
         //return data.putIfAbsent(src, target);
 //        /*if ((existing !=null) && (existing!=target))
