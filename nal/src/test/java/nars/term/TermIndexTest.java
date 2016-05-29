@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
 import nars.index.AbstractMapIndex;
-import nars.index.GroupedMapIndex;
+import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -28,8 +28,9 @@ import static org.junit.Assert.*;
 
 public class TermIndexTest {
 
+    public static final XorShift128PlusRandom rng = new XorShift128PlusRandom(2);
     public static final DefaultConceptBuilder defaultConceptBuilder = new DefaultConceptBuilder(
-            new XorShift128PlusRandom(2)
+            rng
     );
 
     @Test
@@ -62,25 +63,25 @@ public class TermIndexTest {
 //        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
 //    }
 
-
-    @Test public void testTermSharing5a() {
-        testIndex(new GroupedMapIndex(new HashMap<>(),
-                new DefaultConceptBuilder(
-                    new XorShift128PlusRandom(2)
-                )));
-    }
-    @Test public void testTermSharing5b() {
-        testIndex(
-                new GroupedMapIndex(Global.newHashMap(),
-                    new DefaultConceptBuilder(
-                        new XorShift128PlusRandom(2)
-                    ))
-        );
-        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
-    }
+//
+//    @Test public void testTermSharing5a() {
+//        testIndex(new GroupedMapIndex(new HashMap<>(),
+//                new DefaultConceptBuilder(
+//                    new XorShift128PlusRandom(2)
+//                )));
+//    }
+//    @Test public void testTermSharing5b() {
+//        testIndex(
+//                new GroupedMapIndex(Global.newHashMap(),
+//                    new DefaultConceptBuilder(
+//                        new XorShift128PlusRandom(2)
+//                    ))
+//        );
+//        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
+//    }
     @Test public void testTermSharing5c() {
         testIndex(
-                new GroupedMapIndex(Global.newHashMap(), defaultConceptBuilder)
+                new Indexes.DefaultTermIndex(1024, rng)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

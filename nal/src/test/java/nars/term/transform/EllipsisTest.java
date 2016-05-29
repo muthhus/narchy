@@ -4,7 +4,6 @@ import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
-import nars.index.GroupedMapIndex;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseRule;
@@ -52,11 +51,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = Global.newHashSet(arity);
 
-            TermIndex index =
-                    new GroupedMapIndex(new HashMap(),
-                            new DefaultConceptBuilder(
-                                    new XorShift128PlusRandom(2)
-                            ));
+            TermIndex index = new PatternIndex();
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

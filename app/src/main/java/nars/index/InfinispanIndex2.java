@@ -3,6 +3,7 @@ package nars.index;
 import com.google.common.base.Joiner;
 import nars.concept.Concept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
@@ -50,18 +51,24 @@ public class InfinispanIndex2 extends MaplikeIndex {
     }
 
     @Override
-    public Termed remove(Termed entry) {
-        return concepts.remove(key(entry));
+    public Termed remove(Termed x) {
+        return concepts.remove(key(x.term()));
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return concepts.get(key(x));
+        return concepts.get(key(x.term()));
+    }
+
+
+    @Override
+    protected TermContainer getSubterms(@NotNull TermContainer t) {
+        return subterms.get(key(t));
     }
 
     protected Termed theCompoundCreated(@NotNull Compound x) {
 
-        if (x.term().hasTemporal()) {
+        if (x.hasTemporal()) {
             return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
         }
 
@@ -69,7 +76,7 @@ public class InfinispanIndex2 extends MaplikeIndex {
                 //.withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
-        .computeIfAbsent(key((Termed)x), xx -> {
+        .computeIfAbsent(key(x.term()), xx -> {
             Termed y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
             return internCompound(y);
         });
@@ -79,8 +86,8 @@ public class InfinispanIndex2 extends MaplikeIndex {
 
 
 
-    public ByteBuffer key(@NotNull Termed x) {
-        byte[] b = codec.asByteArray(x.term());
+    public ByteBuffer key(@NotNull Term x) {
+        byte[] b = codec.asByteArray(x);
         return new ByteBufferImpl(b,0,b.length);
     }
 
@@ -88,6 +95,7 @@ public class InfinispanIndex2 extends MaplikeIndex {
         byte[] b = codec.asByteArray(x);
         return new ByteBufferImpl(b,0,b.length);
     }
+
 
     @Override
     @Deprecated public @Nullable Termed set(@NotNull Termed src, Termed target) {
@@ -106,7 +114,7 @@ strictlyLocal.put("local_3", "only");
                 .withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
-                .put(key(src), target);
+                .put(key(src.term()), target);
 
         return target;
     }

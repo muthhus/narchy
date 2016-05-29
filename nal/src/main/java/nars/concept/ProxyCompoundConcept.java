@@ -30,7 +30,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     public ProxyCompoundConcept(Compound alias, CompoundConcept target, NAR n) {
         this.alias = alias;
 
-        this.target = (CompoundConcept) n.index.remove(target);
+        //this.target = (CompoundConcept) n.index.remove(target);
+        this.target = target;
         n.index.set(target, this);
         n.index.set(alias, this);
     }

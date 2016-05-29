@@ -22,7 +22,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
     @Nullable
     @Override
-    protected final Termed theCompound(@NotNull Compound x, boolean create) {
+    protected Termed theCompound(@NotNull Compound x, boolean create) {
         //??
 //            Termed existing = data.get(x);
 //            if (existing!=null)
@@ -37,7 +37,6 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
     }
 
 
-
     protected Termed theCompoundCreated(@NotNull Compound x) {
 
 //        if (x.hasTemporal()) {
@@ -47,7 +46,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
         Termed y = get(x);
         if (y == null) {
-            y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+            y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt()  /* TODO make this sometimes false */);
             if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
                 y = internCompound(y);
 
@@ -65,13 +64,26 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
 
     abstract public Termed remove(Termed entry);
+
     public abstract Termed get(@NotNull Termed x);
 
     @Override
-    @Nullable abstract public Termed set(@NotNull Termed src, Termed target);
+    @Nullable
+    abstract public Termed set(@NotNull Termed src, Termed target);
+
+    /* default */ protected TermContainer getSubterms(@NotNull TermContainer t) {
+        return null;
+    }
+
 
     @Override
     public final @Nullable TermContainer theSubterms(TermContainer s) {
+
+        //early existence test:
+        TermContainer existing = getSubterms(s);
+        if (existing!=null)
+            return existing;
+
         int ss = s.size();
         Term[] bb = new Term[ss];
         boolean changed = false;
@@ -83,11 +95,11 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
                 if (a.hasTemporal())
                     return s; //dont store subterm arrays containing temporal compounds
 
-                b = theCompound((Compound)a, true).term();
+                b = theCompound((Compound) a, true).term();
             } else {
-                b = theAtom((Atomic)a, true).term();
+                b = theAtom((Atomic) a, true).term();
             }
-            if (a!=b) {
+            if (a != b) {
                 changed = true;
             }
             bb[i] = b;
@@ -95,15 +107,17 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
         if (changed) {
             s = TermVector.the(bb);
+            TermContainer existing2 = putIfAbsent(s, s);
+            if (existing2!=null)
+                s = existing2;
         }
 
-        TermContainer prev = putIfAbsent(s, s);
-        if (prev == null)
-            prev = s;
-        return prev;
+        return s;
     }
 
-    /** subterms put */
+    /**
+     * subterms put
+     */
     abstract protected TermContainer putIfAbsent(TermContainer s, TermContainer s1);
 
 }

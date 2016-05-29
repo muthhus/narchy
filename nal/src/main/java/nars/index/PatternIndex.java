@@ -8,8 +8,6 @@ import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-
 /**
  * Index which specifically holds the term components of a deriver ruleset.
  */
@@ -21,9 +19,7 @@ public class PatternIndex extends RawTermIndex {
 //              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
 //    }
     public PatternIndex() {
-        super(new HashSymbolMap(
-                new HashMap(512)),
-                new HashMap(2048), Terms.terms, null);
+        super(Terms.terms, null, 1024);
     }
 
     @Override

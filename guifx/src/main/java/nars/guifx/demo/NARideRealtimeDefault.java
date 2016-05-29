@@ -1,7 +1,7 @@
 package nars.guifx.demo;
 
 import javassist.scopedpool.SoftValueHashMap;
-import nars.index.GroupedMapIndex;
+import nars.index.Indexes;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
@@ -61,9 +61,9 @@ public enum NARideRealtimeDefault {
         //)
         //);
 
-        Default nar = new Default(1024, 3, 2, 2, rng, new GroupedMapIndex(
-                new SoftValueHashMap(128 * 1024), new DefaultConceptBuilder(rng)
-        ), new RealtimeMSClock());
+        Default nar = new Default(1024, 3, 2, 2, rng,
+                new Indexes.WeakTermIndex(128*1024, new XorShift128PlusRandom(1)),
+                new RealtimeMSClock());
 
         nar.with(
                 Anticipate.class,

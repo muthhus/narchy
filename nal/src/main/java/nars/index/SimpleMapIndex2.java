@@ -17,7 +17,6 @@ import java.util.Map;
 /** additionally caches subterm vectors */
 public class SimpleMapIndex2 extends SimpleMapIndex {
 
-
     private final Map<TermContainer, TermContainer> subterms;
 
     public SimpleMapIndex2(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {

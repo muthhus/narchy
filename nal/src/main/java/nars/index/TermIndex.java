@@ -447,12 +447,14 @@ public interface TermIndex {
 //        if (t instanceof Compound && ((Compound)t).hasTemporal())
 //            return t;
 
-        //fast access to concept if not temporal:
-        Termed existing = the(t);
-        if (existing != null)
-            return existing;
-        else
-            return t;
+        return t;
+
+        //fast resolve to concept if not temporal:
+        //Termed existing = the(t);
+//        if (existing != null)
+//            return existing;
+//        else
+//            return t;
     }
 
 
@@ -460,7 +462,11 @@ public interface TermIndex {
 
     @Nullable
     default Term theTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
-        return theTransformed(src, theSubterms(  TermContainer.the(src.op(), newSubs) ) );
+        return theTransformed(src,
+                //theSubterms(
+                        TermContainer.the(src.op(), newSubs)
+                //)
+        );
     }
 
 
@@ -493,10 +499,10 @@ public interface TermIndex {
                 cx = transform((Compound) x, trans); //recurse
             }
 
-            if (cx == null)
-                return null;
-
             if (x!= cx) { //must be refernce equality test for some variable normalization cases
+                if (cx == null)
+                    return null;
+
                 modifications++;
                 x = cx;
             }

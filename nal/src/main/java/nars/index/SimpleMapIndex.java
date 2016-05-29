@@ -51,7 +51,7 @@ import java.util.function.Consumer;
     }
 
     @Override
-    public void forEach(@NotNull Consumer c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         data.forEach((k,v)-> c.accept(v));
     }
 

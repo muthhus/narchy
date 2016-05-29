@@ -36,14 +36,14 @@ public enum Indexes {
             }
         }
 
-    public static class WeakTermIndex2 extends GroupedMapIndex {
-
-            public WeakTermIndex2(int capacity, @NotNull Random random) {
-                super(new WeakHashMap<>(capacity),
-                        new DefaultConceptBuilder(random));
-
-            }
-        }
+//    public static class WeakTermIndex2 extends GroupedMapIndex {
+//
+//            public WeakTermIndex2(int capacity, @NotNull Random random) {
+//                super(new WeakHashMap<>(capacity),
+//                        new DefaultConceptBuilder(random));
+//
+//            }
+//        }
 
     public static class WeakTermIndex extends SimpleMapIndex2 {
 
