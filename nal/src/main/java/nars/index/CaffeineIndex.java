@@ -6,6 +6,7 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,10 @@ public class CaffeineIndex extends MaplikeIndex {
     final Cache<Termed, Termed> data;
     final Cache<TermContainer, TermContainer> subterms;
 
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder) {
+        this(Terms.terms, conceptBuilder);
+    }
+
     public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(termBuilder, conceptBuilder);
 
@@ -29,7 +34,7 @@ public class CaffeineIndex extends MaplikeIndex {
                 //.expireAfterAccess(5, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
-                .maximumSize(32*1024)
+                //.maximumSize(32*1024)
                 .build();
                 //.build(key -> createExpensiveGraph(key));
 
@@ -40,7 +45,7 @@ public class CaffeineIndex extends MaplikeIndex {
                 //.expireAfterAccess(5, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
-                .maximumSize(32*1024)
+                //.maximumSize(32*1024)
                 .build();
     }
 
@@ -96,20 +101,20 @@ public class CaffeineIndex extends MaplikeIndex {
         return subterms.get(s, t -> s1);
     }
 
-    protected Termed theCompoundCreated(@NotNull Compound x) {
-
-        if (x.hasTemporal()) {
-            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
-        }
-
-        Termed yyy = data.get(x, xx -> {
-            Compound y = (Compound)xx;
-            Termed yy = internCompoundSubterms(y.subterms(), y.op(), y.relation(), y.dt());
-            return internCompound(yy);
-        });
-        return yyy;
-
-    }
+//    protected Termed theCompoundCreated(@NotNull Compound x) {
+//
+//        if (x.hasTemporal()) {
+//            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+//        }
+//
+//        Termed yyy = data.get(x, xx -> {
+//            Compound y = (Compound)xx;
+//            Termed yy = internCompoundSubterms(y.subterms(), y.op(), y.relation(), y.dt());
+//            return internCompound(yy);
+//        });
+//        return yyy;
+//
+//    }
 
     @Override
     public @NotNull String summary() {

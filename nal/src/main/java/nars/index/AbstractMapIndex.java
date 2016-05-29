@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractMapIndex implements TermIndex {
 
-    public final SymbolMap atoms;
+    //public final SymbolMap atoms;
     protected final TermBuilder termBuilder;
     protected final Concept.ConceptBuilder conceptBuilder;
 
@@ -28,7 +28,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super();
         this.termBuilder = termBuilder;
-        this.atoms = symbolMap;
+        //this.atoms = symbolMap;
         this.conceptBuilder = conceptBuilder;
     }
 
@@ -48,32 +48,23 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
 
-    Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {
-        SymbolMap a = this.atoms;
-        return (createIfMissing ? a.resolveOrAdd(t, conceptBuilder) : a.resolve(t)) ;
-    }
-
     @Nullable
-    abstract protected Termed theCompound(@NotNull Compound x, boolean create);
+    abstract protected Termed theCompound(@NotNull Compound x, boolean createIfMissing);
+
+    abstract protected Termed theAtom(@NotNull Atomic t, boolean createIfMissing);
+
 
 
     @NotNull
-    protected Termed<Compound> internCompound(@NotNull Termed interned) {
+    protected Termed build(@NotNull Termed interned) {
         return conceptBuilder.apply(interned.term());
     }
 
     @NotNull
-    protected final Termed internCompoundSubterms(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+    protected final Termed build(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
         return termBuilder.make(op, rel, theSubterms(subs), dt);
     }
 
-    @Override
-    public void print(@NotNull PrintStream out) {
-
-        atoms.print(System.out);
-        out.println();
-
-    }
 
     @Override
     public final Concept.ConceptBuilder conceptBuilder() {

@@ -24,7 +24,7 @@ public class PatternIndex extends RawTermIndex {
 
     @Override
     protected @Nullable
-    Termed theCompound(@NotNull Compound t, boolean create) {
+    Termed theCompound(@NotNull Compound t, boolean createIfMissing) {
 
         //dont store the actual rules, they are guaranteed unique by other means
         if (t instanceof PremiseRule) {
@@ -32,10 +32,10 @@ public class PatternIndex extends RawTermIndex {
         }
 
         //process Patterns
-        return super.theCompound(
+        return
             PatternCompound.make(t,
                 theSubterms(t.subterms())
-        ), true);
+        );
 
     }
 

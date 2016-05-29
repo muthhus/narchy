@@ -20,22 +20,16 @@ public abstract class RawTermIndex extends SimpleMapIndex2 implements Serializab
 
     public RawTermIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, int capacity) {
         super(termBuilder, conceptBuilder,
-                new HashMap(capacity),
-                new HashMap(capacity) );
-    }
-
-    @Override
-    Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {
-        SymbolMap a = this.atoms;
-        return (createIfMissing ? a.resolveOrAdd(t, u -> u /* pass through */) : a.resolve(t)) ;
-    }
-
-    @NotNull
-    @Override
-    protected Termed internCompound(@NotNull Termed interned) {
-        return interned; //dont conceptualize, pass-through raw term
+                new HashMap<>(capacity),
+                new HashMap<>(capacity) );
     }
 
 
+    /**
+     * doesnt conceptualize, pass-through raw term
+     */
+    @NotNull @Override protected Termed build(@NotNull Termed interned) {
+        return interned;
+    }
 
 }

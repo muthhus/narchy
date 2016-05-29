@@ -22,44 +22,38 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
     @Nullable
     @Override
-    protected Termed theCompound(@NotNull Compound x, boolean create) {
-        //??
-//            Termed existing = data.get(x);
-//            if (existing!=null)
-//                return existing;
-//
-//            Termed c = internCompound(internSubterms(x.subterms(), x.op(), x.relation(), x.dt()));
-//            data.put(c, c);
-//            return c;
-        return create ?
-                theCompoundCreated(x) :
+    protected Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
+        return createIfMissing ?
+                getNewCompound(x) :
                 get(x);
     }
 
+    @Override
+    protected Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
+        return createIfMissing ?
+                getNewAtom(x) :
+                get(x);
+    }
 
-    protected Termed theCompoundCreated(@NotNull Compound x) {
+    /** default lowest common denominator impl, subclasses may reimpl for more efficiency */
+    protected Termed getNewAtom(@NotNull Atomic x) {
+        Termed y = get(x);
+        if (y == null)  {
+            set(y = build(x));
+        }
+        return y;
+    }
 
-//        if (x.hasTemporal()) {
-//            x = theTemporalCompound(x);
-//            return x;
-//        }
-
+    /** default lowest common denominator impl, subclasses may reimpl for more efficiency */
+    protected Termed getNewCompound(@NotNull Compound x) {
         Termed y = get(x);
         if (y == null) {
-            y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt()  /* TODO make this sometimes false */);
+            y = build(x.subterms(), x.op(), x.relation(), x.dt()  /* TODO make this sometimes false */);
             if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
-                y = internCompound(y);
-
-                set(y);
+                set(y = build(y));
             }
         }
         return y;
-
-        //doesnt work due to recursive concurrent modification exception:
-//        return data.computeIfAbsent(x, (X) -> {
-//            Compound XX = (Compound) X; //??
-//            return internCompound(internCompound(XX.subterms(), XX.op(), XX.relation(), XX.dt()));
-//        });
     }
 
 
@@ -86,15 +80,15 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
         int ss = s.size();
         Term[] bb = new Term[ss];
-        boolean changed = false;
+        boolean changed = false, temporal = false;
         for (int i = 0; i < ss; i++) {
             Term a = s.term(i);
 
             Term b;
             if (a instanceof Compound) {
-                if (a.hasTemporal())
-                    return s; //dont store subterm arrays containing temporal compounds
-
+                if (a.hasTemporal()) {
+                    temporal = true;//dont store subterm arrays containing temporal compounds
+                }
                 b = theCompound((Compound) a, true).term();
             } else {
                 b = theAtom((Atomic) a, true).term();
@@ -107,11 +101,12 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
         if (changed) {
             s = TermVector.the(bb);
+        }
+        if (!temporal) {
             TermContainer existing2 = putIfAbsent(s, s);
-            if (existing2!=null)
+            if (existing2 != null)
                 s = existing2;
         }
-
         return s;
     }
 

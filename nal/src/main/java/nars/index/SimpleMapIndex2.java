@@ -34,8 +34,7 @@ public class SimpleMapIndex2 extends SimpleMapIndex {
     public String summary() {
         return
                 data.size() + " concepts, " +
-                subterms.size() + " subterms, " +
-                ((HashSymbolMap)atoms).map.size() + " atoms";
+                subterms.size() + " subterms";
     }
 
     @Override

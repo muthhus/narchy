@@ -70,6 +70,6 @@ import java.util.function.Consumer;
     @NotNull
     @Override
     public String summary() {
-        return data.size() + " concepts, " + ((HashSymbolMap)atoms).map.size() + " atoms";
+        return data.size() + " concepts ";
     }
 }

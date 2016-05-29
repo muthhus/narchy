@@ -5,9 +5,11 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.index.CaffeineIndex;
 import nars.index.Indexes;
 import nars.nal.Deriver;
 import nars.nal.Reasoner;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.DefaultCore;
 import nars.nar.util.DefaultReasoner;
 import nars.task.Task;
@@ -45,7 +47,9 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new Indexes.DefaultTermIndex(activeConcepts * 4, random), new FrameClock());
+                new Indexes.DefaultTermIndex(activeConcepts * 4, random),
+                //new CaffeineIndex(new DefaultConceptBuilder(random)),
+                new FrameClock());
     }
 
 

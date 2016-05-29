@@ -1,6 +1,5 @@
 package nars.index;
 
-import com.google.common.base.Joiner;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -67,10 +66,10 @@ public class InfinispanIndex extends MaplikeIndex {
         return subterms.get(key(t));
     }
 
-    protected Termed theCompoundCreated(@NotNull Compound x) {
+    protected Termed getNewCompound(@NotNull Compound x) {
 
         if (x.hasTemporal()) {
-            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+            return build(x.subterms(), x.op(), x.relation(), x.dt());
         }
 
         Termed yy = concepts.getAdvancedCache()
@@ -78,8 +77,8 @@ public class InfinispanIndex extends MaplikeIndex {
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
         .computeIfAbsent(key(x.term()), xx -> {
-            Termed y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
-            return internCompound(y);
+            Termed y = build(x.subterms(), x.op(), x.relation(), x.dt());
+            return build(y);
         });
         return yy;
 
