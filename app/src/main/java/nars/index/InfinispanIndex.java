@@ -35,9 +35,6 @@ public class InfinispanIndex extends MaplikeIndex {
 
 
 
-
-
-
         DefaultCacheManager cm = new DefaultCacheManager(cb.build());
         //DefaultCacheManager cm = new DefaultCacheManager();
         System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
@@ -59,11 +56,17 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @Override
     public @Nullable Termed set(@NotNull Termed src, Termed target) {
-        //concepts
-                /*.getAdvancedCache()
-                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
-                .withFlags(Flag.FORCE_SYNCHRONOUS)*/
-                //.put(src, target);
+        /*
+        3.5.1. DecoratedCache
+
+Another approach would be to use the DecoratedCache wrapper. This allows you to reuse flags. For example:
+
+AdvancedCache cache = ...
+DecoratedCache strictlyLocal = new DecoratedCache(cache, Flag.CACHE_MODE_LOCAL, Flag.SKIP_CACHE_STORE);
+strictlyLocal.put("local_1", "only");
+strictlyLocal.put("local_2", "only");
+strictlyLocal.put("local_3", "only");
+         */
         concepts.getAdvancedCache()
                 .withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
@@ -87,8 +90,6 @@ public class InfinispanIndex extends MaplikeIndex {
     public int size() {
         return concepts.size();
     }
-
-
 
     @Override
     public int subtermsCount() {

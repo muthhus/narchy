@@ -25,7 +25,7 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.time.Clock;
 import nars.truth.DefaultTruth;
-import nars.util.TermCodec;
+import nars.util.IO;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
@@ -1047,7 +1047,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         forEachConceptTask(t-> {
             if (each.test(t)) {
                 try {
-                    TermCodec.the.encodeToStream(o, t);
+                    IO.TermCodec.the.encodeToStream(o, t);
                 } catch (IOException e) {
                     logger.error("{} when trying to output to {}", t, e);
                     throw new RuntimeException(e);
@@ -1075,7 +1075,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR input(@NotNull InputStream tasks) throws Exception {
         while (tasks.available() > 0) {
-            Task t = (Task)TermCodec.the.decodeFromStream(tasks);
+            Task t = (Task) IO.TermCodec.the.decodeFromStream(tasks);
             input(t);
         }
         return this;

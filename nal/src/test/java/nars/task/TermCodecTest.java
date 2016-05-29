@@ -2,13 +2,14 @@ package nars.task;
 
 import nars.NAR;
 import nars.nar.Default;
-import nars.util.TermCodec;
+import nars.util.IO;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,12 +25,12 @@ public class TermCodecTest {
 
 
 
-    final static FSTConfiguration conf = TermCodec.the;
+    final static FSTConfiguration conf = IO.TermCodec.the;
 
 
     void assertEqualSerialize(@NotNull Object orig) {
         byte barray[] = conf.asByteArray(orig);
-        out.println(orig + "\n\tserialized: " + barray.length + " bytes");
+        out.println(orig + "\n\tserialized: " + barray.length + " bytes " + Arrays.toString(barray));
 
         Object copy = conf.asObject(barray);
         //if (copy instanceof Task) {

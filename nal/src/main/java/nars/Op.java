@@ -111,6 +111,7 @@ public enum Op {
     public final boolean temporal;
     public final int bit;
     public final boolean var;
+    private boolean atomic;
 
 
 //    Op(char c, int minLevel) {
@@ -160,6 +161,8 @@ public enum Op {
 
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
+
+        this.atomic = str.equals(".") /* atom */ || var || str.equals("^");
 
     }
 
@@ -290,6 +293,10 @@ public enum Op {
 
     public static boolean hasAny(int structure, Op o) {
         return ((structure & o.bit) > 0);
+    }
+
+    public boolean isAtomic() {
+        return atomic;
     }
 
 
