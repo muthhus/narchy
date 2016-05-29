@@ -31,7 +31,7 @@ public class InfinispanIndex extends MaplikeIndex {
         cb.unsafe().versioning().disable();
         cb.locking().concurrencyLevel(1);
         cb.jmxStatistics().disable();
-        //cb.customInterceptors().addInterceptor()
+        //cb.customInterceptors().addInterceptor();
 
 
 
@@ -39,6 +39,7 @@ public class InfinispanIndex extends MaplikeIndex {
 
 
         DefaultCacheManager cm = new DefaultCacheManager(cb.build());
+        //DefaultCacheManager cm = new DefaultCacheManager();
         System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
 
         this.concepts = cm.getCache("concepts");
@@ -58,7 +59,18 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @Override
     public @Nullable Termed set(@NotNull Termed src, Termed target) {
-        return concepts.putIfAbsent(src, target);
+        //concepts
+                /*.getAdvancedCache()
+                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
+                .withFlags(Flag.FORCE_SYNCHRONOUS)*/
+                //.put(src, target);
+        concepts.getAdvancedCache()
+                .withFlags(Flag.IGNORE_RETURN_VALUES)
+                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
+                .withFlags(Flag.FORCE_SYNCHRONOUS)
+                .put(src, target);
+
+        return target;
     }
 
     @Override
@@ -80,11 +92,16 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @Override
     public int subtermsCount() {
-        return -1;
+        return subterms.size();
     }
 
     @Override
     protected TermContainer putIfAbsent(TermContainer x, TermContainer y) {
-        return subterms.putIfAbsent(x, y);
+        return subterms
+                .getAdvancedCache()
+                .withFlags(Flag.IGNORE_RETURN_VALUES)
+                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
+                .withFlags(Flag.FORCE_SYNCHRONOUS)
+                .putIfAbsent(x, y);
     }
 }
