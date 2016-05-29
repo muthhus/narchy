@@ -4,8 +4,8 @@ import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
-import nars.index.AbstractMapIndex;
 import nars.index.Indexes;
+import nars.index.MaplikeIndex;
 import nars.index.TermIndex;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -204,14 +204,14 @@ public class TermIndexTest {
 
     @Test public void testSubtermIntern() {
         Default n = new Default();
-        AbstractMapIndex i = (AbstractMapIndex)(n.index);
+        MaplikeIndex i = (MaplikeIndex)(n.index);
 
         Term at = $("a");
         TermVector a = TermVector.the(at, $("b"), $("cd"));
         TermContainer b = ((Compound)n.conceptualize(p(a), UnitBudget.Zero)).subterms();
         assertEquals(a, b);
 
-        i.print(System.out);
+        //i.print(System.out);
 
         //System.out.println(a.term(0));
         //System.out.println(a.term(0));
@@ -235,7 +235,7 @@ public class TermIndexTest {
     }
 
     public static void testCommonPrefix(boolean direction) {
-        AbstractMapIndex i = (AbstractMapIndex)(new Default().index);
+        MaplikeIndex i = (MaplikeIndex)(new Default().index);
         Atomic sui = operator("substituteIfUnifies");
         Atomic su = operator("substitute");
 

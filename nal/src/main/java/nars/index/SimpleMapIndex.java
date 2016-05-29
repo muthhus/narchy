@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /** implements AbstractMapIndex with one ordinary map implementation. does not cache subterm vectors */
-@Deprecated abstract public class SimpleMapIndex extends MaplikeIndex {
+abstract public class SimpleMapIndex extends MaplikeIndex {
 
     public final Map<Termed,Termed> data;
 

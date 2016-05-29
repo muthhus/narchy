@@ -10,6 +10,7 @@ import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
+import nars.index.symbol.SymbolMap;
 import nars.term.Term;
 import nars.term.Termed;
 

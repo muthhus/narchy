@@ -76,6 +76,7 @@ public class CaffeineIndex extends MaplikeIndex {
 //        return current;
     }
 
+
     @Override
     public void clear() {
         data.invalidateAll();
@@ -101,7 +102,12 @@ public class CaffeineIndex extends MaplikeIndex {
         return subterms.get(s, t -> s1);
     }
 
-//    protected Termed theCompoundCreated(@NotNull Compound x) {
+    @Override
+    protected TermContainer getSubterms(@NotNull TermContainer t) {
+        return subterms.getIfPresent(t);
+    }
+
+    //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
 //        if (x.hasTemporal()) {
 //            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());

@@ -1,5 +1,6 @@
 package nars.index;
 
+import nars.Op;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -11,24 +12,30 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 /**
- * Created by me on 5/28/16.
+ * Index which is supported by Map/Cache-like operations
  */
-public abstract class MaplikeIndex extends AbstractMapIndex {
+public abstract class MaplikeIndex implements TermIndex {
+
+    //public final SymbolMap atoms;
+    protected final TermBuilder termBuilder;
+    protected final Concept.ConceptBuilder conceptBuilder;
 
     public MaplikeIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
-        super(termBuilder, conceptBuilder);
+        this.termBuilder = termBuilder;
+        this.conceptBuilder = conceptBuilder;
     }
 
+
     @Nullable
-    @Override
     protected Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewCompound(x) :
                 get(x);
     }
 
-    @Override
     protected Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewAtom(x) :
@@ -99,10 +106,8 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
             bb[i] = b;
         }
 
-        if (changed) {
+        if (changed && !temporal) {
             s = TermVector.the(bb);
-        }
-        if (!temporal) {
             TermContainer existing2 = putIfAbsent(s, s);
             if (existing2 != null)
                 s = existing2;
@@ -115,4 +120,35 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
      */
     abstract protected TermContainer putIfAbsent(TermContainer s, TermContainer s1);
 
+    @Override
+    public final TermBuilder builder() {
+        return termBuilder;
+    }
+
+    @Nullable
+    @Override
+    public final Termed get(@NotNull Termed key, boolean createIfMissing) {
+
+        return key instanceof Compound ?
+                theCompound((Compound) key, createIfMissing)
+                : theAtom((Atomic)key.term(), createIfMissing);
+    }
+
+    @NotNull
+    protected Termed build(@NotNull Termed interned) {
+        return conceptBuilder.apply(interned.term());
+    }
+
+    @NotNull
+    protected final Termed build(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+        return termBuilder.make(op, rel, theSubterms(subs), dt);
+    }
+
+    @Override
+    public final Concept.ConceptBuilder conceptBuilder() {
+        return conceptBuilder;
+    }
+
+    @Override
+    public abstract void forEach(Consumer<? super Termed> c);
 }

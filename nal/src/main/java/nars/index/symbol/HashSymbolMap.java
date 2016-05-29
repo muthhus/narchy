@@ -1,4 +1,4 @@
-package nars.index;
+package nars.index.symbol;
 
 import nars.term.Term;
 import nars.term.Termed;
