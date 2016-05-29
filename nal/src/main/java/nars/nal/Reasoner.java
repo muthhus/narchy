@@ -220,7 +220,9 @@ abstract public class Reasoner {
     }
 
     private void answer(Task q, Task a) {
-        nar.concept(q).questions().answer(a, nar);
+        @Nullable Concept c = nar.concept(q);
+        if (c != null)
+            c.questions().answer(a, nar);
     }
 
     public void matchQueryQuestion(@NotNull Task task, @NotNull Task belief) {

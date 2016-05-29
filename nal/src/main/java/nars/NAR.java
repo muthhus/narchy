@@ -1044,7 +1044,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) {
 
-        IO.TermCodec c = new IO.TermCodec(index);
+        IO.DefaultCodec c = new IO.DefaultCodec(index);
 
         forEachConceptTask(t-> {
             if (each.test(t)) {
@@ -1077,7 +1077,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR input(@NotNull InputStream tasks) throws Exception {
 
-        IO.TermCodec c = new IO.TermCodec(index);
+        IO.DefaultCodec c = new IO.DefaultCodec(index);
 
         while (tasks.available() > 0) {
             Task t = (Task) c.decodeFromStream(tasks);

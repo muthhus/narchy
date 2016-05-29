@@ -2,11 +2,14 @@ package nars.index;
 
 import com.google.common.base.Joiner;
 import nars.concept.Concept;
+import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.util.IO;
 import org.infinispan.Cache;
-import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.commons.io.ByteBuffer;
+import org.infinispan.commons.io.ByteBufferImpl;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.context.Flag;
 import org.infinispan.manager.DefaultCacheManager;
@@ -16,14 +19,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 
-public class InfinispanIndex extends MaplikeIndex {
+public class InfinispanIndex2 extends MaplikeIndex {
 
-    private final Cache<Termed, Termed> concepts;
-    private final Cache<TermContainer, TermContainer> subterms;
+    private final Cache<ByteBuffer, Termed> concepts;
+    private final Cache<ByteBuffer, TermContainer> subterms;
+
+    private final IO.DefaultCodec codec;
 
 
-    public InfinispanIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
+    public InfinispanIndex2(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(termBuilder, conceptBuilder);
+
+        this.codec = new IO.DefaultCodec(this);
 
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.unsafe().versioning().disable();
@@ -44,16 +51,46 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @Override
     public Termed remove(Termed entry) {
-        return concepts.remove(entry);
+        return concepts.remove(key(entry));
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return concepts.get(x);
+        return concepts.get(key(x));
+    }
+
+    protected Termed theCompoundCreated(@NotNull Compound x) {
+
+        if (x.term().hasTemporal()) {
+            return internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+        }
+
+        Termed yy = concepts.getAdvancedCache()
+                //.withFlags(Flag.IGNORE_RETURN_VALUES)
+                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
+                .withFlags(Flag.FORCE_SYNCHRONOUS)
+        .computeIfAbsent(key((Termed)x), xx -> {
+            Termed y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
+            return internCompound(y);
+        });
+        return yy;
+
+    }
+
+
+
+    public ByteBuffer key(@NotNull Termed x) {
+        byte[] b = codec.asByteArray(x.term());
+        return new ByteBufferImpl(b,0,b.length);
+    }
+
+    public ByteBuffer key(@NotNull TermContainer x) {
+        byte[] b = codec.asByteArray(x);
+        return new ByteBufferImpl(b,0,b.length);
     }
 
     @Override
-    public @Nullable Termed set(@NotNull Termed src, Termed target) {
+    @Deprecated public @Nullable Termed set(@NotNull Termed src, Termed target) {
         /*
         3.5.1. DecoratedCache
 
@@ -69,7 +106,7 @@ strictlyLocal.put("local_3", "only");
                 .withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
-                .put(src, target);
+                .put(key(src), target);
 
         return target;
     }
@@ -101,6 +138,11 @@ strictlyLocal.put("local_3", "only");
                 .withFlags(Flag.IGNORE_RETURN_VALUES)
                 .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
                 .withFlags(Flag.FORCE_SYNCHRONOUS)
-                .putIfAbsent(x, y);
+                .putIfAbsent(key(x), y);
+    }
+
+    @Override
+    public @NotNull String summary() {
+        return concepts.size() + " concepts, " + subterms.size() + " subterms";
     }
 }

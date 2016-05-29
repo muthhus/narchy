@@ -154,7 +154,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         }
 
         if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
-            Task ap = ((CompoundConcept)nar.concept(a)).merge(q, a, q.occurrence(), nar);
+            Task ap = nar.concept(a).merge(q, a, q.occurrence(), nar);
             if (ap!=null)
                 nar.process(ap);
         }

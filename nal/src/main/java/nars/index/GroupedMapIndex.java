@@ -128,7 +128,7 @@ public class GroupedMapIndex extends AbstractMapIndex {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
-                if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
+                if ((interned = internCompoundSubterms(subsAfter, t.op(), t.relation(), t.dt())) == null)
                     throw new InvalidTerm(t);
                     //return null;
             } else {

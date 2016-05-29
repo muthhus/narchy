@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
+import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.task.DerivedTask;
@@ -14,6 +15,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -133,31 +136,42 @@ public class IO {
             writeCompound(out, (Compound)term);
     }
 
-    static void writeCompound(@NotNull ObjectOutput out, Compound a) throws IOException {
+    static void writeCompound(@NotNull ObjectOutput out, Compound c) throws IOException {
 
         //how many subterms to follow
-        int siz = a.size();
-        out.writeByte(siz);
-        for (int i = 0; i < siz; i++) {
-            writeTerm(out, a.term(i));
-        }
+        writeTermContainer(out, c.subterms());
 
-        if (a.op().isImage())
-            out.writeByte(a.relation());
-        else if (a.op().temporal)
-            out.writeInt(a.dt());
+        if (c.op().isImage())
+            out.writeByte(c.relation());
+        else if (c.op().temporal)
+            out.writeInt(c.dt());
     }
 
-    /** TODO make a version which reads directlyinto TermIndex */
+    static void writeTermContainer(ObjectOutput out, TermContainer c) throws IOException {
+        int siz = c.size();
+        out.writeByte(siz);
+        for (int i = 0; i < siz; i++) {
+            writeTerm(out, c.term(i));
+        }
+    }
     @Nullable
-    public static Compound readCompound(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
-
-
+    public static TermContainer readTermContainer(@NotNull ObjectInput in, TermIndex t) throws IOException {
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
             s[i] = readTerm(in, t);
         }
+
+        return TermVector.the(s);
+    }
+
+    /**
+     * called by readTerm after determining the op type
+     * TODO make a version which reads directlyinto TermIndex */
+    @Nullable
+    static Compound readCompound(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
+
+        TermContainer v = readTermContainer(in, t);
 
         int relation = -1, dt = Tense.DTERNAL;
         if (o.isImage())
@@ -165,9 +179,11 @@ public class IO {
         else if (o.temporal)
             dt = in.readInt();
 
-        return (Compound) $.the(o, relation, dt, TermVector.the(s));
+        return (Compound) $.the(o, relation, dt, v);
     }
 
+    /**
+     * called by readTerm after determining the op type */
     static Term readTerm(ObjectInput in, TermIndex t) throws IOException {
         Op o = Op.values()[in.readByte()];
         if (o.isAtomic())
@@ -178,11 +194,11 @@ public class IO {
 
 
     /** serialization and deserialization of terms, tasks, etc. */
-    public static class TermCodec extends FSTConfiguration {
+    public static class DefaultCodec extends FSTConfiguration {
 
         final TermIndex index;
 
-        public TermCodec(TermIndex t) {
+        public DefaultCodec(TermIndex t) {
             super(null);
 
             this.index = t;
@@ -192,13 +208,17 @@ public class IO {
             setForceSerializable(true);
 
             //setCrossPlatform(false);
-            setShareReferences(true);
+            setShareReferences(false);
+            setPreferSpeed(true);
+            setCrossPlatform(false);
+
 
 
 
             registerClass(Atom.class, GenericCompound.class,
                     MutableTask.class, DerivedTask.class,
                     Term[].class,
+                    TermVector.class, TermContainer.class, TermSet.class,
                     //long[].class, char.class,
                     Op.class);
 
@@ -225,11 +245,31 @@ public class IO {
 
             registerSerializer(Atom.class, terms, true);
             registerSerializer(Atomic.class, terms, true);
-            registerSerializer(AtomConcept.class, terms, true);
+
             registerSerializer(GenericCompound.class, terms, true);
 
+            registerSerializer(AtomConcept.class, terms, true);
+            registerSerializer(CompoundConcept.class, terms, true);
 
         }
+
+        final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
+
+            @Override
+            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+            }
+
+            @Nullable
+            @Override
+            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+                return readTermContainer(in, index);
+            }
+
+            @Override
+            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+                writeTermContainer(out, (TermContainer) toWrite);
+            }
+        };
 
         final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {
 

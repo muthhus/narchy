@@ -38,7 +38,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
 
 
-    protected final Termed theCompoundCreated(@NotNull Compound x) {
+    protected Termed theCompoundCreated(@NotNull Compound x) {
 
 //        if (x.hasTemporal()) {
 //            x = theTemporalCompound(x);
@@ -47,7 +47,7 @@ public abstract class MaplikeIndex extends AbstractMapIndex {
 
         Termed y = get(x);
         if (y == null) {
-            y = internCompound(x.subterms(), x.op(), x.relation(), x.dt());
+            y = internCompoundSubterms(x.subterms(), x.op(), x.relation(), x.dt());
             if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
                 y = internCompound(y);
 

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 public class TermIOTest {
 
     final static NAR nar = new Terminal();
-    final static IO.TermCodec codec = new IO.TermCodec(nar.index);
+    final static IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);
 
     void assertEqualSerialize(@NotNull Object orig) {
         byte barray[] = codec.asByteArray(orig);
