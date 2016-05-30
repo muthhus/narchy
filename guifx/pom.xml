@@ -116,12 +116,7 @@
             <version>1.4.4</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.boofcv</groupId>
-            <artifactId>visualize</artifactId>
-            <version>0.23</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>WebcamCapture</artifactId>
