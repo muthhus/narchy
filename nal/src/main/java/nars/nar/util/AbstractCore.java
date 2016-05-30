@@ -27,10 +27,6 @@ import java.util.List;
  * for development and testing.
  */
 public abstract class AbstractCore {
-
-    final @NotNull Active handlers;
-
-
     /**
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
@@ -113,10 +109,6 @@ public abstract class AbstractCore {
         this.concepts = newConceptBag();
         this.conceptUpdate = new AutoBag<>(nar.perfection);
 
-        this.handlers = new Active(
-                nar.eventFrameStart.on(this::frame),
-                nar.eventReset.on(this::reset)
-        );
 
         this.termlinkUpdate = new AutoBag(nar.perfection);
         this.tasklinkUpdate = new AutoBag(nar.perfection);
@@ -125,23 +117,22 @@ public abstract class AbstractCore {
 
     protected abstract Bag<Concept> newConceptBag();
 
-    protected void frame(@NotNull NAR nar) {
+    public void frame(@NotNull NAR nar) {
 
         tasklinkUpdate.update(nar);
         termlinkUpdate.update(nar);
         conceptUpdate.update(nar);
 
 
-        cycle(nar);
+        run(nar.cyclesPerFrame.intValue());
     }
 
-    protected final void cycle(Memory memory) {
+    protected final void run(int cycles) {
 
-        int num = memory.cyclesPerFrame.intValue();
         int cpf = conceptsFiredPerCycle.intValue();
-        float dCycle = 1f / num;
+        float dCycle = 1f / cycles;
 
-        for (int cycleNum = 0; cycleNum < num; cycleNum++) {
+        for (int cycleNum = 0; cycleNum < cycles; cycleNum++) {
             float subCycle = dCycle * cycleNum;
 
             termlinkUpdate.cycle(subCycle);
@@ -156,7 +147,7 @@ public abstract class AbstractCore {
 
     }
 
-    private void reset(Memory m) {
+    public void reset(Memory m) {
         concepts.clear();
     }
 

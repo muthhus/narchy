@@ -15,11 +15,13 @@ import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.event.On;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -58,11 +60,13 @@ public class Multi extends AbstractNAR {
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
             PremiseEval matcher = new PremiseEval(random, newDeriver());
-            this.cores[i] = newCore(
+            WorkerCore core = this.cores[i] = newCore(
                     conceptsPerCore,
                     conceptsFirePerCycle,
                     termLinksPerConcept, taskLinksPerConcept, matcher
             );
+            eventFrameStart.on(core::frameQueued);
+            eventReset.on(core::reset);
         }
 
         runLater(this::initHigherNAL);
@@ -78,14 +82,17 @@ public class Multi extends AbstractNAR {
 
 
     /** runs asynchronously in its own thread. counts down a # of pending cycles */
-    public class WorkerCore extends DefaultCore {
+    public class WorkerCore extends DefaultCore implements Runnable {
 
-        private final AtomicInteger cyclesPending = new AtomicInteger(0);
+        private final AtomicBoolean running = new AtomicBoolean(false);
+        private final AtomicInteger framesPending = new AtomicInteger(0);
+        private final Thread thread;
+        private boolean stopped = false;
 
         public WorkerCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
             super(nar, matcher, warm, cold);
+            this.thread = new Thread(this);
         }
-
 
         @Override
         protected void activate(Concept c) {
@@ -99,6 +106,40 @@ public class Multi extends AbstractNAR {
             Concept cc = c.get();
             if (Multi.this.active.remove(cc)==cc) {
                 super.deactivate(c);
+            }
+        }
+
+
+        public void frameQueued(NAR nar) {
+            framesPending.incrementAndGet();
+            if (!running.get()) {
+                wake();
+            }
+        }
+
+        protected void wake() {
+            thread.interrupt();
+        }
+
+        protected void sleep() {
+            try {
+                while (true) {
+                    Thread.sleep(1);
+                }
+            } catch (InterruptedException e) {  }
+        }
+
+        public void stop() {
+            stopped = true;
+        }
+
+        @Override public final void run() {
+            while (!stopped) {
+                if (framesPending.getAndDecrement() <= 0) {
+                    sleep();
+                } else {
+                    frame(Multi.this);
+                }
             }
         }
     }

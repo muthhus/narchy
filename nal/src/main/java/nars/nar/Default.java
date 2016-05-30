@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -89,6 +90,10 @@ public class Default extends AbstractNAR {
 
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
+        //this.handlers = new Active(
+        eventFrameStart.on(core::frame);
+        eventReset.on(core::reset);
+        //);
         return c;
     }
 
