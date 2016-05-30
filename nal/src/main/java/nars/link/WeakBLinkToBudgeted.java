@@ -15,6 +15,6 @@ public final class WeakBLinkToBudgeted<B extends Budgeted> extends WeakBLink<B> 
     @Override
     public boolean commit() {
         B val = id.get();
-        return val.isDeleted() ? delete() : super.commit();
+        return (val == null || val.isDeleted()) ? delete() : super.commit();
     }
 }

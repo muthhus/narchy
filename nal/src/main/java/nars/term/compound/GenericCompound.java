@@ -177,7 +177,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean equals(@Nullable Object that) {
         return this == that ||
-                ( that!=null && hash == that.hashCode() && equalsFurther((Termed) that));
+                ( that instanceof Compound && hash == that.hashCode() && equalsFurther((Termed) that));
     }
 
     @Override
