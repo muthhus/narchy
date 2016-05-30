@@ -1,7 +1,7 @@
 package nars.nar.util;
 
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.forget.Forget;
@@ -36,7 +36,7 @@ public final class DefaultCore extends AbstractCore {
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(BLink<Concept> cl) {
+    protected void deactivate(ArrayBLink<Concept> cl) {
         Concept c = cl.get();
 
         //apply forgetting so that shrinking capacity will be applied to concept's components fairly
@@ -80,10 +80,9 @@ public final class DefaultCore extends AbstractCore {
         }
 
 
-        @Nullable
         @Override
-        protected BLink<Concept> putNew(Concept i, BLink<Concept> b) {
-            BLink<Concept> displaced = super.putNew(i, b);
+        protected @Nullable ArrayBLink<Concept> putNew(Concept i, ArrayBLink<Concept> b) {
+            ArrayBLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
 
                 Concept dd = displaced.get();
@@ -99,10 +98,9 @@ public final class DefaultCore extends AbstractCore {
             return displaced;
         }
 
-        @Nullable
         @Override
-        public BLink<Concept> remove(Concept x) {
-            BLink<Concept> removed = super.remove(x);
+        public @Nullable ArrayBLink<Concept> remove(Concept x) {
+            ArrayBLink<Concept> removed = super.remove(x);
             if (removed!=null) {
                 deactivate(removed);
             }

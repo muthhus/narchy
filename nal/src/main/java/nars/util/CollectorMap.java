@@ -1,6 +1,6 @@
 package nars.util;
 
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,7 +120,7 @@ public abstract class CollectorMap<K, V>  {
     }
 
     /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
-    protected final void removeKey(BLink<V> item) {
+    protected final void removeKey(ArrayBLink<V> item) {
         boolean removed = map.values().remove(item); //removeIf((v)->(v==item));
         if (!removed)
             throw new RuntimeException("Bag fault while trying to remove key by item value");

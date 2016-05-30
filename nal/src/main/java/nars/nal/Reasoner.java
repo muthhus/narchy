@@ -3,8 +3,7 @@ package nars.nal;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
-import nars.bag.BLink;
-import nars.concept.CompoundConcept;
+import nars.bag.ArrayBLink;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.nal.meta.PremiseEval;
@@ -72,18 +71,18 @@ abstract public class Reasoner {
     /**
      * temporary re-usable array for batch firing
      */
-    private final Collection<BLink<? extends Termed>> terms =
+    private final Collection<ArrayBLink<? extends Termed>> terms =
             Global.newArrayList();
             //Global.newHashSet(1);
 
     /**
      * temporary re-usable array for batch firing
      */
-    private final List<BLink<Task>> tasks =
+    private final List<ArrayBLink<Task>> tasks =
             Global.newArrayList();
             //Global.newHashSet(1);
 
-    @NotNull private BLink[] termsArray = new BLink[0];
+    @NotNull private ArrayBLink[] termsArray = new ArrayBLink[0];
 
     //@NotNull private BLink[] tasksArray = new BLink[0];
 
@@ -99,32 +98,32 @@ abstract public class Reasoner {
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
     public final void firePremiseSquared(
-            @NotNull BLink<? extends Concept> conceptLink,
+            @NotNull ArrayBLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks) {
 
         Concept c = conceptLink.get();
 
-        Collection<BLink<? extends Termed>> termsBuffer;
+        Collection<ArrayBLink<? extends Termed>> termsBuffer;
         termsBuffer = this.terms;
         c.termlinks().sample(termlinks, termsBuffer::add);
         assert (!termsBuffer.isEmpty());
 
 
-        List<BLink<Task>> tasksBuffer = this.tasks;
+        List<ArrayBLink<Task>> tasksBuffer = this.tasks;
         c.tasklinks().sample(tasklinks, tasksBuffer::add);
 
         //assert (!tasksBuffer.isEmpty());
         if (tasksBuffer.isEmpty() || termsBuffer.isEmpty()) return;
 
 
-        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
+        ArrayBLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
 
         //convert to array for fast for-within-for iterations
         //BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
 
         for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
-            BLink<Task> taskLink = tasksBuffer.get(i);
+            ArrayBLink<Task> taskLink = tasksBuffer.get(i);
             //for (BLink<Task> taskLink : tasksArray) {
             //if (taskLink == null) break; //null-terminated array, ends
 
@@ -139,14 +138,14 @@ abstract public class Reasoner {
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@Nullable BLink<Termed>[] termsArray, @NotNull BLink<Task> taskLink, @NotNull Task task) {
+    private void premiseTask(@Nullable ArrayBLink<Termed>[] termsArray, @NotNull ArrayBLink<Task> taskLink, @NotNull Task task) {
 
 
         long occ = task.occurrence();
 
         Compound taskTerm = task.term();
 
-        for (BLink<Termed> termLink : termsArray) {
+        for (ArrayBLink<Termed> termLink : termsArray) {
 
             if (termLink == null || taskLink.isDeleted() || task.isDeleted())
                 break; //end of termsArray, or task has become deleted in the previous iteration, cancel

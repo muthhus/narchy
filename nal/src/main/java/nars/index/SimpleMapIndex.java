@@ -1,10 +1,9 @@
 package nars.index;
 
 import nars.concept.Concept;
-import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,29 +13,33 @@ import java.util.function.Consumer;
 /** implements AbstractMapIndex with one ordinary map implementation. does not cache subterm vectors */
 abstract public class SimpleMapIndex extends MaplikeIndex {
 
-    public final Map<Termed,Termed> data;
+    protected final Map<Termed,Termed> concepts;
 
     public SimpleMapIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
         super(termBuilder, conceptBuilder);
-        this.data = compounds;
+        this.concepts = compounds;
     }
 
+    @Override
+    protected Termed getNewAtom(@NotNull Atomic x) {
+        return concepts.computeIfAbsent(x, this::build);
+    }
 
     @Override
     public Termed remove(Termed entry) {
-        return data.remove(entry);
+        return concepts.remove(entry);
     }
 
 
     @Override public final Termed get(@NotNull Termed x) {
-        return data.get(x);
+        return concepts.get(x);
     }
 
 
     @Nullable
     @Override
     public final void set(@NotNull Termed src, Termed target) {
-        data.put(src, target);
+        concepts.put(src, target);
 
 
         //return data.putIfAbsent(src, target);
@@ -47,17 +50,17 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
 
     @Override
     public void clear() {
-        data.clear();
+        concepts.clear();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        data.forEach((k,v)-> c.accept(v));
+        concepts.forEach((k, v)-> c.accept(v));
     }
 
     @Override
     public int size() {
-        return data.size() /* + atoms.size? */;
+        return concepts.size() /* + atoms.size? */;
     }
 
 
@@ -70,6 +73,6 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     @NotNull
     @Override
     public String summary() {
-        return data.size() + " concepts ";
+        return concepts.size() + " concepts ";
     }
 }

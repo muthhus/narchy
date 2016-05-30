@@ -1,6 +1,6 @@
 package nars.guifx.highdim;
 
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
 import nars.term.Compound;
@@ -10,14 +10,14 @@ import nars.util.data.Util;
 /**
  * Created by me on 2/29/16.
  */
-public class AEConcept1 extends HighDim.AutoEnc2Projection<BLink<? extends Concept>> {
+public class AEConcept1 extends HighDim.AutoEnc2Projection<ArrayBLink<? extends Concept>> {
 
     public AEConcept1() {
         super(20, 8, 4);
     }
 
     @Override
-    public float[] vectorize(BLink<? extends Concept> clink, float[] x) {
+    public float[] vectorize(ArrayBLink<? extends Concept> clink, float[] x) {
         //x[0] = c.op().ordinal() / 16f; //approx;
         //x[1] = clink.pri();
         Concept c = clink.get();

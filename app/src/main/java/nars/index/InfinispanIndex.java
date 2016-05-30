@@ -5,10 +5,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.IO;
 import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
+import org.infinispan.cache.impl.DecoratedCache;
 import org.infinispan.commons.io.ByteBuffer;
 import org.infinispan.commons.io.ByteBufferImpl;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -23,9 +25,12 @@ import java.util.function.Consumer;
 public class InfinispanIndex extends MaplikeIndex {
 
     private final Cache<ByteBuffer, Termed> concepts;
+    private final DecoratedCache<ByteBuffer,Termed> conceptsLocal;
     private final Cache<ByteBuffer, TermContainer> subterms;
+    private final DecoratedCache<ByteBuffer,TermContainer> subtermsLocal;
 
     private final IO.DefaultCodec codec;
+
 
 
     public InfinispanIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
@@ -46,44 +51,57 @@ public class InfinispanIndex extends MaplikeIndex {
         //System.out.println(Joiner.on('\n').join(cm.getCacheManagerConfiguration().toString().split(", ")));
 
         this.concepts = cm.getCache("concepts");
+        this.conceptsLocal = new DecoratedCache<>(
+                concepts.getAdvancedCache(),
+                Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING, Flag.SKIP_OWNERSHIP_CHECK,
+                Flag.SKIP_REMOTE_LOOKUP);
         this.subterms = cm.getCache("subterms");
+        this.subtermsLocal = new DecoratedCache<>(
+                subterms.getAdvancedCache(),
+                Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING, Flag.SKIP_OWNERSHIP_CHECK,
+                Flag.SKIP_REMOTE_LOOKUP);
+
 
     }
 
     @Override
     public Termed remove(Termed x) {
-        return concepts.remove(key(x.term()));
+        return conceptsLocal.remove(key(x.term()));
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return concepts.get(key(x.term()));
+        return conceptsLocal.get(key(x.term()));
     }
 
 
     @Override
+    protected Termed getNewAtom(@NotNull Atomic x) {
+        return conceptsLocal.computeIfAbsent(key(x.term()), xx -> {
+            return build(x);
+        });
+    }
+
+    @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
-        return subterms.get(key(t));
+        return subtermsLocal.get(key(t));
     }
 
     protected Termed getNewCompound(@NotNull Compound x) {
 
         if (x.hasTemporal()) {
-            return build(x.subterms(), x.op(), x.relation(), x.dt());
+            return buildCompound(x);
+        } else {
+            return conceptsLocal.computeIfAbsent(key(x.term()), xx -> {
+                return build(buildCompound(x));
+            });
         }
-
-        Termed yy = concepts.getAdvancedCache()
-                //.withFlags(Flag.IGNORE_RETURN_VALUES)
-                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
-                .withFlags(Flag.FORCE_SYNCHRONOUS)
-        .computeIfAbsent(key(x.term()), xx -> {
-            Termed y = build(x.subterms(), x.op(), x.relation(), x.dt());
-            return build(y);
-        });
-        return yy;
-
     }
 
+    @NotNull
+    private Termed buildCompound(@NotNull Compound x) {
+        return build(x.subterms(), x.op(), x.relation(), x.dt());
+    }
 
 
     public ByteBuffer key(@NotNull Term x) {
@@ -110,47 +128,39 @@ strictlyLocal.put("local_1", "only");
 strictlyLocal.put("local_2", "only");
 strictlyLocal.put("local_3", "only");
          */
-        concepts.getAdvancedCache()
-                .withFlags(Flag.IGNORE_RETURN_VALUES)
-                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
-                .withFlags(Flag.FORCE_SYNCHRONOUS)
+        conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES)
                 .put(key(src.term()), target);
 
     }
 
     @Override
     public void clear() {
-        concepts.clear();
+        conceptsLocal.clear();
+        subtermsLocal.clear();
     }
 
     @Override
     public void forEach(Consumer<? super Termed> c) {
-        concepts.forEach( (k, v) -> c.accept(v) );
+        conceptsLocal.forEach( (k, v) -> c.accept(v) );
     }
 
     @Override
     public int size() {
-        return concepts.size();
+        return conceptsLocal.size();
     }
 
     @Override
     public int subtermsCount() {
-        return subterms.size();
+        return subtermsLocal.size();
     }
 
     @Override
     protected TermContainer putIfAbsent(TermContainer x, TermContainer y) {
-        return subterms
-                .getAdvancedCache()
-                .withFlags(Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING)
-                .withFlags(Flag.FORCE_SYNCHRONOUS)
-                .putIfAbsent(key(x), y);
+        return subtermsLocal.putIfAbsent(key(x), y);
     }
 
     @Override
     public @NotNull String summary() {
-        AdvancedCache conceptsLocal = concepts.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD, Flag.CACHE_MODE_LOCAL);
-        AdvancedCache subtermsLocal = subterms.getAdvancedCache().withFlags(Flag.SKIP_CACHE_LOAD, Flag.CACHE_MODE_LOCAL);
         return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms";
     }
 }

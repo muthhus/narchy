@@ -3,21 +3,20 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.concept.Concept;
-import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
 public class CaffeineIndex extends MaplikeIndex {
 
-    final Cache<Termed, Termed> data;
+    final Cache<Termed, Termed> concepts;
     final Cache<TermContainer, TermContainer> subterms;
 
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder) {
@@ -27,7 +26,7 @@ public class CaffeineIndex extends MaplikeIndex {
     public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(termBuilder, conceptBuilder);
 
-        data = Caffeine.newBuilder()
+        concepts = Caffeine.newBuilder()
                 .softValues()
                 //.weakValues()
                 //.maximumSize(10_000)
@@ -53,19 +52,19 @@ public class CaffeineIndex extends MaplikeIndex {
     public Termed remove(Termed entry) {
         Termed t = get(entry);
         if (t!=null) {
-            data.invalidate(entry);
+            concepts.invalidate(entry);
         }
         return t;
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return data.getIfPresent(x);
+        return concepts.getIfPresent(x);
     }
 
     @Override
     public @Nullable void set(@NotNull Termed src, Termed target) {
-        data.put(src, target);
+        concepts.put(src, target);
         //Termed exist = data.getIfPresent(src);
 
         //data.put(src, target);
@@ -79,17 +78,18 @@ public class CaffeineIndex extends MaplikeIndex {
 
     @Override
     public void clear() {
-        data.invalidateAll();
+        concepts.invalidateAll();
+        subterms.invalidateAll();
     }
 
     @Override
     public void forEach(Consumer<? super Termed> c) {
-        data.asMap().forEach((k,v) -> c.accept(v));
+        concepts.asMap().forEach((k, v) -> c.accept(v));
     }
 
     @Override
     public int size() {
-        return (int)data.estimatedSize();
+        return (int) concepts.estimatedSize();
     }
 
     @Override
@@ -107,6 +107,11 @@ public class CaffeineIndex extends MaplikeIndex {
         return subterms.getIfPresent(t);
     }
 
+
+    @Override
+    protected Termed getNewAtom(@NotNull Atomic x) {
+        return concepts.get(x, this::build);
+    }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
 //        if (x.hasTemporal()) {
@@ -124,6 +129,6 @@ public class CaffeineIndex extends MaplikeIndex {
 
     @Override
     public @NotNull String summary() {
-        return data.estimatedSize() + " concepts, " + subterms.estimatedSize() + " subterms";
+        return concepts.estimatedSize() + " concepts, " + subterms.estimatedSize() + " subterms";
     }
 }

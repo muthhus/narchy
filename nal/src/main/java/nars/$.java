@@ -557,7 +557,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
-        return terms.the(op, relation, dt, subterms);
+        return terms.build(op, relation, dt, subterms);
     }
 
 

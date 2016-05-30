@@ -1,15 +1,10 @@
 package nars.index;
 
 import nars.concept.Concept;
-import nars.term.Compound;
-import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Map;
@@ -33,7 +28,7 @@ public class MapIndex extends SimpleMapIndex {
     @Override
     public String summary() {
         return
-                data.size() + " concepts, " +
+                concepts.size() + " concepts, " +
                 subterms.size() + " subterms";
     }
 
@@ -45,8 +40,14 @@ public class MapIndex extends SimpleMapIndex {
         //subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
         //data.forEach((k,v) -> System.out.println(k + "\t" + v));
 
-        data.keySet().forEach(System.out::println);
+        concepts.keySet().forEach(System.out::println);
 
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        subterms.clear();
     }
 
     @Override

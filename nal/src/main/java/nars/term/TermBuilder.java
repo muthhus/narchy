@@ -30,7 +30,7 @@ import static nars.term.compound.Statement.subj;
 public abstract class TermBuilder {
 
     @Nullable
-    public Term the(@NotNull Op op, int relation, int dt, @NotNull TermContainer tt) throws InvalidTerm {
+    public Term build(@NotNull Op op, int relation, int dt, @NotNull TermContainer tt) throws InvalidTerm {
 
         Term[] u = tt.terms();
 
@@ -179,7 +179,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term newCompound(@NotNull Op op, int relation, @NotNull TermContainer tt) {
-        return the(op, relation, DTERNAL, tt);
+        return build(op, relation, DTERNAL, tt);
     }
 
 
@@ -469,10 +469,10 @@ public abstract class TermBuilder {
 
                         MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                         if (!common.isEmpty()) {
-                            subject = theTransformed(csub, TermContainer.except(subjs, common));
+                            subject = buildTransformed(csub, TermContainer.except(subjs, common));
                             if (subject == null)
                                 return null;
-                            predicate = theTransformed(cpred, TermContainer.except(preds, common));
+                            predicate = buildTransformed(cpred, TermContainer.except(preds, common));
                             if (predicate == null)
                                 return null;
 
@@ -611,11 +611,11 @@ public abstract class TermBuilder {
     }
 
 
-    public final Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
+    public final Term buildTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
 
-        return the(csrc.op(), csrc.relation(), csrc.dt(), subs);
+        return build(csrc.op(), csrc.relation(), csrc.dt(), subs);
     }
 
 }

@@ -2,14 +2,12 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.index.CaffeineIndex;
 import nars.index.Indexes;
 import nars.nal.Deriver;
 import nars.nal.Reasoner;
-import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.DefaultCore;
 import nars.nar.util.DefaultReasoner;
 import nars.task.Task;
@@ -160,7 +158,7 @@ public class Default extends AbstractNAR {
         if (termed!=null) {
             //Concept cc = concept(termed);
             //if (cc != null) {
-                BLink<Concept> c = core.active.get(termed);
+                ArrayBLink<Concept> c = core.active.get(termed);
                 if (c != null)
                     return c.priIfFiniteElseZero();
             //}

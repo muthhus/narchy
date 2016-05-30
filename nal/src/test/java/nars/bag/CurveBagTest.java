@@ -89,7 +89,7 @@ public class CurveBagTest  {
 
         a.commit();
 
-        Iterator<BLink<String>> ii = a.iterator();
+        Iterator<ArrayBLink<String>> ii = a.iterator();
         assertEquals("y", ii.next().get());
         assertEquals("x", ii.next().get());
 

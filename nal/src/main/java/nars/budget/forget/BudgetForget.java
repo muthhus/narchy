@@ -1,13 +1,13 @@
 package nars.budget.forget;
 
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 /** processes a BLink, usually affecting its budget somehow */
-public interface BudgetForget extends Consumer<BLink> {
+public interface BudgetForget extends Consumer<ArrayBLink> {
     /**
      * called each frame to update parameters
      */

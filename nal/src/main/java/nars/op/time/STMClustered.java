@@ -2,7 +2,8 @@ package nars.op.time;
 
 import nars.$;
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
+import nars.bag.StrongBLink;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.learn.gng.NeuralGasNet;
@@ -152,7 +153,7 @@ public class STMClustered extends STM {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends BLink.StrongBLink<Task> {
+    public final class TLink extends StrongBLink<Task> {
 
         /** feature vector representing the item as learned by clusterer */
         public final double[] coord;
@@ -231,7 +232,7 @@ public class STMClustered extends STM {
         this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {
             @Override
-            protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
+            protected ArrayBLink<Task> newLink(Task i, Budgeted b, float scale) {
                 return new TLink(i, b, scale);
             }
         };

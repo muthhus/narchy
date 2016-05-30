@@ -84,7 +84,7 @@ public interface TermIndex {
     @Nullable
     default Termed the(@NotNull Op op, @NotNull TermContainer subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        Term b = builder().the(op, -1, DTERNAL, subterms);
+        Term b = builder().build(op, -1, DTERNAL, subterms);
         return b == null ? null : the(b);
     }
 
@@ -176,7 +176,7 @@ public interface TermIndex {
 
     @Nullable
     default Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
-        return builder().theTransformed(csrc, subs);
+        return builder().buildTransformed(csrc, subs);
     }
 
 
@@ -212,7 +212,6 @@ public interface TermIndex {
         List<Term> sub = Global.newArrayList(len /* estimate */);
 
         boolean changed = false;
-        int j; //pointer to the term of crc to compare changes against
         for (int i = 0; i < len; i++) {
             Term t = crc.term(i);
             Term u = resolve(t, f);
@@ -233,10 +232,12 @@ public interface TermIndex {
                 //                    return src; //invalid transformation, violates arity constraint
                 //                }
 
-                if (u == null) {
-                    u = t; //keep value
-                } else if (t!=u) {//!changed && !t.equals(u)) {
-                    changed = true; //check for any changes
+                if (t!=u) {
+                    if (u == null) {
+                        u = t; //keep value
+                    } else {//!changed && !t.equals(u)) {
+                        changed = true; //check for any changes
+                    }
                 }
 
                 sub.add(u);

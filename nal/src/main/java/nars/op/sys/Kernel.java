@@ -4,7 +4,7 @@ import nars.$;
 import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.bag.impl.CurveBag;
 import nars.budget.UnitBudget;
 import nars.budget.forget.Forget;
@@ -77,7 +77,7 @@ public class Kernel {
         //schedule.printAll();
     }
 
-    private float strength(@NotNull BLink<Task> cl) {
+    private float strength(@NotNull ArrayBLink<Task> cl) {
         return strength * cl.summary();
     }
 

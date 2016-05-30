@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.budget.Budgeted;
 import nars.guifx.TaskPane;
 import nars.guifx.graph2.TermNode;
@@ -45,7 +45,7 @@ public class TaskButton<X> extends Label implements Runnable {
         this.item = t;
 
         Object ref;
-        ref = t instanceof BLink ? ((BLink) t).get() : t;
+        ref = t instanceof ArrayBLink ? ((ArrayBLink) t).get() : t;
 
         String s;
         if (ref instanceof Task) {
@@ -146,7 +146,7 @@ public class TaskButton<X> extends Label implements Runnable {
 
 
             Object item = this.item;
-            if (item instanceof BLink) item = ((BLink)item).get(); //get what it refers to
+            if (item instanceof ArrayBLink) item = ((ArrayBLink)item).get(); //get what it refers to
 
 
             //            setBackground(new Background(
@@ -180,8 +180,8 @@ public class TaskButton<X> extends Label implements Runnable {
         Termed tt;
         if (item instanceof Termed) {
             tt = (Termed)item;
-        } else if (item instanceof BLink) {
-            tt = ((BLink<? extends Termed>)item).get();
+        } else if (item instanceof ArrayBLink) {
+            tt = ((ArrayBLink<? extends Termed>)item).get();
         } else {
             throw new UnsupportedOperationException();
         }

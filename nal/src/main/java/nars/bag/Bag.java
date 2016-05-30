@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * TODO remove unnecessary methods, documetn
  * TODO implement java.util.Map interface
  */
-public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<V>> {
+public interface Bag<V> extends Table<V, ArrayBLink<V>>, Consumer<V>, Iterable<ArrayBLink<V>> {
 
 
 
@@ -35,8 +35,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * gets the next value without removing changing it or removing it from any index.  however
      * the bag is cycled so that subsequent elements are different.
      */
-    @Nullable
-    BLink<V> sample();
+    @Nullable ArrayBLink<V> sample();
 
 
     /**
@@ -45,16 +44,15 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * @param key
      * @return
      */
-    @Nullable
     @Override
-    BLink<V> remove(@NotNull V x);
+    @Nullable
+    ArrayBLink<V> remove(@NotNull V x);
 
 
     /**
      * insert/merge with an initial / default budget
      */
-    @Nullable
-    default BLink<V> put(@NotNull V x) {
+    default @Nullable ArrayBLink<V> put(@NotNull V x) {
         return put(x, initialBudget(x), null);
     }
 //        @Nullable
@@ -85,30 +83,26 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        return new BLink(v, 0,0,0);
     }
 
-    @Override @Nullable
-    default BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
+    @Override
+    default @Nullable ArrayBLink<V> put(@NotNull V i, @NotNull ArrayBLink<V> b) {
         return put(i, b, 1f, null);
     }
 
-    @Nullable
-    default BLink<V> put(@NotNull V i, @NotNull Budgeted b) {
+    default @Nullable ArrayBLink<V> put(@NotNull V i, @NotNull Budgeted b) {
         return put(i, b, 1f, null);
     }
 
 
-    @Nullable
-    default BLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
+    default @Nullable ArrayBLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
         return put(i, b, 1f, overflowing);
     }
 
-    @Nullable
-    default BLink<V> put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
+    default @Nullable ArrayBLink<V> put(@NotNull V v, @NotNull ArrayBLink<V> b, @Nullable MutableFloat overflowing) {
         return put(v, b, 1f, overflowing);
     }
 
 
-    @Nullable
-    BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
+    @Nullable ArrayBLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
 
 
 
@@ -121,14 +115,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-    @NotNull default Bag<V> sample(float percent, @NotNull Consumer<? super BLink<V>> target) {
+    @NotNull default Bag<V> sample(float percent, @NotNull Consumer<? super ArrayBLink<V>> target) {
         int n = (int)Math.ceil(percent * size());
         sample(n, target);
         return this;
     }
 
     @NotNull
-    Bag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target);
+    Bag<V> sample(int n, @NotNull Consumer<? super ArrayBLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added
@@ -199,7 +193,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      */
     @Nullable
     @Override
-    Iterator<BLink<V>> iterator();
+    Iterator<ArrayBLink<V>> iterator();
 
     /**
      * Check if an item is in the bag.  both its key and its value must match the parameter
@@ -320,9 +314,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    default void forEach(int max, @NotNull Consumer<? super BLink<V>> action) {
+    default void forEach(int max, @NotNull Consumer<? super ArrayBLink<V>> action) {
 
-        Iterator<BLink<V>> ii = iterator();
+        Iterator<ArrayBLink<V>> ii = iterator();
         int n = 0;
         while (ii.hasNext() && (n++ < max)) {
             action.accept(ii.next());
@@ -450,6 +444,6 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         a.forEach(this::put);
     }
 
-    Bag<V> commit(@NotNull Consumer<BLink> each);
+    Bag<V> commit(@NotNull Consumer<ArrayBLink> each);
 
 }

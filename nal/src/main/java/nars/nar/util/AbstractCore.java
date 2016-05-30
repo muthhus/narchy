@@ -2,7 +2,7 @@ package nars.nar.util;
 
 import nars.Memory;
 import nars.NAR;
-import nars.bag.BLink;
+import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.bag.impl.AutoBag;
 import nars.budget.Budgeted;
@@ -167,7 +167,7 @@ public abstract class AbstractCore {
         b.sample(conceptsToFire, this::fireConcept);
     }
 
-    protected final void fireConcept(BLink<Concept> conceptLink) {
+    protected final void fireConcept(ArrayBLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
         tasklinkUpdate.update(concept.tasklinks(), true);
