@@ -44,7 +44,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
     @NotNull
     protected final NAR nar;
     private final String termPrefix;
-    private nars.budget.Budgeted NewAbbreviationBudget = UnitBudget.Full.cloneMult(0.9f, 0.5f, 0.5f);
+    private final nars.budget.Budgeted NewAbbreviationBudget = UnitBudget.Full.cloneMult(0.9f, 0.5f, 0.5f);
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix) {

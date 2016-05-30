@@ -49,10 +49,8 @@ public class TaskBudgeting {
 
         //Penalize by complexity
         float volRatioScale;
-        {
-            //ORIGINAL METHOD
-            //volRatioScale = 1f / derived.term().volume();
-        }
+        //ORIGINAL METHOD
+        //volRatioScale = 1f / derived.term().volume();
         //RELATIVE SIZE INCREASE METHOD
         int tasktermVol = task.term().volume();
         volRatioScale =

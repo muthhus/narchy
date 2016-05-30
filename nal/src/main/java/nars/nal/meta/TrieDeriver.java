@@ -275,11 +275,9 @@ public class TrieDeriver extends Deriver {
         } */ else if (p instanceof AndCondition) {
             indent(indent);
             out.println("and {");
-            {
-                AndCondition ac = (AndCondition) p;
-                for (BoolCondition b : ac.termCache) {
-                    print(b, out, indent + 2);
-                }
+            AndCondition ac = (AndCondition) p;
+            for (BoolCondition b : ac.termCache) {
+                print(b, out, indent + 2);
             }
             indent(indent);
             out.println("}");

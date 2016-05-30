@@ -92,7 +92,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         }
     }
 
-    default public @Nullable Task merge(Task x, Task y, long when, NAR nar) {
+    default @Nullable Task merge(Task x, Task y, long when, NAR nar) {
         long now = nar.time();
         return Revision.merge(x, y, now, when,
                 ((BeliefTable)tableFor(y.punc())).truth(now, when)

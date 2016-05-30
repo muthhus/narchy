@@ -56,7 +56,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     }
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((Compound) $.$(compoundTermString), n);
+        this($.$(compoundTermString), n);
     }
 
 //    static void ensureOperation(@NotNull Compound term) {

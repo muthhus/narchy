@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 
 public interface ProxyTerm<T extends Term> extends Term {
 
+    @Override
     T term();
 
     T target();

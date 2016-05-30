@@ -2,6 +2,7 @@ package nars.op.java;
 
 import nars.$;
 import nars.Global;
+import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
@@ -9,7 +10,6 @@ import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.Truth;

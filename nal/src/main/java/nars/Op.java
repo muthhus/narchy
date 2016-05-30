@@ -111,7 +111,7 @@ public enum Op {
     public final boolean temporal;
     public final int bit;
     public final boolean var;
-    private boolean atomic;
+    private final boolean atomic;
 
 
 //    Op(char c, int minLevel) {

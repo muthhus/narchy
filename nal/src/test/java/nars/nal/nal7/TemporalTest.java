@@ -2,10 +2,10 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.budget.UnitBudget;
+import nars.index.TermIndex;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Term;
-import nars.index.TermIndex;
 import nars.term.Termed;
 import org.junit.Test;
 

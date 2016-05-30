@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class ControlFlowTest {
 
     private static final boolean METER = false;
-    private static boolean LOG = false;
+    private static boolean LOG;
 
 
     private final List<CompoundConcept> states = new ArrayList();

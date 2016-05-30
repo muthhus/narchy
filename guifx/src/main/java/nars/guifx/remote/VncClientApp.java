@@ -67,7 +67,8 @@ public class VncClientApp extends Application {
         Injector.setLogger(logger::fine);
 
         // Injector.setModelOrService(Stage.class, stage);
-        Injector.setModelOrService(ProtocolConfiguration.class, Injector.instantiateModelOrService(DefaultProtocolConfiguration.class));
+        //Injector.setModelOrService(ProtocolConfiguration.class, Injector.instantiateModelOrService(DefaultProtocolConfiguration.class));
+        Injector.setModelOrService(ProtocolConfiguration.class, new DefaultProtocolConfiguration());
 
         VncRenderService vncService = Injector.instantiateModelOrService(VncRenderService.class);
 

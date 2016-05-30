@@ -7,7 +7,6 @@ import nars.budget.Budget;
 import nars.concept.BeliefTable;
 import nars.concept.Concept;
 import nars.concept.TaskTable;
-import nars.link.*;
 import nars.premise.Premise;
 import nars.premise.PremiseGenerator;
 import nars.task.Sentence;

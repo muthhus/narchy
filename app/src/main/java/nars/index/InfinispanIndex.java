@@ -8,7 +8,6 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.IO;
-import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.cache.impl.DecoratedCache;
 import org.infinispan.commons.io.ByteBuffer;

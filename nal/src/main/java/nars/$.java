@@ -105,7 +105,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @Nullable
     public static Term inh(@NotNull String subj, @NotNull String pred) {
-        return inh((Term)$(subj), $(pred));
+        return inh($(subj), $(pred));
     }
 
 
@@ -266,7 +266,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static MutableTask task(@NotNull String term, char punct, float freq, float conf) throws Narsese.NarseseException {
-        return task((Compound)$.$(term), punct, freq, conf);
+        return task($.$(term), punct, freq, conf);
     }
 
     @NotNull

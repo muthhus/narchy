@@ -27,35 +27,8 @@ public final class DerivedTask extends MutableTask {
     }
 
     @Override public boolean delete() {
-        if (super.delete()) {
-            //weaken the premise components which formed this in proportion to the confidence.
-            //ie, the weaker the conf the less budget penalty because these are more likely and frequently to be removed
+        return super.delete();
 
-            //this produces negative feedback anytime a derived task is deleted, for example,
-            //if a duplicate already existed. then the premise is less likely to be activated
-            //in the future having been attenuated.
-
-//            if (isBeliefOrGoal()) {
-//
-//
-//                //more confidence involved makes the penalization more severe
-//                //more evidence involved makes the penalization less severe?
-//
-//                //float c = conf();
-//
-//                //taskLink.clear();
-//                //termLink.clear();
-//            } else {
-//                //TODO for Questions?
-//            }
-
-//            float decayFactor = 1f - ((isBeliefOrGoal() ? conf() : qua() ) *durability);
-//            multiplyPremise(decayFactor, false);
-
-            return true;
-        }
-
-        return false;
     }
 
 //    /** next = the child which resulted from this and another task being revised */

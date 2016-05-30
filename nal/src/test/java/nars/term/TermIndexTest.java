@@ -1,6 +1,5 @@
 package nars.term;
 
-import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 

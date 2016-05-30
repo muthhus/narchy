@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
-import nars.link.BLink;
 import nars.budget.Budgeted;
 import nars.guifx.TaskPane;
 import nars.guifx.graph2.TermNode;

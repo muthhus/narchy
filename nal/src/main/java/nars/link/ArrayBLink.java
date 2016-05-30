@@ -75,6 +75,7 @@ abstract public class ArrayBLink<X> extends BLink<X> {
     }
 
 
+    @Override
     public boolean commit() {
         if (changed) {
             float[] b = this.b;
@@ -138,6 +139,7 @@ abstract public class ArrayBLink<X> extends BLink<X> {
     }
 
     /** doesnt compute the delta */
+    @Override
     public final void setLastForgetTimeFast(float currentTime) {
         b[LASTFORGET] = currentTime;
     }

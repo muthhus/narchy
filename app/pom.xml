@@ -84,6 +84,31 @@
       <version>9.0.0.Alpha2</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.jfxvnc</groupId>
+      <artifactId>jfxvnc-net</artifactId>
+      <version>1.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>2.3.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-noawt-main</artifactId>
+      <version>2.3.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.tess4j</groupId>
+      <artifactId>tess4j</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
 
 
   </dependencies>

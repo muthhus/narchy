@@ -99,6 +99,7 @@ public class TrieDeriverTest {
     @NotNull
     public Default testRuleInputs(@NotNull TrieDeriver d, String... inputs) {
         return (Default) new Default() {
+            @Override
             protected Deriver newDeriver() {
                 return d;
             }

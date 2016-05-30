@@ -64,8 +64,10 @@ public abstract class MaplikeIndex implements TermIndex {
     }
 
 
+    @Override
     abstract public Termed remove(Termed entry);
 
+    @Override
     public abstract Termed get(@NotNull Termed x);
 
     @Override

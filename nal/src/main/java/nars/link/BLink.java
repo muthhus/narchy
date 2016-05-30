@@ -50,7 +50,7 @@ public abstract class BLink<X> extends Budget implements Link<X> {
 
     private final boolean equalsReferenced(Object obj) {
         Object x = get();
-        return x != null ? x.equals(obj) : false;
+        return x != null && x.equals(obj);
     }
 
     @Override public final int hashCode() {

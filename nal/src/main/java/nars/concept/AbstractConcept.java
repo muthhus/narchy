@@ -191,6 +191,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
 
+    @Override
     public void linkTask(@NotNull Task t, float scale) {
         if (term.vars()==0 /*|| !isConceptOf(t)*/) { //insert tasklink to its terms own concept only if no variables
             taskLinks.put(t, t/*.budget()*/, scale, null);

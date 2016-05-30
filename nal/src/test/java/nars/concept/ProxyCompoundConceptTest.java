@@ -1,10 +1,8 @@
 package nars.concept;
 
-import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Compound;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

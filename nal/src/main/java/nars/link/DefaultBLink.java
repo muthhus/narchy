@@ -68,6 +68,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
 
+    @Override
     public boolean commit() {
         if (changed) {
             float p = PRI;
@@ -124,6 +125,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
     /** doesnt compute the delta */
+    @Override
     public final void setLastForgetTimeFast(float currentTime) {
         LASTFORGET = currentTime;
     }

@@ -104,7 +104,7 @@ public class TermTest {
         assertEquivalentTerm("[a,c,b]", "[b,a,c]");
 
         assertEquivalentTerm("<{Birdie}<->{Tweety}>", "<{Tweety}<->{Birdie}>");
-        assertEquivalentTerm((Term)$("<{Birdie}<->{Tweety}>"),
+        assertEquivalentTerm($("<{Birdie}<->{Tweety}>"),
                         $("<{Tweety}<->{Birdie}>"));
         assertEquivalentTerm(
                 $.sim($("{Birdie}"),$("{Tweety}")),

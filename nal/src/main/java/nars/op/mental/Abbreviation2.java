@@ -30,6 +30,7 @@ public class Abbreviation2 extends Abbreviation {
         super(n, termPrefix);
     }
 
+    @Override
     @NotNull
     protected Compound newSerialTerm() {
         return $.p(super.newSerialTerm());

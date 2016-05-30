@@ -12,8 +12,10 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisZeroOrMore;
-import nars.nar.util.DefaultConceptBuilder;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
@@ -25,7 +27,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
@@ -251,7 +252,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() {
             final PatternIndex pi = new PatternIndex();
-            return (Compound)( pi.normalized(pi.the("<%1 --> (" + ellipsisTerm +  ")>")).term());
+            return pi.normalized(pi.the("<%1 --> (" + ellipsisTerm +  ")>")).term();
         }
 
     }
