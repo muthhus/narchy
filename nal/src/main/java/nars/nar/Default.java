@@ -91,8 +91,8 @@ public class Default extends AbstractNAR {
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
         //this.handlers = new Active(
-        eventFrameStart.on(core::frame);
-        eventReset.on(core::reset);
+        eventFrameStart.on(c::frame);
+        eventReset.on(c::reset);
         //);
         return c;
     }

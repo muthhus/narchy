@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
+import nars.concept.table.BeliefTable;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
@@ -19,8 +20,11 @@ import nars.util.event.On;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -60,14 +64,22 @@ public class Multi extends AbstractNAR {
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
             PremiseEval matcher = new PremiseEval(random, newDeriver());
-            WorkerCore core = this.cores[i] = newCore(
+            WorkerCore core = this.cores[i] = newCore(i,
                     conceptsPerCore,
                     conceptsFirePerCycle,
                     termLinksPerConcept, taskLinksPerConcept, matcher
             );
-            eventFrameStart.on(core::frameQueued);
+
             eventReset.on(core::reset);
         }
+
+        eventFrameStart.on((x) -> {
+            framesPending.addAndGet(cores);
+            for (WorkerCore w : Multi.this.cores)
+                if (w.running.compareAndSet(false,true)) {
+                    w.wake();
+                }
+        });
 
         runLater(this::initHigherNAL);
 
@@ -80,29 +92,34 @@ public class Multi extends AbstractNAR {
 
     }
 
+    private final AtomicInteger framesPending = new AtomicInteger(0);
 
     /** runs asynchronously in its own thread. counts down a # of pending cycles */
     public class WorkerCore extends DefaultCore implements Runnable {
 
+        private final Logger logger = LoggerFactory.getLogger(WorkerCore.class);
+
         private final AtomicBoolean running = new AtomicBoolean(false);
-        private final AtomicInteger framesPending = new AtomicInteger(0);
         private final Thread thread;
         private boolean stopped = false;
+        private final ConcurrentLinkedDeque<Runnable> pendingActivations = new ConcurrentLinkedDeque<>();
 
-        public WorkerCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
-            super(nar, matcher, warm, cold);
+        public WorkerCore(int n, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
+            super(Multi.this, matcher, warm, cold);
             this.thread = new Thread(this);
+            thread.setName(nar.toString() + "Worker" + n);
+            thread.start();
         }
 
         @Override
-        protected void activate(Concept c) {
+        protected synchronized void activate(Concept c) {
             if (Multi.this.active.putIfAbsent(c, this)==null) {
                 super.activate(c);
             }
         }
 
         @Override
-        protected void deactivate(BLink<Concept> c) {
+        protected synchronized void deactivate(BLink<Concept> c) {
             Concept cc = c.get();
             if (Multi.this.active.remove(cc)==cc) {
                 super.deactivate(c);
@@ -110,18 +127,14 @@ public class Multi extends AbstractNAR {
         }
 
 
-        public void frameQueued(NAR nar) {
-            framesPending.incrementAndGet();
-            if (!running.get()) {
-                wake();
-            }
-        }
-
         protected void wake() {
+            logger.info("wake");
             thread.interrupt();
         }
 
         protected void sleep() {
+            running.set(false);
+            logger.info("sleep");
             try {
                 while (true) {
                     Thread.sleep(1);
@@ -135,20 +148,42 @@ public class Multi extends AbstractNAR {
 
         @Override public final void run() {
             while (!stopped) {
-                if (framesPending.getAndDecrement() <= 0) {
-                    sleep();
+                if (framesPending.get() >= 0) {
+                    logger.info("frame " + framesPending.get());
+                    try {
+                        frame(Multi.this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    framesPending.decrementAndGet();
                 } else {
-                    frame(Multi.this);
+                    sleep();
                 }
             }
+        }
+
+        @Override
+        public void frame(@NotNull NAR nar) {
+            int n = pendingActivations.size();
+            for (int i = 0; i < n; i++) {
+                pendingActivations.removeFirst().run();
+            }
+
+            super.frame(nar);
+        }
+
+        @Override public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
+            pendingActivations.add(() -> {
+                super.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
+            });
         }
     }
 
 
 
-    protected @NotNull WorkerCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
+    protected @NotNull WorkerCore newCore(int id, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
 
-        WorkerCore c = new WorkerCore(this, matcher, conceptWarm, conceptCold);
+        WorkerCore c = new WorkerCore(id, matcher, conceptWarm, conceptCold);
         c.concepts.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies

@@ -27,7 +27,7 @@ public class TermTemplateTest {
         Concept c = t.concept(n);
 
         List<TermTemplate> templates = dereference(((CompoundConcept)c).termLinkTemplates);
-        assertEquals(8, templates.size());
+        assertEquals(12, templates.size());
 
         String s = Joiner.on('\n').join(templates);
         System.out.println(s);

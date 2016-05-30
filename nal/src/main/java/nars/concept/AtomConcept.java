@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +16,6 @@ import org.jetbrains.annotations.Nullable;
  * Created by me on 9/2/15.
  */
 public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements Atomic {
-
-
 
     public AtomConcept(@NotNull E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(atom, termLinks, taskLinks);
@@ -50,7 +49,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
         return QuestionTable.EMPTY;
     }
 
-    
+
 
 
     @Nullable

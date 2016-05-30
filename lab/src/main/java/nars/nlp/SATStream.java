@@ -1,7 +1,6 @@
 package nars.nlp;
 
 import nars.nar.Default;
-import nars.nar.util.DefaultReasoner;
 
 /**
  * Created by me on 2/10/16.
@@ -13,7 +12,6 @@ public class SATStream {
 
         d.conceptActivation.setValue(0.2f);
         d.perfection.setValue(0.5f);
-        ((DefaultReasoner)d.matcher).confMin.setValue(0.1f);
 
 
         d.log();

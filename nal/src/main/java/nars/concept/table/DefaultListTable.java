@@ -1,6 +1,8 @@
 package nars.concept.table;
 
 import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -27,7 +29,9 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
 
 
     @Override
-    protected void listAdd(L i) {
+    protected void listAdd(@NotNull L i) {
+        if (i == null)
+            throw new NullPointerException();
         list.add(i);
     }
 

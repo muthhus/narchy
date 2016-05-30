@@ -78,10 +78,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    @Override @NotNull
-    public Term term() {
-        return term;
-    }
+//    @Override @NotNull
+//    public Term term() {
+//        return term;
+//    }
 
     /**
      * metadata table where processes can store and retrieve concept-specific data by a key. lazily allocated

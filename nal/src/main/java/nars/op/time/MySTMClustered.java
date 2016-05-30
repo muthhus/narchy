@@ -5,6 +5,7 @@ import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;
+import nars.NAR;
 import nars.budget.BudgetFunctions;
 import nars.nar.Default;
 import nars.task.MutableTask;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
-    public MySTMClustered(Default nar, int size, char punc) {
+    public MySTMClustered(NAR nar, int size, char punc) {
         super(nar, new MutableInteger(size), punc);
     }
 

@@ -899,8 +899,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public void copyInto(@NotNull Collection set) {
-        Collections.addAll(set, term);
+    public final void copyInto(@NotNull Collection set) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            set.add(term(i));
+        }
     }
 
     @Override

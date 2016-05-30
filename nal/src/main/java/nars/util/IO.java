@@ -7,6 +7,7 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nal.Tense;
+import nars.task.AbstractTask;
 import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -179,7 +180,8 @@ public class IO {
         else if (o.temporal)
             dt = in.readInt();
 
-        return (Compound) $.the(o, relation, dt, v);
+
+        return (Compound) t.normalized(t.builder().build(o, relation, dt, v));
     }
 
     /**
@@ -216,15 +218,15 @@ public class IO {
 
 
             registerClass(Atom.class, GenericCompound.class,
-                    MutableTask.class, DerivedTask.class,
+                    AbstractTask.class,
                     Term[].class,
-                    TermVector.class, TermContainer.class, TermSet.class,
+                    TermContainer.class,
                     //long[].class, char.class,
                     Op.class);
 
 
 
-            registerSerializer(MutableTask.class, new FSTBasicObjectSerializer() {
+            registerSerializer(AbstractTask.class, new FSTBasicObjectSerializer() {
 
                 @Override
                 public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {

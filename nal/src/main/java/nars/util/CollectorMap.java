@@ -119,15 +119,16 @@ public abstract class CollectorMap<K, V>  {
         return map.remove(key);
     }
 
-    /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
-    protected final void removeKey(BLink<V> item) {
-        boolean removed = map.values().remove(item); //removeIf((v)->(v==item));
-        if (!removed)
-            throw new RuntimeException("Bag fault while trying to remove key by item value");
-    }
+//    /** does a more exhaustive removal in case the BLink no longer has the key (ex: weakref) */
+//    protected final void removeKey(BLink<V> item) {
+//        boolean removed = map.values().remove(item); //removeIf((v)->(v==item));
+//        if (!removed)
+//            throw new RuntimeException("Bag fault while trying to remove key by item value");
+//    }
 
     protected final V removeKeyForValue(V value) {
-        return removeKey(key(value));
+        @Nullable K key = key(value);
+        return key == null ? null : removeKey(key);
     }
 
 

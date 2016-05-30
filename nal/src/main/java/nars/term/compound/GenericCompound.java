@@ -127,6 +127,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p);
     }
 
+    @Override
+    public @NotNull Term term() {
+        return this;
+    }
+
     @NotNull
     @Override
     public String toString() {

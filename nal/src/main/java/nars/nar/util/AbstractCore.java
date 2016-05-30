@@ -206,7 +206,8 @@ public abstract class AbstractCore {
     public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
         concepts.put(c, b, conceptActivation, conceptOverflow);
         if (b.isDeleted())
-            throw new RuntimeException("Concept rejected: " + b);
+            return;
+            //throw new RuntimeException("Concept rejected: " + b);
         if (linkActivation > 0)
             c.link(b, linkActivation, nar, conceptOverflow);
     }

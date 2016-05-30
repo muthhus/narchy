@@ -379,7 +379,6 @@ public interface BeliefTable extends TaskTable {
         Task belief;
         do {
             belief = top(
-                //nar.time()
                 taskOcc
             );
 

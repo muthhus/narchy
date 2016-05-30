@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
@@ -11,7 +12,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 
 
@@ -22,11 +24,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
+    private int pendingMass;
 
 
     public ArrayBag(int cap) {
         super(BLink[]::new,
-                new HashMap<>(cap), //Global.newHashMap(cap),
+
+                new ConcurrentHashMapUnsafe<V, BLink<V>>(),
+                //new LinkedHashMap<>(cap),
+                //new HashMap<>(cap),
+                //Global.newHashMap(cap),
+
                 SortedArray.SearchType.BinarySearch);
         setCapacity(cap);
     }
@@ -218,19 +226,29 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         BLink<V> existing = get(i);
 
-        return (existing != null) ?
-                    putExists(b, scale, existing, overflow) : (
-                       isFull() ?
-                            putQueue(i, b, scale) :
-                            putNew(i, link(i, b, scale))
-                    );
+        if (existing != null) {
+            return putExists(b, scale, existing, overflow);
+        }
+        else if (isFull()) {
+            @NotNull BLink<V> link = link(i, b, scale);
+            pendingMass += link.pri() * link.dur();
+            pending.add(link);
+            return null;
+        }
+        else {
+            return putNew(i, link(i, b, scale));
+        }
 
+    }
+
+    public int getPendingMass() {
+        return pendingMass;
     }
 
     /**
      * the applied budget will not become effective until commit()
      */
-    private final @NotNull BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+    @NotNull private final BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
         if (existing != b) {
 
@@ -246,7 +264,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return existing;
     }
 
-    protected BLink<V> link(V i, Budgeted b, float scale) {
+    @NotNull protected BLink<V> link(@NotNull V i, @NotNull Budgeted b, float scale) {
         if (b instanceof BLink)
             return (BLink)b;
         if (i instanceof BLink)
@@ -254,22 +272,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return newLink(i, b, scale);
     }
 
-    protected BLink<V> newLink(V i, Budgeted b, float scale) {
+    @NotNull protected BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
         return new StrongBLink(i, b, scale);
     }
 
-    protected @Nullable BLink<V> putNew(V i, BLink<V> newBudget) {
+    protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
         newBudget.commit(); //?? necessary
         return put(i, newBudget);
     }
 
-    protected final FasterList<BLink<V>> pending = new FasterList();
-
-    protected BLink<V> putQueue(V x, @NotNull Budgeted b, float scale) {
-        BLink<V> link = link(x, b, scale);
-        pending.add(link);
-        return null;
-    }
+    //protected final FasterList<BLink<V>> pending = new FasterList();
+    protected final ConcurrentLinkedDeque<BLink<V>> pending = new ConcurrentLinkedDeque<>();
 
 
     @NotNull
@@ -304,14 +317,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     private void addPending() {
         //add pending items now that the bag is updated
+        pendingMass = 0;
         int pendingSize = pending.size();
         /*int merged = 0;
         int added = 0;
         int rejected = 0;*/
 
         for (int i1 = 0; i1 < pendingSize; i1++) {
-            BLink<V> link = pending.get(i1);
+            //BLink<V> link = pending.get(i1);
+            BLink<V> link = pending.removeFirst();
             V key = link.get();
+            if (key == null)
+                continue; //link was destroyed before it could be processed
+
             BLink<V> existing = get(key);
             if (existing != null) {
                 mergeFunction.merge(existing, link, 1f);
@@ -332,7 +350,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             }
 
         }
-        pending.clear0();
 
         //System.out.println("cap=" + capacity() + ", pending=" + pendingSize + ", merged=" + merged + ", added=" + added + ", rejected=" + rejected);
     }
