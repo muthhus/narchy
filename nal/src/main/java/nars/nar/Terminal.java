@@ -25,8 +25,7 @@ import java.util.function.Predicate;
  */
 public class Terminal extends AbstractNAR {
 
-    final Predicate<Task> taskFilter =
-            Task::isCommand;
+    //final Predicate<Task> taskFilter = Task::isCommand;
 
     public Terminal() {
         this(1024);
@@ -66,11 +65,8 @@ public class Terminal extends AbstractNAR {
 //    }
 
 
-    @Nullable
-    @Override
-    public Concept process(@NotNull Task input, float activation) {
-        return null;
-    }
+
+
 
     @Nullable
     @Override

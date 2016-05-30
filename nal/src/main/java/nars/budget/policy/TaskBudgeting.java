@@ -40,7 +40,7 @@ public class TaskBudgeting {
         //float priority = or(taskLink.pri(), termLink.pri());
         //float priority = and(taskLink.pri(), termLink.pri());
 
-        Task task = nal.task;
+        Task task = nal.task();
         float priority = //UtilityFunctions.aveGeo(
                 //task!=null ? task.priIfFiniteElseZero() : 0,
                 (aveGeo(taskLink.priIfFiniteElseZero(),
