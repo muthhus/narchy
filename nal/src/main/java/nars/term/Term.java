@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 

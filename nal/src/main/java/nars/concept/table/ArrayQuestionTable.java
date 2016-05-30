@@ -3,7 +3,6 @@ package nars.concept.table;
 import nars.Global;
 import nars.NAR;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;

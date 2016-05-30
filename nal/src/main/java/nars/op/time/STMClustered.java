@@ -2,12 +2,12 @@ package nars.op.time;
 
 import nars.$;
 import nars.NAR;
-import nars.bag.ArrayBLink;
-import nars.bag.StrongBLink;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
+import nars.link.BLink;
+import nars.link.StrongBLink;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -232,7 +232,7 @@ public class STMClustered extends STM {
         this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {
             @Override
-            protected ArrayBLink<Task> newLink(Task i, Budgeted b, float scale) {
+            protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
                 return new TLink(i, b, scale);
             }
         };

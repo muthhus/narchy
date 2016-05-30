@@ -8,8 +8,8 @@ import nars.Global;
 import nars.NAR;
 import nars.Premise;
 import nars.Symbols;
-import nars.bag.ArrayBLink;
 import nars.budget.Budget;
+import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
@@ -34,9 +34,9 @@ import static nars.nal.Tense.DTERNAL;
 public class ConceptProcess implements Premise {
 
     public final NAR nar;
-    public final ArrayBLink<? extends Task> taskLink;
+    public final BLink<? extends Task> taskLink;
 
-    public final ArrayBLink<? extends Termed> termLink;
+    public final BLink<? extends Termed> termLink;
     @Nullable public final Task belief;
 
 
@@ -60,8 +60,8 @@ public class ConceptProcess implements Premise {
 
 
     public ConceptProcess(NAR nar,
-                          ArrayBLink<? extends Task> taskLink,
-                          ArrayBLink<? extends Termed> termLink, @Nullable Task belief) {
+                          BLink<? extends Task> taskLink,
+                          BLink<? extends Termed> termLink, @Nullable Task belief) {
         this.nar = nar;
 
         this.taskLink = taskLink;

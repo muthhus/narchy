@@ -1,8 +1,8 @@
 package nars.bag.impl;
 
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
+import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,19 +60,19 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> commit(@NotNull Consumer<ArrayBLink> each) {
+    public Bag<V> commit(@NotNull Consumer<BLink> each) {
         super.commit(each);
         sampler.commit(this);
         return this;
     }
 
-    public @Nullable ArrayBLink<V> peekNext(boolean remove) {
+    public @Nullable BLink<V> peekNext(boolean remove) {
 
         while (!isEmpty()) {
 
             int index = sampleIndex();
 
-            ArrayBLink<V> i = remove ?
+            BLink<V> i = remove ?
                     removeItem(index) : item(index);
 
             if (!i.isDeleted()) {
@@ -98,7 +98,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      * */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, @NotNull Consumer<? super ArrayBLink<V>> target) {
+    public CurveBag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
 
         assert(!isEmpty());
         assert(n > 0);
@@ -120,9 +120,9 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         }
 
 
-        ArrayBLink<V>[] l = items.array();
+        BLink<V>[] l = items.array();
         for (int i = begin; i < end; i++) {
-            ArrayBLink<V> b = l[i];
+            BLink<V> b = l[i];
             if (!b.isDeleted())
                 target.accept(b);
         }
@@ -135,7 +135,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
     @Override
-    public final @Nullable ArrayBLink<V> sample() {
+    public final @Nullable BLink<V> sample() {
         return peekNext(false);
     }
 

@@ -7,6 +7,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
@@ -75,8 +76,9 @@ public class CurveBagTest  {
         assertEquals(1, a.size());
 
 
+        BLink<String> agx = a.get("x");
         assertTrue(new UnitBudget(0.2f, 0.5f, 0.5f).equalsByPrecision(
-            a.get("x"), 0.01f));
+                agx, 0.01f));
 
     }
 
@@ -89,7 +91,7 @@ public class CurveBagTest  {
 
         a.commit();
 
-        Iterator<ArrayBLink<String>> ii = a.iterator();
+        Iterator<BLink<String>> ii = a.iterator();
         assertEquals("y", ii.next().get());
         assertEquals("x", ii.next().get());
 

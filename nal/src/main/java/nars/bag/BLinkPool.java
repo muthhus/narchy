@@ -4,6 +4,7 @@ import nars.Global;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
+import nars.link.Link;
 import nars.util.data.FastBitSet;
 import org.jetbrains.annotations.NotNull;
 

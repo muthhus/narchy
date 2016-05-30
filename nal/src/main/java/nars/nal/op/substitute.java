@@ -1,11 +1,11 @@
 package nars.nal.op;
 
 import nars.Op;
+import nars.index.TermIndex;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.index.TermIndex;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;

@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Random;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.or;

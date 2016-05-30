@@ -2,7 +2,7 @@ package nars.budget.forget;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.ArrayBLink;
+import nars.link.BLink;
 import nars.nal.Tense;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -21,7 +21,7 @@ public enum Forget {
     /**
      * acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item
      */
-    public interface BudgetForgetFilter extends Predicate<ArrayBLink>, BudgetForget {
+    public interface BudgetForgetFilter extends Predicate<BLink>, BudgetForget {
         /**
          * called each frame to update parameters
          */
@@ -92,7 +92,7 @@ public enum Forget {
         }
 
         @Override
-        public abstract void accept(@NotNull ArrayBLink budget);
+        public abstract void accept(@NotNull BLink budget);
 
         @Override
         public void update(@Nullable NAR nar) {
@@ -200,7 +200,7 @@ public enum Forget {
         }
 
         @Override
-        public void accept(@NotNull ArrayBLink budget) {
+        public void accept(@NotNull BLink budget) {
 
             float p0 = budget.pri();
             if (p0 != p0) /* NaN, deleted */
@@ -251,7 +251,7 @@ public enum Forget {
         }
 
         @Override
-        public void accept(@NotNull ArrayBLink budget) {
+        public void accept(@NotNull BLink budget) {
 
             float p0 = budget.pri();
             if (p0 != p0) /* NaN, deleted */
@@ -314,7 +314,7 @@ public enum Forget {
     public final static BudgetForget QualityToPriority = new BudgetForget() {
 
         @Override
-        public void accept(@NotNull ArrayBLink budget) {
+        public void accept(@NotNull BLink budget) {
             budget.setPriority(budget.qua());
         }
 
@@ -331,7 +331,7 @@ public enum Forget {
 
 
     //TODO implement as a Forgetter:
-    public static final Predicate<ArrayBLink<?>> simpleForgetDecay = (b) -> {
+    public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
         float p = b.pri() * 0.95f;
         if (p > b.qua() * 0.1f)
             b.setPriority(p);

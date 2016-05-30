@@ -4,10 +4,10 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import nars.Global;
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
@@ -60,7 +60,7 @@ public class ConceptsSource extends GraphSource {
                 ((BLink)link).pri(), ee.pri,
                       0.1f);*/
 
-        ee.pri.addValue( ((ArrayBLink) link).pri() );
+        ee.pri.addValue( ((BLink) link).pri() );
     }
 
 
@@ -87,7 +87,7 @@ public class ConceptsSource extends GraphSource {
         final int[] max = {0};
         Predicate linkUpdater = link -> {
 
-            Termed target = ((ArrayBLink<Termed>) link).get();
+            Termed target = ((BLink<Termed>) link).get();
 
             if (cct.equals(target)) //self-loop
                 return true;
@@ -202,7 +202,7 @@ public class ConceptsSource extends GraphSource {
         ii.clear();
     }
 
-    private class ConceptFilter implements Predicate<ArrayBLink<Concept>> {
+    private class ConceptFilter implements Predicate<BLink<Concept>> {
 
         int count;
 
@@ -211,7 +211,7 @@ public class ConceptsSource extends GraphSource {
         }
 
         @Override
-        public boolean test(ArrayBLink<Concept> cc) {
+        public boolean test(BLink<Concept> cc) {
 
 
             float p = cc.pri();

@@ -2,16 +2,16 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
+import nars.index.TermIndex;
+import nars.link.BLink;
 import nars.nal.Deriver;
 import nars.nal.Reasoner;
 import nars.nar.util.DefaultCore;
 import nars.nar.util.DefaultReasoner;
 import nars.task.Task;
-import nars.index.TermIndex;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -158,7 +158,7 @@ public class Default extends AbstractNAR {
         if (termed!=null) {
             //Concept cc = concept(termed);
             //if (cc != null) {
-                ArrayBLink<Concept> c = core.active.get(termed);
+                BLink<Concept> c = core.active.get(termed);
                 if (c != null)
                     return c.priIfFiniteElseZero();
             //}

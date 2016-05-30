@@ -1,6 +1,6 @@
 package nars.task;
 
-import nars.bag.ArrayBLink;
+import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -15,8 +15,8 @@ public final class DerivedTask extends MutableTask {
     //if the links are weak then these dont need to be also
     //@NotNull private final Reference<BLink<? extends Task>> taskLink;
     //@NotNull private final Reference<BLink<? extends Termed>> termLink;
-    private final @NotNull ArrayBLink<? extends Task> taskLink;
-    private final @NotNull ArrayBLink<? extends Termed> termLink;
+    private final @NotNull BLink<? extends Task> taskLink;
+    private final @NotNull BLink<? extends Termed> termLink;
 
     //TODO should this also affect the Belief task?
 
@@ -70,7 +70,7 @@ public final class DerivedTask extends MutableTask {
         multiply(factor, termLink, alsoDurability);
     }
 
-    static void multiply(float factor, ArrayBLink link, boolean alsoDurability) {
+    static void multiply(float factor, BLink link, boolean alsoDurability) {
         if (link !=null && !link.isDeleted()) {
             link.andPriority(factor);
             if (alsoDurability)

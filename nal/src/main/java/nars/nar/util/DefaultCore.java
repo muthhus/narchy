@@ -1,13 +1,13 @@
 package nars.nar.util;
 
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.forget.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nal.Reasoner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +36,7 @@ public final class DefaultCore extends AbstractCore {
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(ArrayBLink<Concept> cl) {
+    protected void deactivate(BLink<Concept> cl) {
         Concept c = cl.get();
 
         //apply forgetting so that shrinking capacity will be applied to concept's components fairly
@@ -81,8 +81,8 @@ public final class DefaultCore extends AbstractCore {
 
 
         @Override
-        protected @Nullable ArrayBLink<Concept> putNew(Concept i, ArrayBLink<Concept> b) {
-            ArrayBLink<Concept> displaced = super.putNew(i, b);
+        protected @Nullable BLink<Concept> putNew(Concept i, BLink<Concept> b) {
+            BLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
 
                 Concept dd = displaced.get();
@@ -99,8 +99,8 @@ public final class DefaultCore extends AbstractCore {
         }
 
         @Override
-        public @Nullable ArrayBLink<Concept> remove(Concept x) {
-            ArrayBLink<Concept> removed = super.remove(x);
+        public @Nullable BLink<Concept> remove(Concept x) {
+            BLink<Concept> removed = super.remove(x);
             if (removed!=null) {
                 deactivate(removed);
             }

@@ -1,9 +1,9 @@
 package nars.budget.policy;
 
-import nars.bag.ArrayBLink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
+import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
@@ -32,8 +32,8 @@ public class TaskBudgeting {
         //Task task = taskLink.get();
 
 
-        ArrayBLink<? extends Termed> termLink = nal.termLink;
-        ArrayBLink<? extends Task> taskLink = nal.taskLink;
+        BLink<? extends Termed> termLink = nal.termLink;
+        BLink<? extends Task> taskLink = nal.taskLink;
 
 
         //originally was OR, but this can explode because the result of OR can exceed the inputs

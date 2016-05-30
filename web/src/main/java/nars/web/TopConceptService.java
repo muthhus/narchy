@@ -2,8 +2,8 @@ package nars.web;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.concept.Concept;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
 
@@ -65,5 +65,5 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
         }
     }
 
-    abstract O summarize(ArrayBLink<? extends Concept> c, int n);
+    abstract O summarize(BLink<? extends Concept> c, int n);
 }

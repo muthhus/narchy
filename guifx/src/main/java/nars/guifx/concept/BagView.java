@@ -4,8 +4,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import nars.Global;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
+import nars.link.BLink;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,15 +22,15 @@ import static javafx.application.Platform.runLater;
  */
 public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
 
-    final Map<ArrayBLink<X>, Node> componentCache = new WeakHashMap<>();
+    final Map<BLink<X>, Node> componentCache = new WeakHashMap<>();
     private final Supplier<Bag<X>> bag;
-    private final Function<ArrayBLink<X>, Node> builder;
-    final Collection<ArrayBLink<X>> pending = Global.newHashSet(1); //Global.newArrayList();
+    private final Function<BLink<X>, Node> builder;
+    final Collection<BLink<X>> pending = Global.newHashSet(1); //Global.newArrayList();
     final AtomicBoolean queued = new AtomicBoolean();
     private final int limit;
 
 
-    public BagView(Supplier<Bag<X>> bag, Function<ArrayBLink<X>, Node> builder, int limit) {
+    public BagView(Supplier<Bag<X>> bag, Function<BLink<X>, Node> builder, int limit) {
         this.bag = bag;
         this.builder = builder;
         this.limit = limit;
@@ -40,7 +40,7 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
         update();
     }
 
-    Node getNode(ArrayBLink<X> n) {
+    Node getNode(BLink<X> n) {
         Node existing = componentCache.computeIfAbsent(n, builder::apply);
 //            Node existing = componentCache.get(n);
 //            if (existing == null) {
@@ -61,7 +61,7 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
         }
 
         if (!queued.compareAndSet(false, true)) {
-            Collection<ArrayBLink<X>> p = this.pending;
+            Collection<BLink<X>> p = this.pending;
             p.clear();
             bLinks.forEach(limit, p::add);
 

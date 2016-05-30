@@ -1,4 +1,4 @@
-package nars.bag;
+package nars.link;
 
 import java.util.function.Supplier;
 

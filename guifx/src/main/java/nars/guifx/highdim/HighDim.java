@@ -3,7 +3,6 @@ package nars.guifx.highdim;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import javafx.scene.control.Button;
-import nars.bag.ArrayBLink;
 import nars.bag.Table;
 import nars.concept.Concept;
 import nars.guifx.Spacegraph;
@@ -11,6 +10,7 @@ import nars.guifx.demo.NARide;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
@@ -91,9 +91,9 @@ public class HighDim<T> extends Spacegraph {
 //        }
 //    }
 
-    public static class ScatterPlot1 extends HighDimProjection<ArrayBLink<? extends Concept>> {
+    public static class ScatterPlot1 extends HighDimProjection<BLink<? extends Concept>> {
         @Override
-        public float[] vectorize(@NotNull ArrayBLink<? extends Concept> concept, float[] x) {
+        public float[] vectorize(@NotNull BLink<? extends Concept> concept, float[] x) {
             x[0] = 100f * (concept.hashCode() % 16) / 16.0f;
             float cpri = concept.pri();
             x[1] = 400 * cpri;
@@ -409,7 +409,7 @@ public class HighDim<T> extends Spacegraph {
         NARide.show(n.loop(), ide -> {
 
 
-            HighDim<ArrayBLink<Concept>> dim = new HighDim(64, new AEConcept1());
+            HighDim<BLink<Concept>> dim = new HighDim(64, new AEConcept1());
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);

@@ -10,11 +10,11 @@ import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.NARLoop;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.index.GroupedMapIndex;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation;
@@ -97,7 +97,7 @@ public class WebServer /*extends PathHandler*/ {
                         .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 800, 128) {
 
                             @Override
-                            Object[] summarize(ArrayBLink<? extends Concept> bc, int n) {
+                            Object[] summarize(BLink<? extends Concept> bc, int n) {
                                 Concept c = bc.get();
                                 return new Object[] {
                                     escape(c), //ID

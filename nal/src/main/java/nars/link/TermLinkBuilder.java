@@ -1,4 +1,4 @@
-package nars.concept.link;
+package nars.link;
 
 import nars.Global;
 import nars.NAR;

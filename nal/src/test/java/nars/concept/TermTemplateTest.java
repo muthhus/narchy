@@ -2,7 +2,7 @@ package nars.concept;
 
 import com.google.common.base.Joiner;
 import nars.NAR;
-import nars.concept.link.TermTemplate;
+import nars.link.TermTemplate;
 import nars.nar.Default;
 import nars.task.Task;
 import org.junit.Test;

@@ -8,7 +8,6 @@ import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.function.Predicate;
 
 public interface ProxyTerm<T extends Term> extends Term {

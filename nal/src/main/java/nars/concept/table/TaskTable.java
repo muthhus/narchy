@@ -1,8 +1,6 @@
 package nars.concept.table;
 
 import nars.task.Task;
-import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
-import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

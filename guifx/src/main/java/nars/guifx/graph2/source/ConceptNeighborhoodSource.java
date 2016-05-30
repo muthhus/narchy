@@ -3,9 +3,9 @@ package nars.guifx.graph2.source;
 import com.google.common.collect.Lists;
 import nars.Global;
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.concept.Concept;
 import nars.guifx.graph2.ConceptsSource;
+import nars.link.BLink;
 import nars.term.Termed;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class ConceptNeighborhoodSource extends ConceptsSource {
 
     final Set<Termed> conceptsSet = Global.newHashSet(1);
 
-    final Consumer<ArrayBLink<? extends Termed>> onLink = n -> {
+    final Consumer<BLink<? extends Termed>> onLink = n -> {
         Termed tn = n.get();
         conceptsSet.add(
                 (tn instanceof Concept) ? tn : nar.concept(tn));

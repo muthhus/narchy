@@ -1,4 +1,4 @@
-package nars.bag;
+package nars.link;
 
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/29/16.
  */
-public abstract class AbstractBLink<X> extends Budget implements Link<X> {
+public abstract class BLink<X> extends Budget implements Link<X> {
 
 
 
@@ -64,4 +64,5 @@ public abstract class AbstractBLink<X> extends Budget implements Link<X> {
     }
 
 
+    public abstract boolean commit();
 }

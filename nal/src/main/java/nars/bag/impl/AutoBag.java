@@ -1,9 +1,9 @@
 package nars.bag.impl;
 
 import nars.NAR;
-import nars.bag.ArrayBLink;
 import nars.bag.Bag;
 import nars.budget.forget.Forget;
+import nars.link.BLink;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
@@ -55,7 +55,7 @@ public class AutoBag<V>  {
 
 
     protected float forgetPeriod(ArrayBag<V> bag) {
-        FasterList<ArrayBLink<V>> pending = bag.pending;
+        FasterList<BLink<V>> pending = bag.pending;
         int pendingSize = pending.size();
 
         //only calculate forgetting if pending amount may cause an overflow:
@@ -65,7 +65,7 @@ public class AutoBag<V>  {
         float pendingMass = 0;
 
         for (int i = 0; i < pendingSize; i++) {
-            ArrayBLink<V> v = pending.get(i);
+            BLink<V> v = pending.get(i);
             pendingMass += v.pri() * v.dur();
         }
 

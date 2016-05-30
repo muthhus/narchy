@@ -1,4 +1,4 @@
-package nars.bag;
+package nars.link;
 
 import nars.budget.Budgeted;
 

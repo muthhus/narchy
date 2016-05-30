@@ -1,7 +1,7 @@
 package nars.guifx.graph2;
 
-import nars.bag.ArrayBLink;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.link.BLink;
 import nars.term.Termed;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +168,7 @@ public abstract class GraphSource/* W? */ {
 
             SpaceGrapher g = GraphSource.this.grapher;
 
-            TermNode tn = g.getTermNode(((ArrayBLink<Termed>) t).get());
+            TermNode tn = g.getTermNode(((BLink<Termed>) t).get());
             if (tn == null)
                 return;
 

@@ -2,24 +2,15 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
-import nars.budget.UnitBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.ProxyCompoundConcept;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  *
