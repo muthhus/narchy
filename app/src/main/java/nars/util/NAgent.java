@@ -480,7 +480,7 @@ public class NAgent implements Agent {
             return lastAction;
 
         if (nextAction!=lastAction)
-            System.err.println("DECIDED TO CHANGE to " + nextAction);
+            System.err.println("DECIDED ACTION " + nextAction);
 
         return nextAction;
     }

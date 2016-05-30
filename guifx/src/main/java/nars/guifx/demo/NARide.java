@@ -633,7 +633,7 @@ public class NARide extends StackPane {
             StringBuilder sb = new StringBuilder();
             nar.onFrame(c -> {
 
-                int activeConcepts = l.active.size();
+                int activeConcepts = l.concepts.size();
                 TermIndex index = nar.index;
                 int totalConcepts = index.size();
                 int uniqueSubterms = index.subtermsCount();

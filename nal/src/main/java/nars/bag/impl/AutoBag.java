@@ -82,7 +82,7 @@ public class AutoBag<V>  {
         forget.update(nar);
     }
 
-    public final void cycle(float subCycle) {
+    @Deprecated public final void cycle(float subCycle) {
         forget.cycle(subCycle);
     }
 

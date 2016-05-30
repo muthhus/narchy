@@ -13,7 +13,7 @@ public class SATStream {
 
         d.conceptActivation.setValue(0.2f);
         d.perfection.setValue(0.5f);
-        ((DefaultReasoner)d.reasoner).confMin.setValue(0.1f);
+        ((DefaultReasoner)d.matcher).confMin.setValue(0.1f);
 
 
         d.log();
@@ -35,7 +35,7 @@ public class SATStream {
 
         d.run(10360);
 
-        d.core.active.print();
+        d.core.concepts.print();
 
         //d.dumpConcepts("/tmp/x.txt");
 

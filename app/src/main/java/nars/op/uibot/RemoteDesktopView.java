@@ -1,16 +1,9 @@
 package nars.op.uibot;
 
-import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.InterleavedU8;
-import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelFormat;
+import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -18,32 +11,57 @@ import nars.util.FX;
 import org.jfxvnc.net.rfb.render.RenderCallback;
 import org.jfxvnc.net.rfb.render.rect.ImageRect;
 
-import javax.swing.*;
-import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 
 
 public class RemoteDesktopView  {
 
 
+
+
     public static class ImageViewWindow extends Stage {
 
-        private final ImageView imv;
+        private final StackPane bp;
+        private final Scene scene;
+        private ImageView[] imv;
 
-        public ImageViewWindow(ImageView imv) {
+        public ImageViewWindow() {
+            this(null);
+        }
+        public ImageViewWindow(ImageView... imv) {
             super();
-            this.imv = imv;
 
-            StackPane bp = new StackPane(imv);
+            bp = new StackPane();
 
+            scene = new Scene(bp, 600, 330);
 
-            Scene scene = new Scene(bp, 600, 330);
+            bp.prefWidthProperty().bind(scene.widthProperty());
+            bp.prefHeightProperty().bind(scene.widthProperty());
 
-            imv.fitWidthProperty().bind(scene.widthProperty());
-            imv.fitHeightProperty().bind(scene.heightProperty());
 
             setScene(scene);
+
+            setImages(imv);
+
+
+
             show();
 
+        }
+
+        private void setImages(ImageView... imv) {
+            this.imv = imv;
+
+            if (imv!=null) {
+                for (ImageView i : imv) {
+                    i.fitWidthProperty().bind(scene.widthProperty());
+                    i.fitHeightProperty().bind(scene.heightProperty());
+                }
+
+                bp.getChildren().setAll(imv);
+            } else {
+                bp.getChildren().clear();
+            }
         }
     }
 
@@ -51,9 +69,12 @@ public class RemoteDesktopView  {
 
 
         final ImageView imv = new ImageView();
+        final ImageView retina = new ImageView();
+
         FX.run(()->{
 
             new ImageViewWindow(imv);
+            new ImageViewWindow(retina);
 
         });
 
@@ -80,13 +101,20 @@ public class RemoteDesktopView  {
                         if (u8img==null || u8img.width!=W || u8img.height!=H) {
                             u8img = new InterleavedU8(W, H, 4);
                         }
-                        image.getPixelReader().getPixels(0,0, W, H, WritablePixelFormat.getByteBgraInstance(), u8img.data, 0, W*4);
+                        WritablePixelFormat<ByteBuffer> format = WritablePixelFormat.getByteBgraInstance();
+                        image.getPixelReader().getPixels(0,0, W, H, format, u8img.data, 0, W*4);
 
 
-                        ImageContext t1 = ImageContext.seq(this, new ImageDistortion());
+                        ImageContext t1 = ImageContext.seq(this, new ImageCrop());
                         t1.apply(null);
-                        int OW = t1.output.width;
-                        int OH = t1.output.height;
+                        InterleavedU8 output = t1.output;
+                        int OW = output.width;
+                        int OH = output.height;
+                        if (retina.getImage() == null || retina.getImage().getWidth()!=OW || retina.getImage().getHeight()!=OH) {
+                            retina.setImage(new WritableImage(OW, OH));
+                        }
+                        ((WritableImage)retina.getImage()).getPixelWriter()
+                                .setPixels(0,0,OW,OH,format, output.data, output.getStartIndex() , output.getStride());
 
 
 

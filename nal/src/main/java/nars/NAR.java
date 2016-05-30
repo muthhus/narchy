@@ -108,7 +108,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = Global.newArrayList();
 
-    private final transient List<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
+    private final transient Deque<Runnable> nextTasks = //new CopyOnWriteArrayList();
+                                                    new ConcurrentLinkedDeque();
 
 
 
@@ -156,12 +157,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         bt.forEach(xt -> {
             System.out.println(xt);
         });
-    }
-
-    private void cycles(@NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
-        for (; cyclesPerFrame > 0; cyclesPerFrame--) {
-            cycleStart.emit(this);
-        }
     }
 
     /**
@@ -549,7 +544,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
     @NotNull
-    public NAR step() {
+    public final NAR step() {
         return run(1);
     }
 
@@ -597,19 +592,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final void _frame(int frames) {
 
-        emotion.frame();
-
         Topic<NAR> frameStart = eventFrameStart;
-
-        Topic<Memory> cycleStart = eventCycleEnd;
 
         Clock clock = this.clock;
 
         int cpf = cyclesPerFrame.intValue();
         for (; frames > 0; frames--) {
             clock.tick();
+            emotion.frame();
+
             frameStart.emit(this);
-            cycles(cycleStart, cpf);
+
             runNextTasks();
         }
 
@@ -761,11 +754,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     private final void runNextTasks() {
 
-        List<Runnable> n = this.nextTasks;
-        if (!n.isEmpty()) {
-            n.forEach(Runnable::run);
-            n.clear();
+        Deque<Runnable> n = this.nextTasks;
+        int s = n.size();
+        for (int i = 0; i < s; i++) {
+            n.removeFirst().run();
         }
+
     }
 
     /**
@@ -944,18 +938,19 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    /** reasoning cycles occurr zero or more times per frame */
-    @NotNull public NAR onCycle(@NotNull Consumer<Memory> receiver) {
-        regs.add(eventCycleEnd.on(receiver));
-        return this;
-    }
+
 
     /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame. */
-    @NotNull public On onFrame(@NotNull Consumer<NAR> receiver) {
+    @NotNull public On onFrame(@NotNull Consumer<NAR> each) {
         On r;
-        regs.add(r = eventFrameStart.on(receiver));
+        regs.add(r = eventFrameStart.on(each));
         return r;
+    }
+
+    @NotNull public NAR eachFrame(@NotNull Consumer<NAR> each) {
+        onFrame(each);
+        return this;
     }
 
     @NotNull
@@ -1018,6 +1013,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public InvalidTaskException(Task t, String message) {
             super(message);
             this.task = t;
+            task.delete(message);
         }
 
         @NotNull

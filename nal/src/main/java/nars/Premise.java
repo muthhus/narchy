@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Defines the conditions used in an instance of a derivation
  */
-public interface Premise extends Level, Tasked {
+public interface Premise extends Tasked {
 
     /*@NotNull
     Concept concept();*/
@@ -27,15 +27,6 @@ public interface Premise extends Level, Tasked {
 //    default public void emit(final Class c, final Object... o) {
 //        nar().emit(c, o);
 //    }
-
-
-    /**
-     * curent maximum allowed NAL level the reasoner is configured to support
-     */
-    @Override
-    default int nal() {
-        return nar().nal();
-    }
 
 
 

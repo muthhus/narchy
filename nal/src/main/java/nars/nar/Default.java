@@ -7,11 +7,8 @@ import nars.concept.Concept;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
-import nars.nal.Deriver;
-import nars.nal.Reasoner;
+import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
-import nars.nar.util.DefaultReasoner;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -32,7 +29,7 @@ public class Default extends AbstractNAR {
 
     public final @NotNull DefaultCore core;
 
-    public final @NotNull Reasoner reasoner;
+    public final @NotNull PremiseEval matcher;
 
     @Deprecated
     public Default() {
@@ -45,7 +42,7 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new Indexes.DefaultTermIndex(activeConcepts * 4, random),
+                new Indexes.DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
                 //new CaffeineIndex(new DefaultConceptBuilder(random)),
                 new FrameClock());
     }
@@ -58,14 +55,14 @@ public class Default extends AbstractNAR {
                 Global.DEFAULT_SELF);
 
 
-        the("reasoner", reasoner = newReasoner());
+        the("reasoner", matcher = new PremiseEval(random, newDeriver()));
 
 
         the("core", core = newCore(
                 activeConcepts,
                 conceptsFirePerCycle,
                 termLinksPerConcept, taskLinksPerConcept,
-                reasoner
+                matcher
         ));
 
         runLater(this::initHigherNAL);
@@ -80,61 +77,11 @@ public class Default extends AbstractNAR {
     }
 
 
-    /**
-     * process a Task through its Concept
-     */
-    @Nullable @Override
-    public final Concept process(@NotNull Task input, float activation) {
 
-        Concept c = concept(input, true);
-        if (c == null) {
+    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
 
-            input.delete("Inconceivable");
-
-
-        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-            task.log(Premise.getStack());*/
-
-            //eventTaskRemoved.emit(task);
-
-        /* else: a more destructive cleanup of the discarded task? */
-
-            return null;
-        }
-
-        float business = input.pri() * activation;
-        emotion.busy(business);
-
-
-        Task t = c.process(input, this);
-        if (t != null && !t.isDeleted()) {
-            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-
-            t.onConcept(c);
-
-            //propagate budget
-            MutableFloat overflow = new MutableFloat();
-
-            conceptualize(c, t, activation, activation, overflow);
-
-            if (overflow.floatValue() > 0) {
-                emotion.stress(overflow.floatValue());
-            }
-
-            eventTaskProcess.emit(t); //signal any additional processes
-
-        } else {
-            emotion.frustration(business);
-        }
-
-        return c;
-    }
-
-
-    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, Reasoner pg) {
-
-        DefaultCore c = new DefaultCore(this, pg, conceptWarm, conceptCold);
-        c.active.setCapacity(activeConcepts);
+        DefaultCore c = new DefaultCore(this, matcher, conceptWarm, conceptCold);
+        c.concepts.setCapacity(activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
@@ -145,24 +92,16 @@ public class Default extends AbstractNAR {
         return c;
     }
 
-    protected @NotNull Reasoner newReasoner() {
-        return new DefaultReasoner(this, newDeriver());
-    }
-
-    protected @NotNull Deriver newDeriver() {
-        return Deriver.getDefaultDeriver();
-    }
-
     @Override
     public final float conceptPriority(@NotNull Termed termed) {
-        if (termed!=null) {
+        //if (termed!=null) {
             //Concept cc = concept(termed);
             //if (cc != null) {
-                BLink<Concept> c = core.active.get(termed);
+                BLink<Concept> c = core.concepts.get(termed);
                 if (c != null)
                     return c.priIfFiniteElseZero();
             //}
-        }
+        //}
         return 0;
     }
 
@@ -180,7 +119,7 @@ public class Default extends AbstractNAR {
     @NotNull
     @Override
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
-        core.active.forEachKey(recip);
+        core.concepts.forEachKey(recip);
         return this;
     }
 

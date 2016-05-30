@@ -6,7 +6,7 @@ import nars.util.event.Active;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by me on 4/16/15.
+ * TODO this is not updated to latest API
  */
 public abstract class ConceptMap {
 
@@ -35,15 +35,12 @@ public abstract class ConceptMap {
             frame++;
             onFrame();
             cycleInFrame = 0;
-        }),
+        }));
         //nar.memory.eventConceptActivated.on(this::onConceptActive),
 //        nar.memory.eventConceptForget.on(c -> {
 //            onConceptForget(c);
 //        }),
-        nar.eventCycleEnd.on(m -> {
-            cycleInFrame++;
-            onCycle();
-        }) );
+
         this.nar = nar;
 
     }
@@ -54,8 +51,7 @@ public abstract class ConceptMap {
 	protected void onFrame() {
 	}
 
-	protected void onCycle() {
-	}
+
 
 	public abstract boolean contains(Concept c);
 

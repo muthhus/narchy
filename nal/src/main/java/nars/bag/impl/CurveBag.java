@@ -100,10 +100,12 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
 
-        assert(!isEmpty());
+        int ss = size();
+        if (ss == 0)
+            return this;
+
         assert(n > 0);
 
-        int ss = size();
         final int begin, end;
         if (ss <= n) {
             //special case: give everything

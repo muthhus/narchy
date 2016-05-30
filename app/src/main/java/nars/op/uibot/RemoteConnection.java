@@ -5,6 +5,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.InterleavedU8;
+import ch.qos.logback.classic.Level;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -20,6 +21,7 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import org.apache.logging.log4j.simple.SimpleLogger;
 import org.jfxvnc.net.rfb.codec.ProtocolHandler;
 import org.jfxvnc.net.rfb.codec.ProtocolState;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
@@ -42,6 +44,10 @@ import java.util.stream.IntStream;
 public class RemoteConnection implements RenderProtocol, ImageProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteConnection.class);
+    static {
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.toLevel("info"));
+    }
 
     WritableImage image;
 
@@ -55,6 +61,7 @@ public class RemoteConnection implements RenderProtocol, ImageProcess {
         config.passwordProperty().set(password);
         config.hostProperty().set(host);
         config.portProperty().set(port);
+
 
 //            if (args != null && args.length >= 3) {
 //                config.securityProperty().set(SecurityType.VNC_Auth);

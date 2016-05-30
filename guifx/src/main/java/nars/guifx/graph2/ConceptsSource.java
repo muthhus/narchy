@@ -163,7 +163,7 @@ public class ConceptsSource extends GraphSource {
     @Override
     public void commit() {
 
-        Bag<Concept> x = ((Default) nar).core.active;
+        Bag<Concept> x = ((Default) nar).core.concepts;
 
         String _keywordFilter = includeString.get();
         this.keywordFilter = _keywordFilter != null && _keywordFilter.isEmpty() ? null : _keywordFilter;

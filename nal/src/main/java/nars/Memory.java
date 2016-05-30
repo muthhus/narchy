@@ -57,11 +57,6 @@ public class Memory extends Param {
 
     public final transient Topic<NAR> eventFrameStart = new DefaultTopic<>();
 
-    /**
-     * fired at the end of each memory cycle
-     */
-    public final transient Topic<Memory> eventCycleEnd = new DefaultTopic<>(); //eventCycleStart; //new DefaultObserved();
-
     public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
 
     /**

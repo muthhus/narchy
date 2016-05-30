@@ -255,7 +255,7 @@ public class ControlFlowTest {
 
     final Supplier<NAR> n = () -> {
         Default x = new Default(512, 1, 2, 2);
-        x.onCycle(c -> {
+        x.onFrame(c -> {
             ts.update(c.time());
         });
         x.cyclesPerFrame.set(4);

@@ -30,9 +30,9 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
-    public final MutableInt abbreviationVolMin = new MutableInt(7);
+    public final MutableInt abbreviationVolMin = new MutableInt(6);
     public final MutableInt abbreviationVolMax = new MutableInt(1000);
-    public final MutableFloat abbreviationQualityMin = new MutableFloat(0.8f);
+    public final MutableFloat abbreviationQualityMin = new MutableFloat(0.75f);
 
     //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
     //public AtomicDouble priorityFactor = new AtomicDouble(1.0);

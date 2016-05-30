@@ -13,7 +13,6 @@ import nars.rover.robot.Spider;
 import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.time.SimulatedClock;
-import nars.util.event.CycleReaction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**

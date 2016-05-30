@@ -160,6 +160,6 @@ strictlyLocal.put("local_3", "only");
 
     @Override
     public @NotNull String summary() {
-        return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms";
+        return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms (WARNING: slow to count)";
     }
 }

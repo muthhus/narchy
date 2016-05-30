@@ -148,14 +148,12 @@ public class PremiseRuleSet  {
     {
         String ret = '<' + rule.toString() + '>';
 
-        //while (ret.contains("  ")) {
-            //ret = twoSpacePattern.matcher(ret).replaceAll(Matcher.quoteReplacement(" "));
-        //}
-
-        ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
-        ret = ret.replace("%A..B=_", "%A..%B=_"); //add var pattern manually to ellipsis
-        ret = ret.replace("B..", "%B.."); //add var pattern manually to ellipsis
-        ret = ret.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
+        if (ret.contains("..")) {
+            ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
+            ret = ret.replace("%A..B=_", "%A..%B=_"); //add var pattern manually to ellipsis
+            ret = ret.replace("B..", "%B.."); //add var pattern manually to ellipsis
+            ret = ret.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
+        }
 
         return ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
     }
@@ -227,18 +225,20 @@ public class PremiseRuleSet  {
 
     @NotNull
     static Stream<PremiseRule> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
-        return rawRules/*.parallelStream()*/
-                .distinct()
+        return rawRules
+                .distinct().parallel()
                 .map(PremiseRuleSet::preprocess)
+                //.sequential()
                 .map(src-> {
 
             List<PremiseRule> ur = Global.newArrayList(4);
             try {
 
+                Termed prt = index.fromStringRaw(src);
+                        //Narsese.the().term(src, Terms.terms, false /* raw */);
 
-                Termed prt = Narsese.the().term(src, Terms.terms, false /* raw */);
-                if (!(prt instanceof Compound))
-                    throw new Narsese.NarseseException("rule parse error: " + src + " -> " + prt);
+//                if (!(prt instanceof Compound))
+//                    throw new Narsese.NarseseException("rule parse error: " + src + " -> " + prt);
 
                 PremiseRule preNorm = new PremiseRule((Compound) prt);
 

@@ -79,7 +79,7 @@ public class BagRegulator<X> {
     public static void main(String[] args) {
         Default n = new Default(512, 4, 3, 3);
 
-        BagRegulator r = new BagRegulator(n.core.active, new MutableFloat(0), n.perfection);
+        BagRegulator r = new BagRegulator(n.core.concepts, new MutableFloat(0), n.perfection);
         n.onFrame(f -> {
            if (f.time() % 25 == 0) {
                r.commit();

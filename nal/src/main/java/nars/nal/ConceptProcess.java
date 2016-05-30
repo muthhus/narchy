@@ -39,12 +39,6 @@ public class ConceptProcess implements Premise {
     public final BLink<? extends Termed> termLink;
     @Nullable public final Task belief;
 
-
-    //cached here to prevent weakref tasklink from losing the task in the middle of derivation
-    public final transient Task task;
-
-    //public final BLink<? extends Concept> conceptLink;
-
     /** lazily cached value :=
      *      -1: unknown
      *      0: parents have no evidential overlap
@@ -65,8 +59,6 @@ public class ConceptProcess implements Premise {
         this.nar = nar;
 
         this.taskLink = taskLink;
-        this.task = taskLink.get();
-        //assert(!task().isDeleted());
 
         //this.conceptLink = conceptLink;
         this.termLink = termLink;
@@ -103,8 +95,7 @@ public class ConceptProcess implements Premise {
 
     @Override
     public final Task task() {
-        //return taskLink.get();
-        return task;
+        return taskLink.get();
     }
 
 
@@ -141,13 +132,10 @@ public class ConceptProcess implements Premise {
         return nar;
     }
 
-    public int getMaxMatches() {
+    public int matchesMax() {
         final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
         return (int) Math.ceil(task().pri() * (max - min) + min);
     }
-
-
-
 
     /** part 2 */
     public final void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {

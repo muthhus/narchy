@@ -108,7 +108,7 @@ public class DeductiveMeshTest {
             if (n.time() == 1000) {
                 NAR.printTasks(n, true);
                 NAR.printTasks(n, false);
-                System.out.println(Arrays.toString(n.core.active.priHistogram(10)));
+                System.out.println(Arrays.toString(n.core.concepts.priHistogram(10)));
             }
         });
 
@@ -149,7 +149,7 @@ public class DeductiveMeshTest {
         //n.stdout();
         //n.frame(5000);
 
-        int nc = ((Default) n).core.active.size();
+        int nc = ((Default) n).core.concepts.size();
         String ts = timestamp(start);
         long time = n.time();
 

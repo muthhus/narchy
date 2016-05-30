@@ -23,14 +23,16 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.index.Indexes;
+import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.NAgent;
@@ -44,7 +46,7 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 1;
+	final int visionRadius = 6;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -60,12 +62,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Random rng = new XorShift128PlusRandom(1);
 
 		Default nar = new Default(
-				1024, 8, 1, 2, rng,
-				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
+				1024, 6, 1, 2, rng,
+				new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				new Indexes.DefaultTermIndex(128 *1024, rng)
+				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
@@ -76,7 +78,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(512);
+		nar.cyclesPerFrame.set(768);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -111,13 +113,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				555450);
+				15512);
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
 		n.printActions();
-		nar.core.active.print();
+		nar.core.concepts.print();
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
 //				Concept c = (Concept)t;
@@ -177,9 +179,28 @@ public class PacmanEnvironment extends cpcman implements Environment {
 						throw new RuntimeException();
 				}
 
-				int dx = cell % visionDiameter;
-				int dy = cell / visionDiameter;
-				Term squareTerm = $.p($.the(dx), $.the(dy));
+				int ax = cell % visionDiameter;
+				int ay = cell / visionDiameter;
+
+				//Term squareTerm = $.p($.the(ax), $.the(ay));
+
+				int dx = (visionRadius  ) - ax;
+				int dy = (visionRadius  ) - ay;
+				Atom dirX, dirY;
+				if (dx == 0) dirX = $.the("v"); //vertical
+				else if (dx > 0) dirX = $.the("r"); //right
+				else /*if (dx < 0)*/ dirX = $.the("l"); //left
+				if (dy == 0) dirY = $.the("h"); //horizontal
+				else if (dy > 0) dirY = $.the("u"); //up
+				else /*if (dy < 0)*/ dirY = $.the("d"); //down
+				Term squareTerm = $.p(
+						//$.p(dirX, $.the(Math.abs(dx))),
+						$.inh($.the(Math.abs(dx)), dirX),
+						//$.p(dirY, $.the(Math.abs(dy)))
+						$.inh($.the(Math.abs(dy)), dirY)
+				);
+				System.out.println(dx + " " + dy + " " + squareTerm);
+
 				//return $.p(squareTerm, typeTerm);
 				return $.prop(squareTerm, typeTerm);
 				//return (Compound)$.inh($.the(square), typeTerm);

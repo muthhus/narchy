@@ -5,6 +5,8 @@ import nars.NAR;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
 import nars.index.TermIndex;
+import nars.nal.Deriver;
+import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.op.ImmediateTermTransform;
@@ -19,8 +21,10 @@ import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.op.time.STMTemporalLinkage;
+import nars.task.Task;
 import nars.term.atom.Atom;
 import nars.time.Clock;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +43,7 @@ public abstract class AbstractNAR extends NAR {
 
     public final DefaultConceptBudgeting conceptWarm, conceptCold;
 
+    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
     public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random random) {
         this(clock, index, random, Global.DEFAULT_SELF);
@@ -123,7 +128,49 @@ public abstract class AbstractNAR extends NAR {
     }
 
 
+    protected @NotNull Deriver newDeriver() {
+        return Deriver.getDefaultDeriver();
+    }
 
+
+    /**
+     * process a Task through its Concept
+     */
+    @Nullable @Override
+    public final Concept process(@NotNull Task input, float activation) {
+
+        Concept c = concept(input, true);
+        if (c == null) {
+            throw new InvalidTaskException(input, "Inconceivable");
+            //input.delete("Inconceivable");
+        }
+
+        float business = input.pri() * activation;
+        emotion.busy(business);
+
+
+        Task t = c.process(input, this);
+        if (t != null && !t.isDeleted()) {
+            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
+
+            t.onConcept(c);
+
+            //propagate budget
+            MutableFloat overflow = new MutableFloat();
+
+            conceptualize(c, t, activation, activation, overflow);
+
+            emotion.stress(overflow);
+
+
+            eventTaskProcess.emit(t); //signal any additional processes
+
+        } else {
+            emotion.frustration(business);
+        }
+
+        return c;
+    }
 
 
 //    public static final AbstractOperator[] exampleOperators = {

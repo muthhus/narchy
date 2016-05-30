@@ -8,7 +8,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nal.Reasoner;
+import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,14 +22,14 @@ import java.util.Random;
  * will not consume budget unfairly relative to another premise
  * with less tasks but equal budget.
  */
-public final class DefaultCore extends AbstractCore {
+public class DefaultCore extends AbstractCore {
 
     private final DefaultConceptBudgeting cold;
     private final DefaultConceptBudgeting warm;
 
 
-    public DefaultCore(@NotNull NAR nar, Reasoner reasoner, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
-        super(nar, reasoner);
+    public DefaultCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
+        super(nar, matcher);
         this.warm = warm;
         this.cold = cold;
     }
@@ -45,7 +45,7 @@ public final class DefaultCore extends AbstractCore {
 
         c.capacity(cold);
 
-        nar.emotion.alert(1f/active.size());
+        nar.emotion.alert(1f/ concepts.size());
     }
 
     /** called when a concept enters the concept bag */

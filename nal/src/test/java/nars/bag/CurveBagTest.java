@@ -171,7 +171,7 @@ public class CurveBagTest  {
         n.input("$1$ b:c.");
         n.input("$1$ c:d.");
         n.run(4);
-        Bag<Concept> bag = n.core.active;
+        Bag<Concept> bag = n.core.concepts;
 
         bag.forEach(System.out::println);
         System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
@@ -185,10 +185,10 @@ public class CurveBagTest  {
 
 
         System.out.print("Sampling: " );
-        printDist(getSamplingDistribution((CurveBag) n.core.active, 1000));
+        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
         System.out.print("Priority: " );
         EmpiricalDistribution pri;
-        printDist(pri = getSamplingPriorityDistribution(n.core.active, 1000));
+        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
 
         List<SummaryStatistics> l = pri.getBinStats();
         assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());

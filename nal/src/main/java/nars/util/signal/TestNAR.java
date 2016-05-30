@@ -11,7 +11,7 @@ import nars.util.condition.EternalTaskCondition;
 import nars.util.condition.ExecutionCondition;
 import nars.util.condition.NARCondition;
 import nars.util.condition.TemporalTaskCondition;
-import nars.util.event.CycleReaction;
+import nars.util.event.FrameReaction;
 import nars.util.event.Topic;
 import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;
@@ -165,7 +165,7 @@ public class TestNAR  {
     }
 
 
-    final class EarlyExit extends CycleReaction {
+    final class EarlyExit extends FrameReaction {
 
         final int checkResolution; //every # cycles to check for completion
         int cycle;
@@ -176,7 +176,7 @@ public class TestNAR  {
         }
 
         @Override
-        public void onCycle() {
+        public void onFrame() {
 
             if (++cycle % checkResolution == 0 && !requires.isEmpty()) {
 

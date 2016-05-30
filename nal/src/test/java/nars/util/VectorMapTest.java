@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.nar.Default;
 import nars.util.data.UniformVector;
 import nars.util.data.VectorMap;
-import nars.util.event.CycleReaction;
+import nars.util.event.FrameReaction;
 import nars.util.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -68,10 +68,10 @@ public class VectorMapTest {
 
         n.run(16);
 
-        new CycleReaction(n) {
+        new FrameReaction(n) {
 
             @Override
-            public void onCycle() {
+            public void onFrame() {
 
                 long t = n.time();
                 if (t % 100 != 0)  return;

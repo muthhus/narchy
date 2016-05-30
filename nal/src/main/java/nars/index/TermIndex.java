@@ -526,6 +526,10 @@ public interface TermIndex {
     default Term fromString(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this, true);
     }
+    @NotNull
+    default Term fromStringRaw(@NotNull String termToParse) throws Narsese.NarseseException {
+        return Narsese.the().term(termToParse, this, false);
+    }
 
     @Nullable
     default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {

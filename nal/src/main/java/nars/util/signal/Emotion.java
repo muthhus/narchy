@@ -1,6 +1,7 @@
 package nars.util.signal;
 
 import nars.util.meter.event.FloatGuage;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.nustaq.serialization.FSTConfiguration;
 import org.slf4j.Logger;
@@ -125,8 +126,10 @@ public final class Emotion implements Serializable {
     @Deprecated public void busy(float pri) {
         busy.accept( pri );
     }
-    @Deprecated public void stress(float pri) {
-        stress.accept( pri );
+    public final void stress(MutableFloat pri) {
+        float v = pri.floatValue();
+        if (v > 0)
+            stress.accept( v );
     }
     @Deprecated public void frustration(float pri) {
         frustration.accept( pri );

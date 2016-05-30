@@ -1,5 +1,6 @@
 package nars.nar.util;
 
+import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
@@ -8,13 +9,18 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
-import nars.nal.Reasoner;
+import nars.nal.ConceptProcess;
+import nars.nal.PremiseBuilder;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.MutableInteger;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The original deterministic memory cycle implementation that is currently used as a standard
@@ -50,18 +56,10 @@ public abstract class AbstractCore {
     /**
      * concepts active in this cycle
      */
-    public final Bag<Concept> active;
+    public final Bag<Concept> concepts;
 
     @Deprecated
     public final transient @NotNull NAR nar;
-
-//        @Range(min=0,max=8192,unit="Concept")
-//        public final MutableInteger capacity = new MutableInteger();
-
-
-//        @NotNull
-//        @Deprecated @Range(min = 0, max = 1f, unit = "Perfection")
-//        public final MutableFloat perfection;
 
 
     @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
@@ -72,34 +70,51 @@ public abstract class AbstractCore {
 
 
 
+    @NotNull private final AutoBag<Concept> conceptUpdate;
 
-    public final @NotNull Reasoner reasoner;
-    private final AutoBag<Concept> conceptUpdate;
+    @NotNull private final PremiseEval matcher;
 
-    private float cyclesPerFrame;
-    private int cycleNum;
+    /**
+     * temporary re-usable array for batch firing
+     */
+    transient private final Collection<BLink<? extends Termed>> terms = Global.newArrayList();
 
-//        @Deprecated
-//        int tasklinks = 2; //TODO use MutableInteger for this
-//        @Deprecated
-//        int termlinks = 3; //TODO use MutableInteger for this
+    /**
+     * temporary re-usable array for batch firing
+     */
+    transient final List<BLink<Task>> tasks = Global.newArrayList();
+
+    /**
+     * temporary re-usable holds references to the tasks of the tasks buffer so that they are not garbage collected during batch firing
+     */
+    transient final List<Task> tasksBuffer = Global.newArrayList();
+
+    /**
+     * temporary re-usable
+     */
+    @NotNull transient private BLink[] termsArray = new BLink[0];
+
+    /**
+     * temporary re-usable
+     */
+    transient final List<ConceptProcess> processes = Global.newArrayList();
 
 
-    protected AbstractCore(@NotNull NAR nar, Reasoner reasoner) {
+
+    protected AbstractCore(@NotNull NAR nar, PremiseEval matcher) {
 
         this.nar = nar;
 
-        this.reasoner = reasoner;
+        this.matcher = matcher;
 
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
 
-        this.active = newConceptBag();
+        this.concepts = newConceptBag();
         this.conceptUpdate = new AutoBag<>(nar.perfection);
 
         this.handlers = new Active(
                 nar.eventFrameStart.on(this::frame),
-                nar.eventCycleEnd.on(this::cycle),
                 nar.eventReset.on(this::reset)
         );
 
@@ -111,60 +126,38 @@ public abstract class AbstractCore {
     protected abstract Bag<Concept> newConceptBag();
 
     protected void frame(@NotNull NAR nar) {
-        cyclesPerFrame = nar.cyclesPerFrame.floatValue();
-        cycleNum = 0;
 
         tasklinkUpdate.update(nar);
         termlinkUpdate.update(nar);
         conceptUpdate.update(nar);
 
-        reasoner.frame(nar);
+
+        cycle(nar);
     }
 
     protected final void cycle(Memory memory) {
 
-        float subCycle = cycleNum++ / cyclesPerFrame;
+        int num = memory.cyclesPerFrame.intValue();
+        int cpf = conceptsFiredPerCycle.intValue();
+        float dCycle = 1f / num;
 
-        termlinkUpdate.cycle(subCycle);
-        tasklinkUpdate.cycle(subCycle);
-        conceptUpdate.cycle(subCycle);
+        for (int cycleNum = 0; cycleNum < num; cycleNum++) {
+            float subCycle = dCycle * cycleNum;
 
-        //active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
-        //active.printAll();
+            termlinkUpdate.cycle(subCycle);
+            tasklinkUpdate.cycle(subCycle);
+            conceptUpdate.cycle(subCycle);
 
-        conceptUpdate.update(active, false);
+            conceptUpdate.update(concepts, false);
 
-        fireConcepts(conceptsFiredPerCycle.intValue());
+            concepts.sample(cpf, this::fireConcept);
+        }
 
-        //active.commit(lastForget != now ? conceptForget : .. );
-
-//            if (!((CurveBag)active).isSorted()) {
-//                throw new RuntimeException(active + " not sorted");
-//            }
 
     }
-
-
-    /**
-     * samples a next active concept
-     */
-    @Deprecated
-    public final Concept next() {
-        return active.sample().get();
-    }
-
 
     private void reset(Memory m) {
-        active.clear();
-    }
-
-
-    protected final void fireConcepts(int conceptsToFire) {
-        Bag<Concept> b = this.active;
-
-        if (conceptsToFire == 0 || b.isEmpty()) return;
-
-        b.sample(conceptsToFire, this::fireConcept);
+        concepts.clear();
     }
 
     protected final void fireConcept(BLink<Concept> conceptLink) {
@@ -173,16 +166,54 @@ public abstract class AbstractCore {
         tasklinkUpdate.update(concept.tasklinks(), true);
         termlinkUpdate.update(concept.termlinks(), false);
 
-        reasoner.firePremiseSquared(
+        firePremiseSquared(
                 conceptLink,
                 tasklinksFiredPerFiredConcept.intValue(),
                 termlinksFiredPerFiredConcept.intValue()
         );
     }
 
+    /**
+     * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
+     * (recycles buffers, non-thread safe, one thread use this at a time)
+     */
+    public final void firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
+
+        Concept c = conceptLink.get();
+
+        Collection<BLink<? extends Termed>> termsBuffer;
+        termsBuffer = this.terms;
+        c.termlinks().sample(termlinks, termsBuffer::add);
+        assert (!termsBuffer.isEmpty());
+
+
+        List<BLink<Task>> taskLinksBuffer = this.tasks;
+        c.tasklinks().sample(tasklinks, taskLinksBuffer::add);
+
+        //assert (!tasksBuffer.isEmpty());
+        if (taskLinksBuffer.isEmpty() || termsBuffer.isEmpty()) return;
+
+
+        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
+        termsBuffer.clear();
+
+        for (int i = 0, tasksBufferSize = taskLinksBuffer.size(); i < tasksBufferSize; i++)
+            tasksBuffer.add(taskLinksBuffer.get(i).get());
+
+        PremiseBuilder.run(nar, termsArray, taskLinksBuffer, processes);
+
+        taskLinksBuffer.clear();
+
+        matcher.run(nar, processes);
+
+        tasksBuffer.clear(); //release tasks, they may be garbage collected after this point
+
+    }
+
+
 
     public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
-        active.put(c, b, conceptActivation, conceptOverflow);
+        concepts.put(c, b, conceptActivation, conceptOverflow);
         if (b.isDeleted())
             throw new RuntimeException("Concept rejected: " + b);
         if (linkActivation > 0)

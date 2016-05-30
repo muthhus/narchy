@@ -5,7 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Termed;
-import nars.util.event.CycleReaction;
+import nars.util.event.FrameReaction;
 import nars.util.meter.Signal;
 import nars.util.meter.Signals;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import java.util.List;
  * Calculates the maximum confidence of a concept's beliefs for a specifc frequency
  * TODO support freq ranges
  */
-public class MaxBeliefConfidence extends CycleReaction implements Signals {
+public class MaxBeliefConfidence extends FrameReaction implements Signals {
 
     @NotNull
     public final Termed term;
@@ -35,7 +35,7 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
     }
 
     @Override
-    public void onCycle() {
+    public void onFrame() {
         Concept c = nar.concept(term);
         if (c == null) conf = -1;
         else {

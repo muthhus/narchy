@@ -19,6 +19,7 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -49,11 +50,12 @@ public class PremiseEval extends FindSubst {
     public final Map<Atomic, ImmediateTermTransform> transforms = Global.newHashMap();
 
     /** run parameters */
-    int termutesPerMatch, termutes;
-    private float minConfidence = Global.TRUTH_EPSILON;
+    int premiseMatchesMax, termutes;
+
 
 
     /** cached value */
+    public float confMin = Global.TRUTH_EPSILON;
     private int termSub0op, termSub1op;
     private int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
@@ -119,7 +121,7 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
-        this.termutes = termutesPerMatch;
+        this.termutes = premiseMatchesMax;
         return super.matchAll(x, y, finish);
     }
 
@@ -150,13 +152,21 @@ public class PremiseEval extends FindSubst {
 
     }
 
+    public final void run(NAR nar, @NotNull List<ConceptProcess> pp) {
+        this.nar = nar;
+        for (int i = 0, ppSize = pp.size(); i < ppSize; i++) {
+            run(pp.get(i));
+        }
+    }
+
     /**
      * set the next premise
      */
-    public final void run(@NotNull ConceptProcess p) {
+    final void run(@NotNull ConceptProcess p) {
+
+        this.premiseMatchesMax = p.matchesMax();
 
         this.premise = p;
-        this.nar = p.nar();
 
         Task task = p.task();
         this.punct.set(task.punc());
@@ -185,7 +195,6 @@ public class PremiseEval extends FindSubst {
 
 
 
-        this.termutesPerMatch = p.getMaxMatches();
 
 
         this.cyclic = p.cyclic();
@@ -238,16 +247,6 @@ public class PremiseEval extends FindSubst {
     }
 
 
-
-    public final void setMinConfidence(float minConfidence) {
-        this.minConfidence = minConfidence;
-    }
-
-    /** default minimum confidence */
-    public final float confidenceMin() {
-        return minConfidence;
-    }
-
     /** specific minimum confidence function for advanced filtering heuristics TODO */
     public final float confidenceMin(Term pattern, char punc) {
 
@@ -260,7 +259,7 @@ public class PremiseEval extends FindSubst {
 //                return minConfidence * 3;
 //        }
 
-        return minConfidence;
+        return confMin;
     }
 
     /** gets the op of the (top-level) pattern being compared
