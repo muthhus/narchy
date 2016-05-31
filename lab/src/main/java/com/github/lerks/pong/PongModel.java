@@ -20,14 +20,14 @@ import java.awt.event.KeyEvent;
 
 public class PongModel extends JPanel implements ActionListener, MouseListener, KeyListener {
 	// Proprietà della palla
-	private static final int RADIUS = 10; // Raggio
-	private static final int START_SPEED = 9; // Velocità iniziale
+	private static final int RADIUS = 20; // Raggio
+	private static final int START_SPEED = 4; // Velocità iniziale
 	private static final int ACCELERATION = 125; // Ogni quanti frame aumenta di 1 pixel la velocità 
 
 	// Proprietà dei carrelli
-	private static final int SPEED = 12; // Velocità dei carrelli
-	private static final int HEIGHT = 50; // SEMI-altezza del carrello
-	private static final int WIDTH = 20;
+	public static final int SPEED = 20; // Velocità dei carrelli
+	public static final int HEIGHT = 50; // SEMI-altezza del carrello
+	public static final int WIDTH = 30;
 	private static final int TOLERANCE = 5;
 	private static final int PADDING = 10;
 	
@@ -47,7 +47,8 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	private boolean mouse_inside = false;
 	private boolean key_up = false;
 	private boolean key_down = false;
-	
+	private double minBallYSpeed = 2f;
+
 	// Constructor
 	public PongModel(Player player1, Player player2) {
 		super ();
@@ -135,8 +136,11 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		// Calcola la posizione della pallina
 		ball_x += ball_x_speed;
 		ball_y += ball_y_speed;
-		if (ball_y_speed < 0) // Hack to fix double-to-int conversion
-			ball_y ++;
+//		if (ball_y_speed < 0) // Hack to fix double-to-int conversion
+//			ball_y ++;
+		if (Math.abs(ball_y_speed) < minBallYSpeed)
+			ball_y_speed += (Math.random()-0.5f) * minBallYSpeed;
+//
 		
 		// Accelera la pallina
 		if (acceleration) {
@@ -154,6 +158,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 			if (collision_point > player1.position - HEIGHT - TOLERANCE && 
 			    collision_point < player1.position + HEIGHT + TOLERANCE) {
 				ball_x = 2 * (PADDING + WIDTH + RADIUS) - ball_x;
+				player1.bounce();
 				ball_x_speed = Math.abs (ball_x_speed);
 				ball_y_speed -= Math.sin ((double)(player1.position - ball_y) / HEIGHT * Math.PI / 4)
 				                * Math.hypot (ball_x_speed, ball_y_speed);
@@ -161,7 +166,8 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 					computeDestination (player2);
 			}
 			else {
-				player2.points ++;
+				player2.score();
+				player1.ouch();
 				new_game = true;
 			}
 		}
@@ -173,13 +179,15 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 			    collision_point < player2.position + HEIGHT + TOLERANCE) {
 				ball_x = 2 * (getWidth() - PADDING - WIDTH - RADIUS ) - ball_x;
 				ball_x_speed = -1 * Math.abs (ball_x_speed);
+				player2.bounce();
 				ball_y_speed -= Math.sin ((double)(player2.position - ball_y) / HEIGHT * Math.PI / 4)
 				                * Math.hypot (ball_x_speed, ball_y_speed);
 				//if (player1.getType() == Player.CPU_HARD)
 					computeDestination (player1);
 			}
 			else {
-				player1.points ++;
+				player1.score();
+				player2.ouch();
 				new_game = true;
 			}
 		}

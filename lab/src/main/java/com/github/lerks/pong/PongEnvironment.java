@@ -5,54 +5,172 @@ package com.github.lerks.pong;/*
  *  Read the file 'COPYING' for more information
  */
 
-import com.github.sarxos.webcam.util.ImageUtils;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.*;
+import javafx.scene.layout.BorderPane;
+import nars.$;
+import nars.NAR;
+import nars.guifx.chart.MatrixImage;
+import nars.guifx.util.ColorArray;
 import nars.learn.Agent;
+import nars.nar.Default;
+import nars.op.mental.Abbreviation2;
+import nars.op.time.MySTMClustered;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atom;
+import nars.util.FX;
+import nars.util.NAgent;
 import nars.util.experiment.Environment;
-import org.encog.util.ImageSize;
+import org.jetbrains.annotations.NotNull;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import static java.awt.Image.SCALE_SMOOTH;
+import static nars.$.*;
 
-public class PongEnvironment implements Environment {
+public class PongEnvironment extends Player implements Environment {
 
-	final int width = 64;
-	final int height = 48;
+	final int width = 16;
+	final int height = 12;
 	final int pixels = width * height;
-	final int scale = 10;
+	final int scale = 30;
+	final int ticksPerFrame = 3; //framerate divisor
+	private final PongModel pong;
+	private final MatrixImage priMatrix;
+	float bias = 0f; //pain of boredom
+	private NAgent nar;
 
-	public PongEnvironment() throws AWTException {
-		super ();
+	public static void main (String[] args) throws AWTException {
+		PongEnvironment e = new PongEnvironment();
+
+		Default nar = new Default();
+		nar.beliefConfidence(0.65f);
+		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+		nar.cyclesPerFrame.set(512);
+
+
+		NAgent a = new NAgent(nar);
+		new Abbreviation2(nar, "_");
+		new MySTMClustered(nar, 16, '.');
+
+		//DQN a = new DQN();
+		//HaiQAgent a = new HaiQAgent();
+
+		e.run(a, 8192);
+
+		NAR.printTasks(nar, true);
+		NAR.printTasks(nar, false);
+		a.printActions();
+		nar.forEachConcept(System.out::println);
+	}
+
+
+	public PongEnvironment() {
+		super();
 
 		JFrame j = new JFrame();
 		j.setTitle ("Pong");
 		j.setSize (width * scale, height * scale);
 		j.setResizable(false);
 
-		
-		PongModel content = new PongModel(new Player.CPU_HARD(), new Player.CPU_EASY());
-		content.acceleration = true;
-		j.getContentPane ().add (content);
-		
-		j.addMouseListener (content);
-		j.addKeyListener (content);
+
+		pong = new PongModel(this, new Player.CPU_EASY());
+		pong.acceleration = false;
+		j.getContentPane ().add (pong);
+
+		j.addMouseListener (pong);
+		j.addKeyListener (pong);
 
 		j.setVisible(true);
 		j.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 
-		Timer timer = new Timer (20, content);
-		timer.start();
+		priMatrix = new MatrixImage();
+		FX.run(()->{
+			BorderPane priMatrixPane = new BorderPane(priMatrix);
+			FX.newWindow("Priority", priMatrixPane);
+			priMatrix.fitWidthProperty().bind(priMatrixPane.widthProperty());
+			priMatrix.fitHeightProperty().bind(priMatrixPane.heightProperty());
+		});
+
+
+	}
+
+
+	@Override
+	public void preStart(Agent a) {
+		if (a instanceof NAgent) {
+			//provide custom sensor input names for the nars agent
+
+			nar = (NAgent) a;
+
+
+			nar.setSensorNamer((i) -> {
+//				int cell = i;
+//				int type = i % 3;
+//				Atom typeTerm;
+//				switch (type) {
+//					case 0: typeTerm = WALL; break;
+//					case 1: typeTerm = PILL; break;
+//					case 2: typeTerm = GHOST; break;
+//					default:
+//						throw new RuntimeException();
+//				}
+
+				int ax = i % width;
+				int ay = i / width;
+
+				//Term squareTerm = $.p($.the(ax), $.the(ay));
+
+//				int dx = (visionRadius  ) - ax;
+//				int dy = (visionRadius  ) - ay;
+//				Atom dirX, dirY;
+//				if (dx == 0) dirX = $.the("v"); //vertical
+//				else if (dx > 0) dirX = $.the("r"); //right
+//				else /*if (dx < 0)*/ dirX = $.the("l"); //left
+//				if (dy == 0) dirY = $.the("h"); //horizontal
+//				else if (dy > 0) dirY = $.the("u"); //up
+//				else /*if (dy < 0)*/ dirY = $.the("d"); //down
+//				Term squareTerm = $.p(
+//						//$.p(dirX, $.the(Math.abs(dx))),
+//						$.inh($.the(Math.abs(dx)), dirX),
+//						//$.p(dirY, $.the(Math.abs(dy)))
+//						$.inh($.the(Math.abs(dy)), dirY)
+//				);
+//				System.out.println(dx + " " + dy + " " + squareTerm);
+
+				return p(ax, ay);
+			});
+		}
+	}
+
+	public static Compound p(int x, int y) {
+		@NotNull Compound c = $.p(the(x), the(y));
+		//System.out.println(i + " (" + ax + "," + ay + ") " + c);
+		//return c;
+		return inh(c, the("w"));
+	}
+
+	@Override
+	public Twin<Integer> start() {
+		return Tuples.twin(pixels, 3);
+	}
+
+	float lastScore = 0;
+
+	@Override
+	public float pre(int t, float[] ins) {
+
+		for (int i = 0; i < ticksPerFrame; i++)
+			pong.actionPerformed(null);
 
 		BufferedImage big =
-				ScreenImage.createImage((JComponent) j.getContentPane());
+				ScreenImage.createImage(pong);
 
 		BufferedImage small = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
 		Graphics2D tGraphics2D = small.createGraphics(); //create a graphics object to paint to
@@ -62,34 +180,54 @@ public class PongEnvironment implements Environment {
 		tGraphics2D.drawImage( big, 0, 0, width, height, null ); //draw the image scaled
 
 
+		int i = 0;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int p = small.getRGB(x, y);
 				int r = (p & 0x00ff0000) >> 16;
 				String c = r > 0 ? "XX" : "..";
-				System.out.print(c);
+				//System.out.print(c);
+				ins[i++] = r/255f;
 			}
-			System.out.println();
+			//System.out.println();
 		}
 
-	}
 
-	public static void main (String[] args) throws AWTException {
-		new PongEnvironment();
-	}
-
-	@Override
-	public Twin<Integer> start() {
-		return Tuples.twin(pixels, 3);
-	}
-
-	@Override
-	public float pre(int t, float[] ins) {
-		return 0;
+		float score = points;
+		float reward = score-lastScore - bias;
+		lastScore = score;
+		return reward;
 	}
 
 	@Override
 	public void post(int t, int action, float[] ins, Agent a) {
+		switch (action) {
+			case 0:
+				move(-PongModel.SPEED, pong);
+				break;
+			case 1: /* nothing */
+				break;
+			case 2:
+				move(+PongModel.SPEED, pong);
+				break;
+
+		}
+
+		priMatrix.set(width,height,(x,y)->{
+
+			float p = nar.nar.conceptPriority(p(x, y));
+			return ColorArray.rgba(0, p, 0, 1f);
+
+		});
+
+		System.out.println( a.summary());
+
+	}
+
+
+
+	@Override
+	public void computePosition(PongModel pong) {
 
 	}
 }

@@ -31,9 +31,10 @@ public class FX {
 
     /** run in FX context in separate thread */
     public static void run(Runnable r) {
-        new Thread( () -> {
+        Thread t = new Thread( () -> {
             run((a, b) -> r.run());
-        }).start();
+        });
+        t.start();
     }
 
     /* https://macdevign.wordpress.com/2014/03/27/running-javafx-application-instance-in-the-main-method-of-a-class/ */

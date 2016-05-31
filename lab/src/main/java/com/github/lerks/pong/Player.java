@@ -9,6 +9,27 @@ abstract public class Player {
 
 	abstract public void computePosition(PongModel pong);
 
+	public void bounce() {
+		points+=0.5f;
+	}
+
+	public void score() {
+		points++;
+	}
+
+	public void ouch() {
+		points--;
+	}
+	public void move(int dy, PongModel pong) {
+		position += dy;
+		int maxPos = pong.getHeight() - pong.HEIGHT;
+		int minPos = pong.HEIGHT;
+		if (position > maxPos)
+			position = maxPos;
+		if (position < minPos)
+			position = minPos;
+
+	}
 	// Tipi di giocatore
 //	public static final int CPU_EASY = 0;
 //	public static final int CPU_HARD = 1;
@@ -39,9 +60,11 @@ abstract public class Player {
 
 	public static final class CPU_EASY extends Player {
 
+		float noise = 10f;
 		@Override
 		public void computePosition(PongModel pong) {
-			pong.movePlayer(this, pong.ball_y);
+
+			pong.movePlayer(this, pong.ball_y + (int)(Math.random() * noise));
 		}
 	}
 	public static final class CPU_HARD extends Player {
@@ -54,7 +77,7 @@ abstract public class Player {
 
 	public int position = 0;
 	public int destination = 0;
-	public int points = 0;
+	public float points = 0;
 	
 
 }

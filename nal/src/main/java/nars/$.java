@@ -93,18 +93,18 @@ public enum $ /* TODO: implements TermIndex */ {
      *  returns a Term if the two inputs are equal to each other
      */
     @Nullable
-    public static Term inh(Term subj, Term pred) {
+    public static Compound inh(Term subj, Term pred) {
 
 //        if ((predicate instanceof Operator) && if (subject instanceof Product))
 //            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
 //        else
 
-        return the(INHERIT, subj, pred);
+        return (Compound) the(INHERIT, subj, pred);
     }
 
 
     @Nullable
-    public static Term inh(@NotNull String subj, @NotNull String pred) {
+    public static Compound inh(@NotNull String subj, @NotNull String pred) {
         return inh($(subj), $(pred));
     }
 
