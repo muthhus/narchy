@@ -146,7 +146,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             if (term.op() == CONJUNCTION && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEGATE)) {
                 if (cterm.subterms().or(new Predicate<Term>() {
                     @Override
-                    public boolean test(Term p) {
+                    public boolean test(@NotNull Term p) {
                         if (p.op() == NEGATE) {
                             return cterm.contains(((Compound) p).term(0));
                         }

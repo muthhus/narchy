@@ -7,6 +7,7 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TemporalTest {
 
-    NAR n = new Terminal(128); //for cycle/frame clock, not realtime like Terminal
+    @NotNull NAR n = new Terminal(128); //for cycle/frame clock, not realtime like Terminal
 
 
     @Test public void parsedCorrectOccurrenceTime() {
@@ -40,7 +41,7 @@ public class TemporalTest {
         assertInvalidTask("((x) &&+0 (--,(x))).");
     }
 
-    public void assertInvalidTask(String ss) {
+    public void assertInvalidTask(@NotNull String ss) {
         try {
             n.input(ss);
             assertTrue(false);

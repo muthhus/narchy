@@ -52,6 +52,7 @@ public abstract class AbstractCore {
     /**
      * concepts active in this cycle
      */
+    @NotNull
     public final Bag<Concept> concepts;
 
     @Deprecated
@@ -73,22 +74,9 @@ public abstract class AbstractCore {
     /**
      * temporary re-usable array for batch firing
      */
-    transient private final Collection<BLink<? extends Termed>> terms = Global.newArrayList();
+    transient private final List<BLink<? extends Termed>> terms = Global.newArrayList();
 
-    /**
-     * temporary re-usable array for batch firing
-     */
-    transient final List<BLink<Task>> tasks = Global.newArrayList();
 
-    /**
-     * temporary re-usable holds references to the tasks of the tasks buffer so that they are not garbage collected during batch firing
-     */
-    transient final List<Task> tasksBuffer = Global.newArrayList();
-
-    /**
-     * temporary re-usable
-     */
-    @NotNull transient private BLink[] termsArray = new BLink[0];
 
     /**
      * temporary re-usable
@@ -97,7 +85,7 @@ public abstract class AbstractCore {
 
 
 
-    protected AbstractCore(@NotNull NAR nar, PremiseEval matcher) {
+    protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
 
         this.nar = nar;
 
@@ -115,6 +103,7 @@ public abstract class AbstractCore {
 
     }
 
+    @NotNull
     protected abstract Bag<Concept> newConceptBag();
 
     public void frame(@NotNull NAR nar) {
@@ -151,7 +140,7 @@ public abstract class AbstractCore {
         concepts.clear();
     }
 
-    protected final void fireConcept(BLink<Concept> conceptLink) {
+    protected final void fireConcept(@NotNull BLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
         tasklinkUpdate.update(concept.tasklinks(), true);
@@ -172,38 +161,29 @@ public abstract class AbstractCore {
 
         Concept c = conceptLink.get();
 
-        Collection<BLink<? extends Termed>> termsBuffer;
-        termsBuffer = this.terms;
-        c.termlinks().sample(termlinks, termsBuffer::add);
-        assert (!termsBuffer.isEmpty());
+        List<BLink<? extends Termed>> termsBuffer = this.terms;
+        Bag<Termed> tl = c.termlinks();
+        if (tl.isEmpty())
+            return;
 
+        tl.sample(termlinks, termsBuffer::add);
 
-        List<BLink<Task>> taskLinksBuffer = this.tasks;
-        c.tasklinks().sample(tasklinks, taskLinksBuffer::add);
+        c.tasklinks().sample(tasklinks, bl -> {
+            PremiseBuilder.run(nar, termsBuffer, bl, processes);
+        });
 
-        //assert (!tasksBuffer.isEmpty());
-        if (taskLinksBuffer.isEmpty() || termsBuffer.isEmpty()) return;
-
-
-        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
         termsBuffer.clear();
 
-        for (int i = 0, tasksBufferSize = taskLinksBuffer.size(); i < tasksBufferSize; i++)
-            tasksBuffer.add(taskLinksBuffer.get(i).get());
-
-        PremiseBuilder.run(nar, termsArray, taskLinksBuffer, processes);
-
-        taskLinksBuffer.clear();
-
-        matcher.run(nar, processes);
-
-        tasksBuffer.clear(); //release tasks, they may be garbage collected after this point
+        if (!processes.isEmpty()) {
+            matcher.run(nar, processes);
+            processes.clear();
+        }
 
     }
 
 
 
-    public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
+    public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
         concepts.put(c, b, conceptActivation, conceptOverflow);
         if (b.isDeleted())
             return;

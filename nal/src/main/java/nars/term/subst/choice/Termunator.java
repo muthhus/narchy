@@ -12,11 +12,13 @@ import java.util.List;
  **/
 public final class Termunator extends Termutator {
 
+    @NotNull
     private final FindSubst f;
     private final List<Termutator> termutes;
+    @NotNull
     final Termutator[] onlyThis;
 
-    public Termunator(FindSubst f) {
+    public Termunator(@NotNull FindSubst f) {
         super(".");
         this.f = f;
         this.termutes = f.termutes;
@@ -27,7 +29,7 @@ public final class Termunator extends Termutator {
      * should be be synchronized if threadsafe necessary
      */
     @Override
-    public final void run(FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
+    public final void run(@NotNull FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
         if (termutes.isEmpty()) {
             f.onMatch();
         } else {

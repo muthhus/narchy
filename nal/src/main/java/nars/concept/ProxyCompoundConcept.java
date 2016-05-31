@@ -25,11 +25,13 @@ import java.util.function.BiFunction;
  */
 public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Term>> {
 
+    @NotNull
     private final CompoundConcept target;
 
+    @NotNull
     private final Compound alias;
 
-    public ProxyCompoundConcept(Compound alias, CompoundConcept target, NAR n) {
+    public ProxyCompoundConcept(@NotNull Compound alias, @NotNull CompoundConcept target, @NotNull NAR n) {
         this.alias = alias;
 
         //this.target = (CompoundConcept) n.index.remove(target);
@@ -53,6 +55,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return target.toString();
     }
 
+    @NotNull
     @Override
     public final Compound target() {
         return alias;
@@ -65,7 +68,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public boolean contains(Task t) {
+    public boolean contains(@NotNull Task t) {
         return target.contains(t);
     }
 
@@ -116,7 +119,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
     @NotNull
     @Override
-    public <C> C meta(Object key, BiFunction value) {
+    public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         return target.meta(key, value);
     }
 
@@ -145,11 +148,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void capacity(ConceptBudgeting c) {
+    public void capacity(@NotNull ConceptBudgeting c) {
         target.capacity(c);
     }
 
 
+    @NotNull
     public String toStringActual() {
         return getClass().getSimpleName() + "(" + alias + " ===> " + target + ")";
     }

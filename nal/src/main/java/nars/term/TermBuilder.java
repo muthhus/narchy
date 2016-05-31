@@ -611,6 +611,7 @@ public abstract class TermBuilder {
     }
 
 
+    @Nullable
     public final Term buildTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;

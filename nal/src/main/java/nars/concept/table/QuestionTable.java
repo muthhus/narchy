@@ -42,7 +42,7 @@ public interface QuestionTable extends TaskTable {
 //        return null;
 //    }
 
-    QuestionTable EMPTY = new QuestionTable() {
+    @Nullable QuestionTable EMPTY = new QuestionTable() {
 
         @Override
         public Iterator<Task> iterator() {

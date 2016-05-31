@@ -6,6 +6,7 @@ import nars.budget.forget.Forget;
 import nars.link.BLink;
 import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is
@@ -15,7 +16,7 @@ public class AutoBag<V>  {
 
     private final Forget.AbstractForget forget;
 
-    public AutoBag(MutableFloat perfection) {
+    public AutoBag(@NotNull MutableFloat perfection) {
         //this(new Forget.ExpForget(new MutableFloat(0), perfection));
         this(new Forget.LinearForget(new MutableFloat(0), perfection));
     }
@@ -33,7 +34,7 @@ public class AutoBag<V>  {
      * @param forceCommit
      * @return
      */
-    public Bag<V> update(Bag<V> bag, boolean forceCommit) {
+    public Bag<V> update(@NotNull Bag<V> bag, boolean forceCommit) {
 
         Forget.AbstractForget f;
         float r = forgetPeriod((ArrayBag<V>) bag);
@@ -54,7 +55,7 @@ public class AutoBag<V>  {
     }
 
 
-    protected float forgetPeriod(ArrayBag<V> bag) {
+    protected float forgetPeriod(@NotNull ArrayBag<V> bag) {
 
         float basePeriod = 0.001f; //"margin of replacement"
         // TODO formalize some relationship between cycles and priority

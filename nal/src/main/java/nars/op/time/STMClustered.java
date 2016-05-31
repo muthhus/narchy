@@ -34,7 +34,9 @@ public class STMClustered extends STM {
 
     final short clusters;
 
+    @NotNull
     public final ArrayBag<Task> bag;
+    @NotNull
     public final NeuralGasNet<TasksNode> net;
     protected long now;
 
@@ -79,12 +81,13 @@ public class STMClustered extends STM {
 //            d[PUNC] = p < 0 ? -1 : 1; //force to polarize -1 (goal) or +1 (belief)
         }
 
+        @NotNull
         @Override
         public String toString() {
             return super.toString() + ":" + tasks;
         }
 
-        public void transfer(TLink x) {
+        public void transfer(@NotNull TLink x) {
             TasksNode previous = x.node;
             if (previous == this)
                 return; //nothing to do
@@ -103,7 +106,7 @@ public class STMClustered extends STM {
             return tasks.size();
         }
 
-        public void insert(TLink x) {
+        public void insert(@NotNull TLink x) {
             tasks.add(x);
             x.node = this;
         }
@@ -126,7 +129,7 @@ public class STMClustered extends STM {
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
-        public void termSet(int maxComponentsPerTerm, Consumer<Task[]> each) {
+        public void termSet(int maxComponentsPerTerm, @NotNull Consumer<Task[]> each) {
             AtomicInteger as = new AtomicInteger();
             tasks.stream().map(t -> t.get()).distinct().
                     collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm))).forEach((n,c)->{
@@ -156,16 +159,18 @@ public class STMClustered extends STM {
     public final class TLink extends StrongBLink<Task> {
 
         /** feature vector representing the item as learned by clusterer */
+        @NotNull
         public final double[] coord;
 
         /** current centroid */
         TasksNode node;
 
-        public TLink(Task t, @NotNull Budgeted b, float scale) {
+        public TLink(@NotNull Task t, @NotNull Budgeted b, float scale) {
             super(t, b, scale);
             this.coord = getCoord(t);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return id + "<<" +
@@ -207,12 +212,13 @@ public class STMClustered extends STM {
     /**
      * amount of priority subtracted from the priority each iteration
      */
-    private float cycleCost(Task id) {
+    private float cycleCost(@NotNull Task id) {
         float dt = Math.abs(id.occurrence() - now);
         return forgetRate * dt * (1f - id.conf());
     }
 
-    public static double[] getCoord(Task t) {
+    @NotNull
+    public static double[] getCoord(@NotNull Task t) {
         double[] c = new double[DIMENSIONS];
         c[0] = t.occurrence(); //time
         c[1] = t.freq(); //0..+1
@@ -223,7 +229,7 @@ public class STMClustered extends STM {
 
     final int expectedTasksPerNode = 4;
 
-    public STMClustered(@NotNull NAR nar, MutableInteger capacity, char punc) {
+    public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc) {
         super(nar, capacity);
 
         //TODO make this adaptive
@@ -231,8 +237,9 @@ public class STMClustered extends STM {
 
         this.punc = punc;
         this.bag = new ArrayBag<Task>(1) {
+            @NotNull
             @Override
-            protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
+            protected BLink<Task> newLink(@NotNull Task i, @NotNull Budgeted b, float scale) {
                 return new TLink(i, b, scale);
             }
         };
@@ -299,7 +306,7 @@ public class STMClustered extends STM {
 
     }
 
-    protected void drop(TLink displaced) {
+    protected void drop(@NotNull TLink displaced) {
         TasksNode owner = displaced.node;
         if (owner != null)
             owner.remove(displaced);
@@ -309,7 +316,7 @@ public class STMClustered extends STM {
         return bag.size();
     }
 
-    public void print(PrintStream out) {
+    public void print(@NotNull PrintStream out) {
         out.println(this + " @" + now + ", x " + size() + " tasks");
         out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
             + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
@@ -339,13 +346,14 @@ public class STMClustered extends STM {
 
     abstract static class EventGenerator implements Consumer<NAR> {
 
+        @NotNull
         private final NAR n;
         private final float averageTasksPerFrame;
         //private final float variation;
         private final int uniques;
         protected long now;
 
-        public EventGenerator(NAR n, float averageTasksPerFrame, /*float variation,*/ int uniques) {
+        public EventGenerator(@NotNull NAR n, float averageTasksPerFrame, /*float variation,*/ int uniques) {
             this.n = n;
             this.averageTasksPerFrame = averageTasksPerFrame;
             //this.variation = variation;
@@ -355,7 +363,7 @@ public class STMClustered extends STM {
         }
 
         @Override
-        public void accept(NAR nar) {
+        public void accept(@NotNull NAR nar) {
             now = n.time();
 
             int numInputs = (int) Math.round(Math.random() * averageTasksPerFrame);
@@ -365,6 +373,7 @@ public class STMClustered extends STM {
             }
         }
 
+        @NotNull
         abstract Task task(int u);
     }
 
@@ -378,6 +387,7 @@ public class STMClustered extends STM {
                 return $.sete($.the(u));
             }
 
+            @NotNull
             @Override
             Task task(int u) {
                 return new MutableTask(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);

@@ -27,6 +27,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         this.items = new SortedArray<>(builder, this, searchType, 1);
     }
 
+    @NotNull
     @Override
     public Iterator<L> iterator() {
         //throw new UnsupportedOperationException();
@@ -175,6 +176,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         return displaced;
     }
 
+    @NotNull
     @Deprecated public List<L> listCopy() {
         List<L> l = new ArrayList(size());
         forEach(x -> l.add(x));

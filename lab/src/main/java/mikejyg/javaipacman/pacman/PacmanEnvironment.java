@@ -24,6 +24,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.index.CaffeineIndex;
+import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.Multi;
@@ -62,14 +63,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Default nar = new Default(
-		Multi nar = new Multi(2,
+		Default nar = new Default(
+		//Multi nar = new Multi(2,
 				1024, 6, 1, 2, rng,
-				new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
+				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				//new Indexes.DefaultTermIndex(128 *1024, rng)
+				new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);

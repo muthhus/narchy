@@ -4,6 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.task.Task;
 import nars.util.TimeMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 abstract public class TemporalStabilityTest {
 
 
-    public void test(int cycles, NAR n) {
+    public void test(int cycles, @NotNull NAR n) {
         Global.DEBUG = true;
 
         input(n);

@@ -15,6 +15,7 @@ import nars.nar.util.DefaultCore;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.On;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -34,8 +35,10 @@ import java.util.function.Consumer;
  */
 public class Multi extends AbstractNAR {
 
+    @NotNull
     final WorkerCore[] cores;
     final ConcurrentHashMapUnsafe<Concept,DefaultCore> active = new ConcurrentHashMapUnsafe<>();
+
 
     @Deprecated
     public Multi(int cores) {
@@ -74,11 +77,12 @@ public class Multi extends AbstractNAR {
         }
 
         eventFrameStart.on((x) -> {
-            framesPending.addAndGet(cores);
-            for (WorkerCore w : Multi.this.cores)
-                if (w.running.compareAndSet(false,true)) {
+            //framesPending.addAndGet(cores);
+            /*for (WorkerCore w : Multi.this.cores)
+                if (w.sleeping.compareAndSet(false,true)) {
                     w.wake();
-                }
+                }*/
+            Util.pause(1); //HACK
         });
 
         runLater(this::initHigherNAL);
@@ -92,16 +96,16 @@ public class Multi extends AbstractNAR {
 
     }
 
-    private final AtomicInteger framesPending = new AtomicInteger(0);
 
     /** runs asynchronously in its own thread. counts down a # of pending cycles */
     public class WorkerCore extends DefaultCore implements Runnable {
 
         private final Logger logger = LoggerFactory.getLogger(WorkerCore.class);
 
-        private final AtomicBoolean running = new AtomicBoolean(false);
+        @NotNull
         private final Thread thread;
         private boolean stopped = false;
+        long lastTime = -1;
         private final ConcurrentLinkedDeque<Runnable> pendingActivations = new ConcurrentLinkedDeque<>();
 
         public WorkerCore(int n, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
@@ -112,14 +116,14 @@ public class Multi extends AbstractNAR {
         }
 
         @Override
-        protected synchronized void activate(Concept c) {
+        protected synchronized void activate(@NotNull Concept c) {
             if (Multi.this.active.putIfAbsent(c, this)==null) {
                 super.activate(c);
             }
         }
 
         @Override
-        protected synchronized void deactivate(BLink<Concept> c) {
+        protected synchronized void deactivate(@NotNull BLink<Concept> c) {
             Concept cc = c.get();
             if (Multi.this.active.remove(cc)==cc) {
                 super.deactivate(c);
@@ -132,15 +136,7 @@ public class Multi extends AbstractNAR {
             thread.interrupt();
         }
 
-        protected void sleep() {
-            running.set(false);
-            logger.info("sleep");
-            try {
-                while (true) {
-                    Thread.sleep(1);
-                }
-            } catch (InterruptedException e) {  }
-        }
+
 
         public void stop() {
             stopped = true;
@@ -148,16 +144,20 @@ public class Multi extends AbstractNAR {
 
         @Override public final void run() {
             while (!stopped) {
-                if (framesPending.get() >= 0) {
-                    logger.info("frame " + framesPending.get());
+                long now = time();
+                if (now > lastTime) {
+                    logger.info("frame " + now);
                     try {
                         frame(Multi.this);
+                        lastTime = now;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    framesPending.decrementAndGet();
                 } else {
-                    sleep();
+                    //logger.info("sleep");
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {  }
                 }
             }
         }
@@ -172,7 +172,7 @@ public class Multi extends AbstractNAR {
             super.frame(nar);
         }
 
-        @Override public void conceptualize(Concept c, Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
+        @Override public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
             pendingActivations.add(() -> {
                 super.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
             });

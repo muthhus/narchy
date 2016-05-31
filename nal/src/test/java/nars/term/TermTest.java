@@ -661,7 +661,7 @@ public class TermTest {
         assertNotNull(o);
     }
 
-    public static void assertValidTermValidConceptInvalidTaskContent(Supplier<Term> o) {
+    public static void assertValidTermValidConceptInvalidTaskContent(@NotNull Supplier<Term> o) {
         try {
             Term x = o.get();
             assertNotNull(x);
@@ -887,7 +887,7 @@ public class TermTest {
 
     }
 
-    public static void assertInvalidTerm(Supplier<Term> o) {
+    public static void assertInvalidTerm(@NotNull Supplier<Term> o) {
         try {
             o.get();
             assertTrue(false);

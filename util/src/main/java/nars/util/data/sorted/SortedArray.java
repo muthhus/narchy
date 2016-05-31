@@ -416,10 +416,10 @@ public final class SortedArray<E> {
 
     private final int indexOfInternal(E e) {
         E[] l = this.list;
-        for (int i = 0; i < size; i++) {
-            if (l[i].equals(e)) {
+        int s = this.size;
+        for (int i = 0; i < s; i++) {
+            if (e.equals(l[i]))
                 return i;
-            }
         }
         return -1;
     }

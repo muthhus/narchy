@@ -22,7 +22,7 @@ public class MapSubst implements Subst {
 //    }
 
 
-    public MapSubst(Term x, Term y) {
+    public MapSubst(@NotNull Term x, @NotNull Term y) {
         this(Map.of(x,y));
     }
 

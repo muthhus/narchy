@@ -2,6 +2,7 @@ package nars.task;
 
 import nars.$;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertTrue;
  * Created by me on 5/8/16.
  */
 public class TruthPolationTest {
-    TruthPolation polation = new TruthPolation(8 /* cap */, 0);
+    @NotNull TruthPolation polation = new TruthPolation(8 /* cap */, 0);
 
     @Test
     public void testRevisionEquivalence()  {
@@ -104,7 +105,7 @@ public class TruthPolationTest {
 //
 //    }
 
-    public static void print(TruthPolation p, List<Task> l, int start, int end) {
+    public static void print(@NotNull TruthPolation p, @NotNull List<Task> l, int start, int end) {
         //interpolation (revision) and extrapolation (projection)
         System.out.println("INPUT");
         for (Task t : l) {

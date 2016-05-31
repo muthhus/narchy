@@ -54,7 +54,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
             p.append(Symbols.ARGUMENT_SEPARATOR);
     }
 
-    static boolean atemporallyEqual(@NotNull Termed term, Termed<Compound> beliefConcept) {
+    static boolean atemporallyEqual(@NotNull Termed term, @NotNull Termed<Compound> beliefConcept) {
         //TODO can be accelerated
         Term t = term.term();
         if (t.op() == beliefConcept.op()) {

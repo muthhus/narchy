@@ -4,6 +4,7 @@ import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
 import nars.nar.Default;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 
@@ -14,6 +15,7 @@ public class TemporalStabilityTests {
 
     static class T1 extends TemporalStabilityTest {
 
+        @NotNull
         private final IntHashSet whens;
         private final IntToObjectFunction<String> eventer;
 
@@ -28,7 +30,7 @@ public class TemporalStabilityTests {
         }
 
         @Override
-        public void input(NAR n) {
+        public void input(@NotNull NAR n) {
             int j = 0;
             for (int i : whens.toSortedArray()) {
                 n.inputAt(i, eventer.valueOf(j++) + ". :|:");

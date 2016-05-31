@@ -239,7 +239,7 @@ public enum Global {
         return null;
     }
 
-    public static void dereference(Reference[] p) {
+    public static void dereference(@NotNull Reference[] p) {
         for (int i = 0; i < p.length; i++) {
             Reference x = p[i];
             if (x != null)

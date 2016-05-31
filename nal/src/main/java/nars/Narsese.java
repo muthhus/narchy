@@ -427,7 +427,8 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-    protected Object nonNull(Object o) {
+    @NotNull
+    protected Object nonNull(@Nullable Object o) {
         return o != null ? o : new MiniNullPointerException();
     }
 
@@ -1334,6 +1335,7 @@ public class Narsese extends BaseParser<Object> {
 
     private static class MiniNullPointerException extends NullPointerException {
 
+        @Nullable
         @Override
         public synchronized Throwable fillInStackTrace() {
             return null;

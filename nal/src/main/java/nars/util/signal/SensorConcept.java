@@ -74,11 +74,13 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     }
 
     /** async timing: only commits when value has changed significantly, and as often as necessary */
+    @NotNull
     public SensorConcept async() {
         timing(0, 0);
         return this;
     }
     /** commits every N cycles only */
+    @NotNull
     public SensorConcept every(int minCycles) {
         timing(minCycles, minCycles);
         return this;

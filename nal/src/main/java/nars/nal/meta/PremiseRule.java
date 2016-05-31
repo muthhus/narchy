@@ -56,6 +56,7 @@ public class PremiseRule extends GenericCompound {
 
     transient private char taskPunc = 0;
 
+    @NotNull
     @Override
     public String toString() {
         return "PremiseRule{" +
@@ -257,8 +258,10 @@ public class PremiseRule extends GenericCompound {
         /** pattern which determines the concluson term.
          * this is applied prior to the actual match.
          * VAR_PATTERN acts as a sort of wildcard / unknown*/
+        @NotNull
         private final Term pattern;
 
+        @NotNull
         private final String id;
 
         public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
@@ -288,7 +291,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         @Override
-        public boolean booleanValueOf(PremiseEval p) {
+        public boolean booleanValueOf(@NotNull PremiseEval p) {
             char punc = p.punct.get();
             switch (punc) {
                 case Symbols.BELIEF:
@@ -358,6 +361,7 @@ public class PremiseRule extends GenericCompound {
      * the goal of this is to maximally fold subexpressions while also
      * pulling the cheapest and most discriminating tests to the beginning.
      */
+    @NotNull
     private static List<Term> sort(@NotNull List<Term> l) {
         HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
 
@@ -394,7 +398,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                              TimeFunction temporalizer) {
+                              @NotNull TimeFunction temporalizer) {
 
 
         char puncOverride = p.puncOverride;

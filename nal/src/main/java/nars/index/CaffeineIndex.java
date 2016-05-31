@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 
 public class CaffeineIndex extends MaplikeIndex {
 
+    @NotNull
     final Cache<Termed, Termed> concepts;
+    @NotNull
     final Cache<TermContainer, TermContainer> subterms;
 
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder) {
@@ -48,8 +50,9 @@ public class CaffeineIndex extends MaplikeIndex {
                 .build();
     }
 
+    @Nullable
     @Override
-    public Termed remove(Termed entry) {
+    public Termed remove(@NotNull Termed entry) {
         Termed t = get(entry);
         if (t!=null) {
             concepts.invalidate(entry);
@@ -63,7 +66,7 @@ public class CaffeineIndex extends MaplikeIndex {
     }
 
     @Override
-    public @Nullable void set(@NotNull Termed src, Termed target) {
+    public @Nullable void set(@NotNull Termed src, @NotNull Termed target) {
         concepts.put(src, target);
         //Termed exist = data.getIfPresent(src);
 
@@ -83,7 +86,7 @@ public class CaffeineIndex extends MaplikeIndex {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         concepts.asMap().forEach((k, v) -> c.accept(v));
     }
 
@@ -98,7 +101,7 @@ public class CaffeineIndex extends MaplikeIndex {
     }
 
     @Override
-    protected TermContainer putIfAbsent(TermContainer s, TermContainer s1) {
+    protected TermContainer putIfAbsent(@NotNull TermContainer s, TermContainer s1) {
         return subterms.get(s, t -> s1);
     }
 

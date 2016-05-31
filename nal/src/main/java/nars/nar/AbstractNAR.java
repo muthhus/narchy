@@ -41,6 +41,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractNAR extends NAR {
 
+    @NotNull
     public final DefaultConceptBudgeting conceptWarm, conceptCold;
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;

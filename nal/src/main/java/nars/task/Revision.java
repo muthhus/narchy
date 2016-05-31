@@ -54,7 +54,7 @@ public class Revision {
 
 
     @Nullable
-    public static Task merge(Task a, Task b, long now, long newOcc, Truth newTruth) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long now, long newOcc, @NotNull Truth newTruth) {
 
         if (Compound.atemporallyEqual(a.term(), b.term())) {
             float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
@@ -213,7 +213,8 @@ public class Revision {
 //        return 1f;
     }
 
-    private static Compound dtMerge(Compound a, Compound b, float balance, MutableFloat accumulatedDifference, float depth) {
+    @NotNull
+    private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float balance, @NotNull MutableFloat accumulatedDifference, float depth) {
         int newDT;
         int adt = a.dt();
         if (a.size() != 2) {

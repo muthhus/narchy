@@ -36,6 +36,7 @@ public abstract class MaplikeIndex implements TermIndex {
                 get(x);
     }
 
+    @Nullable
     protected Termed theAtom(@NotNull Atomic x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewAtom(x) :
@@ -43,6 +44,7 @@ public abstract class MaplikeIndex implements TermIndex {
     }
 
     /** default lowest common denominator impl, subclasses may reimpl for more efficiency */
+    @Nullable
     protected Termed getNewAtom(@NotNull Atomic x) {
         Termed y = get(x);
         if (y == null)  {
@@ -52,6 +54,7 @@ public abstract class MaplikeIndex implements TermIndex {
     }
 
     /** default lowest common denominator impl, subclasses may reimpl for more efficiency */
+    @Nullable
     protected Termed getNewCompound(@NotNull Compound x) {
         Termed y = get(x);
         if (y == null) {
@@ -67,6 +70,7 @@ public abstract class MaplikeIndex implements TermIndex {
     @Override
     abstract public Termed remove(Termed entry);
 
+    @Nullable
     @Override
     public abstract Termed get(@NotNull Termed x);
 
@@ -74,13 +78,14 @@ public abstract class MaplikeIndex implements TermIndex {
     @Nullable
     abstract public void set(@NotNull Termed src, Termed target);
 
-    /* default */ protected TermContainer getSubterms(@NotNull TermContainer t) {
+    /* default */ @Nullable
+    protected TermContainer getSubterms(@NotNull TermContainer t) {
         return null;
     }
 
 
     @Override
-    public final @Nullable TermContainer theSubterms(TermContainer s) {
+    public final @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
 
         //early existence test:
         TermContainer existing = getSubterms(s);

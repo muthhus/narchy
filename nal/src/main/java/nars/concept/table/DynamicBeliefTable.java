@@ -30,6 +30,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         //ignored
     }
 
+    @Nullable
     @Override
     public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
         return input == current ? input : null;
@@ -68,10 +69,12 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     abstract protected Task update(long now);
 
+    @Nullable
     @Override public Task get(Task t) {
         return current.equals(t) ? current : null;
     }
 
+    @Nullable
     @Override
     public Truth truth(long now, long when) {
         return topTemporal(when, now).projectTruth(when, now, false);

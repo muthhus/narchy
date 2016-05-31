@@ -12,6 +12,7 @@ import java.lang.ref.WeakReference;
 public class WeakBLink<X> extends DefaultBLink<X> {
 
     ///** the referred item */
+    @NotNull
     public final WeakReference<X> id;
 
     public WeakBLink(X id, @NotNull Budgeted b, float scal) {

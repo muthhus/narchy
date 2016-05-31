@@ -95,7 +95,7 @@ public class Memory extends Param {
     /**
      * Create a new memory
      */
-    public Memory(@NotNull Clock clock, @NotNull Random rng, TermIndex index) {
+    public Memory(@NotNull Clock clock, @NotNull Random rng, @NotNull TermIndex index) {
 
         random = rng;
 

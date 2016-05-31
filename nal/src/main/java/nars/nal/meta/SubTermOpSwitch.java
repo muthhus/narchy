@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.nal.meta.op.SubTermOp;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public final class SubTermOpSwitch extends Atom /* TODO represent as some Generi
     public final int subterm;
 
 
-    public SubTermOpSwitch(int subterm, Map<SubTermOp, ProcTerm> cases) {
+    public SubTermOpSwitch(int subterm, @NotNull Map<SubTermOp, ProcTerm> cases) {
         super("\"" + cases.toString() + "\"");
 
         this.subterm = subterm;
@@ -25,7 +26,7 @@ public final class SubTermOpSwitch extends Atom /* TODO represent as some Generi
     }
 
     @Override
-    public void accept(PremiseEval m) {
+    public void accept(@NotNull PremiseEval m) {
         ProcTerm p = proc[m.subOp(subterm)];
         if (p!=null) {
             p.accept(m);

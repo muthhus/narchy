@@ -10,6 +10,7 @@ import java.util.Map;
 
 public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
 
+    @NotNull
     public final FasterList<L> list;
 
     public DefaultListTable(Map<V,L> map) {
@@ -40,6 +41,7 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
         return list.size();
     }
 
+    @NotNull
     @Override
     public Iterator<L> iterator() {
         return list.iterator();

@@ -14,6 +14,7 @@ import nars.term.atom.Atom;
 import nars.util.data.map.UnifriedMap;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.ext.*;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
@@ -31,6 +32,7 @@ import static java.lang.System.out;
  */
 public class GraphDeriver extends Deriver {
 
+    @Nullable
     static final PremiseRuleSet rules;
     static {
         PremiseRuleSet r;
@@ -147,7 +149,7 @@ public class GraphDeriver extends Deriver {
         return $.the(ruleID.computeIfAbsent(r, k->ruleID.size()+1));
     }
 
-    private String proc(Term cc) {
+    private String proc(@NotNull Term cc) {
         switch (cc.getClass().getSimpleName()) {
             case "MatchOneSubterm":
             case "SolvePuncOverride":
@@ -194,11 +196,11 @@ public class GraphDeriver extends Deriver {
 
     }
 
-    static public void exportGraph(SimpleDirectedWeightedGraph<Term,DefaultWeightedEdge> g) {
+    static public void exportGraph(@NotNull SimpleDirectedWeightedGraph<Term,DefaultWeightedEdge> g) {
         IntegerNameProvider<Term> p1=new IntegerNameProvider<Term>();
         StringNameProvider<Term> p2=new StringNameProvider<Term>() {
             @Override
-            public String getVertexName(Term vertex) {
+            public String getVertexName(@NotNull Term vertex) {
                 return StringEscapeUtils.ESCAPE_JSON.translate( vertex.toString() );
             }
         };
@@ -207,8 +209,9 @@ public class GraphDeriver extends Deriver {
 
         ComponentAttributeProvider<DefaultWeightedEdge> p4 =
                 new ComponentAttributeProvider<DefaultWeightedEdge>() {
+                    @NotNull
                     @Override
-                    public Map<String, String> getComponentAttributes(DefaultWeightedEdge e) {
+                    public Map<String, String> getComponentAttributes(@NotNull DefaultWeightedEdge e) {
                         Map<String, String> map =new UnifriedMap<>(1);
                         map.put("weight", Double.toString(g.getEdgeWeight(e)));
                         return map;

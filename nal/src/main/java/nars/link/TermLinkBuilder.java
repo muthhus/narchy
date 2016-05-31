@@ -86,7 +86,8 @@ public enum TermLinkBuilder {
 //    }
 
     /** termlink templates with equal proportion shared, except variables and anything else which would not have a concept */
-    public static List<TermTemplate> buildFlat(Compound term, NAR nar) {
+    @NotNull
+    public static List<TermTemplate> buildFlat(@NotNull Compound term, @NotNull NAR nar) {
         Set<Termed> s = components(term, nar);
 
         int total = s.size();

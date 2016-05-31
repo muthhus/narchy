@@ -33,6 +33,7 @@ public final class Emotion implements Serializable {
     private transient final Logger logger;
 
     /** alertness, % active concepts change per cycle */
+    @NotNull
     public final FloatGuage alert;
 
 
@@ -126,7 +127,7 @@ public final class Emotion implements Serializable {
     @Deprecated public void busy(float pri) {
         busy.accept( pri );
     }
-    public final void stress(MutableFloat pri) {
+    public final void stress(@NotNull MutableFloat pri) {
         float v = pri.floatValue();
         if (v > 0)
             stress.accept( v );

@@ -6,6 +6,7 @@ import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.Trie;
 import org.magnos.trie.TrieNode;
 import org.magnos.trie.TrieSequencer;
@@ -95,7 +96,8 @@ abstract public class TermTrie<K extends Term, V> {
 
 
     //TODO use the compiled rule trie
-    @Deprecated public SummaryStatistics costAnalyze(FloatFunction<K> costFn, PrintStream o) {
+    @NotNull
+    @Deprecated public SummaryStatistics costAnalyze(@NotNull FloatFunction<K> costFn, @Nullable PrintStream o) {
 
         SummaryStatistics termCost = new SummaryStatistics();
         SummaryStatistics sequenceLength = new SummaryStatistics();
@@ -114,11 +116,11 @@ abstract public class TermTrie<K extends Term, V> {
         return termCost;
     }
 
-    private String s(SummaryStatistics s) {
+    private String s(@NotNull SummaryStatistics s) {
         return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
     }
 
-    public static <K,V> void costAnalyze(FloatFunction<K> costFn, SummaryStatistics termCost, SummaryStatistics sequenceLength, SummaryStatistics branchFanOut, SummaryStatistics endDepth, int[] currentDepth, TrieNode<List<K>, V> root) {
+    public static <K,V> void costAnalyze(@NotNull FloatFunction<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
 
         int nc = root.childCount();
         if (nc > 0)

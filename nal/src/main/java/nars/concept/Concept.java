@@ -73,14 +73,15 @@ public interface Concept extends Termed, Comparable<Termlike> {
     <C> C meta(Object key, BiFunction value);
 
 
-    @NotNull BeliefTable beliefs();
+    @Nullable BeliefTable beliefs();
 
-    @NotNull BeliefTable goals();
+    @Nullable BeliefTable goals();
 
-    @NotNull QuestionTable questions();
+    @Nullable QuestionTable questions();
 
-    @NotNull QuestionTable quests();
+    @Nullable QuestionTable quests();
 
+    @Nullable
     default TaskTable tableFor(char punctuation) {
         switch(punctuation) {
             case Symbols.BELIEF: return beliefs();
@@ -92,7 +93,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         }
     }
 
-    default @Nullable Task merge(Task x, Task y, long when, NAR nar) {
+    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
         long now = nar.time();
         return Revision.merge(x, y, now, when,
                 ((BeliefTable)tableFor(y.punc())).truth(now, when)

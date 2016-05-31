@@ -117,7 +117,7 @@ public interface TermIndex {
 
     TermBuilder builder();
 
-    Concept.@Nullable ConceptBuilder conceptBuilder();
+    @Nullable Concept.@Nullable ConceptBuilder conceptBuilder();
 
 
     @NotNull
@@ -295,7 +295,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term applyImmediateTransform(Subst f, Compound result, ImmediateTermTransform tf) {
+    default Term applyImmediateTransform(Subst f, @NotNull Compound result, ImmediateTermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
         Compound args = Operator.opArgs(result);
@@ -616,7 +616,8 @@ public interface TermIndex {
         return "";
     }
 
-    default Term remap(Map<Term, Term> m, Term src) {
+    @NotNull
+    default Term remap(Map<Term, Term> m, @NotNull Term src) {
         return resolve(src, new MapSubst(m)).term();
     }
 
@@ -661,11 +662,12 @@ public interface TermIndex {
     }
 
 
-    default Compound atemporalize(Compound c) {
+    @Nullable
+    default Compound atemporalize(@NotNull Compound c) {
         return (Compound) transform(c.dt(DTERNAL), CompoundAtemporalizer);
     }
 
-    CompoundTransform CompoundAtemporalizer = new CompoundTransform<>() {
+    @Nullable CompoundTransform CompoundAtemporalizer = new CompoundTransform<>() {
 
         @Override
         public boolean test(Term term) {

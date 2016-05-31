@@ -22,69 +22,70 @@ import static nars.nal.Tense.ETERNAL;
 
 /**
  * Entry point for using the NAL+ Internal Reasoner
- *
+ * <p>
  * TODO abstraction for dynamic link iterator / generator allowing a concept to
- *      programmatically supply the tasklinks/termlinks it fires.  bag selection being
- *      the default but overridable on a per-concept basis.
- *      ex:
- *         --ranges of values (numbers, strings, etc..)
- *         --without and/or with memory of prior iterations from which to continue
- *              (ex: database cursors)
- *
- *  may determine the iteration "power" according to
- *       some budgeting feature (ex: Concept BLink)
+ * programmatically supply the tasklinks/termlinks it fires.  bag selection being
+ * the default but overridable on a per-concept basis.
+ * ex:
+ * --ranges of values (numbers, strings, etc..)
+ * --without and/or with memory of prior iterations from which to continue
+ * (ex: database cursors)
+ * <p>
+ * may determine the iteration "power" according to
+ * some budgeting feature (ex: Concept BLink)
  */
 public enum PremiseBuilder {
     ;
 
 
+    /**
+     * Main Entry point: begin matching the task half of a premise
+     */
+    @NotNull
+    public static void run(@NotNull NAR nar, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, @NotNull List<ConceptProcess> processes) {
 
-    /** Main Entry point: begin matching the task half of a premise */
-    public static List<ConceptProcess> run(NAR nar, @Nullable BLink<Termed>[] termsArray, @NotNull List<BLink<Task>> taskLinks, List<ConceptProcess> processes) {
+        Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
+        if (task == null)
+            return;
 
-        processes.clear();
+        long occ = task.occurrence();
 
-        for (int i = 0, tasksBufferSize = taskLinks.size(); i < tasksBufferSize; i++) {
-            BLink<Task> taskLink = taskLinks.get(i);
-            Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
-            if (task ==null)
+        Compound taskTerm = task.term();
+
+        for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+            BLink<? extends Termed> termLink = termsArray.get(i);
+
+            if (termLink == null || taskLink.isDeleted() || task.isDeleted())
+                break; //end of termsArray, or task has become deleted in the previous iteration, cancel
+
+            Termed tl = termLink.get();
+            if (tl == null)
                 continue;
 
-            long occ = task.occurrence();
+            Term termLinkTerm = tl.term();
 
-            Compound taskTerm = task.term();
+            if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
 
-            for (BLink<Termed> termLink : termsArray) {
-
-                if (termLink == null || taskLink.isDeleted() || task.isDeleted())
-                    break; //end of termsArray, or task has become deleted in the previous iteration, cancel
-
-                Termed tl = termLink.get();
-                if (tl == null)
-                    continue;
-
-                Term termLinkTerm  = tl.term();
-
-                if (!Terms.equalSubTermsInRespectToImageAndProduct( taskTerm, termLinkTerm )) {
-
-                    processes.add(
-                            newPremise(nar, termLink, taskLink, task, occ, tl)
-                    );
-                }
+                processes.add(
+                        newPremise(nar, termLink, taskLink, task, occ, tl)
+                );
             }
         }
 
-        return processes;
+
     }
 
-    static ConceptProcess newPremise(NAR nar, BLink<Termed> termLink, BLink<Task> taskLink, Task task, long occ, Termed tl) {
+    @Nullable
+    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, long occ, @NotNull Termed tl) {
         return new ConceptProcess(nar, taskLink, termLink, match(nar, task, tl, occ));
     }
 
 
-    /** resolves the most relevant belief of a given term/concept */
+    /**
+     * resolves the most relevant belief of a given term/concept
+     */
     @Nullable
-    static Task match(NAR nar, @NotNull Task task, @NotNull Termed beliefConceptTerm, long taskOcc) {
+    static Task match(@NotNull NAR nar, @NotNull Task task, @NotNull Termed beliefConceptTerm, long taskOcc) {
 
         //atomic concepts will have no beliefs to match
         if (!(beliefConceptTerm instanceof Compound))
@@ -108,12 +109,12 @@ public enum PremiseBuilder {
         if (task.isQuestOrQuestion()) {
 
             //project the belief to the question's time
-            if (taskOcc!=ETERNAL) {
+            if (taskOcc != ETERNAL) {
                 @Nullable Concept cbel = nar.concept(belief);
-                belief = cbel!=null ? cbel.merge(task, belief, task.occurrence(), nar) : null;
+                belief = cbel != null ? cbel.merge(task, belief, task.occurrence(), nar) : null;
             }
 
-            if (belief!=null) { //may have become null as a result of projection
+            if (belief != null) { //may have become null as a result of projection
 
                 //attempt to Unify any Query variables; answer if unifies
                 if (task.term().hasVarQuery()) {
@@ -132,13 +133,13 @@ public enum PremiseBuilder {
 
     }
 
-    static void matchAnswer(NAR nar, Task q, Task a) {
+    static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
         @Nullable Concept c = nar.concept(q);
         if (c != null)
             c.questions().answer(a, nar);
     }
 
-    static void matchQueryQuestion(NAR nar, @NotNull Task task, @NotNull Task belief) {
+    static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {
         List<Termed> result = Global.newArrayList(1);
         new UnifySubst(Op.VAR_QUERY, nar, result, 1).matchAll(
                 task.term(), belief.term()
@@ -179,7 +180,6 @@ public enum PremiseBuilder {
 //
 //        return true;
 //    }
-
 
 
 }

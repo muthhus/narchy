@@ -25,12 +25,12 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
     }
 
     @Override
-    default void recurseTerms(SubtermVisitor v, Compound parent) {
+    default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         target().recurseTerms(v,parent);
     }
 
     @Override
-    default boolean or(Predicate<Term> v) {
+    default boolean or(@NotNull Predicate<Term> v) {
         return target().or(v);
     }
 
@@ -118,7 +118,7 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
 
 
     @Override
-    default boolean and(Predicate<Term> v) {
+    default boolean and(@NotNull Predicate<Term> v) {
         return target().and(v);
     }
 }

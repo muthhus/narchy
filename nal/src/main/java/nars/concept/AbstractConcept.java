@@ -26,7 +26,6 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     @NotNull
     public final T term;
-    private transient final int hash;
 
 
     @Nullable
@@ -36,7 +35,6 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         this.term = term;
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;
-        this.hash = term.hashCode();
     }
 
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
@@ -136,8 +134,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     @Override
     public final int hashCode() {
-        //return term.hashCode();
-        return hash;
+        return term.hashCode();
     }
 
     @Override
@@ -160,6 +157,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     /**
      * Task links for indirect processing
      */
+    @NotNull
     @Override
     public final Bag<Task> tasklinks() {
         return taskLinks;
@@ -168,6 +166,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     /**
      * Term links between the term and its components and compounds; beliefs
      */
+    @NotNull
     @Override
     public final Bag<Termed> termlinks() {
         return termLinks;
@@ -180,11 +179,11 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 //    }
 
     @Override
-    public void capacity(ConceptBudgeting p) {
+    public void capacity(@NotNull ConceptBudgeting p) {
         linkCapacity(p);
     }
 
-    public void linkCapacity(ConceptBudgeting p) {
+    public void linkCapacity(@NotNull ConceptBudgeting p) {
         termlinks().setCapacity( p.linkCap(this, true) );
         tasklinks().setCapacity( p.linkCap(this, false) );
     }
@@ -192,10 +191,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
     @Override
-    public void linkTask(@NotNull Task t, float scale) {
-        if (term.vars()==0 /*|| !isConceptOf(t)*/) { //insert tasklink to its terms own concept only if no variables
-            taskLinks.put(t, t/*.budget()*/, scale, null);
-        }
+    public final void linkTask(@NotNull Task t, float scale) {
+       taskLinks.put(t, t, scale, null);
     }
 
 

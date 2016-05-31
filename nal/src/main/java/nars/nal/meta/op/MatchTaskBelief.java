@@ -97,7 +97,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     private static void compile(@NotNull TaskBeliefPair pattern,
-                                List<BoolCondition> pre, @NotNull List<BoolCondition> code,
+                                @NotNull List<BoolCondition> pre, @NotNull List<BoolCondition> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 

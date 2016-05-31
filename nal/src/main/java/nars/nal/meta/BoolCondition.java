@@ -20,7 +20,7 @@ public interface BoolCondition extends Term/*, BooleanFunction<PremiseEval>*/, P
         return ATOM; //shouldnt this be a product?
     }
 
-    static void run(BoolCondition b, PremiseEval m) {
+    static void run(@NotNull BoolCondition b, @NotNull PremiseEval m) {
         final int stack = m.now();
         b.booleanValueOf(m);
         m.revert(stack);

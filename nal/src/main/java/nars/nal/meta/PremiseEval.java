@@ -59,7 +59,9 @@ public class PremiseEval extends FindSubst {
     private int termSub0op, termSub1op;
     private int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
+    @Nullable
     public Truth taskTruth, beliefTruth;
+    @Nullable
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;

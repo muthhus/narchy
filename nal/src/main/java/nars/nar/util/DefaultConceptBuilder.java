@@ -60,6 +60,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @Override public Bag<Task> taskbag() {
 
         return new CurveBag<Task>(rng) {
+            @NotNull
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
                 return new WeakBLinkToBudgeted<>(i, b, scale);

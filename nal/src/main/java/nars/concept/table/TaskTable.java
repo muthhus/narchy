@@ -120,6 +120,6 @@ public interface TaskTable extends Iterable<Task> {
     void remove(@NotNull Task belief);
 
 
-    Task get(Task t);
+    @Nullable Task get(Task t);
 
 }

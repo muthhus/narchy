@@ -263,7 +263,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 matchVarCommon(x, y);
     }
 
-    private final boolean matchVarCommon(Term x, Term y) {
+    private final boolean matchVarCommon(@NotNull Term x, @NotNull Term y) {
         return matchVarCommon(x, y, x.op(), x.op()==y.op());
     }
 
@@ -352,7 +352,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     @Nullable
-    public final Term resolve(@NotNull Term t, Subst subst) {
+    public final Term resolve(@NotNull Term t, @NotNull Subst subst) {
         return index.resolve(t, subst);
     }
 
@@ -369,7 +369,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return matchEllipsedLinear(X, e, Y);
     }
 
-    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
+    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, @NotNull Ellipsis e) {
         //if the ellipsis is normal, then interpret the relationIndex as it is
         int xs = X.size();
         if (xs > 1) {
@@ -395,7 +395,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return true;
     }
 
-    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull Compound Y, EllipsisTransform et) {
+    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull Compound Y, @NotNull EllipsisTransform et) {
         if (et.from.equals(Op.Imdex)) {
             Term n = resolve(et.to);
             if (!n.equals(Y)) {

@@ -83,7 +83,7 @@ public class IO {
         return truth;
     }
 
-    public static void writeTask(@NotNull ObjectOutput out, Task t) throws IOException {
+    public static void writeTask(@NotNull ObjectOutput out, @NotNull Task t) throws IOException {
         out.writeObject(t.term());
 
         char p = t.punc();
@@ -114,20 +114,20 @@ public class IO {
         out.writeFloat(conf);
     }
 
-    public static void writeAtomic(@NotNull ObjectOutput out, Atomic a) throws IOException {
+    public static void writeAtomic(@NotNull ObjectOutput out, @NotNull Atomic a) throws IOException {
         out.writeUTF(a.toString());
     }
 
 
     @Nullable
-    public static Atomic readAtomic(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull ObjectInput in, Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
         return t.the(s);
     }
 
 
 
-    static void writeTerm(ObjectOutput out, Term term) throws IOException {
+    static void writeTerm(@NotNull ObjectOutput out, @NotNull Term term) throws IOException {
 
         out.writeByte(term.op().ordinal());
 
@@ -137,7 +137,7 @@ public class IO {
             writeCompound(out, (Compound)term);
     }
 
-    static void writeCompound(@NotNull ObjectOutput out, Compound c) throws IOException {
+    static void writeCompound(@NotNull ObjectOutput out, @NotNull Compound c) throws IOException {
 
         //how many subterms to follow
         writeTermContainer(out, c.subterms());
@@ -148,7 +148,7 @@ public class IO {
             out.writeInt(c.dt());
     }
 
-    static void writeTermContainer(ObjectOutput out, TermContainer c) throws IOException {
+    static void writeTermContainer(@NotNull ObjectOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
         out.writeByte(siz);
         for (int i = 0; i < siz; i++) {
@@ -156,7 +156,7 @@ public class IO {
         }
     }
     @Nullable
-    public static TermContainer readTermContainer(@NotNull ObjectInput in, TermIndex t) throws IOException {
+    public static TermContainer readTermContainer(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
@@ -170,7 +170,7 @@ public class IO {
      * called by readTerm after determining the op type
      * TODO make a version which reads directlyinto TermIndex */
     @Nullable
-    static Compound readCompound(@NotNull ObjectInput in, Op o, TermIndex t) throws IOException {
+    static Compound readCompound(@NotNull ObjectInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         TermContainer v = readTermContainer(in, t);
 
@@ -186,7 +186,8 @@ public class IO {
 
     /**
      * called by readTerm after determining the op type */
-    static Term readTerm(ObjectInput in, TermIndex t) throws IOException {
+    @Nullable
+    static Term readTerm(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
         Op o = Op.values()[in.readByte()];
         if (o.isAtomic())
             return readAtomic(in, o, t);
@@ -255,6 +256,7 @@ public class IO {
 
         }
 
+        @Nullable
         final FSTBasicObjectSerializer termContainers = new FSTBasicObjectSerializer() {
 
             @Override
@@ -273,6 +275,7 @@ public class IO {
             }
         };
 
+        @Nullable
         final FSTBasicObjectSerializer terms = new FSTBasicObjectSerializer() {
 
             @Override

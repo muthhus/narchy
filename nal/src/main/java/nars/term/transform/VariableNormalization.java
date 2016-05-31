@@ -25,6 +25,7 @@ import java.util.function.Function;
  */
 public class VariableNormalization extends VariableTransform implements Function<Term,Variable> {
 
+    @NotNull
     final Map<Term, Variable /*Variable*/> rename;
 
     boolean renamed;

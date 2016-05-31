@@ -86,7 +86,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return l;
     }
 
-    public static boolean equalOrNegationOf(Term a, Term b) {
+    public static boolean equalOrNegationOf(@NotNull Term a, @NotNull Term b) {
         if (a.op() == b.op()) {
             return a.equals(b);
         } else if (a.op() == NEGATE) {
@@ -122,6 +122,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return this;
     }
 
+    @Nullable
     @Override
     public Concept.@Nullable ConceptBuilder conceptBuilder() {
         return null;

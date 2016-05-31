@@ -129,7 +129,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
         }
     }
 
-    protected  void abbreviate(Concept abbreviated, Term alias) {
+    protected  void abbreviate(@NotNull Concept abbreviated, @NotNull Term alias) {
         Concept abbreviation = nar.conceptualize(newAbbreviation(abbreviated, alias), NewAbbreviationBudget);
         if (abbreviation != null) {
 

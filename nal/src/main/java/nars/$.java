@@ -745,7 +745,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     /** negates each entry in the array */
-    public static void neg(Term[] s) {
+    public static void neg(@NotNull Term[] s) {
         for (int i = 0; i < s.length; i++) {
             s[i] = $.neg(s[i]);
         }

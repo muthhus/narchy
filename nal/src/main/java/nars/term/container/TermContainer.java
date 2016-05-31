@@ -67,8 +67,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
 
     /** gets subterm at index i */
-    @NotNull
-    T term(int i);
+    @Nullable T term(int i);
 
     /** tests if subterm i is op o */
     boolean isTerm(int i, @NotNull Op o);
@@ -595,6 +594,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return c; //unchanged
     }
 
+    @NotNull
     default TermContainer<T> filter(Predicate<T> p) {
         if (!(this instanceof TermVector))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");

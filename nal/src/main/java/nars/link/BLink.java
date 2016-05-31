@@ -4,6 +4,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 5/29/16.
@@ -12,6 +13,7 @@ public abstract class BLink<X> extends Budget implements Link<X> {
 
 
 
+    @Nullable
     @Override abstract public X get();
 
     protected void init(@NotNull Budgeted c, float scale) {
@@ -48,9 +50,12 @@ public abstract class BLink<X> extends Budget implements Link<X> {
         return obj == this || equalsReferenced(obj);
     }
 
-    private final boolean equalsReferenced(Object obj) {
+    private final boolean equalsReferenced(@Nullable Object obj) {
         Object x = get();
-        return x != null && x.equals(obj);
+        if (x == null && obj == null)
+            return true;
+        else
+            return (obj instanceof BLink && ((BLink)obj).get().equals(x));
     }
 
     @Override public final int hashCode() {

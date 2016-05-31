@@ -100,7 +100,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
 
     @Override
-    public void answer(Task a, NAR nar) {
+    public void answer(@NotNull Task a, @NotNull NAR nar) {
         int listSize = list.size();
         if (listSize == 0)
             return;
@@ -116,7 +116,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     /** returns true if a quality was modified as a signal whether the list needs sorted */
-    public void answer(Task q, Task a, NAR nar) {
+    public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
         float factor = 1f;
@@ -161,7 +161,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     @Nullable
     @Override
-    public Task add(@NotNull Task q, BeliefTable answers, @NotNull NAR n) {
+    public Task add(@NotNull Task q, @NotNull BeliefTable answers, @NotNull NAR n) {
         Task existing = get(q);
         if (existing != null) {
             if (existing != q) {
@@ -188,6 +188,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return list.get(list.size()-1);
     }
 
+    @Nullable
     public Task insert(@NotNull Task t) {
 
         int siz = size();
@@ -298,7 +299,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     @Override
-    public int compare(Task o1, Task o2) {
+    public int compare(@NotNull Task o1, @NotNull Task o2) {
         return Float.compare(o2.qua(), o1.qua());
     }
 

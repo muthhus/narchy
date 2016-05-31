@@ -67,7 +67,7 @@ public class TermIOTest {
         assertTermEqualSerialize("(#a --> b)");
     }
 
-    void assertTermEqualSerialize(String s) {
+    void assertTermEqualSerialize(@NotNull String s) {
         Termed t = nar.term(s);
         assertTrue(t.isNormalized());
         assertTrue(t.term().isNormalized());

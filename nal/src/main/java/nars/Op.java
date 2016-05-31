@@ -241,11 +241,11 @@ public enum Op {
     public static final int ANY = 0;
 
 
-    public static boolean isTemporal(Term t, int newDT) {
+    public static boolean isTemporal(@NotNull Term t, int newDT) {
         return isTemporal(t.op(), newDT, t.size());
     }
 
-    public static boolean isTemporal(Op o, int dt, int arity) {
+    public static boolean isTemporal(@NotNull Op o, int dt, int arity) {
         if (o.temporal) {
             return !(o == Op.CONJUNCTION && dt != 0 && dt != DTERNAL && arity > 2);
         }
@@ -291,7 +291,7 @@ public enum Op {
         return this == IMPLICATION; //in(ImplicationsBits);
     }
 
-    public static boolean hasAny(int structure, Op o) {
+    public static boolean hasAny(int structure, @NotNull Op o) {
         return ((structure & o.bit) > 0);
     }
 

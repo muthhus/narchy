@@ -89,7 +89,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Override
-    public boolean contains(Task t) {
+    public boolean contains(@NotNull Task t) {
         return tableFor(t.punc()).get(t)!=null;
     }
 
@@ -224,14 +224,14 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     /**
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, BeliefTable target, QuestionTable questions) {
+    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
         Task b = target.add(belief, questions, nar);
         if (b!=null)
             updateSatisfaction(nar);
         return b;
     }
 
-    protected final void updateSatisfaction(NAR nar) {
+    protected final void updateSatisfaction(@NotNull NAR nar) {
         BeliefTable b = beliefs();
         BeliefTable g = goals();
 
@@ -254,12 +254,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
 
-    @Override public void capacity(ConceptBudgeting p) {
+    @Override public void capacity(@NotNull ConceptBudgeting p) {
         linkCapacity(p);
         beliefCapacity(p);
     }
 
-    protected void beliefCapacity(ConceptBudgeting p) {
+    protected void beliefCapacity(@NotNull ConceptBudgeting p) {
         beliefs().capacity(p.beliefCap(this, true, true), p.beliefCap(this, true, false));
         goals().capacity(p.beliefCap(this, false, true), p.beliefCap(this, false, false));
     }

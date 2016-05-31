@@ -26,6 +26,7 @@ public class BagRegulator<X> {
     final SummaryStatistics pri = new SummaryStatistics();
 
     //next state vector to input
+    @NotNull
     final float[] input;
 
     private final MutableFloat perfection;

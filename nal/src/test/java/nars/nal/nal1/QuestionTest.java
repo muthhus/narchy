@@ -31,7 +31,7 @@ public class QuestionTest {
     }
 
     /** question to answer matching */
-    public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, String expectedSolution) {
+    public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, @NotNull String expectedSolution) {
         AtomicBoolean ok = new AtomicBoolean(false);
 
 

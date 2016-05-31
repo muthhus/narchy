@@ -34,6 +34,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final PremiseRule rule;
+    @NotNull
     private final TimeFunction temporalizer;
 
     /**
@@ -51,7 +52,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  boolean beliefSingle, boolean goalSingle, boolean eternalize, TimeFunction temporalizer) {
+                  boolean beliefSingle, boolean goalSingle, boolean eternalize, @NotNull TimeFunction temporalizer) {
         this.rule = rule;
 
 
@@ -74,6 +75,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
+    @NotNull
     @Override
     public Op op() {
         return ATOM; //product?
@@ -106,7 +108,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     }
 
-    final void derive(@NotNull PremiseEval m, Term raw) {
+    final void derive(@NotNull PremiseEval m, @NotNull Term raw) {
         ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 

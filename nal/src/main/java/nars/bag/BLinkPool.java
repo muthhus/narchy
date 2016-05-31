@@ -15,7 +15,9 @@ import static nars.util.data.Util.clamp;
  */
 public class BLinkPool<X> {
 
+    @NotNull
     final FastBitSet changed;
+    @NotNull
     final float[] b;
     private final int cap;
 
@@ -25,6 +27,7 @@ public class BLinkPool<X> {
         this.changed = new FastBitSet(capacity);
     }
 
+    @NotNull
     public BLinkI<X> get(int n) {
         return new BLinkI(n);
     }

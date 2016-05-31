@@ -7,6 +7,7 @@ import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.InvalidTerm;
 import nars.term.Term;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -21,7 +22,9 @@ import static org.junit.Assert.*;
  */
 public class TemporalRelationsTest {
 
+    @Nullable
     static final Term A = $("a");
+    @Nullable
     static final Term B = $("b");
 
     @Test

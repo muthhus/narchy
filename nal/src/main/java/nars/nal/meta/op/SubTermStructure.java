@@ -42,7 +42,7 @@ public final class SubTermStructure extends AtomicBoolCondition {
         return ff.subTermMatch(subterm, bits);
     }
 
-    static int filter(Op matchingType, int bits) {
+    static int filter(@NotNull Op matchingType, int bits) {
         if (matchingType != Op.VAR_PATTERN)
             bits &= (~matchingType.bit);
 

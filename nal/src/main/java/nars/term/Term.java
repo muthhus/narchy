@@ -39,7 +39,7 @@ public interface Term extends Termed, Termlike {
         return this;
     }
 
-    @NotNull
+    @Nullable
     @Override
     Op op();
 

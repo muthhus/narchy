@@ -12,6 +12,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
@@ -30,9 +31,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     public ArrayBag(int cap) {
         super(BLink[]::new,
 
-                new ConcurrentHashMapUnsafe<V, BLink<V>>(),
+                //new ConcurrentHashMapUnsafe<V, BLink<V>>(),
                 //new LinkedHashMap<>(cap),
-                //new HashMap<>(cap),
+                new HashMap<>(cap),
                 //Global.newHashMap(cap),
 
                 SortedArray.SearchType.BinarySearch);
@@ -295,6 +296,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
+    @NotNull
     @Override public Bag<V> commit(@Nullable Consumer<BLink> each) {
         int s = size();
         if (s > 0) {

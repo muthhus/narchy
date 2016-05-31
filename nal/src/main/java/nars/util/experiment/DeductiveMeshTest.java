@@ -9,6 +9,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +29,11 @@ public class DeductiveMeshTest {
 
 
 
-    public DeductiveMeshTest(@NotNull NAR n, int[] dims, int timeLimit) {
+    public DeductiveMeshTest(@NotNull NAR n, @NotNull int[] dims, int timeLimit) {
         this(new TestNAR(n), dims, timeLimit);
     }
 
-    public DeductiveMeshTest(@NotNull TestNAR n, int[] dims, int timeLimit) {
+    public DeductiveMeshTest(@NotNull TestNAR n, @NotNull int[] dims, int timeLimit) {
 
         if (dims.length!=2)
             throw new UnsupportedOperationException("2-D only implemented");
@@ -77,6 +78,7 @@ public class DeductiveMeshTest {
 
     }
 
+    @Nullable
     private Term link(int x1, int y1, int x2, int y2) {
         //return $.prop($.p(a, b), $.the("X"));
         return $.sim( $.p($.the(x1), $.the(y1)), $.p($.the(x2), $.the(y2)) );
@@ -118,7 +120,7 @@ public class DeductiveMeshTest {
 
     }
 
-    static void test(@NotNull NAR n, int[] dims, int cycles) {
+    static void test(@NotNull NAR n, @NotNull int[] dims, int cycles) {
 
 
         TestNAR testnar = new TestNAR(n);

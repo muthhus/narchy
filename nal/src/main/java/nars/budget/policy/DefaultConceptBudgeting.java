@@ -3,6 +3,7 @@ package nars.budget.policy;
 import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
 import nars.util.data.MutableInteger;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 5/11/16.
@@ -31,11 +32,11 @@ public class DefaultConceptBudgeting implements ConceptBudgeting {
     }
 
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void beliefCapacityNonEternal(CompoundConcept c, ConceptBudgeting p) {
+    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptBudgeting p) {
         c.beliefs().capacity(0, p.beliefCap(c, true, true) + p.beliefCap(c, true, false));
     }
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void goalCapacityNonEternal(CompoundConcept c, ConceptBudgeting p) {
+    public static void goalCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptBudgeting p) {
         c.goals().capacity(0, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
     }
 

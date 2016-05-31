@@ -144,7 +144,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     }
 
-    @Deprecated public static void printTasks(NAR n, boolean beliefsOrGoals) {
+    @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
         TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
         n.forEachConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
@@ -596,7 +596,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Clock clock = this.clock;
 
-        int cpf = cyclesPerFrame.intValue();
         for (; frames > 0; frames--) {
             clock.tick();
             emotion.frame();
@@ -795,15 +794,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
+    @Nullable
     public Task ask(@NotNull String question, long occ, @NotNull Predicate<Task> eachAnswer) throws NarseseException {
         return ask(term(question), occ, eachAnswer);
     }
 
-    public Task ask(Termed<Compound> term, long occ, Predicate<Task> eachAnswer) {
+    @Nullable
+    public Task ask(@NotNull Termed<Compound> term, long occ, @NotNull Predicate<Task> eachAnswer) {
         return ask(term, occ, Symbols.QUESTION, eachAnswer);
     }
 
-    public Task ask(Termed<Compound> term, long occ, char punc /* question or quest */, Predicate<Task> eachAnswer) {
+    @Nullable
+    public Task ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
         return inputTask(new MutableTask(term, punc, null) {
             @Override public boolean onAnswered(Task answer) {
                 return eachAnswer.test(answer);
@@ -857,6 +859,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+    @NotNull
     public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         forEachConcept(c -> {
             c.visitTasks(each, includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests);

@@ -26,12 +26,14 @@ import static nars.nal.meta.op.MatchTaskBelief.compile;
  */
 abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
+    @Nullable
     private ProcTerm eachMatch;
 
     @Nullable
     public final MatchConstraint constraints;
 
 
+    @NotNull
     protected final Term pid;
 
     @NotNull

@@ -129,6 +129,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
         min = max = ETERNAL;
     }
 
+    @Nullable
     @Override public Task weakest() {
         if (lastUpdate == Tense.TIMELESS)
             throw new RuntimeException("unable to measure weakest without knowing current time");
@@ -214,7 +215,8 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     }
 
     /** t is the target time of the new merged task */
-    public Task merge(Task a, Task b, long now) {
+    @Nullable
+    public Task merge(@NotNull Task a, @NotNull Task b, long now) {
         float ac = a.confWeight();
         float bc = b.confWeight();
         int mid = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));

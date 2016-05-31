@@ -36,7 +36,7 @@ public class DefaultCore extends AbstractCore {
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(BLink<Concept> cl) {
+    protected void deactivate(@NotNull BLink<Concept> cl) {
         Concept c = cl.get();
 
         //apply forgetting so that shrinking capacity will be applied to concept's components fairly
@@ -49,7 +49,7 @@ public class DefaultCore extends AbstractCore {
     }
 
     /** called when a concept enters the concept bag */
-    protected void activate(Concept c) {
+    protected void activate(@NotNull Concept c) {
 
         //set capacity first in case there are any queued items, they may join during the commit */
         c.capacity(warm);
@@ -59,6 +59,7 @@ public class DefaultCore extends AbstractCore {
         c.termlinks().commit(Forget.QualityToPriority);
     }
 
+    @NotNull
     @Override
     protected Bag<Concept> newConceptBag() {
         return new MonitoredCurveBag(nar, 1, nar.random)
@@ -73,7 +74,7 @@ public class DefaultCore extends AbstractCore {
 
         final NAR nar;
 
-        public MonitoredCurveBag(NAR nar, int capacity, Random rng) {
+        public MonitoredCurveBag(NAR nar, int capacity, @NotNull Random rng) {
             super(capacity, rng);
             this.nar = nar;
             setCapacity(capacity);
@@ -81,7 +82,7 @@ public class DefaultCore extends AbstractCore {
 
 
         @Override
-        protected @Nullable BLink<Concept> putNew(Concept i, BLink<Concept> b) {
+        protected @Nullable BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
             BLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
 

@@ -252,7 +252,7 @@ public interface Stamp {
         return evidenceLength(a.evidence().length, b.evidence().length);
     }
 
-    static long[] zip(Stream<Task> s, int num, int maxLen) {
+    static long[] zip(@NotNull Stream<Task> s, int num, int maxLen) {
         final int extra = 1;
         int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);

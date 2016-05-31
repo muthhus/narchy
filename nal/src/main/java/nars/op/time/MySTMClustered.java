@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.util.data.MutableInteger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
-    public MySTMClustered(NAR nar, int size, char punc) {
+    public MySTMClustered(@NotNull NAR nar, int size, char punc) {
         super(nar, new MutableInteger(size), punc);
     }
 

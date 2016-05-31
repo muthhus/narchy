@@ -91,6 +91,7 @@ public abstract class Budget implements Budgeted {
         setPriority(pri() - toSubtract);
     }
 
+    @NotNull
     public Budgeted cloneMult(float p, float d, float q) {
         Budget x = clone();
         x.mul(p, d, q);
@@ -337,6 +338,7 @@ public abstract class Budget implements Budgeted {
         setDurability(dur()*df);
         setQuality(qua()*qf);
     }
+    @NotNull
     public Budget multiplied(float pf, float df, float qf) {
         mul(pf, df, qf);
         return this;

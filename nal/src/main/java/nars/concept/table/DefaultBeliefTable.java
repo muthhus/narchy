@@ -42,6 +42,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
+    @Nullable
     @Override
     public final Truth truth(long now, long when) {
 
@@ -137,8 +138,9 @@ public class DefaultBeliefTable implements BeliefTable {
         return map.get(t);
     }
 
+    @Nullable
     @Override
-    public Task add(@NotNull Task input, QuestionTable questions, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
 
         /* if a duplicate exists, it will merge the incoming task and return true.
           otherwise false */

@@ -64,11 +64,13 @@ public interface BeliefTable extends TaskTable {
             throw new UnsupportedOperationException();
         }
 
+        @Nullable
         @Override
         public Task get(Task t) {
             return null;
         }
 
+        @NotNull
         @Override
         public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
             return input;
@@ -86,6 +88,7 @@ public interface BeliefTable extends TaskTable {
         }
 
 
+        @NotNull
         @Override
         public Truth truth(long now, long when) {
             return Truth.Null;

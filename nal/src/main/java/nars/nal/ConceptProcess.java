@@ -93,6 +93,7 @@ public class ConceptProcess implements Premise {
     }
 
 
+    @NotNull
     @Override
     public final Task task() {
         return taskLink.get();

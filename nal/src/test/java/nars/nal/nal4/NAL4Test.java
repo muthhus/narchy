@@ -33,9 +33,9 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation1_DepVar()  {
         TestNAR t = test();
-        //t.log();
-        t.mustBelieve(CYCLES*6, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
-        t.mustBelieve(CYCLES*6, "<#1 --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
+        t.log();
+        t.mustBelieve(CYCLES*2, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
+        t.mustBelieve(CYCLES*2, "<#1 --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
         t.believe("<(acid,#1) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
     }
 

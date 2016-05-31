@@ -97,7 +97,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 
 
     @Override
-    public boolean contains(Task t) {
+    public final boolean contains(Task t) {
         return false;
     }
 }

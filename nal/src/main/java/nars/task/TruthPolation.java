@@ -21,8 +21,11 @@ import static nars.nal.UtilityFunctions.w2c;
 public class TruthPolation {
 
     final @Nullable InterpolatingMicrosphere s;
+    @NotNull
     final float[][] times;
+    @NotNull
     final float[] freq;
+    @NotNull
     final float[] conf;
     int count;
     //private List<Task> tasks;

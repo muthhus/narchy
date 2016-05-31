@@ -18,6 +18,8 @@ import nars.util.meter.TemporalMetrics;
 import nars.util.meter.event.SourceFunctionMeter;
 import nars.util.signal.MotorConcept;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -52,10 +54,11 @@ public class ControlFlowTest {
 
     abstract public static class Sequence extends ConceptGroup {
 
+        @NotNull
         private final List<Termed> states;
 
 
-        public Sequence(String id, NAR nar, int length) {
+        public Sequence(@NotNull String id, @NotNull NAR nar, int length) {
             super(id, nar);
 
 
@@ -70,6 +73,7 @@ public class ControlFlowTest {
 
 
         /** flow desire forward */
+        @NotNull
         public Sequence forward(int delay, float startFrequency) {
 
             int length = states.size();
@@ -88,17 +92,19 @@ public class ControlFlowTest {
         public Termed start() { return states.get(0); }
         public Termed end() { return states.get(states.size()-1); }
 
+        @NotNull
         protected abstract Termed newState(int i);
 
 
         @Override
-        public void forEachMember(Consumer<Termed> each) {
+        public void forEachMember(@NotNull Consumer<Termed> each) {
             states.forEach(each);
         }
 
     }
 
-    public ExeTracker testSequence(Supplier<NAR> nn, int length, int delay) {
+    @NotNull
+    public ExeTracker testSequence(@NotNull Supplier<NAR> nn, int length, int delay) {
 
         System.out.println("sequence execution:  states=" + length + " inter-state delay=" + delay);
 
@@ -113,6 +119,7 @@ public class ControlFlowTest {
 
         Sequence seq = new Sequence("(seq)", n, length) {
 
+            @NotNull
             @Override
             protected Termed newState(int i) {
                 return newExeState(n, $.p( id , Integer.toString(i) ), exeTracker);
@@ -149,9 +156,10 @@ public class ControlFlowTest {
 
     abstract public static class ConceptGroup extends OperationConcept {
 
+        @NotNull
         public final String id;
 
-        public ConceptGroup(String id, NAR nar) {
+        public ConceptGroup(@NotNull String id, @NotNull NAR nar) {
             super(id, nar);
             this.id = id;
         }
@@ -165,7 +173,8 @@ public class ControlFlowTest {
 
 
 
-    public ExeTracker testBranch(Supplier<NAR> nn, int delay, float... conditionSequence) {
+    @NotNull
+    public ExeTracker testBranch(@NotNull Supplier<NAR> nn, int delay, @NotNull float... conditionSequence) {
 
 
         int beforeBranchLength = 2;
@@ -308,12 +317,14 @@ public class ControlFlowTest {
     }
 
 
-    public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e) {
+    @NotNull
+    public CompoundConcept newExeState(@NotNull NAR n, @NotNull Compound term, @NotNull ExeTracker e) {
 
         return newExeState(n, term, e, 0.5f);
     }
 
-    public CompoundConcept newExeState(NAR n, Compound term, ExeTracker e, float exeThresh) {
+    @NotNull
+    public CompoundConcept newExeState(@NotNull NAR n, @NotNull Compound term, @NotNull ExeTracker e, float exeThresh) {
 
 
         MotorConcept c = new MotorConcept(term, n, (b, d) -> {
@@ -368,12 +379,15 @@ public class ControlFlowTest {
 
     private static class ConceptBeliefGoalPriorityMeter extends SourceFunctionMeter {
 
+        @NotNull
         private final CompoundConcept c;
         private final NAR n;
+        @Nullable
         public Truth desire;
+        @Nullable
         public Truth belief;
 
-        public ConceptBeliefGoalPriorityMeter(CompoundConcept c, NAR n) {
+        public ConceptBeliefGoalPriorityMeter(@NotNull CompoundConcept c, NAR n) {
             super(c.toString(), "_blf_frq", "_blf_conf", "_gol_frq", "_gol_conf", "_pri");
             this.c = c;
             this.n = n;

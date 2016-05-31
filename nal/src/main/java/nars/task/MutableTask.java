@@ -231,6 +231,7 @@ public class MutableTask extends AbstractTask {
 
     }
 
+    @Nullable
     public static Reference<Task>[] parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
         return Global.reference(
                 (parentTask.isCommand()) ? null : parentTask,

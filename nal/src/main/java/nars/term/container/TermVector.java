@@ -255,7 +255,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
      * @return Whether the target is in the current term
      */
     @Override
-    public final boolean containsTerm(Termlike t) {
+    public final boolean containsTerm(@NotNull Termlike t) {
         return !impossibleSubterm(t) && Terms.contains(term, t);
     }
 

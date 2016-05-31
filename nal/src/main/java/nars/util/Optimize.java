@@ -43,7 +43,7 @@ public class Optimize<X> {
         tweaks.add(new FloatRange(parameter, min, max, inc, apply));
         return this;
     }
-    public @NotNull Optimize<X> call(String parameter, float min, float max, float inc, String invoker) {
+    public @NotNull Optimize<X> call(String parameter, float min, float max, float inc, @NotNull String invoker) {
         Map m = new HashMap(4);
 
         tweaks.add(new FloatRange(parameter, min, max, inc, (v,x) -> {
