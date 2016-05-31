@@ -97,6 +97,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
         double[] Y = this.yp;
 
 
+
         gfx.setFill(TermNode.getTermColor(aSrc.term, colors, p*aSrc.priNorm));
         //gfx.fillPolygon(X, Y, 3);
         gfx.beginPath();

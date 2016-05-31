@@ -14,8 +14,8 @@ public class GraphNode extends Group {
 	final static double SCALE_EPSILON = 0.05f;
 
 	private double scaled;
-	private double tx;
-	private double ty;
+	public double tx;
+	public double ty;
 	private double px = Double.NaN, py = Double.NaN;
 
 	public GraphNode() {

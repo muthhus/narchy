@@ -22,7 +22,7 @@ public class SubButtonVis extends DefaultNodeVis {
 
     @Override
     public TermNode newNode(Termed term, NAR nar) {
-        return new LabeledCanvasNode(nar, term, 32, null, null) {
+        return new LabeledCanvasNode(term, 32, null, null) {
 
             @Override
             protected Node newBase() {

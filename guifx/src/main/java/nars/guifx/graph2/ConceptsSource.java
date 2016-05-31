@@ -121,7 +121,7 @@ public class ConceptsSource extends GraphSource {
     @Override
     public Termed getTargetVertex(Termed edge) {
 
-        return grapher.getTermNode(edge.term()).c;
+        return grapher.getTermNode(edge).c;
     }
 
 

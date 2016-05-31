@@ -1,7 +1,7 @@
 package nars.guifx.graph2.source;
 
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
+
 import javafx.beans.property.SimpleObjectProperty;
 import nars.NAR;
 import nars.guifx.Spacegraph;
@@ -11,6 +11,7 @@ import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.graph2.layout.None;
 import nars.guifx.util.Animate;
 import nars.term.Termed;
+import org.infinispan.commons.util.WeakValueHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +30,15 @@ public class SpaceGrapher extends Spacegraph {
 
     public static final Logger logger = LoggerFactory.getLogger(SpaceGrapher.class);
 
-    final Map<Termed, TermNode> terms = new UnifiedMap();
-    //new WeakValueHashMap<>();
+    final Map<Termed, TermNode> terms = new WeakValueHashMap<>();
 
     static final int defaultFramePeriodMS = 30; //~60hz/2
 
     public final SimpleObjectProperty<EdgeRenderer<TermEdge>> edgeRenderer = new SimpleObjectProperty<>();
 
     public final SimpleObjectProperty<IterativeLayout<TermNode>> layout = new SimpleObjectProperty<>();
-    public static final IterativeLayout nullLayout = new None();
 
+    public static final IterativeLayout nullLayout = new None();
 
     //public final SimpleIntegerProperty maxNodes;
     public final SimpleObjectProperty<GraphSource> source = new SimpleObjectProperty<>();
@@ -565,8 +565,8 @@ public class SpaceGrapher extends Spacegraph {
                 //                }
 
 
-                updater.execute(this::reupdate);
-                //reupdate();
+                //updater.execute(this::reupdate);
+                reupdate();
 
                 rerender();
             });

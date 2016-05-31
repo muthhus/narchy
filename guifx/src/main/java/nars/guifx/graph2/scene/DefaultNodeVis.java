@@ -68,15 +68,15 @@ public class DefaultNodeVis implements NodeVis {
 
     //TODO make abstract
     public TermNode newNode(Termed term, NAR nar) {
-        return new LabeledCanvasNode(nar, term, maxEdges, mouseActivity, mouseUntivity);
+        return new LabeledCanvasNode(term, maxEdges, mouseActivity, mouseUntivity);
     }
 
     @Override
     public void accept(TermNode t) {
 
-        if (t == null) {
-            return;
-        }
+//        if (t == null) {
+//            return;
+//        }
         //t.priNorm = 1f; //((Concept)t.term).getPriority();
 
 //            p = t.term.cgetPriority();
@@ -286,7 +286,7 @@ public class DefaultNodeVis implements NodeVis {
 
         private GraphicsContext g;
 
-        public LabeledCanvasNode(NAR n, N t, int maxEdges, EventHandler<MouseEvent> mouseActivity, EventHandler<MouseEvent> mouseUntivity) {
+        public LabeledCanvasNode(N t, int maxEdges, EventHandler<MouseEvent> mouseActivity, EventHandler<MouseEvent> mouseUntivity) {
             super(t, maxEdges);
 
             base = newBase();

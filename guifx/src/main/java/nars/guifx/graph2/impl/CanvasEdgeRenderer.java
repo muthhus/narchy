@@ -1,5 +1,6 @@
 package nars.guifx.graph2.impl;
 
+import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -98,7 +99,7 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 //    }
 
     @Override
-    public void reset(SpaceGrapher g) {
+    public synchronized void reset(SpaceGrapher g) {
 
         Scene scene = g.getScene();
         if (scene == null) return;
@@ -106,6 +107,10 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
         if (floorCanvas == null) {
 
             floorCanvas = new ResizableCanvas();//g.widthProperty(), g.heightProperty());
+
+
+//            floorCanvas.setCacheHint(CacheHint.SPEED);
+//            floorCanvas.setCache(true);
 
 
             g.getChildren().
@@ -118,6 +123,7 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
         else {
 
         }
+
 
 
 

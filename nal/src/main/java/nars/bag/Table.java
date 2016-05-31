@@ -61,9 +61,4 @@ public interface Table<K,V> extends Iterable<V> {
     void topWhile(@NotNull Predicate<V> each);
 
 
-    @NotNull
-    default String toStringDetailed() {
-        return Joiner.on(",").join(this);
-    }
-
 }

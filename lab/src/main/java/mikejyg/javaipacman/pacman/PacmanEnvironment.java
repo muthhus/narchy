@@ -63,8 +63,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	public static void main (String[] args) 	{
 		Random rng = new XorShift128PlusRandom(1);
 
-		Default nar = new Default(
 		//Multi nar = new Multi(2,
+		Default nar = new Default(
 				1024, 6, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
