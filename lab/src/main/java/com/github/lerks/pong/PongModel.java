@@ -114,11 +114,9 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 			ball_acceleration_count = 0;
 			
 			/*if (player1.getType() == Player.CPU_HARD || player1.getType() == Player.CPU_EASY)*/ {
-				player1.position = getHeight () / 2;
 				computeDestination (player1);
 			}
 			/*if (player2.getType() == Player.CPU_HARD || player2.getType() == Player.CPU_EASY)*/ {
-				player2.position = getHeight () / 2;
 				computeDestination (player2);
 			}
 			
@@ -153,9 +151,12 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		}
 		
 		// Border-collision LEFT
-		if (ball_x <= PADDING + WIDTH + RADIUS) {
+		int bounceLX = PADDING + WIDTH + RADIUS;
+		int dieLX = RADIUS;
+
+		if (ball_x <= bounceLX) {
 			int collision_point = ball_y + (int)(ball_y_speed / ball_x_speed * (PADDING + WIDTH + RADIUS - ball_x));
-			if (collision_point > player1.position - HEIGHT - TOLERANCE && 
+			if (ball_x <= bounceLX && collision_point > player1.position - HEIGHT - TOLERANCE &&
 			    collision_point < player1.position + HEIGHT + TOLERANCE) {
 				ball_x = 2 * (PADDING + WIDTH + RADIUS) - ball_x;
 				player1.bounce();
@@ -165,7 +166,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 				//if (player2.getType() == Player.CPU_HARD)
 					computeDestination (player2);
 			}
-			else {
+			else if (ball_x <= dieLX) {
 				player2.score();
 				player1.ouch();
 				new_game = true;
@@ -173,11 +174,13 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		}
 		
 		// Border-collision RIGHT
-		if (ball_x >= getWidth() - PADDING - WIDTH - RADIUS) {
+		int bounceRX = getWidth() - PADDING - WIDTH - RADIUS;
+		int dieRX = getWidth() - RADIUS;
+		if (ball_x >= bounceRX) {
 			int collision_point = ball_y - (int)(ball_y_speed / ball_x_speed * (ball_x - getWidth() + PADDING + WIDTH + RADIUS));
-			if (collision_point > player2.position - HEIGHT - TOLERANCE && 
+			if (ball_x >= bounceRX && collision_point > player2.position - HEIGHT - TOLERANCE &&
 			    collision_point < player2.position + HEIGHT + TOLERANCE) {
-				ball_x = 2 * (getWidth() - PADDING - WIDTH - RADIUS ) - ball_x;
+				ball_x = 2 * (bounceRX) - ball_x;
 				ball_x_speed = -1 * Math.abs (ball_x_speed);
 				player2.bounce();
 				ball_y_speed -= Math.sin ((double)(player2.position - ball_y) / HEIGHT * Math.PI / 4)
@@ -185,7 +188,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 				//if (player1.getType() == Player.CPU_HARD)
 					computeDestination (player1);
 			}
-			else {
+			else if (ball_x >= dieRX) {
 				player1.score();
 				player2.ouch();
 				new_game = true;

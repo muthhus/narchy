@@ -10,6 +10,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
+import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
 import nars.learn.Agent;
@@ -23,6 +24,7 @@ import nars.util.FX;
 import nars.util.NAgent;
 import nars.util.experiment.Environment;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,11 +34,11 @@ import static nars.$.*;
 
 public class PongEnvironment extends Player implements Environment {
 
-	final int width = 16;
-	final int height = 12;
+	final int width = 36;
+	final int height = 20;
 	final int pixels = width * height;
-	final int scale = 30;
-	final int ticksPerFrame = 3; //framerate divisor
+	final int scale = 20;
+	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 	float bias = 0f; //pain of boredom
@@ -46,9 +48,10 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 		Default nar = new Default();
-		nar.beliefConfidence(0.65f);
+		nar.core.conceptsFiredPerCycle.set(8);
+		nar.beliefConfidence(0.85f);
 		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.6f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
@@ -109,6 +112,9 @@ public class PongEnvironment extends Player implements Environment {
 
 			nar = (NAgent) a;
 
+			for (int i = 1; i < Math.max(width,height); i++) {
+				nar.nar.believe("(" + (i-1) + " <-> " + i + ")", 0.75f, 1f);
+			}
 
 			nar.setSensorNamer((i) -> {
 //				int cell = i;
@@ -154,6 +160,7 @@ public class PongEnvironment extends Player implements Environment {
 		//System.out.println(i + " (" + ax + "," + ay + ") " + c);
 		//return c;
 		return inh(c, the("w"));
+		//return inst(c, the("w"));
 	}
 
 	@Override
@@ -213,10 +220,13 @@ public class PongEnvironment extends Player implements Environment {
 
 		}
 
+		long now = nar.nar.time();
 		priMatrix.set(width,height,(x,y)->{
 
+			@Nullable Concept c = nar.nar.concept(p(x, y));
 			float p = nar.nar.conceptPriority(p(x, y));
-			return ColorArray.rgba(0, p, 0, 1f);
+			float e = c.beliefs().truth(now).expectation();
+			return ColorArray.rgba(e, p, 0, 1f);
 
 		});
 

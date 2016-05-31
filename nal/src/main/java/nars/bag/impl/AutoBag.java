@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.forget.Forget;
@@ -15,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
 public class AutoBag<V>  {
 
     private final Forget.AbstractForget forget;
+
+    static final float maxForgetPeriod = 1000f; //TODO calculate based on budget epsilon etc
+    static final float minForgetPeriod = 0.5f; //TODO calculate based on budget epsilon etc
 
     public AutoBag(@NotNull MutableFloat perfection) {
         //this(new Forget.ExpForget(new MutableFloat(0), perfection));
@@ -39,7 +43,10 @@ public class AutoBag<V>  {
         Forget.AbstractForget f;
         float r = forgetPeriod((ArrayBag<V>) bag);
 
-        if (r > 0) {
+        if (Float.isFinite(r) && r < maxForgetPeriod) {
+            r = Math.max(minForgetPeriod, r);
+
+            //System.out.println("autobag: " + bag.getClass() +  " " + r);
             f = forget;
             /*if (bag.size() > 500)
                 System.out.println(bag.size() + " / " + bag.capacity() + " pressurized_forgetRate="  + r);*/
@@ -57,11 +64,16 @@ public class AutoBag<V>  {
 
     protected float forgetPeriod(@NotNull ArrayBag<V> bag) {
 
+        float pendingMass = bag.getPendingMass();
+        if (pendingMass <= Global.BUDGET_EPSILON)
+            return Float.NaN;
+
         float basePeriod = 0.001f; //"margin of replacement"
         // TODO formalize some relationship between cycles and priority
         // TODO estimate based on the min/max priority of existing items and normalize the rate to that
 
-        return (basePeriod) * bag.capacity()/bag.getPendingMass();
+
+        return (basePeriod) * bag.capacity()/ pendingMass;
 
     }
 

@@ -62,8 +62,9 @@ public class NAgent implements Agent {
     /**
      * exploration rate - confidence of initial goal for each action
      */
-    float epsilon = 0.1f;
-    private double epsilonRandom = 0.1f; //0.01f;
+    float epsilon = 0.15f;
+    private double epsilonRandom = 0.15f; //0.01f;
+    private double epsilonRandomMin = 0.01f; //0.01f;
     private final double epsilonRandomDecay = 0.99f; //0.01f;
 
     float sensorPriority;
@@ -368,7 +369,8 @@ public class NAgent implements Agent {
 
         decide(this.lastAction);
 
-        epsilonRandom *= epsilonRandomDecay;
+        epsilonRandom *= Math.max(epsilonRandomMin, epsilonRandomDecay);
+
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         nar.conceptualize(reward, RewardAttentionPerFrame);
