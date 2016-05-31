@@ -114,29 +114,21 @@ public enum $ /* TODO: implements TermIndex */ {
         return the(SIMILAR, subj, pred);
     }
 
-    /** execution (NARS "operation") */
-    @NotNull
-    public static Compound exec(@NotNull String operator, String... args) {
-        return exec(operator(operator), $.p(args));
-    }
 
 
     /** execution (NARS "operation") */
     @NotNull
     public static Compound exec(@NotNull Atomic opTerm, Term... arg) {
-        return exec(opTerm, $.p(arg));
-    }
-
-//    static Compound oper(Atom opTerm, Compound args) {
-//        return oper(new Operator(opTerm), args);
-//    }
-
-    /** execution (NARS "operation") */
-    @NotNull
-    public static Compound exec(@NotNull Atomic opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
-                arg == null ? Terms.ZeroProduct : arg,
+                arg == null ? Terms.ZeroProduct : $.p(arg),
+                opTerm
+        );
+    }
+    @NotNull public static Compound exec(@NotNull Atomic opTerm, Collection<Term> arg) {
+        return (Compound) the(
+                INHERIT,
+                arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
@@ -166,7 +158,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
     }
     @NotNull
-    public static Compound p(@NotNull TermContainer t) {
+    public static Compound p(@NotNull TermVector t) {
         return p((Term[])t.terms());
     }
 

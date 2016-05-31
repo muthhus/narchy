@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class FloatConcept extends SensorConcept {
 
-    @NotNull
+
     private final MutableFloat value;
 
     public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
@@ -35,8 +35,4 @@ public class FloatConcept extends SensorConcept {
         return v;
     }
 
-    @NotNull @Override public FloatConcept punc(char c) {
-        super.punc(c);
-        return this;
-    }
 }

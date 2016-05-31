@@ -8,9 +8,10 @@ import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.util.signal.FloatConcept;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static nars.nal.nal8.MotivationTest.timeUntil;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -29,107 +30,108 @@ public class BooleanConceptTest {
 
         Global.DEBUG = true;
 
-        NAR n = new Default(1024, 2, 2, 2).log();
+        NAR n = new Default(1024, 8, 2, 2).log();
 
-        FloatConcept A = new FloatConcept("(a)", n).punc('!');
+        FloatConcept A = new FloatConcept("(a)", n).punc('.');
 
-        FloatConcept B = new FloatConcept("(b)", n).punc('!');
+        FloatConcept B = new FloatConcept("(b)", n).punc('.');
 
-        OperationConcept y = new OperationConcept("do(that)", n);
+        BooleanConcept bc = BooleanConcept.And(n, A, B);
+        n.ask(bc);
 
-        n.believe(
-                $.impl(
-                        BooleanConcept.And(n, A, B), 0 /*concurrent =|>*/, y
-                ),
-                Tense.Eternal,
-                1f, 0.95f
-        );
+        assertEquals(0.5f, bc.beliefs().truth(n.time()).freq(), 0.01f);
+
+        A.set(0f);
+        B.set(0f);
+        n.step();
+        assertEquals(0f, bc.beliefs().truth(n.time()).freq(), 0.01f);
+
+        A.set(0f);
+        B.set(1f);
+        n.step();
+        assertEquals(0f, bc.beliefs().truth(n.time()).freq(), 0.01f);
+
+        A.set(1f);
+        B.set(1f);
+        n.step();
+        assertEquals(1f, bc.beliefs().truth(n.time()).freq(), 0.3f); //big tolerance here
+
+        n.step();
+
+        B.set(1f);
+        n.step();
+        n.step();
+        n.step();
+        n.step();
 
 
-        int loops = 3;
-        int cyclesBetweenPhases = 2;
-        for (int i = 0; i < loops; i++) {
 
-            n.run(cyclesBetweenPhases);
 
-            A.set(1f); B.set(1f);
 
-            timeUntil("switch on", n, nn -> {
-                //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-                return y.desire(nn.time()).expectation() >= 0.51f;
-            }, 150);
 
-            n.run(cyclesBetweenPhases);
 
-            A.set(0f);
-
-            timeUntil("switch off", n, nn -> {
-                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-                return y.desire(nn.time()).expectation() <= 0.49f;
-            }, 150);
-        }
 
     }
 
-    @Test
-    public void testOrConcept() {
-
-        Global.DEBUG = true;
-
-        NAR n = new Default(1024, 6, 2, 2).log();
-
-        FloatConcept A = new FloatConcept("(a)", n).punc('!');
-
-        FloatConcept B = new FloatConcept("(b)", n).punc('!');
-
-        OperationConcept y = new OperationConcept("do(that)", n);
-
-        n.believe(
-                $.impl(
-                        BooleanConcept.Or(n, A, B), 0 /*concurrent =|>*/, y
-                ),
-                Tense.Eternal,
-                1f, 0.95f
-        );
-
-
-        int loops = 2;
-        int cyclesBetweenPhases = 32;
-        for (int i = 0; i < loops; i++) {
-
-            n.run(cyclesBetweenPhases);
-
-            A.set(1f); B.set(1f);
-
-            timeUntil("switch (on,on)", n, nn -> {
-                //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-                return y.desire(nn.time()).expectation() >= 0.49f;
-            }, 150);
-
-            n.run(cyclesBetweenPhases);
-
-            A.set(0f);
-
-            timeUntil("switch (on,off)", n, nn -> {
-                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-                float m = y.desire(nn.time()).expectation();
-                return m >= 0.51f;
-                //return m <= 0.55f && m >= 0.45f; //~=0.5
-            }, 150);
-
-            n.run(cyclesBetweenPhases);
-
-//            B.set(0f);
+//    @Test
+//    public void testOrConcept() {
 //
-//            timeUntil("switch (off,off)", n, nn -> {
+//        Global.DEBUG = true;
+//
+//        NAR n = new Default(1024, 6, 2, 2).log();
+//
+//        FloatConcept A = new FloatConcept("(a)", n).punc('!');
+//
+//        FloatConcept B = new FloatConcept("(b)", n).punc('!');
+//
+//        OperationConcept y = new OperationConcept("do(that)", n);
+//
+//        n.believe(
+//                $.impl(
+//                        BooleanConcept.Or(n, A, B), 0 /*concurrent =|>*/, y
+//                ),
+//                Tense.Eternal,
+//                1f, 0.95f
+//        );
+//
+//
+//        int loops = 2;
+//        int cyclesBetweenPhases = 32;
+//        for (int i = 0; i < loops; i++) {
+//
+//            n.run(cyclesBetweenPhases);
+//
+//            A.set(1f); B.set(1f);
+//
+//            timeUntil("switch (on,on)", n, nn -> {
+//                //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
+//                return y.desire(nn.time()).expectation() >= 0.49f;
+//            }, 150);
+//
+//            n.run(cyclesBetweenPhases);
+//
+//            A.set(0f);
+//
+//            timeUntil("switch (on,off)", n, nn -> {
 //                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-//                float m = y.expectation(nn);
-//                return m <= 0.49f;
-//            }, 350);
-
-        }
-
-    }
+//                float m = y.desire(nn.time()).expectation();
+//                return m >= 0.51f;
+//                //return m <= 0.55f && m >= 0.45f; //~=0.5
+//            }, 150);
+//
+//            n.run(cyclesBetweenPhases);
+//
+////            B.set(0f);
+////
+////            timeUntil("switch (off,off)", n, nn -> {
+////                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+////                float m = y.expectation(nn);
+////                return m <= 0.49f;
+////            }, 350);
+//
+//        }
+//
+//    }
 
 //        b.setValue(1f);
 //        int t3 = timeUntil("switch half", n, nn -> {

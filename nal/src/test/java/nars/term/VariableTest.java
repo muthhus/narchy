@@ -87,7 +87,7 @@ public class VariableTest {
 
     @Test public void testEqualityOfVariablesAndTheirConceptInstances() {
         @NotNull VarPattern vp0 = $.varPattern(0);
-        VariableConcept vc0 = new VariableConcept(vp0, null, null);
+        VariableConcept vc0 = new VariableConcept(vp0);
         assertEquals(vp0, vc0);
         assertEquals(vc0, vp0); //reverse
         assertEquals(vp0, vc0.term());

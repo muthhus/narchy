@@ -10,6 +10,7 @@ import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
 import nars.term.Termed;
+import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -115,7 +116,7 @@ public class Default extends AbstractNAR {
     @Override
     public final Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
         Concept c = concept(termed, true);
-        if (c != null)
+        if ((c != null) && !(c instanceof Variable))
             core.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
         return c;
     }

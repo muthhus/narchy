@@ -10,7 +10,7 @@ abstract public class Player {
 	abstract public void computePosition(PongModel pong);
 
 	public void bounce() {
-		points+=0.5f;
+		points++;
 	}
 
 	public void score() {
@@ -20,6 +20,7 @@ abstract public class Player {
 	public void ouch() {
 		points--;
 	}
+
 	public void move(int dy, PongModel pong) {
 		position += dy;
 		int maxPos = pong.getHeight() - pong.HEIGHT;

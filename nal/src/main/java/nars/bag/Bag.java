@@ -3,6 +3,7 @@ package nars.bag;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
+import nars.term.Termed;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -10,8 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -21,7 +24,6 @@ import java.util.function.Consumer;
  * TODO implement java.util.Map interface
  */
 public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<V>> {
-
 
 
 
@@ -447,4 +449,96 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
     @NotNull Bag<V> commit(@NotNull Consumer<BLink> each);
 
+
+    Bag EMPTY = new Bag() {
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Nullable
+        @Override
+        public BLink sample() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public BLink remove(Object x) {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public BLink put(Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public Iterator<BLink> iterator() {
+            return Collections.emptyIterator();
+        }
+
+        @Override
+        public boolean contains(Object it) {
+            return false;
+        }
+
+        @NotNull
+        @Override
+        public Bag commit() {
+            return this;
+        }
+
+        @Override
+        public void setCapacity(int c) {
+
+        }
+
+        @NotNull
+        @Override
+        public Bag commit(@NotNull Consumer each) {
+            return this;
+        }
+
+        @NotNull
+        @Override
+        public Bag sample(int n, @NotNull Consumer target) {
+            return this;
+        }
+
+        @Nullable
+        @Override
+        public Object get(@NotNull Object key) {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public Object put(Object o, Object o2) {
+            return null;
+        }
+
+        @Override
+        public void forEachKey(@NotNull Consumer each) {
+
+        }
+
+        @Override
+        public int capacity() {
+            return 0;
+        }
+
+        @Override
+        public void topWhile(@NotNull Predicate each) {
+
+        }
+    };
 }

@@ -16,14 +16,10 @@ import java.util.Iterator;
  */
 abstract public class DynamicBeliefTable implements BeliefTable {
 
-    private final NAR nar;
-    @Nullable
-    Task current;
+    @Nullable Task current;
+    //boolean changed = true;
 
-    public DynamicBeliefTable(NAR nar) {
-        //this.concept = concept;
-        this.nar = nar;
-    }
+    abstract public NAR nar();
 
     @Override
     public void capacity(int eternals, int temporals) {
@@ -45,11 +41,13 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Task topTemporal(long when, long now) {
+        updateTask(now);
         return current;
     }
 
     @Nullable
     public void updateTask(long now) {
+        ///if (changed) { //
         if (current == null || current.occurrence() != now) {
             Task prev = current;
             Task next = update(now);
@@ -60,8 +58,9 @@ abstract public class DynamicBeliefTable implements BeliefTable {
                 this.current = next;
                 if (prev!=null)
                     prev.delete();
-                nar.process(next);
+                nar().process(next);
             }
+            //changed = false;
         }
 
     }
@@ -77,7 +76,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Truth truth(long now, long when) {
-        return topTemporal(when, now).projectTruth(when, now, false);
+        @Nullable Task x = topTemporal(when, now);
+        return x == null ? Truth.Null : x.projectTruth(when, now, false);
     }
 
     @Override
@@ -105,4 +105,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     public Iterator<Task> iterator() {
         return !isEmpty() ? Iterators.singletonIterator(current) : Collections.emptyIterator();
     }
+
+//    public void changed() {
+//        changed = true;
+//    }
 }

@@ -14,6 +14,7 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.term.variable.Variable;
 import nars.util.data.MutableInteger;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -184,6 +185,7 @@ public abstract class AbstractCore {
 
 
     public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
+
         concepts.put(c, b, conceptActivation, conceptOverflow);
         if (b.isDeleted())
             return;

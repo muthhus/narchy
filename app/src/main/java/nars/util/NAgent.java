@@ -62,15 +62,16 @@ public class NAgent implements Agent {
     /**
      * exploration rate - confidence of initial goal for each action
      */
-    float epsilon = 0.15f;
-    private double epsilonRandom = 0.15f; //0.01f;
-    private double epsilonRandomMin = 0.01f; //0.01f;
-    private final double epsilonRandomDecay = 0.99f; //0.01f;
+    public float epsilon = 0.1f;
+    float epsilonRandom = 0.1f; //0.01f;
+    public float epsilonRandomMin = 0.0f; //0.01f;
+    float epsilonRandomDecay = 0.99f; //0.01f;
 
     float sensorPriority;
     float rewardPriority;
     float goalFeedbackPriority;
     float goalPriority;
+
 
     final FloatToObjectFunction sensorTruth = (v) -> {
         /*return new DefaultTruth(
@@ -124,8 +125,8 @@ public class NAgent implements Agent {
                         //(d > 0.5 ? d : 0) / (d+b);
                         //d / (d+b);
                         //(d > 0.1f ? d - b : -1f);
-                        //d - b;
-                        d;
+                        d - b;
+                        //d;
 
                         //(d*d) - (b*b);
                         //Math.max(0, d-b);
@@ -369,7 +370,8 @@ public class NAgent implements Agent {
 
         decide(this.lastAction);
 
-        epsilonRandom *= Math.max(epsilonRandomMin, epsilonRandomDecay);
+        epsilonRandom *= epsilonRandomDecay;
+        epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
 
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
@@ -420,7 +422,7 @@ public class NAgent implements Agent {
         long now = nar.time();
 
         /*if (lastAction != nextAction)*/ {
-            float off = 0.5f;
+            float off = 0.25f;
             float mid = 0.75f;
             float on = 1f;
             if (lastAction != -1) {

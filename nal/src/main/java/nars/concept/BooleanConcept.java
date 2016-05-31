@@ -4,6 +4,7 @@ import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.Symbols;
 import nars.budget.Budgeted;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
@@ -23,12 +24,14 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Dynamically updates a truth value based on truth aggregation of the concepts referred by parameters
  */
-public class BooleanConcept extends OperationConcept {
+public class BooleanConcept extends CompoundConcept {
     @NotNull
     public final NAR nar;
 
     public static final Operator AND_OP = $.operator("and");
     public static final Operator OR_OP = $.operator("or");
+    private final Compound params;
+
 
     public interface BooleanModel {
         @NotNull Operator op();
@@ -121,40 +124,46 @@ public class BooleanConcept extends OperationConcept {
     }
 
     public BooleanConcept(@NotNull NAR nar, @NotNull BooleanModel model, @NotNull Term... args)  {
-        super($.exec(model.op(), args), nar);
+        super($.exec(model.op(),$.sete(args)), nar);
+
 
         if (args.length < 2)
             throw new RuntimeException("too few args");
         if (args.length > Global.STAMP_MAX_EVIDENCE)
             throw new RuntimeException("too many args");
 
+        this.params = cterm(0).cterm(0); // (({...}) --> ^...)
+
         this.model = model;
         this.nar = nar;
     }
 
-    @Override
-    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        if (super.link(b, scale, minScale, nar, conceptOverflow)) {
-
-            //intercept activated tasklinks with compounds present in the subterms
-            if (b instanceof Task) {
-                Task t = (Task) b;
-
-                //TODO defer the update to one run at the end of the cycle like Sensor and Motor
-                if (t.isBeliefOrGoal() && parameters().containsTerm(t.term())) {
-                    executeLater(nar);
-                    //char punc = t.punc();
-                    //long now = nar.time();
-                    /*if (punc == '.')
-                         ((DynamicBeliefTable) beliefs()).updateTask(now);
-                    else if (punc == '!')
-                        ((DynamicBeliefTable) goals()).updateTask(now);*/
-                }
-            }
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+//        if (super.link(b, scale, minScale, nar, conceptOverflow)) {
+//
+//            //intercept activated tasklinks with compounds present in the subterms
+//            if (b instanceof Task) {
+//                Task t = (Task) b;
+//
+//                //TODO defer the update to one run at the end of the cycle like Sensor and Motor
+//                char punc = t.punc();
+//                if ((punc == Symbols.BELIEF || punc == Symbols.GOAL) && params.containsTerm(t.term()) /* recursively? */) {
+//
+//                    ((DynamicBeliefTable)tableFor(punc)).changed();
+//
+//                    //char punc = t.punc();
+//                    //long now = nar.time();
+//                    /*if (punc == '.')
+//                         ((DynamicBeliefTable) beliefs()).updateTask(now);
+//                    else if (punc == '!')
+//                        ((DynamicBeliefTable) goals()).updateTask(now);*/
+//                }
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
 //    @NotNull
 //    @Override
@@ -176,15 +185,15 @@ public class BooleanConcept extends OperationConcept {
 //        return goals;
 //    }
 
-    @Override
-    public void run() {
-        super.run();
-
-        //TODO only update belief or goal if changed, not both
-        long now = nar.time();
-        ((DynamicBeliefTable) beliefs()).updateTask(now);
-        ((DynamicBeliefTable) goals()).updateTask(now);
-    }
+//    @Override
+//    public void run() {
+//        super.run();
+//
+//        //TODO only update belief or goal if changed, not both
+//        long now = nar.time();
+//        ((DynamicBeliefTable) beliefs()).updateTask(now);
+//        ((DynamicBeliefTable) goals()).updateTask(now);
+//    }
 
     @NotNull
     @Override
@@ -202,15 +211,20 @@ public class BooleanConcept extends OperationConcept {
         private final boolean beliefOrGoal; //or goals
 
         public BooleanConceptTable(boolean beliefOrGoal) {
-            super(nar);
+            super();
             this.beliefOrGoal = beliefOrGoal;
+        }
+
+        @Override
+        public NAR nar() {
+            return nar;
         }
 
         @Nullable @Override
         protected Task update(long now) {
 
-            Term[] args = parameters().terms();
-            MutableTask result = model.update(nar, now, term, beliefOrGoal, args);
+
+            MutableTask result = model.update(nar, now, term, beliefOrGoal, params.terms());
 
             return result != null ? result.present(now).normalize(nar) : null;
         }

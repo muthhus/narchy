@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -120,9 +121,11 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
         Term cterm = c.term();
 
         Bag<Termed> tl = c.termlinks();
-        if (tl == null) return;
 
         tl.forEach(t -> {
+            if (t instanceof Variable)
+                return;
+
             Termed target = t.get();
             if (!containsVertex(target)) {
                 addVertex(target);

@@ -116,6 +116,7 @@ public class LinkageTest extends AbstractNALTest {
 
 
         boolean passed = linksIndirectly(nar, premise2, nar.concept(premise1));
+
         boolean passed2 = linksIndirectly(nar, premise1, nar.concept(premise2));
 
 

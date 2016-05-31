@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
 
     @NotNull
-    private final Sensor sensor;
+    protected final Sensor sensor;
     private FloatSupplier input;
     private float current = Float.NaN;
 
@@ -144,9 +144,9 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     }
 
     @NotNull
-    public SensorConcept punc(char c) {
+    public <S extends SensorConcept> S punc(char c) {
         sensor.punc(c);
-        return this;
+        return (S)this;
     }
 
 }

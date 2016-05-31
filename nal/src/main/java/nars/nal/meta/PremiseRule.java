@@ -992,10 +992,10 @@ public class PremiseRule extends GenericCompound {
         return p;
     }
 
-    static final Term TaskQuestionTerm = exec("task", "\"?\"");
+    static final Term TaskQuestionTerm = exec($.operator("task"), $.quote("?"));
 
-    static final Term BELIEF = $.the("Belief");
-    static final Term DESIRE = $.the("Desire");
+//    static final Term BELIEF = $.the("Belief");
+//    static final Term DESIRE = $.the("Desire");
 
     @NotNull
     private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {

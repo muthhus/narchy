@@ -69,6 +69,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     /** gets subterm at index i */
     @Nullable T term(int i);
 
+    /** returns subterm automatically casted as compound (Use with caution) */
+    default public <C extends Compound> C cterm(int i) {
+        return (C)term(i);
+    }
+
     /** tests if subterm i is op o */
     boolean isTerm(int i, @NotNull Op o);
     /*default boolean isTerm(int i, @NotNull Op o) {

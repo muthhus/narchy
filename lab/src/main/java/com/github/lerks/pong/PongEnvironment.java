@@ -10,6 +10,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
+import nars.concept.BooleanConcept;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
@@ -18,8 +19,8 @@ import nars.nar.Default;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.atom.Atom;
+import nars.term.variable.Variable;
+import nars.truth.Truth;
 import nars.util.FX;
 import nars.util.NAgent;
 import nars.util.experiment.Environment;
@@ -29,48 +30,56 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import static nars.$.*;
 
 public class PongEnvironment extends Player implements Environment {
 
-	final int width = 36;
-	final int height = 20;
+	final int width = 16;
+	final int height = 12;
 	final int pixels = width * height;
-	final int scale = 20;
-	final int ticksPerFrame = 1; //framerate divisor
+	final int scale = 40;
+	final int ticksPerFrame = 4; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
-	float bias = 0f; //pain of boredom
-	private NAgent nar;
+	float bias; //pain of boredom
+	private NAgent nagent;
 
-	public static void main (String[] args) throws AWTException {
+	public static void main (String[] args) {
 		PongEnvironment e = new PongEnvironment();
+
 
 		Default nar = new Default();
 		nar.core.conceptsFiredPerCycle.set(8);
 		nar.beliefConfidence(0.85f);
 		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.6f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(512);
+		nar.cyclesPerFrame.set(64);
 
 
 		NAgent a = new NAgent(nar);
+		a.epsilon = 0.6f;
+		a.epsilonRandomMin = 0.01f;
+
 		new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 8192);
+		e.run(a, 512);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
 		a.printActions();
-		nar.forEachConcept(System.out::println);
+		nar.forEachConcept(c -> {
+			System.out.println(c);
+		});
+		//nar.forEachConcept(System.out::println);
 	}
 
 
@@ -96,6 +105,7 @@ public class PongEnvironment extends Player implements Environment {
 		priMatrix = new MatrixImage();
 		FX.run(()->{
 			BorderPane priMatrixPane = new BorderPane(priMatrix);
+
 			FX.newWindow("Priority", priMatrixPane);
 			priMatrix.fitWidthProperty().bind(priMatrixPane.widthProperty());
 			priMatrix.fitHeightProperty().bind(priMatrixPane.heightProperty());
@@ -105,18 +115,46 @@ public class PongEnvironment extends Player implements Environment {
 	}
 
 
+
+
+
 	@Override
 	public void preStart(Agent a) {
 		if (a instanceof NAgent) {
 			//provide custom sensor input names for the nars agent
 
-			nar = (NAgent) a;
+			nagent = (NAgent) a;
+			NAR nar = nagent.nar;
+//			for (int i = 1; i < Math.max(width,height); i++) {
+//				nar.nar.believe("(" + (i-1) + " <-> " + i + ")", 0.75f, 1f);
+//			}
 
-			for (int i = 1; i < Math.max(width,height); i++) {
-				nar.nar.believe("(" + (i-1) + " <-> " + i + ")", 0.75f, 1f);
+			ArrayList<Concept> convolution = new ArrayList();
+
+			//convolution concepts
+			for (int x = 0; x+1 < width; x+=2) {
+				for (int y = 0; y+1 < height; y+=2) {
+					@NotNull BooleanConcept b = BooleanConcept.Or(nar,
+						p(x, y), p(x + 1, y), p(x, y + 1), p(x + 1, y + 1)
+					);
+					convolution.add(b);
+					nar.ask(b);
+				}
 			}
 
-			nar.setSensorNamer((i) -> {
+			//nar.log();
+
+			//HACK some other way than forcing an update each frame
+			nar.onFrame(f -> {
+				long t = nagent.nar.time();
+				for (Concept concept : convolution) {
+					Truth b = concept.beliefs().truth(t);
+					Truth g = concept.goals().truth(t);
+					//System.out.println(concept + " " + t);
+				}
+			});
+
+			nagent.setSensorNamer((i) -> {
 //				int cell = i;
 //				int type = i % 3;
 //				Atom typeTerm;
@@ -168,7 +206,7 @@ public class PongEnvironment extends Player implements Environment {
 		return Tuples.twin(pixels, 3);
 	}
 
-	float lastScore = 0;
+	float lastScore;
 
 	@Override
 	public float pre(int t, float[] ins) {
@@ -220,13 +258,15 @@ public class PongEnvironment extends Player implements Environment {
 
 		}
 
-		long now = nar.nar.time();
+		long now = nagent.nar.time();
 		priMatrix.set(width,height,(x,y)->{
 
-			@Nullable Concept c = nar.nar.concept(p(x, y));
-			float p = nar.nar.conceptPriority(p(x, y));
-			float e = c.beliefs().truth(now).expectation();
-			return ColorArray.rgba(e, p, 0, 1f);
+			@Nullable Concept c = nagent.nar.concept(p(x, y));
+			float p = nagent.nar.conceptPriority(p(x, y));
+			float pA = 0.5f + 0.5f * p;
+			float b = c.beliefs().truth(now).expectation();
+			float g = c.goals().truth(now).expectation();
+			return ColorArray.rgba(b * pA, p, g * pA, 1f);
 
 		});
 

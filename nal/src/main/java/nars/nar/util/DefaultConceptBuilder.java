@@ -34,7 +34,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     //private static volatile int serial = 0;
 
     final Function<Variable, VariableConcept> varBuilder =
-            (Variable v) -> new VariableConcept(v, termbag(), taskbag());
+            (Variable v) -> new VariableConcept(v);
 
     @Nullable
     final Function<Compound, Termed> compoundBuilder = (Compound t) -> {

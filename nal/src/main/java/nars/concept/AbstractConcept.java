@@ -9,6 +9,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
+import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
         }*/
 
+//        if (targetTerm instanceof Variable) {
+//            return null;
+//        }
+
         /* activate concept */
         Concept target = nar.conceptualize(targetTerm, b, subScale,
                 0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
@@ -61,6 +66,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
         if (target == source)
             throw new RuntimeException("termlink self-loop");
+
 
 
         /* insert termlink target to source */
