@@ -64,7 +64,8 @@ public class DefaultCore extends AbstractCore {
     protected Bag<Concept> newConceptBag() {
         return new MonitoredCurveBag(nar, 1, nar.random)
                 .merge(BudgetMerge.
-                        avgDQBlend
+                        plusDQBlend
+                        //avgDQBlend
                         //plusDQDominant
                 );
     }

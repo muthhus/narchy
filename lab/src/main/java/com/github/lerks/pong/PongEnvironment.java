@@ -8,6 +8,9 @@ package com.github.lerks.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import nars.$;
 import nars.NAR;
 import nars.concept.BooleanConcept;
@@ -36,13 +39,14 @@ import static nars.$.*;
 
 public class PongEnvironment extends Player implements Environment {
 
-	final int width = 16;
-	final int height = 12;
+	final int width = 24;
+	final int height = 16;
 	final int pixels = width * height;
 	final int scale = 40;
 	final int ticksPerFrame = 4; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
+
 	float bias; //pain of boredom
 	private NAgent nagent;
 
@@ -52,8 +56,8 @@ public class PongEnvironment extends Player implements Environment {
 
 		Default nar = new Default();
 		nar.core.conceptsFiredPerCycle.set(8);
-		nar.beliefConfidence(0.85f);
-		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.65f);
+		nar.goalConfidence(0.25f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
@@ -62,7 +66,7 @@ public class PongEnvironment extends Player implements Environment {
 
 
 		NAgent a = new NAgent(nar);
-		a.epsilon = 0.6f;
+		//a.epsilon = 0.6f;
 		a.epsilonRandomMin = 0.01f;
 
 		new Abbreviation2(nar, "_");
@@ -103,12 +107,13 @@ public class PongEnvironment extends Player implements Environment {
 		j.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 
 		priMatrix = new MatrixImage();
+
 		FX.run(()->{
 			BorderPane priMatrixPane = new BorderPane(priMatrix);
 
-			FX.newWindow("Priority", priMatrixPane);
-			priMatrix.fitWidthProperty().bind(priMatrixPane.widthProperty());
-			priMatrix.fitHeightProperty().bind(priMatrixPane.heightProperty());
+			FX.newWindow("Visual", new BorderPane(priMatrixPane), 400, 400);
+
+			priMatrix.fit(priMatrixPane);
 		});
 
 
@@ -230,7 +235,7 @@ public class PongEnvironment extends Player implements Environment {
 			for (int x = 0; x < width; x++) {
 				int p = small.getRGB(x, y);
 				int r = (p & 0x00ff0000) >> 16;
-				String c = r > 0 ? "XX" : "..";
+				//String c = r > 0 ? "XX" : "..";
 				//System.out.print(c);
 				ins[i++] = r/255f;
 			}
@@ -259,14 +264,26 @@ public class PongEnvironment extends Player implements Environment {
 		}
 
 		long now = nagent.nar.time();
-		priMatrix.set(width,height,(x,y)->{
+		int dt = 16;
+		priMatrix.set(width,height*2,(x,y)->{
 
-			@Nullable Concept c = nagent.nar.concept(p(x, y));
-			float p = nagent.nar.conceptPriority(p(x, y));
-			float pA = 0.5f + 0.5f * p;
-			float b = c.beliefs().truth(now).expectation();
-			float g = c.goals().truth(now).expectation();
-			return ColorArray.rgba(b * pA, p, g * pA, 1f);
+			if (y < height) {
+				@Nullable Concept c = nagent.nar.concept(p(x, y));
+				//float pA = 0.5f + 0.5f * p;
+				float b = c.beliefs().truth(now).expectation();
+				float g = c.goals().truth(now).expectation();
+				return ColorArray.rgba(b, 0, g, 1f);
+			}else {
+				//FUTURE
+				y-=height;
+				float p = nagent.nar.conceptPriority(p(x, y));
+				//@Nullable Concept c = nagent.nar.concept(p(x, y));
+				//float b0 = c.beliefs().truth(now).expectation();
+				//float b = c.beliefs().truth(now+dt).expectation();
+				//float g = c.goals().truth(now+dt).expectation();
+				//return ColorArray.rgba(b-b0 > 0 ? 1f : 0f, b0-b > 0 ? 1f: 0f, 0, 1f);
+				return ColorArray.rgba(p, 0, 0, 1f);
+			}
 
 		});
 

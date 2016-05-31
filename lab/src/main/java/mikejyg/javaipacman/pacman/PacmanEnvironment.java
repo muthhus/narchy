@@ -68,9 +68,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				1024, 6, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				//new Indexes.WeakTermIndex(128 * 1024, rng)
+				new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				new Indexes.DefaultTermIndex(128 *1024, rng)
+				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);

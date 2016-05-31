@@ -20,6 +20,8 @@ package nars.guifx.chart;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 
 import static javafx.application.Platform.runLater;
 
@@ -53,6 +55,11 @@ public class MatrixImage extends ImageView {
         //setPreferredSize(new Dimension(width, height));
         //setMinimumSize(new Dimension(width, height));
 
+    }
+
+    public void fit(Region r) {
+        fitWidthProperty().bind(r.widthProperty());
+        fitHeightProperty().bind(r.heightProperty());
     }
 
     @FunctionalInterface  public interface MatrixRGBA {
