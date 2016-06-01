@@ -178,23 +178,23 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         feedback.accept(nar);
     }
 
-    @Override
-    public @Nullable
-    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        //if (belief.evidence().length > 1) {
-
-//        //Filter feedback that contradicts the sensor's provided beliefs
-//        if (belief!=feedback.next()) {
-//            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+//    @Override
+//    public @Nullable
+//    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+//        //if (belief.evidence().length > 1) {
 //
-//            //TODO delete its non-input parent tasks?
-//            onConflict(belief);
+////        //Filter feedback that contradicts the sensor's provided beliefs
+////        if (belief!=feedback.next()) {
+////            //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
+////
+////            //TODO delete its non-input parent tasks?
+////            onConflict(belief);
+////
+////            return null;
+////        }
 //
-//            return null;
-//        }
-
-        return super.processBelief(belief, nar);
-    }
+//        return super.processBelief(belief, nar);
+//    }
 
 //    @Override
 //    public @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {

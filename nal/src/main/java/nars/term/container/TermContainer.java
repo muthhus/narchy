@@ -557,8 +557,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-    @Nullable TermContainer replacing(int subterm, Term replacement);
-
 
     /** a and b must be instances of input, and output must be of size input.length-2 */
     static Term[] except(@NotNull TermContainer input, Term a, Term b, Term[] output) {

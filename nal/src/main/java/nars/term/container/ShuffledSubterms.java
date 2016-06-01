@@ -127,17 +127,11 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return Terms.hashSubterms(this);
     }
 
-    @Override
-    public int compareTo(@NotNull Termlike o) {
-        return TermContainer.compareTo(this, o);
-    }
-
     @NotNull
     @Override
     public Iterator iterator() {
         throw new UnsupportedOperationException();
     }
-
 
     @NotNull
     @Override
@@ -150,12 +144,6 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
 
-
-    @NotNull
-    @Override
-    public TermContainer replacing(int subterm, Term replacement) {
-        throw new UnsupportedOperationException(); //TODO maybe is valid
-    }
 
 
     @Override

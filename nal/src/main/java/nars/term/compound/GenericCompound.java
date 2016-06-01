@@ -21,7 +21,6 @@ import static nars.nal.Tense.DTERNAL;
 
 public class GenericCompound<T extends Term> implements Compound<T> {
 
-
     /**
      * subterm vector
      */
@@ -55,13 +54,12 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        this(op, relation, Tense.DTERNAL, (TermVector<T>) subterms);
+        this(op, relation, Tense.DTERNAL, (TermVector) subterms);
     }
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
         if (!op.temporal && dt != DTERNAL)
             throw new RuntimeException("invalid temporal relation for " + op);
-
 
         this.subterms = subterms;
 
@@ -71,14 +69,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.relation = relation;
 
         if (dt!=DTERNAL && !Op.isTemporal(op, dt, subterms.size()))
-            throw new InvalidTerm(this.op, relation, dt, terms());
+            throw new InvalidTerm(op, relation, dt, subterms.terms());
 
-        //t = op.isTemporal() ? t : ITERNAL;
         this.dt = dt;
 
-
-        this.hash = Util.hashCombine(subterms.hash, opRel(), dt);
-
+        this.hash = Util.hashCombine(subterms.hash, Terms.opRel(op, relation), dt);
     }
 
     @Override
@@ -131,10 +126,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p);
     }
 
-    @Override
-    public @NotNull Term term() {
-        return this;
-    }
 
     @NotNull
     @Override
@@ -186,7 +177,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean equals(@Nullable Object that) {
         return this == that ||
-                ( that instanceof Compound && hash == that.hashCode() && equalsFurther((Termed) that));
+                ( that instanceof Compound && hash == that.hashCode() && equalsFurther((Compound) that));
     }
 
     @Override
@@ -194,16 +185,14 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return subterms.equalTerms(c);
     }
 
-    private final boolean equalsFurther(@NotNull Termed thatTerm) {
+    private boolean equalsFurther(@NotNull Compound u) {
 
-        Term u = thatTerm.term();
         if (opRel() == u.opRel() /*&& (((t instanceof Compound))*/) {
-            Compound c = (Compound) u;
             /*if (relation != c.relation())
                 return false;*/
-            if (/*op.isTemporal() &&*/ dt!=c.dt())
+            if (/*op.isTemporal() &&*/ dt!= u.dt())
                 return false;
-            if (!subterms.equals(c.subterms()))
+            if (!subterms.equals(u.subterms()))
                 return false;
         }
         return true;
@@ -211,7 +200,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hash;
     }
 
@@ -256,12 +245,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
         subterms.forEach(action, start, stop);
-    }
-
-    @NotNull
-    @Override
-    public TermContainer replacing(int subterm, Term replacement) {
-        throw new RuntimeException("n/a for compound");
     }
 
     @Override

@@ -27,12 +27,7 @@ public final class DerivedTask extends MutableTask {
         this.termLink = (premise.termLink);
     }
 
-    @Override public boolean delete() {
-        return super.delete();
-
-    }
-
-//    /** next = the child which resulted from this and another task being revised */
+    //    /** next = the child which resulted from this and another task being revised */
 //    @Override public boolean onRevision(@NotNull Task next) {
 //
 //

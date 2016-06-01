@@ -327,7 +327,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     /** creates a copy if changed */
     @NotNull
-    @Override public TermVector replacing(int subterm, @NotNull Term replacement) {
+    public TermVector replacing(int subterm, @NotNull Term replacement) {
         if (replacement.equals(term(subterm)))
             return this;
 

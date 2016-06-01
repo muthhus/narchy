@@ -892,11 +892,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         term.forEach(action, start, end);
     }
 
-    @Nullable
-    @Override
-    public TermContainer replacing(int subterm, Term replacement) {
-        return term.replacing(subterm, replacement);
-    }
 
     @Override
     public final void copyInto(@NotNull Collection set) {

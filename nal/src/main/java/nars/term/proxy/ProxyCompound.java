@@ -105,11 +105,6 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
         target().forEach(action, start, stop);
     }
 
-    @Nullable
-    @Override
-    default TermContainer replacing(int subterm, Term replacement) {
-        return target().replacing(subterm, replacement);
-    }
 
     @Override
     default void copyInto(Collection<Term> target) {
