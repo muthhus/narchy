@@ -44,9 +44,7 @@ public final class OneMatchFindSubst extends FindSubst {
     @Nullable
     public boolean tryMatch(@NotNull Op op, @NotNull Term x, @NotNull Term y) {
         tryMatch(op, null, null, x, y);
-        if (xy.isEmpty()) //TODO return if xy.size()==# of variables to assign
-            return false;
-        return true;
+        return !xy.isEmpty();
     }
 
     @Nullable

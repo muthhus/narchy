@@ -7,7 +7,6 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -26,6 +26,8 @@ import nars.term.Term;
 import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.$.t;
+
 /**
  * Feeling common operations
  */
@@ -42,7 +44,7 @@ public abstract class feel extends AbstractOperator {
         Term content = $.instprop(nar.self, feeling);
 
         return
-            new MutableTask(content, Symbols.BELIEF, new DefaultTruth(value, 0.99f))
+            new MutableTask(content, Symbols.BELIEF, t(value, 0.99f))
                 .present(nar.time())
         ;
     }

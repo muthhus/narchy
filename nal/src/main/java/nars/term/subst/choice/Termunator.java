@@ -12,15 +12,15 @@ import java.util.List;
  **/
 public final class Termunator extends Termutator {
 
-    @NotNull
-    private final FindSubst f;
+//    @NotNull
+//    private final FindSubst f;
     private final List<Termutator> termutes;
     @NotNull
     final Termutator[] onlyThis;
 
     public Termunator(@NotNull FindSubst f) {
         super(".");
-        this.f = f;
+        //this.f = f;
         this.termutes = f.termutes;
         this.onlyThis = new Termutator[] { this };
     }

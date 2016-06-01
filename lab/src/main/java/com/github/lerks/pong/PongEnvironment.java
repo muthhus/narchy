@@ -41,10 +41,11 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 	final int width = 12;
-	final int height = 14;
+	final int height = 12;
 	final int pixels = width * height;
-	final int scale = 40;
-	final int ticksPerFrame = 12; //framerate divisor
+	final int scaleY = 40;
+	final int scaleX = 60;
+	final int ticksPerFrame = 4; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
@@ -63,9 +64,9 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.45f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.beliefConfidence(0.75f);
+		nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
@@ -99,7 +100,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		JFrame j = new JFrame();
 		j.setTitle ("Pong");
-		j.setSize (width * scale, height * scale);
+		j.setSize (width * scaleX, height * scaleY);
 		j.setResizable(false);
 
 
@@ -141,30 +142,30 @@ public class PongEnvironment extends Player implements Environment {
 //				nar.nar.believe("(" + (i-1) + " <-> " + i + ")", 0.75f, 1f);
 //			}
 
-			ArrayList<Concept> convolution = new ArrayList();
-
-			//convolution concepts
-			for (int x = 0; x+1 < width; x+=2) {
-				for (int y = 0; y+1 < height; y+=2) {
-					@NotNull BooleanConcept b = BooleanConcept.Or(nar,
-						p(x, y), p(x + 1, y), p(x, y + 1), p(x + 1, y + 1)
-					);
-					convolution.add(b);
-					nar.ask(b);
-				}
-			}
-
-			//nar.log();
-
-			//HACK some other way than forcing an update each frame
-			nar.onFrame(f -> {
-				long t = nagent.nar.time();
-				for (Concept concept : convolution) {
-					Truth b = concept.beliefs().truth(t);
-					Truth g = concept.goals().truth(t);
-					//System.out.println(concept + " " + t);
-				}
-			});
+//			ArrayList<Concept> convolution = new ArrayList();
+//
+//			//convolution concepts
+//			for (int x = 0; x+1 < width; x+=2) {
+//				for (int y = 0; y+1 < height; y+=2) {
+//					@NotNull BooleanConcept b = BooleanConcept.Or(nar,
+//						p(x, y), p(x + 1, y), p(x, y + 1), p(x + 1, y + 1)
+//					);
+//					convolution.add(b);
+//					nar.ask(b);
+//				}
+//			}
+//
+//			//nar.log();
+//
+//			//HACK some other way than forcing an update each frame
+//			nar.onFrame(f -> {
+//				long t = nagent.nar.time();
+//				for (Concept concept : convolution) {
+//					Truth b = concept.beliefs().truth(t);
+//					Truth g = concept.goals().truth(t);
+//					//System.out.println(concept + " " + t);
+//				}
+//			});
 
 			nagent.setSensorNamer((i) -> {
 //				int cell = i;
@@ -258,7 +259,8 @@ public class PongEnvironment extends Player implements Environment {
 
 	@Override
 	public void post(int t, int action, float[] ins, Agent a) {
-		actRelative(action); //numActions = 3
+		//actRelative(action); //numActions = 3
+		actRelativeVelocity(action); //numActions = 3
 		//actAbsolute(action);
 
 		long now = nagent.nar.time();
@@ -291,7 +293,7 @@ public class PongEnvironment extends Player implements Environment {
 
 	private void actAbsolute(int action) {
 
-		moveTo( (int)(((float)action) / (actions-1) * height * scale), pong );
+		moveTo( (int)(((float)action) / (actions-1) * height * scaleY), pong );
 	}
 
 	public void actRelative(int action) {
@@ -306,6 +308,23 @@ public class PongEnvironment extends Player implements Environment {
 				break;
 
 		}
+	}
+
+	int vel = 0;
+
+	public void actRelativeVelocity(int action) {
+		switch (action) {
+			case 0:
+				vel = -PongModel.SPEED;
+				break;
+			case 1: /* nothing */
+				break;
+			case 2:
+				vel = +PongModel.SPEED;
+				break;
+
+		}
+		move(vel, pong);
 	}
 
 

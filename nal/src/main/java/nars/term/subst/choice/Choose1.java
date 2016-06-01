@@ -65,12 +65,10 @@ public class Choose1 extends Termutator {
 
         int start = f.now();
 
-        Term x = this.x;
-        Term xEllipsis = this.xEllipsis;
-
         Term[] m = new Term[l];
 
-        for ( ; l >=0; l--) {
+        Term xEllipsis = this.xEllipsis;
+        for (Term x = this.x; l >=0; l--) {
 
             Term y = next(shuffle, l);
             if (f.match(x, y) &&

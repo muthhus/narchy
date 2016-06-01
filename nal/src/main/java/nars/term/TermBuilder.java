@@ -70,6 +70,7 @@ public abstract class TermBuilder {
                     return finish(op, relation, DTERNAL, tt);
                 }
 
+
             case DIFF_EXT:
             case DIFF_INT:
                 return newDiff(op, tt);
@@ -384,8 +385,7 @@ public abstract class TermBuilder {
         //if all subterms negated; apply DeMorgan's Law
         if ((dt == DTERNAL) && (negs.size() == s.size())) {
 
-            if (op == CONJUNCTION) op = DISJUNCTION;
-            else /* (op == DISJUNCTION) */ op = CONJUNCTION;
+            op = op == CONJUNCTION ? DISJUNCTION : CONJUNCTION;
 
             Term nn = finish(op, -1, dt, TermSet.the(negs));
             return newCompound(NEGATE, nn);

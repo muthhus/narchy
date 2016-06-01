@@ -53,7 +53,7 @@ public final class InvalidTerm extends RuntimeException {
     @Override
     public String toString() {
         if (op!=null)
-            return getClass().getSimpleName() + "{" +
+            return getClass().getSimpleName() + '{' +
                     op +
                     ", rel=" + rel +
                     ", dt=" + dt +

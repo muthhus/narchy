@@ -302,7 +302,9 @@ public class NAgent implements Agent {
         nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
 
         nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
+        nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
         nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease usually
+        nar.goal("(dRn)", Tense.Present, 0f, 1f); //avoid decrease usually
 
         //nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
         //nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase

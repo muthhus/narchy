@@ -98,12 +98,15 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	}
 	
 
+	float bgFlash = 0f;
+
 	// Draw
 	public void paintComponent (Graphics g) {
-		super.paintComponent (g);
+
 		
 		// Prepara il campo di gioco
 		if (new_game) {
+			bgFlash = 1f;
 			ball_x = getWidth () / 2;
 			ball_y = getHeight () / 2;
 			
@@ -122,7 +125,13 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 			
 			new_game = false;
 		}
-		
+
+		bgFlash *= 0.95f;
+		//setBackground(new Color(bgFlash,bgFlash,bgFlash));
+
+		super.paintComponent (g);
+
+
 		// Calcola la posizione del primo giocatore
 		//if (player1.getType() == Player.MOUSE || player1.getType() == Player.KEYBOARD || ball_x_speed < 0)
 			player1.computePosition(this);
@@ -208,7 +217,9 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		}
 		
 		// Disegna i carrelli
-		g.setColor (Color.WHITE);
+		//g.setColor (Color.WHITE);
+		g.setColor (new Color(1f-bgFlash, 1f-bgFlash, 1f-bgFlash));
+
 		g.fillRect (PADDING, player1.position - HEIGHT, WIDTH, HEIGHT * 2);
 		g.fillRect (getWidth() - PADDING - WIDTH, player2.position - HEIGHT, WIDTH, HEIGHT * 2);
 		

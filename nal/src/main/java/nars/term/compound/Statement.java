@@ -58,10 +58,9 @@ public interface Statement {
             return false;
 
 
-        Term[] ss = ((Compound)subject).terms();
-        Term[] pp = ((Compound)predicate).terms();
-
-        return ss[0].equals(pp[1]) && ss[1].equals(pp[0]);
+        Compound cs = (Compound) subject;
+        Compound cp = (Compound) predicate;
+        return cs.term(0).equals(cp.term(1)) && cs.term(1).equals(cp.term(0));
     }
 
     static boolean coNegated(@NotNull Term subject, @NotNull Term predicate) {

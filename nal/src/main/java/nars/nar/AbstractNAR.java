@@ -147,6 +147,7 @@ public abstract class AbstractNAR extends NAR {
                 logger.error("Inconceivable: {}", input);
             }
             input.delete("Inconceivable");
+            return null;
         }
 
         float business = input.pri() * activation;

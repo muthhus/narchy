@@ -4,9 +4,6 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.concept.Concept;
-import nars.index.TermIndex;
-import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -466,9 +463,9 @@ public class Terms   {
      * returns lev distance divided by max(a.length(), b.length()
      */
     public static float levenshteinDistancePercent(@NotNull CharSequence a, @NotNull CharSequence b) {
-        float len = Math.max(a.length(), b.length());
-        if (len == 0) return 0;
-        return Texts.levenshteinDistance(a, b) / len;
+        int len = Math.max(a.length(), b.length());
+        if (len == 0) return 0f;
+        return Texts.levenshteinDistance(a, b) / ((float)len);
     }
 
     public static Term empty(@NotNull Op op) {
