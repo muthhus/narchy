@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.Global;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -8,14 +7,12 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.util.data.Util;
-import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 
@@ -28,6 +25,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
     private float pendingMass;
+    private boolean requiresSort = false;
 
 
     public ArrayBag(int cap) {
@@ -261,15 +259,22 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             float o = mergeFunction.merge(existing, b, scale);
             if (overflow != null)
                 overflow.add(o);
+            existing.commit();
             float priAfter = existing.pri();
             if (!Util.equals(priBefore,priAfter, Global.BUDGET_EPSILON)) {
-                pendingMass += b.pri(); //HACK cause pendingMass to be non-zero to trigger sorting
+                requiresSort = true;
             }
 
         }
 
         return existing;
     }
+
+    @Override
+    public boolean requiresSort() {
+        return requiresSort;
+    }
+
 
     @NotNull protected BLink<V> link(@NotNull V i, @NotNull Budgeted b, float scale) {
         if (b instanceof BLink)

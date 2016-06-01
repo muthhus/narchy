@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 abstract public class DynamicBeliefTable implements BeliefTable {
 
-    @Nullable Task current;
+    protected @Nullable Task current;
     //boolean changed = true;
 
     abstract public NAR nar();

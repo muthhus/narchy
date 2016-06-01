@@ -232,6 +232,9 @@ public class BooleanConcept extends CompoundConcept {
         @Override
         public void remove(@NotNull Task belief) {
             //nothing, maybe force update
+            if (belief == this.current) {
+                current = null;
+            }
         }
 
     }

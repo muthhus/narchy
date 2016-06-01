@@ -540,5 +540,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         public void topWhile(@NotNull Predicate each) {
 
         }
+
+        @Override
+        public boolean requiresSort() {
+            return false;
+        }
     };
+
+    boolean requiresSort();
 }

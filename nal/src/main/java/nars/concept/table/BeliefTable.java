@@ -379,6 +379,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable
     default Task match(Compound term, long taskOcc) {
 
+        int size = size();
         Task belief;
         do {
             belief = top(
@@ -392,7 +393,7 @@ public interface BeliefTable extends TaskTable {
                 remove(belief);
             }
 
-        } while (belief.isDeleted());
+        } while (belief.isDeleted() && size-- > 0);
 
         return belief;
     }

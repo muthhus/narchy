@@ -44,7 +44,7 @@ public class AutoBag<V>  {
         if (Float.isFinite(r) && r < Global.maxForgetPeriod) {
             (f = forget).setForgetCycles( Math.max(Global.minForgetPeriod, r) );
         } else {
-            if (!forceCommit)
+            if (!forceCommit && !bag.requiresSort())
                 return bag;
 
             f = null;

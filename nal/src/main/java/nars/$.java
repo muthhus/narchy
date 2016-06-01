@@ -126,8 +126,8 @@ public enum $ {
 
 
     @Nullable
-    public static Term sim(@NotNull Term subj, @NotNull Term pred) {
-        return the(SIMILAR, subj, pred);
+    public static Compound sim(@NotNull Term subj, @NotNull Term pred) {
+        return (Compound) the(SIMILAR, subj, pred);
     }
 
 

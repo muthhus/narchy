@@ -659,26 +659,50 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
     @Override
     public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        //1. Link the Task
 
         if (super.link(b, scale, minScale, nar, conceptOverflow)) {
 
-            //3. Link the termlink templates
-            List<TermTemplate> templates = Global.dereference(this.termLinkTemplates);
-            if (templates == null) {
-                templates = TermLinkBuilder.buildFlat(term, nar);
+            linkSubs(b, scale, minScale, nar, conceptOverflow);
+            //linkPeers(b, scale, nar, false);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /** link to all existing termlinks, hierarchical and heterarchical */
+    public void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
+        List<Termed> targets = Global.newArrayList(termlinks().size());
+        termlinks().forEach(tl -> {
+            targets.add(tl.get());
+        });
+        float subScale = scale / targets.size();
+        targets.forEach(t -> {
+            System.out.println(CompoundConcept.this + " activate " + t + " " + b + "x" + subScale);
+            termlinks().put(t, b, subScale, null); //activate the termlink
+            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
+        });
+
+    }
+
+    /** link to subterms, hierarchical downward */
+    public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+        //3. Link the termlink templates
+        List<TermTemplate> templates = Global.dereference(this.termLinkTemplates);
+        if (templates == null) {
+            templates = TermLinkBuilder.buildFlat(term, nar);
 //                if (this.termLinkTemplates!=null) {
 //                    System.err.println("GC'd");
 //                }
-                this.termLinkTemplates = Global.reference(templates);
-            } /*else {
+            this.termLinkTemplates = Global.reference(templates);
+        } /*else {
 //                if (this.termLinkTemplates!=null) {
 //                    System.err.println("exist");
 //                }
-            }*/
+        }*/
 
-            linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
-
+        linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
 
 
 //            /*if (subScale >= minScale)*/
@@ -706,7 +730,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 ////                    }
 //
 //            }
-            //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
+        //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
 
 
 //                //redistribute overflow to termlink templates:
@@ -728,11 +752,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                    }
 //
 //                }
-
-            return true;
-        }
-
-        return false;
     }
 
     final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {

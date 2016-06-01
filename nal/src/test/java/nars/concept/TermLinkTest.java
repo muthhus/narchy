@@ -1,13 +1,23 @@
 package nars.concept;
 
+import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
-import nars.budget.UnitBudget;
+import nars.bag.Bag;
+import nars.link.BLink;
+import nars.nal.Tense;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 import static nars.$.b;
 import static nars.$.the;
 
@@ -27,43 +37,98 @@ public class TermLinkTest {
 
     }
 
-    static class HebbianTermLinks {
+    abstract static class Hebbian<V extends Term, E extends Compound> {
 
         private final NAR nar;
+        private final int size;
 
-        public HebbianTermLinks(NAR n, int size) {
+        public Hebbian(NAR n, int size, float initialActivationPerEdge) {
             this.nar = n;
+            this.size = size;
             for (int x = 0; x < size; x++) {
                 for (int y = 0; y < size; y++) {
                     if ((x!=y) && (x < y))
-                        n.believe(edge(x, y));
+                        n.believe(initialActivationPerEdge, edge(x, y), Tense.Eternal, 1f, 0.9f);
                 }
             }
         }
 
+        abstract protected V vertex(int x);
+        abstract protected E edge(V x, V y);
+
+        public float pri(int x) {
+            return pri(vertex(x));
+        }
+
+        float pri(Term x) {
+            return nar.conceptPriority(x);
+        }
+
         public float pri(int x, int y) {
-            return nar.concept(vertex(x)).termlinks().get(vertex(y)).pri();
+            BLink<Termed> tl = concept(x).termlinks().get(vertex(y));
+            if (tl == null)
+                return 0f;
+            return tl.pri();
         }
 
-        public void activate(int x) {
-            nar.conceptualize(vertex(x), b(x, 0.5f, 0.5f));
-        }
-        public void activate(int x, int y) {
-            nar.conceptualize(edge(x, y), b(x, 0.5f, 0.5f));
+        public void activate(int x, float a) {
+
+            //Concept c = concept(x);
+            Concept c = nar.conceptualize(vertex(x), b(a, 0.5f, 0.5f),
+                    /* concept factor */ 1f,  /* link factor */ 1f, null);
+
+            //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
         }
 
-        //TODO make abstract
-        public Term vertex(int x) {
-            return the(x);
+        public @Nullable Concept concept(int x) {
+            return concept(vertex(x));
         }
 
-        //TODO make abstract
-        protected Termed edge(Term x, Term y) {
-            return $.sim(x, y);
+        public void activate(int x, int y, float a) {
+            nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
         }
+
+
 
         final public Termed edge(int x, int y) {
             return edge(vertex(x), vertex(y));
+        }
+
+        public Stream<Term> vertices() {
+            return IntStream.range(0, size).mapToObj(i -> vertex(i));
+        }
+
+        public void commit() {
+            vertices().forEach(v -> {
+                @NotNull Bag<Termed> tl = concept(v).termlinks();
+                tl.commit();
+                System.out.println("commit: " + v + " " + tl);
+            });
+        }
+
+        public @Nullable Concept concept(Term v) {
+            return nar.concept(v);
+        }
+
+        public void print() {
+            commit();
+
+            System.out.println("Vertex: " + Joiner.on(" ").join(
+                vertices().map(v -> v.toString() + '=' + pri(v)).collect(toList())
+            ));
+            System.out.println("Edges:");
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    System.out.print(priChar(pri(x, y)));
+                    System.out.print(' ');
+                }
+                System.out.println();
+            }
+        }
+
+        static char priChar(float pri) {
+            int i = (int) Math.floor(pri * 10f);
+            return (char)(i + '0');
         }
 
     }
@@ -71,8 +136,28 @@ public class TermLinkTest {
     @Test public void testTermLinkHebbianLearning() {
         Default n = new Default();
         n.log();
-        HebbianTermLinks h = new HebbianTermLinks(n, 4);
+        Hebbian h = new Hebbian<Compound,Compound>(n, 4, 0.5f) {
+
+            public Compound vertex(int x) {
+                return $.p(the(x));
+            }
+
+            protected Compound edge(Compound x, Compound y) {
+                return $.sim(x, y);
+            }
+
+
+        };
+        n.step(); //build network
+        n.core.concepts.print();
+
+        //activate neurons 1 and 3
+        h.activate(1, 1f);
+        h.activate(3, 1f);
+
         n.step();
+
+        h.print();
 
     }
 
