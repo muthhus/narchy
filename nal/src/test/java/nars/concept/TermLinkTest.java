@@ -1,7 +1,15 @@
 package nars.concept;
 
+import nars.$;
+import nars.NAR;
+import nars.budget.UnitBudget;
 import nars.nar.Default;
+import nars.term.Term;
+import nars.term.Termed;
 import org.junit.Test;
+
+import static nars.$.b;
+import static nars.$.the;
 
 
 public class TermLinkTest {
@@ -16,6 +24,55 @@ public class TermLinkTest {
             System.out.println(n.time());
             n.step();
         }
+
+    }
+
+    static class HebbianTermLinks {
+
+        private final NAR nar;
+
+        public HebbianTermLinks(NAR n, int size) {
+            this.nar = n;
+            for (int x = 0; x < size; x++) {
+                for (int y = 0; y < size; y++) {
+                    if ((x!=y) && (x < y))
+                        n.believe(edge(x, y));
+                }
+            }
+        }
+
+        public float pri(int x, int y) {
+            return nar.concept(vertex(x)).termlinks().get(vertex(y)).pri();
+        }
+
+        public void activate(int x) {
+            nar.conceptualize(vertex(x), b(x, 0.5f, 0.5f));
+        }
+        public void activate(int x, int y) {
+            nar.conceptualize(edge(x, y), b(x, 0.5f, 0.5f));
+        }
+
+        //TODO make abstract
+        public Term vertex(int x) {
+            return the(x);
+        }
+
+        //TODO make abstract
+        protected Termed edge(Term x, Term y) {
+            return $.sim(x, y);
+        }
+
+        final public Termed edge(int x, int y) {
+            return edge(vertex(x), vertex(y));
+        }
+
+    }
+
+    @Test public void testTermLinkHebbianLearning() {
+        Default n = new Default();
+        n.log();
+        HebbianTermLinks h = new HebbianTermLinks(n, 4);
+        n.step();
 
     }
 

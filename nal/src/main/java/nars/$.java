@@ -6,6 +6,9 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import nars.budget.Budget;
+import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
 import nars.nal.meta.match.VarPattern;
 import nars.task.MutableTask;
 import nars.term.*;
@@ -263,7 +266,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static MutableTask task(@NotNull Compound term, char punct, float freq, float conf) {
-        return task(term, punct, new DefaultTruth(freq, conf));
+        return task(term, punct, t(freq, conf));
     }
     @NotNull
     public static MutableTask task(@NotNull Compound term, char punct, Truth truth) {
@@ -733,7 +736,16 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static Truth t(float f, float c) {
-        return c < Global.TRUTH_EPSILON ? null : new DefaultTruth(f, c);
+        return t(f, c, Global.TRUTH_EPSILON);
+    }
+
+    @NotNull
+    public static Truth t(float f, float c, float minConf) {
+        return c < minConf ? null : new DefaultTruth(f, c);
+    }
+
+    public static Budget b(float p, float d, float q) {
+        return new UnitBudget(p, d, q);
     }
 
     /** negates each entry in the array */
@@ -742,6 +754,8 @@ public enum $ /* TODO: implements TermIndex */ {
             s[i] = $.neg(s[i]);
         }
     }
+
+
 
 
     //TODO add this to a '$.printree' command

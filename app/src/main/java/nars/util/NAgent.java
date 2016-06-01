@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
+import static nars.$.b;
+import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -77,7 +79,7 @@ public class NAgent implements Agent {
         /*return new DefaultTruth(
                 v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
 
-        return new DefaultTruth(v, alpha);
+        return t(v, alpha);
         //return new DefaultTruth(1f, v);
         //0.5f + alpha /2f /* learning rate */);
     };
@@ -87,8 +89,8 @@ public class NAgent implements Agent {
     private float lastMotivation;
     private int nextAction = -1;
     private SensorConcept dRewardSensor;
-    private Budgeted RewardAttentionPerFrame = UnitBudget.Full.cloneMult(0.9f,0.9f,0.9f);
-    private Budgeted ActionAttentionPerFrame = UnitBudget.Full.cloneMult(0.9f,0.9f,0.9f);
+    private Budgeted RewardAttentionPerFrame = b(0.9f,0.9f,0.9f);
+    private Budgeted ActionAttentionPerFrame = b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
 

@@ -4,6 +4,8 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.$.t;
+
 /**
  * Mutable holder and manipulator of a float value restricted to range 0...+1.0
  */
@@ -26,7 +28,7 @@ public class UnitVal {
 
     @NotNull
     public Truth isTrue() {
-        return new DefaultTruth(v, 0.25f);
+        return t(v, 0.25f);
     }
 
 
@@ -43,7 +45,7 @@ public class UnitVal {
     @NotNull
     protected Truth _inc(boolean positive, float dv) {
         v = Util.clamp(v + (positive ? 1 : -1) * dv);
-        return new DefaultTruth(v, 0.5f);
+        return t(v, 0.5f);
     }
 
     public void setOne() {

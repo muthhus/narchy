@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import static nars.$.t;
+
 /**
  * http://aleph.sagemath.org/?q=qwssnn
  <patham9> only strong rules are allowing overlap
@@ -295,7 +297,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null) return null;
             Truth res =  TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
-            return (res != null) ? new DefaultTruth(1.0f - res.freq(), res.conf()) : null;
+            return (res != null) ? t(1.0f - res.freq(), res.conf()) : null;
         }
     },
 

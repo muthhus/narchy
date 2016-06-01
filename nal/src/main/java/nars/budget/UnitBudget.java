@@ -36,10 +36,10 @@ public class UnitBudget extends RawBudget {
     public static final Budget Deleted = new ROBudget(Float.NaN, 0, 0);
 
     /** common instance for a 'full budget'.*/
-    public static final Budget Full = new ROBudget(1f,1f,1f);
+    public static final Budget One = new ROBudget(1f,1f,1f);
 
     /** common instance for a 'half budget'.*/
-    public static final Budget Mid = new ROBudget(0.5f, 0.5f, 0.5f);
+    public static final Budget Half = new ROBudget(0.5f, 0.5f, 0.5f);
 
     /** common instance for a 'zero budget'.*/
     public static final Budget Zero = new ROBudget(0,0,0);
