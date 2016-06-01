@@ -78,8 +78,9 @@ public class TaskBudgeting {
 //            ); //was: termLink.orPriority(or(quality, targetActivation));
 //            termLink.orDurability(quality);
 //        }
-        termLink.orPriority(quality);
-        termLink.orDurability(quality);
+
+//        termLink.orPriority(quality);
+//        termLink.orDurability(quality);
 
 
 

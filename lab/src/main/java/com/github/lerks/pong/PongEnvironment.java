@@ -17,9 +17,12 @@ import nars.guifx.util.ColorArray;
 import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.util.Answerer;
+import nars.nar.util.OperationAnswerer;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.FX;
@@ -33,6 +36,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 import static nars.$.*;
 
@@ -65,12 +70,12 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		nar.beliefConfidence(0.75f);
-		nar.goalConfidence(0.75f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(256);
 
 
 		NAgent a = new NAgent(nar);
@@ -203,6 +208,19 @@ public class PongEnvironment extends Player implements Environment {
 
 				return p(ax, ay);
 			});
+
+
+//			new OperationAnswerer($.$("dist((%1,%2),(%3,%4),#d)"), nar) {
+//
+//				@Override
+//				protected void onMatch(Term[] args) {
+//					System.out.println(Arrays.toString(args));
+//				}
+//			};
+//
+//			//nar.log();
+//			nar.input("((&&, ((#1,#2)-->w), ((#3,#4)-->w)) &&+0 dist((#1,#2),(#3,#4),#x)).");
+
 		}
 	}
 
