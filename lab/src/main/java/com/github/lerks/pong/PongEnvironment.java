@@ -38,7 +38,7 @@ import static nars.$.*;
 
 public class PongEnvironment extends Player implements Environment {
 
-	int actions = 7;
+	int actions = 3;
 
 	final int width = 12;
 	final int height = 14;
@@ -258,8 +258,8 @@ public class PongEnvironment extends Player implements Environment {
 
 	@Override
 	public void post(int t, int action, float[] ins, Agent a) {
-		//actRelative(action); //numActions = 3
-		actAbsolute(action);
+		actRelative(action); //numActions = 3
+		//actAbsolute(action);
 
 		long now = nagent.nar.time();
 		int dt = 16;

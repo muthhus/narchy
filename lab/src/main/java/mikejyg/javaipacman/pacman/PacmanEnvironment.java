@@ -48,7 +48,7 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 6;
+	final int visionRadius = 4;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;

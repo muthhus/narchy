@@ -10,11 +10,13 @@ import nars.budget.BudgetFunctions;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
@@ -74,7 +76,11 @@ public class MySTMClustered extends STMClustered {
 				if (negated)
 					$.neg(s);
 
-				Task m = new MutableTask($.conj(0, s), punc,
+				@Nullable Term conj = $.conj(0, s);
+				if (!(conj instanceof Compound))
+					return;
+
+				Task m = new MutableTask(conj, punc,
 						new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 						.time(now, t)
 						.evidence(evidence)

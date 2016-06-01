@@ -142,8 +142,11 @@ public abstract class AbstractNAR extends NAR {
 
         Concept c = concept(input, true);
         if (c == null) {
-            throw new InvalidTaskException(input, "Inconceivable");
-            //input.delete("Inconceivable");
+            if (Global.DEBUG) {
+                //throw new InvalidTaskException(input, "Inconceivable");
+                logger.error("Inconceivable: {}", input);
+            }
+            input.delete("Inconceivable");
         }
 
         float business = input.pri() * activation;
