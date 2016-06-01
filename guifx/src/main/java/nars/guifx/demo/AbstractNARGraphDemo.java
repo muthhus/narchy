@@ -4,6 +4,7 @@ import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
+import nars.guifx.graph2.impl.MeshEdgeRenderer;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.TabX;
@@ -77,6 +78,7 @@ public abstract class AbstractNARGraphDemo {
                 //new HalfHalfLineCanvasEdgeRenderer()
                 new HalfHalfIsoTriangleCanvasEdgeRenderer()
                 //new BlurCanvasEdgeRenderer()
+                //new MeshEdgeRenderer()
         );
 
         //initial settings

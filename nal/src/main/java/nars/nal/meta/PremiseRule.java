@@ -264,6 +264,7 @@ public class PremiseRule extends GenericCompound {
         @NotNull
         private final String id;
 
+
         public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
 
             Term pattern = post.pattern;

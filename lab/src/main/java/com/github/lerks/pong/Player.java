@@ -21,15 +21,23 @@ abstract public class Player {
 		points--;
 	}
 
+
+	public void moveTo(int y, PongModel pong) {
+		position = y;
+		clip(pong);
+	}
 	public void move(int dy, PongModel pong) {
 		position += dy;
+		clip(pong);
+	}
+
+	public void clip(PongModel pong) {
 		int maxPos = pong.getHeight() - pong.HEIGHT;
 		int minPos = pong.HEIGHT;
 		if (position > maxPos)
 			position = maxPos;
 		if (position < minPos)
 			position = minPos;
-
 	}
 	// Tipi di giocatore
 //	public static final int CPU_EASY = 0;

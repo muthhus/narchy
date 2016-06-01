@@ -17,8 +17,6 @@ public class AutoBag<V>  {
 
     private final Forget.AbstractForget forget;
 
-    static final float maxForgetPeriod = 1000f; //TODO calculate based on budget epsilon etc
-    static final float minForgetPeriod = 0.5f; //TODO calculate based on budget epsilon etc
 
     public AutoBag(@NotNull MutableFloat perfection) {
         //this(new Forget.ExpForget(new MutableFloat(0), perfection));
@@ -43,14 +41,8 @@ public class AutoBag<V>  {
         Forget.AbstractForget f;
         float r = forgetPeriod((ArrayBag<V>) bag);
 
-        if (Float.isFinite(r) && r < maxForgetPeriod) {
-            r = Math.max(minForgetPeriod, r);
-
-            //System.out.println("autobag: " + bag.getClass() +  " " + r);
-            f = forget;
-            /*if (bag.size() > 500)
-                System.out.println(bag.size() + " / " + bag.capacity() + " pressurized_forgetRate="  + r);*/
-            f.setForgetCycles(r);
+        if (Float.isFinite(r) && r < Global.maxForgetPeriod) {
+            (f = forget).setForgetCycles( Math.max(Global.minForgetPeriod, r) );
         } else {
             if (!forceCommit)
                 return bag;

@@ -499,21 +499,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return tq;
     }
 
-//    public On onExecTask(@NotNull String operator, @NotNull Consumer<Execution> f) {
-//        return onExec(operator, f);
-//    }
-
 
     public final On onExec(@NotNull AbstractOperator r) {
         r.init(this);
         return onExecution(r.getOperatorTerm(), r);
     }
 
-
-
-    public final On onExecution(@NotNull String op, @NotNull Consumer<OperationConcept> each) {
-        return onExecution($.operator(op), each);
-    }
 
     @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
         return concept(op,true)

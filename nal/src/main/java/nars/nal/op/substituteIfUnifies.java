@@ -36,7 +36,9 @@ public class substituteIfUnifies extends substitute {
             this.matcher = new OneMatchFindSubst(r.premise.nar);
         }
 
-        return matcher.tryMatch(substitute.getOp(opT), r, term, x, y);
+        Term result = matcher.tryMatch(substitute.getOp(opT), r, term, x, y);
+        matcher.clear();
+        return result;
     }
 
 }

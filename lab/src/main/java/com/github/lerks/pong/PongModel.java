@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent;
 public class PongModel extends JPanel implements ActionListener, MouseListener, KeyListener {
 	// Proprietà della palla
 	private static final int RADIUS = 20; // Raggio
-	private static final int START_SPEED = 4; // Velocità iniziale
+	private static final int START_SPEED = 8; // Velocità iniziale
 	private static final int ACCELERATION = 125; // Ogni quanti frame aumenta di 1 pixel la velocità 
 
 	// Proprietà dei carrelli
@@ -47,7 +47,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	private boolean mouse_inside = false;
 	private boolean key_up = false;
 	private boolean key_down = false;
-	private double minBallYSpeed = 2f;
+	private double minBallYSpeed = 0.1f;
 
 	// Constructor
 	public PongModel(Player player1, Player player2) {
@@ -136,8 +136,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		ball_y += ball_y_speed;
 //		if (ball_y_speed < 0) // Hack to fix double-to-int conversion
 //			ball_y ++;
-		if (Math.abs(ball_y_speed) < minBallYSpeed)
-			ball_y_speed += (Math.random()-0.5f) * minBallYSpeed;
+
 //
 		
 		// Accelera la pallina
@@ -194,7 +193,8 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 				new_game = true;
 			}
 		}
-		
+
+
 		// Border-collision TOP
 		if (ball_y <= RADIUS) {
 			ball_y_speed = Math.abs (ball_y_speed);
@@ -218,6 +218,12 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		// Disegna i punti
 		g.drawString (player1.points+" ", getWidth() / 2 - 20, 20);
 		g.drawString (player2.points+" ", getWidth() / 2 + 20, 20);
+
+
+		//prevent horizontal minimum
+//		if (Math.abs(ball_y_speed) < minBallYSpeed)
+//			ball_y_speed = (Math.random()-0.5f) * minBallYSpeed*4;
+
 	}
 	
 	// New frame

@@ -117,6 +117,9 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
                     add(0, floorCanvas); //underneath, background must be transparent to see
                     //add(floorCanvas); //over
 
+            //[ResizableCanvas@da89c2a, Rectangle[x=0.0, y=0.0, width=0.0, height=0.0, fill=0xffa500ff], Group@3aecf5fd, POJOPane@40b69be4]
+            g.getChildren().remove(1); //what is this
+
             gfx = floorCanvas.getGraphicsContext2D();
 
         }

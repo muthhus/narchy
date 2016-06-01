@@ -367,7 +367,7 @@ public class SpaceGrapher extends Spacegraph {
     public SpaceGrapher(NAR nar, GraphSource g,
                         NodeVis vv,
                         BiFunction<TermNode, TermNode, TermEdge> edgeVis,
-                        CanvasEdgeRenderer edgeRenderer) {
+                        EdgeRenderer edgeRenderer) {
 
         source.set(g);
 

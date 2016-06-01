@@ -1,11 +1,13 @@
 package nars.bag.impl;
 
 import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import nars.Global;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
+import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -255,10 +257,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             /*if (overflow > 0)
                 target.charge(overflow);*/
+            float priBefore = existing.pri();
             float o = mergeFunction.merge(existing, b, scale);
-
             if (overflow != null)
                 overflow.add(o);
+            float priAfter = existing.pri();
+            if (!Util.equals(priBefore,priAfter, Global.BUDGET_EPSILON)) {
+                pendingMass += b.pri(); //HACK cause pendingMass to be non-zero to trigger sorting
+            }
 
         }
 

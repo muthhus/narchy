@@ -16,3 +16,4 @@ do
 rapper $i
 done
 # http://resources.mpi-inf.mpg.de/yago-naga/yago/download/yago/yago3_entire_ttl.7z
+# https://sweet.jpl.nasa.gov/sites/default/files/2.3.zip

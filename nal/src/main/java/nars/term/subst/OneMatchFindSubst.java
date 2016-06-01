@@ -14,10 +14,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class OneMatchFindSubst extends FindSubst {
 
-    private @NotNull Term xterm;
-    private @NotNull PremiseEval r;
-    @Nullable
-    private Term result;
+    private @Nullable Term xterm;
+    private @Nullable PremiseEval target;
+
+    @Nullable private Term result;
 
     public OneMatchFindSubst(@NotNull NAR nar) {
         super(nar.index, null, nar.random); //HACK
@@ -25,7 +25,7 @@ public final class OneMatchFindSubst extends FindSubst {
 
     @Override
     public Versioned<Term> get() {
-        return r.get();
+        return target.get();
     }
 
     /**
@@ -34,18 +34,27 @@ public final class OneMatchFindSubst extends FindSubst {
     @Override
     public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-        r.replaceAllXY(this);
-        result = substitute.resolve(r, r, xterm);
+        if (target !=null)
+            target.replaceAllXY(this);
+        if (xterm!=null)
+            result = substitute.resolve(target, target, xterm);
         return false;
     }
 
     @Nullable
-    public Term tryMatch(@NotNull Op op, @NotNull PremiseEval r, @NotNull Term xterm, @NotNull Term x, @NotNull Term y) {
+    public boolean tryMatch(@NotNull Op op, @NotNull Term x, @NotNull Term y) {
+        tryMatch(op, null, null, x, y);
+        if (xy.isEmpty()) //TODO return if xy.size()==# of variables to assign
+            return false;
+        return true;
+    }
+
+    @Nullable
+    public Term tryMatch(@NotNull Op op, @NotNull PremiseEval target, @NotNull Term xterm, @NotNull Term x, @NotNull Term y) {
         this.type = op;
         this.xterm = xterm;
-        this.r = r;
+        this.target = target;
         matchAll(x, y, true);
-        clear();
         return result;
     }
 

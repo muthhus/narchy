@@ -3,10 +3,7 @@ package nars.guifx.graph2.source;
 import nars.NAR;
 import nars.guifx.annotation.Implementation;
 import nars.guifx.annotation.ImplementationProperty;
-import nars.guifx.graph2.GraphSource;
-import nars.guifx.graph2.NodeVis;
-import nars.guifx.graph2.TermEdge;
-import nars.guifx.graph2.TermNode;
+import nars.guifx.graph2.*;
 import nars.guifx.graph2.impl.CanvasEdgeRenderer;
 import nars.guifx.graph2.layout.*;
 import nars.guifx.util.POJOPane;
@@ -45,7 +42,7 @@ public class DefaultGrapher extends SpaceGrapher {
     public DefaultGrapher(NAR nar, GraphSource source,
                           NodeVis v,
                           BiFunction<TermNode, TermNode, TermEdge> edgeBuilder,
-                          CanvasEdgeRenderer edgeRenderer) {
+                          EdgeRenderer edgeRenderer) {
 
         super(nar, source, v, edgeBuilder, edgeRenderer);
 

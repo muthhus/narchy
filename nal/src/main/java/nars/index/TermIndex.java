@@ -430,7 +430,7 @@ public interface TermIndex {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
             t = transform(ct,
-                    (numVars == 1) ?
+                    (ct.vars() == 1 && ct.varPattern() == 0) ?
                             VariableNormalization.singleVariableNormalization :
                             new VariableNormalization(numVars)
             );

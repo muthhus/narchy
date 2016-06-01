@@ -8,24 +8,23 @@ package com.github.lerks.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import nars.$;
 import nars.NAR;
 import nars.concept.BooleanConcept;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
+import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.variable.Variable;
+import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.FX;
 import nars.util.NAgent;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,26 +38,34 @@ import static nars.$.*;
 
 public class PongEnvironment extends Player implements Environment {
 
-	final int width = 24;
-	final int height = 16;
+	int actions = 7;
+
+	final int width = 12;
+	final int height = 14;
 	final int pixels = width * height;
 	final int scale = 40;
-	final int ticksPerFrame = 4; //framerate divisor
+	final int ticksPerFrame = 12; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
-	float bias; //pain of boredom
+	float bias = -0.1f; //pain of boredom
 	private NAgent nagent;
 
 	public static void main (String[] args) {
 		PongEnvironment e = new PongEnvironment();
 
-
-		Default nar = new Default();
-		nar.core.conceptsFiredPerCycle.set(8);
-		nar.beliefConfidence(0.65f);
-		nar.goalConfidence(0.25f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
+		Default nar = new Default(
+				1024, 6, 1, 2, rng,
+				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
+				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
+				new Indexes.WeakTermIndex(128 * 1024, rng)
+				//new Indexes.SoftTermIndex(128 * 1024, rng)
+				//new Indexes.DefaultTermIndex(128 *1024, rng)
+				,new FrameClock());
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.45f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
@@ -75,7 +82,7 @@ public class PongEnvironment extends Player implements Environment {
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 512);
+		e.run(a, 88512);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -208,7 +215,7 @@ public class PongEnvironment extends Player implements Environment {
 
 	@Override
 	public Twin<Integer> start() {
-		return Tuples.twin(pixels, 3);
+		return Tuples.twin(pixels, actions);
 	}
 
 	float lastScore;
@@ -251,17 +258,8 @@ public class PongEnvironment extends Player implements Environment {
 
 	@Override
 	public void post(int t, int action, float[] ins, Agent a) {
-		switch (action) {
-			case 0:
-				move(-PongModel.SPEED, pong);
-				break;
-			case 1: /* nothing */
-				break;
-			case 2:
-				move(+PongModel.SPEED, pong);
-				break;
-
-		}
+		//actRelative(action); //numActions = 3
+		actAbsolute(action);
 
 		long now = nagent.nar.time();
 		int dt = 16;
@@ -291,6 +289,24 @@ public class PongEnvironment extends Player implements Environment {
 
 	}
 
+	private void actAbsolute(int action) {
+
+		moveTo( (int)(((float)action) / (actions-1) * height * scale), pong );
+	}
+
+	public void actRelative(int action) {
+		switch (action) {
+			case 0:
+				move(-PongModel.SPEED*3, pong);
+				break;
+			case 1: /* nothing */
+				break;
+			case 2:
+				move(+PongModel.SPEED*3, pong);
+				break;
+
+		}
+	}
 
 
 	@Override

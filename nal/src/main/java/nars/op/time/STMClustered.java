@@ -265,7 +265,11 @@ public class STMClustered extends STM {
         });
         nar.onFrame(n -> {
         //nar.onCycle(n -> {
-            iterate();
+            try {
+                iterate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         start();

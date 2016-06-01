@@ -1,10 +1,7 @@
 package nars.term.transform;
 
 import com.gs.collections.impl.factory.Sets;
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.concept.Concept;
 import nars.index.PatternIndex;
 import nars.nar.Default;

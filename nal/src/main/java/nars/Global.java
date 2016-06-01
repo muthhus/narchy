@@ -79,6 +79,8 @@ public enum Global {
     public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 
 
+    static public final float maxForgetPeriod = 1000f; //TODO calculate based on budget epsilon etc
+    static public final float minForgetPeriod = 0.5f; //TODO calculate based on budget epsilon etc
 
 
 

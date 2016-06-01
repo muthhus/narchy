@@ -20,6 +20,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
     }
 
     private static final Affine tra = new Affine();
+    //private int edgesDrawn;
 
 
     @Override
@@ -44,6 +45,8 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
         X[2] = 0.5;
         Y[2] = 0d;
 
+        //System.out.println("edges drawn=" + edgesDrawn);
+        //edgesDrawn = 0;
     }
 
     //final static Translate identity = Affine.translate(0,0);
@@ -118,6 +121,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
         gfx.closePath();
         gfx.fill();
 
+        //edgesDrawn++;
         //gfx.restore();
     }
 
