@@ -5,12 +5,14 @@ import nars.NAR;
 import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.ArrayQuestionTable;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
+import nars.link.BLink;
 import nars.link.TermLinkBuilder;
 import nars.link.TermTemplate;
 import nars.task.Task;
@@ -671,20 +673,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    /** link to all existing termlinks, hierarchical and heterarchical */
-    public void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
-        List<Termed> targets = Global.newArrayList(termlinks().size());
-        termlinks().forEach(tl -> {
-            targets.add(tl.get());
-        });
-        float subScale = scale / targets.size();
-        targets.forEach(t -> {
-            System.out.println(CompoundConcept.this + " activate " + t + " " + b + "x" + subScale);
-            termlinks().put(t, b, subScale, null); //activate the termlink
-            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
-        });
-
-    }
 
     /** link to subterms, hierarchical downward */
     public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
@@ -952,6 +940,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     public Iterator iterator() {
         return term.iterator();
     }
+
 
 
 }

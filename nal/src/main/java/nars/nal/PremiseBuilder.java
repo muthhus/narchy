@@ -42,7 +42,7 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static void run(@NotNull NAR nar, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, @NotNull List<ConceptProcess> processes) {
+    public static void run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, @NotNull List<ConceptProcess> processes) {
 
         Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
         if (task == null)
@@ -67,7 +67,7 @@ public enum PremiseBuilder {
             if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
 
                 processes.add(
-                        newPremise(nar, termLink, taskLink, task, occ, tl)
+                        newPremise(nar, conceptLink, termLink, taskLink, task, occ, tl)
                 );
             }
         }
@@ -76,8 +76,8 @@ public enum PremiseBuilder {
     }
 
     @Nullable
-    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, long occ, @NotNull Termed tl) {
-        return new ConceptProcess(nar, taskLink, termLink, match(nar, task, tl, occ));
+    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, long occ, @NotNull Termed tl) {
+        return new ConceptProcess(nar, conceptLink, taskLink, termLink, match(nar, task, tl, occ));
     }
 
 

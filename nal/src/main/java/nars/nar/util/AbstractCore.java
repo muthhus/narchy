@@ -170,7 +170,7 @@ public abstract class AbstractCore {
         tl.sample(termlinks, termsBuffer::add);
 
         c.tasklinks().sample(tasklinks, bl -> {
-            PremiseBuilder.run(nar, termsBuffer, bl, processes);
+            PremiseBuilder.run(nar, conceptLink, termsBuffer, bl, processes);
         });
 
         termsBuffer.clear();

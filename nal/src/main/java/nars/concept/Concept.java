@@ -21,14 +21,17 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
+import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
+import nars.link.BLink;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Term;
@@ -42,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -80,6 +84,46 @@ public interface Concept extends Termed, Comparable<Termlike> {
     @Nullable QuestionTable questions();
 
     @Nullable QuestionTable quests();
+
+    @Nullable
+    default Truth belief(long when, long now) {
+        return hasBeliefs() ? beliefs().truth(now, when) : Truth.Null;
+    }
+
+    @Nullable
+    default Truth desire(long when, long now) {
+        return hasGoals() ? goals().truth(now, when) : Truth.Null;
+    }
+
+    @Nullable
+    default Truth belief(long now) {
+        return belief(now, now);
+    }
+
+    @Nullable
+    default Truth desire(long now) {
+        return desire(now, now);
+    }
+
+    void capacity(ConceptBudgeting c);
+
+    boolean contains(Task t);
+
+
+    default boolean hasGoals() {
+        return !goals().isEmpty();
+    }
+
+    default boolean hasBeliefs() {
+        return !beliefs().isEmpty();
+    }
+
+    default boolean hasQuestions() { return !questions().isEmpty();    }
+
+    default boolean hasQuests() {
+        return !quests().isEmpty();
+    }
+
 
     @Nullable
     default TaskTable tableFor(char punctuation) {
@@ -129,6 +173,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
     void linkTask(@NotNull Task t, float scale);
 
 
+
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
         if (initialScale <= 0f || b.isDeleted())
             throw new RuntimeException("invalid budget: " + initialScale + " " + b.toString());
@@ -159,44 +204,63 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
     }
 
-    @Nullable
-    default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(now, when) : Truth.Null;
+    /** link to a specific peer */
+    default void linkPeer(Termed x, Budget b, float v) {
+        BLink<Termed> existing = termlinks().get(x);
+
+        /*
+        Hebbian Learning:
+            deltaWeight = (input[fromNeuron] -
+                            output[toNeuron] * weight(fromNeuron,toNeuron)
+							* output[toNeuron] * this.learningRate);
+							*
+            deltaWeight = input[toNeuron] * output[toNeuron] * learningRate;
+            deltaWeight = (input - netInput) * output * this.learningRate; // is it right to use netInput here?
+			deltaWeight = input * desiredOutput * this.learningRate;
+         */
+
+
+        boolean init;
+        if (existing == null ) {
+            termlinks().put(x, b, v, null);
+            init = true;
+        } else {
+            init = false;
+        }
+
+        final float learningRate = v / termlinks().size();
+        //System.out.println(this + " activating " + x);
+        termlinks().forEach(tl -> {
+            boolean active = tl.get().equals(x);
+            if (active&&init)
+                return; //dont modify the newly inserted link
+
+            float a = b.pri();
+            float outputTarget = active ? a : (1f-a);
+            float output = outputTarget - tl.pri(); //nar.conceptPriority(x);
+            float dp = output * learningRate;
+            tl.priAdd(dp);
+            //System.out.println(tl.toString2());
+        });
+        termlinks().setRequiresSort();
+
     }
 
-    @Nullable
-    default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(now, when) : Truth.Null;
+    /** link to all existing termlinks, hierarchical and heterarchical */
+    default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
+        List<Termed> targets = Global.newArrayList(termlinks().size());
+        termlinks().forEach(tl -> {
+            targets.add(tl.get());
+        });
+        float subScale = scale / targets.size();
+        targets.forEach(t -> {
+            //System.out.println(Concept.this + " activate " + t + " " + b + "x" + subScale);
+            termlinks().put(t, b, subScale, null); //activate the termlink
+            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
+        });
+
     }
 
-    @Nullable
-    default Truth belief(long now) {
-        return belief(now, now);
-    }
-
-    @Nullable
-    default Truth desire(long now) {
-        return desire(now, now);
-    }
-
-    void capacity(ConceptBudgeting c);
-
-    boolean contains(Task t);
-
-
-    default boolean hasGoals() {
-        return !goals().isEmpty();
-    }
-
-    default boolean hasBeliefs() {
-        return !beliefs().isEmpty();
-    }
-
-    default boolean hasQuestions() { return !questions().isEmpty();    }
-
-    default boolean hasQuests() {
-        return !quests().isEmpty();
-    }
 
     default void visitTasks(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         if (includeConceptBeliefs) beliefs().forEach(each);

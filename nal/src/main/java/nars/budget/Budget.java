@@ -87,8 +87,11 @@ public abstract class Budget implements Budgeted {
         return this;
     }
 
+    public final void priAdd(float toAdd) {
+        setPriority(pri() + toAdd);
+    }
     public final void priSub(float toSubtract) {
-        setPriority(pri() - toSubtract);
+        priAdd(-toSubtract);
     }
 
     @NotNull

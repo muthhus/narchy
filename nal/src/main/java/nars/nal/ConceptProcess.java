@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.Premise;
 import nars.Symbols;
 import nars.budget.Budget;
+import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
@@ -38,6 +39,7 @@ public class ConceptProcess implements Premise {
 
     public final BLink<? extends Termed> termLink;
     @Nullable public final Task belief;
+    public final BLink<? extends Concept> conceptLink;
 
     /** lazily cached value :=
      *      -1: unknown
@@ -54,13 +56,15 @@ public class ConceptProcess implements Premise {
 
 
     public ConceptProcess(NAR nar,
+                          BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
                           BLink<? extends Termed> termLink, @Nullable Task belief) {
         this.nar = nar;
 
         this.taskLink = taskLink;
 
-        //this.conceptLink = conceptLink;
+        this.conceptLink = conceptLink;
+
         this.termLink = termLink;
 
         this.belief = belief;
@@ -191,7 +195,8 @@ public class ConceptProcess implements Premise {
 
     @NotNull
     public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task>[] parents) {
-        return new DerivedTask(c, punct, truth, this, parents);
+        //return new DerivedTask.DefaultDerivedTask(c, punct, truth, this, parents);
+        return new DerivedTask.CompetingDerivedTask(c, punct, truth, this, parents);
     }
 
 

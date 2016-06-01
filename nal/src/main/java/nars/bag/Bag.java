@@ -545,7 +545,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         public boolean requiresSort() {
             return false;
         }
+        public void setRequiresSort() {
+
+        }
     };
 
     boolean requiresSort();
+    @Deprecated void setRequiresSort();
+
 }

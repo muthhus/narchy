@@ -21,20 +21,20 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     /** priority */
     private float PRI;
     /** delta pri */
-    private float DPRI;
+    private float dPri;
 
     /** durability */
     private float DUR;
     /** delta dur */
-    private float DDUR;
+    private float dDur;
 
     /** quality */
     private float QUA;
     /** delta qua */
-    private float DQUA;
+    private float dQua;
 
     /** time of last forget */
-    private float LASTFORGET;
+    private float lastForget;
 
     public DefaultBLink(X id, float p, float d, float q) {
         init(p, d, q);
@@ -52,7 +52,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         PRI = clamp(p);
         DUR = clamp(d);
         QUA = clamp(q);
-        LASTFORGET = Float.NaN;
+        lastForget = Float.NaN;
     }
 
     @Override
@@ -73,9 +73,9 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         if (changed) {
             float p = PRI;
             if (p == p) /* not NaN */ {
-                PRI = clamp( p  + DPRI);   DPRI = 0;
-                DUR = clamp(DUR + DDUR);   DDUR = 0;
-                QUA = clamp(QUA + DQUA);   DQUA = 0;
+                PRI = clamp( p  + dPri);   dPri = 0;
+                DUR = clamp(DUR + dDur);   dDur = 0;
+                QUA = clamp(QUA + dQua);   dQua = 0;
             }
             changed = false;
             return true;
@@ -90,7 +90,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     
     @Override
     public final void _setPriority(float p) {
-        DPRI += p - PRI;
+        dPri += p - PRI;
         changed = true;
     }
 
@@ -101,7 +101,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setDurability(float d) {
-        DDUR += d - DUR;
+        dDur += d - DUR;
         changed = true;
     }
 
@@ -112,13 +112,13 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
     @Override
     public final void _setQuality(float q) {
-        DQUA += q - QUA;
+        dQua += q - QUA;
         changed = true;
     }
 
     @Override
     @Deprecated public final float setLastForgetTime(float currentTime) {
-        float lastForget = LASTFORGET;
+        float lastForget = this.lastForget;
         float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
         setLastForgetTimeFast(currentTime);
         return diff;
@@ -127,14 +127,17 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     /** doesnt compute the delta */
     @Override
     public final void setLastForgetTimeFast(float currentTime) {
-        LASTFORGET = currentTime;
+        lastForget = currentTime;
     }
 
     @Override
     public final float getLastForgetTime() {
-        return LASTFORGET;
+        return lastForget;
     }
 
+    @Override public String toString2() {
+        return toString() + "+/-:" + dPri + ';' + dDur + ';' + dQua;
+    }
 
 
 }

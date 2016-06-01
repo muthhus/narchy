@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.link.BLink;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -85,7 +86,12 @@ public class TermLinkTest {
         }
 
         public void activate(int x, int y, float a) {
-            nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
+            //nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
+            //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
+            Budget b = b(a, 0.5f, 0.5f);
+            Concept c = nar.conceptualize(vertex(x), b, a, 0f, null);
+            ((CompoundConcept)c).linkPeer(vertex(y), b, a);
+
         }
 
 
@@ -127,7 +133,7 @@ public class TermLinkTest {
         }
 
         static char priChar(float pri) {
-            int i = (int) Math.floor(pri * 10f);
+            int i = (int) Math.floor(pri * 9.5f);
             return (char)(i + '0');
         }
 
@@ -151,11 +157,13 @@ public class TermLinkTest {
         n.step(); //build network
         n.core.concepts.print();
 
-        //activate neurons 1 and 3
-        h.activate(1, 1f);
-        h.activate(3, 1f);
+//        //activate neurons 1 and 3
+//        h.activate(1, 1f);
+//        h.activate(3, 1f);
+        h.activate(1, 3, 1f);
+        h.activate(1, 2, 1f);
 
-        n.step();
+        n.run(10);
 
         h.print();
 

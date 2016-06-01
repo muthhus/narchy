@@ -558,6 +558,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //        }*/
 //    }
 
+
+    public void setRequiresSort() {
+        this.requiresSort = true;
+    }
+
     @NotNull
     @Override
     public String toString() {
