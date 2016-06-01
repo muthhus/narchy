@@ -30,9 +30,8 @@ import static nars.Op.*;
  *
  * @author me
  */
-public class Terms extends TermBuilder implements TermIndex {
+public class Terms   {
 
-    @NotNull public static final Terms terms = new Terms();
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector<?> ZeroSubterms = new TermVector<>((Term[])new Term[] { });
@@ -95,37 +94,6 @@ public class Terms extends TermBuilder implements TermIndex {
             return ((Compound)b).term(0).equals(a);
         }
         return false;
-    }
-
-    @NotNull @Override
-    public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
-        return new GenericCompound(op, relation, subterms).dt(dt);
-    }
-
-    @Override
-    public
-    @Nullable
-    Termed get(Termed t, boolean createIfMissing) {
-        return createIfMissing ? t : null;
-    }
-
-    @Nullable
-    @Override
-    public void set(@NotNull Termed s, Termed t) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @NotNull
-    @Override
-    public TermBuilder builder() {
-        return this;
-    }
-
-    @Nullable
-    @Override
-    public Concept.@Nullable ConceptBuilder conceptBuilder() {
-        return null;
     }
 
 
@@ -528,34 +496,6 @@ public class Terms extends TermBuilder implements TermIndex {
         return oprel & 0xffff; //HACK do something here with signed and unsigned short/int
     }
 
-    @Override
-    public int size() {
-        return 0;
-    }
-
-
-    @Override
-    public
-    @Nullable
-    TermContainer theSubterms(TermContainer s) {
-        return s;
-    }
-
-    @Override
-    public int subtermsCount() {
-        return 0;
-    }
-
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public void forEach(Consumer<? super Termed> c) {
-
-    }
 
 
     public static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {

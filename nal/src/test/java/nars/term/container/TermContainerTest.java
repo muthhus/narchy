@@ -1,7 +1,7 @@
 package nars.term.container;
 
+import nars.$;
 import nars.term.Compound;
-import nars.term.Terms;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -34,13 +34,13 @@ public class TermContainerTest {
         Compound container = $("{a,b}");
         Compound contained = $("{a}");
         assertTrue(
-            TermContainer.union(Terms.terms, container, contained) == container
+            TermContainer.union($.terms, container, contained) == container
         );
         assertTrue(
-            TermContainer.union(Terms.terms, contained, container) == container  //reverse
+            TermContainer.union($.terms, contained, container) == container  //reverse
         );
         assertTrue(
-            TermContainer.union(Terms.terms, container, container) == container  //equal
+            TermContainer.union($.terms, container, container) == container  //equal
         );
     }
 
@@ -49,7 +49,7 @@ public class TermContainerTest {
         Compound x = $("{x}");
         Compound y = $("{y}");
         assertTrue(
-                TermContainer.difference(Terms.terms, x, y) == x
+                TermContainer.difference($.terms, x, y) == x
         );
     }
     @Test
@@ -57,7 +57,7 @@ public class TermContainerTest {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
         assertTrue(
-                TermContainer.intersect(Terms.terms, x, y) == x
+                TermContainer.intersect($.terms, x, y) == x
         );
     }
 
@@ -66,9 +66,9 @@ public class TermContainerTest {
         Compound x = $("{e,f}");
         Compound y = $("{e,d}");
 
-        System.out.println(TermContainer.intersect(Terms.terms, x, y));
-        System.out.println(TermContainer.difference(Terms.terms, x, y));
-        System.out.println(TermContainer.union(Terms.terms, x, y));
+        System.out.println(TermContainer.intersect($.terms, x, y));
+        System.out.println(TermContainer.difference($.terms, x, y));
+        System.out.println(TermContainer.union($.terms, x, y));
 
     }
 }

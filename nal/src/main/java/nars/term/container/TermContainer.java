@@ -6,6 +6,7 @@ import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.factory.Sets;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.term.*;
@@ -233,7 +234,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     /** returns null if empty set */
     @Nullable
     static Compound difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
-        return difference(Terms.terms, op, a, b);
+        return difference($.terms, op, a, b);
     }
 
     @Nullable

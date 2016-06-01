@@ -15,7 +15,6 @@ import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
@@ -399,7 +398,7 @@ public class EllipsisTest {
             Set<String> results = Global.newHashSet(0);
 
             Random rng = new XorShift128PlusRandom(seed);
-            FindSubst f = new FindSubst(Terms.terms, VAR_PATTERN, rng) {
+            FindSubst f = new FindSubst($.terms, VAR_PATTERN, rng) {
                 @Override
                 public boolean onMatch() {
                     results.add(xy.toString());

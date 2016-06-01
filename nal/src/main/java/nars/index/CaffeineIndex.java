@@ -2,10 +2,10 @@ package nars.index;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import nars.$;
 import nars.concept.Concept;
 import nars.term.TermBuilder;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class CaffeineIndex extends MaplikeIndex {
     final Cache<TermContainer, TermContainer> subterms;
 
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder) {
-        this(Terms.terms, conceptBuilder);
+        this($.terms, conceptBuilder);
     }
 
     public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {

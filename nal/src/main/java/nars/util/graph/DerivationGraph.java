@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static nars.term.Terms.terms;
-
 /**
  * table for holding derivation results for online & offline
  * testing and analysis
@@ -105,7 +103,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
     @Nullable
     Term normalize(Term x) {
         if (x instanceof Compound)
-            return terms.transform((Compound)x, new VariableNormalization());
+            return $.terms.transform((Compound)x, new VariableNormalization());
         else if (x instanceof Variable)
             return $.v(x.op(), 1);
         else

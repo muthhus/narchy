@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.subst.FindSubst;
 import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final FindSubst f = new FindSubst(Terms.terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1)) {
+    final FindSubst f = new FindSubst(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1)) {
         @Override
         public boolean onMatch() {
             return true;

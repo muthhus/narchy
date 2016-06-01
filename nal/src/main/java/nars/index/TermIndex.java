@@ -1,5 +1,6 @@
 package nars.index;
 
+import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
@@ -680,7 +681,7 @@ public interface TermIndex {
             if (subterm instanceof Compound) {
                 Compound csub = (Compound) subterm;
                 if (csub.hasTemporal()) {
-                    return /*the*/(Terms.terms.atemporalize(csub));
+                    return /*the*/($.terms.atemporalize(csub));
                 }
             }
             return /*the*/(subterm);

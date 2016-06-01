@@ -68,13 +68,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.normalized = (subterms.vars == 0) && (subterms.varPatterns == 0) /* not included in the count */;
         this.op = op;
 
+        this.relation = relation;
+
+        if (dt!=DTERNAL && !Op.isTemporal(op, dt, subterms.size()))
+            throw new InvalidTerm(this.op, relation, dt, terms());
 
         //t = op.isTemporal() ? t : ITERNAL;
         this.dt = dt;
 
-        this.relation = relation;
 
         this.hash = Util.hashCombine(subterms.hash, opRel(), dt);
+
     }
 
     @Override
@@ -351,9 +355,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final Compound dt(int cycles) {
 
         if (cycles == dt) return this;
-
-        if (!Op.isTemporal(this, cycles))
-            throw new InvalidTerm(this.op, relation, cycles, terms());
 
         GenericCompound g = new GenericCompound(this.op, relation, cycles, subterms);
         if (normalized) g.setNormalized();

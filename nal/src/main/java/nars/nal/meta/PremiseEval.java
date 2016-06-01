@@ -69,7 +69,7 @@ public class PremiseEval extends FindSubst {
 
     /** initializes with the default static term index/builder */
     public PremiseEval(Random r, Deriver deriver) {
-        this(Terms.terms, r, deriver);
+        this($.terms, r, deriver);
     }
 
     public PremiseEval(TermIndex index, Random r, Deriver deriver) {

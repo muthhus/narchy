@@ -23,6 +23,7 @@ package nars.term;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
@@ -60,7 +61,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         if (t.op() == beliefConcept.op()) {
             Term b = beliefConcept.term();
             if (t.structure() == b.structure() && t.volume() == b.volume()) {
-                return Terms.terms.atemporalize((Compound) t).equals(b);
+                return $.terms.atemporalize((Compound) t).equals(b);
             }
         }
         return false;

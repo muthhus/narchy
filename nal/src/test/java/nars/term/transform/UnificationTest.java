@@ -8,7 +8,6 @@ import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.subst.FindSubst;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
@@ -83,7 +82,7 @@ public class UnificationTest {
         AtomicBoolean subbed = new AtomicBoolean(false);
 
         final Term finalT = t1;
-        FindSubst sub = new FindSubst(Terms.terms, type, nar.random) {
+        FindSubst sub = new FindSubst($.terms, type, nar.random) {
 
 //            @Override
 //            public void onPartial() {

@@ -7,13 +7,15 @@ import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
+import nars.concept.Concept;
+import nars.index.TermIndex;
 import nars.nal.meta.match.VarPattern;
 import nars.task.MutableTask;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
@@ -31,24 +33,35 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
-import static nars.term.Terms.terms;
 
-/**
- * core utility class for:
-    --building any type of value, either programmatically or parsed from string input
-       (which can be constructed in a static context)
-    --??
+/***
+ *     oooo       oo       .o.       ooooooooo.
+ *    `888b.      8'      .888.      `888   `Y88.
+ *     88`88b.    88     .8"888.      888   .d88'  .ooooo oo oooo  oooo   .ooooo.  oooo d8b oooo    ooo
+ *     88  `88b.  88    .8' `888.     888ooo88P'  d88' `888  `888  `888  d88' `88b `888""8P  `88.  .8'
+ *     88    `88b.88   .88ooo8888.    888`88b.    888   888   888   888  888ooo888  888       `88..8'
+ *     88      `8888  .8'     `888.   888  `88b.  888   888   888   888  888    .o  888        `888'
+ *     8o        `88 o88o     o8888o o888o  o888o `V8bod888   `V88V"V8P' `Y8bod8P' d888b        .8'
+ *                                                      888.                                .o..P'
+ *                                                      8P'                                 `Y8P'
+ *                                                      "
+ *
+ *                                          Core Utility Class
  */
-public enum $ /* TODO: implements TermIndex */ {
+public enum $ {
     ;
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
+
+
+
 
     public static <T extends Term> T $(@NotNull String term) {
         Termed normalized = Narsese.the().term(term, terms, true);
@@ -229,11 +242,11 @@ public enum $ /* TODO: implements TermIndex */ {
      */
     @Nullable
     public static Compound inst(@NotNull Term subj, Term pred) {
-        return terms.builder().inst(subj, pred);
+        return terms.inst(subj, pred);
     }
     @Nullable
     public static Compound instprop(@NotNull Term subject, @NotNull Term predicate) {
-        return terms.builder().instprop(subject, predicate);
+        return terms.instprop(subject, predicate);
     }
     @Nullable
     public static Compound prop(Term subject, Term predicate) {
@@ -272,11 +285,6 @@ public enum $ /* TODO: implements TermIndex */ {
     public static MutableTask task(@NotNull Compound term, char punct, Truth truth) {
         return new MutableTask(term, punct, truth);
     }
-
-//    @NotNull
-//    public static MutableTask task(@NotNull String s, Memory m) {
-//        return Narsese.the().task(s, m);
-//    }
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
@@ -755,7 +763,74 @@ public enum $ /* TODO: implements TermIndex */ {
         }
     }
 
+    /** static storeless term builder */
+    public static final StaticTermBuilder terms = new StaticTermBuilder();
 
+    public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
+
+        @NotNull @Override
+        public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
+            //return new GenericCompound(op, relation, subterms).dt(dt);
+            return new GenericCompound(op, relation, dt, (TermVector)subterms);
+        }
+
+        @Override
+        public
+        @Nullable
+        Termed get(Termed t, boolean createIfMissing) {
+            return createIfMissing ? t : null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+
+        @Override
+        public
+        @Nullable
+        TermContainer theSubterms(TermContainer s) {
+            return s;
+        }
+
+        @Override
+        public int subtermsCount() {
+            return 0;
+        }
+
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public void forEach(Consumer<? super Termed> c) {
+
+        }
+
+
+        @Nullable
+        @Override
+        public void set(@NotNull Termed s, Termed t) {
+            throw new UnsupportedOperationException();
+        }
+
+
+        @NotNull
+        @Override
+        public TermBuilder builder() {
+            return this;
+        }
+
+        @Nullable
+        @Override
+        public Concept.@Nullable ConceptBuilder conceptBuilder() {
+            return null;
+        }
+
+    }
 
 
     //TODO add this to a '$.printree' command

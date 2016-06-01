@@ -1,10 +1,10 @@
 package nars.index;
 
+import nars.$;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +19,7 @@ public class PatternIndex extends RawTermIndex {
 //              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
 //    }
     public PatternIndex() {
-        super(Terms.terms, null, 1024);
+        super($.terms, null, 1024);
     }
 
     @Override
