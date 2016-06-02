@@ -48,12 +48,7 @@ public class NARNotes extends BorderPane {
 
         statusPanel.getChildren().add(new LoopPane(n.loop()));
 
-        tasks = new Taskversation(n) {
-            @Override
-            public @NotNull Consumer<Task> newTaskResponse(Task t) {
-                return addTask(t);
-            }
-        };
+        tasks = new Taskversation(n, this::addTask);
 
         //TextField filterText = new TextField();
         //selectorPanel.getChildren().add(filterText);
@@ -68,7 +63,7 @@ public class NARNotes extends BorderPane {
         return p;
     }
 
-    class Note extends BorderPane implements Consumer<Task> {
+    class Note extends VBox implements Consumer<Task> {
         //private final TextArea edit;
         //private final Button inputButton;
         private final BagView<Task> responseBox;
@@ -82,16 +77,21 @@ public class NARNotes extends BorderPane {
             //edit.setPrefRowCount(1);
             TaskButton title = new TaskButton<>(t, nar) {
                 @Override
+                public boolean scalesText() {
+                    return false;
+                }
+
+                @Override
                 protected void color(Color c) {
                     //inverted
                     setBackground(new Background(new BackgroundFill(c, CornerRadii.EMPTY, Insets.EMPTY)));
                     setTextFill(Color.BLACK);
                 }
             };
-            setTop(title);
+            getChildren().add(title);
             title.getStyleClass().add("header");
 
-            setCenter(scrolled(
+            getChildren().add(scrolled(
                 responseBox = new BagView<Task>(
                         responses, (x) -> new TaskButton(x, nar), responses.capacity()))
             );
@@ -110,13 +110,13 @@ public class NARNotes extends BorderPane {
 //
 //                    });
 //                });
-
         }
 
         @Override
         public void accept(Task t) {
             if (responses.put(t)!=t) {
                 responseBox.update();
+                runLater(this::layout);
             }
 
             //responseBox.getChildren().add(new TaskButton(t, nar));

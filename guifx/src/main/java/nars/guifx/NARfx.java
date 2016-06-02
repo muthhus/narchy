@@ -52,9 +52,10 @@ public final class NARfx extends FX {
         //TODO //ConceptPane wn = new ConceptPane(nar, c);
         AbstractConceptPane wn = new DetailedConceptPane(nar, c);
 
-        Stage st;
-        Stage removed = window.put(c, st = newWindow(c.toString(), wn));
+        Stage st = newWindow(c.toString(), wn);
+        Stage removed = window.put(c, st);
         st.setAlwaysOnTop(true); //? does this work
+        theme(st.getScene());
         wn.autosize();
 
         if (removed!=null)

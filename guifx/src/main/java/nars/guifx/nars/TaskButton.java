@@ -12,6 +12,7 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
 import nars.budget.Budgeted;
+import nars.guifx.NARfx;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.util.NSlider;
@@ -94,7 +95,6 @@ public class TaskButton<X> extends Label implements Runnable {
                 p.setAutoHide(true);
                 p.setAutoFix(true);
 
-
                 p.show(this, c.getScreenX(), c.getScreenY());
 
             });
@@ -137,8 +137,9 @@ public class TaskButton<X> extends Label implements Runnable {
             if (scalesText()) {
                 Scale scale1 = this.scale;
                 float minScale = 0.5f;
-                scale1.setX(scale + minScale);
-                scale1.setY(scale + minScale);
+                double newScale =  scale + minScale;
+                scale1.setX(newScale);
+                scale1.setY(newScale);
                 //setNeedsLayout(true);
             }
 
@@ -164,7 +165,7 @@ public class TaskButton<X> extends Label implements Runnable {
         setTextFill(c);
     }
 
-    public static boolean scalesText() {
+    public boolean scalesText() {
         return true;
     }
 

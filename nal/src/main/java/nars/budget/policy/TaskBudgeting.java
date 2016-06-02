@@ -32,8 +32,8 @@ public class TaskBudgeting {
         //Task task = taskLink.get();
 
 
-        BLink<? extends Termed> termLink = nal.termLink;
-        BLink<? extends Task> taskLink = nal.taskLink;
+//        BLink<? extends Termed> termLink = nal.termLink;
+//        BLink<? extends Task> taskLink = nal.taskLink;
 
 
         //originally was OR, but this can explode because the result of OR can exceed the inputs
@@ -41,10 +41,10 @@ public class TaskBudgeting {
         //float priority = and(taskLink.pri(), termLink.pri());
 
         Task task = nal.task();
-        float priority = //UtilityFunctions.aveGeo(
-                //task!=null ? task.priIfFiniteElseZero() : 0,
-                (aveGeo(taskLink.priIfFiniteElseZero(),
-                    termLink.priIfFiniteElseZero()));
+//        float priority = //UtilityFunctions.aveGeo(
+//                //task!=null ? task.priIfFiniteElseZero() : 0,
+//                (aveGeo(taskLink.priIfFiniteElseZero(),
+//                    termLink.priIfFiniteElseZero()));
 
 
         //Penalize by complexity
@@ -56,6 +56,7 @@ public class TaskBudgeting {
         volRatioScale =
             Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.term().volume() )));
 
+        float priority = task.pri() * volRatioScale;
 
         final float durability =
                 task.dur() * volRatioScale;

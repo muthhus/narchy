@@ -311,6 +311,7 @@ public class NARide extends StackPane {
             s.getStylesheets().add("internal:stylesheet.css");
         }
 
+
         /**
          * URLConnection implementation that returns the css string property, as a stream, in the getInputStream method.
          */

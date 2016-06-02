@@ -719,10 +719,12 @@
 }
 
 .notes .note .header {
-
+    -fx-font-size: 150%;
+}
+.notes .note .content {
+    -fx-padding-left: 1em;
 }
 .notes .note {
-    -fx-padding-bottom: 5;
     -fx-border-width: 1;
     -fx-border-color: orange;
 }

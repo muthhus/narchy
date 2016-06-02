@@ -92,9 +92,13 @@ public interface BudgetMerge {
 
         return overflow;
     }
+    BudgetMerge errorMerge = (x, y, z) -> {
+        throw new UnsupportedOperationException();
+    };
 
     BudgetMerge nullMerge = (x, y, z) -> {
-        throw new UnsupportedOperationException();
+        //nothing
+        return 0f;
     };
 
     /** sum priority, LERP other components in proportion to the priorities */
