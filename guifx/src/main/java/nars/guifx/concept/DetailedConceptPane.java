@@ -16,6 +16,7 @@ import nars.guifx.nars.TaskButton;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.util.FX;
 
 
 /**
@@ -183,7 +184,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
         n.run(16);
 
-        NARfx.run((a, s) -> {
+        FX.run((a, s) -> {
             NARfx.newWindow(n, n.concept("<a-->b>"));
 //            s.setScene(new ConsolePanel(n, n.concept("<a-->b>")),
 //                    800,600);

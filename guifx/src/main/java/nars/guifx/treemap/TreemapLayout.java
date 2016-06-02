@@ -88,13 +88,12 @@ class TreemapLayout extends Parent {
         Deque<TreemapDtoElement> concatRow = new ArrayDeque<>(row);
         concatRow.add(c);
 
-        Deque<TreemapDtoElement> remaining = new ArrayDeque<>(remainPoped);
-
 
         double worstConcat = worst(concatRow, w);
         double worstRow = worst(row, w);
 
         if (row.isEmpty() || (worstRow > worstConcat || isDoubleEqual(worstRow, worstConcat))) {
+            Deque<TreemapDtoElement> remaining = new ArrayDeque<>(remainPoped);
             if (remaining.isEmpty()) {
                 layoutrow(concatRow, w);
             } else {
@@ -106,7 +105,7 @@ class TreemapLayout extends Parent {
         }
     }
 
-    private double worst(Deque<TreemapDtoElement> ch, double w) {
+    private static double worst(Deque<TreemapDtoElement> ch, double w) {
         if (ch.isEmpty()) {
             return Double.MAX_VALUE;
         }
@@ -139,10 +138,10 @@ class TreemapLayout extends Parent {
 
             for (TreemapDtoElement item : row) {
                 double area = item.getArea();
-                double h = (area / rowWidth);
                 item.setTop(top + topItem);
                 item.setLeft(left);
                 item.setWidth(rowWidth);
+                double h = (area / rowWidth);
                 item.setHeight(h);
 
                 topItem += h;
@@ -161,10 +160,10 @@ class TreemapLayout extends Parent {
 
             for (TreemapDtoElement item : row) {
                 double area = item.getArea();
-                double wi = (area / rowHeight);
                 item.setTop(top);
                 item.setLeft(left + rowLeft);
                 item.setHeight(rowHeight);
+                double wi = (area / rowHeight);
                 item.setWidth(wi);
 
                 rowLeft += wi;
@@ -185,7 +184,7 @@ class TreemapLayout extends Parent {
         layoutOrient = layoutOrient == LayoutOrient.HORIZONTAL ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
     }
 
-    private boolean isDoubleEqual(double one, double two) {
+    private static boolean isDoubleEqual(double one, double two) {
         double eps = 0.00001;
         return Math.abs(one - two) < eps;
     }

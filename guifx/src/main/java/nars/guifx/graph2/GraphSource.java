@@ -75,7 +75,7 @@ public abstract class GraphSource/* W? */ {
         start(null);
     }
 
-    public synchronized void start(SpaceGrapher g) {
+    public void start(SpaceGrapher g) {
 
         if (g == grapher) return; //no change
 

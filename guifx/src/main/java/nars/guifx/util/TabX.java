@@ -47,9 +47,7 @@ public class TabX extends Tab {
 
 	public TabX(String name, Node content) {
         super(name,content);
-        selectedProperty().addListener(s -> {
-            update();
-        });
+        selectedProperty().addListener(s -> update());
 
         onClosedProperty().addListener(c -> {
             closed = true;

@@ -43,6 +43,7 @@ import nars.nar.util.DefaultCore;
 import nars.term.Term;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
+import nars.util.FX;
 import nars.util.data.Util;
 import nars.video.WebcamFX;
 import org.jewelsea.willow.browser.WebBrowser;
@@ -91,7 +92,7 @@ public class NARide extends StackPane {
 
         //SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 
-        NARfx.run((a,b) -> newIDE(loop, ide, b));
+        FX.run((a, b) -> newIDE(loop, ide, b));
 //        SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 //
 //        ni.resize(500,500);
@@ -118,7 +119,6 @@ public class NARide extends StackPane {
         Thread.currentThread().setName("NARide");
 
 
-        NAR nar = loop.nar;
         NARide ni = new NARide(loop);
 
         Scene scene = new Scene(ni, 1400, 800,
@@ -130,6 +130,7 @@ public class NARide extends StackPane {
 
 
         //ni.addView(new TaskSheet(nar));
+        NAR nar = loop.nar;
         ni.addView(new IOPane(nar));
 
                 /*ni.addView(new UDPPane(new UDPNetwork(
@@ -304,7 +305,7 @@ public class NARide extends StackPane {
             });
         }
 
-        public void applyCssToParent(Scene s){
+        public static void applyCssToParent(Scene s){
             s.getStylesheets().clear();
             s.getStylesheets().add("internal:stylesheet.css");
         }
@@ -330,7 +331,7 @@ public class NARide extends StackPane {
          */
         private class StringURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
-            URLStreamHandler streamHandler = new URLStreamHandler(){
+            final URLStreamHandler streamHandler = new URLStreamHandler(){
                 @Override
                 protected URLConnection openConnection(URL url) throws IOException {
                     if (url.toString().toLowerCase().endsWith(".css")) {
@@ -607,16 +608,14 @@ public class NARide extends StackPane {
     public static void loop(NAR nar, boolean start) {
 
         NARLoop tmp = nar.loop();
-        new Thread(() -> {
-            NARide.show(tmp, x -> {
-                if (!start)
-                    try {
-                        tmp.stop();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-            });
-        }).start();
+        new Thread(() -> NARide.show(tmp, x -> {
+            if (!start)
+                try {
+                    tmp.stop();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        })).start();
     }
 
 
@@ -630,7 +629,6 @@ public class NARide extends StackPane {
             nar = l.nar;
 
             Label status = new Label();
-            StringBuilder sb = new StringBuilder();
             nar.onFrame(c -> {
 
                 int activeConcepts = l.concepts.size();
@@ -639,6 +637,7 @@ public class NARide extends StackPane {
                 int uniqueSubterms = index.subtermsCount();
 
                 runLater(() -> {
+                    StringBuilder sb = new StringBuilder();
                     sb.append("Active Concepts: ").append(activeConcepts).append('\n');
                     sb.append("Total Concepts: ").append(totalConcepts).append('\n');
                     if (uniqueSubterms!=-1)
@@ -721,12 +720,11 @@ public class NARide extends StackPane {
             double w = canvas.getWidth(), h = canvas.getHeight();
             g.clearRect(0, 0, w, h);
 
-            double iw = 6;
-            double ih = 6;
-
             if (source!=null) {
                 Iterable<X> si = source.get();
 
+                double ih = 6;
+                double iw = 6;
                 for (X i : si) {
                     Budget b = i.budget();
 

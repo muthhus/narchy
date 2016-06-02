@@ -41,7 +41,7 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
     }
 
     Node getNode(BLink<X> n) {
-        Node existing = componentCache.computeIfAbsent(n, builder::apply);
+        Node existing = componentCache.computeIfAbsent(n, builder);
 //            Node existing = componentCache.get(n);
 //            if (existing == null) {
 //                componentCache.put(n, existing = builder.apply(n));

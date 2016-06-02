@@ -1,5 +1,6 @@
 package nars.link;
 
+import com.google.common.base.Objects;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
@@ -52,7 +53,12 @@ public abstract class BLink<X> extends Budget implements Link<X> {
 
     private final boolean equalsReferenced(@Nullable Object obj) {
         Object x = get();
-        return ((x == null) && (obj == null)) || ((obj instanceof BLink) && ((BLink) obj).get().equals(x));
+
+        if (obj instanceof BLink) {
+            Object o = ((BLink) obj).get();
+            return Objects.equal(x, o);
+        }
+        return false;
     }
 
     @Override public final int hashCode() {

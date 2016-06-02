@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import nars.guifx.NARfx;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
+import nars.util.FX;
 import nars.util.data.map.LMap;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +32,7 @@ public class SizeAwareWindow extends Scene {
     //private final BorderPane content;
     //private final BorderPane overlay;
     //private Scene scene;
-    public Stage window;
+    public final Stage window;
 
 
     final LMap<double[], Parent> nodes;
@@ -94,8 +95,6 @@ public class SizeAwareWindow extends Scene {
 
             NARfx.theme(finalWindow.getScene());
 
-            AtomicBoolean sizeChanging = new AtomicBoolean(false);
-
             ChangeListener onSizeChange = (observable1, oldValue1, newValue1) -> {
                 Scene ss = finalWindow.getScene();
 
@@ -105,6 +104,7 @@ public class SizeAwareWindow extends Scene {
 
                 if ((w != 0) && (h != 0)) {
                     //System.out.println(w + " " + h);
+                    AtomicBoolean sizeChanging = new AtomicBoolean(false);
                     if (sizeChanging.compareAndSet(false, true)) {
 
                         runLater(() -> {
@@ -225,7 +225,7 @@ public class SizeAwareWindow extends Scene {
     //public static SizeAwareWindow vsplit(
 
     public static void main(String[] args) {
-        NARfx.run((x, y) -> {
+        FX.run((x, y) -> {
 
             SizeAwareWindow wn = new SizeAwareWindow((d) -> {
                 double w = d[0];

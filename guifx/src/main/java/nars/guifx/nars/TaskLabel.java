@@ -23,12 +23,12 @@ public class TaskLabel extends AutoLabel<Task> {
         super(task);
         nar = n;
 
-        int iconWidth = 30;
         summary = new TaskSummaryIcon(obj, this);
+        int iconWidth = 30;
         summary.width(iconWidth);
 
-        String selectedClass = "selected";
         selected.addListener((c, p, v) -> {
+            String selectedClass = "selected";
             if (v) {
                 getStyleClass().add(selectedClass);
             } else {

@@ -233,7 +233,6 @@ public class Plot2D extends NControl/*Canvas */  {
 
             double w = g.getCanvas().getWidth();
             double H = g.getCanvas().getHeight();
-            double h = H - m * 2;
 
             g.setGlobalBlendMode(BlendMode.DIFFERENCE);
             g.setFill(Color.GRAY);
@@ -248,6 +247,7 @@ public class Plot2D extends NControl/*Canvas */  {
                 double py = (v - minValue) / (maxValue - minValue);
                 if (py < 0) py = 0;
                 else if (py > 1.0) py = 1.0;
+                double h = H - m * 2;
                 return m + (1.0 - py) * h;
             };
 

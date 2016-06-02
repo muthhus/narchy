@@ -9,9 +9,9 @@ import javafx.beans.value.ObservableValue;
  */
 public class LerpDoubleProperty extends SimpleDoubleProperty {
 
-    double epsilon = 0.01;
+    final double epsilon = 0.01;
 
-    double rate = 0.25;
+    final double rate = 0.25;
 
     public double target;
     boolean stable;
@@ -24,16 +24,6 @@ public class LerpDoubleProperty extends SimpleDoubleProperty {
 
     public double getTarget() {
         return target;
-    }
-
-    @Override
-    public void bind(ObservableValue<? extends Number> rawObservable) {
-        super.bind(rawObservable);
-    }
-
-    @Override
-    public void bindBidirectional(Property<Number> other) {
-        super.bindBidirectional(other);
     }
 
     @Override

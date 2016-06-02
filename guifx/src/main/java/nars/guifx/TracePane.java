@@ -206,11 +206,6 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
             appender = new UnsynchronizedAppenderBase() {
 
                 @Override
-                public void start() {
-                    super.start();
-                }
-
-                @Override
                 protected void append(Object eventObject) {
                     TracePane.this.append(eventObject.toString());
                 }

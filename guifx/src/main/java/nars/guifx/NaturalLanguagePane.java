@@ -11,7 +11,7 @@ public class NaturalLanguagePane extends CodeInput {
 
     final Twenglish te = new Twenglish();
     private final NAR nar;
-    float sentenceBudget = 0.5f;
+    final float sentenceBudget = 0.5f;
 
     public NaturalLanguagePane(NAR n) {
         nar = n;

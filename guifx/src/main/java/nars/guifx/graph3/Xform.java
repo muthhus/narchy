@@ -43,16 +43,16 @@ public class Xform extends Group {
         XYZ, XZY, YXZ, YZX, ZXY, ZYX
     }
         
-    public Translate t  = new Translate();
-    public Translate p = new Translate();
-    public Translate ip = new Translate();
-    public Rotate rx = new Rotate();
+    public final Translate t  = new Translate();
+    public final Translate p = new Translate();
+    public final Translate ip = new Translate();
+    public final Rotate rx = new Rotate();
     { rx.setAxis(Rotate.X_AXIS); }
-    public Rotate ry = new Rotate();
+    public final Rotate ry = new Rotate();
     { ry.setAxis(Rotate.Y_AXIS); }
-    public Rotate rz = new Rotate();
+    public final Rotate rz = new Rotate();
     { rz.setAxis(Rotate.Z_AXIS); }
-    public Scale s = new Scale();
+    public final Scale s = new Scale();
 
     public Xform() {
         getTransforms().addAll(t, rz, ry, rx, s);

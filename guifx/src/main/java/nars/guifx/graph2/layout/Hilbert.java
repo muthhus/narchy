@@ -81,13 +81,13 @@ public class Hilbert extends Linear {
 //    {
         static final int  NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 
-        float[] lastPoint = new float[2];
+        final float[] lastPoint = new float[2];
         float scaleFactor;
 
 
 
 
-        int curveSize( int ord ) {
+        static int curveSize(int ord) {
             //return (int)(Math.pow(2.0, (double)ord)) - 1;
             return power(2, ord) - 1;
         }

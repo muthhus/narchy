@@ -106,7 +106,7 @@ public class ZoomFX extends AnchorPane implements Consumer<Animate> {
         panY.update();
     }
 
-    private synchronized boolean start() {
+    private boolean start() {
 
         if (positionAnimation == null) {
             (positionAnimation = new Animate(0, this)).start();
@@ -116,7 +116,7 @@ public class ZoomFX extends AnchorPane implements Consumer<Animate> {
         return false;
     }
 
-    private synchronized boolean stop() {
+    private boolean stop() {
         if (positionAnimation!=null) {
             positionAnimation.stop();
             positionAnimation = null;

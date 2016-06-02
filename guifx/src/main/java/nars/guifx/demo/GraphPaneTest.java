@@ -4,7 +4,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import nars.$;
 import nars.NAR;
-import nars.guifx.NARfx;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.BlurCanvasEdgeRenderer;
@@ -16,6 +15,7 @@ import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.util.FX;
 import nars.util.graph.TermLinkGraph;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
@@ -122,7 +122,7 @@ public enum GraphPaneTest {
     public static void main(String[] args) {
 
 
-        NARfx.run((a, b) -> {
+        FX.run((a, b) -> {
             SpaceGrapher gggg = newGrapher(new Default());
             b.setScene(
                     new Scene(gggg, 800, 800)
@@ -131,7 +131,7 @@ public enum GraphPaneTest {
 
             gggg.start(50);
 
-            runLater(()-> gggg.source.get().updateGraph());
+            runLater(() -> gggg.source.get().updateGraph());
             //gggg.start(35);
 
 //            n.spawnThread(250, x -> {

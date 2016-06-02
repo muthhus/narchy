@@ -99,9 +99,7 @@ public class InputPane extends TabPane {
 
             index.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-            index.getSelectionModel().selectedItemProperty().addListener((e) -> {
-                runLater(LibraryInputPane.this);
-            });
+            index.getSelectionModel().selectedItemProperty().addListener((e) -> runLater(LibraryInputPane.this));
 
         }
 

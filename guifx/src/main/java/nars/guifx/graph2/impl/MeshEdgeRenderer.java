@@ -1,16 +1,12 @@
 package nars.guifx.graph2.impl;
 
-import com.github.sarxos.webcam.WebcamPanel;
 import javafx.scene.DepthTest;
-import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
-import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
-import javafx.scene.transform.Rotate;
 import nars.guifx.graph2.EdgeRenderer;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;

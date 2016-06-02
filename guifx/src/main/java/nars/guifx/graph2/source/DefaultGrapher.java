@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.guifx.annotation.Implementation;
 import nars.guifx.annotation.ImplementationProperty;
 import nars.guifx.graph2.*;
-import nars.guifx.graph2.impl.CanvasEdgeRenderer;
 import nars.guifx.graph2.layout.*;
 import nars.guifx.util.POJOPane;
 
@@ -57,9 +56,7 @@ public class DefaultGrapher extends SpaceGrapher {
 
         layoutType.addListener(e -> {
             IterativeLayout il = layoutType.getInstance();
-            runLater(()->{
-                setLayout(il!=null ? il : nullLayout);
-            });
+            runLater(()-> setLayout(il!=null ? il : nullLayout));
         });
 
 

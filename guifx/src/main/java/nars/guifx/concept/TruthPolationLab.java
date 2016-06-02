@@ -13,11 +13,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import nars.$;
-import nars.guifx.NARfx;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
+import nars.util.FX;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public class TruthPolationLab extends VBox implements ChangeListener {
         super();
 
 
-        freqSliders = new ArrayList<Slider>(range);
-        confSliders = new ArrayList<Slider>(range);
+        freqSliders = new ArrayList<>(range);
+        confSliders = new ArrayList<>(range);
 
         this.truth = new TruthPolation(range, 0);
 
@@ -65,9 +65,9 @@ public class TruthPolationLab extends VBox implements ChangeListener {
 
     @NotNull
     public VBox newSliderBank() {
-        final HBox freqEdit, confEdit;
+        final HBox confEdit;
 
-        freqEdit = new HBox();
+        final HBox freqEdit = new HBox();
         confEdit = new HBox();
 
 
@@ -86,9 +86,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
             confEdit.getChildren().add(c);
             c.valueProperty().addListener(this);
 
-            InvalidationListener updateOpac = v -> {
-                c.setOpacity(c.getValue() * 0.5 + 0.5);
-            };
+            InvalidationListener updateOpac = v -> c.setOpacity(c.getValue() * 0.5 + 0.5);
             c.valueProperty().addListener(updateOpac);
 
             updateOpac.invalidated(null);
@@ -130,17 +128,16 @@ public class TruthPolationLab extends VBox implements ChangeListener {
         g.fillRect(0, 0, cw, ch);
 
         double w = cw * 0.9;
-        double h = ch * 0.9;
-        double dx = w / range;
 
         //GraphicsContext f = editor.getGraphicsContext2D();
 
 
         int rad = 20;
 
-        double my = rad*2;
-
         if (active > 0) {
+            double my = rad * 2;
+            double dx = w / range;
+            double h = ch * 0.9;
             for (int i = 0; i < range; i++) {
                 Truth tc = truth.truth(i, tasks);
                 double x = dx * i;
@@ -173,7 +170,7 @@ public class TruthPolationLab extends VBox implements ChangeListener {
     }
 
     public static void main(String[] args) {
-        NARfx.run((a,b)->{
+        FX.run((a, b) -> {
             Stage st = new Stage();
             st.setScene(new Scene(new TruthPolationLab()));
             st.show();

@@ -41,7 +41,6 @@ public class LoopPane extends FlowPane {
 
         this.loop = loop;
 
-        NAR n = loop.nar;
         runButton = JFX.newIconButton(FontAwesomeIcon.PLAY);
         stepButton = JFX.newIconButton(FontAwesomeIcon.STEP_FORWARD);
         cpuLabel = new SimpleStringProperty("CPU");
@@ -67,6 +66,7 @@ public class LoopPane extends FlowPane {
         stepButton.setTooltip(new Tooltip("Step"));
         stepButton.setOnAction(e -> {
 
+            NAR n = loop.nar;
             if (!n.running.get()) {
                 n.step();
                 say("stepped to time " + n.time());
@@ -143,10 +143,9 @@ public class LoopPane extends FlowPane {
 
             //new delay set:
 
-            int MS = nMS;
-
             runLater(() -> {
                 unpause();
+                int MS = nMS;
                 say("@" + MS + "ms (" + Texts.n2(1000.0f / MS) + "hz)");
             });
         }

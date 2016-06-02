@@ -19,9 +19,9 @@ import nars.util.data.Util;
  */
 public class TaskAxis extends HighDim.AutoEnc2Projection<Task> {
 
-    public Group axes;
+    public final Group axes;
 
-    double xscale = 100;
+    final double xscale = 100;
 
     public TaskAxis() {
         super(22, 8, 4);

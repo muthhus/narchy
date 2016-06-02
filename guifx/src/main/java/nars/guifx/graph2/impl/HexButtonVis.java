@@ -27,7 +27,7 @@ public class HexButtonVis extends DefaultNodeVis {
     public static final Font labelFont = NARfx.mono(2f);
     private final NAR n;
 
-    static float labelMinScale = 10f; //label visibilty cutoff
+    static final float labelMinScale = 10f; //label visibilty cutoff
 
     final static float fontScale = 1/2f;
 
@@ -128,7 +128,7 @@ public class HexButtonVis extends DefaultNodeVis {
             return s;
         }
 
-        private Node getBase() {
+        private static Node getBase() {
             Polygon s = JFX.newPoly(6, 1.0);
             //s.setStrokeType(StrokeType.INSIDE);
             //s.setManaged(false);

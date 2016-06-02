@@ -3,6 +3,7 @@ package nars.guifx.demo;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
 import nars.nar.Default;
+import nars.util.FX;
 import nars.util.Texts;
 
 /**
@@ -14,18 +15,17 @@ public class BeliefLab {
 	// Global.HORIZON = 2f;
 	// }
 	public static final int beliefCapacity = 64;
-	static float waveFreq = 0.1715f;
+	static final float waveFreq = 0.1715f;
 
-    static float confMax = 0.9f;
-    static float confMin = 0.2f;
+    static final float confMax = 0.9f;
+    static final float confMin = 0.2f;
 
-	static float predictionProbability = 0.1f; // how often to ask for a
+	static final float predictionProbability = 0.1f; // how often to ask for a
 												// prediction
-	static float pastProbability = 0.1f; // how often to ask for a prediction
+	static final float pastProbability = 0.1f; // how often to ask for a prediction
 	static final float fps = 45f;
-	static boolean enableEternals;
-	static boolean enableTemporals = true;
-	static int stmInduction;
+	static final boolean enableEternals = false;
+	static final boolean enableTemporals = true;
 
 	public static void main(String[] args) {
         Default nar = new Default();
@@ -69,9 +69,7 @@ public class BeliefLab {
         });
 
 
-
-
-        NARfx.run((a,s)->{
+        FX.run((a, s) -> {
             NARfx.newWindow(nar, c);
 
 

@@ -59,7 +59,6 @@ public class ConceptSummaryPane extends Text {
             this.icon.repaint();
         }
 
-        float pri = 1f;
         /*float pri = concept.getPriority();
         if (Util.equal(lastPri, pri, 0.01) )
             priority = false;*/
@@ -81,6 +80,7 @@ public class ConceptSummaryPane extends Text {
             runLater(() -> {
                 pendingUpdate.set(false);
 
+                float pri = 1f;
                 lastPri = pri;
                 setStyle(JFX.fontSize(((1.0f + pri) * 100.0f)));
 
@@ -118,9 +118,7 @@ public class ConceptSummaryPane extends Text {
             double m = 2;
 
             double W = getWidth();
-            double Wm = W -m*2;
             double H = getHeight();
-            double Hm = H -m*2;
             if (W*H == 0) return;
 
             GraphicsContext g = getGraphicsContext2D();
@@ -131,6 +129,8 @@ public class ConceptSummaryPane extends Text {
             g.setLineWidth(m);
             g.strokeRect(m/2, m/2, W-m, H-m);
 
+            double Hm = H - m * 2;
+            double Wm = W - m * 2;
             concept.beliefs().forEach(t-> plot(m, Wm, Hm, g, t, false));
             concept.goals().forEach(t-> plot(m, Wm, Hm, g, t, true));
 
@@ -142,8 +142,6 @@ public class ConceptSummaryPane extends Text {
     static void plot(double m, double Wm, double hm, GraphicsContext g, Task t, boolean type) {
 
         ColorMatrix ca = type ? red: blue;
-
-        double w = 12;
 
 
         float freq = t.freq();
@@ -157,10 +155,10 @@ public class ConceptSummaryPane extends Text {
         //g.fillRect(m + x-wh, m + y-wh, w, w);
 
 
-        double cx = m + x;
-        double cy = m + y;
-
         g.setStroke(color);
+        double cy = m + y;
+        double cx = m + x;
+        double w = 12;
         if (type)
             g.strokeLine(cx-w/2, cy-w/2, cx+w/2, cy+w/2);
         else

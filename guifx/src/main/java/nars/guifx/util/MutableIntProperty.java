@@ -20,7 +20,7 @@ public class MutableIntProperty extends SimpleIntegerProperty {
         this(a::intValue, (v) -> a.setValue((float)v));
     }
     public MutableIntProperty(AtomicInteger a) {
-        this(a::intValue, (v) -> a.set((int)v));
+        this(a::intValue, a::set);
     }
 
     public MutableIntProperty(IntSupplier getter, IntProcedure setter) {

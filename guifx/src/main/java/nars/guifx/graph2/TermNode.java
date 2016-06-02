@@ -111,8 +111,7 @@ public class TermNode<T> extends GraphNode {
 
         TermEdge[] edges = this.edges;
 
-        TermEdge[] e;
-        e = edges.length != s ? new TermEdge[s] : edges;
+        TermEdge[] e = edges.length != s ? new TermEdge[s] : edges;
 
         return this.edges = edge.values().toArray(e);
     }

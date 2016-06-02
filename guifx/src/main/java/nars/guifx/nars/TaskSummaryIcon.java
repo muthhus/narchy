@@ -39,13 +39,13 @@ public class TaskSummaryIcon extends SummaryIcon implements Runnable {
         run();
     }
 
-    final Color getBudgetColor(float pri) {
+    static Color getBudgetColor(float pri) {
         return grayRange.get(pri);
     }
-    final Color getBeliefColor(float freq, float conf) {
+    static Color getBeliefColor(float freq, float conf) {
         return beliefRange.get(freq);
     }
-    final Color getGoalColor(float freq, float conf) {
+    static Color getGoalColor(float freq, float conf) {
         return goalRange.get(freq);
     }
 

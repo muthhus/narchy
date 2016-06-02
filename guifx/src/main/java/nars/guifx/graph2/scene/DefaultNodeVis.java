@@ -33,10 +33,10 @@ public class DefaultNodeVis implements NodeVis {
 
     //static final Font nodeFont = NARfx.mono(0.25);
 
-    protected double minSize = 16;
-    protected double maxSize = 64;
+    protected final double minSize = 16;
+    protected final double maxSize = 64;
 
-    int maxEdges = 16;
+    final int maxEdges = 16;
 
     double nodeScaleCache = 1.0;
 
@@ -48,9 +48,7 @@ public class DefaultNodeVis implements NodeVis {
     private NAR nar;
 
     public DefaultNodeVis() {
-        nodeScale.addListener((e) -> {
-            nodeScaleCache = nodeScale.get();
-        });
+        nodeScale.addListener((e) -> nodeScaleCache = nodeScale.get());
         nodeScaleCache = nodeScale.get();
 
 
@@ -101,7 +99,7 @@ public class DefaultNodeVis implements NodeVis {
     static final Font mono = NARfx.mono(8);
 
     public static final ColorMatrix colors = new ColorMatrix(17 /* op hashcode color, hopefully prime */, 17 /* activation  */,
-            (op, activation) -> termcolor(op,activation));
+            DefaultNodeVis::termcolor);
 
     private static Color termcolor(double op, double activation) {
         return Color.hsb(op * 360.0,
@@ -208,7 +206,7 @@ public class DefaultNodeVis implements NodeVis {
     }
 
 
-    EventHandler<MouseEvent> mouseUntivity = e -> {
+    final EventHandler<MouseEvent> mouseUntivity = e -> {
         if (hoverPanel.isVisible()) {
             setSelected(null);
             //base.setStroke(null);
@@ -344,7 +342,6 @@ public class DefaultNodeVis implements NodeVis {
 
                 Color color = TermNode.getTermColor(term, colors, 0.5);
                 //TODO move nodeScaleCache elsewhere
-                double s = (1.0 * 4.0) / w; //scaled to width
 
                 //if (term instanceof Term) {
                 g.setFill(color); /*colors.get(
@@ -361,6 +358,7 @@ public class DefaultNodeVis implements NodeVis {
 
                 g.fillText(term.toString(), 0, h / 2);
 
+                double s = (1.0 * 4.0) / w; //scaled to width
                 base.setScaleX(s);
                 base.setScaleY(s);
                 //base.setScaleZ(s);

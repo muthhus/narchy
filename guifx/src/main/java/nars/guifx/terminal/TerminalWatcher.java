@@ -27,10 +27,10 @@ public class TerminalWatcher implements Runnable {
 
     @Override
     public void run() {
-        InputStreamReader isr = new InputStreamReader(outFromChannel);
         try {
             char[] buff = new char[1024];
             int read;
+            InputStreamReader isr = new InputStreamReader(outFromChannel);
             while ((read = isr.read(buff)) != -1) {
                 String s = new String(buff, 0, read);
 
@@ -83,7 +83,7 @@ public class TerminalWatcher implements Runnable {
         }
     }
 
-    private String removeEscapes(String source) {
+    private static String removeEscapes(String source) {
         String target = source.replaceAll("\u001B[\\(\\)][AB012]", "");
 
         target = target.replaceAll("\u001B\\[\\?*\\d*;*\\d*[a-zA-Z]", "");

@@ -131,7 +131,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
      * Boolean flag that specifies if the layout is allowed to run. If this is
      * set to false, then the layout exits in the following iteration.
      */
-    protected boolean allowedToRun = true;
+    protected final boolean allowedToRun = true;
 
     /**
      * Maps from vertex to indices.
@@ -290,9 +290,8 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             if (vd.width() /*getRadius()*/ == 0) continue;
             vertexArray.add(vd);
         }
-        
-        Rectangle initialBounds = null; //new mxRectangle(-100, -50, 100, 50);
-                //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
+
+        //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
         
         int n = vertexArray.size();
 
@@ -353,8 +352,6 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             // the center point of the vertex for better positioning
             double ww = Math.max(vd.width(), vd.height()); /*getRadius()*/
             double width = ww*2f; //bounds.getWidth();
-            double height = ww*2f; //bounds.getHeight();
-
 
 
             // Randomize (0, 0) locations
@@ -366,6 +363,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             double[] cli = cl[i];
 
             cli[0] = x + width / 2.0;
+            double height = ww * 2f; //bounds.getHeight();
             cli[1] = y + height / 2.0;
 
             double r = radius[i] = Math.min(width, height);
@@ -395,12 +393,10 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             if (edges!=null) {
 
 
-                final Object[] ccells;
-                int cellsSize = edges.length;
-
                 cells.clear();
+                int cellsSize = edges.length;
                 cells.ensureCapacity(cellsSize);
-                ccells = cells.array();
+                final Object[] ccells = cells.array();
 
                 int cn = 0;
                 for (TermEdge e : edges) {
@@ -510,6 +506,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             double dx = -(maxx + minx) / 2f;
             double dy = -(maxy + miny) / 2f;
 
+            Rectangle initialBounds = null; //new mxRectangle(-100, -50, 100, 50);
             if (initialBounds != null) {
                 dx += initialBounds.getX();
                 dy += initialBounds.getY();

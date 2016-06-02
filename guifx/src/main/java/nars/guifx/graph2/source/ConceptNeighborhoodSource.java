@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public class ConceptNeighborhoodSource extends ConceptsSource {
 
     private final ArrayList<Termed> roots;
-    int termLinkNeighbors = 16;
+    final int termLinkNeighbors = 16;
 
     public ConceptNeighborhoodSource(NAR nar, Termed... c) {
         super(nar);

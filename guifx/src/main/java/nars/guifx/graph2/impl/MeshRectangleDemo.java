@@ -21,7 +21,7 @@ public class MeshRectangleDemo extends Application {
 
     double anchorX, anchorY, anchorAngle;
 
-    private PerspectiveCamera addCamera(Scene scene) {
+    private static PerspectiveCamera addCamera(Scene scene) {
         PerspectiveCamera perspectiveCamera = new PerspectiveCamera(false);
         scene.setCamera(perspectiveCamera);
         return perspectiveCamera;
@@ -47,16 +47,18 @@ public class MeshRectangleDemo extends Application {
         final Group root = new Group(rect);
         final Scene scene = new Scene(root, 500, 500, true);
 
-        scene.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
+        scene.setOnMousePressed(new EventHandler<>() {
+            @Override
+            public void handle(MouseEvent event) {
                 anchorX = event.getSceneX();
                 anchorY = event.getSceneY();
                 anchorAngle = rect.getRotate();
             }
         });
 
-        scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
+        scene.setOnMouseDragged(new EventHandler<>() {
+            @Override
+            public void handle(MouseEvent event) {
                 rect.setRotate(anchorAngle + anchorX - event.getSceneX());
             }
         });

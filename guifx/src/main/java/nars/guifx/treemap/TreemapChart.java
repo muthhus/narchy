@@ -15,8 +15,8 @@ public class TreemapChart extends Parent {
 	// private final ColorBucket colorBucket = ColorBucket.createBucket();
 	public final Item root;
 
-	public DoubleProperty width = new SimpleDoubleProperty(640.0);
-	public DoubleProperty height = new SimpleDoubleProperty(280.0);
+	public final DoubleProperty width = new SimpleDoubleProperty(640.0);
+	public final DoubleProperty height = new SimpleDoubleProperty(280.0);
 
 	private final TreemapElementFactory elementFactory = new TreemapElementFactory();
 	private final TreemapLayout treemapLayouter;

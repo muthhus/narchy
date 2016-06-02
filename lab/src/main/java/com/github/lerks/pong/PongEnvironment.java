@@ -270,7 +270,7 @@ public class PongEnvironment extends Player implements Environment {
 
 
 		float score = points;
-		float reward = score-lastScore - bias;
+		float reward = score-lastScore + bias;
 		lastScore = score;
 		return reward;
 	}

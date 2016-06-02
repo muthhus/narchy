@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import nars.NAR;
 import nars.guifx.Spacegraph;
 import nars.guifx.graph2.*;
-import nars.guifx.graph2.impl.CanvasEdgeRenderer;
 import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.graph2.layout.None;
 import nars.guifx.util.Animate;
@@ -204,7 +203,7 @@ public class SpaceGrapher extends Spacegraph {
         return newEdge;
     }
 
-    public final boolean addEdge(TermNode A, Termed b, TermEdge e) {
+    public static boolean addEdge(TermNode A, Termed b, TermEdge e) {
         return A.putEdge(b, e) == null;
     }
 
@@ -387,17 +386,14 @@ public class SpaceGrapher extends Spacegraph {
             }*/
         });
 
-        nodeVis.addListener((l, c, v) -> {
-            runLater(()-> {
-                SpaceGrapher gg = SpaceGrapher.this;
-                logger.info("nodeVis {} <- {}", v, c);
-                if (c != null)
-                    c.stop(gg);
-                if (v!=null)
-                    v.start(gg, nar);
-            });
-
-        });
+        nodeVis.addListener((l, c, v) -> runLater(()-> {
+            SpaceGrapher gg = SpaceGrapher.this;
+            logger.info("nodeVis {} <- {}", v, c);
+            if (c != null)
+                c.stop(gg);
+            if (v!=null)
+                v.start(gg, nar);
+        }));
 
 
         //.onEachNthFrame(this::updateGraph, 1);
@@ -437,7 +433,7 @@ public class SpaceGrapher extends Spacegraph {
     /**
      * called when layout changes to restart the source & layout
      */
-    public synchronized void setLayout(IterativeLayout il) {
+    public void setLayout(IterativeLayout il) {
 
         long lastAnimPeriodMS;
         if (animator!=null) {
@@ -536,9 +532,9 @@ public class SpaceGrapher extends Spacegraph {
 
     }
 
-    final Executor updater = Executors.newSingleThreadExecutor();
+    //final Executor updater = Executors.newSingleThreadExecutor();
 
-    public synchronized void start(long layoutPeriodMS) {
+    public void start(long layoutPeriodMS) {
 
         if (layoutPeriodMS > 0) {
 

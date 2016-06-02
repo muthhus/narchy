@@ -10,7 +10,7 @@ import javafx.scene.text.TextAlignment;
 public abstract class AutoLabel<T> extends Label implements ChangeListener {
 
 
-    protected T obj;
+    protected final T obj;
     protected float lastPri = -1;
     public final SimpleBooleanProperty selected = new SimpleBooleanProperty(false);
     protected String text;

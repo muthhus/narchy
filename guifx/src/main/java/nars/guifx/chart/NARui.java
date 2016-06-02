@@ -53,9 +53,9 @@ public class NARui {
         TemporalMetrics meter = new TemporalMetrics(DEFAULT_HISTORY_SIZE);
         metrics.add(meter);
 
-        MetricsCollector<X> mc = new MetricsCollector<X>() {
+        MetricsCollector<X> mc = new MetricsCollector<>() {
 
-            Map<String, ObjectMeter<X>> m = new HashMap();
+            final Map<String, ObjectMeter<X>> m = new HashMap();
 
             @Override
             public MetricsCollector<X> set(String signal, X value) {

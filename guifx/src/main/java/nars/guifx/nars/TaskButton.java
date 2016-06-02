@@ -44,8 +44,7 @@ public class TaskButton<X> extends Label implements Runnable {
         super();
         this.item = t;
 
-        Object ref;
-        ref = t instanceof BLink ? ((BLink) t).get() : t;
+        Object ref = t instanceof BLink ? ((BLink) t).get() : t;
 
         String s;
         if (ref instanceof Task) {
@@ -136,9 +135,9 @@ public class TaskButton<X> extends Label implements Runnable {
             }
 
 
-            float minScale = 0.5f;
             if (scalesText()) {
                 Scale scale1 = this.scale;
+                float minScale = 0.5f;
                 scale1.setX(scale + minScale);
                 scale1.setY(scale + minScale);
                 //setNeedsLayout(true);
@@ -162,11 +161,11 @@ public class TaskButton<X> extends Label implements Runnable {
         }
     }
 
-    public boolean scalesText() {
+    public static boolean scalesText() {
         return true;
     }
 
-    public float getScale(float pri) {
+    public static float getScale(float pri) {
         return pri + 0.5f;
     }
 

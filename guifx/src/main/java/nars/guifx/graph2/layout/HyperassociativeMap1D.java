@@ -45,7 +45,7 @@ public class HyperassociativeMap1D<N extends Termed> extends HyperassociativeMap
         double[] vv = v.getDataRef();
 
         //int volume = node.c.getTerm().volume();
-        double xTarget, yTarget, speedX, speedY;
+        double yTarget, speedX, speedY;
 
 //            //vertical line
 //            {
@@ -63,7 +63,7 @@ public class HyperassociativeMap1D<N extends Termed> extends HyperassociativeMap
 
         double r = 100 * complexity + 200;
 
-        xTarget = r * Math.cos( theta);
+        double xTarget = r * Math.cos(theta);
         yTarget = r * Math.sin( theta);
 
         speedX = 0.05f;

@@ -20,7 +20,6 @@ package nars.guifx.chart;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 
 import static javafx.application.Platform.runLater;

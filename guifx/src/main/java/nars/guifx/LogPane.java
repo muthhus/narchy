@@ -38,7 +38,7 @@ public class LogPane extends BorderPane  {
 
     //NSliderSet filter = new NSliderSet();
 
-    ScrollPane scrollParent;
+    final ScrollPane scrollParent;
 
 
 //    public void commit(Node[] c) {
@@ -50,7 +50,7 @@ public class LogPane extends BorderPane  {
         scrollBottom.run();
     }
 
-    final Runnable scrollBottom = () -> scrollParent.setVvalue(1.0f);
+    final Runnable scrollBottom;
 
     void updateParent() {
 //        if (content.getParent()!=null) {
@@ -75,12 +75,10 @@ public class LogPane extends BorderPane  {
         //((VBox)content).setFillWidth(false);
 
         setCenter(scrollParent = scrolled(content));
+        scrollBottom = () -> scrollParent.setVvalue(1.0f);
 
 
-
-        sceneProperty().addListener((c) -> {
-            updateParent();
-        });
+        sceneProperty().addListener((c) -> updateParent());
 
         /*incoming = new Output(nar) {
 
@@ -110,7 +108,8 @@ public class LogPane extends BorderPane  {
     public static class ActivationTreeMap extends TreemapChart {
 
         private final Item.DefaultItem r;
-        @Deprecated Set<Concept> concept = new HashSet();
+        @Deprecated
+        final Set<Concept> concept = new HashSet();
 
         public ActivationTreeMap(Object firstChild, float firstChildSize) {
             super(Item.get("", 0.0f, firstChild, firstChildSize));

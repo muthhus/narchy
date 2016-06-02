@@ -51,13 +51,11 @@ public class NARMenu extends HBox {
 
         NSlider fontSlider = new NSlider(25.0f, 25.0f, 0.5);
         //getChildren().add(0, fontSlider);
-        fontSlider.value[0].addListener((a, b, c) -> {
-            runLater(() -> {
-                double pointSize = 6 + 12 * c.doubleValue();
-                getScene().getRoot().setStyle("-fx-font-size: " + pointSize + "pt;");
-                //+ 100*(0.5 + c.doubleValue()) + "%");
-            });
-        });
+        fontSlider.value[0].addListener((a, b, c) -> runLater(() -> {
+            double pointSize = 6 + 12 * c.doubleValue();
+            getScene().getRoot().setStyle("-fx-font-size: " + pointSize + "pt;");
+            //+ 100*(0.5 + c.doubleValue()) + "%");
+        }));
         fontSlider.setOnMouseClicked((e) -> {
             if (e.getClickCount() == 2) {
                 //double click
@@ -187,7 +185,7 @@ public class NARMenu extends HBox {
         private final RealtimeMSClock clock;
         private final TextField clockTextField;
         private final Plot2D busyPlot;
-        long startTime;
+        final long startTime;
         final static int WINDOW_SIZE = 32;
 
         final DescriptiveStatistics busyAvgShort = new DescriptiveStatistics(WINDOW_SIZE);
@@ -205,7 +203,7 @@ public class NARMenu extends HBox {
 
 
             busyPlot = new Plot2D(Plot2D.Line, WINDOW_SIZE, 192);
-            busyPlot.add("Busy", ()-> nar.emotion.busy.getSum());
+            busyPlot.add("Busy", nar.emotion.busy::getSum);
             //busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double) nar.emotion.busy()));
             //busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double) nar.emotion.busy.()));
 

@@ -95,7 +95,7 @@ public abstract class Scatter3D<X> extends SpaceNet {
     final Set<X> dead = new UnifiedSet();
     double n;
 
-    float spaceScale = 10;
+    final float spaceScale = 10;
 
     public void frame() {
 
@@ -105,14 +105,13 @@ public abstract class Scatter3D<X> extends SpaceNet {
 
         n = 0;
 
-        double[] d = new double[3];
-        double[] s = new double[3];
-
         List<DataPoint> toAdd = new ArrayList();
 
 
         Iterable<X>[] collects = get();
         if (collects != null) {
+            double[] s = new double[3];
+            double[] d = new double[3];
             for (Iterable<X> ii : collects) {
                 if (ii == null) continue;
                 ii.forEach(tl -> {

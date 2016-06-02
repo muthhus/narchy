@@ -130,7 +130,7 @@ public class Graph1 extends SpacenetApp {
         return g;
     }
 
-    public Pane getControls() {
+    public static Pane getControls() {
         GraphVis g = new GraphVis();
         List<String> range = new ArrayList<>();
         g.add("Force Directed");

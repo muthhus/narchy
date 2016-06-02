@@ -8,13 +8,13 @@ import java.util.List;
 /** graph visualization model */
 public class GraphVis {
 
-    List<String> parameters = new ArrayList<>();
+    final List<String> parameters = new ArrayList<>();
 
-    String wtf = "dsfsdfsdf";
+    final String wtf = "dsfsdfsdf";
 
-    int num = 14159;
+    final int num = 14159;
 
-    Interval ii = new Interval(0, 1);
+    final Interval ii = new Interval(0, 1);
 
     public Interval getIi() {
         return ii;

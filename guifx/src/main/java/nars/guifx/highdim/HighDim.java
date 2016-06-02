@@ -196,7 +196,7 @@ public class HighDim<T> extends Spacegraph {
         /**
          * when term changes
          */
-        Button l;
+        final Button l;
 
 
         /* TODO abstract */

@@ -13,6 +13,7 @@ import nars.guifx.util.NSlider;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.out.echo;
 import nars.task.Task;
+import nars.util.FX;
 import nars.util.event.FrameReaction;
 
 import java.util.*;
@@ -53,9 +54,7 @@ public class TreePane extends BorderPane {
         NSlider ns = new NSlider("Min Task Priority", 80, 20, 0); //show everytihng initially
 
 
-        (minPriority = ns.value[0]).addListener((v) -> {
-            update();
-        });
+        (minPriority = ns.value[0]).addListener((v) -> update());
 
 
 
@@ -67,7 +66,7 @@ public class TreePane extends BorderPane {
         tree.setShowRoot(false);
 
 
-        setCenter(NARfx.scrolled(tree));
+        setCenter(FX.scrolled(tree));
 
         onFrame = new FrameReaction(n) {
             @Override

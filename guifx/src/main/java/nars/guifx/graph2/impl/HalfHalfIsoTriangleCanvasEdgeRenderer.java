@@ -29,7 +29,6 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
         //if (aSrc.isVisible()) {
         double[] X = this.xp;
-        double[] Y = this.yp;
         /*{
             X[0] = -0.5;
             Y[0] = 0d;
@@ -39,6 +38,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
             Y[2] = 0d;
         }*/
         X[0] = -0.5;
+        double[] Y = this.yp;
         Y[0] = -0.5;
         X[1] = -0.5;
         Y[1] = 0.5;
@@ -96,14 +96,14 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
 
         //if (aSrc.isVisible()) {
-        double[] X = this.xp;
-        double[] Y = this.yp;
-
 
 
         gfx.setFill(TermNode.getTermColor(aSrc.term, colors, p*aSrc.priNorm));
         //gfx.fillPolygon(X, Y, 3);
+
         gfx.beginPath();
+        double[] Y = this.yp;
+        double[] X = this.xp;
         gfx.moveTo(X[0], Y[0]);
         gfx.lineTo(X[1], Y[1]);
         gfx.lineTo(X[2], Y[2]);

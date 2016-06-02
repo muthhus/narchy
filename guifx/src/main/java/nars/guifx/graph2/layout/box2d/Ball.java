@@ -28,7 +28,7 @@ import org.jbox2d.dynamics.FixtureDef;
 public class Ball {
 
 	// JavaFX UI for ball
-	public Node node;
+	public final Node node;
 
 	// X and Y position of the ball in JBox2D world
 	private float posX;

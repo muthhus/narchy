@@ -122,14 +122,12 @@ public class Spacegraph extends ZoomFX {
             boolean drawSharpLines = this.drawSharpLines;
 
             for (; y <= h; y += scale) {
-                double Y;
-                Y = drawSharpLines ? snap(y) : y;
+                double Y = drawSharpLines ? snap(y) : y;
 
                 gc.strokeLine(0, Y, w, Y);
             }
             for (; x <= w; x += scale) {
-                double sx;
-                sx = drawSharpLines ? snap(x) : x;
+                double sx = drawSharpLines ? snap(x) : x;
 
                 gc.strokeLine(sx, 0, sx, h);
             }

@@ -16,19 +16,18 @@ import static javafx.application.Platform.runLater;
 public abstract class ConceptsListPane extends LogPane {
 
     private List<Node> displayed;
-    LinkedHashSet<Concept> pendingDisplay = new LinkedHashSet();
-    int maxShown = 64;
+    final LinkedHashSet<Concept> pendingDisplay = new LinkedHashSet();
+    final int maxShown = 64;
 
     final AtomicBoolean pendingShown = new AtomicBoolean(false);
 
-    long now;
+    final long now;
 
     public ConceptsListPane(NAR n) {
 
         now = n.time();
 
         n.onFrame(nn-> {
-            now = n.time();
             if (displayed!=null)
                 displayed.forEach(this::update);
         });

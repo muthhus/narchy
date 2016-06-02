@@ -80,7 +80,7 @@ public class DefaultWindow extends GraphNode implements SelectableNode {
     private boolean RESIZE_LEFT;
     private boolean RESIZE_BOTTOM;
     private boolean RESIZE_RIGHT;
-    public Node titleBar;
+    public final Node titleBar;
     public final StackPane root = new StackPane();
     private final double contentScale = 0.95f;
     private double oldHeight;

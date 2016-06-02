@@ -112,34 +112,6 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
             //return SubButton.make(nar, t);
         }
 
-        @Override
-        public void appear() {
-            super.appear();
-//            On commands = nar.onExecution("html", (e) -> {
-//
-//                Term[] a = Operator.argArray(e.term());
-//                String content = ((Atom)a[0]).toStringUnquoted();
-//
-//                runLater(() -> {
-//                    WebView w = new WebView();
-//                    //w.resize(400,200);
-//                    w.getEngine().loadContent(
-//                            content
-//                    );
-//                    w.setMinHeight(100);
-//
-//                    w.autosize();
-//                    w.layout();
-//                    append(w);
-//                } );
-//            });
-        }
-
-        @Override
-        public void disappear() {
-            super.disappear();
-            //TODO unregister
-        }
     }
 
     public class OutputPane extends BorderPane {

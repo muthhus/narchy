@@ -18,7 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
-import nars.guifx.NARfx;
+import nars.util.FX;
 import nars.util.Texts;
 
 import java.util.Arrays;
@@ -250,13 +250,12 @@ public class NSlider extends NControl {
         }
     }
 
-    public Vis vis;
+    public final Vis vis;
 
     public static final Vis BarSlider = (vector, canvas1, W, H, g1) -> {
 
 
         double p = Vis.getFirstAndOnlyDimension(vector);
-        double barSize = W * p;
 
         double margin = 4;
         double mh = margin / 2.0;
@@ -269,19 +268,16 @@ public class NSlider extends NControl {
         g1.setLineWidth(0);
         double hp = 0.5 + 0.5 * p;
         g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
+        double barSize = W * p;
         g1.fillRect(mh, mh, barSize - mh * 2, H - mh * 2);
     };
 
     public static final Vis NotchSlider = (v, canvas, W, H, g) -> {
 
         double p = Vis.getFirstAndOnlyDimension(v);
-        double barSize = W * p;
 
         double margin = 4;
-        double mh = margin / 2.0;
 
-
-        double notchRadius = W * 0.1;
 
         g.setLineWidth(0);
 
@@ -289,6 +285,9 @@ public class NSlider extends NControl {
 
         double hp = 0.5 + 0.5 * p;
         g.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
+        double notchRadius = W * 0.1;
+        double mh = margin / 2.0;
+        double barSize = W * p;
         g.fillRect(mh + barSize - notchRadius, mh, notchRadius * 2, H - mh * 2);
     };
 
@@ -301,8 +300,6 @@ public class NSlider extends NControl {
 
         double angleStart = 0;
         double circumferenceActive = 0.5; //how much of the circumference of the interior circle is active as a dial track
-
-        double theta = angleStart + (1-p) * circumferenceActive * (2 * Math.PI);
 
 
 //        double x = W/2 + (W/2-margin) * Math.cos(theta);
@@ -318,16 +315,16 @@ public class NSlider extends NControl {
 
         //double ews = ew * np, ehs = eh * np; //scale by prop
 
-        double ul = (W - ew) / 2.0;
-        double ut = (H - eh) / 2.0;
-
         g.setFill(Color.DARKGRAY);
+        double ut = (H - eh) / 2.0;
+        double ul = (W - ew) / 2.0;
         g.fillOval(ul, ut, ew, eh);
 
         double hp = 0.5 + 0.5 * p;
         g.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
 
+        double theta = angleStart + (1 - p) * circumferenceActive * (2 * Math.PI);
         double atheta = theta * 180.0 / Math.PI; //radian to degree
         double knobArc = 60;
         g.fillArc(ul, ut, ew, eh,
@@ -391,17 +388,17 @@ public class NSlider extends NControl {
 
 
     public static void main(String[] args) {
-        NARfx.run((a, b) -> {
+        FX.run((a, b) -> {
 
             FlowPane p = new FlowPane(16, 16);
 
             p.getChildren().setAll(
-                new NSlider("Bar", 256, 96, NSlider.BarSlider, 0.5),
-                new NSlider("Notch", 128, 45, NSlider.NotchSlider, 0.25),
-                new NSlider("Notch--", 64, 25, NSlider.NotchSlider, 0.75),
-                new NSlider("Knob", 256, 256, NSlider.CircleKnob, 0.5),
-                new NSlider("Ranged", 256, 256, NSlider.BarSlider, 75)
-                    .range(0, 100).on(0, c -> System.out.println(Arrays.toString(c.normalized())))
+                    new NSlider("Bar", 256, 96, NSlider.BarSlider, 0.5),
+                    new NSlider("Notch", 128, 45, NSlider.NotchSlider, 0.25),
+                    new NSlider("Notch--", 64, 25, NSlider.NotchSlider, 0.75),
+                    new NSlider("Knob", 256, 256, NSlider.CircleKnob, 0.5),
+                    new NSlider("Ranged", 256, 256, NSlider.BarSlider, 75)
+                            .range(0, 100).on(0, c -> System.out.println(Arrays.toString(c.normalized())))
             );
 
 
@@ -418,9 +415,7 @@ public class NSlider extends NControl {
     private NSlider on(int dimension, Consumer<NSlider> callback) {
 
         //TODO save listener so it can be de-registered
-        value[0].addListener(c -> {
-           callback.accept(NSlider.this);
-        });
+        value[0].addListener(c -> callback.accept(NSlider.this));
 
         return this;
     }

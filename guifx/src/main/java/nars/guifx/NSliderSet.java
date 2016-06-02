@@ -12,7 +12,7 @@ import static javafx.application.Platform.runLater;
  * Created by me on 9/13/15.
  */
 public class NSliderSet<K> extends FlowPane {
-    protected Map<K, NSlider> data = new ConcurrentHashMap<>();
+    protected final Map<K, NSlider> data = new ConcurrentHashMap<>();
 
 
     public NSliderSet() {

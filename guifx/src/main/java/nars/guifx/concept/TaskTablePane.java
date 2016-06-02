@@ -79,20 +79,17 @@ public class TaskTablePane extends HBox implements Runnable {
         //compute bounds from combined min/max of beliefs and goals so they align correctly
         long minT = Long.MAX_VALUE;
         long maxT = Long.MIN_VALUE;
-        {
 
-            if (!beliefs.isEmpty()) {
-                minT = beliefs.start();
-                maxT = beliefs.end();
-            }
-            if (!goals.isEmpty()) {
+        if (!beliefs.isEmpty()) {
+            minT = beliefs.start();
+            maxT = beliefs.end();
+        }
+        if (!goals.isEmpty()) {
 
-                long min = goals.start();
-                if (min != ETERNAL) {
-                    minT = Math.min(goals.start(), minT);
-                    maxT = Math.max(goals.end(), maxT);
-                }
-
+            long min = goals.start();
+            if (min != ETERNAL) {
+                minT = Math.min(goals.start(), minT);
+                maxT = Math.max(goals.end(), maxT);
             }
 
         }
@@ -154,11 +151,11 @@ public class TaskTablePane extends HBox implements Runnable {
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
         double r = gew * (0.1 + (0.15 * conf));
-        double hpi = PI/2.0;
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
         ge.strokeLine(dx0+bcx, dy0+bcy, -dx0+bcx, -dy0+bcy);
+        double hpi = PI / 2.0;
         double dx1 = Math.cos(theta +hpi) * r;
         double dy1 = Math.sin(theta +hpi) * r;
         ge.strokeLine(dx1+bcx, dy1+bcy, -dx1+bcx, -dy1+bcy);
@@ -193,8 +190,6 @@ public class TaskTablePane extends HBox implements Runnable {
         }
 
         /** drawn "pixel" dimensions*/
-        float pw = 10;
-        float ph = 10;
 
         table.forEach((freq, conf, o, pri) -> {
 
@@ -202,6 +197,7 @@ public class TaskTablePane extends HBox implements Runnable {
             float eh, x;
             GraphicsContext g;
             float padding = this.padding;
+            float pw = 10;
             if (eternal) {
                 eh = geh;
 
@@ -212,6 +208,7 @@ public class TaskTablePane extends HBox implements Runnable {
                 x = xTime(tew, padding, minT, maxT, o, pw);
                 g = te;
             }
+            float ph = 10;
             float y = yPos(eh, padding, ph, freq
             );
             r.renderTask(g, pri, conf, pw, ph, x, y);
@@ -234,7 +231,7 @@ public class TaskTablePane extends HBox implements Runnable {
     }
 
 
-    private float xTime(float tew, float b, float minT, float maxT, float o, float w) {
+    private static float xTime(float tew, float b, float minT, float maxT, float o, float w) {
         float p = minT == maxT ? 0.5f : (o - minT) / (maxT - minT);
         return b + p * (tew - b - w);
     }

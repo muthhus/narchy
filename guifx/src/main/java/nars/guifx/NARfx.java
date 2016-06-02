@@ -1,14 +1,10 @@
 package nars.guifx;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -48,7 +44,7 @@ public final class NARfx extends FX {
 
     /** retarded hack because this stylesheet stuff in JavaFX is designed pretty bad */
     public static void theme(Scene scene) {
-        updater.applyCssToParent(scene);
+        NARide.FXCSSUpdater.applyCssToParent(scene);
     }
 
     public static void newWindow(NAR nar, Termed c) {
@@ -92,9 +88,7 @@ public final class NARfx extends FX {
 
         double finalV = v;
 
-        return monoFonts.getIfAbsentPut(i, () -> {
-            return Font.font("Monospaced", finalV);
-        });
+        return monoFonts.getIfAbsentPut(i, () -> Font.font("Monospaced", finalV));
     }
 
 //   static void popup(Core core, Parent n) {
@@ -134,7 +128,7 @@ public final class NARfx extends FX {
 
 
     /** Object instances -> GUI windows */
-    public static Map<Object, Stage> window = Global.newHashMap();
+    public static final Map<Object, Stage> window = Global.newHashMap();
 
 
     public static final ColorMatrix colors = new ColorMatrix(24, 24,
@@ -204,7 +198,7 @@ public final class NARfx extends FX {
 //
 //    }
 
-    static NARide.FXCSSUpdater updater;
+    static final NARide.FXCSSUpdater updater;
     static {
         StringProperty cssProp = new SimpleStringProperty("");
         updater = new NARide.FXCSSUpdater();

@@ -89,8 +89,8 @@ public class ConceptsSource extends GraphSource {
 
             Termed target = ((BLink<Termed>) link).get();
 
-            if (cct.equals(target)) //self-loop
-                return true;
+            //if (cct.equals(target)) //self-loop
+            //    return true;
 
             TermNode tn = sg.getTermNode(target);
             if (tn != null) {
@@ -163,8 +163,6 @@ public class ConceptsSource extends GraphSource {
     @Override
     public void commit() {
 
-        Bag<Concept> x = ((Default) nar).core.concepts;
-
         String _keywordFilter = includeString.get();
         this.keywordFilter = _keywordFilter != null && _keywordFilter.isEmpty() ? null : _keywordFilter;
 
@@ -175,6 +173,7 @@ public class ConceptsSource extends GraphSource {
 
         //TODO use forEach witha predicate return to stop early
         eachConcept.reset();
+        Bag<Concept> x = ((Default) nar).core.concepts;
         x.topWhile(eachConcept);
 
 //        Iterable<Termed> _concepts = StreamSupport.stream(x.spliterator(), false).filter(cc -> {

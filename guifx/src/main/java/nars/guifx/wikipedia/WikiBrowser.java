@@ -276,7 +276,7 @@ public abstract class WikiBrowser extends BorderPane {
     }
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public String getWikiTag(String url) {
+    public static String getWikiTag(String url) {
         if (url.contains(".wikipedia.org/wiki/")) {
             int p = url.lastIndexOf('/');
             String tag = url.substring(p + 1);
