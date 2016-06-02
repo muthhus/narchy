@@ -81,11 +81,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return Terms.opRel(op, relation);
     }
 
-    @Override
-    public final boolean isTerm(int i, @NotNull Op o) {
-        //return subterms.isTerm(i, o);
-        return subterms.term[i].op() == o;
-    }
+
 
 //    protected GenericCompound(GenericCompound copy, int newT) {
 //        this.terms = copy.terms;
@@ -101,10 +97,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return op;
     }
 
-    @Override
-    public final boolean isCommutative() {
-        return op.commutative && size() > 1;
-    }
 
 
     //    @Override
@@ -163,14 +155,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
 
-    @Override
-    public final void copyInto(@NotNull Collection<Term> set) {
-        subterms.copyInto(set);
-    }
+
 
     @NotNull
     @Override
-    public final TermContainer<T> subterms() {
+    public final TermVector<T> subterms() {
         return subterms;
     }
 
@@ -180,23 +169,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
                 ( that instanceof Compound && hash == that.hashCode() && equalsFurther((Compound) that));
     }
 
-    @Override
-    public final boolean equalTerms(@NotNull TermContainer c) {
-        return subterms.equalTerms(c);
-    }
-
-    private boolean equalsFurther(@NotNull Compound u) {
-
-        if (opRel() == u.opRel() /*&& (((t instanceof Compound))*/) {
-            /*if (relation != c.relation())
-                return false;*/
-            if (/*op.isTemporal() &&*/ dt!= u.dt())
-                return false;
-            if (!subterms.equals(u.subterms()))
-                return false;
-        }
-        return true;
-    }
 
 
     @Override
@@ -205,104 +177,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
 
-    @Override
-    public final int varDep() {
-        return subterms.varDeps;
-    }
-
-    @Override
-    public final int varIndep() {
-        return subterms.varIndeps;
-    }
-
-    @Override
-    public final int varQuery() {
-        return subterms.varQuerys;
-    }
-
-    @Override
-    public final int varPattern() {
-        return subterms.varPatterns;
-    }
-
-
-    @Override
-    public final int vars() {
-        return subterms.vars;
-    }
-
-//    public final Term[] cloneTermsReplacing(int index, Term replaced) {
-//        return terms.cloneTermsReplacing(index, replaced);
-//    }
-
-
-    @Override
-    public final boolean contains(Object o) {
-        return subterms.contains(o);
-    }
-
-
-    @Override
-    public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
-        subterms.forEach(action, start, stop);
-    }
-
-    @Override
-    public final void forEach(@NotNull Consumer<? super T> c) {
-        subterms.forEach(c);
-    }
-
-    @NotNull
-    @Override
-    @Deprecated
-    public T[] terms() {
-        return subterms.terms();
-    }
-
-    @Override
-    public final Term[] terms(@NotNull IntObjectPredicate<T> filter) {
-        return subterms.terms(filter);
-    }
-
-    @Override
-    public final Iterator<T> iterator() {
-        return subterms.iterator();
-    }
-
-    @Override
-    public int structure() {
-        return subterms.structure() | op.bit;
-    }
-
-    @Override
-    public final T term(int i) {
-        return subterms.term(i);
-    }
-
-    @Override
-    public final boolean containsTerm(Termlike target) {
-        return subterms.containsTerm(target);
-    }
-
-    @Override
-    public final int size() {
-        return subterms.size();
-    }
-
-    @Override
-    public final int complexity() {
-        return subterms.complexity();
-    }
-
-    @Override
-    public final int volume() {
-        return subterms.volume();
-    }
-
-    @Override
-    public final boolean impossibleSubTermVolume(int otherTermVolume) {
-        return subterms.impossibleSubTermVolume(otherTermVolume);
-    }
 
     @Override
     public final boolean isNormalized() {

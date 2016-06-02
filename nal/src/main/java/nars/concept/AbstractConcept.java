@@ -32,10 +32,16 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Nullable
     private Map meta;
 
+    transient final int _hash;
+
+
     protected AbstractConcept(@NotNull T term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         this.term = term;
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;
+
+        _hash = term.hashCode();
+
     }
 
     //public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
@@ -140,7 +146,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     @Override
     public final int hashCode() {
-        return term.hashCode();
+        //return term.hashCode();
+        return _hash;
     }
 
     @Override

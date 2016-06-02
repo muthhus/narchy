@@ -23,86 +23,74 @@ public interface ProxyTerm<T extends Term> extends Term {
         return target().op();
     }
 
-    @Override
-    default int volume() {
-        return target().volume();
-    }
-
-    @Override
-    default int complexity() {
-        return target().complexity();
-    }
-
-    @Override
-    default int structure() {
-        return target().structure();
-    }
-
-    @Override
-    default int size() {
-        return target().size();
-    }
-
 //    @Override
-//    default boolean equals(Object o) {
-//        return this == o || target().equals(o);
+//    default int volume() {
+//        return target().volume();
 //    }
 //
 //    @Override
-//    default int hashCode() {
-//        return target().hashCode();
+//    default int complexity() {
+//        return target().complexity();
+//    }
+//
+//    @Override
+//    default int structure() {
+//        return target().structure();
+//    }
+//
+//    @Override
+//    default int size() {
+//        return target().size();
 //    }
 
-    @Override
-    default void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent) {
-        target().recurseTerms(v, parent);
-    }
 
-    @Override
-    default boolean isCommutative() {
-        return target().isCommutative();
-    }
+//    @Override
+//    default void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent) {
+//        target().recurseTerms(v, parent);
+//    }
+//
+//    @Override
+//    default boolean isCommutative() {
+//        return target().isCommutative();
+//    }
 
-    @Override
-    default int varIndep() {
-        return target().varIndep();
-    }
-
-    @Override
-    default int varDep() {
-        return target().varDep();
-    }
-
-    @Override
-    default int varQuery() {
-        return target().varQuery();
-    }
-
-    @Override
-    default int varPattern() {
-        return target().varPattern();
-    }
-
-    @Override
-    default int vars() {
-        return target().vars();
-    }
-
-
-    @Override
-    default boolean hasTemporal() {
-        return target().hasTemporal();
-    }
+//    @Override
+//    default int varIndep() {
+//        return target().varIndep();
+//    }
+//
+//    @Override
+//    default int varDep() {
+//        return target().varDep();
+//    }
+//
+//    @Override
+//    default int varQuery() {
+//        return target().varQuery();
+//    }
+//
+//    @Override
+//    default int varPattern() {
+//        return target().varPattern();
+//    }
+//
+//    @Override
+//    default int vars() {
+//        return target().vars();
+//    }
 
 
-    @Override
-    default boolean containsTerm(Termlike t) {
-        return target().containsTerm(t);
-    }
+//    @Override
+//    default boolean hasTemporal() {
+//        return target().hasTemporal();
+//    }
+//
+//
+//    @Override
+//    default boolean containsTerm(Termlike t) {
+//        return target().containsTerm(t);
+//    }
 
 
-    @Override
-    default boolean or(Predicate<Term> v) {
-        return target().or(v);
-    }
+
 }

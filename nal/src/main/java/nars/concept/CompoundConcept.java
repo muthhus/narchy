@@ -55,6 +55,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
     private float satisfaction = 0;
 
+
     /**
      * Constructor, called in Memory.getConcept only
      *  @param term      A term corresponding to the concept
@@ -68,7 +69,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         goals = newGoalTable();
         questions = newQuestionTable();
         quests = newQuestionTable();
+
     }
+
 
     /** used for questions and quests */
     @NotNull protected QuestionTable newQuestionTable() {
@@ -817,98 +820,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public final int volume() {
-        return term.volume();
-    }
-
-    @Override
-    public final int complexity() {
-        return term.complexity();
-    }
-
-    @Override
-    public final int structure() {
-        return term.structure();
-    }
-
-    @Override
-    public final int size() {
-        return term.size();
-    }
-
-    @Override
-    public final boolean containsTerm(Termlike t) {
-        return term.containsTerm(t);
-    }
-
-    @Override
-    public final boolean isCommutative() {
-        return term.isCommutative();
-    }
-
-    @Override
-    public final int varIndep() {
-        return term.varIndep();
-    }
-
-    @Override
-    public final int varDep() {
-        return term.varDep();
-    }
-
-    @Override
-    public final int varQuery() {
-        return term.varQuery();
-    }
-
-    @Override
-    public final int varPattern() {
-        return term.varPattern();
-    }
-
-    @Override
-    public final int vars() {
-        return term.vars();
-    }
-
-    @Nullable
-    @Override
-    public final Term term(int i) {
-        return term.term(i);
-    }
-
-    @Override
-    public boolean isTerm(int i, @NotNull Op o) {
-        Term ti = term(i);
-        return (ti.op() == o);
-    }
-
-    @Override
-    public final boolean equalTerms(@NotNull TermContainer c) {
-        return term.equalTerms(c);
-    }
-
-    @NotNull
-    @Override
-    public final Term[] terms() {
-        return term.terms();
-    }
-
-    @Override
-    public void forEach(@NotNull Consumer action, int start, int end) {
-        term.forEach(action, start, end);
-    }
-
-
-    @Override
-    public final void copyInto(@NotNull Collection set) {
-        int s = size();
-        for (int i = 0; i < s; i++) {
-            set.add(term(i));
-        }
-    }
-
-    @Override
     public final boolean isNormalized() {
         return true; //must be normalized to create the concept
     }
@@ -928,19 +839,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //concept itself is eternal
         return DTERNAL;
     }
-
-//    @NotNull
-//    @Override
-//    public final Compound anonymous() {
-//        //concept itself is eternal
-//        return this;
-//    }
-
-    @Override
-    public Iterator iterator() {
-        return term.iterator();
-    }
-
 
 
 }

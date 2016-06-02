@@ -28,10 +28,6 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
         target().recurseTerms(v,parent);
     }
 
-    @Override
-    default boolean or(@NotNull Predicate<Term> v) {
-        return target().or(v);
-    }
 
 
     @Override
@@ -70,49 +66,5 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
         return target().dt();
     }
 
-    @Override
-    default Iterator iterator() {
-        return target().iterator();
-    }
 
-    @NotNull
-    @Override
-    default Term term(int i) {
-        return target().term(i);
-    }
-
-    @Override
-    default boolean isTerm(int i, @NotNull Op o) {
-        return target().isTerm(i, o);
-    }
-
-    @Override
-    default boolean equalTerms(TermContainer c) {
-        return target().equalTerms(c);
-    }
-
-    @NotNull
-    @Override
-    default Term[] terms() {
-        return target().terms();
-    }
-
-
-
-    @Override
-    default void forEach(Consumer action, int start, int stop) {
-        target().forEach(action, start, stop);
-    }
-
-
-    @Override
-    default void copyInto(Collection<Term> target) {
-        target().copyInto(target);
-    }
-
-
-    @Override
-    default boolean and(@NotNull Predicate<Term> v) {
-        return target().and(v);
-    }
 }

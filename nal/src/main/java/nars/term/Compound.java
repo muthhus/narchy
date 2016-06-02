@@ -37,7 +37,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -194,6 +197,25 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return p;
     }
 
+
+    default boolean equalsFurther(@NotNull Compound u) {
+
+        if (opRel() == u.opRel() /*&& (((t instanceof Compound))*/) {
+            /*if (relation != c.relation())
+                return false;*/
+            if (/*op.isTemporal() &&*/ dt()!= u.dt())
+                return false;
+            if (!subterms().equals(u.subterms()))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    default boolean equalTerms(@NotNull TermContainer c) {
+        return subterms().equalTerms(c);
+    }
+
     @NotNull
     @Override
     default Object setFirst(Object first) {
@@ -206,6 +228,117 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         throw new UnsupportedOperationException();
     }
 
+
+    @Override
+    default int varDep() {
+        return subterms().varDep();
+    }
+
+    @Override
+    default int varIndep() {
+        return subterms().varIndep();
+    }
+
+    @Override
+    default int varQuery() {
+        return subterms().varQuery();
+    }
+
+    @Override
+    default int varPattern() {
+        return subterms().varPattern();
+    }
+
+    @Override
+    default int vars() {
+        return subterms().vars();
+    }
+
+
+
+    @Nullable
+    @Override
+    default T term(int i) {
+        return subterms().term(i);
+    }
+
+    @NotNull
+    @Override
+    default T[] terms() {
+        return subterms().terms();
+    }
+
+
+    @Override
+    default boolean contains(Object o) {
+        return subterms().contains(o);
+    }
+
+
+
+    @Override
+    default void forEach(@NotNull Consumer<? super T> c) {
+        subterms().forEach(c);
+    }
+
+
+    @Override
+    default int structure() {
+        return subterms().structure() | op().bit;
+    }
+
+
+
+    @Override
+    default boolean containsTerm(Termlike target) {
+        return subterms().containsTerm(target);
+    }
+
+    @Override
+    default int size() {
+        return subterms().size();
+    }
+
+    @Override
+    default int complexity() {
+        return subterms().complexity();
+    }
+
+    @Override
+    default int volume() {
+        return subterms().volume();
+    }
+
+    @Override
+    default boolean impossibleSubTermVolume(int otherTermVolume) {
+        return subterms().impossibleSubTermVolume(otherTermVolume);
+    }
+
+
+    @Override
+    default boolean isCommutative() {
+        return op().commutative && size() > 1;
+    }
+
+    @Override
+    default void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
+        subterms().forEach(action, start, stop);
+    }
+
+    @Override
+    default Iterator<T> iterator() {
+        return subterms().iterator();
+    }
+
+    @Override
+    default void copyInto(@NotNull Collection<Term> set) {
+        subterms().copyInto(set);
+    }
+
+    @Override
+    default boolean isTerm(int i, @NotNull Op o) {
+        return subterms().isTerm(i, o);
+    }
 
     /**
      * unification matching entry point (default implementation)
