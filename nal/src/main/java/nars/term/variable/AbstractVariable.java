@@ -63,12 +63,7 @@ public abstract class AbstractVariable implements Variable {
         return hash;
     }
 
-    @Override
-    public final int compareTo(Termlike o) {
-        //hashcode can serve as the ordering too
-        if (o == this) return 0;
-        return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
-    }
+
 
     @NotNull
     @Override

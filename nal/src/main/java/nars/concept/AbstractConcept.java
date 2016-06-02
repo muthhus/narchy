@@ -31,7 +31,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Nullable
     private Map meta;
 
-    transient final int _hash;
+    //transient final int _hash;
 
 
     protected AbstractConcept(@NotNull T term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
@@ -39,7 +39,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;
 
-        _hash = term.hashCode();
+        //_hash = term.hashCode();
 
     }
 
@@ -145,13 +145,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     @Override
     public final int hashCode() {
-        //return term.hashCode();
-        return _hash;
-    }
-
-    @Override
-    public final int compareTo(@NotNull Termlike o) {
-        return term.compareTo(o);
+        return term.hashCode();
+        //return _hash;
     }
 
     /**

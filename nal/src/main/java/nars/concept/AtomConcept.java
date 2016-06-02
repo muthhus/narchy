@@ -7,6 +7,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +50,10 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     }
 
 
-
+    @Override
+    public final int compareTo(Termlike o) {
+        return term.compareTo(o);
+    }
 
     @Nullable
     @Override

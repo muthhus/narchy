@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
-public class VariableConcept extends AtomConcept<Variable> implements Variable {
+public final class VariableConcept extends AtomConcept<Variable> implements Variable {
 
     public VariableConcept(@NotNull Variable atom) {
         super(atom, Bag.EMPTY, Bag.EMPTY);

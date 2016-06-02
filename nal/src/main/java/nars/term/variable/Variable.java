@@ -1,5 +1,6 @@
 package nars.term.variable;
 
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 
 /**
@@ -43,5 +44,10 @@ public interface Variable extends Atomic {
         return 0;
     }
 
-
+    @Override
+    default int compareTo(Termlike o) {
+        //hashcode can serve as the ordering too
+        if (o == this) return 0;
+        return o instanceof Variable ? Integer.compare(hashCode(), o.hashCode()) : 1;
+    }
 }
