@@ -292,12 +292,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default int complexity() {
-        return subterms().complexity()+1;
+        return subterms().complexity(); //already has +1 for this compound
     }
 
     @Override
     default int volume() {
-        return subterms().volume()+1;
+        return subterms().volume();  //already has +1 for this compound
     }
 
     @Override

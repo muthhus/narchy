@@ -323,7 +323,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         if (!impossibleSubterm(t)) {
             int s = size();
             for (int i = 0; i < s; i++) {
-                if (term(i).equals(t))
+                if (t.equals(term(i)))
                     return true;
             }
         }

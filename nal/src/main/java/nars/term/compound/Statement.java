@@ -89,8 +89,8 @@ public interface Statement {
     static boolean invalidReflexive(Term t1, Term t2) {
 
         return !(!(t1 instanceof Compound) || t1.op().isImage() ||
-                //!t1.containsTerm(t2)
-                !((Compound) t1).containsTermRecursively(t2)
+                !t1.containsTerm(t2)
+                //!((Compound) t1).containsTermRecursively(t2)
         );
     }
 

@@ -43,7 +43,9 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     public  final int structureHash;
 
 
+    /** stored as volume+1 as if this termvector were already wrapped in its compound */
     public  final short volume;
+    /** stored as complexity+1 as if this termvector were already wrapped in its compound */
     public  final short complexity;
 
     /**
@@ -102,7 +104,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         this.vars = (byte)(varTot);
 
 
-        final int vol = meta[4];
+        final int vol = meta[4] + 1;
         this.volume = (short)( vol );
 
         int cmp = vol - varTot - vP;

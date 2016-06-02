@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.budget.UnitBudget;
+import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nar.Terminal;
 import nars.task.Task;
@@ -60,8 +61,12 @@ public class TemporalTest {
         Task a = n.inputTask("((x) ==>+10 (y)).");
         Task c = n.inputTask("((x) ==>+9 (y)).");
         Task b = n.inputTask("((x) <-> (y)).");
-        assertTrue(a.term().term(0) == b.term().term(0));
-        assertTrue(c.term().term(0) == b.term().term(0));
+
+        assertTrue( n.concept(a.term()) == n.concept(c.term()));
+
+        assertTrue( ((CompoundConcept)n.concept(a.term())).term(0) == ((CompoundConcept)n.concept(c.term())).term(0));
+        assertTrue( ((CompoundConcept)n.concept(b.term())).term(0) == ((CompoundConcept)n.concept(c.term())).term(0));
+
     }
 
     @Test public void testParseOperationInFunctionalForm2() {
