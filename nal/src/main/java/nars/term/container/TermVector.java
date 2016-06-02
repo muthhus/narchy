@@ -3,7 +3,10 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
+import nars.term.Terms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 

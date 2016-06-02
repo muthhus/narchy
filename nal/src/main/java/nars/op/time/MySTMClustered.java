@@ -7,7 +7,6 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.budget.BudgetFunctions;
-import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;

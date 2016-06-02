@@ -1,6 +1,5 @@
 package nars.bag;
 
-import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

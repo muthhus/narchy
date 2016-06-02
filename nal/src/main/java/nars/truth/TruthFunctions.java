@@ -20,7 +20,6 @@
  */
 package nars.truth;
 
-import nars.$;
 import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
@@ -28,7 +27,7 @@ import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.$.*;
+import static nars.$.t;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules

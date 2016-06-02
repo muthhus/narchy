@@ -3,16 +3,12 @@ package nars.budget.policy;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.aveGeo;
 
 /**
  * Created by me on 5/23/16.

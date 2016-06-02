@@ -2,13 +2,11 @@ package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
-import nars.Narsese;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

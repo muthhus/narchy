@@ -28,7 +28,9 @@ import nars.Global;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
@@ -112,7 +114,35 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
+    /**
+     * unification matching entry point (default implementation)
+     *
+     * @param y compound to match against (the instance executing this method is considered 'x')
+     * @param subst the substitution context holding the match state
+     * @return whether match was successful or not, possibly having modified subst regardless
+     *
+     * implementations may assume that y's .op() already matches this, and that
+     * equality has already determined to be false.
+     * */
+    default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
+        int ys = y.size();
+        TermContainer xsubs = subterms();
+        if (xsubs.size() == ys)  {
+            //@NotNull Op op = this.op;
+            if (/*op.isImage() && */(relation() != y.relation()))
+                return false;
+
+
+            @NotNull TermContainer ysubs = y.subterms();
+            return (isCommutative()) ?
+                    //return (ys > 1 && op.commutative) ?
+                    subst.matchPermute(xsubs, ysubs) :
+                    subst.matchLinear(xsubs, ysubs);
+        }
+        return false;
+
+    }
 
     @Override
     default void append(@NotNull Appendable p) throws IOException {
@@ -133,6 +163,35 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     default void appendArg(@NotNull Appendable p, int i) throws IOException {
         term(i).append(p);
+    }
+
+
+    @Override
+    default int compareTo(@NotNull Termlike o) {
+        if (this == o) return 0;
+        //if (o == null) return -1;
+
+        Termed t = (Termed) o;
+        //int diff = op().compareTo(t.op());
+
+        //sort by op and relation first
+        int diff = Integer.compare(opRel(), t.opRel()); //op.ordinal(), t.op().ordinal());
+        if (diff != 0)
+            return diff;
+
+
+        Compound c = (Compound) (t.term());
+
+//        int diff2 = Integer.compare(this.hash, c.hashCode());
+//        if (diff2 != 0)
+//            return diff2;
+
+
+        int diff3 = Integer.compare(this.dt(), c.dt());
+        if (diff3 != 0)
+            return diff3;
+
+        return subterms().compareTo(c.subterms());
     }
 
 
@@ -200,15 +259,9 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     default boolean equalsFurther(@NotNull Compound u) {
 
-        if (opRel() == u.opRel() /*&& (((t instanceof Compound))*/) {
-            /*if (relation != c.relation())
-                return false;*/
-            if (/*op.isTemporal() &&*/ dt()!= u.dt())
-                return false;
-            if (!subterms().equals(u.subterms()))
-                return false;
-        }
-        return true;
+        return (opRel() == u.opRel()) &&
+                (dt() == u.dt()) &&
+                (subterms().equals(u.subterms()));
     }
 
     @Override
@@ -331,17 +384,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return subterms().isTerm(i, o);
     }
 
-    /**
-     * unification matching entry point (default implementation)
-     *
-     * @param y compound to match against (the instance executing this method is considered 'x')
-     * @param subst the substitution context holding the match state
-     * @return whether match was successful or not, possibly having modified subst regardless
-     *
-     * implementations may assume that y's .op() already matches this, and that
-     * equality has already determined to be false.
-     * */
-    boolean match(@NotNull Compound y, @NotNull FindSubst subst);
 
 
 
@@ -352,11 +394,11 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //        return null;
 //    }
 
+
     @Override
-    int opRel();
-    /*@Override default int opRel() {
-        return Terms.opRel(op().ordinal(), relation());
-    }*/
+    default int opRel() {
+        return Terms.opRel(op(), relation());
+    }
 
     @Nullable
     default Term last() {
@@ -384,7 +426,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     /** sets temporal relation value (TEMPORARY). returns new value */
     @NotNull
-    @Deprecated Compound dt(int cycles);
+    default Compound dt(int cycles) {
+
+        if (cycles == dt()) return this;
+
+        GenericCompound g = new GenericCompound(op(), relation(), cycles, (TermVector)subterms());
+        if (isNormalized()) g.setNormalized();
+        return g;
+    }
 
     /** gets temporal relation value */
     int dt();

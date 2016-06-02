@@ -1,7 +1,6 @@
 package nars.concept.table;
 
 import nars.util.data.list.FasterList;
-import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

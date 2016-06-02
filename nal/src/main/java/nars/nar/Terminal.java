@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Terminal only executes commands and does not

@@ -3,7 +3,6 @@ package nars.bag;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
-import nars.term.Termed;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -545,6 +544,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         public boolean requiresSort() {
             return false;
         }
+        @Override
         public void setRequiresSort() {
 
         }

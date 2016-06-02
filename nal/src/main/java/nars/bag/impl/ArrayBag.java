@@ -25,7 +25,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /** this default value must be changed */
     @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
     private float pendingMass;
-    private boolean requiresSort = false;
+    private boolean requiresSort;
 
 
     public ArrayBag(int cap) {
@@ -559,6 +559,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 //    }
 
 
+    @Override
     public void setRequiresSort() {
         this.requiresSort = true;
     }

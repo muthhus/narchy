@@ -729,7 +729,7 @@ public enum $ {
         Term related = elements[relation];
         Term img = the(ext ? IMAGE_EXT : IMAGE_INT, relation, elementsMasked);
 
-        return (Compound) ( ext ? $.inh(related, img) : $.inh(img, related));
+        return ext ? $.inh(related, img) : $.inh(img, related);
     }
     @Nullable
     public static Compound imageExt(int relation, @NotNull Compound product) {

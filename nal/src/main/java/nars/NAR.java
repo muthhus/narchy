@@ -26,7 +26,6 @@ import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.truth.DefaultTruth;
 import nars.util.IO;

@@ -14,13 +14,10 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.term.variable.Variable;
 import nars.util.data.MutableInteger;
-import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

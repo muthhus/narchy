@@ -1,6 +1,5 @@
 package nars.util;
 
-import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

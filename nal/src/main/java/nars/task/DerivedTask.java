@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.budget.UnitBudget;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.ConceptProcess;

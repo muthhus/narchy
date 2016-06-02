@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
-import nars.concept.table.BeliefTable;
 import nars.index.Indexes;
 import nars.index.TermIndex;
 import nars.link.BLink;
@@ -17,7 +16,6 @@ import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.event.On;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -104,7 +100,7 @@ public class Multi extends AbstractNAR {
 
         @NotNull
         private final Thread thread;
-        private boolean stopped = false;
+        private boolean stopped;
         long lastTime = -1;
         private final ConcurrentLinkedDeque<Runnable> pendingActivations = new ConcurrentLinkedDeque<>();
 

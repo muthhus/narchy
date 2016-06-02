@@ -6,7 +6,6 @@ import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
-import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.op.ImmediateTermTransform;

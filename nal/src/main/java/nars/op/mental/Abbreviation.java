@@ -58,7 +58,7 @@ public class Abbreviation/*<S extends Term>*/ implements Consumer<Task> {
 
     @Nullable
     static final Compound newAbbreviation(@NotNull Concept abbreviated, @NotNull Term id) {
-        return (Compound) $.sim(abbreviated.term(), id);
+        return $.sim(abbreviated.term(), id);
 
         /*
         //old 1.6 pattern:

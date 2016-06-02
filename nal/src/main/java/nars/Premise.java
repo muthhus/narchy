@@ -1,6 +1,5 @@
 package nars;
 
-import nars.nal.Level;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Termed;

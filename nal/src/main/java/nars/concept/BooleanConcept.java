@@ -4,8 +4,6 @@ import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Symbols;
-import nars.budget.Budgeted;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
 import nars.task.MutableTask;
@@ -17,7 +15,6 @@ import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

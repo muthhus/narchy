@@ -1,6 +1,5 @@
 package nars.util;
 
-import nars.$;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
@@ -8,7 +7,6 @@ import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.task.AbstractTask;
-import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -17,7 +15,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

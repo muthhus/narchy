@@ -23,7 +23,6 @@ import nars.nal.nal8.AbstractOperator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
-import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;

@@ -1,9 +1,6 @@
 package nars.concept;
 
 import nars.bag.Bag;
-import nars.concept.table.BeliefTable;
-import nars.task.Task;
-import nars.term.Termed;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 

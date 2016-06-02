@@ -2,7 +2,6 @@ package nars.term.container;
 
 import nars.Op;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.Terms;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;

@@ -6,7 +6,6 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

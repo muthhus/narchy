@@ -253,14 +253,12 @@ public class TrieDeriver extends Deriver {
 
             indent(indent);
             out.println(Util.className(p) + " (");
-            {
-                print(it.cond, out, indent + 2);
+            print(it.cond, out, indent + 2);
 
-                indent(indent);
-                out.println(") ==> {");
+            indent(indent);
+            out.println(") ==> {");
 
-                print(it.conseq, out, indent + 2);
-            }
+            print(it.conseq, out, indent + 2);
             indent(indent);
             out.println("}");
 
