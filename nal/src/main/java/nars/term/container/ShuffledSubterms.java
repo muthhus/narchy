@@ -83,11 +83,6 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 //    }
 
     @Override
-    public boolean containsTerm(Termlike term) {
-        return srcsubs.containsTerm(term);
-    }
-
-    @Override
     public void forEach(@NotNull Consumer action, int start, int stop) {
         TermContainer.forEach(this, action, start, stop);
     }

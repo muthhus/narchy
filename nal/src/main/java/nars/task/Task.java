@@ -148,7 +148,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                     @Override
                     public boolean test(@NotNull Term p) {
                         if (p.op() == NEGATE) {
-                            return cterm.contains(((Compound) p).term(0));
+                            return cterm.containsTerm(((Compound) p).term(0));
                         }
                         return false;
                     }

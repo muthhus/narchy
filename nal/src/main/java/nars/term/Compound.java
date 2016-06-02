@@ -269,10 +269,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-    @Override
-    default boolean contains(Object o) {
-        return subterms().contains(o);
-    }
+
 
 
 
@@ -288,12 +285,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-
-    @Override
-    default boolean containsTerm(Termlike target) {
-        return subterms().containsTerm(target);
-    }
-
     @Override
     default int size() {
         return subterms().size();
@@ -301,12 +292,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default int complexity() {
-        return subterms().complexity();
+        return subterms().complexity()+1;
     }
 
     @Override
     default int volume() {
-        return subterms().volume();
+        return subterms().volume()+1;
     }
 
     @Override

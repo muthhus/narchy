@@ -187,12 +187,12 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
 
 
-    /**
-     * scans first level only, not recursive
-     */
-    default boolean contains(Object o) {
-        return o instanceof Term && containsTerm((Term) o);
-    }
+//    /**
+//     * scans first level only, not recursive
+//     */
+//    default boolean contains(Object o) {
+//        return o instanceof Term && containsTerm((Term) o);
+//    }
 
     boolean equals(Object o);
 
@@ -310,6 +310,24 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
             }
         }
         return added > 0 ? Terms.empty : l.toArray(new Term[added]);
+    }
+
+    /**
+     * Check the subterms (first level only) for a target term
+     *
+     * @param t The term to be searched
+     * @return Whether the target is in the current term
+     */
+    @Override
+    default boolean containsTerm(@NotNull Termlike t) {
+        if (!impossibleSubterm(t)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                if (term(i).equals(t))
+                    return true;
+            }
+        }
+        return false;
     }
 
 

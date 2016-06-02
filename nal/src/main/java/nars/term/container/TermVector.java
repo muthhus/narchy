@@ -102,7 +102,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         this.vars = (byte)(varTot);
 
 
-        final int vol = meta[4]  + 1 /* for the compound wrapping it */;
+        final int vol = meta[4];
         this.volume = (short)( vol );
 
         int cmp = vol - varTot - vP;
@@ -248,16 +248,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
             action.accept(t);
     }
 
-    /**
-     * Check the subterms (first level only) for a target term
-     *
-     * @param t The term to be searched
-     * @return Whether the target is in the current term
-     */
-    @Override
-    public final boolean containsTerm(@NotNull Termlike t) {
-        return !impossibleSubterm(t) && Terms.contains(term, t);
-    }
 
 
     @Override
