@@ -126,7 +126,7 @@ public class ConceptsSource extends GraphSource {
 
 
     @Override
-    public synchronized void start(SpaceGrapher g) {
+    public void start(SpaceGrapher g) {
 
         if (g != null) {
 

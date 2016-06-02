@@ -50,7 +50,7 @@ public class BeliefLab {
                 //float ef = Math.random() < 0.5 ? 1f : 0f; //biphasic
 
                 float ec = 0.4f * (float)Math.random(); //0.1f;
-                nar.input("y:x. %" + Texts.n2(ef) + ";" + Texts.n2(ec) + "%");
+                nar.input("y:x. %" + Texts.n2(ef) + ';' + Texts.n2(ec) + "%");
             }
 
             //random temporals
@@ -62,7 +62,7 @@ public class BeliefLab {
                     nar.input("y:x? :\\:");
                 else {
                     CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
-                    nar.input("y:x. :|: %" + y + ";" + ((float)(Math.random()*(confMax-confMin))+ confMin) + "%");
+                    nar.input("y:x. :|: %" + y + ';' + ((float)(Math.random()*(confMax-confMin))+ confMin) + "%");
                 }
 
             }

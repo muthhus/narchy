@@ -23,9 +23,8 @@
     /*-fx-control-inner-background: transparent;*/
 
 
-    -fx-accent: #333;
+    -fx-accent: #222;
 
-    -fx-focus-color: #222;
 
     /*-fx-text-base-color: rgb(252.0, 240.0, 237.0);
     -fx-text-fill: -fx-text-base-color;*/
@@ -40,7 +39,10 @@
     /*-flatter-red: rgb(237.0, 68.0, 37.0);
     -flatter-blue: rgb(0.0, 184.0, 222.0);*/
 
+    -fx-focus-color: #111;
+    -fx-faint-focus-color: #111;
 }
+
 .root.popup {
     -fx-background-color: black;
     -fx-border-width: 0;
@@ -48,6 +50,7 @@
 
 .control {
     -fx-base-color: black;
+    -fx-highlight-fill: rgb(15,15,15);
 }
 
 
@@ -712,5 +715,14 @@
     -fx-border-color: transparent;
 }
 .ConceptPane:hover {
+    -fx-border-color: orange;
+}
+
+.notes .note .header {
+
+}
+.notes .note {
+    -fx-padding-bottom: 5;
+    -fx-border-width: 1;
     -fx-border-color: orange;
 }

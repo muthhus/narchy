@@ -31,7 +31,7 @@ public class LogPane extends BorderPane  {
 
     final Pane content;
 
-    final int maxLines = 64;
+    public final int maxLines = 64;
 
 
 
@@ -236,7 +236,7 @@ public class LogPane extends BorderPane  {
 //    }
 
     /** displays a specific (from) or a range (from..to) of cycle time values */
-    static class CycleActivationBar extends Label {
+    protected static class CycleActivationBar extends Label {
         private final long from;
         private long to = Tense.TIMELESS;
 

@@ -74,6 +74,7 @@ public class InputPane extends TabPane {
 
         final ListView<String> index = new ListView<>();
         final TextArea source = new TextArea();
+
         final Map<String, String> absPath;
 
         public LibraryInputPane() {

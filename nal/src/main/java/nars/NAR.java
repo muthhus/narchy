@@ -188,9 +188,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * inputs a task, only if the parsed text is valid; returns null if invalid
      */
-    @Nullable
+    @NotNull
     public Task inputTask(@NotNull String taskText) {
-        return inputTask( task(taskText) );
+        Task task = task(taskText);
+        if (task == null)
+            throw new NarseseException("No task parsed: " + taskText);
+        return inputTask(task);
     }
 
     @Nullable
@@ -985,6 +988,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         });
         pw.close();
+    }
+
+    public On onTask(Consumer<Task> o) {
+        return eventTaskProcess.on(o);
     }
 
 

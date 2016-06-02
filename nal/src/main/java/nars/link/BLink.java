@@ -52,13 +52,13 @@ public abstract class BLink<X> extends Budget implements Link<X> {
     }
 
     private final boolean equalsReferenced(@Nullable Object obj) {
-        Object x = get();
-
+        @Nullable X x = get();
         if (obj instanceof BLink) {
             Object o = ((BLink) obj).get();
             return Objects.equal(x, o);
+        } else {
+            return Objects.equal(x, obj);
         }
-        return false;
     }
 
     @Override public final int hashCode() {

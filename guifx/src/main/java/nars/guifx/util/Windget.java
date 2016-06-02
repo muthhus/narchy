@@ -352,6 +352,7 @@ public class Windget extends DefaultWindow  {
     public Windget(String title, Region content, double width, double height) {
         this(title, content);
 
+        getStyleClass().add("windget");
 
         //new Tangible(this);
 

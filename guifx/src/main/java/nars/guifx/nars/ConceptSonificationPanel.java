@@ -1,4 +1,4 @@
-package nars.guifx;
+package nars.guifx.nars;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

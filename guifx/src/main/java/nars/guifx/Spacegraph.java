@@ -27,7 +27,7 @@ import static javafx.application.Platform.runLater;
  */
 public class Spacegraph extends ZoomFX {
 
-    static final String spacegraphCSS = Spacegraph.class.getClassLoader().getResource("spacegraph.css").toExternalForm();
+    public static final String spacegraphCSS = Spacegraph.class.getClassLoader().getResource("spacegraph.css").toExternalForm();
 
 
     //private final GridCanvas grid = null;

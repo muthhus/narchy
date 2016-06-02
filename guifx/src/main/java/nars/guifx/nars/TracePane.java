@@ -1,4 +1,4 @@
-package nars.guifx;
+package nars.guifx.nars;
 
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import javafx.beans.property.DoubleProperty;
@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import nars.$;
 import nars.NAR;
+import nars.guifx.LogPane;
 import nars.util.data.list.CircularArrayList;
 import nars.util.data.list.FasterList;
 import nars.util.event.Active;

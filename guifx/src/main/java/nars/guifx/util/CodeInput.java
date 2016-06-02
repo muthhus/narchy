@@ -12,6 +12,8 @@ import static javafx.application.Platform.runLater;
  */
 public class CodeInput extends BorderPane {
 
+    protected final TextArea codeArea;
+
     public CodeInput() {
         this("");
     }
@@ -22,7 +24,7 @@ public class CodeInput extends BorderPane {
         //codeArea.getStyleClass().add("code-area");
         //codeArea.setStyle(0, Lists.newArrayList("code-area-default"));
 
-        TextArea codeArea= new TextArea();
+        codeArea= new TextArea();
 
         codeArea.appendText(text);
 

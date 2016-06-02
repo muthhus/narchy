@@ -97,29 +97,33 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
         //if (aSrc.isVisible()) {
 
-
-        gfx.setFill(TermNode.getTermColor(aSrc.term, colors, p*aSrc.priNorm));
-        //gfx.fillPolygon(X, Y, 3);
-
-        gfx.beginPath();
         double[] Y = this.yp;
         double[] X = this.xp;
-        gfx.moveTo(X[0], Y[0]);
-        gfx.lineTo(X[1], Y[1]);
-        gfx.lineTo(X[2], Y[2]);
-        gfx.closePath();
-        gfx.fill();
+
+        gfx.setFill(TermNode.getTermColor(aSrc.term, colors, p*aSrc.priNorm));
+        gfx.fillPolygon(X, Y, 3);
+
+//        gfx.beginPath();
+//        gfx.moveTo(X[0], Y[0]);
+//        gfx.lineTo(X[1], Y[1]);
+//        gfx.lineTo(X[2], Y[2]);
+//        gfx.closePath();
+//        gfx.fill();
 
         gfx.transform(reverse);
 
         gfx.setFill(TermNode.getTermColor(bSrc.term, colors, p*bSrc.priNorm));
-//        gfx.fillPolygon(X, Y, 3);
-        gfx.beginPath();
-        gfx.moveTo(X[0], Y[0]);
-        gfx.lineTo(X[1], Y[1]);
-        gfx.lineTo(X[2], Y[2]);
-        gfx.closePath();
-        gfx.fill();
+        gfx.fillPolygon(X, Y, 3);
+        //gfx.strokePolygon(X, Y, 3);
+
+
+////        gfx.fillPolygon(X, Y, 3);
+//        gfx.beginPath();
+//        gfx.moveTo(X[0], Y[0]);
+//        gfx.lineTo(X[1], Y[1]);
+//        gfx.lineTo(X[2], Y[2]);
+//        gfx.closePath();
+//        gfx.fill();
 
         //edgesDrawn++;
         //gfx.restore();

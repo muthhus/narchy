@@ -1,4 +1,4 @@
-package nars.guifx;
+package nars.guifx.nars;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.guifx.NARfx;
 import nars.task.Task;
 
 import static nars.guifx.NARfx.scrolled;

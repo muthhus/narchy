@@ -15,6 +15,7 @@ import nars.NAR;
 import nars.guifx.concept.AbstractConceptPane;
 import nars.guifx.concept.DetailedConceptPane;
 import nars.guifx.demo.NARide;
+import nars.guifx.nars.TaskPane;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 import nars.term.Termed;

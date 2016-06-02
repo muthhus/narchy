@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;
 import nars.guifx.nars.TaskButton;
+import nars.guifx.nars.TracePane;
 import nars.guifx.util.NSlider;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -108,7 +109,7 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 //
 //            }
 //        }
-            return new TaskButton(IOPane.this.nar, t);
+            return new TaskButton(t, IOPane.this.nar);
             //return SubButton.make(nar, t);
         }
 

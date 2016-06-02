@@ -11,6 +11,7 @@ public class NarseseInput extends CodeInput {
 
     public NarseseInput(NAR nar) {
         this.nar = nar;
+        codeArea.setPrefRowCount(1);
     }
 
     @Override

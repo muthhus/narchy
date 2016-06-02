@@ -1,4 +1,4 @@
-package nars.guifx;
+package nars.guifx.nars;
 
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;

@@ -60,7 +60,7 @@ public class Plot2D extends NControl/*Canvas */  {
 
         @Override
         public String toString() {
-            return name + "[" + history.size() + "/" + capacity + "]";
+            return name + '[' + history.size() + "/" + capacity + "]";
         }
 
         public abstract void update();

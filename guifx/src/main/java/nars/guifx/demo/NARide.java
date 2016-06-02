@@ -33,8 +33,7 @@ import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.source.DefaultGrapher;
-import nars.guifx.nars.LoopPane;
-import nars.guifx.nars.SubButton;
+import nars.guifx.nars.*;
 import nars.guifx.remote.VncClientApp;
 import nars.guifx.util.*;
 import nars.index.TermIndex;
@@ -122,7 +121,9 @@ public class NARide extends StackPane {
         NARide ni = new NARide(loop);
 
         Scene scene = new Scene(ni, 1400, 800,
-                false, SceneAntialiasing.DISABLED);
+                false
+                //, SceneAntialiasing.DISABLED
+        );
 
 
 

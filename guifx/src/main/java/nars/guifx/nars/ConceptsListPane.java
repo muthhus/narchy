@@ -1,9 +1,10 @@
-package nars.guifx;
+package nars.guifx.nars;
 
 import javafx.scene.Node;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.guifx.LogPane;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

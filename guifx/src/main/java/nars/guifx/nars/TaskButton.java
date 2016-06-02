@@ -12,7 +12,6 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
 import nars.budget.Budgeted;
-import nars.guifx.TaskPane;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.util.NSlider;
@@ -40,7 +39,7 @@ public class TaskButton<X> extends Label implements Runnable {
     private final static float priTolerance = 0.05f;
 
 
-    public TaskButton(NAR nar, X t) {
+    public TaskButton(X t, NAR nar) {
         super();
         this.item = t;
 
@@ -155,10 +154,14 @@ public class TaskButton<X> extends Label implements Runnable {
             //                        Insets.EMPTY)));
 
             if (item instanceof Termed)
-                setTextFill(getColor(pri));
+                color(getColor(pri));
 
             this.lastPri = pri;
         }
+    }
+
+    protected void color(Color c) {
+        setTextFill(c);
     }
 
     public static boolean scalesText() {

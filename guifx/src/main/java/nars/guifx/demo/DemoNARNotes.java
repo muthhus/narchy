@@ -1,22 +1,60 @@
 package nars.guifx.demo;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.stage.Stage;
+import nars.$;
 import nars.guifx.NARfx;
 import nars.guifx.Spacegraph;
-import nars.guifx.graph2.layout.HyperOrganicLayout;
+import nars.guifx.nars.NARNotes;
 import nars.guifx.terminal.Console;
 import nars.guifx.util.CodeInput;
 import nars.guifx.util.Windget;
+import nars.nar.Default;
 import nars.util.FX;
+import za.co.knonchalant.builder.POJONode;
+
+import static javafx.application.Platform.runLater;
+import static nars.util.FX.scrolled;
 
 
-public class RunSpacegraph extends Application {
+public class DemoNARNotes {
+
+    public static void main(String[] args) {
+
+        Default d = new Default();
+
+        FX.run(()->{
+            //DemoSpacegraph s = new DemoSpacegraph();
+            NARNotes s = new NARNotes(d);
+
+            Stage w = new Stage();
+            w.setScene(new Scene(s));
+            //Stage w = FX.newWindow("x", s, 800, 600);
+            //w.setFullScreen(false);
+
+
+            NARfx.theme(s.getScene());
+            //s.getStylesheets().addAll(Spacegraph.spacegraphCSS);
+            //s.getScene().getStylesheets().add(Spacegraph.spacegraphCSS);
+
+            w.setWidth(900);
+            w.setHeight(800);
+
+            w.show();
+
+
+            runLater(()->{
+                d.believe("a:b");
+                d.believe("b:c");
+                d.believe("c:d");
+            });
+        });
+
+    }
 
     //final Spacegraph space = new Spacegraph();
 
@@ -71,21 +109,21 @@ public class RunSpacegraph extends Application {
 
 
             addNodes(
-                new Windget("Chart", chart, 400, 400),
-                new Windget("Edit", new CodeInput("ABC"), 300, 200)
-                        .move(-100,-100),
+                    new Windget("Chart", chart, 400, 400),
+                    new Windget("Edit", new CodeInput("ABC"), 300, 200)
+                            .move(-100,-100),
                     new Windget("Console", new Console(), 300, 200)
                             .move(300,-100)
-                //new Windget("NAR",
+                    //new Windget("NAR",
                     //new IOPane(new Default2(512,8,4,2)), 200, 200).move(-200,300)
             );
 
-//            for (int i = 0; i < 4; i++) {
-//                addNodes( new Windget("x" + i,
-//                        POJONode.build(
-//                        //new POJOPane(
-//                                $.$("<a --> " + i + '>'))) );
-//            }
+            for (int i = 0; i < 4; i++) {
+                addNodes( new Windget("x" + i,
+                        POJONode.build(
+                                //new POJOPane(
+                                $.$("<a --> " + i + '>'))) );
+            }
 
             ground.getChildren().add(new GridCanvas(true));
 
@@ -96,36 +134,5 @@ public class RunSpacegraph extends Application {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-
-        Scene scene = new DemoSpacegraph().newScene(1200, 800);
-        NARfx.theme(scene);
-
-        // init and show the stage
-
-        primaryStage.setTitle("WignerFX Spacegraph Demo");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-//
-//        Platform.runLater(() -> {
-//            start();
-//        });
-    }
-
-
-    /**
-     * The main() method is ignored in correctly deployed JavaFX application.
-     * main() serves only as fallback in case the application can not be
-     * launched through deployment artifacts, e.g., in IDEs with limited FX
-     * support. NetBeans ignores main().
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        //JFX.popup(new VFXWindowsTutorial3());
-        launch(args);
-    }
 
 }

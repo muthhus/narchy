@@ -127,11 +127,6 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
      */
     protected int[][] neighbors;
 
-    /**
-     * Boolean flag that specifies if the layout is allowed to run. If this is
-     * set to false, then the layout exits in the following iteration.
-     */
-    protected final boolean allowedToRun = true;
 
     /**
      * Maps from vertex to indices.
@@ -139,7 +134,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
     protected ObjectIntHashMap<TermNode> indices;
 
     /** final normalization step to center all nodes */
-    private final boolean center = false;
+    private static final boolean center = false;
     private final FasterList<TermNode> cells = new FasterList();
 
 
@@ -448,10 +443,6 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
         // Main iteration loop
         try {
             for (iteration = 0; iteration < maxIterations; iteration++) {
-                if (!allowedToRun) {
-                    return;
-                }
-
 
                 // Calculate repulsive forces on all vertex
                 calcRepulsion();
@@ -622,17 +613,15 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
         double[] dispY = this.dispY;
         boolean[] movable = this.isMoveable;
 
+        double[][] cl = this.cellLocation;
+
         for (int i = 0; i < vertexCount; i++) {
 
-            double[] ci = cellLocation[i];
+            double[] ci = cl[i];
 
             for (int j = i; j < vertexCount; j++) {
-                // Exits if the layout is no longer allowed to run
-                if (!allowedToRun) {
-                    return;
-                }
 
-                double[] cj = cellLocation[j];
+                double[] cj = cl[j];
 
                 if ((j != i) && (ci !=null) && (cj !=null)) {
                     double xDelta = ci[0] - cj[0];

@@ -110,6 +110,7 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
             floorCanvas.setManaged(false);
 
 
+
 //            floorCanvas.setCacheHint(CacheHint.SPEED);
 //            floorCanvas.setCache(true);
 
