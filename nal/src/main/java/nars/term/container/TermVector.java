@@ -25,14 +25,14 @@ import java.util.function.Consumer;
  * TODO make this class immutable and term field private
  * provide a MutableTermVector that holds any write/change methods
  */
-public class TermVector<T extends Term> implements TermContainer<T>, Serializable {
+public class TermVector implements TermContainer<Term>, Serializable {
 
 
     /**
      * list of (direct) term
      * TODO make not public
      */
-    public final T[] term;
+    public final Term[] term;
 
 
 
@@ -65,17 +65,17 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //        this(null);
 //    }
 
-    public TermVector(@NotNull Collection<? extends T> t, Class c) {
-        this((T[]) t.toArray((T[]) Array.newInstance(c, t.size())));
+    public TermVector(@NotNull Collection<? extends Term> t, Class c) {
+        this( t.toArray( new Term[t.size()]));
     }
 
-    public TermVector(@NotNull Collection<? extends T> t) {
-        this((T[]) t.toArray(new Term[t.size()]));
+    public TermVector(@NotNull Collection<? extends Term> t) {
+        this( t.toArray(new Term[t.size()]));
     }
 
     /** first n items */
-    public TermVector(@NotNull Collection<T> t, int n) {
-        this((T[]) t.toArray(new Term[n]));
+    public TermVector(@NotNull Collection<Term> t, int n) {
+        this( t.toArray(new Term[n]));
     }
 
 
@@ -84,7 +84,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
      @SafeVarargs
-     public TermVector(T... terms) {
+     public TermVector(Term... terms) {
         this.term = terms;
 
         /**
@@ -127,14 +127,14 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return term[i].op() == o;
     }
 
-    @NotNull @Override public final T[] terms() {
+    @NotNull @Override public final Term[] terms() {
         return term;
     }
 
 
 
     @NotNull
-    @Override public final Term[] terms(@NotNull IntObjectPredicate<T> filter) {
+    @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
         return Terms.filter(term, filter);
     }
 
@@ -145,7 +145,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    @NotNull public final T term(int i) {
+    @NotNull public final Term term(int i) {
         return term[i];
     }
 
@@ -234,22 +234,22 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @Override
-    public final Iterator<T> iterator() {
+    public final Iterator<Term> iterator() {
         return Arrays.stream(term).iterator();
     }
 
 
     @Override
-    public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
-        T[] tt = term;
+    public final void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
+        Term[] tt = term;
         for (int i = start; i < stop; i++)
             action.accept(tt[i]);
     }
 
     @Override
-    public final void forEach(@NotNull Consumer<? super T> action) {
-        T[] tt = term;
-        for (T t : tt)
+    public final void forEach(@NotNull Consumer<? super Term> action) {
+        Term[] tt = term;
+        for (Term t : tt)
             action.accept(t);
     }
 
@@ -271,7 +271,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override public final boolean equalTerms(@NotNull TermContainer c) {
-        T[] tt = this.term;
+        Term[] tt = this.term;
 
         int s = tt.length;
         if (s!=c.size())
@@ -294,7 +294,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @NotNull
     public TermVector reverse() {
-        T[] s = this.term;
+        Term[] s = this.term;
         if (s.length < 2)
             return this; //no change needed
         Term[] r = s.clone();
@@ -320,20 +320,20 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //        }
 //    }
 
-    /** creates a copy if changed */
-    @NotNull
-    public TermVector replacing(int subterm, @NotNull Term replacement) {
-        if (replacement.equals(term(subterm)))
-            return this;
-
-        Term[] u = term;
-        if (!u[subterm].equals(replacement)) {
-            Term[] t = u.clone();
-            t[subterm] = replacement;
-            return new TermVector(t);
-        } else
-            return this;
-
-    }
+//    /** creates a copy if changed */
+//    @NotNull
+//    public TermVector replacing(int subterm, @NotNull Term replacement) {
+//        if (replacement.equals(term(subterm)))
+//            return this;
+//
+//        Term[] u = term;
+//        if (!u[subterm].equals(replacement)) {
+//            Term[] t = u.clone();
+//            t[subterm] = replacement;
+//            return new TermVector(t);
+//        } else
+//            return this;
+//
+//    }
 
 }

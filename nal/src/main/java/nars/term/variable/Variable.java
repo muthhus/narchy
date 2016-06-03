@@ -2,6 +2,7 @@ package nars.term.variable;
 
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * similar to a plain atom, but applies altered operating semantics according to the specific
@@ -45,7 +46,7 @@ public interface Variable extends Atomic {
     }
 
     @Override
-    default int compareTo(Termlike o) {
+    default int compareTo(@NotNull Termlike o) {
         //hashcode can serve as the ordering too
         if (o == this) return 0;
         return o instanceof Variable ? Integer.compare(hashCode(), o.hashCode()) : 1;

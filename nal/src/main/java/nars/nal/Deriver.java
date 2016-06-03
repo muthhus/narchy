@@ -34,6 +34,7 @@ public abstract class Deriver  {
                         defaultRules = new PremiseRuleSet();
                         defaultDeriver = new TrieDeriver( defaultRules );
                     } catch (Exception e) {
+                        e.printStackTrace();
                         logger.error("{}",e.getCause());
                         System.exit(1);  //e.printStackTrace();
                     }

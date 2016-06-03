@@ -53,13 +53,6 @@ import static nars.nal.Tense.DTERNAL;
 public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
 
 
-    static void argSep(@NotNull Appendable p) throws IOException {
-        /*if (pretty)
-            p.append(Symbols.ARGUMENT_SEPARATOR_PRETTY);
-        else*/
-            p.append(Symbols.ARGUMENT_SEPARATOR);
-    }
-
     static boolean atemporallyEqual(@NotNull Termed term, @NotNull Termed<Compound> beliefConcept) {
         //TODO can be accelerated
         Term t = term.term();
@@ -147,22 +140,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @Override
     default void append(@NotNull Appendable p) throws IOException {
         TermPrinter.append(this, p);
-    }
-
-    default void appendArgs(@NotNull Appendable p, boolean appendedOperator) throws IOException {
-        int nterms = size();
-
-        boolean bb = nterms > 1 && appendedOperator;
-        for (int i = 0; i < nterms; i++) {
-            if ((i != 0) || bb) {
-                argSep(p);
-            }
-            appendArg(p, i);
-        }
-    }
-
-    default void appendArg(@NotNull Appendable p, int i) throws IOException {
-        term(i).append(p);
     }
 
 

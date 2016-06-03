@@ -39,7 +39,7 @@ public interface Term extends Termed, Termlike {
         return this;
     }
 
-    @Nullable
+    @NotNull
     @Override
     Op op();
 
@@ -137,7 +137,7 @@ public interface Term extends Termed, Termlike {
 
 
 
-    void append(Appendable w) throws IOException;
+    void append(@NotNull Appendable w) throws IOException;
 
 //    default public void append(Writer w, boolean pretty) throws IOException {
 //        //try {
@@ -280,7 +280,7 @@ public interface Term extends Termed, Termlike {
         return hashCode();
     }
 
-    default boolean equalsIgnoringVariables(Term other) {
+    default boolean equalsIgnoringVariables(@NotNull Term other) {
         return (this instanceof Variable) || (other instanceof Variable) || equals(other);
     }
 

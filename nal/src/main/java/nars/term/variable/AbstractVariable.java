@@ -23,7 +23,6 @@ package nars.term.variable;
 
 import nars.Op;
 import nars.nal.meta.match.VarPattern;
-import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 

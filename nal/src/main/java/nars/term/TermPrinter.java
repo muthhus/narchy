@@ -37,11 +37,25 @@ public interface TermPrinter {
         if (c.size() == 1)
             p.append(ARGUMENT_SEPARATOR);
 
-        c.appendArgs(p, true);
+        appendArgs(c, p);
 
         appendCloser(p);
 
     }
+
+
+    static void appendArgs(Compound c, @NotNull Appendable p) throws IOException {
+        int nterms = c.size();
+
+        boolean bb = nterms > 1;
+        for (int i = 0; i < nterms; i++) {
+            if ((i != 0) || bb) {
+                p.append(Symbols.ARGUMENT_SEPARATOR);
+            }
+            c.term(i).append(p);
+        }
+    }
+
 
     static void appendCloser(@NotNull Appendable p) throws IOException {
         p.append(COMPOUND_TERM_CLOSER);

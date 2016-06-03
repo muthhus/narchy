@@ -157,7 +157,7 @@ public class TrieDeriver extends Deriver {
                 } else if (cond instanceof AndCondition) {
                     //TODO extract it
                     AndCondition ac = (AndCondition)cond;
-                    for (Term x : ac.terms()) {
+                    if (ac.or(x -> {
                         if (x instanceof SubTermOp) {
                             SubTermOp so = (SubTermOp)x;
                             if (so.subterm == subterm) {
@@ -167,7 +167,9 @@ public class TrieDeriver extends Deriver {
                                 }
                             }
                         }
-                    }
+                        return false;
+                    }))
+                        return true;
                 }
             }
             return false;

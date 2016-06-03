@@ -294,7 +294,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
      *  if this creates a new array, consider using .term(i) to access
      *  subterms iteratively.
      */
-    @Deprecated @NotNull T[] terms();
+    @NotNull T[] terms();
 
 
     @NotNull
@@ -617,7 +617,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
     @NotNull
-    default TermContainer<T> filter(Predicate<T> p) {
+    default TermContainer filter(Predicate<T> p) {
         if (!(this instanceof TermVector))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 

@@ -5,12 +5,9 @@ import nars.nal.Tense;
 import nars.term.*;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.subst.FindSubst;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -21,7 +18,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      * subterm vector
      */
     @NotNull
-    public final TermVector<T> subterms;
+    public final TermVector subterms;
 
     /**
      * subterm relation, resolves to unique concept
@@ -86,7 +83,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @NotNull
     @Override
-    public final TermVector<T> subterms() {
+    public final TermContainer subterms() {
         return subterms;
     }
 

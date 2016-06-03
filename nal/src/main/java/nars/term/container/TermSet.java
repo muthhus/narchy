@@ -10,10 +10,10 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class TermSet<X extends Term> extends TermVector<X> {
+public class TermSet<X extends Term> extends TermVector {
 
     @NotNull
-    public static TermSet the(Term... x) {
+    public static TermSet the(@NotNull Term... x) {
         return new TermSet(Terms.toSortedSetArray(x));
     }
 
@@ -66,10 +66,10 @@ public class TermSet<X extends Term> extends TermVector<X> {
         return true;
     }
 
-    @NotNull
-    @Override
-    public TermVector replacing(int subterm, Term replacement) {
-        throw new RuntimeException("n/a for set");
-    }
+//    @NotNull
+//    @Override
+//    public TermVector replacing(int subterm, Term replacement) {
+//        throw new RuntimeException("n/a for set");
+//    }
 
 }

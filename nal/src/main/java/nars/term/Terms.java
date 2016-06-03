@@ -12,6 +12,7 @@ import nars.util.data.sorted.SortedList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -31,7 +32,7 @@ public class Terms   {
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
-    @NotNull public static final TermVector<?> ZeroSubterms = new TermVector<>((Term[])new Term[] { });
+    @NotNull public static final TermVector ZeroSubterms = new TermVector((Term[])new Term[] { });
     @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
@@ -85,7 +86,8 @@ public class Terms   {
     public static boolean equalOrNegationOf(@NotNull Term a, @NotNull Term b) {
         if (a.op() == b.op()) {
             return a.equals(b);
-        } else if (a.op() == NEGATE) {
+        }
+        if (a.op() == NEGATE) {
             return ((Compound)a).term(0).equals(b);
         } else if (b.op() == NEGATE) {
             return ((Compound)b).term(0).equals(a);
@@ -151,7 +153,8 @@ public class Terms   {
 
         if (A.equals(B)) {
             return true;
-        } else if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
+        }
+        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
             //product and one of either image types
             return false; //the remaining comparisons are unnecessary
         }
@@ -300,21 +303,21 @@ public class Terms   {
         }
     }
 
-    public static void printRecursive(@NotNull Term x, int level) {
+    public static void printRecursive(PrintStream out, @NotNull Term x, int level) {
         //indent
         for (int i = 0; i < level; i++)
-            System.out.print("  ");
+            out.print("  ");
 
-        System.out.print(x);
-        System.out.print(" (");
-        System.out.print(x.op() + "[" + x.getClass().getSimpleName() + "] ");
-        System.out.print("c" + x.complexity() + ",v" + x.volume() + ' ');
-        System.out.print(Integer.toBinaryString(x.structure()) + ')');
-        System.out.println();
+        out.print(x);
+        out.print(" (");
+        out.print(x.op() + "[" + x.getClass().getSimpleName() + "] ");
+        out.print("c" + x.complexity() + ",v" + x.volume() + ' ');
+        out.print(Integer.toBinaryString(x.structure()) + ')');
+        out.println();
 
         if (x instanceof Compound) {
             for (Term z : ((Compound<?>) x))
-                printRecursive(z, level + 1);
+                printRecursive(out, z, level + 1);
         }
     }
 

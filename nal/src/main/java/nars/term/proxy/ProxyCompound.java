@@ -1,7 +1,6 @@
 package nars.term.proxy;
 
 import nars.term.Compound;
-import nars.term.SubtermVisitor;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;

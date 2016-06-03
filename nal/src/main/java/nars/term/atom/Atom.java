@@ -51,7 +51,7 @@ public class Atom extends AtomicStringConstant {
 
 
     @Override
-    public final int init(int[] meta) {
+    public final int init(@NotNull int[] meta) {
 
         meta[4] ++; //volume
         meta[5] |= AtomBit;

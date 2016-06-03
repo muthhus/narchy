@@ -26,7 +26,7 @@ public class PremiseRuleTest {
      * for printing complex terms as a recursive tree
      */
     public static void printRecursive(@NotNull Term x) {
-        Terms.printRecursive(x, 0);
+        Terms.printRecursive(System.out, x, 0);
     }
 
 

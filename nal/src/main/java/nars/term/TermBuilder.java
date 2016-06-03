@@ -199,8 +199,7 @@ public abstract class TermBuilder {
                 return t0;
             }
             case 2:
-                Term t0 = t[0];
-                Term et0 = t0, et1 = t[1];
+                Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
                     return subtractSet(set, (Compound) et0, (Compound) et1);
 

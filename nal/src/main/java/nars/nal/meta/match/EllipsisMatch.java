@@ -17,7 +17,7 @@ import java.util.Collection;
  * subterm collection, and post-filter before
  * forming a resulting substituted term.
  */
-public final class EllipsisMatch extends TermVector<Term> implements Term {
+public final class EllipsisMatch extends TermVector implements Term {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
