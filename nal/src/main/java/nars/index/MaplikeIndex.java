@@ -143,7 +143,7 @@ public abstract class MaplikeIndex implements TermIndex {
 
     @NotNull
     protected Termed build(@NotNull Termed interned) {
-        return conceptBuilder.apply(interned.term());
+        return conceptBuilder.apply( interned.term() );
     }
 
     @NotNull

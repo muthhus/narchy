@@ -115,7 +115,7 @@ public class Default extends AbstractNAR {
     @Override
     public final Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
         Concept c = concept(termed, true);
-        if ((c != null) && !(c instanceof Variable))
+        if (c != null)
             core.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
         return c;
     }

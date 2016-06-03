@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
@@ -18,26 +19,17 @@ import org.jetbrains.annotations.Nullable;
  * as shown above, but is not an "Operator").
  *
  */
-public final class Operator<T extends Term> extends AtomicStringConstant {
+public final class Operator<T extends Term> extends Atom {
 
-    @NotNull
-    private final String str;
-
-    private final int hash;
 
     public Operator(@NotNull T the) {
         this(the.toString());
     }
 
-    public Operator(@NotNull String the) {
-        this.str = (the.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + the : the); //prepends ^ if necessary
-        this.hash = str.hashCode();
+    public Operator(@NotNull String id) {
+        super((id.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + id : id));
     }
 
-    @Override
-    public final int hashCode() {
-        return hash;
-    }
 
     /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */
     @Nullable
@@ -45,9 +37,6 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
         return (Compound) operation.term(0);
     }
 
-//    @NotNull public static Compound opArgs(@NotNull Termed<Compound> t) {
-//        return opArgs((Compound)t.term());
-//    }
 
     /** returns the terms array of the arguments of an operation. does not check if the input is actually an operation */
     @NotNull public static Term[] argArray(@NotNull Compound term) {
@@ -64,13 +53,6 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
     @Override
     public Op op() {
         return Op.OPERATOR;
-    }
-
-
-    @NotNull
-    @Override
-    public String toString() {
-        return str;
     }
 
 

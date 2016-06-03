@@ -26,6 +26,7 @@ import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.truth.DefaultTruth;
 import nars.util.IO;
@@ -884,6 +885,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
+        if (t instanceof Variable)
+            return null;
 
         //optimization: assume a concept instance is the concept of this NAR
         if (t instanceof Concept) {

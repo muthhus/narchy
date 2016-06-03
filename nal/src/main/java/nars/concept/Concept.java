@@ -167,8 +167,13 @@ public interface Concept extends Termed, Comparable<Termlike> {
             linkTask((Task)b, scale);
         }
 
+        linkAny(b, scale, minScale, nar, conceptOverflow);
+
         return true;
     }
+
+    void linkAny(Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow);
+
 
     void linkTask(@NotNull Task t, float scale);
 

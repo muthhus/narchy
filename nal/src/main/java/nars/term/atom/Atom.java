@@ -37,7 +37,7 @@ public class Atom extends AtomicStringConstant {
 
     @NotNull
     @Override
-    public final Op op() {
+    public Op op() {
         return Op.ATOM;
     }
 

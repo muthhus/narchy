@@ -148,6 +148,11 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
+    public void linkAny(Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+        target.linkAny(b, scale, minScale, nar, conceptOverflow);
+    }
+
+    @Override
     public void capacity(@NotNull ConceptBudgeting c) {
         target.capacity(c);
     }

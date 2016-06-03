@@ -12,6 +12,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -27,14 +28,14 @@ import java.util.function.Function;
  */
 public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
-    final Function<Atomic, AtomConcept> atomBuilder =
-            (Atomic a) -> new AtomConcept(a, termbag(), taskbag());
+    final Function<Atom, AtomConcept> atomBuilder =
+            (Atom a) -> new AtomConcept(a, termbag(), taskbag());
 
 
     //private static volatile int serial = 0;
 
-    final Function<Variable, VariableConcept> varBuilder =
-            (Variable v) -> new VariableConcept(v);
+//    final Function<Variable, VariableConcept> varBuilder =
+//            (Variable v) -> new VariableConcept(v);
 
     @Nullable
     final Function<Compound, Termed> compoundBuilder = (Compound t) -> {
@@ -114,15 +115,16 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
         Termed result = null;
         if (term instanceof Compound) {
-            result = compoundBuilder.apply((Compound) term);
+            result = compoundBuilder.apply(  (Compound) term );
         } else {
 
             if (term instanceof Variable) {
                 //final int s = this.serial;
                 //serial++;
-                result = varBuilder.apply((Variable) term);
-            } else if (term instanceof Atomic) {
-                result = atomBuilder.apply((Atomic) term);
+                //result = varBuilder.apply((Variable) term);
+                return term;
+            } else if (term instanceof Atom) {
+                result = atomBuilder.apply((Atom) term);
             }
 
         }

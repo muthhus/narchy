@@ -24,6 +24,9 @@ public class TermTemplateTest {
         NAR n = new Default();
         Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
         n.step();
+
+        n.index.print(System.out);
+
         Concept c = t.concept(n);
 
         List<TermTemplate> templates = dereference(((CompoundConcept)c).termLinkTemplates);

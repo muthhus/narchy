@@ -221,7 +221,7 @@ public class BooleanConcept extends CompoundConcept {
         protected Task update(long now) {
 
 
-            MutableTask result = model.update(nar, now, term, beliefOrGoal, params.terms());
+            MutableTask result = model.update(nar, now, BooleanConcept.this, beliefOrGoal, params.terms());
 
             return result != null ? result.present(now).normalize(nar) : null;
         }

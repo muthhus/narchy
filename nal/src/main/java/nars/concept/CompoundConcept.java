@@ -17,6 +17,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -25,11 +26,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 import static nars.nal.Tense.DTERNAL;
 
 
-public class CompoundConcept extends AbstractConcept<Compound> implements Compound<Term> {
+public class CompoundConcept extends GenericCompound<Term> implements AbstractConcept , Compound<Term> {
+
+    private final Bag<Task> taskLinks;
+    private final Bag<Termed> termLinks;
 
     /**
      * how incoming budget is merged into its existing duplicate quest/question
@@ -47,6 +53,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     private final BeliefTable goals;
 
     private float satisfaction = 0;
+    private @NotNull Map meta;
 
 
     /**
@@ -56,7 +63,13 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * @param taskLinks
      */
     public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
-        super(term, termLinks, taskLinks);
+        super(term.op(), term.relation(), term.subterms());
+
+//        if (!term.isNormalized())
+//            throw new RuntimeException(term + " unnormalized");
+
+        this.termLinks = termLinks;
+        this.taskLinks = taskLinks;
 
         beliefs = newBeliefTable();
         goals = newGoalTable();
@@ -66,33 +79,24 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public final @NotNull TermContainer subterms() {
-        return term.subterms();
-    }
-
-
-    @Override
-    public final int relation() {
-        return term.relation();
-    }
-
-    @Override @NotNull
-    public final Op op() {
-        return term.op();
+    public void setMeta(@NotNull Map newMeta) {
+        this.meta = newMeta;
     }
 
     @Override
-    public final boolean isNormalized() {
-        return true; //must be normalized to create the concept
+    public @Nullable Map<Object, Object> meta() {
+        return meta;
     }
 
     @Override
-    public final int dt() {
-        //concept itself is eternal
-        return DTERNAL;
+    public @NotNull Bag<Task> tasklinks() {
+        return taskLinks;
     }
 
-
+    @Override
+    public @NotNull Bag<Termed> termlinks() {
+        return termLinks;
+    }
 
     /** used for questions and quests */
     @NotNull protected QuestionTable newQuestionTable() {
@@ -255,26 +259,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return questionTable.add(q, answerTable, nar);
     }
 
-
     @Override
-    public final boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-        return term.match(y, subst);
-    }
-
-
-
-    @Override
-    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-
-        if (super.link(b, scale, minScale, nar, conceptOverflow)) {
-
-            linkSubs(b, scale, minScale, nar, conceptOverflow);
-            //linkPeers(b, scale, nar, false);
-
-            return true;
-        }
-
-        return false;
+    public void linkAny(Budgeted b, float scale, float minScale, NAR nar, @Nullable MutableFloat conceptOverflow) {
+        linkSubs(b, scale, minScale, nar, conceptOverflow);
+        //linkPeers(b, scale, nar, false);
     }
 
 
@@ -283,7 +271,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //3. Link the termlink templates
         List<TermTemplate> templates = Global.dereference(this.termLinkTemplates);
         if (templates == null) {
-            templates = TermLinkBuilder.buildFlat(term, nar);
+            templates = TermLinkBuilder.buildFlat(this, nar);
 //                if (this.termLinkTemplates!=null) {
 //                    System.err.println("GC'd");
 //                }
@@ -353,7 +341,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
             //Link the peer termlink bidirectionally
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                Concept target = linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+                Concept target = AbstractConcept.linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
 
                 if (target!=null && b instanceof Task) {
                     //insert 2nd-order tasklink
