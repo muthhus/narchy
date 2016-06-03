@@ -38,7 +38,7 @@ public final class Termunator extends Termutator {
     }
 
     @NotNull
-    private final Termutator[] next() {
+    private Termutator[] next() {
         List<Termutator> t = termutes;
         int n = t.size();
         if (n == 0) {

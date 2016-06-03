@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 6/1/15.
  */
-public abstract class VariableTransform implements CompoundTransform<Compound, Term> {
+public abstract class VariableTransform implements CompoundTransform<Compound, Variable> {
 
     @Override
     public final boolean test(@NotNull Term possiblyAVariable) {

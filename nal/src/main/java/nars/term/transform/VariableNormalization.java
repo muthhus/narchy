@@ -23,10 +23,10 @@ import java.util.function.Function;
  * information - the particular labels the input has attached.
  *
  */
-public class VariableNormalization extends VariableTransform implements Function<Term,Variable> {
+public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
     @NotNull
-    final Map<Term, Variable /*Variable*/> rename;
+    final Map<Variable, Variable /*Variable*/> rename;
 
     boolean renamed;
 
@@ -76,7 +76,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @NotNull @Override
-        public Termed apply(Compound containing, @NotNull Term current) {
+        public Termed apply(Compound containing, @NotNull Variable current) {
 
             if (current instanceof Ellipsis)
                 throw new RuntimeException("not allowed");
@@ -90,7 +90,7 @@ public class VariableNormalization extends VariableTransform implements Function
 
     @NotNull
     @Override
-    public final Variable apply(@NotNull Term v) {
+    public final Variable apply(@NotNull Variable v) {
         Variable rvv = newVariable(v, rename.size()+1);
         if (!this.renamed) {
             //track if modification occurred
@@ -100,12 +100,12 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @NotNull @Override
-    public final Termed apply(Compound ct, Term v) {
+    public final Termed apply(Compound ct, Variable v) {
         return rename.computeIfAbsent(v, this);
     }
 
     @NotNull
-    protected Variable newVariable(@NotNull Term v, int serial) {
+    protected Variable newVariable(@NotNull Variable v, int serial) {
         if (v instanceof GenericVariable) {
             return ((GenericVariable) v).normalize(serial); //HACK
         } else if (v instanceof Ellipsis) {

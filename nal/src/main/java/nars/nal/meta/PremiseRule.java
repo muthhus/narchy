@@ -1094,7 +1094,7 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         @Override
-        protected Variable newVariable(@NotNull Term v, int serial) {
+        protected Variable newVariable(@NotNull Variable v, int serial) {
 
 
             int actualSerial = serial + offset;
