@@ -236,7 +236,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         final float learningRate = v / termlinks().size();
         //System.out.println(this + " activating " + x);
         termlinks().forEach(tl -> {
-            boolean active = tl.get().equals(x);
+            boolean active = tl == existing;
             if (active&&init)
                 return; //dont modify the newly inserted link
 

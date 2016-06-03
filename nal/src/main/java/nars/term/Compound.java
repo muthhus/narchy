@@ -234,18 +234,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-    default boolean equalsFurther(@NotNull Compound u) {
-
-        return (opRel() == u.opRel()) &&
-                (dt() == u.dt()) &&
-                (subterms().equals(u.subterms()));
-    }
-
-    @Override
-    default boolean equalTerms(@NotNull TermContainer c) {
-        return subterms().equalTerms(c);
-    }
-
     @NotNull
     @Override
     default Object setFirst(Object first) {

@@ -10,7 +10,7 @@ import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.index.TermIndex;
-import nars.nal.meta.match.VarPattern;
+import nars.term.variable.VarPattern;
 import nars.task.MutableTask;
 import nars.term.*;
 import nars.term.atom.Atom;

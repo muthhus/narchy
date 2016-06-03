@@ -267,25 +267,8 @@ public class TermVector implements TermContainer<Term>, Serializable {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj instanceof TermContainer && TermContainer.equals(this, (TermContainer) obj);
+        return (this == obj) || (obj instanceof TermContainer && equalTo((TermContainer) obj));
     }
-
-    @Override public final boolean equalTerms(@NotNull TermContainer c) {
-        Term[] tt = this.term;
-
-        int s = tt.length;
-        if (s!=c.size())
-            return false;
-
-        for (int i = 0; i < s; i++) {
-            if (!tt[i].equals(c.term(i)))
-                return false;
-        }
-
-        return true;
-    }
-
-
 
     public final void visit(@NotNull SubtermVisitor v, Compound parent) {
         for (Term t : term)

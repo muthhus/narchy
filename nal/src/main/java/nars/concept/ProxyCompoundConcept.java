@@ -61,11 +61,6 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return alias;
     }
 
-    @NotNull
-    @Override
-    public Compound term() {
-        return this;
-    }
 
     @Override
     public boolean contains(@NotNull Task t) {

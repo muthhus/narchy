@@ -60,11 +60,11 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return term(i).op() == o;
     }
 
-    @Override
-    public boolean equalTerms(@NotNull TermContainer c) {
-        //to compare them in-order
-        return TermContainer.equals(this, c);
-    }
+//    @Override
+//    public boolean equalTerms(@NotNull TermContainer c) {
+//        //to compare them in-order
+//        return TermContainer.equ(this, c);
+//    }
 
     @Override
     public String toString() {
@@ -113,7 +113,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public boolean equals(Object obj) {
-        return TermContainer.equals(this, (TermContainer) obj);
+        return obj == this || equalTo(((TermContainer) obj));
     }
 
     @Override

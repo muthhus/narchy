@@ -1,4 +1,4 @@
-package nars.nal.meta.match;
+package nars.term.variable;
 
 import nars.Op;
 import nars.term.variable.AbstractVariable;
@@ -14,8 +14,6 @@ public class VarPattern extends AbstractVariable {
     }
 
 
-
-
     @Override
     public final int structure() {
         return 0;
@@ -28,10 +26,6 @@ public class VarPattern extends AbstractVariable {
         return Op.VAR_PATTERN;
     }
 
-//    @Override
-//    public int volume() {
-//        return 1;
-//    }
 
     /**
      * pattern variable hidden in the count 0

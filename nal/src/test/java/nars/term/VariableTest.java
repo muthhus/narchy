@@ -2,8 +2,6 @@ package nars.term;
 
 import nars.$;
 import nars.Narsese;
-import nars.nal.meta.match.VarPattern;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

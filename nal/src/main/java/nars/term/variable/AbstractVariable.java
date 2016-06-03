@@ -21,10 +21,13 @@
 package nars.term.variable;
 
 
+import nars.Global;
 import nars.Op;
-import nars.nal.meta.match.VarPattern;
+import nars.Symbols;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.VAR_QUERY;
 
 /**
  * Normalized variable
@@ -55,6 +58,7 @@ public abstract class AbstractVariable implements Variable {
         return obj==this ||
                 (obj instanceof Variable && obj.hashCode() == hash); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
+
     }
 
     @Override
@@ -70,12 +74,10 @@ public abstract class AbstractVariable implements Variable {
         return str;
     }
 
-    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 32;
-
     /**
      * numerically-indexed variable instance cache; prevents duplicates and speeds comparisons
      */
-    private static final AbstractVariable[][] varCache = new AbstractVariable[4][MAX_VARIABLE_CACHED_PER_TYPE];
+    private static final AbstractVariable[][] varCache = new AbstractVariable[4][Global.MAX_VARIABLE_CACHED_PER_TYPE];
 
     @NotNull
     public static Op typeIndex(char c) {
@@ -87,7 +89,7 @@ public abstract class AbstractVariable implements Variable {
             case '$':
                 return Op.VAR_INDEP;
             case '?':
-                return Op.VAR_QUERY;
+                return VAR_QUERY;
         }
         throw new RuntimeException(c + " not a variable");
     }
@@ -120,19 +122,26 @@ public abstract class AbstractVariable implements Variable {
 //    @Override
 //    abstract public int volume();
 
-    public static AbstractVariable cached(@NotNull Op type, int counter) {
-        if (counter >= AbstractVariable.MAX_VARIABLE_CACHED_PER_TYPE) {
-            return vNew(type, counter);
-            //throw new RuntimeException("variable cache overflow");
-        } else {
-            AbstractVariable[] vct = AbstractVariable.varCache[typeIndex(type)];
-            AbstractVariable v = vct[counter];
-            if (v == null) {
-                v = vNew(type, counter);
-                vct[counter] = v;
+    static {
+        //precompute cached variable instances
+        for (Op o : new Op[] { Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP } ) {
+            int t = typeIndex(o);
+            for (int i = 0; i < Global.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
+                varCache[t][i] = vNew(o, i);
             }
-            return v;
         }
+    }
+
+    public static AbstractVariable cached(@NotNull Op type, int counter) {
+        if (counter >= Global.MAX_VARIABLE_CACHED_PER_TYPE) {
+            return vNew(type, counter); //for special variables like ellipsis
+        }
+
+        return varCache[typeIndex(type)][counter];
+//        if (v == null) {
+//            v = vNew(type, counter);
+//            vct[counter] = v;
+//        }
     }
 
     /** TODO move this to TermBuilder */

@@ -50,6 +50,7 @@ public enum Global {
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

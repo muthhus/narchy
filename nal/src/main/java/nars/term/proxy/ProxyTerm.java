@@ -6,9 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ProxyTerm<T extends Term> extends Term {
 
-    @NotNull
-    @Override
-    T term();
 
     @NotNull
     T target();

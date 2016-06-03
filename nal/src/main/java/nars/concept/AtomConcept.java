@@ -46,10 +46,6 @@ public class AtomConcept extends Atom implements AbstractConcept  {
         return op;
     }
 
-    /** the atom in this case is the concept itself, exposing this and not the internal 'term' field */
-    @Override @NotNull public final AtomConcept term() {
-        return this;
-    }
 
 
 

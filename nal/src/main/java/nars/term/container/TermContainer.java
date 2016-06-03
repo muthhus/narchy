@@ -194,37 +194,27 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 //        return o instanceof Term && containsTerm((Term) o);
 //    }
 
-    boolean equals(Object o);
+
 
 //    static boolean equals(@NotNull TermContainer a, Object b) {
 //        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
 //    }
 
-    /** can be called from equals() */
-    static boolean equals(@NotNull TermContainer a, @NotNull TermContainer b) {
-        return
-                (a == b) ||
-                ((a.equalMeta(b)) &&
-                 (a.equalTerms(b)));
-    }
-
-    default boolean equalMeta(@NotNull TermContainer b) {
+    /** should be called only from equals() */
+    default boolean equalTo(@NotNull TermContainer b) {
         return (hashCode() == b.hashCode()) &&
-                (structure() == b.structure()) &&
-                (volume() == b.volume()) &&
-                (size() == b.size());
+               (structure() == b.structure()) &&
+               (volume() == b.volume()) &&
+               (size() == b.size()) &&
+               (equalTerms(b));
     }
 
-    /** test for exhaustive equality */
-    boolean equalTerms(TermContainer c);
 
-    default boolean equalTerms(@NotNull Term[] c) {
-        int cl = c.length;
-        if (cl != size())
-            return false;
-
+    /** size should already be known equal */
+    default boolean equalTerms(@NotNull TermContainer c) {
+        int cl = size();
         for (int i = 0; i < cl; i++) {
-            if (!term(i).equals(c[i]))
+            if (!term(i).equals(c.term(i)))
                 return false;
         }
         return true;

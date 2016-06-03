@@ -89,8 +89,19 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final boolean equals(@Nullable Object that) {
-        return this == that ||
-                ( that instanceof Compound && equalsFurther((Compound) that));
+
+        if (this == that) return true;
+        if (hashCode() == that.hashCode()) {
+            if (that instanceof Compound) {
+                Compound cthat = (Compound) that;
+                return (
+                    opRel() == cthat.opRel() &&
+                    dt() == cthat.dt() &&
+                    subterms().equals(cthat.subterms())
+                );
+            }
+        }
+        return false;
     }
 
     @Override

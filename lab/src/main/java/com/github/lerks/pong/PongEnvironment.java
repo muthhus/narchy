@@ -10,6 +10,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
+import nars.Symbols;
 import nars.concept.BooleanConcept;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
@@ -45,12 +46,12 @@ public class PongEnvironment extends Player implements Environment {
 
 	int actions = 3;
 
-	final int width = 12;
+	final int width = 6;
 	final int height = 12;
 	final int pixels = width * height;
 	final int scaleY = 40;
 	final int scaleX = 60;
-	final int ticksPerFrame = 4; //framerate divisor
+	final int ticksPerFrame = 3; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
@@ -70,9 +71,9 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		nar.beliefConfidence(0.75f);
-		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.goalConfidence(0.35f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(256);
@@ -143,8 +144,9 @@ public class PongEnvironment extends Player implements Environment {
 
 			nagent = (NAgent) a;
 			NAR nar = nagent.nar;
+
 //			for (int i = 1; i < Math.max(width,height); i++) {
-//				nar.nar.believe("(" + (i-1) + " <-> " + i + ")", 0.75f, 1f);
+//				nar.believe("(" + (i-1) + " <-> " + i + ")", 0.85f, 1f);
 //			}
 
 //			ArrayList<Concept> convolution = new ArrayList();
@@ -208,6 +210,10 @@ public class PongEnvironment extends Player implements Environment {
 
 				return p(ax, ay);
 			});
+			nar.ask($("( ((?1,?2)-->w) && (R) )"), Symbols.QUESTION);
+			nar.ask($("( ((?1,?2)-->w) && (R) )"), Symbols.QUEST);
+			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUESTION);
+			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUEST);
 
 
 //			new OperationAnswerer($.$("dist((%1,%2),(%3,%4),#d)"), nar) {
@@ -289,8 +295,10 @@ public class PongEnvironment extends Player implements Environment {
 				@Nullable Concept c = nagent.nar.concept(p(x, y));
 				//float pA = 0.5f + 0.5f * p;
 				float b = c.beliefs().truth(now).expectation();
-				float g = c.goals().truth(now).expectation();
-				return ColorArray.rgba(b, 0, g, 1f);
+				@NotNull Truth gg = c.goals().truth(now);
+				float gP = (gg.expectationPositive()-0.5f) * 2f;
+				float gN = (gg.expectationNegative()-0.5f) * 2f;
+				return ColorArray.rgba(b, gP, gN, 1f);
 			}else {
 				//FUTURE
 				y-=height;
@@ -317,12 +325,12 @@ public class PongEnvironment extends Player implements Environment {
 	public void actRelative(int action) {
 		switch (action) {
 			case 0:
-				move(-PongModel.SPEED*3, pong);
+				move(-PongModel.SPEED*ticksPerFrame, pong);
 				break;
 			case 1: /* nothing */
 				break;
 			case 2:
-				move(+PongModel.SPEED*3, pong);
+				move(+PongModel.SPEED*ticksPerFrame, pong);
 				break;
 
 		}
