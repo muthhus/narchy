@@ -30,6 +30,10 @@ public class RawBudget extends Budget {
 
     }
 
+    public RawBudget(Budgeted b, float scale) {
+        this(b.pri()*scale, b.dur(), b.qua());
+    }
+
     public RawBudget(float p, float d, float q) {
         setPriority(p);
         setDurability(d);

@@ -9,6 +9,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.BooleanConcept;
@@ -49,38 +50,39 @@ public class PongEnvironment extends Player implements Environment {
 
 	int actions = 3;
 
-	final int width = 6;
-	final int height = 12;
+	final int width = 20;
+	final int height = 20;
 	final int pixels = width * height;
-	final int scaleY = 40;
-	final int scaleX = 60;
-	final int ticksPerFrame = 3; //framerate divisor
+	final int scaleY = 20;
+	final int scaleX = 20;
+	final int ticksPerFrame = 2; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
-	float bias = -0.1f; //pain of boredom
+	float bias = 0f; //pain of boredom
 	private NAgent nagent;
 
 	public static void main (String[] args) {
+		//Global.TRUTH_EPSILON = 0.2f;
 		PongEnvironment e = new PongEnvironment();
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		Default nar = new Default(
-				1024, 6, 1, 2, rng,
+				1024, 16, 1, 3, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				new Indexes.WeakTermIndex(128 * 1024, rng)
+				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				//new Indexes.DefaultTermIndex(128 *1024, rng)
+				new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.6f);
+		nar.conceptActivation.setValue(0.8f);
 		nar.beliefConfidence(0.9f);
 		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.125f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(64);
 
 
 		NAgent a = new NAgent(nar);
@@ -167,11 +169,7 @@ public class PongEnvironment extends Player implements Environment {
 //					nar.ask(b);
 //				}
 //			}
-//
-//			//nar.log();
-//
-//			//HACK some other way than forcing an update each frame
-//			nar.onFrame(f -> {
+//			nar.onFrame(f -> { //HACK some other way than forcing an update each frame
 //				long t = nagent.nar.time();
 //				for (Concept concept : convolution) {
 //					Truth b = concept.beliefs().truth(t);
@@ -216,9 +214,9 @@ public class PongEnvironment extends Player implements Environment {
 
 				return p(ax, ay);
 			});
-			nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUESTION);
-			nar.ask($("( ((#1,#2)-->w) ==> (R) )"), Symbols.QUESTION);
-			nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUEST);
+			//nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUESTION);
+			//nar.ask($("( ((#1,#2)-->w) ==> (R) )"), Symbols.QUESTION);
+			//nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUEST);
 //			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUESTION);
 //			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUEST);
 
@@ -240,8 +238,8 @@ public class PongEnvironment extends Player implements Environment {
 	public static Compound p(int x, int y) {
 		@NotNull Compound c = $.p(the(x), the(y));
 		//System.out.println(i + " (" + ax + "," + ay + ") " + c);
-		//return c;
-		return inh(c, the("w"));
+		return c;
+		//return inh(c, the("w"));
 		//return inst(c, the("w"));
 	}
 

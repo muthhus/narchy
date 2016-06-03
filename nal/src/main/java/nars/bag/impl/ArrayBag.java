@@ -2,7 +2,10 @@ package nars.bag.impl;
 
 import nars.Global;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.RawBudget;
+import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
@@ -13,7 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 
@@ -23,9 +30,13 @@ import java.util.function.Consumer;
 public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> {
 
     /** this default value must be changed */
-    @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
+    @NotNull protected BudgetMerge mergeFunction;
     private float pendingMass;
     private boolean requiresSort;
+
+    //protected final FasterList<BLink<V>> pending = new FasterList();
+    protected final Map<V,RawBudget> pending = new HashMap<>();
+    private BiFunction<RawBudget, RawBudget, RawBudget> pendingMerge;
 
 
     public ArrayBag(int cap) {
@@ -38,6 +49,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
                 SortedArray.SearchType.BinarySearch);
         setCapacity(cap);
+        merge( BudgetMerge.errorMerge );
     }
 
     @Override
@@ -80,6 +92,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @NotNull
     public Bag<V> merge(@NotNull BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
+
+        this.pendingMerge = (RawBudget bExisting, RawBudget bNext) -> {
+            if (bExisting!=null) {
+                mergeFunction.merge(bExisting, bNext, 1f);
+                return bExisting;
+            } else {
+                return bNext;
+            }
+        };
+
         return this;
     }
 
@@ -230,15 +252,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
         }
-        else if (isFull()) {
-            @NotNull BLink<V> link = link(i, b, scale);
-            pendingMass += link.pri() * link.dur();
-            pending.add(link);
+        else {//if (isFull()) {
+            RawBudget inc = new RawBudget(b, scale);
+            pending.merge(i, inc, pendingMerge);
+            pendingMass += inc.pri() * inc.dur();
             return null;
         }
-        else {
+        /*else {
             return putNew(i, link(i, b, scale));
-        }
+        }*/
 
     }
 
@@ -293,9 +315,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return put(i, newBudget);
     }
 
-    //protected final FasterList<BLink<V>> pending = new FasterList();
-    protected final ConcurrentLinkedDeque<BLink<V>> pending = new ConcurrentLinkedDeque<>();
-
 
     @NotNull
     @Override
@@ -315,8 +334,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
             if (lowestUnsorted != -1)  {
                 qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
-
-
             } // else: perfectly sorted
 
             removeDeletedAtBottom();
@@ -328,43 +345,37 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return this;
     }
 
-    private void addPending() {
-        //add pending items now that the bag is updated
+    /** add pending items (after bag is updated) */
+    private final void addPending() {
         pendingMass = 0;
-        int pendingSize = pending.size();
-        /*int merged = 0;
-        int added = 0;
-        int rejected = 0;*/
+        pending.forEach(eachPending);
+        pending.clear();
+    }
 
-        for (int i1 = 0; i1 < pendingSize; i1++) {
-            //BLink<V> link = pending.get(i1);
-            BLink<V> link = pending.removeFirst();
-            V key = link.get();
-            if (key == null)
-                continue; //link was destroyed before it could be processed
+    final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
+        //            if (key == null)
+//                continue; //link was destroyed before it could be processed
 
-            BLink<V> existing = get(key);
+            /*BLink<V> existing = get(key);
             if (existing != null) {
-                mergeFunction.merge(existing, link, 1f);
-                if (existing.commit()) {
-                    //reorder
-                    removeItem(existing);
-                    addItem(existing);
-                }
-                //merged++;
+                //SHOULD NOT BE IN THE MAP ALREADY
+                mergeFunction.merge(existing, inc, 1f);
             }
-            else {
-                boolean inserted = link != putNew(key, link);
-                /*if (inserted) {
-                    added++;
-                } else {
-                    rejected++;
-                }*/
-            }
+            else {*/
 
+        if (inc.pri() > bottomPri()) {
+            putNew(key, link(key, inc, 1f));
         }
+                /*else {
+                    insufficient, try again next commit
+                }*/
+        //}
 
-        //System.out.println("cap=" + capacity() + ", pending=" + pendingSize + ", merged=" + merged + ", added=" + added + ", rejected=" + rejected);
+    };
+
+    private final float bottomPri() {
+        int s = size();
+        return s == 0 ? -1 : get(s - 1).pri();
     }
 
     /** returns the index of the lowest unsorted item */

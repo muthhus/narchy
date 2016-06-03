@@ -90,7 +90,7 @@ public enum Global {
      */
     public static float HORIZON = 1f;
 
-    public static final float TRUTH_EPSILON = 0.01f;
+    public static float TRUTH_EPSILON = 0.01f;
 
     /** how precise unit test results must match expected values to pass */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;

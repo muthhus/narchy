@@ -22,6 +22,7 @@ package mikejyg.javaipacman.pacman;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.index.CaffeineIndex;
 import nars.index.Indexes;
@@ -61,6 +62,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 	public static void main (String[] args) 	{
+		Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
 		//Multi nar = new Multi(2,

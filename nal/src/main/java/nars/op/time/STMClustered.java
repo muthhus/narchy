@@ -4,6 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
@@ -243,6 +244,8 @@ public class STMClustered extends STM {
                 return new TLink(i, b, scale);
             }
         };
+        bag.merge(BudgetMerge.avgDQBlend);
+
         this.net = new NeuralGasNet<TasksNode>(DIMENSIONS, clusters) {
             @NotNull
             @Override

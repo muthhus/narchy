@@ -303,10 +303,11 @@ public class NAgent implements Agent {
         nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
         nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
 
-        nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
+        /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
         nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
         nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //avoid decrease usually
         nar.goal("(dRn)", Tense.Present, 0f, 1f); //avoid decrease usually
+        */
 
         //nar.goal("(dRp)", Tense.Eternal, 1f, 1f); //prefer increase
         //nar.goal("(dRp)", Tense.Present, 1f, 1f); //prefer increase
@@ -428,8 +429,8 @@ public class NAgent implements Agent {
         long now = nar.time();
 
         /*if (lastAction != nextAction)*/ {
-            float off = 0.25f;
-            float mid = 0.75f;
+            float off = 0.0f;
+            float mid = 0.5f;
             float on = 1f;
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
