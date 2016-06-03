@@ -55,17 +55,19 @@ public interface AbstractConcept extends Concept, Term {
 
         }*/
 
-        if (targetTerm instanceof Variable) {
-            return null;
-        }
+
 
         /* activate concept */
         Concept target = nar.conceptualize(targetTerm, b, subScale,
                 0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
                 conceptOverflow);
 
-        if (target == null)
-            throw new RuntimeException("termlink to null concept: " + targetTerm);
+        if (targetTerm instanceof Variable) {
+
+        } else {
+            if (target == null)
+                throw new RuntimeException("termlink to null concept: " + targetTerm);
+        }
 
         if (target == source)
             throw new RuntimeException("termlink self-loop");
@@ -73,13 +75,13 @@ public interface AbstractConcept extends Concept, Term {
 
 
         /* insert termlink target to source */
-        if (alsoReverse) {
+        if (target!=null && alsoReverse) {
             subScale /= 2; //divide among both directions
             target.termlinks().put(source, b, subScale, termlinkOverflow);
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(target, b, subScale, termlinkOverflow);
+        source.termlinks().put(target != null ? target : targetTerm, b, subScale, termlinkOverflow);
 
         return target;
     }

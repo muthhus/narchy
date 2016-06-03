@@ -67,6 +67,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
 //        if (!term.isNormalized())
 //            throw new RuntimeException(term + " unnormalized");
+        setNormalized();
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
@@ -106,6 +107,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 //    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
 //        this((Compound) $.$(compoundTermString), n);
 //    }
+
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {

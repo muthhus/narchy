@@ -218,7 +218,7 @@ public enum TermLinkBuilder {
             if (t.op()==Op.VAR_QUERY)
                 return null;
 
-            target.add(t);
+            target.add(nar.index.the(t));
             return t;
         }
 
