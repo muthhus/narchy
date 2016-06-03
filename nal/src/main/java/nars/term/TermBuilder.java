@@ -139,18 +139,18 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term newCompound(@NotNull Op op, @NotNull Collection<Term> t) {
-        return newCompound(op, -1, t);
+    public Term build(@NotNull Op op, @NotNull Collection<Term> t) {
+        return build(op, -1, t);
     }
 
     @Nullable
-    public Term newCompound(@NotNull Op op, int relation, @NotNull Collection<Term> t) {
-        return newCompound(op, relation, TermContainer.the(op, t));
+    public Term build(@NotNull Op op, int relation, @NotNull Collection<Term> t) {
+        return build(op, relation, TermContainer.the(op, t));
     }
 
     @Nullable
-    public Term newCompound(@NotNull Op op, Term singleton) {
-        return newCompound(op, TermVector.the(singleton));
+    public Term build(@NotNull Op op, Term singleton) {
+        return build(op, TermVector.the(singleton));
     }
 
 
@@ -173,13 +173,13 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term newCompound(@NotNull Op op, @NotNull TermContainer subs) {
-        return newCompound(op, -1, subs);
+    public Term build(@NotNull Op op, @NotNull TermContainer subs) {
+        return build(op, -1, subs);
     }
 
 
     @Nullable
-    public Term newCompound(@NotNull Op op, int relation, @NotNull TermContainer tt) {
+    public Term build(@NotNull Op op, int relation, @NotNull TermContainer tt) {
         return build(op, relation, DTERNAL, tt);
     }
 
@@ -249,17 +249,17 @@ public abstract class TermBuilder {
 
     @Nullable
     public Compound inst(Term subj, Term pred) {
-        return (Compound) newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), pred));
+        return (Compound) build(INHERIT, TermVector.the(build(SET_EXT, subj), pred));
     }
 
     @Nullable
     public Compound prop(Term subj, Term pred) {
-        return (Compound) newCompound(INHERIT, TermVector.the(subj, newCompound(SET_INT, pred)));
+        return (Compound) build(INHERIT, TermVector.the(subj, build(SET_INT, pred)));
     }
 
     @Nullable
     public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
+        return (Compound) build(INHERIT, TermVector.the(build(SET_EXT, subj), build(SET_INT, pred)));
     }
 
     @Nullable
@@ -291,7 +291,7 @@ public abstract class TermBuilder {
         System.arraycopy(res, index + 1, ser, index, (serN - index));
         res = ser;
 
-        return newCompound(
+        return build(
                 o,
                 index, TermVector.the(res));
     }
@@ -387,7 +387,7 @@ public abstract class TermBuilder {
             op = op == CONJUNCTION ? DISJUNCTION : CONJUNCTION;
 
             Term nn = finish(op, -1, dt, TermSet.the(negs));
-            return newCompound(NEGATE, nn);
+            return build(NEGATE, nn);
         }
 
         return finish(op, -1, dt, TermSet.the(s));
@@ -512,7 +512,7 @@ public abstract class TermBuilder {
     @Nullable
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
         Term s = junction(CONJUNCTION, t, subject, oldCondition);
-        return s != null ? newCompound(IMPLICATION, t, TermVector.the(s, pred(predicate))) : null;
+        return s != null ? build(IMPLICATION, t, TermVector.the(s, pred(predicate))) : null;
     }
 
     @Nullable

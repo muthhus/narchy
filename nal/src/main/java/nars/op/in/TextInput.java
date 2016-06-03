@@ -37,7 +37,7 @@ public class TextInput extends TaskQueue {
 		int n = Narsese.the().tasks(input,
 				(Collection<Task>) this, nar);
 		if (n == 0)
-			throw new Narsese.NarseseException("No tasks parsed");
+			throw new Narsese.NarseseException("No tasks parsed: " + input);
 	}
 
 }

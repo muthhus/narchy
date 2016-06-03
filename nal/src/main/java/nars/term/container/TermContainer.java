@@ -62,7 +62,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         else if (u == term2)
             return term2;
         else
-            return (Compound) b.newCompound(o, u);
+            return (Compound) b.build(o, u);
     }
 
 
@@ -113,7 +113,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         MutableSet<Term> s = TermContainer.intersect(
                 (TermContainer) a, (TermContainer) b
         );
-        return s.isEmpty() ? null : (Compound) builder.newCompound(o, s);
+        return s.isEmpty() ? null : (Compound) builder.build(o, s);
     }
 
 
@@ -260,7 +260,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
             return null;
         }
 
-        return (Compound) t.newCompound(o, terms);
+        return (Compound) t.build(o, terms);
 
 //        if (a.size() == 1 && b.size() == 1) {
 //            //special case

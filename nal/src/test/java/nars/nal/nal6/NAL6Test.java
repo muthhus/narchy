@@ -368,12 +368,12 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     public void variable_elimination_deduction()  {
-        TestNAR tester = test();
-        tester.believe("<(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>", 1.00f, 0.90f); //en("there is a lock with the property that when opened by something, this something is a key");
-        tester.believe("<lock1 --> lock>", 1.00f, 0.90f); //en("lock1 is a lock");
-        tester.mustBelieve(cycles, "<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
-
+        test()
+        .believe("<(&&,<#1 --> lock>,<#1 --> (/,open,$2,_)>) ==> <$2 --> key>>", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
+        .believe("<lock1 --> lock>", 1.00f, 0.90f) //en("lock1 is a lock");
+        .mustBelieve(cycles, "<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
     }
+
 
 
     @Test

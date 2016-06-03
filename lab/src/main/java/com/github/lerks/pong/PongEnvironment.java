@@ -17,6 +17,7 @@ import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
 import nars.index.Indexes;
 import nars.learn.Agent;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
@@ -30,6 +31,7 @@ import nars.util.FX;
 import nars.util.NAgent;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static nars.$.*;
 
@@ -70,13 +73,14 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.75f);
-		nar.goalConfidence(0.35f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.4f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(256);
+		nar.conceptActivation.setValue(0.6f);
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.125f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
+		nar.cyclesPerFrame.set(128);
 
 
 		NAgent a = new NAgent(nar);
@@ -85,11 +89,12 @@ public class PongEnvironment extends Player implements Environment {
 
 		new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
+		new HappySad(nar, 8);
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 88512);
+		e.run(a, 1024*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -97,6 +102,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.forEachConcept(c -> {
 			System.out.println(c);
 		});
+
 		//nar.forEachConcept(System.out::println);
 	}
 
@@ -210,10 +216,11 @@ public class PongEnvironment extends Player implements Environment {
 
 				return p(ax, ay);
 			});
-			nar.ask($("( ((?1,?2)-->w) && (R) )"), Symbols.QUESTION);
-			nar.ask($("( ((?1,?2)-->w) && (R) )"), Symbols.QUEST);
-			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUESTION);
-			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUEST);
+			nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUESTION);
+			nar.ask($("( ((#1,#2)-->w) ==> (R) )"), Symbols.QUESTION);
+			nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUEST);
+//			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUESTION);
+//			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUEST);
 
 
 //			new OperationAnswerer($.$("dist((%1,%2),(%3,%4),#d)"), nar) {
@@ -308,7 +315,7 @@ public class PongEnvironment extends Player implements Environment {
 				//float b = c.beliefs().truth(now+dt).expectation();
 				//float g = c.goals().truth(now+dt).expectation();
 				//return ColorArray.rgba(b-b0 > 0 ? 1f : 0f, b0-b > 0 ? 1f: 0f, 0, 1f);
-				return ColorArray.rgba(p, 0, 0, 1f);
+				return ColorArray.rgba(p, p, p, 1f);
 			}
 
 		});
@@ -357,5 +364,50 @@ public class PongEnvironment extends Player implements Environment {
 	@Override
 	public void computePosition(PongModel pong) {
 
+	}
+
+	private static class HappySad implements Consumer<NAR> {
+
+		private final DescriptiveStatistics happy;
+
+		public HappySad(Default nar, int windowSize) {
+			happy = new DescriptiveStatistics();
+			happy.setWindowSize(windowSize);
+
+			nar.onFrame(this);
+
+		}
+
+		@Override
+		public void accept(NAR nar) {
+			float h = nar.emotion.happy();
+
+			float dMean = (float)(h - happy.getMean());
+			double varianceThresh = happy.getVariance();
+
+			Compound e;
+			if (dMean > varianceThresh) {
+				e = happy(nar);
+			} else if (dMean < -varianceThresh) {
+				e = sad(nar);
+			} else {
+				e = null;
+			}
+
+			if (e!=null) {
+				nar.believe(e, Tense.Present);
+				logger.info("{}", e);
+			}
+
+			happy.addValue(h);
+		}
+
+		private Compound happy(NAR nar) {
+			return $.prop(nar.self, $.the("happy"));
+		}
+		private Compound sad(NAR nar) {
+			return $.prop(nar.self, $.the("sad"));
+
+		}
 	}
 }

@@ -113,7 +113,7 @@ public class CaffeineIndex extends MaplikeIndex {
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return concepts.get(x, this::build);
+        return concepts.get(x, this::buildConcept);
     }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //

@@ -104,8 +104,10 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     }
 
+    /** allow no eternal beliefs, and ONE eternal goal */
     @Override protected void beliefCapacity(ConceptBudgeting p) {
         beliefCapacityNonEternal(this, p);
+        goals().capacity(1, p.beliefCap(this, false, true) + p.beliefCap(this, false, false)  - 1);
     }
 
 

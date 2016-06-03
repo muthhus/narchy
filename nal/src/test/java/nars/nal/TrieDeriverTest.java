@@ -223,7 +223,7 @@ public class TrieDeriverTest {
 
             //test all subterms are in the pattern index too
             t.term().recurseTerms((s, parent)->{
-                Termed sub = p.get(s, false);
+                Termed sub = p.get(s);
                 if (sub == null) {
                     System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
                 }

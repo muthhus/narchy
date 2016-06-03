@@ -318,6 +318,7 @@
     (&&,X,A), B, time(decomposeTask), task("!")            |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
     //B, (&&,X,A), time(decomposeBelief), task("!")          |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
 
+
         //TODO use ellipsis here?
 
 

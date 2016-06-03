@@ -77,7 +77,7 @@ public class InfinispanIndex extends MaplikeIndex {
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
         return conceptsLocal.computeIfAbsent(key(x.term()), xx -> {
-            return build(x);
+            return buildConcept(x);
         });
     }
 
@@ -91,15 +91,13 @@ public class InfinispanIndex extends MaplikeIndex {
         if (x.hasTemporal()) {
             return buildCompound(x);
         } else {
-            return conceptsLocal.computeIfAbsent(key(x.term()), xx -> {
-                return build(buildCompound(x));
-            });
+            return conceptsLocal.computeIfAbsent(key(x.term()), xx -> buildConcept(buildCompound(x)));
         }
     }
 
     @NotNull
     private Termed buildCompound(@NotNull Compound x) {
-        return build(x.subterms(), x.op(), x.relation(), x.dt());
+        return buildCompound(x.subterms(), x.op(), x.relation(), x.dt());
     }
 
 

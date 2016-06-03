@@ -22,6 +22,7 @@ import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -50,7 +51,7 @@ public class PremiseEval extends FindSubst {
     @NotNull
     @Deprecated public ProcTerm forEachMatch;
 
-    public final Map<Atomic, ImmediateTermTransform> transforms = Global.newHashMap();
+    public final Map<Atomic, ImmediateTermTransform> transforms = new HashMap();
 
     /** run parameters */
     int premiseMatchesMax, termutes;

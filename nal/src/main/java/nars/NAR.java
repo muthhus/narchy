@@ -1004,6 +1004,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return eventTaskProcess.on(o);
     }
 
+    public @NotNull NAR believe(Termed<Compound> c, Tense tense) {
+        return believe(c, tense, 1f);
+    }
+
 
 //    @Nullable
 //    public Term eval(@NotNull String x) throws NarseseException {

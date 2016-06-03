@@ -16,6 +16,14 @@
  */
 package nars.op.math;
 
+import nars.$;
+import nars.index.TermIndex;
+import nars.nal.op.BinaryTermOperator;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,3 +36,23 @@ public class add extends IntIntTo<Integer> {
         return a+b;
     }
 }
+//public class add extends BinaryTermOperator {
+//
+//    @Override public @NotNull Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+//        if (!(a instanceof Atom) || !(b instanceof Atom))
+//            return null;
+//
+//
+//        try {
+//            int ia = Texts.i(a.toString());
+//            int ib = Texts.i(b.toString());
+//            return $.the(ia + ib);
+//        }
+//        catch (Exception e) {
+//            return null;
+//        }
+//
+//
+//    }
+//
+//}

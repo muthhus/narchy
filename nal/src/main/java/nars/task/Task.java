@@ -110,31 +110,28 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * */
     @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean input) {
 
+        t = memory.index.normalized(t);
+        if (!(t instanceof Compound))
+            throw new TermIndex.InvalidTaskTerm(t, "Task Term Does Not Normalize to Compound");
+
         Op op = t.op();
 
-        if (op.isStatement()) {
-            Compound cc = (Compound)t;
+        @NotNull Compound ct = t.term();
 
+        if (op.isStatement()) {
             /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
-            if (subjectOrPredicateIsIndependentVar(cc))
+            if (subjectOrPredicateIsIndependentVar(ct))
                 throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
         }
 
-        if (hasCoNegatedAtemporalConjunction(t.term())) {
+        if (hasCoNegatedAtemporalConjunction(ct)) {
             throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
         }
 
-        Termed normalizedTerm = memory.index.normalized(t);
-        if ((normalizedTerm == null) || (!(t instanceof Compound)))
-            throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Task Term Does Not Normalize to Compound");
+        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPLICATION || op == Op.EQUIV))
+            throw new TermIndex.InvalidTaskTerm(t, "Goal/Quest task term may not be Implication or Equivalence");
 
-
-        if (/*input && */(punc == Symbols.GOAL) && (op ==Op.IMPLICATION || op == Op.EQUIV))
-            throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Goal task term may not be Implication or Equivalence");
-
-
-
-        return normalizedTerm;
+        return t;
     }
 
     static boolean hasCoNegatedAtemporalConjunction(Term term) {
@@ -144,16 +141,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
             int dt = cterm.dt();
             if (term.op() == CONJUNCTION && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEGATE)) {
-                if (cterm.subterms().or(new Predicate<Term>() {
-                    @Override
-                    public boolean test(@NotNull Term p) {
-                        if (p.op() == NEGATE) {
-                            return cterm.containsTerm(((Compound) p).term(0));
+                int s = cterm.size();
+                for (int i = 0; i < s; i++) {
+                    Term x = cterm.term(i);
+                    if (x.op() == NEGATE) {
+                        if (cterm.containsTerm(((Compound) x).term(0))) {
+                            return true;
                         }
-                        return false;
                     }
-                }))
-                    return true;
+                }
             }
 
             if (term.hasAll(CONJUNCTION_WITH_NEGATION)) {

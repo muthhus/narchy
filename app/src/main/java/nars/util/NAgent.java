@@ -125,9 +125,9 @@ public class NAgent implements Agent {
 
                         //(d > 0.5 && d > b ? d - b : 0);
                         //(d > 0.5 ? d : 0) / (d+b);
-                        //d / (d+b);
+                        d / (d+b);
                         //(d > 0.1f ? d - b : -1f);
-                        d - b;
+                        //d - b;
                         //d;
 
                         //(d*d) - (b*b);
@@ -250,8 +250,10 @@ public class NAgent implements Agent {
 
         @NotNull Emotion emotion = nar.emotion;
 
+        long now = nar.time();
+
         return                    Texts.n2(motivation) + "\t + "
-                 + "rwrd=" + Texts.n4(prevReward) + " "
+                 + "rwrd=" + Texts.n4(reward.beliefs().truth(now).expectation()) + " "
                  + "hapy=" + Texts.n4(emotion.happy()) + " "
                  + "busy=" + Texts.n4(emotion.busy.getSum()) + " "
                  + "lern=" + Texts.n4(emotion.learning()) + " "

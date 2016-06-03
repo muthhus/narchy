@@ -48,7 +48,7 @@ public abstract class MaplikeIndex implements TermIndex {
     protected Termed getNewAtom(@NotNull Atomic x) {
         Termed y = get(x);
         if (y == null)  {
-            set(y = build(x));
+            set(y = buildConcept(x));
         }
         return y;
     }
@@ -58,9 +58,9 @@ public abstract class MaplikeIndex implements TermIndex {
     protected Termed getNewCompound(@NotNull Compound x) {
         Termed y = get(x);
         if (y == null) {
-            y = build(x.subterms(), x.op(), x.relation(), x.dt()  /* TODO make this sometimes false */);
+            y = buildCompound(x.subterms(), x.op(), x.relation(), x.dt()  /* TODO make this sometimes false */);
             if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
-                set(y = build(y));
+                set(y = buildConcept(y));
             }
         }
         return y;
@@ -142,12 +142,12 @@ public abstract class MaplikeIndex implements TermIndex {
     }
 
     @NotNull
-    protected Termed build(@NotNull Termed interned) {
+    protected Termed buildConcept(@NotNull Termed interned) {
         return conceptBuilder.apply( interned.term() );
     }
 
     @NotNull
-    protected final Termed build(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+    protected final Termed buildCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
         return termBuilder.make(op, rel, theSubterms(subs), dt);
     }
 

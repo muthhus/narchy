@@ -22,7 +22,7 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return concepts.computeIfAbsent(x, this::build);
+        return concepts.computeIfAbsent(x, this::buildConcept);
     }
 
     @Override

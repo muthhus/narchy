@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,29 +69,6 @@ public interface TermIndex {
     @Nullable
     default void set(@NotNull Termed t) {
         set(t, t);
-    }
-
-
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-    //return builder().make(op, relation, subterms, dt);
-    //}
-
-    //    @Nullable
-//    default Termed newCompound(Op op, int relation, TermContainer subterms) {
-//        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-//        return newCompound(op, relation, subterms, ITERNAL);
-//    }
-    @Nullable
-    default Termed the(@NotNull Op op, @NotNull TermContainer subterms) {
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        Term b = builder().build(op, -1, DTERNAL, subterms);
-        return b == null ? null : the(b);
-    }
-
-    @Nullable
-    default Termed the(@NotNull Op op, @NotNull Collection<Term> subterms) {
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return the(op, TermContainer.the(op, subterms));
     }
 
 
@@ -176,7 +152,7 @@ public interface TermIndex {
 //    }
 
     @Nullable
-    default Term theTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
+    default Term buildTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
         return builder().buildTransformed(csrc, subs);
     }
 
@@ -187,8 +163,8 @@ public interface TermIndex {
     @Nullable
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
-        if (src == null)
-            throw new NullPointerException();
+        //if (src == null)
+            //throw new NullPointerException();
         //return null; //pass-through
 
         //constant atom or zero-length compound, ex: ()
@@ -259,9 +235,9 @@ public interface TermIndex {
         if (sop.isStatement() && (sub.size() != 2 || sub.get(0).equals(sub.get(1))))
             return null; //transformed to degenerate statement
 
-        Term result = theTransformed(crc, TermContainer.the(sop, sub));
+        Term result = buildTransformed(crc, TermContainer.the(sop, sub));
 
-        if (result != null) {
+        if (result instanceof Compound) {
 
             //post-process: apply any known immediate transform operators
             if (isOperation(result)) {
@@ -463,8 +439,8 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term theTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
-        return theTransformed(src,
+    default Term buildTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
+        return buildTransformed(src,
                 //theSubterms(
                         TermContainer.the(src.op(), newSubs)
                 //)
@@ -512,7 +488,7 @@ public interface TermIndex {
             target[i] = x;
         }
 
-        return modifications > 0 ? theTransformed(src, target) : src;
+        return modifications > 0 ? buildTransformed(src, target) : src;
     }
 
     /**
