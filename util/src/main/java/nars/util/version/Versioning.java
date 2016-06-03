@@ -32,7 +32,7 @@ abstract public class Versioning extends FasterList<Versioned> {
 
     /** start a new version with a commit, returns current version  */
     public final int newChange(Versioned v) {
-        int c = commit();
+        int c = ++now;
         if (!addIfCapacity(v))
             throw new OutOfMemoryError("Versioned stack fault");
         return c;
@@ -43,10 +43,6 @@ abstract public class Versioning extends FasterList<Versioned> {
         if (!addIfCapacity(v))
             throw new RuntimeException();
         return now;
-    }
-
-    public final int commit() {
-        return ++now;
     }
 
 

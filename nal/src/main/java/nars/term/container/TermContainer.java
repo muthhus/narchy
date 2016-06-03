@@ -616,4 +616,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         );
     }
 
+    int init(@NotNull int[] meta);
+
 }

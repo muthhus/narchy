@@ -885,20 +885,28 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
-        if (t instanceof Variable)
-            return null;
+        Termed tt;
+        if (t instanceof Task) {
+            tt = t.term();
 
-        //optimization: assume a concept instance is the concept of this NAR
-        if (t instanceof Concept) {
-            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-            return (Concept) t;
+            if (tt instanceof Concept) {
+                //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+                return (Concept) tt;
+            }
+
+        } else {
+            if (t instanceof Variable)
+                return null;
+
+            //optimization: assume a concept instance is the concept of this NAR
+            if (t instanceof Concept) {
+                //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+                return (Concept) t;
+            }
+
+            tt = t;
         }
 
-        Termed tt = t.term();
-        if (tt instanceof Concept) {
-            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-            return (Concept) tt;
-        }
 
         tt = index.validConceptTerm(tt);
         if (tt == null)

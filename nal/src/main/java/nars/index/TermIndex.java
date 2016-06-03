@@ -563,9 +563,9 @@ public interface TermIndex {
 
         } else {
             //COMPOUND -------
-            Compound tc = (Compound) term.term();
 
-            if (tc.op() == NEGATE) {
+
+            if (term.op() == NEGATE) {
 //                Term t0 = tc.term(0);
 //                if (t0 instanceof Atomic) {
 //                    //negations of non-DepVar atomics are invalid
@@ -580,7 +580,8 @@ public interface TermIndex {
             }
 
             //NORMALIZATION
-            Compound prenormalized = tc;
+            //Compound tc = (Compound) term.term();
+            Termed prenormalized = term;
             if ((term = normalized(term)) == null)
                 throw new InvalidTerm(prenormalized);
 

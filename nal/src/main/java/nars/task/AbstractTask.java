@@ -27,7 +27,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     /** content term of this task */
     private Termed<Compound> term;
 
-    protected char punctuation;
+    protected char punc;
 
     @Nullable
     private Truth truth;
@@ -35,8 +35,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Nullable
     private long[] evidence;
 
-    private long creationTime = Tense.TIMELESS;
-    private long occurrenceTime = Tense.ETERNAL;
+    private long creation = Tense.TIMELESS;
+    private long occurrence = Tense.ETERNAL;
 
     /** Array of tasks from which the Task is derived, or null if input
      *
@@ -72,9 +72,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 //                solution);
 //    }
 
-    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q) {
-        this(term, punc, truth, p, d, q, (Task) null, null);
-    }
+//    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q) {
+//        this(term, punc, truth, p, d, q, (Task) null, null);
+//    }
 
 //    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief) {
 //        this(term, punc, truth,
@@ -90,12 +90,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
                 task.pri(), task.dur(), task.qua(),
                 task.getParentsRef());
         setEvidence(task.evidence());
-        setOccurrenceTime(task.occurrence());
+        setOccurrence(task.occurrence());
     }
 
     void setTime(long creation, long occurrence) {
-        this.creationTime = creation;
-        setOccurrenceTime(occurrence);
+        this.creation = creation;
+        setOccurrence(occurrence);
     }
 
 
@@ -116,7 +116,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
                         @Nullable Reference<Task>[] parents) {
         super(p, d, q);
 
-        this.punctuation = punctuation;
+        this.punc = punctuation;
 
         //unwrap top-level negation
         if (term.op() == Op.NEGATE) {
@@ -266,11 +266,11 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private final int rehash() {
 
         int h = Util.hashCombine( Util.hashCombine(
-                term().hashCode(),
-                punc(),
-                Arrays.hashCode(evidence())
+                term.hashCode(),
+                punc,
+                Arrays.hashCode(evidence)
             ),
-            Long.hashCode( occurrence())
+            Long.hashCode( occurrence )
         );
 
         Truth t = truth();
@@ -324,7 +324,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      * @return Whether the object is a Question
      */
     @Override public final boolean isQuestion() {
-        return (punctuation == Symbols.QUESTION);
+        return (punc == Symbols.QUESTION);
     }
 
     /**
@@ -332,15 +332,15 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      * @return Whether the object is a Judgment
      */
     @Override public final boolean isBelief() {
-        return (punctuation  == Symbols.BELIEF);
+        return (punc == Symbols.BELIEF);
     }
 
     @Override public final boolean isGoal() {
-        return (punctuation  == Symbols.GOAL);
+        return (punc == Symbols.GOAL);
     }
 
     @Override public final boolean isQuest() {
-        return (punctuation  == Symbols.QUEST);
+        return (punc == Symbols.QUEST);
     }
 
 
@@ -366,7 +366,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     @Override
     public final char punc() {
-        return punctuation;
+        return punc;
     }
 
     @Nullable
@@ -384,12 +384,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     @Override
     public final long creation() {
-        return creationTime;
+        return creation;
     }
 
     @Override
     public final long occurrence() {
-        return occurrenceTime;
+        return occurrence;
     }
 
 
@@ -422,12 +422,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @NotNull
     @Override
     public final Task setCreationTime(long creationTime) {
-        if ((this.creationTime <= Tense.TIMELESS) && (occurrenceTime > Tense.TIMELESS)) {
+        if ((this.creation <= Tense.TIMELESS) && (occurrence > Tense.TIMELESS)) {
             //use the occurrence time as the delta, now that this has a "finite" creationTime
-            setOccurrenceTime(occurrenceTime + creationTime);
+            setOccurrence(occurrence + creationTime);
         }
         //if (this.creationTime != creationTime) {
-        this.creationTime = creationTime;
+        this.creation = creationTime;
             //does not need invalidated since creation time is not part of hash
         //}
         return this;
@@ -471,9 +471,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     /** TODO for external use in MutableTask instances only */
-    @Override public final void setOccurrenceTime(long o) {
-        if (o != occurrenceTime) {
-            this.occurrenceTime = o;
+    public final void setOccurrence(long o) {
+        if (o != occurrence) {
+            this.occurrence = o;
             invalidate();
         }
     }

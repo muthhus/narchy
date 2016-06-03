@@ -218,7 +218,23 @@ public class TermVector implements TermContainer<Term>, Serializable {
         return vars;
     }
 
-//    public Term[] cloneTermsReplacing(int index, Term replaced) {
+    @Override
+    public int init(@NotNull int[] meta) {
+        if (vars() > 0) {
+            meta[0] += varDep();
+            meta[1] += varIndep();
+            meta[2] += varQuery();
+        }
+
+        meta[3] += varPattern();
+        meta[4] += volume();
+        meta[5] |= structure();
+
+
+        return -1; //hashcode for this isn't used
+    }
+
+    //    public Term[] cloneTermsReplacing(int index, Term replaced) {
 //        Term[] y = termsCopy();
 //        y[index] = replaced;
 //        return y;

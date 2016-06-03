@@ -76,10 +76,11 @@ public class FasterList<X> extends FastList<X> {
 
     public final boolean addIfCapacity(X newItem) {
         X[] ii = this.items;
-        if (ii.length == this.size) {
+        int s;
+        if (ii.length == (s = this.size++)) {
             return false;
         }
-        ii[this.size++] = newItem;
+        ii[s] = newItem;
         return true;
     }
 

@@ -106,6 +106,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         subterms().forEach(a -> a.recurseTerms(v, this));
     }
 
+    default int init(@NotNull int[] meta) {
+
+        subterms().init(meta);
+
+        meta[5] |= op().bit;
+
+        return hashCode();
+    }
 
     /**
      * unification matching entry point (default implementation)

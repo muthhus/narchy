@@ -35,7 +35,8 @@ public interface Term extends Termed, Termlike {
 
 
     @NotNull
-    @Override default Term term() {
+    @Override
+    default Term term() {
         return this;
     }
 
@@ -43,11 +44,15 @@ public interface Term extends Termed, Termlike {
     @Override
     Op op();
 
-    /** volume = total number of terms = complexity + # total variables */
+    /**
+     * volume = total number of terms = complexity + # total variables
+     */
     @Override
     int volume();
 
-    /** total number of leaf terms, excluding variables which have a complexity of zero */
+    /**
+     * total number of leaf terms, excluding variables which have a complexity of zero
+     */
     @Override
     int complexity();
 
@@ -56,13 +61,17 @@ public interface Term extends Termed, Termlike {
     int structure();
 
 
-    /** number of subterms. if atomic, size=0 */
+    /**
+     * number of subterms. if atomic, size=0
+     */
     @Override
     int size();
 
-    @Override boolean equals(Object o);
+    @Override
+    boolean equals(Object o);
 
-    @Override int hashCode();
+    @Override
+    int hashCode();
 
     default void recurseTerms(@NotNull SubtermVisitor v) {
         recurseTerms(v, null);
@@ -74,7 +83,7 @@ public interface Term extends Termed, Termlike {
     /**
      * Commutivity in NARS means that a Compound term's
      * subterms will be unique and arranged in order (compareTo)
-     *
+     * <p>
      * <p>
      * commutative CompoundTerms: Sets, Intersections Commutative Statements:
      * Similarity, Equivalence (except the one with a temporal order)
@@ -86,14 +95,12 @@ public interface Term extends Termed, Termlike {
     boolean isCommutative();
 
 
-
-
     //boolean hasVar(final Op type);
 
 
-
-
-    /** true if the operator bit is included in the enabld bits of the provided vector */
+    /**
+     * true if the operator bit is included in the enabld bits of the provided vector
+     */
     default boolean isAnyOf(int bitsetOfOperators) {
         int s = op().bit;
         return (s & bitsetOfOperators) == s;
@@ -105,8 +112,6 @@ public interface Term extends Termed, Termlike {
 //    }
 
 
-
-
 //    default boolean hasAll(int structuralVector) {
 //        final int s = structure();
 //        return (s & structuralVector) == s;
@@ -114,11 +119,8 @@ public interface Term extends Termed, Termlike {
 //
 
 
-
-
-
     default boolean hasVarIndep() {
-        return varIndep()!=0;
+        return varIndep() != 0;
     }
 
 //    /** returns the first ellipsis subterm or null if not present */
@@ -128,13 +130,12 @@ public interface Term extends Termed, Termlike {
 //    }
 
     default boolean hasVarDep() {
-        return varDep()!=0;
+        return varDep() != 0;
     }
 
     default boolean hasVarQuery() {
-        return varQuery()!=0;
+        return varQuery() != 0;
     }
-
 
 
     void append(@NotNull Appendable w) throws IOException;
@@ -158,7 +159,6 @@ public interface Term extends Termed, Termlike {
 //    }
 
 
-
     @Override
     default boolean levelValid(int nal) {
 
@@ -172,11 +172,14 @@ public interface Term extends Termed, Termlike {
     default String structureString() {
         return String.format("%16s",
                 Integer.toBinaryString(structure()))
-                    .replace(" ", "0");
+                .replace(" ", "0");
     }
 
-    /** upper 16 bits: ordinal, lower 16 bits: relation (default=-1) */
-    @Override default int opRel() {
+    /**
+     * upper 16 bits: ordinal, lower 16 bits: relation (default=-1)
+     */
+    @Override
+    default int opRel() {
         return Terms.opRel(op(), -1);
         //return op().ordinal()<<16 | (0xffff);
     }
@@ -187,14 +190,16 @@ public interface Term extends Termed, Termlike {
     }
 
     default int subtermTime(Term x) {
-        return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
+        return subtermTime(x, this instanceof Compound ? ((Compound) this).dt() : DTERNAL);
     }
 //    default long subtermTimeOrZero(Term x, long offset) {
 //        int e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
 //        return e == DTERNAL ? DTERNAL : e + offset;
 //    }
 
-    /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */
+    /**
+     * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
+     */
     default int subtermTime(Term x, int dt) {
 
         if (this.equals(x))
@@ -240,10 +245,10 @@ public interface Term extends Termed, Termlike {
                 return dt;
 
             int withinSubj = first.subtermTime(x);
-            if (withinSubj!=DTERNAL)
+            if (withinSubj != DTERNAL)
                 return withinSubj;
             int withinPred = last.subtermTime(x);
-            if (withinPred!=DTERNAL)
+            if (withinPred != DTERNAL)
                 return dt + withinPred;
 
         } else {
@@ -255,15 +260,15 @@ public interface Term extends Termed, Termlike {
     }
 
     /**
-     meta is int[] that collects term metadata:
-     0: patternVar
-     1: depVars
-     2: indepVars
-     3: queryVars
-     4: volume
-     5: struct
-
-     subclasses can override this for more efficient aggregation if certain features are sure to be absent
+     * meta is int[] that collects term metadata:
+     * 0: patternVar
+     * 1: depVars
+     * 2: indepVars
+     * 3: queryVars
+     * 4: volume
+     * 5: struct
+     * <p>
+     * subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
     default int init(@NotNull int[] meta) {
 

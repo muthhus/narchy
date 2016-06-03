@@ -48,9 +48,9 @@ public class TaskBudgeting {
         //ORIGINAL METHOD
         //volRatioScale = 1f / derived.term().volume();
         //RELATIVE SIZE INCREASE METHOD
-        int tasktermVol = task.term().volume();
+        int tasktermVol = task.volume();
         volRatioScale =
-            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.term().volume() )));
+            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
 
         float priority = task.priIfFiniteElseZero() * volRatioScale;
 

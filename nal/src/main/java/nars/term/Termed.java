@@ -30,4 +30,6 @@ public interface Termed<T extends Term>  {
         return x == null ? null : x.term();
     }
 
+    default int volume() { return term().volume(); }
+
 }

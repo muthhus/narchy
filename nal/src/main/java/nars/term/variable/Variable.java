@@ -51,4 +51,29 @@ public interface Variable extends Atomic {
         if (o == this) return 0;
         return o instanceof Variable ? Integer.compare(hashCode(), o.hashCode()) : 1;
     }
+
+    @Override
+    default int init(@NotNull int[] meta) {
+        int i;
+        switch (op()) {
+            case VAR_DEP:
+                i = 0;
+                break;
+            case VAR_INDEP:
+                i = 1;
+                break;
+            case VAR_QUERY:
+                i = 2;
+                break;
+            case VAR_PATTERN:
+                i = 3;
+                break;
+            default:
+                i = -1; break; //fail
+        }
+        meta[i] ++;
+        meta[4] ++;
+        meta[5] |= structure();
+        return hashCode();
+    }
 }

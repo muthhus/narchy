@@ -208,7 +208,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public MutableTask time(long creationTime, long occurrenceTime) {
         setCreationTime(creationTime);
-        setOccurrenceTime(occurrenceTime);
+        setOccurrence(occurrenceTime);
         return this;
     }
 
@@ -280,7 +280,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public final MutableTask occurr(long occurrenceTime) {
-        setOccurrenceTime(occurrenceTime);
+        setOccurrence(occurrenceTime);
         return this;
     }
 
@@ -317,8 +317,8 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     protected final MutableTask punc(char punctuation) {
-        if (this.punctuation!=punctuation) {
-            this.punctuation = punctuation;
+        if (this.punc !=punctuation) {
+            this.punc = punctuation;
             invalidate();
         }
         return this;

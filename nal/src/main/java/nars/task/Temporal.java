@@ -14,7 +14,7 @@ public interface Temporal extends Tasked {
     long creation();
     long occurrence();
 
-    void setOccurrenceTime(long t);
+    void setOccurrence(long t);
 
 
 //    default boolean concurrent(Task s, int duration) {
@@ -37,7 +37,7 @@ public interface Temporal extends Tasked {
 //    }
 
     default void setEternal() {
-        setOccurrenceTime(Tense.ETERNAL);
+        setOccurrence(Tense.ETERNAL);
     }
 
 //    default void setOccurrenceTime(@NotNull Tense tense, int duration) {

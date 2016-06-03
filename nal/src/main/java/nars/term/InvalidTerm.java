@@ -18,6 +18,12 @@ public final class InvalidTerm extends RuntimeException {
     private final Term[] args;
 
 
+    public InvalidTerm(@NotNull Termed x) {
+        this(x.op(),
+                x instanceof Compound ? ((Compound)x).relation() :  -1,
+                x instanceof Compound ? ((Compound)x).dt() :  DTERNAL,
+                x instanceof Compound ? ((Compound)x).terms() :  null);
+    }
 
     public InvalidTerm(@NotNull Compound x /* incomplete or invalid */) {
         this(x.op(), x.relation(), x.dt(), x.terms());
