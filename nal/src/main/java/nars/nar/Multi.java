@@ -11,10 +11,10 @@ import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
+import nars.task.Task;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
-import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -23,11 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -37,9 +34,8 @@ public class Multi extends AbstractNAR {
 
     @NotNull
     final WorkerCore[] cores;
-    final Map<Concept,DefaultCore> active =
-            //new ConcurrentHashMapUnsafe<>();
-            new ConcurrentHashMap();
+    final Map<Concept, DefaultCore> active;
+    //new ConcurrentHashMap();
 
     final CyclicBarrier barrier;
 
@@ -66,7 +62,8 @@ public class Multi extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
-        barrier = new CyclicBarrier(cores+1);
+        active = new ConcurrentHashMapUnsafe<>(cores * conceptsPerCore);
+        barrier = new CyclicBarrier(cores + 1);
 
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
@@ -80,15 +77,7 @@ public class Multi extends AbstractNAR {
             eventReset.on(core::reset);
         }
 
-        eventFrameStart.on((x) -> {
-
-            try {
-                barrier.await();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });
+        eventFrameStart.on(this::frame);
 
         runLater(this::initHigherNAL);
 
@@ -101,8 +90,15 @@ public class Multi extends AbstractNAR {
 
     }
 
+    protected final void frame(NAR n) {
+        try {
+            barrier.await();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    /** runs asynchronously in its own thread. counts down a # of pending cycles */
+
     public class WorkerCore extends DefaultCore implements Runnable {
 
         private final Logger logger = LoggerFactory.getLogger(WorkerCore.class);
@@ -110,26 +106,27 @@ public class Multi extends AbstractNAR {
         @NotNull
         private final Thread thread;
         private boolean stopped;
-        long lastTime = -1;
 
 
         public WorkerCore(int n, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
             super(Multi.this, matcher, warm, cold);
             this.thread = new Thread(this);
-            thread.setName(nar.toString() + "Worker" + n);
+            thread.setName(nar.toString() + ".Worker" + n);
             thread.start();
         }
 
         @Override
-        protected void activate(@NotNull Concept c) {
-            if (Multi.this.active.putIfAbsent(c, this)==null) {
+        protected boolean activate(@NotNull Concept c) {
+            if (Multi.this.active.putIfAbsent(c, this) == null) {
                 super.activate(c);
+                return true;
             }
+            return false;
         }
 
         @Override
         protected void deactivate(@NotNull Concept c) {
-            if (Multi.this.active.remove(c)==c) {
+            if (Multi.this.active.remove(c) == c) {
                 super.deactivate(c);
             }
         }
@@ -138,13 +135,9 @@ public class Multi extends AbstractNAR {
             stopped = true;
         }
 
-        @Override public final void run() {
+        @Override
+        public final void run() {
             while (!stopped) {
-                try {
-                    barrier.await();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
                 try {
                     frame(Multi.this);
@@ -154,6 +147,13 @@ public class Multi extends AbstractNAR {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                try {
+                    barrier.await();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         }
 
@@ -164,13 +164,13 @@ public class Multi extends AbstractNAR {
     }
 
     private synchronized void printWorkers() {
-        Map<Concept,WorkerCore> conceptCores = new HashMap();
+        Map<Concept, WorkerCore> conceptCores = new HashMap();
         for (WorkerCore w : cores) {
 
             w.concepts.forEach(bc -> {
                 Concept c = bc.get();
                 WorkerCore e = conceptCores.put(c, w);
-                if (e!=null) {
+                if (e != null) {
                     System.err.println(c + " already in " + e + " and " + w);
                 }
             });
@@ -202,7 +202,7 @@ public class Multi extends AbstractNAR {
     public final float conceptPriority(@NotNull Termed termed) {
 
         DefaultCore core = active.get(termed);
-        if (core!=null) {
+        if (core != null) {
             BLink<Concept> c = core.concepts.get(termed);
             if (c != null)
                 return c.priIfFiniteElseZero();
@@ -217,15 +217,32 @@ public class Multi extends AbstractNAR {
     public final Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
         Concept c = concept(termed, true);
         if (c != null) {
-            DefaultCore core = active.get(c);
-            if (core == null) {
-                //select a core at random
-                core = cores[random.nextInt(cores.length)];
-            }
+//            {
+//                int cc = 0;
+//                int as = active.size();
+//                for (WorkerCore w : cores) {
+//                    cc += w.concepts.size();
+//                }
+//                if (Math.abs(cc - as) > 1) {
+//                    System.err.println("active size fault: " + cc + " " + as);
+//                }
+//            }
 
-            core.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
+            DefaultCore w;
+            if ((w = active.get(c)) == null) {
+                w = assign(c);
+            }
+            w.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
+
+
         }
         return c;
+    }
+
+    @NotNull
+    public Multi.@NotNull WorkerCore assign(Concept c) {
+        @NotNull WorkerCore[] cores = this.cores;
+        return cores[random.nextInt(cores.length)];
     }
 
 

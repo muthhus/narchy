@@ -126,27 +126,31 @@ public class DefaultBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public final Task topEternal() {
-        return eternal.top();
+        EternalTable ee = eternal;
+        if (ee!=null && !ee.isEmpty()) {
+            synchronized (ee) {
+                return ee.top();
+            }
+        }
+        return null;
     }
 
     @Nullable
     @Override
     public final Task topTemporal(long when, long now) {
-        return temporal.top(when);
+        TemporalBeliefTable tt = temporal;
+        if (!tt.isEmpty()) {
+            synchronized (tt) {
+                return tt.top(when);
+            }
+        }
+        return null;
     }
 
     @Override
-    public Task get(Task t) {
+    public final Task get(Task t) {
         return map.get(t);
     }
-
-    @Override public Table<Task, Task> eternal() {
-        return eternal;
-    }
-    @Override public Table<Task, Task> temporal() {
-        return temporal;
-    }
-
 
     @Nullable @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
 

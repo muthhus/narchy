@@ -67,7 +67,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		Multi nar = new Multi(4,
 		//Default nar = new Default(
-				512, 16, 2, 2, rng,
+				512, 8, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -79,11 +79,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		nar.beliefConfidence(0.65f);
 		nar.goalConfidence(0.65f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(128);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

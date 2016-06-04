@@ -235,14 +235,6 @@ public class BooleanConcept extends CompoundConcept {
             }
         }
 
-        @Override
-        public Table<Task, Task> eternal() {
-            return null;
-        }
 
-        @Override
-        public Table<Task, Task> temporal() {
-            return null;
-        }
     }
 }

@@ -69,6 +69,8 @@ public class PremiseEval extends FindSubst {
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;
+    public Task task;
+    public char taskPunct;
 
 
     /** initializes with the default static term index/builder */
@@ -168,6 +170,9 @@ public class PremiseEval extends FindSubst {
         Task task = p.task();
         if (task == null)
             return;
+
+        this.task = task;
+        this.taskPunct = task.punc();
 
         this.premiseMatchesMax = p.matchesMax();
 

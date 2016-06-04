@@ -13,12 +13,12 @@ import java.util.function.Predicate;
 /**
  * Items are available by an integer index
  */
-abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements Table<V,L>, Iterable<L> {
+abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements Table<V, L>, Iterable<L> {
 
 
     private int capacity = -1;
 
-    public ArrayListTable(Map<V,L> map) {
+    public ArrayListTable(Map<V, L> map) {
         super(map);
     }
 
@@ -117,14 +117,15 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements T
     }
 
     @Override
-    public synchronized void setCapacity(int newCapacity) {
-        if (newCapacity!= this.capacity) {
+    final public void setCapacity(int newCapacity) {
+        if (newCapacity != this.capacity) {
             this.capacity = newCapacity;
             //int excess = size() - newCapacity;
             //while (excess-- > 0)
 
             while (size() - newCapacity > 0)
                 removeWeakest("Shrink");
+
         }
     }
 

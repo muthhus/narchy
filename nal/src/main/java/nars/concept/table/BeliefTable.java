@@ -77,15 +77,7 @@ public interface BeliefTable extends TaskTable {
             return input;
         }
 
-        @Override
-        public Table<Task, Task> eternal() {
-            return null;
-        }
 
-        @Override
-        public Table<Task, Task> temporal() {
-            return null;
-        }
 
         @Override
         public Task topEternal() {
@@ -204,10 +196,6 @@ public interface BeliefTable extends TaskTable {
 //        return top(nar.time());
 //    }
 
-    Table<Task, Task> eternal();
-    Table<Task, Task> temporal();
-
-
     @Nullable
     default Task top(long now) {
         return top(now, now);
@@ -217,11 +205,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable
     default Task top(long t, long now) {
 
-        final Task ete;
-        synchronized (eternal()) {
-            ete = topEternal();
-        }
-
+        final Task ete = topEternal();
         if (t == Tense.ETERNAL) {
             if (ete != null) {
                 return ete;
@@ -230,10 +214,7 @@ public interface BeliefTable extends TaskTable {
             } */
         }
 
-        Task tmp;
-        synchronized (temporal()) {
-            tmp = topTemporal(t, now);
-        }
+        Task tmp = topTemporal(t, now);
 
         if (tmp == null) {
             return ete;

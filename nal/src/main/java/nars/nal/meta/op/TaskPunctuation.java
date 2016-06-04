@@ -19,7 +19,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 
     public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
         @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
-            char c = o.premise.task().punc();
+            char c = o.taskPunct;
             return c == Symbols.QUESTION || c == Symbols.QUEST;
         }
         @Override public String toString() {
@@ -36,7 +36,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 //    };
     public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
         @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
-            char p = o.premise.task().punc();
+            char p = o.taskPunct;
             return (p != Symbols.QUESTION && p!= Symbols.QUEST);
         }
         @Override public String toString() { return "task:\".!\""; }
@@ -67,8 +67,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 
     @Override
     public final boolean booleanValueOf(@NotNull PremiseEval m) {
-        return m.premise.task().punc() == punc;
-        //return m.punct.get() == punc;
+        return m.taskPunct == punc;
     }
 
     //    @NotNull

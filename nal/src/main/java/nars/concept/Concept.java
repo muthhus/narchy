@@ -233,23 +233,26 @@ public interface Concept extends Termed, Comparable<Termlike> {
             init = false;
         }
 
-        final float learningRate = v / termlinks().size();
-        //System.out.println(this + " activating " + x);
-        termlinks().forEach(tl -> {
-            boolean active = tl == existing;
-            if (active&&init)
-                return; //dont modify the newly inserted link
+        float a = b.pri();
+        if (a == a /*!NaN */) {
 
-            float a = b.pri();
-            float outputTarget = active ? a : (1f-a);
-            float output = outputTarget - tl.pri(); //nar.conceptPriority(x);
-            float dp = output * learningRate;
-            tl.priAdd(dp);
-            //System.out.println(tl.toString2());
-        });
+            final float learningRate = v / termlinks().size();
+            //System.out.println(this + " activating " + x);
+            termlinks().forEach(tl -> {
+                boolean active = tl == existing;
+                if (active && init)
+                    return; //dont modify the newly inserted link
 
-        //TODO only sort if the order will have changed which is detectable
-        termlinks().setRequiresSort();
+                float outputTarget = active ? a : (1f - a);
+                float output = outputTarget - tl.pri(); //nar.conceptPriority(x);
+                float dp = output * learningRate;
+                tl.priAdd(dp);
+                //System.out.println(tl.toString2());
+            });
+
+            //TODO only sort if the order will have changed which is detectable
+            termlinks().setRequiresSort();
+        }
 
     }
 

@@ -32,63 +32,66 @@ public class MySTMClustered extends STMClustered {
 	protected void iterate() {
 		super.iterate();
 
-		LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
+		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
-		net.nodeStream().sorted((a, b) -> Float.compare(
-				a.priSum(), b.priSum())).forEach(n -> {
-			double[] tc = n.coherence(0);
+		net.nodeStream().parallel()
+			//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
+			.filter(n -> {
+				double[] tc = n.coherence(0);
 
-			float timeCoherenceThresh = 0.98f;
-            float freqCoherenceThresh = 0.9f;
+				float timeCoherenceThresh = 0.98f;
+				float freqCoherenceThresh = 0.9f;
 
-			if (tc[1] >= timeCoherenceThresh) {
-				double[] fc = n.coherence(1);
-				if (fc[1] >= freqCoherenceThresh) {
-					selected.put(Math.round(tc[0]), PrimitiveTuples.pair(n, (float) fc[0]));
+				if (tc[1] >= timeCoherenceThresh) {
+					double[] fc = n.coherence(1);
+					if (fc[1] >= freqCoherenceThresh) {
+						return true;
+					}
 				}
-			}
-		});
+				return false;
+			})
+			.map(n -> PrimitiveTuples.pair(n, n.coherence(1)[0]))
+			.forEach(nodeFreq -> {
+				TasksNode node = nodeFreq.getOne();
+				float freq = (float)nodeFreq.getTwo();
 
-		//Create co-occurrence beliefs containing each centroid's members
-		selected.forEachKeyValue((t, nodeFreq) -> {
-			TasksNode node = nodeFreq.getOne();
-			float freq = nodeFreq.getTwo();
+				boolean negated;
+				if (freq < 0.5f) {
+					freq = 1f - freq;
+					negated = true;
+				} else {
+					negated = false;
+				}
 
-			boolean negated;
-			if (freq < 0.5f) {
-				freq = 1f - freq;
-				negated = true;
-			} else {
-				negated = false;
-			}
+				float finalFreq = freq;
+				node.termSet(4).forEach(tt -> {
 
-			float finalFreq = freq;
-			node.termSet(4, (Task[] tt) -> {
+					Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
+
+					float confMin = (float) Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
+
+					long[] evidence = Stamp.zip(Stream.of(tt), tt.length, Global.STAMP_MAX_EVIDENCE);
+
+					if (negated)
+						$.neg(s);
+
+					@Nullable Term conj = $.conj(0, s);
+					if (!(conj instanceof Compound))
+						return;
 
 
-				Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
+					long t = Math.round(node.coherence(0)[0]);
 
-				float confMin = (float) Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
+					Task m = new MutableTask(conj, punc,
+							new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+							.time(now, t)
+							.evidence(evidence)
+							.budget(BudgetFunctions.taxCollection(tt, 1f / s.length))
+							.log("STMCluster CoOccurr");
 
-				long[] evidence = Stamp.zip(Stream.of(tt), tt.length, Global.STAMP_MAX_EVIDENCE);
-
-				if (negated)
-					$.neg(s);
-
-				@Nullable Term conj = $.conj(0, s);
-				if (!(conj instanceof Compound))
-					return;
-
-				Task m = new MutableTask(conj, punc,
-						new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-						.time(now, t)
-						.evidence(evidence)
-						.budget(BudgetFunctions.taxCollection(tt, 1f / s.length))
-						.log("STMCluster CoOccurr");
-
-				//System.err.println(m + " " + Arrays.toString(m.evidence()));
-				nar.input(m);
-				node.clear();
+					//System.err.println(m + " " + Arrays.toString(m.evidence()));
+					nar.input(m);
+					node.clear();
 
 			});
 

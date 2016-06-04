@@ -48,8 +48,10 @@ public class DefaultCore extends AbstractCore {
         nar.emotion.alert(1f/ concepts.size());
     }
 
-    /** called when a concept enters the concept bag */
-    protected void activate(@NotNull Concept c) {
+    /** called when a concept enters the concept bag
+     * @return whether to accept the item into the bag
+     * */
+    protected boolean activate(@NotNull Concept c) {
 
         //set capacity first in case there are any queued items, they may join during the commit */
         c.capacity(warm);
@@ -57,6 +59,8 @@ public class DefaultCore extends AbstractCore {
         //clean out any deleted links since having been deactivated
         c.tasklinks().commit(Forget.QualityToPriority);
         c.termlinks().commit(Forget.QualityToPriority);
+
+        return true;
     }
 
     @NotNull
@@ -84,7 +88,8 @@ public class DefaultCore extends AbstractCore {
 
         @Override
         protected @Nullable BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
-            activate(i);
+            if (!activate(i))
+                return b;
             BLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
                 deactivate(displaced.get());
@@ -99,10 +104,11 @@ public class DefaultCore extends AbstractCore {
 
         @Override
         public @Nullable BLink<Concept> remove(Concept x) {
-            if (x!=null) {
+            BLink<Concept> r = super.remove(x);
+            if (r!=null) {
                 deactivate(x);
             }
-            return super.remove(x);
+            return r;
         }
 
 

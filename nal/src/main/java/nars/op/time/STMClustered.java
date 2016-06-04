@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
@@ -130,14 +131,13 @@ public class STMClustered extends STM {
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
-        public void termSet(int maxComponentsPerTerm, @NotNull Consumer<Task[]> each) {
+        public Stream<Task[]> termSet(int maxComponentsPerTerm) {
             AtomicInteger as = new AtomicInteger();
-            tasks.stream().map(t -> t.get()).distinct().
-                    collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm))).forEach((n,c)->{
-                if (c.size() > 1)
-                    each.accept(c.toArray(new Task[c.size()]));
-            });
-
+            return tasks.stream().map(t -> t.get()).distinct().
+                    collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm)))
+                    .values().stream()
+                    .filter(c -> c.size()> 1)
+                    .map(c -> c.toArray(new Task[c.size()]));
         }
 
 //        public float confMin() {
@@ -265,9 +265,7 @@ public class STMClustered extends STM {
         nar.onFrame(n -> {
             //update each frame
             bag.setCapacity(capacity.intValue());
-        });
-        nar.onFrame(n -> {
-        //nar.onCycle(n -> {
+
             try {
                 iterate();
             } catch (Exception e) {

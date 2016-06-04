@@ -262,7 +262,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     protected void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
-        synchronized (items) {
+        synchronized (map) {
+            if (b.isDeleted())
+                return;
             if (pending == null)
                 pending = newPendingMap();
             RawBudget inc = new RawBudget(b, scale);
@@ -293,7 +295,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             float o = mergeFunction.merge(existing, b, scale);
             if (overflow != null)
                 overflow.add(o);
-            existing.commit();
+            //existing.commit();
             float priAfter = existing.pri();
             if (!Util.equals(priBefore,priAfter, Global.BUDGET_EPSILON)) {
                 requiresSort = true;
@@ -361,7 +363,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     protected final void addPending() {
 
         Map<V, RawBudget> p;
-        synchronized (items) {
+        synchronized (map) {
             pendingMass = 0;
             p = pending;
             if (p!=null) {
@@ -461,8 +463,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
-            if (map.values().removeIf(BLink::isDeleted)) {
-                return true;
+            synchronized (map) {
+                if (map.values().removeIf(BLink::isDeleted)) {
+                    return true;
+                }
             }
 
 
