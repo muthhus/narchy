@@ -60,7 +60,7 @@ public class NAL1Test extends AbstractNALTest {
         String belief = "<bird --> swimmer>";
 
         test()
-                //.log()
+                .log()
                 .mustBelieve(3, belief, 0.87f, 0.91f)
                 .believe(belief)                 //.en("bird is a type of swimmer.");
                 .believe(belief, 0.10f, 0.60f)                 //.en("bird is probably not a type of swimmer."); //.en("bird is very likely to be a type of swimmer.");*/

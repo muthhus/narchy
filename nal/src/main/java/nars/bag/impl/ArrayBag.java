@@ -363,8 +363,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             }
             else {*/
 
-        if (inc.pri() > bottomPri()) {
+        float v = bottomPriIfFull();
+        if (v <= inc.pri()) {
             putNew(key, link(key, inc, 1f));
+        } else {
+            putFail(key);
         }
                 /*else {
                     insufficient, try again next commit
@@ -373,9 +376,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     };
 
-    private final float bottomPri() {
+    protected void putFail(V key) {
+
+    }
+
+    private final float bottomPriIfFull() {
         int s = size();
-        return s == 0 ? -1 : get(s - 1).pri();
+        return (s == capacity()) ? get(s - 1).pri() : -1f;
     }
 
     /** returns the index of the lowest unsorted item */

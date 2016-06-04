@@ -215,11 +215,12 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
     @NotNull
     protected BeliefTable newBeliefTable() {
-        return new DefaultBeliefTable();
+        //2 for a task and a pending revision
+        return new DefaultBeliefTable(2,2);
     }
     @NotNull
     protected BeliefTable newGoalTable() {
-        return new DefaultBeliefTable();
+        return new DefaultBeliefTable(2,2);
     }
 
 

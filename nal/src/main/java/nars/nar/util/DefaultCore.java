@@ -36,8 +36,8 @@ public class DefaultCore extends AbstractCore {
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(@NotNull BLink<Concept> cl) {
-        Concept c = cl.get();
+    protected void deactivate(Concept c) {
+
 
         //apply forgetting so that shrinking capacity will be applied to concept's components fairly
         c.tasklinks().commit(Forget.QualityToPriority);
@@ -84,29 +84,25 @@ public class DefaultCore extends AbstractCore {
 
         @Override
         protected @Nullable BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
+            activate(i);
             BLink<Concept> displaced = super.putNew(i, b);
             if (displaced!=null) {
-
-                Concept dd = displaced.get();
-                if (dd != i)
-                    activate(i);
-
-                deactivate(displaced);
-
-            } else {
-                activate(i);
+                deactivate(displaced.get());
             }
-
             return displaced;
         }
 
         @Override
+        protected void putFail(Concept c) {
+            deactivate(c);
+        }
+
+        @Override
         public @Nullable BLink<Concept> remove(Concept x) {
-            BLink<Concept> removed = super.remove(x);
-            if (removed!=null) {
-                deactivate(removed);
+            if (x!=null) {
+                deactivate(x);
             }
-            return removed;
+            return super.remove(x);
         }
 
 

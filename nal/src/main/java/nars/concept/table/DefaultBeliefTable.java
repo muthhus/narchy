@@ -29,16 +29,16 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
-    public DefaultBeliefTable() {
+    public DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
 
         Map<Task, Task> mp;
         this.map = mp =
-            Global.newHashMap(1);
+            Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
             //new HashMap<>(1);
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new EternalTable(mp);
-        temporal = new MicrosphereTemporalBeliefTable(mp, eternal);
+        eternal = new EternalTable(mp, initialEternalCapacity);
+        temporal = new MicrosphereTemporalBeliefTable(mp, eternal, initialTemporalCapacity);
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */

@@ -29,9 +29,9 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     private TruthPolation polation;
     private long lastUpdate = Tense.TIMELESS;
 
-    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task,Task> eternal) {
+    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task, Task> eternal, int initialCapacity) {
         super(mp);
-        setCapacity(1);
+        setCapacity(initialCapacity);
         this.eternal = eternal;
     }
 

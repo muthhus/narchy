@@ -119,9 +119,8 @@ public class Multi extends AbstractNAR {
         }
 
         @Override
-        protected synchronized void deactivate(@NotNull BLink<Concept> c) {
-            Concept cc = c.get();
-            if (Multi.this.active.remove(cc)==cc) {
+        protected synchronized void deactivate(@NotNull Concept c) {
+            if (Multi.this.active.remove(c)==c) {
                 super.deactivate(c);
             }
         }

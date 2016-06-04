@@ -20,9 +20,9 @@ import static nars.nal.Tense.ETERNAL;
  */
 public class EternalTable extends SortedListTable<Task, Task> {
 
-    public EternalTable(Map<Task, Task> index) {
+    public EternalTable(Map<Task, Task> index, int initialCapacity) {
         super(Task[]::new, index, SortedArray.SearchType.BinarySearch);
-        setCapacity(1);
+        setCapacity(initialCapacity);
     }
 
     @Override

@@ -164,36 +164,37 @@ public class CurveBagTest  {
 
     }
 
-    @Test public void testDistribution() {
-        Default n = new Default(48, 4, 2, 4);
-        n.perfection.setValue(1f);
-        n.input("$1$ a:b.");
-        n.input("$1$ b:c.");
-        n.input("$1$ c:d.");
-        n.run(4);
-        Bag<Concept> bag = n.core.concepts;
-
-        bag.forEach(System.out::println);
-        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
-
-        //TODO verify the histogram resulting from the above execution is relatively flat:
-        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
-        //the tests below assume that it begins with a relatively flat distribution
-        System.out.println(Arrays.toString(bag.priHistogram(4)));
-        System.out.println(Arrays.toString(bag.priHistogram(8)));
-
-
-
-        System.out.print("Sampling: " );
-        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
-        System.out.print("Priority: " );
-        EmpiricalDistribution pri;
-        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
-
-        List<SummaryStatistics> l = pri.getBinStats();
-        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
-
-    }
+    //AutoBag does not apply to this test
+//    @Test public void testDistribution() {
+//        Default n = new Default(48, 4, 2, 4);
+//        n.perfection.setValue(1f);
+//        n.input("$1$ a:b.");
+//        n.input("$1$ b:c.");
+//        n.input("$1$ c:d.");
+//        n.run(4);
+//        Bag<Concept> bag = n.core.concepts;
+//
+//        bag.forEach(System.out::println);
+//        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
+//
+//        //TODO verify the histogram resulting from the above execution is relatively flat:
+//        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
+//        //the tests below assume that it begins with a relatively flat distribution
+//        System.out.println(Arrays.toString(bag.priHistogram(4)));
+//        System.out.println(Arrays.toString(bag.priHistogram(8)));
+//
+//
+//
+//        System.out.print("Sampling: " );
+//        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
+//        System.out.print("Priority: " );
+//        EmpiricalDistribution pri;
+//        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
+//
+//        List<SummaryStatistics> l = pri.getBinStats();
+//        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
+//
+//    }
     static void printDist(@NotNull EmpiricalDistribution f) {
         System.out.println(f.getSampleStats().toString().replace("\n"," "));
         f.getBinStats().forEach(

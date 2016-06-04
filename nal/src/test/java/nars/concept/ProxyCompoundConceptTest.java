@@ -20,6 +20,8 @@ public class ProxyCompoundConceptTest {
         String cString = "(c)";
 
         n.input(abString + ".");
+        n.step();
+
         CompoundConcept ab = (CompoundConcept) n.concept(abString);
 
         Compound cTerm = nars.$.$(cString);
