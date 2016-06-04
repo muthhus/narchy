@@ -74,17 +74,21 @@ public class BagView<X> extends VBox /* FlowPane */  {
 
 
         int size = bLinks.size();
+        List<Node> x;
         if (size == 0) {
-            getChildren().clear();
-            return;
+            x = null;
+        } else {
+            x = Global.newArrayList(size);
+            bLinks.forEach(limit, a -> {
+                x.add(getNode(a));
+            });
         }
 
-        List<Node> x = Global.newArrayList(size);
-        bLinks.forEach(limit, a -> {
-            x.add(getNode(a));
-        });
         runLater(() -> {
-            getChildren().setAll(x);
+            if (x != null)
+                getChildren().setAll(x);
+            else
+                getChildren().clear();
             layout();
         });
 

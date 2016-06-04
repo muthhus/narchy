@@ -14,13 +14,13 @@ import java.util.function.Function;
 /**
  * Conversation of Tasks: Groups derivations by their corresponding input tasks
  */
-public class Taskversation {
+public class Taskversation<V extends Consumer<Task>> {
 
     private final NAR nar;
 
-    final LinkedHashMap<Task,Consumer<Task>> tasks = new LinkedHashMap<>();
+    final LinkedHashMap<Task,V> tasks = new LinkedHashMap<>();
 
-    public Taskversation(NAR n, Function<Task,Consumer<Task>> receiver) {
+    public Taskversation(NAR n, Function<Task,V> receiver) {
         this.nar = n;
         n.onTask(t -> {
             if (t.isInput()) {
@@ -33,6 +33,10 @@ public class Taskversation {
                 });
             }
         });
+    }
+
+    public final Iterable<V> each() {
+        return tasks.values();
     }
 
     protected boolean relevant(Task input, Task derivation) {
