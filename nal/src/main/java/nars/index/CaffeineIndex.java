@@ -29,8 +29,8 @@ public class CaffeineIndex extends MaplikeIndex {
         super(termBuilder, conceptBuilder);
 
         concepts = Caffeine.newBuilder()
-                .softValues()
-                //.weakValues()
+                //.softValues()
+                .weakValues()
                 //.maximumSize(10_000)
                 //.expireAfterAccess(5, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.MINUTES)
@@ -40,8 +40,8 @@ public class CaffeineIndex extends MaplikeIndex {
                 //.build(key -> createExpensiveGraph(key));
 
         subterms = Caffeine.newBuilder()
-                .softValues()
-                //.weakValues()
+                //.softValues()
+                .weakValues()
                 //.maximumSize(10_000)
                 //.expireAfterAccess(5, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.MINUTES)
@@ -97,7 +97,7 @@ public class CaffeineIndex extends MaplikeIndex {
 
     @Override
     public int subtermsCount() {
-        return -1;
+        return (int) subterms.estimatedSize();
     }
 
     @Override

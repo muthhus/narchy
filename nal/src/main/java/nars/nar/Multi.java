@@ -6,12 +6,12 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.budget.policy.DefaultConceptBudgeting;
 import nars.concept.Concept;
-import nars.index.Indexes;
+import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.nar.util.DefaultCore;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -23,8 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
 /**
@@ -37,7 +36,8 @@ public class Multi extends AbstractNAR {
     final Map<Concept, DefaultCore> active;
     //new ConcurrentHashMap();
 
-    final CyclicBarrier barrier;
+    //final CyclicBarrier barrier;
+    final Semaphore demand, supply;
 
     @Deprecated
     public Multi(int cores) {
@@ -50,8 +50,7 @@ public class Multi extends AbstractNAR {
 
     public Multi(int cores, int conceptsPerCore, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(cores, conceptsPerCore, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new Indexes.DefaultTermIndex(conceptsPerCore * cores * INDEX_TO_CORE_INITIAL_SIZE_RATIO, random),
-                //new CaffeineIndex(new DefaultConceptBuilder(random)),
+                new CaffeineIndex(new DefaultConceptBuilder(random)),
                 new FrameClock());
     }
 
@@ -63,7 +62,9 @@ public class Multi extends AbstractNAR {
                 Global.DEFAULT_SELF);
 
         active = new ConcurrentHashMapUnsafe<>(cores * conceptsPerCore);
-        barrier = new CyclicBarrier(cores + 1);
+        //barrier = new CyclicBarrier(cores + 1);
+        demand = new Semaphore(0);
+        supply = new Semaphore(cores);
 
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
@@ -91,11 +92,28 @@ public class Multi extends AbstractNAR {
     }
 
     protected final void frame(NAR n) {
+        //try {
+        int numCores = cores.length;
+        int supplied = supply.availablePermits();
+        int demanded = Math.min(numCores, numCores - supplied);
+        demand.release(demanded);
+
+        //wait for at least one to finish
+        int waitFor = Math.max(1, supplied);
+
+        //System.out.println("demanded=" + demanded + ", waiting=" + waitFor);
+
         try {
-            barrier.await();
-        } catch (Exception e) {
+            supply.acquire(waitFor);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+            //barrier.await();
+        //} catch (Exception e) {
+            //e.printStackTrace();
+        //}
     }
 
 
@@ -140,19 +158,29 @@ public class Multi extends AbstractNAR {
             while (!stopped) {
 
                 try {
-                    frame(Multi.this);
-                } catch (ConcurrentModificationException e) {
-                    e.printStackTrace();
-                    printWorkers();
-                } catch (Exception e) {
+
+                    demand.acquire();
+
+                    try {
+                        frame(Multi.this);
+                    } catch (ConcurrentModificationException e) {
+                        e.printStackTrace();
+                        printWorkers();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    supply.release();
+
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                try {
-                    barrier.await();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    barrier.await();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
 
             }
         }

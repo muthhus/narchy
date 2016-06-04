@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.BiConsumer;
@@ -35,7 +36,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     private boolean requiresSort;
 
     //protected final FasterList<BLink<V>> pending = new FasterList();
-    protected Map<V,RawBudget> pending = null;
+    protected Map<V,RawBudget> pending;
     private BiFunction<RawBudget, RawBudget, RawBudget> pendingMerge;
 
 
@@ -262,20 +263,24 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     protected void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
+        if (b.isDeleted())
+            return;
+
+        RawBudget inc = new RawBudget(b, scale);
+
         synchronized (map) {
-            if (b.isDeleted())
-                return;
-            if (pending == null)
-                pending = newPendingMap();
-            RawBudget inc = new RawBudget(b, scale);
-            pending.merge(i, inc, pendingMerge);
-            pendingMass += inc.pri() * inc.dur();
+            Map<V, RawBudget> p = this.pending;
+            if (p == null)
+                this.pending = p = newPendingMap();
+            p.merge(i, inc, pendingMerge);
         }
 
+        pendingMass += inc.pri() * inc.dur();
     }
 
     protected Map<V, RawBudget> newPendingMap() {
-        return new HashMap<>();
+        //return new HashMap<>();
+        return new LinkedHashMap<>();
     }
 
     public float getPendingMass() {

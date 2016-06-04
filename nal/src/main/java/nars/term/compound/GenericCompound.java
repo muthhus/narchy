@@ -91,7 +91,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final boolean equals(@Nullable Object that) {
 
         if (this == that) return true;
-        if (hashCode() == that.hashCode()) {
+        if (that!=null && hashCode() == that.hashCode()) {
             if (that instanceof Compound) {
                 Compound cthat = (Compound) that;
                 return (

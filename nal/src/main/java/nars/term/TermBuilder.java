@@ -192,12 +192,11 @@ public abstract class TermBuilder {
 
         Term[] t = tt.terms();
         switch (t.length) {
-            case 1: {
+            case 1:
                 Term t0 = t[0];
                 if (ellipsisoid(t0))
                     return finish(op, -1, tt);
                 return t0;
-            }
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))

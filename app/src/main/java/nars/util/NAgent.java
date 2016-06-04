@@ -127,8 +127,8 @@ public class NAgent implements Agent {
                         //(d > 0.5 ? d : 0) / (d+b);
                         //d / (d+b);
                         //(d > 0.1f ? d - b : -1f);
-                        //d - b;
-                        d;
+                        d - b;
+                        //d;
 
                         //(d*d) - (b*b);
                         //Math.max(0, d-b);

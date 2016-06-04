@@ -1,5 +1,7 @@
 package nars.index;
 
+import nars.$;
+import nars.Global;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -8,6 +10,7 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.util.IO;
+import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.cache.impl.DecoratedCache;
 import org.infinispan.commons.io.ByteBuffer;
@@ -29,8 +32,13 @@ public class InfinispanIndex extends MaplikeIndex {
     private final DecoratedCache<ByteBuffer,TermContainer> subtermsLocal;
 
     private final IO.DefaultCodec codec;
+    private final AdvancedCache<ByteBuffer,TermContainer> subtermsLocalNoResult;
+    private final AdvancedCache<ByteBuffer,Termed> conceptsLocalNoResult;
 
 
+    public InfinispanIndex(Concept.ConceptBuilder conceptBuilder) {
+        this($.terms, conceptBuilder);
+    }
 
     public InfinispanIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
         super(termBuilder, conceptBuilder);
@@ -52,13 +60,15 @@ public class InfinispanIndex extends MaplikeIndex {
         this.concepts = cm.getCache("concepts");
         this.conceptsLocal = new DecoratedCache<>(
                 concepts.getAdvancedCache(),
-                Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING, Flag.SKIP_OWNERSHIP_CHECK,
+                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
                 Flag.SKIP_REMOTE_LOOKUP);
+        this.conceptsLocalNoResult = conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
         this.subterms = cm.getCache("subterms");
         this.subtermsLocal = new DecoratedCache<>(
                 subterms.getAdvancedCache(),
-                Flag.CACHE_MODE_LOCAL, Flag.SKIP_LOCKING, Flag.SKIP_OWNERSHIP_CHECK,
+                Flag.CACHE_MODE_LOCAL, /*Flag.SKIP_LOCKING,*/ Flag.SKIP_OWNERSHIP_CHECK,
                 Flag.SKIP_REMOTE_LOOKUP);
+        this.subtermsLocalNoResult = subtermsLocal.withFlags(Flag.IGNORE_RETURN_VALUES, Flag.SKIP_CACHE_LOAD, Flag.SKIP_REMOTE_LOOKUP);
 
 
     }
@@ -76,9 +86,7 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return conceptsLocal.computeIfAbsent(key(x.term()), xx -> {
-            return buildConcept(x);
-        });
+        return conceptsLocal.computeIfAbsent(key(x.term()), xx -> buildConcept(x));
     }
 
     @Override
@@ -125,7 +133,7 @@ strictlyLocal.put("local_1", "only");
 strictlyLocal.put("local_2", "only");
 strictlyLocal.put("local_3", "only");
          */
-        conceptsLocal.withFlags(Flag.IGNORE_RETURN_VALUES)
+        conceptsLocalNoResult
                 .put(key(src.term()), target);
 
     }
@@ -158,6 +166,11 @@ strictlyLocal.put("local_3", "only");
 
     @Override
     public @NotNull String summary() {
-        return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms (WARNING: slow to count)";
+        if (Global.DEBUG) {
+            return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms (WARNING: slow to count)";
+        }
+        else {
+            return "";
+        }
     }
 }
