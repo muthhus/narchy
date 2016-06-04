@@ -164,10 +164,17 @@ public class Multi extends AbstractNAR {
     }
 
     private synchronized void printWorkers() {
+        Map<Concept,WorkerCore> conceptCores = new HashMap();
         for (WorkerCore w : cores) {
-            System.err.println(w);
-            w.concepts.print();
-            System.err.println();
+
+            w.concepts.forEach(bc -> {
+                Concept c = bc.get();
+                WorkerCore e = conceptCores.put(c, w);
+                if (e!=null) {
+                    System.err.println(c + " already in " + e + " and " + w);
+                }
+            });
+
         }
 //        active.forEach((c,w) -> {
 //            System.out.println(c + " " + w);

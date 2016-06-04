@@ -74,19 +74,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return 0;
     }
 
-
-
     /** true iff o1 > o2 */
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseNeg1();
-        float f2 = o2.priIfFiniteElseNeg1();
-        return (f1 < f2);
+        return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
     }
+
     /** true iff o1 < o2 */
     static final boolean cmpLT(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseNeg1();
-        float f2 = o2.priIfFiniteElseNeg1();
-        return (f1 > f2);
+        return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
+    }
+
+    static float priIfFiniteElseNeg1(BLink b) {
+        return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
     }
 
     @NotNull
@@ -247,18 +246,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     @Override
     public final @Nullable BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
+        if (b.isDeleted())
+            return null;
+
         BLink<V> existing = get(i);
 
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
-        }
-        else {//if (isFull()) {
+        } else {//if (isFull()) {
             putPending(i, b, scale);
             return null;
         }
-        /*else {
-            return putNew(i, link(i, b, scale));
-        }*/
+
 
     }
 
@@ -418,11 +417,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         @NotNull BLink<V> lower = l[t]; //compares with self below to avoid a null check in subsequent iterations
         for (int i = t; i >= 0; i--) {
             BLink<V> b = l[i];
+            if (b!=null) {
+                if (eachNotNull)
+                    each.accept(b);
 
-            if (eachNotNull)
-                each.accept(b);
-
-            b.commit();
+                b.commit();
+            }
 
             if (lowestUnsorted == -1 && cmpGT(b, lower)) {
                 lowestUnsorted = i+1;
@@ -461,7 +461,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
-            if (map.values().removeIf(b -> b.isDeleted())) {
+            if (map.values().removeIf(BLink::isDeleted)) {
                 return true;
             }
 

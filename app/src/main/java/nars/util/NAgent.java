@@ -315,8 +315,9 @@ public class NAgent implements Agent {
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
-        Task whatCauseReward = nar.ask("(?x ==> (R))", ETERNAL, (Task causeOfIncreasedReward) -> {
-            System.out.println(causeOfIncreasedReward.explanation());
+        nar.ask($("(?x ==> (R))"), '?', ETERNAL);
+        //Task whatCauseReward = nar.ask("(?x ==> (R))", ETERNAL, (Task causeOfIncreasedReward) -> {
+            //System.out.println(causeOfIncreasedReward.explanation());
 
 //            //BOOST
 //            if (causeOfIncreasedReward.expectation() > 0.75f) {
@@ -325,28 +326,11 @@ public class NAgent implements Agent {
 //                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
 //            }
 
-            return true;
-        });
-        Task whatCauseDeltaReward = nar.ask("(?x ==> (dR))", ETERNAL, (Task causeOfIncreasedReward) -> {
-            System.out.println(causeOfIncreasedReward.explanation());
-
-//            //BOOST
-//            if (causeOfIncreasedReward.expectation() > 0.75f) {
-//                Term strategy = causeOfIncreasedReward.term(0);
-//                System.err.println("\nSTRATEGY BOOST! :" + strategy);
-//                nar.conceptualize(strategy, UnitBudget.Full.cloneMult(0.9f, 0.7f, 0.7f));
-//            }
-
-            return true;
-        });
-        Task howToAcheiveDeltaReward = nar.ask($("(dR)"), ETERNAL, '@', how -> {
-            //System.out.println(how.explanation());
-            return true;
-        });
-        Task howToAcheiveReward = nar.ask($("(R)"), ETERNAL, '@', how -> {
-            //System.out.println(how.explanation());
-            return true;
-        });
+            //return true;
+        //});
+        nar.ask($("(?x ==> (dR))"), '?', ETERNAL);
+        nar.ask($("(dR)"), '@', ETERNAL);
+        nar.ask($("(R)"), '@', ETERNAL);
 //        for (MotorConcept a : actions) {
 //            nar.ask(a, ETERNAL, '@', how -> {
 //                //System.out.println(how.explanation());
@@ -491,7 +475,7 @@ public class NAgent implements Agent {
             return lastAction;
 
         if (nextAction!=lastAction)
-            System.err.println("DECIDED ACTION " + nextAction);
+            System.err.println("DECIDED " + nextAction);
 
         return nextAction;
     }

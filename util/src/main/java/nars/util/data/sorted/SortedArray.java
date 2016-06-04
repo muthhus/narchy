@@ -59,6 +59,9 @@ public final class SortedArray<E> {
     }
 
     public E remove(int index) {
+        if (size < index)
+            return null;
+
         E previous = this.list[index];
         int totalOffset = this.size - index - 1;
         if (totalOffset > 0)
@@ -195,12 +198,13 @@ public final class SortedArray<E> {
 
     public boolean addInternal(E e) {
         int s = this.size;
-        if (this.list.length == s) {
+        E[] l = this.list;
+        if (l.length == s) {
             E[] newList = builder.apply(grow(s));
-            System.arraycopy(this.list, 0, newList, 0, s);
-            this.list = newList;
+            System.arraycopy(l, 0, newList, 0, s);
+            this.list = l = newList;
 		}
-        this.list[this.size++] = e;
+        l[this.size++] = e;
         return true;
     }
 
@@ -237,7 +241,10 @@ public final class SortedArray<E> {
     }
 
     public E removeLast() {
-        return this.list[--size];
+        //if (size > 0)
+            return this.list[--size];
+        //else
+            //return null;
     }
 
 

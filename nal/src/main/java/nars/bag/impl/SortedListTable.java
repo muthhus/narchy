@@ -162,7 +162,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         int size = size();
 
         L displaced = null;
-        if (size == capacity()) {
+        if (size > 0 && size == capacity()) {
             if (compare(items.last(), i) < 0) {
                 //insufficient rank, bounce
                 return i;

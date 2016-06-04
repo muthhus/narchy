@@ -62,12 +62,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 	public static void main (String[] args) 	{
-		Global.TRUTH_EPSILON = 0.1f;
+		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
 		Multi nar = new Multi(4,
 		//Default nar = new Default(
-				1024, 16, 2, 2, rng,
+				512, 16, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -83,7 +83,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(256);
+		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -98,14 +98,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		//nar.log();
 		//nar.logSummaryGT(System.out, 0.1f);
-		nar.log(System.err, v -> {
-			if (v instanceof Task) {
-				Task t = (Task)v;
-				if (t instanceof DerivedTask && t.punc() == '!')
-					return true;
-			}
-			return false;
-		});
+//		nar.log(System.err, v -> {
+//			if (v instanceof Task) {
+//				Task t = (Task)v;
+//				if (t instanceof DerivedTask && t.punc() == '!')
+//					return true;
+//			}
+//			return false;
+//		});
 
 		new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
@@ -204,7 +204,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 						//$.p(dirY, $.the(Math.abs(dy)))
 						$.inh($.the(Math.abs(dy)), dirY)
 				);
-				System.out.println(dx + " " + dy + " " + squareTerm);
+				//System.out.println(dx + " " + dy + " " + squareTerm);
 
 				//return $.p(squareTerm, typeTerm);
 				return $.prop(squareTerm, typeTerm);
