@@ -262,7 +262,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     }
 
-    protected synchronized void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
+    protected void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
         synchronized (items) {
             if (pending == null)
                 pending = newPendingMap();
@@ -365,8 +365,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         synchronized (items) {
             pendingMass = 0;
             p = pending;
-            this.pending = null;
-            p.forEach(eachPending);
+            if (p!=null) {
+                this.pending = null;
+                p.forEach(eachPending);
+            }
         }
 
     }
@@ -439,8 +441,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         int removed = 0;
         int toRemoveFromMap = 0;
-        while (i > 0 && (ii = l[i]).isDeleted()) {
-            if (removeKeyForValue(ii) == null) {
+        while (i > 0 && ((ii = l[i])==null || (ii.isDeleted()))) {
+            if (ii!=null && removeKeyForValue(ii) == null) {
                 //
                 //throw new RuntimeException("Bag fault while trying to remove key by item value");
 

@@ -117,11 +117,12 @@ abstract public class ArrayListTable<V,L> extends CollectorMap<V,L> implements T
     }
 
     @Override
-    public void setCapacity(int newCapacity) {
+    public synchronized void setCapacity(int newCapacity) {
         if (newCapacity!= this.capacity) {
             this.capacity = newCapacity;
             //int excess = size() - newCapacity;
             //while (excess-- > 0)
+
             while (size() - newCapacity > 0)
                 removeWeakest("Shrink");
         }

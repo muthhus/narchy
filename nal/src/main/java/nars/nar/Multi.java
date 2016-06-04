@@ -22,8 +22,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,7 +37,9 @@ public class Multi extends AbstractNAR {
 
     @NotNull
     final WorkerCore[] cores;
-    final ConcurrentHashMapUnsafe<Concept,DefaultCore> active = new ConcurrentHashMapUnsafe<>();
+    final Map<Concept,DefaultCore> active =
+            //new ConcurrentHashMapUnsafe<>();
+            new ConcurrentHashMap();
 
     final CyclicBarrier barrier;
 
@@ -143,13 +146,35 @@ public class Multi extends AbstractNAR {
                     e.printStackTrace();
                 }
 
-                frame(Multi.this);
+                try {
+                    frame(Multi.this);
+                } catch (ConcurrentModificationException e) {
+                    e.printStackTrace();
+                    printWorkers();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-
+        @Override
+        public String toString() {
+            return thread.toString();
+        }
     }
 
+    private synchronized void printWorkers() {
+        for (WorkerCore w : cores) {
+            System.err.println(w);
+            w.concepts.print();
+            System.err.println();
+        }
+//        active.forEach((c,w) -> {
+//            System.out.println(c + " " + w);
+//        });
+
+
+    }
 
 
     protected @NotNull WorkerCore newCore(int id, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
