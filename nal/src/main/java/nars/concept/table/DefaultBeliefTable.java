@@ -24,7 +24,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
 
-    @NotNull public final SortedTable<Task,Task> eternal;
+    @NotNull public final EternalTable eternal;
     @NotNull public final TemporalBeliefTable temporal;
     @NotNull final Map<Task,Task> map;
 
@@ -47,27 +47,28 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final Truth truth(long now, long when) {
 
+        final Truth ee;
+        synchronized (eternal) {
+            ee = eternal.truth();
+        }
 
-        boolean hasEternal = !eternal.isEmpty();
-        boolean hasTemporal = !temporal.isEmpty();
+        final Truth tt;
+        synchronized (temporal) {
+            tt = temporal.truth(when);
+        }
 
-        if (hasTemporal) {
-            Truth tt = temporal.truth(when);
-            if (hasEternal) {
-                //higher confidence
-                Truth ee = topEternal().truth();
-                if (ee == null)
-                    return Truth.Null;
+        if (tt!=null) {
+            if (ee != null) {
                 return (tt == null || ee.conf() > tt.conf()) ? ee : tt;
             } else {
                 return tt;
             }
         } else {
-            return hasEternal ? topEternal().truth() : Truth.Null;
-
+            return ee!=null ? ee : Truth.Null;
         }
 
     }
+
 //    public float rankTemporalByOriginality(@NotNull Task b) {
 //        return BeliefTable.rankTemporalByOriginality(b, lastUpdate);
 //    }
@@ -139,9 +140,15 @@ public class DefaultBeliefTable implements BeliefTable {
         return map.get(t);
     }
 
-    @Nullable
-    @Override
-    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
+    @Override public Table<Task, Task> eternal() {
+        return eternal;
+    }
+    @Override public Table<Task, Task> temporal() {
+        return temporal;
+    }
+
+
+    @Nullable @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
 
         /* if a duplicate exists, it will merge the incoming task and return true.
           otherwise false */
@@ -156,9 +163,17 @@ public class DefaultBeliefTable implements BeliefTable {
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
-        Task result = (input.isEternal() ?
-               addEternal(input, nar) :
-               addTemporal(input, nar));
+        Task result;
+        if (input.isEternal()) {
+            synchronized (eternal) {
+                result = addEternal(input, nar);
+            }
+        }
+        else {
+            synchronized (temporal) {
+                result = addTemporal(input, nar);
+            }
+        }
 
         if (result!=null) {
             questions.answer(result, nar);

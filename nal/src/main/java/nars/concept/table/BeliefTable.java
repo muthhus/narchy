@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.bag.Table;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -74,6 +75,16 @@ public interface BeliefTable extends TaskTable {
         @Override
         public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
             return input;
+        }
+
+        @Override
+        public Table<Task, Task> eternal() {
+            return null;
+        }
+
+        @Override
+        public Table<Task, Task> temporal() {
+            return null;
         }
 
         @Override
@@ -193,6 +204,10 @@ public interface BeliefTable extends TaskTable {
 //        return top(nar.time());
 //    }
 
+    Table<Task, Task> eternal();
+    Table<Task, Task> temporal();
+
+
     @Nullable
     default Task top(long now) {
         return top(now, now);
@@ -202,7 +217,11 @@ public interface BeliefTable extends TaskTable {
     @Nullable
     default Task top(long t, long now) {
 
-        Task ete = topEternal();
+        final Task ete;
+        synchronized (eternal()) {
+            ete = topEternal();
+        }
+
         if (t == Tense.ETERNAL) {
             if (ete != null) {
                 return ete;
@@ -211,7 +230,10 @@ public interface BeliefTable extends TaskTable {
             } */
         }
 
-        Task tmp = topTemporal(t, now);
+        Task tmp;
+        synchronized (temporal()) {
+            tmp = topTemporal(t, now);
+        }
 
         if (tmp == null) {
             return ete;
@@ -219,10 +241,11 @@ public interface BeliefTable extends TaskTable {
             if (ete == null) {
                 return tmp;
             } else {
-                return ( ete.conf() > tmp.conf()) ?
+                return (ete.conf() > tmp.conf()) ?
                         ete : tmp;
             }
         }
+
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */

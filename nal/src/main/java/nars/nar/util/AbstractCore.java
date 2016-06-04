@@ -73,14 +73,7 @@ public abstract class AbstractCore {
      * temporary re-usable array for batch firing
      */
     transient private final List<BLink<? extends Termed>> terms = Global.newArrayList();
-
-
-
-    /**
-     * temporary re-usable
-     */
-    transient final List<ConceptProcess> processes = Global.newArrayList();
-
+    transient private final List<BLink<Task>> tasks = Global.newArrayList();
 
 
     protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
@@ -160,22 +153,29 @@ public abstract class AbstractCore {
         Concept c = conceptLink.get();
 
         List<BLink<? extends Termed>> termsBuffer = this.terms;
-        Bag<Termed> tl = c.termlinks();
-        if (tl.isEmpty())
-            return;
 
-        tl.sample(termlinks, termsBuffer::add);
+        c.termlinks().sample(termlinks, termsBuffer::add);
+        if (!termsBuffer.isEmpty()) {
 
-        c.tasklinks().sample(tasklinks, bl -> {
-            PremiseBuilder.run(nar, conceptLink, termsBuffer, bl, processes);
-        });
+            List<BLink<Task>> tasksBuffer = this.tasks;
 
-        termsBuffer.clear();
+            c.tasklinks().sample(tasklinks, tasksBuffer::add);
+            if (!tasksBuffer.isEmpty()) {
+                for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
+                    PremiseBuilder.run(
+                            nar,
+                            conceptLink,
+                            termsBuffer,
+                            tasksBuffer.get(i),
+                            matcher);
+                }
 
-        if (!processes.isEmpty()) {
-            matcher.run(nar, processes);
-            processes.clear();
+                tasksBuffer.clear();
+            }
+
+            termsBuffer.clear();
         }
+
 
     }
 

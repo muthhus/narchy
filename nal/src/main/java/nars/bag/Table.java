@@ -1,5 +1,6 @@
 package nars.bag;
 
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,6 +9,8 @@ import java.util.function.Predicate;
 
 /** nearly a Map */
 public interface Table<K,V> extends Iterable<V> {
+
+
 
     void clear();
 

@@ -128,7 +128,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         reassignerXY = new VersionMap.Reassigner<>(this::assignable, xy);
         reassignerYX = new VersionMap.Reassigner<>(this::assignable, yx);
         parent = new Versioned(versioning);
-        constraints = new Versioned(versioning, new int[2], new FasterList(0, new MatchConstraint[2]));
+
+        int constraintsLimit = 4;
+        constraints = new Versioned(versioning, new int[constraintsLimit], new FasterList(0, new MatchConstraint[constraintsLimit]));
 
     }
 

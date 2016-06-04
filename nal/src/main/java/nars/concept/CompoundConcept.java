@@ -192,12 +192,15 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
     /**
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
+     * TODO remove synchronized by lock-free technique
      */
-    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
-        Task b = target.add(belief, questions, nar);
-        if (b!=null)
-            updateSatisfaction(nar);
-        return b;
+    synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
+        //synchronized (target) {
+            Task b = target.add(belief, questions, nar);
+            if (b != null)
+                updateSatisfaction(nar);
+            return b;
+        //}
     }
 
     protected final void updateSatisfaction(@NotNull NAR nar) {

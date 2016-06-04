@@ -6,6 +6,7 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.link.BLink;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -41,7 +42,8 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static void run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, @NotNull List<ConceptProcess> processes) {
+    public static void run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, PremiseEval matcher) {
+
 
         Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
         if (task == null)
@@ -52,20 +54,19 @@ public enum PremiseBuilder {
         Compound taskTerm = task.term();
 
         for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+
+            if (task.isDeleted())
+                return;
+
             BLink<? extends Termed> termLink = termsArray.get(i);
 
-            if (termLink == null || taskLink.isDeleted() || task.isDeleted())
-                break; //end of termsArray, or task has become deleted in the previous iteration, cancel
-
             Termed tl = termLink.get();
-            if (tl == null)
-                continue;
 
             Term termLinkTerm = tl.term();
 
             if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
 
-                processes.add(
+                matcher.run(
                         newPremise(nar, conceptLink, termLink, taskLink, task, occ, tl)
                 );
             }
@@ -90,8 +91,6 @@ public enum PremiseBuilder {
         if (!(beliefConceptTerm instanceof Compound))
             return null;
 
-        if (task.isDeleted())
-            throw new RuntimeException("Deleted task: " + task);
 
         Concept beliefConcept = nar.concept(beliefConceptTerm);
 

@@ -158,23 +158,22 @@ public class PremiseEval extends FindSubst {
 
     }
 
-    public final void run(NAR nar, @NotNull List<ConceptProcess> pp) {
-        this.nar = nar;
-        for (int i = 0, ppSize = pp.size(); i < ppSize; i++) {
-            run(pp.get(i));
-        }
-    }
 
     /**
      * set the next premise
      */
-    final void run(@NotNull ConceptProcess p) {
+    public final void run(@NotNull ConceptProcess p) {
+        this.nar = p.nar;
+
+        Task task = p.task();
+        if (task == null)
+            return;
 
         this.premiseMatchesMax = p.matchesMax();
 
         this.premise = p;
 
-        Task task = p.task();
+
         this.punct.set(task.punc());
 
         Task belief = p.belief();

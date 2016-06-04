@@ -65,14 +65,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Multi nar = new Multi(2,
-		Default nar = new Default(
-				1024, 6, 1, 2, rng,
-				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
+		Multi nar = new Multi(2,
+		//Default nar = new Default(
+				1024, 6, 2, 2, rng,
+				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				new Indexes.DefaultTermIndex(128 *1024, rng)
+				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);

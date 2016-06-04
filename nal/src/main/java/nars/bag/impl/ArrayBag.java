@@ -35,7 +35,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     private boolean requiresSort;
 
     //protected final FasterList<BLink<V>> pending = new FasterList();
-    protected final Map<V,RawBudget> pending = new HashMap<>();
+    protected Map<V,RawBudget> pending = null;
     private BiFunction<RawBudget, RawBudget, RawBudget> pendingMerge;
 
 
@@ -253,15 +253,28 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             return putExists(b, scale, existing, overflow);
         }
         else {//if (isFull()) {
-            RawBudget inc = new RawBudget(b, scale);
-            pending.merge(i, inc, pendingMerge);
-            pendingMass += inc.pri() * inc.dur();
+            putPending(i, b, scale);
             return null;
         }
         /*else {
             return putNew(i, link(i, b, scale));
         }*/
 
+    }
+
+    protected synchronized void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
+        synchronized (items) {
+            if (pending == null)
+                pending = newPendingMap();
+            RawBudget inc = new RawBudget(b, scale);
+            pending.merge(i, inc, pendingMerge);
+            pendingMass += inc.pri() * inc.dur();
+        }
+
+    }
+
+    protected Map<V, RawBudget> newPendingMap() {
+        return new HashMap<>();
     }
 
     public float getPendingMass() {
@@ -339,17 +352,23 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             removeDeletedAtBottom();
         }
 
-        if (!pending.isEmpty())
+        if (pending!=null)
             addPending();
 
         return this;
     }
 
     /** add pending items (after bag is updated) */
-    private final void addPending() {
-        pendingMass = 0;
-        pending.forEach(eachPending);
-        pending.clear();
+    protected final void addPending() {
+
+        Map<V, RawBudget> p;
+        synchronized (items) {
+            pendingMass = 0;
+            p = pending;
+            this.pending = null;
+            p.forEach(eachPending);
+        }
+
     }
 
     final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {

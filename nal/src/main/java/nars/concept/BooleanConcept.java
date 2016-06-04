@@ -4,6 +4,7 @@ import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.bag.Table;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
 import nars.task.MutableTask;
@@ -234,5 +235,14 @@ public class BooleanConcept extends CompoundConcept {
             }
         }
 
+        @Override
+        public Table<Task, Task> eternal() {
+            return null;
+        }
+
+        @Override
+        public Table<Task, Task> temporal() {
+            return null;
+        }
     }
 }

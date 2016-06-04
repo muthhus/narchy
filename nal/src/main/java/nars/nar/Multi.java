@@ -23,7 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -35,6 +38,7 @@ public class Multi extends AbstractNAR {
     final WorkerCore[] cores;
     final ConcurrentHashMapUnsafe<Concept,DefaultCore> active = new ConcurrentHashMapUnsafe<>();
 
+    final CyclicBarrier barrier;
 
     @Deprecated
     public Multi(int cores) {
@@ -59,6 +63,7 @@ public class Multi extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
+        barrier = new CyclicBarrier(cores+1);
 
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
@@ -73,12 +78,13 @@ public class Multi extends AbstractNAR {
         }
 
         eventFrameStart.on((x) -> {
-            //framesPending.addAndGet(cores);
-            /*for (WorkerCore w : Multi.this.cores)
-                if (w.sleeping.compareAndSet(false,true)) {
-                    w.wake();
-                }*/
-            Util.pause(1); //HACK
+
+            try {
+                barrier.await();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         });
 
         runLater(this::initHigherNAL);
@@ -102,7 +108,7 @@ public class Multi extends AbstractNAR {
         private final Thread thread;
         private boolean stopped;
         long lastTime = -1;
-        private final ConcurrentLinkedDeque<Runnable> pendingActivations = new ConcurrentLinkedDeque<>();
+
 
         public WorkerCore(int n, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
             super(Multi.this, matcher, warm, cold);
@@ -112,26 +118,18 @@ public class Multi extends AbstractNAR {
         }
 
         @Override
-        protected synchronized void activate(@NotNull Concept c) {
+        protected void activate(@NotNull Concept c) {
             if (Multi.this.active.putIfAbsent(c, this)==null) {
                 super.activate(c);
             }
         }
 
         @Override
-        protected synchronized void deactivate(@NotNull Concept c) {
+        protected void deactivate(@NotNull Concept c) {
             if (Multi.this.active.remove(c)==c) {
                 super.deactivate(c);
             }
         }
-
-
-        protected void wake() {
-            logger.info("wake");
-            thread.interrupt();
-        }
-
-
 
         public void stop() {
             stopped = true;
@@ -139,39 +137,17 @@ public class Multi extends AbstractNAR {
 
         @Override public final void run() {
             while (!stopped) {
-                long now = time();
-                if (now > lastTime) {
-                    logger.info("frame " + now);
-                    try {
-                        frame(Multi.this);
-                        lastTime = now;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    //logger.info("sleep");
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {  }
+                try {
+                    barrier.await();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                frame(Multi.this);
             }
         }
 
-        @Override
-        public void frame(@NotNull NAR nar) {
-            int n = pendingActivations.size();
-            for (int i = 0; i < n; i++) {
-                pendingActivations.removeFirst().run();
-            }
 
-            super.frame(nar);
-        }
-
-        @Override public void conceptualize(@NotNull Concept c, @NotNull Budgeted b, float conceptActivation, float linkActivation, MutableFloat conceptOverflow) {
-            pendingActivations.add(() -> {
-                super.conceptualize(c, b, conceptActivation, linkActivation, conceptOverflow);
-            });
-        }
     }
 
 

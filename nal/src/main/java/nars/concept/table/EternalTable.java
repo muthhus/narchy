@@ -117,4 +117,8 @@ public class EternalTable extends SortedListTable<Task, Task> {
                 null;
     }
 
+    public final Truth truth() {
+        Task s = top();
+        return s!=null ? s.truth() : null;
+    }
 }

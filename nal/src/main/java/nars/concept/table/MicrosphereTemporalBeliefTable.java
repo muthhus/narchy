@@ -251,6 +251,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
         for (int i = 0; i < ls; i++) {
             Task x = get(i);
+            if (x == null) continue;
             float r = rank(x, when, ageFactor);
             if (r > bestRank) {
                 best = x;
@@ -265,6 +266,9 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     @Nullable
     @Override
     public Truth truth(long when) {
+        if (isEmpty())
+            return null;
+
         int c = capacity();
         if (polation == null || polation.capacity() < c) {
             float ecap = eternal.capacity();
@@ -283,7 +287,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
         int s = size();
         for (int i = 0; i < s; ) {
             Task x = get(i);
-            if (x.isDeleted()) {
+            if (x == null || x.isDeleted()) {
                 removeItem(i);
                 s--;
             } else {
