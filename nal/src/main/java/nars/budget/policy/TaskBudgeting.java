@@ -52,7 +52,9 @@ public class TaskBudgeting {
         volRatioScale =
             Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
 
-        float priority = task.priIfFiniteElseZero() * volRatioScale;
+        float priority =
+                //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
+                task.priIfFiniteElseZero() * volRatioScale;
 
         final float durability =
                 task.dur() * volRatioScale;

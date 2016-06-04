@@ -11,6 +11,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,8 +34,8 @@ public class DefaultBeliefTable implements BeliefTable {
 
         Map<Task, Task> mp;
         this.map = mp =
-            Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
-            //new HashMap<>(1);
+            //Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
+            new HashMap<>(initialEternalCapacity + initialTemporalCapacity);
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new EternalTable(mp, initialEternalCapacity);
