@@ -26,15 +26,11 @@ public interface Termlike extends Comparable<Termlike> {
 
     default boolean hasAll(int structuralVector) {
         int s = structure();
-        return hasAll(s, structuralVector);
-    }
-
-    static boolean hasAll(int existing, int possiblyIncluded) {
-        return ((existing | possiblyIncluded) == existing);
+        return Op.hasAll(s, structuralVector);
     }
 
     default boolean hasAny(int structuralVector) {
-        return (structure() & structuralVector) != 0;
+        return Op.hasAny(structure(), structuralVector);
     }
     /** tests if contains a term in the structural hash
      *  WARNING currently this does not detect presence of pattern variables
@@ -50,7 +46,7 @@ public interface Termlike extends Comparable<Termlike> {
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
         return  this==target ||
-                ((!hasAll(structure(), target.structure()))) ||
+                ((!Op.hasAll(structure(), target.structure()))) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 
@@ -77,7 +73,7 @@ public interface Termlike extends Comparable<Termlike> {
 
 
     default boolean impossibleSubTermOrEquality(@NotNull Term target) {
-        return ((!hasAll(structure(), target.structure())) ||
+        return ((!Op.hasAll(structure(), target.structure())) ||
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }
 

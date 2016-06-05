@@ -5,10 +5,7 @@ import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class TermSet<X extends Term> extends TermVector {
 
@@ -17,6 +14,22 @@ public class TermSet<X extends Term> extends TermVector {
         return new TermSet(Terms.toSortedSetArray(x));
     }
 
+    @NotNull public static TermSet concat(@NotNull Term[] a, Term... b) {
+        if ((a.length + b.length) == 2) {
+            //simple case
+            return TermSet.the(a[0], b[0]);
+        }
+        TreeSet<Term> t = new TreeSet<>();
+        Collections.addAll(t, a);
+        return concat(t, b);
+    }
+
+    public
+    @NotNull
+    static TermSet concat(TreeSet<Term> t, Term[] b) {
+        Collections.addAll(t, b);
+        return TermSet.the(t);
+    }
 
 
     @NotNull
@@ -44,18 +57,18 @@ public class TermSet<X extends Term> extends TermVector {
 
         Term[] a = c.toArray(new Term[n]);
 
+        if (c instanceof TreeSet) {
+            //already sorted
+            return a;
+        }
         if (c instanceof Set) {
-            if (c instanceof TreeSet) {
-                //already sorted
-                return a;
-            } else {
 
-                //already unique but not necessarily sorted
-                if (n > 1)
-                    Arrays.sort(a);
+            //already unique but not necessarily sorted
+            if (n > 1)
+                Arrays.sort(a);
 
-                return a;
-            }
+            return a;
+
         }
 
         //potentially is unsorted and has duplicates

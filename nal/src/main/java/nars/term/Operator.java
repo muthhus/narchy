@@ -3,7 +3,6 @@ package nars.term;
 import nars.Op;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,9 +43,9 @@ public final class Operator<T extends Term> extends Atom {
     }
 
     /** returns the Operator predicate of an operation. */
-    @NotNull public static Atomic operator(@NotNull Compound operation) {
+    @Nullable public static Atomic operator(@NotNull Compound operation) {
         Term o = operation.term(1);
-        return (o!=null && o.op() == Op.OPERATOR) ? ((Atomic) o) : null;
+        return (o.op() == Op.OPERATOR) ? ((Atomic) o) : null;
     }
 
     @NotNull

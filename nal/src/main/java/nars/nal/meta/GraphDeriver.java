@@ -12,7 +12,6 @@ import nars.nal.meta.op.events;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.util.data.map.UnifriedMap;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

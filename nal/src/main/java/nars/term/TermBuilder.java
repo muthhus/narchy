@@ -295,7 +295,7 @@ public abstract class TermBuilder {
                 index, TermVector.the(res));
     }
 
-    @NotNull
+    @Nullable
     public Term junction(@NotNull Op op, int t, @NotNull Term... u) {
 //        if (u.length == 1)
 
@@ -362,7 +362,7 @@ public abstract class TermBuilder {
     /**
      * flattening junction builder, for multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
-    @NotNull
+    @Nullable
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
 
@@ -561,11 +561,7 @@ public abstract class TermBuilder {
 
     @Nullable
     @Deprecated
-    public Term newIntersection2(@NotNull Term term1, @Nullable Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
-
-        if (term2 == null) {
-            throw new NullPointerException();
-        }
+    public Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         Op o1 = term1.op();
         Op o2 = term2.op();
@@ -593,13 +589,11 @@ public abstract class TermBuilder {
         //reduction between one or both of the intersection type
 
         if (o1 == intersection) {
-
-            Term[] suffix = o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2};
-
             return finish(intersection, -1,
-                    TermSet.the(Terms.concat(
-                            ((TermContainer) term1).terms(), suffix
-                    ))
+                    TermSet.concat(
+                        ((TermContainer) term1).terms(),
+                        o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
+                    )
             );
         }
 

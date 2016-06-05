@@ -22,17 +22,14 @@ package nars;
 
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -86,7 +83,7 @@ public enum Global {
     /** Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
-    public static float HORIZON = 1f;
+    public static final float HORIZON = 1f;
 
     public static final float TRUTH_EPSILON = 0.01f;
 
@@ -151,8 +148,8 @@ public enum Global {
     public static final float BUDGET_EPSILON = 0.0005f;
 
     /** minimum durability and quality necessary for a derivation to form */
-    public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
-
+    public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.5f;
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

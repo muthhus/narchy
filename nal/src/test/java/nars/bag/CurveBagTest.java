@@ -6,16 +6,13 @@ import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
-import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;

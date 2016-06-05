@@ -7,14 +7,13 @@ import nars.budget.policy.ConceptBudgeting;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.proxy.ProxyCompound;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -36,9 +35,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
         //this.target = (CompoundConcept) n.index.remove(target);
         this.target = target;
-        n.index.set(target, this);
+
         n.index.set(alias, this);
+        n.index.set(target, this);
+
     }
+
 
     @Override
     public int hashCode() {
@@ -47,17 +49,40 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || alias.equals(obj);
+
+        if (obj == this) return true;
+
+        return alias.equals(obj);
+//        Object ref;
+//
+//        if (obj instanceof ProxyCompoundConcept) {
+//            ref = (((ProxyCompoundConcept)obj).target);
+//        } else {
+//            ref = obj;
+//        }
+//        return alias.equals(ref);
     }
 
     @Override
-    public String toString() {
-        return target.toString();
+    public int compareTo(Termlike o) {
+        if (equals(o)) return 0;
+        return alias.compareTo(o);
     }
 
     @NotNull
     @Override
-    public final Compound target() {
+    public String toString() {
+        return TermPrinter.stringify(target).toString();
+    }
+
+    @Override
+    public void append(Appendable p) throws IOException {
+        TermPrinter.append(target, p);
+    }
+
+    @NotNull
+    @Override
+    public final Compound proxy() {
         return alias;
     }
 

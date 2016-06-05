@@ -1,6 +1,5 @@
 package nars.op.time;
 
-import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Short-term Memory Belief Event Induction.

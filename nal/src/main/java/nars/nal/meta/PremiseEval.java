@@ -3,6 +3,7 @@ package nars.nal.meta;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
@@ -14,7 +15,6 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
 import nars.truth.Truth;
@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -288,7 +287,7 @@ public class PremiseEval extends FindSubst {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Termlike.hasAll(existingStructure, bits);
+        return Op.hasAll(existingStructure, bits);
     }
 
     /** both */
@@ -299,8 +298,8 @@ public class PremiseEval extends FindSubst {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Termlike.hasAll(termSub0Struct, bits) &&
-               Termlike.hasAll(termSub1Struct, bits);
+        return Op.hasAll(termSub0Struct, bits) &&
+               Op.hasAll(termSub1Struct, bits);
     }
 
 //    /** returns whether the put operation was successful */

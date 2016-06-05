@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
-import nars.bag.Table;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;

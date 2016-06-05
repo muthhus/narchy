@@ -816,7 +816,7 @@ public class TermTest {
                 )
         );
         assertTrue(
-                !Termlike.hasAll(n.term("<a --> b>").term().structure(), n.term("<a-->#b>").term().structure())
+                !Op.hasAll(n.term("<a --> b>").term().structure(), n.term("<a-->#b>").term().structure())
         );
 
     }

@@ -23,7 +23,6 @@ package nars.term.variable;
 
 import nars.Global;
 import nars.Op;
-import nars.Symbols;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 

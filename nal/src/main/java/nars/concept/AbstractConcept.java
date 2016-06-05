@@ -2,13 +2,11 @@ package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
-import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptBudgeting;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

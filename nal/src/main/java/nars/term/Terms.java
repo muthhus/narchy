@@ -36,11 +36,6 @@ public class Terms   {
     @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
-
-    Terms() {
-
-    }
-
     /**
      * TODO decide on some reasonable coding scheme for bundling these numeric values
      * into 32-bit or 64-bit fields/arrays
@@ -106,8 +101,6 @@ public class Terms   {
             boolean equalOps = (o == b.op());
 
             if (equalOps) {
-                if (a.equals(b))
-                    return false;
 
                 switch (o) {
                     case INHERIT:
@@ -117,6 +110,11 @@ public class Terms   {
                         //only half seems necessary:
                         //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
                         return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+
+                    default:
+                        if (a.equals(b))
+                            return false;
+                        break;
                 }
             }
 
@@ -154,10 +152,18 @@ public class Terms   {
         if (A.equals(B)) {
             return true;
         }
-        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
-            //product and one of either image types
-            return false; //the remaining comparisons are unnecessary
-        }
+
+        int as = A.structure();
+        if (/*!hasAny(as, Op.PRODUCT) || */!hasAny(as, Op.ImageBits))
+            return false;
+        int bs = B.structure();
+        if (/*!hasAny(bs, Op.PRODUCT) || */!hasAny(bs, Op.ImageBits))
+            return false;
+
+//        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
+//            //product and one of either image types
+//            return false; //the remaining comparisons are unnecessary
+//        }
 
         Term subjA = Statement.subj(A);
         Term predA = Statement.pred(A);

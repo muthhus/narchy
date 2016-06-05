@@ -9,7 +9,6 @@ import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.link.BLink;
-import nars.nal.ConceptProcess;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;

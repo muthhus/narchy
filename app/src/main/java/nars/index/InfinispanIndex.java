@@ -99,7 +99,7 @@ public class InfinispanIndex extends MaplikeIndex {
         if (x.hasTemporal()) {
             return buildCompound(x);
         } else {
-            return conceptsLocal.computeIfAbsent(key(x.term()), xx -> buildConcept(buildCompound(x)));
+            return conceptsLocal.computeIfAbsent(key((Term)(x.term())), xx -> buildConcept(buildCompound(x)));
         }
     }
 

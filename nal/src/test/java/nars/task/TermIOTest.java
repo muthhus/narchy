@@ -3,7 +3,6 @@ package nars.task;
 import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.util.IO;
 import org.jetbrains.annotations.NotNull;

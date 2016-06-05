@@ -58,7 +58,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         if (t.op() == beliefConcept.op()) {
             Term b = beliefConcept.term();
             if (t.structure() == b.structure() && t.volume() == b.volume()) {
-                return $.terms.atemporalize((Compound) t).equals(b);
+                return b.equals($.terms.atemporalize((Compound) t));
             }
         }
         return false;
@@ -152,8 +152,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @Override
+    @NotNull
+    default Compound<T> term() {
+        return this;
+    }
+
+    @Override
     default void append(@NotNull Appendable p) throws IOException {
-        TermPrinter.append(this, p);
+        TermPrinter.append(term(), p);
     }
 
 
@@ -288,7 +294,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
 
-    @Nullable
+    @NotNull
     @Override
     default T term(int i) {
         return subterms().term(i);

@@ -2,10 +2,8 @@ package nars.bag.impl;
 
 import nars.Global;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.RawBudget;
-import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
@@ -16,10 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -66,8 +62,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
-        float f1 = o1.priIfFiniteElseNeg1();
-        float f2 = o2.priIfFiniteElseNeg1();
+        float f1 = priIfFiniteElseNeg1(o1);
+        float f2 = priIfFiniteElseNeg1(o2);
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
         if (f1 > f2)
@@ -85,8 +81,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
     }
 
-    static float priIfFiniteElseNeg1(BLink b) {
+    static float priIfFiniteElseNeg1(Budgeted b) {
         return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
+        //return b.priIfFiniteElseNeg1();
     }
 
     @NotNull

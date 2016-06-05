@@ -27,9 +27,12 @@ public class ProxyCompoundConceptTest {
         Compound cTerm = nars.$.$(cString);
         ProxyCompoundConcept C = new ProxyCompoundConcept(cTerm, ab, n);
         assertEquals(cTerm, C);
+        assertEquals(C, cTerm);
 
         Concept C1 = n.concept(cString);
         assertNotNull(C1);
+        assertEquals(C, C1);
+        assertEquals(C1, C);
         assertTrue(C1 == C);
         assertEquals(2, C1.termlinks().size());
 

@@ -49,8 +49,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
-        if (!op.temporal && dt != DTERNAL)
-            throw new RuntimeException("invalid temporal relation for " + op);
+
+        if (dt!=DTERNAL && !Op.isTemporal(op, dt, subterms.size()))
+            throw new InvalidTerm(op, relation, dt, subterms.terms());
 
         this.subterms = subterms;
 
@@ -58,9 +59,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.op = op;
 
         this.relation = relation;
-
-        if (dt!=DTERNAL && !Op.isTemporal(op, dt, subterms.size()))
-            throw new InvalidTerm(op, relation, dt, subterms.terms());
 
         this.dt = dt;
 

@@ -34,10 +34,11 @@ public final class OneMatchFindSubst extends FindSubst {
     @Override
     public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-        if (target !=null)
+        if (target !=null) {
             target.replaceAllXY(this);
-        if (xterm!=null)
-            result = substitute.resolve(target, target, xterm);
+            if (xterm != null)
+                result = substitute.resolve(target, target, xterm);
+        }
         return false;
     }
 
@@ -48,7 +49,7 @@ public final class OneMatchFindSubst extends FindSubst {
     }
 
     @Nullable
-    public Term tryMatch(@NotNull Op op, @NotNull PremiseEval target, @NotNull Term xterm, @NotNull Term x, @NotNull Term y) {
+    public Term tryMatch(@NotNull Op op, @Nullable PremiseEval target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.type = op;
         this.xterm = xterm;
         this.target = target;

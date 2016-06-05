@@ -10,7 +10,6 @@ import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
 import nars.term.Termed;
-import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;

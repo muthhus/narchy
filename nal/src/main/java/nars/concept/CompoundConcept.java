@@ -2,7 +2,6 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
-import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -18,8 +17,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
-import nars.term.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,9 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.Reference;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
-
-import static nars.nal.Tense.DTERNAL;
 
 
 public class CompoundConcept extends GenericCompound<Term> implements AbstractConcept , Compound<Term> {

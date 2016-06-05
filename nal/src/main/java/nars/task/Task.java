@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;

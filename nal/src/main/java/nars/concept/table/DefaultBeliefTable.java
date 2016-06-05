@@ -127,7 +127,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final Task topEternal() {
         EternalTable ee = eternal;
-        if (ee!=null && !ee.isEmpty()) {
+        if (!ee.isEmpty()) {
             synchronized (ee) {
                 return ee.top();
             }

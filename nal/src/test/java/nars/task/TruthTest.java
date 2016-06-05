@@ -1,8 +1,6 @@
 package nars.task;
 
-import nars.$;
 import nars.Global;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.junit.Test;
 

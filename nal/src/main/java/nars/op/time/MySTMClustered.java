@@ -1,7 +1,5 @@
 package nars.op.time;
 
-import com.gs.collections.api.tuple.primitive.ObjectFloatPair;
-import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;

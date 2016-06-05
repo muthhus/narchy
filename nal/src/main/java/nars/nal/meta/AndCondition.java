@@ -3,7 +3,6 @@ package nars.nal.meta;
 import com.google.common.collect.Lists;
 import nars.Op;
 import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +23,7 @@ public final class AndCondition extends GenericCompound<BoolCondition> implement
         this(TermVector.the((Term[])p));
     }*/
     public AndCondition(@NotNull Collection<BoolCondition> p) {
-        super(Op.CONJUNCTION, new TermVector(p, BoolCondition.class));
+        super(Op.CONJUNCTION, new TermVector(p));
         this.termCache = p.toArray(new BoolCondition[p.size()]);
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");

@@ -15,18 +15,18 @@ import static nars.Symbols.*;
  */
 public interface TermPrinter {
 
-    static void appendSeparator(@NotNull Appendable p) throws IOException {
-        p.append(ARGUMENT_SEPARATOR);
-        //if (pretty) p.append(' ');
-    }
-
-    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer) throws IOException {
-        writer.append(COMPOUND_TERM_OPENER);
-        writer.append(op.str);
-        writer.append(ARGUMENT_SEPARATOR);
-        singleTerm.append(writer);
-        writer.append(COMPOUND_TERM_CLOSER);
-    }
+//    static void appendSeparator(@NotNull Appendable p) throws IOException {
+//        p.append(ARGUMENT_SEPARATOR);
+//        //if (pretty) p.append(' ');
+//    }
+//
+//    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer) throws IOException {
+//        writer.append(COMPOUND_TERM_OPENER);
+//        writer.append(op.str);
+//        writer.append(ARGUMENT_SEPARATOR);
+//        singleTerm.append(writer);
+//        writer.append(COMPOUND_TERM_CLOSER);
+//    }
 
     static void compoundAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
 

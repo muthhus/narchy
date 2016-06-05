@@ -1,14 +1,10 @@
 package nars.nal.nal8;
 
-import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.concept.BooleanConcept;
-import nars.concept.OperationConcept;
-import nars.nal.Tense;
 import nars.nar.Default;
 import nars.util.signal.FloatConcept;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -3,9 +3,7 @@ package nars;
 
 import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
@@ -176,6 +174,14 @@ public enum Op {
                 //(!c.impossibleStructureMatch(OperationBits)) &&
     }
 
+    public static boolean hasAll(int existing, int possiblyIncluded) {
+        return ((existing | possiblyIncluded) == existing);
+    }
+
+    public static boolean hasAny(int existing, int possiblyIncluded) {
+        return (existing & possiblyIncluded) != 0;
+    }
+
 
     @NotNull
     @Override
@@ -291,7 +297,7 @@ public enum Op {
     }
 
     public static boolean hasAny(int structure, @NotNull Op o) {
-        return ((structure & o.bit) > 0);
+        return hasAny(structure, o.bit);
     }
 
     public boolean isAtomic() {

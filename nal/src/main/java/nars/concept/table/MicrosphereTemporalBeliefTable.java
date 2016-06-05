@@ -1,5 +1,6 @@
 package nars.concept.table;
 
+import nars.Global;
 import nars.NAR;
 import nars.bag.impl.SortedTable;
 import nars.nal.Tense;
@@ -24,7 +25,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
      *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
      *      lower means more accuracy at the expense of shorter memory span
      */
-    private final float historyFactor = 1.5f;
+    private final float historyFactor = Global.DEFAULT_TEMPORAL_HISTORY_FACTOR;
     long min, max;
     private TruthPolation polation;
     private long lastUpdate = Tense.TIMELESS;

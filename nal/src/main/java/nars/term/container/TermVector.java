@@ -64,9 +64,9 @@ public class TermVector implements TermContainer<Term>, Serializable {
 //        this(null);
 //    }
 
-    public TermVector(@NotNull Collection<? extends Term> t, Class c) {
-        this( t.toArray( new Term[t.size()]));
-    }
+//    public TermVector(@NotNull Collection<? extends Term> t, Class c) {
+//        this( t.toArray( new Term[t.size()]));
+//    }
 
     public TermVector(@NotNull Collection<? extends Term> t) {
         this( t.toArray(new Term[t.size()]));
@@ -229,8 +229,7 @@ public class TermVector implements TermContainer<Term>, Serializable {
         meta[4] += volume();
         meta[5] |= structure();
 
-
-        return -1; //hashcode for this isn't used
+        return 0; //hashcode for this isn't used
     }
 
     //    public Term[] cloneTermsReplacing(int index, Term replaced) {

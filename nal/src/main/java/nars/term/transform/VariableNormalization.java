@@ -4,7 +4,6 @@ import nars.$;
 import nars.Global;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;

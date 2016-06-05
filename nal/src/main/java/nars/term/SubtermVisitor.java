@@ -1,6 +1,5 @@
 package nars.term;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**

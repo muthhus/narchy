@@ -8,11 +8,11 @@ public interface ProxyTerm<T extends Term> extends Term {
 
 
     @NotNull
-    T target();
+    T proxy();
 
     @Override
     default @NotNull Op op() {
-        return target().op();
+        return proxy().op();
     }
 
 

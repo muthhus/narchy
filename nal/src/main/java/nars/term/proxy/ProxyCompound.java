@@ -11,30 +11,33 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, Compound<Term> {
 
+
+
     @Override
     default @NotNull TermContainer subterms() {
-        return target().subterms();
+        return proxy().subterms();
     }
 
     @Override
     default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-        return target().match(y, subst);
+        return proxy().match(y, subst);
     }
 
 
     @Override
     default int relation() {
-        return target().relation();
+        return proxy().relation();
     }
 
     @Override
     default boolean isNormalized() {
-        return target().isNormalized();
+        return proxy().isNormalized();
     }
 
     @Override
     default int dt() {
-        return target().dt();
+        return proxy().dt();
     }
+
 
 }

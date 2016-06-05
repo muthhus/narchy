@@ -27,6 +27,7 @@ import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.FX;
@@ -92,13 +93,13 @@ public class PongEnvironment extends Player implements Environment {
 		a.epsilonRandomMin = 0.05f;
 
 		new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.');
+		//new MySTMClustered(nar, 16, '.');
 		new HappySad(nar, 8);
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 1024*8);
+		e.run(a, 240*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -237,12 +238,54 @@ public class PongEnvironment extends Player implements Environment {
 		}
 	}
 
-	public static Compound p(int x, int y) {
-		@NotNull Compound c = $.p(the(x), the(y));
-		//System.out.println(i + " (" + ax + "," + ay + ") " + c);
-		return c;
+
+	final Compound[][] pCache = new Compound[width][height];
+
+	public final Compound p(int x, int y) {
+		Compound e = pCache[x][y];
+		if (e == null) {
+			pCache[x][y] = e = _p(x, y);
+		}
+		return e;
+	}
+
+	public Compound _p(int x, int y) {
+		//return $.p(the(x), the(y));
+
+		int d = log2(Math.max(width, height));
+		Compound n = $.inh($.p(binaryp(x, d), binaryp(y, d)), $.the("w"));
+		System.out.println(" (" + x + "," + y + ") " + n);
+		return n;
+
+
+
 		//return inh(c, the("w"));
 		//return inst(c, the("w"));
+	}
+
+	public static int log2(int width) {
+		return (int)Math.ceil(Math.log(width)/Math.log(2));
+	}
+
+	public Term binaryp(int x, int depth) {
+		String s = Integer.toBinaryString(x);
+		int i = s.length()-1;
+		Term n = null;
+		for (int d = 0; d < depth; d++, i--) {
+			Atom next = (i<0 || s.charAt(i) == '0') ? $.the(0) : $.the(1);
+
+			//next = $.the( ((char)(d+'a')) + "" + next.toString());
+
+			if (n == null) {
+				//n = next;
+				n = $.p(next);
+				//n = $.p(next, $.varDep(0));
+			} else {
+				n = $.p(next, n);
+				//n = $.inh(n, next);
+			}
+		}
+		return n;
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package nars.nal.nal1;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
