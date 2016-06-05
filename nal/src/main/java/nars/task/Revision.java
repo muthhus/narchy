@@ -4,6 +4,7 @@ import com.gs.collections.api.tuple.primitive.FloatObjectPair;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;
+import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
@@ -127,11 +128,15 @@ public class Revision {
 //            return null;
 //
             //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+            @NotNull Budget bb = b.budget();
+
+            if (bb.isDeleted()) return null;
+
             Task solution = new MutableTask(b.term() /* question term in case it has different temporality */,
                     b.punc(), newTruth)
                     .time(now, newOcc)
                     .parent(b, a)
-                    .budget(b.budget())
+                    .budget(bb)
                     //.state(state())
                     //.setEvidence(evidence())
                     .log("Projected Answer")

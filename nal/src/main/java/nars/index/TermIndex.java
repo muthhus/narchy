@@ -34,6 +34,7 @@ import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.term.Termed.termOrNull;
 
 /**
  *
@@ -465,7 +466,7 @@ public interface TermIndex {
      * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
      */
     @Nullable
-    default Term _transform(@NotNull Compound src, @NotNull CompoundTransform<Compound, Term> trans) {
+    default Term _transform(@NotNull Compound src, @NotNull CompoundTransform trans) {
 
         int n = src.size();
 
@@ -479,7 +480,7 @@ public interface TermIndex {
             Term cx = x;
 
             if (trans.test(x)) {
-                cx = trans.apply(src, x).term();
+                cx = termOrNull(trans.apply(src, x));
             } else if (x instanceof Compound) {
                 cx = transform((Compound) x, trans); //recurse
             }

@@ -352,7 +352,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             int lowestUnsorted = updateExisting(each, s);
 
             if (lowestUnsorted != -1)  {
-                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, items.size());
+                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
             } // else: perfectly sorted
 
             removeDeletedAtBottom();
