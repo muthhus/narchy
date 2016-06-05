@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -21,9 +22,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            new UnifriedMap(initialSize)
+            //new UnifriedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
-            //new HashMap(initialSize)
+            new HashMap(initialSize)
         );
     }
 

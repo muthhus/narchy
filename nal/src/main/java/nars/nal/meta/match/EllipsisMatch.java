@@ -1,10 +1,7 @@
 package nars.nal.meta.match;
 
 import nars.Op;
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
-import nars.term.Terms;
+import nars.term.*;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,8 +81,12 @@ public final class EllipsisMatch extends TermVector implements Term {
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
-        forEach(x -> v.accept(x, parent));
+    public void recurseTerms(@NotNull SubtermVisitorX v, Compound parent) {
+        forEach(x -> x.recurseTerms(v, null /*this*/));
+    }
+    @Override
+    public void recurseTerms(@NotNull SubtermVisitor v) {
+        forEach(x -> x.recurseTerms(v));
     }
 
     @Override

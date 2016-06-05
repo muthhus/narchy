@@ -156,7 +156,7 @@ public enum $ {
     }
     @Nullable
     public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (Compound) the(IMPLICATION, -1, dt, TermVector.the(a, b));
+        return (Compound) compound(IMPLICATION, -1, dt, TermVector.the(a, b));
     }
 
     @Nullable
@@ -383,7 +383,7 @@ public enum $ {
     }
     @Nullable
     public static Term conj(int dt, Term... a) {
-        return the(CONJUNCTION, -1, dt, TermVector.the(a)); //must be a vector, not set
+        return compound(CONJUNCTION, -1, dt, TermVector.the(a)); //must be a vector, not set
     }
 
     @Nullable
@@ -541,7 +541,7 @@ public enum $ {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        return the(op, relation, DTERNAL, subterms);
+        return compound(op, relation, DTERNAL, subterms);
     }
     @Nullable
     public static Term the(@NotNull Op op, @NotNull TermContainer subterms) {
@@ -559,7 +559,7 @@ public enum $ {
 
 
     @Nullable
-    public static Term the(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
+    public static Term compound(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
         return terms.build(op, relation, dt, subterms);
     }
 

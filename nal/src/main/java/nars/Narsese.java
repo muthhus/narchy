@@ -560,7 +560,7 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
-        return $.the(o, -1, cycles, TermVector.the(subj, pred));
+        return $.compound(o, -1, cycles, TermVector.the(subj, pred));
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);

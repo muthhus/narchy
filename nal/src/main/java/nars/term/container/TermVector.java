@@ -4,14 +4,13 @@ import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.SubtermVisitor;
+import nars.term.SubtermVisitorX;
 import nars.term.Term;
 import nars.term.Terms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -286,7 +285,7 @@ public class TermVector implements TermContainer<Term>, Serializable {
         return (this == obj) || (obj instanceof TermContainer && equalTo((TermContainer) obj));
     }
 
-    public final void visit(@NotNull SubtermVisitor v, Compound parent) {
+    public final void visit(@NotNull SubtermVisitorX v, Compound parent) {
         for (Term t : term)
             v.accept(t, parent);
     }

@@ -302,7 +302,7 @@ public class PremiseRuleSet  {
     /** whether a rule will be forward permuted */
     static boolean forwardPermutes(@NotNull PremiseRule r) {
         boolean[] fwd = new boolean[] { true };
-        r.recurseTerms((s,c) -> {
+        r.recurseTerms((s) -> {
 
             if (!fwd[0])
                 return; //already disqualified

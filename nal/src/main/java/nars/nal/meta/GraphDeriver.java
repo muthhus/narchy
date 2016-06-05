@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import com.google.common.collect.Iterators;
+import com.gs.collections.impl.map.mutable.UnifiedMap;
 import nars.$;
 import nars.Global;
 import nars.nal.Deriver;
@@ -212,7 +213,7 @@ public class GraphDeriver extends Deriver {
                     @NotNull
                     @Override
                     public Map<String, String> getComponentAttributes(@NotNull DefaultWeightedEdge e) {
-                        Map<String, String> map =new UnifriedMap<>(1);
+                        Map<String, String> map =new UnifiedMap<>(1);
                         map.put("weight", Double.toString(g.getEdgeWeight(e)));
                         return map;
                     }

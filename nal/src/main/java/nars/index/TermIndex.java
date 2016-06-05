@@ -422,17 +422,17 @@ public interface TermIndex {
 
 
 //        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
-//        if (t instanceof Compound && ((Compound)t).hasTemporal())
-//            return t;
+        if (t instanceof Compound && ((Compound)t).hasTemporal())
+            return t;
 
-        return t;
+//        return t;
 
         //fast resolve to concept if not temporal:
-        //Termed existing = the(t);
-//        if (existing != null)
-//            return existing;
-//        else
-//            return t;
+        Termed existing = the(t);
+        if (existing != null)
+            return existing;
+        else
+            return t;
     }
 
 
@@ -440,6 +440,13 @@ public interface TermIndex {
 
     @Nullable
     default Term buildTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
+
+        /* early test for invalid statement: */
+        if (src.op().isStatement()) {
+            if ((newSubs.length!=2) || (newSubs[0].equals(newSubs[1])))
+                return null;
+        }
+
         return buildTransformed(src,
                 //theSubterms(
                         TermContainer.the(src.op(), newSubs)

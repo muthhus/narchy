@@ -1,9 +1,6 @@
 package nars.term.atom;
 
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
-import nars.term.Termlike;
+import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,8 +17,13 @@ public interface Atomic extends Term {
     String toString();
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
+    default void recurseTerms(@NotNull SubtermVisitorX v, Compound parent) {
         v.accept(this, parent);
+    }
+
+    @Override
+    default void recurseTerms(@NotNull SubtermVisitor v) {
+        v.accept(this);
     }
 
     @Override

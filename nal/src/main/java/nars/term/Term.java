@@ -73,11 +73,13 @@ public interface Term extends Termed, Termlike {
     @Override
     int hashCode();
 
-    default void recurseTerms(@NotNull SubtermVisitor v) {
+    void recurseTerms(@NotNull SubtermVisitor v);
+
+    default void recurseTerms(@NotNull SubtermVisitorX v) {
         recurseTerms(v, null);
     }
 
-    void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent);
+    void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent);
 
 
     /**

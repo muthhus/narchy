@@ -26,7 +26,6 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.Symbols;
 import nars.nal.Tense;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -71,7 +70,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
         Set<Term> t = Global.newHashSet(volume());
-        recurseTerms((t1, superterm) -> {
+        recurseTerms((t1) -> {
             if (t1.op() == onlyType)
                 t.add(t1);
         });
@@ -80,15 +79,15 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @NotNull
     default SetIterable<Term> recurseTermsToSet() {
-        UnifiedSet<Term> t = Global.newHashSet(volume());
-        recurseTerms((t1, superterm) -> t.add(t1));
+        UnifiedSet<Term> t = new UnifiedSet(volume());
+        recurseTerms(t::add);
         return t;
         //return t.toImmutable();
     }
     @NotNull
     default SetIterable<Term> recurseTermsToSet(int inStructure) {
-        UnifiedSet<Term> t = Global.newHashSet(0);
-        recurseTerms((s, superterm) -> {
+        UnifiedSet<Term> t = new UnifiedSet(0);
+        recurseTerms((s) -> {
             if ((s.structure() & inStructure) > 0)
                 t.add(s);
         });
@@ -97,11 +96,17 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v) {
+        v.accept(this);
+        subterms().forEach(a -> a.recurseTerms(v));
+    }
+
+    @Override
+    default void recurseTerms(@NotNull SubtermVisitorX v) {
         recurseTerms(v, this);
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent) {
+    default void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
         v.accept(this, parent);
         subterms().forEach(a -> a.recurseTerms(v, this));
     }

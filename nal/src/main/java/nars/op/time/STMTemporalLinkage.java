@@ -26,7 +26,9 @@ public final class STMTemporalLinkage extends STM {
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
         super(nar, new MutableInteger(capacity));
 
-        stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
+        //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
+        stm = new ArrayDeque<>(capacity);
+        //stm = new ConcurrentLinkedDeque<>();
 
         start();
 

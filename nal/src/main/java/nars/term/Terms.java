@@ -385,7 +385,7 @@ public class Terms   {
 
     public static int maxLevel(@NotNull Term term) {
         int[] max = {0};
-        term.recurseTerms((t, p) -> {
+        term.recurseTerms((t) -> {
             int m = t.op().minLevel;
             if (m > max[0])
                 max[0] = m;

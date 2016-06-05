@@ -274,8 +274,7 @@ public enum Op {
     }
 
     /** true if matches any of the on bits of the vector */
-    public boolean in(int vector) {
-
+    public final boolean in(int vector) {
         return in(bit, vector);
     }
 

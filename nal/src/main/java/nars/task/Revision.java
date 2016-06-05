@@ -225,8 +225,6 @@ public class Revision {
 
         if (adt != b.dt()) {
 
-
-
             int bdt = b.dt();
             if (adt != DTERNAL && bdt != DTERNAL) {
                 newDT = Math.round(Util.lerp(adt, bdt, balance));
@@ -250,13 +248,14 @@ public class Revision {
         if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {
             throw new RuntimeException();
         }
-        Compound d = $.compound(a.op(), new TermVector(
+
+        return (Compound)$.compound(a.op(), a.relation(), newDT, new TermVector(
                 (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
                 (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
         ));
-        if (a.op().temporal) //when would it not be temporal? this happens though
-            d = d.dt(newDT);
-        return d;
+        //if (a.op().temporal) //when would it not be temporal? this happens though
+            //d = d.dt(newDT);
+        //return d;
     }
 }
 

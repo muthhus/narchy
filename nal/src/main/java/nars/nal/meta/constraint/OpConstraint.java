@@ -18,6 +18,7 @@ public final class OpConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(Term assignee, @NotNull Term value, FindSubst f) {
+
         return value.op()!=op;
     }
 

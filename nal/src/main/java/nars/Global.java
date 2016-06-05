@@ -21,6 +21,7 @@
 package nars;
 
 
+import com.gs.collections.impl.map.mutable.UnifiedMap;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -32,10 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 /**
  * Global NAR operating parameters (static scope)
@@ -50,7 +49,6 @@ public enum Global {
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
-    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
@@ -63,8 +61,8 @@ public enum Global {
         it is enabled for unit tests automatically regardless of the value here.    */
     public static boolean DEBUG;
 
-    /** extra debugging checks */
-    public static final boolean DEBUG_PARANOID = false;
+    ///** extra debugging checks */
+    //public static final boolean DEBUG_PARANOID = false;
 
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
@@ -77,11 +75,11 @@ public enum Global {
     //public static final boolean DEBUG_REMOVED_CYCLIC_DERIVATIONS = false;
     //public static final boolean DEBUG_REMOVED_INSUFFICIENT_BUDGET_DERIVATIONS = false;
     //public static boolean DEBUG_DETECT_DUPLICATE_RULES;
-    public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
+    //public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 
 
-    static public final float maxForgetPeriod = 1000f; //TODO calculate based on budget epsilon etc
-    static public final float minForgetPeriod = 0.5f; //TODO calculate based on budget epsilon etc
+    static public final float maxForgetPeriod = 200f; //TODO calculate based on budget epsilon etc
+    static public final float minForgetPeriod = 0.75f; //TODO calculate based on budget epsilon etc
 
 
 
@@ -90,7 +88,7 @@ public enum Global {
      */
     public static float HORIZON = 1f;
 
-    public static float TRUTH_EPSILON = 0.01f;
+    public static final float TRUTH_EPSILON = 0.01f;
 
     /** how precise unit test results must match expected values to pass */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
@@ -98,7 +96,8 @@ public enum Global {
 
 
 
-    
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
+
     
     /* ---------- avoiding repeated reasoning ---------- */
         /** Maximum length of the evidental base of the Stamp, a power of 2 */
@@ -110,11 +109,6 @@ public enum Global {
 //     * set to zero to disable this feature.
 //     */
 //    public static float DISCOUNT_RATE = 0.5f;
-
-
-
-
-    @Deprecated public static final int THREADS = 1; //temporary parameter for setting #threads to use, globally
 
 
 
@@ -154,7 +148,7 @@ public enum Global {
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.0001f;
+    public static final float BUDGET_EPSILON = 0.0005f;
 
     /** minimum durability and quality necessary for a derivation to form */
     public static float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
@@ -176,19 +170,21 @@ public enum Global {
 
     @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
-        //return new UnifiedMap(capacity);
-        return new UnifriedMap(capacity /*, loadFactor */);
+        return new UnifiedMap(capacity);
+        //return new UnifriedMap(capacity /*, loadFactor */);
 
         //return new FasterHashMap(capacity);
         //return new FastMap<>(); //javolution http://javolution.org/apidocs/javolution/util/FastMap.html
-        //return new HashMap<>(capacity);
+        //return new HashMap<>(capacity); //doesn't work here, possiblye due to null value policy
         //return new LinkedHashMap(capacity);
     }
 
     /** copy */
     @NotNull
     public static <X,Y> Map<X, Y> newHashMap(Map<X, Y> xy) {
-        return new UnifriedMap(xy);
+        //return new UnifriedMap(xy);
+        return new UnifiedMap(xy);
+        //return new HashMap(xy);
     }
 
     @NotNull
@@ -204,10 +200,10 @@ public enum Global {
     }
 
     @NotNull
-    public static <X> UnifiedSet<X> newHashSet(int capacity) {
-        return new UnifiedSet(capacity);
+    public static <X> Set<X> newHashSet(int capacity) {
+        //return new UnifiedSet(capacity);
         //return new SimpleHashSet(capacity);
-        //return new HashSet(capacity);
+        return new HashSet(capacity);
         //return new LinkedHashSet(capacity);
     }
 
@@ -222,8 +218,8 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                new SoftReference<>(s);
-                //new WeakReference<>(s);
+                //new SoftReference<>(s);
+                new WeakReference<>(s);
                 //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 
