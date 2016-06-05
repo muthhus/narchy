@@ -50,12 +50,12 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 3;
+	final int visionRadius = 4;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 	private final int pacmanCyclesPerFrame = 8;
-	float bias = -0.05f; //pain of boredom
+	float bias = 0f; //pain of boredom
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -66,7 +66,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		Multi nar = new Multi(3,
+		Multi nar = new Multi(4,
 		//Default nar = new Default(
 				512, 8, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
@@ -288,13 +288,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		float ds = score - lastScore;
 		this.lastScore = score;
 
-		ds/=10f;
+		//ds/=2f;
 
 		ds += bias;
 
 		ds += interScore;
-		interScore *= 0.97f;
-		//interScore = 0;
+		interScore = 0;
 
 		if (ds > 1f) ds = 1f;
 		if (ds < -1f) ds = -1f;

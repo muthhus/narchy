@@ -41,10 +41,7 @@ public abstract class Budget implements Budgeted {
         float p = pri();
         return /*Float.isFinite(p)*/ (p==p) ? p : 0;
     }
-    public final float priIfFiniteElseNeg1() {
-        float p = pri();
-        return /*Float.isFinite(p)*/ (p==p) ? p : -1;
-    }
+
 
     public static String toString(@NotNull Budget b) {
 

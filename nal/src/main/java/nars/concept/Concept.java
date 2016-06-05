@@ -180,14 +180,13 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
 
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        if (initialScale <= 0f || b.isDeleted())
-            throw new RuntimeException("invalid budget: " + initialScale + " " + b.toString());
-            //return false;
+        float p = b.priIfFiniteElseNeg1();
+        if (p < 0)
+            return false;
 
-        float minScale =
-                nar.taskLinkThreshold.floatValue() / b.pri();
-
-        return (minScale==minScale /* fast NaN test */) && link(b, initialScale, minScale, nar, conceptOverflow);
+        return link(b, initialScale,
+                nar.taskLinkThreshold.floatValue() / p, //minScale
+                nar, conceptOverflow);
     }
 
     /**

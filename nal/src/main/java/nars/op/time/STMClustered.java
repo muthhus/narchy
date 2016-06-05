@@ -262,21 +262,17 @@ public class STMClustered extends STM {
 
         now = nar.time();
 
-        nar.onFrame(n -> {
-            //update each frame
-            bag.setCapacity(capacity.intValue());
-
-            try {
-                iterate();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
         start();
     }
 
+    @Override
+    protected void start() {
+        super.start();
+        nar.runAsync(this::iterate, 1);
+    }
+
     protected void iterate() {
+        bag.setCapacity(capacity.intValue());
 
         int rr = removed.size();
         for (int i = 0; i < rr; i++) {
@@ -287,6 +283,7 @@ public class STMClustered extends STM {
 
         now = nar.time();
         bag.commit();
+
 
         //net.compact();
 

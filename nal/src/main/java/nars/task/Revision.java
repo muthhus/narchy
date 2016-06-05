@@ -250,10 +250,13 @@ public class Revision {
         if (a0.op() != b.term(0).op() || (a1.op() != b.term(1).op())) {
             throw new RuntimeException();
         }
-        return $.compound(a.op(), new TermVector(
+        Compound d = $.compound(a.op(), new TermVector(
                 (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
                 (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
-        )).dt(newDT);
+        ));
+        if (a.op().temporal) //when would it not be temporal? this happens though
+            d = d.dt(newDT);
+        return d;
     }
 }
 

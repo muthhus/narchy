@@ -84,6 +84,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
+
+
+//    /** tasks which are to be executed asynchronously by the next frame's start. if the tasks
+//     * are not finished by then, it will wait for them before proceeding with the next frame.
+//     */
+//    private ThreadPoolExecutor asyncPerFrame = null;
+
     private static final ExecutorService asyncs = //shared
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
@@ -111,8 +118,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final transient Deque<Runnable> nextTasks = //new CopyOnWriteArrayList();
                                                     new ConcurrentLinkedDeque();
-
-
 
     private NARLoop loop;
 
@@ -592,6 +597,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Clock clock = this.clock;
 
         for (; frames > 0; frames--) {
+//            if (asyncPerFrame != null) {
+//                runAsyncFrameTasks();
+//            }
+
             clock.tick();
             emotion.frame();
 
@@ -602,6 +611,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     }
+
+//    private void runAsyncFrameTasks() {
+//        try {
+//            int active = asyncPerFrame.getActiveCount();
+//            if (active > 0) {
+//
+//                asyncPerFrame.awaitTermination(0, TimeUnit.MINUTES);
+//                //asyncPerFrame.shutdown();
+//                asyncPerFrame = null;
+//
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @NotNull
     public NAR trace(@NotNull Appendable out, Predicate<String> includeKey) {
@@ -773,12 +797,30 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         logger.trace("runAsyncs run {}", t);
 
         try {
-            Future<?> f = asyncs.submit(t);
-            return f;
+            return asyncs.submit(t);
         } catch (RejectedExecutionException e) {
-            logger.error("execAsync error {} in {}", t, e);
+            logger.error("runAsync error {} in {}", t, e);
             return null;
         }
+    }
+
+    public Future runAsync(Runnable t, int maxRunsPerFrame) {
+        final Semaphore s = new Semaphore(0);
+        onFrame(nn->{
+            int a = s.availablePermits();
+            if (a < maxRunsPerFrame)
+                s.release(maxRunsPerFrame-a);
+        });
+        return runAsync(()->{
+            while (true) {
+                try {
+                    s.acquire();
+                    t.run();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @NotNull
