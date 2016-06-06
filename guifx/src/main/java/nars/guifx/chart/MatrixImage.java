@@ -40,8 +40,8 @@ public class MatrixImage extends ImageView {
 
     public MatrixImage() {
         super();
-        maxWidth(Double.MAX_VALUE);
-        maxHeight(Double.MAX_VALUE);
+        //maxWidth(Double.MAX_VALUE);
+        //maxHeight(Double.MAX_VALUE);
 
 
         setSmooth(false);

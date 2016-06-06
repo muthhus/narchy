@@ -23,10 +23,13 @@ import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
+import nars.op.data.flat;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
@@ -43,6 +46,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -52,16 +56,17 @@ public class PongEnvironment extends Player implements Environment {
 
 	int actions = 3;
 
-	final int width = 20;
-	final int height = 20;
+
+	final int width = 32;
+	final int height = 22;
 	final int pixels = width * height;
-	final int scaleY = 20;
-	final int scaleX = 20;
+	final int scaleX = 22;
+	final int scaleY = 22;
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
-	float bias = 0f; //pain of boredom
+	float bias; //pain of boredom
 	private NAgent nagent;
 
 	public static void main (String[] args) {
@@ -69,18 +74,18 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
-		Multi nar = new Multi(4,
-		//Default nar = new Default(
-				512, 12, 1, 3, rng,
+		//Multi nar = new Multi(3,
+		Default nar = new Default(
+				768, 8, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.3f);
-		nar.beliefConfidence(0.99f);
-		nar.goalConfidence(0.99f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		//nar.conceptActivation.setValue(0.3f);
+		nar.beliefConfidence(0.95f);
+		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
@@ -90,16 +95,16 @@ public class PongEnvironment extends Player implements Environment {
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
-		a.epsilonRandomMin = 0.05f;
+		a.epsilonRandomMin = 0.02f;
 
 		new Abbreviation2(nar, "_");
-		//new MySTMClustered(nar, 16, '.');
+		new MySTMClustered(nar, 16, '.');
 		new HappySad(nar, 8);
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 240*8);
+		e.run(a, 2580*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -252,15 +257,82 @@ public class PongEnvironment extends Player implements Environment {
 	public Compound _p(int x, int y) {
 		//return $.p(the(x), the(y));
 
-		int d = log2(Math.max(width, height));
-		Compound n = $.inh($.p(binaryp(x, d), binaryp(y, d)), $.the("w"));
+//		int d = log2(Math.max(width, height));
+//		Compound n = $.inh($.p(binaryp(x, d), binaryp(y, d)), $.the("w"));
+//		System.out.println(" (" + x + "," + y + ") " + n);
+//		return n;
+
+		//int d = log2(Math.max(width, height));
+		Compound q = (Compound) quadp(x, y, width, height);
+		//Compound n = $.inh(q, $.the("w"));
+		Compound n = q;
+
 		System.out.println(" (" + x + "," + y + ") " + n);
 		return n;
 
 
-
 		//return inh(c, the("w"));
 		//return inst(c, the("w"));
+	}
+
+	private Term quadp(int x, int y, int width, int height) {
+		int cx = width/2;
+		int cy = height/2;
+
+		boolean left = x < cx;
+		boolean up = y < cy;
+
+
+		char c1 = (left ? 'l' : 'r');
+		char c2 = (up ? 'u' : 'd');
+		if (!left)
+			x -= cx;
+		if (!up)
+			y -= cy;
+
+		Atom dir = $.the(c1 + "" + c2);
+
+		if (width>1 || height > 1) {
+			Term q = quadp(x, y, width / 2, height / 2);
+			if (q!=null) {
+				//return $.p(dir, q);
+				return $.image(0, false, dir, q);
+			}
+			else {
+				//return $.p(dir);
+				return dir;
+			}
+		} else {
+			return null; //dir; //$.p(dir);
+		}
+	}
+
+	private Compound quadpFlat(int x, int y, int width, int height) {
+		int cx = width/2;
+		int cy = height/2;
+
+		boolean left = x < cx;
+		boolean up = y < cy;
+
+
+		char c1 = (left ? 'l' : 'r');
+		char c2 = (up ? 'u' : 'd');
+		if (!left)
+			x -= cx;
+		if (!up)
+			y -= cy;
+
+		Atom dir = $.the(c1 + "" + c2);
+
+		if (width>1 || height > 1) {
+			Compound q = quadpFlat(x, y, width / 2, height / 2);
+			if (q!=null)
+				return $.p(Terms.concat(new Term[] { dir }, q.terms()));
+			else
+				return $.p(dir);
+		} else {
+			return null; //dir; //$.p(dir);
+		}
 	}
 
 	public static int log2(int width) {
@@ -272,7 +344,7 @@ public class PongEnvironment extends Player implements Environment {
 		int i = s.length()-1;
 		Term n = null;
 		for (int d = 0; d < depth; d++, i--) {
-			Atom next = (i<0 || s.charAt(i) == '0') ? $.the(0) : $.the(1);
+			Atom next = $.the(i < 0 || s.charAt(i) == '0' ? 0 : 1);
 
 			//next = $.the( ((char)(d+'a')) + "" + next.toString());
 
@@ -386,7 +458,7 @@ public class PongEnvironment extends Player implements Environment {
 		}
 	}
 
-	int vel = 0;
+	int vel;
 
 	public void actRelativeVelocity(int action) {
 		switch (action) {

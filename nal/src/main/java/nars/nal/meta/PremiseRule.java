@@ -406,7 +406,13 @@ public class PremiseRule extends GenericCompound {
         char puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
+        if ((p.beliefTruth!=null) && (belief == null)) {
+            throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
+        }
         TruthOperator desire = DesireFunction.get(p.goalTruth);
+        if ((p.goalTruth!=null) && (desire == null)) {
+            throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
+        }
 
         Derive der = new Derive(rule, p.pattern,
                 belief != null && belief.single(),

@@ -222,12 +222,13 @@ public enum BeliefFunction implements TruthOperator {
     },
 
 
-    /*
-     sseehh__> there are 5 of these decompose used, but 8 possible permutations so the 3 which are missing are
-    <sseehh__> + + -
-    <sseehh__> - - +
-    <sseehh__> - + -
-     */
+    DecomposeNegativeNegativePositive() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+            if (B == null || T == null) return null;
+            return TruthFunctions.decompose(T, B, false, false, true, minConf);
+        }
+    },
 
     DecomposeNegativeNegativeNegative() {
         @Nullable
