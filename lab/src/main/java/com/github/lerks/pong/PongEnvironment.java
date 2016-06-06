@@ -9,10 +9,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.layout.BorderPane;
 import nars.$;
-import nars.Global;
 import nars.NAR;
-import nars.Symbols;
-import nars.concept.BooleanConcept;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
@@ -20,21 +17,17 @@ import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.nar.Multi;
-import nars.nar.util.Answerer;
-import nars.nar.util.OperationAnswerer;
-import nars.op.data.flat;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.FX;
 import nars.util.NAgent;
+import nars.vision.SwingCamera;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -42,12 +35,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.$.*;
@@ -57,17 +44,20 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 32;
-	final int height = 22;
+	final int width = 40;
+	final int height = 24;
 	final int pixels = width * height;
-	final int scaleX = 22;
-	final int scaleY = 22;
+	final int scaleX = 16;
+	final int scaleY = 16;
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
 
 	float bias; //pain of boredom
 	private NAgent nagent;
+	final SwingCamera swingCamera;
+
+
 
 	public static void main (String[] args) {
 		//Global.TRUTH_EPSILON = 0.2f;
@@ -135,6 +125,9 @@ public class PongEnvironment extends Player implements Environment {
 
 		j.setVisible(true);
 		j.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+
+
+		this.swingCamera = new SwingCamera(pong,width,height);
 
 		priMatrix = new MatrixImage();
 
@@ -367,34 +360,20 @@ public class PongEnvironment extends Player implements Environment {
 
 	float lastScore;
 
+
 	@Override
 	public float pre(int t, float[] ins) {
 
 		for (int i = 0; i < ticksPerFrame; i++)
 			pong.actionPerformed(null);
 
-		BufferedImage big =
-				ScreenImage.createImage(pong);
-
-		BufferedImage small = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
-		Graphics2D tGraphics2D = small.createGraphics(); //create a graphics object to paint to
-
-		tGraphics2D.fillRect( 0, 0, width, height );
-		tGraphics2D.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR );
-		tGraphics2D.drawImage( big, 0, 0, width, height, null ); //draw the image scaled
+		swingCamera.update((x,y,p)->{
+			int i = width * y + x;
+			int r = (p & 0x00ff0000) >> 16;
+			ins[i++] = r/255f;
+		});
 
 
-		int i = 0;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				int p = small.getRGB(x, y);
-				int r = (p & 0x00ff0000) >> 16;
-				//String c = r > 0 ? "XX" : "..";
-				//System.out.print(c);
-				ins[i++] = r/255f;
-			}
-			//System.out.println();
-		}
 
 
 		float score = points;
@@ -463,15 +442,14 @@ public class PongEnvironment extends Player implements Environment {
 	public void actRelativeVelocity(int action) {
 		switch (action) {
 			case 0:
-				vel = -PongModel.SPEED;
+				vel = -PongModel.SPEED*2;
 				break;
 			case 1:
 				vel = 0;
 				break;
 			case 2:
-				vel = +PongModel.SPEED;
+				vel = +PongModel.SPEED*2;
 				break;
-
 		}
 		move(vel, pong);
 	}

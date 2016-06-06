@@ -1,11 +1,8 @@
-package com.github.lerks.pong;
+package nars.vision;
 
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
-import java.util.List;
-import java.util.Arrays;
-import javax.imageio.*;
 import javax.swing.*;
 
 /*
@@ -53,7 +50,7 @@ public class ScreenImage
 	 *  @param  component Swing component to create image from
 	 *  @return	image the image for the given region
 	*/
-	public static BufferedImage createImage(JComponent component)
+	public static BufferedImage get(JComponent component, BufferedImage image)
 	{
 		Dimension d = component.getSize();
 
@@ -64,7 +61,7 @@ public class ScreenImage
 		}
 
 		Rectangle region = new Rectangle(0, 0, d.width, d.height);
-		return ScreenImage.createImage(component, region);
+		return ScreenImage.get(component, region, image);
 	}
 
 	/*
@@ -75,7 +72,7 @@ public class ScreenImage
 	 *  @param  region The region of the component to be captured to an image
 	 *  @return	image the image for the given region
 	*/
-	public static BufferedImage createImage(JComponent component, Rectangle region)
+	public static BufferedImage get(JComponent component, Rectangle region, BufferedImage image)
 	{
         //  Make sure the component has a size and has been layed out.
         //  (necessary check for components not added to a realized frame)
@@ -93,8 +90,12 @@ public class ScreenImage
 			layoutComponent( component );
 		}
 
-		BufferedImage image = new BufferedImage(region.width, region.height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2d = image.createGraphics();
+		if (image==null || image.getWidth()!=region.width || image.getHeight()!=region.height) {
+			image = new BufferedImage(region.width, region.height, BufferedImage.TYPE_INT_RGB);
+		}
+
+		//Graphics2D g2d = image.createGraphics();
+		Graphics2D g2d = (Graphics2D) image.getGraphics();
 
 		//  Paint a background for non-opaque components,
 		//  otherwise the background will be black
@@ -124,7 +125,7 @@ public class ScreenImage
 	{
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		Rectangle region = new Rectangle(0, 0, d.width, d.height);
-		return ScreenImage.createImage(region);
+		return ScreenImage.get(region);
 	}
 
 	/*
@@ -134,7 +135,7 @@ public class ScreenImage
 	 *  @return	image the image for the given region
 	 *  @exception AWTException see Robot class constructors
 	*/
-	public static BufferedImage createImage(Component component)
+	public static BufferedImage get(Component component)
 		throws AWTException
 	{
 		Point p = new Point(0, 0);
@@ -142,7 +143,7 @@ public class ScreenImage
 		Rectangle region = component.getBounds();
 		region.x = p.x;
 		region.y = p.y;
-		return ScreenImage.createImage(region);
+		return ScreenImage.get(region);
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class ScreenImage
 	 *  @return	image the image for the given region
 	 *  @exception AWTException see Robot class constructors
 	 */
-	public static BufferedImage createImage(Rectangle region)
+	public static BufferedImage get(Rectangle region)
 		throws AWTException
 	{
 		BufferedImage image = new Robot().createScreenCapture( region );
