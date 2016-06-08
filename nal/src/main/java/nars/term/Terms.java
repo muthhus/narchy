@@ -4,6 +4,7 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -20,6 +21,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * Static utility class for static methods related to Terms
@@ -33,7 +35,7 @@ public class Terms   {
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector ZeroSubterms = new TermVector((Term[])new Term[] { });
-    @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
+    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PRODUCT, -1, DTERNAL, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**

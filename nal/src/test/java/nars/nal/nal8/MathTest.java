@@ -12,7 +12,7 @@ public class MathTest {
     public void testAdd1() {
         Terminal t = new Terminal();
         t.log();
-        t.input("(add(1,2)<->result).");
+        t.input("(add(1,2,?x)<->result).");
         t.step();
     }
     @Test
@@ -28,7 +28,7 @@ public class MathTest {
         t.input("((&&,({$x} --> i),({$y} --> i)) ==> ({($x,$y),($y,$x)} --> j)).");
         t.run(1000);
 
-        t.input("(({(#x,#y)} --> j) ==> ({add(#x,#y)} --> i)).");
+        t.input("(({(#x,#y)} --> j) ==> ({add(#x,#y,?z)} --> i)).");
         t.run(1000);
 
         //t.input("(({#x,#y} --> i) && (add(#x,#y)<->sum)).");

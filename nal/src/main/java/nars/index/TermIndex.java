@@ -236,8 +236,10 @@ public interface TermIndex {
         if (sop.isStatement() && (sub.size() != 2 || sub.get(0).equals(sub.get(1))))
             return null; //transformed to degenerate statement
 
-        Term result = buildTransformed(crc, TermContainer.the(sop, sub));
+        return immediates(f, buildTransformed(crc, TermContainer.the(sop, sub)));
+    }
 
+    default Term immediates(@NotNull Subst f, Term result) {
         if (result instanceof Compound) {
 
             //post-process: apply any known immediate transform operators
@@ -248,26 +250,7 @@ public interface TermIndex {
                     result = applyImmediateTransform(f, cres, tf);
                 }
             }
-        } /*else {
-//            //why was it null?
-//            if (!sop.isStatement())
-//                System.err.println(crc + " " + TermContainer.the(sop, sub));
-
-
-            if (Global.DEBUG_PARANOID) {
-
-                //these should not happen
-
-                if (sop.isStatement() && sub.size() != 2) {
-                    throw new RuntimeException("transformed to degenerate statement");
-                } else if (sop.isImage()) {
-                    int resultSize = sub.size();
-                    if (resultSize == 0 || (resultSize == 1 && sub.get(0).equals(Imdex)))
-                        throw new RuntimeException("transformed to degenerate image");
-                }
-            }
-        }*/
-
+        }
         return result;
     }
 

@@ -16,35 +16,57 @@
  */
 package nars.op.math;
 
+import nars.$;
+import nars.index.TermIndex;
+import nars.nal.op.BinaryTermOperator;
+import nars.nal.op.ImmediateTermTransform;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atom;
+import nars.term.variable.Variable;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Count the number of elements in a set
- */
-public class add extends IntIntTo<Integer> {
+//public class add extends IntIntTo<Integer> {
+//
+//    @NotNull
+//    @Override protected Integer apply(int a, int b) {
+//        return a+b;
+//    }
+//}
+public class add extends ImmediateTermTransform {
 
-    @NotNull
-    @Override protected Integer apply(int a, int b) {
-        return a+b;
+    Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+        if (!(a instanceof Atom) || !(b instanceof Atom))
+            return null;
+
+
+        try {
+            int ia = Texts.i(a.toString());
+            int ib = Texts.i(b.toString());
+            return $.the(ia + ib);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Nullable
+    @Override
+    public Term function(Compound a, TermIndex i) {
+        Term x = a.term(0);
+        Term y = a.term(1);
+        Term r = a.size() > 2 ? a.term(2) : null;
+        Term z = apply(x, y, i);
+        if (z == null)
+            return a;
+        if (r == null) {
+            return z;
+        } else if (r instanceof Variable) {
+            return i.buildTransformed(a, new Term[] { x, y, z });
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }
-//public class add extends BinaryTermOperator {
-//
-//    @Override public @NotNull Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
-//        if (!(a instanceof Atom) || !(b instanceof Atom))
-//            return null;
-//
-//
-//        try {
-//            int ia = Texts.i(a.toString());
-//            int ib = Texts.i(b.toString());
-//            return $.the(ia + ib);
-//        }
-//        catch (Exception e) {
-//            return null;
-//        }
-//
-//
-//    }
-//
-//}

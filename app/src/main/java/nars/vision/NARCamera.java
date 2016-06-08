@@ -1,7 +1,6 @@
 package nars.vision;
 
-import com.gs.collections.api.tuple.primitive.IntIntPair;
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
+import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import nars.$;
 import nars.NAR;
 import nars.index.TermIndex;
@@ -17,7 +16,9 @@ public class NARCamera implements PixelCamera.PerPixel {
     private final PixelCamera cam;
     private final PixelToTerm pixelTerm;
 
-    final WeakHashMap<IntIntPair,Termed> terms = new WeakHashMap();
+    //final WeakHashMap<IntIntPair,Termed> terms = new WeakHashMap();
+    final LongObjectHashMap<Termed> terms = new LongObjectHashMap<>();
+
     private final TermIndex index;
     private PerPixel perPixel;
 
@@ -56,8 +57,20 @@ public class NARCamera implements PixelCamera.PerPixel {
     }
 
     public final Termed p(int x, int y) {
-        return terms.computeIfAbsent(PrimitiveTuples.pair(x, y),
-                xy -> index.the(pixelTerm.pixel(xy.getOne(), xy.getTwo())));
+        return terms.getIfAbsentPutWithKey(l(x, y),
+                xy -> index.the(pixelTerm.pixel(x(xy), y(xy))));
+    }
+
+    private int x(long xy) {
+        return (int)(xy >> 32);
+    }
+
+    private int y(long xy) {
+        return (int)(xy & 0x0000ffff);
+    }
+
+    static long l(int x, int y) {
+        return (((long)x) << 32) | ((long)y);
     }
 
 }

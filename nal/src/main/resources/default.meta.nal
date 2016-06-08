@@ -564,3 +564,14 @@
 //                                                  (S & P), (Belief:Intersection),
 //                                                  (P ~ S), (Belief:Difference)
 
+
+//DeMorgan's Law - currently implemented as a reduction but possibly should be a structural rule
+    //<sseehh__> it becomes more helpful when there are >2 terms, ex: (&&, --(x), --(y), --(z))
+    //<sseehh__> then it can replace N negations with one
+    //<sseehh__> then the compound and its opposite resolve to the same compound
+    //<patham9> if then I would add it as structural rule
+    //<patham9> not as "reduction"
+    //<patham9> meaning the system has free choice about the representation
+    //<patham9> should have
+    //<sseehh__> thats possible
+    //<patham9> and I wouldnt apply StructuralDeduction as truth

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
+import static java.util.Arrays.parallelSetAll;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.compound.Statement.pred;
@@ -53,9 +54,8 @@ public abstract class TermBuilder {
                 return instprop(u[0], u[1]);
 
             case CONJUNCTION:
-                return junction(CONJUNCTION, dt, u);
             case DISJUNCTION:
-                return junction(DISJUNCTION, dt, u);
+                return junction(op, dt, u);
 
             case IMAGE_INT:
             case IMAGE_EXT:
@@ -79,16 +79,21 @@ public abstract class TermBuilder {
             case INTERSECT_INT:
                 return newIntersectINT(u);
 
-            case SET_EXT:
-            case SET_INT:
-                if (u.length == 0)
-                    throw new InvalidTerm(op,u);
-                    //return null; /* emptyset */
+            case INHERIT:
+            case SIMILAR:
+            case EQUIV:
+            case IMPLICATION:
+                return statement(op, dt, u);
 
+            default:
+                if (u.length == 0) {
+                    if (op == PRODUCT)
+                        return Terms.ZeroProduct;
+                    else
+                        throw new InvalidTerm(op, u);
+                }
+                return finish(op, relation, dt, tt);
         }
-
-        return op.isStatement() ? statement(op, dt, u) : finish(op, relation, dt, tt);
-
     }
 
 

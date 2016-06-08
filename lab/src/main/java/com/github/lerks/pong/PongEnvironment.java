@@ -44,7 +44,7 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 40;
+	final int width = 24;
 	final int height = 24;
 	final int pixels = width * height;
 	final int scaleX = 16;
@@ -66,28 +66,28 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				768, 8, 1, 2, rng,
+				768, 6, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				new Indexes.WeakTermIndex(128 * 1024, rng)
+				new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.conceptActivation.setValue(0.3f);
-		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.97f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(256);
+		nar.cyclesPerFrame.set(512);
 
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
-		a.epsilonRandomMin = 0.02f;
+		a.epsilonRandomMin = 0.01f;
 
-		new Abbreviation2(nar, "_");
+		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		new HappySad(nar, 8);
 
@@ -289,11 +289,12 @@ public class PongEnvironment extends Player implements Environment {
 			Term q = quadp(x, y, width / 2, height / 2);
 			if (q!=null) {
 				//return $.p(dir, q);
-				return $.image(0, false, dir, q);
+				//return $.image(0, false, dir, $.sete(q));
+				return $.inh($.sete(q), dir);
 			}
 			else {
-				//return $.p(dir);
-				return dir;
+				return $.sete(dir);
+				//return dir;
 			}
 		} else {
 			return null; //dir; //$.p(dir);
