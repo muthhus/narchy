@@ -94,7 +94,7 @@ public class PongEnvironment extends Player implements Environment {
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
-		e.run(a, 2580*8);
+		e.run(a, 1024*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);

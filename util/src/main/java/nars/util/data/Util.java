@@ -633,9 +633,7 @@ public enum Util {
     public static float round(float value, float epsilon) {
 
         return clamp(
-                //Math.round(value / epsilon)
-                FastMath.round(value / epsilon)
-                        * epsilon);
+                Math.round(value / epsilon) * epsilon);
     }
 
     public static int hash(float f, int discretness) {

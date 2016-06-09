@@ -375,23 +375,25 @@ public abstract class TermBuilder {
 
 
         TreeSet<Term> s = new TreeSet();
-        UnifiedSet<Term> negs = new UnifiedSet(0);
+        //UnifiedSet<Term> negs = new UnifiedSet(0);
 
-        flatten(op, u, dt, s, negs);
+        UnifiedSet<Term> negs = flatten(op, u, dt, s, null);
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
-        if (op == DISJUNCTION && negs.anySatisfy(s::contains))
-            return null; //throw new InvalidTerm(op, u);
-        //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
+        if (negs!=null) {
+            if (op == DISJUNCTION && negs.anySatisfy(s::contains))
+                return null; //throw new InvalidTerm(op, u);
+            //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
 
 
-        //if all subterms negated; apply DeMorgan's Law
-        if ((dt == DTERNAL) && (negs.size() == s.size())) {
+            //if all subterms negated; apply DeMorgan's Law
+            if ((dt == DTERNAL) && (negs.size() == s.size())) {
 
-            op = op == CONJUNCTION ? DISJUNCTION : CONJUNCTION;
+                op = op == CONJUNCTION ? DISJUNCTION : CONJUNCTION;
 
-            Term nn = finish(op, -1, dt, TermSet.the(negs));
-            return build(NEGATE, nn);
+                Term nn = finish(op, -1, dt, TermSet.the(negs));
+                return build(NEGATE, nn);
+            }
         }
 
         return finish(op, -1, dt, TermSet.the(s));
@@ -399,17 +401,21 @@ public abstract class TermBuilder {
 
     }
 
-    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull Set<Term> unwrappedNegations) {
+    static UnifiedSet<Term> flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
         for (Term x : u) {
             if ((x.op() == op) && (((Compound) x).dt()==dt)) {
-                flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
+                unwrappedNegations = flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
             } else {
                 if (s.add(x)) { //ordinary term, add
-                    if (x.op() == NEGATE)
-                        unwrappedNegations.add(((Compound)x).term(0));
+                    if (x.op() == NEGATE) {
+                        if (unwrappedNegations == null)
+                            unwrappedNegations = new UnifiedSet<>(1);
+                        unwrappedNegations.add(((Compound) x).term(0));
+                    }
                 }
             }
         }
+        return unwrappedNegations;
     }
 
 
