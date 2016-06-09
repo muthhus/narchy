@@ -162,9 +162,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return xy.get(t);
     }
 
-
-
-
     public final boolean matchAll(@NotNull Term x, @NotNull Term y) {
         return matchAll(x, y, true);
     }

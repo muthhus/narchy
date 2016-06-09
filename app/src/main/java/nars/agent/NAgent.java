@@ -409,10 +409,10 @@ public class NAgent implements Agent {
         /*if (lastAction != nextAction)*/ {
 
             //belief/goal feedback levels
-            float off = 0.5f;
-            float preOff = 1f; //0.75f;
+            float off = 0.45f;
             float on = 1f;
-            float preOn = 0.5f; // 0.75f;
+            float preOff = on; //0.75f;
+            float preOn = off; // 0.75f;
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);

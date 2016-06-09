@@ -48,14 +48,14 @@ public enum TermLinkBuilder {
 
         for (int i = 0; i < ni; i++) {
 
-            Term ti = growComponent(host.term(i), 0, nar, components);
+            Termed ti = growComponent(host.term(i), 0, nar, components);
 
             if (ti instanceof Compound) {
 
                 Compound cti = (Compound) ti;
                 for (int j = 0, nj = cti.size(); j < nj; j++) {
 
-                    Term tj = growComponent(cti.term(j), 1, nar, components);
+                    Termed tj = growComponent(cti.term(j), 1, nar, components);
                     if (tj instanceof Compound) {
 
                         Compound ctj = (Compound) tj;
@@ -206,12 +206,8 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Term growComponent(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
+    protected static Termed growComponent(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
 
-        if (t.op() == Op.NEGATE) {
-            //unwrap negation to its content
-            t = ((Compound)t).term(0);
-        }
 
         if (t instanceof Variable) {
 
@@ -222,13 +218,12 @@ public enum TermLinkBuilder {
             return t;
         }
 
-
         Concept ct = nar.concept(t, true);
         if (ct == null) {
             return null;
         } else {
             target.add(ct);
-            return ct.term();
+            return ct;
         }
     }
 

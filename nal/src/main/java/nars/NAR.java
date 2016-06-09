@@ -950,16 +950,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
 
 
-        tt = index.validConceptTerm(tt);
+        tt = index.conceptTerm(tt);
         if (tt == null)
             return null;
 
         Termed c = createIfMissing ? index.the(tt) : index.get(tt);
         if (c == null)
             return null;
-        if (!(c instanceof Concept)) {
-            throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
-        }
+//        if (!(c instanceof Concept)) {
+//            throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
+//        }
         return (Concept) c;
 
     }

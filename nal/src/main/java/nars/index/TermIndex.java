@@ -519,7 +519,21 @@ public interface TermIndex {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    default Termed validConceptTerm(@NotNull Termed term) {
+    default Termed conceptTerm(@NotNull Termed term) {
+
+
+        if (term.op() == NEGATE) {
+            //unwrap negation
+            term = ((Compound)term).term(0);
+            if (term instanceof Atomic) {
+                //negations of non-DepVar atomics are invalid
+                if (term.op() != Op.VAR_DEP) {
+                    throw new InvalidConceptTerm(term);
+                }
+            }
+
+        }
+
 
         if (term instanceof Atomic) {
 
@@ -529,50 +543,13 @@ public interface TermIndex {
             return term;
 
         } else {
-            //COMPOUND -------
 
-
-            if (term.op() == NEGATE) {
-//                Term t0 = tc.term(0);
-//                if (t0 instanceof Atomic) {
-//                    //negations of non-DepVar atomics are invalid
-//                    if (t0.op() != Op.VAR_DEP) {
-//                        if (Global.DEBUG)
-//                            throw new InvalidConceptTerm(term);
-//                        else
-//                            return null;
-//                    }
-//                }
-                return null;
-            }
-
-            //NORMALIZATION
-            //Compound tc = (Compound) term.term();
             Termed prenormalized = term;
             if ((term = normalized(term)) == null)
                 throw new InvalidTerm(prenormalized);
 
             return atemporalize((Compound)term);
 
-//            //ANONYMIZATION
-//            //TODO ? put the unnormalized term for cached future normalizations?
-//            Termed anonymizedTerm = term.anonymous();
-//            if (anonymizedTerm != term) {
-//                //complete anonymization process
-//                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer))) {
-//                    if (Global.DEBUG)
-//                        throw new InvalidTerm((Compound) term);
-//                    else
-//                        return null;
-//                }
-//
-//                term = anonymizedTerm;
-//            }
-//
-//            if (term.term().isTemporal())
-//                throw new RuntimeException("anonymization failure");
-//
-//            return term;
         }
 
     }
