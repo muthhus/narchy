@@ -44,11 +44,11 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 24;
-	final int height = 24;
+	final int width = 16;
+	final int height = 16;
 	final int pixels = width * height;
-	final int scaleX = 16;
-	final int scaleY = 16;
+	final int scaleX = 24;
+	final int scaleY = 24;
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
@@ -66,7 +66,7 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				768, 6, 1, 2, rng,
+				1024, 6, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -74,13 +74,13 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.conceptActivation.setValue(0.3f);
-		nar.beliefConfidence(0.97f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.beliefConfidence(0.95f);
+		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(512);
+		nar.cyclesPerFrame.set(256);
 
 
 		NAgent a = new NAgent(nar);
@@ -117,6 +117,7 @@ public class PongEnvironment extends Player implements Environment {
 
 
 		pong = new PongModel(this, new Player.CPU_EASY());
+		this.position = (height*scaleY)/2;
 		pong.acceleration = false;
 		j.getContentPane ().add (pong);
 
@@ -293,8 +294,8 @@ public class PongEnvironment extends Player implements Environment {
 				return $.inh($.sete(q), dir);
 			}
 			else {
-				return $.sete(dir);
 				//return dir;
+				return $.sete(dir);
 			}
 		} else {
 			return null; //dir; //$.p(dir);

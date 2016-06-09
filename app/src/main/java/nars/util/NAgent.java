@@ -5,13 +5,11 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.data.array.Arrays;
@@ -401,12 +399,13 @@ public class NAgent implements Agent {
         this.nextAction = -1;
         float nextMotivation;
         if (Math.random() < epsilonRandom) {
-            nextAction = randomMotivation();
+            nextAction = -1;
         } else {
             nextAction = decideMotivation();
-            if (nextAction == -1)
-                nextAction = randomMotivation();
         }
+
+        if (nextAction == -1)
+            nextAction = randomMotivation();
 
         nextMotivation = motivation[nextAction];
 
@@ -452,6 +451,16 @@ public class NAgent implements Agent {
     }
 
     private int decideMotivation() {
+        //return decideMotivationMax();
+        return decideMotivationGreedyProb();
+    }
+
+    private int decideMotivationGreedyProb() {
+        return Util.randomNormalizedSample(motivation, nar.random);
+    }
+
+    /** decides action according to maximum motivation, but fairly (random if there is a tie) */
+    private int decideMotivationGreedy() {
         int nextAction = -1;
         boolean equalToPreviousAction = true;
         float nextMotivation = Float.NEGATIVE_INFINITY;
@@ -478,6 +487,7 @@ public class NAgent implements Agent {
             System.err.println("DECIDED " + nextAction);
 
         return nextAction;
+
     }
 
     private String actionConceptName(int i) {

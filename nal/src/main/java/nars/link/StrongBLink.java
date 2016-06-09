@@ -3,9 +3,7 @@ package nars.link;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by me on 5/29/16.
- */
+
 public class StrongBLink<X> extends DefaultBLink<X> {
 
     ///** the referred item */

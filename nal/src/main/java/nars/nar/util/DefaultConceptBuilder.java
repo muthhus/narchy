@@ -10,6 +10,7 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.link.BLink;
+import nars.link.StrongBLinkToBudgeted;
 import nars.link.WeakBLinkToBudgeted;
 import nars.task.Task;
 import nars.term.Compound;
@@ -47,11 +48,12 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 if (Op.isOperation(t))
                     return new OperationConcept(t, termbag(), taskbag());
                 break;
+
             case NEGATE:
                 return t; //return new NegationConcept(t, termbag, taskbag);
+
         }
 
-        //default:
         return new CompoundConcept(t, termbag(), taskbag());
     };
 
@@ -66,7 +68,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
             @NotNull
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
-                return new WeakBLinkToBudgeted<>(i, b, scale);
+                //return new WeakBLinkToBudgeted<>(i, b, scale);
+                return new StrongBLinkToBudgeted<>(i, b, scale);
             }
         }.merge(mergeDefault());
     }
