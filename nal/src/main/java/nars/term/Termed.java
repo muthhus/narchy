@@ -30,4 +30,6 @@ public interface Termed<T extends Term>  {
 
     default int volume() { return term().volume(); }
 
+    default int structure() { return term().structure(); }
+
 }

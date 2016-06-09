@@ -770,7 +770,6 @@ public enum $ {
 
         @NotNull @Override
         public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
-            //return new GenericCompound(op, relation, subterms).dt(dt);
             return new GenericCompound(op, relation, dt, (TermVector)subterms);
         }
 

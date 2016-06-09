@@ -164,14 +164,14 @@ public enum Op {
 
     }
 
-    public static boolean isOperation(@NotNull Termed t) {
-        if (t.op() == Op.INHERIT) {
+    public static boolean isOperation(@NotNull Termed _t) {
+        Term t = _t.term();
+        if (Op.hasAll(t.structure(), Op.OperationBits) && t.op() == Op.INHERIT) {
             Compound c = (Compound) t;
             return c.isTerm(1, Op.OPERATOR) &&
                    c.isTerm(0, Op.PRODUCT);
         }
         return false;
-                //(!c.impossibleStructureMatch(OperationBits)) &&
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {

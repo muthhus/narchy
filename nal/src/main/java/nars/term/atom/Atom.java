@@ -42,19 +42,11 @@ public class Atom extends AtomicStringConstant {
     }
 
 
-    public static final int AtomBit = Op.ATOM.bit;
-
-    @Override
-    public final int structure() {
-        return AtomBit;
-    }
-
-
     @Override
     public final int init(@NotNull int[] meta) {
 
         meta[4] ++; //volume
-        meta[5] |= AtomBit;
+        meta[5] |= structure();
 
         return hash;
     }

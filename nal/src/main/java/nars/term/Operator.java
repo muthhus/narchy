@@ -54,5 +54,4 @@ public final class Operator<T extends Term> extends Atom {
         return Op.OPERATOR;
     }
 
-
 }

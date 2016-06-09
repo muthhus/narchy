@@ -1,6 +1,7 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
+import com.gs.collections.api.set.ImmutableSet;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
@@ -13,12 +14,14 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEGATE;
+import static nars.Op.VAR_PATTERN;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -49,6 +52,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * does have a belief but it was not involved in determining Truth
      */
     public final boolean beliefSingle, goalSingle;
+    private ImmutableSet<Term> uniquePatternVar;
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
@@ -57,6 +61,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         this.conclusionPattern = term;
+        this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.temporalizer = temporalizer;
         this.beliefSingle = beliefSingle;
         this.goalSingle = goalSingle;
@@ -97,14 +102,16 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @Override
     public final void accept(@NotNull PremiseEval m) {
 
-        Term raw = m.resolve(conclusionPattern);
-        if (!(raw instanceof Compound)) //includes null test
-            return;
+//        if (!uniquePatternVar.allSatisfy(m.xy::containsKey))
+//            return;
 
-        if (raw.varPattern() != 0)
-            return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
+        Term r = m.resolve(conclusionPattern);
+        if (r instanceof Compound) { //includes null test
 
-        derive(m, raw);
+            // if (r.varPattern() != 0) return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
+
+            derive(m, r);
+        }
 
     }
 

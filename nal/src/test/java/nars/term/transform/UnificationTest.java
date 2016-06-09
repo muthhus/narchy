@@ -186,14 +186,14 @@ public class UnificationTest {
         );
     }
 
-    @Test
-    public void unification4() {
-        test(Op.VAR_PATTERN,
-                "<(%1,%2,%3,$1) --> wu>",
-                "<(%1,lol2,%1,$1) --> wu>",
-                true
-        );
-    }
+//    @Test
+//    public void unification4() {
+//        test(Op.VAR_PATTERN,
+//                "<(%1,%2,%3,$1) --> wu>",
+//                "<(%1,lol2,%1,$1) --> wu>",
+//                true
+//        );
+//    }
 
 
     @Test

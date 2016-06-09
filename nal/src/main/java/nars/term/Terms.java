@@ -1,6 +1,8 @@
 package nars.term;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -541,4 +543,15 @@ public class Terms   {
             return false;
         }
     }
+
+    public static ImmutableSet<Term> unique(Term c, Predicate<Term> p) {
+        UnifiedSet<Term> u = new UnifiedSet();
+        c.recurseTerms(x -> {
+            if (p.test(x)) {
+                u.add(x);
+            }
+        });
+        return u.toImmutable();
+    }
+
 }

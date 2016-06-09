@@ -164,10 +164,6 @@ public interface TermIndex {
     @Nullable
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
-        //if (src == null)
-            //throw new NullPointerException();
-        //return null; //pass-through
-
         //constant atom or zero-length compound, ex: ()
         int len = src.size();
         boolean variable;
@@ -178,21 +174,28 @@ public interface TermIndex {
             variable = false;
         }
 
+        Op sop = src.op();
 
         Term y = f.term(src);
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
-        else if (variable)
-            return null; //unassigned variable
+        else if (variable) {
+            if (sop == VAR_PATTERN)
+                return null; //unassigned pattern variable
+            else
+                return src; //unassigned but literal non-pattern var
+        }
+
+        boolean strict = f instanceof PremiseEval;
 
         Compound crc = (Compound) src;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
 
-        boolean changed = false;
         for (int i = 0; i < len; i++) {
             Term t = crc.term(i);
             Term u = resolve(t, f);
+
 
             if (u instanceof EllipsisMatch) {
 
@@ -200,9 +203,7 @@ public interface TermIndex {
 //                    return src; //invalid transformation, violated arity constraint
 //                }
 
-                Term[] ee = ((EllipsisMatch) u).term;
-                Collections.addAll(sub, ee);
-                changed = true; //just assume it was changed
+                Collections.addAll(sub, ((EllipsisMatch) u).term);
 
             } else {
 
@@ -210,23 +211,22 @@ public interface TermIndex {
                 //                    return src; //invalid transformation, violates arity constraint
                 //                }
 
-                if (t!=u) {
-                    if (u == null) {
-                        u = t; //keep value
-                    } else {//!changed && !t.equals(u)) {
-                        changed = true; //check for any changes
-                    }
+                if (u == null) {
+
+                    if (strict)
+                        return null;
+
+                    u = t; //keep value
+
                 }
 
                 sub.add(u);
             }
         }
 
-        if (!changed)
-            return src;
 
         //Prefilters
-        Op sop = src.op();
+
 
         //Prefilters?
         //        if ((minArity!=-1) && (resultSize < minArity)) {
@@ -587,7 +587,7 @@ public interface TermIndex {
 
     @NotNull
     default Term remap(Map<Term, Term> m, @NotNull Term src) {
-        return resolve(src, new MapSubst(m)).term();
+        return termOrNull(resolve(src, new MapSubst(m)));
     }
 
     default Termed remove(Termed entry) {
