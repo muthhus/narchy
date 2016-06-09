@@ -636,7 +636,7 @@ public interface TermIndex {
         return (Compound) transform(c.dt(DTERNAL), CompoundAtemporalizer);
     }
 
-    @Nullable CompoundTransform CompoundAtemporalizer = new CompoundTransform<>() {
+    @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<Compound,Term>() {
 
         @Override
         public boolean test(Term term) {

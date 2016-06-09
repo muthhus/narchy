@@ -13,7 +13,7 @@ import nars.NARLoop;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
-import nars.index.GroupedMapIndex;
+import nars.index.Indexes;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -221,9 +221,10 @@ public class WebServer /*extends PathHandler*/ {
         int numConceptsPerCycle = 32;
 
         Default nar = new Default(1024, numConceptsPerCycle, 3, 3, random,
-                new GroupedMapIndex(
-                    new SoftValueHashMap(256*1024),
-                    new DefaultConceptBuilder(random)),
+                new Indexes.WeakTermIndex(256*1024,random),
+//                new GroupedMapIndex(
+//                    new SoftValueHashMap(256*1024),
+//                    new DefaultConceptBuilder(random)),
                 new RealtimeMSClock()
         );
 

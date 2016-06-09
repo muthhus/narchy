@@ -47,7 +47,7 @@ public class MeshRectangleDemo extends Application {
         final Group root = new Group(rect);
         final Scene scene = new Scene(root, 500, 500, true);
 
-        scene.setOnMousePressed(new EventHandler<>() {
+        scene.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 anchorX = event.getSceneX();
@@ -56,7 +56,7 @@ public class MeshRectangleDemo extends Application {
             }
         });
 
-        scene.setOnMouseDragged(new EventHandler<>() {
+        scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 rect.setRotate(anchorAngle + anchorX - event.getSceneX());

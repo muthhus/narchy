@@ -23,7 +23,7 @@ public final class On<V> {
     @Override
     public String toString() {
         return "On{" +
-                topic.name() +
+                topic +
                 '}';
     }
 }

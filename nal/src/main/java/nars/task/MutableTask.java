@@ -25,7 +25,7 @@ public class MutableTask extends AbstractTask {
     }
 
     public MutableTask(@NotNull String compoundTermString, char punct, @Nullable Truth truth) throws Narsese.NarseseException {
-        this($.$(compoundTermString), punct, truth);
+        this((Compound)$.$(compoundTermString), punct, truth);
     }
 
 

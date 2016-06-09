@@ -7,6 +7,7 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -88,7 +89,7 @@ public class QuestionTest {
             }
         };
 
-        nar.ask($.$("add(1, 2, #x)"));
+        nar.ask((Compound)$.$("add(1, 2, #x)"));
 
         assertEquals(3, s[0]);
 
@@ -105,7 +106,7 @@ public class QuestionTest {
             }
         };
 
-        nar.ask($.$("add(1, 2, #x)"));
+        nar.ask((Compound)$.$("add(1, 2, #x)"));
 
 
     }

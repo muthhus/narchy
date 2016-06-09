@@ -22,32 +22,32 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 //        topics.remove(t.name());
 //    }
 
-    static AtomicInteger topicSerial = new AtomicInteger();
-    static int nextTopicID() {
-        return topicSerial.incrementAndGet();
-    }
+//    static AtomicInteger topicSerial = new AtomicInteger();
+//    static int nextTopicID() {
+//        return topicSerial.incrementAndGet();
+//    }
 
-    final String id;
+//    final String id;
 
-    @Override
-    public String name() {
-        return id;
-    }
+//    @Override
+//    public String name() {
+//        return id;
+//    }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+//    @Override
+//    public String toString() {
+//        return super.toString();
+//    }
+
+//    public DefaultTopic() {
+//        this(Integer.toString(nextTopicID(), 36));
+//    }
+
+
 
     public DefaultTopic() {
-        this(Integer.toString(nextTopicID(), 36));
-    }
-
-
-
-    DefaultTopic(String id) {
         super(Consumer[]::new);
-        this.id = id;
+        //this.id = id;
         //register(this);
     }
 
@@ -66,7 +66,7 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 
     @Override
     public final On on(Consumer<V> o) {
-        On d = new On(this,o);
+        On<V> d = new On<>(this,o);
         add(o);
         return d;
     }

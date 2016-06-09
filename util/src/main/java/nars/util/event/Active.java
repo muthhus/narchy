@@ -8,7 +8,7 @@ import java.util.Collections;
  * essentially holds a list of registrations but forms an activity context
  * from the dynamics of its event reactivity
  */
-public class Active extends FasterList<On> {
+public class Active extends FasterList<On<?>> {
 
     Active(int length) {
         super(length);
@@ -18,7 +18,7 @@ public class Active extends FasterList<On> {
         this(1);
     }
 
-    public Active(On... r) {
+    public Active(On<?>... r) {
         super(r.length);
         Collections.addAll(this, r);
     }
@@ -31,7 +31,7 @@ public class Active extends FasterList<On> {
         clear();
     }
 
-    public Active add(On... elements) {
+    public Active add(On<?>... elements) {
         Collections.addAll(this, elements);
         return this;
     }

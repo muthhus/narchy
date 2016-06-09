@@ -25,7 +25,7 @@ public interface Topic<V> {
     static void each(Object obj, Consumer<Field /* fieldName*/> f) {
         /** TODO cache the fields because reflection may be slow */
         for (Field field : obj.getClass().getFields()) {
-            Class returnType = field.getType();
+            Class<?> returnType = field.getType();
             if (returnType.equals(Topic.class)) {
                 f.accept(field);
             }
@@ -36,8 +36,10 @@ public interface Topic<V> {
     }
 
 
-    /** registers to all public Topic fields in an object */
-    static Active all(Object obj, BiConsumer<String /* fieldName*/, Object /* value */> f, Predicate<String> includeKey) {
+    /** registers to all public Topic fields in an object
+     * BiConsumer<String  fieldName, Object  value >
+     * */
+    static Active all(Object obj, BiConsumer<String, Object> f, Predicate<String> includeKey) {
 
         Active s = new Active();
 
@@ -47,7 +49,7 @@ public interface Topic<V> {
                 return;
 
             try {
-                Topic t = ((Topic) field.get(obj));
+                Topic<?> t = ((Topic) field.get(obj));
 
                 // could send start message: f.accept(f.getName(),  );
 
@@ -75,21 +77,21 @@ public interface Topic<V> {
     @NotNull On on(@NotNull Consumer<V> o);
     void off(@NotNull On<V> reaction);
 
-    @SafeVarargs
-    static <V> Active onAll(@NotNull Consumer<V> o, Topic<V>... w) {
-        Active r = new Active(w.length);
-    
-        for (Topic<V> c : w)
-            r.add( c.on(o) );
-        
-        return r;
-    }
+//    @SafeVarargs
+//    static <V> Active onAll(@NotNull Consumer<V> o, Topic... w) {
+//        Active r = new Active(w.length);
+//
+//        for (Topic<V> c : w)
+//            r.add( c.on(o) );
+//
+//        return r;
+//    }
 
     int size();
 
     boolean isEmpty();
 
-    String name();
+//    String name();
 
 
 //

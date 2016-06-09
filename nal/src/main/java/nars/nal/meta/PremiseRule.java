@@ -135,7 +135,7 @@ public class PremiseRule extends GenericCompound {
 
     private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
     @Nullable
-    private static final CompoundTransform truthSwap = new CompoundTransform<>() {
+    private static final CompoundTransform<Compound,Term> truthSwap = new CompoundTransform<Compound,Term>() {
 
         final Atom belief = $.the("Belief");
         final Atom desire = $.the("Desire");

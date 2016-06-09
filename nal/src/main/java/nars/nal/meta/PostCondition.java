@@ -43,7 +43,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     }
 
 
-    public static final Set<Atom> reservedMetaInfoCategories = new HashSet<>() {{
+    public static final Set<Atom> reservedMetaInfoCategories = new HashSet<Atom>() {{
         add(the("Belief"));
         add(the("Stamp"));
         add(the("Desire"));

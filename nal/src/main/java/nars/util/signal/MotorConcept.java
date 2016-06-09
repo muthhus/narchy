@@ -58,7 +58,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     float nextFeedback;
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
-        this($(compoundTermString), n, motor);
+        this((Compound)$(compoundTermString), n, motor);
     }
     public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         super(term, n);

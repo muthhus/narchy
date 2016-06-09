@@ -48,7 +48,7 @@ public class Shell {
         //errReader.start();
         reader.start();
 
-        logger.info("started {}", proc.getPid());
+        logger.info("started"/*, proc.getPid()*/);
 
     }
 

@@ -79,7 +79,7 @@ public class NARNotes extends BorderPane {
 
             //setTop(new HBox(edit = new TextArea(), inputButton = new Button("->")));
             //edit.setPrefRowCount(1);
-            TaskButton title = new TaskButton<>(t, nar) {
+            TaskButton title = new TaskButton(t, nar) {
                 @Override
                 public boolean scalesText() {
                     return false;
