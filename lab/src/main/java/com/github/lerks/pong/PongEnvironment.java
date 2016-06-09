@@ -17,7 +17,6 @@ import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -26,7 +25,7 @@ import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
 import nars.util.FX;
-import nars.util.NAgent;
+import nars.agent.NAgent;
 import nars.vision.SwingCamera;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
@@ -85,7 +84,6 @@ public class PongEnvironment extends Player implements Environment {
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
-		a.epsilonRandomMin = 0.01f;
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');

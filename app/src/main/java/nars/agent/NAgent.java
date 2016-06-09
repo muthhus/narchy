@@ -1,4 +1,4 @@
-package nars.util;
+package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.NAR;
@@ -11,8 +11,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.util.data.Util;
-import nars.util.data.array.Arrays;
+import nars.util.Texts;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
@@ -41,7 +40,6 @@ public class NAgent implements Agent {
     private IntFunction<Compound> sensorNamer = null;
 
     float motivation[];
-    int motivationOrder[];
 
     float input[];
 
@@ -63,8 +61,6 @@ public class NAgent implements Agent {
      * exploration rate - confidence of initial goal for each action
      */
     public float epsilon = 0.1f;
-    float epsilonRandom = 0.1f; //0.01f;
-    public float epsilonRandomMin = 0.0f; //0.01f;
     float epsilonRandomDecay = 0.99f; //0.01f;
 
     float sensorPriority;
@@ -91,10 +87,16 @@ public class NAgent implements Agent {
     private Budgeted ActionAttentionPerFrame = b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
+    private DecideAction decideAction;
 
 
     public NAgent(NAR n) {
+        this(n, new DecideActionSoftmax());
+    }
+
+    public NAgent(NAR n, DecideAction decideAction) {
         this.nar = n;
+        this.decideAction = decideAction;
     }
 
     @Override
@@ -109,9 +111,7 @@ public class NAgent implements Agent {
         gamma = nar.confidenceDefault(Symbols.GOAL);
 
         motivation = new float[actions];
-        motivationOrder = new int[actions];
-        for (int i = 0; i < actions; i++)
-            motivationOrder[i] = i;
+
 
         input = new float[inputs];
 
@@ -359,8 +359,6 @@ public class NAgent implements Agent {
 
         decide(this.lastAction);
 
-        epsilonRandom *= epsilonRandomDecay;
-        epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
 
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
@@ -398,11 +396,8 @@ public class NAgent implements Agent {
     private void decide(int lastAction) {
         this.nextAction = -1;
         float nextMotivation;
-        if (Math.random() < epsilonRandom) {
-            nextAction = -1;
-        } else {
-            nextAction = decideMotivation();
-        }
+
+        nextAction = decideMotivation();
 
         if (nextAction == -1)
             nextAction = randomMotivation();
@@ -454,45 +449,10 @@ public class NAgent implements Agent {
         return (int) (Math.random() * actions.size());
     }
 
-    private int decideMotivation() {
-        //return decideMotivationMax();
-        return decideMotivationGreedyProb();
+    private final int decideMotivation() {
+        return decideAction.decideAction(motivation, lastAction, nar.random);
     }
 
-    private int decideMotivationGreedyProb() {
-        return Util.randomNormalizedSample(motivation, nar.random);
-    }
-
-    /** decides action according to maximum motivation, but fairly (random if there is a tie) */
-    private int decideMotivationGreedy() {
-        int nextAction = -1;
-        boolean equalToPreviousAction = true;
-        float nextMotivation = Float.NEGATIVE_INFINITY;
-
-        Arrays.shuffle(motivationOrder, nar.random);
-
-        for (int j = 0; j < motivation.length; j++) {
-            int i = motivationOrder[j];
-            float m = motivation[i];
-
-            if (m > nextMotivation) {
-                nextAction = i;
-                nextMotivation = m;
-            }
-            if (equalToPreviousAction && j > 0 && !Util.equals(m, motivation[motivationOrder[j - 1]])) {
-                equalToPreviousAction = false; //there is some variation
-            }
-
-        }
-        if (equalToPreviousAction) //all equal?
-            return lastAction;
-
-        if (nextAction!=lastAction)
-            System.err.println("DECIDED " + nextAction);
-
-        return nextAction;
-
-    }
 
     private String actionConceptName(int i) {
         return "(a" + i + ")";

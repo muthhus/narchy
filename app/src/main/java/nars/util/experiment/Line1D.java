@@ -8,7 +8,7 @@ import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
-import nars.util.NAgent;
+import nars.agent.NAgent;
 
 import java.util.Arrays;
 

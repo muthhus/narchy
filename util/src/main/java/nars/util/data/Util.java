@@ -926,6 +926,9 @@ public enum Util {
     public static double normalize(double x, double min, double max) {
         return (x - min) / (max - min);
     }
+    public static float normalize(float x, float min, float max) {
+        return (x - min) / (max - min);
+    }
 
     public static int lastNonNull(Object... x) {
         int j = -1;
@@ -994,46 +997,15 @@ public enum Util {
         return f;
     }
 
-    public static int randomNormalizedSample(float[] x, Random random) {
-        /*if (x.length == 1)
-            return 0;*/
-
-        float[] mms = minmaxsum(x);
-        float min = mms[0];
-        float max = mms[1];
-        float range = max - min;
-
-        if (Util.equals(min, max))
-            return random.nextInt(x.length);
-
-        float normSum = 0;
-        for (float v : x) {
-            normSum += (v - min)/range;
-        }
-
-        float r = random.nextFloat() * normSum;
-
-        for (int i = x.length-1; i >= 1; i--) {
-            float v = (x[i] - min)/range;
-            r -= v;
-            if (r <= 0)
-                return i;
-        }
-
-        return 0;
-
-        //throw new ArithmeticException();
-    }
-
-    private static float[] minmaxsum(float[] x) {
-        float sum = 0;
+    public static float[] minmax(float[] x) {
+        //float sum = 0;
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;
         for (float y : x) {
-            sum += y;
+            //sum += y;
             if (y < min) min = y;
             if (y > max) max = y;
         }
-        return new float[] { min, max, sum };
+        return new float[] { min, max/*, sum */};
     }
 }

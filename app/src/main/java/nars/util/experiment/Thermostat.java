@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
 import nars.nar.Default;
-import nars.util.NAgent;
+import nars.agent.NAgent;
 import nars.util.Optimize;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;

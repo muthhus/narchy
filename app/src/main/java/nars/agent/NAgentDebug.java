@@ -1,4 +1,4 @@
-package nars.util;
+package nars.agent;
 
 import nars.Global;
 import nars.NAR;
