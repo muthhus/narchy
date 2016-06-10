@@ -1,6 +1,5 @@
 package nars.truth;
 
-import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.Symbols;
@@ -91,10 +90,7 @@ public enum DesireFunction implements TruthOperator {
     static final Map<Term, TruthOperator> atomToTruthModifier = Global.newHashMap(DesireFunction.values().length);
 
     static {
-        for (DesireFunction tm : DesireFunction.values()) {
-            atomToTruthModifier.put($.the(tm.toString()), tm);
-            atomToTruthModifier.put($.the(tm.toString() + 'X'), TruthOperator.inverse(tm));
-        }
+        TruthOperator.permuteTruth(DesireFunction.values(), atomToTruthModifier);
     }
 
 

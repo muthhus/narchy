@@ -667,7 +667,7 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
-                //.log()
+                .log()
                 .input("(--,(R))!")
                 .input("((G) <-> (R)).")
                 .mustDesire(cycles, "(G)", 0.0f, 0.81f);

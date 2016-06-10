@@ -164,11 +164,14 @@ public interface TermIndex {
     @Nullable
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
+        boolean strict = f instanceof PremiseEval;
+
         //constant atom or zero-length compound, ex: ()
         int len = src.size();
         boolean variable;
         if (len == 0) {
-            if (!(variable = (src instanceof Variable)))
+            variable = (src instanceof Variable);
+            if (strict && !(variable))
                 return src; //constant term, of which none should be mapped in the subst
         } else {
             variable = false;
@@ -184,9 +187,10 @@ public interface TermIndex {
                 return null; //unassigned pattern variable
             else
                 return src; //unassigned but literal non-pattern var
+        } else if (!strict && len == 0) {
+            return src;
         }
 
-        boolean strict = f instanceof PremiseEval;
 
         Compound crc = (Compound) src;
 
@@ -562,8 +566,7 @@ public interface TermIndex {
         return "";
     }
 
-    @NotNull
-    default Term remap(Map<Term, Term> m, @NotNull Term src) {
+    default Term remap(@NotNull Term src, Map<Term, Term> m) {
         return termOrNull(resolve(src, new MapSubst(m)));
     }
 

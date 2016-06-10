@@ -5,45 +5,14 @@
 // Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
 // --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
 
-//// Revision ////////////////////////////////////////////////////////////////////////////////////
-// When a given belief is challenged by new experience, a new belief2 with same content (and disjoint evidental base),
-// a new revised task, which sums up the evidence of both belief and belief2 is derived:
-
-//   A, A |- A, (Belief:Revision) (Commented out because it is already handled by belief management in java)
-
 //Similarity to Inheritance
 
     (S --> P), (S <-> P), task("?") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Judgment)
 
 
 //desire spreading by similarity
-         S, (S <-> P), task("!") |- P, (Desire:Intersection, Punctuation:Goal)
-    (--,S), (S <-> P), task("!") |- (--,P), (Desire:Intersection, Punctuation:Goal)
+     S, (S <-> P), task("!") |- P, (Desire:Intersection)
 
-//// Immediate Inference ////////////////////////////////////////////////////////////////////////////////////
-
-//  --A,   A, task("?") |- --A, (Belief:BeliefNegation, Punctuation:Judgment)
-//    A, --A, task("?") |-   A, (Belief:BeliefNegation, Punctuation:Judgment)
-
-//A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
-
-//    A, A, task(negative) |- --A, (Belief:Negation, Desire:Negation)
-//    --A, A, task(positive) |- A, (Belief:Negation, Desire:Negation)
-
-//    (A-->B), (A-->B), task(negative) |- (--,(A --> B)), (Belief:Negation, Desire:Negation)
-//    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-//    (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-
-//  --(A --> B), A |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-//  --(A --> B), B |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-
-//    (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-// --(A <-> B), A |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-
-
-//Product negation TODO use var arg:
-//    (A), A, task(negative) |- (--, (A)), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-//    (--, (A)), A |- (A), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
 
 //Set Definition Similarity to Inheritance
@@ -135,24 +104,16 @@
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
          (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
-    (--,(S --> M)), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposeNegativeNegativeNegative)
          (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
-    (--,(S --> M)), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposePositivePositivePositive)
 
          (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
-    (--,(S --> M)), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativePositive)
          (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
-    (--,(S --> M)), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposePositiveNegativeNegative)
 
          (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-    (--,(M --> S)), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposeNegativeNegativeNegative)
          (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
-    (--,(M --> S)), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposePositivePositivePositive)
 
          (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
-    (--,(M --> S)), (M --> (S - P)) |- (M --> P), (Belief:DecomposeNegativeNegativePositive)
          (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
-    (--,(M --> S)), (M --> (P - S)) |- (M --> P), (Belief:DecomposePositiveNegativeNegative)
 
 
 //Set comprehension:
@@ -502,16 +463,12 @@
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 
     (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
-        (--,(B --> (/,M, A.._=B..+, _))), M |- ((A.._=B..+) --> M), (Belief:Negation, Desire:Negation)
 
     ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
-        (--,((A..B=_..+) --> M)), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Negation, Desire:Negation)
 
     (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
-        (--,(M --> (A..B=_..+))), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Negation, Desire:Negation)
 
     ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
-        (--,((\, M, A.._=B..+, _ ) --> B)), M |- (M --> (A.._=B..+)), (Belief:Negation, Desire:Negation)
 
 //Recursion Force - TODO use varargs
 

@@ -24,9 +24,10 @@ import nars.op.math.add;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
@@ -44,7 +45,6 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
-import static nars.Op.INHERIT;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
@@ -134,35 +134,17 @@ public class PremiseRule extends GenericCompound {
     MatchTaskBelief match;
 
     private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
+
     @Nullable
-    private static final CompoundTransform<Compound,Term> truthSwap = new CompoundTransform<Compound,Term>() {
-
-        final Atom belief = $.the("Belief");
-        final Atom desire = $.the("Desire");
-
-        @Nullable
-        @Override
-        public Termed<?> apply(Compound parent, Term subterm) {
-
-            Compound tf = (Compound) subterm;
-            Term func = tf.term(0);
-            Term mode = tf.term(1);
-
-            return $.inh(swap(func), mode);
-
-        }
-
-        private Term swap(@NotNull Term func) {
+    private static final CompoundTransform<Compound,Term> truthSwap = new PremiseTruthTransform() {
+        @Override public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'X');
         }
-
-        @Override
-        public boolean test(@NotNull Term o) {
-            if (o.op() == INHERIT) {
-                Term pred = ((Compound) o).term(1);
-                return pred.equals(belief) || pred.equals(desire);
-            }
-            return false;
+    };
+    @Nullable
+    private static final CompoundTransform<Compound,Term> truthNegate = new PremiseTruthTransform() {
+        @Override public Term apply(@NotNull Term func) {
+            return $.the(func.toString() + 'N');
         }
     };
 
@@ -254,6 +236,9 @@ public class PremiseRule extends GenericCompound {
 
         return l;
     }
+
+
+
 
     /** pre-match filtering based on conclusion op type and other premise context */
     public static final class Conclusion extends AtomicBoolCondition {
@@ -942,7 +927,7 @@ public class PremiseRule extends GenericCompound {
      * so each premise gets exchanged with the conclusion in order to form a own rule,
      * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
-    public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w) {
+    public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w, @NotNull PatternIndex index) {
 
         if (Global.BACKWARD_QUESTIONS) {
             Term T = getTask(); //Task
@@ -950,11 +935,11 @@ public class PremiseRule extends GenericCompound {
             Term C = getConclusionTermPattern(); //Conclusion
 
             // C, B, [pre], task_is_question() |- T, [post]
-            PremiseRule clone1 = clonePermutation(C, B, T, true);
+            PremiseRule clone1 = clonePermutation(C, B, T, true, index);
             w.accept(clone1, "C,B,question |- B");
 
             // T, C, [pre], task_is_question() |- B, [post]
-            PremiseRule clone2 = clonePermutation(T, C, B, true);
+            PremiseRule clone2 = clonePermutation(T, C, B, true, index);
             w.accept(clone2, "T,C,question |- B");
         }
 
@@ -993,8 +978,7 @@ public class PremiseRule extends GenericCompound {
         ////      B, T, [pre], task_is_question() |- T, [post]
         //      B, T, [pre], task_is_question() |- C, [post]
 
-        PremiseRule p = clonePermutation(B, T, C, false);
-        p = normalize(p, index);
+        PremiseRule p = clonePermutation(B, T, C, false, index);
         if (p.getTask().equals(T) && p.getBelief().equals(B)) {
             //no change, ignore the permutation
             p = null;
@@ -1007,8 +991,33 @@ public class PremiseRule extends GenericCompound {
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");
 
+    public PremiseRule negateTask(PatternIndex index) {
+
+        Compound newTask = (Compound) neg(getTask());
+        Term[] pp = getPremise().terms().clone();
+        pp[0] = newTask;
+        Compound newPremise = (Compound) $.the(getPremise().op(), pp);
+        Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
+
+        @NotNull PremiseRule neg = normalize(new PremiseRule(newPremise, newConclusion), index);
+
+        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
+
+        return neg;
+    }
+
+    /** safe negation */
+    private static Term neg(Term x) {
+        if (x.op() == Op.NEGATE) {
+            return ((Compound)x).term(0); //unwrap
+        } else {
+            //do this manually for premise rules since they will need to negate atoms which is not usually allowed
+            return new GenericCompound(Op.NEGATE, TermContainer.the(x));
+        }
+    }
+
     @NotNull
-    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {
+    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternIndex index) {
 
 
         Map<Term, Term> m = new HashMap(3);
@@ -1019,7 +1028,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound)terms.remap(m, this);
+        Compound remapped = (Compound)terms.remap(this, m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
@@ -1048,45 +1057,10 @@ public class PremiseRule extends GenericCompound {
             newPremise = pc; //same
         }
 
-        return new PremiseRule(newPremise, newConclusion);
+        return normalize(new PremiseRule(newPremise, newConclusion), index);
 
-
-//
-//        /*if (StringUtils.countMatches(newPremise.toString(), "task(\"") > 1) {
-//            System.err.println(newPremise);
-//        }*/
-//
-//        newPremise.terms()[0] = newT;
-//        newPremise.terms()[1] = newB;
-//
-//        Term[] newConclusion = getConclusion().terms().clone();
-//        newConclusion[0] = newR;
-//
-//
-//        return new PremiseRule(newPremise, $.p( newConclusion ));
     }
 
-//    /**
-//     * -1 or +1 depending on how arg1 and arg2 match either Task/Belief of the premise
-//     * @return +1 if first arg=task, second arg = belief, -1 if opposite,
-//     * throws exception if incomplete match
-//     */
-//    public final int getTaskOrder(Term arg1, Term arg2) {
-//
-//        Product p = getPremises();
-//        Term taskPattern = p.term(0);
-//        Term beliefPattern = p.term(1);
-//        if (arg2.equals(taskPattern) && arg1.equals(beliefPattern)) {
-//            return -1;
-//        } else if (arg1.equals(taskPattern) && arg2.equals(beliefPattern)) {
-//            return 1;
-//        } else {
-//            throw new RuntimeException("after(X,Y) needs to match both taks and belief patterns, in one of 2 orderings");
-//        }
-//
-//    }
-
-    //public final int nal() { return minNAL; }
 
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 
@@ -1160,6 +1134,7 @@ public class PremiseRule extends GenericCompound {
             return apply(null, secondary);
         }
     }
+
 }
 
 

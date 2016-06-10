@@ -338,10 +338,7 @@ public enum BeliefFunction implements TruthOperator {
 
 
     static {
-        for (BeliefFunction tm : BeliefFunction.values()) {
-            atomToTruthModifier.put($.the(tm.toString()), tm);
-            atomToTruthModifier.put($.the(tm.toString() + 'X'), TruthOperator.inverse(tm));
-        }
+        TruthOperator.permuteTruth(BeliefFunction.values(), atomToTruthModifier);
     }
 
     @Nullable

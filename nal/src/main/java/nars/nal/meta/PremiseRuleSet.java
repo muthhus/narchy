@@ -1,11 +1,9 @@
 package nars.nal.meta;
 
-import nars.$;
 import nars.Global;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -34,16 +33,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class PremiseRuleSet  {
 
-    final static Term rule = $.the("rule");
-
-
-
-    private static final Pattern twoSpacePattern = Pattern.compile("  ", Pattern.LITERAL);
-    //private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
-    //private static final Pattern implOperatorPattern = Pattern.compile("==>", Pattern.LITERAL);
-    //private static final Pattern conjOperatorPattern = Pattern.compile("&&", Pattern.LITERAL);
     public final List<PremiseRule> rules;
-
 
     public PremiseRuleSet() throws IOException, URISyntaxException {
         this(Paths.get(Deriver.class.getClassLoader().getResource("default.meta.nal").toURI()));
@@ -157,69 +147,6 @@ public class PremiseRuleSet  {
     }
 
 
-//    private static final String[] equFull = {"<=>"/*, "</>", "<|>"*/};
-//    private static final String[] implFull = {"==>"/*, "=/>" , "=|>", "=\\>"*/};
-//    private static final String[] conjFull = {"&&"/*, "&|", "&/"*/};
-//    @Nullable
-//    private static final String[] unchanged = {null};
-
-//    /**
-//     * //TODO do this on the parsed rule, because string contents could be unpredictable:
-//     * permute(rule, Map<Op,Op[]> alternates)
-//     *
-//     * @param rules
-//     * @param ruleString
-//     */
-//    static void permuteTenses(@NotNull Collection<String> rules /* results collection */,
-//                              @NotNull String ruleString) {
-//
-//        //Original version which permutes in different tenses
-//
-//        if (!ruleString.contains("Order:ForAllSame")) {
-//            rules.add(ruleString);
-//            return;
-//        }
-//
-//        String[] equs =
-//                ruleString.contains("<=>") ?
-//                        equFull :
-//                        unchanged;
-//
-//
-//        String[] impls =
-//                ruleString.contains("==>") ?
-//                        implFull :
-//                        unchanged;
-//
-//        String[] conjs =
-//                ruleString.contains("&&") ?
-//                        conjFull :
-//                        unchanged;
-//
-//
-//        rules.add(ruleString);
-//
-//
-//        for (String equ : equs) {
-//
-//            String p1 = equ != null ? equivOperatorPattern.matcher(ruleString).replaceAll(Matcher.quoteReplacement(equ)) : ruleString;
-//
-//            for (String imp : impls) {
-//
-//                String p2 = imp != null ? implOperatorPattern.matcher(p1).replaceAll(Matcher.quoteReplacement(imp)) : p1;
-//
-//                for (String conj : conjs) {
-//
-//                    String p3 = conj != null ? conjOperatorPattern.matcher(p2).replaceAll(Matcher.quoteReplacement(conj)) : p2;
-//
-//                    rules.add(p3);
-//                }
-//            }
-//        }
-//
-//
-//    }
-
 
     @NotNull
     static Stream<PremiseRule> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
@@ -233,14 +160,10 @@ public class PremiseRuleSet  {
             try {
 
                 Termed prt = index.fromStringRaw(src);
-                        //Narsese.the().term(src, Terms.terms, false /* raw */);
-
-//                if (!(prt instanceof Compound))
-//                    throw new Narsese.NarseseException("rule parse error: " + src + " -> " + prt);
 
                 PremiseRule preNorm = new PremiseRule((Compound) prt);
 
-                permute(index, ur, src, preNorm);
+                permute(preNorm, src, index, ur);
 
             } catch (Exception ex) {
                 logger.error("Invalid TaskRule: {} {}", src, ex.getMessage());
@@ -254,48 +177,57 @@ public class PremiseRuleSet  {
     @NotNull
     public static Set<PremiseRule> permute(PremiseRule preNorm) {
         Set<PremiseRule> ur;
-        permute(new PatternIndex(), ur = Global.newHashSet(1), "", preNorm);
+        permute(preNorm, "", new PatternIndex(), ur = Global.newHashSet(1));
         return ur;
     }
 
-    @NotNull
-    public static void permute(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, PremiseRule preNorm) {
-        PremiseRule r = add(ur, preNorm, src, index);
+    public static void permute(PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
 
+        posNegPermute(preNormRule, src, (PremiseRule r) -> {
 
-        if (forwardPermutes(r)) {
-            permuteForward(index, ur, src, r, r.backward);
-        }
+            if (forwardPermutes(r)) {
+                permuteForward(r, src, r.backward, index, ur);
+            }
 
-        if (r.backward) {
+            if (r.backward) {
 
-            //System.err.println("r: " + r);
+                //System.err.println("r: " + r);
 
-            r.backwardPermutation((q, reason) -> {
+                r.backwardPermutation((q, reason) -> {
 
-                //System.err.println("  q: " + q + " " + reason);
-                PremiseRule b = add(ur, q, src + ':' + reason, index);
+                    //System.err.println("  q: " + q + " " + reason);
+                    PremiseRule b = add(ur, q, src + ':' + reason, index);
 
-                //2nd-order backward
-                if (forwardPermutes(b)) {
-                    permuteForward(index, ur, src, b, r.backward);
-                }
-            });
-        }
+                    //2nd-order backward
+                    if (forwardPermutes(b)) {
+                        permuteForward(b, src, r.backward, index, ur);
+                    }
+                }, index);
+            }
+        }, ur, index);
     }
 
-    public static void permuteForward(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
+    protected static void posNegPermute(PremiseRule preNorm, String src, Consumer<PremiseRule> each, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index) {
+        PremiseRule pos = add(ur, preNorm, src, index);
+        each.accept(pos);
+        PremiseRule neg = add(ur, preNorm.negateTask(index), src, index);
+        each.accept(neg);
+    }
 
-        @NotNull PremiseRule bSwap = b.forwardPermutation(index);
+
+
+    public static void permuteForward(@NotNull PremiseRule r, String src, boolean thenBackward, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
+
+        @NotNull PremiseRule bSwap = r.forwardPermutation(index);
         if (bSwap!=null) {
             add(ur, bSwap, src + ":forward", index);
         }
         //PremiseRule f = b;
 
         if (thenBackward) {
-            b.backwardPermutation((s, reasonBF) -> {
+            r.backwardPermutation((s, reasonBF) -> {
                 add(ur, s, src + ':' + reasonBF, index);
-            });
+            }, index);
         }
     }
 
