@@ -42,6 +42,7 @@ import java.util.function.Supplier;
 import static nars.Global.dereference;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.task.Revision.truthProjection;
 import static nars.truth.TruthFunctions.eternalize;
@@ -645,7 +646,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
     default boolean isEternal() {
-        return occurrence()== Tense.ETERNAL;
+        return occurrence()== ETERNAL;
     }
 
 
@@ -656,12 +657,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
         /*if (oc == Stamp.TIMELESS)
             throw new RuntimeException("invalid occurrence time");*/
-        if (ct == Tense.ETERNAL)
+        if (ct == ETERNAL)
             throw new RuntimeException("invalid creation time");
 
         //however, timeless creation time means it has not been perceived yet
 
-        if (oc == Tense.ETERNAL) {
+        if (oc == ETERNAL) {
             if (ct == TIMELESS) {
                 sb.append(":-:");
             } else {
@@ -742,7 +743,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     default long occurrence() {
-        return Tense.ETERNAL;
+        return ETERNAL;
     }
 
 
@@ -754,21 +755,20 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    @Deprecated @Nullable
-    default Truth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
+    @NotNull
+    default ProjectedTruth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
 
         Truth currentTruth = truth();
 
-        if ((targetTime == Tense.ETERNAL)) {
+        if ((targetTime == ETERNAL)) {
 
-            return isEternal() ? currentTruth :
-                    eternalize(currentTruth);
+            return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
 
         } else {
 
             long occ = occurrence();
             if (occ == targetTime)
-                return currentTruth;
+                return new ProjectedTruth(currentTruth, ETERNAL);
 
             float conf = currentTruth.conf();
 
@@ -784,7 +784,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
                 if (projConf < eternConf) {
                     nextConf = eternConf;
-                    nextOcc = Tense.ETERNAL;
+                    nextOcc = ETERNAL;
                 }
             }
 

@@ -1,6 +1,5 @@
 package nars.link;
 
-import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
@@ -33,41 +32,14 @@ public enum TermLinkBuilder {
     @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
         //HashBag<Termed> components = new HashBag(host.volume());
 
-        int ni = host.size();
+        int ni = host.complexity();
 
         Set<Termed> components =
-                //Global.newHashSet(1 + host.volume()/2 /* estimate */);
                 new LinkedHashSet<>(ni /* estimate */);
 
-        ///** add self link for structural transform: */
-        //components.add(t);
+        for (int i = 0, ii = host.size(); i < ii; i++) {
 
-        //Op tOp = host.op();
-        //boolean tEquivalence = tOp == Op.EQUIV;
-        //boolean tImplication = tOp == Op.IMPLICATION;
-
-
-        for (int i = 0; i < ni; i++) {
-
-            Termed ti = growComponent(host.term(i), 0, nar, components);
-
-            if (ti instanceof Compound) {
-
-                Compound cti = (Compound) ti;
-                for (int j = 0, nj = cti.size(); j < nj; j++) {
-
-                    Termed tj = growComponent(cti.term(j), 1, nar, components);
-                    if (tj instanceof Compound) {
-
-                        Compound ctj = (Compound) tj;
-                        for (int k = 0, nk = ctj.size(); k < nk; k++) {
-
-                            growComponent(ctj.term(k), 2, nar, components);
-
-                        }
-                    }
-                }
-            }
+            components(host.term(i), 2, nar, components);
 
             /*if (ti == null)
                 continue;*/
@@ -91,12 +63,11 @@ public enum TermLinkBuilder {
     public static List<TermTemplate> buildFlat(@NotNull Compound term, @NotNull NAR nar) {
         Set<Termed> s = components(term, nar);
 
-        int total = s.size();
         //int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
 
         //List<TermTemplate> sa = Global.newArrayList(total);
         //float fraction = 1f / active;
-        float fraction = 1f / total;
+        float fraction = 1f / s.size();
 
         return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
     }
@@ -203,24 +174,35 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Termed growComponent(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
-
+    protected static void components(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
 
         if (t instanceof Variable) {
 
             if (t.op()==Op.VAR_QUERY)
-                return null;
+                return;
 
             target.add(nar.index.the(t));
-            return t;
+            return;
         }
 
         Concept ct = nar.concept(t, true);
         if (ct == null) {
-            return null;
+            return;
         } else {
             target.add(ct);
-            return ct;
+
+            if (level > 0 && ct instanceof Compound) {
+
+                Compound cct = (Compound) ct;
+                for (int i = 0, ii = cct.size(); i < ii; i++) {
+
+                    Term dct = cct.term(i);
+
+                    components(dct, level-1, nar, target);
+
+                }
+            }
+            return;
         }
     }
 

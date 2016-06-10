@@ -7,12 +7,15 @@ import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
+import nars.truth.ProjectedTruth;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +52,6 @@ public enum PremiseBuilder {
         if (task == null)
             return;
 
-        long occ = task.occurrence();
 
         Compound taskTerm = task.term();
 
@@ -68,7 +70,7 @@ public enum PremiseBuilder {
             if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
 
                 matcher.run(
-                        newPremise(nar, conceptLink, termLink, taskLink, task, occ, tl)
+                        newPremise(nar, conceptLink, termLink, taskLink, task, tl)
                 );
             }
         }
@@ -77,16 +79,26 @@ public enum PremiseBuilder {
     }
 
     @Nullable
-    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, long occ, @NotNull Termed tl) {
-        return new ConceptProcess(nar, conceptLink, taskLink, termLink, match(nar, task, tl, occ));
+    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
+        return new ConceptProcess(nar, conceptLink, taskLink, termLink, match(nar, task, tl));
     }
 
 
     /**
      * resolves the most relevant belief of a given term/concept
+     *
+     *   patham9 project-eternalize
+         patham9 depending on 4 cases
+         patham9 https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj
+         sseehh__ ok ill add that in a bit
+         patham9 you need  project-eternalize-to
+         sseehh__ btw i disabled immediate eternalization entirely
+         patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
+         patham9 especially try to understand the "temporal temporal" case
+         patham9 its using the result of higher confidence
      */
     @Nullable
-    static Task match(@NotNull NAR nar, @NotNull Task task, @NotNull Termed beliefConceptTerm, long taskOcc) {
+    static Task match(@NotNull NAR nar, @NotNull Task task, @NotNull Termed beliefConceptTerm) {
 
         //atomic concepts will have no beliefs to match
         if (!(beliefConceptTerm instanceof Compound))
@@ -101,16 +113,17 @@ public enum PremiseBuilder {
             return null;
         }
 
-        Task belief = table.match(task.term(), taskOcc);
-        if (belief == null)
-            return null;
+        //Task belief = project(task, table.match(task), nar.time());
+        Task belief = table.match(task);
 
-        if (task.isQuestOrQuestion()) {
+        if (belief!=null && task.isQuestOrQuestion()) {
+
+            long taskOcc = task.occurrence();
 
             //project the belief to the question's time
             if (taskOcc != ETERNAL) {
                 @Nullable Concept cbel = nar.concept(belief);
-                belief = cbel != null ? cbel.merge(task, belief, task.occurrence(), nar) : null;
+                belief = cbel != null ? cbel.merge(task, belief, taskOcc, nar) : null;
             }
 
             if (belief != null) { //may have become null as a result of projection
@@ -131,6 +144,31 @@ public enum PremiseBuilder {
 
 
     }
+
+//    /**
+//           (case [(get-eternal target-time) (get-eternal source-time)]
+//                 [:eternal :eternal] t
+//                 [:temporal :eternal] t
+//                 [:eternal :temporal] (eternalize t)
+//                 [:temporal :temporal] (let [t-eternal (eternalize t)
+//                         t-project (project-to target-time t cur-time)]
+//                         (if (> (confidence t-eternal)
+//                             (confidence t-project))
+//                             t-eternal
+//                             t-project))))))
+//     * @param target
+//     * @param matched
+//     * @return
+//     */
+//    private static Task project(Task target, Task matched, long now) {
+//        boolean me = matched.isEternal();
+//        if (me) {
+//            return matched;
+//        } else {
+//            ProjectedTruth newTruth = matched.projectTruth(target.occurrence(), now, true);
+//            return new MutableTask(matched, newTruth, now, newTruth.when);
+//        }
+//    }
 
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
         @Nullable Concept c = nar.concept(q);

@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -215,8 +216,8 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                //new SoftReference<>(s);
-                new WeakReference<>(s);
+                new SoftReference<>(s);
+                //new WeakReference<>(s);
                 //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 

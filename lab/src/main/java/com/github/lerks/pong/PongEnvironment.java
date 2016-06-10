@@ -79,8 +79,8 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(128);
-
+		nar.cyclesPerFrame.set(256);
+		nar.confMin.setValue(0.03f);
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;

@@ -375,30 +375,31 @@ public interface BeliefTable extends TaskTable {
 
     /** finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
      *
-     *  HACK also removes deleted entries that it finds in the process
-     *
-     *  TODO apply term's 'dt' in ranking if present
+     *  TODO consider similarity of any of term's recursive 'dt' temporality in ranking
      * */
     @Nullable
-    default Task match(Compound term, long taskOcc) {
+    default Task match(Task target) {
 
         int size = size();
         Task belief;
+
+        long occ = target.occurrence();
+
         do {
-            belief = top(
-                taskOcc
-            );
 
-            if (belief == null)
+            belief = top( occ );
+
+            if (belief == null) {
                 return null;
-
-            if (belief.isDeleted()) {
+            } else if (belief.isDeleted()) {
                 remove(belief);
+            } else {
+                return belief;
             }
 
-        } while (belief.isDeleted() && size-- > 0);
+        } while (size-- > 0);
 
-        return belief;
+        return null;
     }
 
     default float expectation(long when) {

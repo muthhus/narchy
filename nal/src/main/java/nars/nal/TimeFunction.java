@@ -290,7 +290,7 @@ public interface TimeFunction {
 
                 long shift = ETERNAL;
 
-                if (decomposedTerm.size() > 2) {
+                if (decomposedTerm.size() != 2) {
                     shift = 0;
                 } else {
 

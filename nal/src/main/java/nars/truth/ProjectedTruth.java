@@ -7,6 +7,10 @@ public final class ProjectedTruth extends DefaultTruth {
 
 	public final long when;
 
+	public ProjectedTruth(Truth t, long when) {
+		this(t.freq(), t.conf(), when);
+	}
+
 	public ProjectedTruth(float f, float c, long when) {
 		super(f, c);
 		this.when = when;
