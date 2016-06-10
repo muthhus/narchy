@@ -131,7 +131,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     protected void believe(Concept c, Task t, boolean truth) {
         //Term tt = t.term();
-        if (t.op() == Op.NEGATE) {
+        if (t.op() == Op.NEG) {
             //unwrap negation
             //tt = ((Compound) tt).term(0);
             truth = !truth;
@@ -245,37 +245,37 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 switch (s.name()) {
 
                     case "-->":
-                        return theTwoArity(Op.INHERIT, s);
+                        return theTwoArity(Op.INH, s);
                     case "<->":
-                        return theTwoArity(Op.SIMILAR, s);
+                        return theTwoArity(Op.SIM, s);
                     case "<=>":
                         return theTwoArity(Op.EQUIV, s);
                     case "==>":
-                        return theTwoArity(Op.IMPLICATION, s);
+                        return theTwoArity(Op.IMPL, s);
 
                     case "~":
-                        return theTwoArity(Op.DIFF_INT, s);
+                        return theTwoArity(Op.DIFINT, s);
                     case "-":
-                        return theTwoArity(Op.DIFF_EXT, s);
+                        return theTwoArity(Op.DIFEXT, s);
 
 
 
                     case "[":
-                        return $.the(Op.SET_INT, the(nterms(s)));
+                        return $.the(Op.SETINT, the(nterms(s)));
                     case "{":
-                        return $.the(Op.SET_EXT, the(nterms(s)));
+                        return $.the(Op.SETEXT, the(nterms(s)));
 
                     case "&":
-                        return $.the(Op.INTERSECT_EXT, the(nterms(s)));
+                        return $.the(Op.SECTEXT, the(nterms(s)));
                     case "|":
-                        return $.the(Op.INTERSECT_INT, the(nterms(s)));
+                        return $.the(Op.SECTINT, the(nterms(s)));
 
                     case "*":
-                        return $.the(Op.PRODUCT, the(nterms(s)));
+                        return $.the(Op.PROD, the(nterms(s)));
                     case "&&":
-                        return $.the(Op.CONJUNCTION, the(nterms(s)));
+                        return $.the(Op.CONJ, the(nterms(s)));
                     case "||":
-                        return $.the(Op.DISJUNCTION, the(nterms(s)));
+                        return $.the(Op.DISJ, the(nterms(s)));
                     case "not":
                         return $.neg(nterm(s, 0));
 
@@ -331,7 +331,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
         if (term instanceof Compound) {
             Op op = term.op();
             switch (op) {
-                case NEGATE:
+                case NEG:
                     return new Struct("not", psubterms(((Compound) term)));
                 default:
                     return new Struct(op.str, psubterms(((Compound) term)));

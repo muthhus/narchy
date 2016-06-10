@@ -478,34 +478,34 @@ public class Narsese extends BaseParser<Object> {
                         Variable(),
 
 //                        //negation shorthand
-                        seq(NEGATE.str, s(), Term(), push(
+                        seq(NEG.str, s(), Term(), push(
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg($.the(pop())))),
 
-                        seq(SET_EXT.str,
+                        seq(SETEXT.str,
 
                                 firstOf(
-                                    EmptyCompound(SET_EXT_CLOSER, SET_EXT),
-                                    MultiArgTerm(SET_EXT, SET_EXT_CLOSER, false, false, false, false)
+                                    EmptyCompound(SET_EXT_CLOSER, SETEXT),
+                                    MultiArgTerm(SETEXT, SET_EXT_CLOSER, false, false, false, false)
                                 )
                         ),
 
-                        seq(SET_INT.str,
+                        seq(SETINT.str,
                                 firstOf(
-                                    EmptyCompound(SET_INT_CLOSER, SET_INT),
-                                    MultiArgTerm(SET_INT, SET_INT_CLOSER, false, false, false, false)
+                                    EmptyCompound(SET_INT_CLOSER, SETINT),
+                                    MultiArgTerm(SETINT, SET_INT_CLOSER, false, false, false, false)
                                 )
                         ),
 
                         seq(COMPOUND_TERM_OPENER,
                                 firstOf(
 
-                                        EmptyCompound(COMPOUND_TERM_CLOSER, PRODUCT),
+                                        EmptyCompound(COMPOUND_TERM_CLOSER, PROD),
 
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false, false, false),
 
                                         //default to product if no operator specified in ( )
-                                        MultiArgTerm(PRODUCT, COMPOUND_TERM_CLOSER, false, false, false, false),
+                                        MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false, false, false),
 
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true, true, false)
                                 )
@@ -578,7 +578,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     public Rule Operator() {
-        return sequence(OPERATOR.ch,
+        return sequence(OPER.ch,
                 Atom(), push($.operator((String)pop())));
                 //Term(false, false),
                 //push($.operator(pop().toString())));
@@ -826,27 +826,27 @@ public class Narsese extends BaseParser<Object> {
     Rule Op() {
         return sequence(
                 trie(
-                        INTERSECT_EXT.str, INTERSECT_INT.str,
-                        DIFF_EXT.str, DIFF_INT.str,
-                        PRODUCT.str,
-                        IMAGE_EXT.str, IMAGE_INT.str,
+                        SECTEXT.str, SECTINT.str,
+                        DIFEXT.str, DIFINT.str,
+                        PROD.str,
+                        IMGEXT.str, IMGINT.str,
 
-                        INHERIT.str,
+                        INH.str,
 
-                        SIMILAR.str,
+                        SIM.str,
 
                         PROPERTY.str,
                         INSTANCE.str,
                         INSTANCE_PROPERTY.str,
 
-                        NEGATE.str,
+                        NEG.str,
 
-                        IMPLICATION.str,
+                        IMPL.str,
 
                         EQUIV.str,
 
-                        DISJUNCTION.str,
-                        CONJUNCTION.str
+                        DISJ.str,
+                        CONJ.str
                 ),
 
                 push(getOperator(match()))
@@ -856,9 +856,9 @@ public class Narsese extends BaseParser<Object> {
     Rule OpTemporal() {
         return sequence(
                 trie(
-                        IMPLICATION.str,
+                        IMPL.str,
                         EQUIV.str,
-                        CONJUNCTION.str
+                        CONJ.str
                 ),
                 push(getOperator(match()))
         );
@@ -983,7 +983,7 @@ public class Narsese extends BaseParser<Object> {
             }
 
             if (p == Operator.class) {
-                op = OPERATOR;
+                op = OPER;
                 break;
             }
 
@@ -1022,7 +1022,7 @@ public class Narsese extends BaseParser<Object> {
 //        }
 
 
-        return (op == OPERATOR) ?
+        return (op == OPER) ?
                 $.exec($.operator(vectorterms.get(0).toString()),
                         vectorterms.subList(1, vectorterms.size())
                 ) :

@@ -146,7 +146,7 @@ public class Inperience {
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
         Compound tt = s.term();
 
-        boolean negated = tt.op() == Op.NEGATE;
+        boolean negated = tt.op() == Op.NEG;
         int k = 0;
 
         if (tr != null) {
@@ -242,7 +242,7 @@ public class Inperience {
             //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
             boolean valid = true;
             Term impsub = beliefTerm.term(0);
-            if (impsub.op() == Op.CONJUNCTION) {
+            if (impsub.op() == Op.CONJ) {
                 Compound conj = (Compound) impsub;
                 if (!conj.term(0).equals(taskTerm)) {
                     valid = false; //the expected needed term is not included

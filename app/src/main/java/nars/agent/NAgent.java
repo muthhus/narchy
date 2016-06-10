@@ -90,13 +90,14 @@ public class NAgent implements Agent {
 
     private SensorConcept dRewardSensorNeg;
     private DecideAction decideAction;
+    private boolean synchronousGoalInput = false;
 
 
     public NAgent(NAR n) {
 
         this(n,
-            //new DecideActionSoftmax()
-            new DecideActionEpsilonGreedy()
+            new DecideActionSoftmax()
+            //new DecideActionEpsilonGreedy()
         );
     }
 
@@ -417,7 +418,7 @@ public class NAgent implements Agent {
 
 
 
-        /*if (lastAction != nextAction)*/ {
+        if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
             float off = 0.49f;

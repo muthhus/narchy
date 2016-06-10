@@ -412,7 +412,7 @@ public interface TimeFunction {
         if (!taskOrBelief && b!=null) {
             //if (b.occurrence()!=ETERNAL) {
                 int derivedInT = dtTerm.subtermTime(derived);
-                if (derivedInT == DTERNAL && derived.op() == Op.IMPLICATION) {
+                if (derivedInT == DTERNAL && derived.op() == Op.IMPL) {
                     //try to find the subtermTime of the implication's subject
                     derivedInT = dtTerm.subtermTime(derived.term(0));
                 }
@@ -517,7 +517,7 @@ public interface TimeFunction {
             return derived; //no change
 
         //exception: if reduction results in || which is non-temporal
-        if (derived.op() == Op.DISJUNCTION)
+        if (derived.op() == Op.DISJ)
             return derived;
 
         if (!Global.DEBUG && !derived.op().temporal)

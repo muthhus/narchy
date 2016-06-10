@@ -57,7 +57,7 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked, Supplier<Task> {
 
-    int CONJUNCTION_WITH_NEGATION = or(Op.CONJUNCTION, NEGATE);
+    int CONJUNCTION_WITH_NEGATION = or(Op.CONJ, NEG);
 
     static void explanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
@@ -128,7 +128,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
         }
 
-        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPLICATION || op == Op.EQUIV))
+        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUIV))
             throw new TermIndex.InvalidTaskTerm(t, "Goal/Quest task term may not be Implication or Equivalence");
 
         return t;
@@ -140,11 +140,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             Compound cterm = ((Compound) term);
 
             int dt = cterm.dt();
-            if (term.op() == CONJUNCTION && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEGATE)) {
+            if (term.op() == CONJ && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEG)) {
                 int s = cterm.size();
                 for (int i = 0; i < s; i++) {
                     Term x = cterm.term(i);
-                    if (x.op() == NEGATE) {
+                    if (x.op() == NEG) {
                         if (cterm.containsTerm(((Compound) x).term(0))) {
                             return true;
                         }

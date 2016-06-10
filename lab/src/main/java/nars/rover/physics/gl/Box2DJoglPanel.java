@@ -31,7 +31,7 @@ public class Box2DJoglPanel extends AbstractJoglPanel implements Display {
 	}
 
 	public Box2DJoglPanel(final World2D world) {
-		super(newDefaultConfig());
+		super();
 		this.world = world;
 		this.draw = new JoglDraw(this);
 
@@ -48,13 +48,14 @@ public class Box2DJoglPanel extends AbstractJoglPanel implements Display {
 
 	public void init(GLAutoDrawable drawable) {
 
-		game.z = -300;
+
 
 		GL2 gl = drawable.getGL().getGL2();
 
 		initEffects(gl);
 
 		game = new Game();
+		game.z = -300;
 
 		game.setMouseCenter(new Point());
 

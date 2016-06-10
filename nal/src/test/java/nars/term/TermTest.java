@@ -35,8 +35,8 @@ import static java.lang.Long.toBinaryString;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.*;
-import static nars.Op.IMAGE_EXT;
-import static nars.Op.IMAGE_INT;
+import static nars.Op.IMGEXT;
+import static nars.Op.IMGINT;
 import static org.junit.Assert.*;
 
 /**
@@ -52,12 +52,12 @@ public class TermTest {
 
     @Nullable
     public static Term imageInt(Term... x) {
-        return the(IMAGE_INT, x);
+        return the(IMGINT, x);
     }
 
     @Nullable
     public static Term imageExt(Term... x) {
-        return the(IMAGE_EXT, x);
+        return the(IMGEXT, x);
     }
 
 
@@ -164,7 +164,7 @@ public class TermTest {
         assertTrue(term1.complexity() > 1);
         assertTrue(term1.complexity() == term2.complexity());
 
-        assertTrue(term1.op() == Op.INHERIT);
+        assertTrue(term1.op() == Op.INH);
 
 
         //System.out.println("t1: " + term1 + ", complexity=" + term1.getComplexity());
@@ -338,7 +338,7 @@ public class TermTest {
 
         try {
             Term x = n.term("wonder(a,b)").term();
-            assertEquals(Op.INHERIT, x.op());
+            assertEquals(Op.INH, x.op());
             assertTrue(Op.isOperation(x));
             assertEquals("wonder(a,b)", x.toString());
 

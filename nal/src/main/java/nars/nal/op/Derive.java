@@ -1,7 +1,6 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.set.ImmutableSet;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
@@ -14,7 +13,6 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +117,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         Truth truth = m.truth.get();
 
-        if (raw.op() == NEGATE) {
+        if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
             raw = ((Compound)raw).term(0);
             if (!(raw instanceof Compound))

@@ -8,7 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
-import static nars.Op.CONJUNCTION;
+import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertParseException;
 import static org.junit.Assert.*;
 
@@ -146,7 +146,7 @@ public class TermReductionsTest {
     @Test public void testConjunctionNormal() {
         Term x = $.$("(&&, <#1 --> lock>, <#1 --> (/, open, #2, _)>, <#2 --> key>)");
         assertEquals(3, x.size());
-        assertEquals(CONJUNCTION, x.op());
+        assertEquals(CONJ, x.op());
     }
 
     @Test public void testIntExtEqual() {
@@ -170,7 +170,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
             new Term[] { r, s },
-            TermContainer.difference(Op.SET_EXT, sete(r, p, q, s), sete(p, q)).terms()
+            TermContainer.difference(Op.SETEXT, sete(r, p, q, s), sete(p, q)).terms()
         );
     }
     @Test public void testDifferenceSortedEmpty() {
@@ -181,7 +181,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
             null,
-            TermContainer.difference(Op.SET_EXT, sete(p, q), sete(p, q))
+            TermContainer.difference(Op.SETEXT, sete(p, q), sete(p, q))
         );
     }
 
@@ -195,7 +195,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Mars,Venus}"),
                 TermContainer.difference(
-                        Op.SET_EXT,
+                        Op.SETEXT,
                         $("{Mars,Pluto,Venus}"),
                         $("{Pluto,Saturn}")
                 )
@@ -203,7 +203,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Saturn}"),
                 TermContainer.difference(
-                        Op.SET_EXT,
+                        Op.SETEXT,
                         $("{Pluto,Saturn}"),
                         $("{Mars,Pluto,Venus}")
                 )
@@ -238,7 +238,7 @@ public class TermReductionsTest {
         Term d = diffInt(
                 seti($("a"), $("b"), $("c")),
                 seti($("d"), $("b")));
-        assertEquals(Op.SET_INT, d.op());
+        assertEquals(Op.SETINT, d.op());
         assertEquals(d.toString(), 2, d.size());
         assertEquals("[a,c]", d.toString());
     }
@@ -250,7 +250,7 @@ public class TermReductionsTest {
         Compound a = $.sete($("a"), $("b"), $("c"));
         Compound b = $.sete($("d"), $("b"));
         Term d = diffExt(a, b);
-        assertEquals(Op.SET_EXT, d.op());
+        assertEquals(Op.SETEXT, d.op());
         assertEquals(d.toString(), 2, d.size());
         assertEquals("{a,c}", d.toString());
 

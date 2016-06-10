@@ -10,11 +10,10 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.PRODUCT;
+import static nars.Op.PROD;
 
 /**
  * Execution context which Operator implementations
@@ -105,7 +104,7 @@ public interface Execution  {
     static Term result(@NotNull Compound operation, @Nullable Term y) {
 
         Compound x = (Compound) operation.term(0);
-        if (x.op() != PRODUCT)
+        if (x.op() != PROD)
             throw new RuntimeException("invalid operation");
 
         //add var dep as last term if missing

@@ -56,7 +56,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Termed> termLinks, @NotNull Bag<Task> taskLinks) {
         super(term.op(), term.relation(), term.subterms());
 
 //        if (!term.isNormalized())

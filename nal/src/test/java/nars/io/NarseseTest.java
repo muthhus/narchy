@@ -103,7 +103,7 @@ public class NarseseTest {
     public void testIncompleteTask() throws Narsese.NarseseException {
         Task t = task("<a --> b>.");
         assertNotNull(t);
-        assertEquals(Op.INHERIT, t.op());
+        assertEquals(Op.INH, t.op());
         Compound i = t.term();
         assertEquals("a", i.term(0).toString());
         assertEquals("b", i.term(1).toString());
@@ -151,7 +151,7 @@ public class NarseseTest {
         String tt = "((a<=>b)-->(c==>d))";
         Task t = task(tt + '?');
         assertNotNull(t);
-        assertEquals(Op.INHERIT, t.op());
+        assertEquals(Op.INH, t.op());
         assertEquals(tt, t.term().toString());
         assertEquals('?', t.punc());
         assertNull(t.truth());
@@ -176,7 +176,7 @@ public class NarseseTest {
         String tt = "(a,b,c)";
         Task t = task(tt + '@');
         assertNotNull(t);
-        assertEquals(Op.PRODUCT, t.op());
+        assertEquals(Op.PROD, t.op());
         assertEquals(tt, t.term().toString());
         assertEquals('@', t.punc());
         assertNull(t.truth());
@@ -197,7 +197,7 @@ public class NarseseTest {
         Compound pt = term("(a, b, c)");
 
         assertNotNull(pt);
-        assertEquals(Op.PRODUCT, pt.op());
+        assertEquals(Op.PROD, pt.op());
 
         testProductABC(pt);
 
@@ -214,24 +214,24 @@ public class NarseseTest {
     @Test
     public void testInfix2() throws Narsese.NarseseException {
         Compound t = term("(x & y)");
-        assertEquals(Op.INTERSECT_EXT, t.op());
+        assertEquals(Op.SECTEXT, t.op());
         assertEquals(2, t.size());
         assertEquals("x", t.term(0).toString());
         assertEquals("y", t.term(1).toString());
 
         Compound a = term("(x | y)");
-        assertEquals(Op.INTERSECT_INT, a.op());
+        assertEquals(Op.SECTINT, a.op());
         assertEquals(2, a.size());
 
         Compound b = term("(x * y)");
-        assertEquals(Op.PRODUCT, b.op());
+        assertEquals(Op.PROD, b.op());
         assertEquals(2, b.size());
 
         Compound c = term("(<a -->b> && y)");
-        assertEquals(Op.CONJUNCTION, c.op());
+        assertEquals(Op.CONJ, c.op());
         assertEquals(2, c.size());
         assertEquals(5, c.complexity());
-        assertEquals(Op.INHERIT, c.term(1).op());
+        assertEquals(Op.INH, c.term(1).op());
     }
 
 
@@ -307,7 +307,7 @@ public class NarseseTest {
         Term a = term("<a --> b>");
         Term x = term("(a --> b)");
         Term y = term("(a-->b)");
-        assertEquals(Op.INHERIT, x.op());
+        assertEquals(Op.INH, x.op());
         assertEquals(x, a);
         assertEquals(x, y);
 
@@ -321,7 +321,7 @@ public class NarseseTest {
 
         Term abcd = term("((a,b) --> (c,d))");
         Term ABCD = term("<(*,a,b) --> (*,c,d)>");
-        assertEquals(Op.INHERIT, x.op());
+        assertEquals(Op.INH, x.op());
         assertEquals(abcd + " != " + ABCD, abcd, ABCD);
     }
 
@@ -351,12 +351,12 @@ public class NarseseTest {
     @Test
     public void testSet() {
         Compound xInt = term("[x]");
-        assertEquals(Op.SET_INT, xInt.op());
+        assertEquals(Op.SETINT, xInt.op());
         assertEquals(1, xInt.size());
         assertEquals("x", xInt.term(0).toString());
 
         Compound xExt = term("{x}");
-        assertEquals(Op.SET_EXT, xExt.op());
+        assertEquals(Op.SETEXT, xExt.op());
         assertEquals(1, xExt.size());
         assertEquals("x", xExt.term(0).toString());
 
@@ -626,7 +626,7 @@ public class NarseseTest {
     public void testOperatorWithNoParams() {
         Term t = term("op()");
         assertNotNull(t);
-        assertEquals(t.toString(), Op.INHERIT, t.op());
+        assertEquals(t.toString(), Op.INH, t.op());
         assertEquals(0, Operator.opArgs((Compound)t).size());
     }
 

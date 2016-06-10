@@ -119,7 +119,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         this.punc = punctuation;
 
         //unwrap top-level negation
-        if (term.op() == Op.NEGATE) {
+        if (term.op() == Op.NEG) {
             Term nt = term.term().term(0);
             if (nt instanceof Compound) {
                 term = nt;

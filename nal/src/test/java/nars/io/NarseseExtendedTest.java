@@ -79,7 +79,7 @@ public class NarseseExtendedTest {
     @Test
     public void testColonReverseInheritance() {
         Compound t = term("namespace:named");
-        assertEquals(t.op(), Op.INHERIT);
+        assertEquals(t.op(), Op.INH);
         assertEquals("named", t.term(0).toString());
         assertEquals("namespace", t.term(1).toString());
 
@@ -168,7 +168,7 @@ public class NarseseExtendedTest {
             */
 
             Term tt = t.term();
-            assertEquals(Op.INHERIT, tt.op());
+            assertEquals(Op.INH, tt.op());
             assertTrue("(negated-->a)".equals(tt.toString()));
             assertTrue(t.punc() == Symbols.GOAL);
         }
@@ -184,9 +184,9 @@ public class NarseseExtendedTest {
 
 
         Compound nab = term("--(a & b)");
-        assertTrue(nab.op() == Op.NEGATE);
+        assertTrue(nab.op() == Op.NEG);
 
-        assertTrue(nab.term(0).op() == Op.INTERSECT_EXT);
+        assertTrue(nab.term(0).op() == Op.SECTEXT);
 
 //        try {
 //            task("(-- negated illegal_extra_term)!");

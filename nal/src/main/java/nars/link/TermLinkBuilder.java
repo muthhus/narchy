@@ -19,44 +19,27 @@ import java.util.stream.Collectors;
 public enum TermLinkBuilder {
     ;
 
-//    public final transient Termed concept;
-//
-//    protected final Term[] template;
-//
-//    transient boolean incoming;
-//
-//    protected int hash;
-//    protected float forgetCycles;
-//    protected long now;
-
     @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
-        //HashBag<Termed> components = new HashBag(host.volume());
 
-        int ni = host.complexity();
-
-        Set<Termed> components =
-                new LinkedHashSet<>(ni /* estimate */);
+        Set<Termed> components = new LinkedHashSet<>(host.complexity() /* estimate */);
 
         for (int i = 0, ii = host.size(); i < ii; i++) {
 
-            components(host.term(i), 2, nar, components);
-
-            /*if (ti == null)
-                continue;*/
-            /*if ((tEquivalence || (tImplication && (i == 0))) &&
-                (ti.term().isAnyOf(NegationOrConjunction))) {
-                //"if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {"
-                //visitComponents((Compound) ti, components, nar);
-            } else */
+            components(host.term(i), levels(host), nar, components);
 
         }
         return components;
     }
 
-//    /** builds termlink templates with linear weighting according to their occurrence proportion of total subterms */
-//    public static @NotNull List<TermTemplate> buildLinear(@NotNull Compound c, @NotNull NAR nar) {
-//        return linearWeightedTermLinks(components(c, nar));
-//    }
+//    final static int levelBoost = Op.or(Op.EQUIV, Op.CONJ, Op.IMPL);
+
+    private static int levels(Compound host) {
+//        if (host.op().in(levelBoost)) {
+//            return 3;
+//        } else {
+            return 2;
+        //}
+    }
 
     /** termlink templates with equal proportion shared, except variables and anything else which would not have a concept */
     @NotNull
@@ -72,6 +55,40 @@ public enum TermLinkBuilder {
         return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
     }
 
+
+
+
+    /**
+     * determines whether to grow a 1st-level termlink to a subterm
+     */
+    protected static void components(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
+
+        if (t instanceof Variable) {
+
+            if (t.op()!=Op.VAR_QUERY)
+                target.add(nar.index.the(t));
+
+        } else {
+
+            Concept ct = nar.concept(t, true);
+            if (ct != null) {
+
+                target.add(ct);
+
+                if (level > 0 && ct instanceof Compound) {
+                    Compound cct = (Compound) ct;
+                    for (int i = 0, ii = cct.size(); i < ii; i++) {
+                        components(cct.term(i), level - 1, nar, target);
+                    }
+                }
+            }
+        }
+    }
+
+//    /** builds termlink templates with linear weighting according to their occurrence proportion of total subterms */
+//    public static @NotNull List<TermTemplate> buildLinear(@NotNull Compound c, @NotNull NAR nar) {
+//        return linearWeightedTermLinks(components(c, nar));
+//    }
 
 //    @NotNull
 //    public static List<TermTemplate> linearWeightedTermLinks(@NotNull HashBag<Termed> s) {
@@ -169,44 +186,6 @@ public enum TermLinkBuilder {
 //
 //        }
 //    }
-
-
-    /**
-     * determines whether to grow a 1st-level termlink to a subterm
-     */
-    protected static void components(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
-
-        if (t instanceof Variable) {
-
-            if (t.op()==Op.VAR_QUERY)
-                return;
-
-            target.add(nar.index.the(t));
-            return;
-        }
-
-        Concept ct = nar.concept(t, true);
-        if (ct == null) {
-            return;
-        } else {
-            target.add(ct);
-
-            if (level > 0 && ct instanceof Compound) {
-
-                Compound cct = (Compound) ct;
-                for (int i = 0, ii = cct.size(); i < ii; i++) {
-
-                    Term dct = cct.term(i);
-
-                    components(dct, level-1, nar, target);
-
-                }
-            }
-            return;
-        }
-    }
-
-
 //    static final boolean growLevel1(Term t) {
 //        return growComponent(t) /*&&
 //                ( growProductOrImage(t) || (t instanceof SetTensional)) */;

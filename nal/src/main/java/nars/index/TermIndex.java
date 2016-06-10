@@ -86,7 +86,7 @@ public interface TermIndex {
     /**
      * implications, equivalences, and interval
      */
-    int InvalidEquivalenceTerm = or(IMPLICATION, EQUIV);
+    int InvalidEquivalenceTerm = or(IMPL, EQUIV);
     /**
      * equivalences and intervals (not implications, they are allowed
      */
@@ -526,7 +526,7 @@ public interface TermIndex {
     default Termed conceptTerm(@NotNull Termed term) {
 
 
-        if (term.op() == NEGATE) {
+        if (term.op() == NEG) {
             //unwrap negation
             term = ((Compound)term).term(0);
             if (term instanceof Atomic) {

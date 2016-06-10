@@ -31,36 +31,36 @@ public enum Op {
     VAR_DEP(Symbols.VAR_DEPENDENT, Op.ANY, OpType.Variable),
     VAR_QUERY(Symbols.VAR_QUERY, Op.ANY, OpType.Variable),
 
-    OPERATOR("^", 8, Args.One),
+    OPER("^", 8, Args.One),
 
-    NEGATE("--", 5, Args.One),
+    NEG("--", 5, Args.One),
 
-    INHERIT("-->", 1, OpType.Relation, Args.Two),
-    SIMILAR("<->", true, 2, OpType.Relation, Args.Two),
+    INH("-->", 1, OpType.Relation, Args.Two),
+    SIM("<->", true, 2, OpType.Relation, Args.Two),
 
-    INTERSECT_EXT("&", true, 3, Args.GTETwo),
-    INTERSECT_INT("|", true, 3, Args.GTETwo),
+    SECTEXT("&", true, 3, Args.GTETwo),
+    SECTINT("|", true, 3, Args.GTETwo),
 
-    DIFF_EXT("-", 3, Args.Two),
-    DIFF_INT("~", 3, Args.Two),
+    DIFEXT("-", 3, Args.Two),
+    DIFINT("~", 3, Args.Two),
 
-    PRODUCT("*", 4, Args.GTEZero),
+    PROD("*", 4, Args.GTEZero),
 
-    IMAGE_EXT("/", 4, Args.GTEOne),
-    IMAGE_INT("\\", 4, Args.GTEOne),
+    IMGEXT("/", 4, Args.GTEOne),
+    IMGINT("\\", 4, Args.GTEOne),
 
     /* CompoundStatement operators, length = 2 */
-    DISJUNCTION("||", true, 5, Args.GTETwo),
-    CONJUNCTION("&&", true, 5, Args.GTETwo),
+    DISJ("||", true, 5, Args.GTETwo),
+    CONJ("&&", true, 5, Args.GTETwo),
 
     //SPACE("+", true, 7, Args.GTEOne),
 
 
-    SET_INT("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
-    SET_EXT("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SETINT("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SETEXT("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
 
-    IMPLICATION("==>", 5, OpType.Relation, Args.Two),
+    IMPL("==>", 5, OpType.Relation, Args.Two),
 
     EQUIV("<=>", true, 5, OpType.Relation, Args.Two),
 
@@ -168,10 +168,10 @@ public enum Op {
 
     public static boolean isOperation(@NotNull Termed _t) {
         Term t = _t.term();
-        if (Op.hasAll(t.structure(), Op.OperationBits) && t.op() == Op.INHERIT) {
+        if (Op.hasAll(t.structure(), Op.OperationBits) && t.op() == Op.INH) {
             Compound c = (Compound) t;
-            return c.isTerm(1, Op.OPERATOR) &&
-                   c.isTerm(0, Op.PRODUCT);
+            return c.isTerm(1, Op.OPER) &&
+                   c.isTerm(0, Op.PROD);
         }
         return false;
     }
@@ -255,7 +255,7 @@ public enum Op {
 
     public static boolean isTemporal(@NotNull Op o, int dt, int arity) {
         if (o.temporal) {
-            return !(o == Op.CONJUNCTION && dt != 0 && dt != DTERNAL && arity > 2);
+            return !(o == Op.CONJ && dt != 0 && dt != DTERNAL && arity > 2);
         }
         return false;
     }
@@ -268,12 +268,12 @@ public enum Op {
     }
 
     public final boolean isImage() {
-        return this == Op.IMAGE_EXT || this == Op.IMAGE_INT;
+        return this == Op.IMGEXT || this == Op.IMGINT;
         //return in(ImageBits);
     }
 
     public boolean isConjunctive() {
-        return this == CONJUNCTION; //in(ConjunctivesBits);
+        return this == CONJ; //in(ConjunctivesBits);
     }
 
 
@@ -321,25 +321,25 @@ public enum Op {
 //            Op.or(Op.EQUIV);
 
     public static final int SetsBits =
-            Op.or(Op.SET_EXT, Op.SET_INT);
+            Op.or(Op.SETEXT, Op.SETINT);
 
     /** all Operations will have these 3 elements in its subterms: */
     public static final int OperationBits =
-            Op.or(Op.INHERIT, Op.PRODUCT, OPERATOR);
+            Op.or(Op.INH, Op.PROD, OPER);
 
     public static final int StatementBits =
-            Op.or(Op.INHERIT, Op.SIMILAR,
+            Op.or(Op.INH, Op.SIM,
                     Op.EQUIV,
-                    Op.IMPLICATION
+                    Op.IMPL
             );
 
 //    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
 //    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPLICATION);
-    public static final int TemporalBits = or(Op.CONJUNCTION, Op.EQUIV, Op.IMPLICATION);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPL);
+    public static final int TemporalBits = or(Op.CONJ, Op.EQUIV, Op.IMPL);
 
     public static final int ImageBits =
-        Op.or(Op.IMAGE_EXT,Op.IMAGE_INT);
+        Op.or(Op.IMGEXT,Op.IMGINT);
 
     public static final int VariableBits =
         Op.or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);

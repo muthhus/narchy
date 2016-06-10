@@ -20,7 +20,7 @@ public final class IfThen extends GenericCompound<Term> implements ProcTerm {
 
 
     public IfThen(@NotNull BoolCondition cond, @NotNull ProcTerm conseq) {
-        super(Op.IMPLICATION,
+        super(Op.IMPL,
             TermVector.the( cond, conseq)
         );
 

@@ -36,7 +36,7 @@ public class Terms   {
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector ZeroSubterms = new TermVector((Term[])new Term[] { });
-    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PRODUCT, -1, DTERNAL, ZeroSubterms);
+    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, -1, DTERNAL, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**
@@ -85,9 +85,9 @@ public class Terms   {
         if (a.op() == b.op()) {
             return a.equals(b);
         }
-        if (a.op() == NEGATE) {
+        if (a.op() == NEG) {
             return ((Compound)a).term(0).equals(b);
-        } else if (b.op() == NEGATE) {
+        } else if (b.op() == NEG) {
             return ((Compound)b).term(0).equals(a);
         }
         return false;
@@ -106,10 +106,10 @@ public class Terms   {
             if (equalOps) {
 
                 switch (o) {
-                    case INHERIT:
+                    case INH:
                         return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
-                    case SIMILAR:
+                    case SIM:
                         //only half seems necessary:
                         //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
                         return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
@@ -182,42 +182,42 @@ public class Terms   {
         Op pbo = predB.op();
 
 
-        if ((sao == PRODUCT) && (pbo == IMAGE_EXT)) {
+        if ((sao == PROD) && (pbo == IMGEXT)) {
             ta = predA;
             sa = subjA;
             tb = subjB;
             sb = predB;
         }
 
-        if ((sbo == PRODUCT) && (pao == IMAGE_EXT)) {
+        if ((sbo == PROD) && (pao == IMGEXT)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pao == IMAGE_EXT) && (pbo == IMAGE_EXT)) {
+        if ((pao == IMGEXT) && (pbo == IMGEXT)) {
             ta = subjA;
             sa = predA;
             tb = subjB;
             sb = predB;
         }
 
-        if ((sao == IMAGE_INT) && (sbo == IMAGE_INT)) {
+        if ((sao == IMGINT) && (sbo == IMGINT)) {
             ta = predA;
             sa = subjA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pao == PRODUCT) && (sbo == IMAGE_INT)) {
+        if ((pao == PROD) && (sbo == IMGINT)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pbo == PRODUCT) && (sao == IMAGE_INT)) {
+        if ((pbo == PROD) && (sao == IMGINT)) {
             ta = predA;
             sa = subjA;
             tb = subjB;
@@ -483,7 +483,7 @@ public class Terms   {
     public static Term empty(@NotNull Op op) {
         switch (op) {
 
-            case PRODUCT:
+            case PROD:
                 return ZeroProduct;
             default:
                 return null;

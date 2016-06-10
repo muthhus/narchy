@@ -26,7 +26,7 @@ public final class Operator<T extends Term> extends Atom {
     }
 
     public Operator(@NotNull String id) {
-        super((id.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + id : id));
+        super((id.charAt(0)!=Op.OPER.ch ? Op.OPER.ch + id : id));
     }
 
 
@@ -45,13 +45,13 @@ public final class Operator<T extends Term> extends Atom {
     /** returns the Operator predicate of an operation. */
     @Nullable public static Atomic operator(@NotNull Compound operation) {
         Term o = operation.term(1);
-        return (o.op() == Op.OPERATOR) ? ((Atomic) o) : null;
+        return (o.op() == Op.OPER) ? ((Atomic) o) : null;
     }
 
     @NotNull
     @Override
     public Op op() {
-        return Op.OPERATOR;
+        return Op.OPER;
     }
 
 }

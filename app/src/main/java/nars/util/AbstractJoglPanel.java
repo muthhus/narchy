@@ -53,6 +53,9 @@ public abstract class AbstractJoglPanel extends GLWindow implements GLEventListe
     //LightEngine light = new LightEngine();
 
 
+    public AbstractJoglPanel() {
+        this(newDefaultConfig());
+    }
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model

@@ -43,12 +43,12 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     final Function<Compound, Termed> compoundBuilder = (Compound t) -> {
 
         switch (t.op()) {
-            case INHERIT:
+            case INH:
                 if (Op.isOperation(t))
                     return new OperationConcept(t, termbag(), taskbag());
                 break;
 
-            case NEGATE:
+            case NEG:
                 return t; //return new NegationConcept(t, termbag, taskbag);
 
         }

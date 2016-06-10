@@ -3,6 +3,7 @@ package nars.guifx.demo;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
 import nars.nar.Default;
+import nars.util.BeliefPanel;
 import nars.util.FX;
 import nars.util.Texts;
 
@@ -68,12 +69,18 @@ public class BeliefLab {
             }
         });
 
+        BeliefPanel b = new BeliefPanel(nar, c);
+        b.setSurfaceSize(400, 100);
+        b.setVisible(true);
 
-        FX.run((a, s) -> {
-            NARfx.newWindow(nar, c);
 
+        nar.loop(fps);
 
-            nar.loop(fps);
-        });
+//        FX.run((a, s) -> {
+//            NARfx.newWindow(nar, c);
+//
+//
+//            nar.loop(fps);
+//        });
     }
 }

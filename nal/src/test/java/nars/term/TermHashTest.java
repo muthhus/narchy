@@ -19,24 +19,24 @@ public class TermHashTest {
 
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
         assertTrue(inh(p("a"), $("b"))
-                .hasAny(or(Op.ATOM, Op.PRODUCT)));
+                .hasAny(or(Op.ATOM, Op.PROD)));
 
         assertFalse(inh(p("a"), $("b"))
-                .isAnyOf(or(SIMILAR, Op.PRODUCT)));
+                .isAnyOf(or(SIM, Op.PROD)));
         assertFalse(inh(p("a"), $("b"))
-                .op() == Op.PRODUCT);
+                .op() == Op.PROD);
 
-        assertTrue(inh("a", "b").op() == INHERIT);
-        assertTrue(inh("a", "b").hasAny(INHERIT));
+        assertTrue(inh("a", "b").op() == INH);
+        assertTrue(inh("a", "b").hasAny(INH));
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
-        assertFalse(inh("a", "b").hasAny(SIMILAR));
+        assertFalse(inh("a", "b").hasAny(SIM));
     }
 
     @Test public void testHasAnyVSAll() {
         @Nullable Compound iii = impl(inh("a", "b"), $("c"));
-        assertTrue(iii.hasAll(or(IMPLICATION, INHERIT)));
-        assertFalse(iii.hasAll(or(IMPLICATION, SIMILAR)));
-        assertTrue(iii.hasAny(or(IMPLICATION, INHERIT)));
+        assertTrue(iii.hasAll(or(IMPL, INH)));
+        assertFalse(iii.hasAll(or(IMPL, SIM)));
+        assertTrue(iii.hasAny(or(IMPL, INH)));
 
     }
 

@@ -289,11 +289,12 @@ public class PongEnvironment extends Player implements Environment {
 			if (q!=null) {
 				//return $.p(dir, q);
 				//return $.image(0, false, dir, $.sete(q));
-				return $.inh($.sete(q), dir);
+				return $.instprop((q), dir);
 			}
 			else {
-				//return dir;
-				return $.sete(dir);
+				return dir;
+				//return $.p(dir);
+				//return $.inst($.varDep(0), dir);
 			}
 		} else {
 			return null; //dir; //$.p(dir);

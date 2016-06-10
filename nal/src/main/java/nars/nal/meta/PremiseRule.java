@@ -162,7 +162,7 @@ public class PremiseRule extends GenericCompound {
     }
 
     public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
-        super(Op.PRODUCT, TermVector.the(premises, result));
+        super(Op.PROD, TermVector.the(premises, result));
     }
 
 
@@ -504,7 +504,7 @@ public class PremiseRule extends GenericCompound {
         public Termed apply(@NotNull Compound containingCompound, @NotNull Term v) {
 
             //do not alter postconditions
-            if ((containingCompound.op() == Op.INHERIT)
+            if ((containingCompound.op() == Op.INH)
                     && PostCondition.reservedMetaInfoCategories.contains(
                     containingCompound.term(1)))
                 return v;
@@ -629,26 +629,26 @@ public class PremiseRule extends GenericCompound {
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
-                    constraints.put(arg1, new OpConstraint(Op.SET_EXT));
-                    constraints.put(arg2, new OpConstraint(Op.SET_EXT));
-                    preNext = new SubTermsStructure(Op.SET_EXT.bit);
+                    constraints.put(arg1, new OpConstraint(Op.SETEXT));
+                    constraints.put(arg2, new OpConstraint(Op.SETEXT));
+                    preNext = new SubTermsStructure(Op.SETEXT.bit);
                     break;
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
-                    constraints.put(arg1, new OpConstraint(Op.SET_INT));
-                    constraints.put(arg2, new OpConstraint(Op.SET_INT));
-                    preNext = new SubTermsStructure(Op.SET_INT.bit);
+                    constraints.put(arg1, new OpConstraint(Op.SETINT));
+                    constraints.put(arg2, new OpConstraint(Op.SETINT));
+                    preNext = new SubTermsStructure(Op.SETINT.bit);
                     break;
 
                 case "notConjunction":
-                    constraints.put(arg1, new NotOpConstraint(Op.CONJUNCTION));
+                    constraints.put(arg1, new NotOpConstraint(Op.CONJ));
                     break;
 
                 case "notImplicationOrEquivalence":
                     constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits));
                     break;
                 case "notImplicationEquivalenceOrConjunction":
-                    constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits | Op.CONJUNCTION.bit));
+                    constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits | Op.CONJ.bit));
                     break;
 
                 case "events":
@@ -1021,11 +1021,11 @@ public class PremiseRule extends GenericCompound {
 
     /** safe negation */
     private static Term neg(Term x) {
-        if (x.op() == Op.NEGATE) {
+        if (x.op() == Op.NEG) {
             return ((Compound)x).term(0); //unwrap
         } else {
             //do this manually for premise rules since they will need to negate atoms which is not usually allowed
-            return new GenericCompound(Op.NEGATE, TermContainer.the(x));
+            return new GenericCompound(Op.NEG, TermContainer.the(x));
         }
     }
 

@@ -35,7 +35,7 @@ public abstract class TermBuilder {
 
         /* special handling */
         switch (op) {
-            case NEGATE:
+            case NEG:
                 if (u.length != 1)
                     throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
                 return negation(u[0]);
@@ -51,12 +51,12 @@ public abstract class TermBuilder {
                 if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
                 return instprop(u[0], u[1]);
 
-            case CONJUNCTION:
-            case DISJUNCTION:
+            case CONJ:
+            case DISJ:
                 return junction(op, dt, u);
 
-            case IMAGE_INT:
-            case IMAGE_EXT:
+            case IMGINT:
+            case IMGEXT:
                 //if no relation was specified and it's an Image,
                 //it must contain a _ placeholder
                 if (hasImdex(u)) {
@@ -69,23 +69,23 @@ public abstract class TermBuilder {
                 }
 
 
-            case DIFF_EXT:
-            case DIFF_INT:
+            case DIFEXT:
+            case DIFINT:
                 return newDiff(op, tt);
-            case INTERSECT_EXT:
+            case SECTEXT:
                 return newIntersectEXT(u);
-            case INTERSECT_INT:
+            case SECTINT:
                 return newIntersectINT(u);
 
-            case INHERIT:
-            case SIMILAR:
+            case INH:
+            case SIM:
             case EQUIV:
-            case IMPLICATION:
+            case IMPL:
                 return statement(op, dt, u);
 
             default:
                 if (u.length == 0) {
-                    if (op == PRODUCT)
+                    if (op == PROD)
                         return Terms.ZeroProduct;
                     else
                         throw new InvalidTerm(op, u);
@@ -191,7 +191,7 @@ public abstract class TermBuilder {
     public Term newDiff(@NotNull Op op, @NotNull TermContainer tt) {
 
         //corresponding set type for reduction:
-        Op set = op == DIFF_EXT ? SET_EXT : SET_INT;
+        Op set = op == DIFEXT ? SETEXT : SETINT;
 
         Term[] t = tt.terms();
         switch (t.length) {
@@ -251,26 +251,26 @@ public abstract class TermBuilder {
 
     @Nullable
     public Compound inst(Term subj, Term pred) {
-        return (Compound) build(INHERIT, TermVector.the(build(SET_EXT, subj), pred));
+        return (Compound) build(INH, TermVector.the(build(SETEXT, subj), pred));
     }
 
     @Nullable
     public Compound prop(Term subj, Term pred) {
-        return (Compound) build(INHERIT, TermVector.the(subj, build(SET_INT, pred)));
+        return (Compound) build(INH, TermVector.the(subj, build(SETINT, pred)));
     }
 
     @Nullable
     public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) build(INHERIT, TermVector.the(build(SET_EXT, subj), build(SET_INT, pred)));
+        return (Compound) build(INH, TermVector.the(build(SETEXT, subj), build(SETINT, pred)));
     }
 
     @Nullable
     public Term negation(@NotNull Term t) {
-        if (t.op() == NEGATE) {
+        if (t.op() == NEG) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         }
-        return make(NEGATE, -1, TermVector.the(t)).term();
+        return make(NEG, -1, TermVector.the(t)).term();
     }
 
     @Nullable
@@ -315,7 +315,7 @@ public abstract class TermBuilder {
         }
 
         if (t != DTERNAL) {
-            if (op == DISJUNCTION) {
+            if (op == DISJ) {
                 throw new RuntimeException("invalid temporal disjunction");
             }
 
@@ -379,7 +379,7 @@ public abstract class TermBuilder {
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
         if (negs!=null) {
-            if (op == DISJUNCTION && negs.anySatisfy(s::contains))
+            if (op == DISJ && negs.anySatisfy(s::contains))
                 return null; //throw new InvalidTerm(op, u);
             //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
 
@@ -387,10 +387,10 @@ public abstract class TermBuilder {
             //if all subterms negated; apply DeMorgan's Law
             if ((dt == DTERNAL) && (negs.size() == s.size())) {
 
-                op = op == CONJUNCTION ? DISJUNCTION : CONJUNCTION;
+                op = op == CONJ ? DISJ : CONJ;
 
                 Term nn = finish(op, -1, dt, TermSet.the(negs));
-                return build(NEGATE, nn);
+                return build(NEG, nn);
             }
         }
 
@@ -405,7 +405,7 @@ public abstract class TermBuilder {
                 unwrappedNegations = flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
             } else {
                 if (s.add(x)) { //ordinary term, add
-                    if (x.op() == NEGATE) {
+                    if (x.op() == NEG) {
                         if (unwrappedNegations == null)
                             unwrappedNegations = new UnifiedSet<>(1);
                         unwrappedNegations.add(((Compound) x).term(0));
@@ -451,13 +451,13 @@ public abstract class TermBuilder {
                 if (!validEquivalenceTerm(predicate)) return null;
                 break;
 
-            case IMPLICATION:
+            case IMPL:
                 if (subject.isAnyOf(TermIndex.InvalidEquivalenceTerm)) return null;
                 if (predicate.isAnyOf(TermIndex.InvalidImplicationPredicate)) return null;
 
-                if (predicate.op() == IMPLICATION) {
+                if (predicate.op() == IMPL) {
                     Term oldCondition = subj(predicate);
-                    if ((oldCondition.op() == CONJUNCTION && oldCondition.containsTerm(subject)))
+                    if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                         return null;
 
                     return impl2Conj(dt, subject, predicate, oldCondition);
@@ -466,7 +466,7 @@ public abstract class TermBuilder {
 
 
                 //filter (factor out) any common subterms iff equal 'dt'
-                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION)) {
+                if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
                     Compound csub = (Compound) subject;
                     Compound cpred = (Compound) predicate;
                     if(csub.dt() == cpred.dt()) {
@@ -519,24 +519,24 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
-        Term s = junction(CONJUNCTION, t, subject, oldCondition);
-        return s != null ? build(IMPLICATION, t, TermVector.the(s, pred(predicate))) : null;
+        Term s = junction(CONJ, t, subject, oldCondition);
+        return s != null ? build(IMPL, t, TermVector.the(s, pred(predicate))) : null;
     }
 
     @Nullable
     public Term newIntersectINT(@NotNull Term[] t) {
         return newIntersection(t,
-                INTERSECT_INT,
-                SET_INT,
-                SET_EXT);
+                SECTINT,
+                SETINT,
+                SETEXT);
     }
 
     @Nullable
     public Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
-                INTERSECT_EXT,
-                SET_EXT,
-                SET_INT);
+                SECTEXT,
+                SETEXT,
+                SETINT);
     }
 
     @Nullable

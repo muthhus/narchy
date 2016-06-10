@@ -65,15 +65,15 @@ public interface TermPrinter {
         final Op op = c.op();
 
         switch (op) {
-            case SET_INT:
-            case SET_EXT:
+            case SETINT:
+            case SETEXT:
                 setAppend(c, p);
                 break;
-            case PRODUCT:
+            case PROD:
                 productAppend(c, p);
                 break;
-            case IMAGE_INT:
-            case IMAGE_EXT:
+            case IMGINT:
+            case IMGEXT:
                 imageAppend(c, p);
                 break;
             //case INHERIT: inheritAppend(c, p, pretty); break;
@@ -187,11 +187,11 @@ public interface TermPrinter {
 
         //duplicated from above, dont want to store this as a field in the class
         char opener, closer;
-        if (set.op() == Op.SET_EXT) {
-            opener = Op.SET_EXT.ch;
+        if (set.op() == Op.SETEXT) {
+            opener = Op.SETEXT.ch;
             closer = Symbols.SET_EXT_CLOSER;
         } else {
-            opener = Op.SET_INT.ch;
+            opener = Op.SETINT.ch;
             closer = Symbols.SET_INT_CLOSER;
         }
 

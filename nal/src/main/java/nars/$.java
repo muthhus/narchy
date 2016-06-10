@@ -52,6 +52,7 @@ import static nars.nal.Tense.DTERNAL;
  *                                                      8P'                                 `Y8P'
  *                                                      "
  *
+ *                                              NARquery
  *                                          Core Utility Class
  */
 public enum $ {
@@ -115,7 +116,7 @@ public enum $ {
 //            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
 //        else
 
-        return (Compound) the(INHERIT, subj, pred);
+        return (Compound) the(INH, subj, pred);
     }
 
 
@@ -127,7 +128,7 @@ public enum $ {
 
     @Nullable
     public static Compound sim(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) the(SIMILAR, subj, pred);
+        return (Compound) the(SIM, subj, pred);
     }
 
 
@@ -136,14 +137,14 @@ public enum $ {
     @NotNull
     public static Compound exec(@NotNull Atomic opTerm, Term... arg) {
         return (Compound) the(
-                INHERIT,
+                INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
     @NotNull public static Compound exec(@NotNull Atomic opTerm, Collection<Term> arg) {
         return (Compound) the(
-                INHERIT,
+                INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
@@ -152,16 +153,16 @@ public enum $ {
 
     @Nullable
     public static Compound impl(@NotNull Term a, @NotNull Term b) {
-        return (Compound) the(IMPLICATION, a, b);
+        return (Compound) the(IMPL, a, b);
     }
     @Nullable
     public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (Compound) compound(IMPLICATION, -1, dt, TermVector.the(a, b));
+        return (Compound) compound(IMPL, -1, dt, TermVector.the(a, b));
     }
 
     @Nullable
     public static Compound neg(@NotNull Termed x) {
-        return (Compound) the(NEGATE, x.term());
+        return (Compound) the(NEG, x.term());
     }
 
     @NotNull
@@ -171,7 +172,7 @@ public enum $ {
 
     @NotNull
     public static Compound p(@NotNull Term... t) {
-        return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
+        return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PROD, t);
     }
     @NotNull
     public static Compound p(@NotNull TermVector t) {
@@ -288,7 +289,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SET_EXT, -1, (Collection)t);
+        return (Compound) the(SETEXT, -1, (Collection)t);
     }
 //    @NotNull
 //    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
@@ -330,7 +331,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(Term... t) {
-        return (Compound) the(SET_EXT, t);
+        return (Compound) the(SETEXT, t);
 
     }
 
@@ -342,7 +343,7 @@ public enum $ {
 
     @NotNull
     public static Compound seti(Term... t) {
-        return (Compound) the(SET_INT, t);
+        return (Compound) the(SETINT, t);
     }
 
 //    /**
@@ -379,16 +380,16 @@ public enum $ {
 
     @Nullable
     public static Term conj(Term... a) {
-        return the(CONJUNCTION, a);
+        return the(CONJ, a);
     }
     @Nullable
     public static Term conj(int dt, Term... a) {
-        return compound(CONJUNCTION, -1, dt, TermVector.the(a)); //must be a vector, not set
+        return compound(CONJ, -1, dt, TermVector.the(a)); //must be a vector, not set
     }
 
     @Nullable
     public static Term disj(Term... a) {
-        return the(DISJUNCTION, a);
+        return the(DISJ, a);
     }
 
     //static {
@@ -488,32 +489,32 @@ public enum $ {
 
     @Nullable
     public static Term diffInt(Term a, Term b) {
-        return the(DIFF_INT, a, b);
+        return the(DIFINT, a, b);
     }
 
     @Nullable
     public static Term diffExt(Term a, Term b) {
-        return the(DIFF_EXT, a, b);
+        return the(DIFEXT, a, b);
     }
 
     @Nullable
     public static Term imageExt(Term... x) {
-        return the(IMAGE_EXT, x);
+        return the(IMGEXT, x);
     }
     @Nullable
     public static Term imageInt(Term... x) {
-        return the(IMAGE_INT, x);
+        return the(IMGINT, x);
     }
 
     @Nullable
     public static Term esect(Term... x) {
-        return the(INTERSECT_EXT, x);
+        return the(SECTEXT, x);
     }
 
 
 
     @Nullable
-    public static Term isect(Term... x) { return the(INTERSECT_INT, x); }
+    public static Term isect(Term... x) { return the(SECTINT, x); }
 
 
     public static @NotNull Operator operator(@NotNull String name) {
@@ -711,7 +712,7 @@ public enum $ {
         argument[0] = relation;
         System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
 
-        return the(IMAGE_EXT, index + 1, argument);
+        return the(IMGEXT, index + 1, argument);
     }
 
     @Nullable
@@ -727,18 +728,18 @@ public enum $ {
     public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         Term related = elements[relation];
-        Term img = the(ext ? IMAGE_EXT : IMAGE_INT, relation, elementsMasked);
+        Term img = the(ext ? IMGEXT : IMGINT, relation, elementsMasked);
 
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
     @Nullable
     public static Compound imageExt(int relation, @NotNull Compound product) {
-        assert(product.op() == Op.PRODUCT);
+        assert(product.op() == Op.PROD);
         return image(relation, true, product.terms());
     }
     @Nullable
     public static Compound imageInt(int relation, @NotNull Compound product) {
-        assert(product.op() == Op.PRODUCT);
+        assert(product.op() == Op.PROD);
         return image(relation, false, product.terms());
     }
 

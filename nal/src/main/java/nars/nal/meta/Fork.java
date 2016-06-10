@@ -17,7 +17,7 @@ public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
 
 
     protected Fork(@NotNull ProcTerm[] actions) {
-        super(Op.CONJUNCTION, TermSet.the(actions));
+        super(Op.CONJ, TermSet.the(actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.termCache = actions;

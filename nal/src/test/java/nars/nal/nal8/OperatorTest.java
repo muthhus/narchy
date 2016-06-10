@@ -72,16 +72,16 @@ public class OperatorTest {
 
     @Test public void testOperationIsInheritance() {
         Compound o = $.exec($.operator("x"), $.p("x"));
-        assertEquals(Op.INHERIT, o.op());
+        assertEquals(Op.INH, o.op());
     }
 
     @Test public void testInhIsOperation() {
         Compound o = $("<(a,b,c)-->^x>");
-        assertTrue(o.term(0).op() == Op.PRODUCT);
+        assertTrue(o.term(0).op() == Op.PROD);
         assertTrue(o.term(1) instanceof Atomic);
-        assertTrue(o.term(1).op() == Op.OPERATOR);
+        assertTrue(o.term(1).op() == Op.OPER);
         assertEquals("x(a,b,c)", o.toString());
-        assertEquals(Op.INHERIT, o.op());
+        assertEquals(Op.INH, o.op());
     }
 
 //    @Test public void testTermReactionRegistration() {

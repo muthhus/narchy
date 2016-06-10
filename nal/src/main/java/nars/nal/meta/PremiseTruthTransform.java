@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-import static nars.Op.INHERIT;
+import static nars.Op.INH;
 
 /**
  * Created by me on 6/9/16.
@@ -35,7 +35,7 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
 
     @Override
     public boolean test(@NotNull Term o) {
-        if (o.op() == INHERIT) {
+        if (o.op() == INH) {
             Term pred = ((Compound) o).term(1);
             return pred.equals(belief) || pred.equals(desire);
         }

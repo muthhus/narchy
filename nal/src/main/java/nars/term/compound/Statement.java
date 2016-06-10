@@ -64,7 +64,7 @@ public interface Statement {
     }
 
     static boolean coNegated(@NotNull Term subject, @NotNull Term predicate) {
-        return subject.op() == Op.NEGATE && ((Compound) subject).term(0).equals(predicate);
+        return subject.op() == Op.NEG && ((Compound) subject).term(0).equals(predicate);
     }
 
 
