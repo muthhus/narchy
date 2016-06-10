@@ -1,6 +1,7 @@
 package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
+import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
@@ -12,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.Texts;
+import nars.util.data.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
@@ -409,35 +411,61 @@ public class NAgent implements Agent {
 
         long now = nar.time();
 
+        float conf = decisiveness(nextAction);
+        conf = Math.max(conf, Global.TRUTH_EPSILON);
+
         /*if (lastAction != nextAction)*/ {
 
             //belief/goal feedback levels
-            float off = 0.49f;
+            float off = 0f;
             float on = 1f;
             float preOff = on; //0.75f;
             float preOn = off; // 0.75f;
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
-                nar.goal(goalPriority, lastActionMotor, now, preOff, gamma); //downward step function top
-                nar.believe(goalPriority, lastActionMotor, now, preOff, gamma); //downward step function top
+                nar.goal(goalPriority, lastActionMotor, now, preOff, gamma * conf); //downward step function top
+                nar.believe(goalPriority, lastActionMotor, now, preOff, gamma * conf); //downward step function top
 //
-                nar.goal(goalPriority, lastActionMotor, now+1, off, gamma); //downward step function bottom
-                nar.believe(goalPriority, lastActionMotor, now+1, off, gamma); //downward step function bottom
+                nar.goal(goalPriority, lastActionMotor, now+1, off, gamma * conf); //downward step function bottom
+                nar.believe(goalPriority, lastActionMotor, now+1, off, gamma * conf); //downward step function bottom
             }
 
             MotorConcept nextAction = actions.get(this.nextAction);
-            nar.goal(goalPriority, nextAction, now, preOn, gamma); //upward step function bottom
-            nar.believe(goalPriority, nextAction, now, preOn, gamma); //upward step function bottom
+            nar.goal(goalPriority, nextAction, now, preOn, gamma * conf); //upward step function bottom
+            nar.believe(goalPriority, nextAction, now, preOn, gamma * conf); //upward step function bottom
 //
-            nar.goal(goalPriority, nextAction, now+1, on, gamma); //upward step function top
-            nar.believe(goalPriority, nextAction, now+1, on, gamma); //upward step function top
+            nar.goal(goalPriority, nextAction, now+1, on, gamma * conf); //upward step function top
+            nar.believe(goalPriority, nextAction, now+1, on, gamma * conf); //upward step function top
         }
 
         //updateMotors();
 
         this.lastAction = nextAction;
         this.lastMotivation = nextMotivation;
+    }
+
+    /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
+     * @return value in (0..1.0]
+     */
+    private float decisiveness(int nextAction) {
+
+        float[] minmax = Util.minmax(motivation);
+        int actions = motivation.length;
+        float[] motNorm = new float[actions];
+        float min = minmax[0];
+        float max = minmax[1];
+        if ( min == max) return 1f;
+        float s = 0;
+        for (int i = 0; i < actions; i++) {
+            float m;
+            motNorm[i] = m = Util.normalize(motivation[i], min, max);
+            s += m;
+        }
+        if (s == 0) return 1f;
+        float p = motNorm[nextAction] / s;
+        return p;
+
     }
 
     private void updateMotors() {
