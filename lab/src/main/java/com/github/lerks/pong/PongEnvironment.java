@@ -96,7 +96,7 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 		a.nar.runLater(()->{
-			new BeliefPanel(a.nar, a.actions.get(0)).show(400, 100);
+			new BeliefPanel(a.nar, a.actions).show(400, 100);
 		});
 
 

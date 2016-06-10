@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptBudgeting;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -28,7 +29,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
-import static nars.$.b;
 import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.w2c;
@@ -92,6 +92,9 @@ public class NAgent implements Agent {
     private DecideAction decideAction;
     private boolean synchronousGoalInput = false;
 
+    private int motorBeliefCapacity = 16;
+    private int motorGoalCapacity = 16;
+
 
     public NAgent(NAR n) {
 
@@ -150,6 +153,12 @@ public class NAgent implements Agent {
             };
 
             MotorConcept mc = new MotorConcept(actionConceptName(i), nar, motorFunc) {
+
+                @Override protected void beliefCapacity(ConceptBudgeting p) {
+                    beliefs().capacity(0, motorBeliefCapacity);
+                    goals().capacity(1, motorGoalCapacity);
+                }
+
                 @Override
                 public float floatValueOf(Term anObject) {
 //                    //shouldnt get called
@@ -424,8 +433,8 @@ public class NAgent implements Agent {
             //belief/goal feedback levels
             float off = 0.49f;
             float on = 1f;
-            float preOff = on; //0.75f;
-            float preOn = off; // 0.75f;
+            float preOff = (on+off)/2f; //0.75f;
+            float preOn = preOff; // 0.75f;
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);

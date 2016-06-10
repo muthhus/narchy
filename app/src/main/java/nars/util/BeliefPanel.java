@@ -4,11 +4,14 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
@@ -17,19 +20,35 @@ import static nars.nal.Tense.ETERNAL;
 
 public class BeliefPanel extends AbstractJoglPanel  {
 
-    final Concept c;
+    final List<? extends Concept> c;
+    final List<TruthWave> beliefs;
+    final List<TruthWave> goals;
+
+
+
     private final NAR nar;
     private long now;
 
     public BeliefPanel(NAR n, Concept c) {
+        this(n, Collections.singletonList(c));
+    }
+
+    public BeliefPanel(NAR n, List<? extends Concept> c) {
         super();
         this.c =c;
         this.nar = n;
 
+        beliefs = Global.newArrayList();
+        goals = Global.newArrayList();
+        for (int i = 0; i < c.size(); i++) {
+            beliefs.add(new TruthWave(0));
+            goals.add(new TruthWave(0));
+        }
+
         //setAutoSwapBufferMode(true);
 
         n.onFrame(nn -> {
-            update(c);
+            update();
         });
     }
 
@@ -38,20 +57,37 @@ public class BeliefPanel extends AbstractJoglPanel  {
         if (!redraw.compareAndSet(true, false)) {
             return;
         }
+
         //swapBuffers();
 
-        int W = getWidth();
-        int H = getHeight();
+        float W = getWidth();
+        float H = getHeight();
 
         //clear
         gl.glColor4f(0,0,0, 0.5f);
         gl.glRectf(0,0,W,H);
 
-        float gew = (float) H;
-        float geh = (float) H;
+        int num = c.size();
+        float dy = H / num;
+        gl.glPushMatrix();
+        for (int i = 0; i < num; i++) {
+            draw(gl, i, W, dy);
+            gl.glTranslatef(0,dy,0);
+        }
+        gl.glPopMatrix();
+
+    }
+
+    protected void draw(GL2 gl, int n, float W, float H) {
+
+        float gew = H;
+        float geh = H;
 
         float tew = W-H;
         float teh = H;
+
+        TruthWave beliefs = this.beliefs.get(n);
+        TruthWave goals = this.goals.get(n);
 
         //compute bounds from combined min/max of beliefs and goals so they align correctly
         long minT = Long.MAX_VALUE;
@@ -114,7 +150,6 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
 
     }
-
     @Override
     public void init(GLAutoDrawable gl) {
 
@@ -150,7 +185,6 @@ public class BeliefPanel extends AbstractJoglPanel  {
     }
 
 
-    final TruthWave beliefs = new TruthWave(0), goals = new TruthWave(0);
 
 //    final static ColorMatrix beliefColors = new ColorMatrix(8, 8, (f, c) ->
 //            new Color(0.6f + 0.38f * c, 0.2f, 1f, 0.39f + 0.6f * c)
@@ -161,12 +195,12 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.6f + 0.38f * c, 0.2f, 1f, 0.39f + 0.6f * pri);
+        ge.glColor4f(0.3f + 0.7f * c, 0.25f, 0.25f, 0.25f + 0.75f * pri);
         rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.2f + 0.4f * c, 1f, 0.2f, 0.39f + 0.6f * pri);
+        ge.glColor4f(0.25f, 0.3f + 0.7f * c, 0.25f, 0.25f + 0.75f * pri);
         rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
 
@@ -220,14 +254,16 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     final AtomicBoolean redraw = new AtomicBoolean(true);
 
-    public void update(Concept concept) {
+    public void update() {
 
-        if (concept == null) return;
 
 
         this.now = nar.time();
-        beliefs.set(concept.beliefs(), now);
-        goals.set(concept.goals(), now);
+        for (int i = 0; i < this.c.size(); i++) {
+            Concept c = this.c.get(i);
+            beliefs.get(i).set(c.beliefs(), now);
+            goals.get(i).set(c.goals(), now);
+        }
 
         redraw.set(true);
 
