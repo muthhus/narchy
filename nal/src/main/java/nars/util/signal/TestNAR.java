@@ -551,7 +551,7 @@ public class TestNAR  {
         }
         for (NARCondition t : disqualifies) {
             if (t.isTrue()) {
-                logger.error("mustNot: {}\n{}", t);
+                logger.error("mustNot: {}", t);
                 t.log(logger);
 
                 success = false;

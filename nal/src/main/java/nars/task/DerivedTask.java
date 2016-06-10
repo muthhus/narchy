@@ -38,10 +38,10 @@ abstract public class DerivedTask extends MutableTask {
 //        return true;
 //    }
 
-    public void multiplyPremise(float factor, boolean alsoDurability) {
-        multiply(factor, taskLink, alsoDurability);
-        multiply(factor, termLink, alsoDurability);
-    }
+//    public void multiplyPremise(float factor, boolean alsoDurability) {
+//        multiply(factor, taskLink, alsoDurability);
+//        multiply(factor, termLink, alsoDurability);
+//    }
 
     static void multiply(float factor, @Nullable BLink link, boolean alsoDurability) {
         if (link !=null && !link.isDeleted()) {

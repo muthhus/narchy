@@ -54,7 +54,7 @@ public class LibraryInput extends TextInput {
     }
     
     @NotNull
-    public static LibraryInput get(@NotNull NAR n, @NotNull String id) throws Exception {
+    public static LibraryInput get(@NotNull NAR n, @NotNull String id) throws IOException {
         if (!id.endsWith(".nal"))
             id = id + ".nal";
 

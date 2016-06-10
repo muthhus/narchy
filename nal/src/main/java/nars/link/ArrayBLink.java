@@ -134,13 +134,13 @@ abstract public class ArrayBLink<X> extends BLink<X> {
         float[] b = this.b;
         float lastForget = b[LASTFORGET];
         float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
-        setLastForgetTimeFast(currentTime);
+        setLastForgetTimeDirect(currentTime);
         return diff;
     }
 
     /** doesnt compute the delta */
     @Override
-    public final void setLastForgetTimeFast(float currentTime) {
+    public final void setLastForgetTimeDirect(float currentTime) {
         b[LASTFORGET] = currentTime;
     }
 

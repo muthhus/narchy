@@ -8,6 +8,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
+import nars.link.DefaultBLink;
 import nars.link.StrongBLink;
 import nars.nar.Default;
 import nars.task.MutableTask;
@@ -127,13 +128,13 @@ public class STMClustered extends STM {
 
         //TODO cache this value
         public float priSum() {
-            return (float)tasks.stream().mapToDouble(t->t.pri()).sum();
+            return (float)tasks.stream().mapToDouble(DefaultBLink::pri).sum();
         }
 
         /** produces a parallel conjunction term consisting of all the task's terms */
         public Stream<Task[]> termSet(int maxComponentsPerTerm) {
             AtomicInteger as = new AtomicInteger();
-            return tasks.stream().map(t -> t.get()).distinct().
+            return tasks.stream().map(StrongBLink::get).distinct().
                     collect(Collectors.groupingBy(x -> as.incrementAndGet() / (1+maxComponentsPerTerm)))
                     .values().stream()
                     .filter(c -> c.size()> 1)
@@ -191,7 +192,7 @@ public class STMClustered extends STM {
             return super.commit();
         }
 
-        public TasksNode nearest() {
+        private TasksNode nearest() {
             return net.learn(coord);
         }
 
@@ -338,11 +339,11 @@ public class STMClustered extends STM {
 
 
     public IntSummaryStatistics nodeStatistics() {
-        return net.nodeStream().mapToInt(v -> v.size()).summaryStatistics();
+        return net.nodeStream().mapToInt(TasksNode::size).summaryStatistics();
     }
 
     public DoubleSummaryStatistics bagStatistics() {
-        return StreamSupport.stream(bag.spliterator(), false).mapToDouble(v -> v.pri()).summaryStatistics();
+        return StreamSupport.stream(bag.spliterator(), false).mapToDouble(Budgeted::pri).summaryStatistics();
     }
 
 

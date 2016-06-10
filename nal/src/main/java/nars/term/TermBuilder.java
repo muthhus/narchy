@@ -15,11 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
-import static java.util.Arrays.parallelSetAll;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.compound.Statement.pred;

@@ -62,7 +62,7 @@ public class DeductiveChainTest  {
 
     @NotNull
     public static Atom a(int i) {
-        return Atom.the((byte)('a' + i));
+        return $.the((byte)('a' + i));
     }
 
 

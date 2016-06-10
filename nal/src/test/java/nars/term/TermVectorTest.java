@@ -16,7 +16,7 @@ public class TermVectorTest {
     @Test
     public void testSubtermsEquality() {
 
-        Compound a = (Compound) $.inh("a", "b");
+        Compound a = $.inh("a", "b");
         //return Atom.the(Utf8.toUtf8(name));
 
         //        int olen = name.length();

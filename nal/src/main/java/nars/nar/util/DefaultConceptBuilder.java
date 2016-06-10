@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.link.BLink;
 import nars.link.StrongBLinkToBudgeted;
-import nars.link.WeakBLinkToBudgeted;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -20,7 +20,6 @@ import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
-import nars.term.atom.Atom;
 import nars.term.container.TermVector;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
@@ -481,7 +480,7 @@ public class Narsese extends BaseParser<Object> {
 //                        //negation shorthand
                         seq(NEGATE.str, s(), Term(), push(
                                 //Negation.make(popTerm(null, true)))),
-                                $.neg(Atom.the(pop())))),
+                                $.neg($.the(pop())))),
 
                         seq(SET_EXT.str,
 

@@ -32,7 +32,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     private final Term term;
 
     boolean succeeded;
-    long successTime = Tense.TIMELESS;
+    //long successTime = Tense.TIMELESS;
 
     final static Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
 
@@ -67,7 +67,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     public final List<Task> matched = Global.newArrayList(1);
 
 
-    final transient int maxSimilars = 3;
+    final static int maxSimilars = 2;
 
     protected final TreeMap<Float, Task> similar = new TreeMap();
 
@@ -104,7 +104,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
             //this.duration = n.memory.duration();
         } catch (Throwable t) {
-            logger.error("{},", t);
+            logger.error("TaskCondition: {}", t);
             throw new RuntimeException(t);
         }
     }
@@ -394,7 +394,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
         if (test(task)) {
             succeeded = true;
-            successTime = nar.time();
+            //successTime = nar.time();
         } else {
             //logger.info("non-matched: {}", task);
             //logger.info("\t{}", task.getLogLast());

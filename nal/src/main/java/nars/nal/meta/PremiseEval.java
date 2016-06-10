@@ -50,7 +50,7 @@ public class PremiseEval extends FindSubst {
     @NotNull
     @Deprecated public ProcTerm forEachMatch;
 
-    public final Map<Atomic, ImmediateTermTransform> transforms = new HashMap();
+    public final Map<Atomic, ImmediateTermTransform> transforms;
 
     /** run parameters */
     int premiseMatchesMax, termutes;
@@ -80,6 +80,7 @@ public class PremiseEval extends FindSubst {
     public PremiseEval(TermIndex index, Random r, Deriver deriver) {
         super(index, VAR_PATTERN, r );
 
+        transforms = new HashMap<>(PremiseRule.Operators.length);
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
             addTransform(c);
         }
@@ -160,11 +161,15 @@ public class PremiseEval extends FindSubst {
     }
 
 
+    public void init(NAR nar) {
+        this.nar = nar;
+        this.confMin = nar.confMin.floatValue();
+    }
+
     /**
-     * set the next premise
+     * execute the next premise, be sure to call init() before a batch of run()'s
      */
     public final void run(@NotNull ConceptProcess p) {
-        this.nar = p.nar;
 
         Task task = p.task();
         if (task == null)
@@ -203,9 +208,6 @@ public class PremiseEval extends FindSubst {
 //        }
 
 
-
-
-
         this.cyclic = p.cyclic();
         this.overlap = p.overlap();
 
@@ -214,24 +216,9 @@ public class PremiseEval extends FindSubst {
         this.termSub1Struct = beliefTerm.structure();
         this.termSub1op = beliefTerm.op().ordinal();
 
-        //term.set( termPattern );
-
-//        //set initial power which will be divided by branch
-//        setPower(
-//            //LERP the power in min/max range by premise mean priority
-//            (int) ((p.getMeanPriority() * (Global.UNIFICATION_POWER - Global.UNIFICATION_POWERmin))
-//                    + Global.UNIFICATION_POWERmin)
-//        );
-
-        //setPower(branchPower.get()); //HACK is this where it should be assigned?
-
-        //p.nar.eventConceptProcess.emit(p);
-
-
         deriver.run(this);
 
         clear();
-
     }
 
 //    public final void occurrenceAdd(long durationsDelta) {
@@ -326,6 +313,7 @@ public class PremiseEval extends FindSubst {
     public void replaceAllXY(@NotNull FindSubst m) {
         m.forEachVersioned(this::replaceXY);
     }
+
 
 
 }

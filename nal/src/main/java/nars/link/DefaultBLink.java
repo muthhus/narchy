@@ -120,13 +120,13 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     @Deprecated public final float setLastForgetTime(float currentTime) {
         float lastForget = this.lastForget;
         float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
-        setLastForgetTimeFast(currentTime);
+        this.lastForget = currentTime;
         return diff;
     }
 
     /** doesnt compute the delta */
     @Override
-    public final void setLastForgetTimeFast(float currentTime) {
+    public final void setLastForgetTimeDirect(float currentTime) {
         lastForget = currentTime;
     }
 

@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public enum TermLinkBuilder {
@@ -93,15 +94,11 @@ public enum TermLinkBuilder {
         int total = s.size();
         //int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
 
-        List<TermTemplate> sa = Global.newArrayList(total);
+        //List<TermTemplate> sa = Global.newArrayList(total);
         //float fraction = 1f / active;
         float fraction = 1f / total;
 
-        for (Termed x : s) {
-            sa.add(new TermTemplate(x, fraction));
-        }
-
-        return sa;
+        return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
     }
 
 

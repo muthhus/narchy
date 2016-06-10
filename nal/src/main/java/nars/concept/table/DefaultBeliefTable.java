@@ -128,7 +128,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Task topEternal() {
         EternalTable ee = eternal;
         if (!ee.isEmpty()) {
-            synchronized (ee) {
+            synchronized (eternal) {
                 return ee.top();
             }
         }
@@ -140,7 +140,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Task topTemporal(long when, long now) {
         TemporalBeliefTable tt = temporal;
         if (!tt.isEmpty()) {
-            synchronized (tt) {
+            synchronized (temporal) {
                 return tt.top(when);
             }
         }

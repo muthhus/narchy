@@ -21,25 +21,25 @@ public abstract class Deriver  {
 
     private static TrieDeriver defaultDeriver;
 
-    public static PremiseRuleSet defaultRules;
+    private static PremiseRuleSet defaultRules;
 
     final static Logger logger = LoggerFactory.getLogger(Deriver.class);
 
     @NotNull
     public synchronized static TrieDeriver getDefaultDeriver() {
         if (defaultRules == null) {
-            synchronized(logger) {
+            //synchronized(logger) {
                 if (defaultDeriver == null) { //double boiler
                     try {
                         defaultRules = new PremiseRuleSet();
                         defaultDeriver = new TrieDeriver( defaultRules );
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.error("{}",e.getCause());
+                        logger.error("getDefaultDeriver: {}",e.getCause());
                         System.exit(1);  //e.printStackTrace();
                     }
                 }
-            }
+            //}
 
         }
         return defaultDeriver;

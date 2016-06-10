@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Memory extends Param {
 
-    @NotNull protected Atom self;
+    @NotNull protected final Atom self;
 
     @NotNull public final Random random;
 

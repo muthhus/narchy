@@ -471,12 +471,12 @@ public class NAgent implements Agent {
 
     }
 
-    private void updateMotors() {
-        //update all motors and their feedback
-        for (MotorConcept m : actions) {
-            m.commit();
-        }
-    }
+//    private void updateMotors() {
+//        //update all motors and their feedback
+//        for (MotorConcept m : actions) {
+//            m.commit();
+//        }
+//    }
 
     private int randomMotivation() {
         System.err.println("RANDOM");
@@ -510,17 +510,17 @@ public class NAgent implements Agent {
         }
     }
 
-    private String inputConceptName(int i, int component) {
-        return "(i" + i +
-                (component != -1 ? ("_" + component) : "") +
-                ")";
-
-        //return "{i" + i + "}";
-        //return "(input, i" + i + ")";
-        //return "input:i" + i;
-        //return "input:{i" + i + '}';
-
-    }
+//    private String inputConceptName(int i, int component) {
+//        return "(i" + i +
+//                (component != -1 ? ("_" + component) : "") +
+//                ")";
+//
+//        //return "{i" + i + "}";
+//        //return "(input, i" + i + ")";
+//        //return "input:i" + i;
+//        //return "input:{i" + i + '}';
+//
+//    }
 
 
 }

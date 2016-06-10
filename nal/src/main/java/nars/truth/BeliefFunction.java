@@ -1,6 +1,5 @@
 package nars.truth;
 
-import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.Symbols;

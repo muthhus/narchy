@@ -121,7 +121,7 @@ public enum $ {
 
     @Nullable
     public static Compound inh(@NotNull String subj, @NotNull String pred) {
-        return inh((Term)$(subj), (Term)$(pred));
+        return inh($(subj), $(pred));
     }
 
 
@@ -274,7 +274,7 @@ public enum $ {
 
     @NotNull
     public static MutableTask task(@NotNull String term, char punct, float freq, float conf) throws Narsese.NarseseException {
-        return task((Compound)$.$(term), punct, freq, conf);
+        return task($.$(term), punct, freq, conf);
     }
 
     @NotNull
@@ -650,7 +650,7 @@ public enum $ {
 
     @NotNull
     public static Atom the(@NotNull String name, boolean quoteIfNecessary) {
-        if (quoteIfNecessary && Atom.quoteNecessary(name))
+        if (quoteIfNecessary && quoteNecessary(name))
             return quote(name);
 
         //return Atom.the(Utf8.toUtf8(name));
@@ -765,6 +765,40 @@ public enum $ {
 
     /** static storeless term builder */
     public static final StaticTermBuilder terms = new StaticTermBuilder();
+
+    /** determines if the string is invalid as an unquoted term according to the characters present */
+    public static boolean quoteNecessary(@NotNull CharSequence t) {
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+//            if (Character.isWhitespace(c)) return true;
+            if (!Narsese.isValidAtomChar(c))
+                return true;
+//            if ((!Character.isDigit(c)) && (!Character.isAlphabetic(c))) return true;
+        }
+        return false;
+    }
+
+    @NotNull
+    public static Atom the(@NotNull byte[] id) {
+        return new Atom(new String(id));
+    }
+
+    @NotNull
+    public static Atom the(byte c) {
+        return the(new byte[] { c });
+    }
+
+    @Nullable
+    public static Term the(Object o) {
+
+        if (o instanceof Term) return ((Term)o);
+        if (o instanceof String)
+            return the((String)o);
+        if (o instanceof Number)
+            return the((Number)o);
+
+        return null;
+    }
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 

@@ -16,7 +16,7 @@ public class NARjs {
 
 	final ScriptEngine js = factory.getEngineByName("JavaScript");
 
-	public NARjs() throws Exception {
+	public NARjs() throws ScriptException {
 		js.eval("load('nashorn:mozilla_compat.js')");
 
 		js.eval("importPackage('java.lang')");
@@ -41,7 +41,7 @@ public class NARjs {
 		System.out.println("Help coming soon.");
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception, java.io.IOException {
 		NARjs j = new NARjs();
 
 		System.out.println(NAR.VERSION

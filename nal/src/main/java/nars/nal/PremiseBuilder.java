@@ -53,6 +53,7 @@ public enum PremiseBuilder {
 
         Compound taskTerm = task.term();
 
+
         for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
 
             if (task.isDeleted())

@@ -28,7 +28,7 @@ public class BLinkPool<X> {
     }
 
     @NotNull
-    public BLinkI<X> get(int n) {
+    public BLinkI get(int n) {
         return new BLinkI(n);
     }
 
@@ -56,7 +56,7 @@ public class BLinkPool<X> {
     /**
      * Buffered Budget Link (an entry in a bag) - Indexed version
      */
-    public final class BLinkI<X> extends Budget implements Link<X> {
+    public final class BLinkI extends Budget implements Link<X> {
 
         final int o; //offset
 

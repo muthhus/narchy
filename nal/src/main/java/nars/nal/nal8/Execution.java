@@ -29,7 +29,7 @@ public interface Execution  {
 
     //float feedbackPriorityMultiplier = 1.0f;
     //float feedbackDurabilityMultiplier = 1.0f;
-    Variable defaultResultVariable = $.varDep("defaultResultVariable");
+    //Variable defaultResultVariable = $.varDep("defaultResultVariable");
 //    public final NAR nar;
 //    public final Task task;
 

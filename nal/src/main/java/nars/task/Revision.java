@@ -9,6 +9,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.container.TermVector;
 import nars.truth.*;
 import nars.util.data.Util;
@@ -261,6 +262,40 @@ public class Revision {
         //if (a.op().temporal) //when would it not be temporal? this happens though
             //d = d.dt(newDT);
         //return d;
+    }
+
+    /**
+     * WARNING: this assumes the task's terms are already
+     * known to be equal.
+     */
+    public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
+        Term t = newBelief.term();
+        return
+            newBelief!=oldBelief &&
+
+            !(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
+
+            //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
+            !Stamp.overlapping(newBelief, oldBelief);
+    }
+
+    /** assumes the compounds are the same except for possible numeric metadata differences */
+    public static @NotNull Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
+        if (a.equals(b)) return a;
+
+        float aWeight = c2w(aConf);
+        float bWeight = c2w(bConf);
+
+        int dt = DTERNAL;
+        int at = a.term().dt();
+        if (at != DTERNAL) {
+            int bt = b.term().dt();
+            if (bt!= DTERNAL) {
+                dt = Math.round(Util.lerp(at, bt, aWeight/(aWeight+bWeight)));
+            }
+        }
+
+        return a.term().dt( dt );
     }
 }
 

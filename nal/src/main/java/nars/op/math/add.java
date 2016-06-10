@@ -18,7 +18,6 @@ package nars.op.math;
 
 import nars.$;
 import nars.index.TermIndex;
-import nars.nal.op.BinaryTermOperator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Compound;
 import nars.term.Term;

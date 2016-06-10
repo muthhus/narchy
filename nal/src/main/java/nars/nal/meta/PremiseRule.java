@@ -24,7 +24,6 @@ import nars.op.math.add;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -37,7 +36,6 @@ import nars.term.variable.Variable;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
 import nars.util.data.list.FasterList;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -821,9 +819,9 @@ public class PremiseRule extends GenericCompound {
 //                        case "negative":
 //                            preNext = TaskNegative.the;
 //                            break;
-                        case "positive":
-                            preNext = TaskPositive.the;
-                            break;
+//                        case "positive":
+//                            preNext = TaskPositive.the;
+//                            break;
                         case "\"?\"":
                             preNext = TaskPunctuation.Question;
                             taskPunc = '?';

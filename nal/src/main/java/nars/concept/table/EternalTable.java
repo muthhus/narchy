@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import nars.NAR;
 import nars.bag.impl.SortedListTable;
-import nars.nal.LocalRules;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
@@ -64,7 +63,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
         for (int i = 0; i < bsize; i++) {
             Task x = get(i);
 
-            if (!LocalRules.isRevisible(newBelief, x))
+            if (!Revision.isRevisible(newBelief, x))
                 continue;
 
 
@@ -106,7 +105,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
 
         return oldBelief != null ?
                 new RevisionTask(
-                    LocalRules.intermpolate(
+                    Revision.intermpolate(
                             newBelief, oldBelief,
                             newBeliefConf, oldBelief.conf()
                     ),

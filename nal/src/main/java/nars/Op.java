@@ -3,7 +3,9 @@ package nars;
 
 import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
@@ -292,10 +294,6 @@ public enum Op {
         return in(SetsBits);
     }
 
-    public boolean isImplication() {
-        return this == IMPLICATION; //in(ImplicationsBits);
-    }
-
     public static boolean hasAny(int structure, @NotNull Op o) {
         return hasAny(structure, o.bit);
     }
@@ -335,8 +333,8 @@ public enum Op {
                     Op.IMPLICATION
             );
 
-    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
-    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
+//    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
+//    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPLICATION);
     public static final int TemporalBits = or(Op.CONJUNCTION, Op.EQUIV, Op.IMPLICATION);
 
@@ -345,8 +343,8 @@ public enum Op {
 
     public static final int VariableBits =
         Op.or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);
-    public static final int WildVariableBits =
-            Op.or(Op.VAR_PATTERN,Op.VAR_QUERY);
+//    public static final int WildVariableBits =
+//            Op.or(Op.VAR_PATTERN,Op.VAR_QUERY);
 
 
 

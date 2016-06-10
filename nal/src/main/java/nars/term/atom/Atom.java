@@ -1,11 +1,8 @@
 package nars.term.atom;
 
-import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /** default Atom implementation */
 public class Atom extends AtomicStringConstant {
@@ -87,37 +84,11 @@ public class Atom extends AtomicStringConstant {
 //    @Deprecated protected Atom() {
 //    }
 
-    /** determines if the string is invalid as an unquoted term according to the characters present */
-    public static boolean quoteNecessary(@NotNull CharSequence t) {
-        for (int i = 0; i < t.length(); i++) {
-            char c = t.charAt(i);
-//            if (Character.isWhitespace(c)) return true;
-            if (!Narsese.isValidAtomChar(c))
-                return true;
-//            if ((!Character.isDigit(c)) && (!Character.isAlphabetic(c))) return true;
-        }
-        return false;
-    }
-
-//    /** interns the atomic term given a name, storing it in the static symbol table */
+    //    /** interns the atomic term given a name, storing it in the static symbol table */
 //    public final static Atom theCached(final String name) {
 //        return atoms.computeIfAbsent(name, AtomInterner);
 //    }
 
-    public static Term the(Term x) {
-        return x;
-    }
-
-    @NotNull
-    public static Atom the(@NotNull byte[] id) {
-        return new Atom(new String(id));
-    }
-
-
-    @NotNull
-    public static Atom the(byte c) {
-        return Atom.the(new byte[] { c });
-    }
 
     @NotNull
     public static String unquote(@NotNull Term s) {
@@ -141,23 +112,6 @@ public class Atom extends AtomicStringConstant {
         return new Atom(name);
     }
     */
-
-    @Nullable
-    public static Term the(Object o) {
-
-        if (o instanceof Term) return ((Term)o);
-        if (o instanceof String)
-            return $.the((String)o);
-        if (o instanceof Number)
-            return $.the((Number)o);
-
-        return null;
-    }
-
-
-
-
-
 
 
     /** performs a thorough check of the validity of a term (by cloneDeep it) to see if it's valid */

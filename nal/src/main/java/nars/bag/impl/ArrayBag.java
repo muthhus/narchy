@@ -32,7 +32,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     private boolean requiresSort;
 
     //protected final FasterList<BLink<V>> pending = new FasterList();
-    protected Map<V,RawBudget> pending;
+    private Map<V,RawBudget> pending;
     private BiFunction<RawBudget, RawBudget, RawBudget> pendingMerge;
 
 
@@ -270,14 +270,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             if (p == null)
                 this.pending = p = newPendingMap();
             p.merge(i, inc, pendingMerge);
+            pendingMass += inc.pri() * inc.dur();
         }
 
-        pendingMass += inc.pri() * inc.dur();
     }
 
     protected Map<V, RawBudget> newPendingMap() {
         //return new HashMap<>();
-        return new LinkedHashMap<>();
+        return new LinkedHashMap<>(1+capacity()/4);
     }
 
     public float getPendingMass() {

@@ -141,7 +141,7 @@ public class TruthPolation {
     }
 
     public void print() {
-        System.out.println(Joiner.on("\n").join(this.s.microsphereData.stream().map(x -> new FloatArrayList(x)).collect(Collectors.toList())));
+        System.out.println(Joiner.on("\n").join(this.s.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
     }
 
 //    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */

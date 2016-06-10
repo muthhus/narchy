@@ -65,8 +65,7 @@ public class DefaultTruth implements Truth  {
 
     @NotNull
     @Override public final Truth withConf(float newConf) {
-        newConf = round(newConf, Global.TRUTH_EPSILON);
-        return (conf != newConf) ? new DefaultTruth(freq, newConf) : this;
+        return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
     }
 
     @NotNull

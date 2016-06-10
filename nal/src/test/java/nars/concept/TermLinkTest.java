@@ -90,7 +90,7 @@ public class TermLinkTest {
             //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
             Budget b = b(a, 0.5f, 0.5f);
             Concept c = nar.conceptualize(vertex(x), b, a, 0f, null);
-            ((CompoundConcept)c).linkPeer(vertex(y), b, a);
+            c.linkPeer(vertex(y), b, a);
 
         }
 
@@ -144,10 +144,12 @@ public class TermLinkTest {
         n.log();
         Hebbian h = new Hebbian<Compound,Compound>(n, 4, 0.5f) {
 
+            @Override
             public Compound vertex(int x) {
                 return $.p(the(x));
             }
 
+            @Override
             protected Compound edge(Compound x, Compound y) {
                 return $.sim(x, y);
             }

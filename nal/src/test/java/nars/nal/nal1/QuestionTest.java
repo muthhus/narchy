@@ -89,7 +89,7 @@ public class QuestionTest {
             }
         };
 
-        nar.ask((Compound)$.$("add(1, 2, #x)"));
+        nar.ask($.$("add(1, 2, #x)"));
 
         assertEquals(3, s[0]);
 
@@ -106,7 +106,7 @@ public class QuestionTest {
             }
         };
 
-        nar.ask((Compound)$.$("add(1, 2, #x)"));
+        nar.ask($.$("add(1, 2, #x)"));
 
 
     }

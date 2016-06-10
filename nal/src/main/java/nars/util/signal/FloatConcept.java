@@ -24,7 +24,7 @@ public class FloatConcept extends SensorConcept {
     }
 
     public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MutableFloat v) throws Narsese.NarseseException {
-        super(compoundTermString, n, () -> v.floatValue(),
+        super(compoundTermString, n, v::floatValue,
                 (vv) -> new DefaultTruth(vv, n.confidenceDefault(Symbols.BELIEF) )
         );
         this.value = v;

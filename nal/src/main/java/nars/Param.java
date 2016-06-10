@@ -39,7 +39,9 @@ public abstract class Param extends Container implements Level {
     @Range(min=0, max=1f)
     public final MutableFloat perfection = new MutableFloat(0.1f);
 
-
+    @NotNull
+    @Range(min=0, max=1f)
+    public final MutableFloat confMin = new MutableFloat(Global.TRUTH_EPSILON);
 
 
     /** factor for concept activation [0 <= c <= 1] */

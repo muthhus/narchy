@@ -1,9 +1,12 @@
 package nars.budget.policy;
 
+import nars.Memory;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
 import nars.nal.ConceptProcess;
+import nars.nal.Tense;
+import nars.nal.UtilityFunctions;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -11,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
 
 /**
  * Created by me on 5/23/16.
@@ -152,4 +154,57 @@ public class TaskBudgeting {
     public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
         return compoundForward(new UnitBudget(), truth, content, nal);
     }
+
+    /**
+     * Evaluate the quality of a belief as a solution to a problem, then reward
+     * the belief and de-prioritize the problem
+     *
+     * @param question  The problem (question or goal) to be solved
+     * @param solution The belief as solution
+     * @param question     The task to be immediately processed, or null for continued
+     *                 process
+     * @return The budget for the new task which is the belief activated, if
+     * necessary
+     */
+    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, @NotNull Memory m) {
+        //boolean feedbackToLinks = false;
+        /*if (task == null) {
+            task = nal.getCurrentTask();
+            feedbackToLinks = true;
+        }*/
+
+
+        boolean judgmentTask = question.isBelief();
+        //float om = orderMatch(problem.term(), solution.term(), duration);
+        //if (om == 0) return 0f;
+        float quality = Tense.solutionQuality(question, solution, projectedTruth, m.time());
+        if (quality <= 0)
+            return null;
+
+        Budget budget = null;
+        if (judgmentTask) {
+            question.budget().orPriority(quality);
+        } else {
+            float taskPriority = question.pri();
+
+            budget = new UnitBudget(
+                    UtilityFunctions.and(taskPriority, quality),
+                    //UtilityFunctions.or(taskPriority, quality),
+                    question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
+            question.budget().setPriority(Math.min(1 - quality, taskPriority));
+        }
+        /*
+        if (feedbackToLinks) {
+            TaskLink tLink = nal.getCurrentTaskLink();
+            tLink.setPriority(Math.min(1 - quality, tLink.getPriority()));
+            TermLink bLink = nal.getCurrentBeliefLink();
+            bLink.incPriority(quality);
+        }*/
+        return budget;
+    }
+
+//    public static float solutionQuality(Task problem, Task solution, Truth truth, long time) {
+//        return Tense.solutionQuality(problem.hasQueryVar(), problem.getOccurrenceTime(), solution, truth, time);
+//    }
+
 }

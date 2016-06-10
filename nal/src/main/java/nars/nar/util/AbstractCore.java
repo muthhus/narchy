@@ -153,6 +153,8 @@ public abstract class AbstractCore {
 
         List<BLink<? extends Termed>> termsBuffer = this.terms;
 
+        matcher.init(nar);
+
         c.termlinks().sample(termlinks, termsBuffer::add);
         if (!termsBuffer.isEmpty()) {
 
