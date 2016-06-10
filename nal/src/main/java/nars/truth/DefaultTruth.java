@@ -4,6 +4,7 @@ import nars.Global;
 import nars.Memory;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.util.data.Util.round;
 
@@ -39,12 +40,15 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(float f, float c, float epsilon, int discreteness) {
+
+        //assert(Float.isFinite(f) && Float.isFinite(c));
+
+        this.freq = f = round(f, epsilon);
+        this.conf = c = round(c, epsilon);
+
         if (c==0)
             throw new RuntimeException("zero conf");
 
-        //assert(Float.isFinite(f) && Float.isFinite(c));
-        this.freq = f = round(f, epsilon);
-        this.conf = c = round(c, epsilon);
         this.hash = Truth.hash(f, c, discreteness);
     }
 
@@ -57,14 +61,16 @@ public class DefaultTruth implements Truth  {
         this(truth.freq(), truth.conf());
     }
 
-    @NotNull
+    @Nullable
     @Override
     public Truth confMult(float factor) {
         return withConf(conf() * factor);
     }
 
-    @NotNull
+    @Nullable
     @Override public final Truth withConf(float newConf) {
+        if (newConf < Global.TRUTH_EPSILON)
+            return null;
         return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
     }
 

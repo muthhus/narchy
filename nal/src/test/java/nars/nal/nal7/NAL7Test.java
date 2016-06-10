@@ -632,7 +632,7 @@ public class NAL7Test extends AbstractNALTest {
                 $.50;.50;.95$ (c-->b). 2+0 %1.0;.90% {2+0: 2} Input
                 $.50;.50;.95$ (d-->c). 5+0 %1.0;.90% {5+0: 3} Input*/
         test()
-                .log()
+                //.log()
                 .inputAt(2, "(c-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
                 .mustBelieve(cycles, "((d-->c) ==>-3 (c-->b))", 1f, 0.45f, 2)
@@ -642,4 +642,20 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void testTruthDecayOverTime0() {
+        testTruthDecayOverTime(0, 0.81f, 0.005f);
+    }
+    @Test public void testTruthDecayOverTime1() {
+        testTruthDecayOverTime(9, 0.78f, 0.005f);
+    }
+
+    public void testTruthDecayOverTime(int dist, float conf, float toler) {
+        test()
+            //.log()
+            .inputAt(1, "(a-->b). :|:")
+            .inputAt(1+dist, "(b-->c). :|:")
+            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1)
+            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1+dist)
+        ;
+    }
 }

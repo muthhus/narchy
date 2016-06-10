@@ -9,6 +9,7 @@ import nars.nal.TimeFunction;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.ProcTerm;
+import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -158,8 +159,17 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 return; //aborted by temporalization
 
             //apply the confidence scale
-            if (truth!=null)
-                truth = truth.confMult(confScale[0]);
+            if (truth!=null) {
+                float projection;
+                if (premise.isEvent()) {
+                    projection = Revision.truthProjection(premise.task().occurrence(), premise.belief().occurrence(), nar.time());
+                } else {
+                    projection = 1f;
+                }
+                truth = truth.confMultViaWeight(confScale[0] * projection);
+                if (truth == null)
+                    return;
+            }
 
             //NOTE: if temporalized, the content term will be the unique Term (NOT Termed)
             //else it will stay as the Concept itself (Termed<> already stored before)

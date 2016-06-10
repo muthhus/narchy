@@ -34,6 +34,8 @@ import java.util.Comparator;
 
 import static java.lang.Math.max;
 import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.c2w;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -240,9 +242,14 @@ public interface Truth extends Truthed {
     }
 
 
-    /** clones a copy with confidence multiplied */
-    @NotNull Truth confMult(float f);
-    @NotNull Truth withConf(float f);
+    /** clones a copy with confidence multiplied. null if conf < epsilon */
+    @Nullable Truth confMult(float f);
+
+    @Nullable Truth withConf(float f);
+
+    default @Nullable Truth confMultViaWeight(float f) {
+        return withConf(w2c(c2w(conf()) * f));
+    }
 
 
 //    @NotNull

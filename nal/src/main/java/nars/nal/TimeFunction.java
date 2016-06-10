@@ -29,7 +29,7 @@ public interface TimeFunction {
      * @param confScale
      * @return
      */
-    @NotNull Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale);
+    @Nullable Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale);
 
 
 
