@@ -92,8 +92,8 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax()
-            //new DecideActionEpsilonGreedy()
+            //new DecideActionSoftmax()
+            new DecideActionEpsilonGreedy()
         );
     }
 
@@ -412,7 +412,7 @@ public class NAgent implements Agent {
         /*if (lastAction != nextAction)*/ {
 
             //belief/goal feedback levels
-            float off = 0.45f;
+            float off = 0.49f;
             float on = 1f;
             float preOff = on; //0.75f;
             float preOn = off; // 0.75f;

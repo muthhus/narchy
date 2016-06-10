@@ -38,6 +38,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
 
+    /** relative temporal lookahead for desire/belief prediction */
+    final int motorDT = 1;
+
     @NotNull
     public final Sensor feedback;
     //private final Logger logger;
@@ -161,9 +164,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         super.run();
 
         long now = nar.time();
-        @Nullable Truth d = this.desire(now);
+        @Nullable Truth d = this.desire(now+motorDT);
         float desired = d!=null ? d.expectation() : 0.5f;
-        @Nullable Truth b = this.belief(now);
+        @Nullable Truth b = this.belief(now+motorDT);
         float believed = b!=null ? b.expectation() : 0.5f;
 
         float response = motor.motor(believed, desired);
