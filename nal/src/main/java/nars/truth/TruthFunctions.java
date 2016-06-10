@@ -496,15 +496,9 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static ProjectedTruth eternalize(@NotNull Truth t) {
-        float oldConf = t.conf();
-        float newConf = eternalize(oldConf);
-
-        //if (Util.equals(oldConf, newConf, Global.TRUTH_EPSILON ))
-            //return t; /* no change */
-
         return new ProjectedTruth(
                 t.freq(),
-                newConf,
+                eternalize(t.conf()),
                 Tense.ETERNAL
         );
     }

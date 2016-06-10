@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.w2c;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.eternalize;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -249,6 +250,11 @@ public interface Truth extends Truthed {
 
     default @Nullable Truth confMultViaWeight(float f) {
         return withConf(w2c(c2w(conf()) * f));
+    }
+    default @Nullable Truth confMultViaWeightMaxEternal(float f) {
+        float c = conf();
+        return withConf(
+                Math.max(eternalize(c), w2c(c2w(c) * f)));
     }
 
 

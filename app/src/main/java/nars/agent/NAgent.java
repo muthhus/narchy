@@ -85,8 +85,8 @@ public class NAgent implements Agent {
     private float lastMotivation;
     private int nextAction = -1;
     private SensorConcept dRewardSensor;
-    private Budgeted RewardAttentionPerFrame = b(0.9f,0.9f,0.9f);
-    private Budgeted ActionAttentionPerFrame = b(0.9f,0.9f,0.9f);
+    private Budgeted RewardAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
+    //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
     private DecideAction decideAction;
@@ -369,8 +369,10 @@ public class NAgent implements Agent {
 
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-        nar.conceptualize(reward, RewardAttentionPerFrame);
-        nar.conceptualize(dRewardSensor, RewardAttentionPerFrame);
+        if (RewardAttentionPerFrame!=null) {
+            nar.conceptualize(reward, RewardAttentionPerFrame);
+            nar.conceptualize(dRewardSensor, RewardAttentionPerFrame);
+        }
 //        for (Concept a : actions) {
 //            nar.conceptualize(a, ActionAttentionPerFrame);
 //        }

@@ -166,7 +166,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 } else {
                     projection = 1f;
                 }
-                truth = truth.confMultViaWeight(confScale[0] * projection);
+                truth = truth.confMultViaWeightMaxEternal(confScale[0] * projection);
                 if (truth == null)
                     return;
             }
