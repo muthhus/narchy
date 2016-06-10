@@ -757,13 +757,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        if (running.get()) {
+        //if (running.get()) {
             //in a frame, so schedule for after it
             nextTasks.add(t);
-        } else {
+        //} else {
             //not in a frame, can execute immediately
-            t.run();
-        }
+            //t.run();
+        //}
     }
 
 

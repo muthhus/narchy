@@ -69,9 +69,8 @@ public class BeliefLab {
             }
         });
 
-        BeliefPanel b = new BeliefPanel(nar, c);
-        b.setSurfaceSize(400, 100);
-        b.setVisible(true);
+        new BeliefPanel(nar, c).show(400, 100);
+
 
 
         nar.loop(fps);

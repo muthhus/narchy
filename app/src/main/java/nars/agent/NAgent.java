@@ -46,7 +46,7 @@ public class NAgent implements Agent {
 
     float input[];
 
-    private List<MotorConcept> actions;
+    public List<MotorConcept> actions;
     private List<SensorConcept> inputs;
     private SensorConcept reward;
     private int lastAction = -1;
@@ -109,7 +109,6 @@ public class NAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
 
-        nar.reset();
 
         sensorPriority = nar.priorityDefault(Symbols.BELIEF);
         rewardPriority = goalFeedbackPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);

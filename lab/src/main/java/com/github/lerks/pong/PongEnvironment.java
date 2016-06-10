@@ -24,6 +24,7 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.BeliefPanel;
 import nars.util.FX;
 import nars.agent.NAgent;
 import nars.vision.SwingCamera;
@@ -60,7 +61,6 @@ public class PongEnvironment extends Player implements Environment {
 
 	public static void main (String[] args) {
 		//Global.TRUTH_EPSILON = 0.2f;
-		PongEnvironment e = new PongEnvironment();
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
@@ -92,6 +92,14 @@ public class PongEnvironment extends Player implements Environment {
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
 
+
+		PongEnvironment e = new PongEnvironment();
+
+		a.nar.runLater(()->{
+			new BeliefPanel(a.nar, a.actions.get(0)).show(400, 100);
+		});
+
+
 		e.run(a, 1024*8);
 
 		NAR.printTasks(nar, true);
@@ -100,6 +108,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.forEachConcept(c -> {
 			System.out.println(c);
 		});
+
 
 		//nar.forEachConcept(System.out::println);
 	}

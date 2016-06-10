@@ -139,11 +139,13 @@ public abstract class AbstractJoglPanel extends GLWindow implements GLEventListe
     }
 
 
-    abstract protected void draw(GL2 gl, float dt);
+    @Deprecated  abstract protected void draw(GL2 gl, float dt);
 
-
-
-
+    public AbstractJoglPanel show(int w, int h) {
+        setSurfaceSize(w, h);
+        setVisible(true);
+        return this;
+    }
 
 
 //

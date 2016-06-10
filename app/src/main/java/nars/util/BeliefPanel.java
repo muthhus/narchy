@@ -3,6 +3,7 @@ package nars.util;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
+import com.jogamp.opengl.util.gl2.GLUT;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.truth.Truth;
@@ -24,6 +25,9 @@ public class BeliefPanel extends AbstractJoglPanel  {
         super();
         this.c =c;
         this.nar = n;
+
+        //setAutoSwapBufferMode(true);
+
         n.onFrame(nn -> {
             update(c);
         });
@@ -34,7 +38,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
         if (!redraw.compareAndSet(true, false)) {
             return;
         }
-
+        //swapBuffers();
 
         int W = getWidth();
         int H = getHeight();
@@ -106,29 +110,29 @@ public class BeliefPanel extends AbstractJoglPanel  {
 //        ge.setStroke(null);
 //        gt.setStroke(null);
 
+        //gl.glFlush();
+
 
     }
 
     @Override
     public void init(GLAutoDrawable gl) {
-        System.out.println("init");
-
 
     }
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
         draw((GL2) glAutoDrawable.getGL(), 0f);
-        glAutoDrawable.getGL().glFlush();
     }
 
     @Override
     public void reshape(GLAutoDrawable ad, int i, int i1, int i2, int i3) {
-        System.out.println("rehape " + getWidth());
 
         GL2 gl = (GL2)ad.getGL();
 
 
+        gl.glEnable(GL2.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
         gl.glClearColor(0, 0, 0, 0);
 
@@ -157,12 +161,12 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, pri, c, w, h, x, y) -> {
-        //ge.setFill(beliefColors.get(c, pri));
+        ge.glColor4f(0.6f + 0.38f * c, 0.2f, 1f, 0.39f + 0.6f * pri);
         rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, pri, c, w, h, x, y) -> {
-        //ge.setFill(goalColors.get(c, pri));
+        ge.glColor4f(0.2f + 0.4f * c, 1f, 0.2f, 0.39f + 0.6f * pri);
         rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
 
@@ -237,8 +241,8 @@ public class BeliefPanel extends AbstractJoglPanel  {
             float nowLineWidth = 3;
             float nx = xTime(tew, padding, minT, maxT, now, nowLineWidth);
 
-            gl.glColor3f(1f,1f,1f);
-            rect(gl, nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
+            gl.glColor4f(1f,1f,1f, 0.5f);
+            rect(gl, gew + nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
         }
 
         /** drawn "pixel" dimensions*/
@@ -249,6 +253,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
             float eh, x;
             float padding = this.padding;
             float pw = 10;
+
             if (eternal) {
                 eh = geh;
 
@@ -262,6 +267,8 @@ public class BeliefPanel extends AbstractJoglPanel  {
             float ph = 10;
             float y = yPos(eh, padding, ph, freq
             );
+            if (!eternal)
+                x += gew + padding;
             r.renderTask(gl, pri, conf, pw, ph, x, y);
 
         });
