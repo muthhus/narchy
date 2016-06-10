@@ -65,7 +65,7 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 6, 1, 2, rng,
+				1024, 4, 1, 2, rng,
 				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -79,7 +79,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(256);
+		nar.cyclesPerFrame.set(64);
 
 
 		NAgent a = new NAgent(nar);

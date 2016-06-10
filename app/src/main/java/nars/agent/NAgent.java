@@ -61,7 +61,6 @@ public class NAgent implements Agent {
      * exploration rate - confidence of initial goal for each action
      */
     public float epsilon = 0.1f;
-    float epsilonRandomDecay = 0.99f; //0.01f;
 
     float sensorPriority;
     float rewardPriority;
@@ -91,7 +90,11 @@ public class NAgent implements Agent {
 
 
     public NAgent(NAR n) {
-        this(n, new DecideActionSoftmax());
+
+        this(n,
+            new DecideActionSoftmax()
+            //new DecideActionEpsilonGreedy()
+        );
     }
 
     public NAgent(NAR n, DecideAction decideAction) {

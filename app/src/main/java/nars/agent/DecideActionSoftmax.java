@@ -14,7 +14,7 @@ public class DecideActionSoftmax implements DecideAction {
      */
     private float[] motNorm, motProb;
 
-    float temperature = 1f;
+    float temperature = 0.5f;
 
     @Override
     public int decideAction(float[] motivation, int lastAction, Random random) {

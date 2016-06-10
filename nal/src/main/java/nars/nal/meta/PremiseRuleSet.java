@@ -208,9 +208,9 @@ public class PremiseRuleSet  {
     }
 
     protected static void posNegPermute(PremiseRule preNorm, String src, Consumer<PremiseRule> each, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index) {
-        PremiseRule pos = add(ur, preNorm, src, index);
+        PremiseRule pos = add(ur, preNorm.positive(index), src, index);
         each.accept(pos);
-        PremiseRule neg = add(ur, preNorm.negateTask(index), src, index);
+        PremiseRule neg = add(ur, preNorm.negative(index), src, index);
         each.accept(neg);
     }
 

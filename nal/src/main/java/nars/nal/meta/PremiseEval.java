@@ -59,8 +59,8 @@ public class PremiseEval extends FindSubst {
 
     /** cached value */
     public float confMin = Global.TRUTH_EPSILON;
-    private int termSub0op, termSub1op;
-    private int termSub0Struct, termSub1Struct;
+    public int termSub0op, termSub1op;
+    public int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
     @Nullable
     public Truth taskTruth, beliefTruth;

@@ -37,6 +37,7 @@ import nars.term.variable.Variable;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
 import nars.util.data.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -820,9 +821,9 @@ public class PremiseRule extends GenericCompound {
 //                        case "negative":
 //                            preNext = TaskNegative.the;
 //                            break;
-//                        case "positive":
-//                            preNext = TaskPositive.the;
-//                            break;
+                        case "positive":
+                            preNext = TaskPositive.the;
+                            break;
                         case "\"?\"":
                             preNext = TaskPunctuation.Question;
                             taskPunc = '?';
@@ -991,7 +992,21 @@ public class PremiseRule extends GenericCompound {
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");
 
-    public PremiseRule negateTask(PatternIndex index) {
+    public PremiseRule positive(PatternIndex index) {
+
+//        Term[] pp = getPremise().terms().clone();
+//        pp = ArrayUtils.add(pp, TaskPositive.proto);
+//        Compound newPremise = (Compound) $.the(getPremise().op(), pp);
+//
+//        PremiseRule r = new PremiseRule(newPremise, getConclusion());
+//        @NotNull PremiseRule pos = normalize(r, index);
+//
+//        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
+
+        return this;
+    }
+
+    public PremiseRule negative(PatternIndex index) {
 
         Compound newTask = (Compound) neg(getTask());
         Term[] pp = getPremise().terms().clone();
