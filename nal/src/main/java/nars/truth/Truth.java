@@ -252,9 +252,14 @@ public interface Truth extends Truthed {
         return withConf(w2c(c2w(conf()) * f));
     }
     default @Nullable Truth confMultViaWeightMaxEternal(float f) {
-        float c = conf();
-        return withConf(
-                Math.max(eternalize(c), w2c(c2w(c) * f)));
+        if (f == 1f) {
+            return this;
+        }
+        else {
+            float c = conf();
+            return withConf(
+                    Math.max(eternalize(c), w2c(c2w(c) * f)));
+        }
     }
 
 

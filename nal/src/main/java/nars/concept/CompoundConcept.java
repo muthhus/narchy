@@ -31,6 +31,10 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     private final Bag<Task> taskLinks;
     private final Bag<Termed> termLinks;
 
+
+    /** cached */
+    private transient final int _structure;
+
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
@@ -71,6 +75,12 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
         questions = newQuestionTable();
         quests = newQuestionTable();
 
+        this._structure = term.structure();
+    }
+
+    @Override
+    public int structure() {
+        return _structure;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
+import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
@@ -161,7 +162,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             //apply the confidence scale
             if (truth!=null) {
                 float projection;
-                if (premise.isEvent()) {
+                if (Global.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
                     projection = Revision.truthProjection(premise.task().occurrence(), premise.belief().occurrence(), nar.time());
                 } else {
                     projection = 1f;

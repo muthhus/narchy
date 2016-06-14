@@ -44,28 +44,17 @@ public interface Term extends Termed, Termlike {
     @Override
     Op op();
 
-    /**
-     * volume = total number of terms = complexity + # total variables
-     */
     @Override
     int volume();
 
-    /**
-     * total number of leaf terms, excluding variables which have a complexity of zero
-     */
     @Override
     int complexity();
-
 
     @Override
     int structure();
 
-
-    /**
-     * number of subterms. if atomic, size=0
-     */
-    @Override
-    int size();
+//    @Override
+//    int size();
 
     @Override
     boolean equals(Object o);

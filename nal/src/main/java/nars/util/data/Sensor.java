@@ -37,7 +37,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     @NotNull
     public final NAR nar;
-    private float pri;
+    public float pri;
     private final float dur;
 
     private float prevF = Float.NaN;
@@ -183,11 +183,15 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         if (t!=null) {
             return new MutableTask(term(), punc, t)
                     .time(now, now + dt())
-                    .budget(pri, dur)
+                    .budget(pri(), dur)
                     .log(this);
         } else {
             return null;
         }
+    }
+
+    public float pri() {
+        return pri;
     }
 
     @NotNull

@@ -297,12 +297,13 @@ public class PremiseRule extends GenericCompound {
 
     /** higher is earlier */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
+        put("SubTermOp1", 21);
         put("SubTermOp0", 20);
-        put(TaskPunctuation.class, 15);
-        put("SubTermOp1", 13);
+        put(SubTermsStructure.class, 16);
 
-        put(SubTermsStructure.class, 11);
-        put(SubTermStructure.class, 11);
+        put(TaskPunctuation.class, 15);
+
+        put(SubTermStructure.class, 12);
 
 //        put(TaskNegative.class, 8);
 //        put(TaskPositive.class, 8);
@@ -1006,7 +1007,16 @@ public class PremiseRule extends GenericCompound {
 
     public PremiseRule negative(PatternIndex index) {
 
-        Compound newTask = (Compound) neg(getTask());
+        @NotNull Term tt = getTask();
+//        if (tt.op() == Op.ATOM) {
+//            //raw pattern var, no need to invert the rule
+//            //System.err.println("--- " + tt);
+//            //return null;
+//        } else {
+//            //System.err.println("NEG " + neg(tt));
+//        }
+
+        Compound newTask = (Compound) neg(tt);
         Term[] pp = getPremise().terms().clone();
         pp[0] = newTask;
         Compound newPremise = (Compound) $.the(getPremise().op(), pp);

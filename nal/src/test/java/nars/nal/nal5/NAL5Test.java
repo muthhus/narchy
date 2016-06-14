@@ -417,6 +417,7 @@ public class NAL5Test extends AbstractNALTest {
                 //.mustDesire(cycles, "a:b", 0.0f, 0.81f)
                 .mustBelieve(cycles, "(R)", 0.0f, 0.81f);
     }
+
     @Test public void testNegatedImplicationTerm5() {
         test()
                 .input("(R). %0.0;0.90%")

@@ -70,15 +70,41 @@ public class BeliefPanel extends AbstractJoglPanel  {
         int num = c.size();
         float dy = H / num;
         gl.glPushMatrix();
+
+        //compute bounds from combined min/max of beliefs and goals so they align correctly
+        long minT = Long.MAX_VALUE;
+        long maxT = Long.MIN_VALUE;
+
+
         for (int i = 0; i < num; i++) {
-            draw(gl, i, W, dy);
+            TruthWave b = this.beliefs.get(i);
+            if (!b.isEmpty()) {
+                long start = b.start();
+                if (start!=ETERNAL) {
+                    minT = Math.min(start, minT);
+                    maxT = Math.max(b.end(), maxT);
+                }
+            }
+            TruthWave g = this.goals.get(i);
+            if (!g.isEmpty()) {
+
+                long start = g.start();
+                if (start != ETERNAL) {
+                    minT = Math.min(start, minT);
+                    maxT = Math.max(g.end(), maxT);
+                }
+
+            }
+        }
+        for (int i = 0; i < num; i++) {
+            draw(gl, i, W, dy, minT, maxT);
             gl.glTranslatef(0,dy,0);
         }
         gl.glPopMatrix();
 
     }
 
-    protected void draw(GL2 gl, int n, float W, float H) {
+    protected void draw(GL2 gl, int n, float W, float H, long minT, long maxT) {
 
         float gew = H;
         float geh = H;
@@ -89,23 +115,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
         TruthWave beliefs = this.beliefs.get(n);
         TruthWave goals = this.goals.get(n);
 
-        //compute bounds from combined min/max of beliefs and goals so they align correctly
-        long minT = Long.MAX_VALUE;
-        long maxT = Long.MIN_VALUE;
 
-        if (!beliefs.isEmpty()) {
-            minT = beliefs.start();
-            maxT = beliefs.end();
-        }
-        if (!goals.isEmpty()) {
-
-            long min = goals.start();
-            if (min != ETERNAL) {
-                minT = Math.min(goals.start(), minT);
-                maxT = Math.max(goals.end(), maxT);
-            }
-
-        }
 
 
         try {
@@ -137,19 +147,13 @@ public class BeliefPanel extends AbstractJoglPanel  {
         }
 
 
-//        //borders
-//        ge.setStroke(Color.GRAY);
-//        gt.setStroke(Color.GRAY);
-//        ge.setLineWidth(1);
-//        ge.strokeRect(0, 0, gew, geh);
-//        gt.strokeRect(0, 0, tew, teh);
-//        ge.setStroke(null);
-//        gt.setStroke(null);
-
-        //gl.glFlush();
-
+        gl.glLineWidth(1f);
+        gl.glColor4f(1f, 1f, 1f, 0.3f);
+        strokeRect(gl, 0, 0, gew, geh);
+        strokeRect(gl, gew, 0, tew, teh);
 
     }
+
     @Override
     public void init(GLAutoDrawable gl) {
 
@@ -195,12 +199,12 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.3f + 0.7f * c, 0.25f, 0.25f, 0.25f + 0.75f * pri);
+        ge.glColor4f(0.3f + 0.7f * c, 0.25f, 0.25f, 0.25f + 0.5f * pri);
         rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.25f, 0.3f + 0.7f * c, 0.25f, 0.25f + 0.75f * pri);
+        ge.glColor4f(0.25f, 0.3f + 0.7f * c, 0.25f, 0.25f + 0.5f * pri);
         rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
 
@@ -241,6 +245,13 @@ public class BeliefPanel extends AbstractJoglPanel  {
         gl.glVertex2f(x2, y2);
         gl.glEnd();
     }
+    protected static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {
+        line(gl, x1, y1, x1 + w, y1);
+        line(gl, x1, y1, x1, y1 + h);
+        line(gl, x1, y1+h, x1+w, y1 + h);
+        line(gl, x1+w, y1, x1+w, y1 + h);
+    }
+
     protected static void rect(GL2 gl, double x1, double y1, double w, double h) {
         gl.glBegin(GL2.GL_QUADS);
         gl.glVertex2d(x1, y1);
@@ -288,7 +299,8 @@ public class BeliefPanel extends AbstractJoglPanel  {
             boolean eternal = !Float.isFinite(o);
             float eh, x;
             float padding = this.padding;
-            float pw = 10;
+            float pw = 10 + 10 * conf;
+            float ph = 10 + 10 * conf;
 
             if (eternal) {
                 eh = geh;
@@ -300,13 +312,11 @@ public class BeliefPanel extends AbstractJoglPanel  {
                 x = xTime(tew, padding, minT, maxT, o, pw);
                 //g = te;
             }
-            float ph = 10;
-            float y = yPos(eh, padding, ph, freq
-            );
+            float y = yPos(eh, padding, ph, freq );
             if (!eternal)
                 x += gew + padding;
-            r.renderTask(gl, pri, conf, pw, ph, x, y);
 
+            r.renderTask(gl, pri, conf, pw, ph, x, y);
         });
 
     }

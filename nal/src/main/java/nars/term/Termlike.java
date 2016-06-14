@@ -11,9 +11,21 @@ import java.util.function.Predicate;
  */
 public interface Termlike extends Comparable<Termlike> {
 
+    /**
+     * volume = total number of terms = complexity + # total variables
+     */
     int volume();
+
+    /**
+     * total number of leaf terms, excluding variables which have a complexity of zero
+     */
     int complexity();
+
     int structure();
+
+    /**
+     * number of subterms. if atomic, size=0
+     */
     int size();
 
     /** if contained within; doesnt match this term (if it's a term);

@@ -37,11 +37,20 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, this, this, truth);
+        this.sensor = new Sensor(n, this, this, truth) {
+            @Override
+            public float pri() {
+                return SensorConcept.this.pri();
+            }
+        };
         n.index.set(this);
 
         this.input = input;
 
+    }
+
+    public float pri() {
+        return sensor.pri;
     }
 
     @NotNull
