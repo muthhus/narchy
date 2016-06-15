@@ -39,7 +39,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         Term[] t2;
 
         int relOffset = y.indexOf(relationTerm);
-        if (relOffset == DTERNAL) {
+        if (relOffset == -1) {
             int yOff = y.dt() - yOffset; //where to expect _ in t
             //insert the relation term
             t2 = new Term[l+1];
