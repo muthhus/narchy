@@ -758,23 +758,6 @@ public class Narsese extends BaseParser<Object> {
         return oneOrMore(noneOf("\""));
     }
 
-//    Rule AnyAlphas() {
-//        //TODO handle \" escape
-//        return sequence( alpha(), push(matchedChar()), zeroOrMore( alphanumeric() ), push(match()),
-//                swap(),
-//                push( pop().toString() + pop().toString()));
-//    }
-
-    //Rule alphanumeric() { return firstOf(alpha(), digit()); }
-
-
-//    @Deprecated Rule IntervalLog() {
-//        return sequence(INTERVAL_PREFIX_OLD, sequence(oneOrMore(digit()), push(match()),
-//                //push(Interval.interval(-1 + Texts.i((String) pop())))
-//                push(CyclesInterval.intervalLog(-1 + Texts.i((String) pop())))
-//        ));
-//    }
-
 
     Rule Variable() {
         /*

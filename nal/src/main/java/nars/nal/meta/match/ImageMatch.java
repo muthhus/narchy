@@ -5,6 +5,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.Imdex;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * the indicated relation term is inserted
@@ -38,7 +39,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         Term[] t2;
 
         int relOffset = y.indexOf(relationTerm);
-        if (relOffset == -1) {
+        if (relOffset == DTERNAL) {
             int yOff = y.dt() - yOffset; //where to expect _ in t
             //insert the relation term
             t2 = new Term[l+1];

@@ -65,7 +65,7 @@ public abstract class TermBuilder {
                 } else if ((dt < 0) || (dt > u.length)) {
                     throw new InvalidTerm(op,u);
                 } else {
-                    return finish(op, DTERNAL, tt);
+                    return finish(op, dt, tt);
                 }
 
 

@@ -169,10 +169,8 @@ public class IO {
 
         TermContainer v = readTermContainer(in, t);
 
-        int relation = -1, dt = Tense.DTERNAL;
-        if (o.isImage())
-            relation = in.readByte();
-        else if (o.temporal)
+        int dt = Tense.DTERNAL;
+        if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
 
 
