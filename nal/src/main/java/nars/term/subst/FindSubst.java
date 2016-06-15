@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.DTERNAL;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -420,7 +419,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
             if (n!=null && n.op() != type) {
                 int imageIndex = Y.indexOf(n);
-                if (imageIndex != DTERNAL)
+                if (imageIndex != -1)
                     return (matchEllipsedLinear(X, et, Y)) &&
                             replaceXY(et, ImageMatch.take(term(et), imageIndex));
             }

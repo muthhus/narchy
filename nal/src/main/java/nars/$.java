@@ -291,17 +291,7 @@ public enum $ {
     public static Compound sete(@NotNull Collection<? extends Term> t) {
         return (Compound) the(SETEXT, (Collection)t);
     }
-//    @NotNull
-//    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
-//
-//        Termizer z = new DefaultTermizer();
-//
-//        //return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
-//        return $.sete(
-//                (Collection<? extends Term>) c.stream().map(
-//                        z::term).collect( toCollection((Supplier<TreeSet>) TreeSet::new)));
-//
-//    }
+
     /** construct set_ext of key,value pairs from a Map */
     @NotNull
     public static Compound seteMap(@NotNull Map<Term,Term> map) {
@@ -361,15 +351,6 @@ public enum $ {
 
     /** unnormalized variable */
     public static @NotNull Variable v(char ch, @NotNull String name) {
-
-//        if (name.length() < 3) {
-//            int digit = Texts.i(name, -1);
-//            if (digit != -1) {
-//                Op op = Variable.typeIndex(ch);
-//                return Variable.the(op, digit);
-//            }
-//        }
-
         return new GenericVariable(AbstractVariable.typeIndex(ch), name);
     }
 
@@ -526,6 +507,10 @@ public enum $ {
     @Nullable
     public static Term the(@NotNull Op op, Term... subterms) {
         return the(op, TermContainer.the(op, subterms));
+    }
+    @Nullable
+    public static Term compound(@NotNull Op op, int dt, Term... subterms) {
+        return compound(op, dt, TermContainer.the(op, subterms));
     }
 
 
@@ -717,7 +702,7 @@ public enum $ {
     public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         Term related = elements[relation];
-        Term img = the(ext ? IMGEXT : IMGINT, elementsMasked);
+        Term img = compound(ext ? IMGEXT : IMGINT, relation, elementsMasked);
 
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
