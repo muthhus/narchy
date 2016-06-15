@@ -15,18 +15,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-/**
- * Created by me on 9/2/15.
- */
-public class AtomConcept extends Atom implements AbstractConcept  {
+
+public final class AtomConcept extends Atom implements AbstractConcept  {
 
     private final Bag<Termed> termLinks;
     private final Bag<Task> taskLinks;
+
     private final Op op;
+
     private Map meta;
 
     public AtomConcept(@NotNull Atom atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
-        //super(atom, termLinks, taskLinks);
         super(atom.toString());
 
         this.op = atom.op();
@@ -34,6 +33,8 @@ public class AtomConcept extends Atom implements AbstractConcept  {
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
     }
+
+
 
 
     @NotNull

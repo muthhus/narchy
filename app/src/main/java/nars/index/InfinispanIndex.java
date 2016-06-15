@@ -105,7 +105,7 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @NotNull
     private Termed buildCompound(@NotNull Compound x) {
-        return buildCompound(x.subterms(), x.op(), x.relation(), x.dt());
+        return buildCompound(x.subterms(), x.op(), x.dt(), x.dt());
     }
 
 

@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.DTERNAL;
+
 
 /* recurses a pair of compound term tree's subterms
 across a hierarchy of sequential and permutative fanouts
@@ -375,8 +377,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
             int xEllipseIndex = X.indexOf(e);
 
-            int xRelationIndex = X.relation();
-            int yRelationIndex = Y.relation();
+            int xRelationIndex = X.dt();
+            int yRelationIndex = Y.dt();
 
 
             if (xEllipseIndex >= xRelationIndex) {
@@ -418,7 +420,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
             if (n!=null && n.op() != type) {
                 int imageIndex = Y.indexOf(n);
-                if (imageIndex != -1)
+                if (imageIndex != DTERNAL)
                     return (matchEllipsedLinear(X, et, Y)) &&
                             replaceXY(et, ImageMatch.take(term(et), imageIndex));
             }

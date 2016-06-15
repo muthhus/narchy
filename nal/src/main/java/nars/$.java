@@ -157,7 +157,7 @@ public enum $ {
     }
     @Nullable
     public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (Compound) compound(IMPL, -1, dt, TermVector.the(a, b));
+        return (Compound) compound(IMPL, dt, TermVector.the(a, b));
     }
 
     @Nullable
@@ -289,7 +289,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SETEXT, -1, (Collection)t);
+        return (Compound) the(SETEXT, (Collection)t);
     }
 //    @NotNull
 //    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
@@ -384,7 +384,7 @@ public enum $ {
     }
     @Nullable
     public static Term conj(int dt, Term... a) {
-        return compound(CONJ, -1, dt, TermVector.the(a)); //must be a vector, not set
+        return compound(CONJ, dt, TermVector.the(a)); //must be a vector, not set
     }
 
     @Nullable
@@ -522,37 +522,26 @@ public enum $ {
     }
 
 
+
     @Nullable
     public static Term the(@NotNull Op op, Term... subterms) {
-        return the(op, -1, subterms);
+        return the(op, TermContainer.the(op, subterms));
     }
-    @Nullable
-    public static Term the(@NotNull Op op, int relation, Term... subterms) {
-        return the(op, relation, TermContainer.the(op, subterms));
-    }
+
 
     @Nullable
     public static Term the(@NotNull Op op, @NotNull Collection<Term> subterms) {
-        return the(op, -1, subterms);
-    }
-    @Nullable
-    public static Term the(@NotNull Op op, int relation, @NotNull Collection<Term> subterms) {
-        return the(op, relation, TermContainer.the(op, subterms));
+        return the(op, TermContainer.the(op, subterms));
     }
 
-    @Nullable
-    public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        return compound(op, relation, DTERNAL, subterms);
-    }
     @Nullable
     public static Term the(@NotNull Op op, @NotNull TermContainer subterms) {
-        return the(op, -1, subterms);
+        return compound(op, DTERNAL, subterms);
     }
-
 
     /** returns null if the result is not a compound */
     @Nullable public static Compound compound(@NotNull Op op, @NotNull TermContainer subterms) {
-        Term t = the(op, -1, subterms);
+        Term t = the(op, subterms);
         if (!(t instanceof Compound))
             return null;
         return (Compound)t;
@@ -560,8 +549,8 @@ public enum $ {
 
 
     @Nullable
-    public static Term compound(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
-        return terms.build(op, relation, dt, subterms);
+    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+        return terms.build(op, dt, subterms);
     }
 
 
@@ -679,7 +668,7 @@ public enum $ {
     public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, @NotNull Compound x) {
         return inh(
                 y,
-                imageExt(x, operation.term(1), x.size() - 1 /* position of the variable */)
+                imageExt(x, operation.term(1)  /* position of the variable */)
         );
     }
 
@@ -692,7 +681,7 @@ public enum $ {
      * @return A compound generated or a term it reduced to
      */
     @Nullable
-    public static Term imageExt(@NotNull Compound product, @NotNull Term relation, int index) {
+    public static Term imageExt(@NotNull Compound product, @NotNull Term relation) {
         int pl = product.size();
 //        if (relation.op(PRODUCT)) {
 //            Compound p2 = (Compound) relation;
@@ -712,7 +701,7 @@ public enum $ {
         argument[0] = relation;
         System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
 
-        return the(IMGEXT, index + 1, argument);
+        return the(IMGEXT, argument);
     }
 
     @Nullable
@@ -728,7 +717,7 @@ public enum $ {
     public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         Term related = elements[relation];
-        Term img = the(ext ? IMGEXT : IMGINT, relation, elementsMasked);
+        Term img = the(ext ? IMGEXT : IMGINT, elementsMasked);
 
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
@@ -804,8 +793,8 @@ public enum $ {
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 
         @NotNull @Override
-        public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
-            return new GenericCompound(op, relation, dt, (TermVector)subterms);
+        public Termed make(@NotNull Op op, @NotNull TermContainer subterms, int dt) {
+            return new GenericCompound(op, dt, (TermVector)subterms);
         }
 
         @Override

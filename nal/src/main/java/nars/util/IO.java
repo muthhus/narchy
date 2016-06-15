@@ -139,9 +139,7 @@ public class IO {
         //how many subterms to follow
         writeTermContainer(out, c.subterms());
 
-        if (c.op().isImage())
-            out.writeByte(c.relation());
-        else if (c.op().temporal)
+        if (c.op().isImage() || c.op().temporal)
             out.writeInt(c.dt());
     }
 
@@ -178,7 +176,7 @@ public class IO {
             dt = in.readInt();
 
 
-        return (Compound) t.normalized(t.builder().build(o, relation, dt, v));
+        return (Compound) t.normalized(t.builder().build(o, dt, v));
     }
 
     /**

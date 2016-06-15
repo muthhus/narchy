@@ -36,7 +36,7 @@ public class Terms   {
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector ZeroSubterms = new TermVector((Term[])new Term[] { });
-    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, -1, DTERNAL, ZeroSubterms);
+    @NotNull public static final Compound ZeroProduct = new GenericCompound(Op.PROD, DTERNAL, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
     /**
@@ -232,7 +232,7 @@ public class Terms   {
             Compound csa = (Compound) sa;
             Compound csb = (Compound) sb;
 
-            return csa.relation() == csb.relation() && containsAll(csa, ta, csb, tb);
+            return csa.dt() == csb.dt() && containsAll(csa, ta, csb, tb);
         } else {
             return false;
         }
@@ -490,28 +490,13 @@ public class Terms   {
         }
     }
 
-    public static int opRel(int opOrdinal, int relation) {
-        return opOrdinal << 16 | (relation & 0xffff);
-    }
 
-    public static int opRel(@NotNull Op op, int relation) {
-        return opRel(op.ordinal(), relation);
-    }
-
-    public static int opComponent(int oprel) {
-        return oprel >> 16;
-    }
-    public static int relComponent(int oprel) {
-        return oprel & 0xffff; //HACK do something here with signed and unsigned short/int
-    }
 
 
 
     public static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
-        if (a.op().temporal && (a.opRel() == b.opRel()) && (a.volume() == b.volume())) {
-
+        if (a.op().temporal && (a.op() == b.op()) && (a.volume() == b.volume())) {
             return equalsAnonymous(a.subterms(), b.subterms());
-
         } else {
             return a.equals(b);
         }

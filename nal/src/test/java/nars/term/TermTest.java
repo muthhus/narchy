@@ -83,7 +83,7 @@ public class TermTest {
         assertEquals(term1, term2);
         assertEquals(term2, term1);
         assertEquals(term1.hashCode(), term2.hashCode());
-        assertEquals(((Compound)term1).relation(), ((Compound)term2).relation());
+        assertEquals(((Compound) term1).dt(), ((Compound) term2).dt());
         assertEquals(0, term1.compareTo(term2));
         assertEquals(0, term2.compareTo(term1));
         assertEquals(0, term1.compareTo(term1));
@@ -757,8 +757,8 @@ public class TermTest {
         Compound b = bb.term();
         Termed<Compound> cc = n.term("(" + v + ",_, x, y)");
         Compound c = cc.term();
-        assertNotEquals(a.relation(), b.relation());
-        assertNotEquals(b.relation(), c.relation());
+        assertNotEquals(a.dt(), b.dt());
+        assertNotEquals(b.dt(), c.dt());
 
         assertNotEquals(a, b);
         assertNotEquals(b, c);
@@ -790,7 +790,7 @@ public class TermTest {
 
         /*assertNotEquals("additional structure code in upper bits",
                 a.structure2(), b.structure2());*/
-        assertNotEquals(a.relation(), b.relation());
+        assertNotEquals(a.dt(), b.dt());
         assertNotEquals("structure code influenced contentHash",
                 b.hashCode(), a.hashCode());
 

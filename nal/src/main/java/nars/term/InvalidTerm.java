@@ -13,38 +13,35 @@ import static nars.nal.Tense.DTERNAL;
 public final class InvalidTerm extends RuntimeException {
 
     private final Op op;
-    private final int rel;
     private final int dt;
     private final Term[] args;
 
 
     public InvalidTerm(@NotNull Termed x) {
         this(x.op(),
-                x instanceof Compound ? ((Compound)x).relation() :  -1,
                 x instanceof Compound ? ((Compound)x).dt() :  DTERNAL,
                 x instanceof Compound ? ((Compound)x).terms() :  null);
     }
 
     public InvalidTerm(@NotNull Compound x /* incomplete or invalid */) {
-        this(x.op(), x.relation(), x.dt(), x.terms());
+        this(x.op(), x.dt(), x.terms());
     }
 
     public InvalidTerm(Term[] args) {
-        this(null, -1, DTERNAL, args);
+        this(null, DTERNAL, args);
     }
 
     public InvalidTerm(Op op) {
-        this(op, -1, DTERNAL, null);
+        this(op, DTERNAL, null);
     }
 
     public InvalidTerm(Op op, Term[] args) {
-        this(op, -1, -1, args);
+        this(op, DTERNAL, args);
     }
 
-    public InvalidTerm(Op op, int rel, int dt, Term[] args) {
+    public InvalidTerm(Op op, int dt, Term[] args) {
 
         this.op = op;
-        this.rel = rel;
         this.dt = dt;
         this.args = args;
     }
@@ -61,7 +58,6 @@ public final class InvalidTerm extends RuntimeException {
         if (op!=null)
             return getClass().getSimpleName() + '{' +
                     op +
-                    ", rel=" + rel +
                     ", dt=" + dt +
                     ", args=" + Arrays.toString(args) +
                     '}';

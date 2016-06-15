@@ -71,7 +71,7 @@ abstract public class PatternCompound extends GenericCompound {
             if (e instanceof EllipsisOneOrMore) {
 
                 if (!ellipsisTransform) {
-                    if (relation != y.relation())
+                    if (dt != y.dt())
                         return false;
                 }
 
@@ -111,7 +111,7 @@ abstract public class PatternCompound extends GenericCompound {
             return  ((yStructure | structureCached) == yStructure) &&
                     (sizeCached == y.size()) &&
                     (volCached <= y.volume()) &&
-                    (relation == y.relation());
+                    (dt == y.dt());
         }
 
 
@@ -137,7 +137,7 @@ abstract public class PatternCompound extends GenericCompound {
 //    }
 
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
-        super(seed.op(), seed.relation(), subterms);
+        super(seed.op(), seed.dt(), (TermVector)subterms);
 
         if (seed.isNormalized())
             this.setNormalized();

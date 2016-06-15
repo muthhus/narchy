@@ -25,11 +25,6 @@ public interface ProxyCompound<T extends Compound<Term>> extends ProxyTerm<T>, C
 
 
     @Override
-    default int relation() {
-        return proxy().relation();
-    }
-
-    @Override
     default boolean isNormalized() {
         return proxy().isNormalized();
     }

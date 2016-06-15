@@ -479,13 +479,13 @@ public class NarseseTest {
 
     private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) {
         Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.term(0)).relation()  );
+        assertEquals(relationIndexExpected, ((Compound)ti.term(0)).dt()  );
         assertEquals(imageTerm, ti.toString());
     }
 
     private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) {
         Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.term(1)).relation() );
+        assertEquals(relationIndexExpected, ((Compound)ti.term(1)).dt() );
         assertEquals(imageTerm, ti.toString());
     }
 

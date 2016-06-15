@@ -137,7 +137,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         TermContainer xsubs = subterms();
         if (xsubs.size() == ys)  {
             //@NotNull Op op = this.op;
-            if (/*op.isImage() && */(relation() != y.relation()))
+            if (op().isImage() && (dt() != y.dt()))
                 return false;
 
 
@@ -166,22 +166,17 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @Override
     default int compareTo(@NotNull Termlike o) {
         if (this == o) return 0;
-        //if (o == null) return -1;
 
         Termed t = (Termed) o;
-        //int diff = op().compareTo(t.op());
 
         //sort by op and relation first
-        int diff = Integer.compare(opRel(), t.opRel()); //op.ordinal(), t.op().ordinal());
+        int diff = op().compareTo(t.op());
         if (diff != 0)
             return diff;
 
 
         Compound c = (Compound) (t.term());
 
-//        int diff2 = Integer.compare(this.hash, c.hashCode());
-//        if (diff2 != 0)
-//            return diff2;
 
 
         int diff3 = Integer.compare(this.dt(), c.dt());
@@ -380,10 +375,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-    @Override
-    default int opRel() {
-        return Terms.opRel(op(), relation());
-    }
 
     @Nullable
     default Term last() {
@@ -391,8 +382,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return s == 0 ? null : term(s - 1);
     }
 
-    int relation();
-    //    return -1; //by default, not relation present (value: -1), except for Images
 
 
     @Override
@@ -415,7 +404,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
         if (cycles == dt()) return this;
 
-        GenericCompound g = new GenericCompound(op(), relation(), cycles, (TermVector)subterms());
+        GenericCompound g = new GenericCompound(op(), cycles, (TermVector)subterms());
         if (isNormalized()) g.setNormalized();
         return g;
     }
@@ -486,8 +475,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default boolean equalsIgnoringVariables(@NotNull Term other) {
+        if (!(other instanceof Compound))
+            return false;
+
         int s = size();
-        if ((other.opRel() == opRel()) && (other.size() == s)) {
+
+        if ((((Compound)other).dt() == dt()) && (other.size() == s)) {
             Compound o = (Compound)other;
             for (int i = 0; i < s; i++) {
                 if (!term(i).equalsIgnoringVariables(o.term(i)))
@@ -503,7 +496,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return hasAny(Op.TemporalBits) && ((dt() != DTERNAL) || or(Term::hasTemporal));
     }
 
-//    public int countOccurrences(final Term t) {
+    //    public int countOccurrences(final Term t) {
 //        final AtomicInteger o = new AtomicInteger(0);
 //
 //        if (equals(t)) return 1;

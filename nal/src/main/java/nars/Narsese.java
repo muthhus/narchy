@@ -559,7 +559,7 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
-        return $.compound(o, -1, cycles, TermVector.the(subj, pred));
+        return $.compound(o, cycles, TermVector.the(subj, pred));
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);
@@ -1026,7 +1026,7 @@ public class Narsese extends BaseParser<Object> {
                 $.exec($.operator(vectorterms.get(0).toString()),
                         vectorterms.subList(1, vectorterms.size())
                 ) :
-                $.the(op, -1, vectorterms);
+                $.the(op, vectorterms);
     }
 
 

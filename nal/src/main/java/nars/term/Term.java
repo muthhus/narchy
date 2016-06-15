@@ -166,14 +166,6 @@ public interface Term extends Termed, Termlike {
                 .replace(" ", "0");
     }
 
-    /**
-     * upper 16 bits: ordinal, lower 16 bits: relation (default=-1)
-     */
-    @Override
-    default int opRel() {
-        return Terms.opRel(op(), -1);
-        //return op().ordinal()<<16 | (0xffff);
-    }
 
     @Override
     default boolean isNormalized() {

@@ -20,13 +20,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @NotNull
     public final TermVector subterms;
 
-    /**
-     * subterm relation, resolves to unique concept
-     */
-    public final int relation;
 
     /**
-     * temporal relation (dt), resolves to same concept
+     * numeric (term or "dt" temporal relation)
      */
     public final int dt;
 
@@ -40,29 +36,26 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     public transient boolean normalized;
 
+
     public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
-        this(op, -1, subterms);
+        this(op, Tense.DTERNAL, (TermVector) subterms);
     }
 
-    public GenericCompound(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        this(op, relation, Tense.DTERNAL, (TermVector) subterms);
-    }
+    public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer _subterms) {
 
-    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
+        TermVector subterms = (TermVector)_subterms; //HACK for future support of alternate TermContainer impls
 
-        if (dt!=DTERNAL && !Op.isTemporal(op, dt, subterms.size()))
-            throw new InvalidTerm(op, relation, dt, subterms.terms());
+        //if (dt!=DTERNAL && (!Op.isImage() || !Op.isTemporal(op, dt, subterms.size())))
+            //throw new InvalidTerm(op, dt, subterms.terms());
 
         this.subterms = subterms;
 
         this.normalized = (subterms.vars == 0) && (subterms.varPatterns == 0) /* not included in the count */;
         this.op = op;
 
-        this.relation = relation;
-
         this.dt = dt;
 
-        this.hash = Util.hashCombine(subterms.hash, Terms.opRel(op, relation), dt);
+        this.hash = Util.hashCombine(subterms.hash, op.ordinal(), dt);
     }
 
     @NotNull
@@ -93,7 +86,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
             if (that instanceof Compound) {
                 Compound cthat = (Compound) that;
                 return (
-                    opRel() == cthat.opRel() &&
                     dt() == cthat.dt() &&
                     subterms().equals(cthat.subterms())
                 );
@@ -117,11 +109,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return dt;
     }
 
-
-    @Override
-    public final int relation() {
-        return relation;
-    }
 
     /**
      * do not call this manually, it will be set by VariableNormalization only

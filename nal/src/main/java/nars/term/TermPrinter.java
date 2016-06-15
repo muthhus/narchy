@@ -120,20 +120,13 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_OPENER);
         a.append(p);
 
-        sep(p);
-
         op.append(c, p);
-
-        sep(p);
 
         b.append(p);
 
         p.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void sep(@NotNull Appendable w) {
-        //if (pretty) w.append(' ');
-    }
 
     static void productAppend(@NotNull Compound product, @NotNull Appendable p) throws IOException {
 
@@ -155,7 +148,7 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_OPENER);
         p.append(image.op().str);
 
-        int relationIndex = image.relation();
+        int relationIndex = image.dt();
         int i;
         for (i = 0; i < len; i++) {
             Term tt = image.term(i);

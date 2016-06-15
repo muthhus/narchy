@@ -69,7 +69,7 @@ public interface Variable extends Atomic {
                 i = 3;
                 break;
             default:
-                i = -1; break; //fail
+                throw new UnsupportedOperationException();
         }
         meta[i] ++;
         meta[4] ++;
