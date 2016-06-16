@@ -5,7 +5,6 @@ import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
 import nars.Global;
 import nars.budget.Budget;
-import nars.budget.merge.BudgetMerge;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Term;
@@ -62,9 +61,9 @@ public class Revision {
             float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
             float bw = c2w(b.conf());
 
-            float aProp = aw / (aw + bw);
+            float aMix = aw / (aw + bw);
 
-            FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aProp);
+            FloatObjectPair<Compound> c = Revision.dtMerge(a.term(), b.term(), aMix);
             float adjustedDifference = c.getOne();
 
             float confScale;
@@ -86,49 +85,47 @@ public class Revision {
                 return null;
             }
 
-            long[] newEv = Stamp.zip(a.evidence(), b.evidence(), aProp);
-
-            return new MutableTask(c.getTwo(),
-                    a, b, now, newOcc, newEv,
-                    newTruth.withConf(newConf),
-                    BudgetMerge.plusDQBlend)
-                    .log("Revection Merge");
+            return new RevisionTask(c.getTwo(),
+                    a, b, now, newOcc, aMix,
+                    newTruth.withConf(newConf)
+                    );
 
         } else {
             //just project 'b' to 'a' time
 
             //    @Nullable
-//    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
-//
-//        float termRelevance = Terms.termRelevance(term(), question.term());
-//        if (termRelevance == 0)
-//            return null;
-//
-//        long now = memory.time();
-//
-//        //TODO avoid creating new Truth instances
-//        Truth solTruth = projectTruth(question.occurrence(), now, true);
-//        if (solTruth == null)
-//            return null;
-//
-//        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-//        long solutionOcc = solTruth instanceof ProjectedTruth ?
-//                ((ProjectedTruth)solTruth).when : occurrence();
-//
-//        if (solTruth.conf() < conf()) return this;
-//
-//        solTruth = solTruth.confMult(termRelevance);
-//                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
-//                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
-//
-//        if (solTruth.conf() < conf())
-//            return this;
-//
-//        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
-//        if (solutionBudget == null)
-//            return null;
-//
+            //    default Task answerProjected(@NotNull Task question, @NotNull Memory memory) {
+            //
+            //        float termRelevance = Terms.termRelevance(term(), question.term());
+            //        if (termRelevance == 0)
+            //            return null;
+            //
+            //        long now = memory.time();
+            //
+            //        //TODO avoid creating new Truth instances
+            //        Truth solTruth = projectTruth(question.occurrence(), now, true);
+            //        if (solTruth == null)
+            //            return null;
+            //
+            //        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+            //        long solutionOcc = solTruth instanceof ProjectedTruth ?
+            //                ((ProjectedTruth)solTruth).when : occurrence();
+            //
+            //        if (solTruth.conf() < conf()) return this;
+            //
+            //        solTruth = solTruth.confMult(termRelevance);
+            //                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
+            //                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
+            //
+            //        if (solTruth.conf() < conf())
+            //            return this;
+            //
+            //        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+            //        if (solutionBudget == null)
+            //            return null;
+            //
             //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+
             @NotNull Budget bb = b.budget();
 
             if (bb.isDeleted()) return null;

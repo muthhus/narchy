@@ -5,6 +5,7 @@ import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,18 +18,25 @@ import org.jetbrains.annotations.NotNull;
  * This is in case the revision task for some reason does not become processed,
  * then this budget will not be moved.
  */
-public class RevisionTask extends MutableTask {
+public class RevisionTask extends MutableTask  {
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc(), conclusion, newBelief, oldBelief);
 
         time(creationTime, occTime);
-        because("Insertion Revision");
+        log("Insertion Revision");
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
                 ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
     }
 
+    public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
+        super(c, a, b,
+                now, newOcc,
+                Stamp.zip(a.evidence(), b.evidence(), aMix),
+                newTruth);
+        log("Revection Merge");
+    }
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override public boolean onConcept(@NotNull Concept c) {

@@ -68,23 +68,18 @@ public class MutableTask extends AbstractTask {
         parent(taskToClone);
     }
 
-    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, @NotNull BudgetMerge budgetMerge) {
-        this(taskToClone, otherTask, now, occ, newEvidence, taskToClone.truth(), budgetMerge);
-    }
 
-    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
-        this(taskToClone, taskToClone, otherTask, now, occ, newEvidence, newTruth, budgetMerge);
-    }
 
-    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
+    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth/*, @NotNull BudgetMerge budgetMerge*/) {
         this(newTerm, taskToClone.punc(), newTruth, taskToClone, otherTask);
 
         setEvidence(newEvidence);
 
         time(now, occ);
+        budget(0, Float.NaN, Float.NaN);
 
-        budget(taskToClone.budget());
-        budgetMerge.merge(budget(), otherTask.budget(), 1f);
+        //budget(taskToClone.budget());
+        //budgetMerge.merge(budget(), otherTask.budget(), 1f);
     }
 
 //    public MutableTask(@NotNull Termed<Compound> content, char punc) {

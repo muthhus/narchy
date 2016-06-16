@@ -85,10 +85,8 @@ public class EternalTable extends SortedListTable<Task, Task> {
             if (c == null)
                 continue;
 
-            //avoid a duplicate truth at the same time
-            if (c.equals(oldBeliefTruth))
-                continue;
-            if (c.equals(newBeliefTruth))
+            //avoid a duplicate truth
+            if (c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
                 continue;
 
             float cconf = c.conf();
@@ -106,8 +104,8 @@ public class EternalTable extends SortedListTable<Task, Task> {
         return oldBelief != null ?
                 new RevisionTask(
                     Revision.intermpolate(
-                            newBelief, oldBelief,
-                            newBeliefConf, oldBelief.conf()
+                        newBelief, oldBelief,
+                        newBeliefConf, oldBelief.conf()
                     ),
                     newBelief, oldBelief,
                     conclusion,
