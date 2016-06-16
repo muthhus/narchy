@@ -613,9 +613,9 @@ public interface TermIndex {
 
     @Nullable
     default Compound atemporalize(@NotNull Compound c) {
-        if (c.op().temporal)
-            return (Compound) transform(c.dt(DTERNAL), CompoundAtemporalizer);
-        return c;
+        return (Compound) transform(
+                (c.op().temporal) ? c.dt(DTERNAL) : c,
+                CompoundAtemporalizer);
     }
 
     @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<Compound,Term>() {

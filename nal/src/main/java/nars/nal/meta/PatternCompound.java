@@ -18,6 +18,8 @@ abstract public class PatternCompound extends GenericCompound {
     public final int sizeCached;
     public final int volCached;
     public final int structureCached;
+    public final boolean imgCached;
+
     @NotNull
     public final Term[] termsCached;
 
@@ -111,7 +113,7 @@ abstract public class PatternCompound extends GenericCompound {
             return  ((yStructure | structureCached) == yStructure) &&
                     (sizeCached == y.size()) &&
                     (volCached <= y.volume()) &&
-                    (!op.isImage() || /*image &&*/ (dt == y.dt()));
+                    (!imgCached || /*image &&*/ (dt == y.dt()));
         }
 
 
@@ -148,6 +150,7 @@ abstract public class PatternCompound extends GenericCompound {
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
         this.volCached = seed.volume();
         this.termsCached = subterms.terms();
+        this.imgCached = op.isImage();
     }
 
 

@@ -136,14 +136,13 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         int ys = y.size();
         TermContainer xsubs = subterms();
         if (xsubs.size() == ys)  {
-            //@NotNull Op op = this.op;
-            if (op().isImage() && (dt() != y.dt()))
+            @NotNull Op op = op();
+            if (op.isImage() && (dt() != y.dt()))
                 return false;
 
 
             @NotNull TermContainer ysubs = y.subterms();
-            return (isCommutative()) ?
-                    //return (ys > 1 && op.commutative) ?
+            return (Compound.commutative(op, ys)) ?
                     subst.matchPermute(xsubs, ysubs) :
                     subst.matchLinear(xsubs, ysubs);
         }
@@ -341,7 +340,11 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default boolean isCommutative() {
-        return op().commutative && size() > 1;
+        return commutative(op(), size());
+    }
+
+    public static boolean commutative(Op op, int size) {
+        return op.commutative && size > 1;
     }
 
     @Override

@@ -2,6 +2,7 @@ package nars.task;
 
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
+import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -23,11 +24,24 @@ public class RevisionTask extends MutableTask  {
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc(), conclusion, newBelief, oldBelief);
 
+
         time(creationTime, occTime);
+        budget(oldBelief, newBelief);
         log("Insertion Revision");
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
                 ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
+    }
+
+    private void budget(Task a, Task b) {
+        float acw = a.confWeight();
+        float aMix = acw / (acw + b.confWeight());
+        budget(a, b, aMix);
+    }
+
+    private void budget(Task a, Task b, float aMix) {
+        budget(b.budget());
+        BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);
     }
 
     public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
@@ -35,6 +49,7 @@ public class RevisionTask extends MutableTask  {
                 now, newOcc,
                 Stamp.zip(a.evidence(), b.evidence(), aMix),
                 newTruth);
+        budget(a, b, aMix);
         log("Revection Merge");
     }
 
