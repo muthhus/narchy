@@ -73,10 +73,20 @@ public class RevisionTask extends MutableTask  {
         super.onConcept(c);
 
         float resultPri = pri();
+//        if (resultPri!=resultPri)
+//            return false; //deleted already?
+
         Task parentNewBelief = getParentTask();
         Task parentOldBelief = getParentBelief();
-        float newBeliefConf = parentNewBelief.confWeight();
-        float newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
+        float newBeliefContribution;
+
+        if (parentNewBelief.isBeliefOrGoal()) {
+            float newBeliefConf = parentNewBelief.confWeight();
+            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
+        } else {
+            //question/quest
+            newBeliefContribution = 0.5f;
+        }
 
         //Balance Tasks
         BudgetFunctions.balancePri(
