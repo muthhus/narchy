@@ -111,7 +111,7 @@ abstract public class PatternCompound extends GenericCompound {
             return  ((yStructure | structureCached) == yStructure) &&
                     (sizeCached == y.size()) &&
                     (volCached <= y.volume()) &&
-                    (dt == y.dt());
+                    (!op.isImage() || /*image &&*/ (dt == y.dt()));
         }
 
 

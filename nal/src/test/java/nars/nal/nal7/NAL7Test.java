@@ -97,6 +97,7 @@ public class NAL7Test extends AbstractNALTest {
     public void testSumNeg() {
         //(P ==> M), (M ==> S), neq(S,P), dt(sumNeg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
         test()
+                .log()
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
                 .mustBelieve(cycles, "(z ==>-5 x)", 1.00f, 0.45f);

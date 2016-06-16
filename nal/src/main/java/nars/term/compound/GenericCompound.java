@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.term.*;
@@ -38,15 +39,15 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
-        this(op, Tense.DTERNAL, (TermVector) subterms);
+        this(op, Tense.DTERNAL, subterms);
     }
 
     public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer _subterms) {
 
         TermVector subterms = (TermVector)_subterms; //HACK for future support of alternate TermContainer impls
 
-        //if (dt!=DTERNAL && (!Op.isImage() || !Op.isTemporal(op, dt, subterms.size())))
-            //throw new InvalidTerm(op, dt, subterms.terms());
+        if (Global.DEBUG && dt!=DTERNAL && (!op.isImage() && !Op.isTemporal(op, dt, subterms.size())))
+            throw new InvalidTerm(op, dt, subterms.terms());
 
         this.subterms = subterms;
 
