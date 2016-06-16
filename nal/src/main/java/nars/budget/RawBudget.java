@@ -57,7 +57,7 @@ public class RawBudget extends Budget {
     }
 
     @Override
-    public final boolean isDeleted() {
+    public boolean isDeleted() {
         float p = priority;
         return p!=p; //fast NaN check
     }
@@ -87,7 +87,9 @@ public class RawBudget extends Budget {
 
     @Override
     public boolean delete() {
-        if (!isDeleted()) {
+        float p = priority;
+        if (p!=p) {
+        //if (!isDeleted()) { //dont call isDeleted it may be overridden in a cyclical way
             this.priority = Float.NaN;
             return true;
         }

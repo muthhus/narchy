@@ -218,8 +218,8 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                new SoftReference<>(s);
-                //new WeakReference<>(s);
+                //new SoftReference<>(s);
+                new WeakReference<>(s);
                 //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 
