@@ -20,6 +20,7 @@
 //import java.util.concurrent.atomic.AtomicReference;
 //import java.util.function.Predicate;
 //
+///** http://www.infowars.com/creeps-in-space/ */
 //public class AIGymClient extends Shell {
 //
 //    private static final Logger logger = LoggerFactory.getLogger(AIGymClient.class);

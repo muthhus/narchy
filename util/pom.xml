@@ -27,12 +27,14 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <!--http://www.activistpost.com/tag/goldman-sachs-->
       <groupId>com.goldmansachs</groupId>
       <artifactId>gs-collections</artifactId>
       <version>7.0.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <!-- https://vimeo.com/12165742 -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>19.0</version>
