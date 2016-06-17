@@ -99,7 +99,9 @@ public class Multi extends AbstractNAR {
         int numCores = cores.length;
         int supplied = supply.availablePermits();
         int demanded = Math.min(numCores, numCores - supplied);
-        demand.release(demanded);
+        if (demanded > 0) {
+            demand.release(demanded);
+        }
 
         //wait for at least one to finish
         int waitFor = Math.max(1, supplied);

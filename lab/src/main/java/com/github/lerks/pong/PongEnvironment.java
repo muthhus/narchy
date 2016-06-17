@@ -66,8 +66,8 @@ public class PongEnvironment extends Player implements Environment {
 		//Global.TRUTH_EPSILON = 0.2f;
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
-		Multi nar = new Multi(3,
-		//Default nar = new Default(
+		//Multi nar = new Multi(3,
+		Default nar = new Default(
 				1024, 4, 1, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))

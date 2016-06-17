@@ -29,8 +29,8 @@ public class CaffeineIndex extends MaplikeIndex {
         super(termBuilder, conceptBuilder);
 
         concepts = Caffeine.newBuilder()
-                //.softValues()
                 .weakValues()
+                //.softValues()
                 //.maximumSize(10_000)
                 //.expireAfterAccess(5, TimeUnit.MINUTES)
                 //.refreshAfterWrite(1, TimeUnit.MINUTES)
