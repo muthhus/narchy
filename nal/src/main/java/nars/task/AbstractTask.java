@@ -303,6 +303,10 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final Compound term() {
         return term.term();
     }
+    @NotNull @Override
+    public final Termed<Compound> termed() {
+        return term;
+    }
 
     @Nullable @Override
     public final Truth truth() {
@@ -515,7 +519,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
 
         if (truth) {
-            Truth thisTruth = truth();
+            Truth thisTruth = this.truth;
             if (thisTruth == null) {
                 //equal punctuation will ensure thatTruth is also null
             } else {
@@ -523,14 +527,12 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             }
         }
 
-
-        if (term) {
-            if (!term().equals(that.term())) return false;
+        if (punctuation) {
+            if (this.punc != that.punc()) return false;
         }
 
-        if (punctuation) {
-            char thisPunc = punc();
-            if (thisPunc != that.punc()) return false;
+        if (term) {
+            if (!this.term.equals(that.termed())) return false;
         }
 
         return true;

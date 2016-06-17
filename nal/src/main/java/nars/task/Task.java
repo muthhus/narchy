@@ -297,11 +297,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @NotNull
     default Concept concept(@NotNull NAR n) {
-        return n.concept(term());
+        return n.concept(termed());
     }
 
-    @NotNull @Override
-    Compound term();
+    @NotNull @Override Compound term();
+
+    Termed<Compound> termed();
 
     @Nullable @Override
     Truth truth();

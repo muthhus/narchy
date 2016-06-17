@@ -24,6 +24,27 @@ abstract public class PatternCompound extends GenericCompound {
     public final Term[] termsCached;
 
 
+
+    PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
+        super(seed.op(), seed.dt(), subterms);
+
+        if (seed.isNormalized())
+            this.setNormalized();
+
+        sizeCached = seed.size();
+        structureCached =
+                //seed.structure() & ~(Op.VariableBits);
+                seed.structure() & ~(Op.VAR_PATTERN.bit);
+        this.volCached = seed.volume();
+        this.termsCached = subterms.terms();
+        this.imgCached = op.isImage();
+
+    }
+    
+
+
+
+
     protected static final class PatternCompoundContainingEllipsis extends PatternCompound {
 
         @Nullable
@@ -137,22 +158,6 @@ abstract public class PatternCompound extends GenericCompound {
 //    PatternCompound(@NotNull Compound seed) {
 //        this(seed, (TermVector) seed.subterms());
 //    }
-
-    PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
-        super(seed.op(), seed.dt(), (TermVector)subterms);
-
-        if (seed.isNormalized())
-            this.setNormalized();
-
-        sizeCached = seed.size();
-        structureCached =
-                //seed.structure() & ~(Op.VariableBits);
-                seed.structure() & ~(Op.VAR_PATTERN.bit);
-        this.volCached = seed.volume();
-        this.termsCached = subterms.terms();
-        this.imgCached = op.isImage();
-    }
-
 
 
     @NotNull

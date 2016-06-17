@@ -188,7 +188,6 @@ public class PremiseEval extends FindSubst {
         Task belief = p.belief();
 
         Compound tt = task.term();
-        Termed bb = p.beliefTerm(); //includes when belief==null, the termlink
 
         this.taskTruth = task.truth();
         this.beliefTruth = belief != null ? belief.truth() : null;
@@ -200,8 +199,10 @@ public class PremiseEval extends FindSubst {
             this.taskTerm = $.neg(tt);
         }
 
+        //Termed bb = p.beliefTerm(); //includes when belief==null, the termlink
+
         //if (beliefTruth == null || !beliefTruth.isNegative()) {
-            this.beliefTerm = bb.term();
+            this.beliefTerm = p.beliefTerm().term();
 //        } else {
 //            this.beliefTruth = this.beliefTruth.negated();
 //            this.beliefTerm = $.neg(bb);

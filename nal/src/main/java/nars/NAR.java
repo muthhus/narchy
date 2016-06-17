@@ -929,7 +929,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
         Termed tt;
         if (t instanceof Task) {
-            tt = t.term();
+            tt = ((Task)t).termed();
 
             if (tt instanceof Concept) {
                 //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is

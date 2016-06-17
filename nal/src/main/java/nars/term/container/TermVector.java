@@ -10,7 +10,6 @@ import nars.term.Terms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +23,7 @@ import java.util.function.Consumer;
  * TODO make this class immutable and term field private
  * provide a MutableTermVector that holds any write/change methods
  */
-public class TermVector implements TermContainer<Term>, Serializable {
+public class TermVector implements TermContainer<Term> {
 
 
     /**
@@ -42,7 +41,7 @@ public class TermVector implements TermContainer<Term>, Serializable {
      * bitvector of subterm types, indexed by NALOperator's .ordinal() and OR'd into by each subterm
      * low-entropy, use 'hash' for normal hash operations.
      */
-    public  final int structureHash;
+    public  final int structure;
 
 
     /** stored as volume+1 as if this termvector were already wrapped in its compound */
@@ -60,13 +59,6 @@ public class TermVector implements TermContainer<Term>, Serializable {
     public final byte varPatterns;
     public final byte varDeps;
 
-    //    public TermVector() {
-//        this(null);
-//    }
-
-//    public TermVector(@NotNull Collection<? extends Term> t, Class c) {
-//        this( t.toArray( new Term[t.size()]));
-//    }
 
     public TermVector(@NotNull Collection<? extends Term> t) {
         this( t.toArray(new Term[t.size()]));
@@ -76,10 +68,6 @@ public class TermVector implements TermContainer<Term>, Serializable {
     public TermVector(@NotNull Collection<Term> t, int n) {
         this( t.toArray(new Term[n]));
     }
-
-
-
-
 
 
      @SafeVarargs
@@ -98,7 +86,6 @@ public class TermVector implements TermContainer<Term>, Serializable {
         this.hash = Terms.hashSubterms(term, meta);
 
 
-
         final int vD = meta[0]; int varTot = 0; this.varDeps = (byte)vD; varTot+=vD;
         final int vI = meta[1];                 this.varIndeps = (byte)vI; varTot+=vI;
         final int vQ = meta[2];                 this.varQuerys = (byte)vQ; varTot+=vQ;
@@ -110,13 +97,13 @@ public class TermVector implements TermContainer<Term>, Serializable {
         this.volume = (short)( vol );
 
         int cmp = vol - varTot - vP;
-        if (cmp < 0) cmp = 0;
+        //if (cmp < 0)
+            //throw new RuntimeException("negative complexity");//cmp = 0;
         this.complexity = (short)(cmp);
 
 
-        this.structureHash = meta[5];
+        this.structure = meta[5];
 
-        //if (h == 0) h = 1; //nonzero to indicate hash calculated
     }
 
 
@@ -130,17 +117,14 @@ public class TermVector implements TermContainer<Term>, Serializable {
         return term;
     }
 
-
-
     @NotNull
     @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
         return Terms.filter(term, filter);
     }
 
-
     @Override
     public final int structure() {
-        return structureHash;
+        return structure;
     }
 
     @Override
@@ -151,8 +135,6 @@ public class TermVector implements TermContainer<Term>, Serializable {
     public final boolean equals(Term[] t) {
         return Arrays.equals(term, t);
     }
-
-
 
     @Override
     public final int volume() {
@@ -218,16 +200,16 @@ public class TermVector implements TermContainer<Term>, Serializable {
     }
 
     @Override
-    public int init(@NotNull int[] meta) {
-        if (vars() > 0) {
-            meta[0] += varDep();
-            meta[1] += varIndep();
-            meta[2] += varQuery();
+    public final int init(@NotNull int[] meta) {
+        if (vars > 0) {
+            meta[0] += varDeps;
+            meta[1] += varIndeps;
+            meta[2] += varQuerys;
         }
 
-        meta[3] += varPattern();
-        meta[4] += volume();
-        meta[5] |= structure();
+        meta[3] += varPatterns;
+        meta[4] += volume;
+        meta[5] |= structure;
 
         return 0; //hashcode for this isn't used
     }
@@ -238,13 +220,6 @@ public class TermVector implements TermContainer<Term>, Serializable {
 //        return y;
 //    }
 
-
-
-//    @Nullable
-//    @Override
-//    public final Ellipsis firstEllipsis() {
-//        return Ellipsis.firstEllipsis(term);
-//    }
 
 
     @Override

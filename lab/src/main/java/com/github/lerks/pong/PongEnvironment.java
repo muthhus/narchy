@@ -13,10 +13,13 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
+import nars.index.CaffeineIndex;
 import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.nar.Multi;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -44,11 +47,11 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 16;
-	final int height = 16;
+	final int width = 24;
+	final int height = 24;
 	final int pixels = width * height;
-	final int scaleX = 24;
-	final int scaleY = 24;
+	final int scaleX = 20;
+	final int scaleY = 20;
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;
@@ -63,12 +66,12 @@ public class PongEnvironment extends Player implements Environment {
 		//Global.TRUTH_EPSILON = 0.2f;
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
-		//Multi nar = new Multi(3,
-		Default nar = new Default(
+		Multi nar = new Multi(3,
+		//Default nar = new Default(
 				1024, 4, 1, 2, rng,
-				//new CaffeineIndex(Terms.terms, new DefaultConceptBuilder(rng))
+				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				new Indexes.WeakTermIndex(256 * 1024, rng)
+				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());

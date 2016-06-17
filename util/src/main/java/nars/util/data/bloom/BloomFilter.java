@@ -50,8 +50,11 @@ public class BloomFilter {
     }
 
     public BloomFilter(long maxNumEntries, double fpp) {
-        assert maxNumEntries > 0 : "maxNumEntries should be > 0";
-        assert fpp > 0.0 && fpp < 1.0 : "False positive percentage should be > 0.0 & < 1.0";
+        if (maxNumEntries <= 0)
+            throw new AssertionError("maxNumEntries should be > 0");
+        if (fpp <= 0.0 || fpp >= 1.0)
+            throw new AssertionError("False positive percentage should be > 0.0 & < 1.0");
+
         this.fpp = fpp;
         n = maxNumEntries;
         m = optimalNumOfBits(maxNumEntries, fpp);

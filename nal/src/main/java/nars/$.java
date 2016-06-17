@@ -161,8 +161,8 @@ public enum $ {
     }
 
     @Nullable
-    public static Compound neg(@NotNull Termed x) {
-        return (Compound) the(NEG, x.term());
+    public static Compound neg(@NotNull Term x) {
+        return (Compound) the(NEG, x);
     }
 
     @NotNull
