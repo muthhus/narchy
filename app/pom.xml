@@ -103,12 +103,14 @@
       <version>2.3.2</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>net.sourceforge.tess4j</groupId>
-      <artifactId>tess4j</artifactId>
-      <version>2.0.2-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
+
+    <!--&lt;!&ndash; http://mvnrepository.com/artifact/net.sourceforge.tess4j/tess4j &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>net.sourceforge.tess4j</groupId>-->
+      <!--<artifactId>tess4j</artifactId>-->
+      <!--<version>3.2.1</version>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>org.boofcv</groupId>
       <artifactId>visualize</artifactId>
