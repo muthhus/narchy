@@ -53,20 +53,20 @@ public class RevisionTask extends MutableTask  {
         log("Revection Merge");
     }
 
-    @Override
-    public boolean isDeleted() {
-        if (super.isDeleted()) {
-            return true;
-        }
-        if (isParentDeleted(getParentTask()) || isParentDeleted(getParentBelief())) {
-            return delete();
-        }
-        return false;
-    }
-    private static boolean isParentDeleted(Task b) {
-        return (b==null || b.isDeleted());
-    }
-
+//    @Override
+//    public boolean isDeleted() {
+//        if (super.isDeleted()) {
+//            return true;
+//        }
+//        if (isParentDeleted(getParentTask()) || isParentDeleted(getParentBelief())) {
+//            return delete();
+//        }
+//        return false;
+//    }
+//    private static boolean isParentDeleted(Task b) {
+//        return (b==null || b.isDeleted());
+//    }
+//
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override public boolean onConcept(@NotNull Concept c) {
