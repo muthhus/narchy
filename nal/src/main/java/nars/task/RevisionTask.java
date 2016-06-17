@@ -63,10 +63,10 @@ public class RevisionTask extends MutableTask  {
         }
         return false;
     }
-
     private static boolean isParentDeleted(Task b) {
-        return (b!=null && b.isDeleted());
+        return (b==null || b.isDeleted());
     }
+
 
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override public boolean onConcept(@NotNull Concept c) {
