@@ -21,33 +21,37 @@ public class CaffeineIndex extends MaplikeIndex {
     @NotNull
     final Cache<TermContainer, TermContainer> subterms;
 
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder) {
-        this($.terms, conceptBuilder);
+    public CaffeineIndex(Concept.ConceptBuilder builder) {
+        this(builder, false);
     }
 
-    public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, boolean soft) {
+        this($.terms, conceptBuilder, soft);
+    }
+
+    public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, boolean soft) {
         super(termBuilder, conceptBuilder);
 
-        concepts = Caffeine.newBuilder()
-                .weakValues()
-                //.softValues()
-                //.maximumSize(10_000)
-                //.expireAfterAccess(5, TimeUnit.MINUTES)
-                //.refreshAfterWrite(1, TimeUnit.MINUTES)
-                //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
-                //.maximumSize(32*1024)
-                .build();
-                //.build(key -> createExpensiveGraph(key));
+        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
+        concepts = builder.build();
 
-        subterms = Caffeine.newBuilder()
-                //.softValues()
-                .weakValues()
-                //.maximumSize(10_000)
-                //.expireAfterAccess(5, TimeUnit.MINUTES)
-                //.refreshAfterWrite(1, TimeUnit.MINUTES)
-                //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
-                //.maximumSize(32*1024)
-                .build();
+        Caffeine<Object, Object> subBuilder = prepare(Caffeine.newBuilder(), soft);
+        subterms = subBuilder.build();
+    }
+
+    private Caffeine<Object, Object> prepare(Caffeine<Object, Object> builder, boolean soft) {
+        if (soft)
+            builder = builder.weakValues();
+
+        //.softValues()
+        //.maximumSize(10_000)
+        //.expireAfterAccess(5, TimeUnit.MINUTES)
+        //.refreshAfterWrite(1, TimeUnit.MINUTES)
+        //.refreshAfterWrite(1, TimeUnit.NANOSECONDS)
+        //.maximumSize(32*1024)
+        //.build(key -> createExpensiveGraph(key));
+
+        return builder;
     }
 
     @Nullable

@@ -68,14 +68,14 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 4, 1, 2, rng,
+				1024, 3, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		//nar.conceptActivation.setValue(0.3f);
+		nar.conceptActivation.setValue(0.5f);
 		nar.beliefConfidence(0.95f);
 		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
