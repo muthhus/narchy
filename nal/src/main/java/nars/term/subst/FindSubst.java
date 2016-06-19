@@ -204,21 +204,23 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public final boolean match(@NotNull Term x, @NotNull Term y) {
 
-        if (x.equals(y))
-            return true;
-
-
-
         Op xOp = x.op();
         Op yOp = y.op();
 
         boolean opEqual = xOp == yOp;
-        if ((x instanceof Compound) && opEqual) {
-            //Compound cx = (Compound)x;
-            //Compound cy = (Compound)y;
-            //if (hasAnyVar(cx) || hasAnyVar(cy))
-            return ((Compound) x).match((Compound) y, this);
-        } else {
+        if (opEqual) {
+
+            if (x.equals(y)) {
+                return true;
+            } else if (x instanceof Compound) {
+                return (x.hasAny(type) || y.hasAny(type)) && ((Compound) x).match((Compound) y, this);
+            } else if (xOp.var) {
+                return matchVarCommon( x, y, xOp, opEqual);
+            }
+
+        }
+
+        {
 
             Op t = type;
 
@@ -229,9 +231,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 return matchVarY(x, y);
             }
 
-            if (xOp.var && yOp.var) {
-                return matchVarCommon( x, y, xOp, opEqual);
-            }
+
         }
 
         return false;

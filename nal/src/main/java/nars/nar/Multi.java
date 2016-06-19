@@ -71,7 +71,7 @@ public class Multi extends AbstractNAR {
 
         this.cores = new WorkerCore[cores];
         for (int i = 0; i < cores; i++) {
-            PremiseEval matcher = new PremiseEval(random, newDeriver());
+            PremiseEval matcher = newMatcher();
             WorkerCore core = this.cores[i] = newCore(i,
                     conceptsPerCore,
                     conceptsFirePerCycle,
@@ -93,7 +93,6 @@ public class Multi extends AbstractNAR {
         */
 
     }
-
 
 
     protected final void frame(NAR n) {

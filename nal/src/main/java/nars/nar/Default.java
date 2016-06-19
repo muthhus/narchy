@@ -54,7 +54,7 @@ public class Default extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
-        the("reasoner", matcher = new PremiseEval(random, newDeriver()));
+        the("reasoner", matcher = newMatcher());
 
         the("core", core = newCore(
                 activeConcepts,

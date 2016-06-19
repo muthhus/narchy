@@ -3,10 +3,7 @@ package nars.nal.meta;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
-import nars.$;
-import nars.Global;
-import nars.Op;
-import nars.Symbols;
+import nars.*;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
 import nars.nal.TimeFunction;
@@ -39,6 +36,8 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -77,7 +76,8 @@ public class PremiseRule extends GenericCompound {
             differ.class,
             union.class,
             substitute.class,
-            substituteIfUnifies.class,
+            substituteIfUnifies.substituteIfUnifiesDep.class,
+            substituteIfUnifies.substituteIfUnifiesIndep.class,
 
             add.class
 //            ifUnifies.class
@@ -135,14 +135,16 @@ public class PremiseRule extends GenericCompound {
     private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
 
     @Nullable
-    private static final CompoundTransform<Compound,Term> truthSwap = new PremiseTruthTransform() {
-        @Override public Term apply(@NotNull Term func) {
+    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform() {
+        @Override
+        public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'X');
         }
     };
     @Nullable
-    private static final CompoundTransform<Compound,Term> truthNegate = new PremiseTruthTransform() {
-        @Override public Term apply(@NotNull Term func) {
+    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform() {
+        @Override
+        public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'N');
         }
     };
@@ -218,7 +220,6 @@ public class PremiseRule extends GenericCompound {
             s.add(truth);
 
 
-
             addAll(s, match.pre);
         }
 
@@ -236,15 +237,35 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
+    public static void eachOperator(NAR nar, BiConsumer<Class, ImmediateTermTransform> eachTransform) throws Exception {
+        for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
+
+            Constructor<?>[] ccc = c.getConstructors();
+            Constructor cc = ccc[0];
+            ImmediateTermTransform o;
+            if (cc.getParameterCount() == 0) {
+                //default empty constructor
+                o = (c.newInstance());
+            } else {
+                //support 'NAR' only parameter constructor
+                o = ((ImmediateTermTransform) cc.newInstance(nar));
+            }
+            eachTransform.accept(c, o);
+
+        }
+    }
 
 
-
-    /** pre-match filtering based on conclusion op type and other premise context */
+    /**
+     * pre-match filtering based on conclusion op type and other premise context
+     */
     public static final class Conclusion extends AtomicBoolCondition {
 
-        /** pattern which determines the concluson term.
+        /**
+         * pattern which determines the concluson term.
          * this is applied prior to the actual match.
-         * VAR_PATTERN acts as a sort of wildcard / unknown*/
+         * VAR_PATTERN acts as a sort of wildcard / unknown
+         */
         @NotNull
         private final Term pattern;
 
@@ -259,7 +280,7 @@ public class PremiseRule extends GenericCompound {
             if (Op.isOperation(pattern)) {
                 //TODO more correctly unwrap certain immediate transform operators to get the actual op
                 //if (p.trans Operator.operator((Compound)pattern) instanceof ImmediateTermTransform) {
-                    this.pattern = $.varPattern(1);
+                this.pattern = $.varPattern(1);
                 //} else {
                 //    this.op = rawPatternOp;
                 //}
@@ -269,7 +290,7 @@ public class PremiseRule extends GenericCompound {
             }
 
             char puncOverride = post.puncOverride;
-            char puncSrc = puncOverride!=0 ? puncOverride : '_';
+            char puncSrc = puncOverride != 0 ? puncOverride : '_';
             this.id = "Conclusion(" + puncSrc + ')';
         }
 
@@ -295,7 +316,9 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    /** higher is earlier */
+    /**
+     * higher is earlier
+     */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
         put("SubTermOp1", 21);
         put("SubTermOp0", 20);
@@ -315,7 +338,6 @@ public class PremiseRule extends GenericCompound {
         put(Solve.class, 5);
 
 
-
 //        put(SubTermOp.class, 10);
 //        put(TaskPunctuation.class, 9);
 //        put(TaskNegative.class, 8);
@@ -325,8 +347,7 @@ public class PremiseRule extends GenericCompound {
 
     private static Object classify(Term b) {
         if (b instanceof SubTermOp)
-            return "SubTermOp" + (((SubTermOp)b).subterm == 0 ? "0" : "1"); //split
-
+            return "SubTermOp" + (((SubTermOp) b).subterm == 0 ? "0" : "1"); //split
 
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
@@ -375,7 +396,7 @@ public class PremiseRule extends GenericCompound {
                 bscore = ps.get(bc);
             }
 
-            if (ascore!=bscore) {
+            if (ascore != bscore) {
                 return Integer.compare(bscore, ascore);
             }
 
@@ -393,11 +414,11 @@ public class PremiseRule extends GenericCompound {
         char puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
-        if ((p.beliefTruth!=null) && (belief == null)) {
+        if ((p.beliefTruth != null) && (belief == null)) {
             throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
         }
         TruthOperator desire = DesireFunction.get(p.goalTruth);
-        if ((p.goalTruth!=null) && (desire == null)) {
+        if ((p.goalTruth != null) && (desire == null)) {
             throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
         }
 
@@ -436,13 +457,17 @@ public class PremiseRule extends GenericCompound {
         return source;
     }
 
-    /** the task-term pattern */
+    /**
+     * the task-term pattern
+     */
     @NotNull
     public final Term getTask() {
         return getPremise().term(0);
     }
 
-    /** the belief-term pattern */
+    /**
+     * the belief-term pattern
+     */
     @NotNull
     public final Term getBelief() {
         return getPremise().term(1);
@@ -576,7 +601,6 @@ public class PremiseRule extends GenericCompound {
 
         ListMultimap<Term, MatchConstraint> constraints =
                 MultimapBuilder.treeKeys().arrayListValues().build();
-
 
 
         //additional modifiers: either preConditionsList or beforeConcs, classify them here
@@ -862,7 +886,7 @@ public class PremiseRule extends GenericCompound {
                 constraints);
 
 
-        if (taskPunc==0) {
+        if (taskPunc == 0) {
             //default: add explicit no-questions rule
             pres.add(TaskPunctuation.NotQuestion);
         }
@@ -897,17 +921,16 @@ public class PremiseRule extends GenericCompound {
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
         minNAL = Math.max(minNAL,
-                        Math.max(
-                                maxLevel(getTask()),
-                                maxLevel(getBelief())
-                        ));
+                Math.max(
+                        maxLevel(getTask()),
+                        maxLevel(getBelief())
+                ));
 
 
         ensureValid();
 
         return this;
     }
-
 
 
     public final void setAllowBackward() {
@@ -1029,10 +1052,12 @@ public class PremiseRule extends GenericCompound {
         return neg;
     }
 
-    /** safe negation */
+    /**
+     * safe negation
+     */
     private static Term neg(Term x) {
         if (x.op() == Op.NEG) {
-            return ((Compound)x).term(0); //unwrap
+            return ((Compound) x).term(0); //unwrap
         } else {
             //do this manually for premise rules since they will need to negate atoms which is not usually allowed
             return new GenericCompound(Op.NEG, TermContainer.the(x));
@@ -1051,7 +1076,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound)terms.remap(this, m);
+        Compound remapped = (Compound) terms.remap(this, m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);

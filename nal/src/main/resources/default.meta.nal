@@ -233,24 +233,24 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-    B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-    B, (C ==> A), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
-    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
+    B, (A ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+    B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
+    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
 //    X, (XI ==> B), substitute_if_unifies("$",XI,(&/,X,/0)), shift_occurrence_forward(XI,"==>") |- B, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
-//    (A ==> C), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+//    (A ==> C), B, time(decomposeTask) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
 
 //    M, (P ==> M), shift_occurrence_backward(unused,"==>") |- P, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
 //    B, (C ==> A), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"==>") |- C, (Truth:Abduction, Order:ForAllSame)
 //    X, (BI ==> Y), substitute_if_unifies("$",Y,X), shift_occurrence_backward(BI,"==>") |- BI, (Truth:Abduction, Desire:Deduction, Order:ForAllSame)
-    //(C ==> A), B, time(decomposeTask) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction)
+    //(C ==> A), B, time(decomposeTask) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
 
 //    M, (S <=> M), shift_occurrence_backward(unused,"<=>") |- S, (Truth:Analogy, Desire:Strong, Order:ForAllSame)
 //      ?? B, (A <=> C), substitute_if_unifies("$",A,B), shift_occurrence_backward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
 //      ?? B, (C <=> A), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"<=>") |- C, (Truth:Deduction, Order:ForAllSame)
-    //(A <=> C), B, time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Analogy, Desire:Strong)
+    //(A <=> C), B, time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
 
 
 
@@ -271,13 +271,13 @@
 
      //decompose any event in a conjunction belief
      (&&,X,A..+), (&&,X,A..+), time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
 
 
     //decompose (only) the leading event in a conjunction goal
     (&&,X,A..+), X, time(decomposeTaskIfBefore), task("!") |- X, (Desire:StructuralStrong)
-    (&&,X,A), B, time(decomposeTask), task("!")            |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
-    //B, (&&,X,A), time(decomposeBelief), task("!")          |- substituteIfUnifies(A,"#",X,B), (Desire:Deduction)
+    (&&,X,A), B, time(decomposeTask), task("!")            |- substituteIfUnifiesDep(A,X,B), (Desire:Deduction)
+    //B, (&&,X,A), time(decomposeBelief), task("!")          |- substituteIfUnifiesDep(A,X,B), (Desire:Deduction)
 
 
         //TODO use ellipsis here?
@@ -297,7 +297,7 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifiesIndep(((&&,A..+) ==> B),X,Y), (Belief:Deduction)
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
@@ -510,7 +510,7 @@
 //TODO for desire
 
 //query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
-//  A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
+//  A, B, task("?") |- substituteIfUnifiesQuery(B, A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
 
 
 

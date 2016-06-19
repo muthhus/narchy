@@ -48,8 +48,8 @@ public interface Termlike extends Comparable<Termlike> {
      *  WARNING currently this does not detect presence of pattern variables
      * */
     default boolean hasAny(@NotNull Op op) {
-//        if (op == Op.VAR_PATTERN)
-//            return Variable.hasPatternVariable(this);
+        if (op == Op.VAR_PATTERN)
+            return varPattern() > 0;
         return hasAny(op.bit);
     }
 

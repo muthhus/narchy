@@ -6,6 +6,7 @@ import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.op.ImmediateTermTransform;
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -83,6 +85,11 @@ public abstract class AbstractNAR extends NAR {
         }
     }
 
+
+    protected PremiseEval newMatcher() {
+        return new PremiseEval(this, random, newDeriver());
+    }
+
     /** NAL7 plugins */
     public void initNAL7() {
 
@@ -92,13 +99,15 @@ public abstract class AbstractNAR extends NAR {
     /* NAL8 plugins */
     public void initNAL8() {
         /* derivation operators available at runtime */
-        for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
-            try {
-                onExec(c.newInstance());
-            } catch (Exception e) {
-                error(e);
-            }
+        try {
+            PremiseRule.eachOperator(this, (c, o) -> {
+                onExec(o);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+
 
         //new shell(this);
         for (AbstractOperator o : defaultOperators)

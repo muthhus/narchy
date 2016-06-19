@@ -107,14 +107,12 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         Term r = m.resolve(conclusionPattern);
         if (r instanceof Compound) { //includes null test
 
-            // if (r.varPattern() != 0) return; //EXACTLY WHY DO WE TAKE THIS FAR TO DISCOVER THIS, CAN WE ELIMINATE USELESS WORK BY DISCOVERING ITS REASON
-
-            derive(m, r);
+            derive(m, (Compound)r);
         }
 
     }
 
-    final void derive(@NotNull PremiseEval m, @NotNull Term raw) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound raw) {
         ConceptProcess premise = m.premise;
         NAR nar = premise.nar();
 
@@ -122,14 +120,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi
-            raw = ((Compound)raw).term(0);
-            if (!(raw instanceof Compound))
-                return; //unwrapped to a variable
+            Term raw2 = raw.term(0);
+            if (!(raw2 instanceof Compound))
+                return; //unwrapped to a variable (negations of atomics are not allowed)
+            raw = (Compound)raw2;
             if (truth!=null)
                 truth = truth.negated();
         }
 
-        //pre-filter invalid statements
+        //pre-filter invalid statements: insufficient NAL level, etc
         if (!Task.preNormalize(raw, nar))
             return;
 

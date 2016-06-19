@@ -86,6 +86,7 @@ public enum Global {
     public static final float HORIZON = 1f;
 
     public static final float TRUTH_EPSILON = 0.01f;
+    public static final int TRUTH_DISCRETION = (int)(1f/Global.TRUTH_EPSILON);
 
     /** how precise unit test results must match expected values to pass */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;

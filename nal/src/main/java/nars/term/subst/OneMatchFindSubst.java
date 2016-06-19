@@ -53,6 +53,7 @@ public final class OneMatchFindSubst extends FindSubst {
         this.type = op;
         this.xterm = xterm;
         this.target = target;
+        this.result = null;
         matchAll(x, y, true);
         return result;
     }

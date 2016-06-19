@@ -12,9 +12,7 @@ import static nars.util.data.Util.round;
 public class DefaultTruth implements Truth  {
 
     public final float freq, conf;
-    public final int hash;
-
-
+    //public final int hash;
 
     @Override
     public final float freq() {
@@ -49,7 +47,7 @@ public class DefaultTruth implements Truth  {
         if (c==0)
             throw new RuntimeException("zero conf");
 
-        this.hash = Truth.hash(f, c, discreteness);
+        //this.hash = Truth.hash(f, c, discreteness);
     }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {
@@ -69,9 +67,10 @@ public class DefaultTruth implements Truth  {
 
     @Nullable
     @Override public final Truth withConf(float newConf) {
-        if (newConf < Global.TRUTH_EPSILON)
-            return null;
-        return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
+//        if (newConf < Global.TRUTH_EPSILON)
+//            return null;
+        //return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
+        return new DefaultTruth(freq, newConf);
     }
 
     @NotNull
@@ -85,28 +84,32 @@ public class DefaultTruth implements Truth  {
 
     @Override
     public final boolean equals(@NotNull Object that) {
+
         //if (that instanceof DefaultTruth) {
-            return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
-        /*} else if (that instanceof Truth) {
-            return equalsTruth((Truth)that);
+
+            //return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
+        /*} else */if (that instanceof Truth) {
+            Truth t = (Truth)that;
+            return freq == t.freq() && conf == t.conf();
         }
-        return false;*/
+        return false;
     }
 
     @Override
     public final int hashCode() {
-        return hash;
+        return Truth.hash(freq, conf, Global.TRUTH_DISCRETION);
+        //return hash;
     }
 
     @NotNull
     @Override
     public final DefaultTruth negated() {
-        float fPos = freq;
+        //float fPos = freq;
 
         //if = 0.5, negating will produce same result
-        return Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON) ? this :
-                new DefaultTruth(1.0f - fPos, conf);
+        //return Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON) ? this :
 
+        return new DefaultTruth(1.0f - freq, conf);
     }
 
     protected boolean equalsFrequency(@NotNull Truth t) {

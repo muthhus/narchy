@@ -186,24 +186,24 @@ public interface Truth extends Truthed {
 
     @NotNull
     default CharSequence toCharSequence() {
-        return appendString(new StringBuilder());
+        return appendString(new StringBuilder(7));
     }
     
-    /** displays the truth value as a short string indicating degree of true/false */
-    @Nullable
-    default String toTrueFalseString() {
-        //TODO:
-        //  F,f,~,t,T
-        return null;
-    }
-
-    /** displays the truth value as a short string indicating degree of yes/no */
-    @Nullable
-    default String toYesNoString() {
-        //TODO
-        // N,n,~,y,Y
-        return null;
-    }
+//    /** displays the truth value as a short string indicating degree of true/false */
+//    @Nullable
+//    default String toTrueFalseString() {
+//        //TODO:
+//        //  F,f,~,t,T
+//        return null;
+//    }
+//
+//    /** displays the truth value as a short string indicating degree of yes/no */
+//    @Nullable
+//    default String toYesNoString() {
+//        //TODO
+//        // N,n,~,y,Y
+//        return null;
+//    }
 
     
     @NotNull
@@ -220,13 +220,6 @@ public interface Truth extends Truthed {
     }
 
 
-
-//    /** negation that modifies the truth instance itself */
-//    @NotNull
-//    default Truth negate() {
-//        //final float f = 1 - getFrequency();
-//        return setFrequency(1.0f - freq());
-//    }
 
     static int compare(@NotNull Truth a, @NotNull Truth b) {
         if (a == b) return 0;

@@ -73,17 +73,21 @@ public class PremiseEval extends FindSubst {
 
 
     /** initializes with the default static term index/builder */
-    public PremiseEval(Random r, Deriver deriver) {
-        this($.terms, r, deriver);
+    public PremiseEval(NAR nar, Random r, Deriver deriver) {
+        this(nar, $.terms, r, deriver);
     }
 
-    public PremiseEval(TermIndex index, Random r, Deriver deriver) {
+    public PremiseEval(NAR nar, TermIndex index, Random r, Deriver deriver) {
         super(index, VAR_PATTERN, r );
 
         transforms = new HashMap<>(PremiseRule.Operators.length);
-        for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
-            addTransform(c);
+        try {
+            PremiseRule.eachOperator(nar, this::addTransform);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+
 
         this.deriver = deriver;
         //occDelta = new Versioned(this);
@@ -92,12 +96,8 @@ public class PremiseEval extends FindSubst {
         punct = new Versioned(versioning);
     }
 
-    private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
-        try {
-            transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), c.newInstance());
-        } catch (Exception e) {
-            throw new RuntimeException(c + ": " + e);
-        }
+    private void addTransform(Class c, ImmediateTermTransform i) {
+        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
     }
 
     @Override public final ImmediateTermTransform getTransform(Atomic t) {
