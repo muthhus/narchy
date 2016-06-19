@@ -133,19 +133,22 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * */
     default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
-        int ys = y.size();
         TermContainer xsubs = subterms();
-        if (xsubs.size() == ys)  {
+        int xs = xsubs.size();
+        TermContainer ysubs = y.subterms();
+        if (xs == ysubs.size())  {
+
+            if (vars() + y.vars() == 0)
+                return false; //no variables that could produce any matches
+
             @NotNull Op op = op();
-            if (op.isImage() && (dt() != y.dt()))
-                return false;
-
-
-            @NotNull TermContainer ysubs = y.subterms();
-            return (Compound.commutative(op, ys)) ?
-                    subst.matchPermute(xsubs, ysubs) :
-                    subst.matchLinear(xsubs, ysubs);
+            if (!op.isImage() || (dt() == y.dt())) {
+                return (Compound.commutative(op, xs)) ?
+                        subst.matchPermute(xsubs, ysubs) :
+                        subst.matchLinear(xsubs, ysubs);
+            }
         }
+
         return false;
 
     }

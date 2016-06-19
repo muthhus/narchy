@@ -15,7 +15,6 @@ import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.subst.choice.*;
 import nars.term.variable.CommonVariable;
-import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
@@ -163,8 +162,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return xy.get(t);
     }
 
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y) {
-        return matchAll(x, y, true);
+    public final void matchAll(@NotNull Term x, @NotNull Term y) {
+        matchAll(x, y, true);
     }
 
 
@@ -174,18 +173,15 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * setting finish=false allows matching in pieces before finishing
      */
-    public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         if (match(x, y) && finish) {
             if (!termutes.isEmpty())
                 termunator.run(this, null, -1);
             else
                 onMatch();
-
-            return true;
         }
 
-        return false;
     }
 
 
@@ -213,20 +209,20 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
             if (x.equals(y)) {
                 return true;
             } else if (x instanceof Compound) {
-                return (x.hasAny(type) || y.hasAny(type)) && ((Compound) x).match((Compound) y, this);
-            } else if (xOp.var) {
-                return matchVarCommon( x, y, xOp, opEqual);
+                return ((Compound) x).match((Compound) y, this);
+            } else if (x instanceof Variable) {
+                return putCommon( x, y );
             }
 
-        }
+        } else {
 
-        {
+
 
             Op t = type;
 
             if (xOp == t) {
                 //if both are variables of the target type, but different; they need to be common variable
-                return opEqual ? matchVarCommon(x, y, xOp, true) : matchVarX(x, y);
+                return matchVarX(x, y);
             } else if (yOp == t) {
                 return matchVarY(x, y);
             }
@@ -240,39 +236,36 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //    private static boolean hasAnyVar(Compound x) {
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
 //    }
-
-    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y, Op xOp, boolean equalOp) {
-        return (equalOp) ?
-                putCommon((Variable)xVar, (Variable)y) :
-                (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
-                    &&
-                    putVarX(xVar, y);
-
-        //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
-        //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
-        //                return false;
-        //            }
-
-    }
+//
+//    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
+//        return (equalOp) ?
+//                putCommon((Variable)xVar, (Variable)y) :
+//                putXY(xVar, y);
+//
+//        //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
+//        //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
+//        //                return false;
+//        //            }
+//
+//    }
 
 
+    /** x's and y's ops already determined inequal */
     private final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term t = term(x);
         return (t != null) ?
                 match(t, y) :
-                matchVarCommon(x, y);
+                putXY(/* (Variable) */ x, y);
     }
 
-    private final boolean matchVarCommon(@NotNull Term x, @NotNull Term y) {
-        return matchVarCommon(x, y, x.op(), x.op()==y.op());
-    }
 
+    /** x's and y's ops already determined inequal */
     private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
+
         Term t = yx.get(y);
         return (t != null) ?
                 match(x, t) :
-                (putYX(/*(Variable)*/ y, x) &&
-                        (!(y instanceof GenericNormalizedVariable) || putXY(y, /*(Variable)*/ x)));
+                putYX(/*(Variable)*/ y, x);// && putXY(y, /*(Variable)*/ x));
     }
 
 
@@ -712,16 +705,19 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    /**
-     * elimination
-     */
-    private boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        return putXY(x, y) && (!(x instanceof GenericNormalizedVariable) || putYX(x, y));
-    }
+////    /**
+////     * elimination
+////     */
+//    private boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
+//        //if (!(x instanceof GenericNormalizedVariable))
+//          //  throw new RuntimeException();
+//
+//        return putXY(x, y);// && (x.op() != type || putYX(x, y));
+//    }
 
 
-    private boolean putCommon(@NotNull Variable /* var */ x, @NotNull Variable y) {
-        Variable commonVar = CommonVariable.make(x, y);
+    private boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
+        Variable commonVar = CommonVariable.make((Variable)x, (Variable)y);
         return putXY(x, commonVar) && putYX(y, commonVar);
         //TODO restore changed values if putYX fails but putXY succeeded?
     }

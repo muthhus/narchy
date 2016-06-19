@@ -35,16 +35,14 @@ public class UnifySubst extends FindSubst  {
     }
 
     @Override
-    public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.a = x;
         this.matches = 0;
 
         if (x.hasAny(type) || y.hasAny(type)) { //no need to unify if there is actually no variable
             clear();
-            return super.matchAll(x, y, finish);
+            super.matchAll(x, y, finish);
         }
-
-        return false;
 
     }
 
