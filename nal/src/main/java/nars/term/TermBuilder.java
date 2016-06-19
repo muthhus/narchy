@@ -250,14 +250,16 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term junction(@NotNull Op op, int t, @NotNull Term... u) {
+    public Term junction(@NotNull Op op, int t, final @NotNull Term... u) {
 //        if (u.length == 1)
 
-        if (u.length == 0) {
+        int ul = u.length;
+
+        if (ul == 0) {
             return null;
         }
 
-        if (u.length == 1) {
+        if (ul == 1) {
             Term only = u[0];
             //preserve unitary ellipsis
             return ellipsisoid(only) ?
@@ -287,7 +289,7 @@ public abstract class TermBuilder {
 
 
 
-           if (u.length == 2) {
+           if (ul == 2) {
                 if (u[0].equals(u[1]))
                     return u[0];
             } else {

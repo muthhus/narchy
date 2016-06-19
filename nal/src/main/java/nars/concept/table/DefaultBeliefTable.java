@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.bag.Table;
 import nars.bag.impl.SortedTable;
 import nars.budget.merge.BudgetMerge;
+import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -190,58 +191,63 @@ public class DefaultBeliefTable implements BeliefTable {
 
     private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
 
-        if (eternal.capacity() == 0)
+        @NotNull EternalTable et = this.eternal;
+
+        int cap = et.capacity();
+        if (cap == 0)
             return input;
+        else if ((input.conf() >= 1f) && (cap != 1) && (et.isEmpty() || (et.top().conf() < 1f))) {
+            //AXIOMATIC/CONSTANT BELIEF/GOAL
+            addEternalAxiom(input, et);
+            return input;
+        }
 
-
-        @NotNull SortedTable<Task, Task> et = this.eternal;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = ((EternalTable) et).tryRevision(input, nar);
-        if (revised!=null)  {
-            if(Global.DEBUG) {
-                if (revised.isDeleted())
-                    throw new RuntimeException("revised task is deleted");
-                if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
-                    throw new RuntimeException("useless revision");
+        Task revised;
+        if (!(input instanceof RevisionTask)) {
+            revised = et.tryRevision(input, nar);
+            if (revised != null) {
+                if (Global.DEBUG) {
+                    if (revised.isDeleted())
+                        throw new RuntimeException("revised task is deleted");
+                    if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
+                        throw new RuntimeException("useless revision");
+                }
             }
-
-
-            //SLOW REVISION:
-            nar.input(revised); //will be processed on subsequent cycle
-
-            //FAST REVISION: return the revision, but also attempt to insert the incoming task which caused it:
-//            tryInsert(input, nar);
-//            input = revised;
+        } else {
+            revised = null;
         }
 
-
-        //AXIOMATIC/CONSTANT BELIEF/GOAL
-        if (input.conf() >=1f && et.capacity()!=1 && (et.isEmpty()|| et.top().conf()<1f)) {
-            //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
-            //1. clear the corresponding table, set capacity to one, and insert this task
-            Consumer<Task> overridden = t -> {
-                TaskTable.removeTask(t, "Overridden");
-            };
-            et.forEach(overridden);
-            et.clear();
-            et.setCapacity(1);
-
-            //2. clear the other table, set capcity to zero preventing temporal tasks
-            Table<Task, Task> otherTable = temporal;
-            otherTable.forEach(overridden);
-            otherTable.clear();
-            otherTable.setCapacity(0);
-
-            //NAR.logger.info("axiom: {}", input);
-
-            et.put(input, input);
-
-            return input;
-        }
 
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        return insert(input, et) ? input : null;
+        Task result = insert(input, et) ? input : null;
+        if (result!=null && revised!=null) {
+            //result = insert(revised, et) ? revised : result;
+            nar.runLater(()->nar.input(revised));
+        }
+        return result;
+    }
+
+    private void addEternalAxiom(@NotNull Task input, SortedTable<Task, Task> et) {
+        //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
+        //1. clear the corresponding table, set capacity to one, and insert this task
+        Consumer<Task> overridden = t -> {
+            TaskTable.removeTask(t, "Overridden");
+        };
+        et.forEach(overridden);
+        et.clear();
+        et.setCapacity(1);
+
+        //2. clear the other table, set capcity to zero preventing temporal tasks
+        Table<Task, Task> otherTable = temporal;
+        otherTable.forEach(overridden);
+        otherTable.clear();
+        otherTable.setCapacity(0);
+
+        //NAR.logger.info("axiom: {}", input);
+
+        et.put(input, input);
     }
 
     @NotNull

@@ -159,7 +159,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
-                //.log()
+                .log()
                 .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
 

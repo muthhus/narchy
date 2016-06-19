@@ -1,9 +1,11 @@
 package nars.util.analyze;
 
 import nars.NAR;
+import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.TruthWave;
 import org.jetbrains.annotations.NotNull;
@@ -114,5 +116,13 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		else
 			goal(1.0f, 0.9f);
 		return this;
+	}
+
+	public Bag<Task> tasklinks() {
+		return concept().tasklinks();
+	}
+
+	public long time() {
+		return nar.time();
 	}
 }

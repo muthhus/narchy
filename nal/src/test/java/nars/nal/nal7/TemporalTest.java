@@ -92,6 +92,12 @@ public class TemporalTest {
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ??
 
     }
+    @Test public void testCommutiveTemporality() {
+        String s = "(goto(#1) &&+5 ((SELF,#1)-->at))!";
+        Termed<Term> t = n.term(s);
+        assertEquals(s, t.toString());
+    }
+
 //    @Test
 //    public void testAfter() {
 //
