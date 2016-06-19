@@ -3,7 +3,7 @@ package nars.concept;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
@@ -173,7 +173,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void capacity(@NotNull ConceptBudgeting c) {
+    public void capacity(@NotNull ConceptPolicy c) {
         target.capacity(c);
     }
 

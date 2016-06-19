@@ -27,7 +27,7 @@ import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
@@ -105,7 +105,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         return desire(now, now);
     }
 
-    void capacity(ConceptBudgeting c);
+    void capacity(ConceptPolicy c);
 
     boolean contains(Task t);
 

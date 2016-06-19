@@ -154,22 +154,32 @@ public class TemporalTest {
         Default n = new Default();
 
         n.log();
+
         n.input("(goto(#1) &&+5 ((SELF,#1)-->at)).");
+        //n.step();
+
         n.input("(goto(#1) &&-5 ((SELF,#1)-->at)).");
+        //n.step();
+
         n.input("(goto(#1) &&+0 ((SELF,#1)-->at)).");
+        //n.step();
         n.input("(((SELF,#1)-->at) &&-3 goto(#1)).");
-        n.input("(((SELF,#1)-->at) &&+3 goto(#1)).");
-        n.input("(((SELF,#1)-->at) &&+0 goto(#1)).");
+        //n.step();
+        //n.input("(((SELF,#1)-->at) &&+3 goto(#1)).");
+        //n.step();
+        //n.input("(((SELF,#1)-->at) &&+0 goto(#1)).");
+
+
+        n.step();
+
         Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
-        a.beliefs().capacity(8, 8);
         assertTrue(a == a0);
 
 
-        n.forEachConcept(Concept::print);
+        //a.beliefs().print();
 
-        a.beliefs().print();
-        assertEquals(6, a.beliefs().size());
+        assertEquals(4, a.beliefs().size());
     }
 
     @Nullable

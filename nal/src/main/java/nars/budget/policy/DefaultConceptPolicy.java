@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/11/16.
  */
-public class DefaultConceptBudgeting implements ConceptBudgeting {
+public class DefaultConceptPolicy implements ConceptPolicy {
 
     public final MutableInteger beliefsMaxEteOrTemp, goalsMaxEteOrTemp;
     public final MutableInteger questionsMax;
     public final MutableInteger termlinksCapacity, taskLinksCapacity;
 
-    public DefaultConceptBudgeting(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
+    public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(new MutableInteger(Math.max(1, beliefsCapTotal / 2)),
                 new MutableInteger(Math.max(1, goalsCapTotal / 2)),
                 new MutableInteger(questionsMax),
@@ -23,7 +23,7 @@ public class DefaultConceptBudgeting implements ConceptBudgeting {
         );
     }
 
-    public DefaultConceptBudgeting(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+    public DefaultConceptPolicy(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
         this.beliefsMaxEteOrTemp = beliefsMaxEteOrTemp;
         this.goalsMaxEteOrTemp = goalsMaxEteOrTemp;
         this.questionsMax = questionsMax;
@@ -32,11 +32,11 @@ public class DefaultConceptBudgeting implements ConceptBudgeting {
     }
 
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptBudgeting p) {
+    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
         c.beliefs().capacity(0, p.beliefCap(c, true, true) + p.beliefCap(c, true, false));
     }
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void goalCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptBudgeting p) {
+    public static void goalCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
         c.goals().capacity(0, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
     }
 

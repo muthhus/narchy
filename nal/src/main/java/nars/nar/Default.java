@@ -76,7 +76,6 @@ public class Default extends AbstractNAR {
     }
 
 
-
     protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
 
         DefaultCore c = new DefaultCore(this, matcher, conceptWarm, conceptCold);

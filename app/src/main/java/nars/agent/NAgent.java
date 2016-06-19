@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -154,7 +154,7 @@ public class NAgent implements Agent {
 
             MotorConcept mc = new MotorConcept(actionConceptName(i), nar, motorFunc) {
 
-                @Override protected void beliefCapacity(ConceptBudgeting p) {
+                @Override protected void beliefCapacity(ConceptPolicy p) {
                     beliefs().capacity(0, motorBeliefCapacity);
                     goals().capacity(1, motorGoalCapacity);
                 }

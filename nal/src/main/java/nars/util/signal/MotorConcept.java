@@ -5,7 +5,7 @@ import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.$.$;
-import static nars.budget.policy.DefaultConceptBudgeting.beliefCapacityNonEternal;
+import static nars.budget.policy.DefaultConceptPolicy.beliefCapacityNonEternal;
 
 
 public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
@@ -108,7 +108,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     }
 
     /** allow no eternal beliefs, and ONE eternal goal */
-    @Override protected void beliefCapacity(ConceptBudgeting p) {
+    @Override protected void beliefCapacity(ConceptPolicy p) {
         beliefCapacityNonEternal(this, p);
         goals().capacity(1, p.beliefCap(this, false, true) + p.beliefCap(this, false, false)  - 1);
     }

@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.ArrayQuestionTable;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
@@ -220,23 +220,24 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
         nar.emotion.happy(deltaSatisfaction);
     }
 
-    @NotNull
-    protected BeliefTable newBeliefTable() {
-        //2 for a task and a pending revision
-        return new DefaultBeliefTable(2,2);
+
+    @NotNull protected BeliefTable newBeliefTable() {
+        return new DefaultBeliefTable();
     }
-    @NotNull
-    protected BeliefTable newGoalTable() {
-        return new DefaultBeliefTable(2,2);
+
+    /** return null to request a default table from the system */
+    @NotNull protected BeliefTable newGoalTable() {
+        return new DefaultBeliefTable();
     }
 
 
-    @Override public void capacity(@NotNull ConceptBudgeting p) {
+
+    @Override public void capacity(@NotNull ConceptPolicy p) {
         linkCapacity(p);
         beliefCapacity(p);
     }
 
-    protected void beliefCapacity(@NotNull ConceptBudgeting p) {
+    protected void beliefCapacity(@NotNull ConceptPolicy p) {
         beliefs().capacity(p.beliefCap(this, true, true), p.beliefCap(this, true, false));
         goals().capacity(p.beliefCap(this, false, true), p.beliefCap(this, false, false));
     }

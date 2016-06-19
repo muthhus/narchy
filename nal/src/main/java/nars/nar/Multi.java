@@ -4,7 +4,7 @@ import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.Global;
 import nars.NAR;
 import nars.budget.Budgeted;
-import nars.budget.policy.DefaultConceptBudgeting;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
@@ -94,6 +94,8 @@ public class Multi extends AbstractNAR {
 
     }
 
+
+
     protected final void frame(NAR n) {
         //try {
         int numCores = cores.length;
@@ -131,7 +133,7 @@ public class Multi extends AbstractNAR {
         private boolean stopped;
 
 
-        public WorkerCore(int n, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
+        public WorkerCore(int n, PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
             super(Multi.this, matcher, warm, cold);
             this.thread = new Thread(this);
             thread.setName(nar.toString() + ".Worker" + n);

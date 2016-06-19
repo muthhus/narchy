@@ -7,7 +7,7 @@ import nars.concept.CompoundConcept;
  *      --budget (time)
  *      --memory (space)
  */
-public interface ConceptBudgeting {
+public interface ConceptPolicy {
 
     int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal);
     int linkCap(AbstractConcept compoundConcept, boolean termOrTask);

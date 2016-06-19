@@ -3,7 +3,7 @@ package nars.concept;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.budget.Budgeted;
-import nars.budget.policy.ConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -189,11 +189,11 @@ public interface AbstractConcept extends Concept, Term {
 //    }
 
     @Override
-    default void capacity(@NotNull ConceptBudgeting p) {
+    default void capacity(@NotNull ConceptPolicy p) {
         linkCapacity(p);
     }
 
-    default void linkCapacity(@NotNull ConceptBudgeting p) {
+    default void linkCapacity(@NotNull ConceptPolicy p) {
         termlinks().setCapacity( p.linkCap(this, true) );
         tasklinks().setCapacity( p.linkCap(this, false) );
     }

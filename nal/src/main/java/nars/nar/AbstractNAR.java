@@ -2,7 +2,7 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
-import nars.budget.policy.DefaultConceptBudgeting;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
@@ -40,8 +40,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractNAR extends NAR {
 
-    @NotNull
-    public final DefaultConceptBudgeting conceptWarm, conceptCold;
+    public final @NotNull DefaultConceptPolicy conceptWarm, conceptCold;
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
@@ -55,8 +54,8 @@ public abstract class AbstractNAR extends NAR {
         /*this.conceptBeliefsMax.set(12);
         this.conceptGoalsMax.set(9);
         this.conceptQuestionsMax.set(3);*/
-        conceptWarm = new DefaultConceptBudgeting(10, 10, 3, 16, 8);
-        conceptCold = new DefaultConceptBudgeting(8, 8, 1, 8, 4);
+        conceptWarm = new DefaultConceptPolicy(10, 10, 3, 16, 8);
+        conceptCold = new DefaultConceptPolicy(8, 8, 1, 8, 4);
 
         derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
@@ -110,22 +109,22 @@ public abstract class AbstractNAR extends NAR {
 //            onExec(o);
     }
 
-    @Deprecated public void initNAL9() {
-
-        the(new Anticipate(this));
-        the(new Inperience(this));
-        //memory.the(new Abbreviation(this, "_"));
-
-        //onExec(Counting.class);
-
-//                /*if (internalExperience == Minimal) {
-//                    new InternalExperience(this);
-//                    new Abbreviation(this);
-//                } else if (internalExperience == Full)*/ {
-//                    on(FullInternalExperience.class);
-//                    on(Counting.class);
-//                }
-    }
+//    @Deprecated public void initNAL9() {
+//
+//        the(new Anticipate(this));
+//        the(new Inperience(this));
+//        //memory.the(new Abbreviation(this, "_"));
+//
+//        //onExec(Counting.class);
+//
+////                /*if (internalExperience == Minimal) {
+////                    new InternalExperience(this);
+////                    new Abbreviation(this);
+////                } else if (internalExperience == Full)*/ {
+////                    on(FullInternalExperience.class);
+////                    on(Counting.class);
+////                }
+//    }
 
 
     protected @NotNull Deriver newDeriver() {
@@ -152,6 +151,10 @@ public abstract class AbstractNAR extends NAR {
         float business = input.pri() * activation;
         emotion.busy(business);
 
+        if (c.beliefs().capacity() == 0) {
+            //concept is new, apply inactive policy by default
+            init(c);
+        }
 
         Task t = c.process(input, this);
         if (t != null && !t.isDeleted()) {
@@ -176,6 +179,10 @@ public abstract class AbstractNAR extends NAR {
         return c;
     }
 
+    /** initialize a new concept: set initial capacity policy, etc */
+    final protected void init(Concept c) {
+        c.capacity(conceptCold);
+    }
 
 //    public static final AbstractOperator[] exampleOperators = {
 //            //new Wait(),

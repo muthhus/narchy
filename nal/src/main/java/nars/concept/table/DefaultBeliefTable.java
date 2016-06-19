@@ -31,7 +31,11 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
-    public DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
+    public DefaultBeliefTable() {
+        this(0, 0);
+    }
+
+    DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
 
         Map<Task, Task> mp;
         this.map = mp =

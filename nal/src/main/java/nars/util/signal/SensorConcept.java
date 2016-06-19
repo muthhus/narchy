@@ -5,8 +5,8 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.budget.policy.ConceptBudgeting;
-import nars.budget.policy.DefaultConceptBudgeting;
+import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.CompoundConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -118,8 +118,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     }
 
     @Override
-    protected void beliefCapacity(ConceptBudgeting p) {
-        DefaultConceptBudgeting.beliefCapacityNonEternal(this, p);
+    protected void beliefCapacity(ConceptPolicy p) {
+        DefaultConceptPolicy.beliefCapacityNonEternal(this, p);
     }
 
 

@@ -5,7 +5,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.forget.Forget;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.DefaultConceptBudgeting;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
@@ -24,11 +24,11 @@ import java.util.Random;
  */
 public class DefaultCore extends AbstractCore {
 
-    private final DefaultConceptBudgeting cold;
-    private final DefaultConceptBudgeting warm;
+    private final DefaultConceptPolicy cold;
+    private final DefaultConceptPolicy warm;
 
 
-    public DefaultCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptBudgeting warm, DefaultConceptBudgeting cold) {
+    public DefaultCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
         super(nar, matcher);
         this.warm = warm;
         this.cold = cold;
