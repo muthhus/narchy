@@ -250,8 +250,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term junction(@NotNull Op op, int t, final @NotNull Term... u) {
-//        if (u.length == 1)
+    public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
 
         int ul = u.length;
 
@@ -263,16 +262,16 @@ public abstract class TermBuilder {
             Term only = u[0];
             //preserve unitary ellipsis
             return ellipsisoid(only) ?
-                    finish(op, t, TermContainer.the(only)) : only;
+                    finish(op, dt, TermContainer.the(only)) : only;
 
         }
 
-        if (t != DTERNAL) {
+        if (dt != DTERNAL) {
             if (op == DISJ) {
                 throw new RuntimeException("invalid temporal disjunction");
             }
 
-            if (t == 0) {
+            if (dt == 0) {
                 //special case: 0
                 Compound x = (Compound) junctionFlat(op, 0, u);
                 if (x == null)
@@ -299,15 +298,21 @@ public abstract class TermBuilder {
                     return null;
             }
 
-            Term x = make(op, TermContainer.the(op, u), DTERNAL).term();
-            if (!(x instanceof Compound)) return x;
+            if (u[0].compareTo(u[1])==+1) {
+                //it will be reversed in commutative sorting, so invert dt
+                dt = -dt;
+            }
+
+
+            TermContainer su = TermContainer.the(op, u);
+            Term x = make(op, su, dt).term();
 
             Compound cx = (Compound) x;
-
-            boolean reversed = cx.term(0) == u[1];
-            return cx.dt(reversed ? -t : t);
+            //boolean reversed = cx.term(0).equals( u[1] );
+            //return cx.dt(reversed ? -dt : dt);
+            return cx;
         } else {
-            return junctionFlat(op, t, u);
+            return junctionFlat(op, dt, u);
         }
     }
 

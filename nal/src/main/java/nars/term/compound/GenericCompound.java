@@ -46,7 +46,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         TermVector subterms = (TermVector)_subterms; //HACK for future support of alternate TermContainer impls
 
-        if (Global.DEBUG && dt!=DTERNAL) {
+        if (/*Global.DEBUG &&*/ dt!=DTERNAL) {
             if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
                 throw new InvalidTerm(op, dt, subterms.terms());

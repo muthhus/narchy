@@ -60,14 +60,14 @@ public class TermVector implements TermContainer<Term> {
     public final byte varDeps;
 
 
-    public TermVector(@NotNull Collection<? extends Term> t) {
-        this( t.toArray(new Term[t.size()]));
+    public static TermVector the(@NotNull Collection<? extends Term> t) {
+        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
     }
 
-    /** first n items */
-    public TermVector(@NotNull Collection<Term> t, int n) {
-        this( t.toArray(new Term[n]));
-    }
+//    /** first n items */
+//    protected TermVector(@NotNull Collection<Term> t, int n) {
+//        this( t.toArray(new Term[n]));
+//    }
 
 
      @SafeVarargs
@@ -289,7 +289,7 @@ public class TermVector implements TermContainer<Term> {
             return this; //no change needed
         Term[] r = s.clone();
         ArrayUtils.reverse(r);
-        return new TermVector(r);
+        return TermVector.the(r);
     }
 
     @NotNull

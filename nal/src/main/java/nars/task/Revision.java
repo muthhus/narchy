@@ -252,7 +252,7 @@ public class Revision {
             throw new RuntimeException();
         }
 
-        return (Compound)$.compound(a.op(), newDT, new TermVector(
+        return (Compound)$.compound(a.op(), newDT, TermVector.the(
                 (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
                 (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
         ));

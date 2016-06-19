@@ -64,8 +64,9 @@ public class TermSet<X extends Term> extends TermVector {
                 return a;
             } else {
                 //already unique but not necessarily sorted
-                if (n > 1)
+                if (n > 1) {
                     Arrays.sort(a);
+                }
 
                 return a;
             }

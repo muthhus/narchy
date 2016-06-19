@@ -73,7 +73,7 @@ public class MySTMClustered extends STMClustered {
 					if (negated)
 						$.neg(s);
 
-					@Nullable Term conj = $.conj(0, s);
+					@Nullable Term conj = $.parallel(s);
 					if (!(conj instanceof Compound))
 						return;
 

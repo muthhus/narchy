@@ -41,10 +41,9 @@ public abstract class AtomicString implements Atomic {
         if (that==this) return 0;
 
         Termed t = (Termed)that;
-        //TODO compare
-        //int d = op().compareTo(t.op());
-        int d = Integer.compare(op().ordinal(), t.op().ordinal());
-        if (d!=0) return d;
+        int d = op().compareTo(t.op());
+        if (d!=0)
+            return d;
 
         //if the op is the same, it is required to be a subclass of Atomic
         //which should have an ordering determined by its toString()

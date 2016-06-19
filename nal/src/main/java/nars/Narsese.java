@@ -20,6 +20,7 @@ import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
@@ -559,7 +560,10 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
-        return $.compound(o, cycles, TermVector.the(subj, pred));
+        TermContainer uu = TermContainer.the(o, subj, pred);
+        if (uu.term(0).equals(pred))
+            cycles = -cycles; //reverse
+        return $.compound(o, cycles, uu);
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);

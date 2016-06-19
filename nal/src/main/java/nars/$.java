@@ -16,6 +16,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
@@ -351,7 +352,7 @@ public enum $ {
 
     /** unnormalized variable */
     public static @NotNull Variable v(char ch, @NotNull String name) {
-        return new GenericVariable(AbstractVariable.typeIndex(ch), name);
+        return v(AbstractVariable.typeIndex(ch), name);
     }
 
     /** normalized variable */
@@ -363,9 +364,20 @@ public enum $ {
     public static Term conj(Term... a) {
         return the(CONJ, a);
     }
-    @Nullable
-    public static Term conj(int dt, Term... a) {
-        return compound(CONJ, dt, TermVector.the(a)); //must be a vector, not set
+
+
+    /** warning: the dt may be reversed, make sure that the subterms are in the order corresponding to the desired result 'dt' */
+    @Nullable public static Term conj(Term x, int dt, Term y) {
+        TermSet s = TermSet.the(x, y);
+        if (dt!=0 && dt!=DTERNAL && !s.term(0).equals(x))
+            dt = -dt;
+        return compound(CONJ, dt, s); //must be a vector, not set
+    }
+
+
+    /** parallel conjunction &| aka &&+0 */
+    public static Term parallel(Term... s) {
+        return compound(CONJ, 0, TermSet.the(s));
     }
 
     @Nullable
@@ -774,6 +786,7 @@ public enum $ {
 
         return null;
     }
+
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 

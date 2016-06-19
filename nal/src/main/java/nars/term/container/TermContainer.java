@@ -482,7 +482,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     @NotNull
     static TermContainer the(@NotNull Term one) {
-        return new TermVector(one);
+        return TermVector.the(one);
     }
 
 
@@ -498,7 +498,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
         return  requiresTermSet(op, tt.length) ?
                 TermSet.the(tt) :
-                new TermVector(tt);
+                TermVector.the(tt);
     }
 
 
@@ -527,16 +527,15 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     static int compareTo(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
 
-        int diff;
-        if ((diff = Integer.compare(a.hashCode(), b.hashCode())) != 0)
-            return diff;
+//        int diff;
+//        if ((diff = Integer.compare(a.hashCode(), b.hashCode())) != 0)
+//            return diff;
 
-        Termlike c = (Termlike) b;
         int diff2;
-        if ((diff2 = Integer.compare(a.structure(), c.structure())) != 0)
+        if ((diff2 = Integer.compare(a.structure(), b.structure())) != 0)
             return diff2;
 
-        return compareContent(a, c);
+        return compareContent(a, b);
     }
 
 

@@ -164,25 +164,22 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default int compareTo(@NotNull Termlike o) {
-        if (this == o) return 0;
-
-        Termed t = (Termed) o;
+        Term t = ((Termed) o).term();
+        if (this == t) return 0;
 
         //sort by op and relation first
-        int diff = op().compareTo(t.op());
+        int diff = this.op().compareTo(t.op());
         if (diff != 0)
             return diff;
 
 
-        Compound c = (Compound) (t.term());
-
-
+        Compound c = (Compound)t;
 
         int diff3 = Integer.compare(this.dt(), c.dt());
         if (diff3 != 0)
             return diff3;
 
-        return subterms().compareTo(c.subterms());
+        return this.subterms().compareTo(c.subterms());
     }
 
 

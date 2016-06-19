@@ -78,7 +78,7 @@ public class ControlFlowTest {
 
             int length = states.size();
             for (int i = 0; i < length - 1; i++) {
-                nar.goal($.conj(delay, states.get(i).term(), states.get(i + 1).term()));
+                nar.goal($.conj(states.get(i).term(), delay, states.get(i + 1).term()));
             }
 
             if (startFrequency > 0) {
@@ -200,7 +200,7 @@ public class ControlFlowTest {
             newExeState(n, s(PRE, i), exeTracker);
         }
         for (int i = 0; i < beforeBranchLength - 1; i++) {
-            n.goal($.conj(delay, s(PRE, i), s(PRE, i + 1)));
+            n.goal($.conj( s(PRE, i), delay, s(PRE, i + 1)));
         }
 
         Term condition = b(0);
@@ -213,14 +213,14 @@ public class ControlFlowTest {
             newExeState(n, s(ELSE, i), exeTracker);
         }
         for (int i = 0; i < afterBranchLength - 1; i++) {
-            n.goal($.conj(delay, s(THEN, i), s(THEN, i + 1)));
-            n.goal($.conj(delay, s(ELSE, i), s(ELSE, i + 1)));
+            n.goal($.conj(s(THEN, i), delay, s(THEN, i + 1)));
+            n.goal($.conj(s(ELSE, i), delay, s(ELSE, i + 1)));
         }
 
         //n.goal($.conj( delay, $.conj( condition, s(PRE, beforeBranchLength-1) ), s(THEN, 0)));
         //n.goal($.conj( delay, $.conj( $.neg(condition), s(PRE, beforeBranchLength-1) ), s(ELSE, 0)));
-        n.goal($.conj( delay, condition, s(THEN, 0)));
-        n.goal($.conj( delay, $.neg(condition), s(ELSE, 0)));
+        n.goal($.conj( condition, delay, s(THEN, 0)));
+        n.goal($.conj( $.neg(condition), delay, s(ELSE, 0)));
 
 
         //n.goal($.conj(delay, $.conj(0, s(PRE, beforeBranchLength-1), condition), s(THEN, 0)));
