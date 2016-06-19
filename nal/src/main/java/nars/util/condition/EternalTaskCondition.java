@@ -383,8 +383,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @Override
     public final void accept(@NotNull Tasked tasked) {
-        Task task = tasked.task();
-        accept(task);
+        accept(tasked.task());
     }
 
     public final void accept(@NotNull Task task) {

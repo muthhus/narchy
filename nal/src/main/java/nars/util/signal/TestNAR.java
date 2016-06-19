@@ -182,8 +182,8 @@ public class TestNAR  {
 
                 boolean finished = true;
 
-                for (NARCondition require : requires) {
-                    if (!require.isTrue()) {
+                for (int i = 0, requiresSize = requires.size(); i < requiresSize; i++) {
+                    if (!requires.get(i).isTrue()) {
                         finished = false;
                         break;
                     }

@@ -54,9 +54,7 @@ public class Default extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
-
         the("reasoner", matcher = new PremiseEval(random, newDeriver()));
-
 
         the("core", core = newCore(
                 activeConcepts,
@@ -65,14 +63,15 @@ public class Default extends AbstractNAR {
                 matcher
         ));
 
-        runLater(this::initHigherNAL);
-
-
-        //new QueryVariableExhaustiveResults(this.memory());
-
-        /*
-        the("memory_sharpen", new BagForgettingEnhancer(memory, core.active));
-        */
+        if (nal() >= 7) {
+            initNAL7();
+            if (nal() >= 8) {
+                initNAL8();
+//                if (nal() >= 9) {
+//                    initNAL9();
+//                }
+            }
+        }
 
     }
 

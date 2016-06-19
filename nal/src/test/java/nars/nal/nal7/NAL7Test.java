@@ -1,6 +1,7 @@
 package nars.nal.nal7;
 
 import nars.NAR;
+import nars.concept.Concept;
 import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
@@ -317,9 +318,10 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
+
         test()
-                //.log()
-                .input("<room --> enter>. :|:")
+            //.log()
+                .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
                     1.00f, 0.45f,
@@ -643,20 +645,20 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Test public void testTruthDecayOverTime0() {
-        testTruthDecayOverTime(0, 0.81f, 0.005f);
-    }
-    @Test public void testTruthDecayOverTime1() {
-        testTruthDecayOverTime(9, 0.78f, 0.005f);
-    }
-
-    public void testTruthDecayOverTime(int dist, float conf, float toler) {
-        test()
-            //.log()
-            .inputAt(1, "(a-->b). :|:")
-            .inputAt(1+dist, "(b-->c). :|:")
-            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1)
-            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1+dist)
-        ;
-    }
+//    @Test public void testTruthDecayOverTime0() {
+//        testTruthDecayOverTime(0, 0.81f, 0.005f);
+//    }
+//    @Test public void testTruthDecayOverTime1() {
+//        testTruthDecayOverTime(9, 0.78f, 0.005f);
+//    }
+//
+//    public void testTruthDecayOverTime(int dist, float conf, float toler) {
+//        test()
+//            //.log()
+//            .inputAt(1, "(a-->b). :|:")
+//            .inputAt(1+dist, "(b-->c). :|:")
+//            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1)
+//            .mustOutput(0, cycles, "(a-->c)", '.', 1f, 1f, conf-toler, conf+toler, 1+dist)
+//        ;
+//    }
 }

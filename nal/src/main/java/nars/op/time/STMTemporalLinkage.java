@@ -40,14 +40,13 @@ public final class STMTemporalLinkage extends STM {
     @Override
     public final void accept(@NotNull Task t) {
 
-        if (!temporallyInductable(t) || t.punc() != Symbols.BELIEF) {
+        if (t.punc() != Symbols.BELIEF) {
             return;
         }
 
         /** current task's... */
         Concept concept = t.concept(nar);
-        if (concept == null)
-            return;
+
 
         int stmSize = capacity.intValue();
 
