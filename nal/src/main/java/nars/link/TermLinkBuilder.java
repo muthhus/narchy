@@ -65,20 +65,23 @@ public enum TermLinkBuilder {
 
         if (t instanceof Variable) {
 
-            if (t.op()!=Op.VAR_QUERY)
-                target.add(nar.index.the(t));
+            if (t.op()!=Op.VAR_QUERY) {
+                //target.add(nar.index.the(t));
+                target.add(t);
+            }
 
         } else {
 
             Concept ct = nar.concept(t, true);
             if (ct != null) {
 
-                target.add(ct);
+                if (target.add(ct)) { //do not descend on repeats
 
-                if (level > 0 && ct instanceof Compound) {
-                    Compound cct = (Compound) ct;
-                    for (int i = 0, ii = cct.size(); i < ii; i++) {
-                        components(cct.term(i), level - 1, nar, target);
+                    if (level > 0 && ct instanceof Compound) {
+                        Compound cct = (Compound) ct;
+                        for (int i = 0, ii = cct.size(); i < ii; i++) {
+                            components(cct.term(i), level - 1, nar, target);
+                        }
                     }
                 }
             }

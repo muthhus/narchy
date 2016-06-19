@@ -13,6 +13,7 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -123,31 +124,30 @@ public abstract class AbstractCore {
             concepts.sample(cpf, this::fireConcept);
         }
 
-
     }
 
     public void reset(Memory m) {
         concepts.clear();
     }
 
-    protected final void fireConcept(@NotNull BLink<Concept> conceptLink) {
+    protected final boolean fireConcept(@NotNull BLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
         tasklinkUpdate.update(concept.tasklinks(), true);
         termlinkUpdate.update(concept.termlinks(), false);
 
-        firePremiseSquared(
+        return firePremiseSquared(
                 conceptLink,
                 tasklinksFiredPerFiredConcept.intValue(),
                 termlinksFiredPerFiredConcept.intValue()
-        );
+        ) > 0;
     }
 
     /**
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
-    public final void firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
+    public final int firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
 
         Concept c = conceptLink.get();
 
@@ -155,20 +155,24 @@ public abstract class AbstractCore {
 
         matcher.init(nar);
 
+        int count = 0;
+
         c.termlinks().sample(termlinks, termsBuffer::add);
         if (!termsBuffer.isEmpty()) {
 
             List<BLink<Task>> tasksBuffer = this.tasks;
 
             c.tasklinks().sample(tasklinks, tasksBuffer::add);
+
             if (!tasksBuffer.isEmpty()) {
                 for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
-                    PremiseBuilder.run(
+                    count += PremiseBuilder.run(
                             nar,
                             conceptLink,
                             termsBuffer,
                             tasksBuffer.get(i),
                             matcher);
+
                 }
 
                 tasksBuffer.clear();
@@ -178,6 +182,7 @@ public abstract class AbstractCore {
         }
 
 
+        return count;
     }
 
 

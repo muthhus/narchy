@@ -20,6 +20,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;
+import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -155,6 +156,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             Term temporalized = this.temporalizer.compute(content.term(),
                     m, this, occReturn, confScale
             );
+
+            if (Global.DEBUG && occReturn[0] == DTERNAL) {
+                //temporalizer.compute(content.term(), m, this, occReturn, confScale);
+                throw new RuntimeException("temporalization resulted in suspicious occurrence time");
+            }
 
             if (temporalized == null)
                 return; //aborted by temporalization

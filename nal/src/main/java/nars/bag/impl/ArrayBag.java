@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -139,7 +140,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
+    public Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 

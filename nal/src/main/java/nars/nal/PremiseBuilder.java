@@ -45,37 +45,37 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static void run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, PremiseEval matcher) {
+    public static int run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<? extends Termed>> termsArray, @NotNull BLink<Task> taskLink, PremiseEval matcher) {
 
+        int count = 0;
 
         Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
-        if (task == null)
-            return;
+        if (task != null) {
+
+            Compound taskTerm = task.term();
 
 
-        Compound taskTerm = task.term();
+            for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
 
+                if (task.isDeleted())
+                    break;
 
-        for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
+                BLink<? extends Termed> termLink = termsArray.get(i);
 
-            if (task.isDeleted())
-                return;
+                Termed tl = termLink.get();
 
-            BLink<? extends Termed> termLink = termsArray.get(i);
+                Term termLinkTerm = tl.term();
 
-            Termed tl = termLink.get();
-
-            Term termLinkTerm = tl.term();
-
-            if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
-
-                matcher.run(
+                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
+                    if (matcher.run(
                         newPremise(nar, conceptLink, termLink, taskLink, task, tl)
-                );
+                    ))
+                        count++;
+                }
             }
         }
 
-
+        return count;
     }
 
     @Nullable

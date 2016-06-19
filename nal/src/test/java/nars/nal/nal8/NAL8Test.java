@@ -159,7 +159,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
-                .log()
+                //.log()
                 .input("goto({t003}). :|:")
                 .inputAt(10, "(goto(#1) &&+5 at:(SELF,#1))!")
 
@@ -381,17 +381,12 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void further_detachment_2()  {
-        TestNAR tester = test();
-
-        //tester.log();
-        tester.input("reachable:(SELF,{t002}). :|:");
-        tester.inputAt(3, "((reachable:(SELF,{t002}) &&+5 pick({t002})) ==>+7 hold:(SELF,{t002})).");
-
-        tester
+        test()
+            .input("reachable:(SELF,{t002}). :|:")
+            .inputAt(3, "((reachable:(SELF,{t002}) &&+5 pick({t002})) ==>+7 hold:(SELF,{t002})).")
             .mustBelieve(cycles, "(pick({t002}) ==>+7 hold:(SELF, {t002}))", 1.0f, 0.81f, 5)
             .mustNotOutput(cycles, "(pick({t002}) ==>+7 hold:(SELF, {t002}))", '.', 0)
         ;
-                //5); <- ?? isnt this more correct?
 
     }
 
@@ -428,6 +423,28 @@ public class NAL8Test extends AbstractNALTest {
             .mustBelieve(time,   "at:(SELF,{t003})", 1.0f, 0.43f, 0)
             .mustNotOutput(time, "at:(SELF,{t003})", '.', 0, 1f, 0, 1f, ETERNAL);
 
+    }
+    @Test
+    public void condition_belief_deduction_2_easier()  {
+        int time = 124;
+
+        test()
+                //.log()
+                .input(              "on:(t002,t003). :|:")
+                .inputAt(10,         "(on:(t002,#1) &&+0 at:(SELF,#1)).")
+                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                .mustNotOutput(time, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, ETERNAL);
+    }
+    @Test
+    public void condition_belief_deduction_2_eternal()  {
+        int time = 124;
+
+        test()
+                //.log()
+                .input(              "on:(t002,t003). :|:")
+                .inputAt(10,         "(on:(t002,#1) && at:(SELF,#1)).") //<-- ETERNAL
+                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, ETERNAL)
+                .mustNotOutput(time, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, 0);
     }
 
     @Test
@@ -667,7 +684,7 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void testNegatedGoalSimilaritySpreading() {
         test()
-                .log()
+                //.log()
                 .input("(--,(R))!")
                 .input("((G) <-> (R)).")
                 .mustDesire(cycles, "(G)", 0.0f, 0.81f);

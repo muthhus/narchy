@@ -117,14 +117,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-    @NotNull default Bag<V> sample(float percent, @NotNull Consumer<? super BLink<V>> target) {
+    @NotNull default Bag<V> sample(float percent, @NotNull Predicate<? super BLink<V>> target) {
         int n = (int)Math.ceil(percent * size());
         sample(n, target);
         return this;
     }
 
     @NotNull
-    Bag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target);
+    Bag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added
@@ -509,7 +509,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
         @NotNull
         @Override
-        public Bag sample(int n, @NotNull Consumer target) {
+        public Bag sample(int n, @NotNull Predicate target) {
             return this;
         }
 

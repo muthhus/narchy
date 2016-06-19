@@ -250,13 +250,11 @@ public interface TimeFunction {
 
             long occ;
 
+            long shift = ETERNAL;
 
             /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
             //if both offer an occurrence time, by default, use occOther
             if (occOther != ETERNAL) {
-
-
-                long shift = ETERNAL;
 
                 if (decomposedTerm.size() != 2) {
                     shift = 0;
@@ -285,10 +283,10 @@ public interface TimeFunction {
                     }
                 }
 
-                occ = occOther + shift;
+                occ = occOther;
+
             } else /*if (occDecomposed != ETERNAL && occOther == ETERNAL)*/ {
 
-                long shift = ETERNAL;
 
                 if (decomposedTerm.size() != 2) {
                     shift = 0;
@@ -309,8 +307,11 @@ public interface TimeFunction {
                     }
                 }
 
-                occ = occDecomposed + shift;
+                occ = occDecomposed;
             }
+
+            if (occ!=ETERNAL && shift!=DTERNAL)
+                occ += shift;
 
             occReturn[0] = occ;
             return derived;

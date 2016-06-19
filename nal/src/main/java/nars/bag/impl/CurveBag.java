@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Bag which stores items, sorted, in one array.
@@ -98,7 +99,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
      * */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
+    public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
         int ss = size();
         if (ss == 0)
@@ -111,6 +112,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             //special case: give everything
             begin = 0;
             end = ss;
+            n = ss;
         } else {
             //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
             int b = sampleIndex();
@@ -121,19 +123,36 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             end = begin + n;
         }
 
-
         BLink<V>[] l = items.array();
+
         for (int i = begin; i < end; i++) {
-            BLink<V> b = l[i];
-            if (!b.isDeleted())
-                target.accept(b);
+            //scan the designated subarray
+            if (trySample(target, l[i]))
+                n--;
         }
+
+        for (int i = begin-1; n > 0 && i >= 0; i--) {
+            //scan upwards for any remaining
+            if (trySample(target, l[i]))
+                n--;
+        }
+
+        for (int i = end+1; n > 0 && i < ss; i++) {
+            //scan downwards for any remaining
+            if (trySample(target, l[i]))
+                n--;
+        }
+
 
         return this;
         //System.out.println("(of " + ss + ") select " + n + ": " + begin + ".." + end + " = " + target);
 
     }
 
+    public boolean trySample(@NotNull Predicate<? super BLink<V>> target, BLink<V> vbLink) {
+        BLink<V> b = vbLink;
+        return (!b.isDeleted() && target.test(b));
+    }
 
 
     @Override

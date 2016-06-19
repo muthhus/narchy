@@ -169,11 +169,11 @@ public class PremiseEval extends FindSubst {
     /**
      * execute the next premise, be sure to call init() before a batch of run()'s
      */
-    public final void run(@NotNull ConceptProcess p) {
+    public final boolean run(@NotNull ConceptProcess p) {
 
         Task task = p.task();
         if (task == null)
-            return;
+            return false;
 
         this.task = task;
         this.taskPunct = task.punc();
@@ -220,6 +220,8 @@ public class PremiseEval extends FindSubst {
         deriver.run(this);
 
         clear();
+
+        return true;
     }
 
 //    public final void occurrenceAdd(long durationsDelta) {

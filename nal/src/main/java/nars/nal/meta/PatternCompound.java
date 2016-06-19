@@ -94,7 +94,7 @@ abstract public class PatternCompound extends GenericCompound {
             if (e instanceof EllipsisOneOrMore) {
 
                 if (!ellipsisTransform) {
-                    if (dt != y.dt())
+                    if (op.isImage() && dt != y.dt())
                         return false;
                 }
 
