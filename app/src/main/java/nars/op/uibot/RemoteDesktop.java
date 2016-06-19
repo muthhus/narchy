@@ -1,13 +1,5 @@
 package nars.op.uibot;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import org.jfxvnc.net.rfb.render.*;
-import org.jfxvnc.net.rfb.render.rect.ImageRect;
-
 /**
  * RDP/VNC Connections
  *

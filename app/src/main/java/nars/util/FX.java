@@ -5,13 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import nars.Global;
-import nars.NAR;
-import nars.term.Termed;
-
-import java.util.Map;
 
 /**
  * JavaFX Util

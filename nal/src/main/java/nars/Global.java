@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -93,23 +92,12 @@ public enum Global {
 
 
 
-
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
 
     
     /* ---------- avoiding repeated reasoning ---------- */
         /** Maximum length of the evidental base of the Stamp, a power of 2 */
     public static final int STAMP_MAX_EVIDENCE = 10;
-
-
-//    /**
-//     * The rate of confidence decrease in mental operations Doubt and Hesitate
-//     * set to zero to disable this feature.
-//     */
-//    public static float DISCOUNT_RATE = 0.5f;
-
-
-
 
 
 
@@ -122,7 +110,7 @@ public enum Global {
     /**
      * maximum changes logged in deriver's stack
      */
-    public final static int UnificationStackMax = 128;
+    public final static int UnificationStackMax = 72;
 
     /**
      * max # of chained termutes which can be active
@@ -131,10 +119,10 @@ public enum Global {
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMin = 1;
+    public static float matchTermutationsMin = 2;
 
     /** upper limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMax = 3;
+    public static float matchTermutationsMax = 4;
 
     /** smallest non-zero sub-cycle time measurement; # of cycles per frame should not exceed 1 / SUBFRAME_EPSILON */
     public static float SUBFRAME_EPSILON = 0.0001f;
@@ -146,21 +134,14 @@ public enum Global {
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.0005f;
+    public static final float BUDGET_EPSILON = 0.001f;
 
     /** minimum durability and quality necessary for a derivation to form */
-    public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON;
+    public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
     public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2.5f;
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
-
-//    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {
-//        return 0.02f + taskPriority * 0.02f; //search up to 4% of concepts
-//    }
-//
-//    public static int TEMPORAL_INDUCTION_CHAIN_SAMPLES = 1; //normal inference rule , this should be 10 to restore 1.6.1 behavior
-//
 
 
     @NotNull

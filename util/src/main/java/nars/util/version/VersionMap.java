@@ -1,6 +1,5 @@
 package nars.util.version;
 
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;

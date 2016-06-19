@@ -6,8 +6,6 @@ import nars.NAR;
 import nars.index.TermIndex;
 import nars.term.Termed;
 
-import java.util.WeakHashMap;
-
 /**
  * Created by me on 6/5/16.
  */

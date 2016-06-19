@@ -243,6 +243,29 @@ public class TermVector implements TermContainer<Term> {
     }
 
 
+    @Override
+    public final boolean equals(Object obj) {
+        return (this == obj) ||
+                (obj instanceof TermVector && equalTerms((TermVector)obj)) ||
+                (obj instanceof TermContainer && equalTo((TermContainer) obj));
+    }
+
+    /** accelerated implementation */
+    final boolean equalTerms(@NotNull TermVector c) {
+         return hash == c.hash && Arrays.equals(term, c.term);
+    }
+
+    /** accelerated implementation */
+    public final boolean equalTerms(@NotNull TermContainer c) {
+        Term[] tt = this.term;
+        int cl = tt.length;
+        for (int i = 0; i < cl; i++) {
+            if (!tt[i].equals(c.term(i)))
+                return false;
+        }
+        return true;
+    }
+
 
     @Override
     public final void copyInto(@NotNull Collection<Term> target) {
@@ -252,11 +275,6 @@ public class TermVector implements TermContainer<Term> {
     @Override
     public final int hashCode() {
         return hash;
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        return (this == obj) || (obj instanceof TermContainer && equalTo((TermContainer) obj));
     }
 
     public final void visit(@NotNull SubtermVisitorX v, Compound parent) {

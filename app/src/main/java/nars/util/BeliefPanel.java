@@ -2,8 +2,6 @@ package nars.util;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-
-import com.jogamp.opengl.util.gl2.GLUT;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;

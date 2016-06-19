@@ -57,22 +57,24 @@ public class TermSet<X extends Term> extends TermVector {
 
         Term[] a = c.toArray(new Term[n]);
 
-        if (c instanceof TreeSet) {
-            //already sorted
-            return a;
-        }
         if (c instanceof Set) {
 
-            //already unique but not necessarily sorted
-            if (n > 1)
-                Arrays.sort(a);
+            if (c instanceof TreeSet) {
+                //already sorted
+                return a;
+            } else {
+                //already unique but not necessarily sorted
+                if (n > 1)
+                    Arrays.sort(a);
 
-            return a;
+                return a;
+            }
 
+        } else {
+
+            //potentially is unsorted and has duplicates
+            return n > 1 ? Terms.toSortedSetArray(a) : a;
         }
-
-        //potentially is unsorted and has duplicates
-        return n > 1 ? Terms.toSortedSetArray(a) : a;
     }
 
     @Override public final boolean isSorted() {

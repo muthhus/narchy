@@ -1,6 +1,5 @@
 package nars.util.event;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /** single-thread synchronous (in-thread) event emitter with direct array access

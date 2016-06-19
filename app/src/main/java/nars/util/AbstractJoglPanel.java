@@ -1,19 +1,12 @@
 package nars.util;
 
 import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.event.*;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.event.WindowListener;
+import com.jogamp.newt.event.WindowUpdateEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.glu.gl2.GLUgl2;
 import com.jogamp.opengl.util.Animator;
-
-
-import java.awt.*;
-import java.nio.FloatBuffer;
-
-import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
-import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /*******************************************************************************
  * Copyright (c) 2013, Daniel Murphy

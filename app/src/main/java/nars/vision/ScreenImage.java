@@ -1,9 +1,9 @@
 package nars.vision;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /*
  *  Convenience class to create and optionally save to a file a

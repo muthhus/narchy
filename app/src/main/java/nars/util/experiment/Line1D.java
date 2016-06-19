@@ -4,11 +4,11 @@ import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.NAR;
+import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
-import nars.agent.NAgent;
 
 import java.util.Arrays;
 

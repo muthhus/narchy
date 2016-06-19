@@ -203,8 +203,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     /** should be called only from equals() */
     default boolean equalTo(@NotNull TermContainer b) {
         return (hashCode() == b.hashCode()) &&
-               (structure() == b.structure()) &&
-               (volume() == b.volume()) &&
+               //(structure() == b.structure()) &&
+               //(volume() == b.volume()) &&
                (size() == b.size()) &&
                (equalTerms(b));
     }

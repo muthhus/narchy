@@ -314,12 +314,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
 
-    @NotNull protected BLink<V> link(@NotNull V i, @NotNull Budgeted b, float scale) {
-        if (b instanceof BLink)
-            return (BLink)b;
-        if (i instanceof BLink)
-            return (BLink)i;
-        return newLink(i, b, scale);
+
+    @NotNull protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
+        return newLink(i, b, 1f);
     }
 
     @NotNull protected BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
@@ -327,7 +324,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
-        newBudget.commit(); //?? necessary
         return put(i, newBudget);
     }
 
@@ -364,17 +360,19 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     /** add pending items (after bag is updated) */
     protected final void addPending() {
 
-        Map<V, RawBudget> p;
         synchronized (map) {
             pendingMass = 0;
-            p = pending;
+            Map<V, RawBudget> p = pending;
             if (p!=null) {
                 this.pending = null;
+                bottomPri = bottomPriIfFull();
                 p.forEach(eachPending);
             }
         }
 
     }
+
+    transient private float bottomPri;
 
     final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
         //            if (key == null)
@@ -387,9 +385,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             }
             else {*/
 
-        float v = bottomPriIfFull();
+        float v = bottomPri;
         if (v <= inc.pri()) {
-            putNew(key, link(key, inc, 1f));
+            putNew(key, newLink(key, inc));
+            bottomPri = bottomPriIfFull();
         } else {
             putFail(key);
         }

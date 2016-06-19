@@ -41,7 +41,7 @@ public class NARjs {
 		System.out.println("Help coming soon.");
 	}
 
-	public static void main(String[] args) throws Exception, java.io.IOException {
+	public static void main(String[] args) throws Exception {
 		NARjs j = new NARjs();
 
 		System.out.println(NAR.VERSION

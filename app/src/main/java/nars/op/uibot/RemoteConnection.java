@@ -1,8 +1,5 @@
 package nars.op.uibot;
 
-import boofcv.core.image.ConvertImage;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.InterleavedU8;
 import ch.qos.logback.classic.Level;
@@ -14,14 +11,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Dimension2D;
 import javafx.scene.ImageCursor;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import javafx.scene.image.WritablePixelFormat;
-import org.apache.logging.log4j.simple.SimpleLogger;
 import org.jfxvnc.net.rfb.codec.ProtocolHandler;
 import org.jfxvnc.net.rfb.codec.ProtocolState;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;
@@ -35,7 +29,6 @@ import org.jfxvnc.net.rfb.render.rect.RawImageRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
 /**
