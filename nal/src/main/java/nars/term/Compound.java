@@ -143,7 +143,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
             @NotNull Op op = op();
             if (!op.isImage() || (dt() == y.dt())) {
-                return (Compound.commutative(op, xs)) ?
+                return Compound.commutative(op, xs) ?
                         subst.matchPermute(xsubs, ysubs) :
                         subst.matchLinear(xsubs, ysubs);
             }

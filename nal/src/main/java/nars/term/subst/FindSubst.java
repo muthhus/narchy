@@ -353,13 +353,12 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
         if (e instanceof EllipsisTransform) {
             return matchCompoundWithEllipsisTransform(X, Y, (EllipsisTransform) e);
-        }
-
-        /** if they are images, they must have same relationIndex */
-        if (X.op().isImage() && !matchEllipsisWithImage(X, Y, e))
+        } else if (X.op().isImage() && !matchEllipsisWithImage(X, Y, e)) {
+            /** if they are images, they must have same relationIndex */
             return false;
-        else
+        } else {
             return matchEllipsedLinear(X, e, Y);
+        }
     }
 
     public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, @NotNull Ellipsis e) {
@@ -467,9 +466,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull TermContainer y) {
         //detect special case of no variables
-        boolean actuallyCommutative = (type == Op.VAR_PATTERN) ? (x.varPattern() == 0) : !x.hasAny(type);
-
-        return actuallyCommutative ? matchLinear(x, y) : addTermutator(new CommutivePermutations(this, x, y));
+        return !x.hasAny(type) ?
+                matchLinear(x, y) :
+                addTermutator(new CommutivePermutations(this, x, y));
     }
 
 

@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,7 +23,6 @@ abstract public class PatternCompound extends GenericCompound {
     public final Term[] termsCached;
 
 
-
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(seed.op(), seed.dt(), subterms);
 
@@ -40,78 +38,91 @@ abstract public class PatternCompound extends GenericCompound {
         this.imgCached = op.isImage();
 
     }
-    
 
 
-
-
-    protected static final class PatternCompoundContainingEllipsis extends PatternCompound {
+    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
         @Nullable
         protected final Ellipsis ellipsis;
-        private final boolean ellipsisTransform;
 
-        PatternCompoundContainingEllipsis(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        PatternCompoundWithEllipsis(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, subterms);
 
             this.ellipsis = ellipsis;
             if (ellipsis == null)
                 throw new RuntimeException("no ellipsis");
 
-            //this.ellipsisTransform = hasEllipsisTransform(this);
-            boolean hasEllipsisTransform = false;
-            int xs = size();
-            for (int i = 0; i < xs; i++) {
-                if (term(i) instanceof EllipsisTransform) {
-                    hasEllipsisTransform = true;
-                    break;
-                }
-            }
-            this.ellipsisTransform = hasEllipsisTransform;
 
+        }
+
+        abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst);
+
+        protected boolean canMatch(@NotNull Compound y) {
+            int yStructure = y.structure();
+            return ((yStructure | structureCached) == yStructure);
         }
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-            return canMatch(y) &&
-                    (!ellipsisTransform && op.commutative) ? //currently this is slightly different than Compound.isCommutive because it ignores the size case, which with ellipsis could seem equal to 1 but in fact would be commutive after matching
-                        subst.matchEllipsedCommutative(
-                                this, ellipsis, y
-                        ) :
-                        subst.matchCompoundWithEllipsisLinear(
-                                this, ellipsis, y
-                        );
+            return canMatch(y) && matchEllipsis(y, subst);
         }
 
-        protected final boolean canMatch(@NotNull Compound y) {
 
-            int yStructure = y.structure();
-            if ((yStructure | structureCached) != yStructure)
-                return false;
+    }
 
-            Ellipsis e = this.ellipsis;
 
-            if (e instanceof EllipsisOneOrMore) {
+    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
 
-                if (!ellipsisTransform) {
-                    if (op.isImage() && dt != y.dt())
-                        return false;
-                }
+        public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, ellipsis, subterms);
+        }
 
-//                //since ellipsisTransform instanceof EllipsisOneOrMore
-//                if ((volCached > y.volume()) ||
-//                        (!ellipsisTransform && (relation != y.relation())))
-//                    return false;
-            }
-
-            return true;
+        @Override
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+            return subst.matchCompoundWithEllipsisLinear(
+                    this, ellipsis, y
+            );
         }
 
     }
 
-    protected static final class PatternCompoundSimple extends PatternCompound {
 
-        PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
+    /**
+     * requies dt exact match, for example, when matching Images (but not temporal terms)
+     */
+    public static final class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
+
+        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, ellipsis, subterms);
+        }
+
+        @Override
+        protected boolean canMatch(@NotNull Compound y) {
+            return (dt == y.dt() && super.canMatch(y));
+        }
+
+
+    }
+
+
+    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
+
+        public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, ellipsis, subterms);
+        }
+
+        @Override
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+            return subst.matchEllipsedCommutative(
+                    this, ellipsis, y
+            );
+        }
+
+    }
+
+    public static final class PatternCompoundSimple extends PatternCompound {
+
+        public PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
             super(seed, subterms);
         }
 
@@ -131,7 +142,7 @@ abstract public class PatternCompound extends GenericCompound {
 
             int yStructure = y.structure();
 
-            return  ((yStructure | structureCached) == yStructure) &&
+            return ((structureCached | yStructure) == yStructure) &&
                     (sizeCached == y.size()) &&
                     (volCached <= y.volume()) &&
                     (!imgCached || /*image &&*/ (dt == y.dt()));
@@ -140,19 +151,6 @@ abstract public class PatternCompound extends GenericCompound {
 
     }
 
-    @NotNull
-    public static PatternCompound make(@NotNull Compound seed) {
-        return make(seed, seed.subterms());
-    }
-
-    @NotNull
-    public static PatternCompound make(@NotNull Compound seed, @NotNull TermContainer v) {
-
-        Ellipsis e = Ellipsis.firstEllipsis(v);
-        return e != null ?
-                new PatternCompoundContainingEllipsis(seed, e, v) :
-                new PatternCompoundSimple(seed, v);
-    }
 
 
 //    PatternCompound(@NotNull Compound seed) {
