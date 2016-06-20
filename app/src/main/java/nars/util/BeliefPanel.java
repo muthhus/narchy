@@ -50,57 +50,6 @@ public class BeliefPanel extends AbstractJoglPanel  {
         });
     }
 
-    @Override
-    protected void draw(GL2 gl, float dt) {
-        if (!redraw.compareAndSet(true, false)) {
-            return;
-        }
-
-        //swapBuffers();
-
-        float W = getWidth();
-        float H = getHeight();
-
-        //clear
-        gl.glColor4f(0,0,0, 0.5f);
-        gl.glRectf(0,0,W,H);
-
-        int num = c.size();
-        float dy = H / num;
-        gl.glPushMatrix();
-
-        //compute bounds from combined min/max of beliefs and goals so they align correctly
-        long minT = Long.MAX_VALUE;
-        long maxT = Long.MIN_VALUE;
-
-
-        for (int i = 0; i < num; i++) {
-            TruthWave b = this.beliefs.get(i);
-            if (!b.isEmpty()) {
-                long start = b.start();
-                if (start!=ETERNAL) {
-                    minT = Math.min(start, minT);
-                    maxT = Math.max(b.end(), maxT);
-                }
-            }
-            TruthWave g = this.goals.get(i);
-            if (!g.isEmpty()) {
-
-                long start = g.start();
-                if (start != ETERNAL) {
-                    minT = Math.min(start, minT);
-                    maxT = Math.max(g.end(), maxT);
-                }
-
-            }
-        }
-        for (int i = 0; i < num; i++) {
-            draw(gl, i, W, dy, minT, maxT);
-            gl.glTranslatef(0,dy,0);
-        }
-        gl.glPopMatrix();
-
-    }
 
     protected void draw(GL2 gl, int n, float W, float H, long minT, long maxT) {
 
@@ -159,7 +108,57 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
-        draw((GL2) glAutoDrawable.getGL(), 0f);
+
+        GL2 gl = (GL2)glAutoDrawable.getGL();
+
+        if (!redraw.compareAndSet(true, false)) {
+            return;
+        }
+
+        //swapBuffers();
+
+        float W = getWidth();
+        float H = getHeight();
+
+        //clear
+        gl.glColor4f(0,0,0, 0.5f);
+        gl.glRectf(0,0,W,H);
+
+        int num = c.size();
+        float dy = H / num;
+        gl.glPushMatrix();
+
+        //compute bounds from combined min/max of beliefs and goals so they align correctly
+        long minT = Long.MAX_VALUE;
+        long maxT = Long.MIN_VALUE;
+
+
+        for (int i = 0; i < num; i++) {
+            TruthWave b = this.beliefs.get(i);
+            if (!b.isEmpty()) {
+                long start = b.start();
+                if (start!=ETERNAL) {
+                    minT = Math.min(start, minT);
+                    maxT = Math.max(b.end(), maxT);
+                }
+            }
+            TruthWave g = this.goals.get(i);
+            if (!g.isEmpty()) {
+
+                long start = g.start();
+                if (start != ETERNAL) {
+                    minT = Math.min(start, minT);
+                    maxT = Math.max(g.end(), maxT);
+                }
+
+            }
+        }
+        for (int i = 0; i < num; i++) {
+            draw(gl, i, W, dy, minT, maxT);
+            gl.glTranslatef(0,dy,0);
+        }
+        gl.glPopMatrix();
+
     }
 
     @Override

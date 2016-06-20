@@ -678,7 +678,6 @@ defines
 
 
 
-	@Override
 	protected void draw(GL2 gl, float dt) {
 
 		if ((world!=null) && (draw!=null)) {

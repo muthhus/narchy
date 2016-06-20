@@ -89,9 +89,9 @@ public class DefaultTruth implements Truth  {
 
             //return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
         /*} else */if (that instanceof Truth) {
-            Truth t = (Truth)that;
+            //Truth t = (Truth)that;
             //return freq == t.freq() && conf == t.conf();
-            return hashCode() == t.hashCode();
+            return hashCode() == that.hashCode();
         }
         return false;
     }
