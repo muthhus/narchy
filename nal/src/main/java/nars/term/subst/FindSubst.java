@@ -350,31 +350,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Ellipsis e, @NotNull Compound Y) {
-        //if the ellipsis is normal, then interpret the relationIndex as it is
-        int xs = X.size();
-        if (xs > 1) {
-
-            int xEllipseIndex = X.indexOf(e);
-
-            int xRelationIndex = X.dt();
-            int yRelationIndex = Y.dt();
-
-
-            if (xEllipseIndex >= xRelationIndex) {
-                //compare relation from beginning as in non-ellipsis case
-                if (xRelationIndex != yRelationIndex)
-                    return false;
-            } else {
-                //compare relation from end
-                if ((xs - xRelationIndex) != (Y.size() - yRelationIndex))
-                    return false;
-            }
-        } else {
-            //ignore the location of imdex in the pattern and match everything
-        }
-        return true;
-    }
 
 
     //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {

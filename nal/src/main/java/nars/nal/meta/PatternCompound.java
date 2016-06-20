@@ -112,17 +112,33 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
 
+        private final int ellipseIndex;
+
         public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
+            this.ellipseIndex = indexOf(ellipsis);
         }
 
-        /**
-         * if they are images, they must have same dt
-         */
+
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return (subst.matchEllipsisWithImage(this, ellipsis, y) && super.matchEllipsis(y, subst));
+            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
         }
+
+        public boolean matchEllipsisWithImage(@NotNull Compound y) {
+
+            int xdt = dt();
+
+            if (ellipseIndex >= xdt) {
+                //compare relation from beginning as in non-ellipsis case
+                return (xdt == y.dt());
+            } else {
+                //compare relation from end
+                return ((size() - xdt) == (y.size() - y.dt()));
+            }
+
+        }
+
 
     }
 
