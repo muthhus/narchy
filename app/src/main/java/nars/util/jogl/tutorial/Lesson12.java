@@ -1,4 +1,4 @@
-package nars.util.jogl;
+package nars.util.jogl.tutorial;
  
 /*--. .-"-.
 / o_O / O o \
@@ -29,7 +29,6 @@ document.getElementById('cloak31699').innerHTML += '<a ' + path + '\'' + prefix 
 ¤¤¤'._______.'`¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ --°oOo--(_)--oOo°--¤¤*/
 
 
-import com.jogamp.newt.event.KeyAdapter;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;

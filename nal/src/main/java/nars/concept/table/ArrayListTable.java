@@ -36,7 +36,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     abstract public Iterator<L> iterator();
 
     @Override
-    public void topWhile(@NotNull Predicate<L> action) {
+    public void topWhile(@NotNull Predicate<? super L> action) {
         int n = size();
         for (int i = 0; i < n; i++) {
             if (!action.test(get(i)))

@@ -366,7 +366,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             Map<V, RawBudget> p = pending;
             if (p!=null) {
                 this.pending = null;
-                bottomPri = bottomPriIfFull();
+                this.bottomPri = bottomPriIfFull();
                 p.forEach(eachPending);
             }
         }
@@ -418,21 +418,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
         BLink<V>[] l = items.array();
         int t = s - 1;
-        @NotNull BLink<V> lower = l[t]; //compares with self below to avoid a null check in subsequent iterations
+        @NotNull BLink<V> beneath = l[t]; //compares with self below to avoid a null check in subsequent iterations
         for (int i = t; i >= 0; i--) {
             BLink<V> b = l[i];
-            if (b!=null) {
+            //if (b!=null) {
                 if (eachNotNull)
                     each.accept(b);
 
                 b.commit();
-            }
+            //}
 
-            if (lowestUnsorted == -1 && cmpGT(b, lower)) {
+            if (lowestUnsorted == -1 && cmpGT(b, beneath)) {
                 lowestUnsorted = i+1;
             }
 
-            lower = b;
+            beneath = b;
         }
         return lowestUnsorted;
     }

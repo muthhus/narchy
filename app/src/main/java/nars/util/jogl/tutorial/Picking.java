@@ -1,4 +1,4 @@
-package nars.util.jogl;
+package nars.util.jogl.tutorial;
 
 //=================================================================================
 // Picking 0.2                                                       (Thomas Bladh)
@@ -22,7 +22,6 @@ import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.Animator;
 import nars.util.AbstractJoglPanel;
 
 

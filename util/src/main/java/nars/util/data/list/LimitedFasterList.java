@@ -4,7 +4,7 @@ package nars.util.data.list;
 /**
  * Created by me on 5/26/16.
  */
-public final class LimitedFasterList extends FasterList {
+public final class LimitedFasterList<X> extends FasterList<X> {
 
     final int max;
 
@@ -15,19 +15,19 @@ public final class LimitedFasterList extends FasterList {
 
     final void ensureLimit() {
         if (size() + 1 > max) {
-            throw new RuntimeException("Termute limit exceeded");
+            throw new RuntimeException("limit exceeded");
             //+ this + " while trying to add " + x);
         }
     }
 
     @Override
-    public boolean add(Object newItem) {
+    public boolean add(X newItem) {
         ensureLimit();
         return super.add(newItem);
     }
 
     @Override
-    public void add(int index, Object element) {
+    public void add(int index, X element) {
         ensureLimit();
         super.add(index, element);
     }

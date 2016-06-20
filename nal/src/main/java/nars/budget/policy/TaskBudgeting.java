@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.or;
 
 /**
  * Created by me on 5/23/16.
@@ -63,7 +64,7 @@ public class TaskBudgeting {
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                and(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
+                or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                         //* volRatioScale
         ;
 

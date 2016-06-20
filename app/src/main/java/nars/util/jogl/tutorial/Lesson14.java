@@ -1,4 +1,4 @@
-package nars.util.jogl;
+package nars.util.jogl.tutorial;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -27,19 +27,19 @@ public class Lesson14 extends AbstractJoglPanel {
         numberFormat.setMaximumFractionDigits(2);
     }
 
-    void renderString(GL2 gl, int font, String string) {
-// Center Our Text On The Screen
+    public static void renderString(GL2 gl, int font, String string) {
+        renderString(gl, font, string, 0, 0, 0);
+    }
+
+    public static void renderString(GL2 gl, int font, String string, float dx, float dy, float dz) {
+        // Center Our Text On The Screen
         float width =
                 glut.glutStrokeLength(font, string);
                 //glut.glutBitmapLength(font, string);
 
-        gl.glTranslatef(-width / 2f, 0, 0);
-// Render The Text
-        for (int i = 0; i < string.length(); i++) {
-            char c = string.charAt(i);
-            glut.glutStrokeCharacter(font, c);
-            //glut.glutBitmapCharacter(font, c);
-        }
+        gl.glTranslatef(-width / 2f + dx, dy, dz);
+
+        glut.glutStrokeString(font, string);
     }
 
     public void init(GLAutoDrawable glDrawable) {

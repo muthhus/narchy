@@ -585,7 +585,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         _frame(frames);
 
-        r.compareAndSet(true, false);
+        r.set(false);
 
         return this;
     }
