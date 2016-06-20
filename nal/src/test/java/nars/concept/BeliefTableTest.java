@@ -194,7 +194,7 @@ public class BeliefTableTest  {
         }
 
         /* first */ assertEquals(0, b.concept().beliefs().truth(0).freq(), 0.05f);
-        /* last */ assertEquals(0.83f, b.concept().beliefs().truth(spacing * (maxBeliefs-1)).freq(), 0.05f);
+        /* last */ assertEquals(0.8f, b.concept().beliefs().truth(spacing * (maxBeliefs-1)).freq(), 0.05f);
 
     }
 

@@ -385,7 +385,8 @@ public abstract class TermBuilder {
             //case 1:
                 //return u[0];
             default:
-                throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
+                //throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
+                return null;
         }
     }
 

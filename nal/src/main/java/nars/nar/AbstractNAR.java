@@ -53,11 +53,9 @@ public abstract class AbstractNAR extends NAR {
     public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
-        /*this.conceptBeliefsMax.set(12);
-        this.conceptGoalsMax.set(9);
-        this.conceptQuestionsMax.set(3);*/
-        conceptWarm = new DefaultConceptPolicy(10, 10, 3, 16, 8);
-        conceptCold = new DefaultConceptPolicy(8, 8, 1, 8, 4);
+
+        conceptWarm = new DefaultConceptPolicy(12, 10, 4, 24, 12);
+        conceptCold = new DefaultConceptPolicy(10, 8, 1, 16, 8);
 
         derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 

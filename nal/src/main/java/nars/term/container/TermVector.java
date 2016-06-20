@@ -245,9 +245,15 @@ public class TermVector implements TermContainer<Term> {
 
     @Override
     public final boolean equals(Object obj) {
-        return (this == obj) ||
-                (obj instanceof TermVector && equalTerms((TermVector)obj)) ||
-                (obj instanceof TermContainer && equalTo((TermContainer) obj));
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof TermVector) {
+            return (equalTerms((TermVector) obj));
+        } else if (obj instanceof TermContainer) {
+            return (equalTo((TermContainer) obj));
+        } else {
+            return false;
+        }
     }
 
     /** accelerated implementation */

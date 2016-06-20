@@ -23,8 +23,8 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         this(context,
             //new UnifriedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
-            //new HashMap(initialSize)
-            new ConcurrentHashMap(initialSize)
+            new HashMap(initialSize)
+            //new ConcurrentHashMap(initialSize)
             //new ConcurrentHashMapUnsafe<>(initialSize)
         );
     }

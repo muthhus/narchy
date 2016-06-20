@@ -3,6 +3,7 @@ package nars.task;
 import nars.$;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.List;
@@ -33,12 +34,13 @@ public class TruthPolationTest {
 
     @Test
     public void testRevisionEquivalence2() {
-        Task a = t(1f, 0.5f, -1);
-        Task b = t(0f, 0.5f, 1);
+        Task a = t(1f, 0.5f, -4);
+        Task b = t(0f, 0.5f, 4);
 
         Truth pt = polation.truth(0, a, b);
+        @Nullable Truth rt = Revision.revision(a, b);
 
-        assertTrue(Revision.revision(a, b).equals(pt, 0.02f));
+        assertTrue(rt.toString() + " vs. " + pt.toString(), rt.equals(pt, 0.03f));
     }
 
 

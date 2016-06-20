@@ -20,6 +20,7 @@ import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -68,10 +69,10 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 2, 2, 3, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng))
+				1024, 4, 2, 2, rng,
+				//new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				//new Indexes.WeakTermIndex(256 * 1024, rng)
+				new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
@@ -79,16 +80,16 @@ public class PongEnvironment extends Player implements Environment {
 		nar.beliefConfidence(0.95f);
 		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(256);
-		nar.confMin.setValue(0.05f);
+		nar.confMin.setValue(0.01f);
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
 
-		//new Abbreviation2(nar, "_");
+		new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		new HappySad(nar, 8);
 

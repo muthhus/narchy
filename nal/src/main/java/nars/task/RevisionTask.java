@@ -80,6 +80,10 @@ public class RevisionTask extends MutableTask  {
         Task parentOldBelief = getParentBelief();
         float newBeliefContribution;
 
+        if (parentNewBelief==null || parentOldBelief==null) {
+            return true; //HACK
+        }
+
         if (parentNewBelief.isBeliefOrGoal()) {
             float newBeliefConf = parentNewBelief.confWeight();
             newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());

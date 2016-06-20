@@ -83,9 +83,8 @@ public class TruthPolation {
             //offset the specified occurence time to a small window around the pure occurrence time,
             //so that tasks with equivalent truths but different evidence (and thus different hash) will
             //have a slightly different position on the time axis
-            float window = 0.1f;
-            int increments = 31337;
-            times[i][0] = t.occurrence() + (window * (-0.5f + (t.hashCode()%increments)/((float)increments)  ));  /* keeps occurrence times unique */
+            float window = 0.01f;
+            times[i][0] = t.occurrence() + (window * (-1f + 2f * (i)/(((float)s-1))  ));  /* keeps occurrence times unique */
 
             freq[i] = t.freq();
             conf[i] = t.confWeight()/sum;
