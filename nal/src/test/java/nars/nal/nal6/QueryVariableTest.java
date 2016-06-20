@@ -4,6 +4,10 @@ import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.task.Task;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,24 +15,13 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-
-@RunWith(Parameterized.class)
-public class QueryVariableTest extends AbstractNALTest {
-
-    public QueryVariableTest(Supplier<NAR> b) { super(b); }
-
-    @Parameterized.Parameters(name= "{0}")
-    public static Collection configurations() {
-        return Arrays.asList(new Supplier[][]{
-                {Default::new},
-                //{() -> new Default().nal(5)}
-                //{new Neuromorphic(4)},
-        });
-    }
+import static org.junit.Assert.assertTrue;
 
 
+public class QueryVariableTest {
 
     @Test public void testNoVariableAnswer() {
         testQuestionAnswer("<a --> b>", "<a --> b>");
@@ -42,39 +35,25 @@ public class QueryVariableTest extends AbstractNALTest {
         testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
 
-    void testQuestionAnswer(@NotNull String belief, @NotNull String question) {
+    void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) {
 
-        int time = 32;
+        int time = 16;
 
-        test().log()
-            .believe(belief)
-            .ask(question)
-            .mustBelieve(time, belief, 1f, 0.9f, Tense.ETERNAL);
-
-//        int[] answers = new int[1];
-//        n.eventTaskProcess.on(d-> {
-//            //if (d.term().hasVarQuery())
-//                //derivations.add(d);
-//            if (d.isJudgment() && d.term().toString().equals(belief))
-//                assertFalse(d + " should not have been derived", Util.equals(d.conf(), 0.81f, 0.01f));
-//        } );
-//        /*n.eventConceptProcess.on(c -> {
-//            System.out.println("\t" + c);
-//        });*/
-//        n.eventAnswer.on(p -> {
-//            System.out.println("q: " + p.getOne() + " a: " + p.getTwo());
-//            answers[0]++;
-//        });
+        AtomicBoolean valid = new AtomicBoolean();
 
 
-
-
-        //n.run(16);
-
-
-        //assertTrue("Answer/Solution reported?", 0 < answers[0]);
-
-
+        Default nar = new Default();
+        Termed beliefTerm = nar.term(beliefString);
+        nar.believe(beliefTerm, 1f, 0.9f);
+        nar.ask(question, Tense.ETERNAL, (Task a)-> {
+            if (a.term().equals(beliefTerm)) {
+                valid.set(true);
+                return false;
+            }
+            return true;
+        });
+        nar.run(time);
+        assertTrue(valid.get());
 
     }
 
