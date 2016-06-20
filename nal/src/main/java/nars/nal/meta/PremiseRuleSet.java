@@ -245,12 +245,13 @@ public class PremiseRuleSet  {
             String x = s.toString();
 
             if ((x.contains("task(")) ||
+                (x.contains("belief(")) ||
                 (x.contains("time(")) ||
-                (x.contains("Punctuation"))  ||
+                //(x.contains("Punctuation"))  ||
                 //(x.contains("Structural")) ||
-                (x.contains("Identity")) ||
-                //(x.contains("substitute")) || //TESTING THIS
-                (x.contains("Negation"))
+                //(x.contains("Identity")) ||
+                (x.contains("substitute"))  //TESTING THIS
+                //(x.contains("Negation"))
 
             ) {
                 fwd[0] = false;

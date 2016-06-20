@@ -47,11 +47,11 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 24;
-	final int height = 24;
+	final int width = 16;
+	final int height = 16;
 	final int pixels = width * height;
-	final int scaleX = 20;
-	final int scaleY = 20;
+	final int scaleX = 24;
+	final int scaleY = 24;
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
 	private final MatrixImage priMatrix;

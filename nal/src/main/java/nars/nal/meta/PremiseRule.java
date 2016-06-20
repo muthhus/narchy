@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -360,7 +359,8 @@ public class PremiseRule extends GenericCompound {
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
-        if (b == events.ifTermLinkIsBefore) return events.class;
+        if (b == events.ifTermLinkBefore) return events.class;
+        if (b == events.ifBeliefBefore) return events.class;
 
         if (b instanceof Solve) return Solve.class;
 
@@ -720,10 +720,14 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunction.decomposeTask;
                             break;
 
-                        //
-                        case "decomposeTaskIfBefore":
+                        case "decomposeTaskIfTermLinkBefore":
                             timeFunction = TimeFunction.decomposeTask;
-                            preNext = events.ifTermLinkIsBefore;
+                            preNext = events.ifTermLinkBefore;
+                            break;
+
+                        case "decomposeTaskIfBeliefBefore":
+                            timeFunction = TimeFunction.decomposeTask;
+                            preNext = events.ifBeliefBefore;
                             break;
 
                         case "decomposeBelief":

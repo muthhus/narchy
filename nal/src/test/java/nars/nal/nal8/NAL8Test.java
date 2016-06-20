@@ -231,7 +231,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void further_detachment()  {
         test()
-            //.log()
+            .log()
             .input("reachable:(SELF,{t002}). :|:")
             .inputAt(10, "(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
             .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5);
@@ -597,11 +597,24 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecompose() {
         test()
-                //.log()
+                .log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 .mustNotOutput(cycles, "(y)", '!', 3)
                 .mustNotOutput(cycles, "(y)", '!', ETERNAL);
+    }
+
+    @Test public void testGoalConjunctionPostDecompose() {
+        //after a belief has been fedback, continue decomposing the conjunction goal to expose the (y) desire:
+
+        test()
+                //.log()
+                .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
+                .believe("(x)", Tense.Present, 1f, 0.9f)
+                .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
+                .mustNotOutput(cycles, "(y)", '!', ETERNAL);
+    }
+
 
 
         //        @Test
@@ -654,13 +667,13 @@ public class NAL8Test extends AbstractNALTest {
         //                    .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
         //                    .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
         //        }
-    }
+    //}
 
 
     @Test public void testGoalConjunctionDecomposeSuffix() {
         test()
                 //.log()
-                .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
+                .goal("((x) &&+3 (y))", Tense.Eternal, 1f, 0.9f)
                 .inputAt(4, "(x). :|:")
                 .mustDesire(cycles, "(y)", 1f, 0.81f, (4+3))
                 .mustNotOutput(cycles, "(y)", '!', 3)

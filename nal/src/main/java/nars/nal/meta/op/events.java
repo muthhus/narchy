@@ -73,20 +73,48 @@ abstract public class events extends AtomicBoolCondition {
             }
         }
     };
-    public static final @Nullable BoolCondition ifTermLinkIsBefore = new events() {
+//    public static final @Nullable BoolCondition ifTermLinkBefore = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "ifBeliefIsBefore";
+//        }
+//    };
+
+    public static final @Nullable BoolCondition ifTermLinkBefore = new IfTermLinkBefore();
+    public static final @Nullable BoolCondition ifBeliefBefore = new IfTermLinkBefore() {
         @Override
         public String toString() {
-            return "ifTermLinkIsBefore";
+            return "ifBeliefIsBefore";
+        }
+        public boolean requireBelief() {
+            return true;
+        }
+
+    };
+
+    private static class IfTermLinkBefore extends events {
+        @Override
+        public String toString() {
+            return "ifTermLinkBefore";
+        }
+
+        public boolean requireBelief() {
+            return false;
         }
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
 
+            Task belief = m.premise.belief();
+            if (belief == null && requireBelief())
+                return false;
+
             Task task = m.premise.task();
             Compound tt = task.term();
             int ttdt = tt.dt();
 
-            Task belief = m.premise.belief();
+
             if ((belief!=null) && (belief.occurrence()!=ETERNAL) && (task.occurrence()!=ETERNAL)) {
                 //only allow a belief if it occurred before or during the task's specified occurrence
                 if (belief.occurrence() > task.occurrence())
@@ -107,7 +135,7 @@ abstract public class events extends AtomicBoolCondition {
             }
         }
 
-    };
+    }
 
 //    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */
 //    public static final events dtBeliefSimultaneous = new events() {

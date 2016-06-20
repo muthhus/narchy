@@ -220,19 +220,35 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 //                    return true;
 //                }
 
-        @Nullable Ellipsis taskEllipsis = EllipsisTransform.firstEllipsisRecursive(task);
-        if (taskEllipsis!=null) {
-        //if (taskEllipsis instanceof EllipsisTransform) {
-            //belief must be matched first for EllipsisTransform
+        Ellipsis taskEllipsis = EllipsisTransform.firstEllipsisRecursive(task);
+        if (taskEllipsis instanceof EllipsisTransform) {
+            //belief must be matched first especially for EllipsisTransform
             return false;
         }
-        @Nullable Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
+
+        //prefer non-ellipsis matches first
+        Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
         if (beliefEllipsis!=null) {
             return true;
         }
+        if (taskEllipsis!=null) {
+            return false;
+        }
 
-        //return task.volume() <= belief.volume();
-        return task.volume() >= belief.volume();
+        //defer any single-term matches to the end because they have the most generality:
+        if (belief.size() == 0) {
+            return true;
+        }
+        if (task.size() == 0) {
+            return false;
+        }
+
+
+
+        //return task.volume() >= belief.volume();
+
+        return task.volume() <= belief.volume(); //might fold better
+
         //return task.varPattern() <= belief.varPattern();
     }
 

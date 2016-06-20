@@ -184,7 +184,9 @@ public class GraphDeriver extends Deriver {
 //                if ((cc == BeliefPositive.the) || (cc == BeliefNegative.the)) {
 //                    return ("beliefFreq");
 //                }
-                if ((cc == events.after) || (cc == events.afterOrEternal) || (cc == events.ifTermLinkIsBefore)) {
+                if ((cc == events.after) || (cc == events.afterOrEternal) ||
+                        (cc == events.ifTermLinkBefore) || (cc == events.ifBeliefBefore)
+                        ) {
                     return ("event");
                 }
 

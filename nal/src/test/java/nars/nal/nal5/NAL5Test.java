@@ -422,7 +422,7 @@ public class NAL5Test extends AbstractNALTest {
         test()
                 .input("(R). %0.0;0.90%")
                 .input("((--,a:b) ==> (--,(R))).")
-                .mustBelieve(cycles, "a:b", 0.0f, 0.81f);
+                .mustBelieve(cycles, "a:b", 0.0f, 0.45f);
     }
     //NO	((<(--,p1) ==> p2>, p2), (<(--,p2) ==> p1>, (<Contraposition --> Truth>, <AllowBackward --> Derive>)))
 

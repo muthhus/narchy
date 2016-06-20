@@ -164,6 +164,10 @@ public interface TermIndex {
     @Nullable
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
+        Term y = f.term(src);
+        if (y != null)
+            return y; //an assigned substitution, whether a variable or other type of term
+
         boolean strict = f instanceof PremiseEval;
 
         //constant atom or zero-length compound, ex: ()
@@ -177,12 +181,10 @@ public interface TermIndex {
             variable = false;
         }
 
+
         Op sop = src.op();
 
-        Term y = f.term(src);
-        if (y != null)
-            return y; //an assigned substitution, whether a variable or other type of term
-        else if (variable) {
+        if (variable) {
             if (sop == VAR_PATTERN)
                 return null; //unassigned pattern variable
             else

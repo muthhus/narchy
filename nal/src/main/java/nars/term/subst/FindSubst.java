@@ -504,40 +504,41 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
 
         //constant terms which have been verified existing in Y and will not need matched
-        Set<Term> alreadyThere = Global.newHashSet(0);
+        Set<Term> alreadyInY = Global.newHashSet(0);
 
         boolean ellipsisMatched = false;
         for (Term x : X.terms()) {
 
-            boolean xVar = x.op() == type;
-            Term v = term(x); //xVar ? getXY(x) : x;
-            if (v == null) v = x;
-
+            //boolean xVar = x.op() == type;
             //ellipsis to be matched in stage 2
             if (x == Xellipsis)
                 continue;
 
+            Term v = term(x); //xVar ? getXY(x) : x;
+            if (v != null) {
 
-            if (v instanceof EllipsisMatch) {
-                //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
-                if (!((EllipsisMatch) v).addWhileMatching(Y, alreadyThere, Xellipsis.sizeMin()))
-                    return false;
+                if (v instanceof EllipsisMatch) {
+                    //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
+                    if (!((EllipsisMatch) v).addWhileMatching(Y, alreadyInY, Xellipsis.sizeMin()))
+                        return false;
 
-                Xellipsis = null;
-                ellipsisMatched = true;
+                    Xellipsis = null;
+                    ellipsisMatched = true;
 
-                continue;
-            } else if (!xVar) {
+                    continue;
+                }
+                //if (v.op()!=type) {
                 if (Y.containsTerm(v)) {
-                    alreadyThere.add(v);
+                    alreadyInY.add(v);
                     continue;
                 }
                 //else
-                //    return false; //something needed by X but not in Y
-            }
+                //    return false;
+                //}
 
-            if (v != Xellipsis) {
-                xFree.add(v);
+            } else {
+
+                xFree.add(x);
             }
 
 
@@ -547,10 +548,10 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
         if (ellipsisMatched) {
             //Xellipsis = null;
-            return alreadyThere.equals(yFree);
+            return alreadyInY.equals(yFree);
         }
 
-        yFree.removeAll(alreadyThere);
+        yFree.removeAll(alreadyInY);
 
         int numRemainingForEllipsis = yFree.size() - xFree.size();
         if (!Xellipsis.validSize(numRemainingForEllipsis)) {
@@ -574,8 +575,12 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 //match everything
                 return putXY(xEllipsis, EllipsisMatch.match(yFree));
             case 1:
-                return addTermutator(new Choose1(
-                        xEllipsis, xFree.iterator().next(), yFree));
+                Term theFreeX = xFree.iterator().next();
+                if (yFree.size() == 1) {
+                    return putXY(theFreeX, yFree.iterator().next());
+                } else {
+                    return addTermutator(new Choose1(xEllipsis, theFreeX, yFree));
+                }
             case 2:
                 return addTermutator(new Choose2(this,
                         xEllipsis, xFree, yFree));
