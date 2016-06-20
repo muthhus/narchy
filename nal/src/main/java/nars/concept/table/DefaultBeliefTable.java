@@ -40,7 +40,10 @@ public class DefaultBeliefTable implements BeliefTable {
         Map<Task, Task> mp;
         this.map = mp =
             //Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
-            new HashMap<>(initialEternalCapacity + initialTemporalCapacity);
+            new HashMap<>(
+                //initialEternalCapacity + initialTemporalCapacity
+                8 /* ESTIMATE */
+            );
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new EternalTable(mp, initialEternalCapacity);

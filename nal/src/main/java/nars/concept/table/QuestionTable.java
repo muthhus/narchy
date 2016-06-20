@@ -22,7 +22,7 @@ public interface QuestionTable extends TaskTable {
     @Nullable
     Task add(Task t, BeliefTable answers, NAR n);
 
-    void setCapacity(int newCapacity);
+    void capacity(int newCapacity);
 
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
@@ -55,7 +55,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void setCapacity(int newCapacity) {
+        public void capacity(int newCapacity) {
 
         }
 

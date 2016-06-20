@@ -44,7 +44,7 @@ public class TemporalTest {
     }
 
     @Test public void testCoNegatedSubtermConcept() {
-        assertEquals("((--,(x))&&(x))", n.conceptualize(
+        assertEquals("((x)&&(--,(x)))", n.conceptualize(
                 n.term("((x) &&+10 (--,(x)))"), UnitBudget.One).toString());
     }
 

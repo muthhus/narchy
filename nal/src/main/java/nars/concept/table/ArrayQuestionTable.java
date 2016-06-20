@@ -29,7 +29,11 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     private final List<Task> list;
 
 
-    public ArrayQuestionTable(int capacity) {
+    public ArrayQuestionTable() {
+        this(0);
+    }
+
+    ArrayQuestionTable(int capacity) {
         super();
 
         this.list = Global.newArrayList(capacity);
@@ -43,7 +47,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         return capacity;
     }
 
-    @Override public final void setCapacity(int newCapacity) {
+    @Override public final void capacity(int newCapacity) {
 
         if (this.capacity==newCapacity)
             return;

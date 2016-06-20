@@ -18,23 +18,42 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestTest {
 
-    int exeCount;
+    final NAR nar = new Default();
 
     @Test
-    public void testQuest() throws Narsese.NarseseException {
+    public void testQuestAfterGoal()  {
+        testQuest(true, 0, 16);
+        testQuest(true, 1, 16);
+        testQuest(true, 4, 16);
+    }
 
-        Global.DEBUG = true;
+    @Test
+    public void testQuestBeforeGoal()  {
+        testQuest(false, 0, 16);
+        testQuest(false, 1, 16);
+        testQuest(false, 4, 16);
+    }
 
-
-        NAR nar = new Default(1, 1, 1, 1);
-
-        nar.log();
-
-        nar.goal(nar.term("a:b"), Tense.Eternal, 1.0f, 0.9f);
-        nar.step();
+    public void testQuest(boolean goalFirst, int timeBetween, int timeAfter) throws Narsese.NarseseException {
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
+        if (goalFirst) {
+            goal(nar);
+            nar.run(timeBetween);
+            question(nar, valid);
+        } else {
+            question(nar, valid);
+            nar.run(timeBetween);
+            goal(nar);
+        }
+
+        nar.run(timeAfter);
+
+        assertTrue(valid.get());
+    }
+
+    public void question(NAR nar, AtomicBoolean valid) {
         nar.ask($("a:?b@"), ETERNAL, '@', a -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
@@ -42,10 +61,10 @@ public class QuestTest {
                 valid.set(true);
             return true;
         });
+    }
 
-        nar.run(100);
-
-        assertTrue(valid.get());
+    public void goal(NAR nar) {
+        nar.goal(nar.term("a:b"), Tense.Eternal, 1.0f, 0.9f);
     }
 
 

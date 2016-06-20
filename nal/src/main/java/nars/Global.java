@@ -125,6 +125,9 @@ public enum Global {
     /** upper limit for # of termutations derived, determined by premise's priority */
     public static float matchTermutationsMax = 4;
 
+    public static int QUERY_ANSWERS_PER_MATCH = 2;
+
+
     /** smallest non-zero sub-cycle time measurement; # of cycles per frame should not exceed 1 / SUBFRAME_EPSILON */
     public static float SUBFRAME_EPSILON = 0.0001f;
 

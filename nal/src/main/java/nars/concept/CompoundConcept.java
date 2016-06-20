@@ -105,7 +105,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
     /** used for questions and quests */
     @NotNull protected QuestionTable newQuestionTable() {
-        return new ArrayQuestionTable(1);
+        return new ArrayQuestionTable();
     }
 
 //    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
@@ -235,6 +235,12 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     @Override public void capacity(@NotNull ConceptPolicy p) {
         linkCapacity(p);
         beliefCapacity(p);
+        questionCapacity(p);
+    }
+
+    protected void questionCapacity(@NotNull ConceptPolicy p) {
+        questions().capacity(p.questionCap(true));
+        quests().capacity(p.questionCap(false));
     }
 
     protected void beliefCapacity(@NotNull ConceptPolicy p) {

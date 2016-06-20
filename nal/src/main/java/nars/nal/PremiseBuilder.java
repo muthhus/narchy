@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
+import nars.concept.table.QuestionTable;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.task.MutableTask;
@@ -173,12 +174,12 @@ public enum PremiseBuilder {
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
         @Nullable Concept c = nar.concept(q);
         if (c != null)
-            c.questions().answer(a, nar);
+            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar);
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {
         List<Termed> result = Global.newArrayList(1);
-        new UnifySubst(Op.VAR_QUERY, nar, result, 1).matchAll(
+        new UnifySubst(Op.VAR_QUERY, nar, result, Global.QUERY_ANSWERS_PER_MATCH).matchAll(
                 task.term(), belief.term()
         );
         if (!result.isEmpty()) {

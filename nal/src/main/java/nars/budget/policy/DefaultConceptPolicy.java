@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/11/16.
  */
-public class DefaultConceptPolicy implements ConceptPolicy {
+public final class DefaultConceptPolicy implements ConceptPolicy {
 
     public final MutableInteger beliefsMaxEteOrTemp, goalsMaxEteOrTemp;
     public final MutableInteger questionsMax;
@@ -54,6 +54,10 @@ public class DefaultConceptPolicy implements ConceptPolicy {
         return termOrTask ? termlinksCapacity.intValue() : taskLinksCapacity.intValue();
     }
 
+    @Override
+    public final int questionCap(boolean questionOrQuest) {
+        return questionsMax.intValue();
+    }
 
 //        public int getBeliefsCapacity(Termed t);
 //        public int getGoalsCapabity(Termed t);

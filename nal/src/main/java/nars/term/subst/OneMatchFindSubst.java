@@ -20,7 +20,7 @@ public final class OneMatchFindSubst extends FindSubst {
     @Nullable private Term result;
 
     public OneMatchFindSubst(@NotNull NAR nar) {
-        super(nar.index, null, nar.random); //HACK
+        super(nar.index, null, nar.random);
     }
 
     @Override

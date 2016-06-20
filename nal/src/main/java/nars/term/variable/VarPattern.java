@@ -13,8 +13,8 @@ public class VarPattern extends AbstractVariable {
     }
 
 
-    @Override
-    public final int structure() {
+    /** special case: pattern variables contribute no structure currently */
+    @Override public final int structure() {
         return 0;
     }
 

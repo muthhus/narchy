@@ -66,13 +66,7 @@ public enum $ {
 
 
     public static <T extends Term> T $(@NotNull String term) {
-        Termed normalized = Narsese.the().term(term, terms, true);
-        if (normalized!=null)
-            return (T)(normalized.term());
-        return null;
-
-        //        try { }
-        //        catch (InvalidInputException e) { }
+        return (T)Narsese.the().term(term, terms, true);
     }
 
 

@@ -126,8 +126,8 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
 
     @Nullable
-    default TaskTable tableFor(char punctuation) {
-        switch(punctuation) {
+    default TaskTable tableFor(char punc) {
+        switch(punc) {
             case Symbols.BELIEF: return beliefs();
             case Symbols.GOAL: return goals();
             case Symbols.QUESTION: return questions();
@@ -136,6 +136,16 @@ public interface Concept extends Termed, Comparable<Termlike> {
                 throw new UnsupportedOperationException();
         }
     }
+
+    default BeliefTable tableAnswering(char punc) {
+        switch (punc) {
+            case Symbols.QUESTION: return beliefs();
+            case Symbols.QUEST: return goals();
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
 
     default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
         long now = nar.time();
@@ -371,6 +381,8 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
         out.println('\n');
     }
+
+
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

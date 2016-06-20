@@ -161,22 +161,20 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default void append(@NotNull Appendable p) throws IOException {
-        TermPrinter.append(term(), p);
+        TermPrinter.append(this, p);
     }
 
 
     @Override
     default int compareTo(@NotNull Termlike o) {
-        Term t = ((Termed) o).term();
-        if (this == t) return 0;
 
-        //sort by op and relation first
-        int diff = this.op().compareTo(t.op());
+        if (this == o) return 0;
+
+        int diff = Integer.compare(structure(), o.structure());
         if (diff != 0)
             return diff;
 
-
-        Compound c = (Compound)t;
+        Compound c = (Compound)o; //(o.term());
 
         int diff3 = Integer.compare(this.dt(), c.dt());
         if (diff3 != 0)
