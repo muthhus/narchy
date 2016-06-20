@@ -9,6 +9,8 @@ import javafx.beans.property.SimpleStringProperty;
 import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
+import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -16,10 +18,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.AbstractJoglPanel;
+import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -40,7 +44,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
     public static void main(String[] args) {
 
-        Default n = new Default(512,2,1,3);
+        Default n = new Default(1024,8,1,3);
 
         n.log();
 
@@ -57,6 +61,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         n.input("<(a,b,#x) <-> d>!");
         n.step();
         n.input("<(a,?x,d) <-> e>. :|:");
+        n.input("<(a,?x,?y) --> {e,d,a}>. :|:");
         n.step();
         n.input("wtf(1,2,#x)!");
         //n.input("<(c|a) --> (b&e)>! :|:");
@@ -67,7 +72,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
 
         new JoglGraphPanel(new ConceptsSource(n)).show(500, 500);
-        n.loop(25f);
+        n.loop(35f);
 
     }
 
@@ -75,12 +80,116 @@ public class JoglGraphPanel extends AbstractJoglPanel {
     private static final GLUT glut = new GLUT();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
+    final WeakValueHashMap<Concept,VDraw<Concept>> vdraw;
+
+    float nodeSpeed = 0.05f;
 
     private int box, top;
 
     public JoglGraphPanel(ConceptsSource c) {
         super();
+
+        vdraw = new WeakValueHashMap<>(1024);
+
         sources.add(c);
+    }
+
+    public VDraw<Concept> draw(float now, BLink<Concept> t) {
+        return update(now, vdraw.computeIfAbsent(t.get(), VDraw::new), t);
+    }
+
+    /** get the latest info into the draw object */
+    protected VDraw<Concept> update(float now, VDraw<Concept> v, BLink<Concept> b) {
+        v.budget = b;
+        float p;
+        v.pri = p = b.priIfFiniteElseZero();
+
+        float lastConceptForget = b.getLastForgetTime();
+        if (lastConceptForget!=lastConceptForget)
+            lastConceptForget = now;
+
+        float lastTermlinkForget = ((BLink)(((ArrayBag)v.key.termlinks()).get(0))).getLastForgetTime();
+        if (lastTermlinkForget!=lastTermlinkForget)
+            lastTermlinkForget = lastConceptForget;
+
+        v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
+        //float act = 1f / (1f + (timeSinceLastUpdate/3f));
+
+
+        layout(v);
+
+        v.updatePosition(nodeSpeed/(1f+ p));
+        //v.updateEdges...
+
+
+        return v;
+    }
+
+    protected void layout(VDraw<Concept> v) {
+        //TODO abstract
+        int hash = v.hash;
+        //int vol = v.key.volume();
+
+        //float ni = n / (float) Math.E;
+        //final float bn = 1f;
+
+        float baseRad = 25f;
+        float rad = 50f;
+        float p = v.pri;
+        v.tp[0] = (float) Math.sin(hash/1024f) * (baseRad + rad * (p));
+        v.tp[1] = (float) Math.cos(hash/1024f) * (baseRad + rad * (p));
+        v.tp[2] =
+                //1f/(1f+v.lag) * (baseRad/2f);
+                v.budget.dur() * (baseRad/2f);
+                //v.tp[2] = act*10f;
+
+
+    }
+
+    /** vertex draw info */
+    public static class VDraw<X> {
+        public final X key;
+        private final int hash;
+
+        /** current x, y, z */
+        public float p[] = new float[3];
+
+        /** target x, y, z */
+        public float tp[] = new float[3];
+
+        public String label;
+
+        public Budget budget;
+        public float pri;
+
+        /** measure of inactivity, in time units */
+        public float lag;
+
+        public VDraw(X k) {
+            this.key = k;
+            this.label = k.toString();
+            this.hash = k.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return key.equals(((VDraw)obj).key);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+
+        /** nodeSpeed < 1.0 */
+        public void updatePosition(float nodeSpeed) {
+            float[] p = this.p;
+            float[] tp = this.tp;
+            for (int i = 0; i < 3; i++) {
+                p[i] = Util.lerp(tp[i], p[i], nodeSpeed);
+            }
+        }
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -95,10 +204,10 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         gl.glEnable(GL2.GL_DEPTH_TEST); // Enables Depth Testing
         gl.glDepthFunc(GL2.GL_LEQUAL);
 
-// Quick And Dirty Lighting (Assumes Light0 Is Set Up)
-        gl.glEnable(GL2.GL_LIGHT0);
+        // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
+        //gl.glEnable(GL2.GL_LIGHT0);
 
-        gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
+        //gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -216,6 +325,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         gl.glRotatef(r0/3f, 0.0f, 0.0f, 1.0f);
         r0+=0.3f;
 
+
         gl.glLineWidth(1f);
 
         for (int i = 0, sourcesSize = sources.size(); i < sourcesSize; i++) {
@@ -225,8 +335,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
             BLink<Concept>[] vv = s.vertices;
             if (vv != null) {
-                long now = s.time();
-                int n = 0;
+                float now = s.time();
+                //int n = 0;
                 for (BLink<Concept> b : vv) {
 
                     float pri = b.pri();
@@ -234,50 +344,45 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                         continue; //deleted
                     }
 
+                    VDraw<Concept> v = draw(now, b);
+
+
                     gl.glPushMatrix();
 
 
 
-                    float lastForgetTime = b.getLastForgetTime();
-                    if (lastForgetTime!=lastForgetTime)
-                        lastForgetTime = now;
 
-                    float timeSinceLastUpdate = now - lastForgetTime;
-                    float act = 1f / (1f + (timeSinceLastUpdate/3f));
+                    //@Nullable Concept c = b.get();
 
-                    @Nullable Concept c = b.get();
-                    //int hash = c.hashCode();
 
-                    float ni = n / (float) Math.E;
-                    final float bn = 1f;
-                    float x = (float) Math.sin(ni) * (bn + ni);
-                    float y = (float) Math.cos(ni) * (bn + ni);
-                    float z = act*10f;
-
-                    gl.glTranslatef(x, y, z);
+                    float[] pp = v.p;
+                    gl.glTranslatef(pp[0], pp[1], pp[2]);
 
                     //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
                     //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
 
 
-                    float p = pri /2f + 0.5f;
-                    gl.glScalef(p, p, p);
-
-
-                    gl.glColor4f(h(pri), act, h(b.dur()), b.qua()*0.25f + 0.75f);
-                    gl.glCallList(box);
+                    float p = pri * 0.75f + 0.25f;
 
                     //Label
                     //float lc = p*0.5f + 0.5f;
-                    gl.glColor4f(1f, 1f, 1f, 1f);
-                    gl.glScalef(0.02f, 0.02f, 1f);
-                    renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, c.toString(),
-                            0, 0, -4f); // Print GL Text To The Screen
+
+                    gl.glScalef(p, p, p);
+
+
+                    gl.glColor4f(h(pri), 1f/(1f+v.lag), h(b.dur()), b.qua()*0.25f + 0.75f);
+                    gl.glCallList(box);
+
+                    gl.glColor4f(1f, 1f, 1f, 1f*p);
+                    float fp = 0.02f * p;
+                    gl.glScalef(fp, fp, 1f);
+                    renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
+                            0, 0, 1f); // Print GL Text To The Screen
 
 
                     gl.glPopMatrix();
 
-                    n++;
+                    //n++;
                 }
             }
             s.ready.set(true);
@@ -305,6 +410,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 //                //gl.glCallList(top);
 //            }
 //        }
+
     }
 
     public float h(float p) {
