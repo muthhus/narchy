@@ -326,4 +326,15 @@ public class TermVector implements TermContainer<Term> {
 //
 //    }
 
+
+    /** accelerated version of super-class's */
+    @Override public final boolean hasAll(int equivalentSize, int baseStructure, int minVol) {
+            return  (minVol <= this.volume)
+                    &&
+                    (equivalentSize == this.term.length)
+                    &&
+                    Op.hasAll(this.structure, baseStructure)
+            ;
+    }
+
 }

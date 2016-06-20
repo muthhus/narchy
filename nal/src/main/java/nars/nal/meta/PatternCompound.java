@@ -87,8 +87,81 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return subst.matchEllipsedLinear(this, ellipsis, y);
+            return matchEllipsedLinear(subst, y);
         }
+
+        /**
+         * non-commutive compound match
+         * X will contain at least one ellipsis
+         * <p>
+         * match subterms in sequence
+         * <p>
+         * WARNING this implementation only works if there is one ellipse in the subterms
+         * this is not tested for either
+         */
+        protected final boolean matchEllipsedLinear(@NotNull FindSubst subst, @NotNull Compound Y) {
+
+            int i = 0, j = 0;
+            int xsize = sizeCached;
+            int ysize = Y.size();
+
+            //TODO check for shim and subtract xsize?
+
+            while (i < xsize) {
+                Term x = termsCached[i++];
+
+                if (x instanceof Ellipsis) {
+                    int available = ysize - j;
+
+                    Term eMatched = subst.term(x); //EllipsisMatch, or null
+                    if (eMatched == null) {
+
+                        //COLLECT
+                        if (i == xsize) {
+                            //SUFFIX
+                            if (!ellipsis.validSize(available))
+                                return false;
+
+                            //TODO special handling to extract intermvals from Sequence terms here
+
+                            if (!subst.putXY(ellipsis,
+                                    EllipsisMatch.match(Y, j, j + available))) {
+                                return false;
+                            }
+                        } else {
+                            //PREFIX the ellipsis occurred at the start and there are additional terms following it
+                            //TODO
+                            return false;
+                        }
+                    } else {
+                        //previous match exists, match against what it had
+                        if (i == xsize) {
+//                        //SUFFIX - match the remaining terms against what the ellipsis previously collected
+//                        //HACK this only works with EllipsisMatch type
+//                        Term[] sp = ((EllipsisMatch) eMatched).term;
+//                        if (sp.length!=available)
+//                            return false; //incorrect size
+//
+//                        //match every item
+//                        for (Term aSp : sp) {
+//                            if (!match(aSp, Y.term(j++)))
+//                                return false;
+//                        }
+                        } else {
+                            //TODO other cases
+                            return false;
+                        }
+
+                    }
+                } else {
+                    if (ysize <= j || !subst.match(x, Y.term(j++)))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
 
     }
 
@@ -134,7 +207,7 @@ abstract public class PatternCompound extends GenericCompound {
                 return (xdt == y.dt());
             } else {
                 //compare relation from end
-                return ((size() - xdt) == (y.size() - y.dt()));
+                return ((sizeCached - xdt) == (y.size() - y.dt()));
             }
 
         }
@@ -156,23 +229,24 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
 
+            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
             //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
+
             EllipsisTransform et = this.ellipsisTransform;
             @NotNull Term from = et.from;
             if (from.equals(Op.Imdex)) {
                 Term n = subst.resolve(et.to);
-                if (n!=null && !n.equals(y)) {
+                if (n != null /*&& !n.equals(y)*/) {
 
                     //the indicated term should be inserted
                     //at the index location of the image
                     //being processed. (this is the opposite
                     //of the other condition of this if { })
 
-                    return subst.matchEllipsedLinear(this, et, y) &&
-                           subst.replaceXY(et,
-                                   ImageMatch.put(subst.term(et), n, y));
+                    return matchEllipsedLinear(subst, y) &&
+                            subst.replaceXY(et,
+                                    ImageMatch.put(subst.term(et), n, y));
 
                 }
             } else {
@@ -184,12 +258,12 @@ abstract public class PatternCompound extends GenericCompound {
 //                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
 //                }
 
-                if (n!=null && n.op() != subst.type) {
+                if (n != null /*&& n.op() != subst.type*/) {
                     int imageIndex = y.indexOf(n);
                     if (imageIndex != -1)
-                        return subst.matchEllipsedLinear(this, et, y) &&
+                        return matchEllipsedLinear(subst, y) &&
                                 subst.replaceXY(et,
-                                    ImageMatch.take(subst.term(et), imageIndex));
+                                        ImageMatch.take(subst.term(et), imageIndex));
                 }
             }
             return false;
@@ -319,7 +393,7 @@ abstract public class PatternCompound extends GenericCompound {
                         return subst.putXY(theFreeX, yFree.iterator().next());
                     } else {
                         return subst.addTermutator(
-                            new Choose1(ellipsis, theFreeX, yFree));
+                                new Choose1(ellipsis, theFreeX, yFree));
                     }
                 case 2:
                     return subst.addTermutator(
@@ -334,30 +408,31 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static final class PatternCompoundSimple extends PatternCompound {
 
+        private final int subStructureCached;
+        private final boolean commutative;
+
         public PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
             super(seed, subterms);
+            this.commutative = Compound.commutative(op(), size());
+            this.subStructureCached = subterms().structure();
         }
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-            @NotNull TermVector subterms = this.subterms;
-            if (canMatch(y)) {
-                TermContainer ysubs = y.subterms();
-                return ((y.isCommutative()) ?
-                        subst.matchPermute(subterms, ysubs) :
-                        subst.matchLinear(subterms, ysubs));
-            }
-            return false;
-        }
 
-        protected final boolean canMatch(@NotNull Compound y) {
+            //since the compound op will already have been determined equal prior to calling this method,
+            // compare the subterms structure (without the compound superterm's bit contribution)
+            // because this will be more specific in cases where the bits are already set
 
-            int yStructure = y.structure();
+            TermContainer ysubs = y.subterms();
 
-            return ((structureCached | yStructure) == yStructure) &&
-                    (sizeCached == y.size()) &&
-                    (volCached <= y.volume()) &&
-                    (!imgCached || /*image &&*/ (dt == y.dt()));
+            return ysubs.hasAll(sizeCached, subStructureCached, volCached) &&
+                    (
+                        commutative ?
+                            (subst.matchPermute(subterms, ysubs))
+                            :
+                            ((!imgCached || (dt == y.dt())) && subst.matchLinear(subterms, ysubs))
+                    );
         }
 
 

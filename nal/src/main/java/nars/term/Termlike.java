@@ -37,8 +37,7 @@ public interface Termlike extends Comparable<Termlike> {
     boolean hasTemporal();
 
     default boolean hasAll(int structuralVector) {
-        int s = structure();
-        return Op.hasAll(s, structuralVector);
+        return Op.hasAll(structure(), structuralVector);
     }
 
     default boolean hasAny(int structuralVector) {
