@@ -92,11 +92,11 @@
 //// inheritance-based composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Desire:Intersection)
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union)
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Desire:Intersection)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference)
 
@@ -153,18 +153,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction, Desire:Deduction)
+    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction, Desire:Deduction)
+    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction, Desire:Deduction)
+    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction, Desire:Deduction)
 
 //NAL3 single premise inference: (switched the belief term to the compound one so that less useful termlinks to atoms arent relied upon)
 
-    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction, Desire:Deduction)
+    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction, Desire:Deduction)
 
-    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
-    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
+    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction, Desire:Deduction)
+    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction, Desire:Deduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

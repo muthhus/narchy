@@ -84,7 +84,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(256);
-		nar.confMin.setValue(0.01f);
+		nar.confMin.setValue(0.02f);
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
@@ -104,7 +104,7 @@ public class PongEnvironment extends Player implements Environment {
 //		});
 
 
-		e.run(a, 1024*8);
+		e.run(a, 640*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -413,6 +413,7 @@ public class PongEnvironment extends Player implements Environment {
 				@NotNull Truth gg = c.goals().truth(now);
 				float gP = (gg.expectationPositive()-0.5f) * 2f;
 				float gN = (gg.expectationNegative()-0.5f) * 2f;
+				//System.out.println(c.beliefs().size() + "/" + c.beliefs().capacity() + " " + gg + " " + gP + " " + gN);
 				return ColorArray.rgba(b, gP, gN, 1f);
 			}else {
 				//FUTURE

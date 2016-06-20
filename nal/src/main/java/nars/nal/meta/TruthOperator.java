@@ -17,7 +17,7 @@ public interface TruthOperator {
             table.put($.the(tm.toString()), tm);
             table.put($.the(tm.toString() + 'X'), TruthOperator.swapped(tm));
             table.put($.the(tm.toString() + 'N'), TruthOperator.negated(tm));
-            table.put($.the(tm.toString() + "NX"), TruthOperator.swapped(TruthOperator.negated(tm)));
+            table.put($.the(tm.toString() + "NX"), TruthOperator.negated(TruthOperator.swapped(tm)));
         }
     }
 

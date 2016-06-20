@@ -5,6 +5,7 @@ import nars.Symbols;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TruthOperator;
+import nars.truth.DesireFunction;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
@@ -150,6 +151,7 @@ abstract public class Solve extends AtomicBoolCondition {
                 m.nar,
                 minConf
         );
+
 
         //pre-filter insufficient confidence level
 
