@@ -310,10 +310,11 @@ public interface TimeFunction {
                 occ = occDecomposed;
             }
 
-            if (occ!=ETERNAL && shift!=DTERNAL)
-                occ += shift;
-
-            occReturn[0] = occ;
+            if (occ!=ETERNAL) {
+                if (shift!=DTERNAL)
+                    occ += shift;
+                occReturn[0] = occ;
+            }
             return derived;
 
         }

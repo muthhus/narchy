@@ -13,6 +13,7 @@ import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
@@ -219,7 +220,19 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 //                    return true;
 //                }
 
-        return task.volume() <= belief.volume();
+        @Nullable Ellipsis taskEllipsis = EllipsisTransform.firstEllipsisRecursive(task);
+        if (taskEllipsis!=null) {
+        //if (taskEllipsis instanceof EllipsisTransform) {
+            //belief must be matched first for EllipsisTransform
+            return false;
+        }
+        @Nullable Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
+        if (beliefEllipsis!=null) {
+            return true;
+        }
+
+        //return task.volume() <= belief.volume();
+        return task.volume() >= belief.volume();
         //return task.varPattern() <= belief.varPattern();
     }
 

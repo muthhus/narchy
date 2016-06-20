@@ -181,13 +181,17 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
-        int time = cycles * 8;
+        int time = cycles * 2;
         test()
-            //.log()
-            .input("S:s.")
-            .inputAt(1, "(S:s &&+1 (Y:y &&+1 Z:z)). :|:")
-            .mustBelieve(time, "S:s.", 1.00f, 0.81f, 1)
-            .mustBelieve(time, "(Y:y &&+1 Z:z).", 1.00f, 0.43f, 2);
+            .log()
+            .input("X:x.")
+            .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
+            .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
+            .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2)
+            .mustNotOutput(time, "(Y:y &&+2 Z:z)", '.', 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
+            .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
+            .mustBelieve(time, "Z:z.", 1.00f, 0.73f, 4)
+        ;
 
     }
 

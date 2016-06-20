@@ -1,8 +1,10 @@
 package nars.nal.nal8;
 
+import nars.$;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
+import nars.term.Term;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.nal.Tense.ETERNAL;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
@@ -38,7 +41,7 @@ public class NAL8Test extends AbstractNALTest {
 
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold:({t002}) &&+5 at:({t001})) &&+5 open({t001}))",
-                1.0f, 0.43f,
+                1.0f, 0.81f,
                 -5);
 
 
@@ -308,7 +311,7 @@ public class NAL8Test extends AbstractNALTest {
                 //.log()
             .input("at:(SELF,{t001}). :|: ")
             .inputAt(10, "(at:(SELF,{t001}) &&+5 " + suffix + "). " + (presentOrEternal ? ":|:" : "")) //the occurrence time of this event is ignored; what matter is the task
-            .mustBelieve(cycles, suffix, 1.0f, 0.43f, 5)
+            .mustBelieve(cycles, suffix, 1.0f, 0.81f, 5)
             .mustNotOutput(cycles,suffix,'.',ETERNAL)
             .mustNotOutput(cycles,suffix,'.',0)
         ;
@@ -368,16 +371,40 @@ public class NAL8Test extends AbstractNALTest {
             .mustDesire(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
             .mustNotOutput(cycles, "hold:(SELF,{t002})", '!', ETERNAL);
     }
+
     @Test
     public void subbelief_2()  {
+        Term t = $.$("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001})))");
+        assertEquals(2, t.size());
+
         test()
-                //.log()
+                .log()
                 .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))). :|:")
                 .mustBelieve(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
-                .mustBelieve(cycles*2, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
+                .mustBelieve(cycles, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
         ;
     }
-
+    @Test
+    public void subbelief_2easy()  {
+        //requires StructuralDeduction to AllowOverlap
+        test()
+                //.log()
+                .input("(a:b &&+5 x:y). :|:")
+                .mustBelieve(cycles, "a:b", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles, "x:y", 1.0f, 0.81f, 5)
+        ;
+    }
+    @Test
+    public void subbelief_2medium()  {
+        //requires StructuralDeduction to AllowOverlap
+        test()
+                .log()
+                .input("(a:b &&+5 (c:d &&+5 x:y)). :|:")
+                .mustBelieve(cycles, "a:b", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles, "c:d", 1.0f, 0.73f, 5)
+                .mustBelieve(cycles, "x:y", 1.0f, 0.73f, 10)
+        ;
+    }
 
     @Test
     public void further_detachment_2()  {
@@ -443,8 +470,8 @@ public class NAL8Test extends AbstractNALTest {
                 //.log()
                 .input(              "on:(t002,t003). :|:")
                 .inputAt(10,         "(on:(t002,#1) && at:(SELF,#1)).") //<-- ETERNAL
-                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, ETERNAL)
-                .mustNotOutput(time, "at:(SELF,t003)", '.', 0, 1f, 0, 1f, 0);
+                .mustBelieve(time,   "at:(SELF,t003)", 1.0f, 0.43f, 0)
+                ;
     }
 
     @Test

@@ -270,8 +270,11 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), (&&,X,A..+), time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
+     //2nd level decompose (when temporal commutives concepts are flattened, this selects embedded subterms
+     //(&&,X,(&&,Y,A..+)), X, time(decomposeTask), task(".") |- Y, (Belief:StructuralDeduction)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
 
 
     //decompose (only) the leading event in a conjunction goal

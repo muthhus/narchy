@@ -22,10 +22,12 @@ package nars;
 
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
+import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -186,10 +188,14 @@ public enum Global {
 
     @NotNull
     public static <X> Set<X> newHashSet(int capacity) {
-        //return new UnifiedSet(capacity);
-        //return new SimpleHashSet(capacity);
-        return new HashSet(capacity);
-        //return new LinkedHashSet(capacity);
+        if (capacity == 0) {
+            return new UnifiedSet(0);
+        } else {
+            //return new UnifiedSet(capacity);
+            //return new SimpleHashSet(capacity);
+            return new HashSet(capacity);
+            //return new LinkedHashSet(capacity);
+        }
     }
 
     @NotNull

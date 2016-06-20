@@ -25,6 +25,9 @@ abstract public class substituteIfUnifies extends substitute {
 
     abstract public Op op();
 
+    /** whether an actual substitution is required to happen; when true and no substitution occurrs, then fails */
+    protected boolean mustSubstitute() { return false; }
+
     @Nullable
     @Override public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
         final Term[] xx = p.terms();
@@ -45,9 +48,13 @@ abstract public class substituteIfUnifies extends substitute {
             OneMatchFindSubst m = this.matcher;
             term = m.tryMatch(op, r, term, x, y);
             m.clear();
+        } else {
+            if (mustSubstitute())
+                term = null;
         }
         return term;
     }
+
 
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
 
@@ -61,6 +68,19 @@ abstract public class substituteIfUnifies extends substitute {
         }
     }
 
+    public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
+
+
+        public substituteOnlyIfUnifiesDep(NAR nar) {
+            super(nar);
+        }
+
+        @Override protected boolean mustSubstitute() { return true; }
+
+        @Override public Op op() {
+            return Op.VAR_DEP;
+        }
+    }
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
 

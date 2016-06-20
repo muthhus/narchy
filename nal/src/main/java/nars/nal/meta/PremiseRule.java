@@ -77,6 +77,7 @@ public class PremiseRule extends GenericCompound {
             union.class,
             substitute.class,
             substituteIfUnifies.substituteIfUnifiesDep.class,
+            substituteIfUnifies.substituteOnlyIfUnifiesDep.class,
             substituteIfUnifies.substituteIfUnifiesIndep.class,
 
             add.class

@@ -126,6 +126,28 @@ public abstract class Ellipsis extends AbstractVariable {
         }
         return null;
     }
+
+    @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull Term x) {
+        if (x instanceof Ellipsis)
+            return (Ellipsis)x;
+        else if (x instanceof Compound)
+            return firstEllipsisRecursive((TermContainer)x);
+        else
+            return null;
+    }
+
+    /** this needs to use .term(x) instead of Term[] because of shuffle terms */
+    @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull TermContainer<?> x) {
+        int xsize = x.size();
+        for (int i = 0; i < xsize; i++) {
+            Term xi = x.term(i);
+            Ellipsis ex = firstEllipsisRecursive(xi);
+            if (ex!=null)
+                return ex;
+        }
+        return null;
+    }
+
     @Nullable
     public static Ellipsis firstEllipsis(@NotNull Term[] xx) {
         for (Term x : xx) {
