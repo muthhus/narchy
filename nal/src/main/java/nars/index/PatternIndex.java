@@ -77,7 +77,8 @@ public class PatternIndex extends RawTermIndex {
                 if (!op.isImage() && op != Op.PROD)
                     throw new RuntimeException("imageTransform ellipsis must be in an Image or Product compound");
 
-                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(seed, e, v);
+                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(
+                        seed, (EllipsisTransform)e, v);
             } else if (op.isImage()) {
                 return new PatternCompound.PatternCompoundWithEllipsisLinearImage(seed, e, v);
             } else {

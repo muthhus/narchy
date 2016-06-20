@@ -376,38 +376,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return true;
     }
 
-    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
-        @NotNull Term from = et.from;
-        if (from.equals(Op.Imdex)) {
-            Term n = resolve(et.to);
-            if (n!=null && !n.equals(Y)) {
-
-                //the indicated term should be inserted
-                //at the index location of the image
-                //being processed. (this is the opposite
-                //of the other condition of this if { })
-
-                return matchEllipsedLinear(X, et, Y) && replaceXY(et, ImageMatch.put(term(et), n, Y));
-
-            }
-        } else {
-            Term n = resolve(from);
-//                if (n == null) {
-//                    //select at random TODO make termutator
-//                    int imageIndex = random.nextInt(Y.size());
-//                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
-//                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
-//                }
-
-            if (n!=null && n.op() != type) {
-                int imageIndex = Y.indexOf(n);
-                if (imageIndex != -1)
-                    return matchEllipsedLinear(X, et, Y) &&
-                            replaceXY(et, ImageMatch.take(term(et), imageIndex));
-            }
-        }
-        return false;
-    }
 
     //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
 //        /*  ex:
@@ -417,7 +385,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //        return false;
 //    }
 
-    protected boolean addTermutator(@NotNull Termutator x) {
+    public boolean addTermutator(@NotNull Termutator x) {
 
         //resolve termutator interferences that the addition may cause
         Termlike xKey = x.key;
@@ -464,32 +432,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
 
-    /**
-     * toMatch matched into some or all of Y's terms
-     */
-    public boolean matchCommutiveRemaining(@NotNull Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
-        int xs = xFree.size();
 
-        switch (xs) {
-            case 0:
-                //match everything
-                return putXY(xEllipsis, EllipsisMatch.match(yFree));
-            case 1:
-                Term theFreeX = xFree.iterator().next();
-                if (yFree.size() == 1) {
-                    return putXY(theFreeX, yFree.iterator().next());
-                } else {
-                    return addTermutator(new Choose1(xEllipsis, theFreeX, yFree));
-                }
-            case 2:
-                return addTermutator(new Choose2(this,
-                        xEllipsis, xFree, yFree));
-            default:
-                //3 or more combination
-                throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
-        }
-
-    }
 
 //    private boolean matchChoose2(Term[] x, MutableSet<Term> y) {
 //        int prePermute = now();

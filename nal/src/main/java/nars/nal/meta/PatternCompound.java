@@ -6,12 +6,15 @@ import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisTransform;
+import nars.nal.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
+import nars.term.subst.choice.Choose1;
+import nars.term.subst.choice.Choose2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,14 +131,54 @@ abstract public class PatternCompound extends GenericCompound {
      */
     public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
 
-        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        private final EllipsisTransform ellipsisTransform;
+
+        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
+            this.ellipsisTransform = ellipsis;
         }
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
+            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
+
+            //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
+            EllipsisTransform et = this.ellipsisTransform;
+            @NotNull Term from = et.from;
+            if (from.equals(Op.Imdex)) {
+                Term n = subst.resolve(et.to);
+                if (n!=null && !n.equals(y)) {
+
+                    //the indicated term should be inserted
+                    //at the index location of the image
+                    //being processed. (this is the opposite
+                    //of the other condition of this if { })
+
+                    return subst.matchEllipsedLinear(this, et, y) &&
+                           subst.replaceXY(et,
+                                   ImageMatch.put(subst.term(et), n, y));
+
+                }
+            } else {
+                Term n = subst.resolve(from);
+//                if (n == null) {
+//                    //select at random TODO make termutator
+//                    int imageIndex = random.nextInt(Y.size());
+//                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
+//                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
+//                }
+
+                if (n!=null && n.op() != subst.type) {
+                    int imageIndex = y.indexOf(n);
+                    if (imageIndex != -1)
+                        return subst.matchEllipsedLinear(this, et, y) &&
+                                subst.replaceXY(et,
+                                    ImageMatch.take(subst.term(et), imageIndex));
+                }
+            }
+            return false;
         }
+
     }
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
@@ -181,8 +224,10 @@ abstract public class PatternCompound extends GenericCompound {
             //constant terms which have been verified existing in Y and will not need matched
             Set<Term> alreadyInY = Global.newHashSet(0);
 
+            final Ellipsis ellipsis = this.ellipsis;
+
             boolean ellipsisMatched = false;
-            for (Term x : terms()) {
+            for (Term x : termsCached) {
 
                 //boolean xVar = x.op() == type;
                 //ellipsis to be matched in stage 2
@@ -231,7 +276,7 @@ abstract public class PatternCompound extends GenericCompound {
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
                 if (ellipsis.validSize(numRemainingForEllipsis)) {
 
-                    return subst.matchCommutiveRemaining(ellipsis, xFree, yFree);
+                    return matchEllipsisCommutive(subst, xFree, yFree);
 
                 } else {
                     //wouldnt be enough remaining matches to satisfy ellipsis cardinality
@@ -242,6 +287,33 @@ abstract public class PatternCompound extends GenericCompound {
 
         }
 
+        /**
+         * toMatch matched into some or all of Y's terms
+         */
+        boolean matchEllipsisCommutive(@NotNull FindSubst subst, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+            int xs = xFree.size();
+
+            switch (xs) {
+                case 0:
+                    //match everything
+                    return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
+                case 1:
+                    Term theFreeX = xFree.iterator().next();
+                    if (yFree.size() == 1) {
+                        return subst.putXY(theFreeX, yFree.iterator().next());
+                    } else {
+                        return subst.addTermutator(
+                            new Choose1(ellipsis, theFreeX, yFree));
+                    }
+                case 2:
+                    return subst.addTermutator(
+                            new Choose2(subst, ellipsis, xFree, yFree));
+                default:
+                    //3 or more combination
+                    throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
+            }
+
+        }
     }
 
     public static final class PatternCompoundSimple extends PatternCompound {
