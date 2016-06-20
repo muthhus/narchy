@@ -461,102 +461,13 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-    /**
-     * commutive compound match: Y into X which contains one ellipsis
-     * <p>
-     * X pattern contains:
-     * <p>
-     * one unmatched ellipsis (identified)
-     * <p>                    //HACK should not need new list
-     * <p>
-     * zero or more "constant" (non-pattern var) terms
-     * all of which Y must contain
-     * <p>
-     * zero or more (non-ellipsis) pattern variables,
-     * each of which may be matched or not.
-     * matched variables whose resolved values that Y must contain
-     * unmatched variables determine the amount of permutations/combinations:
-     * <p>
-     * if the number of matches available to the ellipse is incompatible with the ellipse requirements, fail
-     * <p>
-     * (total eligible terms) Choose (total - #normal variables)
-     * these are then matched in revertable frames.
-     * <p>
-     * *        proceed to collect the remaining zero or more terms as the ellipse's match using a predicate filter
-     *
-     * @param X the pattern term
-     * @param Y the compound being matched into X
-     */
-    public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
-        //ALL OF THIS CAN BE PRECOMPUTED
-        Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
-
-        //constant terms which have been verified existing in Y and will not need matched
-        Set<Term> alreadyInY = Global.newHashSet(0);
-
-        boolean ellipsisMatched = false;
-        for (Term x : X.terms()) {
-
-            //boolean xVar = x.op() == type;
-            //ellipsis to be matched in stage 2
-            if (x == Xellipsis)
-                continue;
-
-            Term v = term(x); //xVar ? getXY(x) : x;
-            if (v != null) {
-
-                if (v instanceof EllipsisMatch) {
-                    //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
-                    if (!((EllipsisMatch) v).addWhileMatching(Y, alreadyInY, Xellipsis.sizeMin()))
-                        return false;
-
-                    Xellipsis = null;
-                    ellipsisMatched = true;
-
-                    continue;
-                }
-                //if (v.op()!=type) {
-                if (Y.containsTerm(v)) {
-                    alreadyInY.add(v);
-                    continue;
-                }
-                else
-                    return false;
-                //}
-
-            } else {
-
-                xFree.add(x);
-            }
-
-
-        }
-
-        MutableSet<Term> yFree = Y.toSet();
-
-        if (ellipsisMatched) {
-            //Xellipsis = null;
-            return alreadyInY.equals(yFree);
-        }
-
-        yFree.removeAll(alreadyInY);
-
-        int numRemainingForEllipsis = yFree.size() - xFree.size();
-        if (!Xellipsis.validSize(numRemainingForEllipsis)) {
-            //wouldnt be enough remaining matches to satisfy ellipsis cardinality
-            return false;
-        }
-
-        return matchCommutiveRemaining(Xellipsis, xFree, yFree);
-
-    }
 
 
     /**
      * toMatch matched into some or all of Y's terms
      */
-    private boolean matchCommutiveRemaining(@NotNull Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+    public boolean matchCommutiveRemaining(@NotNull Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
         int xs = xFree.size();
 
         switch (xs) {

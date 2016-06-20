@@ -1,7 +1,10 @@
 package nars.nal.meta;
 
+import com.gs.collections.api.set.MutableSet;
+import nars.Global;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
 import nars.term.Term;
@@ -11,6 +14,8 @@ import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 abstract public class PatternCompound extends GenericCompound {
 
@@ -79,23 +84,7 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-
-                if (ellipsis instanceof EllipsisTransform) {
-                    return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
-                } else if (op().isImage()) {
-                    if (!subst.matchEllipsisWithImage(this, ellipsis, y))
-                        return false;
-                } //else {
-
-                return subst.matchEllipsedLinear(this, ellipsis, y);
-
-                //}
-
-
-
-//            return matchCompoundWithEllipsisLinear(
-//                    this, ellipsis, y
-//            );
+            return subst.matchEllipsedLinear(this, ellipsis, y);
         }
 
     }
@@ -117,20 +106,26 @@ abstract public class PatternCompound extends GenericCompound {
 
 
     }
+
     public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
 
         public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
         }
 
-        /** if they are images, they must have same dt */
-        @Override protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+        /**
+         * if they are images, they must have same dt
+         */
+        @Override
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
             return (subst.matchEllipsisWithImage(this, ellipsis, y) && super.matchEllipsis(y, subst));
         }
 
     }
 
-    /** does not compare specific image dt */
+    /**
+     * does not compare specific image dt
+     */
     public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
 
         public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
@@ -142,17 +137,109 @@ abstract public class PatternCompound extends GenericCompound {
             return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
         }
     }
+
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
         public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
         }
 
+        /**
+         * commutive compound match: Y into X which contains one ellipsis
+         * <p>
+         * X pattern contains:
+         * <p>
+         * one unmatched ellipsis (identified)
+         * <p>                    //HACK should not need new list
+         * <p>
+         * zero or more "constant" (non-pattern var) terms
+         * all of which Y must contain
+         * <p>
+         * zero or more (non-ellipsis) pattern variables,
+         * each of which may be matched or not.
+         * matched variables whose resolved values that Y must contain
+         * unmatched variables determine the amount of permutations/combinations:
+         * <p>
+         * if the number of matches available to the ellipse is incompatible with the ellipse requirements, fail
+         * <p>
+         * (total eligible terms) Choose (total - #normal variables)
+         * these are then matched in revertable frames.
+         * <p>
+         * *        proceed to collect the remaining zero or more terms as the ellipse's match using a predicate filter
+         *
+         * @param y the compound being matched to this
+         */
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return subst.matchEllipsedCommutative(
-                    this, ellipsis, y
-            );
+            //return subst.matchEllipsedCommutative(
+            //        this, ellipsis, y
+            //);
+            //public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
+
+            Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
+
+            //constant terms which have been verified existing in Y and will not need matched
+            Set<Term> alreadyInY = Global.newHashSet(0);
+
+            boolean ellipsisMatched = false;
+            for (Term x : terms()) {
+
+                //boolean xVar = x.op() == type;
+                //ellipsis to be matched in stage 2
+                if (x == ellipsis)
+                    continue;
+
+                Term v = subst.term(x); //xVar ? getXY(x) : x;
+
+                if (v instanceof EllipsisMatch) {
+
+                    //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
+                    if (!((EllipsisMatch) v).addWhileMatching(y, alreadyInY, ellipsis.sizeMin())) {
+                        return false;
+                    } else {
+                        //Xellipsis = null;
+                        ellipsisMatched = true;
+                        break; //continued below
+                    }
+
+                } else if (v != null) {
+
+                    if (!y.containsTerm(v)) {
+                        //required but not actually present in Y
+                        return false;
+                    } else {
+                        alreadyInY.add(v);
+                    }
+
+                } else {
+
+                    xFree.add(x);
+                }
+
+
+            }
+
+            MutableSet<Term> yFree = y.toSet();
+
+            if (ellipsisMatched) {
+                //Xellipsis = null;
+                return alreadyInY.equals(yFree);
+            } else {
+
+                yFree.removeAll(alreadyInY);
+
+                int numRemainingForEllipsis = yFree.size() - xFree.size();
+                if (ellipsis.validSize(numRemainingForEllipsis)) {
+
+                    return subst.matchCommutiveRemaining(ellipsis, xFree, yFree);
+
+                } else {
+                    //wouldnt be enough remaining matches to satisfy ellipsis cardinality
+                    return false;
+                }
+
+            }
+
         }
 
     }
@@ -187,7 +274,6 @@ abstract public class PatternCompound extends GenericCompound {
 
 
     }
-
 
 
 //    PatternCompound(@NotNull Compound seed) {
