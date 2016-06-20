@@ -349,19 +349,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return index.resolve(t, subst);
     }
 
-    public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, Ellipsis e, @NotNull Compound Y) {
 
-        if (e instanceof EllipsisTransform) {
-            return matchCompoundWithEllipsisTransform(X, Y, (EllipsisTransform) e);
-        } else if (X.op().isImage() && !matchEllipsisWithImage(X, Y, e)) {
-            /** if they are images, they must have same relationIndex */
-            return false;
-        } else {
-            return matchEllipsedLinear(X, e, Y);
-        }
-    }
-
-    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, @NotNull Ellipsis e) {
+    public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Ellipsis e, @NotNull Compound Y) {
         //if the ellipsis is normal, then interpret the relationIndex as it is
         int xs = X.size();
         if (xs > 1) {
@@ -387,7 +376,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return true;
     }
 
-    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull Compound Y, @NotNull EllipsisTransform et) {
+    public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
         @NotNull Term from = et.from;
         if (from.equals(Op.Imdex)) {
             Term n = resolve(et.to);

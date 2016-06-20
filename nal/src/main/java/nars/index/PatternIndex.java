@@ -1,6 +1,7 @@
 package nars.index;
 
 import nars.$;
+import nars.Op;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
@@ -60,8 +61,11 @@ public class PatternIndex extends RawTermIndex {
                 break;
             }
         }
+
+        Op op = seed.op();
+
         boolean ellipsisTransform = hasEllipsisTransform;
-        boolean commutative = (!ellipsisTransform && seed.op().commutative);
+        boolean commutative = (!ellipsisTransform && op.commutative);
 
         if (commutative) {
             if (ellipsisTransform)
@@ -69,10 +73,15 @@ public class PatternIndex extends RawTermIndex {
 
             return new PatternCompound.PatternCompoundWithEllipsisCommutive(seed, e, v);
         } else {
-            if (!seed.op().isImage() || ellipsisTransform) {
-                return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
+            if (ellipsisTransform) {
+                if (!op.isImage() && op != Op.PROD)
+                    throw new RuntimeException("imageTransform ellipsis must be in an Image or Product compound");
+
+                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(seed, e, v);
+            } else if (op.isImage()) {
+                return new PatternCompound.PatternCompoundWithEllipsisLinearImage(seed, e, v);
             } else {
-                return new PatternCompound.PatternCompoundWithEllipsisLinearDT(seed, e, v);
+                return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
             }
         }
 

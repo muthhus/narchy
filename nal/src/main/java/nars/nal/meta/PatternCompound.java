@@ -79,9 +79,23 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
-            return subst.matchCompoundWithEllipsisLinear(
-                    this, ellipsis, y
-            );
+
+                if (ellipsis instanceof EllipsisTransform) {
+                    return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
+                } else if (op().isImage()) {
+                    if (!subst.matchEllipsisWithImage(this, ellipsis, y))
+                        return false;
+                } //else {
+
+                return subst.matchEllipsedLinear(this, ellipsis, y);
+
+                //}
+
+
+
+//            return matchCompoundWithEllipsisLinear(
+//                    this, ellipsis, y
+//            );
         }
 
     }
@@ -90,7 +104,7 @@ abstract public class PatternCompound extends GenericCompound {
     /**
      * requies dt exact match, for example, when matching Images (but not temporal terms)
      */
-    public static final class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
+    abstract public static class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
 
         public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
@@ -103,8 +117,31 @@ abstract public class PatternCompound extends GenericCompound {
 
 
     }
+    public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
 
+        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, ellipsis, subterms);
+        }
 
+        /** if they are images, they must have same dt */
+        @Override protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+            return (subst.matchEllipsisWithImage(this, ellipsis, y) && super.matchEllipsis(y, subst));
+        }
+
+    }
+
+    /** does not compare specific image dt */
+    public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
+
+        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, ellipsis, subterms);
+        }
+
+        @Override
+        protected boolean matchEllipsis(@NotNull Compound y, @NotNull FindSubst subst) {
+            return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
+        }
+    }
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
         public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
