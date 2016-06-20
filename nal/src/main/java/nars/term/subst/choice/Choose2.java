@@ -99,8 +99,9 @@ public class Choose2 extends Termutator {
                     next(f, chain, current);
                 }
 
-                f.revert(start);
             }
+
+            f.revert(start);
 
 
         }

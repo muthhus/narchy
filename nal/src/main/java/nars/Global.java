@@ -122,10 +122,10 @@ public enum Global {
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMin = 2;
+    public static float matchTermutationsMin = 8;
 
     /** upper limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMax = 4;
+    public static float matchTermutationsMax = 16;
 
     public static int QUERY_ANSWERS_PER_MATCH = 2;
 

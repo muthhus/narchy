@@ -67,8 +67,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     @NotNull public final Versioned<MatchConstraint> constraints;
     @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY, reassignerYX;
 
+    /*
     @NotNull public final Matcher matcherXY, matcherYX;
-
+    */
 
     @NotNull
     public final VersionMap<Term, Term> xy;
@@ -129,8 +130,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         int constraintsLimit = 4;
         constraints = new Versioned(versioning, new int[constraintsLimit], new FasterList(0, new MatchConstraint[constraintsLimit]));
 
-        matcherXY = new Matcher(this::assignable, xy);
-        matcherYX = new Matcher(this::assignable, yx);
+        //matcherXY = new Matcher(this::assignable, xy);
+        //matcherYX = new Matcher(this::assignable, yx);
 
     }
 
@@ -276,48 +277,52 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      * x's and y's ops already determined inequal
      */
     private final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-//        Term t = term(x);
-//        return (t != null) ?
-//                match(t, y) :
-//                putXY(/* (Variable) */ x, y);
+        Term x2 = term(x);
+        return (x2 != null) ?
+                match(x2, y) :
+                putXY(/* (Variable) */ x, y);
 
-        return matcherXY.computeMatch(x, y);
+        //return matcherXY.computeMatch(x, y);
     }
-
-    public class Matcher extends VersionMap.Reassigner<Term,Term> {
-
-        public Matcher(BiPredicate<Term, Term> assigner, VersionMap map) {
-            super(assigner, map);
-        }
-
-        @Override
-        public Versioned<Term> apply(Term x, Versioned<Term> vy) {
-            Term t = vy!=null ? vy.get() : null;
-            if (t!=null) {
-                return match(t, y) ? vy : null;
-            } else {
-                return super.apply(x, vy);
-            }
-        }
-
-        public final boolean computeMatch(@NotNull Term x, @NotNull Term y) {
-            this.y = y;
-            return map.computeAssignable(x, this);
-        }
-    }
-
-
-
     /**
      * x's and y's ops already determined inequal
      */
     private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
-        Term t = yx.get(y);
-        return (t != null) ?
-                match(x, t) :
-                putYX(/*(Variable)*/ y, x);  // && putXY(y, /*(Variable)*/ x));
+        Term y2 = yx.get(y);
+        return (y2 != null) ?
+                match(x, y2) :
+                putYX(/*(Variable)*/ x, y);  // && putXY(y, /*(Variable)*/ x));
+
+        //return matcherYX.computeMatch(y, x);
+
     }
+
+//    public class Matcher extends VersionMap.Reassigner<Term,Term> {
+//
+//        public Matcher(BiPredicate<Term, Term> assigner, VersionMap map) {
+//            super(assigner, map);
+//        }
+//
+//        @Override
+//        public Versioned<Term> apply(Term x, Versioned<Term> vy) {
+//            Term t = vy!=null ? vy.get() : null;
+//            if (t!=null) {
+//                return match(t, y) ? vy : null;
+//            } else {
+//                return super.apply(x, vy);
+//            }
+//        }
+//
+//        public final boolean computeMatch(@NotNull Term x, @NotNull Term y) {
+//            this.y = y;
+//            return map.computeAssignable(x, this);
+//        }
+//    }
+
+
+
+
 
 
 //    private static void printComparison(int power, Compound cx, Compound cy) {
@@ -508,8 +513,16 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     private boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
         Variable commonVar = CommonVariable.make((Variable) x, (Variable) y);
-        return putXY(x, commonVar) && putYX(y, commonVar);
-        //TODO restore changed values if putYX fails but putXY succeeded?
+        int s = now();
+        if (putXY(x, commonVar)) {
+            if (putYX(y, commonVar)) {
+                return true;
+            } else {
+                //restore changed values if putYX fails but putXY succeeded
+                revert(s);
+            }
+        }
+        return false;
     }
 
     /**
@@ -524,7 +537,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 return matchSub(X, Y, 0);
             case 2:
                 //match the target variable first, if exists:
-                return matchLinear2(X, Y, X.isTerm(1, type) ? 1 : 0);
+                return matchLinear2(X, Y, X.isTerm(0, type) ? 0 : 1);
+                //return matchLinear2(X, Y, 0);
             default:
                 return matchLinearN(X, Y);
         }
@@ -555,8 +569,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putYX(@NotNull Term y /* usually a Variable */, @NotNull Term x) {
-        return reassignerYX.compute(x, y);
+    public final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
+        return reassignerYX.compute(y, x);
     }
 
     /**

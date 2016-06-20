@@ -43,7 +43,9 @@ public class CommutivePermutations extends Termutator {
 
 
         while (p.hasNext()) {
+
             p.next();
+
             if (f.matchLinear(p, y))
                 next(f, chain, current);
 

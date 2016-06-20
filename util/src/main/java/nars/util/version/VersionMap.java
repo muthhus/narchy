@@ -1,14 +1,13 @@
 package nars.util.version;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -22,9 +21,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            new UnifriedMap(initialSize)
+            //new UnifriedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
             //new HashMap(initialSize)
+            new ConcurrentHashMap(initialSize)
+            //new ConcurrentHashMapUnsafe<>(initialSize)
         );
     }
 
@@ -230,11 +231,8 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         /** should not be used by multiple threads at once! */
         public final boolean compute(@NotNull X x, @NotNull Y y) {
             this.y = y;
-            boolean b = map.computeAssignable(x, this);
-            this.y = null;
-            return b;
+            return map.computeAssignable(x, this);
         }
-
 
     }
 

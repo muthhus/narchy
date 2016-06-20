@@ -595,6 +595,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
                 output[j++] = x;
         }
 
+        if (j!=output.length)
+            throw new RuntimeException("permute underflow");
+
         return output;
     }
 

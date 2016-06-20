@@ -424,7 +424,7 @@ public class EllipsisTest {
 
     @Test public void testMatchAll2() {
         testCombinations(
-                $("((|,%X,%A) --> (|,%Y,%A))"),
+                $("((|,%1,%2) --> (|,%2,%3))"),
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1);
     }
@@ -433,6 +433,13 @@ public class EllipsisTest {
                 $("((|,%X,%Z,%A) --> (|,%Y,%Z,%A))"),
                 $("((|,bird,man, swimmer)-->(|,man, animal,swimmer))"),
                 2);
+    }
+
+    @Test public void testRepeatEllipsisAWithoutEllipsis() {
+        testCombinations(
+                $("((|,%X,%Y) --> (|,%Y,%Z))"),
+                $("((|,bird,swimmer)-->(|,animal,swimmer))"),
+                1 /* weird */);
     }
 
     @Test public void testRepeatEllipsisA() {

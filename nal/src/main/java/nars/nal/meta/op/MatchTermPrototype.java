@@ -46,6 +46,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     private final Set<Derive> derive = Global.newHashSet(1);
 
 
+    int matchFactor;
 
 
     public MatchTermPrototype(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
@@ -109,12 +110,15 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
                     break;
             }
 
+            matchFactor = derive.size();
+
             this.id = $.the("MatchTerm(" + pid +
                     ((om!=null) ? ",  " + om  : "") + ")");
 
 
             this.eachMatch = om;
         }
+
         return build(this.eachMatch);
     }
 

@@ -35,7 +35,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
     @Nullable
     @Override
     protected ProcTerm build(ProcTerm eachMatch) {
-        return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null);
+        return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null, matchFactor);
     }
 
 }

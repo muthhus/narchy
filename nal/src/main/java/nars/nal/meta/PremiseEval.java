@@ -53,7 +53,7 @@ public class PremiseEval extends FindSubst {
     public final Map<Atomic, ImmediateTermTransform> transforms;
 
     /** run parameters */
-    int premiseMatchesMax, termutes;
+    int termutes;
 
 
 
@@ -105,13 +105,23 @@ public class PremiseEval extends FindSubst {
     }
 
     /** only one thread should be in here at a time */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
 
         int t = now();
 
-        boolean finish = (eachMatch != null);
+        boolean finish;
 
         this.forEachMatch = eachMatch; //to notify of matches
+        if (eachMatch!=null) {
+            //set the # of matches according to the # of conclusions in this branch
+            //each matched termutation will be used to derive F=matchFactor conclusions,
+            //so divide the premiseMatches value by it to equalize the derivation quantity
+            this.termutes = Math.max(1, premise.matchesMax() / matchFactor);
+            finish = true;
+        } else {
+            this.termutes = -1; //will not apply unless eachMatch!=null (final step)
+            finish = false;
+        }
 
         if (constraints!=null)
             this.constraints.set( constraints );
@@ -127,15 +137,14 @@ public class PremiseEval extends FindSubst {
 
     }
 
-    @Override
-    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
-        this.termutes = premiseMatchesMax;
-        super.matchAll(x, y, finish);
-    }
+//    @Override
+//    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+//        super.matchAll(x, y, finish);
+//    }
 
     @Override
     public boolean onMatch() {
-        if (termutes-- > 0) {
+        if (termutes-- >= 0) {
             forEachMatch.accept(this);
             return true;
         }
@@ -177,8 +186,6 @@ public class PremiseEval extends FindSubst {
 
         this.task = task;
         this.taskPunct = task.punc();
-
-        this.premiseMatchesMax = p.matchesMax();
 
         this.premise = p;
 

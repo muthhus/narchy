@@ -26,8 +26,8 @@ public abstract class Termutator  {
 
     /** call this to invoke the next termutator in the chain */
     protected static void next(FindSubst f, Termutator[] chain, int next) {
-        //next++;
-        chain[++next].run(f, chain, next);
+        next++;
+        chain[next].run(f, chain, next);
     }
 
     public abstract int getEstimatedPermutations();

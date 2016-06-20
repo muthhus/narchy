@@ -98,19 +98,19 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //    }
 
 
-    @Nullable
-    public static Op getOp(@NotNull Term type) {
-
-        switch (type.toString()) {
-            case "\"$\"":
-                return Op.VAR_INDEP;
-            case "\"#\"":
-                return Op.VAR_DEP;
-            case "\"?\"":
-                return Op.VAR_QUERY;
-        }
-
-        return null;
-    }
+//    @Nullable
+//    public static Op getOp(@NotNull Term type) {
+//
+//        switch (type.toString()) {
+//            case "\"$\"":
+//                return Op.VAR_INDEP;
+//            case "\"#\"":
+//                return Op.VAR_DEP;
+//            case "\"?\"":
+//                return Op.VAR_QUERY;
+//        }
+//
+//        return null;
+//    }
 
 }
