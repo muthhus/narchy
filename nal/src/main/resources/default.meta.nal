@@ -270,9 +270,10 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     //(&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction)
-     //(&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
-     (&&,X,Y,A..*), X, time(decomposeTask), task(".") |- Y, (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
+     //TODO maybe try to get this working:
+     //(&&,X,Y,A..*), Y, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
      (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
 
 

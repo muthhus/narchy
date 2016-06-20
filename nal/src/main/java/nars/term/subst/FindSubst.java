@@ -349,7 +349,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         return index.resolve(t, subst);
     }
 
-    public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
+    public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, Ellipsis e, @NotNull Compound Y) {
 
         if (e instanceof EllipsisTransform) {
             return matchCompoundWithEllipsisTransform(X, Y, (EllipsisTransform) e);
@@ -357,9 +357,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
         /** if they are images, they must have same relationIndex */
         if (X.op().isImage() && !matchEllipsisWithImage(X, Y, e))
-                return false;
-
-        return matchEllipsedLinear(X, e, Y);
+            return false;
+        else
+            return matchEllipsedLinear(X, e, Y);
     }
 
     public boolean matchEllipsisWithImage(@NotNull Compound X, @NotNull Compound Y, @NotNull Ellipsis e) {
@@ -389,20 +389,21 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull Compound Y, @NotNull EllipsisTransform et) {
-        if (et.from.equals(Op.Imdex)) {
+        @NotNull Term from = et.from;
+        if (from.equals(Op.Imdex)) {
             Term n = resolve(et.to);
-            if (!n.equals(Y)) {
+            if (n!=null && !n.equals(Y)) {
 
                 //the indicated term should be inserted
                 //at the index location of the image
                 //being processed. (this is the opposite
                 //of the other condition of this if { })
-                if (matchEllipsedLinear(X, et, Y)) {
-                    return replaceXY(et, ImageMatch.put(term(et), n, Y));
-                }
+
+                return matchEllipsedLinear(X, et, Y) && replaceXY(et, ImageMatch.put(term(et), n, Y));
+
             }
         } else {
-            Term n = resolve(et.from);
+            Term n = resolve(from);
 //                if (n == null) {
 //                    //select at random TODO make termutator
 //                    int imageIndex = random.nextInt(Y.size());
@@ -413,7 +414,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
             if (n!=null && n.op() != type) {
                 int imageIndex = Y.indexOf(n);
                 if (imageIndex != -1)
-                    return (matchEllipsedLinear(X, et, Y)) &&
+                    return matchEllipsedLinear(X, et, Y) &&
                             replaceXY(et, ImageMatch.take(term(et), imageIndex));
             }
         }
@@ -532,8 +533,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                     alreadyInY.add(v);
                     continue;
                 }
-                //else
-                //    return false;
+                else
+                    return false;
                 //}
 
             } else {

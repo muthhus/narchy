@@ -77,14 +77,17 @@ public class Choose2 extends Termutator {
         FindSubst f = this.f;
         Term[] x = this.x;
 
+        int[] c = null;
         while (ccc.hasNext() || !phase) {
 
-            int[] c = phase ? ccc.next() : ccc.prev();
+            c = phase ? ccc.next() : c;
             phase = !phase;
 
-            Term y1 = yy.term(c[0]);
+            int c0 = c[0];
             int c1 = c[1];
             IntArrays.reverse(c); //swap to try the reverse next iteration
+
+            Term y1 = yy.term(c0);
 
             if (f.match(x[0], y1)) {
 
@@ -95,9 +98,10 @@ public class Choose2 extends Termutator {
 
                     next(f, chain, current);
                 }
+
+                f.revert(start);
             }
 
-            f.revert(start);
 
         }
 

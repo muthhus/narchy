@@ -79,7 +79,7 @@ abstract public class PatternCompound extends GenericCompound {
                                 this, ellipsis, y
                         ) :
                         subst.matchCompoundWithEllipsisLinear(
-                                this, y, ellipsis
+                                this, ellipsis, y
                         );
         }
 

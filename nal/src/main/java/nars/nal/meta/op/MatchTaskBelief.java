@@ -211,27 +211,11 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
     private static boolean taskFirst(@Nullable Term task, @Nullable Term belief) {
 
-        //order by ellipsis content
-        //
-//                if (Ellipsis.containsEllipsis(task.term())) {
-//                    return false;
-//                }
-//                if (Ellipsis.containsEllipsis(belief.term())) {
-//                    return true;
-//                }
+
 
         Ellipsis taskEllipsis = EllipsisTransform.firstEllipsisRecursive(task);
         if (taskEllipsis instanceof EllipsisTransform) {
             //belief must be matched first especially for EllipsisTransform
-            return false;
-        }
-
-        //prefer non-ellipsis matches first
-        Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
-        if (beliefEllipsis!=null) {
-            return true;
-        }
-        if (taskEllipsis!=null) {
             return false;
         }
 
@@ -242,6 +226,17 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         if (task.size() == 0) {
             return false;
         }
+        
+        //prefer non-ellipsis matches first
+        Ellipsis beliefEllipsis = EllipsisTransform.firstEllipsisRecursive(belief);
+        if (beliefEllipsis!=null) {
+            return true;
+        }
+        if (taskEllipsis!=null) {
+            return false;
+        }
+
+
 
 
 
