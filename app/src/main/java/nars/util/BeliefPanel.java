@@ -1,7 +1,7 @@
 package nars.util;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.*;
+import jogamp.opengl.es3.GLES3Impl;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
@@ -165,7 +165,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
     @Override
     public void reshape(GLAutoDrawable ad, int i, int i1, int i2, int i3) {
 
-        GL2 gl = (GL2)ad.getGL();
+        GL2 gl = (GL2) ad.getGL();
 
 
         gl.glEnable(GL2.GL_BLEND);
@@ -174,6 +174,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
         gl.glClearColor(0, 0, 0, 0);
 
         gl.glViewport(0, 0, getWidth(), getHeight());
+
 
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();

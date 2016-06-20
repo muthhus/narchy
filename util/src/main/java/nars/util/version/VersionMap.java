@@ -1,5 +1,6 @@
 package nars.util.version;
 
+import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -21,9 +22,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            //new UnifriedMap(initialSize)
+            new UnifriedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
-            new HashMap(initialSize)
+            //new HashMap(initialSize)
         );
     }
 
@@ -195,10 +196,10 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.get(key);
     }
 
-    public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
+    public static class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
 
-        private Y y;
-        private final VersionMap map;
+        protected Y y;
+        protected final VersionMap map;
         private final BiPredicate<X, Y> assigner;
 
         public Reassigner(BiPredicate<X, Y> assigner, final VersionMap map) {
@@ -207,22 +208,22 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         }
 
         @Override
-        public Versioned<Y> apply(X X, @Nullable Versioned<Y> py) {
+        public Versioned<Y> apply(X x, @Nullable Versioned<Y> vy) {
             final Y y = this.y;
             BiPredicate<X, Y> a = this.assigner;
-            if (py == null) {
-                return a.test(X, y) ? map.newEntry(X).set(y) : null;
+            if (vy == null) {
+                return a.test(x, y) ? map.newEntry(x).set(y) : null;
             } else {
-                Y yy = py.get();
+                Y yy = vy.get();
                 if (yy == null) {
-                    if (a.test(X, y))
-                        py.set(y);
+                    if (a.test(x, y))
+                        vy.set(y);
                     else
                         return null;
                 } else if (!yy.equals(y)) {
                     return null; //conflict
                 }
-                return py;
+                return vy;
             }
         }
 
@@ -233,5 +234,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             this.y = null;
             return b;
         }
+
+
     }
+
+
 }

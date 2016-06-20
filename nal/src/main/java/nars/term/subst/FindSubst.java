@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
-
 
 
 /* recurses a pair of compound term tree's subterms
@@ -51,7 +51,6 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
-
     public final Random random;
     public Op type; //TODO make final again
 
@@ -65,16 +64,16 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     /**
      * variables whose contents are disallowed to equal each other
      */
-    @NotNull
-    public final Versioned<MatchConstraint> constraints;
-    @NotNull
-    public final VersionMap.Reassigner<Term,Term> reassignerXY, reassignerYX;
+    @NotNull public final Versioned<MatchConstraint> constraints;
+    @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY, reassignerYX;
+
+    @NotNull public final Matcher matcherXY, matcherYX;
 
 
     @NotNull
-    public final VersionMap<Term,Term> xy;
+    public final VersionMap<Term, Term> xy;
     @NotNull
-    public final VersionMap<Term,Term> yx;
+    public final VersionMap<Term, Term> yx;
 
 
 //    @NotNull
@@ -88,8 +87,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
     public final List<Termutator> termutes = new LimitedFasterList(Global.UnificationTermutesMax);
-
-
 
 
     @NotNull
@@ -109,8 +106,8 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     protected FindSubst(TermIndex index, Op type, Random random) {
         this(index, type, random,
-            new HeapVersioning(Global.UnificationStackMax, 4)
-            //new PooledVersioning(Global.UnificationStackMax, 4)
+                new HeapVersioning(Global.UnificationStackMax, 4)
+                //new PooledVersioning(Global.UnificationStackMax, 4)
         );
     }
 
@@ -131,6 +128,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
         int constraintsLimit = 4;
         constraints = new Versioned(versioning, new int[constraintsLimit], new FasterList(0, new MatchConstraint[constraintsLimit]));
+
+        matcherXY = new Matcher(this::assignable, xy);
+        matcherYX = new Matcher(this::assignable, yx);
 
     }
 
@@ -167,7 +167,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
 
-
     private final Termunator termunator = new Termunator(this);
 
     /**
@@ -200,37 +199,60 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public final boolean match(@NotNull Term x, @NotNull Term y) {
 
-        Op xOp = x.op();
-        Op yOp = y.op();
-
-        boolean opEqual = xOp == yOp;
-        if (opEqual) {
-
-            if (x.equals(y)) {
-                return true;
-            } else if (x instanceof Compound) {
-                return ((Compound) x).match((Compound) y, this);
-            } else if (x instanceof Variable) {
-                return putCommon( x, y );
-            }
-
+        if (x.equals(y)) {
+            return true;
         } else {
 
+            final Op xOp = x.op();
 
-
-            Op t = type;
-
-            if (xOp == t) {
-                //if both are variables of the target type, but different; they need to be common variable
-                return matchVarX(x, y);
-            } else if (yOp == t) {
-                return matchVarY(x, y);
+            switch (xOp) {
+                case VAR_DEP:
+                case VAR_INDEP:
+                case VAR_QUERY:
+                case VAR_PATTERN:
+                    //Var
+                    if (xOp == y.op())
+                        return putCommon(x, y);
+                    else if (xOp == type)
+                        return matchVarX(x, y);
+                    else
+                        break;
+                case OPER:
+                case ATOM:
+                    //Atomic
+                    return false;
+                default:
+                    //Compound
+                    if (y instanceof Compound)
+                        return ((Compound) x).match((Compound) y, this);
+                    else
+                        break;
             }
 
-
+            return (y.op() == type) && matchVarY(x, y);
         }
 
-        return false;
+//            else if (x instanceof Compound) {
+//                return ((Compound) x).match((Compound) y, this);
+//            } else if (x instanceof Variable) {
+//                return putCommon( x, y );
+//            }
+//
+//        } else {
+//
+//            Op t = type;
+//
+//            if (xOp == t) {
+//                //if both are variables of the target type, but different; they need to be common variable
+//                return matchVarX(x, y);
+//            } else if (yOp == t) {
+//                return matchVarY(x, y);
+//            }
+//
+//
+//        }
+//
+//        return false;
     }
 
 //    private static boolean hasAnyVar(Compound x) {
@@ -250,22 +272,51 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //    }
 
 
-    /** x's and y's ops already determined inequal */
+    /**
+     * x's and y's ops already determined inequal
+     */
     private final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        Term t = term(x);
-        return (t != null) ?
-                match(t, y) :
-                putXY(/* (Variable) */ x, y);
+//        Term t = term(x);
+//        return (t != null) ?
+//                match(t, y) :
+//                putXY(/* (Variable) */ x, y);
+
+        return matcherXY.computeMatch(x, y);
+    }
+
+    public class Matcher extends VersionMap.Reassigner<Term,Term> {
+
+        public Matcher(BiPredicate<Term, Term> assigner, VersionMap map) {
+            super(assigner, map);
+        }
+
+        @Override
+        public Versioned<Term> apply(Term x, Versioned<Term> vy) {
+            Term t = vy!=null ? vy.get() : null;
+            if (t!=null) {
+                return match(t, y) ? vy : null;
+            } else {
+                return super.apply(x, vy);
+            }
+        }
+
+        public final boolean computeMatch(@NotNull Term x, @NotNull Term y) {
+            this.y = y;
+            return map.computeAssignable(x, this);
+        }
     }
 
 
-    /** x's and y's ops already determined inequal */
+
+    /**
+     * x's and y's ops already determined inequal
+     */
     private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
         Term t = yx.get(y);
         return (t != null) ?
                 match(x, t) :
-                putYX(/*(Variable)*/ y, x);// && putXY(y, /*(Variable)*/ x));
+                putYX(/*(Variable)*/ y, x);  // && putXY(y, /*(Variable)*/ x));
     }
 
 
@@ -275,7 +326,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //        System.out.println(!cx.impossibleToMatch(cy) + "|" + !cy.impossibleToMatch(cx) + " ---> " + (power >= 0) + " " + power);
 //        System.out.println();
 //    }
-
 
 
     @Override
@@ -335,12 +385,13 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
         //TODO make a half resolve that only does xy?
         return resolve(t, this);
     }
+
     @Nullable
     public final Term resolveNormalized(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
         t = resolve(t);
         if (t instanceof Compound)
-            t = this.index.normalized((Compound)t).term();
+            t = this.index.normalized((Compound) t).term();
         return t;
     }
 
@@ -348,8 +399,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Term resolve(@NotNull Term t, @NotNull Subst subst) {
         return index.resolve(t, subst);
     }
-
-
 
 
     //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
@@ -397,16 +446,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull TermContainer y) {
-        //detect special case of no variables
-        return !x.hasAny(type) ?
-                matchLinear(x, y) :
-                addTermutator(new CommutivePermutations(this, x, y));
+        //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
+        return x.hasAny(type) && addTermutator(new CommutivePermutations(this, x, y));
     }
-
-
-
-
-
 
 
 //    private boolean matchChoose2(Term[] x, MutableSet<Term> y) {
@@ -453,8 +495,6 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //    }
 
 
-
-
 ////    /**
 ////     * elimination
 ////     */
@@ -467,7 +507,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
 
     private boolean putCommon(@NotNull Term /* var */ x, @NotNull Term y) {
-        Variable commonVar = CommonVariable.make((Variable)x, (Variable)y);
+        Variable commonVar = CommonVariable.make((Variable) x, (Variable) y);
         return putXY(x, commonVar) && putYX(y, commonVar);
         //TODO restore changed values if putYX fails but putXY succeeded?
     }
@@ -502,54 +542,15 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return match(X.term(i), Y.term(i));
     }
-    /** special match for size=2 compounds, with order reversal ability */
+
+    /**
+     * special match for size=2 compounds, with order reversal ability
+     */
     public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
-        int other = 1-first;
+        int other = 1 - first;
         return match(X.term(first), Y.term(first)) && match(X.term(other), Y.term(other));
     }
 
-//    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
-//        for (int i = X.size() - 1; i >= 0; i--) {
-//            if (!matchSub(X, Y, i)) return false;
-//        }
-//        return true;
-//    }
-
-
-//    public void termute(int i, Termutator[] chain) {
-//
-//        int max = chain.length;
-//        if (i == max) {
-//            onMatch();
-//            return;
-//        }
-//
-//        Termutator t = chain[i];
-//        t.reset(this, i, chain);
-//
-//    }
-
-//    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
-//        //yx.put(x, y);
-//
-//        VarCachedVersionMap yx = this.yx;
-//
-//        Versioned<Term> v = yx.map.get(x);
-//
-//        /*if (!assignable(x, y))
-//            return false;*/
-//
-//        if (v == null) {
-//            v = yx.getOrCreateIfAbsent(x);
-//        } else {
-//            Term vv = (v != null) ? v.get() : null;
-//            if (vv != null) {
-//                return y.equals(vv);
-//            }
-//        }
-//        v.set(y);
-//        return true;
-//    }
 
     /**
      * returns true if the assignment was allowed, false otherwise
@@ -571,7 +572,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     }
 
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
-        assert(y!=null);
+        //assert (y != null);
         xy.put(x, y);
         return true;
     }
@@ -690,6 +691,49 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 //            }
 //            return true;
 //        }
+//    }
+
+//    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
+//        for (int i = X.size() - 1; i >= 0; i--) {
+//            if (!matchSub(X, Y, i)) return false;
+//        }
+//        return true;
+//    }
+
+
+//    public void termute(int i, Termutator[] chain) {
+//
+//        int max = chain.length;
+//        if (i == max) {
+//            onMatch();
+//            return;
+//        }
+//
+//        Termutator t = chain[i];
+//        t.reset(this, i, chain);
+//
+//    }
+
+//    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
+//        //yx.put(x, y);
+//
+//        VarCachedVersionMap yx = this.yx;
+//
+//        Versioned<Term> v = yx.map.get(x);
+//
+//        /*if (!assignable(x, y))
+//            return false;*/
+//
+//        if (v == null) {
+//            v = yx.getOrCreateIfAbsent(x);
+//        } else {
+//            Term vv = (v != null) ? v.get() : null;
+//            if (vv != null) {
+//                return y.equals(vv);
+//            }
+//        }
+//        v.set(y);
+//        return true;
 //    }
 
 }

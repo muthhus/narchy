@@ -71,9 +71,12 @@ public abstract class AbstractJoglPanel extends GLWindow implements GLEventListe
 
     }
 
-    public static GLCapabilitiesImmutable newDefaultConfig() {
+    public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
 
-        GLCapabilities config = new GLCapabilities(GLProfile.getMaximum(true)); //getDefault());
+        GLCapabilities config = new GLCapabilities(
+                //GLProfile.getMaximum(true)
+                GLProfile.getDefault()
+        );
 
         config.setHardwareAccelerated(true);
 //        config.setBackgroundOpaque(false);
