@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.gui.JoglGraphPanel;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
 import nars.index.Indexes;
@@ -71,15 +72,15 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.1f);
+		nar.conceptActivation.setValue(0.5f);
 		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(256);
-		nar.confMin.setValue(0.03f);
+		nar.confMin.setValue(0.05f);
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
@@ -98,8 +99,10 @@ public class PongEnvironment extends Player implements Environment {
 //			new BeliefPanel(a.nar, a.actions).show(400, 100);
 //		});
 
+		new JoglGraphPanel(new JoglGraphPanel.ConceptsSource(nar, 32)).show(500, 500);
 
-		e.run(a, 8*8);
+
+		e.run(a, 164*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -138,13 +141,13 @@ public class PongEnvironment extends Player implements Environment {
 
 		priMatrix = new MatrixImage();
 
-		FX.run(()->{
-			BorderPane priMatrixPane = new BorderPane(priMatrix);
-
-			FX.newWindow("Visual", new BorderPane(priMatrixPane), 400, 400);
-
-			priMatrix.fit(priMatrixPane);
-		});
+//		FX.run(()->{
+//			BorderPane priMatrixPane = new BorderPane(priMatrix);
+//
+//			FX.newWindow("Visual", new BorderPane(priMatrixPane), 400, 400);
+//
+//			priMatrix.fit(priMatrixPane);
+//		});
 
 
 	}
@@ -294,14 +297,23 @@ public class PongEnvironment extends Player implements Environment {
 			x -= cx;
 		if (!up)
 			y -= cy;
+		int area = width * height;
 
 		//Term d = $.the(c1 + "" + c2);
-		Term d = $.secti($.the(c1), $.the(c2));
-		int area = width * height;
+		//Term d = $.secti($.the(c1), $.the(c2));
+		//Term d = $.seti($.the(c1), $.the(c2));
+//		Term d = level > 0  ?
+//					$.seti($.the(c1), $.the(c2), $.the(area)) :
+//					$.seti($.the(c1), $.the(c2) );
+		Term d = level > 0  ?
+				$.secte($.the(c1), $.the(c2), $.the(area)) :
+				$.secte($.the(c1), $.the(c2) );
+
 		//Term dir = $.p(d,$.the(area));
 		//Term dir = level == 0 ? d : $.p(d,$.the(area));
 		//Term dir = level == 0 ? d : $.p(d,$.the(area));
-		Term dir = level == 0 ? d : $.inh(d,$.the(area));
+		//Term dir = level == 0 ? d : $.inh(d,$.the(area));
+		//Term dir = $.inh(d,$.the(area));
 
 		//Term dir = $.inh(d,$.the(area));
 		//Term dir = level == 0 ? d : $.inh(d,$.the(area));
@@ -312,8 +324,9 @@ public class PongEnvironment extends Player implements Environment {
 			//return $.image(0, false, dir, $.sete(q));
 
 			//return $.inh(q, dir);
-			//return $.secte(dir, q);
-			return $.diffe(d, q);
+			//return $.inst(q, (level== 0 ? d : $.seti(d, $.the(area))));
+			return $.inst(q, d);
+			//return $.diffe(dir, q);
 
 			//return $.sete(q, dir);
 			//return $.inst(q, dir);
@@ -418,30 +431,31 @@ public class PongEnvironment extends Player implements Environment {
 
 		long now = nagent.nar.time();
 		int dt = 16;
-		priMatrix.set(width,height*2,(x,y)->{
 
-			if (y < height) {
-				@Nullable Concept c = nagent.nar.concept(p(x, y));
-				//float pA = 0.5f + 0.5f * p;
-				float b = c.beliefs().truth(now).expectation();
-				@NotNull Truth gg = c.goals().truth(now);
-				float gP = (gg.expectationPositive()-0.5f) * 2f;
-				float gN = (gg.expectationNegative()-0.5f) * 2f;
-				//System.out.println(c.beliefs().size() + "/" + c.beliefs().capacity() + " " + gg + " " + gP + " " + gN);
-				return ColorArray.rgba(b, gP, gN, 1f);
-			}else {
-				//FUTURE
-				y-=height;
-				float p = nagent.nar.conceptPriority(p(x, y));
-				//@Nullable Concept c = nagent.nar.concept(p(x, y));
-				//float b0 = c.beliefs().truth(now).expectation();
-				//float b = c.beliefs().truth(now+dt).expectation();
-				//float g = c.goals().truth(now+dt).expectation();
-				//return ColorArray.rgba(b-b0 > 0 ? 1f : 0f, b0-b > 0 ? 1f: 0f, 0, 1f);
-				return ColorArray.rgba(p, p, p, 1f);
-			}
-
-		});
+//		priMatrix.set(width,height*2,(x,y)->{
+//
+//			if (y < height) {
+//				@Nullable Concept c = nagent.nar.concept(p(x, y));
+//				//float pA = 0.5f + 0.5f * p;
+//				float b = c.beliefs().truth(now).expectation();
+//				@NotNull Truth gg = c.goals().truth(now);
+//				float gP = (gg.expectationPositive()-0.5f) * 2f;
+//				float gN = (gg.expectationNegative()-0.5f) * 2f;
+//				//System.out.println(c.beliefs().size() + "/" + c.beliefs().capacity() + " " + gg + " " + gP + " " + gN);
+//				return ColorArray.rgba(b, gP, gN, 1f);
+//			}else {
+//				//FUTURE
+//				y-=height;
+//				float p = nagent.nar.conceptPriority(p(x, y));
+//				//@Nullable Concept c = nagent.nar.concept(p(x, y));
+//				//float b0 = c.beliefs().truth(now).expectation();
+//				//float b = c.beliefs().truth(now+dt).expectation();
+//				//float g = c.goals().truth(now+dt).expectation();
+//				//return ColorArray.rgba(b-b0 > 0 ? 1f : 0f, b0-b > 0 ? 1f: 0f, 0, 1f);
+//				return ColorArray.rgba(p, p, p, 1f);
+//			}
+//
+//		});
 
 		System.out.println( a.summary());
 

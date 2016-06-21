@@ -2,7 +2,7 @@ package nars.util.data.list;
 
 
 /**
- * Created by me on 5/26/16.
+ * capacity limited list, doesnt allow additions beyond a certain size
  */
 public final class LimitedFasterList<X> extends FasterList<X> {
 
@@ -13,17 +13,18 @@ public final class LimitedFasterList<X> extends FasterList<X> {
         this.max = max;
     }
 
-    final void ensureLimit() {
+    final boolean ensureLimit() {
         if (size() + 1 > max) {
-            throw new RuntimeException("limit exceeded");
+            //throw new RuntimeException("limit exceeded");
             //+ this + " while trying to add " + x);
+            return false;
         }
+        return true;
     }
 
     @Override
     public boolean add(X newItem) {
-        ensureLimit();
-        return super.add(newItem);
+        return ensureLimit() && super.add(newItem);
     }
 
     @Override

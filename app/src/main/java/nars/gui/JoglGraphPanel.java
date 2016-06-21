@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.gui.tutorial.Lesson14.renderString;
@@ -36,7 +37,7 @@ import static nars.gui.tutorial.Lesson14.renderString;
 public class JoglGraphPanel extends AbstractJoglPanel {
 
 
-
+    private List<VDraw> toDraw = new FasterList();
 
     public static void main(String[] args) {
 
@@ -95,28 +96,37 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         sources.add(c);
     }
 
-    public VDraw update(float now, BLink<Termed> t) {
-        return update(now, get(t.get()), t);
+    public VDraw update(BLink<Termed> t) {
+        return pre(get(t.get()), t);
     }
 
     public VDraw get(Termed t) {
-
         return vdraw.computeIfAbsent(t, x -> new VDraw(x, maxEdgesPerVertex));
     }
 
+    public VDraw getIfActive(Termed t) {
+        VDraw v = vdraw.get(t);
+        return v!=null && v.active() ? v : null;
+    }
+
     /** get the latest info into the draw object */
-    protected VDraw update(float now, VDraw v, BLink<Termed> b) {
-        v.budget = b;
-        float p;
-        v.pri = p = b.priIfFiniteElseZero();
+    protected VDraw pre(VDraw v, BLink<Termed> b) {
+        v.budget = b; //mark as active
+        return v;
+    }
 
-        float lastConceptForget = b.getLastForgetTime();
-        if (lastConceptForget!=lastConceptForget)
-            lastConceptForget = now;
-
+    protected void post(float now, VDraw v) {
         Termed tt = v.key;
+
+        Budget b = v.budget;
+        v.pri = b.priIfFiniteElseZero();
+
         if (tt instanceof Concept) {
             Concept cc = (Concept)tt;
+
+            float lastConceptForget = b.getLastForgetTime();
+            if (lastConceptForget != lastConceptForget)
+                lastConceptForget = now;
 
             @NotNull Bag<Termed> termlinks = cc.termlinks();
             @NotNull Bag<Task> tasklinks = cc.tasklinks();
@@ -129,9 +139,10 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             //float act = 1f / (1f + (timeSinceLastUpdate/3f));
 
             v.clearEdges();
-            v.setLimit(v.edges.length/2);
+            int numEdges = v.edges.length;
+            v.setLimit(numEdges /2);
             termlinks.topWhile(v::addTermLink);
-            v.setLimit(v.edges.length/2);
+            v.setLimit(numEdges /2);
             tasklinks.topWhile(v::addTaskLink);
             v.clearRemainingEdges();
         }
@@ -139,11 +150,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
         layout(v);
 
-        v.updatePosition(nodeSpeed/(1f+ p));
+        v.updatePosition(nodeSpeed/(1f+ v.pri));
         //v.updateEdges...
-
-
-        return v;
     }
 
     protected void layout(VDraw v) {
@@ -244,6 +252,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             return addEdge(ll, ll.get(), false) && (edgeLimit-- > 0);
         }
         public boolean addTaskLink(BLink<Task> ll) {
+            if (ll == null)
+                return true;
             @Nullable Task t = ll.get();
             if (t == null)
                 return true;
@@ -273,7 +283,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                 g = dur/2f;
                 r = qua/2f;
             }
-            ee[ne = nextEdge++].set(get(ll), width, r, g, b, dur * qua);
+            VDraw target = getIfActive(ll);
+            ee[ne = nextEdge++].set(target, width, r, g, b, dur * qua);
             return (ne+1< ee.length);
 
         }
@@ -286,6 +297,13 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             EDraw[] ee = this.edges;
             for (int i = nextEdge; i < ee.length; i++)
                 ee[i].clear();
+        }
+
+        public boolean active() {
+            return budget!=null;
+        }
+        public void inactivate() {
+            budget = null;
         }
     }
 
@@ -422,15 +440,22 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             if (vv != null) {
                 float now = s.time();
                 //int n = 0;
-                for (BLink<Termed> b : vv) {
 
+                List<VDraw> toDraw = this.toDraw;
+
+                for (BLink<Termed> b : vv) {
                     float pri = b.pri();
                     if (pri!=pri) {
                         continue; //deleted
                     }
 
-                    VDraw v = update(now, b);
+                    VDraw v = update(b);
+                    toDraw.add(v);
+                }
 
+                for (VDraw v : toDraw) {
+
+                    post(now, v);
 
                     gl.glPushMatrix();
 
@@ -463,6 +488,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                     //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
 
 
+                    float pri = v.pri;
                     float p = pri * 0.75f + 0.25f;
 
                     //Label
@@ -471,13 +497,13 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                     gl.glScalef(p, p, p);
 
 
-                    gl.glColor4f(h(pri), 1f/(1f+v.lag), h(b.dur()), b.qua()*0.25f + 0.75f);
+                    gl.glColor4f(h(pri), 1f/(1f+v.lag), h(v.budget.dur()), v.budget.qua()*0.25f + 0.75f);
                     gl.glCallList(box);
 
                     gl.glColor4f(1f, 1f, 1f, 1f*p);
-                    float fontScale = 0.05f;
-                    float fp = fontScale * p;
-                    gl.glScalef(fp, fp, 1f);
+                    float fontScale = 0.01f;
+
+                    gl.glScalef(fontScale, fontScale, 1f);
                     float fontThick = 2f;
                     gl.glLineWidth(fontThick);
                     renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
@@ -488,6 +514,11 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
                     //n++;
                 }
+
+                for (VDraw v : toDraw) {
+                    v.inactivate();
+                }
+                toDraw.clear();
             }
             s.ready.set(true);
         }
