@@ -1,5 +1,6 @@
 package nars.gui;
 
+import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -30,7 +31,7 @@ import static nars.gui.tutorial.Lesson14.renderString;
 /**
  * Created by me on 6/20/16.
  */
-public class JoglGraphWindow extends AbstractJoglWindow {
+public class GraphWindow extends AbstractJoglWindow {
 
 
     public static void main(String[] args) {
@@ -65,7 +66,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
         final int maxNodes = 1024;
 
-        new JoglGraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
+        new GraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
         n.loop(25f);
 
     }
@@ -78,11 +79,13 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
     int maxEdgesPerVertex = 8;
 
-    float nodeSpeed = 0.05f;
+    List<GraphLayout> layout = Lists.newArrayList(
+        new Spiral()
+    );
 
     private int box, top;
 
-    public JoglGraphWindow(ConceptsSource c) {
+    public GraphWindow(ConceptsSource c) {
         super();
 
         vdraw = new WeakValueHashMap<>(1024);
@@ -160,31 +163,51 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
     }
 
-    protected void update(VDraw v) {
-        //TODO abstract
-        //int hash = v.hash;
-        //int vol = v.key.volume();
+    public interface GraphLayout {
 
-        //float ni = n / (float) Math.E;
-        //final float bn = 1f;
-
-        float baseRad = 5f;
-        //float p = v.pri;
-
-        float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
-
-        int o = v.order;
-        float theta = o;
-        v.move(
-                (float) Math.sin(theta / 10f) * (baseRad + 0.2f * (theta)),
-                (float) Math.cos(theta / 10f) * (baseRad + 0.2f * (theta)),
-                0,
-                //1f/(1f+v.lag) * (baseRad/2f);
-                //v.budget.qua() * (baseRad + rad)
-                //v.tp[2] = act*10f;
-                nodeSpeed);
+        void update(GraphWindow g, List<VDraw> verts, float dt);
 
     }
+
+    public static class Spiral implements GraphLayout {
+
+        float nodeSpeed = 0.05f;
+
+        @Override
+        public void update(GraphWindow g, List<VDraw> verts, float dt) {
+            verts.forEach(this::update);
+        }
+
+        protected void update(VDraw v) {
+            //TODO abstract
+            //int hash = v.hash;
+            //int vol = v.key.volume();
+
+            //float ni = n / (float) Math.E;
+            //final float bn = 1f;
+
+            float baseRad = 5f;
+            //float p = v.pri;
+
+            float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
+
+            int o = v.order;
+            float theta = o;
+
+            v.move(
+                    (float) Math.sin(theta / 10f) * (baseRad + 0.2f * (theta)),
+                    (float) Math.cos(theta / 10f) * (baseRad + 0.2f * (theta)),
+                    0,
+                    //1f/(1f+v.lag) * (baseRad/2f);
+                    //v.budget.qua() * (baseRad + rad)
+                    //v.tp[2] = act*10f;
+                    nodeSpeed);
+
+        }
+
+    }
+
+
 
     public static class EDraw {
         public VDraw key;
@@ -238,7 +261,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
          */
         public int order;
 
-        transient private JoglGraphWindow grapher;
+        transient private GraphWindow grapher;
 
         public VDraw(nars.term.Termed k, int edges) {
             inactivate();
@@ -322,7 +345,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
             return true;
         }
 
-        public void clearEdges(JoglGraphWindow grapher) {
+        public void clearEdges(GraphWindow grapher) {
             numEdges = 0;
             this.grapher = grapher;
         }
@@ -459,95 +482,113 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
+
+        clear(gl);
+
+        updateCamera(gl);
+
+        List<ConceptsSource> s = this.sources;
+        for (int i = 0, sourcesSize = s.size(); i < sourcesSize; i++) {
+            render(gl, s.get(i));
+        }
+
+    }
+
+    public void clear(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void render(GL2 gl, ConceptsSource s) {
+
+        @Deprecated float dt = Math.max(0.001f /* non-zero */, s.dt());
+
+        List<VDraw> toDraw = s.visible;
+
+        update(toDraw, dt);
+
+        for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
+
+            gl.glPushMatrix();
+
+            render(gl, dt, toDraw.get(i1));
+
+            gl.glPopMatrix();
+        }
+
+        s.ready.set(true);
+    }
+
+    public void render(GL2 gl, float dt, VDraw v) {
+
+        float[] pp = v.p;
+        float x = pp[0], y = pp[1], z = pp[2];
+
+        int n = v.numEdges();
+        EDraw[] eee = v.edges;
+        for (int en = 0; en < n; en++) {
+            EDraw e = eee[en];
+            VDraw ee = e.key;
+
+            float[] eep = ee.p;
+            gl.glColor4f(e.r, e.g, e.b, e.a);
+            gl.glLineWidth(e.width);
+            gl.glBegin(GL.GL_LINES);
+            {
+                gl.glVertex3f(x, y, z);
+                gl.glVertex3f(eep[0], eep[1], eep[2]);
+            }
+            gl.glEnd();
+        }
 
 
+        //@Nullable Concept c = b.get();
+
+
+        gl.glTranslatef(x, y, z);
+
+        //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
+        //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
+
+
+        float pri = v.pri;
+        float p = pri * 0.75f + 0.25f;
+
+        //Label
+        //float lc = p*0.5f + 0.5f;
+
+        float sc = 4f;
+        gl.glScalef(sc * p, sc * p, sc * p);
+
+        final float activationPeriods = 4f;
+        gl.glColor4f(h(pri), 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
+        gl.glCallList(box);
+
+        gl.glColor4f(1f, 1f, 1f, 1f * p);
+        float fontScale = 0.01f;
+
+        gl.glScalef(fontScale, fontScale, 1f);
+        float fontThick = 2f;
+        gl.glLineWidth(fontThick);
+        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
+                0, 0, 1f); // Print GL Text To The Screen
+
+        //n++;
+    }
+
+    public void update(List<VDraw> toDraw, float dt) {
+        List<GraphLayout> ll = this.layout;
+        for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
+            ll.get(i1).update(this, toDraw, dt);
+        }
+    }
+
+    public void updateCamera(GL2 gl) {
         gl.glLoadIdentity();
         gl.glTranslatef(0, 0, -120f);
         //gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
         //gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
         gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);
         r0 += 0.3f;
-
-
-        for (int i = 0, sourcesSize = sources.size(); i < sourcesSize; i++) {
-            ConceptsSource s = sources.get(i);
-//            if (s.ready.get())
-//                continue; //not finished yet
-            //float now = s.time();
-            @Deprecated float dt = Math.max(0.001f /* non-zero */, s.dt());
-
-            List<VDraw> toDraw = s.visible;
-            s.ready.set(true);
-
-            for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
-
-                VDraw v = toDraw.get(i1);
-
-                update(v);
-
-                gl.glPushMatrix();
-
-                float[] pp = v.p;
-                float x = pp[0], y = pp[1], z = pp[2];
-
-                int n = v.numEdges();
-                EDraw[] eee = v.edges;
-                for (int en = 0; en < n; en++) {
-                    EDraw e = eee[en];
-                    VDraw ee = e.key;
-
-                    float[] eep = ee.p;
-                    gl.glColor4f(e.r, e.g, e.b, e.a);
-                    gl.glLineWidth(e.width);
-                    gl.glBegin(GL.GL_LINES);
-                    {
-                        gl.glVertex3f(x, y, z);
-                        gl.glVertex3f(eep[0], eep[1], eep[2]);
-                    }
-                    gl.glEnd();
-                }
-
-
-                //@Nullable Concept c = b.get();
-
-
-                gl.glTranslatef(x, y, z);
-
-                //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
-                //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
-
-
-                float pri = v.pri;
-                float p = pri * 0.75f + 0.25f;
-
-                //Label
-                //float lc = p*0.5f + 0.5f;
-
-                gl.glScalef(p, p, p);
-
-
-                gl.glColor4f(h(pri), 1f / (1f + (v.lag / dt)), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
-                gl.glCallList(box);
-
-                gl.glColor4f(1f, 1f, 1f, 1f * p);
-                float fontScale = 0.01f;
-
-                gl.glScalef(fontScale, fontScale, 1f);
-                float fontThick = 2f;
-                gl.glLineWidth(fontThick);
-                renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                        0, 0, 1f); // Print GL Text To The Screen
-
-
-                gl.glPopMatrix();
-
-                //n++;
-            }
-
-
-        }
-
     }
 
     public float h(float p) {
@@ -591,7 +632,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
         final AtomicBoolean ready = new AtomicBoolean(false);
         private long now;
-        private JoglGraphWindow grapher;
+        private GraphWindow grapher;
         private float dt;
 
         public ConceptsSource(NAR nar, int maxNodes) {
@@ -615,7 +656,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 //            });
         }
 
-        public void start(JoglGraphWindow grapher) {
+        public void start(GraphWindow grapher) {
             this.grapher = grapher;
             ready.set(true);
         }
@@ -759,7 +800,7 @@ public class JoglGraphWindow extends AbstractJoglWindow {
 
             }, capacity);
 
-            JoglGraphWindow g = grapher;
+            GraphWindow g = grapher;
             for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
                 g.post(now, v.get(i1));
             }

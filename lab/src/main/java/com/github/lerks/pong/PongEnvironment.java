@@ -9,8 +9,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.gui.BeliefWindow;
-import nars.gui.JoglGraphWindow;
+import nars.gui.GraphWindow;
 import nars.guifx.chart.MatrixImage;
 import nars.index.Indexes;
 import nars.learn.Agent;
@@ -93,7 +92,7 @@ public class PongEnvironment extends Player implements Environment {
 			//new BeliefWindow(a.nar, a.actions).show(400, 100);
 		});
 
-		new JoglGraphWindow(new JoglGraphWindow.ConceptsSource(nar, 256)).show(800, 500);
+		new GraphWindow(new GraphWindow.ConceptsSource(nar, 256)).show(800, 500);
 
 		e.run(a, 164*8);
 
