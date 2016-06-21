@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestTest {
 
-    final NAR nar = new Default();
 
     @Test
     public void testQuestAfterGoal()  {
@@ -35,6 +34,7 @@ public class QuestTest {
     }
 
     public void testQuest(boolean goalFirst, int timeBetween, int timeAfter) throws Narsese.NarseseException {
+        final NAR nar = new Default();
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
