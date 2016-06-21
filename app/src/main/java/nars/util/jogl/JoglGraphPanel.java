@@ -144,14 +144,14 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         //float ni = n / (float) Math.E;
         //final float bn = 1f;
 
-        float baseRad = 25f;
+        float baseRad = 50f;
         float rad = 50f;
         float p = v.pri;
         v.tp[0] = (float) Math.sin(hash/1024f) * (baseRad + rad * (p));
         v.tp[1] = (float) Math.cos(hash/1024f) * (baseRad + rad * (p));
         v.tp[2] =
                 //1f/(1f+v.lag) * (baseRad/2f);
-                v.budget.dur() * (baseRad/2f);
+                v.budget.dur() * (baseRad);
                 //v.tp[2] = act*10f;
 
 
@@ -159,13 +159,15 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
     public static class EDraw {
         public VDraw key;
-        public float width, r, g, b;
+        public float width, r, g, b, a;
 
-        public void set(VDraw x, float r, float g, float b) {
+        public void set(VDraw x, float width, float r, float g, float b, float a) {
             this.key = x;
+            this.width = width;
             this.r = r;
             this.g = g;
             this.b = b;
+            this.a = a;
         }
 
         public void clear() {
@@ -192,6 +194,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
         /** measure of inactivity, in time units */
         public float lag;
+        private float baseLineWidth = 2f;
 
         public VDraw(nars.term.Termed k, int edges) {
             this.key = k;
@@ -225,14 +228,15 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         transient int nextEdge = -1;
 
         public boolean addEdge(BLink<Termed> l) {
-            if (l == null)
-                return false;
 
             @Nullable Termed ll = l.get();
             if (ll == null)
                 return false;
 
-            edges[nextEdge++].set(get(ll), l.pri(), l.dur(), l.qua());
+            float pri = l.pri();
+            float dur = l.dur();
+            float width = baseLineWidth * (1f + pri) * (1f + dur);
+            edges[nextEdge++].set(get(ll), width, pri, dur, 0, l.qua());
             return (nextEdge<edges.length);
 
         }
@@ -242,8 +246,9 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         }
 
         public void clearRemainingEdges() {
-            for (int i = nextEdge; i < edges.length; i++)
-                edges[i].clear();
+            EDraw[] ee = this.edges;
+            for (int i = nextEdge; i < ee.length; i++)
+                ee[i].clear();
         }
     }
 
@@ -376,12 +381,11 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         gl.glLoadIdentity();
         gl.glTranslatef(0, 0, -90f);
         gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
-        gl.glRotatef(r0/1.5f, 0.0f, 1.0f, 0.0f);
-        gl.glRotatef(r0/3f, 0.0f, 0.0f, 1.0f);
+        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
+        gl.glRotatef(r0/2f, 0.0f, 0.0f, 1.0f);
         r0+=0.3f;
 
 
-        gl.glLineWidth(1f);
 
         for (int i = 0, sourcesSize = sources.size(); i < sourcesSize; i++) {
             ConceptsSource s = sources.get(i);
@@ -412,6 +416,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                         if (ee ==null)
                             break;
                         float[] eep = ee.p;
+                        gl.glColor4f(e.r, e.g, e.b, e.a);
+                        gl.glLineWidth(e.width);
                         gl.glBegin(GL.GL_LINES);
                         {
                             gl.glVertex3f(x, y, z);
@@ -443,8 +449,11 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                     gl.glCallList(box);
 
                     gl.glColor4f(1f, 1f, 1f, 1f*p);
-                    float fp = 0.02f * p;
+                    float fontScale = 0.05f;
+                    float fp = fontScale * p;
                     gl.glScalef(fp, fp, 1f);
+                    float fontThick = 2f;
+                    gl.glLineWidth(fontThick);
                     renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
                             0, 0, 1f); // Print GL Text To The Screen
 
