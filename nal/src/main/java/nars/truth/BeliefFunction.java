@@ -35,8 +35,7 @@ public enum BeliefFunction implements TruthOperator {
     StructuralIntersection() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null) return null;
-            return TruthFunctions.intersection(B, defaultTruth(m), minConf);
+            return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
         }
     },
 
@@ -61,7 +60,7 @@ public enum BeliefFunction implements TruthOperator {
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
-            return (T == null) ? null : TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
+            return T != null ? TruthFunctions.deduction1(T, defaultConfidence(m), minConf) : null;
         }
     },
 

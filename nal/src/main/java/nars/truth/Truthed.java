@@ -65,6 +65,11 @@ public interface Truthed  {
         return c2w(conf());
     }
 
+    default float freqNegated() {
+        return 1f - freq();
+    }
+
+
 
     //void setValue(T v); //move to MutableMetaTruth interface
 

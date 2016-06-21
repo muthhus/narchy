@@ -9,7 +9,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.gui.GraphWindow;
+import nars.gui.graph.GraphWindow;
 import nars.guifx.chart.MatrixImage;
 import nars.index.Indexes;
 import nars.learn.Agent;
@@ -65,7 +65,7 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.01f);
+		//nar.conceptActivation.setValue(0.01f);
 		nar.beliefConfidence(0.95f);
 		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;

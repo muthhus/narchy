@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.$.t;
+import static nars.util.data.Util.lerp;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
@@ -397,16 +398,25 @@ public final class TruthFunctions extends UtilityFunctions {
     public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, boolean invert1, float minConf) {
         if (v1 == null) return null;
 
-        float c = and(v1.conf(), v2.conf());
+        float c1 = v1.conf();
+        float c2 = v2.conf();
+        float c = and(c1, c2);
+        if (c < minConf)
+            return null;
 
+        float f1 = invert1 ? v1.freqNegated() : v1.freq();
+        float f2 = v2.freq();
 
+        //float f = and(f1, v2.freq()); //original
+        float f = freqInterp(f1, f2, c1, c2); //stronger, balanced
 
-        if (c < minConf) return null;
+        return t(f, c);
+    }
 
-        float f1 = v1.freq();
-        if (invert1)
-            f1 = 1-f1;
-        return t(and(f1, v2.freq()), c);
+    private static float freqInterp(float f1, float f2, float c1, float c2) {
+        float w1 = c2w(c1);
+        float w2 = c2w(c2);
+        return lerp(f2, f1, w1/(w1+w2));
     }
 
     /**

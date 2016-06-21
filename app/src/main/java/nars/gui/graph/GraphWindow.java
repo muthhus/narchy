@@ -1,4 +1,4 @@
-package nars.gui;
+package nars.gui.graph;
 
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
@@ -36,38 +36,17 @@ public class GraphWindow extends AbstractJoglWindow {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 8, 3, 3);
+        Default n = new Default(1024, 4, 3, 3);
 
         //n.log();
 
         new DeductiveMeshTest(n, new int[]{6, 5}, 16384);
 
-//        n.input("<a <-> b>. :|:");
-//        n.step();
-//        n.input("<b --> c>. :|:");
-//        n.step();
-//        n.input("<c --> d>. :|:");
-//        n.step();
-//        n.input("<d --> a>. :|:");
-//        n.step();
-//        n.input("<(a,b) <-> c>?");
-//        n.step();
-//        n.input("<(a,b,#x) <-> d>!");
-//        n.step();
-//        n.input("<(a,?x,d) <-> e>. :|:");
-//        n.input("<(a,?x,?y) --> {e,d,a}>. :|:");
-//        n.step();
-//        n.input("wtf(1,2,#x)!");
-//        //n.input("<(c|a) --> (b&e)>! :|:");
-//        //n.step();
-//        //n.input("<x <-> a>! :|:");
-//        //n.run(5);
-
 
         final int maxNodes = 1024;
 
         new GraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
-        n.loop(25f);
+        n.loop(15f);
 
     }
 
@@ -160,56 +139,10 @@ public class GraphWindow extends AbstractJoglWindow {
         tasklinks.topWhile(v::addTaskLink, maxEdges / 2);
         termlinks.topWhile(v::addTermLink, maxEdges - v.numEdges()); //fill remaining edges
 
-
-    }
-
-    public interface GraphLayout {
-
-        void update(GraphWindow g, List<VDraw> verts, float dt);
-
-    }
-
-    public static class Spiral implements GraphLayout {
-
-        float nodeSpeed = 0.05f;
-
-        @Override
-        public void update(GraphWindow g, List<VDraw> verts, float dt) {
-            verts.forEach(this::update);
-        }
-
-        protected void update(VDraw v) {
-            //TODO abstract
-            //int hash = v.hash;
-            //int vol = v.key.volume();
-
-            //float ni = n / (float) Math.E;
-            //final float bn = 1f;
-
-            float baseRad = 5f;
-            //float p = v.pri;
-
-            float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
-
-            int o = v.order;
-            float theta = o;
-
-            v.move(
-                    (float) Math.sin(theta / 10f) * (baseRad + 0.2f * (theta)),
-                    (float) Math.cos(theta / 10f) * (baseRad + 0.2f * (theta)),
-                    0,
-                    //1f/(1f+v.lag) * (baseRad/2f);
-                    //v.budget.qua() * (baseRad + rad)
-                    //v.tp[2] = act*10f;
-                    nodeSpeed);
-
-        }
-
     }
 
 
-
-    public static class EDraw {
+    public static final class EDraw {
         public VDraw key;
         public float width, r, g, b, a;
 
@@ -231,10 +164,10 @@ public class GraphWindow extends AbstractJoglWindow {
     /**
      * vertex draw info
      */
-    public static class VDraw {
+    public static final class VDraw {
         public final nars.term.Termed key;
-        private final int hash;
-        private final EDraw[] edges;
+        public final int hash;
+        public final EDraw[] edges;
 
         /**
          * current x, y, z
