@@ -109,14 +109,17 @@ public class GraphWindow extends AbstractJoglWindow {
         Termed tt = v.key;
 
         Budget b = v.budget;
-        v.pri = b.priIfFiniteElseZero();
+        float p = v.pri = b.priIfFiniteElseZero();
+        v.scale(p, p, p);
 
         if (tt instanceof Concept) {
-            updateEdges(v, (Concept) tt, now);
+            updateConcept(v, (Concept) tt, now);
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 
-    private void updateEdges(VDraw v, Concept cc, float now) {
+    private void updateConcept(VDraw v, Concept cc, float now) {
 
         float lastConceptForget = v.budget.getLastForgetTime();
         if (lastConceptForget != lastConceptForget)
@@ -171,10 +174,12 @@ public class GraphWindow extends AbstractJoglWindow {
         public final int hash;
         @NotNull public final EDraw[] edges;
 
-        /**
-         * position: x, y, z
-         */
+        /** position: x, y, z */
         @NotNull public final float p[] = new float[3];
+
+        /** scale: x, y, z -- should not modify directly, use scale(x,y,z) method to change */
+        @NotNull public final float[] s = new float[3];
+
 
         public String label;
 
@@ -193,12 +198,16 @@ public class GraphWindow extends AbstractJoglWindow {
 
         transient private GraphWindow grapher;
 
+        transient private float radius;
+
+
         public VDraw(nars.term.Termed k, int edges) {
             inactivate();
             this.key = k;
             this.label = k.toString();
             this.hash = k.hashCode();
             this.edges = new EDraw[edges];
+            this.radius = 0;
             for (int i = 0; i < edges; i++)
                 this.edges[i] = new EDraw();
         }
@@ -298,16 +307,27 @@ public class GraphWindow extends AbstractJoglWindow {
         public float y() {  return p[1];        }
         public float z() {  return p[2];        }
 
-        //TODO
-        public float width() {  return 1f;        }
-        public float height() {  return 1f;        }
+
 
         public void moveDelta(float dx, float dy, float dz) {
-            float[] t = this.p;
-            t[0] += dx;
-            t[1] += dy;
-            t[2] += dz;
+            float[] p = this.p;
+            p[0] += dx;
+            p[1] += dy;
+            p[2] += dz;
         }
+
+        public void scale(float sx, float sy, float sz) {
+            float[] s = this.s;
+            s[0] = sx;
+            s[1] = sy;
+            s[2] = sz;
+            this.radius = Math.max(Math.max(sx, sy), sz);
+        }
+
+        public float radius() {
+            return radius;
+        }
+
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -496,17 +516,18 @@ public class GraphWindow extends AbstractJoglWindow {
         //Label
         //float lc = p*0.5f + 0.5f;
 
-        float sc = 4f;
-        gl.glScalef(sc * p, sc * p, sc * p);
+        float[] s = v.s;
+        gl.glScalef(s[0], s[1], s[2]);
 
         final float activationPeriods = 4f;
         gl.glColor4f(h(pri), 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
         gl.glCallList(box);
 
         gl.glColor4f(1f, 1f, 1f, 1f * p);
-        float fontScale = 0.01f;
 
+        float fontScale = 0.01f;
         gl.glScalef(fontScale, fontScale, 1f);
+
         float fontThick = 2f;
         gl.glLineWidth(fontThick);
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
@@ -730,6 +751,7 @@ public class GraphWindow extends AbstractJoglWindow {
             x.topWhile(this::accept, capacity);
 
             GraphWindow g = grapher;
+            long now = this.now;
             for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
                 g.post(now, v.get(i1));
             }

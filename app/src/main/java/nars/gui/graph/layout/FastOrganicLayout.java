@@ -122,7 +122,7 @@ public class FastOrganicLayout implements GraphLayout {
 
         setInitialTemp(9f);
         setMinDistanceLimit(1f);
-        setMaxDistanceLimit(10f);
+        setMaxDistanceLimit(50f);
 
     }
 
@@ -273,23 +273,22 @@ public class FastOrganicLayout implements GraphLayout {
 
             // Set the X,Y value of the internal version of the cell to
             // the center point of the vertex for better positioning
-            double ww = Math.max(V.width(), V.height()); /*getRadius()*/
-            double width = ww * 2f; //bounds.getWidth();
+
+            double vr = radius[i] = V.radius(); /*getRadius()*/
+            double width = vr * 2f; //bounds.getWidth();
+            double height = width; //vr * 2f; //bounds.getHeight();
 
 
             // Randomize (0, 0) locations
             //TODO re-use existing location
 
-            final double x = V.x();
-            final double y = V.y();
+            float[] p = V.p;
+            final double x = p[0];
+            final double y = p[1];
 
             double[] cli = cl[i];
-
-            cli[0] = x + width / 2.0;
-            double height = ww * 2f; //bounds.getHeight();
-            cli[1] = y + height / 2.0;
-
-            radius[i] = Math.max(width, height);
+            cli[0] = x + width / 2f;
+            cli[1] = y + height / 2f;
 
             // Moves cell location back to top-left from center locations used in
             // algorithm, resetting the edge points is part of the transaction
@@ -311,37 +310,11 @@ public class FastOrganicLayout implements GraphLayout {
             EDraw[] edges = V.edges;
             int ne = V.edgeCount();
 
-            //cells.clear();
-
-            //cells.ensureCapacity(ne);
-            //final Object[] ccells = cells.array();
-
-//            int cn = 0;
-//            for (int ie = 0; ie < ne; ie++) {
-//                EDraw e = edges[ie];
-//                //for (E e : edges) {
-////                    if (isResetEdges()) {
-////                        //graph.resetEdge(edge[k]);
-////                    }
-////
-////                    if (isDisableEdgeStyle()) {
-////                        //setEdgeStyleEnabled(edge[k], false);
-////                    }
-//
-//                //if (e == null) continue; //HACK shouldlnt happen
-//
-//                ccells[cn++] = e.key;
-//                //else if (target!=vd)  cells.add(target);
-//            }
 
             int[] ni = neighbors[i];
             if (ni == null || ni.length!=ne) {
                 neighbors[i] = ni = new int[ne];
             }
-
-//                else {
-//                    Arrays.fill(neighbors[i], -1);
-//                }
 
             for (int j = 0; j < ne; j++) {
 
@@ -361,19 +334,19 @@ public class FastOrganicLayout implements GraphLayout {
         temperature = initialTemp;
 
         // Main iteration loop
-        //try {
-            for (int iteration = 0; iteration < maxIterations; iteration++) {
-                calcRepulsion(); // Calculate repulsive forces on all vertex
-                calcAttraction(); // Calculate attractive forces through edge
-                calcPositions();
-                reduceTemperature(iteration);
-            }
-        /*} catch (Exception e) {
-        }*/
+
+        for (int iteration = 0; iteration < maxIterations; iteration++) {
+            calcRepulsion(); // Calculate repulsive forces on all vertex
+            calcAttraction(); // Calculate attractive forces through edge
+            calcPositions();
+            reduceTemperature(iteration);
+        }
 
         double minx = 0, miny = 0, maxx = 0, maxy = 0;
 
         float speed = nodeSpeed.floatValue();
+
+        double[] radius = this.radius;
 
         for (int i = 0; i < n; i++) {
             VDraw vd = vertices.get(i);
@@ -382,7 +355,8 @@ public class FastOrganicLayout implements GraphLayout {
             //cellLocation[i][0] -= 1/2.0; //geo.getWidth() / 2.0;
             //cellLocation[i][1] -= 1/2.0; //geo.getHeight() / 2.0;
 
-            float r = (float) vd.width(); //getRadius();
+
+            float r = (float) radius[i];
 
             double x = /*graph.snap*/(ci[0] - r);
             double y = /*graph.snap*/(ci[1] - r);
