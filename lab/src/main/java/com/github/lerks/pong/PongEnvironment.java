@@ -79,7 +79,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(256);
+		nar.cyclesPerFrame.set(128);
 		nar.confMin.setValue(0.05f);
 
 		NAgent a = new NAgent(nar);
@@ -99,7 +99,7 @@ public class PongEnvironment extends Player implements Environment {
 //			new BeliefPanel(a.nar, a.actions).show(400, 100);
 //		});
 
-		new JoglGraphPanel(new JoglGraphPanel.ConceptsSource(nar, 32)).show(500, 500);
+		new JoglGraphPanel(new JoglGraphPanel.ConceptsSource(nar, 512)).show(800, 500);
 
 
 		e.run(a, 164*8);

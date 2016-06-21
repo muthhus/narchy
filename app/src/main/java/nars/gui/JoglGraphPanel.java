@@ -435,10 +435,12 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             ConceptsSource s = sources.get(i);
 //            if (s.ready.get())
 //                continue; //not finished yet
+            float now = s.time();
+            float dt = Math.max(0.001f /* non-zero */, s.dt());
 
             BLink<Termed>[] vv = s.vertices;
             if (vv != null) {
-                float now = s.time();
+
                 //int n = 0;
 
                 List<VDraw> toDraw = this.toDraw;
@@ -497,7 +499,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
                     gl.glScalef(p, p, p);
 
 
-                    gl.glColor4f(h(pri), 1f/(1f+v.lag), h(v.budget.dur()), v.budget.qua()*0.25f + 0.75f);
+                    gl.glColor4f(h(pri), 1f/(1f+(v.lag/dt)), h(v.budget.dur()), v.budget.qua()*0.25f + 0.75f);
                     gl.glCallList(box);
 
                     gl.glColor4f(1f, 1f, 1f, 1f*p);
@@ -562,11 +564,13 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         //private final ConceptFilter eachConcept = new ConceptFilter();
         public BLink<Termed>[] vertices;
         final AtomicBoolean ready = new AtomicBoolean(true);
+        private long now;
 
         public ConceptsSource(NAR nar, int maxNodes) {
 
             concepts = new LimitedFasterList<>(maxNodes);
             this.nar = nar;
+            now = nar.time();
 
             nar.onFrame(nn -> {
                 if (ready.get()) {
@@ -733,6 +737,11 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
         public long time() {
             return nar.time();
+        }
+
+        public float dt() {
+            float last = this.now;
+            return (this.now = nar.time()) - last;
         }
 
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {
