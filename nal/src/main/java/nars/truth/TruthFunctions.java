@@ -53,7 +53,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * {A} |- (--A)
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth negation(@Nullable Truth v1, float minConf) {
         return ((v1 == null) || (v1.conf() < minConf)) ? null : v1.negated();
 
@@ -271,24 +271,35 @@ public final class TruthFunctions extends UtilityFunctions {
         float c1 = a.conf();
         float c2 = b.conf();
         float c = and(c1, c2/*, f2*/);
-
-        return (c < minConf) ? null : t(and(a.freq(), f2), c);
+        return desire(minConf, a.freq(), f2, c1, c2, c);
     }
+
     /**
      * A function specially designed for desire value [To be refined]
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth desireWeak(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
         float c1 = a.conf();
         float c2 = b.conf();
         float c = and(c1, c2, f2, w2c(1.0f));
+        return desire(minConf, f1, f2, c1, c2, c);
+    }
 
-        return c < minConf ? null : t(and(f1, f2), c);
+    public
+    @Nullable
+    static Truth desire(float minConf, float f1, float f2, float c1, float c2, float c) {
+        if (c < minConf)
+            return null;
+        else {
+            //float f = and(f1, f2);
+            float f = freqInterp(f1, f2, c1, c2);
+            return t(f, c);
+        }
     }
 
     static float andPolar(float x, float y) {
