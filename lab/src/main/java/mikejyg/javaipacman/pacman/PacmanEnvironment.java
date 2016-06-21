@@ -33,7 +33,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.agent.NAgent;
-import nars.util.BeliefPanel;
+import nars.gui.BeliefWindow;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
@@ -108,7 +108,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
-			new BeliefPanel(n.nar, n.actions).show(400, 100);
+			new BeliefWindow(n.nar, n.actions).show(400, 100);
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

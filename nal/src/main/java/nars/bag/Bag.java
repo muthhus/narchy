@@ -536,7 +536,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public void topWhile(@NotNull Predicate each) {
+        public void topWhile(@NotNull Predicate each, int n) {
 
         }
 

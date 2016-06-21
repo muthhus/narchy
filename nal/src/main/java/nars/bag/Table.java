@@ -57,9 +57,15 @@ public interface Table<K,V> extends Iterable<V> {
 //    }
 
     /**
-     * if predicate evaluates false, it terminates the iteration
+     * if predicate evaluates false, it terminates the iteration,
+     * or if n items have been reached (whichever comes first)
+     *
+     * if n is -1, it will visit all items
      */
-    void topWhile(@NotNull Predicate<? super V> each);
+    void topWhile(@NotNull Predicate<? super V> each, int n);
 
+    default void topWhile(@NotNull Predicate<? super V> action) {
+        topWhile(action, -1);
+    }
 
 }

@@ -22,10 +22,10 @@ import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import nars.util.AbstractJoglPanel;
+import nars.util.AbstractJoglWindow;
 
 
-public class Picking extends AbstractJoglPanel implements MouseListener {
+public class Picking extends AbstractJoglWindow implements MouseListener {
     public static void main(String[] args) {
         new Picking().show(800, 800);
     }

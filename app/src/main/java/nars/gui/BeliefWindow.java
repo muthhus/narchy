@@ -1,12 +1,12 @@
-package nars.util;
+package nars.gui;
 
 import com.jogamp.opengl.*;
-import jogamp.opengl.es3.GLES3Impl;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
+import nars.util.AbstractJoglWindow2D;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,25 +16,28 @@ import static java.lang.Math.PI;
 import static nars.nal.Tense.ETERNAL;
 
 
-public class BeliefPanel extends AbstractJoglPanel  {
+public class BeliefWindow extends AbstractJoglWindow2D {
 
     final List<? extends Concept> c;
     final List<TruthWave> beliefs;
     final List<TruthWave> goals;
 
+    final AtomicBoolean redraw;
 
 
     private final NAR nar;
     private long now;
 
-    public BeliefPanel(NAR n, Concept c) {
+    public BeliefWindow(NAR n, Concept c) {
         this(n, Collections.singletonList(c));
     }
 
-    public BeliefPanel(NAR n, List<? extends Concept> c) {
+    public BeliefWindow(NAR n, List<? extends Concept> c) {
         super();
         this.c =c;
         this.nar = n;
+
+        redraw = new AtomicBoolean(false);
 
         beliefs = Global.newArrayList();
         goals = Global.newArrayList();
@@ -48,6 +51,9 @@ public class BeliefPanel extends AbstractJoglPanel  {
         n.onFrame(nn -> {
             update();
         });
+
+        redraw.set(true);
+
     }
 
 
@@ -98,11 +104,6 @@ public class BeliefPanel extends AbstractJoglPanel  {
         gl.glColor4f(1f, 1f, 1f, 0.3f);
         strokeRect(gl, 0, 0, gew, geh);
         strokeRect(gl, gew, 0, tew, teh);
-
-    }
-
-    @Override
-    public void init(GLAutoDrawable gl) {
 
     }
 
@@ -161,32 +162,6 @@ public class BeliefPanel extends AbstractJoglPanel  {
 
     }
 
-    @Override
-    public void reshape(GLAutoDrawable ad, int i, int i1, int i2, int i3) {
-
-        GL2 gl = (GL2) ad.getGL();
-
-
-        gl.glEnable(GL2.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
-        gl.glClearColor(0, 0, 0, 0);
-
-        gl.glViewport(0, 0, getWidth(), getHeight());
-
-
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        gl.glOrtho(0, getWidth(), 0, getHeight(), 1, -1);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-        redraw.set(true);
-    }
-
-
 
 //    final static ColorMatrix beliefColors = new ColorMatrix(8, 8, (f, c) ->
 //            new Color(0.6f + 0.38f * c, 0.2f, 1f, 0.39f + 0.6f * c)
@@ -233,35 +208,7 @@ public class BeliefPanel extends AbstractJoglPanel  {
         line(gl, dx1+bcx, dy1+bcy, -dx1+bcx, -dy1+bcy);
     }
 
-    @Deprecated protected static void line(GL2 gl, double x1, double y1, double x2, double y2) {
-        line(gl, (float)x1, (float)y1, (float)x2, (float)y2 );
-    }
-
-    protected static void line(GL2 gl, float x1, float y1, float x2, float y2) {
-        gl.glBegin(GL2.GL_LINES);
-        gl.glVertex2f(x1, y1);
-        gl.glVertex2f(x2, y2);
-        gl.glEnd();
-    }
-    protected static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {
-        line(gl, x1, y1, x1 + w, y1);
-        line(gl, x1, y1, x1, y1 + h);
-        line(gl, x1, y1+h, x1+w, y1 + h);
-        line(gl, x1+w, y1, x1+w, y1 + h);
-    }
-
-    protected static void rect(GL2 gl, double x1, double y1, double w, double h) {
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2d(x1, y1);
-        gl.glVertex2d(x1+w, y1);
-        gl.glVertex2d(x1+w, y1+h);
-        gl.glVertex2d(x1, y1+h);
-        gl.glEnd();
-    }
-
     final float padding = 4;
-
-    final AtomicBoolean redraw = new AtomicBoolean(true);
 
     public void update() {
 
@@ -274,8 +221,18 @@ public class BeliefPanel extends AbstractJoglPanel  {
             goals.get(i).set(c.goals(), now);
         }
 
-        redraw.set(true);
+        ready();
 
+    }
+
+    @Override
+    public void reshape(GLAutoDrawable ad, int i, int i1, int i2, int i3) {
+        super.reshape(ad, i, i1, i2, i3);
+        ready();
+    }
+
+    public void ready() {
+        redraw.set(true);
     }
 
     private void renderTable(long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave table, TaskRenderer r) {

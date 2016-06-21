@@ -119,7 +119,7 @@ public abstract class AbstractCore {
             tasklinkUpdate.cycle(subCycle);
             conceptUpdate.cycle(subCycle);
 
-            conceptUpdate.update(concepts, cycleNum == 0 ? true : false);
+            conceptUpdate.update(concepts, cycleNum == (cycles-1) ? true : false);
 
             concepts.sample(cpf, this::fireConcept);
         }

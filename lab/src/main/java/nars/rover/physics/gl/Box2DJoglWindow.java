@@ -6,7 +6,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import nars.rover.Sim;
 import nars.rover.physics.Display;
-import nars.util.AbstractJoglPanel;
+import nars.util.AbstractJoglWindow;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
@@ -16,7 +16,7 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /* generic box2d physics-executing panel */
-public class Box2DJoglPanel extends AbstractJoglPanel implements Display {
+public class Box2DJoglWindow extends AbstractJoglWindow implements Display {
 
 
 	//final Space2D sg = new DemoTextButton().getSpace();
@@ -26,11 +26,11 @@ public class Box2DJoglPanel extends AbstractJoglPanel implements Display {
 	private Point center;
 	private int w = 1024, h = 768;
 
-	public Box2DJoglPanel(final Sim sim) {
+	public Box2DJoglWindow(final Sim sim) {
 		this(sim.world);
 	}
 
-	public Box2DJoglPanel(final World2D world) {
+	public Box2DJoglWindow(final World2D world) {
 		super();
 		this.world = world;
 		this.draw = new JoglDraw(this);

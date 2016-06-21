@@ -7,13 +7,11 @@ package com.github.lerks.pong;/*
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import javafx.scene.layout.BorderPane;
 import nars.$;
 import nars.NAR;
-import nars.concept.Concept;
-import nars.gui.JoglGraphPanel;
+import nars.gui.BeliefWindow;
+import nars.gui.JoglGraphWindow;
 import nars.guifx.chart.MatrixImage;
-import nars.guifx.util.ColorArray;
 import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
@@ -24,15 +22,11 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
-import nars.truth.Truth;
-import nars.util.FX;
 import nars.agent.NAgent;
 import nars.vision.SwingCamera;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.function.Consumer;
@@ -72,7 +66,7 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.5f);
+		nar.conceptActivation.setValue(0.01f);
 		nar.beliefConfidence(0.95f);
 		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
@@ -95,12 +89,11 @@ public class PongEnvironment extends Player implements Environment {
 
 		PongEnvironment e = new PongEnvironment();
 
-//		a.nar.runLater(()->{
-//			new BeliefPanel(a.nar, a.actions).show(400, 100);
-//		});
+		a.nar.runLater(()->{
+			//new BeliefWindow(a.nar, a.actions).show(400, 100);
+		});
 
-		new JoglGraphPanel(new JoglGraphPanel.ConceptsSource(nar, 512)).show(800, 500);
-
+		new JoglGraphWindow(new JoglGraphWindow.ConceptsSource(nar, 256)).show(800, 500);
 
 		e.run(a, 164*8);
 

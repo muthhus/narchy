@@ -1,7 +1,7 @@
 package nars.rover.physics.gl;
 
 import com.jogamp.opengl.GL2;
-import nars.util.AbstractJoglPanel;
+import nars.util.AbstractJoglWindow;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -13,10 +13,10 @@ import org.jbox2d.particle.ParticleColor;
  *
  */
 public class JoglDraw extends JoglAbstractDraw {
-    private final AbstractJoglPanel panel;
+    private final AbstractJoglWindow panel;
     private GL2 gl;
 
-    public JoglDraw(AbstractJoglPanel panel) {
+    public JoglDraw(AbstractJoglWindow panel) {
         this.panel = panel;
     }
 

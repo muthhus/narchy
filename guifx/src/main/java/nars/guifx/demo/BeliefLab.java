@@ -1,10 +1,8 @@
 package nars.guifx.demo;
 
 import nars.concept.Concept;
-import nars.guifx.NARfx;
 import nars.nar.Default;
-import nars.util.BeliefPanel;
-import nars.util.FX;
+import nars.gui.BeliefWindow;
 import nars.util.Texts;
 
 /**
@@ -69,7 +67,7 @@ public class BeliefLab {
             }
         });
 
-        new BeliefPanel(nar, c).show(400, 100);
+        new BeliefWindow(nar, c).show(400, 100);
 
 
 

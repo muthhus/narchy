@@ -34,14 +34,14 @@ import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import nars.util.AbstractJoglPanel;
+import nars.util.AbstractJoglWindow;
 
 import javax.swing.*;
 
 /**
  * @author Abdul Bezrati
  */
-public class Lesson12 extends AbstractJoglPanel implements KeyListener {
+public class Lesson12 extends AbstractJoglWindow implements KeyListener {
 
     public static void main(String[] args) {
         new Lesson12().show(500, 500);
