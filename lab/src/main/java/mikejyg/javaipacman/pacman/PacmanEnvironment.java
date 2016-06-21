@@ -26,6 +26,7 @@ import nars.NAR;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
@@ -60,8 +61,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Multi nar = new Multi(4,
-		Default nar = new Default(
+		Multi nar = new Multi(2,
+		//Default nar = new Default(
 				1024, 4, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
@@ -78,7 +79,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(64);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);

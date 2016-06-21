@@ -23,6 +23,7 @@ package nars.truth;
 import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
+import nars.task.Task;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -541,5 +542,13 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     public static float c2w(float c) {
         return Global.HORIZON * c / (1 - Math.min(c, 1.0f - Global.TRUTH_EPSILON));
+    }
+
+    public static float and(Truthed... tt) {
+        float c = 1f;
+        for (Truthed x : tt) {
+            c *= x.conf();
+        }
+        return c;
     }
 }

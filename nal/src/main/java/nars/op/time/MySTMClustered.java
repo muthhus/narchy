@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
+import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,7 +67,8 @@ public class MySTMClustered extends STMClustered {
 
 					Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
 
-					float confMin = (float) Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
+					//float confMin = (float) Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
+					float conf = TruthFunctions.and(tt); //used for emulation of 'intersection' truth function
 
 					long[] evidence = Stamp.zip(Stream.of(tt), tt.length, Global.STAMP_MAX_EVIDENCE);
 
@@ -81,7 +83,7 @@ public class MySTMClustered extends STMClustered {
 					long t = Math.round(node.coherence(0)[0]);
 
 					Task m = new MutableTask(conj, punc,
-							new DefaultTruth(finalFreq, confMin)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+							new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 							.time(now, t)
 							.evidence(evidence)
 							.budget(BudgetFunctions.taxCollection(tt, 1f / s.length))

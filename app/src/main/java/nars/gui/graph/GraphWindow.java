@@ -10,6 +10,7 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.Concept;
+import nars.gui.graph.layout.FastOrganicLayout;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -36,14 +37,14 @@ public class GraphWindow extends AbstractJoglWindow {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 4, 3, 3);
+        Default n = new Default(1024, 1, 2, 3);
 
         //n.log();
 
         new DeductiveMeshTest(n, new int[]{6, 5}, 16384);
 
 
-        final int maxNodes = 1024;
+        final int maxNodes = 64;
 
         new GraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
         n.loop(15f);
@@ -59,7 +60,8 @@ public class GraphWindow extends AbstractJoglWindow {
     int maxEdgesPerVertex = 8;
 
     List<GraphLayout> layout = Lists.newArrayList(
-        new Spiral()
+        //new Spiral()
+        new FastOrganicLayout()
     );
 
     private int box, top;
@@ -137,7 +139,7 @@ public class GraphWindow extends AbstractJoglWindow {
         int maxEdges = v.edges.length;
 
         tasklinks.topWhile(v::addTaskLink, maxEdges / 2);
-        termlinks.topWhile(v::addTermLink, maxEdges - v.numEdges()); //fill remaining edges
+        termlinks.topWhile(v::addTermLink, maxEdges - v.edgeCount()); //fill remaining edges
 
     }
 
@@ -167,17 +169,12 @@ public class GraphWindow extends AbstractJoglWindow {
     public static final class VDraw {
         public final nars.term.Termed key;
         public final int hash;
-        public final EDraw[] edges;
+        @NotNull public final EDraw[] edges;
 
         /**
-         * current x, y, z
+         * position: x, y, z
          */
-        public float p[] = new float[3];
-
-        /**
-         * target x, y, z
-         */
-        public float tp[] = new float[3];
+        @NotNull public final float p[] = new float[3];
 
         public String label;
 
@@ -208,7 +205,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
         @Override
         public boolean equals(Object obj) {
-            return key.equals(((VDraw) obj).key);
+            return this == obj || key.equals(((VDraw) obj).key);
         }
 
         @Override
@@ -216,17 +213,6 @@ public class GraphWindow extends AbstractJoglWindow {
             return hash;
         }
 
-
-        /**
-         * nodeSpeed < 1.0
-         */
-        public void updatePosition(float nodeSpeed) {
-            float[] p = this.p;
-            float[] tp = this.tp;
-            for (int i = 0; i < 3; i++) {
-                p[i] = Util.lerp(tp[i], p[i], nodeSpeed);
-            }
-        }
 
         transient int numEdges = 0;
 
@@ -272,14 +258,13 @@ public class GraphWindow extends AbstractJoglWindow {
                 r = 0;
             }
 
-            ee[numEdges].set(target, width, r, g, b, 0.75f + 0.25f * (dur));
-            numEdges++;
+            ee[numEdges++].set(target, width, r, g, b, 0.75f + 0.25f * (dur));
 
             return true;
         }
 
         public void clearEdges(GraphWindow grapher) {
-            numEdges = 0;
+            this.numEdges = 0;
             this.grapher = grapher;
         }
 
@@ -291,18 +276,38 @@ public class GraphWindow extends AbstractJoglWindow {
             order = -1;
         }
 
-        public void move(float x, float y, float z, float nodeSpeed) {
-            float[] t = this.tp;
-            t[0] = x;
-            t[1] = y;
-            t[2] = z;
-            updatePosition(nodeSpeed);
+        public void move(float x, float y, float z) {
+            float[] p = this.p;
+            p[0] = x;
+            p[1] = y;
+            p[2] = z;
         }
 
-        public int numEdges() {
+        public void move(float tx, float ty, float tz, float rate) {
+            float[] p = this.p;
+            p[0] = Util.lerp(tx, p[0], rate);
+            p[1] = Util.lerp(ty, p[1], rate);
+            p[2] = Util.lerp(tz, p[2], rate);
+        }
+
+        public int edgeCount() {
             return numEdges;
         }
 
+        public float x() {  return p[0];        }
+        public float y() {  return p[1];        }
+        public float z() {  return p[2];        }
+
+        //TODO
+        public float width() {  return 1f;        }
+        public float height() {  return 1f;        }
+
+        public void moveDelta(float dx, float dy, float dz) {
+            float[] t = this.p;
+            t[0] += dx;
+            t[1] += dy;
+            t[2] += dz;
+        }
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -413,7 +418,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
     float r0 = 0f;
 
-    public void display(GLAutoDrawable drawable) {
+    public synchronized void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
 
         clear(gl);
@@ -437,6 +442,8 @@ public class GraphWindow extends AbstractJoglWindow {
 
         List<VDraw> toDraw = s.visible;
 
+        s.busy.set(true);
+
         update(toDraw, dt);
 
         for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
@@ -448,7 +455,7 @@ public class GraphWindow extends AbstractJoglWindow {
             gl.glPopMatrix();
         }
 
-        s.ready.set(true);
+        s.busy.set(false);
     }
 
     public void render(GL2 gl, float dt, VDraw v) {
@@ -456,7 +463,7 @@ public class GraphWindow extends AbstractJoglWindow {
         float[] pp = v.p;
         float x = pp[0], y = pp[1], z = pp[2];
 
-        int n = v.numEdges();
+        int n = v.edgeCount();
         EDraw[] eee = v.edges;
         for (int en = 0; en < n; en++) {
             EDraw e = eee[en];
@@ -563,7 +570,7 @@ public class GraphWindow extends AbstractJoglWindow {
         //private String keywordFilter;
         //private final ConceptFilter eachConcept = new ConceptFilter();
 
-        final AtomicBoolean ready = new AtomicBoolean(false);
+        final AtomicBoolean busy = new AtomicBoolean(true);
         private long now;
         private GraphWindow grapher;
         private float dt;
@@ -577,9 +584,8 @@ public class GraphWindow extends AbstractJoglWindow {
             this.capacity = maxNodes;
 
             nar.onFrame(nn -> {
-                if (ready.get()) {
+                if (!busy.get()) {
                     update();
-                    ready.set(false);
                 }
             });
 
@@ -591,7 +597,6 @@ public class GraphWindow extends AbstractJoglWindow {
 
         public void start(GraphWindow grapher) {
             this.grapher = grapher;
-            ready.set(true);
         }
 
         public void stop() {
@@ -722,16 +727,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
             FasterList<VDraw> v = visible = new FasterList(capacity);
             Bag<Concept> x = ((Default) nar).core.concepts;
-            x.topWhile((BLink<Concept> b) -> {
-                float pri = b.pri();
-                if (pri != pri) {
-                    //throw new RuntimeException("deleted item: " + b);
-                    return true;
-                }
-
-                return v.add(grapher.update(visible.size(), b));
-
-            }, capacity);
+            x.topWhile(this::accept, capacity);
 
             GraphWindow g = grapher;
             for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
@@ -739,6 +735,17 @@ public class GraphWindow extends AbstractJoglWindow {
             }
         }
 
+        public boolean accept(BLink<Concept> b) {
+
+            float pri = b.pri();
+            if (pri != pri) {
+                //throw new RuntimeException("deleted item: " + b);
+                return true;
+            }
+
+            FasterList<VDraw> v = this.visible;
+            return v.add(grapher.update(v.size(), b));
+        }
 
         public long time() {
             return nar.time();

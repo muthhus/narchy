@@ -1,4 +1,7 @@
-package nars.gui.graph;
+package nars.gui.graph.layout;
+
+import nars.gui.graph.GraphLayout;
+import nars.gui.graph.GraphWindow;
 
 import java.util.List;
 
