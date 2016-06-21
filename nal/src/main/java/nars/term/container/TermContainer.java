@@ -82,7 +82,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return (ti.op() == o);
     }*/
 
-    @Nullable
+    @Override @Nullable
     default Term termOr(int i, @Nullable Term ifOutOfBounds) {
         return size() <= i ? ifOutOfBounds : term(i);
     }

@@ -23,6 +23,7 @@ package nars.term;
 
 import nars.Op;
 import nars.term.variable.Variable;
+import nars.util.data.array.IntArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -279,6 +280,15 @@ public interface Term extends Termed, Termlike {
 //    default public boolean hasAny(final Op... op) {
 //        //TODO
 //    }
+
+    /** returns an int[] path to the first occurrence of the specified subterm
+     * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
+     */
+    @Nullable default int[] pathTo(Term subterm) {
+        if (subterm.equals(this))
+            return IntArrays.EMPTY_ARRAY;
+        return null;
+    }
 
 }
 

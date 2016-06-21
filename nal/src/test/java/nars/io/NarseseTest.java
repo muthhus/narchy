@@ -137,7 +137,7 @@ public class NarseseTest {
     public void testNoBudget() throws Narsese.NarseseException {
         Task t = task("<a <=> b>. %0.00;0.93");
         assertNotNull(t);
-        assertEquals(Op.EQUIV, t.op());
+        assertEquals(Op.EQUI, t.op());
 
         assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
@@ -214,13 +214,13 @@ public class NarseseTest {
     @Test
     public void testInfix2() throws Narsese.NarseseException {
         Compound t = term("(x & y)");
-        assertEquals(Op.SECTEXT, t.op());
+        assertEquals(Op.SECTe, t.op());
         assertEquals(2, t.size());
         assertEquals("x", t.term(0).toString());
         assertEquals("y", t.term(1).toString());
 
         Compound a = term("(x | y)");
-        assertEquals(Op.SECTINT, a.op());
+        assertEquals(Op.SECTi, a.op());
         assertEquals(2, a.size());
 
         Compound b = term("(x * y)");
@@ -351,12 +351,12 @@ public class NarseseTest {
     @Test
     public void testSet() {
         Compound xInt = term("[x]");
-        assertEquals(Op.SETINT, xInt.op());
+        assertEquals(Op.SETi, xInt.op());
         assertEquals(1, xInt.size());
         assertEquals("x", xInt.term(0).toString());
 
         Compound xExt = term("{x}");
-        assertEquals(Op.SETEXT, xExt.op());
+        assertEquals(Op.SETe, xExt.op());
         assertEquals(1, xExt.size());
         assertEquals("x", xExt.term(0).toString());
 

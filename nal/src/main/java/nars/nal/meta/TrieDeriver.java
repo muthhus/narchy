@@ -6,7 +6,7 @@ import nars.Global;
 import nars.Op;
 import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTermPrototype;
-import nars.nal.meta.op.SubTermOp;
+import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.nal.op.Derive;
 import nars.term.Term;
 import nars.util.data.Util;
@@ -139,15 +139,15 @@ public class TrieDeriver extends Deriver {
 
     @NotNull
     private List<ProcTerm> factorSubOpToSwitch(@NotNull List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
-        Map<SubTermOp, ProcTerm> cases = Global.newHashMap();
+        Map<PatternOp, ProcTerm> cases = Global.newHashMap();
         List<ProcTerm> removed = Global.newArrayList(); //in order to undo
         bb.removeIf(p -> {
             if (p instanceof IfThen) {
                 IfThen ii = (IfThen) p;
                 BoolCondition cond = ii.cond;
                 ProcTerm cnsq = ii.conseq;
-                if (cond instanceof SubTermOp) {
-                    SubTermOp so = (SubTermOp) cond;
+                if (cond instanceof PatternOp) {
+                    PatternOp so = (PatternOp) cond;
                     if (so.subterm == subterm) {
                         if (null == cases.putIfAbsent(so, cnsq)) {
                             removed.add(p);
@@ -158,8 +158,8 @@ public class TrieDeriver extends Deriver {
                     //TODO extract it
                     AndCondition ac = (AndCondition)cond;
                     if (ac.or(x -> {
-                        if (x instanceof SubTermOp) {
-                            SubTermOp so = (SubTermOp)x;
+                        if (x instanceof PatternOp) {
+                            PatternOp so = (PatternOp)x;
                             if (so.subterm == subterm) {
                                 if (null == cases.putIfAbsent(so, new IfThen(ac.without(so), cnsq) )) {
                                     removed.add(p);
@@ -181,7 +181,7 @@ public class TrieDeriver extends Deriver {
             if (cases.size()!=removed.size()) {
                 throw new RuntimeException("switch fault");
             }
-            bb.add(new SubTermOpSwitch(subterm, cases));
+            bb.add(new PatternOpSwitch(subterm, cases));
         } else {
             bb.addAll(removed); //undo
         }
@@ -227,8 +227,8 @@ public class TrieDeriver extends Deriver {
                 termCache[i] = build(b);
             }
 
-        } else if (p instanceof SubTermOpSwitch) {
-            SubTermOpSwitch sw = (SubTermOpSwitch) p;
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
             ProcTerm[] proc = sw.proc;
             for (int i = 0; i < proc.length; i++) {
                 ProcTerm b = proc[i];
@@ -290,8 +290,8 @@ public class TrieDeriver extends Deriver {
             }
             indent(indent); out.println("}");
 
-        } else if (p instanceof SubTermOpSwitch) {
-            SubTermOpSwitch sw = (SubTermOpSwitch) p;
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
             indent(indent); out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
             for (ProcTerm b : sw.proc) {

@@ -38,37 +38,54 @@ public enum Op {
     INH("-->", 1, OpType.Relation, Args.Two),
     SIM("<->", true, 2, OpType.Relation, Args.Two),
 
-    SECTEXT("&", true, 3, Args.GTETwo),
-    SECTINT("|", true, 3, Args.GTETwo),
+    /** extensional intersection */
+    SECTe("&", true, 3, Args.GTETwo),
 
-    DIFEXT("-", 3, Args.Two),
-    DIFINT("~", 3, Args.Two),
+    /** intensional intersection */
+    SECTi("|", true, 3, Args.GTETwo),
 
+    /** extensional difference */
+    DIFFe("-", 3, Args.Two),
+
+    /** intensional difference */
+    DIFFi("~", 3, Args.Two),
+
+    /** PRODUCT */
     PROD("*", 4, Args.GTEZero),
 
-    IMGEXT("/", 4, Args.GTEOne),
-    IMGINT("\\", 4, Args.GTEOne),
+    /** extensional image */
+    IMGe("/", 4, Args.GTEOne),
 
-    /* CompoundStatement operators, length = 2 */
+    /** intensional image */
+    IMGi("\\", 4, Args.GTEOne),
+
+    /** disjunction */
     DISJ("||", true, 5, Args.GTETwo),
+
+    /** conjunction */
     CONJ("&&", true, 5, Args.GTETwo),
 
     //SPACE("+", true, 7, Args.GTEOne),
 
 
-    SETINT("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
-    SETEXT("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    /** intensional set */
+    SETi("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+
+    /** extensional set */
+    SETe("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
 
+    /** implication */
     IMPL("==>", 5, OpType.Relation, Args.Two),
 
-    EQUIV("<=>", true, 5, OpType.Relation, Args.Two),
+    /** equivalence */
+    EQUI("<=>", true, 5, OpType.Relation, Args.Two),
 
 
     // keep all items which are invlved in the lower 32 bit structuralHash above this line
     // so that any of their ordinal values will not exceed 31
     //-------------
-    NONE('\u2205', Op.ANY, null),
+    //NONE('\u2205', Op.ANY, null),
 
     VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
 
@@ -268,7 +285,7 @@ public enum Op {
     }
 
     public final boolean isImage() {
-        return this == Op.IMGEXT || this == Op.IMGINT;
+        return this == Op.IMGe || this == Op.IMGi;
         //return in(ImageBits);
     }
 
@@ -321,7 +338,7 @@ public enum Op {
 //            Op.or(Op.EQUIV);
 
     public static final int SetsBits =
-            Op.or(Op.SETEXT, Op.SETINT);
+            Op.or(Op.SETe, Op.SETi);
 
     /** all Operations will have these 3 elements in its subterms: */
     public static final int OperationBits =
@@ -329,17 +346,17 @@ public enum Op {
 
     public static final int StatementBits =
             Op.or(Op.INH, Op.SIM,
-                    Op.EQUIV,
+                    Op.EQUI,
                     Op.IMPL
             );
 
 //    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
 //    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPL);
-    public static final int TemporalBits = or(Op.CONJ, Op.EQUIV, Op.IMPL);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
+    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
 
     public static final int ImageBits =
-        Op.or(Op.IMGEXT,Op.IMGINT);
+        Op.or(Op.IMGe,Op.IMGi);
 
     public static final int VariableBits =
         Op.or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);

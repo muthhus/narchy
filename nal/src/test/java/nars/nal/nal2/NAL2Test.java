@@ -80,6 +80,7 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void resemblance() throws Narsese.NarseseException {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<robin <-> swan>");//Robin is similar to swan.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
         tester.mustBelieve(cycles, "<gull <-> robin>", 1.0f, 0.81f);//Gull is similar to robin.");

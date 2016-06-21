@@ -32,6 +32,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import nars.util.data.Util;
+import nars.util.data.array.IntArrays;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -121,6 +122,35 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return hashCode();
     }
 
+    @Nullable default int[] pathTo(Term subterm) {
+        if (subterm.equals(this)) return IntArrays.EMPTY_ARRAY;
+        if (!containsTermRecursively(subterm)) return null;
+        return pathTo(new IntArrayList(0), this, subterm);
+    }
+
+    static int[] pathTo(IntArrayList p, Term superTerm, Term target) {
+        if (superTerm instanceof Compound) {
+            Compound cc = (Compound)superTerm;
+            for (int i = 0; i < cc.size(); i++) {
+                Term s = cc.term(i);
+                if (s.equals(target)) {
+                    p.add(i);
+                    return p.toArray();
+                }
+                if (s instanceof Compound) {
+                    Compound cs = (Compound) s;
+                    if (cs.containsTermRecursively(target)) {
+                        p.add(i);
+                        return pathTo(p, cs, target);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+
     /**
      * unification matching entry point (default implementation)
      *
@@ -189,18 +219,18 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * returns null if specified subterm does not exist
      */
     @Nullable
-    default <X extends Term> X subterm(@NotNull int... path) {
+    default Term subterm(@NotNull int... path) {
         Term ptr = this;
         for (int i : path) {
-            //if (ptr instanceof TermContainer) {
-            if (null == (ptr = ((TermContainer) ptr).termOr(i, null)))
+            if ((ptr = ptr.termOr(i, null))==null)
                 return null;
-            //}
         }
-        return (X) ptr;
+        return ptr;
     }
 
-
+    default Term termOr(int i, @Nullable Term ifOutOfBounds) {
+        return subterms().termOr(i, ifOutOfBounds);
+    }
 
 
     @NotNull

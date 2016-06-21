@@ -55,8 +55,8 @@ public abstract class TermBuilder {
             case DISJ:
                 return junction(op, dt, u);
 
-            case IMGINT:
-            case IMGEXT:
+            case IMGi:
+            case IMGe:
                 //if no relation was specified and it's an Image,
                 //it must contain a _ placeholder
                 if (hasImdex(u)) {
@@ -69,17 +69,17 @@ public abstract class TermBuilder {
                 }
 
 
-            case DIFEXT:
-            case DIFINT:
+            case DIFFe:
+            case DIFFi:
                 return newDiff(op, tt);
-            case SECTEXT:
+            case SECTe:
                 return newIntersectEXT(u);
-            case SECTINT:
+            case SECTi:
                 return newIntersectINT(u);
 
             case INH:
             case SIM:
-            case EQUIV:
+            case EQUI:
             case IMPL:
                 return statement(op, dt, u);
 
@@ -142,7 +142,7 @@ public abstract class TermBuilder {
     public Term newDiff(@NotNull Op op, @NotNull TermContainer tt) {
 
         //corresponding set type for reduction:
-        Op set = op == DIFEXT ? SETEXT : SETINT;
+        Op set = op == DIFFe ? SETe : SETi;
 
         Term[] t = tt.terms();
         switch (t.length) {
@@ -202,17 +202,17 @@ public abstract class TermBuilder {
 
     @Nullable
     public Compound inst(Term subj, Term pred) {
-        return (Compound) build(INH, TermVector.the(build(SETEXT, subj), pred));
+        return (Compound) build(INH, TermVector.the(build(SETe, subj), pred));
     }
 
     @Nullable
     public Compound prop(Term subj, Term pred) {
-        return (Compound) build(INH, TermVector.the(subj, build(SETINT, pred)));
+        return (Compound) build(INH, TermVector.the(subj, build(SETi, pred)));
     }
 
     @Nullable
     public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) build(INH, TermVector.the(build(SETEXT, subj), build(SETINT, pred)));
+        return (Compound) build(INH, TermVector.the(build(SETe, subj), build(SETi, pred)));
     }
 
     @Nullable
@@ -405,7 +405,7 @@ public abstract class TermBuilder {
         switch (op) {
 
 
-            case EQUIV:
+            case EQUI:
                 if (!validEquivalenceTerm(subject)) return null;
                 if (!validEquivalenceTerm(predicate)) return null;
                 break;
@@ -485,17 +485,17 @@ public abstract class TermBuilder {
     @Nullable
     public Term newIntersectINT(@NotNull Term[] t) {
         return newIntersection(t,
-                SECTINT,
-                SETINT,
-                SETEXT);
+                SECTi,
+                SETi,
+                SETe);
     }
 
     @Nullable
     public Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
-                SECTEXT,
-                SETEXT,
-                SETINT);
+                SECTe,
+                SETe,
+                SETi);
     }
 
     @Nullable

@@ -249,26 +249,26 @@ public class PrologCore extends Agent implements Consumer<Task> {
                     case "<->":
                         return theTwoArity(Op.SIM, s);
                     case "<=>":
-                        return theTwoArity(Op.EQUIV, s);
+                        return theTwoArity(Op.EQUI, s);
                     case "==>":
                         return theTwoArity(Op.IMPL, s);
 
                     case "~":
-                        return theTwoArity(Op.DIFINT, s);
+                        return theTwoArity(Op.DIFFi, s);
                     case "-":
-                        return theTwoArity(Op.DIFEXT, s);
+                        return theTwoArity(Op.DIFFe, s);
 
 
 
                     case "[":
-                        return $.the(Op.SETINT, the(nterms(s)));
+                        return $.the(Op.SETi, the(nterms(s)));
                     case "{":
-                        return $.the(Op.SETEXT, the(nterms(s)));
+                        return $.the(Op.SETe, the(nterms(s)));
 
                     case "&":
-                        return $.the(Op.SECTEXT, the(nterms(s)));
+                        return $.the(Op.SECTe, the(nterms(s)));
                     case "|":
-                        return $.the(Op.SECTINT, the(nterms(s)));
+                        return $.the(Op.SECTi, the(nterms(s)));
 
                     case "*":
                         return $.the(Op.PROD, the(nterms(s)));

@@ -346,7 +346,7 @@ public abstract class NQuadsRDF {
         }
         else if (predicate.equals(equivalentClass)) {
 
-            belief = equiv(
+            belief = equi(
                 inst(varIndep(1), subject),
                 inst(varIndep(1), object)
             );
@@ -385,7 +385,7 @@ public abstract class NQuadsRDF {
         else if (predicate.equals(inverseOf)) {
 
             //PREDSUBJ(#subj, #obj) <=> PREDOBJ(#obj, #subj)
-            belief = equiv(
+            belief = equi(
                     subjObjInst(subject, '$', '$', false),
                     subjObjInst(object, '$', '$', true));
 

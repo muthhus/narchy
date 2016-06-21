@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
-import nars.nal.meta.op.SubTermOp;
+import nars.nal.meta.op.AbstractPatternOp;
+import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,13 +10,13 @@ import java.util.Map;
 /**
  * Created by me on 5/21/16.
  */
-public final class SubTermOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements ProcTerm {
+public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements ProcTerm {
 
     final ProcTerm[] proc = new ProcTerm[32]; //should be large enough
     public final int subterm;
 
 
-    public SubTermOpSwitch(int subterm, @NotNull Map<SubTermOp, ProcTerm> cases) {
+    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, ProcTerm> cases) {
         super("\"" + cases.toString() + "\"");
 
         this.subterm = subterm;

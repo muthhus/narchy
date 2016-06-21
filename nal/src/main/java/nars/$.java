@@ -99,6 +99,10 @@ public enum $ {
     public static Atom the(int i) {
         return the(i, 10);
     }
+    @NotNull
+    public static Atom the(char c) {
+        return the(String.valueOf(c));
+    }
 
     /**
      * Op.INHERITANCE from 2 Terms: subj --> pred
@@ -110,7 +114,6 @@ public enum $ {
 //        if ((predicate instanceof Operator) && if (subject instanceof Product))
 //            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
 //        else
-
         return (Compound) the(INH, subj, pred);
     }
 
@@ -284,7 +287,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SETEXT, (Collection)t);
+        return (Compound) the(SETe, (Collection)t);
     }
 
     /** construct set_ext of key,value pairs from a Map */
@@ -316,7 +319,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(Term... t) {
-        return (Compound) the(SETEXT, t);
+        return (Compound) the(SETe, t);
 
     }
 
@@ -328,7 +331,7 @@ public enum $ {
 
     @NotNull
     public static Compound seti(Term... t) {
-        return (Compound) the(SETINT, t);
+        return (Compound) the(SETi, t);
     }
 
 //    /**
@@ -470,38 +473,38 @@ public enum $ {
     }
 
     @Nullable
-    public static Term equiv(Term subject, Term pred) {
-        return the(EQUIV, subject, pred);
+    public static Term equi(Term subject, Term pred) {
+        return the(EQUI, subject, pred);
     }
 
     @Nullable
-    public static Term diffInt(Term a, Term b) {
-        return the(DIFINT, a, b);
+    public static Term diffi(Term a, Term b) {
+        return the(DIFFi, a, b);
     }
 
     @Nullable
-    public static Term diffExt(Term a, Term b) {
-        return the(DIFEXT, a, b);
+    public static Term diffe(Term a, Term b) {
+        return the(DIFFe, a, b);
     }
 
     @Nullable
-    public static Term imageExt(Term... x) {
-        return the(IMGEXT, x);
+    public static Term imge(Term... x) {
+        return the(IMGe, x);
     }
     @Nullable
-    public static Term imageInt(Term... x) {
-        return the(IMGINT, x);
+    public static Term imgi(Term... x) {
+        return the(IMGi, x);
     }
 
     @Nullable
-    public static Term esect(Term... x) {
-        return the(SECTEXT, x);
+    public static Term secte(Term... x) {
+        return the(SECTe, x);
     }
 
 
 
     @Nullable
-    public static Term isect(Term... x) { return the(SECTINT, x); }
+    public static Term secti(Term... x) { return the(SECTi, x); }
 
 
     public static @NotNull Operator operator(@NotNull String name) {
@@ -659,7 +662,7 @@ public enum $ {
     public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, @NotNull Compound x) {
         return inh(
                 y,
-                imageExt(x, operation.term(1)  /* position of the variable */)
+                imge(x, operation.term(1)  /* position of the variable */)
         );
     }
 
@@ -672,7 +675,7 @@ public enum $ {
      * @return A compound generated or a term it reduced to
      */
     @Nullable
-    public static Term imageExt(@NotNull Compound product, @NotNull Term relation) {
+    public static Term imge(@NotNull Compound product, @NotNull Term relation) {
         int pl = product.size();
 //        if (relation.op(PRODUCT)) {
 //            Compound p2 = (Compound) relation;
@@ -692,7 +695,7 @@ public enum $ {
         argument[0] = relation;
         System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
 
-        return the(IMGEXT, argument);
+        return the(IMGe, argument);
     }
 
     @Nullable
@@ -700,7 +703,7 @@ public enum $ {
         return image(relation, true, elements);
     }
     @Nullable
-    public static Compound imageInt(int relation, Term... elements) {
+    public static Compound imgi(int relation, Term... elements) {
         return image(relation, false, elements);
     }
 
@@ -708,17 +711,17 @@ public enum $ {
     public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         Term related = elements[relation];
-        Term img = compound(ext ? IMGEXT : IMGINT, relation, elementsMasked);
+        Term img = compound(ext ? IMGe : IMGi, relation, elementsMasked);
 
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
     @Nullable
-    public static Compound imageExt(int relation, @NotNull Compound product) {
+    public static Compound imge(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PROD);
         return image(relation, true, product.terms());
     }
     @Nullable
-    public static Compound imageInt(int relation, @NotNull Compound product) {
+    public static Compound imgi(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PROD);
         return image(relation, false, product.terms());
     }

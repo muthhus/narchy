@@ -128,7 +128,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
         }
 
-        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUIV))
+        if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUI))
             throw new TermIndex.InvalidTaskTerm(t, "Goal/Quest task term may not be Implication or Equivalence");
 
         return t;

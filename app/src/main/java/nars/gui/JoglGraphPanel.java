@@ -1,4 +1,4 @@
-package nars.util.jogl;
+package nars.gui;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -19,6 +19,7 @@ import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
 import nars.util.event.Active;
+import nars.util.experiment.DeductiveMeshTest;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.util.jogl.tutorial.Lesson14.renderString;
+import static nars.gui.tutorial.Lesson14.renderString;
 
 /**
  * Created by me on 6/20/16.
@@ -39,35 +40,38 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024,8,1,3);
+        Default n = new Default(1024,8,3,3);
 
-        n.log();
+        //n.log();
 
-        n.input("<a <-> b>. :|:");
-        n.step();
-        n.input("<b --> c>. :|:");
-        n.step();
-        n.input("<c --> d>. :|:");
-        n.step();
-        n.input("<d --> a>. :|:");
-        n.step();
-        n.input("<(a,b) <-> c>?");
-        n.step();
-        n.input("<(a,b,#x) <-> d>!");
-        n.step();
-        n.input("<(a,?x,d) <-> e>. :|:");
-        n.input("<(a,?x,?y) --> {e,d,a}>. :|:");
-        n.step();
-        n.input("wtf(1,2,#x)!");
-        //n.input("<(c|a) --> (b&e)>! :|:");
-        //n.step();
-        //n.input("<x <-> a>! :|:");
-        //n.run(5);
+        new DeductiveMeshTest(n, new int[] { 6, 5 }, 16384);
+
+//        n.input("<a <-> b>. :|:");
+//        n.step();
+//        n.input("<b --> c>. :|:");
+//        n.step();
+//        n.input("<c --> d>. :|:");
+//        n.step();
+//        n.input("<d --> a>. :|:");
+//        n.step();
+//        n.input("<(a,b) <-> c>?");
+//        n.step();
+//        n.input("<(a,b,#x) <-> d>!");
+//        n.step();
+//        n.input("<(a,?x,d) <-> e>. :|:");
+//        n.input("<(a,?x,?y) --> {e,d,a}>. :|:");
+//        n.step();
+//        n.input("wtf(1,2,#x)!");
+//        //n.input("<(c|a) --> (b&e)>! :|:");
+//        //n.step();
+//        //n.input("<x <-> a>! :|:");
+//        //n.run(5);
 
 
+        final int maxNodes = 1024;
 
-        new JoglGraphPanel(new ConceptsSource(n)).show(500, 500);
-        n.loop(35f);
+        new JoglGraphPanel(new ConceptsSource(n, maxNodes)).show(500, 500);
+        n.loop(25f);
 
     }
 
@@ -77,7 +81,9 @@ public class JoglGraphPanel extends AbstractJoglPanel {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed,VDraw> vdraw;
 
-    float nodeSpeed = 0.05f;
+    int maxEdgesPerVertex = 16;
+
+    float nodeSpeed = 0.02f;
 
     private int box, top;
 
@@ -94,7 +100,8 @@ public class JoglGraphPanel extends AbstractJoglPanel {
     }
 
     public VDraw get(Termed t) {
-        return vdraw.computeIfAbsent(t, x -> new VDraw(x, 8));
+
+        return vdraw.computeIfAbsent(t, x -> new VDraw(x, maxEdgesPerVertex));
     }
 
     /** get the latest info into the draw object */
@@ -112,7 +119,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             Concept cc = (Concept)tt;
 
             @NotNull Bag<Termed> termlinks = cc.termlinks();
-            //@NotNull Bag<Task> tasklinks = cc.tasklinks();
+            @NotNull Bag<Task> tasklinks = cc.tasklinks();
 
             float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
             if (lastTermlinkForget != lastTermlinkForget)
@@ -122,7 +129,10 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             //float act = 1f / (1f + (timeSinceLastUpdate/3f));
 
             v.clearEdges();
-            termlinks.topWhile(v::addEdge);
+            v.setLimit(v.edges.length/2);
+            termlinks.topWhile(v::addTermLink);
+            v.setLimit(v.edges.length/2);
+            tasklinks.topWhile(v::addTaskLink);
             v.clearRemainingEdges();
         }
 
@@ -144,14 +154,14 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         //float ni = n / (float) Math.E;
         //final float bn = 1f;
 
-        float baseRad = 50f;
-        float rad = 50f;
+        float baseRad = 20f;
+        float rad = 35f;
         float p = v.pri;
         v.tp[0] = (float) Math.sin(hash/1024f) * (baseRad + rad * (p));
         v.tp[1] = (float) Math.cos(hash/1024f) * (baseRad + rad * (p));
         v.tp[2] =
                 //1f/(1f+v.lag) * (baseRad/2f);
-                v.budget.dur() * (baseRad);
+                v.budget.qua() * (baseRad + rad);
                 //v.tp[2] = act*10f;
 
 
@@ -175,6 +185,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         }
     }
 
+
     /** vertex draw info */
     public class VDraw {
         public final nars.term.Termed key;
@@ -194,7 +205,6 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
         /** measure of inactivity, in time units */
         public float lag;
-        private float baseLineWidth = 2f;
 
         public VDraw(nars.term.Termed k, int edges) {
             this.key = k;
@@ -226,18 +236,45 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         }
 
         transient int nextEdge = -1;
+        transient int edgeLimit = -1;
 
-        public boolean addEdge(BLink<Termed> l) {
+        public void setLimit(int e) { this.edgeLimit = e; }
 
-            @Nullable Termed ll = l.get();
-            if (ll == null)
-                return false;
+        public boolean addTermLink(BLink<Termed> ll) {
+            return addEdge(ll, ll.get(), false) && (edgeLimit-- > 0);
+        }
+        public boolean addTaskLink(BLink<Task> ll) {
+            @Nullable Task t = ll.get();
+            if (t == null)
+                return true;
+            return addEdge(ll, t.term(), true) && (edgeLimit-- > 0);
+        }
+
+        public boolean addEdge(BLink l, Termed ll, boolean task) {
+
+//            if (ll == null)
+//                return false;
 
             float pri = l.pri();
             float dur = l.dur();
+            float qua = l.qua();
+            float baseLineWidth = 3f;
+
             float width = baseLineWidth * (1f + pri) * (1f + dur);
-            edges[nextEdge++].set(get(ll), width, pri, dur, 0, l.qua());
-            return (nextEdge<edges.length);
+            int ne;
+            EDraw[] ee = this.edges;
+            float r, g, b;
+            if (task) {
+                r = pri;
+                g = dur/2f;
+                b = qua/2f;
+            } else {
+                b = pri;
+                g = dur/2f;
+                r = qua/2f;
+            }
+            ee[ne = nextEdge++].set(get(ll), width, r, g, b, dur * qua);
+            return (ne+1< ee.length);
 
         }
 
@@ -273,7 +310,6 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
 
-// Enable Material Coloring
         gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
 
@@ -360,16 +396,6 @@ public class JoglGraphPanel extends AbstractJoglPanel {
     }
 
 
-//    private void update() {
-//        if (decreaseX)
-//            xrot -= 8f;
-//        if (increaseX)
-//            xrot += 8f;
-//        if (decreaseY)
-//            yrot -= 8f;
-//        if (increaseY)
-//            yrot += 8f;
-//    }
 
     float r0 = 0f;
 
@@ -379,9 +405,9 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
 
         gl.glLoadIdentity();
-        gl.glTranslatef(0, 0, -90f);
-        gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
-        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
+        gl.glTranslatef(0, 0, -120f);
+        //gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
+        //gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
         gl.glRotatef(r0/2f, 0.0f, 0.0f, 1.0f);
         r0+=0.3f;
 
@@ -466,29 +492,6 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             s.ready.set(true);
         }
 
-        //gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[0]);
-//        int n = 8;
-//        for (yloop = 1; yloop < n; yloop++) {
-//            for (xloop = 0; xloop < yloop; xloop++) {
-//                gl.glLoadIdentity();
-//
-//                gl.glTranslatef(1.4f + (xloop * 2.8f) -
-//                        (yloop * 1.4f), ((6.0f - yloop) * 2.4f) - 7.0f, -20.0f);
-//
-//                gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
-//                gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
-//
-//                float s = (float)Math.random() + 0.5f;
-//                gl.glScalef(s, s, s);
-//
-//                gl.glColor3fv(boxcol[(yloop - 1)%boxcol.length], 0);
-//                gl.glCallList(box);
-//
-//                //gl.glColor3fv(topcol[yloop - 1], 0);
-//                //gl.glCallList(top);
-//            }
-//        }
-
     }
 
     public float h(float p) {
@@ -519,25 +522,19 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         public final NAR nar;
         private Active regs;
 
-        final int maxNodes = 512;
-        final int maxNodeLinks = 8; //per type
 
         public final MutableFloat maxPri = new MutableFloat(1.0f);
         public final MutableFloat minPri = new MutableFloat(0.0f);
-        //public final SimpleStringProperty includeString = new SimpleStringProperty("");
 
-//    private final BiFunction<TermNode, TermNode, TermEdge> edgeBuilder =
-//            TLinkEdge::new;
-
-        //private float _maxPri = 1f, _minPri;
-        protected final FasterList<BLink<? extends Termed>> concepts = new LimitedFasterList<>(maxNodes);
+        protected final FasterList<BLink<? extends Termed>> concepts;
         //private String keywordFilter;
         //private final ConceptFilter eachConcept = new ConceptFilter();
         public BLink<Termed>[] vertices;
         final AtomicBoolean ready = new AtomicBoolean(true);
 
-        public ConceptsSource(NAR nar) {
+        public ConceptsSource(NAR nar, int maxNodes) {
 
+            concepts = new LimitedFasterList<>(maxNodes);
             this.nar = nar;
 
             nar.onFrame(nn -> {

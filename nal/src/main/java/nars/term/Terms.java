@@ -182,42 +182,42 @@ public class Terms   {
         Op pbo = predB.op();
 
 
-        if ((sao == PROD) && (pbo == IMGEXT)) {
+        if ((sao == PROD) && (pbo == IMGe)) {
             ta = predA;
             sa = subjA;
             tb = subjB;
             sb = predB;
         }
 
-        if ((sbo == PROD) && (pao == IMGEXT)) {
+        if ((sbo == PROD) && (pao == IMGe)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pao == IMGEXT) && (pbo == IMGEXT)) {
+        if ((pao == IMGe) && (pbo == IMGe)) {
             ta = subjA;
             sa = predA;
             tb = subjB;
             sb = predB;
         }
 
-        if ((sao == IMGINT) && (sbo == IMGINT)) {
+        if ((sao == IMGi) && (sbo == IMGi)) {
             ta = predA;
             sa = subjA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pao == PROD) && (sbo == IMGINT)) {
+        if ((pao == PROD) && (sbo == IMGi)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((pbo == PROD) && (sao == IMGINT)) {
+        if ((pbo == PROD) && (sao == IMGi)) {
             ta = predA;
             sa = subjA;
             tb = subjB;

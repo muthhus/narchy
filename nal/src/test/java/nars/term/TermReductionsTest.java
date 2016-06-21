@@ -24,12 +24,12 @@ public class TermReductionsTest {
     @Test
     public void testIntersectExtReduction1() {
         // (&,R,(&,P,Q)) = (&,P,Q,R)
-        assertEquals("(&,P,Q,R)", esect(r, esect(p, q)).toString());
+        assertEquals("(&,P,Q,R)", secte(r, secte(p, q)).toString());
         assertEquals("(&,P,Q,R)", $("(&,R,(&,P,Q))").toString());
     }
     @Test public void testIntersectExtReduction2() {
         // (&,(&,P,Q),(&,R,S)) = (&,P,Q,R,S)
-        assertEquals("(&,P,Q,R,S)", esect(esect(p, q), esect(r, s)).toString());
+        assertEquals("(&,P,Q,R,S)", secte(secte(p, q), secte(r, s)).toString());
         assertEquals("(&,P,Q,R,S)", $("(&,(&,P,Q),(&,R,S))").toString());
     }
     @Test public void testIntersectExtReduction3() {
@@ -42,20 +42,20 @@ public class TermReductionsTest {
     }
     @Test public void testIntersectExtReduction4() {
         //UNION if (term1.op(Op.SET_INT) && term2.op(Op.SET_INT)) {
-        assertEquals("{P,Q,R,S}", esect(sete(p, q), sete(r, s)).toString());
+        assertEquals("{P,Q,R,S}", secte(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
-        assertEquals(null /* emptyset */, esect(seti(p, q), seti(r, s)));
+        assertEquals(null /* emptyset */, secte(seti(p, q), seti(r, s)));
 
     }
 
     @Test public void testIntersectIntReduction1() {
         // (|,R,(|,P,Q)) = (|,P,Q,R)
-        assertEquals("(|,P,Q,R)", isect(r, isect(p, q)).toString());
+        assertEquals("(|,P,Q,R)", secti(r, secti(p, q)).toString());
         assertEquals("(|,P,Q,R)", $("(|,R,(|,P,Q))").toString());
     }
     @Test public void testIntersectIntReduction2() {
         // (|,(|,P,Q),(|,R,S)) = (|,P,Q,R,S)
-        assertEquals("(|,P,Q,R,S)", isect(isect(p, q), isect(r, s)).toString());
+        assertEquals("(|,P,Q,R,S)", secti(secti(p, q), secti(r, s)).toString());
         assertEquals("(|,P,Q,R,S)", $("(|,(|,P,Q),(|,R,S))").toString());
     }
     @Test public void testIntersectIntReduction3() {
@@ -64,7 +64,7 @@ public class TermReductionsTest {
     }
     @Test public void testIntersectIntReduction4() {
         //UNION if (term1.op(Op.SET_INT) || term2.op(Op.SET_INT)) {
-        assertEquals("[P,Q,R,S]", isect(seti(p, q), seti(r, s)).toString());
+        assertEquals("[P,Q,R,S]", secti(seti(p, q), seti(r, s)).toString());
         assertEquals("[P,Q,R,S]", $("(|,[P,Q],[R,S])").toString());
 
     }
@@ -79,10 +79,10 @@ public class TermReductionsTest {
 
 
     @Test public void testInvalidEquivalences() {
-        assertEquals("(P<=>Q)", equiv(p, q).toString() );
+        assertEquals("(P<=>Q)", equi(p, q).toString() );
 
-        assertNull(equiv( impl(p, q), r) );
-        assertNull(equiv( equiv(p, q), r) );
+        assertNull(equi( impl(p, q), r) );
+        assertNull(equi( equi(p, q), r) );
         assertParseException("<<a <=> b> <=> c>");
     }
 
@@ -150,17 +150,17 @@ public class TermReductionsTest {
     }
 
     @Test public void testIntExtEqual() {
-        assertEquals(p, $.esect(p, p));
-        assertEquals(p, isect(p, p));
+        assertEquals(p, $.secte(p, p));
+        assertEquals(p, secti(p, p));
     }
 
     @Test public void testDiffIntEqual() {
 
-        assertEquals(null, diffInt(p, p));
+        assertEquals(null, diffi(p, p));
     }
     @Test public void testDiffExtEqual() {
 
-        assertEquals(null, diffExt(p, p));
+        assertEquals(null, diffe(p, p));
     }
     @Test public void testDifferenceSorted() {
 //        assertArrayEquals(
@@ -170,7 +170,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
             new Term[] { r, s },
-            TermContainer.difference(Op.SETEXT, sete(r, p, q, s), sete(p, q)).terms()
+            TermContainer.difference(Op.SETe, sete(r, p, q, s), sete(p, q)).terms()
         );
     }
     @Test public void testDifferenceSortedEmpty() {
@@ -181,7 +181,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
             null,
-            TermContainer.difference(Op.SETEXT, sete(p, q), sete(p, q))
+            TermContainer.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
 
@@ -195,7 +195,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Mars,Venus}"),
                 TermContainer.difference(
-                        Op.SETEXT,
+                        Op.SETe,
                         $("{Mars,Pluto,Venus}"),
                         $("{Pluto,Saturn}")
                 )
@@ -203,7 +203,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Saturn}"),
                 TermContainer.difference(
-                        Op.SETEXT,
+                        Op.SETe,
                         $("{Pluto,Saturn}"),
                         $("{Mars,Pluto,Venus}")
                 )
@@ -235,10 +235,10 @@ public class TermReductionsTest {
     @Test
     public void testDifferenceImmediate() {
 
-        Term d = diffInt(
+        Term d = diffi(
                 seti($("a"), $("b"), $("c")),
                 seti($("d"), $("b")));
-        assertEquals(Op.SETINT, d.op());
+        assertEquals(Op.SETi, d.op());
         assertEquals(d.toString(), 2, d.size());
         assertEquals("[a,c]", d.toString());
     }
@@ -249,8 +249,8 @@ public class TermReductionsTest {
 
         Compound a = $.sete($("a"), $("b"), $("c"));
         Compound b = $.sete($("d"), $("b"));
-        Term d = diffExt(a, b);
-        assertEquals(Op.SETEXT, d.op());
+        Term d = diffe(a, b);
+        assertEquals(Op.SETe, d.op());
         assertEquals(d.toString(), 2, d.size());
         assertEquals("{a,c}", d.toString());
 

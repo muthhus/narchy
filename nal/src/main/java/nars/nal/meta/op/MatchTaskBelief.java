@@ -14,6 +14,7 @@ import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
+import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.FindSubst;
@@ -160,9 +161,9 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         boolean belIsPatVar = belief!=null && belief.op() == Op.VAR_PATTERN;
 
         if (task!=null && !taskIsPatVar)
-            pre.add(new SubTermOp(0, task.op()));
+            pre.add(new PatternOp(0, task.op()));
         if (belief!=null && !belIsPatVar)
-            pre.add(new SubTermOp(1, belief.op()));
+            pre.add(new PatternOp(1, belief.op()));
 
         if (task!=null && !taskIsPatVar)
             pre.add(new SubTermStructure(0, task.structure()));

@@ -21,7 +21,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
@@ -483,18 +482,18 @@ public class Narsese extends BaseParser<Object> {
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg($.the(pop())))),
 
-                        seq(SETEXT.str,
+                        seq(SETe.str,
 
                                 firstOf(
-                                    EmptyCompound(SET_EXT_CLOSER, SETEXT),
-                                    MultiArgTerm(SETEXT, SET_EXT_CLOSER, false, false, false, false)
+                                    EmptyCompound(SET_EXT_CLOSER, SETe),
+                                    MultiArgTerm(SETe, SET_EXT_CLOSER, false, false, false, false)
                                 )
                         ),
 
-                        seq(SETINT.str,
+                        seq(SETi.str,
                                 firstOf(
-                                    EmptyCompound(SET_INT_CLOSER, SETINT),
-                                    MultiArgTerm(SETINT, SET_INT_CLOSER, false, false, false, false)
+                                    EmptyCompound(SET_INT_CLOSER, SETi),
+                                    MultiArgTerm(SETi, SET_INT_CLOSER, false, false, false, false)
                                 )
                         ),
 
@@ -813,10 +812,10 @@ public class Narsese extends BaseParser<Object> {
     Rule Op() {
         return sequence(
                 trie(
-                        SECTEXT.str, SECTINT.str,
-                        DIFEXT.str, DIFINT.str,
+                        SECTe.str, SECTi.str,
+                        DIFFe.str, DIFFi.str,
                         PROD.str,
-                        IMGEXT.str, IMGINT.str,
+                        IMGe.str, IMGi.str,
 
                         INH.str,
 
@@ -830,7 +829,7 @@ public class Narsese extends BaseParser<Object> {
 
                         IMPL.str,
 
-                        EQUIV.str,
+                        EQUI.str,
 
                         DISJ.str,
                         CONJ.str
@@ -844,7 +843,7 @@ public class Narsese extends BaseParser<Object> {
         return sequence(
                 trie(
                         IMPL.str,
-                        EQUIV.str,
+                        EQUI.str,
                         CONJ.str
                 ),
                 push(getOperator(match()))

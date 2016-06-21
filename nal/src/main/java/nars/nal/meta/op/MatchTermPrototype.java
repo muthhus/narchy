@@ -63,7 +63,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
                 //no constraints
                 pattern :
                 //constraints stored in atomic string
-                (Compound) ($.esect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+                (Compound) ($.secte(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
     }
 
 

@@ -5,7 +5,7 @@ import com.gs.collections.impl.map.mutable.UnifiedMap;
 import nars.$;
 import nars.Global;
 import nars.nal.Deriver;
-import nars.nal.meta.op.SubTermOp;
+import nars.nal.meta.op.AbstractPatternOp;
 import nars.nal.meta.op.SubTermStructure;
 import nars.nal.meta.op.TaskPunctuation;
 import nars.nal.meta.op.events;
@@ -156,8 +156,8 @@ public class GraphDeriver extends Deriver {
             case "SolvePuncFromTask":
                 return cc.toString();
 
-            case "SubTermOp":
-                return ("SubTermOp" + ((SubTermOp)cc).subterm);
+//            case "SubTermOp":
+//                return ("SubTermOp" + ((AbstractPatternOp)cc).subterm);
 
             case "SubTermStructure": //either 0 or 1
                 return ("SubTermStructure" + ((SubTermStructure)cc).subterm );

@@ -186,7 +186,7 @@ public class NarseseExtendedTest {
         Compound nab = term("--(a & b)");
         assertTrue(nab.op() == Op.NEG);
 
-        assertTrue(nab.term(0).op() == Op.SECTEXT);
+        assertTrue(nab.term(0).op() == Op.SECTe);
 
 //        try {
 //            task("(-- negated illegal_extra_term)!");

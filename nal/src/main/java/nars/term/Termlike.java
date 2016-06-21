@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.Op;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -66,6 +67,7 @@ public interface Termlike extends Comparable<Termlike> {
         return otherTermsVolume > volume();
     }
 
+    Term termOr(int i, @Nullable Term ifOutOfBounds);
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >

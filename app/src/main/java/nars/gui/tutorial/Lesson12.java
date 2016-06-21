@@ -1,4 +1,4 @@
-package nars.util.jogl.tutorial;
+package nars.gui.tutorial;
  
 /*--. .-"-.
 / o_O / O o \

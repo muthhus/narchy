@@ -86,11 +86,11 @@ public interface TermIndex {
     /**
      * implications, equivalences, and interval
      */
-    int InvalidEquivalenceTerm = or(IMPL, EQUIV);
+    int InvalidEquivalenceTerm = or(IMPL, EQUI);
     /**
      * equivalences and intervals (not implications, they are allowed
      */
-    int InvalidImplicationPredicate = or(EQUIV);
+    int InvalidImplicationPredicate = or(EQUI);
 
 
     TermBuilder builder();

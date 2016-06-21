@@ -35,8 +35,8 @@ import static java.lang.Long.toBinaryString;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.*;
-import static nars.Op.IMGEXT;
-import static nars.Op.IMGINT;
+import static nars.Op.IMGe;
+import static nars.Op.IMGi;
 import static org.junit.Assert.*;
 
 /**
@@ -52,12 +52,12 @@ public class TermTest {
 
     @Nullable
     public static Term imageInt(Term... x) {
-        return the(IMGINT, x);
+        return the(IMGi, x);
     }
 
     @Nullable
     public static Term imageExt(Term... x) {
-        return the(IMGEXT, x);
+        return the(IMGe, x);
     }
 
 
@@ -680,15 +680,15 @@ public class TermTest {
     @Test
     public void testImageInhConstruction() {
         Compound p = $.p("a", "b", "c");
-        assertEquals("(a-->(/,_,b,c))", $.imageExt(0, p).toString());
+        assertEquals("(a-->(/,_,b,c))", $.imge(0, p).toString());
         assertEquals("(a-->(/,_,b,c))", $.image(0, p.terms()).toString());
-        assertEquals("(b-->(/,a,_,c))", $.imageExt(1, p).toString());
-        assertEquals("(c-->(/,a,b,_))", $.imageExt(2, p).toString());
+        assertEquals("(b-->(/,a,_,c))", $.imge(1, p).toString());
+        assertEquals("(c-->(/,a,b,_))", $.imge(2, p).toString());
 
-        assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p).toString());
-        assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p.terms()).toString());
-        assertEquals("((\\,a,_,c)-->b)", $.imageInt(1, p).toString());
-        assertEquals("((\\,a,b,_)-->c)", $.imageInt(2, p).toString());
+        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p).toString());
+        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.terms()).toString());
+        assertEquals("((\\,a,_,c)-->b)", $.imgi(1, p).toString());
+        assertEquals("((\\,a,b,_)-->c)", $.imgi(2, p).toString());
 
     }
 

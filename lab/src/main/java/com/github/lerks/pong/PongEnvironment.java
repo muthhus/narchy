@@ -13,14 +13,10 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
-import nars.index.CaffeineIndex;
 import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.nar.Multi;
-import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -28,7 +24,6 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
-import nars.util.BeliefPanel;
 import nars.util.FX;
 import nars.agent.NAgent;
 import nars.vision.SwingCamera;
@@ -76,20 +71,20 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		//nar.conceptActivation.setValue(0.5f);
+		nar.conceptActivation.setValue(0.1f);
 		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(256);
-		nar.confMin.setValue(0.02f);
+		nar.confMin.setValue(0.03f);
 
 		NAgent a = new NAgent(nar);
 		//a.epsilon = 0.6f;
 
-		new Abbreviation2(nar, "_");
+		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		new HappySad(nar, 8);
 
@@ -104,7 +99,7 @@ public class PongEnvironment extends Player implements Environment {
 //		});
 
 
-		e.run(a, 640*8);
+		e.run(a, 8*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -268,7 +263,7 @@ public class PongEnvironment extends Player implements Environment {
 //		return n;
 
 		//int d = log2(Math.max(width, height));
-		Compound q = (Compound) quadp(x, y, width, height);
+		Compound q = (Compound) quadp(0, x, y, width, height);
 		//Compound n = $.inh(q, $.the("w"));
 		Compound n = q;
 
@@ -280,7 +275,12 @@ public class PongEnvironment extends Player implements Environment {
 		//return inst(c, the("w"));
 	}
 
-	private Term quadp(int x, int y, int width, int height) {
+	private Term quadp(int level, int x, int y, int width, int height) {
+
+		if (width <= 1 || height <= 1) {
+			return null; //dir; //$.p(dir);
+		}
+
 		int cx = width/2;
 		int cy = height/2;
 
@@ -295,22 +295,36 @@ public class PongEnvironment extends Player implements Environment {
 		if (!up)
 			y -= cy;
 
-		Atom dir = $.the(c1 + "" + c2);
+		//Term d = $.the(c1 + "" + c2);
+		Term d = $.secti($.the(c1), $.the(c2));
+		int area = width * height;
+		//Term dir = $.p(d,$.the(area));
+		//Term dir = level == 0 ? d : $.p(d,$.the(area));
+		//Term dir = level == 0 ? d : $.p(d,$.the(area));
+		Term dir = level == 0 ? d : $.inh(d,$.the(area));
 
-		if (width>1 || height > 1) {
-			Term q = quadp(x, y, width / 2, height / 2);
-			if (q!=null) {
-				//return $.p(dir, q);
-				//return $.image(0, false, dir, $.sete(q));
-				return $.instprop((q), dir);
-			}
-			else {
-				return dir;
-				//return $.p(dir);
-				//return $.inst($.varDep(0), dir);
-			}
-		} else {
-			return null; //dir; //$.p(dir);
+		//Term dir = $.inh(d,$.the(area));
+		//Term dir = level == 0 ? d : $.inh(d,$.the(area));
+
+		Term q = quadp(level+1, x, y, width / 2, height / 2);
+		if (q!=null) {
+			//return $.p(dir, q);
+			//return $.image(0, false, dir, $.sete(q));
+
+			//return $.inh(q, dir);
+			//return $.secte(dir, q);
+			return $.diffe(d, q);
+
+			//return $.sete(q, dir);
+			//return $.inst(q, dir);
+			//return $.instprop(q, dir);
+			//return $.p(q, dir);
+			//return $.image(0, false, dir, q);
+		}
+		else {
+			return d;
+			//return $.p(dir);
+			//return $.inst($.varDep(0), dir);
 		}
 	}
 

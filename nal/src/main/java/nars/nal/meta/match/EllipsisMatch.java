@@ -77,7 +77,8 @@ public final class EllipsisMatch extends TermVector implements Term {
     @NotNull
     @Override
     public Op op() {
-        return Op.NONE;
+        throw new UnsupportedOperationException();
+        //return Op.NONE;
     }
 
     @Override
