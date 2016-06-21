@@ -1,12 +1,10 @@
 package nars.util.jogl;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.bag.impl.ArrayBag;
@@ -14,8 +12,7 @@ import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.term.Compound;
-import nars.term.Term;
+import nars.task.Task;
 import nars.term.Termed;
 import nars.util.AbstractJoglPanel;
 import nars.util.data.Util;
@@ -24,13 +21,11 @@ import nars.util.data.list.LimitedFasterList;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.infinispan.commons.util.WeakValueHashMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static nars.util.jogl.tutorial.Lesson14.renderString;
 
@@ -80,7 +75,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
     private static final GLUT glut = new GLUT();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
-    final WeakValueHashMap<Concept,VDraw<Concept>> vdraw;
+    final WeakValueHashMap<Termed,VDraw> vdraw;
 
     float nodeSpeed = 0.05f;
 
@@ -94,12 +89,16 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         sources.add(c);
     }
 
-    public VDraw<Concept> draw(float now, BLink<Concept> t) {
-        return update(now, vdraw.computeIfAbsent(t.get(), VDraw::new), t);
+    public VDraw update(float now, BLink<Termed> t) {
+        return update(now, get(t.get()), t);
+    }
+
+    public VDraw get(Termed t) {
+        return vdraw.computeIfAbsent(t, x -> new VDraw(x, 8));
     }
 
     /** get the latest info into the draw object */
-    protected VDraw<Concept> update(float now, VDraw<Concept> v, BLink<Concept> b) {
+    protected VDraw update(float now, VDraw v, BLink<Termed> b) {
         v.budget = b;
         float p;
         v.pri = p = b.priIfFiniteElseZero();
@@ -108,12 +107,24 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         if (lastConceptForget!=lastConceptForget)
             lastConceptForget = now;
 
-        float lastTermlinkForget = ((BLink)(((ArrayBag)v.key.termlinks()).get(0))).getLastForgetTime();
-        if (lastTermlinkForget!=lastTermlinkForget)
-            lastTermlinkForget = lastConceptForget;
+        Termed tt = v.key;
+        if (tt instanceof Concept) {
+            Concept cc = (Concept)tt;
 
-        v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
-        //float act = 1f / (1f + (timeSinceLastUpdate/3f));
+            @NotNull Bag<Termed> termlinks = cc.termlinks();
+            //@NotNull Bag<Task> tasklinks = cc.tasklinks();
+
+            float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
+            if (lastTermlinkForget != lastTermlinkForget)
+                lastTermlinkForget = lastConceptForget;
+
+            v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
+            //float act = 1f / (1f + (timeSinceLastUpdate/3f));
+
+            v.clearEdges();
+            termlinks.topWhile(v::addEdge);
+            v.clearRemainingEdges();
+        }
 
 
         layout(v);
@@ -125,7 +136,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         return v;
     }
 
-    protected void layout(VDraw<Concept> v) {
+    protected void layout(VDraw v) {
         //TODO abstract
         int hash = v.hash;
         //int vol = v.key.volume();
@@ -146,10 +157,27 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 
     }
 
+    public static class EDraw {
+        public VDraw key;
+        public float width, r, g, b;
+
+        public void set(VDraw x, float r, float g, float b) {
+            this.key = x;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        public void clear() {
+            key = null;
+        }
+    }
+
     /** vertex draw info */
-    public static class VDraw<X> {
-        public final X key;
+    public class VDraw {
+        public final nars.term.Termed key;
         private final int hash;
+        private final EDraw[] edges;
 
         /** current x, y, z */
         public float p[] = new float[3];
@@ -165,10 +193,13 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         /** measure of inactivity, in time units */
         public float lag;
 
-        public VDraw(X k) {
+        public VDraw(nars.term.Termed k, int edges) {
             this.key = k;
             this.label = k.toString();
             this.hash = k.hashCode();
+            this.edges = new EDraw[edges];
+            for (int i = 0; i < edges; i++)
+                this.edges[i] = new EDraw();
         }
 
         @Override
@@ -189,6 +220,30 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             for (int i = 0; i < 3; i++) {
                 p[i] = Util.lerp(tp[i], p[i], nodeSpeed);
             }
+        }
+
+        transient int nextEdge = -1;
+
+        public boolean addEdge(BLink<Termed> l) {
+            if (l == null)
+                return false;
+
+            @Nullable Termed ll = l.get();
+            if (ll == null)
+                return false;
+
+            edges[nextEdge++].set(get(ll), l.pri(), l.dur(), l.qua());
+            return (nextEdge<edges.length);
+
+        }
+
+        public void clearEdges() {
+            nextEdge = 0;
+        }
+
+        public void clearRemainingEdges() {
+            for (int i = nextEdge; i < edges.length; i++)
+                edges[i].clear();
         }
     }
 
@@ -333,30 +388,44 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 //            if (s.ready.get())
 //                continue; //not finished yet
 
-            BLink<Concept>[] vv = s.vertices;
+            BLink<Termed>[] vv = s.vertices;
             if (vv != null) {
                 float now = s.time();
                 //int n = 0;
-                for (BLink<Concept> b : vv) {
+                for (BLink<Termed> b : vv) {
 
                     float pri = b.pri();
                     if (pri!=pri) {
                         continue; //deleted
                     }
 
-                    VDraw<Concept> v = draw(now, b);
+                    VDraw v = update(now, b);
 
 
                     gl.glPushMatrix();
 
+                    float[] pp = v.p;
+                    float x = pp[0], y = pp[1], z = pp[2];
+
+                    for (EDraw e : v.edges) {
+                        VDraw ee = e.key;
+                        if (ee ==null)
+                            break;
+                        float[] eep = ee.p;
+                        gl.glBegin(GL.GL_LINES);
+                        {
+                            gl.glVertex3f(x, y, z);
+                            gl.glVertex3f(eep[0], eep[1], eep[2]);
+                        }
+                        gl.glEnd();
+                    }
 
 
 
                     //@Nullable Concept c = b.get();
 
 
-                    float[] pp = v.p;
-                    gl.glTranslatef(pp[0], pp[1], pp[2]);
+                    gl.glTranslatef(x, y, z);
 
                     //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
                     //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
@@ -452,10 +521,10 @@ public class JoglGraphPanel extends AbstractJoglPanel {
 //            TLinkEdge::new;
 
         //private float _maxPri = 1f, _minPri;
-        protected final FasterList<BLink<Concept>> concepts = new LimitedFasterList<>(maxNodes);
+        protected final FasterList<BLink<? extends Termed>> concepts = new LimitedFasterList<>(maxNodes);
         //private String keywordFilter;
         //private final ConceptFilter eachConcept = new ConceptFilter();
-        public BLink<Concept>[] vertices;
+        public BLink<Termed>[] vertices;
         final AtomicBoolean ready = new AtomicBoolean(true);
 
         public ConceptsSource(NAR nar) {
@@ -594,7 +663,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
             //final int maxNodes = this.maxNodes;
 
             concepts.clear();
-            Bag<Concept> x = ((Default) nar).core.concepts;
+            Bag<? extends Termed> x = ((Default) nar).core.concepts;
             x.topWhile(concepts::add);
             commit(concepts);
 
@@ -617,7 +686,7 @@ public class JoglGraphPanel extends AbstractJoglPanel {
         }
 
 
-        protected final void commit(Collection<BLink<Concept>> ii) {
+        protected final void commit(Collection<BLink<? extends Termed>> ii) {
             int iis = ii.size();
             if (this.vertices == null || this.vertices.length != iis)
                 this.vertices = new BLink[iis];
