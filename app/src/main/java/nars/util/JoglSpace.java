@@ -5,10 +5,13 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
+
+    final static int DEFAULT_FPS = 30;
 
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
@@ -26,7 +29,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         w.addWindowListener(j);
 
         //TODO FPSAnimator
-        Animator a = new Animator();
+        FPSAnimator a = new FPSAnimator(DEFAULT_FPS);
         a.add(w);
         a.start();
         return w;

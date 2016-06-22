@@ -219,8 +219,9 @@ public interface Concept extends Termed, Comparable<Termlike> {
     }
 
     /** link to a specific peer */
-    default void linkPeer(Termed x, Budget b, float v) {
-        BLink<Termed> existing = termlinks().get(x);
+    static <T> void linkPeer(Bag<T> bag, T x, Budget b, float v) {
+        //@NotNull Bag<Termed> bag = termlinks();
+        BLink<T> existing = bag.get(x);
 
         /*
         Hebbian Learning:
@@ -236,7 +237,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
         boolean init;
         if (existing == null ) {
-            termlinks().put(x, b, v, null);
+            bag.put(x, b, v, null);
             init = true;
         } else {
             init = false;
@@ -245,12 +246,16 @@ public interface Concept extends Termed, Comparable<Termlike> {
         float a = b.pri();
         if (a == a /*!NaN */) {
 
-            final float learningRate = v / termlinks().size();
+            final float learningRate = v / bag.size();
             //System.out.println(this + " activating " + x);
-            termlinks().forEach(tl -> {
+            bag.forEach(tl -> {
                 boolean active = tl == existing;
                 if (active && init)
                     return; //dont modify the newly inserted link
+
+                float p = tl.pri();
+                if (p!=p) //the link is currently deleted
+                    return;
 
                 float outputTarget = active ? a : (1f - a);
                 float output = outputTarget - tl.pri(); //nar.conceptPriority(x);

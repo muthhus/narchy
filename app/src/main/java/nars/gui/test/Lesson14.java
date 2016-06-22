@@ -38,7 +38,7 @@ public class Lesson14 extends JoglSpace {
                 //glut.glutBitmapLength(font, string);
 
         gl.glPushMatrix();
-        gl.glScalef(fontScale, fontScale, 1f);
+        gl.glScalef(fontScale, fontScale, fontScale);
 
         gl.glTranslatef(-width / 2f + dx, dy, dz);
 

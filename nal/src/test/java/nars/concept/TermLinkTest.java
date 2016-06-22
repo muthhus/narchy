@@ -90,7 +90,7 @@ public class TermLinkTest {
             //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
             Budget b = b(a, 0.5f, 0.5f);
             Concept c = nar.conceptualize(vertex(x), b, a, 0f, null);
-            c.linkPeer(vertex(y), b, a);
+            Concept.linkPeer(c.termlinks(), vertex(y), b, a);
 
         }
 

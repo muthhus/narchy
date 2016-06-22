@@ -296,36 +296,39 @@ public final class TruthFunctions extends UtilityFunctions {
         if (c < minConf)
             return null;
         else {
-            //float f = and(f1, f2);
-            float f = freqInterp(f1, f2, c1, c2);
+
+            float f = and(f1, f2);
+            //float f = freqInterp(f1, f2, c1, c2);
             return t(f, c);
         }
     }
 
-    static float andPolar(float x, float y) {
-        x = fb(x);
-        y = fb(y);
-
-        float xy = x * y;
-        if (x < 0 && y < 0)
-            xy = -xy;
-        else if (x < 0 && y > 0)
-            xy = 0f;
-        else if (x > 0 && y < 0)
-            xy = 0f;
-
-        return bf(xy);
+    static float avgPolar(float x, float y) {
+        return bf((fb(x) + fb(y)) / 2f);
     }
 
-    /** transforms a frequency into a weighting factor symmetric about f=0.5, where f=0.5 is zero and f=0 and f=1 are 1 */
-    public static float f2w(float f) {
-        return Math.abs(fb(f));
-    }
+//    static float andPolar(float x, float y) {
+//        x = fb(x);
+//        y = fb(y);
+//        float xy = x * y;
+//        if (x < 0 && y < 0)
+//            xy = -xy;
+//        else if (x < 0 && y > 0)
+//            xy = 0f;
+//        else if (x > 0 && y < 0)
+//            xy = 0f;
+//        return bf(xy);
+//    }
 
-    /** 0..1.0 in proportion to two frequency's multiplied magnitude toward the same polarity */
-    public static float xnor(float a, float b) {
-        return bf( fb(a) * fb(b) );
-    }
+//    /** transforms a frequency into a weighting factor symmetric about f=0.5, where f=0.5 is zero and f=0 and f=1 are 1 */
+//    public static float f2w(float f) {
+//        return Math.abs(fb(f));
+//    }
+
+//    /** 0..1.0 in proportion to two frequency's multiplied magnitude toward the same polarity */
+//    public static float xnor(float a, float b) {
+//        return bf( fb(a) * fb(b) );
+//    }
 
 //    /** bipolar AND , symmetric about 0.5 */
 //    public static float andb(float a, float b) {

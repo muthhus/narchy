@@ -270,11 +270,11 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
      //decompose any event in a conjunction belief
-     (&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction)
-     (&&,X,A..+), X, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction)
+     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction)
      //TODO maybe try to get this working:
-     //(&&,X,Y,A..*), Y, time(decomposeTask), task(".") |- X, (Belief:StructuralDeduction)
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy)
+     //(&&,X,Y,A..*), Y, time(decomposeTask) |- X, (Belief:StructuralDeduction)
+     B, (&&,X,A..+), time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
 
     //decompose (only) the leading event in a conjunction goal
@@ -455,7 +455,7 @@
     ((-,S,A) --> (-,S,B)), (B --> A), task("?") |- ((-,S,A) --> (-,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((~,S,A) --> (~,S,B)), (B --> A), task("?") |- ((~,S,A) --> (~,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
-////composition on one side of aay w statement:
+////composition on one side of a statement:
 
     (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)

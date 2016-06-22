@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import static nars.$.t;
 import static nars.Global.TRUTH_EPSILON;
-import static nars.truth.TruthFunctions.xnor;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -12,19 +11,19 @@ import static org.junit.Assert.assertEquals;
  */
 public class TruthFunctionsTest {
 
-    @Test
-    public void testXNOR() {
-
-        assertEquals(1f, xnor(1f,1f), 0.01f );
-        assertEquals(0.5f, xnor(0.5f,1f), 0.01f );
-        assertEquals(0f, xnor(0f,1f), 0.01f );
-
-        assertEquals(0.5f, xnor(0.5f,0.5f), 0.01f );
-        assertEquals(0.48f, xnor(0.4f,0.6f), 0.01f );
-
-        assertEquals(1f, xnor(0f,0f), 0.01f );
-        assertEquals(0.625f, xnor(0.25f,0.25f), 0.01f );
-    }
+//    @Test
+//    public void testXNOR() {
+//
+//        assertEquals(1f, xnor(1f,1f), 0.01f );
+//        assertEquals(0.5f, xnor(0.5f,1f), 0.01f );
+//        assertEquals(0f, xnor(0f,1f), 0.01f );
+//
+//        assertEquals(0.5f, xnor(0.5f,0.5f), 0.01f );
+//        assertEquals(0.48f, xnor(0.4f,0.6f), 0.01f );
+//
+//        assertEquals(1f, xnor(0f,0f), 0.01f );
+//        assertEquals(0.625f, xnor(0.25f,0.25f), 0.01f );
+//    }
 
 //    @Test
 //    public void testANDB() {

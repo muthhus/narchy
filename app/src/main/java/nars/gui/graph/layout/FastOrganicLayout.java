@@ -38,7 +38,7 @@ public class FastOrganicLayout implements GraphLayout {
      */
 
     //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(20f);
+    public final MutableFloat forceConstant = new MutableFloat(6f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -113,11 +113,11 @@ public class FastOrganicLayout implements GraphLayout {
      */
     public FastOrganicLayout() {
 
-        this.movementThreshold = 0.05f;
+        this.movementThreshold = 0.01f;
 
-        setInitialTemp(5f);
-        setMinDistanceLimit(20f);
-        setMaxDistanceLimit(60f);
+        setInitialTemp(7f);
+        setMinDistanceLimit(3.5f);
+        setMaxDistanceLimit(250f);
 
     }
 
@@ -415,8 +415,8 @@ public class FastOrganicLayout implements GraphLayout {
             double deltaLength = Math.sqrt(xind * xind + yind * yind);
 
             if (deltaLength < movementThresholdSq) {
-                //deltaLength = 0.001;
-                continue;
+                deltaLength = 0.001;
+                //continue;
             }
 
             // Scale down by the current temperature if less than the
@@ -561,12 +561,12 @@ public class FastOrganicLayout implements GraphLayout {
                     }
 
                     if (deltaLength < minDistanceLimitSq) {
-                        deltaLength = minDistanceLimit;
+                        deltaLength = minDistanceLimitSq;
                     } else {
-                        deltaLength = Math.sqrt(deltaLength);
+                        deltaLength = /*Math.sqrt*/(deltaLength);
                     }
 
-                    double force = forceConstantSq / deltaLength;
+                    double force = forceConstantSq / (deltaLength/*Sq*/);
 
                     double displacementX = (xDelta /*/ deltaLength*/) * force;
                     double displacementY = (yDelta /*/ deltaLength*/) * force;

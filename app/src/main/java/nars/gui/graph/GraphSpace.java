@@ -40,17 +40,17 @@ public class GraphSpace extends JoglSpace {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 8, 2, 3);
+        Default n = new Default(1024, 8, 4, 3);
 
         //n.log();
 
-        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
+        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
 
 
         final int maxNodes = 256;
 
-        new GraphSpace(new ConceptsSource(n, maxNodes)).show(500, 500);
-        n.loop(15f);
+        new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
+        n.loop(25f);
 
     }
 
@@ -60,7 +60,7 @@ public class GraphSpace extends JoglSpace {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
 
-    int maxEdgesPerVertex = 16;
+    int maxEdgesPerVertex = 6;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()
@@ -114,8 +114,9 @@ public class GraphSpace extends JoglSpace {
         Budget b = v.budget;
         float p = v.pri = b.priIfFiniteElseZero();
 
-        float nodeScale = 2f;
-        v.scale(1f + nodeScale * p, 1f + nodeScale * p, 1f + nodeScale * p);
+        float nodeScale = 0.1f + 2f * p;
+        nodeScale /= Math.sqrt(tt.volume());
+        v.scale(nodeScale, nodeScale, nodeScale/2f);
 
         if (tt instanceof Concept) {
             updateConcept(v, (Concept) tt, now);
@@ -549,9 +550,12 @@ public class GraphSpace extends JoglSpace {
         gl.glScalef(s[0], s[1], s[2]);
 
         final float activationPeriods = 4f;
-        gl.glColor4f(h(pri), pri * 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
-        //gl.glCallList(box);
-        glut.glutSolidTetrahedron();
+        gl.glColor4f(h(pri),
+                pri * Math.min(1f, 1f / (1f + (v.lag / (activationPeriods * dt)))),
+                h(v.budget.dur()),
+                v.budget.qua() * 0.25f + 0.25f);
+        gl.glCallList(box);
+        //glut.glutSolidTetrahedron();
 
         gl.glPopMatrix();
     }
@@ -559,15 +563,16 @@ public class GraphSpace extends JoglSpace {
     public void renderLabel(GL2 gl, VDraw v) {
 
 
-        float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(1f, 1f, 1f, 1f * p);
+        //float p = v.pri * 0.75f + 0.25f;
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
 
         float fontThick = 2f;
         gl.glLineWidth(fontThick);
 
+        float div = 0.01f;
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                0.01f, //scale
-                0, 0, 0f); // Print GL Text To The Screen
+                div * v.s[0], //scale
+                0, 0, (3.5f * v.s[2])/div); // Print GL Text To The Screen
 
 
     }
@@ -645,7 +650,7 @@ public class GraphSpace extends JoglSpace {
 //        gl.glRotatef(0,0,1,0);
 //        gl.glRotatef(0,0,0,1);
 //        gl.glScalef(1f,1f,1f);
-        gl.glTranslatef(0, 0, -120f);
+        gl.glTranslatef(0, 0, -90f);
 //        gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
 //        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
 //        gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);

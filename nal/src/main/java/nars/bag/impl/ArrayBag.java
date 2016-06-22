@@ -594,12 +594,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         for (int i = s - 1; i >= 0; i--) {
             BLink<V> b = l[i];
             float d = b.dur(); //HACK ignores any pending durDelta change
-            mass += d * b.pri();
+            mass += d * b.priIfFiniteElseZero();
             pendingMass += d * b.priDelta();
         }
         Map<V,RawBudget> pending = this.pending;
         if (pending!=null) {
-            pendingMass += (float)pending.values().stream().mapToDouble(v -> v.pri() * v.dur()).sum();
+            pendingMass += (float)pending.values().stream().mapToDouble(v -> v.priIfFiniteElseZero() * v.dur()).sum();
         }
         return new float[] { mass, pendingMass };
     }

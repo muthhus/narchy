@@ -66,7 +66,7 @@ public class TaskBudgeting {
         ;
 
         final float durability =
-                task.dur() * volRatioScale;
+                nal.taskLink.dur() * volRatioScale;
                 //UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
 
         final float quality = qualRaw * volRatioScale;

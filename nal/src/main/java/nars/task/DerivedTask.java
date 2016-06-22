@@ -70,7 +70,8 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean onConcept(@NotNull Concept c) {
             if (super.onConcept(c)) {
-                parentConcept.linkPeer(termLink.get(), budget(), qua());
+                Concept.linkPeer(parentConcept.termlinks(), termLink.get(), budget(), qua());
+                Concept.linkPeer(parentConcept.tasklinks(), taskLink.get(), budget(), qua());
                 return true;
             }
             return false;
@@ -79,7 +80,8 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                parentConcept.linkPeer(termLink.get(), UnitBudget.Zero, qua());
+                Concept.linkPeer(parentConcept.termlinks(), termLink.get(), UnitBudget.Zero, qua());
+                Concept.linkPeer(parentConcept.tasklinks(), taskLink.get(), UnitBudget.Zero, qua());
                 return true;
             }
             return false;
