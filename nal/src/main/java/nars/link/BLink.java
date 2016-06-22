@@ -31,6 +31,8 @@ public abstract class BLink<X> extends Budget implements Link<X> {
     protected abstract void setLastForgetTimeDirect(float now);
 
 
+    abstract public float priDelta();
+
     @Override
     public boolean isDeleted() {
         float p = pri(); //b[PRI];
@@ -79,4 +81,5 @@ public abstract class BLink<X> extends Budget implements Link<X> {
     public String toString2() {
         return toString();
     }
+
 }

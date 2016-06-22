@@ -38,7 +38,7 @@ public class FastOrganicLayout implements GraphLayout {
      */
 
     //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(10f);
+    public final MutableFloat forceConstant = new MutableFloat(20f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -98,7 +98,7 @@ public class FastOrganicLayout implements GraphLayout {
     /**
      * Local copy of cell neighbours.
      */
-    protected int[][] neighbors;
+    protected short[][] neighbors;
 
     /**
      * final normalization step to center all nodes
@@ -113,10 +113,10 @@ public class FastOrganicLayout implements GraphLayout {
      */
     public FastOrganicLayout() {
 
-        this.movementThreshold = 0.25f;
+        this.movementThreshold = 0.05f;
 
-        setInitialTemp(2f);
-        setMinDistanceLimit(10f);
+        setInitialTemp(5f);
+        setMinDistanceLimit(20f);
         setMaxDistanceLimit(60f);
 
     }
@@ -231,7 +231,7 @@ public class FastOrganicLayout implements GraphLayout {
             disp = new double[n][2];
             cellLocation = new double[n][2];
             //if (neighbors == null || neighbors.length<n)
-            neighbors = new int[n][];
+            neighbors = new short[n][];
             radius = new double[n];
             //radiusSquared = new double[n];
         }
@@ -243,7 +243,7 @@ public class FastOrganicLayout implements GraphLayout {
 
         //final double spacing = this.spacing.get();
 
-        int[][] neighbors = this.neighbors;
+        short[][] neighbors = this.neighbors;
 
         double[][] cl = this.cellLocation;
 
@@ -306,9 +306,9 @@ public class FastOrganicLayout implements GraphLayout {
             int ne = V.edgeCount();
 
 
-            int[] ni = neighbors[i];
+            short[] ni = neighbors[i];
             if (ni == null || ni.length!=ne) {
-                neighbors[i] = ni = new int[ne];
+                neighbors[i] = ni = new short[ne];
             }
 
             for (int j = 0; j < ne; j++) {
@@ -446,7 +446,7 @@ public class FastOrganicLayout implements GraphLayout {
         int n = cl.length;
 
         //double[] radiusSquared = this.radiusSquared;
-        int[][] neighbors = this.neighbors;
+        short[][] neighbors = this.neighbors;
 
         double minDistanceLimit = this.minDistanceLimit;
         double minDistanceLimitSq = minDistanceLimit * minDistanceLimit;
@@ -457,7 +457,7 @@ public class FastOrganicLayout implements GraphLayout {
 
         for (int i = 0; i < numNeighbors; i++) {
 
-            int[] neighbor = neighbors[i];
+            short[] neighbor = neighbors[i];
 
             if (neighbor == null || cl[i] == null)
                 continue;

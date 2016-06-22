@@ -37,10 +37,10 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 8;
-	final int height = 8;
+	final int width = 12;
+	final int height = 12;
 	final int pixels = width * height;
-	final int scaleX = (int)(24f*16/width);
+	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
 	final int ticksPerFrame = 1; //framerate divisor
 	private final PongModel pong;
@@ -68,8 +68,8 @@ public class PongEnvironment extends Player implements Environment {
 		nar.conceptActivation.setValue(0.5f);
 		nar.beliefConfidence(0.95f);
 		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(64);

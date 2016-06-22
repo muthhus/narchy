@@ -118,7 +118,7 @@ public abstract class AbstractCore {
             tasklinkUpdate.cycle(subCycle);
             conceptUpdate.cycle(subCycle);
 
-            conceptUpdate.update(concepts, cycleNum == (cycles - 1));
+            conceptUpdate.commit(concepts);
 
             concepts.sample(cpf, this::fireConcept);
         }
@@ -132,8 +132,8 @@ public abstract class AbstractCore {
     protected final boolean fireConcept(@NotNull BLink<Concept> conceptLink) {
         Concept concept = conceptLink.get();
 
-        tasklinkUpdate.update(concept.tasklinks(), true);
-        termlinkUpdate.update(concept.termlinks(), true);
+        tasklinkUpdate.commit(concept.tasklinks());
+        termlinkUpdate.commit(concept.termlinks());
 
         return firePremiseSquared(
                 conceptLink,

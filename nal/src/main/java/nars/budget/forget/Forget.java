@@ -109,9 +109,10 @@ public enum Forget {
         }
 
 
-        public void setForgetCycles(float f) {
+        public AbstractForget setForgetCycles(float f) {
             forgetCycles.setValue(f); //not necessary unless we want access to this value as a MutableFloat from elsewhere
             forgetCyclesCached = f;
+            return this;
         }
     }
 

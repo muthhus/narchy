@@ -68,6 +68,10 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
 
+    @Override public final float priDelta() {
+        return dPri;
+    }
+
     @Override
     public boolean commit() {
         if (changed) {

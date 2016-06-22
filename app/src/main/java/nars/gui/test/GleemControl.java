@@ -228,7 +228,7 @@ public class GleemControl {
      */
     public void render(GL2 gl) {
         recalc();
-        matrix(gl);
+        //matrix(gl);
 
         manip.render(camera);
     }

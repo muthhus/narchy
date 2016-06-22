@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  */
 public abstract class CollectorMap<K, V>  {
 
-    protected final Map<K, V> map;
+    public final Map<K, V> map;
 
     protected CollectorMap(Map<K, V> map) {
         this.map = map;

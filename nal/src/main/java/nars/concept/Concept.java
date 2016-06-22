@@ -259,8 +259,6 @@ public interface Concept extends Termed, Comparable<Termlike> {
                 //System.out.println(tl.toString2());
             });
 
-            //TODO only sort if the order will have changed which is detectable
-            termlinks().setRequiresSort();
         }
 
     }

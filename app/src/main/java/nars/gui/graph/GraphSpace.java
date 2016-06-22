@@ -40,7 +40,7 @@ public class GraphSpace extends JoglSpace {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 3, 2, 3);
+        Default n = new Default(1024, 8, 2, 3);
 
         //n.log();
 
@@ -55,7 +55,7 @@ public class GraphSpace extends JoglSpace {
     }
 
 
-    private final GleemControl gleem = new GleemControl();
+    //private final GleemControl gleem = new GleemControl();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
@@ -103,8 +103,8 @@ public class GraphSpace extends JoglSpace {
      */
     @NotNull
     protected VDraw pre(int i, VDraw v, BLink<? extends Termed> b) {
-        v.order = i;
-        v.budget = b; //mark as active
+        v.order = (short)i;
+        v.budget = b;
         return v;
     }
 
@@ -199,7 +199,7 @@ public class GraphSpace extends JoglSpace {
         /**
          * the draw order if being drawn
          */
-        public int order;
+        public short order;
 
         transient private GraphSpace grapher;
 
@@ -258,8 +258,6 @@ public class GraphSpace extends JoglSpace {
         public boolean addEdge(BLink l, Termed ll, boolean task) {
 
             EDraw[] ee = this.edges;
-            if (numEdges >= ee.length)
-                return false;
 
             VDraw target = grapher.getIfActive(ll);
             if (target == null)
@@ -269,29 +267,29 @@ public class GraphSpace extends JoglSpace {
             float dur = l.dur();
             float qua = l.qua();
 
-            float minLineWidth = 0.2f;
-            float maxLineWidth = 5f;
-            float width = minLineWidth + (maxLineWidth - minLineWidth) * (dur) * (qua);
+            float minLineWidth = 1f;
+            float maxLineWidth = 7f;
+            float width = minLineWidth + (maxLineWidth - minLineWidth) * ((dur) * (qua));
 
             float r, g, b;
-            //float hp = 0.2f + 0.8f * pri;
-            float qh = 0.5f + 0.5f * qua;
-            float dh = 0.5f + 0.5f * dur;
+            float hp = 0.4f + 0.6f * pri;
+            //float qh = 0.5f + 0.5f * qua;
             if (task) {
-                r = qh;
-                g = dh/2;
+                r = hp;
+                g = dur/3f;
                 b = 0;
             } else {
-                g = qh;
-                r = dh/2;
-                b = 0;
+                b = hp;
+                g = dur/3f;
+                r = 0;
             }
+            float a = 0.25f + 0.75f * (pri);
 
-            ee[numEdges++].set(target, width,
-                    r, g, b, 0.5f + 0.4f * (pri)
+            int n;
+            ee[n = (numEdges++)].set(target, width,
+                    r, g, b, a
             );
-
-            return true;
+            return (n - 1 <= ee.length);
         }
 
         public void clearEdges(GraphSpace grapher) {
@@ -384,8 +382,8 @@ public class GraphSpace extends JoglSpace {
 
 
 
-        gleem.start(Vec3f.Y_AXIS, window);
-        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
+//        gleem.start(Vec3f.Y_AXIS, window);
+//        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
     private void buildLists(GL2 gl) {
@@ -454,9 +452,9 @@ public class GraphSpace extends JoglSpace {
             gl.glNormal3f(0.0f, 0f, 1.0f);
 
             final float h = 0.5f;
-            gl.glVertex3f(-h, -h, 0f); //left base
-            gl.glVertex3f(-h, +h, 0f); //right base
-            gl.glVertex3f(h,  0,  0f);  //midpoint on opposite end
+            gl.glVertex3f(0, -h, 0f); //left base
+            gl.glVertex3f(0, h,  0f); //right base
+            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
 
             gl.glEnd();
             gl.glEndList();
@@ -471,11 +469,9 @@ public class GraphSpace extends JoglSpace {
 
         clear(gl);
 
-        //gl.glPushMatrix();
 
         updateCamera(gl);
 
-        gleem.render(gl);
 
 
         List<ConceptsSource> s = this.sources;
@@ -483,8 +479,8 @@ public class GraphSpace extends JoglSpace {
             render(gl, s.get(i));
         }
 
-        //gl.glPopMatrix();
-
+//        gleem.viewAll();
+//        gleem.render(gl);
     }
 
     public void clear(GL2 gl) {
@@ -519,18 +515,22 @@ public class GraphSpace extends JoglSpace {
         float x = pp[0], y = pp[1], z = pp[2];
         gl.glTranslatef(x, y, z);
 
-        renderLabel(gl, v);
-
-//        int n = v.edgeCount();
-//        EDraw[] eee = v.edges;
-//        for (int en = 0; en < n; en++)
-//            render(gl, v, eee[en]);
-
         renderVertexBase(gl, dt, v);
+
+        renderEdges(gl, v);
+
+        renderLabel(gl, v);
 
         gl.glPopMatrix();
 
 
+    }
+
+    public void renderEdges(GL2 gl, VDraw v) {
+        int n = v.edgeCount();
+        EDraw[] eee = v.edges;
+        for (int en = 0; en < n; en++)
+            render(gl, v, eee[en]);
     }
 
     public void renderVertexBase(GL2 gl, float dt, VDraw v) {
@@ -550,41 +550,40 @@ public class GraphSpace extends JoglSpace {
 
         final float activationPeriods = 4f;
         gl.glColor4f(h(pri), pri * 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
-        gl.glCallList(box);
-        //glut.glutSolidTetrahedron();
+        //gl.glCallList(box);
+        glut.glutSolidTetrahedron();
 
         gl.glPopMatrix();
     }
 
     public void renderLabel(GL2 gl, VDraw v) {
 
-        //gl.glPushMatrix();
 
         float p = v.pri * 0.75f + 0.25f;
         gl.glColor4f(1f, 1f, 1f, 1f * p);
 
-        float fontThick = 1f;
+        float fontThick = 2f;
         gl.glLineWidth(fontThick);
 
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                0.1f, //scale
+                0.01f, //scale
                 0, 0, 0f); // Print GL Text To The Screen
 
-        //gl.glPopMatrix();
 
     }
 
     public void render(GL2 gl, VDraw v, EDraw e) {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
-        if (e.width <= 1f) {
-            renderLineEdge(gl, v, e);
+        float width = e.width;
+        if (width <= 1f) {
+            renderLineEdge(gl, v, e, width);
         } else {
-            renderHalfTriEdge(gl, v, e);
+            renderHalfTriEdge(gl, v, e, width);
         }
     }
 
-    public void renderHalfTriEdge(GL2 gl, VDraw v, EDraw e) {
+    public void renderHalfTriEdge(GL2 gl, VDraw v, EDraw e, float width) {
         VDraw ee = e.key;
         float[] tgt = ee.p;
         float[] src = v.p;
@@ -596,20 +595,21 @@ public class GraphSpace extends JoglSpace {
 
             float x1 = src[0];
             float x2 = tgt[0];
-            float dx = (x1 - x2);
-            float cx = 0.5f * (x1 + x2);
+            float dx = (x2 - x1);
+            //float cx = 0.5f * (x1 + x2);
             float y1 = src[1];
             float y2 = tgt[1];
-            float dy = (y1 - y2);
-            float cy = 0.5f * (y1 + y2);
+            float dy = (y2 - y1);
+            //float cy = 0.5f * (y1 + y2);
 
-            gl.glTranslatef(cx, cy, 0f);
+            //gl.glTranslatef(cx, cy, 0f);
 
             float rotAngle = (float) Math.atan2(dy, dx) * 180f / 3.14159f;
             gl.glRotatef(rotAngle, 0f, 0f, 1f);
 
+
             float len = (float) Math.sqrt(dx * dx + dy * dy);
-            gl.glScalef(len, e.width, 1f);
+            gl.glScalef(len, width, 1f);
 
             gl.glCallList(isoTri);
         }
@@ -618,15 +618,15 @@ public class GraphSpace extends JoglSpace {
 
     }
 
-    public static void renderLineEdge(GL2 gl, VDraw v, EDraw e) {
+    public static void renderLineEdge(GL2 gl, VDraw v, EDraw e, float width) {
         VDraw ee = e.key;
         float[] eep = ee.p;
         float[] vp = v.p;
-        gl.glLineWidth(e.width);
+        gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         {
-            gl.glVertex3f(vp[0], vp[1], vp[2]);
-            gl.glVertex3f(eep[0], eep[1], eep[2]);
+            gl.glVertex3f(0,0,0);//vp[0], vp[1], vp[2]);
+            gl.glVertex3f(eep[0]-vp[0], eep[1]-vp[1], eep[2]-vp[2]);
         }
         gl.glEnd();
     }
@@ -639,13 +639,13 @@ public class GraphSpace extends JoglSpace {
     }
 
     public void updateCamera(GL2 gl) {
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
 //        gl.glRotatef(0,1,0,0);
 //        gl.glRotatef(0,0,1,0);
 //        gl.glRotatef(0,0,0,1);
-//        gl.glTranslatef(0,0,0);
 //        gl.glScalef(1f,1f,1f);
-//        gl.glTranslatef(0, 0, -120f);
+        gl.glTranslatef(0, 0, -120f);
 //        gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
 //        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
 //        gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);
@@ -669,10 +669,12 @@ public class GraphSpace extends JoglSpace {
         gl.glMatrixMode(GL2ES1.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        glu.gluPerspective(45, (float) width / height, 1, 1000);
-        gl.glMatrixMode(GL2ES1.GL_MODELVIEW);
+        glu.gluPerspective(45, (float) width / height, 10, 5000);
+
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
-        gleem.viewAll();
+
+//        gleem.viewAll();
 
     }
 

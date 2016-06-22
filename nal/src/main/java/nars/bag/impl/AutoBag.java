@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is
  * under capacity.
  */
-public class AutoBag<V>  {
+public final class AutoBag<V>  {
 
     private final Forget.AbstractForget forget;
 
@@ -26,49 +26,48 @@ public class AutoBag<V>  {
     }
 
 
-    /** @param forceCommit - force a commit even if there are no pending items requiring
-    *                      forgetting. this is necessary if the bag involves weak BLink's or other
-     *                     links which can spontaneously get deleted or delete themselves and need
-     *                     to be removed.
-     * @param bag
-     * @param forceCommit
+    /** @param bag
      * @return
      */
-    public Bag<V> update(@NotNull Bag<V> bag, boolean forceCommit) {
+    public Bag<V> commit(@NotNull Bag<V> bag) {
 
-        Forget.AbstractForget f;
-        float r = forgetPeriod((ArrayBag<V>) bag);
+        ArrayBag<V> abag = (ArrayBag<V>) bag; //HACK
 
-        if (Float.isFinite(r) && r < Global.maxForgetPeriod) {
-            (f = forget).setForgetCycles( Math.max(Global.minForgetPeriod, r) );
-        } else {
-            if (!forceCommit && !bag.requiresSort())
-                return bag;
+        synchronized (abag.map) {
+            float r = forgetPeriod(abag);
 
-            f = null;
+            return abag.commit(
+                    (r > 0 && r <= Global.maxForgetPeriod) ?
+                            forget.setForgetCycles(Math.max(Global.minForgetPeriod, r)) :
+                            null /* no forgetting to be applied */
+            );
         }
 
-        return bag.commit(f);
     }
 
 
     protected float forgetPeriod(@NotNull ArrayBag<V> bag) {
 
-        float pendingMass = bag.getPendingMass();
-        if (pendingMass <= Global.BUDGET_EPSILON)
-            return Float.NaN;
+        float[] b = bag.preCommit();
 
-        float basePeriod = 0.01f; //"margin of replacement"
+        float pending = b[1];
+        if (pending <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
+            return -1f;
+        float existing = b[0];
+
         // TODO formalize some relationship between cycles and priority
-        // TODO estimate based on the min/max priority of existing items and normalize the rate to that
 
+        //a load factor
+        final float massMeanTarget = 0.5f; //ex: 0.5 pri * 0.5 dur = 0.25 mass
 
-        //estimate existing mass
-        float existing = (bag.priMax() - bag.priMin()) * 0.5f * bag.size();
+        float overflow = (existing+pending) - (massMeanTarget * bag.capacity());
+        if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
+            return -1;
 
-        float period = (basePeriod) * existing / pendingMass;
+        float decaySpeed = 0.5f; //< 1.0, smaller means slower forgetting rate / longer forgetting time
+        float period = existing / (overflow * decaySpeed);
 
-        //System.out.println("existing " + existing + " (est), pending: " + pendingMass + " ==> " + period);
+        System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);
 
         return period;
 
