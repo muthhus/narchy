@@ -1,4 +1,4 @@
-package nars.nal.meta;
+package nars.nal.derive;
 
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.function.primitive.FloatFunction;

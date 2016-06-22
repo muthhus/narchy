@@ -11,6 +11,7 @@ import nars.nal.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.ImmediateTermTransform;
+import nars.nal.rule.PremiseRule;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements ProcTerm {
 
-    final ProcTerm[] proc = new ProcTerm[32]; //should be large enough
+    public final ProcTerm[] proc = new ProcTerm[32]; //should be large enough
     public final int subterm;
 
 

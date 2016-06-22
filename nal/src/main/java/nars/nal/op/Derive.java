@@ -8,7 +8,7 @@ import nars.budget.Budget;
 import nars.nal.ConceptProcess;
 import nars.nal.TimeFunction;
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.PremiseRule;
+import nars.nal.rule.PremiseRule;
 import nars.nal.meta.ProcTerm;
 import nars.task.Revision;
 import nars.task.Task;

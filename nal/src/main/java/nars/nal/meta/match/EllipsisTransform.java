@@ -1,7 +1,7 @@
 package nars.nal.meta.match;
 
 import nars.Op;
-import nars.nal.meta.PremiseRule;
+import nars.nal.rule.PremiseRule;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.AbstractVariable;

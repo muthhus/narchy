@@ -48,6 +48,10 @@ abstract public class AbstractPatternOp extends AtomicBoolCondition {
             super(subterm, op);
         }
 
+        public PatternOp(int subterm, int structure) {
+            super(subterm, structure);
+        }
+
 
         @Override
         public boolean test(int i) {

@@ -1,4 +1,4 @@
-package nars.nal.meta;
+package nars.nal.rule;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
@@ -7,6 +7,7 @@ import nars.*;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
 import nars.nal.TimeFunction;
+import nars.nal.meta.*;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisOneOrMore;
@@ -22,7 +23,6 @@ import nars.op.math.add;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -46,7 +46,6 @@ import java.util.function.BiConsumer;
 import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
-import static nars.nal.meta.PremiseRuleSet.normalize;
 import static nars.term.Terms.*;
 
 /**
@@ -129,7 +128,7 @@ public class PremiseRule extends GenericCompound {
      */
     public int minNAL;
 
-    protected String source;
+    public String source;
 
     public
     @Nullable
@@ -270,7 +269,7 @@ public class PremiseRule extends GenericCompound {
          * VAR_PATTERN acts as a sort of wildcard / unknown
          */
         @NotNull
-        private final Term pattern;
+        public final Term pattern;
 
         @NotNull
         private final String id;
@@ -1122,7 +1121,7 @@ public class PremiseRule extends GenericCompound {
         Compound newPremise = (Compound) $.the(getPremise().op(), pp);
         Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
 
-        @NotNull PremiseRule neg = normalize(new PremiseRule(newPremise, newConclusion), index);
+        @NotNull PremiseRule neg = PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
 
         //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
 
@@ -1182,7 +1181,7 @@ public class PremiseRule extends GenericCompound {
             newPremise = pc; //same
         }
 
-        return normalize(new PremiseRule(newPremise, newConclusion), index);
+        return PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
 
     }
 

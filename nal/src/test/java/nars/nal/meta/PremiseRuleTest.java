@@ -4,6 +4,8 @@ import com.google.common.base.Joiner;
 import nars.Global;
 import nars.Narsese;
 import nars.index.PatternIndex;
+import nars.nal.rule.PremiseRule;
+import nars.nal.rule.PremiseRuleSet;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

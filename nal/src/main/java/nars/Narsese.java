@@ -13,7 +13,7 @@ import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import nars.index.TermIndex;
 import nars.nal.Tense;
-import nars.nal.meta.PremiseRule;
+import nars.nal.rule.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.out.echo;

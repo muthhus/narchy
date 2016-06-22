@@ -1,7 +1,10 @@
-package nars.nal.meta;
+package nars.nal.derive;
 
 import nars.Global;
 import nars.nal.Deriver;
+import nars.nal.meta.*;
+import nars.nal.rule.PremiseRule;
+import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

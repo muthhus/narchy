@@ -1,8 +1,8 @@
 package nars.nal;
 
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.PremiseRuleSet;
-import nars.nal.meta.TrieDeriver;
+import nars.nal.rule.PremiseRuleSet;
+import nars.nal.derive.TrieDeriver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -101,4 +101,5 @@ public abstract class Deriver  {
 //            r.get(i).index(memory.index);
 //        }
 //    }
+
 }

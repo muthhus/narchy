@@ -7,7 +7,7 @@ import nars.Op;
 import nars.index.Indexes;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
-import nars.nal.meta.PremiseRule;
+import nars.nal.rule.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisOneOrMore;

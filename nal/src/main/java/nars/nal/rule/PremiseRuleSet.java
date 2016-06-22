@@ -1,4 +1,4 @@
-package nars.nal.meta;
+package nars.nal.rule;
 
 import nars.Global;
 import nars.index.PatternIndex;

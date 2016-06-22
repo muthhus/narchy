@@ -1,13 +1,17 @@
-package nars.nal.meta;
+package nars.nal.derive;
 
 import com.google.common.collect.Lists;
 import javassist.*;
 import nars.Global;
 import nars.Op;
 import nars.nal.Deriver;
+import nars.nal.meta.*;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.nal.meta.op.MatchTermPrototype;
 import nars.nal.op.Derive;
+import nars.nal.rule.PremiseRule;
+import nars.nal.rule.PremiseRuleSet;
+import nars.term.SubtermVisitorX;
 import nars.term.Term;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-
-import static nars.nal.meta.TermTrie.indent;
 
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
@@ -245,23 +248,73 @@ public class TrieDeriver extends Deriver {
         return p;
     }
 
+    public void recurse(CauseEffect each) {
+        for (ProcTerm p : roots) {
+            recurse(null, p, each);
+        }
+    }
+
+    public interface CauseEffect extends BiConsumer<Term,Term> {
+
+    }
+
+    public Term recurse(Term pred, Term curr, CauseEffect each) {
+
+        each.accept(pred, curr);
+
+        if (curr instanceof IfThen) {
+
+            IfThen it = (IfThen) curr;
+            each.accept(/*recurse(curr, */it.cond/*, each)*/, recurse(curr, it.conseq, each));
+
+        } else if (curr instanceof AndCondition) {
+
+            AndCondition ac = (AndCondition) curr;
+            Term p = curr;
+            for (BoolCondition b : ac.termCache) {
+                p = recurse(p, b, each);
+            }
+
+        } else if (curr instanceof Fork) {
+            Fork ac = (Fork) curr;
+            for (ProcTerm b : ac.termCache) {
+                recurse(curr, b, each);
+            }
+        } else if (curr instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) curr;
+            int i = -1;
+            for (ProcTerm b : sw.proc) {
+                i++;
+                if (b == null)
+                    continue;
+
+                //construct a virtual if/then branch to emulate the entire switch structure
+                recurse(curr,
+                        new IfThen(
+                            new PatternOp(sw.subterm, Op.values()[i]),
+                            b), each);
+
+            }
+        }
+
+        return curr;
+    }
 
     public void print(Object p, @NotNull PrintStream out, int indent) {
-
 
         if (p instanceof IfThen) {
 
             IfThen it = (IfThen) p;
 
-            indent(indent);
+            TermTrie.indent(indent);
             out.println(Util.className(p) + " (");
             print(it.cond, out, indent + 2);
 
-            indent(indent);
+            TermTrie.indent(indent);
             out.println(") ==> {");
 
             print(it.conseq, out, indent + 2);
-            indent(indent);
+            TermTrie.indent(indent);
             out.println("}");
 
         } /*else if (p instanceof If) {
@@ -274,62 +327,46 @@ public class TrieDeriver extends Deriver {
             indent(indent); out.println("}");
 
         } */ else if (p instanceof AndCondition) {
-            indent(indent);
+            TermTrie.indent(indent);
             out.println("and {");
             AndCondition ac = (AndCondition) p;
             for (BoolCondition b : ac.termCache) {
                 print(b, out, indent + 2);
             }
-            indent(indent);
+            TermTrie.indent(indent);
             out.println("}");
         } else if (p instanceof Fork) {
-            indent(indent); out.println(Util.className(p) + " {");
+            TermTrie.indent(indent); out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
             for (ProcTerm b : ac.termCache) {
                 print(b, out, indent + 2);
             }
-            indent(indent); out.println("}");
+            TermTrie.indent(indent); out.println("}");
 
         } else if (p instanceof PatternOpSwitch) {
             PatternOpSwitch sw = (PatternOpSwitch) p;
-            indent(indent); out.println("SubTermOp" + sw.subterm + " {");
+            TermTrie.indent(indent); out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
             for (ProcTerm b : sw.proc) {
                 i++;
                 if (b == null) continue;
 
-                indent(indent+2); out.println( '"' + Op.values()[i].toString() + "\": {");
+                TermTrie.indent(indent+2); out.println( '"' + Op.values()[i].toString() + "\": {");
                 print(b, out, indent + 4);
-                indent(indent+2); out.println("}");
+                TermTrie.indent(indent+2); out.println("}");
 
             }
-            indent(indent); out.println("}");
+            TermTrie.indent(indent); out.println("}");
         } else {
 
             if (p instanceof MatchTermPrototype)
                 ((MatchTermPrototype) p).build();
 
-            indent(indent);
+            TermTrie.indent(indent);
             out.println( /*Util.className(p) + ": " +*/ p);
 
         }
 
-//        node.forEach(n -> {
-//            List<A> seq = n.seq();
-//
-//            int from = n.start();
-//
-//            out.print(n.childCount() + "|" + n.getSize() + "  ");
-//
-//            indent(from * 4);
-//
-//            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())
-//                    //.stream().map(x ->
-//                    //'[' + x.getClass().getSimpleName() + ": " + x + "/]").collect(Collectors.toList())
-//            ) );
-//
-//            printSummary(n, out);
-//        });
 
     }
 

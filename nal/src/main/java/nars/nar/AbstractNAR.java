@@ -7,7 +7,7 @@ import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.PremiseRule;
+import nars.nal.rule.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.op.data.*;
 import nars.op.math.add;
