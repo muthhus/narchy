@@ -4,11 +4,11 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.util.AbstractJoglWindow;
+import nars.util.JoglSpace;
 
 import java.text.NumberFormat;
 
-public class Lesson14 extends AbstractJoglWindow {
+public class Lesson14 extends JoglSpace {
     private float rotation; // Rotation
     private static final GLU glu = new GLU();
     private static final GLUT glut = new GLUT();

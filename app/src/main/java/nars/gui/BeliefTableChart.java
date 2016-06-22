@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
-import nars.util.AbstractJoglWindow2D;
+import nars.util.JoglSpace2D;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ import static java.lang.Math.PI;
 import static nars.nal.Tense.ETERNAL;
 
 
-public class BeliefWindow extends AbstractJoglWindow2D {
+public class BeliefTableChart extends JoglSpace2D {
 
     final List<? extends Concept> c;
     final List<TruthWave> beliefs;
@@ -28,11 +28,11 @@ public class BeliefWindow extends AbstractJoglWindow2D {
     private final NAR nar;
     private long now;
 
-    public BeliefWindow(NAR n, Concept c) {
+    public BeliefTableChart(NAR n, Concept c) {
         this(n, Collections.singletonList(c));
     }
 
-    public BeliefWindow(NAR n, List<? extends Concept> c) {
+    public BeliefTableChart(NAR n, List<? extends Concept> c) {
         super();
         this.c =c;
         this.nar = n;

@@ -6,9 +6,9 @@ import com.jogamp.opengl.GLAutoDrawable;
 /**
  * 2D window
  */
-public abstract class AbstractJoglWindow2D extends AbstractJoglWindow {
+public abstract class JoglSpace2D extends JoglSpace {
 
-    public AbstractJoglWindow2D() {
+    public JoglSpace2D() {
         super();
     }
 
@@ -40,10 +40,7 @@ public abstract class AbstractJoglWindow2D extends AbstractJoglWindow {
         gl.glEnd();
     }
 
-    @Override
-    public void init(GLAutoDrawable gl) {
 
-    }
 
     @Override
     public abstract void display(GLAutoDrawable glAutoDrawable);
@@ -71,4 +68,5 @@ public abstract class AbstractJoglWindow2D extends AbstractJoglWindow {
         gl.glLoadIdentity();
 
     }
+
 }

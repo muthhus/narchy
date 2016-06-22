@@ -2,7 +2,7 @@ package nars.guifx.demo;
 
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.gui.BeliefWindow;
+import nars.gui.BeliefTableChart;
 import nars.util.Texts;
 
 /**
@@ -67,7 +67,7 @@ public class BeliefLab {
             }
         });
 
-        new BeliefWindow(nar, c).show(400, 100);
+        new BeliefTableChart(nar, c).show(400, 100);
 
 
 

@@ -39,263 +39,283 @@
 
 package gleem;
 
-import java.util.*;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES1;
+import gleem.linalg.IntersectionPoint;
+import gleem.linalg.Mat4f;
+import gleem.linalg.Vec3f;
 
-import gleem.linalg.*;
-import com.jogamp.opengl.*;
+import java.util.List;
 
-/** Triangle-based manipulator part. This is the base class for most
-    of the ManipParts that GLEEM uses internally. You can feel free to
-    subclass this if you want to replace geometry in the manipulators,
-    or re-derive from ManipPart. See ManipPartLineSeg for an example. */
+/**
+ * Triangle-based manipulator part. This is the base class for most
+ * of the ManipParts that GLEEM uses internally. You can feel free to
+ * subclass this if you want to replace geometry in the manipulators,
+ * or re-derive from ManipPart. See ManipPartLineSeg for an example.
+ */
 
 public class ManipPartTriBased extends ManipPart {
-  private final Vec3f   color;
-  private final Vec3f   highlightColor;
-  private boolean highlighted;
-  private boolean pickable;
-  private boolean visible;
-  /** Direct references down to subclass-specific data */
-  private Vec3f[] vertices;
-  private Vec3f[] normals;
-  private int[]   vertexIndices;
-  private int[]   normalIndices;
-  /** Current transformation matrix */
-  private final Mat4f   xform;
-  /** Transformed vertices and normals */
-  private Vec3f[] curVertices;
-  private Vec3f[] curNormals;
+    private final Vec3f color;
+    private final Vec3f highlightColor;
+    private boolean highlighted;
+    private boolean pickable;
+    private boolean visible;
+    /**
+     * Direct references down to subclass-specific data
+     */
+    private Vec3f[] vertices;
+    private Vec3f[] normals;
+    private int[] vertexIndices;
+    private int[] normalIndices;
+    /**
+     * Current transformation matrix
+     */
+    private final Mat4f xform;
+    /**
+     * Transformed vertices and normals
+     */
+    private Vec3f[] curVertices;
+    private Vec3f[] curNormals;
 
-  public ManipPartTriBased() {
-    color          = new Vec3f(0.8f, 0.8f, 0.8f);
-    highlightColor = new Vec3f(0.8f, 0.8f, 0.2f);
-    highlighted    = false;
-    pickable       = true;
-    visible	   = true;
-    vertices	   = null;
-    normals        = null;
-    vertexIndices  = null;
-    normalIndices  = null;
-    xform          = new Mat4f();
-    xform.makeIdent();
-    curVertices    = null;
-  }
-
-  /** Default color is (0.8, 0.8, 0.8) */
-  public void setColor(Vec3f color) {
-    this.color.set(color);
-  }
-
-  public Vec3f getColor() {
-    return new Vec3f(color);
-  }
-
-  /** Default highlight color is (0.8, 0.8, 0) */
-  public void setHighlightColor(Vec3f highlightColor) {
-    this.highlightColor.set(highlightColor);
-  }
-  
-  public Vec3f getHighlightColor() {
-    return new Vec3f(highlightColor);
-  }
-
-  @Override
-  public void intersectRay(Vec3f rayStart,
-                           Vec3f rayDirection,
-                           List  results,
-                           Manip caller) {
-    consistencyCheck();
-    if (!pickable) {
-      return;
+    public ManipPartTriBased() {
+        color = new Vec3f(0.8f, 0.8f, 0.8f);
+        highlightColor = new Vec3f(0.8f, 0.8f, 0.2f);
+        highlighted = false;
+        pickable = true;
+        visible = true;
+        vertices = null;
+        normals = null;
+        vertexIndices = null;
+        normalIndices = null;
+        xform = new Mat4f();
+        xform.makeIdent();
+        curVertices = null;
     }
 
-    IntersectionPoint intPt = new IntersectionPoint();
-    HitPoint hitPt = new HitPoint();
-    hitPt.manipulator = caller;
-    hitPt.manipPart = this;
-    for (int i = 0; i < vertexIndices.length; i+=3) {
-      int i0 = vertexIndices[i];
-      int i1 = vertexIndices[i+1];
-      int i2 = vertexIndices[i+2];
-      if (RayTriangleIntersection.intersectRayWithTriangle(rayStart,
-							   rayDirection,
-							   curVertices[i0],
-							   curVertices[i1],
-							   curVertices[i2],
-							   intPt)
-	  == RayTriangleIntersection.INTERSECTION) {
-	// Check for intersections behind the ray
-	if (intPt.getT() >= 0) {
-	  hitPt.rayStart = rayStart;
-	  hitPt.rayDirection = rayDirection;
-	  hitPt.intPt = intPt;
-	  results.add(hitPt);
-	}
-      }
-    }
-  }
-
-  @Override
-  public void setTransform(Mat4f xform) {
-    this.xform.set(xform);
-    recalcVertices();
-  }
-
-  @Override
-  public void highlight() {
-    highlighted = true;
-  }
-
-  @Override
-  public void clearHighlight() {
-    highlighted = false;
-  }
-
-  /** Default is pickable */
-  @Override
-  public void setPickable(boolean pickable) {
-    this.pickable = pickable;    
-  }
-
-  @Override
-  public boolean getPickable() {
-    return pickable;
-  }
-
-  /** Default is visible */
-  @Override
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-  }
-
-  @Override
-  public boolean getVisible() {
-    return visible;
-  }
-
-  @Override
-  public void render(GL2 gl) {
-    if (!visible)
-      return;
-    boolean lightingOn = true;
-    // FIXME: this is too expensive; figure out another way
-    //  if (glIsEnabled(GL2ES1.GL_LIGHTING))
-    //    lightingOn = true;
-
-    if (lightingOn) {
-      gl.glEnable(GL2ES1.GL_COLOR_MATERIAL);
-      gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL2ES1.GL_AMBIENT_AND_DIFFUSE);
-    }
-    gl.glBegin(GL.GL_TRIANGLES);
-    if (highlighted)
-      gl.glColor3f(highlightColor.x(), highlightColor.y(), highlightColor.z());
-    else
-      gl.glColor3f(color.x(), color.y(), color.z());
-    int i = 0;
-    while (i < vertexIndices.length) {
-      Vec3f n0 = curNormals[normalIndices[i]];
-      Vec3f v0 = curVertices[vertexIndices[i]];
-      gl.glNormal3f(n0.x(), n0.y(), n0.z());
-      gl.glVertex3f(v0.x(), v0.y(), v0.z());
-      i++;
-
-      Vec3f n1 = curNormals[normalIndices[i]];
-      Vec3f v1 = curVertices[vertexIndices[i]];
-      gl.glNormal3f(n1.x(), n1.y(), n1.z());
-      gl.glVertex3f(v1.x(), v1.y(), v1.z());
-      i++;
-
-      Vec3f n2 = curNormals[normalIndices[i]];
-      Vec3f v2 = curVertices[vertexIndices[i]];
-      gl.glNormal3f(n2.x(), n2.y(), n2.z());
-      gl.glVertex3f(v2.x(), v2.y(), v2.z());
-      i++;
-    }
-    gl.glEnd();
-    if (lightingOn)
-      gl.glDisable(GL2ES1.GL_COLOR_MATERIAL);
-  }
-
-  //----------------------------------------------------------------------
-  // Used by subclasses to set up vertex, normals, and vertex and
-  // normal indices.
-  //
-  
-  protected void setVertices(Vec3f[] vertices) {
-    this.vertices = vertices;
-  }
-
-  protected Vec3f[] getVertices() {
-    return vertices;
-  }
-
-  protected void setNormals(Vec3f[] normals) {
-    this.normals = normals;
-  }
-
-  protected Vec3f[] getNormals() {
-    return normals;
-  }
-
-  protected void setVertexIndices(int[] vertexIndices) {
-    this.vertexIndices = vertexIndices;
-  }
-
-  protected int[] getVertexIndices() {
-    return vertexIndices;
-  }
-
-  protected void setNormalIndices(int[] normalIndices) {
-    this.normalIndices = normalIndices;
-  }
-
-  protected int[] getNormalIndices() {
-    return normalIndices;
-  }
-
-  //----------------------------------------------------------------------
-  // Internals only below this point
-  //
-
-  private void consistencyCheck() {
-    if (vertexIndices.length != normalIndices.length) {
-      throw new RuntimeException("vertexIndices.length != normalIndices.length");
-    }
-    
-    if ((vertexIndices.length % 3) != 0) {
-      throw new RuntimeException("(vertexIndices % 3) != 0");
-    }
-    
-    if ((curVertices != null) &&
-        (vertices.length != curVertices.length)) {
-      throw new RuntimeException("vertices.length != curVertices.length");
-    }
-  }
-
-  private void recalcVertices() {
-    if ((curVertices == null) ||
-        (curVertices.length != vertices.length)) {
-      curVertices = new Vec3f[vertices.length];
-      for (int i = 0; i < vertices.length; i++) {
-        curVertices[i] = new Vec3f();
-      }
+    /**
+     * Default color is (0.8, 0.8, 0.8)
+     */
+    public void setColor(Vec3f color) {
+        this.color.set(color);
     }
 
-    for (int i = 0; i < vertices.length; i++) {
-      xform.xformPt(vertices[i], curVertices[i]);
+    public Vec3f getColor() {
+        return new Vec3f(color);
     }
 
-    if ((curNormals == null) ||
-        (curNormals.length != normals.length)) {
-      curNormals = new Vec3f[normals.length];
-      for (int i = 0; i < normals.length; i++) {
-        curNormals[i] = new Vec3f();
-      }
+    /**
+     * Default highlight color is (0.8, 0.8, 0)
+     */
+    public void setHighlightColor(Vec3f highlightColor) {
+        this.highlightColor.set(highlightColor);
     }
 
-    for (int i = 0; i < normals.length; i++) {
-      xform.xformDir(normals[i], curNormals[i]);
-      curNormals[i].normalize();
+    public Vec3f getHighlightColor() {
+        return new Vec3f(highlightColor);
     }
-  }
+
+    @Override
+    public void intersectRay(Vec3f rayStart,
+                             Vec3f rayDirection,
+                             List results,
+                             Manip caller) {
+        consistencyCheck();
+        if (!pickable) {
+            return;
+        }
+
+        IntersectionPoint intPt = new IntersectionPoint();
+        HitPoint hitPt = new HitPoint();
+        hitPt.manipulator = caller;
+        hitPt.manipPart = this;
+        for (int i = 0; i < vertexIndices.length; i += 3) {
+            int i0 = vertexIndices[i];
+            int i1 = vertexIndices[i + 1];
+            int i2 = vertexIndices[i + 2];
+            if (RayTriangleIntersection.intersectRayWithTriangle(rayStart,
+                    rayDirection,
+                    curVertices[i0],
+                    curVertices[i1],
+                    curVertices[i2],
+                    intPt)
+                    == RayTriangleIntersection.INTERSECTION) {
+                // Check for intersections behind the ray
+                if (intPt.t >= 0) {
+                    hitPt.rayStart = rayStart;
+                    hitPt.rayDirection = rayDirection;
+                    hitPt.intPt = intPt;
+                    results.add(hitPt);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setTransform(Mat4f xform) {
+        this.xform.set(xform);
+        recalcVertices();
+    }
+
+    @Override
+    public void highlight() {
+        highlighted = true;
+    }
+
+    @Override
+    public void clearHighlight() {
+        highlighted = false;
+    }
+
+    /**
+     * Default is pickable
+     */
+    @Override
+    public void setPickable(boolean pickable) {
+        this.pickable = pickable;
+    }
+
+    @Override
+    public boolean getPickable() {
+        return pickable;
+    }
+
+    /**
+     * Default is visible
+     */
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    @Override
+    public boolean getVisible() {
+        return visible;
+    }
+
+    @Override
+    public void render(GL2 gl) {
+        if (!visible)
+            return;
+        boolean lightingOn = true;
+        // FIXME: this is too expensive; figure out another way
+        //  if (glIsEnabled(GL2ES1.GL_LIGHTING))
+        //    lightingOn = true;
+
+        if (lightingOn) {
+            gl.glEnable(GL2ES1.GL_COLOR_MATERIAL);
+            gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL2ES1.GL_AMBIENT_AND_DIFFUSE);
+        }
+        gl.glBegin(GL.GL_TRIANGLES);
+        if (highlighted)
+          gl.glColor3f(highlightColor.x, highlightColor.y, highlightColor.z);
+        else
+          gl.glColor3f(color.x, color.y, color.z);
+        int i = 0;
+        while (i < vertexIndices.length) {
+            Vec3f n0 = curNormals[normalIndices[i]];
+            Vec3f v0 = curVertices[vertexIndices[i]];
+          gl.glNormal3f(n0.x, n0.y, n0.z);
+          gl.glVertex3f(v0.x, v0.y, v0.z);
+            i++;
+
+            Vec3f n1 = curNormals[normalIndices[i]];
+            Vec3f v1 = curVertices[vertexIndices[i]];
+          gl.glNormal3f(n1.x, n1.y, n1.z);
+          gl.glVertex3f(v1.x, v1.y, v1.z);
+            i++;
+
+            Vec3f n2 = curNormals[normalIndices[i]];
+            Vec3f v2 = curVertices[vertexIndices[i]];
+          gl.glNormal3f(n2.x, n2.y, n2.z);
+          gl.glVertex3f(v2.x, v2.y, v2.z);
+            i++;
+        }
+        gl.glEnd();
+        if (lightingOn)
+            gl.glDisable(GL2ES1.GL_COLOR_MATERIAL);
+    }
+
+    //----------------------------------------------------------------------
+    // Used by subclasses to set up vertex, normals, and vertex and
+    // normal indices.
+    //
+
+    protected void setVertices(Vec3f[] vertices) {
+        this.vertices = vertices;
+    }
+
+    protected Vec3f[] getVertices() {
+        return vertices;
+    }
+
+    protected void setNormals(Vec3f[] normals) {
+        this.normals = normals;
+    }
+
+    protected Vec3f[] getNormals() {
+        return normals;
+    }
+
+    protected void setVertexIndices(int[] vertexIndices) {
+        this.vertexIndices = vertexIndices;
+    }
+
+    protected int[] getVertexIndices() {
+        return vertexIndices;
+    }
+
+    protected void setNormalIndices(int[] normalIndices) {
+        this.normalIndices = normalIndices;
+    }
+
+    protected int[] getNormalIndices() {
+        return normalIndices;
+    }
+
+    //----------------------------------------------------------------------
+    // Internals only below this point
+    //
+
+    private void consistencyCheck() {
+        if (vertexIndices.length != normalIndices.length) {
+            throw new RuntimeException("vertexIndices.length != normalIndices.length");
+        }
+
+        if ((vertexIndices.length % 3) != 0) {
+            throw new RuntimeException("(vertexIndices % 3) != 0");
+        }
+
+        if ((curVertices != null) &&
+                (vertices.length != curVertices.length)) {
+            throw new RuntimeException("vertices.length != curVertices.length");
+        }
+    }
+
+    private void recalcVertices() {
+        if ((curVertices == null) ||
+                (curVertices.length != vertices.length)) {
+            curVertices = new Vec3f[vertices.length];
+            for (int i = 0; i < vertices.length; i++) {
+                curVertices[i] = new Vec3f();
+            }
+        }
+
+        for (int i = 0; i < vertices.length; i++) {
+            xform.xformPt(vertices[i], curVertices[i]);
+        }
+
+        if ((curNormals == null) ||
+                (curNormals.length != normals.length)) {
+            curNormals = new Vec3f[normals.length];
+            for (int i = 0; i < normals.length; i++) {
+                curNormals[i] = new Vec3f();
+            }
+        }
+
+        for (int i = 0; i < normals.length; i++) {
+            xform.xformDir(normals[i], curNormals[i]);
+            curNormals[i].normalize();
+        }
+    }
 }

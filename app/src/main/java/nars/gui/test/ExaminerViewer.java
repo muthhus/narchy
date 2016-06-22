@@ -143,12 +143,12 @@ public class ExaminerViewer {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            mouseMethod(e, e.getModifiers(), true, e.getX(), e.getY());
+            mouseMethod(e, e.getButton(), true, e.getX(), e.getY());
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            mouseMethod(e, e.getModifiers(), false, e.getX(), e.getY());
+            mouseMethod(e, e.getButton(), false, e.getX(), e.getY());
         }
     };
 
@@ -235,14 +235,6 @@ public class ExaminerViewer {
     }
 
     /**
-     * Call this to force the ExaminerViewer to update its
-     * CameraParameters without touching the OpenGL state.
-     */
-    public void update() {
-        recalc();
-    }
-
-    /**
      * Call this from within your display() method to cause the
      * ExaminerViewer to recompute its position based on the visible
      * geometry. A BSphereProvider must have already been set or this
@@ -267,9 +259,9 @@ public class ExaminerViewer {
         }
         BSphere bsph = provider.getBoundingSphere();
         float dist = bsph.getRadius() / (float) Math.sin(minFOV / 2.0f);
-        dolly.setZ(dist);
+        dolly.z = dist;
         center.set(bsph.getCenter());
-        recalc(gl);
+        //recalc(gl);
     }
 
     /**
@@ -341,7 +333,7 @@ public class ExaminerViewer {
      */
     public void setPosition(Vec3f position) {
         Vec3f tmp = orientation.rotateVector(Vec3f.NEG_Z_AXIS);
-        tmp.scale(dolly.z());
+        tmp.scale(dolly.z);
         center.add(position, tmp);
     }
 
@@ -428,18 +420,18 @@ public class ExaminerViewer {
     }
 
     private boolean modifiersMatch(MouseEvent e, int mods) {
-//        if (noAltKeyMode) {
-//            if ((mods & MouseEvent.) != 0 &&
-//                    (mods & MouseEvent.BUTTON2_DOWN_MASK) == 0 &&
-//                    (mods & MouseEvent.BUTTON3_DOWN_MASK) == 0) {
-//                return (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown() && !e.isShiftDown());
-//            } else {
-//                // At least on Windows, meta seems to be declared to be down on right button presses
-//                return !e.isControlDown() && !e.isShiftDown();
-//            }
-//        } else {
+        if (noAltKeyMode) {
+            /*if ((mods & MouseEvent.) != 0 &&
+                    (mods & MouseEvent.BUTTON2_DOWN_MASK) == 0 &&
+                    (mods & MouseEvent.BUTTON3_DOWN_MASK) == 0) {
+                return (!e.isAltDown() && !e.isMetaDown() && !e.isControlDown() && !e.isShiftDown());
+            } else {*/
+                // At least on Windows, meta seems to be declared to be down on right button presses
+                return !e.isControlDown() && !e.isShiftDown();
+            //}
+        } else {
             return (e.isAltDown() || e.isMetaDown());
-        //}
+        }
     }
 
     private void init() {
@@ -535,11 +527,11 @@ public class ExaminerViewer {
 
                 // FIXME: implement this in terms of mouse wheel
                 float diff = dollySpeed * (-1.0f * dy - dx) / 100.0f;
-                float newDolly = dolly.z() + diff;
+                float newDolly = dolly.z + diff;
                 if (newDolly < minFocalDist) {
                     newDolly = minFocalDist;
                 }
-                dolly.setZ(newDolly);
+                dolly.z = newDolly;
 
             }
 
@@ -550,35 +542,36 @@ public class ExaminerViewer {
         }
     }
 
-    private void mouseMethod(MouseEvent e, int mods, boolean press,
+    private void mouseMethod(MouseEvent e, int button, boolean press,
                              int x, int y) {
-        if ((interactionUnderway && !iOwnInteraction) ||
-                (!modifiersMatch(e, mods))) {
+
+
+
+
+        //if ((interactionUnderway && !iOwnInteraction) || (!modifiersMatch(e, mods))) {
             // Update state and pass this event along to the ManipManager
             if (press) {
-                interactionUnderway = true;
-                iOwnInteraction = false;
-                manip.mousePressed(e);
+                if (interactionUnderway = manip.mousePressed(e)) {
+                    iOwnInteraction = false;
+                }
             } else {
-                interactionUnderway = false;
-                iOwnInteraction = false;
-                manip.mouseReleased(e);
+                if (!(interactionUnderway = manip.mouseReleased(e))) {
+                    iOwnInteraction = false;
+                }
             }
-        } else {
-            if ((mods & MouseEvent.BUTTON1_MASK) != 0) {
-                button1Down = true;
-            } else {
-                button1Down = false;
-            }
-            if ((mods & MouseEvent.BUTTON2_MASK) != 0) {
-                button2Down = true;
-            } else {
-                button2Down = false;
-            }
-            if ((mods & MouseEvent.BUTTON3_MASK) != 0) {
-                button3Down = true;
-            } else {
-                button3Down = false;
+        //} else {
+        if (!interactionUnderway || iOwnInteraction) {
+
+            switch (button) {
+                case 1:
+                    button1Down = press;
+                    break;
+                case 2:
+                    button2Down = press;
+                    break;
+                case 3:
+                    button3Down = press;
+                    break;
             }
 
             lastX = x;
@@ -596,6 +589,7 @@ public class ExaminerViewer {
                 // Force redraw
                 //window.display(); //repaint();
             }
+
         }
     }
 
@@ -714,7 +708,7 @@ public class ExaminerViewer {
         Vec3f tmp = new Vec3f();
         float ang = orientation.get(tmp);
         if (tmp.lengthSquared() > EPSILON)
-            gl.glRotatef((float) Math.toDegrees(ang), tmp.x(), tmp.y(), tmp.z());
+            gl.glRotatef((float) Math.toDegrees(ang), tmp.x, tmp.y, tmp.z);
     }
 
     private Vec3f computePosition(Vec3f tmp) {

@@ -1,47 +1,41 @@
 package nars.util;
 
-import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.event.WindowEvent;
-import com.jogamp.newt.event.WindowListener;
-import com.jogamp.newt.event.WindowUpdateEvent;
+import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.Animator;
 
 
-public abstract class AbstractJoglWindow extends GLWindow implements GLEventListener, WindowListener {
 
-    //public static final int SCREEN_DRAG_BUTTON = 3;
-
-    public static final int INIT_WIDTH = 1200;
-    public static final int INIT_HEIGHT = 900;
-
-    //private Timer timer;
-    //LightEngine light = new LightEngine();
+public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
-    public AbstractJoglWindow() {
-        this(newDefaultConfig());
+    protected GLWindow window;
+    protected GL2 gl;
+
+    public static GLWindow window(JoglSpace j) {
+        return window(newDefaultConfig(), j);
     }
 
-    // model can be null
-    // if it is null world and debugDraw can be null, because they are retrived from model
-    public AbstractJoglWindow(GLCapabilitiesImmutable config) {
-        //super(GLWindow.create(config));
-        super(NewtFactory.createWindow(config));
+    public static GLWindow window(GLCapabilitiesImmutable config, JoglSpace j) {
+        GLWindow w = GLWindow.create(config);
+        w.addGLEventListener(j);
+        w.addWindowListener(j);
 
-        addGLEventListener(this);
-        addWindowListener(this);
-
+        //TODO FPSAnimator
         Animator a = new Animator();
-        a.add(this);
+        a.add(w);
         a.start();
+        return w;
+    }
 
-        setSize(INIT_WIDTH, INIT_HEIGHT);
-        setVisible(true);
+    @Override
+    public void init(GLAutoDrawable drawable) {
+        this.window = (GLWindow)drawable;
+        init(this.gl = drawable.getGL().getGL2());
+    }
 
-
-
+    protected void init(GL2 gl2) {
 
     }
 
@@ -52,7 +46,7 @@ public abstract class AbstractJoglWindow extends GLWindow implements GLEventList
                 GLProfile.getDefault()
         );
 
-        config.setHardwareAccelerated(true);
+        //config.setHardwareAccelerated(true);
 //        config.setBackgroundOpaque(false);
 
         config.setAlphaBits(8);
@@ -67,6 +61,15 @@ public abstract class AbstractJoglWindow extends GLWindow implements GLEventList
 //    protected World2D getWorld() {
 //        return model != null ? model.getCurrTest().getWorld() : world;
 //    }
+
+
+    public int getWidth() {
+        return window.getWidth();
+    }
+    public int getHeight() {
+        return window.getWidth();
+    }
+
 
 
     @Override
@@ -110,15 +113,30 @@ public abstract class AbstractJoglWindow extends GLWindow implements GLEventList
 
 
 
-    public AbstractJoglWindow show(int w, int h) {
+    public GLWindow show(int w, int h) {
         return show("", w, h );
     }
 
-    public AbstractJoglWindow show(String title, int w, int h) {
-        setTitle(title);
-        setVisible(true);
-        setSurfaceSize(w, h);
-        return this;
+    public GLWindow show(String title, int w, int h) {
+        GLWindow g = window(this);
+        g.setTitle(title);
+        g.setSurfaceSize(w, h);
+        g.setVisible(true);
+        return g;
+    }
+
+    public void addMouseListener(MouseListener m) {
+        window.addMouseListener(m);
+    }
+    public void addWindowListener(WindowListener m) {
+        window.addWindowListener(m);
+    }
+    public void addKeyListener(KeyListener m) {
+        window.addKeyListener(m);
+    }
+
+    public GL2 gl() {
+        return gl;
     }
 
 

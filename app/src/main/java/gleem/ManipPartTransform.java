@@ -39,35 +39,35 @@
 
 package gleem;
 
-import java.util.*;
+import gleem.linalg.Mat4f;
 
-import gleem.linalg.*;
-
-/** A Group which contains an offset transformation which is performed
-    before the one handed down in setTransform. */
+/**
+ * A Group which contains an offset transformation which is performed
+ * before the one handed down in setTransform.
+ */
 
 public class ManipPartTransform extends ManipPartGroup {
-  private final Mat4f offsetTransform;
+    private final Mat4f offsetTransform;
 
-  public ManipPartTransform() {
-    super();
-    offsetTransform = new Mat4f();
-    offsetTransform.makeIdent();
-  }
-
-  @Override
-  public void setTransform(Mat4f xform) {
-    Mat4f totalXform = xform.mul(offsetTransform);
-    for (int i = 0; i < getNumChildren(); i++) {
-      getChild(i).setTransform(totalXform);
+    public ManipPartTransform() {
+        super();
+        offsetTransform = new Mat4f();
+        offsetTransform.makeIdent();
     }
-  }
 
-  public void setOffsetTransform(Mat4f offsetTransform) {
-    this.offsetTransform.set(offsetTransform);
-  }
+    @Override
+    public void setTransform(Mat4f xform) {
+        Mat4f totalXform = xform.mul(offsetTransform);
+        for (int i = 0; i < getNumChildren(); i++) {
+            getChild(i).setTransform(totalXform);
+        }
+    }
 
-  public Mat4f getOffsetTransform() {
-    return offsetTransform;
-  }
+    public void setOffsetTransform(Mat4f offsetTransform) {
+        this.offsetTransform.set(offsetTransform);
+    }
+
+    public Mat4f getOffsetTransform() {
+        return offsetTransform;
+    }
 }

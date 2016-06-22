@@ -12,7 +12,7 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import java.io.File;
 import java.nio.ByteBuffer;
 
-import static nars.rover.physics.gl.Box2DJoglWindow.newDefaultConfig;
+import static nars.rover.physics.gl.Box2DJoglSpace.newDefaultConfig;
 
 
 public class NEHEBitmapFont implements GLEventListener {

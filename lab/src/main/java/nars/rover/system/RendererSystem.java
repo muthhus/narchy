@@ -10,7 +10,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.rover.Sim;
 import nars.rover.obj.DrawAbove;
-import nars.rover.physics.gl.Box2DJoglWindow;
+import nars.rover.physics.gl.Box2DJoglSpace;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.run.NEHEBitmapFont;
 import nars.util.data.list.FasterList;
@@ -32,7 +32,7 @@ public class RendererSystem extends EntitySystem {
         super(Aspect.all(DrawAbove.class));
         this.sim = sim;
 
-        new Box2DJoglWindow(sim) {
+        new Box2DJoglSpace(sim) {
 
             final Procedure<LayerDraw> drawProc = (LayerDraw l) -> {
                 if (l != null) l.drawSky(draw, world);

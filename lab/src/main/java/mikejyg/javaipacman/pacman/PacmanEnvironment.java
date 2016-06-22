@@ -25,7 +25,6 @@ import nars.$;
 import nars.NAR;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
-import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation2;
@@ -34,7 +33,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.agent.NAgent;
-import nars.gui.BeliefWindow;
+import nars.gui.BeliefTableChart;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 
@@ -109,7 +108,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
-			new BeliefWindow(n.nar, n.actions).show(400, 100);
+			new BeliefTableChart(n.nar, n.actions).show(400, 100);
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

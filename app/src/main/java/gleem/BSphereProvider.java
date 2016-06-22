@@ -39,8 +39,10 @@
 
 package gleem;
 
-/** Provides a bounding sphere to an arbitrary client. */
+/**
+ * Provides a bounding sphere to an arbitrary client.
+ */
 
 public interface BSphereProvider {
-  BSphere getBoundingSphere();
+    BSphere getBoundingSphere();
 }

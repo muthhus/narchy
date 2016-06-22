@@ -39,134 +39,148 @@
 
 package gleem;
 
-import java.util.*;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES1;
+import gleem.linalg.Mat4f;
+import gleem.linalg.Vec3f;
 
-import gleem.linalg.*;
-import com.jogamp.opengl.*;
+import java.util.List;
 
-/** A line segment from (-1, 0, 0) to (1, 0, 0). */
+/**
+ * A line segment from (-1, 0, 0) to (1, 0, 0).
+ */
 
 public class ManipPartLineSeg extends ManipPart {
-  private final Vec3f color;
-  private final Vec3f highlightColor;
-  private boolean highlighted;
-  private boolean visible;
-  private static final Vec3f[] vertices = new Vec3f[] {
-    new Vec3f(-1, 0, 0),
-    new Vec3f(1, 0, 0)
-  };
-  /** Current transformation matrix */
-  private final Mat4f xform;
-  /** Transformed vertices */
-  private Vec3f[] curVertices;
+    private final Vec3f color;
+    private final Vec3f highlightColor;
+    private boolean highlighted;
+    private boolean visible;
+    private static final Vec3f[] vertices = new Vec3f[]{
+            new Vec3f(-1, 0, 0),
+            new Vec3f(1, 0, 0)
+    };
+    /**
+     * Current transformation matrix
+     */
+    private final Mat4f xform;
+    /**
+     * Transformed vertices
+     */
+    private Vec3f[] curVertices;
 
-  public ManipPartLineSeg() {
-    color          = new Vec3f(0.8f, 0.8f, 0.8f);
-    highlightColor = new Vec3f(0.8f, 0.8f, 0.2f);
-    highlighted    = false;
-    visible	   = true;
-    xform          = new Mat4f();
-    xform.makeIdent();
-    curVertices    = null;
-  }
-
-  /** Default color is (0.8, 0.8, 0.8) */
-  public void setColor(Vec3f color) {
-    this.color.set(color);
-  }
-
-  public Vec3f getColor() {
-    return new Vec3f(color);
-  }
-
-  /** Default highlight color is (0.8, 0.8, 0) */
-  public void setHighlightColor(Vec3f highlightColor) {
-    this.highlightColor.set(highlightColor);
-  }
-  
-  public Vec3f getHighlightColor() {
-    return new Vec3f(highlightColor);
-  }
-
-  @Override
-  public void intersectRay(Vec3f rayStart,
-                           Vec3f rayDirection,
-                           List results,
-                           Manip caller) {
-  }
-
-  @Override
-  public void setTransform(Mat4f xform) {
-    this.xform.set(xform);
-    recalcVertices();
-  }
-
-  @Override
-  public void highlight() {
-    highlighted = true;
-  }
-
-  @Override
-  public void clearHighlight() {
-    highlighted = false;
-  }
-
-  @Override
-  public void setPickable(boolean pickable) {
-  }
-
-  @Override
-  public boolean getPickable() {
-    return false;
-  }
-
-  /** Default is visible */
-  @Override
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-  }
-
-  @Override
-  public boolean getVisible() {
-    return visible;
-  }
-
-  @Override
-  public void render(GL2 gl) {
-    if (!visible)
-      return;
-    // FIXME: probably too slow
-    boolean reenable = gl.glIsEnabled(GL2ES1.GL_LIGHTING);
-    gl.glDisable(GL2ES1.GL_LIGHTING);
-    gl.glBegin(GL.GL_LINES);
-    if (highlighted)
-      gl.glColor3f(highlightColor.x(), highlightColor.y(), highlightColor.z());
-    else
-      gl.glColor3f(color.x(), color.y(), color.z());
-    for (int i = 0; i < curVertices.length; i++) {
-      Vec3f v = curVertices[i];
-      gl.glVertex3f(v.x(), v.y(), v.z());
-    }
-    gl.glEnd();
-    if (reenable)
-      gl.glEnable(GL2ES1.GL_LIGHTING);
-  }
-
-  //----------------------------------------------------------------------
-  // Internals only below this point
-  //
-
-  private void recalcVertices() {
-    if ((curVertices == null) ||
-        (curVertices.length != vertices.length)) {
-      curVertices = new Vec3f[vertices.length];
-      for (int i = 0; i < vertices.length; i++) {
-        curVertices[i] = new Vec3f();
-      }
+    public ManipPartLineSeg() {
+        color = new Vec3f(0.8f, 0.8f, 0.8f);
+        highlightColor = new Vec3f(0.8f, 0.8f, 0.2f);
+        highlighted = false;
+        visible = true;
+        xform = new Mat4f();
+        xform.makeIdent();
+        curVertices = null;
     }
 
-    for (int i = 0; i < curVertices.length; i++) {
-      xform.xformPt(vertices[i], curVertices[i]);
+    /**
+     * Default color is (0.8, 0.8, 0.8)
+     */
+    public void setColor(Vec3f color) {
+        this.color.set(color);
     }
-  }
+
+    public Vec3f getColor() {
+        return new Vec3f(color);
+    }
+
+    /**
+     * Default highlight color is (0.8, 0.8, 0)
+     */
+    public void setHighlightColor(Vec3f highlightColor) {
+        this.highlightColor.set(highlightColor);
+    }
+
+    public Vec3f getHighlightColor() {
+        return new Vec3f(highlightColor);
+    }
+
+    @Override
+    public void intersectRay(Vec3f rayStart,
+                             Vec3f rayDirection,
+                             List results,
+                             Manip caller) {
+    }
+
+    @Override
+    public void setTransform(Mat4f xform) {
+        this.xform.set(xform);
+        recalcVertices();
+    }
+
+    @Override
+    public void highlight() {
+        highlighted = true;
+    }
+
+    @Override
+    public void clearHighlight() {
+        highlighted = false;
+    }
+
+    @Override
+    public void setPickable(boolean pickable) {
+    }
+
+    @Override
+    public boolean getPickable() {
+        return false;
+    }
+
+    /**
+     * Default is visible
+     */
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    @Override
+    public boolean getVisible() {
+        return visible;
+    }
+
+    @Override
+    public void render(GL2 gl) {
+        if (!visible)
+            return;
+        // FIXME: probably too slow
+        boolean reenable = gl.glIsEnabled(GL2ES1.GL_LIGHTING);
+        gl.glDisable(GL2ES1.GL_LIGHTING);
+        gl.glBegin(GL.GL_LINES);
+        if (highlighted)
+          gl.glColor3f(highlightColor.x, highlightColor.y, highlightColor.z);
+        else
+          gl.glColor3f(color.x, color.y, color.z);
+        for (Vec3f v : curVertices) {
+          gl.glVertex3f(v.x, v.y, v.z);
+        }
+        gl.glEnd();
+        if (reenable)
+            gl.glEnable(GL2ES1.GL_LIGHTING);
+    }
+
+    //----------------------------------------------------------------------
+    // Internals only below this point
+    //
+
+    private void recalcVertices() {
+        if ((curVertices == null) ||
+                (curVertices.length != vertices.length)) {
+            curVertices = new Vec3f[vertices.length];
+            for (int i = 0; i < vertices.length; i++) {
+                curVertices[i] = new Vec3f();
+            }
+        }
+
+        for (int i = 0; i < curVertices.length; i++) {
+            xform.xformPt(vertices[i], curVertices[i]);
+        }
+    }
 }

@@ -1,7 +1,7 @@
 package nars.gui.graph.layout;
 
 import nars.gui.graph.GraphLayout;
-import nars.gui.graph.GraphWindow;
+import nars.gui.graph.GraphSpace;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ public class Spiral implements GraphLayout {
     float nodeSpeed = 0.05f;
 
     @Override
-    public void update(GraphWindow g, List<GraphWindow.VDraw> verts, float dt) {
+    public void update(GraphSpace g, List<GraphSpace.VDraw> verts, float dt) {
         verts.forEach(this::update);
     }
 
-    protected void update(GraphWindow.VDraw v) {
+    protected void update(GraphSpace.VDraw v) {
         //TODO abstract
         //int hash = v.hash;
         //int vol = v.key.volume();

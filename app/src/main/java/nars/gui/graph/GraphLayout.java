@@ -7,6 +7,6 @@ import java.util.List;
  */
 public interface GraphLayout {
 
-    void update(GraphWindow g, List<GraphWindow.VDraw> verts, float dt);
+    void update(GraphSpace g, List<GraphSpace.VDraw> verts, float dt);
 
 }

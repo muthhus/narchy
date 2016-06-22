@@ -39,15 +39,16 @@
 
 package gleem;
 
-import java.util.*;
-
 import com.jogamp.newt.event.InputEvent;
 import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.opengl.GLWindow;
-import gleem.linalg.*;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import gleem.linalg.Vec2f;
+import gleem.linalg.Vec3f;
 
-import com.jogamp.opengl.*;
+import java.util.*;
 
 /**
  * The ManipManager handles making manipulators visible in a
@@ -57,11 +58,12 @@ import com.jogamp.opengl.*;
 public class ManipManager {
 
     private final GLAutoDrawable gl;
+    private final WindowInfo info;
 
     // Screen-to-ray mapping
     private ScreenToRayMapping mapping;
     // Maps GLDrawables to WindowInfos
-    private final Map windowToInfoMap = new HashMap();
+    //private final Map windowToInfoMap = new HashMap();
     // Maps Manips to Set<GLAutoDrawable>
     private final Map manipToWindowMap = new HashMap();
 
@@ -112,6 +114,7 @@ public class ManipManager {
     public ManipManager(GLAutoDrawable gl) {
         super();
         this.gl = gl;
+        this.info = new WindowInfo();
         mapping = new RightTruncPyrMapping();
         setWindowUpdateListener(null);
     }
@@ -133,38 +136,34 @@ public class ManipManager {
      * installed on this window; see setupMouseListeners, below.
      */
     public synchronized void registerWindow(GLAutoDrawable window) {
-        windowToInfoMap.put(window, new WindowInfo());
         setupMouseListeners(window);
     }
 
-    /**
-     * Remove all references to a given window, including removing all
-     * manipulators from it.
-     */
-    public synchronized void unregisterWindow(GLAutoDrawable window) {
-        if (window == null) {
-            return;
-        }
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
-        if (info != null) {
-            Object[] manips = info.manips.toArray();
-            for (int i = 0; i < manips.length; i++) {
-                removeManipFromWindow((Manip) manips[i], window);
-            }
-            windowToInfoMap.remove(window);
-            removeMouseListeners(window);
-        }
-    }
+//    /**
+//     * Remove all references to a given window, including removing all
+//     * manipulators from it.
+//     */
+//    public synchronized void unregisterWindow(GLAutoDrawable window) {
+//        if (window == null) {
+//            return;
+//        }
+//        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
+//        if (info != null) {
+//            Object[] manips = info.manips.toArray();
+//            for (int i = 0; i < manips.length; i++) {
+//                removeManipFromWindow((Manip) manips[i], window);
+//            }
+//            windowToInfoMap.remove(window);
+//            removeMouseListeners(window);
+//        }
+//    }
 
     /**
      * Make a given manipulator visible and active in a given
      * window. The window must be registered.
      */
     public synchronized void showManipInWindow(Manip manip, GLAutoDrawable window) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
-        if (info == null) {
-            throw new RuntimeException("Window not registered");
-        }
+
         info.manips.add(manip);
         Set windows = (Set) manipToWindowMap.get(manip);
         if (windows == null) {
@@ -179,7 +178,7 @@ public class ManipManager {
      * be registered.
      */
     public synchronized void removeManipFromWindow(Manip manip, GLAutoDrawable window) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
+        //WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
         if (info == null) {
             throw new RuntimeException("Window not registered");
         }
@@ -196,10 +195,6 @@ public class ManipManager {
      * camera parameters of the window change.
      */
     public synchronized void updateCameraParameters(GLAutoDrawable window, CameraParameters params) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
-        if (info == null) {
-            throw new RuntimeException("Window not registered");
-        }
         info.params.set(params);
     }
 
@@ -242,10 +237,6 @@ public class ManipManager {
      * of a GLEventListener.
      */
     public synchronized void render(GLAutoDrawable window, GL2 gl) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
-        if (info == null) {
-            throw new RuntimeException("Window not registered");
-        }
         for (Iterator iter = info.manips.iterator(); iter.hasNext(); ) {
             ((Manip) iter.next()).render(gl);
         }
@@ -262,7 +253,7 @@ public class ManipManager {
      */
     public synchronized void setupMouseListeners(GLAutoDrawable window) {
         //window.addMouseMotionListener(mouseMotionListener);
-        ((GLWindow)window).addMouseListener(mouseListener);
+        ((GLWindow) window).addMouseListener(mouseListener);
     }
 
     /**
@@ -272,7 +263,7 @@ public class ManipManager {
      */
     public synchronized void removeMouseListeners(GLAutoDrawable window) {
         //((GLWindow)window).removeMouseMotionListener(mouseMotionListener);
-        ((GLWindow)window).removeMouseListener(mouseListener);
+        ((GLWindow) window).removeMouseListener(mouseListener);
     }
 
     /**
@@ -301,8 +292,8 @@ public class ManipManager {
      * are exposed so application-level code can intercept events when
      * certain modifier keys are depressed.
      */
-    public synchronized void mousePressed(MouseEvent e) {
-        mouseMethod(gl, e.getModifiers(),
+    public synchronized boolean mousePressed(MouseEvent e) {
+        return mouseMethod(gl, e.getModifiers(),
                 true, e.getX(), e.getY());
     }
 
@@ -312,8 +303,8 @@ public class ManipManager {
      * are exposed so application-level code can intercept events when
      * certain modifier keys are depressed.
      */
-    public synchronized void mouseReleased(MouseEvent e) {
-        mouseMethod(gl, e.getModifiers(),
+    public synchronized boolean mouseReleased(MouseEvent e) {
+        return mouseMethod(gl, e.getModifiers(),
                 false, e.getX(), e.getY());
     }
 
@@ -323,8 +314,9 @@ public class ManipManager {
 
 
     private void motionMethod(GLAutoDrawable window, int x, int y) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
         if (info.dragging) {
+            final WindowInfo info = this.info;
+
             // Compute ray in 3D
             Vec3f rayStart = new Vec3f();
             Vec3f rayDirection = new Vec3f();
@@ -335,7 +327,8 @@ public class ManipManager {
     }
 
     private void passiveMotionMethod(GLAutoDrawable window, int x, int y) {
-        WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
+        final WindowInfo info = this.info;
+
         // Compute ray in 3D
         Vec3f rayStart = new Vec3f();
         Vec3f rayDirection = new Vec3f();
@@ -349,7 +342,7 @@ public class ManipManager {
         HitPoint hp = null;
         for (Iterator iter = hits.iterator(); iter.hasNext(); ) {
             HitPoint cur = (HitPoint) iter.next();
-            if ((hp == null) || (cur.intPt.getT() < hp.intPt.getT())) {
+            if ((hp == null) || (cur.intPt.t < hp.intPt.t)) {
                 hp = cur;
             }
         }
@@ -374,11 +367,11 @@ public class ManipManager {
         }
     }
 
-    private void mouseMethod(GLAutoDrawable window, int modifiers,
+    private boolean mouseMethod(GLAutoDrawable window, int modifiers,
                              boolean isPress, int x, int y) {
-        /*if ((modifiers & InputEvent.BUTTON1_MASK) != 0)*/ {
-            WindowInfo info = (WindowInfo) windowToInfoMap.get(window);
+        /*if ((modifiers & InputEvent.BUTTON1_MASK) != 0)*/
 
+        final WindowInfo info = this.info;
             if (isPress) {
                 // Compute ray in 3D
                 Vec3f rayStart = new Vec3f();
@@ -393,7 +386,7 @@ public class ManipManager {
                 HitPoint hp = null;
                 for (Iterator iter = hits.iterator(); iter.hasNext(); ) {
                     HitPoint cur = (HitPoint) iter.next();
-                    if ((hp == null) || (cur.intPt.getT() < hp.intPt.getT())) {
+                    if ((hp == null) || (cur.intPt.t < hp.intPt.t)) {
                         hp = cur;
                     }
                 }
@@ -423,7 +416,8 @@ public class ManipManager {
                     passiveMotionMethod(window, x, y);
                 }
             }
-        }
+
+        return info.curManip != null;
     }
 
     private Vec2f screenToNormalizedCoordinates(CameraParameters params,

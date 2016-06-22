@@ -39,56 +39,79 @@
 
 package gleem;
 
-import java.util.*;
+import com.jogamp.opengl.GL2;
+import gleem.linalg.Mat4f;
+import gleem.linalg.Vec3f;
 
-import gleem.linalg.*;
-import com.jogamp.opengl.*;
+import java.util.List;
 
-/** A ManipPart is a visible or invisible sub-part of a manipulator.
-    ManipParts are organized into trees. */
+/**
+ * A ManipPart is a visible or invisible sub-part of a manipulator.
+ * ManipParts are organized into trees.
+ */
 
 public abstract class ManipPart {
-  private ManipPartGroup parent;
+    private ManipPartGroup parent;
 
-  /** Get the parent ManipPartGroup, or null if none (NOTE that this
-      differs from the C++ API) */
-  public ManipPartGroup getParent() {
-    return parent;
-  }
+    /**
+     * Get the parent ManipPartGroup, or null if none (NOTE that this
+     * differs from the C++ API)
+     */
+    public ManipPartGroup getParent() {
+        return parent;
+    }
 
-  /** Set the parent ManipPartGroup of this ManipPart (NOTE that this
-      differs from the C++ API) */
-  public void setParent(ManipPartGroup parent) {
-    this.parent = parent;
-  }
-  
-  /** Intersect a ray with this part, returning all intersected points
-      as HitPoints in the result list. The same rules as
-      Manip.intersectRay() apply. */
-  public abstract void intersectRay(Vec3f rayStart,
-				    Vec3f rayDirection,
-				    List results,
-				    Manip caller);
-  
-  /** Sets the transform of this part. */
-  public abstract void setTransform(Mat4f xform);
+    /**
+     * Set the parent ManipPartGroup of this ManipPart (NOTE that this
+     * differs from the C++ API)
+     */
+    public void setParent(ManipPartGroup parent) {
+        this.parent = parent;
+    }
 
-  /** Highlight this part */
-  public abstract void highlight();
+    /**
+     * Intersect a ray with this part, returning all intersected points
+     * as HitPoints in the result list. The same rules as
+     * Manip.intersectRay() apply.
+     */
+    public abstract void intersectRay(Vec3f rayStart,
+                                      Vec3f rayDirection,
+                                      List results,
+                                      Manip caller);
 
-  /** Unhighlight this part */
-  public abstract void clearHighlight();
+    /**
+     * Sets the transform of this part.
+     */
+    public abstract void setTransform(Mat4f xform);
 
-  /** Is this part pickable, or just decorative? Not pickable implies
-      that intersectRay() will return immediately. */
-  public abstract void setPickable(boolean pickable);
-  public abstract boolean getPickable();
+    /**
+     * Highlight this part
+     */
+    public abstract void highlight();
 
-  /** Is this part visible? */
-  public abstract void setVisible(boolean visible);
-  public abstract boolean getVisible();
+    /**
+     * Unhighlight this part
+     */
+    public abstract void clearHighlight();
 
-  /** Render this ManipPart now using the given OpenGL routines and
-      assuming an OpenGL context is current. */
-  public abstract void render(GL2 gl);
+    /**
+     * Is this part pickable, or just decorative? Not pickable implies
+     * that intersectRay() will return immediately.
+     */
+    public abstract void setPickable(boolean pickable);
+
+    public abstract boolean getPickable();
+
+    /**
+     * Is this part visible?
+     */
+    public abstract void setVisible(boolean visible);
+
+    public abstract boolean getVisible();
+
+    /**
+     * Render this ManipPart now using the given OpenGL routines and
+     * assuming an OpenGL context is current.
+     */
+    public abstract void render(GL2 gl);
 }

@@ -6,7 +6,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import nars.rover.Sim;
 import nars.rover.physics.Display;
-import nars.util.AbstractJoglWindow;
+import nars.util.JoglSpace;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
@@ -16,7 +16,7 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /* generic box2d physics-executing panel */
-public class Box2DJoglWindow extends AbstractJoglWindow implements Display {
+public class Box2DJoglSpace extends JoglSpace implements Display {
 
 
 	//final Space2D sg = new DemoTextButton().getSpace();
@@ -26,11 +26,11 @@ public class Box2DJoglWindow extends AbstractJoglWindow implements Display {
 	private Point center;
 	private int w = 1024, h = 768;
 
-	public Box2DJoglWindow(final Sim sim) {
+	public Box2DJoglSpace(final Sim sim) {
 		this(sim.world);
 	}
 
-	public Box2DJoglWindow(final World2D world) {
+	public Box2DJoglSpace(final World2D world) {
 		super();
 		this.world = world;
 		this.draw = new JoglDraw(this);
@@ -46,11 +46,7 @@ public class Box2DJoglWindow extends AbstractJoglWindow implements Display {
 
 	final boolean mousePressed[] = new boolean[6];
 
-	public void init(GLAutoDrawable drawable) {
-
-
-
-		GL2 gl = drawable.getGL().getGL2();
+	public void init(GL2 gl) {
 
 		initEffects(gl);
 
@@ -82,6 +78,7 @@ public class Box2DJoglWindow extends AbstractJoglWindow implements Display {
 		gl.glDepthFunc(gl.GL_LEQUAL);
 
 		gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_FASTEST);
+
 
 
 
@@ -594,8 +591,6 @@ defines
 
 	@Override
 	public void display(GLAutoDrawable arg0) {
-
-		GL2 gl = getGL().getGL2();
 
 		// Clear the draw and depth buffers
 

@@ -1,17 +1,13 @@
 package nars.gui.graph.layout;
 
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.data.Range;
 import nars.gui.graph.GraphLayout;
-import nars.gui.graph.GraphWindow;
-import nars.gui.graph.GraphWindow.EDraw;
-import nars.gui.graph.GraphWindow.VDraw;
-import nars.util.data.list.FasterList;
+import nars.gui.graph.GraphSpace;
+import nars.gui.graph.GraphSpace.EDraw;
+import nars.gui.graph.GraphSpace.VDraw;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.util.DoubleArray;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -223,7 +219,7 @@ public class FastOrganicLayout implements GraphLayout {
 
 
     @Override
-    public void update(GraphWindow graph, List<VDraw> vertices, float dt) {
+    public void update(GraphSpace graph, List<VDraw> vertices, float dt) {
 
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;

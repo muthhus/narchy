@@ -15,7 +15,7 @@ import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.util.AbstractJoglWindow;
+import nars.util.JoglSpace;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.experiment.DeductiveMeshTest;
@@ -32,7 +32,7 @@ import static nars.gui.test.Lesson14.renderString;
 /**
  * Created by me on 6/20/16.
  */
-public class GraphWindow extends AbstractJoglWindow {
+public class GraphSpace extends JoglSpace {
 
 
     public static void main(String[] args) {
@@ -46,7 +46,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
         final int maxNodes = 256;
 
-        new GraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
+        new GraphSpace(new ConceptsSource(n, maxNodes)).show(500, 500);
         n.loop(15f);
 
     }
@@ -66,7 +66,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
     private int box, isoTri;
 
-    public GraphWindow(ConceptsSource c) {
+    public GraphSpace(ConceptsSource c) {
         super();
 
         vdraw = new WeakValueHashMap<>(1024);
@@ -198,7 +198,7 @@ public class GraphWindow extends AbstractJoglWindow {
          */
         public int order;
 
-        transient private GraphWindow grapher;
+        transient private GraphSpace grapher;
 
         transient private float radius;
 
@@ -291,7 +291,7 @@ public class GraphWindow extends AbstractJoglWindow {
             return true;
         }
 
-        public void clearEdges(GraphWindow grapher) {
+        public void clearEdges(GraphSpace grapher) {
             this.numEdges = 0;
             this.grapher = grapher;
         }
@@ -349,8 +349,8 @@ public class GraphWindow extends AbstractJoglWindow {
 
     }
 
-    public void init(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+    public void init(GL2 gl) {
+
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
         gl.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
@@ -529,7 +529,8 @@ public class GraphWindow extends AbstractJoglWindow {
 
         final float activationPeriods = 4f;
         gl.glColor4f(h(pri), pri * 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
-        gl.glCallList(box);
+        //gl.glCallList(box);
+        glut.glutSolidTetrahedron();
 
         gl.glColor4f(1f, 1f, 1f, 1f * p);
 
@@ -659,7 +660,7 @@ public class GraphWindow extends AbstractJoglWindow {
 
         final AtomicBoolean busy = new AtomicBoolean(true);
         private long now;
-        private GraphWindow grapher;
+        private GraphSpace grapher;
         private float dt;
 
         public ConceptsSource(NAR nar, int maxNodes) {
@@ -682,7 +683,7 @@ public class GraphWindow extends AbstractJoglWindow {
 //            });
         }
 
-        public void start(GraphWindow grapher) {
+        public void start(GraphSpace grapher) {
             this.grapher = grapher;
         }
 
@@ -816,7 +817,7 @@ public class GraphWindow extends AbstractJoglWindow {
             Bag<Concept> x = ((Default) nar).core.concepts;
             x.topWhile(this::accept, capacity);
 
-            GraphWindow g = grapher;
+            GraphSpace g = grapher;
             long now = this.now;
             for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
                 g.post(now, v.get(i1));

@@ -48,14 +48,14 @@ import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import nars.util.AbstractJoglWindow;
+import nars.util.JoglSpace;
 
 
 /**
  * Tests the Examiner Viewer.
  */
 
-public class TestExaminerViewer extends AbstractJoglWindow {
+public class TestExaminerViewer extends JoglSpace {
     private static final int X_SIZE = 400;
     private static final int Y_SIZE = 400;
     private ManipManager manip;
@@ -64,100 +64,93 @@ public class TestExaminerViewer extends AbstractJoglWindow {
     static class HandleBoxManipBSphereProvider implements BSphereProvider {
         private final HandleBoxManip manip;
 
+        final BSphere bsph = new BSphere();
+
         private HandleBoxManipBSphereProvider(HandleBoxManip manip) {
             this.manip = manip;
         }
 
         @Override
         public BSphere getBoundingSphere() {
-            BSphere bsph = new BSphere();
-            bsph.setCenter(manip.getTranslation());
-            Vec3f scale0 = manip.getScale();
-            Vec3f scale1 = manip.getGeometryScale();
-            Vec3f scale = new Vec3f();
-            scale.setX(2.0f * scale0.x() * scale1.x());
-            scale.setY(2.0f * scale0.y() * scale1.y());
-            scale.setZ(2.0f * scale0.z() * scale1.z());
-            bsph.setRadius(scale.length());
-            return bsph;
+            return bsph.setCenter(manip.getTranslation()).setRadius(manip.getRadius());
         }
     }
 
 
-        private final GLU glu = new GLU();
-        private final CameraParameters params = new CameraParameters();
-        private ExaminerViewer viewer;
+    private static final GLU glu = new GLU();
+    private final CameraParameters params = new CameraParameters();
+    private ExaminerViewer viewer;
 
-        @Override
-        public void init(GLAutoDrawable drawable) {
-            GL2 gl = drawable.getGL().getGL2();
+    @Override
+    public void init(GLAutoDrawable drawable) {
+        GL2 gl = drawable.getGL().getGL2();
 
-            gl.glClearColor(0, 0, 0, 0);
-            float[] lightPosition = new float[]{1, 1, 1, 0};
-            float[] ambient = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
-            float[] diffuse = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-            gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_AMBIENT, ambient, 0);
-            gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_DIFFUSE, diffuse, 0);
-            gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_POSITION, lightPosition, 0);
+        gl.glClearColor(0, 0, 0, 0);
+        float[] lightPosition = new float[]{1, 1, 1, 0};
+        float[] ambient = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+        float[] diffuse = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+        gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_AMBIENT, ambient, 0);
+        gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GL2ES1.GL_LIGHT0, GL2ES1.GL_POSITION, lightPosition, 0);
 
-            gl.glEnable(GL2ES1.GL_LIGHTING);
-            gl.glEnable(GL2ES1.GL_LIGHT0);
-            gl.glEnable(GL.GL_DEPTH_TEST);
+        gl.glEnable(GL2ES1.GL_LIGHTING);
+        gl.glEnable(GL2ES1.GL_LIGHT0);
+        gl.glEnable(GL.GL_DEPTH_TEST);
 
-            params.setPosition(new Vec3f(0, 0, 0));
-            params.setForwardDirection(Vec3f.NEG_Z_AXIS);
-            params.setUpDirection(Vec3f.Y_AXIS);
-            params.setVertFOV((float) (Math.PI / 8.0));
-            params.setImagePlaneAspectRatio(1);
-            params.xSize = X_SIZE;
-            params.ySize = Y_SIZE;
+        params.setPosition(new Vec3f(0, 0, 0));
+        params.setForwardDirection(Vec3f.NEG_Z_AXIS);
+        params.setUpDirection(Vec3f.Y_AXIS);
+        params.setVertFOV((float) (Math.PI / 8.0));
+        params.setImagePlaneAspectRatio(1);
+        params.xSize = X_SIZE;
+        params.ySize = Y_SIZE;
 
-            gl.glMatrixMode(GL2ES1.GL_PROJECTION);
-            gl.glLoadIdentity();
-            glu.gluPerspective(45, 1, 1, 100);
-            gl.glMatrixMode(GL2ES1.GL_MODELVIEW);
-            gl.glLoadIdentity();
+        gl.glMatrixMode(GL2ES1.GL_PROJECTION);
+        gl.glLoadIdentity();
+        glu.gluPerspective(45, 1, 1, 100);
+        gl.glMatrixMode(GL2ES1.GL_MODELVIEW);
+        gl.glLoadIdentity();
 
-            viewer = new ExaminerViewer();
-            
-
-            // Instantiate ExaminerViewer
-            
-            viewer.setUpVector(Vec3f.Y_AXIS);
-
-            viewer.start((GLWindow) drawable);
-
-            // Register the window with the ManipManager
-            manip = viewer.manip;
-            manip.registerWindow(drawable);
-
-            // Instantiate a HandleBoxManip
-            HandleBoxManip manip = new HandleBoxManip();
-            manip.setTranslation(new Vec3f(0, 0, -10));
-            this.manip.showManipInWindow(manip, drawable);
+        viewer = new ExaminerViewer();
 
 
-            viewer.attach(new HandleBoxManipBSphereProvider(manip));
-            viewer.viewAll(gl);
-        }
+        // Instantiate ExaminerViewer
 
-        @Override
-        public void dispose(GLAutoDrawable drawable) {
-        }
+        viewer.setUpVector(Vec3f.Y_AXIS);
 
-        @Override
-        public void display(GLAutoDrawable drawable) {
-            GL2 gl = drawable.getGL().getGL2();
-            gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-            viewer.update(gl);
-            manip.updateCameraParameters(drawable, viewer.getCameraParameters());
-            manip.render(drawable, gl);
-        }
+        viewer.start((GLWindow) drawable);
 
-        // Unused routines
-        @Override
-        public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
-        }
+        // Register the window with the ManipManager
+        manip = viewer.manip;
+        manip.registerWindow(drawable);
+
+        // Instantiate a HandleBoxManip
+        HandleBoxManip manip = new HandleBoxManip();
+        manip.setTranslation(new Vec3f(0, 0, -10));
+        this.manip.showManipInWindow(manip, drawable);
+
+
+        viewer.attach(new HandleBoxManipBSphereProvider(manip));
+        viewer.viewAll(gl);
+    }
+
+    @Override
+    public void dispose(GLAutoDrawable drawable) {
+    }
+
+    @Override
+    public void display(GLAutoDrawable drawable) {
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        viewer.update(gl);
+        manip.updateCameraParameters(drawable, viewer.getCameraParameters());
+        manip.render(drawable, gl);
+    }
+
+    // Unused routines
+    @Override
+    public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
+    }
 
 //        public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
 //        }

@@ -39,25 +39,12 @@
 
 package gleem.linalg;
 
-/** Wraps a 3D point and parametric time value. */
+/**
+ * Wraps a 3D point and parametric time value.
+ */
 
-public class IntersectionPoint {
-  private final Vec3f intPt = new Vec3f();
-  private float t;
+public final class IntersectionPoint extends Vec3f {
 
-  public Vec3f getIntersectionPoint() {
-    return intPt;
-  }
+    public float t;
 
-  public void setIntersectionPoint(Vec3f newPt) {
-    intPt.set(newPt);
-  }
-
-  public float getT() {
-    return t;
-  }
-
-  public void setT(float t) {
-    this.t = t;
-  }
 }

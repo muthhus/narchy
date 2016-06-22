@@ -39,104 +39,109 @@
 
 package gleem;
 
-import java.util.*;
+import com.jogamp.opengl.GL2;
+import gleem.linalg.Mat4f;
+import gleem.linalg.Vec3f;
 
-import gleem.linalg.*;
-import com.jogamp.opengl.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-/** This class groups a set of ManipParts. Makes a set of ManipParts
-    look like one. */
+/**
+ * This class groups a set of ManipParts. Makes a set of ManipParts
+ * look like one.
+ */
 
 public class ManipPartGroup extends ManipPart {
-  private boolean pickable = true;
-  private boolean visible = true;
-  private final List children = new ArrayList();
+    private boolean pickable = true;
+    private boolean visible = true;
+    private final List children = new ArrayList();
 
-  public void addChild(ManipPart child) {
-    children.add(child);
-  }
-
-  public void removeChild(ManipPart child) {
-    children.remove(child);
-  }
-
-  public int getNumChildren() {
-    return children.size();
-  }
-
-  public ManipPart getChild(int index) {
-    return (ManipPart) children.get(index);
-  }
-
-  @Override
-  public void intersectRay(Vec3f rayStart,
-                           Vec3f rayDirection,
-                           List results,
-                           Manip caller) {
-    if (!pickable) {
-      return;
+    public void addChild(ManipPart child) {
+        children.add(child);
     }
 
-    int topIdx = results.size();
-    for (int i = 0; i < getNumChildren(); i++) {
-      getChild(i).intersectRay(rayStart, rayDirection, results, caller);
+    public void removeChild(ManipPart child) {
+        children.remove(child);
     }
 
-    // Fix up all HitPoints so we appear to be the manipulator part
-    // which caused the intersection
-    for (int i = topIdx; i < results.size(); i++) {
-      ((HitPoint) results.get(i)).manipPart = this;
+    public int getNumChildren() {
+        return children.size();
     }
-  }
 
-  @Override
-  public void setTransform(Mat4f xform) {
-    for (int i = 0; i < getNumChildren(); i++) {
-      getChild(i).setTransform(xform);
+    public ManipPart getChild(int index) {
+        return (ManipPart) children.get(index);
     }
-  }
 
-  @Override
-  public void highlight() {
-    for (int i = 0; i < getNumChildren(); i++) {
-      getChild(i).highlight();
+    @Override
+    public void intersectRay(Vec3f rayStart,
+                             Vec3f rayDirection,
+                             List results,
+                             Manip caller) {
+        if (!pickable) {
+            return;
+        }
+
+        int topIdx = results.size();
+        for (int i = 0; i < getNumChildren(); i++) {
+            getChild(i).intersectRay(rayStart, rayDirection, results, caller);
+        }
+
+        // Fix up all HitPoints so we appear to be the manipulator part
+        // which caused the intersection
+        for (int i = topIdx; i < results.size(); i++) {
+            ((HitPoint) results.get(i)).manipPart = this;
+        }
     }
-  }
 
-  @Override
-  public void clearHighlight() {
-    for (int i = 0; i < getNumChildren(); i++) {
-      getChild(i).clearHighlight();
+    @Override
+    public void setTransform(Mat4f xform) {
+        for (int i = 0; i < getNumChildren(); i++) {
+            getChild(i).setTransform(xform);
+        }
     }
-  }
 
-  @Override
-  public void setPickable(boolean pickable) {
-    this.pickable = pickable;
-  }
-
-  @Override
-  public boolean getPickable() {
-    return pickable;
-  }
-
-  @Override
-  public void setVisible(boolean visible) {
-    this.visible = visible;
-    for (Iterator iter = children.iterator(); iter.hasNext(); ) {
-      ((ManipPart) iter.next()).setVisible(visible);
+    @Override
+    public void highlight() {
+        for (int i = 0; i < getNumChildren(); i++) {
+            getChild(i).highlight();
+        }
     }
-  }
 
-  @Override
-  public boolean getVisible() {
-    return visible;
-  }
-
-  @Override
-  public void render(GL2 gl) {
-    for (Iterator iter = children.iterator(); iter.hasNext(); ) {
-      ((ManipPart) iter.next()).render(gl);
+    @Override
+    public void clearHighlight() {
+        for (int i = 0; i < getNumChildren(); i++) {
+            getChild(i).clearHighlight();
+        }
     }
-  }
+
+    @Override
+    public void setPickable(boolean pickable) {
+        this.pickable = pickable;
+    }
+
+    @Override
+    public boolean getPickable() {
+        return pickable;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        for (Object aChildren : children) {
+            ((ManipPart) aChildren).setVisible(visible);
+        }
+    }
+
+    @Override
+    public boolean getVisible() {
+        return visible;
+    }
+
+    @Override
+    public void render(GL2 gl) {
+        for (Object aChildren : children) {
+            ((ManipPart) aChildren).render(gl);
+        }
+    }
 }
