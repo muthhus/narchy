@@ -58,12 +58,19 @@ public class AutoBag<V>  {
         if (pendingMass <= Global.BUDGET_EPSILON)
             return Float.NaN;
 
-        float basePeriod = 0.001f; //"margin of replacement"
+        float basePeriod = 0.01f; //"margin of replacement"
         // TODO formalize some relationship between cycles and priority
         // TODO estimate based on the min/max priority of existing items and normalize the rate to that
 
 
-        return (basePeriod) * bag.capacity()/ pendingMass;
+        //estimate existing mass
+        float existing = (bag.priMax() - bag.priMin()) * 0.5f * bag.size();
+
+        float period = (basePeriod) * existing / pendingMass;
+
+        //System.out.println("existing " + existing + " (est), pending: " + pendingMass + " ==> " + period);
+
+        return period;
 
     }
 

@@ -111,7 +111,7 @@ public class GraphWindow extends AbstractJoglWindow {
         Budget b = v.budget;
         float p = v.pri = b.priIfFiniteElseZero();
 
-        float nodeScale = 4f;
+        float nodeScale = 2f;
         v.scale(1f + nodeScale * p, 1f + nodeScale * p, 1f + nodeScale * p);
 
         if (tt instanceof Concept) {
@@ -265,11 +265,13 @@ public class GraphWindow extends AbstractJoglWindow {
             float pri = l.pri();
             float dur = l.dur();
             float qua = l.qua();
-            float baseLineWidth = 2f;
 
-            float width = baseLineWidth * (1f + pri) * (1f + dur);
+            float minLineWidth = 0.2f;
+            float maxLineWidth = 5f;
+            float width = minLineWidth + (maxLineWidth - minLineWidth) * (dur) * (qua);
+
             float r, g, b;
-            float hp = 0.5f + 0.5f * pri;
+            float hp = 0.2f + 0.8f * pri;
             if (task) {
                 r = hp;
                 g = qua * hp;
@@ -280,7 +282,7 @@ public class GraphWindow extends AbstractJoglWindow {
                 r = 0;
             }
 
-            ee[numEdges++].set(target, width, r, g, b, 0.75f + 0.25f * (dur));
+            ee[numEdges++].set(target, width, r, g, b, 0.5f + 0.5f * (dur));
 
             return true;
         }

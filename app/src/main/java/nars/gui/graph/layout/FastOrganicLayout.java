@@ -42,7 +42,7 @@ public class FastOrganicLayout implements GraphLayout {
      */
 
     //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(5f);
+    public final MutableFloat forceConstant = new MutableFloat(10f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -117,11 +117,11 @@ public class FastOrganicLayout implements GraphLayout {
      */
     public FastOrganicLayout() {
 
-        this.movementThreshold = 1f;
+        this.movementThreshold = 0.25f;
 
-        setInitialTemp(9f);
+        setInitialTemp(2f);
         setMinDistanceLimit(10f);
-        setMaxDistanceLimit(50f);
+        setMaxDistanceLimit(60f);
 
     }
 
