@@ -32,7 +32,7 @@ import com.bulletphysics.util.StackList;
  */
 public class ObjectStackList<T> extends StackList<T> {
 
-	private Class<T> cls;
+	private final Class<T> cls;
 	
 	public ObjectStackList(Class<T> cls) {
 		super(false);

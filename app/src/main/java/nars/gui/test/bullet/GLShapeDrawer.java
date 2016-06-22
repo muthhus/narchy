@@ -244,11 +244,11 @@ public class GLShapeDrawer {
 					if (shape.isPolyhedral()) {
 						PolyhedralConvexShape polyshape = (PolyhedralConvexShape) shape;
 
-                        ImmModeSink vbo = ImmModeSink.createFixed(GL.GL_STATIC_DRAW, polyshape.getNumEdges()+3,
+                        ImmModeSink vbo = ImmModeSink.createFixed(polyshape.getNumEdges()+3,
                                               3, GL.GL_FLOAT,  // vertex
                                               0, GL.GL_FLOAT,  // color
                                               0, GL.GL_FLOAT,  // normal
-                                              0, GL.GL_FLOAT); // texture
+                                              0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
 
 						vbo.glBegin(gl.GL_LINES);
 

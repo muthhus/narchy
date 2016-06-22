@@ -26,187 +26,267 @@
 
 package nars.gui.test.bullet;
 
-import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.ContactAddedCallback;
-import com.bulletphysics.ContactDestroyedCallback;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.SimpleBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.dynamics.constraintsolver.Point2PointConstraint;
-import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
-import com.bulletphysics.linearmath.*;
-import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.dynamics.*;
+import com.bulletphysics.dynamics.constraintsolver.*;
 import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.dynamics.constraintsolver.Generic6DofConstraint;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
+import com.jogamp.newt.event.MouseEvent;
+
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author jezek2
  */
-public class RagDoll {
-	
-	protected final BulletStack stack = BulletStack.get();
+public class RagDoll extends DemoApplication {
 
-	public enum BodyPart {
-		BODYPART_PELVIS,
-		BODYPART_SPINE,
-		BODYPART_HEAD,
-
-		BODYPART_LEFT_UPPER_LEG,
-		BODYPART_LEFT_LOWER_LEG,
-
-		BODYPART_RIGHT_UPPER_LEG,
-		BODYPART_RIGHT_LOWER_LEG,
-
-		BODYPART_LEFT_UPPER_ARM,
-		BODYPART_LEFT_LOWER_ARM,
-
-		BODYPART_RIGHT_UPPER_ARM,
-		BODYPART_RIGHT_LOWER_ARM,
-
-		BODYPART_COUNT;
+	public static void main(String[] args) {
+		JoglPhysics j = new JoglPhysics();
+		j.run("", new RagDoll());
+		j.show(800, 600);
 	}
 
-	public enum JointType {
-		JOINT_PELVIS_SPINE,
-		JOINT_SPINE_HEAD,
 
-		JOINT_LEFT_HIP,
-		JOINT_LEFT_KNEE,
+	private final List<RagDollModel> ragdolls = new ArrayList<>();
 
-		JOINT_RIGHT_HIP,
-		JOINT_RIGHT_KNEE,
-
-		JOINT_LEFT_SHOULDER,
-		JOINT_LEFT_ELBOW,
-
-		JOINT_RIGHT_SHOULDER,
-		JOINT_RIGHT_ELBOW,
-
-		JOINT_COUNT
+	public RagDoll(String... args) {
+		super(args);
+		initPhysics();
+		setCameraDistance(10f);
 	}
 
-	private DynamicsWorld ownerWorld;
-	private CollisionShape[] shapes = new CollisionShape[BodyPart.BODYPART_COUNT.ordinal()];
-	private RigidBody[] bodies = new RigidBody[BodyPart.BODYPART_COUNT.ordinal()];
-	private TypedConstraint[] joints = new TypedConstraint[JointType.JOINT_COUNT.ordinal()];
+	@Override
+	public void initPhysics() {
+		// Setup the basic world
+		DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
 
-	public RagDoll(DynamicsWorld ownerWorld, Vector3f positionOffset) {
-		this(ownerWorld, positionOffset, 1.0f);
+		CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
+
+		//btPoint3 worldAabbMin(-10000,-10000,-10000);
+		//btPoint3 worldAabbMax(10000,10000,10000);
+		//btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
+		BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
+
+		//#ifdef USE_ODE_QUICKSTEP
+		//btConstraintSolver* constraintSolver = new OdeConstraintSolver();
+		//#else
+		ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
+		//#endif
+
+		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
+
+		dynamicsWorld.setGravity(new Vector3f(0f, -30f, 0f));
+
+		// Setup a big ground box
+		CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
+		Transform groundTransform = new Transform();
+		groundTransform.setIdentity();
+		groundTransform.origin.set(0f, -15f, 0f);
+		localCreateRigidBody(0f, groundTransform, groundShape);
+
+		// Spawn one ragdoll
+		spawnRagdoll();
+
+		clientResetScene();
 	}
 
-	public RagDoll(DynamicsWorld ownerWorld, Vector3f positionOffset, float scale_ragdoll) {
-		this.ownerWorld = ownerWorld;
+	public void spawnRagdoll() {
+		spawnRagdoll(false);
+	}
 
-		stack.pushCommonMath();
-		try {
-			Transform tmpTrans = stack.transforms.get();
+	public void spawnRagdoll(boolean random) {
+		RagDollModel ragDoll = new RagDollModel(dynamicsWorld, new Vector3f(0f, 0f, 10f), 5f);
+		ragdolls.add(ragDoll);
+	}
 
-			// Setup the geometry
-			shapes[BodyPart.BODYPART_PELVIS.ordinal()] = new CapsuleShape(scale_ragdoll * 0.15f, scale_ragdoll * 0.20f);
-			shapes[BodyPart.BODYPART_SPINE.ordinal()] = new CapsuleShape(scale_ragdoll * 0.15f, scale_ragdoll * 0.28f);
-			shapes[BodyPart.BODYPART_HEAD.ordinal()] = new CapsuleShape(scale_ragdoll * 0.10f, scale_ragdoll * 0.05f);
-			shapes[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.07f, scale_ragdoll * 0.45f);
-			shapes[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.37f);
-			shapes[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.07f, scale_ragdoll * 0.45f);
-			shapes[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.37f);
-			shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.33f);
-			shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.04f, scale_ragdoll * 0.25f);
-			shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.33f);
-			shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.04f, scale_ragdoll * 0.25f);
+	@Override
+	public void keyboardCallback(char key) {
+		switch (key) {
+			case 'e':
+				spawnRagdoll(true);
+				break;
+			default:
+				super.keyboardCallback(key);
+		}
+	}
 
-			// Setup all the rigid bodies
-			Transform offset = stack.transforms.get();
-			offset.setIdentity();
-			offset.origin.set(positionOffset);
+//	public static void main(String[] args) {
+//		GenericJointDemo demoApp = new GenericJointDemo(args);
+//		demoApp.initPhysics();
+//		demoApp.setCameraDistance(10f);
+//
+//		//JOGL.main("Joint 6DOF - Sequencial Impulse Solver", demoApp, args);
+//	}
 
-			Transform transform = stack.transforms.get();
-			transform.setIdentity();
-			transform.origin.set(0f, scale_ragdoll * 1f, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_PELVIS.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_PELVIS.ordinal()]);
+	@Override
+	public void mouseWheelMoved(MouseEvent e) {
 
-			transform.setIdentity();
-			transform.origin.set(0f, scale_ragdoll * 1.2f, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_SPINE.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_SPINE.ordinal()]);
+	}
 
-			transform.setIdentity();
-			transform.origin.set(0f, scale_ragdoll * 1.6f, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_HEAD.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
+	public static class RagDollModel {
+		protected final BulletStack stack = BulletStack.get();
 
-			transform.setIdentity();
-			transform.origin.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()]);
+		public enum BodyPart {
+			BODYPART_PELVIS,
+			BODYPART_SPINE,
+			BODYPART_HEAD,
 
-			transform.setIdentity();
-			transform.origin.set(-0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()]);
+			BODYPART_LEFT_UPPER_LEG,
+			BODYPART_LEFT_LOWER_LEG,
 
-			transform.setIdentity();
-			transform.origin.set(0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()]);
+			BODYPART_RIGHT_UPPER_LEG,
+			BODYPART_RIGHT_LOWER_LEG,
 
-			transform.setIdentity();
-			transform.origin.set(0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()]);
+			BODYPART_LEFT_UPPER_ARM,
+			BODYPART_LEFT_LOWER_ARM,
 
-			transform.setIdentity();
-			transform.origin.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-			MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
+			BODYPART_RIGHT_UPPER_ARM,
+			BODYPART_RIGHT_LOWER_ARM,
 
-			transform.setIdentity();
-			transform.origin.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-			MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()]);
+			BODYPART_COUNT
+		}
 
-			transform.setIdentity();
-			transform.origin.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-			MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()]);
+		public enum JointType {
+			JOINT_PELVIS_SPINE,
+			JOINT_SPINE_HEAD,
 
-			transform.setIdentity();
-			transform.origin.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-			MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
-			tmpTrans.mul(offset, transform);
-			bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()]);
+			JOINT_LEFT_HIP,
+			JOINT_LEFT_KNEE,
 
-			// Setup some damping on the m_bodies
-			for (int i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
-				bodies[i].setDamping(0.05f, 0.85f);
-				bodies[i].setDeactivationTime(0.8f);
-				bodies[i].setSleepingThresholds(1.6f, 2.5f);
-			}
+			JOINT_RIGHT_HIP,
+			JOINT_RIGHT_KNEE,
 
-			///////////////////////////// SETTING THE CONSTRAINTS /////////////////////////////////////////////7777
-			// Now setup the constraints
-			Generic6DofConstraint joint6DOF;
-			Transform localA = stack.transforms.get(), localB = stack.transforms.get();
-			boolean useLinearReferenceFrameA = true;
-			/// ******* SPINE HEAD ******** ///
-			{
+			JOINT_LEFT_SHOULDER,
+			JOINT_LEFT_ELBOW,
+
+			JOINT_RIGHT_SHOULDER,
+			JOINT_RIGHT_ELBOW,
+
+			JOINT_COUNT
+		}
+
+
+		private final DynamicsWorld ownerWorld;
+		private final CollisionShape[] shapes = new CollisionShape[BodyPart.BODYPART_COUNT.ordinal()];
+		private final RigidBody[] bodies = new RigidBody[BodyPart.BODYPART_COUNT.ordinal()];
+		private final TypedConstraint[] joints = new TypedConstraint[JointType.JOINT_COUNT.ordinal()];
+
+		public RagDollModel(DynamicsWorld ownerWorld, Vector3f positionOffset) {
+			this(ownerWorld, positionOffset, 1.0f);
+		}
+
+		public RagDollModel(DynamicsWorld ownerWorld, Vector3f positionOffset, float scale_ragdoll) {
+			this.ownerWorld = ownerWorld;
+
+			stack.pushCommonMath();
+			try {
+				Transform tmpTrans = stack.transforms.get();
+
+				// Setup the geometry
+				shapes[BodyPart.BODYPART_PELVIS.ordinal()] = new CapsuleShape(scale_ragdoll * 0.15f, scale_ragdoll * 0.20f);
+				shapes[BodyPart.BODYPART_SPINE.ordinal()] = new CapsuleShape(scale_ragdoll * 0.15f, scale_ragdoll * 0.28f);
+				shapes[BodyPart.BODYPART_HEAD.ordinal()] = new CapsuleShape(scale_ragdoll * 0.10f, scale_ragdoll * 0.05f);
+				shapes[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.07f, scale_ragdoll * 0.45f);
+				shapes[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.37f);
+				shapes[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.07f, scale_ragdoll * 0.45f);
+				shapes[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.37f);
+				shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.33f);
+				shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.04f, scale_ragdoll * 0.25f);
+				shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.05f, scale_ragdoll * 0.33f);
+				shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = new CapsuleShape(scale_ragdoll * 0.04f, scale_ragdoll * 0.25f);
+
+				// Setup all the rigid bodies
+				Transform offset = stack.transforms.get();
+				offset.setIdentity();
+				offset.origin.set(positionOffset);
+
+				Transform transform = stack.transforms.get();
+				transform.setIdentity();
+				transform.origin.set(0f, scale_ragdoll * 1f, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_PELVIS.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_PELVIS.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0f, scale_ragdoll * 1.2f, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_SPINE.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_SPINE.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0f, scale_ragdoll * 1.6f, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_HEAD.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_HEAD.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(-0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_LEG.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(-0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_LEG.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0.18f * scale_ragdoll, 0.65f * scale_ragdoll, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_LEG.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0.18f * scale_ragdoll, 0.2f * scale_ragdoll, 0f);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_LEG.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+				MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+				MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+				MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()]);
+
+				transform.setIdentity();
+				transform.origin.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
+				MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				tmpTrans.mul(offset, transform);
+				bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()]);
+
+				// Setup some damping on the m_bodies
+				for (int i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
+					bodies[i].setDamping(0.05f, 0.85f);
+					bodies[i].setDeactivationTime(0.8f);
+					bodies[i].setSleepingThresholds(1.6f, 2.5f);
+				}
+
+				///////////////////////////// SETTING THE CONSTRAINTS /////////////////////////////////////////////7777
+				// Now setup the constraints
+				Generic6DofConstraint joint6DOF;
+				Transform localA = stack.transforms.get(), localB = stack.transforms.get();
+				boolean useLinearReferenceFrameA = true;
+				/// ******* SPINE HEAD ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -225,11 +305,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_SPINE_HEAD.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_SPINE_HEAD.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* LEFT SHOULDER ******** ///
-			{
+				/// ******* LEFT SHOULDER ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -249,11 +327,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_LEFT_SHOULDER.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_SHOULDER.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* RIGHT SHOULDER ******** ///
-			{
+				/// ******* RIGHT SHOULDER ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -271,11 +347,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_RIGHT_SHOULDER.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_SHOULDER.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* LEFT ELBOW ******** ///
-			{
+				/// ******* LEFT ELBOW ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -292,11 +366,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_LEFT_ELBOW.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_ELBOW.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* RIGHT ELBOW ******** ///
-			{
+				/// ******* RIGHT ELBOW ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -314,12 +386,10 @@ public class RagDoll {
 
 				joints[JointType.JOINT_RIGHT_ELBOW.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_ELBOW.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
 
-			/// ******* PELVIS ******** ///
-			{
+				/// ******* PELVIS ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -338,11 +408,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_PELVIS_SPINE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_PELVIS_SPINE.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* LEFT HIP ******** ///
-			{
+				/// ******* LEFT HIP ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -361,12 +429,10 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_LEFT_HIP.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_HIP.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
 
-			/// ******* RIGHT HIP ******** ///
-			{
+				/// ******* RIGHT HIP ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -384,12 +450,10 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_RIGHT_HIP.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_HIP.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
 
-			/// ******* LEFT KNEE ******** ///
-			{
+				/// ******* LEFT KNEE ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -406,11 +470,9 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_LEFT_KNEE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_KNEE.ordinal()], true);
-			}
-			/// *************************** ///
+				/// *************************** ///
 
-			/// ******* RIGHT KNEE ******** ///
-			{
+				/// ******* RIGHT KNEE ******** ///
 				localA.setIdentity();
 				localB.setIdentity();
 
@@ -427,59 +489,57 @@ public class RagDoll {
 				//#endif
 				joints[JointType.JOINT_RIGHT_KNEE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_KNEE.ordinal()], true);
+				/// *************************** ///
+			} finally {
+				stack.popCommonMath();
 			}
-			/// *************************** ///
-		}
-		finally {
-			stack.popCommonMath();
-		}
-	}
-
-	public void destroy() {
-		int i;
-
-		// Remove all constraints
-		for (i = 0; i < JointType.JOINT_COUNT.ordinal(); ++i) {
-			ownerWorld.removeConstraint(joints[i]);
-			//joints[i].destroy();
-			joints[i] = null;
 		}
 
-		// Remove all bodies and shapes
-		for (i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
-			ownerWorld.removeRigidBody(bodies[i]);
+		public void destroy() {
+			int i;
 
-			//bodies[i].getMotionState().destroy();
-
-			bodies[i].destroy();
-			bodies[i] = null;
-
-			//shapes[i].destroy();
-			shapes[i] = null;
-		}
-	}
-	
-	private RigidBody localCreateRigidBody(float mass, Transform startTransform, CollisionShape shape) {
-		stack.vectors.push();
-		try {
-			boolean isDynamic = (mass != 0f);
-
-			Vector3f localInertia = stack.vectors.get(0f, 0f, 0f);
-			if (isDynamic) {
-				shape.calculateLocalInertia(mass, localInertia);
+			// Remove all constraints
+			for (i = 0; i < JointType.JOINT_COUNT.ordinal(); ++i) {
+				ownerWorld.removeConstraint(joints[i]);
+				//joints[i].destroy();
+				joints[i] = null;
 			}
 
-			DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
-			RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
-			rbInfo.additionalDamping = true;
-			RigidBody body = new RigidBody(rbInfo);
+			// Remove all bodies and shapes
+			for (i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
+				ownerWorld.removeRigidBody(bodies[i]);
 
-			ownerWorld.addRigidBody(body);
+				//bodies[i].getMotionState().destroy();
 
-			return body;
+				bodies[i].destroy();
+				bodies[i] = null;
+
+				//shapes[i].destroy();
+				shapes[i] = null;
+			}
 		}
-		finally {
-			stack.vectors.pop();
+
+		private RigidBody localCreateRigidBody(float mass, Transform startTransform, CollisionShape shape) {
+			stack.vectors.push();
+			try {
+				boolean isDynamic = (mass != 0f);
+
+				Vector3f localInertia = stack.vectors.get(0f, 0f, 0f);
+				if (isDynamic) {
+					shape.calculateLocalInertia(mass, localInertia);
+				}
+
+				DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
+				RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
+				rbInfo.additionalDamping = true;
+				RigidBody body = new RigidBody(rbInfo);
+
+				ownerWorld.addRigidBody(body);
+
+				return body;
+			} finally {
+				stack.vectors.pop();
+			}
 		}
 	}
 	

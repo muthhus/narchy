@@ -32,32 +32,42 @@ import nars.util.JoglSpace;
  * @author jezek2
  */
 
-public class JOGL extends JoglSpace implements MouseListener {
+public class JoglPhysics extends JoglSpace implements MouseListener {
 	
 
     private DemoApplication app;
 
+    @Override
     public void windowResized(WindowEvent e) { }
+    @Override
     public void windowMoved(WindowEvent e) { }
+    @Override
     public void windowDestroyNotify(WindowEvent e) {
 
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         //if(e.getClickCount()>1) {
             //quit=true;
         //}
     }
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
+    @Override
     public void mouseExited(MouseEvent e) {
     }
+    @Override
     public void mousePressed(MouseEvent e) {
     }
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
+    @Override
     public void mouseMoved(MouseEvent e) {
     }
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
@@ -68,10 +78,8 @@ public class JOGL extends JoglSpace implements MouseListener {
 
 
 
-    private void run(String title, DemoApplication demoApp) {
+    public void run(String title, DemoApplication demoApp) {
         this.app = demoApp;
-        System.err.print(title);
-        System.err.println(" run()");
     }
 
     @Override
@@ -126,38 +134,9 @@ public class JOGL extends JoglSpace implements MouseListener {
 
     }
 
-    public static int USE_NEWT      = 0;
-    public static int USE_AWT       = 1 << 0;
-
-    public static void main(String[] args) {
-        int width = 480;
-        int height = 800;
-        int type = USE_NEWT ;
-        for(int i=args.length-1; i>=0; i--) {
-            if(args[i].equals("-awt")) {
-                type |= USE_AWT; 
-            }
-            if(args[i].equals("-width") && i+1<args.length) {
-                try {
-                    width = Integer.parseInt(args[i+1]);
-                } catch (NumberFormatException nfe) {}
-            }
-            if(args[i].equals("-height") && i+1<args.length) {
-                try {
-                    height = Integer.parseInt(args[i+1]);
-                } catch (NumberFormatException nfe) {}
-            }
-        }
-        JOGL j = new JOGL();
-        j.run("", new GenericJointDemo());
-        j.show(800, 600);
-        //System.exit(0);
-
-
-    }
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        System.out.println("wrong display");
+        //System.out.println("wrong display");
     }
 }

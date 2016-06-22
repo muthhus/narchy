@@ -223,7 +223,6 @@ public abstract class DemoApplication
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
-		System.out.println("draw");
 
         if(!isIdle()) {
             // simple dynamics world doesn't handle fixed-time-stepping
@@ -235,6 +234,7 @@ public abstract class DemoApplication
             }
             if (dynamicsWorld != null) {
                 dynamicsWorld.stepSimulation(ms / 1000000.f);
+				updateCamera();
             }
         }
 
@@ -287,7 +287,6 @@ public abstract class DemoApplication
     public void keyPressed(KeyEvent e) {
     }
     public void keyReleased(KeyEvent e) {
-        char c = e.getKeyChar();
         if(e.isActionKey()) {
             specialKeyboard(e.getKeyCode());
         } else {
@@ -356,6 +355,9 @@ public abstract class DemoApplication
 					cameraUp.x, cameraUp.y, cameraUp.z);
 			gl.glMatrixMode(gl.GL_MODELVIEW);
 			gl.glLoadIdentity();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		finally {
 			stack.vectors.pop();
