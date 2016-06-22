@@ -46,9 +46,10 @@ public final class TermNotEquals extends AtomicBoolCondition {
         Term ca = a == 0 ? ff.taskTerm : ff.beliefTerm;
         Term cb = b == 0 ? ff.taskTerm : ff.beliefTerm;
 
-        Term ta, tb;
+        Term ta;
         if ((ta = resolve(ca, aPath)) == null)
             return false;
+        Term tb;
         if ((tb = resolve(cb, bPath)) == null)
             return false;
 

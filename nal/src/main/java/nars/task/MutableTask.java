@@ -3,7 +3,6 @@ package nars.task;
 import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
-import nars.budget.merge.BudgetMerge;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -229,8 +228,10 @@ public class MutableTask extends AbstractTask {
     @Nullable
     public static Reference<Task>[] parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
         return Global.reference(
-                (parentTask.isCommand()) ? null : parentTask,
-                (parentBelief == null || parentBelief.isCommand()) ? null : parentBelief
+                new Task[]{
+                        (parentTask.isCommand()) ? null : parentTask,
+                        (parentBelief == null || parentBelief.isCommand()) ? null : parentBelief
+                }
         );
     }
 

@@ -23,9 +23,7 @@ import java.util.Set;
 public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
 
     public TermLinkGraph() {
-        super((a, b) -> {
-            return $.p(a.term(),b.term());
-        });
+        super((a, b) -> $.p(a.term(),b.term()));
     }
 
 

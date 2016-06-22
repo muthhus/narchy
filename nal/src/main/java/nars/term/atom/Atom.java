@@ -26,7 +26,6 @@ public class Atom extends AtomicStringConstant {
     }
 
 
-
     @NotNull
     @Override public final String toString() {
         return id;

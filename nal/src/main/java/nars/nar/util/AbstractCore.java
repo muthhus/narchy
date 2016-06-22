@@ -13,7 +13,6 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +118,7 @@ public abstract class AbstractCore {
             tasklinkUpdate.cycle(subCycle);
             conceptUpdate.cycle(subCycle);
 
-            conceptUpdate.update(concepts, cycleNum == (cycles-1) ? true : false);
+            conceptUpdate.update(concepts, cycleNum == (cycles - 1));
 
             concepts.sample(cpf, this::fireConcept);
         }
@@ -151,13 +150,11 @@ public abstract class AbstractCore {
 
         Concept c = conceptLink.get();
 
-        List<BLink<? extends Termed>> termsBuffer = this.terms;
-
         matcher.init(nar);
 
-        int count = 0;
-
+        List<BLink<? extends Termed>> termsBuffer = this.terms;
         c.termlinks().sample(termlinks, termsBuffer::add);
+        int count = 0;
         if (!termsBuffer.isEmpty()) {
 
             List<BLink<Task>> tasksBuffer = this.tasks;

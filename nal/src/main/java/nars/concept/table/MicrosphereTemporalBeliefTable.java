@@ -21,11 +21,6 @@ import static nars.nal.Tense.ETERNAL;
 public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> implements TemporalBeliefTable {
 
     private final SortedTable<Task, Task> eternal;
-    /** history factor:
-     *      higher means it is easier to hold beliefs further away from current time at the expense of accuracy
-     *      lower means more accuracy at the expense of shorter memory span
-     */
-    private final float historyFactor = Global.DEFAULT_TEMPORAL_HISTORY_FACTOR;
     long min, max;
     private TruthPolation polation;
     private long lastUpdate = Tense.TIMELESS;
@@ -177,6 +172,11 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     public float ageFactor() {
         //return 1f;
         long range = max - min;
+        /* history factor:
+           higher means it is easier to hold beliefs further away from current time at the expense of accuracy
+           lower means more accuracy at the expense of shorter memory span
+     */
+        float historyFactor = Global.DEFAULT_TEMPORAL_HISTORY_FACTOR;
         return (range == 0) ? 1 :
                 ((1f) / (range * historyFactor));
     }

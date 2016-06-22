@@ -268,9 +268,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
     /** link to all existing termlinks, hierarchical and heterarchical */
     default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
         List<Termed> targets = Global.newArrayList(termlinks().size());
-        termlinks().forEach(tl -> {
-            targets.add(tl.get());
-        });
+        termlinks().forEach(tl -> targets.add(tl.get()));
         float subScale = scale / targets.size();
         targets.forEach(t -> {
             //System.out.println(Concept.this + " activate " + t + " " + b + "x" + subScale);

@@ -238,7 +238,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.bag = new ArrayBag<Task>(1) {
+        this.bag = new ArrayBag<>(1) {
             @NotNull
             @Override
             protected BLink<Task> newLink(@NotNull Task i, @NotNull Budgeted b, float scale) {
@@ -247,7 +247,7 @@ public class STMClustered extends STM {
         };
         bag.merge(BudgetMerge.avgDQBlend);
 
-        this.net = new NeuralGasNet<TasksNode>(DIMENSIONS, clusters) {
+        this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
             @NotNull
             @Override
             public STMClustered.TasksNode newNode(int i, int dims) {

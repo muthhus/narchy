@@ -2,7 +2,6 @@ package nars.nar.util;
 
 import nars.NAR;
 import nars.Op;
-import nars.Symbols;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

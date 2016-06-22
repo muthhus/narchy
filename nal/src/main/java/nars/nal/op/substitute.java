@@ -1,6 +1,5 @@
 package nars.nal.op;
 
-import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;

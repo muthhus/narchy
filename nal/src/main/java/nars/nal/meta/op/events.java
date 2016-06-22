@@ -87,6 +87,7 @@ abstract public class events extends AtomicBoolCondition {
         public String toString() {
             return "ifBeliefIsBefore";
         }
+        @Override
         public boolean requireBelief() {
             return true;
         }

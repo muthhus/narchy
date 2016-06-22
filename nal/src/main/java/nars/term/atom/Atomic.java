@@ -83,6 +83,7 @@ public interface Atomic extends Term {
     @Override
     default int volume() { return 1; }
 
+    @Override
     default Term termOr(int i, @Nullable Term ifOutOfBounds) {
         //no superterms to select
         return ifOutOfBounds;

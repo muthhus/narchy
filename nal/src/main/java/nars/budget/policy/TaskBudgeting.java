@@ -13,7 +13,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
 
 /**
@@ -53,13 +52,11 @@ public class TaskBudgeting {
 
 
         //Penalize by complexity
-        float volRatioScale;
         //ORIGINAL METHOD
         //volRatioScale = 1f / derived.term().volume();
         //RELATIVE SIZE INCREASE METHOD
         int tasktermVol = task.volume();
-        volRatioScale =
-            Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
+        float volRatioScale = Math.min(1f, tasktermVol / ((float) (tasktermVol + derived.volume())));
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;

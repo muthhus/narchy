@@ -56,21 +56,15 @@ public interface TimeFunction {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
-        return dtDiff(derived, p, occReturn, +1);
-    };
+    TimeFunction dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
-        return dtDiff(derived, p, occReturn, -1);
-    };
+    TimeFunction dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
-        return dtDiff(derived, p, occReturn, 0);
-    };
+    TimeFunction dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
 
     /**
      * early-aligned, difference in dt
@@ -139,12 +133,8 @@ public interface TimeFunction {
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    TimeFunction occForward = (derived, p, d, occReturn, confScale) -> {
-        return occBeliefMinTask(derived, p, occReturn, +1);
-    };
-    TimeFunction occReverse = (derived, p, d, occReturn, confScale) -> {
-        return occBeliefMinTask(derived, p, occReturn, -1);
-    };
+    TimeFunction occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1);
+    TimeFunction occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1);
 
 
 //    /**
@@ -208,9 +198,7 @@ public interface TimeFunction {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunction dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        return dtExact(derived, occReturn, p, true);
-    };
+    TimeFunction dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
     TimeFunction dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, p, false);
@@ -220,12 +208,8 @@ public interface TimeFunction {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable TimeFunction decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
-        return decompose(derived, p, occReturn, true);
-    };
-    @Nullable TimeFunction decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
-        return decompose(derived, p, occReturn, false);
-    };
+    @Nullable TimeFunction decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
+    @Nullable TimeFunction decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
 
     @NotNull
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {

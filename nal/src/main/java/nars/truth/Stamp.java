@@ -56,7 +56,6 @@ public interface Stamp {
 
         int aLen = a.length, bLen = b.length;
         int baseLength = Math.min(aLen + bLen, maxLen);
-        long[] c = new long[baseLength];
 
         //how many items to exclude from each due to weighting
         int aMin = 0, bMin = 0;
@@ -87,6 +86,7 @@ public interface Stamp {
 
         }
 
+        long[] c = new long[baseLength];
         if (newToOld) {
             //"forward" starts with newes, oldest are trimmed
             int ib = bLen-1, ia = aLen-1;
@@ -151,7 +151,6 @@ public interface Stamp {
         //2. count unique elements
         long lastValue = -1;
         int uniques = 0; //# of unique items
-        int sLen = outputLen;
 
         for (long v : sorted) {
             if (lastValue != v)
@@ -159,6 +158,7 @@ public interface Stamp {
             lastValue = v;
         }
 
+        int sLen = outputLen;
         if ((uniques == sLen) && (sorted.length == sLen)) {
             //if no duplicates and it's the right size, just return it
             return sorted;

@@ -91,14 +91,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     public Bag<V> merge(@NotNull BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
 
-        this.pendingMerge = (RawBudget bExisting, RawBudget bNext) -> {
-            if (bExisting!=null) {
-                mergeFunction.merge(bExisting, bNext, 1f);
-                return bExisting;
-            } else {
-                return bNext;
-            }
-        };
+        synchronized (map) {
+            this.pendingMerge = (RawBudget bExisting, RawBudget bNext) -> {
+                if (bExisting != null) {
+                    mergeFunction.merge(bExisting, bNext, 1f);
+                    return bExisting;
+                } else {
+                    return bNext;
+                }
+            };
+        }
 
         return this;
     }

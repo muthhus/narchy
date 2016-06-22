@@ -86,10 +86,10 @@ public class TermVector implements TermContainer<Term> {
         this.hash = Terms.hashSubterms(term, meta);
 
 
-        final int vD = meta[0]; int varTot = 0; this.varDeps = (byte)vD; varTot+=vD;
-        final int vI = meta[1];                 this.varIndeps = (byte)vI; varTot+=vI;
-        final int vQ = meta[2];                 this.varQuerys = (byte)vQ; varTot+=vQ;
-        final int vP = meta[3];                 this.varPatterns = (byte)vP; //varTot+=vP;
+        final int vD = meta[0];  this.varDeps = (byte)vD;   int varTot = vD;
+        final int vI = meta[1];  this.varIndeps = (byte)vI;     varTot+=vI;
+        final int vQ = meta[2];  this.varQuerys = (byte)vQ;     varTot+=vQ;
+        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
         this.vars = (byte)(varTot);
 
 
@@ -262,6 +262,7 @@ public class TermVector implements TermContainer<Term> {
     }
 
     /** accelerated implementation */
+    @Override
     public final boolean equalTerms(@NotNull TermContainer c) {
         Term[] tt = this.term;
         int cl = tt.length;

@@ -9,12 +9,9 @@ import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
-import nars.nal.op.ImmediateTermTransform;
 import nars.op.data.*;
 import nars.op.math.add;
 import nars.op.math.length;
-import nars.op.mental.Anticipate;
-import nars.op.mental.Inperience;
 import nars.op.mental.doubt;
 import nars.op.mental.schizo;
 import nars.op.out.echo;
@@ -28,7 +25,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -98,9 +94,7 @@ public abstract class AbstractNAR extends NAR {
     public void initNAL8() {
         /* derivation operators available at runtime */
         try {
-            PremiseRule.eachOperator(this, (c, o) -> {
-                onExec(o);
-            });
+            PremiseRule.eachOperator(this, (c, o) -> onExec(o));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import nars.nal.meta.op.AbstractPatternOp;
 import nars.nal.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +20,7 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
 
         this.subterm = subterm;
 
-        cases.forEach((c,p) -> {
-            proc[c.op] = p;
-        });
+        cases.forEach((c,p) -> proc[c.op] = p);
     }
 
     @Override

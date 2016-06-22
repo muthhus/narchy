@@ -227,9 +227,7 @@ public class PremiseRuleSet  {
         //PremiseRule f = b;
 
         if (thenBackward) {
-            r.backwardPermutation((s, reasonBF) -> {
-                add(ur, s, src + ':' + reasonBF, index);
-            }, index);
+            r.backwardPermutation((s, reasonBF) -> add(ur, s, src + ':' + reasonBF, index), index);
         }
     }
 

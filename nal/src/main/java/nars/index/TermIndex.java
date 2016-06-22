@@ -222,11 +222,12 @@ public interface TermIndex {
                     if (strict)
                         return null;
 
-                    u = t; //keep value
+                    sub.add(t); //keep value
 
+                } else {
+                    sub.add(u);
                 }
 
-                sub.add(u);
             }
         }
 
@@ -620,7 +621,7 @@ public interface TermIndex {
                 CompoundAtemporalizer);
     }
 
-    @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<Compound,Term>() {
+    @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<>() {
 
         @Override
         public boolean test(Term term) {

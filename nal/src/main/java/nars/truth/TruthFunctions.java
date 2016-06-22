@@ -23,7 +23,6 @@ package nars.truth;
 import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
-import nars.task.Task;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

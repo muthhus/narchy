@@ -28,8 +28,6 @@ public class TruthPolation {
     @NotNull
     final float[] conf;
     int count;
-    //private List<Task> tasks;
-    final private float exp = 1f;
 
     public TruthPolation(int size, float eternalization) {
         s = new InterpolatingMicrosphere(1, 2,
@@ -104,6 +102,7 @@ public class TruthPolation {
         //double whenNormalized = ((double)when - tmin) / range;
 
 
+        float exp = 1f;
         float[] v = this.s.value(new float[]{
                 when
         }, times, freq, conf, exp,

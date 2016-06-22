@@ -218,7 +218,6 @@ public class Revision {
 
     @NotNull
     private static Compound dtMerge(@NotNull Compound a, @NotNull Compound b, float balance, @NotNull MutableFloat accumulatedDifference, float depth) {
-        int newDT;
         int adt = a.dt();
         if (a.size() != 2) {
             if (b.size() != a.size())
@@ -226,6 +225,7 @@ public class Revision {
             return a;
         }
 
+        int newDT;
         if (adt != b.dt()) {
 
             int bdt = b.dt();

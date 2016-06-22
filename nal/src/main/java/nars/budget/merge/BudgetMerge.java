@@ -75,7 +75,6 @@ public interface BudgetMerge {
     }
 
     static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float cp) {
-        float ip = 1f - cp; // inverse proportion
 
         float overflow;
         if (nextPri > 1f) {
@@ -85,6 +84,7 @@ public interface BudgetMerge {
             overflow = 0;
         }
 
+        float ip = 1f - cp; // inverse proportion
 
         tgt.budget(nextPri,
                 (cp * tgt.dur()) + (ip * src.dur()),

@@ -1,6 +1,5 @@
 package nars.term.compound;
 
-import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.term.*;

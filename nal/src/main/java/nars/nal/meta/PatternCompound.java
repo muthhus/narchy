@@ -11,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;

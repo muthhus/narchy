@@ -57,9 +57,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value) {
         this(n, t, value,
-                (v) -> {
-                    return $.t(1f, v * n.confidenceDefault(Symbols.BELIEF));
-                } );
+                (v) -> $.t(1f, v * n.confidenceDefault(Symbols.BELIEF)));
     }
 
     public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {

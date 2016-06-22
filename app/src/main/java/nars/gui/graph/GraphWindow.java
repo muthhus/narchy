@@ -271,18 +271,22 @@ public class GraphWindow extends AbstractJoglWindow {
             float width = minLineWidth + (maxLineWidth - minLineWidth) * (dur) * (qua);
 
             float r, g, b;
-            float hp = 0.2f + 0.8f * pri;
+            //float hp = 0.2f + 0.8f * pri;
+            float qh = 0.5f + 0.5f * qua;
+            float dh = 0.5f + 0.5f * dur;
             if (task) {
-                r = hp;
-                g = qua * hp;
+                r = qh;
+                g = dh/2;
                 b = 0;
             } else {
-                b = hp;
-                g = qua * hp;
-                r = 0;
+                g = qh;
+                r = dh/2;
+                b = 0;
             }
 
-            ee[numEdges++].set(target, width, r, g, b, 0.5f + 0.5f * (dur));
+            ee[numEdges++].set(target, width,
+                    r, g, b, 0.5f + 0.4f * (pri)
+            );
 
             return true;
         }
@@ -524,7 +528,7 @@ public class GraphWindow extends AbstractJoglWindow {
         gl.glScalef(s[0], s[1], s[2]);
 
         final float activationPeriods = 4f;
-        gl.glColor4f(h(pri), 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
+        gl.glColor4f(h(pri), pri * 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
         gl.glCallList(box);
 
         gl.glColor4f(1f, 1f, 1f, 1f * p);
@@ -532,7 +536,7 @@ public class GraphWindow extends AbstractJoglWindow {
         float fontScale = 0.01f;
         gl.glScalef(fontScale, fontScale, 1f);
 
-        float fontThick = 2f;
+        float fontThick = 1f;
         gl.glLineWidth(fontThick);
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
                 0, 0, 1f); // Print GL Text To The Screen

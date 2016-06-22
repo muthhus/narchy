@@ -27,7 +27,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -146,7 +145,7 @@ public enum Global {
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
     public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.5f;
 
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
+    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
 
@@ -216,7 +215,7 @@ public enum Global {
 
 
     @Nullable
-    public static <C> Reference<C>[] reference(@Nullable C... s) {
+    public static <C> Reference<C>[] reference(@Nullable C[] s) {
         int l = Util.lastNonNull(s);
         if (l > -1) {
             l++;

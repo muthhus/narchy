@@ -5,7 +5,6 @@ import com.gs.collections.impl.map.mutable.UnifiedMap;
 import nars.$;
 import nars.Global;
 import nars.nal.Deriver;
-import nars.nal.meta.op.AbstractPatternOp;
 import nars.nal.meta.op.SubTermStructure;
 import nars.nal.meta.op.TaskPunctuation;
 import nars.nal.meta.op.events;
@@ -128,13 +127,10 @@ public class GraphDeriver extends Deriver {
                 );
 
         List<Term> sortedRoots = g.vertexSet().stream().filter(v -> g.inDegreeOf(v)==0).sorted(rank).collect(Collectors.toList());
-        sortedRoots.forEach(r -> {
-
-            out.println(r + " " +
-                    //g.outDegreeOf(r) + " " + g.outgoingEdgesOf(r)
-                    "reach=" + reach(r) + " fanOut=" + g.outDegreeOf(r) //+ "\t" + cs
-            );
-        });
+        sortedRoots.forEach(r -> out.println(r + " " +
+                //g.outDegreeOf(r) + " " + g.outgoingEdgesOf(r)
+                "reach=" + reach(r) + " fanOut=" + g.outDegreeOf(r) //+ "\t" + cs
+        ));
 
         exportGraph(g);
     }
@@ -199,22 +195,22 @@ public class GraphDeriver extends Deriver {
     }
 
     static public void exportGraph(@NotNull SimpleDirectedWeightedGraph<Term,DefaultWeightedEdge> g) {
-        IntegerNameProvider<Term> p1=new IntegerNameProvider<Term>();
-        StringNameProvider<Term> p2=new StringNameProvider<Term>() {
+        IntegerNameProvider<Term> p1= new IntegerNameProvider<>();
+        StringNameProvider<Term> p2= new StringNameProvider<>() {
             @Override
             public String getVertexName(@NotNull Term vertex) {
-                return StringEscapeUtils.ESCAPE_JSON.translate( vertex.toString() );
+                return StringEscapeUtils.ESCAPE_JSON.translate(vertex.toString());
             }
         };
-        EdgeNameProvider<DefaultWeightedEdge> e1=new IntegerEdgeNameProvider<DefaultWeightedEdge>();
+        EdgeNameProvider<DefaultWeightedEdge> e1= new IntegerEdgeNameProvider<>();
 
 
         ComponentAttributeProvider<DefaultWeightedEdge> p4 =
-                new ComponentAttributeProvider<DefaultWeightedEdge>() {
+                new ComponentAttributeProvider<>() {
                     @NotNull
                     @Override
                     public Map<String, String> getComponentAttributes(@NotNull DefaultWeightedEdge e) {
-                        Map<String, String> map =new UnifiedMap<>(1);
+                        Map<String, String> map = new UnifiedMap<>(1);
                         map.put("weight", Double.toString(g.getEdgeWeight(e)));
                         return map;
                     }

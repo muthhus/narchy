@@ -20,7 +20,7 @@ import java.util.HashMap;
  */
 public class js extends TermFunction {
 
-    private static final ThreadLocal<ScriptEngine> js = new ThreadLocal<ScriptEngine>() {
+    private static final ThreadLocal<ScriptEngine> js = new ThreadLocal<>() {
         @Override
         protected ScriptEngine initialValue() {
             ScriptEngineManager factory = new ScriptEngineManager();

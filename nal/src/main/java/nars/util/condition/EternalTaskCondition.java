@@ -2,7 +2,6 @@ package nars.util.condition;
 
 
 import nars.*;
-import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Compound;

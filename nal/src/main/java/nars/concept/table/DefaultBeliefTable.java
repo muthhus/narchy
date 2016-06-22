@@ -239,9 +239,7 @@ public class DefaultBeliefTable implements BeliefTable {
     private void addEternalAxiom(@NotNull Task input, SortedTable<Task, Task> et) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
-        Consumer<Task> overridden = t -> {
-            TaskTable.removeTask(t, "Overridden");
-        };
+        Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
         et.forEach(overridden);
         et.clear();
         et.setCapacity(1);
@@ -283,8 +281,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
         Task displaced = table.put(incoming, incoming);
 
-        boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
-
         if (displaced!=null && !displaced.isDeleted()) {
             TaskTable.removeTask(displaced,
                     "Displaced"
@@ -292,6 +288,7 @@ public class DefaultBeliefTable implements BeliefTable {
             );
         }
 
+        boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
         return inserted;
     }
 

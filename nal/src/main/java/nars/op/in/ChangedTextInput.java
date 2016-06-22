@@ -41,7 +41,7 @@ public class ChangedTextInput {
 	public boolean allowRepeats() {
 		return allowRepeats;
 	}
-	public boolean enable() {
+	public static boolean enable() {
 		return true;
 	}
 

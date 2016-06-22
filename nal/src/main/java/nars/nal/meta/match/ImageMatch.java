@@ -5,7 +5,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.Imdex;
-import static nars.nal.Tense.DTERNAL;
 
 /**
  * the indicated relation term is inserted

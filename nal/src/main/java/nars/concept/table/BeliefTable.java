@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
@@ -30,7 +30,7 @@ public interface BeliefTable extends TaskTable {
 
         @Override
         public Iterator<Task> iterator() {
-            return Iterators.emptyIterator();
+            return Collections.emptyIterator();
         }
 
 
@@ -298,9 +298,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     default void print(@NotNull PrintStream out) {
-        this.forEach(t -> {
-            out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log());
-        });
+        this.forEach(t -> out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log()));
     }
     default void print() {
         print(System.out);
@@ -381,13 +379,12 @@ public interface BeliefTable extends TaskTable {
     default Task match(Task target) {
 
         int size = size();
-        Task belief;
 
         long occ = target.occurrence();
 
         do {
 
-            belief = top( occ );
+            Task belief = top( occ );
 
             if (belief == null) {
                 return null;

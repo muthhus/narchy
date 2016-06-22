@@ -435,7 +435,7 @@ public enum $ {
     }
 
     static void initLogger() {
-        logRoot = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        logRoot = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 
         LoggerContext loggerContext = logRoot.getLoggerContext();
         // we are not interested in auto-configuration
