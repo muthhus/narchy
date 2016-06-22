@@ -37,12 +37,12 @@ public class BulletStack {
 
 	private BulletStack() {}
 	
-	private static final ThreadLocal<BulletStack> threadLocal = new ThreadLocal<BulletStack>() {
-		@Override
-		protected BulletStack initialValue() {
-			return new BulletStack();
-		}
-	};
+	private static final ThreadLocal<BulletStack> threadLocal = new ThreadLocal<>() {
+        @Override
+        protected BulletStack initialValue() {
+            return new BulletStack();
+        }
+    };
 	
 	/**
 	 * Returns stack for current thread, or create one if not present.
@@ -62,7 +62,7 @@ public class BulletStack {
 	public final Vector4StackList vectors4 = new Vector4StackList();
 	public final QuatStackList quats = new QuatStackList();
 
-	public final ArrayPool<float[]> floatArrays = new ArrayPool<float[]>(float.class);
+	public final ArrayPool<float[]> floatArrays = new ArrayPool<>(float.class);
 	
 	/**
 	 * Pushes Vector3f, Transform and Matrix3f stacks.

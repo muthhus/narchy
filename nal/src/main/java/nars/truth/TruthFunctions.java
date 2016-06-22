@@ -419,10 +419,10 @@ public final class TruthFunctions extends UtilityFunctions {
             return null;
 
         float f1 = invert1 ? v1.freqNegated() : v1.freq();
-        float f2 = v2.freq();
 
-        //float f = and(f1, v2.freq()); //original
-        float f = freqInterp(f1, f2, c1, c2); //stronger, balanced
+
+        float f = and(f1, v2.freq()); //original
+        //float f = freqInterp(f1, v2.freq(), c1, c2); //stronger, balanced
 
         return t(f, c);
     }

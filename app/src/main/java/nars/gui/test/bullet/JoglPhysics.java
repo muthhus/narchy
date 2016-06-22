@@ -38,15 +38,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener {
     private DemoApplication app;
 
     @Override
-    public void windowResized(WindowEvent e) { }
-    @Override
-    public void windowMoved(WindowEvent e) { }
-    @Override
-    public void windowDestroyNotify(WindowEvent e) {
-
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         //if(e.getClickCount()>1) {
             //quit=true;
@@ -78,7 +69,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener {
 
 
 
-    public void run(String title, DemoApplication demoApp) {
+    public void run(DemoApplication demoApp) {
         this.app = demoApp;
     }
 
@@ -87,7 +78,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener {
         super.init(gl2);
 
         //GLProfile.setProfileGLAny();
-        try {
+//        try {
 //            NWCapabilities caps = new NWCapabilities();
 //            // For emulation library, use 16 bpp
 //            caps.setRedBits(5);
@@ -128,9 +119,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener {
 
             // Shut things down cooperatively
 //            window.destroy();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//        }
 
     }
 

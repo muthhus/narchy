@@ -35,10 +35,6 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.*;
 import com.bulletphysics.dynamics.constraintsolver.*;
 import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
@@ -56,7 +52,7 @@ public class RagDoll extends DemoApplication {
 
 	public static void main(String[] args) {
 		JoglPhysics j = new JoglPhysics();
-		j.run("", new RagDoll());
+		j.run(new RagDoll());
 		j.show(800, 600);
 	}
 
@@ -104,11 +100,8 @@ public class RagDoll extends DemoApplication {
 		clientResetScene();
 	}
 
-	public void spawnRagdoll() {
-		spawnRagdoll(false);
-	}
 
-	public void spawnRagdoll(boolean random) {
+	public void spawnRagdoll() {
 		RagDollModel ragDoll = new RagDollModel(dynamicsWorld, new Vector3f(0f, 0f, 10f), 5f);
 		ragdolls.add(ragDoll);
 	}
@@ -117,7 +110,7 @@ public class RagDoll extends DemoApplication {
 	public void keyboardCallback(char key) {
 		switch (key) {
 			case 'e':
-				spawnRagdoll(true);
+				spawnRagdoll();
 				break;
 			default:
 				super.keyboardCallback(key);
@@ -252,25 +245,25 @@ public class RagDoll extends DemoApplication {
 
 				transform.setIdentity();
 				transform.origin.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -BulletGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -BulletGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()]);
 
@@ -313,7 +306,7 @@ public class RagDoll extends DemoApplication {
 
 				localA.origin.set(-0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
 
-				MatrixUtil.setEulerZYX(localB.basis, BulletGlobals.SIMD_HALF_PI, 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(localB.basis, BulletGlobals.SIMD_HALF_PI, (float) 0, -BulletGlobals.SIMD_HALF_PI);
 				localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
 
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
@@ -334,7 +327,7 @@ public class RagDoll extends DemoApplication {
 				localB.setIdentity();
 
 				localA.origin.set(0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(localB.basis, 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(localB.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
 				localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -393,9 +386,9 @@ public class RagDoll extends DemoApplication {
 				localA.setIdentity();
 				localB.setIdentity();
 
-				MatrixUtil.setEulerZYX(localA.basis, 0, BulletGlobals.SIMD_HALF_PI, 0);
+				MatrixUtil.setEulerZYX(localA.basis, (float) 0, BulletGlobals.SIMD_HALF_PI, 0);
 				localA.origin.set(0f, 0.15f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(localB.basis, 0, BulletGlobals.SIMD_HALF_PI, 0);
+				MatrixUtil.setEulerZYX(localB.basis, (float) 0, BulletGlobals.SIMD_HALF_PI, 0);
 				localB.origin.set(0f, -0.15f * scale_ragdoll, 0f);
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_PELVIS.ordinal()], bodies[BodyPart.BODYPART_SPINE.ordinal()], localA, localB, useLinearReferenceFrameA);
 

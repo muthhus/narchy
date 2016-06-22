@@ -48,10 +48,10 @@ public class GLSRT {
         ImmModeSink.setVBOUsage(false);
     }*/
 
-	private GLU    glu;
+	private final GLU    glu;
 	// private GLFont font;
 
-	public GLSRT(GLU glu, GL gl) {
+	public GLSRT(GLU glu) {
         System.out.println("VBO_CACHE: "+VBO_CACHE);
         this.glu = glu;
         /*
@@ -149,7 +149,7 @@ public class GLSRT {
             16, 19, 17, 18, 16, 17, /* right  */
             23, 20, 21, 20, 22, 21 /* left   */
     };
-    private ByteBuffer cubeIndices= GLBuffers.newDirectByteBuffer(s_cubeIndices);
+    private final ByteBuffer cubeIndices= GLBuffers.newDirectByteBuffer(s_cubeIndices);
 	
 	////////////////////////////////////////////////////////////////////////////
 	
@@ -179,10 +179,10 @@ public class GLSRT {
 		}
 	}
 	
-	private static Map<SphereKey,ImmModeSink> sphereDisplayLists = new HashMap<SphereKey,ImmModeSink>();
-	private static SphereKey sphereKey = new SphereKey();
+	private static final Map<SphereKey,ImmModeSink> sphereDisplayLists = new HashMap<SphereKey,ImmModeSink>();
+	private static final SphereKey sphereKey = new SphereKey();
 	
-	public void drawSphere(GL gl, float radius, int slices, int stacks) {
+	public void drawSphere(GL gl, float radius) {
         if(sphere==null) {
             sphere = glu.gluNewQuadric();
             sphere.setImmMode((VBO_CACHE)?false:true);
@@ -240,8 +240,8 @@ public class GLSRT {
 		}
 	}
 	
-	private static Map<CylinderKey,ImmModeSink> cylinderDisplayLists = new HashMap<CylinderKey,ImmModeSink>();
-	private static CylinderKey cylinderKey = new CylinderKey();
+	private static final Map<CylinderKey,ImmModeSink> cylinderDisplayLists = new HashMap<CylinderKey,ImmModeSink>();
+	private static final CylinderKey cylinderKey = new CylinderKey();
 	
 	public void drawCylinder(GL2 gl, float radius, float halfHeight, int upAxis) {
         if(cylinder==null) {
@@ -291,7 +291,7 @@ public class GLSRT {
 	
 	////////////////////////////////////////////////////////////////////////////
 
-	public void drawString(GL gl, CharSequence s, int x, int y, float red, float green, float blue) {
+	public void drawString() {
         /*
 		if (font != null) {
 			FontRender.drawString(gl, font, s, x, y, red, green, blue);

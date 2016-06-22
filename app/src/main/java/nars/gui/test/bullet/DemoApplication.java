@@ -28,7 +28,6 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.ContactAddedCallback;
 import com.bulletphysics.ContactDestroyedCallback;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -43,11 +42,10 @@ import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.*;
-import java.nio.*;
+
 import java.util.*;
 import java.util.Map.Entry;
 
-import com.jogamp.newt.*;
 import com.jogamp.newt.event.*;
 
 /**
@@ -64,7 +62,7 @@ public abstract class DemoApplication
 	
 	public static int numObjects = 0;
 	public static final int maxNumObjects = 16384;
-	public static Transform[] startTransforms = new Transform[maxNumObjects];
+	public static final Transform[] startTransforms = new Transform[maxNumObjects];
 	public static CollisionShape[] gShapePtr = new CollisionShape[maxNumObjects]; //1 rigidbody has 1 shape (no re-use of shapes)
 	
 	public static RigidBody pickedBody = null; // for deactivation state
@@ -76,7 +74,7 @@ public abstract class DemoApplication
 	}
 	// TODO: class CProfileIterator* m_profileIterator;
 	
-	protected Clock clock = new Clock();
+	protected final Clock clock = new Clock();
 
 	// this is the most important class
 	protected DynamicsWorld dynamicsWorld = null;
@@ -129,7 +127,7 @@ public abstract class DemoApplication
         }
 	}
 	
-	public abstract void initPhysics() throws Exception;
+	public abstract void initPhysics();
 	
 	public void destroy() {
 		// TODO: CProfileManager::Release_Iterator(m_profileIterator);
@@ -166,7 +164,7 @@ public abstract class DemoApplication
         System.err.print("GL_EXTENSIONS: ");
         System.err.println(gl.glGetString(gl.GL_EXTENSIONS));
 
-        glsrt = new GLSRT(glu, gl);
+        glsrt = new GLSRT(glu);
         if(useLight0) {
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, light_diffuse, 0);
@@ -249,7 +247,7 @@ public abstract class DemoApplication
         //glutSwapBuffers();
     }
 
-    public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
+    public void displayChanged() {
     }
 
     protected GL2  gl;
@@ -1008,7 +1006,7 @@ public abstract class DemoApplication
     */
 
 	private final Transform m = new Transform();
-	private Vector3f wireColor = new Vector3f();
+	private final Vector3f wireColor = new Vector3f();
 	private Color3f TEXT_COLOR = new Color3f(0f, 0f, 0f);
 	// private StringBuilder buf = new StringBuilder();
 
@@ -1314,7 +1312,7 @@ public abstract class DemoApplication
 	}
 	
 	public void drawString(CharSequence s, int x, int y, Color3f color) {
-		glsrt.drawString(gl, s, x, y, color.x, color.y, color.z);
+		glsrt.drawString();
 	}
 	
 }

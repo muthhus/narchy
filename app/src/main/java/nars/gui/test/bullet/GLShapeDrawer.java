@@ -34,8 +34,6 @@ import com.bulletphysics.linearmath.VectorUtil;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.ImmModeSink;
 
-import static com.bulletphysics.collision.broadphase.BroadphaseNativeType.*;
-
 /**
  *
  * @author jezek2
@@ -88,7 +86,7 @@ public class GLShapeDrawer {
 		vbo.glEnd(gl);
 	}
 
-	private static float[] glMat = new float[16];
+	private static final float[] glMat = new float[16];
 	
 	public static void drawOpenGL(GLSRT glsrt, GL2 gl, Transform trans, CollisionShape shape, Vector3f color, int debugMode) {
 		BulletStack stack = BulletStack.get();
@@ -153,7 +151,7 @@ public class GLShapeDrawer {
 							float radius = sphereShape.getMargin(); // radius doesn't include the margin, so draw with margin
 							// TODO: glutSolidSphere(radius,10,10);
 							//sphere.draw(radius, 8, 8);
-							glsrt.drawSphere(gl, radius, 10, 10);
+							glsrt.drawSphere(gl, radius);
 							/*
 							glPointSize(10f);
 							glBegin(gl.GL_POINTS);
@@ -176,11 +174,11 @@ public class GLShapeDrawer {
 							gl.glTranslatef(0f, -halfHeight, 0f);
 							//glutSolidSphere(radius,10,10);
 							//sphere.draw(radius, 10, 10);
-							glsrt.drawSphere(gl, radius, 10, 10);
+							glsrt.drawSphere(gl, radius);
 							gl.glTranslatef(0f, 2f*halfHeight,0f);
 							//glutSolidSphere(radius,10,10);
 							//sphere.draw(radius, 10, 10);
-							glsrt.drawSphere(gl, radius, 10, 10);
+							glsrt.drawSphere(gl, radius);
 							useWireframeFallback = false;
 							break;
 						}
@@ -372,7 +370,7 @@ public class GLShapeDrawer {
 	}
 	
 	private static class GlDisplaylistDrawcallback extends TriangleCallback {
-		private GL gl;
+		private final GL gl;
 		
 		private final Vector3f diff1 = new Vector3f();
 		private final Vector3f diff2 = new Vector3f();
@@ -430,7 +428,7 @@ public class GLShapeDrawer {
 	}
 	
 	private static class GlDrawcallback extends TriangleCallback {
-		private GL gl;
+		private final GL gl;
 		public boolean wireframe = false;
 
 		public GlDrawcallback(GL gl) {
@@ -470,7 +468,7 @@ public class GLShapeDrawer {
 	}
 	
 	private static class TriangleGlDrawcallback extends InternalTriangleIndexCallback {
-		private GL gl;
+		private final GL gl;
 
 		public TriangleGlDrawcallback(GL gl) {
 			this.gl = gl;

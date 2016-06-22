@@ -57,8 +57,8 @@ public class DefaultCore extends AbstractCore {
         c.capacity(warm);
 
         //clean out any deleted links since having been deactivated
-        //c.tasklinks().commit(Forget.QualityToPriority);
-        //c.termlinks().commit(Forget.QualityToPriority);
+        c.tasklinks().commit(Forget.QualityToPriority);
+        c.termlinks().commit(Forget.QualityToPriority);
 
         return true;
     }

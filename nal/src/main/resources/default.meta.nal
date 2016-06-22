@@ -274,7 +274,7 @@
      (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction)
      //TODO maybe try to get this working:
      //(&&,X,Y,A..*), Y, time(decomposeTask) |- X, (Belief:StructuralDeduction)
-     B, (&&,X,A..+), time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteOnlyIfUnifiesDep((&&,A..+),X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 
 
     //decompose (only) the leading event in a conjunction goal
