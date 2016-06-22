@@ -80,7 +80,7 @@ import com.jogamp.opengl.GLEventListener;
  * button. </P>
  */
 
-public class ExaminerViewer {
+public class GleemControl {
     private GLWindow window;
     /**
      * Simple state machine for figuring out whether we are grabbing
@@ -116,7 +116,7 @@ public class ExaminerViewer {
     private float zNear = 1.0f;
     private float zFar = 100.0f;
     private float vertFOVScale = 1.0f;
-    private final CameraParameters params = new CameraParameters();
+    private final CameraParameters camera = new CameraParameters();
 
     /**
      * Our bounding sphere provider (for viewAll())
@@ -173,9 +173,9 @@ public class ExaminerViewer {
         public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
         }
     };
-    protected ManipManager manip;
+    public ManipManager manip;
 
-    public ExaminerViewer() {
+    public GleemControl() {
         
     }
 
@@ -203,7 +203,13 @@ public class ExaminerViewer {
             throw new RuntimeException("already started");
         this.window = window;
         this.manip = new ManipManager(window);
+        manip.registerWindow(window);
     }
+    public void start(Vec3f up, GLWindow window) {
+        setUpVector(up);
+        start(window);
+    }
+
 
     /**
      * Detaches from the given window. This causes the ManipManager's
@@ -220,8 +226,11 @@ public class ExaminerViewer {
      * Call this at the end of your display() method to cause the
      * Modelview matrix to be recomputed for the next frame.
      */
-    public void update(GL2 gl) {
-        recalc(gl);
+    public void render(GL2 gl) {
+        recalc();
+        matrix(gl);
+
+        manip.render(camera);
     }
 
     /**
@@ -240,15 +249,15 @@ public class ExaminerViewer {
      * geometry. A BSphereProvider must have already been set or this
      * method has no effect.
      */
-    public void viewAll(GL2 gl) {
+    public void viewAll() {
         if (provider == null) {
             return;
         }
         // Figure out how far to move
         float vertFOV, horizFOV, minFOV;
-        float adjustedVertFOV = params.getVertFOV() * vertFOVScale;
+        float adjustedVertFOV = camera.getVertFOV() * vertFOVScale;
         vertFOV = 2.0f * adjustedVertFOV;
-        horizFOV = 2.0f * (float) Math.atan(params.getImagePlaneAspectRatio() *
+        horizFOV = 2.0f * (float) Math.atan(camera.getImagePlaneAspectRatio() *
                 Math.tan(adjustedVertFOV));
         if (vertFOV < horizFOV)
             minFOV = vertFOV;
@@ -261,7 +270,7 @@ public class ExaminerViewer {
         float dist = bsph.getRadius() / (float) Math.sin(minFOV / 2.0f);
         dolly.z = dist;
         center.set(bsph.getCenter());
-        //recalc(gl);
+        //recalc();
     }
 
     /**
@@ -270,8 +279,8 @@ public class ExaminerViewer {
      * that mutating the returned object is not recommended but
      * regardless will have no effect on the ExaminerViewer.
      */
-    public CameraParameters getCameraParameters() {
-        return params;
+    public CameraParameters camera() {
+        return camera;
     }
 
     /**
@@ -442,14 +451,14 @@ public class ExaminerViewer {
 
         int xSize = window.getSurfaceWidth();
         int ySize = window.getSurfaceHeight();
-        params.setOrientation(orientation);
-        params.setPosition(computePosition(new Vec3f()));
-        params.setForwardDirection(Vec3f.NEG_Z_AXIS);
-        params.setUpDirection(Vec3f.Y_AXIS);
-        params.setVertFOV((float) Math.PI / 8.0f);
-        params.setImagePlaneAspectRatio((float) xSize / (float) ySize);
-        params.setXSize(xSize);
-        params.setYSize(ySize);
+        camera.setOrientation(orientation);
+        camera.setPosition(computePosition(new Vec3f()));
+        camera.setForwardDirection(Vec3f.NEG_Z_AXIS);
+        camera.setUpDirection(Vec3f.Y_AXIS);
+        camera.setVertFOV((float) Math.PI / 8.0f);
+        camera.setImagePlaneAspectRatio((float) xSize / (float) ySize);
+        camera.setXSize(xSize);
+        camera.setYSize(ySize);
     }
 
     private void motionMethod(MouseEvent e, int x, int y) {
@@ -601,39 +610,39 @@ public class ExaminerViewer {
         else
             theta = (float) Math.toDegrees(Math.atan(1 / aspect));
         theta *= vertFOVScale;
-        params.setVertFOV((float) (Math.toRadians(theta) / 2.0));
-        params.setImagePlaneAspectRatio(aspect);
-        params.setXSize(w);
-        params.setYSize(h);
+        camera.setVertFOV((float) (Math.toRadians(theta) / 2.0));
+        camera.setImagePlaneAspectRatio(aspect);
+        camera.setXSize(w);
+        camera.setYSize(h);
     }
 
     private void recalc() {
         // Recompute position, forward and up vectors
         Vec3f tmp = new Vec3f();
-        params.setPosition(computePosition(tmp));
+        camera.setPosition(computePosition(tmp));
         orientation.rotateVector(Vec3f.NEG_Z_AXIS, tmp);
-        params.setForwardDirection(tmp);
+        camera.setForwardDirection(tmp);
         orientation.rotateVector(Vec3f.Y_AXIS, tmp);
-        params.setUpDirection(tmp);
-        params.setOrientation(orientation);
+        camera.setUpDirection(tmp);
+        camera.setOrientation(orientation);
 
         // Compute modelview matrix based on camera parameters, position and
         // orientation
         Mat4f tmpMat = new Mat4f();
         tmpMat.makeIdent();
         tmpMat.setRotation(orientation);
-        tmpMat.setTranslation(params.getPosition());
+        tmpMat.setTranslation(camera.getPosition());
         tmpMat.invertRigid();
-        params.setModelviewMatrix(tmpMat);
+        camera.setModelviewMatrix(tmpMat);
 
         // Compute perspective matrix given camera parameters
         float deltaZ = zFar - zNear;
-        float aspect = params.getImagePlaneAspectRatio();
-        float radians = params.getVertFOV();
+        float aspect = camera.getImagePlaneAspectRatio();
+        float radians = camera.getVertFOV();
         float sine = (float) Math.sin(radians);
         if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {
             tmpMat.makeIdent();
-            params.setProjectionMatrix(tmpMat);
+            camera.setProjectionMatrix(tmpMat);
             return;
         }
         float cotangent = (float) Math.cos(radians) / sine;
@@ -644,7 +653,7 @@ public class ExaminerViewer {
         tmpMat.set(3, 2, -1);
         tmpMat.set(2, 3, -2 * zNear * zFar / deltaZ);
         tmpMat.set(3, 3, 0);
-        params.setProjectionMatrix(tmpMat);
+        camera.setProjectionMatrix(tmpMat);
 
 
         /********************
@@ -690,16 +699,15 @@ public class ExaminerViewer {
          **********************/
     }
 
-    private void recalc(GL2 gl) {
-        recalc();
+    private void matrix(GL2 gl) {
 
         gl.glMatrixMode(GL2ES1.GL_MODELVIEW);
         float[] data = new float[16];
-        params.getModelviewMatrix().getColumnMajorData(data);
+        camera.getModelviewMatrix().getColumnMajorData(data);
         gl.glLoadMatrixf(data, 0);
 
         gl.glMatrixMode(GL2ES1.GL_PROJECTION);
-        params.getProjectionMatrix().getColumnMajorData(data);
+        camera.getProjectionMatrix().getColumnMajorData(data);
         gl.glLoadMatrixf(data, 0);
     }
 

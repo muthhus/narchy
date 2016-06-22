@@ -3,12 +3,15 @@ package nars.util;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.Animator;
-
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
+    public static final GLU glu = new GLU();
+    public static final GLUT glut = new GLUT();
 
     protected GLWindow window;
     protected GL2 gl;
@@ -30,13 +33,21 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
     @Override
-    public void init(GLAutoDrawable drawable) {
+    public final void init(GLAutoDrawable drawable) {
         this.window = (GLWindow)drawable;
         init(this.gl = drawable.getGL().getGL2());
     }
 
+
     protected void init(GL2 gl2) {
 
+    }
+
+    // Unused routines
+    @Override
+    public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
+        if (this.gl!= drawable.getGL().getGL2())
+            throw new RuntimeException("gl context changed");
     }
 
     public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
@@ -46,7 +57,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 GLProfile.getDefault()
         );
 
-        //config.setHardwareAccelerated(true);
+        config.setHardwareAccelerated(true);
 //        config.setBackgroundOpaque(false);
 
         config.setAlphaBits(8);
@@ -67,7 +78,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return window.getWidth();
     }
     public int getHeight() {
-        return window.getWidth();
+        return window.getHeight();
     }
 
 
@@ -122,6 +133,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setTitle(title);
         g.setSurfaceSize(w, h);
         g.setVisible(true);
+
         return g;
     }
 

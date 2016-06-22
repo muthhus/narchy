@@ -248,8 +248,7 @@ public class Lesson12 extends JoglSpace implements KeyListener {
         gl.glEndList();
     }
 
-    public void init(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+    public void init(GL2 gl) {
         gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
         gl.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.01f); // Black Background

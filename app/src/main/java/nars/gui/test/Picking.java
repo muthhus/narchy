@@ -44,8 +44,8 @@ public class Picking extends JoglSpace implements MouseListener {
 
     private GLU glu = new GLU();
 
-    public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
+    public void init(GL2 gl) {
+
         gl.glEnable(GL2.GL_CULL_FACE);
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_NORMALIZE);

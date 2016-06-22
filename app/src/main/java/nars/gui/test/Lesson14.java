@@ -28,22 +28,27 @@ public class Lesson14 extends JoglSpace {
     }
 
     public static void renderString(GL2 gl, int font, String string) {
-        renderString(gl, font, string, 0, 0, 0);
+        renderString(gl, font, string, 1f, 0, 0, 0);
     }
 
-    public static void renderString(GL2 gl, int font, String string, float dx, float dy, float dz) {
+    public static void renderString(GL2 gl, int font, String string, float fontScale, float dx, float dy, float dz) {
         // Center Our Text On The Screen
         float width =
                 glut.glutStrokeLength(font, string);
                 //glut.glutBitmapLength(font, string);
 
+        gl.glPushMatrix();
+
         gl.glTranslatef(-width / 2f + dx, dy, dz);
 
+        gl.glScalef(fontScale, fontScale, 1f);
+
         glut.glutStrokeString(font, string);
+
+        gl.glPopMatrix();
     }
 
-    public void init(GLAutoDrawable glDrawable) {
-        GL2 gl2 = (GL2) glDrawable.getGL();
+    public void init(GL2 gl2) {
         gl2.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
         gl2.glClearColor(0.0f, 0.0f, 0.0f, 0.1f); // Black Background
         gl2.glClearDepth(1.0f); // Depth Buffer Setup

@@ -3,14 +3,17 @@ package nars.gui.graph;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
+import gleem.linalg.Vec3f;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
+import nars.gui.test.DefaultHandleBoxManip;
+import nars.gui.test.GleemControl;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -51,8 +54,8 @@ public class GraphSpace extends JoglSpace {
 
     }
 
-    private static final GLU glu = new GLU();
-    private static final GLUT glut = new GLUT();
+
+    private final GleemControl gleem = new GleemControl();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
@@ -377,6 +380,12 @@ public class GraphSpace extends JoglSpace {
 
         //loadGLTexture(gl);
         buildLists(gl);
+
+
+
+
+        gleem.start(Vec3f.Y_AXIS, window);
+        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
     private void buildLists(GL2 gl) {
@@ -462,12 +471,19 @@ public class GraphSpace extends JoglSpace {
 
         clear(gl);
 
+        //gl.glPushMatrix();
+
         updateCamera(gl);
+
+        gleem.render(gl);
+
 
         List<ConceptsSource> s = this.sources;
         for (int i = 0, sourcesSize = s.size(); i < sourcesSize; i++) {
             render(gl, s.get(i));
         }
+
+        //gl.glPopMatrix();
 
     }
 
@@ -487,11 +503,8 @@ public class GraphSpace extends JoglSpace {
 
         for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
 
-            gl.glPushMatrix();
-
             render(gl, dt, toDraw.get(i1));
 
-            gl.glPopMatrix();
         }
 
         s.busy.set(false);
@@ -499,50 +512,66 @@ public class GraphSpace extends JoglSpace {
 
     public void render(GL2 gl, float dt, VDraw v) {
 
+        gl.glPushMatrix();
+
+
         float[] pp = v.p;
-
-        int n = v.edgeCount();
-        EDraw[] eee = v.edges;
-        for (int en = 0; en < n; en++) {
-            render(gl, v, eee[en]);
-        }
-
-
-        //@Nullable Concept c = b.get();
-
-
         float x = pp[0], y = pp[1], z = pp[2];
         gl.glTranslatef(x, y, z);
+
+        renderLabel(gl, v);
+
+//        int n = v.edgeCount();
+//        EDraw[] eee = v.edges;
+//        for (int en = 0; en < n; en++)
+//            render(gl, v, eee[en]);
+
+        renderVertexBase(gl, dt, v);
+
+        gl.glPopMatrix();
+
+
+    }
+
+    public void renderVertexBase(GL2 gl, float dt, VDraw v) {
+
+        gl.glPushMatrix();
+
 
         //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
         //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
 
 
         float pri = v.pri;
-        float p = pri * 0.75f + 0.25f;
 
-        //Label
-        //float lc = p*0.5f + 0.5f;
 
         float[] s = v.s;
         gl.glScalef(s[0], s[1], s[2]);
 
         final float activationPeriods = 4f;
         gl.glColor4f(h(pri), pri * 1f / (1f + (v.lag / (activationPeriods * dt))), h(v.budget.dur()), v.budget.qua() * 0.25f + 0.75f);
-        //gl.glCallList(box);
-        glut.glutSolidTetrahedron();
+        gl.glCallList(box);
+        //glut.glutSolidTetrahedron();
 
+        gl.glPopMatrix();
+    }
+
+    public void renderLabel(GL2 gl, VDraw v) {
+
+        //gl.glPushMatrix();
+
+        float p = v.pri * 0.75f + 0.25f;
         gl.glColor4f(1f, 1f, 1f, 1f * p);
-
-        float fontScale = 0.01f;
-        gl.glScalef(fontScale, fontScale, 1f);
 
         float fontThick = 1f;
         gl.glLineWidth(fontThick);
-        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                0, 0, 1f); // Print GL Text To The Screen
 
-        //n++;
+        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
+                0.1f, //scale
+                0, 0, 0f); // Print GL Text To The Screen
+
+        //gl.glPopMatrix();
+
     }
 
     public void render(GL2 gl, VDraw v, EDraw e) {
@@ -596,7 +625,6 @@ public class GraphSpace extends JoglSpace {
         gl.glLineWidth(e.width);
         gl.glBegin(GL.GL_LINES);
         {
-
             gl.glVertex3f(vp[0], vp[1], vp[2]);
             gl.glVertex3f(eep[0], eep[1], eep[2]);
         }
@@ -612,11 +640,16 @@ public class GraphSpace extends JoglSpace {
 
     public void updateCamera(GL2 gl) {
         gl.glLoadIdentity();
-        gl.glTranslatef(0, 0, -120f);
-        //gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
-        //gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
-        gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);
-        r0 += 0.3f;
+//        gl.glRotatef(0,1,0,0);
+//        gl.glRotatef(0,0,1,0);
+//        gl.glRotatef(0,0,0,1);
+//        gl.glTranslatef(0,0,0);
+//        gl.glScalef(1f,1f,1f);
+//        gl.glTranslatef(0, 0, -120f);
+//        gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
+//        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
+//        gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);
+//        r0 += 0.3f;
     }
 
     public float h(float p) {
@@ -628,17 +661,19 @@ public class GraphSpace extends JoglSpace {
                         int ystart,
                         int width,
                         int height) {
-        GL2 gl = (GL2) drawable.getGL();
 
         height = (height == 0) ? 1 : height;
 
         gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL2.GL_PROJECTION);
+
+        gl.glMatrixMode(GL2ES1.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        glu.gluPerspective(45, (float) width / height, 1, 500);
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
+        glu.gluPerspective(45, (float) width / height, 1, 1000);
+        gl.glMatrixMode(GL2ES1.GL_MODELVIEW);
         gl.glLoadIdentity();
+        gleem.viewAll();
+
     }
 
     public static class ConceptsSource {

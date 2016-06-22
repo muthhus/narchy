@@ -41,6 +41,7 @@ package gleem;
 
 import com.jogamp.opengl.GL2;
 import gleem.linalg.*;
+import nars.gui.test.GleemControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ import java.util.List;
 
 public class HandleBoxManip extends Manip {
     private ManipPart parts;
-    private final Vec3f translation;
+    protected final Vec3f translation;
     private final Vec3f scale;
     private final Vec3f geometryScale;
     private final Rotf rotation;
@@ -230,6 +231,11 @@ public class HandleBoxManip extends Manip {
 
         createGeometry();
         recalc();
+    }
+
+    public HandleBoxManip(GleemControl c) {
+        this();
+        c.manip.showManipInWindow(this);
     }
 
     /**

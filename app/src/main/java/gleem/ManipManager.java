@@ -65,7 +65,7 @@ public class ManipManager {
     // Maps GLDrawables to WindowInfos
     //private final Map windowToInfoMap = new HashMap();
     // Maps Manips to Set<GLAutoDrawable>
-    private final Map manipToWindowMap = new HashMap();
+    //private final Map manipToWindowMap = new HashMap();
 
     // MouseAdapter for this
     private final MouseAdapter mouseListener = new MouseAdapter() {
@@ -97,16 +97,21 @@ public class ManipManager {
     };
     private WindowUpdateListener windowListener;
 
+    public void render(CameraParameters c) {
+        updateCameraParameters(c);
+        render();
+    }
+
     class WindowInfo {
         /**
          * Set<Manip>
          */
-        Set manips = new HashSet();
-        CameraParameters params = new CameraParameters();
+        final Set<Manip> manips = new LinkedHashSet();
+        final CameraParameters params = new CameraParameters();
         Manip curHighlightedManip;
         ManipPart curHighlightedManipPart;
         // Current manip
-        Manip curManip;
+        Manip active;
         // Dragging?
         boolean dragging;
     }
@@ -162,15 +167,15 @@ public class ManipManager {
      * Make a given manipulator visible and active in a given
      * window. The window must be registered.
      */
-    public synchronized void showManipInWindow(Manip manip, GLAutoDrawable window) {
+    public synchronized void showManipInWindow(Manip manip) {
 
         info.manips.add(manip);
-        Set windows = (Set) manipToWindowMap.get(manip);
-        if (windows == null) {
-            windows = new HashSet();
-            manipToWindowMap.put(manip, windows);
-        }
-        windows.add(window);
+//        Set windows = (Set) manipToWindowMap.get(manip);
+//        if (windows == null) {
+//            windows = new HashSet();
+//            manipToWindowMap.put(manip, windows);
+//        }
+//        windows.add(window);
     }
 
     /**
@@ -185,16 +190,16 @@ public class ManipManager {
         if (!info.manips.remove(manip)) {
             throw new RuntimeException("Manip not registered in window");
         }
-        Set windows = (Set) manipToWindowMap.get(manip);
-        assert windows != null;
-        windows.remove(window);
+        //Set windows = (Set) manipToWindowMap.get(manip);
+        //assert windows != null;
+        //windows.remove(window);
     }
 
     /**
      * This must be called for a registered window every time the
      * camera parameters of the window change.
      */
-    public synchronized void updateCameraParameters(GLAutoDrawable window, CameraParameters params) {
+    public synchronized void updateCameraParameters(CameraParameters params) {
         info.params.set(params);
     }
 
@@ -236,10 +241,12 @@ public class ManipManager {
      * OpenGL context is valid, i.e., from within the display() method
      * of a GLEventListener.
      */
-    public synchronized void render(GLAutoDrawable window, GL2 gl) {
-        for (Iterator iter = info.manips.iterator(); iter.hasNext(); ) {
-            ((Manip) iter.next()).render(gl);
-        }
+    public synchronized void render() {
+        info.manips.forEach( this::render );
+    }
+
+    public void render( Manip m) {
+        m.render(gl.getGL().getGL2());
     }
 
     /**
@@ -321,8 +328,8 @@ public class ManipManager {
             Vec3f rayStart = new Vec3f();
             Vec3f rayDirection = new Vec3f();
             computeRay(info.params, x, y, rayStart, rayDirection);
-            info.curManip.drag(rayStart, rayDirection);
-            fireUpdate(info.curManip);
+            info.active.drag(rayStart, rayDirection);
+            fireUpdate(info.active);
         }
     }
 
@@ -402,22 +409,22 @@ public class ManipManager {
                     }
 
                     hp.manipulator.makeActive(hp);
-                    info.curManip = hp.manipulator;
+                    info.active = hp.manipulator;
                     info.dragging = true;
-                    fireUpdate(info.curManip);
+                    fireUpdate(info.active);
                 }
             } else {
-                if (info.curManip != null) {
-                    info.curManip.makeInactive();
+                if (info.active != null) {
+                    info.active.makeInactive();
                     info.dragging = false;
-                    fireUpdate(info.curManip);
-                    info.curManip = null;
+                    fireUpdate(info.active);
+                    info.active = null;
                     // Check to see where mouse is
                     passiveMotionMethod(window, x, y);
                 }
             }
 
-        return info.curManip != null;
+        return info.active != null;
     }
 
     private Vec2f screenToNormalizedCoordinates(CameraParameters params,
@@ -441,10 +448,11 @@ public class ManipManager {
     }
 
     private void fireUpdate(Manip manip) {
-        Set windows = (Set) manipToWindowMap.get(manip);
-        assert windows != null;
-        for (Iterator iter = windows.iterator(); iter.hasNext(); ) {
-            windowListener.update((GLAutoDrawable) iter.next());
-        }
+//        Set windows = (Set) manipToWindowMap.get(manip);
+//        assert windows != null;
+//        for (Iterator iter = windows.iterator(); iter.hasNext(); ) {
+//            windowListener.update((GLAutoDrawable) iter.next());
+//        }
+        windowListener.update(gl);
     }
 }
