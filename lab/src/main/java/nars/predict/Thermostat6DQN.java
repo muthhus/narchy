@@ -5,7 +5,7 @@ import nars.concept.table.BeliefTable;
 import nars.learn.ql.DQN;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.TreeSet;

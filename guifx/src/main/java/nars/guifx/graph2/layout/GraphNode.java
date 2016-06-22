@@ -2,7 +2,7 @@ package nars.guifx.graph2.layout;
 
 import javafx.scene.Group;
 import nars.guifx.graph2.TermEdge;
-import nars.util.data.Util;
+import nars.util.Util;
 
 
 public class GraphNode extends Group {

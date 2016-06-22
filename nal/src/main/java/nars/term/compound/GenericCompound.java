@@ -2,10 +2,13 @@ package nars.term.compound;
 
 import nars.Op;
 import nars.nal.Tense;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.InvalidTerm;
+import nars.term.Term;
+import nars.term.TermPrinter;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

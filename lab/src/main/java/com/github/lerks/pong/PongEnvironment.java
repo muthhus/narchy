@@ -37,7 +37,7 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 12;
+	final int width = 16;
 	final int height = 12;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
@@ -72,7 +72,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(256);
 		nar.confMin.setValue(0.01f);
 
 		NAgent a = new NAgent(nar);

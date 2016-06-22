@@ -4,7 +4,7 @@ import nars.Global;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.util.data.Util.clamp;
+import static nars.util.Util.clamp;
 
 /**
  * Buffered/Budgeted Link (an entry in a bag)

@@ -5,7 +5,7 @@ package nars.guifx.graph2;
 
 
 import nars.term.Termed;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**

@@ -1,6 +1,6 @@
 package nars.util.math;
 
-import nars.util.data.Util;
+import nars.util.Util;
 
 /**
  * Created by me on 5/4/16.

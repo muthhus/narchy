@@ -3,7 +3,7 @@ package nars.guifx.graph2.layout;
 import nars.guifx.graph2.TermNode;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**

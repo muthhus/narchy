@@ -11,7 +11,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermVector;
 import nars.truth.*;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

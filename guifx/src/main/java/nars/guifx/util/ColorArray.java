@@ -1,7 +1,7 @@
 package nars.guifx.util;
 
 import javafx.scene.paint.Color;
-import nars.util.data.Util;
+import nars.util.Util;
 
 
 /**

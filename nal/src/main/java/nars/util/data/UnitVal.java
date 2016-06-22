@@ -1,6 +1,7 @@
 package nars.util.data;
 
 import nars.truth.Truth;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;

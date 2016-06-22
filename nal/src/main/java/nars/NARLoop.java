@@ -1,6 +1,6 @@
 package nars;
 
-import nars.util.data.Util;
+import nars.util.Util;
 import net.openhft.affinity.AffinityLock;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

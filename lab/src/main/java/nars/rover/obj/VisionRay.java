@@ -9,7 +9,7 @@ import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.RayCastClosestCallback;
 import nars.term.Term;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;

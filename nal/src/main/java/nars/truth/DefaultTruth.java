@@ -2,11 +2,11 @@ package nars.truth;
 
 import nars.Global;
 import nars.Memory;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.util.data.Util.round;
+import static nars.util.Util.round;
 
 
 public class DefaultTruth implements Truth  {

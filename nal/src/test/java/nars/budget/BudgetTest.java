@@ -1,6 +1,6 @@
 package nars.budget;
 
-import nars.util.data.Util;
+import nars.util.Util;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

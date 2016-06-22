@@ -362,12 +362,12 @@ public enum BeliefFunction implements TruthOperator {
     }
 
     @Override
-    public boolean single() {
+    public final boolean single() {
         return single;
     }
 
     @Override
-    public boolean allowOverlap() {
+    public final boolean allowOverlap() {
         return overlap;
     }
 

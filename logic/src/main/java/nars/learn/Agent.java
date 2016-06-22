@@ -1,6 +1,6 @@
 package nars.learn;
 
-import nars.util.data.Util;
+import nars.util.Util;
 
 /**
  * lowest common denominator reinforcement learning agent interface

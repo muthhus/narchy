@@ -1,6 +1,6 @@
 package nars.agent;
 
-import nars.util.data.Util;
+import nars.util.Util;
 
 import java.util.Random;
 

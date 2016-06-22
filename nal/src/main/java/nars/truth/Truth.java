@@ -25,7 +25,7 @@ import nars.Global;
 import nars.Symbols;
 import nars.term.Term;
 import nars.util.Texts;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

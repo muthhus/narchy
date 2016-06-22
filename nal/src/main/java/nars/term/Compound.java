@@ -31,7 +31,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
-import nars.util.data.Util;
+import nars.util.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;

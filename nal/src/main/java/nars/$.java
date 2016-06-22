@@ -24,7 +24,7 @@ import nars.term.variable.VarPattern;
 import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -160,7 +160,12 @@ public enum $ {
 
     @Nullable
     public static Compound neg(@NotNull Term x) {
-        return (Compound) the(NEG, x);
+        if (x.op() == NEG) {
+            //fast unwrap
+            return (Compound) ((Compound)x).term(0);
+        } else {
+            return (Compound) the(NEG, x);
+        }
     }
 
     @NotNull
@@ -742,7 +747,8 @@ public enum $ {
 
     /** negates each entry in the array */
     public static void neg(@NotNull Term[] s) {
-        for (int i = 0; i < s.length; i++) {
+        int l = s.length;
+        for (int i = 0; i < l; i++) {
             s[i] = $.neg(s[i]);
         }
     }

@@ -64,7 +64,7 @@ public final class AutoBag<V>  {
         if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
             return -1;
 
-        float decaySpeed = 0.5f; //< 1.0, smaller means slower forgetting rate / longer forgetting time
+        float decaySpeed = Global.AUTOBAG_NOVELTY_RATE; //< 1.0, smaller means slower forgetting rate / longer forgetting time
         float period = existing / (overflow * decaySpeed);
 
         System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);

@@ -7,8 +7,7 @@ import javafx.scene.layout.VBox;
 import nars.Global;
 import nars.bag.Bag;
 import nars.link.BLink;
-import org.reactfx.collection.LiveArrayList;
-import org.reactfx.collection.LiveList;
+
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

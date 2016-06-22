@@ -4,7 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.link.BLink;
 import nars.nal.Tense;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -2,7 +2,7 @@ package nars.budget.merge;
 
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Global.BUDGET_EPSILON;

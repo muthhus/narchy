@@ -12,14 +12,13 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
 import nars.budget.Budgeted;
-import nars.guifx.NARfx;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.util.NSlider;
 import nars.link.BLink;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;

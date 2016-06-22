@@ -17,7 +17,7 @@ import nars.guifx.NARfx;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.term.Termed;
-import nars.util.data.Util;
+import nars.util.Util;
 
 /**
  * Created by me on 12/27/15.

@@ -23,12 +23,12 @@ package nars.truth;
 import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.$.t;
-import static nars.util.data.Util.lerp;
+import static nars.util.Util.lerp;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
@@ -108,6 +108,7 @@ public final class TruthFunctions extends UtilityFunctions {
     /** assumes belief freq=1f */
     @Nullable
     public static Truth deduction1(@NotNull Truth a, float bC, float minConf) {
+
         return deductionB(a, 1f, bC, minConf);
     }
 
@@ -120,7 +121,7 @@ public final class TruthFunctions extends UtilityFunctions {
     public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
         float f = and(a.freq(), bF);
         float c = and(f, a.conf(), bC);
-        return t(f, c, minConf);
+        return c >= minConf ? t(f, c) : null;
     }
 
     /**

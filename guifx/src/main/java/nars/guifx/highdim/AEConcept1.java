@@ -5,7 +5,7 @@ import nars.guifx.graph2.TermNode;
 import nars.link.BLink;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.util.data.Util;
+import nars.util.Util;
 
 /**
  * Created by me on 2/29/16.

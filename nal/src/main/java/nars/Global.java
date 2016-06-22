@@ -25,7 +25,7 @@ import com.gs.collections.impl.map.mutable.UnifiedMap;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.util.data.Util;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -121,10 +121,10 @@ public enum Global {
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMin = 8;
+    public static float matchTermutationsMin = 6;
 
     /** upper limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMax = 16;
+    public static float matchTermutationsMax = 12;
 
     public static int QUERY_ANSWERS_PER_MATCH = 2;
 
@@ -141,11 +141,16 @@ public enum Global {
     /** minimum difference necessary to indicate a significant modification in budget float number components */
     public static final float BUDGET_EPSILON = 0.001f;
 
+    /** for autobag managed bags:
+     *  lower rate means that a bag's existing items are remembered longer relative to incoming activation */
+    public static final float AUTOBAG_NOVELTY_RATE = 0.3f;
+
+
     /** minimum durability and quality necessary for a derivation to form */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.5f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
 
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
+    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
 
 
@@ -187,7 +192,7 @@ public enum Global {
 
     @NotNull
     public static <X> Set<X> newHashSet(int capacity) {
-        if (capacity == 0) {
+        if (capacity < 2) {
             return new UnifiedSet(0);
         } else {
             //return new UnifiedSet(capacity);

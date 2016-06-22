@@ -1,6 +1,6 @@
 package nars.util.signal;
 
-import nars.util.data.Util;
+import nars.util.Util;
 
 import java.util.Random;
 

@@ -20,7 +20,7 @@ import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.FX;
-import nars.util.data.Util;
+import nars.util.Util;
 
 import java.io.IOException;
 import java.util.Map;

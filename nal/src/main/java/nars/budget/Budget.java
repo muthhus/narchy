@@ -3,7 +3,7 @@ package nars.budget;
 import nars.Symbols;
 import nars.task.Task;
 import nars.util.Texts;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 

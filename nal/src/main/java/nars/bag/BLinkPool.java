@@ -8,7 +8,7 @@ import nars.link.Link;
 import nars.util.data.FastBitSet;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.util.data.Util.clamp;
+import static nars.util.Util.clamp;
 
 /**
  * Created by me on 5/19/16.

@@ -8,7 +8,7 @@ import nars.learn.Agent;
 import nars.learn.ql.DQN;
 import nars.nar.Default;
 import nars.util.Optimize;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import static java.lang.System.out;

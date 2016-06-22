@@ -12,7 +12,7 @@ import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.util.data.Util;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.Autoencoder;

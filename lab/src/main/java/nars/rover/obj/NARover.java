@@ -16,7 +16,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.util.data.Util;
+import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;

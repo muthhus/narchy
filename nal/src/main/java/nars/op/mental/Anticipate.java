@@ -32,7 +32,7 @@ import nars.task.Task;
 import nars.task.Temporal;
 import nars.term.Compound;
 import nars.truth.DefaultTruth;
-import nars.util.data.Util;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

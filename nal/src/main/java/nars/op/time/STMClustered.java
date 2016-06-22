@@ -15,8 +15,8 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.truth.DefaultTruth;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
-import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -50,6 +50,8 @@ public class STMClustered extends STM {
     //final float timeResolution = 0.5f;
 
     private static final double[] EmptyCoherence = new double[] { Double.NaN, Double.NaN };
+
+    private int compactPeriod = 8;
 
     public final class TasksNode extends Node {
 
@@ -282,6 +284,10 @@ public class STMClustered extends STM {
             t.delete();
         }
 
+        long t = nar.time();
+        if (t - now > compactPeriod) {
+            net.compact();
+        }
         now = nar.time();
         bag.commit();
 

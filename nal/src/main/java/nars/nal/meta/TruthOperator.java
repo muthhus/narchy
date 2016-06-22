@@ -75,23 +75,24 @@ public interface TruthOperator {
     final class NegatedTruth implements TruthOperator {
 
         private final TruthOperator o;
+        private final transient boolean overlapCached;
 
         public NegatedTruth(TruthOperator o) {
             this.o = o;
+            overlapCached = o.allowOverlap();
         }
 
         @Override
         public
         @Nullable
         Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf) {
-            if (task == null)
-                return null;
-            return o.apply(task.negated(), belief, m, minConf);
+            return task == null ? null : o.apply(task.negated(), belief, m, minConf);
         }
 
         @Override
         public boolean allowOverlap() {
-            return o.allowOverlap();
+            //return o.allowOverlap();
+            return overlapCached;
         }
 
         @Override

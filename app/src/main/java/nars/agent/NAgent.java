@@ -14,7 +14,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.Texts;
-import nars.util.data.Util;
+import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
