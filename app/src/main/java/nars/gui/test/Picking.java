@@ -1,4 +1,4 @@
-package nars.gui.tutorial;
+package nars.gui.test;
 
 //=================================================================================
 // Picking 0.2                                                       (Thomas Bladh)

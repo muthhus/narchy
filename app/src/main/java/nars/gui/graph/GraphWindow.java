@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.gui.tutorial.Lesson14.renderString;
+import static nars.gui.test.Lesson14.renderString;
 
 /**
  * Created by me on 6/20/16.

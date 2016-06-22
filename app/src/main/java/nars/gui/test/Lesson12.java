@@ -1,4 +1,4 @@
-package nars.gui.tutorial;
+package nars.gui.test;
  
 /*--. .-"-.
 / o_O / O o \

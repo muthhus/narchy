@@ -104,6 +104,8 @@
       <scope>compile</scope>
     </dependency>
 
+
+
     <!--&lt;!&ndash; http://mvnrepository.com/artifact/net.sourceforge.tess4j/tess4j &ndash;&gt;-->
     <!--<dependency>-->
       <!--<groupId>net.sourceforge.tess4j</groupId>-->

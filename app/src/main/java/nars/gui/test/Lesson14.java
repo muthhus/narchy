@@ -1,4 +1,4 @@
-package nars.gui.tutorial;
+package nars.gui.test;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
