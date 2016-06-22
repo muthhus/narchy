@@ -37,14 +37,14 @@ public class GraphWindow extends AbstractJoglWindow {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 1, 2, 3);
+        Default n = new Default(1024, 3, 2, 3);
 
         //n.log();
 
-        new DeductiveMeshTest(n, new int[]{6, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{4, 4}, 16384);
 
 
-        final int maxNodes = 64;
+        final int maxNodes = 256;
 
         new GraphWindow(new ConceptsSource(n, maxNodes)).show(500, 500);
         n.loop(15f);
@@ -57,14 +57,14 @@ public class GraphWindow extends AbstractJoglWindow {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
 
-    int maxEdgesPerVertex = 8;
+    int maxEdgesPerVertex = 16;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()
         new FastOrganicLayout()
     );
 
-    private int box, top;
+    private int box, isoTri;
 
     public GraphWindow(ConceptsSource c) {
         super();
@@ -110,7 +110,9 @@ public class GraphWindow extends AbstractJoglWindow {
 
         Budget b = v.budget;
         float p = v.pri = b.priIfFiniteElseZero();
-        v.scale(p, p, p);
+
+        float nodeScale = 4f;
+        v.scale(1f + nodeScale * p, 1f + nodeScale * p, 1f + nodeScale * p);
 
         if (tt instanceof Concept) {
             updateConcept(v, (Concept) tt, now);
@@ -208,8 +210,19 @@ public class GraphWindow extends AbstractJoglWindow {
             this.hash = k.hashCode();
             this.edges = new EDraw[edges];
             this.radius = 0;
+
+            final float initDistanceEpsilon = 0.5f;
+            move(r(initDistanceEpsilon),
+                 r(initDistanceEpsilon),
+                 r(initDistanceEpsilon));
+
             for (int i = 0; i < edges; i++)
                 this.edges[i] = new EDraw();
+
+        }
+
+        static float r(float range) {
+            return (-0.5f + (float)Math.random()*range)*2f;
         }
 
         @Override
@@ -252,7 +265,7 @@ public class GraphWindow extends AbstractJoglWindow {
             float pri = l.pri();
             float dur = l.dur();
             float qua = l.qua();
-            float baseLineWidth = 3f;
+            float baseLineWidth = 2f;
 
             float width = baseLineWidth * (1f + pri) * (1f + dur);
             float r, g, b;
@@ -418,21 +431,21 @@ public class GraphWindow extends AbstractJoglWindow {
 
         gl.glEndList();
 
-        top = box + 1; // Storage For "Top" Is "Box" Plus One
-        gl.glNewList(top, GL2.GL_COMPILE); // Now The "Top" Display List
+        {
+            isoTri = box + 1; // Storage For "Top" Is "Box" Plus One
+            gl.glNewList(isoTri, GL2.GL_COMPILE); // Now The "Top" Display List
 
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glNormal3f(0.0f, 1.0f, 0.0f);
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);// Top Face
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-        gl.glEnd();
-        gl.glEndList();
+            gl.glBegin(GL2.GL_TRIANGLES);
+            gl.glNormal3f(0.0f, 0f, 1.0f);
+
+            final float h = 0.5f;
+            gl.glVertex3f(-h, -h, 0f); //left base
+            gl.glVertex3f(-h, +h, 0f); //right base
+            gl.glVertex3f(h,  0,  0f);  //midpoint on opposite end
+
+            gl.glEnd();
+            gl.glEndList();
+        }
     }
 
 
@@ -481,29 +494,18 @@ public class GraphWindow extends AbstractJoglWindow {
     public void render(GL2 gl, float dt, VDraw v) {
 
         float[] pp = v.p;
-        float x = pp[0], y = pp[1], z = pp[2];
 
         int n = v.edgeCount();
         EDraw[] eee = v.edges;
         for (int en = 0; en < n; en++) {
-            EDraw e = eee[en];
-            VDraw ee = e.key;
-
-            float[] eep = ee.p;
-            gl.glColor4f(e.r, e.g, e.b, e.a);
-            gl.glLineWidth(e.width);
-            gl.glBegin(GL.GL_LINES);
-            {
-                gl.glVertex3f(x, y, z);
-                gl.glVertex3f(eep[0], eep[1], eep[2]);
-            }
-            gl.glEnd();
+            render(gl, v, eee[en]);
         }
 
 
         //@Nullable Concept c = b.get();
 
 
+        float x = pp[0], y = pp[1], z = pp[2];
         gl.glTranslatef(x, y, z);
 
         //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
@@ -534,6 +536,64 @@ public class GraphWindow extends AbstractJoglWindow {
                 0, 0, 1f); // Print GL Text To The Screen
 
         //n++;
+    }
+
+    public void render(GL2 gl, VDraw v, EDraw e) {
+
+        gl.glColor4f(e.r, e.g, e.b, e.a);
+        if (e.width <= 1f) {
+            renderLineEdge(gl, v, e);
+        } else {
+            renderHalfTriEdge(gl, v, e);
+        }
+    }
+
+    public void renderHalfTriEdge(GL2 gl, VDraw v, EDraw e) {
+        VDraw ee = e.key;
+        float[] tgt = ee.p;
+        float[] src = v.p;
+
+
+        gl.glPushMatrix();
+
+        {
+
+            float x1 = src[0];
+            float x2 = tgt[0];
+            float dx = (x1 - x2);
+            float cx = 0.5f * (x1 + x2);
+            float y1 = src[1];
+            float y2 = tgt[1];
+            float dy = (y1 - y2);
+            float cy = 0.5f * (y1 + y2);
+
+            gl.glTranslatef(cx, cy, 0f);
+
+            float rotAngle = (float) Math.atan2(dy, dx) * 180f / 3.14159f;
+            gl.glRotatef(rotAngle, 0f, 0f, 1f);
+
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+            gl.glScalef(len, e.width, 1f);
+
+            gl.glCallList(isoTri);
+        }
+
+        gl.glPopMatrix();
+
+    }
+
+    public static void renderLineEdge(GL2 gl, VDraw v, EDraw e) {
+        VDraw ee = e.key;
+        float[] eep = ee.p;
+        float[] vp = v.p;
+        gl.glLineWidth(e.width);
+        gl.glBegin(GL.GL_LINES);
+        {
+
+            gl.glVertex3f(vp[0], vp[1], vp[2]);
+            gl.glVertex3f(eep[0], eep[1], eep[2]);
+        }
+        gl.glEnd();
     }
 
     public void update(List<VDraw> toDraw, float dt) {

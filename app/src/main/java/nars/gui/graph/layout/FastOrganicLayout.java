@@ -20,7 +20,7 @@ import java.util.List;
 public class FastOrganicLayout implements GraphLayout {
 
     @Range(min = 0, max = 1f)
-    public final MutableFloat nodeSpeed = new MutableFloat(0.05);
+    public final MutableFloat nodeSpeed = new MutableFloat(0.03);
 
     /**
      * Specifies if the top left corner of the input cells should be the origin
@@ -41,11 +41,11 @@ public class FastOrganicLayout implements GraphLayout {
      * average radius there is of free space around each node. Default is 50.
      */
 
-    @Range(min = 0, max = 300f)
-    public final MutableFloat forceConstant = new MutableFloat(1);
+    //@Range(min = 1, max = 5f)
+    public final MutableFloat forceConstant = new MutableFloat(5f);
 
-    @Range(min = 0.5f, max = 4f)
-    public final MutableFloat spacing = new MutableFloat(1f);
+//    @Range(min = 0.5f, max = 4f)
+//    public final MutableFloat spacing = new MutableFloat(1f);
 
 
 
@@ -80,12 +80,8 @@ public class FastOrganicLayout implements GraphLayout {
     /**
      * An array of locally stored X co-ordinate displacements for the vertex.
      */
-    protected double[] dispX;
+    protected double[][] disp;
 
-    /**
-     * An array of locally stored Y co-ordinate displacements for the vertex.
-     */
-    protected double[] dispY;
 
     /**
      * An array of locally stored co-ordinate positions for the vertex.
@@ -112,6 +108,7 @@ public class FastOrganicLayout implements GraphLayout {
      * final normalization step to center all nodes
      */
     private static final boolean center = false;
+    private float movementThreshold;
     //private final FasterList<VDraw> cells = new FasterList<>();
 
 
@@ -120,8 +117,10 @@ public class FastOrganicLayout implements GraphLayout {
      */
     public FastOrganicLayout() {
 
+        this.movementThreshold = 1f;
+
         setInitialTemp(9f);
-        setMinDistanceLimit(1f);
+        setMinDistanceLimit(10f);
         setMaxDistanceLimit(50f);
 
     }
@@ -233,8 +232,7 @@ public class FastOrganicLayout implements GraphLayout {
 
 
         if ((cellLocation == null) || (cellLocation.length != n)) {
-            dispX = new double[n];
-            dispY = new double[n];
+            disp = new double[n][2];
             cellLocation = new double[n][2];
             //if (neighbors == null || neighbors.length<n)
             neighbors = new int[n][];
@@ -294,8 +292,9 @@ public class FastOrganicLayout implements GraphLayout {
             // algorithm, resetting the edge points is part of the transaction
 
 
-            dispX[i] = 0;
-            dispY[i] = 0;
+            disp[i][0] = 0;
+            disp[i][1] = 0;
+
             // Get lists of neighbours to all vertex, translate the cells
             // obtained in indices into vertexArray and store as an array
             // against the original cell index
@@ -400,19 +399,26 @@ public class FastOrganicLayout implements GraphLayout {
      * temperature.
      */
     protected void calcPositions() {
-        int n = dispX.length;
+        float movementThresholdSq = this.movementThreshold*this.movementThreshold;
+
+        double[][] disp = this.disp;
+        int n = disp.length;
+
         for (int index = 0; index < n; index++) {
             // Get the distance of displacement for this node for this
             // iteration
-            double xind = dispX[index];
-            double yind = dispY[index];
+
+            double[] displacement = disp[index];
+
+            double xind = displacement[0];
+            double yind = displacement[1];
             // reset displacements
-            dispX[index] = 0;
-            dispY[index] = 0;
+            displacement[0] = 0;
+            displacement[1] = 0;
 
             double deltaLength = Math.sqrt(xind * xind + yind * yind);
 
-            if (deltaLength < 0.001) {
+            if (deltaLength < movementThresholdSq) {
                 //deltaLength = 0.001;
                 continue;
             }
@@ -420,14 +426,11 @@ public class FastOrganicLayout implements GraphLayout {
             // Scale down by the current temperature if less than the
             // displacement distance
             double dtemp = Math.min(deltaLength, temperature) / deltaLength;
-            double newXDisp = xind * dtemp;
-            double newYDisp = yind * dtemp;
-
 
             // Update the cached cell locations
             double[] ci = cellLocation[index];
-            ci[0] += newXDisp;
-            ci[1] += newYDisp;
+            ci[0] += xind * dtemp;
+            ci[1] += yind * dtemp;
 
         }
     }
@@ -449,15 +452,21 @@ public class FastOrganicLayout implements GraphLayout {
         //double[] radiusSquared = this.radiusSquared;
         int[][] neighbors = this.neighbors;
 
-        double minDistanceLimitSq = this.minDistanceLimit * this.minDistanceLimit;
+        double minDistanceLimit = this.minDistanceLimit;
+        double minDistanceLimitSq = minDistanceLimit * minDistanceLimit;
 
         int numNeighbors = neighbors.length;
+
+        double[][] disp = this.disp;
+
         for (int i = 0; i < numNeighbors; i++) {
 
             int[] neighbor = neighbors[i];
 
             if (neighbor == null || cl[i] == null)
                 continue;
+
+            double ir = radius[i];
 
             for (int nj = 0; nj < neighbor.length; nj++) {
                 // Get the index of the othe cell in the vertex array
@@ -474,6 +483,7 @@ public class FastOrganicLayout implements GraphLayout {
 
                 double[] clj = cl[j];
                 double[] cli = cl[i];
+                double rr = radius[j] + ir;
                 double xDelta = cli[0] - clj[0];
                 double yDelta = cli[1] - clj[1];
 
@@ -481,20 +491,25 @@ public class FastOrganicLayout implements GraphLayout {
                 double distance = (xDelta * xDelta + yDelta * yDelta);
                     // - (spacing * (radiusSquared[i] + radiusSquared[j]));
 
-                if (distance < minDistanceLimitSq)
+                if (distance < minDistanceLimitSq /*-rr*rr*/)
                     continue;
 
                 distance = Math.sqrt(distance);
+                distance = Math.max(0, distance-rr); //subtract radius
 
-                double force = 1f / (distance * forceConstant);
+                if (distance < this.minDistanceLimit)
+                    continue;
+
+                double force = distance / forceConstant;
 
                 double displacementX = (xDelta) * force;
                 double displacementY = (yDelta) * force;
 
-                this.dispX[i] -= displacementX;
-                this.dispY[i] -= displacementY;
-                this.dispX[j] += displacementX;
-                this.dispY[j] += displacementY;
+
+                disp[i][0] -= displacementX;
+                disp[i][1] -= displacementY;
+                disp[j][0] += displacementX;
+                disp[j][1] += displacementY;
 
             }
         }
@@ -506,8 +521,7 @@ public class FastOrganicLayout implements GraphLayout {
     protected void calcRepulsion() {
 
         //double[] radius = this.radius;
-        double[] dispX = this.dispX;
-        double[] dispY = this.dispY;
+        double[][] disp = this.disp;
 
         double[][] cl = this.cellLocation;
         final int vertexCount = cl.length;
@@ -530,13 +544,13 @@ public class FastOrganicLayout implements GraphLayout {
                     double xDelta = ci[0] - cj[0];
                     double yDelta = ci[1] - cj[1];
 
-                    if (xDelta == 0) {
-                        xDelta = 0.01 + Math.random();
-                    }
-
-                    if (yDelta == 0) {
-                        yDelta = 0.01 + Math.random();
-                    }
+//                    if (xDelta == 0) {
+//                        xDelta = movementThreshold*2f * Math.random();
+//                    }
+//
+//                    if (yDelta == 0) {
+//                        yDelta = movementThreshold*2f * Math.random();
+//                    }
 
                     // Distance between nodes
                     double deltaLength = ((xDelta * xDelta) + (yDelta * yDelta));
@@ -561,10 +575,10 @@ public class FastOrganicLayout implements GraphLayout {
                     double displacementX = (xDelta /*/ deltaLength*/) * force;
                     double displacementY = (yDelta /*/ deltaLength*/) * force;
 
-                    dispX[i] += displacementX;
-                    dispY[i] += displacementY;
-                    dispX[j] -= displacementX;
-                    dispY[j] -= displacementY;
+                    disp[i][0] += displacementX;
+                    disp[i][1] += displacementY;
+                    disp[j][0] -= displacementX;
+                    disp[j][1] -= displacementY;
                 }
             }
         }
