@@ -172,7 +172,8 @@ public class BeliefTableChart extends JoglSpace2D {
         rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
     final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f((0.1f + 0.9f * c)/2f, 0.1f, 0.5f, 0.25f + 0.25f * q);
+        float a = 0.1f + 0.9f * c;
+        ge.glColor4f(a *0.8f, 0.1f, a *0.5f, 0.25f + 0.25f * q);
         rect(ge, x - w / 2, y - h / 4, w/2, h / 2);
     };
     //vertical block
@@ -181,7 +182,8 @@ public class BeliefTableChart extends JoglSpace2D {
         rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
     final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
-        ge.glColor4f(0.1f, (0.1f + 0.9f * c)/2f, 0.5f, 0.25f + 0.25f * q);
+        float a = 0.1f + 0.9f * c;
+        ge.glColor4f(0.1f, a *0.8f, a * 0.5f, 0.25f + 0.25f * q);
         rect(ge, x - w / 4, y - h / 2, w / 2, h/2);
     };
 

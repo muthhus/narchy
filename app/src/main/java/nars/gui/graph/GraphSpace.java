@@ -11,6 +11,7 @@ import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
+import nars.gui.test.bullet.JoglPhysics;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -32,7 +33,7 @@ import static nars.gui.test.Lesson14.renderString;
 /**
  * Created by me on 6/20/16.
  */
-public class GraphSpace extends JoglSpace {
+public class GraphSpace extends JoglPhysics {
 
 
     public static void main(String[] args) {
@@ -40,16 +41,8 @@ public class GraphSpace extends JoglSpace {
         Default n = new Default(1024, 8, 6, 8);
         n.nal(4);
 
-        n.conceptCold.termlinksCapacityMin.setValue(8);
-        n.conceptCold.termlinksCapacityMax.setValue(16);
-        n.conceptWarm.termlinksCapacityMin.setValue(8);
-        n.conceptWarm.termlinksCapacityMax.setValue(32);
-        n.conceptCold.taskLinksCapacity.setValue(16);
-        n.conceptWarm.taskLinksCapacity.setValue(32);
-        //n.log();
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
-
 
         final int maxNodes = 128;
 

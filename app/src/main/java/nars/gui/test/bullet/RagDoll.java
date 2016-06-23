@@ -48,25 +48,18 @@ import java.util.List;
  *
  * @author jezek2
  */
-public class RagDoll extends DemoApplication {
+public class RagDoll extends JoglPhysics {
 
 	public static void main(String[] args) {
-		JoglPhysics j = new JoglPhysics();
-		j.run(new RagDoll());
-		j.show(800, 600);
+		new RagDoll().show(800, 600);
 	}
 
 
 	private final List<RagDollModel> ragdolls = new ArrayList<>();
 
-	public RagDoll(String... args) {
-		super(args);
-		initPhysics();
-		setCameraDistance(10f);
-	}
+	public RagDoll() {
+		super();
 
-	@Override
-	public void initPhysics() {
 		// Setup the basic world
 		DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
 
@@ -98,7 +91,10 @@ public class RagDoll extends DemoApplication {
 		spawnRagdoll();
 
 		clientResetScene();
+
+		setCameraDistance(10f);
 	}
+
 
 
 	public void spawnRagdoll() {

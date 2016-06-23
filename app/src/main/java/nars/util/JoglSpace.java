@@ -53,6 +53,18 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             throw new RuntimeException("gl context changed");
     }
 
+    public void printHardware() {
+        System.err.println("Entering initialization");
+        System.err.print("GL Profile: ");
+        //System.err.println(GLProfile.getProfile());
+        System.err.print("GL:");
+        System.err.println(gl);
+        System.err.print("GL_VERSION=");
+        System.err.println(gl.glGetString(gl.GL_VERSION));
+        System.err.print("GL_EXTENSIONS: ");
+        System.err.println(gl.glGetString(gl.GL_EXTENSIONS));
+    }
+
     public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
 
         GLCapabilities config = new GLCapabilities(

@@ -112,8 +112,8 @@ public class TruthWave {
 
 
 
-        float dt = (maxT-minT)/(points+1);
-        float t = minT + dt/2;
+        float dt = (maxT-minT)/(points);
+        float t = minT;
         float[] data = this.truth;
         for (int i = 0; i < points; i++) {
             int lt = Math.round(t);
