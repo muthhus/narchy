@@ -9,6 +9,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
+import nars.gui.BeliefTableChart;
 import nars.gui.graph.GraphSpace;
 import nars.guifx.chart.MatrixImage;
 import nars.index.Indexes;
@@ -38,7 +39,7 @@ public class PongEnvironment extends Player implements Environment {
 
 
 	final int width = 16;
-	final int height = 12;
+	final int height = 16;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -58,25 +59,39 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 4, 2, 2, rng,
+				1024, 4, 2, 3, rng,
 				//new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.conceptActivation.setValue(0.5f);
-		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
+		//nar.conceptActivation.setValue(0.5f);
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(256);
-		nar.confMin.setValue(0.01f);
+		nar.cyclesPerFrame.set(72);
+		nar.confMin.setValue(0.03f);
 
-		NAgent a = new NAgent(nar);
+		nar.conceptCold.termlinksCapacityMin.setValue(8);
+		nar.conceptCold.termlinksCapacityMax.setValue(16);
+		nar.conceptWarm.termlinksCapacityMin.setValue(16);
+		nar.conceptWarm.termlinksCapacityMax.setValue(64);
+		nar.conceptCold.taskLinksCapacity.setValue(16);
+		nar.conceptWarm.taskLinksCapacity.setValue(64);
+		
+		NAgent a = new NAgent(nar) {
+			@Override
+			public void start(int inputs, int ac) {
+				super.start(inputs, ac);
+				new BeliefTableChart(nar, actions).show(400, 100);
+			}
+		};
 		//a.epsilon = 0.6f;
+		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
@@ -88,13 +103,10 @@ public class PongEnvironment extends Player implements Environment {
 
 		PongEnvironment e = new PongEnvironment();
 
-		a.nar.runLater(()->{
-			//new BeliefWindow(a.nar, a.actions).show(400, 100);
-		});
 
 		new GraphSpace(new GraphSpace.ConceptsSource(nar, 256)).show(800, 500);
 
-		e.run(a, 164*8);
+		e.run(a, 256*8);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);

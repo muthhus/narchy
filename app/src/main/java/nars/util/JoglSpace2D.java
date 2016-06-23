@@ -31,12 +31,12 @@ public abstract class JoglSpace2D extends JoglSpace {
         line(gl, x1+w, y1, x1+w, y1 + h);
     }
 
-    protected static void rect(GL2 gl, double x1, double y1, double w, double h) {
+    protected static void rect(GL2 gl, float x1, float y1, float w, float h) {
         gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2d(x1, y1);
-        gl.glVertex2d(x1+w, y1);
-        gl.glVertex2d(x1+w, y1+h);
-        gl.glVertex2d(x1, y1+h);
+        gl.glVertex2f(x1, y1);
+        gl.glVertex2f(x1+w, y1);
+        gl.glVertex2f(x1+w, y1+h);
+        gl.glVertex2f(x1, y1+h);
         gl.glEnd();
     }
 

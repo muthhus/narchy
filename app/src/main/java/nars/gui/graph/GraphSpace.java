@@ -40,13 +40,15 @@ public class GraphSpace extends JoglSpace {
         Default n = new Default(1024, 8, 6, 8);
         n.nal(4);
 
-        n.conceptCold.termlinksCapacity.setValue(32);
-        n.conceptWarm.termlinksCapacity.setValue(64);
-        n.conceptCold.taskLinksCapacity.setValue(32);
-        n.conceptWarm.taskLinksCapacity.setValue(64);
+        n.conceptCold.termlinksCapacityMin.setValue(8);
+        n.conceptCold.termlinksCapacityMax.setValue(16);
+        n.conceptWarm.termlinksCapacityMin.setValue(8);
+        n.conceptWarm.termlinksCapacityMax.setValue(32);
+        n.conceptCold.taskLinksCapacity.setValue(16);
+        n.conceptWarm.taskLinksCapacity.setValue(32);
         //n.log();
 
-        new DeductiveMeshTest(n, new int[]{8, 6}, 16384);
+        new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
 
         final int maxNodes = 128;

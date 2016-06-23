@@ -58,7 +58,8 @@ public class NAgent implements Agent {
     /**
      * learning rate
      */
-    float alpha, gamma;
+    float alpha;
+    public float gamma;
 
     /**
      * exploration rate - confidence of initial goal for each action
@@ -432,15 +433,17 @@ public class NAgent implements Agent {
         long now = nar.time();
 
         float d = decisiveness(nextAction);
-        float conf = Math.max(w2c(d *motivation.length) * gamma, Global.TRUTH_EPSILON);
-
+        float conf = Math.max(
+                //w2c(d *motivation.length) * gamma,
+                d * gamma,
+                Global.TRUTH_EPSILON);
 
 
         if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
-            float off = 0.49f;
-            float on = 1f;
+            float off = 0.25f; //0.49f;
+            float on = 0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;
 

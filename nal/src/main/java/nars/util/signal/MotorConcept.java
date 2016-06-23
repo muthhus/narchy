@@ -165,9 +165,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+motorDT);
-        float desired = d!=null ? d.expectation() : 0.5f;
+        float desired = d!=null ? d.motivation() : 0f;
         @Nullable Truth b = this.belief(now+motorDT);
-        float believed = b!=null ? b.expectation() : 0.5f;
+        float believed = b!=null ? b.motivation() : 0f;
 
         float response = motor.motor(believed, desired);
 

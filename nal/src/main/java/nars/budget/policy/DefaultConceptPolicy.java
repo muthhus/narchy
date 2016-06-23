@@ -2,6 +2,7 @@ package nars.budget.policy;
 
 import nars.concept.AbstractConcept;
 import nars.concept.CompoundConcept;
+import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +13,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
 
     public final MutableInteger beliefsMaxEteOrTemp, goalsMaxEteOrTemp;
     public final MutableInteger questionsMax;
-    public final MutableInteger termlinksCapacity, taskLinksCapacity;
+    public final MutableInteger termlinksCapacityMax, termlinksCapacityMin, taskLinksCapacity;
 
     public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(new MutableInteger(Math.max(1, beliefsCapTotal / 2)),
@@ -23,11 +24,12 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    public DefaultConceptPolicy(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+    DefaultConceptPolicy(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
         this.beliefsMaxEteOrTemp = beliefsMaxEteOrTemp;
         this.goalsMaxEteOrTemp = goalsMaxEteOrTemp;
         this.questionsMax = questionsMax;
-        this.termlinksCapacity = termlinksCapacity;
+        this.termlinksCapacityMin = termlinksCapacity;
+        this.termlinksCapacityMax = new MutableInteger(termlinksCapacity.intValue()); //HACK
         this.taskLinksCapacity = taskLinksCapacity;
     }
 
@@ -50,8 +52,20 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     }
 
     @Override
-    public int linkCap(AbstractConcept compoundConcept, boolean termOrTask) {
-        return termOrTask ? termlinksCapacity.intValue() : taskLinksCapacity.intValue();
+    public int linkCap(AbstractConcept c, boolean termOrTask) {
+        if (termOrTask) {
+            int min = termlinksCapacityMin.intValue();
+            int max = termlinksCapacityMax.intValue();
+            int v = Math.max(1, c.volume());
+
+            int tl = (int)Math.ceil(Util.lerp(min, max, 1f - 1f/(v)));
+            //System.out.println(c + " " + min + " " + max + " " + c.volume() + " " + ":" + tl);
+            return tl;
+
+            //return termlinksCapacity.intValue();
+        } else {
+            return taskLinksCapacity.intValue();
+        }
     }
 
     @Override

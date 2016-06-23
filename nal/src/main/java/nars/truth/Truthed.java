@@ -22,8 +22,12 @@ public interface Truthed  {
     }
 
     /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
-    default float motivation() {
+    default float motivationUnweighted() {
         return (freq() - 0.5f) * conf() * 2f;
+    }
+    /** balanced form of expectation, where -infinity = no, +infinity = yes, and 0 = maybe */
+    default float motivation() {
+        return (freq() - 0.5f) * c2w(conf()) * 2f;
     }
 
     default float expectation(boolean positive) {

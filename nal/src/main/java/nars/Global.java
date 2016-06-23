@@ -139,7 +139,7 @@ public enum Global {
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.001f;
+    public static final float BUDGET_EPSILON = 0.0005f;
 
     /** for autobag managed bags:
      *  lower rate means that a bag's existing items are remembered longer relative to incoming activation */
@@ -148,7 +148,7 @@ public enum Global {
 
     /** minimum durability and quality necessary for a derivation to form */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 4f;
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 

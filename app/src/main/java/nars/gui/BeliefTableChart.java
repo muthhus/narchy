@@ -254,8 +254,8 @@ public class BeliefTableChart extends JoglSpace2D {
             boolean eternal = !Float.isFinite(o);
             float eh, x;
             float padding = this.padding;
-            float pw = 10 + 10 * conf;
-            float ph = 10 + 10 * conf;
+            float pw = 1f + gew/(1f/conf)/4f;//10 + 10 * conf;
+            float ph = 1f + geh/(1f/conf)/4f;//10 + 10 * conf;
 
             if (eternal) {
                 eh = geh;
