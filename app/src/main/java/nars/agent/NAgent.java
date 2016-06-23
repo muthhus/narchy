@@ -439,7 +439,7 @@ public class NAgent implements Agent {
         if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
-            float off = 0f;
+            float off = 0.49f;
             float on = 1f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;

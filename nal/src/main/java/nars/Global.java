@@ -143,7 +143,7 @@ public enum Global {
 
     /** for autobag managed bags:
      *  lower rate means that a bag's existing items are remembered longer relative to incoming activation */
-    public static final float AUTOBAG_NOVELTY_RATE = 0.3f;
+    public static final float AUTOBAG_NOVELTY_RATE = 0.75f;
 
 
     /** minimum durability and quality necessary for a derivation to form */

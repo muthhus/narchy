@@ -37,17 +37,22 @@ public class GraphSpace extends JoglSpace {
 
     public static void main(String[] args) {
 
-        Default n = new Default(1024, 8, 4, 3);
+        Default n = new Default(1024, 8, 6, 8);
+        n.nal(4);
 
+        n.conceptCold.termlinksCapacity.setValue(32);
+        n.conceptWarm.termlinksCapacity.setValue(64);
+        n.conceptCold.taskLinksCapacity.setValue(32);
+        n.conceptWarm.taskLinksCapacity.setValue(64);
         //n.log();
 
-        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{8, 6}, 16384);
 
 
-        final int maxNodes = 256;
+        final int maxNodes = 128;
 
         new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
-        n.loop(25f);
+        n.loop(75f);
 
     }
 
@@ -57,7 +62,7 @@ public class GraphSpace extends JoglSpace {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
 
-    int maxEdgesPerVertex = 6;
+    int maxEdgesPerVertex = 4;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()
