@@ -1,5 +1,6 @@
 package nars.util;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
@@ -22,6 +23,18 @@ public abstract class JoglSpace2D extends JoglSpace {
         gl.glVertex2f(x1, y1);
         gl.glVertex2f(x2, y2);
         gl.glEnd();
+    }
+
+    public void clear(float opacity) {
+
+        if (opacity < 1f) {
+            //TODO use gl.clear faster than rendering this quad
+            gl.glColor4f(0, 0, 0, opacity);
+            gl.glRectf(0, 0, getWidth(), getHeight());
+        } else {
+            gl.glClearColor(0f,0f,0f,1f);
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+        }
     }
 
     protected static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {

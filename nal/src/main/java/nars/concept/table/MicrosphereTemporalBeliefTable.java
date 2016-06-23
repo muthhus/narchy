@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
@@ -32,7 +33,8 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     }
 
     public static float rank(@NotNull Task t, long when, float ageFactor) {
-        return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
+        //return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
+        return rankTemporalByConfidence(t, when, when, ageFactor, -1);
     }
 
     @Nullable

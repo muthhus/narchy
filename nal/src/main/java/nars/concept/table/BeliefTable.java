@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.or;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -167,7 +168,8 @@ public interface BeliefTable extends TaskTable {
      * @return
      */
     static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
-        float c = t.conf();
+        //float c = t.conf();
+        float c = c2w(t.conf());
         if (c < bestSoFar)
             return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
         else {

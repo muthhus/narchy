@@ -67,14 +67,14 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.conceptActivation.setValue(0.5f);
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.beliefConfidence(0.8f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(72);
-		nar.confMin.setValue(0.03f);
+		nar.cyclesPerFrame.set(128);
+		nar.confMin.setValue(0.01f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
 		nar.conceptCold.termlinksCapacityMax.setValue(16);

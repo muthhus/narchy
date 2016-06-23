@@ -432,36 +432,37 @@ public class NAgent implements Agent {
 
         long now = nar.time();
 
-        float d = decisiveness(nextAction);
-        float conf = Math.max(
+        float onConf = Math.max(
                 //w2c(d *motivation.length) * gamma,
-                d * gamma,
+                //decisiveness(nextAction) * gamma,
+                gamma,
                 Global.TRUTH_EPSILON);
+        float offConf = onConf;
 
 
         if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
-            float off = 0.25f; //0.49f;
-            float on = 0.75f;
+            float off = 0f; //0.25f; //0.49f;
+            float on = 1f; //0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
-//                nar.goal(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
-//                nar.believe(goalPriority, lastActionMotor, now+1, preOff, conf); //downward step function top
+                //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
+                //nar.believe(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
 
-                nar.goal(goalPriority, lastActionMotor, now, off, conf); //downward step function bottom
-                nar.believe(goalPriority, lastActionMotor, now+1, off, conf); //downward step function bottom
+                nar.goal(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
+                nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
             }
 
             MotorConcept nextAction = actions.get(this.nextAction);
-//            nar.goal(goalPriority, nextAction, now, preOn, conf); //upward step function bottom
-//            nar.believe(goalPriority, nextAction, now+1, preOn, conf); //upward step function bottom
+            //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
+            //nar.believe(goalPriority, nextAction, now, preOn, conf); //upward step function bottom
 
-            nar.goal(goalPriority, nextAction, now, on, conf); //upward step function top
-            nar.believe(goalPriority, nextAction, now+1, on, conf); //upward step function top
+            nar.goal(goalPriority, nextAction, now, on, onConf); //upward step function top
+            nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
         }
 
         //updateMotors();

@@ -4,9 +4,12 @@ import com.jogamp.opengl.*;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.concept.table.BeliefTable;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
 import nars.util.JoglSpace2D;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,13 +23,18 @@ public class BeliefTableChart extends JoglSpace2D {
 
     final List<? extends Concept> c;
     final List<TruthWave> beliefs;
+    final List<TruthWave> beliefProj;
     final List<TruthWave> goals;
+    final List<TruthWave> goalProj;
 
     final AtomicBoolean redraw;
 
 
     private final NAR nar;
     private long now;
+
+    float angleSpeed = 0.5f;
+
 
     public BeliefTableChart(NAR n, Concept c) {
         this(n, Collections.singletonList(c));
@@ -40,11 +48,18 @@ public class BeliefTableChart extends JoglSpace2D {
         redraw = new AtomicBoolean(false);
 
         beliefs = Global.newArrayList();
+        beliefProj = Global.newArrayList();
         goals = Global.newArrayList();
-        for (int i = 0; i < c.size(); i++) {
+        goalProj = Global.newArrayList();
+        int numConcepts = c.size();
+        for (int i = 0; i < numConcepts; i++) {
             beliefs.add(new TruthWave(0));
+            beliefProj.add(new TruthWave(0));
             goals.add(new TruthWave(0));
+            goalProj.add(new TruthWave(0));
         }
+        beliefTheta = new float[numConcepts];
+        goalTheta = new float[numConcepts];
 
         //setAutoSwapBufferMode(true);
 
@@ -66,38 +81,15 @@ public class BeliefTableChart extends JoglSpace2D {
         float teh = H;
 
         TruthWave beliefs = this.beliefs.get(n);
+        if (!beliefs.isEmpty()) {
+            renderTable(n, minT, maxT, now, gl, gew, geh, tew, teh, beliefs, true);
+        }
+
         TruthWave goals = this.goals.get(n);
-
-
-
-
-        try {
-            if (!beliefs.isEmpty())
-                renderTable(minT, maxT, now, gl, gew, geh, tew, teh, beliefs, beliefRenderer);
-            if (!goals.isEmpty())
-                renderTable(minT, maxT, now, gl, gew, geh, tew, teh, goals, goalRenderer);
-        } catch (Throwable t) {
-            //HACK
-            t.printStackTrace();
+        if (!goals.isEmpty()) {
+            renderTable(n, minT, maxT, now, gl, gew, geh, tew, teh, goals, false);
         }
 
-        //render current belief and goal states as crosshairs on eternal grid
-        Truth bc = beliefs.current;
-        long t = nar.time();
-
-        float angleSpeed = 0.5f;
-        if (bc!=null) {
-            beliefTheta += bc.motivation() * angleSpeed;
-            gl.glColor3f(1f,0.5f,0);
-            drawCrossHair(gl, gew, geh, bc, t, beliefTheta);
-        }
-
-        Truth gc = goals.current;
-        if (gc!=null) {
-            goalTheta += gc.motivation() * angleSpeed;
-            gl.glColor3f(0.5f,1f,0);
-            drawCrossHair(gl, gew, geh, gc, t, goalTheta);
-        }
 
 
         gl.glLineWidth(1f);
@@ -122,8 +114,7 @@ public class BeliefTableChart extends JoglSpace2D {
         float H = getHeight();
 
         //clear
-        gl.glColor4f(0,0,0, 0.5f);
-        gl.glRectf(0,0,W,H);
+        clear(1f /*0.5f*/);
 
         int num = c.size();
         float dy = H / num;
@@ -154,13 +145,18 @@ public class BeliefTableChart extends JoglSpace2D {
 
             }
         }
-        for (int i = 0; i < num; i++) {
-            draw(gl, i, W, dy, minT, maxT);
-            gl.glTranslatef(0,dy,0);
+
+        for (int i = num-1; i >=0; i--) {
+            float my = dy * 0.15f;
+            gl.glTranslatef(0,my/2,0);
+            draw(gl, i, W, dy-my, minT, maxT);
+            gl.glTranslatef(0,dy-my/2,0);
         }
         gl.glPopMatrix();
 
     }
+
+
 
 
 //    final static ColorMatrix beliefColors = new ColorMatrix(8, 8, (f, c) ->
@@ -171,20 +167,27 @@ public class BeliefTableChart extends JoglSpace2D {
 //    );
 
     //horizontal block
-    final static TaskRenderer beliefRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.3f + 0.7f * c, 0.25f, 0.25f, 0.25f + 0.5f * pri);
+    final static TaskRenderer beliefRenderer = (ge, q, c, w, h, x, y) -> {
+        ge.glColor4f(0.1f + 0.9f * c, 0.1f, 0.1f, 0.5f + 0.25f * q);
         rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
+    final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
+        ge.glColor4f((0.1f + 0.9f * c)/2f, 0.1f, 0.5f, 0.25f + 0.25f * q);
+        rect(ge, x - w / 2, y - h / 4, w/2, h / 2);
+    };
     //vertical block
-    final static TaskRenderer goalRenderer = (ge, pri, c, w, h, x, y) -> {
-        ge.glColor4f(0.25f, 0.3f + 0.7f * c, 0.25f, 0.25f + 0.5f * pri);
+    final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
+        ge.glColor4f(0.1f, 0.1f + 0.9f * c, 0.1f, 0.5f + 0.25f * q);
         rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
+    final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
+        ge.glColor4f(0.1f, (0.1f + 0.9f * c)/2f, 0.5f, 0.25f + 0.25f * q);
+        rect(ge, x - w / 4, y - h / 2, w / 2, h/2);
+    };
 
+    float[] beliefTheta, goalTheta;
 
-    double beliefTheta, goalTheta = PI/2;
-
-    public void drawCrossHair(GL2 gl, float gew, float geh, Truth truth, long t, double theta) {
+    public void drawCrossHair(GL2 gl, float gew, float geh, Truth truth, double theta) {
         float w = 4;
         gl.glLineWidth(w);
 
@@ -192,7 +195,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
 
         float bcx = eternalX(gew, padding, w, conf);
-        float bcy = yPos(geh, padding, w, truth.freq());
+        float bcy = yPos(truth.freq(), geh, padding, w);
 
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
@@ -200,11 +203,11 @@ public class BeliefTableChart extends JoglSpace2D {
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
-
         line(gl, dx0+bcx, dy0+bcy, -dx0+bcx, -dy0+bcy);
+
         double hpi = PI / 2.0;
-        double dx1 = Math.cos(theta +hpi) * r;
-        double dy1 = Math.sin(theta +hpi) * r;
+        double dx1 = Math.cos(theta + hpi) * r;
+        double dy1 = Math.sin(theta + hpi) * r;
         line(gl, dx1+bcx, dy1+bcy, -dx1+bcx, -dy1+bcy);
     }
 
@@ -216,13 +219,17 @@ public class BeliefTableChart extends JoglSpace2D {
 
         this.now = nar.time();
         for (int i = 0; i < this.c.size(); i++) {
-            Concept c = this.c.get(i);
+            Concept c = c(i);
             beliefs.get(i).set(c.beliefs(), now);
             goals.get(i).set(c.goals(), now);
         }
 
         ready();
 
+    }
+
+    public Concept c(int i) {
+        return this.c.get(i);
     }
 
     @Override
@@ -235,8 +242,7 @@ public class BeliefTableChart extends JoglSpace2D {
         redraw.set(true);
     }
 
-    private void renderTable(long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave table, TaskRenderer r) {
-
+    private void renderTable(int n, long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave wave, boolean beliefOrGoal) {
 
         //Present axis line
         if ((now <= maxT) && (now >= minT)) {
@@ -249,9 +255,39 @@ public class BeliefTableChart extends JoglSpace2D {
 
         /** drawn "pixel" dimensions*/
 
-        table.forEach((freq, conf, o, pri) -> {
+        renderWave(minT, maxT, gl, gew, geh, tew, teh, wave, beliefOrGoal ? beliefRenderer : goalRenderer);
 
-            boolean eternal = !Float.isFinite(o);
+        //draw projections
+        if (minT!=maxT) {
+            Concept c = c(n);
+            BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
+
+            int projections = 8;
+            TruthWave pwave = beliefProj.get(n);
+            pwave.setProjected(table, minT, maxT, projections);
+            renderWave(minT, maxT, gl, gew, geh, tew, teh, pwave, beliefOrGoal ? beliefProjRenderer : goalProjRenderer);
+        }
+
+        Truth bc = wave.current;
+        if (bc!=null) {
+            float[] theta;
+            if (beliefOrGoal) {
+                theta = beliefTheta;
+                gl.glColor4f(1f,0f,0,0.85f);
+            } else {
+                theta = goalTheta;
+                gl.glColor4f(0f,1f,0,0.85f);
+            }
+            theta[n] += bc.motivation() * angleSpeed;
+            drawCrossHair(gl, gew, geh, bc, theta[n]);
+        }
+
+    }
+
+    private void renderWave(long minT, long maxT, GL2 gl, float gew, float geh, float tew, float teh, TruthWave wave, TaskRenderer r) {
+        wave.forEach((freq, conf, o, qua) -> {
+
+            boolean eternal = (o!=o);
             float eh, x;
             float padding = this.padding;
             float pw = 1f + gew/(1f/conf)/4f;//10 + 10 * conf;
@@ -267,17 +303,16 @@ public class BeliefTableChart extends JoglSpace2D {
                 x = xTime(tew, padding, minT, maxT, o, pw);
                 //g = te;
             }
-            float y = yPos(eh, padding, ph, freq );
+            float y = yPos(freq, eh, padding, ph);
             if (!eternal)
                 x += gew + padding;
 
-            r.renderTask(gl, pri, conf, pw, ph, x, y);
+            r.renderTask(gl, qua, conf, pw, ph, x, y);
         });
-
     }
 
-    private static float yPos(float eh, float b, float h, float f) {
-        return b + (eh - b - h) * (1 - f);
+    private static float yPos(float f, float eh, float b /* margin */, float dh /* drawn object height, padding */) {
+        return b + (eh - b - dh) * (f);
     }
 
     private static float eternalX(float width, float b, float w, float cc) {
@@ -286,7 +321,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
     @FunctionalInterface
     interface TaskRenderer {
-        void renderTask(GL2 gl, float pri, float c, float w, float h, float x, float y);
+        void renderTask(GL2 gl, float qua, float c, float w, float h, float x, float y);
     }
 
 

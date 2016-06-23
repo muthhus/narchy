@@ -3,6 +3,7 @@ package nars.truth;
 import nars.NAR;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import java.util.Arrays;
  *      1) freq
  *      2) conf
  *      3) occ
- *      4) pri
+ *      4) quality
  * */
 public class TruthWave {
 
@@ -49,32 +50,20 @@ public class TruthWave {
 
     /** clears and fills this wave with the data from a table */
     public void set(@NotNull BeliefTable b, long now) {
-        if (b.isEmpty()) {
+        int s = b.size();
+        if (s == 0) {
             clear();
             return;
         }
-
-        int s = b.size();
-        int c = capacity();
-
-        if (c < s)
-            resize(s);
-        else {
-            if (s < c) Arrays.fill(truth, 0); //TODO memfill only the necessary part of the array that won't be used
-        }
+        ensureSize(s);
 
         float[] t = this.truth;
 
-
         final int[] size = {0};
         b.forEach(x -> {
-            int j = size[0] * 4;
-            t[j++] = x.freq();
-            t[j++] = x.conf();
+            int j = (size[0]++) * 4;
             long occ = x.occurrence();
-            t[j++] = occ==Tense.ETERNAL ? Float.NaN : occ;
-            t[j/*++*/] = x.pri();
-            size[0]++;
+            load(t, x, j, occ, x.qua());
         });
         this.size = size[0];
 
@@ -92,6 +81,52 @@ public class TruthWave {
         this.current = b.truth(now);
     }
 
+    public void load(float[] t, Truthed x, int j, long occ, float q) {
+        t[j++] = x.freq();
+        t[j++] = x.conf();
+        t[j++] = occ== Tense.ETERNAL ? Float.NaN : occ;
+        t[j/*++*/] = q;
+    }
+
+    public void ensureSize(int s) {
+
+        int c = capacity();
+
+        if (c < s)
+            resize(s);
+        else {
+            if (s < c) Arrays.fill(truth, 0); //TODO memfill only the necessary part of the array that won't be used
+        }
+
+    }
+
+
+    /** fills the wave with evenly sampled points in a time range */
+    public void setProjected(BeliefTable table, float minT, float maxT, int points) {
+        if (minT == maxT) {
+            clear();
+            return;
+        }
+        ensureSize(points);
+
+
+
+
+        float dt = (maxT-minT)/(points+1);
+        float t = minT + dt/2;
+        float[] data = this.truth;
+        for (int i = 0; i < points; i++) {
+            int lt = Math.round(t);
+            Truth x = table.truth(lt);
+            load(data, x, i*4, lt, 0.5f);
+            t+= dt;
+        }
+        this.current = null;
+        this.size = points;
+        this.start = (long)Math.floor(minT);
+        this.end = (long)Math.ceil(maxT);
+    }
+
     public boolean isEmpty() { return size == 0; }
 
     public long start() {
@@ -102,8 +137,9 @@ public class TruthWave {
         return end;
     }
 
+
     @FunctionalInterface public interface TruthWaveVisitor {
-        void onTruth(float f, float c, float occ, float pri);
+        void onTruth(float f, float c, float occ, float qua);
     }
 
     public final void forEach(@NotNull TruthWaveVisitor v) {
@@ -114,8 +150,8 @@ public class TruthWave {
             float f = t[j++];
             float c = t[j++];
             float o = t[j++];
-            float p = t[j++];
-            v.onTruth(f, c, o, p);
+            float q = t[j++];
+            v.onTruth(f, c, o, q);
         }
     }
 
