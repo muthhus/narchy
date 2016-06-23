@@ -60,37 +60,13 @@ public class RagDoll extends JoglPhysics {
 	public RagDoll() {
 		super();
 
-		// Setup the basic world
-		DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
 
-		CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
 
-		//btPoint3 worldAabbMin(-10000,-10000,-10000);
-		//btPoint3 worldAabbMax(10000,10000,10000);
-		//btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
-		BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
+		clientResetScene();
 
-		//#ifdef USE_ODE_QUICKSTEP
-		//btConstraintSolver* constraintSolver = new OdeConstraintSolver();
-		//#else
-		ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
-		//#endif
-
-		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
-
-		dynamicsWorld.setGravity(new Vector3f(0f, -30f, 0f));
-
-		// Setup a big ground box
-		CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
-		Transform groundTransform = new Transform();
-		groundTransform.setIdentity();
-		groundTransform.origin.set(0f, -15f, 0f);
-		localCreateRigidBody(0f, groundTransform, groundShape);
 
 		// Spawn one ragdoll
 		spawnRagdoll();
-
-		clientResetScene();
 
 		setCameraDistance(10f);
 	}
@@ -98,7 +74,7 @@ public class RagDoll extends JoglPhysics {
 
 
 	public void spawnRagdoll() {
-		RagDollModel ragDoll = new RagDollModel(dynamicsWorld, new Vector3f(0f, 0f, 10f), 5f);
+		RagDollModel ragDoll = new RagDollModel(dyn, new Vector3f(0f, 0f, 10f), 5f);
 		ragdolls.add(ragDoll);
 	}
 

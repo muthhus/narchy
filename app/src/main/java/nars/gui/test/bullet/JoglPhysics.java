@@ -25,19 +25,25 @@ package nars.gui.test.bullet;
 
 import com.bulletphysics.ContactAddedCallback;
 import com.bulletphysics.ContactDestroyedCallback;
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.SimpleBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.Point2PointConstraint;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.*;
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.glu.GLU;
 import nars.util.JoglSpace;
 
 import javax.vecmath.Color3f;
@@ -141,7 +147,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     protected final Clock clock = new Clock();
 
     // this is the most important class
-    protected DynamicsWorld dynamicsWorld = null;
+    protected DynamicsWorld dyn = null;
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
@@ -149,16 +155,16 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     protected CollisionShape shootBoxShape = null;
 
     protected float cameraDistance = 15f;
-    protected int debugMode = 0;
+    protected int debug = 0;
 
     protected float ele = 20f;
     protected float azi = 0f;
-    protected final Vector3f cameraPosition = new Vector3f(0f, 0f, 0f);
-    protected final Vector3f cameraTargetPosition = new Vector3f(0f, 0f, 0f); // look at
+    protected final Vector3f camPos = new Vector3f(0f, 0f, 0f);
+    protected final Vector3f camPosTarget = new Vector3f(0f, 0f, 0f); // look at
 
     protected float scaleBottom = 0.5f;
     protected float scaleFactor = 2f;
-    protected final Vector3f cameraUp = new Vector3f(0f, 1f, 0f);
+    protected final Vector3f camUp = new Vector3f(0f, 1f, 0f);
     protected int forwardAxis = 2;
 
     protected int glutScreenWidth = 0;
@@ -181,7 +187,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         super();
 
         // debugMode |= DebugDrawModes.DRAW_WIREFRAME;
-        debugMode |= DebugDrawModes.NO_HELP_TEXT;
+        debug |= DebugDrawModes.NO_HELP_TEXT;
         //debugMode |= DebugDrawModes.DISABLE_BULLET_LCP;
 
 //        for(int i=args.length-1; i>=0; i--) {
@@ -191,6 +197,34 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //                useLight1=false;
 //            }
 //        }
+
+        // Setup the basic world
+        DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
+
+        CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
+
+        //btPoint3 worldAabbMin(-10000,-10000,-10000);
+        //btPoint3 worldAabbMax(10000,10000,10000);
+        //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
+        BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
+
+        //#ifdef USE_ODE_QUICKSTEP
+        //btConstraintSolver* constraintSolver = new OdeConstraintSolver();
+        //#else
+        ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
+        //#endif
+
+        dyn = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
+
+        dyn.setGravity(new Vector3f(0f, -30f, 0f));
+
+        // Setup a big ground box
+        CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
+        Transform groundTransform = new Transform();
+        groundTransform.setIdentity();
+        groundTransform.origin.set(0f, -15f, 0f);
+        localCreateRigidBody(0f, groundTransform, groundShape);
+
     }
 
 
@@ -217,10 +251,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         //gl.glViewport(x, y, width, height);
         updateCamera();
 
-        System.out.println("DemoApplication RESHAPE");
+        //System.out.println("DemoApplication RESHAPE");
     }
 
     public void display(GLAutoDrawable drawable) {
+
         gl = drawable.getGL().getGL2();
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
@@ -234,18 +269,18 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             if (ms > minFPS) {
                 ms = minFPS;
             }
-            if (dynamicsWorld != null) {
-                dynamicsWorld.stepSimulation(ms / 1000000.f);
+            if (dyn != null) {
+                dyn.stepSimulation(ms / 1000000.f);
                 updateCamera();
             }
         }
 
-        if (dynamicsWorld != null) {
+        if (dyn != null) {
             // optional but useful: debug drawing
-            dynamicsWorld.debugDrawWorld();
+            dyn.debugDrawWorld();
         }
 
-        renderme();
+        renderWorld();
 
         //glFlush();
         //glutSwapBuffers();
@@ -332,7 +367,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             float razi = azi * 0.01745329251994329547f; // rads per deg
 
             Quat4f rot = stack.quats.get();
-            QuaternionUtil.setRotation(rot, cameraUp, razi);
+            QuaternionUtil.setRotation(rot, camUp, razi);
 
             Vector3f eyePos = stack.vectors.get(0f, 0f, 0f);
             VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance);
@@ -342,7 +377,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 forward.set(1f, 0f, 0f);
             }
             Vector3f right = stack.vectors.get();
-            right.cross(cameraUp, forward);
+            right.cross(camUp, forward);
             Quat4f roll = stack.quats.get();
             QuaternionUtil.setRotation(roll, right, -rele);
 
@@ -353,12 +388,12 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             tmpMat1.mul(tmpMat2);
             tmpMat1.transform(eyePos);
 
-            cameraPosition.set(eyePos);
+            camPos.set(eyePos);
 
             gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
-            glu.gluLookAt(cameraPosition.x, cameraPosition.y, cameraPosition.z,
-                    cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z,
-                    cameraUp.x, cameraUp.y, cameraUp.z);
+            glu.gluLookAt(camPos.x, camPos.y, camPos.z,
+                    camPosTarget.x, camPosTarget.y, camPosTarget.z,
+                    camUp.x, camUp.y, camUp.z);
             gl.glMatrixMode(gl.GL_MODELVIEW);
             gl.glLoadIdentity();
         } catch (Exception e) {
@@ -443,81 +478,81 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 toggleIdle();
                 break;
             case 'h':
-                if ((debugMode & DebugDrawModes.NO_HELP_TEXT) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.NO_HELP_TEXT);
+                if ((debug & DebugDrawModes.NO_HELP_TEXT) != 0) {
+                    debug = debug & (~DebugDrawModes.NO_HELP_TEXT);
                 } else {
-                    debugMode |= DebugDrawModes.NO_HELP_TEXT;
+                    debug |= DebugDrawModes.NO_HELP_TEXT;
                 }
                 break;
 
             case 'w':
-                if ((debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DRAW_WIREFRAME);
+                if ((debug & DebugDrawModes.DRAW_WIREFRAME) != 0) {
+                    debug = debug & (~DebugDrawModes.DRAW_WIREFRAME);
                 } else {
-                    debugMode |= DebugDrawModes.DRAW_WIREFRAME;
+                    debug |= DebugDrawModes.DRAW_WIREFRAME;
                 }
                 break;
 
             case 'p':
-                if ((debugMode & DebugDrawModes.PROFILE_TIMINGS) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.PROFILE_TIMINGS);
+                if ((debug & DebugDrawModes.PROFILE_TIMINGS) != 0) {
+                    debug = debug & (~DebugDrawModes.PROFILE_TIMINGS);
                 } else {
-                    debugMode |= DebugDrawModes.PROFILE_TIMINGS;
+                    debug |= DebugDrawModes.PROFILE_TIMINGS;
                 }
                 break;
 
             case 'm':
-                if ((debugMode & DebugDrawModes.ENABLE_SAT_COMPARISON) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.ENABLE_SAT_COMPARISON);
+                if ((debug & DebugDrawModes.ENABLE_SAT_COMPARISON) != 0) {
+                    debug = debug & (~DebugDrawModes.ENABLE_SAT_COMPARISON);
                 } else {
-                    debugMode |= DebugDrawModes.ENABLE_SAT_COMPARISON;
+                    debug |= DebugDrawModes.ENABLE_SAT_COMPARISON;
                 }
                 break;
 
             case 'n':
-                if ((debugMode & DebugDrawModes.DISABLE_BULLET_LCP) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DISABLE_BULLET_LCP);
+                if ((debug & DebugDrawModes.DISABLE_BULLET_LCP) != 0) {
+                    debug = debug & (~DebugDrawModes.DISABLE_BULLET_LCP);
                 } else {
-                    debugMode |= DebugDrawModes.DISABLE_BULLET_LCP;
+                    debug |= DebugDrawModes.DISABLE_BULLET_LCP;
                 }
                 break;
 
             case 't':
-                if ((debugMode & DebugDrawModes.DRAW_TEXT) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DRAW_TEXT);
+                if ((debug & DebugDrawModes.DRAW_TEXT) != 0) {
+                    debug = debug & (~DebugDrawModes.DRAW_TEXT);
                 } else {
-                    debugMode |= DebugDrawModes.DRAW_TEXT;
+                    debug |= DebugDrawModes.DRAW_TEXT;
                 }
                 break;
             case 'y':
-                if ((debugMode & DebugDrawModes.DRAW_FEATURES_TEXT) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DRAW_FEATURES_TEXT);
+                if ((debug & DebugDrawModes.DRAW_FEATURES_TEXT) != 0) {
+                    debug = debug & (~DebugDrawModes.DRAW_FEATURES_TEXT);
                 } else {
-                    debugMode |= DebugDrawModes.DRAW_FEATURES_TEXT;
+                    debug |= DebugDrawModes.DRAW_FEATURES_TEXT;
                 }
                 break;
             case 'a':
-                if ((debugMode & DebugDrawModes.DRAW_AABB) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DRAW_AABB);
+                if ((debug & DebugDrawModes.DRAW_AABB) != 0) {
+                    debug = debug & (~DebugDrawModes.DRAW_AABB);
                 } else {
-                    debugMode |= DebugDrawModes.DRAW_AABB;
+                    debug |= DebugDrawModes.DRAW_AABB;
                 }
                 break;
             case 'c':
-                if ((debugMode & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.DRAW_CONTACT_POINTS);
+                if ((debug & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
+                    debug = debug & (~DebugDrawModes.DRAW_CONTACT_POINTS);
                 } else {
-                    debugMode |= DebugDrawModes.DRAW_CONTACT_POINTS;
+                    debug |= DebugDrawModes.DRAW_CONTACT_POINTS;
                 }
                 break;
 
             case 'd':
-                if ((debugMode & DebugDrawModes.NO_DEACTIVATION) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.NO_DEACTIVATION);
+                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
+                    debug = debug & (~DebugDrawModes.NO_DEACTIVATION);
                 } else {
-                    debugMode |= DebugDrawModes.NO_DEACTIVATION;
+                    debug |= DebugDrawModes.NO_DEACTIVATION;
                 }
-                if ((debugMode & DebugDrawModes.NO_DEACTIVATION) != 0) {
+                if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
                     BulletGlobals.gDisableDeactivation = true;
                 } else {
                     BulletGlobals.gDisableDeactivation = false;
@@ -535,16 +570,16 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 clientResetScene();
                 break;
             case '1': {
-                if ((debugMode & DebugDrawModes.ENABLE_CCD) != 0) {
-                    debugMode = debugMode & (~DebugDrawModes.ENABLE_CCD);
+                if ((debug & DebugDrawModes.ENABLE_CCD) != 0) {
+                    debug = debug & (~DebugDrawModes.ENABLE_CCD);
                 } else {
-                    debugMode |= DebugDrawModes.ENABLE_CCD;
+                    debug |= DebugDrawModes.ENABLE_CCD;
                 }
                 break;
             }
 
             case '.': {
-                shootBox(getCameraTargetPosition());
+                shootBox(getCamPosTarget());
                 break;
             }
 
@@ -562,21 +597,21 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 break;
         }
 
-        if (getDynamicsWorld() != null && getDynamicsWorld().getDebugDrawer() != null) {
-            getDynamicsWorld().getDebugDrawer().setDebugMode(debugMode);
+        if (getDyn() != null && getDyn().getDebugDrawer() != null) {
+            getDyn().getDebugDrawer().setDebugMode(debug);
         }
 
         //LWJGL.postRedisplay();
     }
 
-    public int getDebugMode() {
-        return debugMode;
+    public int getDebug() {
+        return debug;
     }
 
-    public void setDebugMode(int mode) {
-        debugMode = mode;
-        if (getDynamicsWorld() != null && getDynamicsWorld().getDebugDrawer() != null) {
-            getDynamicsWorld().getDebugDrawer().setDebugMode(mode);
+    public void setDebug(int mode) {
+        debug = mode;
+        if (getDyn() != null && getDyn().getDebugDrawer() != null) {
+            getDyn().getDebugDrawer().setDebugMode(mode);
         }
     }
 
@@ -589,11 +624,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 break;
             }
             case KeyEvent.VK_END: {
-                int numObj = getDynamicsWorld().getNumCollisionObjects();
+                int numObj = getDyn().getNumCollisionObjects();
                 if (numObj != 0) {
-                    CollisionObject obj = getDynamicsWorld().getCollisionObjectArray().get(numObj - 1);
+                    CollisionObject obj = getDyn().getCollisionObjectArray().get(numObj - 1);
 
-                    getDynamicsWorld().removeCollisionObject(obj);
+                    getDyn().removeCollisionObject(obj);
                     RigidBody body = RigidBody.upcast(obj);
                     if (body != null && body.getMotionState() != null) {
                         //delete body->getMotionState();
@@ -632,11 +667,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
     public void shootBox(Vector3f destination) {
-        if (dynamicsWorld != null) {
+        if (dyn != null) {
             float mass = 10f;
             Transform startTransform = new Transform();
             startTransform.setIdentity();
-            Vector3f camPos = new Vector3f(getCameraPosition());
+            Vector3f camPos = new Vector3f(getCamPos());
             startTransform.origin.set(camPos);
 
             if (shootBoxShape == null) {
@@ -672,15 +707,15 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         float tanFov = (top - bottom) * 0.5f / nearPlane;
         float fov = 2f * (float) Math.atan(tanFov);
 
-        Vector3f rayFrom = new Vector3f(getCameraPosition());
+        Vector3f rayFrom = new Vector3f(getCamPos());
         Vector3f rayForward = new Vector3f();
-        rayForward.sub(getCameraTargetPosition(), getCameraPosition());
+        rayForward.sub(getCamPosTarget(), getCamPos());
         rayForward.normalize();
         float farPlane = 600f;
         rayForward.scale(farPlane);
 
         Vector3f rightOffset = new Vector3f();
-        Vector3f vertical = new Vector3f(cameraUp);
+        Vector3f vertical = new Vector3f(camUp);
 
         Vector3f hor = new Vector3f();
         // TODO: check: hor = rayForward.cross(vertical);
@@ -727,9 +762,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             }
             case MouseEvent.BUTTON2: {
                 // apply an impulse
-                if (dynamicsWorld != null) {
-                    CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(cameraPosition, rayTo);
-                    dynamicsWorld.rayTest(cameraPosition, rayTo, rayCallback);
+                if (dyn != null) {
+                    CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+                    dyn.rayTest(camPos, rayTo, rayCallback);
                     if (rayCallback.hasHit()) {
                         RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
                         if (body != null) {
@@ -757,9 +792,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             case MouseEvent.BUTTON1: {
                 if (state == 1) {
                     // add a point to point constraint for picking
-                    if (dynamicsWorld != null) {
-                        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(cameraPosition, rayTo);
-                        dynamicsWorld.rayTest(cameraPosition, rayTo, rayCallback);
+                    if (dyn != null) {
+                        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+                        dyn.rayTest(camPos, rayTo, rayCallback);
                         if (rayCallback.hasHit()) {
                             RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
                             if (body != null) {
@@ -776,11 +811,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                                     tmpTrans.transform(localPivot);
 
                                     Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                                    dynamicsWorld.addConstraint(p2p);
+                                    dyn.addConstraint(p2p);
                                     pickConstraint = p2p;
                                     // save mouse position for dragging
                                     BulletGlobals.gOldPickingPos.set(rayTo);
-                                    Vector3f eyePos = new Vector3f(cameraPosition);
+                                    Vector3f eyePos = new Vector3f(camPos);
                                     Vector3f tmp = new Vector3f();
                                     tmp.sub(pickPos, eyePos);
                                     BulletGlobals.gOldPickingDist = tmp.length();
@@ -793,8 +828,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
                 } else {
 
-                    if (pickConstraint != null && dynamicsWorld != null) {
-                        dynamicsWorld.removeConstraint(pickConstraint);
+                    if (pickConstraint != null && dyn != null) {
+                        dyn.removeConstraint(pickConstraint);
                         // delete m_pickConstraint;
                         pickConstraint = null;
                         pickedBody.forceActivationState(CollisionObject.ACTIVE_TAG);
@@ -817,7 +852,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 // keep it at the same picking distance
 
                 Vector3f newRayTo = new Vector3f(getRayTo(x, y));
-                Vector3f eyePos = new Vector3f(cameraPosition);
+                Vector3f eyePos = new Vector3f(camPos);
                 Vector3f dir = new Vector3f();
                 dir.sub(newRayTo, eyePos);
                 dir.normalize();
@@ -959,7 +994,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         //btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);
         //body->setWorldTransform(startTransform);
         //#endif//
-        dynamicsWorld.addRigidBody(body);
+        dyn.addRigidBody(body);
 
         return body;
     }
@@ -1003,14 +1038,14 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     private Color3f TEXT_COLOR = new Color3f(0f, 0f, 0f);
     // private StringBuilder buf = new StringBuilder();
 
-    public void renderme() {
+    public void renderWorld() {
         // JAU updateCamera();
 
-        if (dynamicsWorld != null) {
-            int numObjects = dynamicsWorld.getNumCollisionObjects();
+        if (dyn != null) {
+            int numObjects = dyn.getNumCollisionObjects();
             wireColor.set(1f, 0f, 0f);
             for (int i = 0; i < numObjects; i++) {
-                CollisionObject colObj = dynamicsWorld.getCollisionObjectArray().get(i);
+                CollisionObject colObj = dyn.getCollisionObjectArray().get(i);
                 RigidBody body = RigidBody.upcast(colObj);
 
                 if (body != null && body.getMotionState() != null) {
@@ -1052,7 +1087,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 }
 
                 // draw (saves the matrix already ..)
-                GLShapeDrawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), wireColor, getDebugMode());
+                GLShapeDrawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), wireColor, getDebug());
             }
             GLShapeDrawer.drawCoordSystem(gl);
             if (false) {
@@ -1238,13 +1273,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         //#endif //SHOW_NUM_DEEP_PENETRATIONS
 
         int numObjects = 0;
-        if (dynamicsWorld != null) {
-            dynamicsWorld.stepSimulation(1f / 60f, 0);
-            numObjects = dynamicsWorld.getNumCollisionObjects();
+        if (dyn != null) {
+            dyn.stepSimulation(1f / 60f, 0);
+            numObjects = dyn.getNumCollisionObjects();
         }
 
         for (int i = 0; i < numObjects; i++) {
-            CollisionObject colObj = dynamicsWorld.getCollisionObjectArray().get(i);
+            CollisionObject colObj = dyn.getCollisionObjectArray().get(i);
             RigidBody body = RigidBody.upcast(colObj);
             if (body != null) {
                 if (body.getMotionState() != null) {
@@ -1255,7 +1290,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                     colObj.activate();
                 }
                 // removed cached contact points
-                dynamicsWorld.getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(colObj.getBroadphaseHandle(), getDynamicsWorld().getDispatcher());
+                dyn.getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(colObj.getBroadphaseHandle(), getDyn().getDispatcher());
 
                 body = RigidBody.upcast(colObj);
                 if (body != null && !body.isStaticObject()) {
@@ -1275,24 +1310,24 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         }
     }
 
-    public DynamicsWorld getDynamicsWorld() {
-        return dynamicsWorld;
+    public DynamicsWorld getDyn() {
+        return dyn;
     }
 
-    public void setCameraUp(Vector3f camUp) {
-        cameraUp.set(camUp);
+    public void setCamUp(Vector3f camUp) {
+        this.camUp.set(camUp);
     }
 
     public void setCameraForwardAxis(int axis) {
         forwardAxis = axis;
     }
 
-    public Vector3f getCameraPosition() {
-        return cameraPosition;
+    public Vector3f getCamPos() {
+        return camPos;
     }
 
-    public Vector3f getCameraTargetPosition() {
-        return cameraTargetPosition;
+    public Vector3f getCamPosTarget() {
+        return camPosTarget;
     }
 
     public boolean isIdle() {
@@ -1304,6 +1339,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
     public void drawString(CharSequence s, int x, int y, Color3f color) {
+        System.out.println(s); //HACK temporary
         glsrt.drawString();
     }
 

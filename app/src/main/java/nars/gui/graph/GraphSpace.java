@@ -349,6 +349,7 @@ public class GraphSpace extends JoglPhysics {
     }
 
     public void init(GL2 gl) {
+        super.init(gl);
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
@@ -463,22 +464,18 @@ public class GraphSpace extends JoglPhysics {
     float r0 = 0f;
 
     public synchronized void display(GLAutoDrawable drawable) {
-        GL2 gl = (GL2) drawable.getGL();
+        super.display(drawable);
+        //GL2 gl = (GL2) drawable.getGL();
 
-        clear(gl);
+        //clear(gl);
 
-
-        updateCamera(gl);
-
-
+        //updateCamera(gl);
 
         List<ConceptsSource> s = this.sources;
         for (int i = 0, sourcesSize = s.size(); i < sourcesSize; i++) {
             render(gl, s.get(i));
         }
 
-//        gleem.viewAll();
-//        gleem.render(gl);
     }
 
     public void clear(GL2 gl) {
