@@ -37,8 +37,7 @@ public class FastOrganicLayout implements GraphLayout {
      * average radius there is of free space around each node. Default is 50.
      */
 
-    //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(4f);
+    public final MutableFloat forceConstant = new MutableFloat(10f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -104,7 +103,6 @@ public class FastOrganicLayout implements GraphLayout {
      * final normalization step to center all nodes
      */
     private static final boolean center = false;
-    private float movementThreshold;
     //private final FasterList<VDraw> cells = new FasterList<>();
 
 
@@ -113,9 +111,8 @@ public class FastOrganicLayout implements GraphLayout {
      */
     public FastOrganicLayout() {
 
-        this.movementThreshold = 0.01f;
 
-        setInitialTemp(0.1f);
+        setInitialTemp(0.3f);
         setMinDistanceLimit(2f);
         setMaxDistanceLimit(100f);
 
@@ -395,7 +392,6 @@ public class FastOrganicLayout implements GraphLayout {
      * temperature.
      */
     protected void calcPositions() {
-        float movementThresholdSq = this.movementThreshold*this.movementThreshold;
         float temperature = this.temperature;
         float tempSq = temperature * temperature;
 

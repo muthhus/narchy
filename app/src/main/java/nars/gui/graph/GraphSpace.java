@@ -409,6 +409,15 @@ public class GraphSpace extends JoglPhysics {
             renderLabel(gl, this);
 
         }
+
+        public void preDraw(GL2 gl) {
+            float p = h(pri)/2f;
+            gl.glColor4f(p,
+                    //pri * Math.min(1f),
+                    p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
+                    p,
+                    1f);
+        }
     }
 
     public void init(GL2 gl) {
@@ -638,7 +647,7 @@ public class GraphSpace extends JoglPhysics {
         float r = v.radius;
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
                 div * r, //scale
-                0, 0, (r)/div); // Print GL Text To The Screen
+                0, 0, (r/1.9f)/div); // Print GL Text To The Screen
 
 
     }

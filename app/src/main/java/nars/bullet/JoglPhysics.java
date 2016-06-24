@@ -931,7 +931,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                                 break;
                             case 2:
                                 //middle mouse
-                                cameraDistance -= dy * 0.05f;
+                                cameraDistance -= dy * 0.15f;
+                                final float minCameraDistance = nearPlane;
+                                if (cameraDistance < minCameraDistance)
+                                    cameraDistance = minCameraDistance; //limit
+
                                 //                        nextDist -= dy * btScalar(0.01f);
                                 //                        if (nextDist < minDist)
                                 //                            nextDist = minDist;
@@ -1056,7 +1060,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             ObjectArrayList<CollisionObject> objects = dyn.getCollisionObjectArray();
             for (int i = 0; i < numObjects; i++) {
 
-                CollisionObject colObj = objects.get(i);
+                CollisionObject colObj = objects.getQuick(i);
                 RigidBody body = RigidBody.upcast(colObj);
 
                 if (/*body != null && */body.getMotionState() != null) {
@@ -1067,7 +1071,14 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 }
 
 
-                gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
+                Object u = colObj.getUserPointer();
+                if (u instanceof GraphSpace.VDraw) {
+                    GraphSpace.VDraw v = (GraphSpace.VDraw)u;
+                    v.preDraw(gl);
+                } else {
+                    gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
+                }
+
                 drawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), debug);
 
             }
