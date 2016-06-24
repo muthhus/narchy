@@ -1,9 +1,13 @@
 package nars.gui.graph;
 
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.linearmath.MotionState;
+import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
 import nars.NAR;
@@ -12,11 +16,11 @@ import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
 import nars.gui.test.bullet.JoglPhysics;
+import nars.gui.test.bullet.Motion;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.util.JoglSpace;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.experiment.DeductiveMeshTest;
@@ -25,6 +29,7 @@ import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -100,8 +105,7 @@ public class GraphSpace extends JoglPhysics {
      */
     @NotNull
     protected VDraw pre(int i, VDraw v, BLink<? extends Termed> b) {
-        v.order = (short)i;
-        v.budget = b;
+        v.activate((short)i, b);
         return v;
     }
 
@@ -169,19 +173,29 @@ public class GraphSpace extends JoglPhysics {
     }
 
 
+    static float r(float range) {
+        return (-0.5f + (float)Math.random()*range)*2f;
+    }
+
+
     /**
      * vertex draw info
      */
-    public static final class VDraw {
+    public final class VDraw {
         public final nars.term.Termed key;
         public final int hash;
         @NotNull public final EDraw[] edges;
 
         /** position: x, y, z */
-        @NotNull public final float p[] = new float[3];
+        //@NotNull public final float p[] = new float[3];
 
         /** scale: x, y, z -- should not modify directly, use scale(x,y,z) method to change */
-        @NotNull public final float[] s = new float[3];
+        //@NotNull public final float[] s = new float[3];
+
+        private final RigidBodyX body;
+        private final CollisionShape shape;
+
+        transient private final Vector3f center; //references a field in MotionState's transform
 
 
         public String label;
@@ -201,11 +215,11 @@ public class GraphSpace extends JoglPhysics {
 
         transient private GraphSpace grapher;
 
-        transient private float radius;
+        transient public float radius;
 
+        public final Motion motion = new Motion();
 
         public VDraw(nars.term.Termed k, int edges) {
-            inactivate();
             this.key = k;
             this.label = k.toString();
             this.hash = k.hashCode();
@@ -220,11 +234,19 @@ public class GraphSpace extends JoglPhysics {
             for (int i = 0; i < edges; i++)
                 this.edges[i] = new EDraw();
 
+
+            //init physics
+
+
+            shape = new BoxShape(v(1,1,1));
+            center = motion.graphicsWorldTrans.origin;
+
+            body = newBody(0f, shape, motion);
+
+            inactivate();
         }
 
-        static float r(float range) {
-            return (-0.5f + (float)Math.random()*range)*2f;
-        }
+
 
         @Override
         public boolean equals(Object obj) {
@@ -299,51 +321,54 @@ public class GraphSpace extends JoglPhysics {
             return order >= 0;
         }
 
+        public void activate(short order, BLink budget) {
+            this.order = order;
+            this.budget = budget;
+            body.setUserPointer(this);
+        }
+
         public void inactivate() {
             order = -1;
+            body.setUserPointer(null); //remove reference to this so it may be collected
         }
 
         public void move(float x, float y, float z) {
-            float[] p = this.p;
-            p[0] = x;
-            p[1] = y;
-            p[2] = z;
+            motion.graphicsWorldTrans.origin.set(x, y, z);
+
+//            float[] p = this.p;
+//            p[0] = x;
+//            p[1] = y;
+//            p[2] = z;
         }
 
         public void move(float tx, float ty, float tz, float rate) {
-            float[] p = this.p;
-            p[0] = Util.lerp(tx, p[0], rate);
-            p[1] = Util.lerp(ty, p[1], rate);
-            p[2] = Util.lerp(tz, p[2], rate);
+
+            move(
+              Util.lerp(tx, x(), rate),
+              Util.lerp(ty, y(), rate),
+              Util.lerp(tz, z(), rate));
         }
 
         public int edgeCount() {
             return numEdges;
         }
 
-        public float x() {  return p[0];        }
-        public float y() {  return p[1];        }
-        public float z() {  return p[2];        }
+        public float x() {  return center.x;        }
+        public float y() {  return center.y;        }
+        public float z() {  return center.z;        }
 
 
 
         public void moveDelta(float dx, float dy, float dz) {
-            float[] p = this.p;
-            p[0] += dx;
-            p[1] += dy;
-            p[2] += dz;
+            move(
+                x() + dx,
+                y() + dy,
+                z() + dz);
         }
 
         public void scale(float sx, float sy, float sz) {
-            float[] s = this.s;
-            s[0] = sx;
-            s[1] = sy;
-            s[2] = sz;
+            this.shape.setLocalScaling(v(sx, sy, sz));
             this.radius = Math.max(Math.max(sx, sy), sz);
-        }
-
-        public float radius() {
-            return radius;
         }
 
     }
@@ -506,9 +531,7 @@ public class GraphSpace extends JoglPhysics {
         gl.glPushMatrix();
 
 
-        float[] pp = v.p;
-        float x = pp[0], y = pp[1], z = pp[2];
-        gl.glTranslatef(x, y, z);
+        gl.glTranslatef(v.x(), v.y(), v.z());
 
         renderVertexBase(gl, dt, v);
 
@@ -540,8 +563,8 @@ public class GraphSpace extends JoglPhysics {
         float pri = v.pri;
 
 
-        float[] s = v.s;
-        gl.glScalef(s[0], s[1], s[2]);
+        float r = v.radius;
+        gl.glScalef(r, r, r);
 
         final float activationPeriods = 4f;
         gl.glColor4f(h(pri),
@@ -564,9 +587,10 @@ public class GraphSpace extends JoglPhysics {
         gl.glLineWidth(fontThick);
 
         float div = 0.01f;
+        float r = v.radius;
         renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                div * v.s[0], //scale
-                0, 0, (3.5f * v.s[2])/div); // Print GL Text To The Screen
+                div * r, //scale
+                0, 0, (r)/div); // Print GL Text To The Screen
 
 
     }
@@ -582,22 +606,20 @@ public class GraphSpace extends JoglPhysics {
         }
     }
 
-    public void renderHalfTriEdge(GL2 gl, VDraw v, EDraw e, float width) {
-        VDraw ee = e.key;
-        float[] tgt = ee.p;
-        float[] src = v.p;
+    public void renderHalfTriEdge(GL2 gl, VDraw src, EDraw e, float width) {
+        VDraw tgt = e.key;
 
 
         gl.glPushMatrix();
 
         {
 
-            float x1 = src[0];
-            float x2 = tgt[0];
+            float x1 = src.x();
+            float x2 = tgt.x();
             float dx = (x2 - x1);
             //float cx = 0.5f * (x1 + x2);
-            float y1 = src[1];
-            float y2 = tgt[1];
+            float y1 = src.y();
+            float y2 = tgt.y();
             float dy = (y2 - y1);
             //float cy = 0.5f * (y1 + y2);
 
@@ -617,15 +639,16 @@ public class GraphSpace extends JoglPhysics {
 
     }
 
-    public static void renderLineEdge(GL2 gl, VDraw v, EDraw e, float width) {
-        VDraw ee = e.key;
-        float[] eep = ee.p;
-        float[] vp = v.p;
+    public static void renderLineEdge(GL2 gl, VDraw src, EDraw e, float width) {
+        VDraw tgt = e.key;
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         {
             gl.glVertex3f(0,0,0);//vp[0], vp[1], vp[2]);
-            gl.glVertex3f(eep[0]-vp[0], eep[1]-vp[1], eep[2]-vp[2]);
+            gl.glVertex3f(
+                tgt.x()-src.x(),
+                tgt.y()-src.y(),
+                tgt.z()-src.z() );
         }
         gl.glEnd();
     }
@@ -655,27 +678,7 @@ public class GraphSpace extends JoglPhysics {
         return p * 0.9f + 0.1f;
     }
 
-    public void reshape(GLAutoDrawable drawable,
-                        int xstart,
-                        int ystart,
-                        int width,
-                        int height) {
 
-        height = (height == 0) ? 1 : height;
-
-        gl.glViewport(0, 0, width, height);
-
-        gl.glMatrixMode(GL2ES1.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        glu.gluPerspective(45, (float) width / height, 10, 5000);
-
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-//        gleem.viewAll();
-
-    }
 
     public static class ConceptsSource {
 

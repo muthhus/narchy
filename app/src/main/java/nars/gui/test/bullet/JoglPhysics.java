@@ -23,8 +23,6 @@
 
 package nars.gui.test.bullet;
 
-import com.bulletphysics.ContactAddedCallback;
-import com.bulletphysics.ContactDestroyedCallback;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.SimpleBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -42,15 +40,18 @@ import com.bulletphysics.dynamics.constraintsolver.Point2PointConstraint;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.*;
+import com.bulletphysics.util.ObjectArrayList;
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.math.FloatUtil;
 import nars.util.JoglSpace;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.*;
+
+import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 
 /**
  * @author jezek2
@@ -59,14 +60,92 @@ import java.util.*;
 public class JoglPhysics extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
-    @Override
-    public void mouseWheelMoved(MouseEvent e) {
+
+    private boolean simulating = true;
+
+    /**
+     * activate/deactivate the simulation; by default it is enabled
+     */
+    public void setSimulating(boolean simulating) {
+        this.simulating = simulating;
+    }
+
+    protected final BulletStack stack = BulletStack.get();
+
+
+
+    public static RigidBody pickedBody = null; // for deactivation state
+
+
+    protected final Clock clock = new Clock();
+
+    // this is the most important class
+    protected DynamicsWorld dyn = null;
+
+    // constraint for mouse picking
+    protected TypedConstraint pickConstraint = null;
+
+    protected CollisionShape shootBoxShape = null;
+
+    protected int debug = 0;
+
+    protected float ele = 20f;
+    protected float azi = 0f;
+
+    protected final Vector3f camPos = v(0f, 0f, 0f);
+    protected final Vector3f camPosTarget = v(0f, 0f, 0f); // look at
+    protected float cameraDistance = 15f;
+
+    float top, bottom, nearPlane, tanFov, fov, farPlane;
+
+
+
+    protected final Vector3f camUp = v(0f, 1f, 0f);
+    protected int forwardAxis = 2;
+
+    protected int screenWidth = 0;
+    protected int screenHeight = 0;
+
+    protected float ShootBoxInitialSpeed = 40f;
+
+    protected boolean stepping = true;
+    protected int lastKey;
+
+    protected GLSRT glsrt = null;
+
+    protected boolean useLight0 = true;
+    protected boolean useLight1 = true;
+
+    public JoglPhysics() {
+        super();
+
+        debug |= DebugDrawModes.NO_HELP_TEXT;
+
+        // Setup the basic world
+        DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
+
+        CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
+
+        //btPoint3 worldAabbMin(-10000,-10000,-10000);
+        //btPoint3 worldAabbMax(10000,10000,10000);
+        //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
+        BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
+
+        //#ifdef USE_ODE_QUICKSTEP
+        //btConstraintSolver* constraintSolver = new OdeConstraintSolver();
+        //#else
+        ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
+        //#endif
+
+        dyn = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
 
     }
 
-
     @Override
     protected void init(GL2 gl2) {
+
+        screenWidth = window.getWidth();
+        screenHeight = window.getHeight();
 
         window.addMouseListener(this);
         window.addKeyListener(this);
@@ -111,6 +190,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         }
 
         gl.glShadeModel(gl.GL_SMOOTH);
+        gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+        gl.glEnable(gl.GL_COLOR_MATERIAL);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
         gl.glDepthFunc(gl.GL_LESS);
@@ -124,134 +205,19 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
 
+    public final void reshape(GLAutoDrawable drawable,
+                              int xstart,
+                              int ystart,
+                              int width,
+                              int height) {
+
+        height = (height == 0) ? 1 : height;
+        screenWidth = width;
+        screenHeight = height;
 
 
-    protected final BulletStack stack = BulletStack.get();
-
-    private static final float STEPSIZE = 5;
-
-    //public static int numObjects = 0;
-    public static final int maxNumObjects = 16384;
-    public static final Transform[] startTransforms = new Transform[maxNumObjects];
-    public static CollisionShape[] gShapePtr = new CollisionShape[maxNumObjects]; //1 rigidbody has 1 shape (no re-use of shapes)
-
-    public static RigidBody pickedBody = null; // for deactivation state
-
-    static {
-        for (int i = 0; i < startTransforms.length; i++) {
-            startTransforms[i] = new Transform();
-        }
-    }
-    // TODO: class CProfileIterator* m_profileIterator;
-
-    protected final Clock clock = new Clock();
-
-    // this is the most important class
-    protected DynamicsWorld dyn = null;
-
-    // constraint for mouse picking
-    protected TypedConstraint pickConstraint = null;
-
-    protected CollisionShape shootBoxShape = null;
-
-    protected float cameraDistance = 15f;
-    protected int debug = 0;
-
-    protected float ele = 20f;
-    protected float azi = 0f;
-    protected final Vector3f camPos = new Vector3f(0f, 0f, 0f);
-    protected final Vector3f camPosTarget = new Vector3f(0f, 0f, 0f); // look at
-
-    protected float scaleBottom = 0.5f;
-    protected float scaleFactor = 2f;
-    protected final Vector3f camUp = new Vector3f(0f, 1f, 0f);
-    protected int forwardAxis = 2;
-
-    protected int glutScreenWidth = 0;
-    protected int glutScreenHeight = 0;
-
-    protected float ShootBoxInitialSpeed = 40f;
-
-    protected boolean stepping = true;
-    protected boolean singleStep = false;
-    protected boolean idle = false;
-    protected int lastKey;
-
-
-    protected GLSRT glsrt = null;
-
-    protected boolean useLight0 = true;
-    protected boolean useLight1 = true;
-
-    public JoglPhysics() {
-        super();
-
-        // debugMode |= DebugDrawModes.DRAW_WIREFRAME;
-        debug |= DebugDrawModes.NO_HELP_TEXT;
-        //debugMode |= DebugDrawModes.DISABLE_BULLET_LCP;
-
-//        for(int i=args.length-1; i>=0; i--) {
-//            if(args[i].equals("-nolight0")) {
-//                useLight0=false;
-//            } else if(args[i].equals("-nolight1")) {
-//                useLight1=false;
-//            }
-//        }
-
-        // Setup the basic world
-        DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
-
-        CollisionDispatcher dispatcher = new CollisionDispatcher(collision_config);
-
-        //btPoint3 worldAabbMin(-10000,-10000,-10000);
-        //btPoint3 worldAabbMax(10000,10000,10000);
-        //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
-        BroadphaseInterface overlappingPairCache = new SimpleBroadphase();
-
-        //#ifdef USE_ODE_QUICKSTEP
-        //btConstraintSolver* constraintSolver = new OdeConstraintSolver();
-        //#else
-        ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
-        //#endif
-
-        dyn = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
-
-        dyn.setGravity(new Vector3f(0f, -30f, 0f));
-
-        // Setup a big ground box
-        CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
-        Transform groundTransform = new Transform();
-        groundTransform.setIdentity();
-        groundTransform.origin.set(0f, -15f, 0f);
-        localCreateRigidBody(0f, groundTransform, groundShape);
-
-    }
-
-
-    public void destroy() {
-        // TODO: CProfileManager::Release_Iterator(m_profileIterator);
-        //if (m_shootBoxShape)
-        //	delete m_shootBoxShape;
-    }
-
-    //
-    // GLEventListener
-    //
-
-
-    public void dispose(GLAutoDrawable drawable) {
-        gl = null;
-    }
-
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        gl = drawable.getGL().getGL2();
-        glutScreenWidth = width;
-        glutScreenHeight = height;
-
-        //gl.glViewport(x, y, width, height);
         updateCamera();
 
-        //System.out.println("DemoApplication RESHAPE");
     }
 
     public void display(GLAutoDrawable drawable) {
@@ -261,7 +227,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
 
-        if (!isIdle()) {
+        if (simulating) {
             // simple dynamics world doesn't handle fixed-time-stepping
             float ms = clock.getTimeMicroseconds();
             clock.reset();
@@ -271,7 +237,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             }
             if (dyn != null) {
                 dyn.stepSimulation(ms / 1000000.f);
-                updateCamera();
             }
         }
 
@@ -290,10 +255,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
 
+    @Override
+    public void mouseWheelMoved(MouseEvent e) {
 
-    //
-    // MouseListener
-    //
+    }
+
     public void mouseClicked(MouseEvent e) {
         mouseClick(e.getButton(), e.getX(), e.getY());
     }
@@ -348,62 +314,78 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         return cameraDistance;
     }
 
-    public void toggleIdle() {
-        if (idle) {
-            idle = false;
-        } else {
-            idle = true;
-        }
-    }
 
     public void updateCamera() {
         stack.vectors.push();
         stack.matrices.push();
         stack.quats.push();
-        try {
-            gl.glMatrixMode(gl.GL_PROJECTION);
-            gl.glLoadIdentity();
-            float rele = ele * 0.01745329251994329547f; // rads per deg
-            float razi = azi * 0.01745329251994329547f; // rads per deg
 
-            Quat4f rot = stack.quats.get();
-            QuaternionUtil.setRotation(rot, camUp, razi);
+        gl.glMatrixMode(gl.GL_PROJECTION);
+        gl.glLoadIdentity();
+        float rele = ele * 0.01745329251994329547f; // rads per deg
+        float razi = azi * 0.01745329251994329547f; // rads per deg
 
-            Vector3f eyePos = stack.vectors.get(0f, 0f, 0f);
-            VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance);
+        Quat4f rot = stack.quats.get();
+        QuaternionUtil.setRotation(rot, camUp, razi);
 
-            Vector3f forward = stack.vectors.get(eyePos.x, eyePos.y, eyePos.z);
-            if (forward.lengthSquared() < BulletGlobals.FLT_EPSILON) {
-                forward.set(1f, 0f, 0f);
-            }
-            Vector3f right = stack.vectors.get();
-            right.cross(camUp, forward);
-            Quat4f roll = stack.quats.get();
-            QuaternionUtil.setRotation(roll, right, -rele);
+        Vector3f eyePos = stack.vectors.get(0f, 0f, 0f);
+        VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance);
 
-            Matrix3f tmpMat1 = stack.matrices.get();
-            Matrix3f tmpMat2 = stack.matrices.get();
-            tmpMat1.set(rot);
-            tmpMat2.set(roll);
-            tmpMat1.mul(tmpMat2);
-            tmpMat1.transform(eyePos);
-
-            camPos.set(eyePos);
-
-            gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
-            glu.gluLookAt(camPos.x, camPos.y, camPos.z,
-                    camPosTarget.x, camPosTarget.y, camPosTarget.z,
-                    camUp.x, camUp.y, camUp.z);
-            gl.glMatrixMode(gl.GL_MODELVIEW);
-            gl.glLoadIdentity();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            stack.vectors.pop();
-            stack.matrices.pop();
-            stack.quats.pop();
+        Vector3f forward = stack.vectors.get(eyePos.x, eyePos.y, eyePos.z);
+        if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
+            forward.set(1f, 0f, 0f);
         }
+        Vector3f right = stack.vectors.get();
+        right.cross(camUp, forward);
+        Quat4f roll = stack.quats.get();
+        QuaternionUtil.setRotation(roll, right, -rele);
+
+        Matrix3f tmpMat1 = stack.matrices.get();
+        Matrix3f tmpMat2 = stack.matrices.get();
+        tmpMat1.set(rot);
+        tmpMat2.set(roll);
+        tmpMat1.mul(tmpMat2);
+        tmpMat1.transform(eyePos);
+
+        camPos.set(eyePos);
+
+        //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
+        //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float)screenWidth/screenHeight, 4, 2000);
+
+
+        glu.gluLookAt(camPos.x, camPos.y, camPos.z,
+                camPosTarget.x, camPosTarget.y, camPosTarget.z,
+                camUp.x, camUp.y, camUp.z);
+
+
+        gl.glMatrixMode(gl.GL_MODELVIEW);
+        gl.glLoadIdentity();
+        stack.vectors.pop();
+        stack.matrices.pop();
+        stack.quats.pop();
+
     }
+
+    private final float[] matTmp = new float[16];
+
+    void perspective(final int m_off, final boolean initM,
+                            final float fovy_rad, final float aspect, final float zNear, final float zFar) throws GLException {
+        this.top =  (float)Math.tan(fovy_rad/2f) * zNear; // use tangent of half-fov !
+        this.bottom =  -1.0f * top;    //          -1f * fovhvTan.top * zNear
+        final float left   = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
+        final float right  = aspect * top;    // aspect * fovhvTan.top * zNear
+        nearPlane = zNear;
+        farPlane = zFar;
+        tanFov = (top - bottom) * 0.5f / zNear;
+        fov = 2f * (float) Math.atan(tanFov);
+        gl.glMultMatrixf(
+                makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
+                0
+        );
+    }
+
+    private static final float STEPSIZE = 5;
 
     public void stepLeft() {
         azi -= STEPSIZE;
@@ -474,9 +456,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             case 'x':
                 zoomOut();
                 break;
-            case 'i':
-                toggleIdle();
-                break;
+
             case 'h':
                 if ((debug & DebugDrawModes.NO_HELP_TEXT) != 0) {
                     debug = debug & (~DebugDrawModes.NO_HELP_TEXT);
@@ -553,9 +533,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                     debug |= DebugDrawModes.NO_DEACTIVATION;
                 }
                 if ((debug & DebugDrawModes.NO_DEACTIVATION) != 0) {
-                    BulletGlobals.gDisableDeactivation = true;
+                    ExtraGlobals.gDisableDeactivation = true;
                 } else {
-                    BulletGlobals.gDisableDeactivation = false;
+                    ExtraGlobals.gDisableDeactivation = false;
                 }
                 break;
 
@@ -566,9 +546,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             case 's':
                 break;
             //    case ' ' : newRandom(); break;
-            case ' ':
-                clientResetScene();
-                break;
+
             case '1': {
                 if ((debug & DebugDrawModes.ENABLE_CCD) != 0) {
                     debug = debug & (~DebugDrawModes.ENABLE_CCD);
@@ -650,16 +628,14 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 stepBack();
                 break;
             /*
-			case KeyEvent.VK_PRIOR:
+            case KeyEvent.VK_PRIOR:
 				zoomIn();
 				break;
 			case KeyEvent.VK_NEXT:
 				zoomOut();
 				break;
             */
-            case KeyEvent.VK_HOME:
-                toggleIdle();
-                break;
+
             default:
                 // std::cout << "unused (special) key : " << key << std::endl;
                 break;
@@ -671,7 +647,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             float mass = 10f;
             Transform startTransform = new Transform();
             startTransform.setIdentity();
-            Vector3f camPos = new Vector3f(getCamPos());
+            Vector3f camPos = v(getCamPos());
             startTransform.origin.set(camPos);
 
             if (shootBoxShape == null) {
@@ -680,13 +656,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 //btConvexShape* childShape = new btBoxShape(btVector3(1.f,1.f,1.f));
                 //m_shootBoxShape = new btUniformScalingShape(childShape,0.5f);
                 //#else
-                shootBoxShape = new BoxShape(new Vector3f(1f, 1f, 1f));
+                shootBoxShape = new BoxShape(v(1f, 1f, 1f));
                 //#endif//
             }
 
-            RigidBody body = this.localCreateRigidBody(mass, startTransform, shootBoxShape);
+            RigidBody body = this.newBody(mass, startTransform, shootBoxShape);
 
-            Vector3f linVel = new Vector3f(destination.x - camPos.x, destination.y - camPos.y, destination.z - camPos.z);
+            Vector3f linVel = v(destination.x - camPos.x, destination.y - camPos.y, destination.z - camPos.z);
             linVel.normalize();
             linVel.scale(ShootBoxInitialSpeed);
 
@@ -696,28 +672,23 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             body.setWorldTransform(ct);
 
             body.setLinearVelocity(linVel);
-            body.setAngularVelocity(new Vector3f(0f, 0f, 0f));
+            body.setAngularVelocity(v(0f, 0f, 0f));
         }
     }
 
     public Vector3f getRayTo(int x, int y) {
-        float top = 1f;
-        float bottom = -1f;
-        float nearPlane = 1f;
-        float tanFov = (top - bottom) * 0.5f / nearPlane;
-        float fov = 2f * (float) Math.atan(tanFov);
 
-        Vector3f rayFrom = new Vector3f(getCamPos());
-        Vector3f rayForward = new Vector3f();
+
+        Vector3f rayFrom = v(getCamPos());
+        Vector3f rayForward = v();
         rayForward.sub(getCamPosTarget(), getCamPos());
         rayForward.normalize();
-        float farPlane = 600f;
         rayForward.scale(farPlane);
 
-        Vector3f rightOffset = new Vector3f();
-        Vector3f vertical = new Vector3f(camUp);
+        //Vector3f rightOffset = new Vector3f();
+        Vector3f vertical = v(camUp);
 
-        Vector3f hor = new Vector3f();
+        Vector3f hor = v();
         // TODO: check: hor = rayForward.cross(vertical);
         hor.cross(rayForward, vertical);
         hor.normalize();
@@ -725,22 +696,21 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         vertical.cross(hor, rayForward);
         vertical.normalize();
 
-        float tanfov = (float) Math.tan(0.5f * fov);
-        hor.scale(2f * farPlane * tanfov);
-        vertical.scale(2f * farPlane * tanfov);
-        Vector3f rayToCenter = new Vector3f();
+        hor.scale(2f * farPlane * tanFov);
+        vertical.scale(2f * farPlane * tanFov);
+        Vector3f rayToCenter = v();
         rayToCenter.add(rayFrom, rayForward);
-        Vector3f dHor = new Vector3f(hor);
-        dHor.scale(1f / (float) glutScreenWidth);
-        Vector3f dVert = new Vector3f(vertical);
-        dVert.scale(1.f / (float) glutScreenHeight);
+        Vector3f dHor = v(hor);
+        dHor.scale(1f / (float) screenWidth);
+        Vector3f dVert = v(vertical);
+        dVert.scale(1.f / (float) screenHeight);
 
-        Vector3f tmp1 = new Vector3f();
-        Vector3f tmp2 = new Vector3f();
+        Vector3f tmp1 = v();
+        Vector3f tmp2 = v();
         tmp1.scale(0.5f, hor);
         tmp2.scale(0.5f, vertical);
 
-        Vector3f rayTo = new Vector3f();
+        Vector3f rayTo = v();
         rayTo.sub(rayToCenter, tmp1);
         rayTo.add(tmp2);
 
@@ -752,8 +722,12 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         return rayTo;
     }
 
+    public static Vector3f v(Vector3f copied) {
+        return new Vector3f(copied);
+    }
+
     private void mouseClick(int button, int x, int y) {
-        Vector3f rayTo = new Vector3f(getRayTo(x, y));
+        Vector3f rayTo = v(getRayTo(x, y));
 
         switch (button) {
             case MouseEvent.BUTTON3: {
@@ -769,13 +743,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                         RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
                         if (body != null) {
                             body.setActivationState(CollisionObject.ACTIVE_TAG);
-                            Vector3f impulse = new Vector3f(rayTo);
+                            Vector3f impulse = v(rayTo);
                             impulse.normalize();
                             float impulseStrength = 10f;
                             impulse.scale(impulseStrength);
-                            Vector3f relPos = new Vector3f();
+                            Vector3f relPos = v();
 
-                            relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(new Vector3f()));
+                            relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
                             body.applyImpulse(impulse, relPos);
                         }
                     }
@@ -786,7 +760,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
     private void pickConstrain(int button, int state, int x, int y) {
-        Vector3f rayTo = new Vector3f(getRayTo(x, y));
+        Vector3f rayTo = v(getRayTo(x, y));
 
         switch (button) {
             case MouseEvent.BUTTON1: {
@@ -803,22 +777,22 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                                     pickedBody = body;
                                     pickedBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 
-                                    Vector3f pickPos = new Vector3f(rayCallback.hitPointWorld);
+                                    Vector3f pickPos = v(rayCallback.hitPointWorld);
 
                                     Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
                                     tmpTrans.inverse();
-                                    Vector3f localPivot = new Vector3f(pickPos);
+                                    Vector3f localPivot = v(pickPos);
                                     tmpTrans.transform(localPivot);
 
                                     Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
                                     dyn.addConstraint(p2p);
                                     pickConstraint = p2p;
                                     // save mouse position for dragging
-                                    BulletGlobals.gOldPickingPos.set(rayTo);
-                                    Vector3f eyePos = new Vector3f(camPos);
-                                    Vector3f tmp = new Vector3f();
+                                    ExtraGlobals.gOldPickingPos.set(rayTo);
+                                    Vector3f eyePos = v(camPos);
+                                    Vector3f tmp = v();
                                     tmp.sub(pickPos, eyePos);
-                                    BulletGlobals.gOldPickingDist = tmp.length();
+                                    ExtraGlobals.gOldPickingDist = tmp.length();
                                     // very weak constraint for picking
                                     p2p.setting.tau = 0.1f;
                                 }
@@ -851,18 +825,22 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             if (p2p != null) {
                 // keep it at the same picking distance
 
-                Vector3f newRayTo = new Vector3f(getRayTo(x, y));
-                Vector3f eyePos = new Vector3f(camPos);
-                Vector3f dir = new Vector3f();
+                Vector3f newRayTo = v(getRayTo(x, y));
+                Vector3f eyePos = v(camPos);
+                Vector3f dir = v();
                 dir.sub(newRayTo, eyePos);
                 dir.normalize();
-                dir.scale(BulletGlobals.gOldPickingDist);
+                dir.scale(ExtraGlobals.gOldPickingDist);
 
-                Vector3f newPos = new Vector3f();
+                Vector3f newPos = v();
                 newPos.add(eyePos, dir);
                 p2p.setPivotB(newPos);
             }
         }
+    }
+
+    private static Vector3f v() {
+        return new Vector3f();
     }
 
     /**
@@ -870,103 +848,36 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
      *
      * @author jezek2
      */
-    static class BulletGlobals {
+    static class ExtraGlobals {
 
         public static final boolean DEBUG = true;
-        public static final boolean ENABLE_PROFILE = false;
 
-        public static final float CONVEX_DISTANCE_MARGIN = 0.04f;
+
         public static final float FLT_EPSILON = 1.19209290e-07f;
         public static final float SIMD_EPSILON = FLT_EPSILON;
 
         public static final float SIMD_2_PI = 6.283185307179586232f;
         public static final float SIMD_PI = SIMD_2_PI * 0.5f;
         public static final float SIMD_HALF_PI = SIMD_2_PI * 0.25f;
-        public static final float SIMD_RADS_PER_DEG = SIMD_2_PI / 360f;
-        public static final float SIMD_DEGS_PER_RAD = 360f / SIMD_2_PI;
-        public static final float SIMD_INFINITY = Float.MAX_VALUE;
 
-        public static ContactDestroyedCallback gContactDestroyedCallback;
-        public static ContactAddedCallback gContactAddedCallback;
-        public static float gContactBreakingThreshold = 0.02f;
 
-        // RigidBody
-        public static float gDeactivationTime = 2f;
         public static boolean gDisableDeactivation = false;
 
-        public static int gTotalContactPoints;
 
-        // GjkPairDetector
-        // temp globals, to improve GJK/EPA/penetration calculations
-        public static int gNumDeepPenetrationChecks = 0;
-        public static int gNumGjkChecks = 0;
-
-        public static int gNumAlignedAllocs;
-        public static int gNumAlignedFree;
-        public static int gTotalBytesAlignedAllocs;
-
-        public static int gPickingConstraintId = 0;
-        public static final Vector3f gOldPickingPos = new Vector3f();
+        public static final Vector3f gOldPickingPos = v();
         public static float gOldPickingDist = 0.f;
 
-        public static int gOverlappingPairs = 0;
-        public static int gRemovePairs = 0;
-        public static int gAddedPairs = 0;
-        public static int gFindPairs = 0;
 
-        public static final Vector3f ZERO_VECTOR3 = new Vector3f(0f, 0f, 0f);
-
-        private static final List<ProfileBlock> profileStack = new ArrayList<ProfileBlock>();
-        private static final Map<String, Long> profiles = new HashMap<String, Long>();
-
-        // JAVA NOTE: added for statistics in applet demo
-        public static long stepSimulationTime;
-        public static long updateTime;
-
-        public static void pushProfile(String name) {
-            if (!ENABLE_PROFILE) return;
-
-            ProfileBlock block = new ProfileBlock();
-            block.name = name;
-            block.startTime = System.currentTimeMillis();
-            profileStack.add(block);
-        }
-
-        public static void popProfile() {
-            if (!ENABLE_PROFILE) return;
-
-            ProfileBlock block = profileStack.remove(profileStack.size() - 1);
-            long time = System.currentTimeMillis();
-
-            Long totalTime = profiles.get(block.name);
-            if (totalTime == null) totalTime = 0L;
-            totalTime += (time - block.startTime);
-            profiles.put(block.name, totalTime);
-        }
-
-        public static void printProfiles() {
-            ArrayList<Map.Entry<String, Long>> list = new ArrayList<Map.Entry<String, Long>>(profiles.entrySet());
-            Collections.sort(list, new Comparator<Map.Entry<String, Long>>() {
-                public int compare(Map.Entry<String, Long> e1, Map.Entry<String, Long> e2) {
-                    return e1.getValue().compareTo(e2.getValue());
-                }
-            });
-
-            for (Map.Entry<String, Long> e : /*profiles.entrySet()*/list) {
-                System.out.println(e.getKey() + " = " + e.getValue() + " ms");
-            }
-        }
-
-        static {
-            if (ENABLE_PROFILE) {
-                Runtime.getRuntime().addShutdownHook(new Thread() {
-                    @Override
-                    public void run() {
-                        printProfiles();
-                    }
-                });
-            }
-        }
+//        static {
+//            if (ENABLE_PROFILE) {
+//                Runtime.getRuntime().addShutdownHook(new Thread() {
+//                    @Override
+//                    public void run() {
+//                        printProfiles();
+//                    }
+//                });
+//            }
+//        }
 
         private static class ProfileBlock {
             public String name;
@@ -975,28 +886,44 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     }
 
-    public RigidBody localCreateRigidBody(float mass, Transform startTransform, CollisionShape shape) {
+    public static class RigidBodyX extends RigidBody {
+
+        public RigidBodyX(float mass, MotionState motionState, CollisionShape collisionShape) {
+            super(mass, motionState, collisionShape);
+        }
+
+        public RigidBodyX(RigidBodyConstructionInfo rigidBodyConstructionInfo) {
+            super(rigidBodyConstructionInfo);
+        }
+
+        public final Transform transform() {
+            return worldTransform;
+        }
+
+    }
+    public RigidBodyX newBody(float mass, Transform startTransform, CollisionShape shape) {
+        Motion myMotionState = new Motion(startTransform);
+        return newBody(mass, shape, myMotionState);
+    }
+
+    public RigidBodyX newBody(float mass, CollisionShape shape, MotionState motion) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
-
-        Vector3f localInertia = new Vector3f(0f, 0f, 0f);
+        Vector3f localInertia = v(0, 0, 0);
         if (isDynamic) {
             shape.calculateLocalInertia(mass, localInertia);
         }
 
-        // using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+        RigidBodyX body = new RigidBodyX(
+                new RigidBodyConstructionInfo(mass, motion, shape, localInertia));
 
-        //#define USE_MOTIONSTATE 1
-        //#ifdef USE_MOTIONSTATE
-        DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
-        RigidBody body = new RigidBody(new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia));
-        //#else
-        //btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);
-        //body->setWorldTransform(startTransform);
-        //#endif//
         dyn.addRigidBody(body);
 
         return body;
+    }
+
+    public static Vector3f v(float a, float b, float c) {
+        return new Vector3f(a, b, c);
     }
 
     // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
@@ -1009,12 +936,12 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         // reset matrix
         gl.glLoadIdentity();
         // set a 2D orthographic projection
-        glu.gluOrtho2D(0f, glutScreenWidth, 0f, glutScreenHeight);
+        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
         // invert the y axis, down is positive
         gl.glScalef(1f, -1f, 1f);
         // mover the origin from the bottom left corner
         // to the upper left corner
-        gl.glTranslatef(0f, -glutScreenHeight, 0f);
+        gl.glTranslatef(0f, -screenHeight, 0f);
         gl.glMatrixMode(gl.GL_MODELVIEW);
     }
 
@@ -1034,77 +961,132 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
      */
 
     private final Transform m = new Transform();
-    private final Vector3f wireColor = new Vector3f();
-    private Color3f TEXT_COLOR = new Color3f(0f, 0f, 0f);
+    private final Vector3f wireColor = v();
+    private final GLShapeDrawer drawer = new GLShapeDrawer();
+
+    //private Color3f TEXT_COLOR = new Color3f(0f, 0f, 0f);
     // private StringBuilder buf = new StringBuilder();
 
     public void renderWorld() {
-        // JAU updateCamera();
+        updateCamera();
 
         if (dyn != null) {
+
+
             int numObjects = dyn.getNumCollisionObjects();
-            wireColor.set(1f, 0f, 0f);
+            int debug = this.debug;
+            ObjectArrayList<CollisionObject> objects = dyn.getCollisionObjectArray();
             for (int i = 0; i < numObjects; i++) {
-                CollisionObject colObj = dyn.getCollisionObjectArray().get(i);
+
+                CollisionObject colObj = objects.get(i);
                 RigidBody body = RigidBody.upcast(colObj);
 
-                if (body != null && body.getMotionState() != null) {
-                    DefaultMotionState myMotionState = (DefaultMotionState) body.getMotionState();
+                if (/*body != null && */body.getMotionState() != null) {
+                    Motion myMotionState = (Motion) body.getMotionState();
                     m.set(myMotionState.graphicsWorldTrans);
                 } else {
                     colObj.getWorldTransform(m);
                 }
 
-                if (0 == i) {
-                    wireColor.set(0.5f, 1f, 0.5f); // wants deactivation
-                } else {
-                    wireColor.set(1f, 1f, 0.5f); // wants deactivation
-                }
-                if ((i & 1) != 0) {
-                    wireColor.set(0f, 0f, 1f);
-                }
 
-                // color differently for active, sleeping, wantsdeactivation states
-                if (colObj.getActivationState() == 1) // active
-                {
-                    if ((i & 1) != 0) {
-                        //wireColor.add(new Vector3f(1f, 0f, 0f));
-                        wireColor.x += 1f;
-                    } else {
-                        //wireColor.add(new Vector3f(0.5f, 0f, 0f));
-                        wireColor.x += 0.5f;
-                    }
-                }
-                if (colObj.getActivationState() == 2) // ISLAND_SLEEPING
-                {
-                    if ((i & 1) != 0) {
-                        //wireColor.add(new Vector3f(0f, 1f, 0f));
-                        wireColor.y += 1f;
-                    } else {
-                        //wireColor.add(new Vector3f(0f, 0.5f, 0f));
-                        wireColor.y += 0.5f;
-                    }
-                }
+                gl.glColor4f(0.5f,0.5f,0.5f, 1f);
+                drawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), debug);
 
-                // draw (saves the matrix already ..)
-                GLShapeDrawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), wireColor, getDebug());
-            }
-            GLShapeDrawer.drawCoordSystem(gl);
-            if (false) {
-                System.err.println("++++++++++++++++++++++++++++++++");
-                System.err.println("++++++++++++++++++++++++++++++++");
-                try {
-                    Thread.sleep(2000);
-                } catch (Exception e) {
-                }
             }
 
-            float xOffset = 10f;
-            float yStart = 20f;
-            float yIncr = 20f;
+        }
+    }
 
-            // gl.glDisable(gl.GL_LIGHTING);
-            // JAU gl.glColor4f(0f, 0f, 0f, 0f);
+//    public void clientResetScene() {
+//        //#ifdef SHOW_NUM_DEEP_PENETRATIONS
+////		BulletGlobals.gNumDeepPenetrationChecks = 0;
+////		BulletGlobals.gNumGjkChecks = 0;
+//        //#endif //SHOW_NUM_DEEP_PENETRATIONS
+//
+//        int numObjects = 0;
+//        if (dyn != null) {
+//            dyn.stepSimulation(1f / 60f, 0);
+//            numObjects = dyn.getNumCollisionObjects();
+//        }
+//
+//        for (int i = 0; i < numObjects; i++) {
+//            CollisionObject colObj = dyn.getCollisionObjectArray().get(i);
+//            RigidBody body = RigidBody.upcast(colObj);
+//            if (body != null) {
+//                if (body.getMotionState() != null) {
+//                    Motion myMotionState = (Motion) body.getMotionState();
+//                    myMotionState.graphicsWorldTrans.set(myMotionState.startWorldTrans);
+//                    colObj.setWorldTransform(myMotionState.graphicsWorldTrans);
+//                    colObj.setInterpolationWorldTransform(myMotionState.startWorldTrans);
+//                    colObj.activate();
+//                }
+//                // removed cached contact points
+//                dyn.getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(colObj.getBroadphaseHandle(), getDyn().getDispatcher());
+//
+//                body = RigidBody.upcast(colObj);
+//                if (body != null && !body.isStaticObject()) {
+//                    RigidBody.upcast(colObj).setLinearVelocity(v(0f, 0f, 0f));
+//                    RigidBody.upcast(colObj).setAngularVelocity(v(0f, 0f, 0f));
+//                }
+//            }
+//
+//			/*
+//            //quickly search some issue at a certain simulation frame, pressing space to reset
+//			int fixed=18;
+//			for (int i=0;i<fixed;i++)
+//			{
+//			getDynamicsWorld()->stepSimulation(1./60.f,1);
+//			}
+//			*/
+//        }
+//    }
+
+    public DynamicsWorld getDyn() {
+        return dyn;
+    }
+
+    public void setCamUp(Vector3f camUp) {
+        this.camUp.set(camUp);
+    }
+
+    public void setCameraForwardAxis(int axis) {
+        forwardAxis = axis;
+    }
+
+    public Vector3f getCamPos() {
+        return camPos;
+    }
+
+    public Vector3f getCamPosTarget() {
+        return camPosTarget;
+    }
+
+
+    public void drawString(CharSequence s, int x, int y, Color3f color) {
+        System.out.println(s); //HACK temporary
+        glsrt.drawString();
+    }
+
+}
+
+
+//GLShapeDrawer.drawCoordSystem(gl);
+
+//            if (false) {
+//                System.err.println("++++++++++++++++++++++++++++++++");
+//                System.err.println("++++++++++++++++++++++++++++++++");
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (Exception e) {
+//                }
+//            }
+
+//            float xOffset = 10f;
+//            float yStart = 20f;
+//            float yIncr = 20f;
+
+// gl.glDisable(gl.GL_LIGHTING);
+// JAU gl.glColor4f(0f, 0f, 0f, 0f);
 
 /*
 			if ((debugMode & DebugDrawModes.NO_HELP_TEXT) == 0) {
@@ -1262,85 +1244,40 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 				resetPerspectiveProjection();
 			} */
 
-            // gl.glEnable(gl.GL_LIGHTING);
-        }
-    }
+// gl.glEnable(gl.GL_LIGHTING);
 
-    public void clientResetScene() {
-        //#ifdef SHOW_NUM_DEEP_PENETRATIONS
-//		BulletGlobals.gNumDeepPenetrationChecks = 0;
-//		BulletGlobals.gNumGjkChecks = 0;
-        //#endif //SHOW_NUM_DEEP_PENETRATIONS
 
-        int numObjects = 0;
-        if (dyn != null) {
-            dyn.stepSimulation(1f / 60f, 0);
-            numObjects = dyn.getNumCollisionObjects();
-        }
+//    public void renderObject(CollisionObject colObj) {
 
-        for (int i = 0; i < numObjects; i++) {
-            CollisionObject colObj = dyn.getCollisionObjectArray().get(i);
-            RigidBody body = RigidBody.upcast(colObj);
-            if (body != null) {
-                if (body.getMotionState() != null) {
-                    DefaultMotionState myMotionState = (DefaultMotionState) body.getMotionState();
-                    myMotionState.graphicsWorldTrans.set(myMotionState.startWorldTrans);
-                    colObj.setWorldTransform(myMotionState.graphicsWorldTrans);
-                    colObj.setInterpolationWorldTransform(myMotionState.startWorldTrans);
-                    colObj.activate();
-                }
-                // removed cached contact points
-                dyn.getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(colObj.getBroadphaseHandle(), getDyn().getDispatcher());
+//        if (0 == i) {
+//            wireColor.set(0.5f, 1f, 0.5f); // wants deactivation
+//        } else {
+//            wireColor.set(1f, 1f, 0.5f); // wants deactivation
+//        }
+//        if ((i & 1) != 0) {
+//            wireColor.set(0f, 0f, 1f);
+//        }
 
-                body = RigidBody.upcast(colObj);
-                if (body != null && !body.isStaticObject()) {
-                    RigidBody.upcast(colObj).setLinearVelocity(new Vector3f(0f, 0f, 0f));
-                    RigidBody.upcast(colObj).setAngularVelocity(new Vector3f(0f, 0f, 0f));
-                }
-            }
+//        // color differently for active, sleeping, wantsdeactivation states
+//        if (colObj.getActivationState() == 1) // active
+//        {
+//            if ((i & 1) != 0) {
+//                //wireColor.add(new Vector3f(1f, 0f, 0f));
+//                wireColor.x += 1f;
+//            } else {
+//                //wireColor.add(new Vector3f(0.5f, 0f, 0f));
+//                wireColor.x += 0.5f;
+//            }
+//        }
+//        if (colObj.getActivationState() == 2) // ISLAND_SLEEPING
+//        {
+//            if ((i & 1) != 0) {
+//                //wireColor.add(new Vector3f(0f, 1f, 0f));
+//                wireColor.y += 1f;
+//            } else {
+//                //wireColor.add(new Vector3f(0f, 0.5f, 0f));
+//                wireColor.y += 0.5f;
+//            }
+//        }
 
-			/*
-			//quickly search some issue at a certain simulation frame, pressing space to reset
-			int fixed=18;
-			for (int i=0;i<fixed;i++)
-			{
-			getDynamicsWorld()->stepSimulation(1./60.f,1);
-			}
-			*/
-        }
-    }
-
-    public DynamicsWorld getDyn() {
-        return dyn;
-    }
-
-    public void setCamUp(Vector3f camUp) {
-        this.camUp.set(camUp);
-    }
-
-    public void setCameraForwardAxis(int axis) {
-        forwardAxis = axis;
-    }
-
-    public Vector3f getCamPos() {
-        return camPos;
-    }
-
-    public Vector3f getCamPosTarget() {
-        return camPosTarget;
-    }
-
-    public boolean isIdle() {
-        return idle;
-    }
-
-    public void setIdle(boolean idle) {
-        this.idle = idle;
-    }
-
-    public void drawString(CharSequence s, int x, int y, Color3f color) {
-        System.out.println(s); //HACK temporary
-        glsrt.drawString();
-    }
-
-}
+//    }

@@ -268,7 +268,7 @@ public class FastOrganicLayout implements GraphLayout {
             // Set the X,Y value of the internal version of the cell to
             // the center point of the vertex for better positioning
 
-            float vr = radius[i] = V.radius(); /*getRadius()*/
+            float vr = radius[i] = V.radius; /*getRadius()*/
             float width = vr * 2f; //bounds.getWidth();
             float height = width; //vr * 2f; //bounds.getHeight();
 
@@ -276,9 +276,9 @@ public class FastOrganicLayout implements GraphLayout {
             // Randomize (0, 0) locations
             //TODO re-use existing location
 
-            float[] p = V.p;
-            final float x = p[0];
-            final float y = p[1];
+
+            final float x = V.x();
+            final float y = V.y();
 
             float[] cli = cl[i];
             cli[0] = x + width / 2f;

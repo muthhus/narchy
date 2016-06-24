@@ -35,7 +35,7 @@ import com.bulletphysics.util.StackList;
  */
 public class BulletStack {
 
-	private BulletStack() {}
+	public BulletStack() {}
 	
 	private static final ThreadLocal<BulletStack> threadLocal = new ThreadLocal<>() {
         @Override
@@ -59,10 +59,10 @@ public class BulletStack {
 	public final MatrixStackList matrices = new MatrixStackList();
 	
 	// others:
-	public final Vector4StackList vectors4 = new Vector4StackList();
+	//public final Vector4StackList vectors4 = new Vector4StackList();
 	public final QuatStackList quats = new QuatStackList();
 
-	public final ArrayPool<float[]> floatArrays = new ArrayPool<>(float.class);
+	//public final ArrayPool<float[]> floatArrays = new ArrayPool<>(float.class);
 	
 	/**
 	 * Pushes Vector3f, Transform and Matrix3f stacks.

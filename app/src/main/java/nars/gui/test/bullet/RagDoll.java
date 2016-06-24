@@ -26,16 +26,11 @@
 
 package nars.gui.test.bullet;
 
-import com.bulletphysics.collision.broadphase.BroadphaseInterface;
-import com.bulletphysics.collision.broadphase.SimpleBroadphase;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.*;
 import com.bulletphysics.dynamics.constraintsolver.*;
 import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.jogamp.newt.event.MouseEvent;
@@ -60,17 +55,22 @@ public class RagDoll extends JoglPhysics {
 	public RagDoll() {
 		super();
 
-
-
-		clientResetScene();
-
-
-		// Spawn one ragdoll
-		spawnRagdoll();
+		dyn.setGravity(new Vector3f(0f, -30f, 0f));
 
 		setCameraDistance(10f);
+
+		spawnGround();
+		spawnRagdoll();
 	}
 
+	public void spawnGround() {
+		// Setup a big ground box
+		CollisionShape groundShape = new BoxShape(new Vector3f(200f, 10f, 200f));
+		Transform groundTransform = new Transform();
+		groundTransform.setIdentity();
+		groundTransform.origin.set(0f, -15f, 0f);
+		newBody(0f, groundTransform, groundShape);
+	}
 
 
 	public void spawnRagdoll() {
@@ -217,25 +217,25 @@ public class RagDoll extends JoglPhysics {
 
 				transform.setIdentity();
 				transform.origin.set(-0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(-0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_LEFT_LOWER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(0.35f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -ExtraGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()]);
 
 				transform.setIdentity();
 				transform.origin.set(0.7f * scale_ragdoll, 1.45f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(transform.basis, (float) 0, 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(transform.basis, 0, 0, -ExtraGlobals.SIMD_HALF_PI);
 				tmpTrans.mul(offset, transform);
 				bodies[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()] = localCreateRigidBody(1f, tmpTrans, shapes[BodyPart.BODYPART_RIGHT_LOWER_ARM.ordinal()]);
 
@@ -265,8 +265,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_PI * 0.3f, -BulletGlobals.FLT_EPSILON, -BulletGlobals.SIMD_PI * 0.3f));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.5f, BulletGlobals.FLT_EPSILON, BulletGlobals.SIMD_PI * 0.3f));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_PI * 0.3f, -ExtraGlobals.FLT_EPSILON, -ExtraGlobals.SIMD_PI * 0.3f));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.5f, ExtraGlobals.FLT_EPSILON, ExtraGlobals.SIMD_PI * 0.3f));
 				//#endif
 				joints[JointType.JOINT_SPINE_HEAD.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_SPINE_HEAD.ordinal()], true);
@@ -278,7 +278,7 @@ public class RagDoll extends JoglPhysics {
 
 				localA.origin.set(-0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
 
-				MatrixUtil.setEulerZYX(localB.basis, BulletGlobals.SIMD_HALF_PI, (float) 0, -BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(localB.basis, ExtraGlobals.SIMD_HALF_PI, (float) 0, -ExtraGlobals.SIMD_HALF_PI);
 				localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
 
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_LEFT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
@@ -287,8 +287,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_PI * 0.8f, -BulletGlobals.FLT_EPSILON, -BulletGlobals.SIMD_PI * 0.5f));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.8f, BulletGlobals.FLT_EPSILON, BulletGlobals.SIMD_PI * 0.5f));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_PI * 0.8f, -ExtraGlobals.FLT_EPSILON, -ExtraGlobals.SIMD_PI * 0.5f));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.8f, ExtraGlobals.FLT_EPSILON, ExtraGlobals.SIMD_PI * 0.5f));
 				//#endif
 				joints[JointType.JOINT_LEFT_SHOULDER.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_SHOULDER.ordinal()], true);
@@ -299,7 +299,7 @@ public class RagDoll extends JoglPhysics {
 				localB.setIdentity();
 
 				localA.origin.set(0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(localB.basis, (float) 0, 0, BulletGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(localB.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
 				localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -307,8 +307,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_PI * 0.8f, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_PI * 0.5f));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.8f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_PI * 0.5f));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_PI * 0.8f, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_PI * 0.5f));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.8f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_PI * 0.5f));
 				//#endif
 				joints[JointType.JOINT_RIGHT_SHOULDER.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_SHOULDER.ordinal()], true);
@@ -326,8 +326,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.7f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.7f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_EPSILON));
 				//#endif
 				joints[JointType.JOINT_LEFT_ELBOW.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_ELBOW.ordinal()], true);
@@ -345,8 +345,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.7f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.7f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_EPSILON));
 				//#endif
 
 				joints[JointType.JOINT_RIGHT_ELBOW.ordinal()] = joint6DOF;
@@ -358,9 +358,9 @@ public class RagDoll extends JoglPhysics {
 				localA.setIdentity();
 				localB.setIdentity();
 
-				MatrixUtil.setEulerZYX(localA.basis, (float) 0, BulletGlobals.SIMD_HALF_PI, 0);
+				MatrixUtil.setEulerZYX(localA.basis, (float) 0, ExtraGlobals.SIMD_HALF_PI, 0);
 				localA.origin.set(0f, 0.15f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(localB.basis, (float) 0, BulletGlobals.SIMD_HALF_PI, 0);
+				MatrixUtil.setEulerZYX(localB.basis, (float) 0, ExtraGlobals.SIMD_HALF_PI, 0);
 				localB.origin.set(0f, -0.15f * scale_ragdoll, 0f);
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_PELVIS.ordinal()], bodies[BodyPart.BODYPART_SPINE.ordinal()], localA, localB, useLinearReferenceFrameA);
 
@@ -368,8 +368,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_PI * 0.2f, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_PI * 0.3f));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.2f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_PI * 0.6f));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_PI * 0.2f, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_PI * 0.3f));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.2f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_PI * 0.6f));
 				//#endif
 				joints[JointType.JOINT_PELVIS_SPINE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_PELVIS_SPINE.ordinal()], true);
@@ -389,8 +389,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_HALF_PI * 0.5f, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_HALF_PI * 0.8f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_HALF_PI * 0.6f));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_HALF_PI * 0.5f, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_HALF_PI * 0.8f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_HALF_PI * 0.6f));
 				//#endif
 				joints[JointType.JOINT_LEFT_HIP.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_HIP.ordinal()], true);
@@ -410,8 +410,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_HALF_PI * 0.5f, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_HALF_PI * 0.6f));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_HALF_PI * 0.8f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_HALF_PI * 0.5f, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_HALF_PI * 0.6f));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_HALF_PI * 0.8f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_EPSILON));
 				//#endif
 				joints[JointType.JOINT_RIGHT_HIP.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_HIP.ordinal()], true);
@@ -430,8 +430,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.7f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.7f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_EPSILON));
 				//#endif
 				joints[JointType.JOINT_LEFT_KNEE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_LEFT_KNEE.ordinal()], true);
@@ -449,8 +449,8 @@ public class RagDoll extends JoglPhysics {
 				//joint6DOF->setAngularLowerLimit(btVector3(-SIMD_EPSILON,-SIMD_EPSILON,-SIMD_EPSILON));
 				//joint6DOF->setAngularUpperLimit(btVector3(SIMD_EPSILON,SIMD_EPSILON,SIMD_EPSILON));
 				//#else
-				joint6DOF.setAngularLowerLimit(stack.vectors.get(-BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON, -BulletGlobals.SIMD_EPSILON));
-				joint6DOF.setAngularUpperLimit(stack.vectors.get(BulletGlobals.SIMD_PI * 0.7f, BulletGlobals.SIMD_EPSILON, BulletGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularLowerLimit(stack.vectors.get(-ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON, -ExtraGlobals.SIMD_EPSILON));
+				joint6DOF.setAngularUpperLimit(stack.vectors.get(ExtraGlobals.SIMD_PI * 0.7f, ExtraGlobals.SIMD_EPSILON, ExtraGlobals.SIMD_EPSILON));
 				//#endif
 				joints[JointType.JOINT_RIGHT_KNEE.ordinal()] = joint6DOF;
 				ownerWorld.addConstraint(joints[JointType.JOINT_RIGHT_KNEE.ordinal()], true);
@@ -494,7 +494,7 @@ public class RagDoll extends JoglPhysics {
 					shape.calculateLocalInertia(mass, localInertia);
 				}
 
-				DefaultMotionState myMotionState = new DefaultMotionState(startTransform);
+				Motion myMotionState = new Motion(startTransform);
 				RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
 				rbInfo.additionalDamping = true;
 				RigidBody body = new RigidBody(rbInfo);
