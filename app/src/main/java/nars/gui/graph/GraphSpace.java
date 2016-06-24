@@ -176,13 +176,11 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
-        gl.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
-        gl.glShadeModel(GL2.GL_LINE_SMOOTH); // Enable Smooth Shading
+
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.01f); // Black Background
-        gl.glClearDepth(1f); // Depth Buffer Setup
-        gl.glEnable(GL2.GL_DEPTH_TEST); // Enables Depth Testing
-        gl.glDepthFunc(GL2.GL_LEQUAL);
+        //gl.glClearDepth(1f); // Depth Buffer Setup
+
 
         // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
         //gl.glEnable(GL2.GL_LIGHT0);
@@ -191,9 +189,6 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
         gl.glEnable(GL2.GL_BLEND);
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
-
-        gl.glEnable(GL2.GL_COLOR_MATERIAL);
 
 
         //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations

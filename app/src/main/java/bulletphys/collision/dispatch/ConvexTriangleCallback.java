@@ -117,33 +117,33 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 		CollisionObject ob = triBody;
 
-		// debug drawing of the overlapping triangles
-		if (dispatchInfoPtr != null && dispatchInfoPtr.debugDraw != null && dispatchInfoPtr.debugDraw.getDebugMode() > 0) {
-			Vector3f color = new Vector3f();
-			color.set(255, 255, 0);
-			Transform tr = ob.getWorldTransform(new Transform());
-
-			Vector3f tmp1 = new Vector3f();
-			Vector3f tmp2 = new Vector3f();
-
-			tmp1.set(triangle[0]); tr.transform(tmp1);
-			tmp2.set(triangle[1]); tr.transform(tmp2);
-			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
-
-			tmp1.set(triangle[1]); tr.transform(tmp1);
-			tmp2.set(triangle[2]); tr.transform(tmp2);
-			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
-
-			tmp1.set(triangle[2]); tr.transform(tmp1);
-			tmp2.set(triangle[0]); tr.transform(tmp2);
-			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
-
-			//btVector3 center = triangle[0] + triangle[1]+triangle[2];
-			//center *= btScalar(0.333333);
-			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[0]),tr(center),color);
-			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[1]),tr(center),color);
-			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[2]),tr(center),color);
-		}
+//		// debug drawing of the overlapping triangles
+//		if (dispatchInfoPtr != null && dispatchInfoPtr.debugDraw != null && dispatchInfoPtr.debugDraw.getDebugMode() > 0) {
+//			Vector3f color = new Vector3f();
+//			color.set(255, 255, 0);
+//			Transform tr = ob.getWorldTransform(new Transform());
+//
+//			Vector3f tmp1 = new Vector3f();
+//			Vector3f tmp2 = new Vector3f();
+//
+//			tmp1.set(triangle[0]); tr.transform(tmp1);
+//			tmp2.set(triangle[1]); tr.transform(tmp2);
+//			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
+//
+//			tmp1.set(triangle[1]); tr.transform(tmp1);
+//			tmp2.set(triangle[2]); tr.transform(tmp2);
+//			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
+//
+//			tmp1.set(triangle[2]); tr.transform(tmp1);
+//			tmp2.set(triangle[0]); tr.transform(tmp2);
+//			dispatchInfoPtr.debugDraw.drawLine(tmp1, tmp2, color);
+//
+//			//btVector3 center = triangle[0] + triangle[1]+triangle[2];
+//			//center *= btScalar(0.333333);
+//			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[0]),tr(center),color);
+//			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[1]),tr(center),color);
+//			//m_dispatchInfoPtr->m_debugDraw->drawLine(tr(triangle[2]),tr(center),color);
+//		}
 
 		//btCollisionObject* colObj = static_cast<btCollisionObject*>(m_convexProxy->m_clientObject);
 

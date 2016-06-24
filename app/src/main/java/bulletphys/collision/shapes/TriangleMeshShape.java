@@ -41,7 +41,7 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 
 	protected final Vector3f localAabbMin = new Vector3f();
 	protected final Vector3f localAabbMax = new Vector3f();
-	protected StridingMeshInterface meshInterface;
+	protected final StridingMeshInterface meshInterface;
 
 	/**
 	 * TriangleMeshShape constructor has been disabled/protected, so that users will not mistakenly use this class.
@@ -175,7 +175,7 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	////////////////////////////////////////////////////////////////////////////
 
 	private class SupportVertexCallback extends TriangleCallback {
-		private final Vector3f supportVertexLocal = new Vector3f(0f, 0f, 0f);
+		private final Vector3f supportVertexLocal = new Vector3f();
 		public final Transform worldTrans = new Transform();
 		public float maxDot = -1e30f;
 		public final Vector3f supportVecLocal = new Vector3f();

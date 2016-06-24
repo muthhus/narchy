@@ -31,6 +31,7 @@ import bulletphys.dynamics.constraintsolver.ConstraintSolver;
 import bulletphys.dynamics.constraintsolver.ContactSolverInfo;
 import bulletphys.dynamics.constraintsolver.TypedConstraint;
 import bulletphys.dynamics.vehicle.RaycastVehicle;
+import bulletphys.linearmath.IDebugDraw;
 
 import javax.vecmath.Vector3f;
 
@@ -74,7 +75,7 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 	 */
 	public abstract int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep);
 
-	public abstract void debugDrawWorld();
+	public abstract void debugDrawWorld(IDebugDraw d);
 
 	public final void addConstraint(TypedConstraint constraint) {
 		addConstraint(constraint, false);

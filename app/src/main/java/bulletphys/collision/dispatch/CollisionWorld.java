@@ -52,8 +52,7 @@ public class CollisionWorld<X> {
 	protected DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
 	protected BroadphaseInterface broadphasePairCache;
-	protected IDebugDraw debugDrawer;
-	
+
 	/**
 	 * This constructor doesn't own the dispatcher and paircache/broadphase.
 	 */
@@ -216,13 +215,13 @@ public class CollisionWorld<X> {
 			// this assert is unwanted in 3D modelers (danger of loosing work)
 			colObj.setActivationState(CollisionObject.DISABLE_SIMULATION);
 
-			if (updateAabbs_reportMe && debugDrawer != null) {
-				updateAabbs_reportMe = false;
-				debugDrawer.reportErrorWarning("Overflow in AABB, object removed from simulation");
-				debugDrawer.reportErrorWarning("If you can reproduce this, please email bugs@continuousphysics.com\n");
-				debugDrawer.reportErrorWarning("Please include above information, your Platform, version of OS.\n");
-				debugDrawer.reportErrorWarning("Thanks.\n");
-			}
+//			if (updateAabbs_reportMe && debugDrawer != null) {
+//				updateAabbs_reportMe = false;
+//				debugDrawer.reportErrorWarning("Overflow in AABB, object removed from simulation");
+//				debugDrawer.reportErrorWarning("If you can reproduce this, please email bugs@continuousphysics.com\n");
+//				debugDrawer.reportErrorWarning("Please include above information, your Platform, version of OS.\n");
+//				debugDrawer.reportErrorWarning("Thanks.\n");
+//			}
 		}
 	}
 
@@ -244,13 +243,6 @@ public class CollisionWorld<X> {
 		}
 	}
 
-	public IDebugDraw getDebugDrawer() {
-		return debugDrawer;
-	}
-
-	public void setDebugDrawer(IDebugDraw debugDrawer) {
-		this.debugDrawer = debugDrawer;
-	}
 	
 	public int getNumCollisionObjects() {
 		return collisionObjects.size();

@@ -23,7 +23,6 @@
 
 package bulletphys.dynamics;
 
-import bulletphys.BulletGlobals;
 import bulletphys.BulletStats;
 import bulletphys.collision.broadphase.*;
 import bulletphys.collision.dispatch.CollisionConfiguration;
@@ -112,9 +111,10 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		return true;
 	}
 
-	@Override
-	public void debugDrawWorld() {
-		if (getDebugDrawer() != null && (getDebugDrawer().getDebugMode() & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
+
+	public void debugDrawWorld(IDebugDraw debugDrawer) {
+
+		if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
 			int numManifolds = getDispatcher().getNumManifolds();
 			Vector3f color = new Vector3f();
 			color.set(0f, 0f, 0f);
@@ -126,12 +126,12 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 				int numContacts = contactManifold.getNumContacts();
 				for (int j = 0; j < numContacts; j++) {
 					ManifoldPoint cp = contactManifold.getContactPoint(j);
-					getDebugDrawer().drawContactPoint(cp.positionWorldOnB, cp.normalWorldOnB, cp.getDistance(), cp.getLifeTime(), color);
+					debugDrawer.drawContactPoint(cp.positionWorldOnB, cp.normalWorldOnB, cp.getDistance(), cp.getLifeTime(), color);
 				}
 			}
 		}
-		
-		if (getDebugDrawer() != null && (getDebugDrawer().getDebugMode() & (DebugDrawModes.DRAW_WIREFRAME | DebugDrawModes.DRAW_AABB)) != 0) {
+
+		if (debugDrawer != null && (debugDrawer.getDebugMode() & (DebugDrawModes.DRAW_WIREFRAME | DebugDrawModes.DRAW_AABB)) != 0) {
 			int i;
 
 			Transform tmpTrans = new Transform();
@@ -143,7 +143,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			for (i = 0; i < collisionObjects.size(); i++) {
 				//return array[index];
 				CollisionObject colObj = collisionObjects.get(i);
-				if (getDebugDrawer() != null && (getDebugDrawer().getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
+				if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
 					Vector3f color = new Vector3f();
 					color.set(255f, 255f, 255f);
 					switch (colObj.getActivationState()) {
@@ -167,7 +167,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 						}
 					}
 
-					debugDrawObject(colObj.getWorldTransform(tmpTrans), colObj.getCollisionShape(), color);
+					debugDrawObject(debugDrawer, colObj.getWorldTransform(tmpTrans), colObj.getCollisionShape(), color);
 				}
 				if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_AABB) != 0) {
 					colorvec.set(1f, 0f, 0f);
@@ -217,7 +217,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 				}
 			}
 
-			if (getDebugDrawer() != null && getDebugDrawer().getDebugMode() != 0) {
+			if (debugDrawer != null && debugDrawer.getDebugMode() != 0) {
 				for (i=0; i<actions.size(); i++) {
 					//return array[index];
 					actions.get(i).debugDraw(debugDrawer);
@@ -277,16 +277,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			}
 		}
 
-		if (getDebugDrawer() != null && (getDebugDrawer().getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
-			for (int i = 0; i < vehicles.size(); i++) {
-				//return array[index];
-				for (int v = 0; v < vehicles.get(i).getNumWheels(); v++) {
-					// synchronize the wheels with the (interpolated) chassis worldtransform
-					//return array[index];
-					vehicles.get(i).updateWheelTransform(v, true);
-				}
-			}
-		}
+
 	}
 
 	@Override
@@ -321,10 +312,10 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 				}
 			}
 
-			// process some debugging flags
-			if (getDebugDrawer() != null) {
-				BulletGlobals.setDeactivationDisabled((getDebugDrawer().getDebugMode() & DebugDrawModes.NO_DEACTIVATION) != 0);
-			}
+//			// process some debugging flags
+//			if (debugDrawer != null) {
+//				BulletGlobals.setDeactivationDisabled((debugDrawer.getDebugMode() & DebugDrawModes.NO_DEACTIVATION) != 0);
+//			}
 			if (numSimulationSubSteps != 0) {
 				saveKinematicState(fixedTimeStep);
 
@@ -369,7 +360,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 			dispatchInfo.timeStep = timeStep;
 			dispatchInfo.stepCount = 0;
-			dispatchInfo.debugDraw = getDebugDrawer();
+
 
 			// perform collision detection
 			performDiscreteCollisionDetection();
@@ -569,16 +560,15 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		public ConstraintSolver solver;
 		public ObjectArrayList<TypedConstraint> sortedConstraints;
 		public int numConstraints;
-		public IDebugDraw debugDrawer;
 		//public StackAlloc* m_stackAlloc;
 		public Dispatcher dispatcher;
 
-		public void init(ContactSolverInfo solverInfo, ConstraintSolver solver, ObjectArrayList<TypedConstraint> sortedConstraints, int numConstraints, IDebugDraw debugDrawer, Dispatcher dispatcher) {
+		public void init(ContactSolverInfo solverInfo, ConstraintSolver solver, ObjectArrayList<TypedConstraint> sortedConstraints, int numConstraints, Dispatcher dispatcher) {
 			this.solverInfo = solverInfo;
 			this.solver = solver;
 			this.sortedConstraints = sortedConstraints;
 			this.numConstraints = numConstraints;
-			this.debugDrawer = debugDrawer;
+
 			this.dispatcher = dispatcher;
 		}
 
@@ -586,7 +576,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		public void processIsland(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
 			if (islandId < 0) {
 				// we don't split islands, so all constraints/contact manifolds/bodies are passed into the solver regardless the island id
-				solver.solveGroup(bodies, numBodies, manifolds, manifolds_offset, numManifolds, sortedConstraints, 0, numConstraints, solverInfo, debugDrawer/*,m_stackAlloc*/, dispatcher);
+				solver.solveGroup(bodies, numBodies, manifolds, manifolds_offset, numManifolds, sortedConstraints, 0, numConstraints, solverInfo/*,m_stackAlloc*/, dispatcher);
 			}
 			else {
 				// also add all non-contact constraints/joints for this island
@@ -615,7 +605,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 				// only call solveGroup if there is some work: avoid virtual function call, its overhead can be excessive
 				if ((numManifolds + numCurConstraints) > 0) {
-					solver.solveGroup(bodies, numBodies, manifolds, manifolds_offset, numManifolds, sortedConstraints, startConstraint_idx, numCurConstraints, solverInfo, debugDrawer/*,m_stackAlloc*/, dispatcher);
+					solver.solveGroup(bodies, numBodies, manifolds, manifolds_offset, numManifolds, sortedConstraints, startConstraint_idx, numCurConstraints, solverInfo/*,m_stackAlloc*/, dispatcher);
 				}
 			}
 		}
@@ -638,14 +628,14 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 			ObjectArrayList<TypedConstraint> constraintsPtr = getNumConstraints() != 0 ? sortedConstraints : null;
 
-			solverCallback.init(solverInfo, constraintSolver, constraintsPtr, sortedConstraints.size(), debugDrawer/*,m_stackAlloc*/, dispatcher1);
+			solverCallback.init(solverInfo, constraintSolver, constraintsPtr, sortedConstraints.size(), /*,m_stackAlloc*/ dispatcher1);
 
 			constraintSolver.prepareSolve(getCollisionWorld().getNumCollisionObjects(), getCollisionWorld().getDispatcher().getNumManifolds());
 
 			// solve all the constraints for this island
 			islandManager.buildAndProcessIslands(getCollisionWorld().getDispatcher(), getCollisionWorld().getCollisionObjectArray(), solverCallback);
 
-			constraintSolver.allSolved(solverInfo, debugDrawer/*, m_stackAlloc*/);
+			constraintSolver.allSolved(solverInfo /*, m_stackAlloc*/);
 		}
 		finally {
 			BulletStats.popProfile();
@@ -774,7 +764,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		//#endif //BT_NO_PROFILE
 	}
 
-	protected void debugDrawSphere(float radius, Transform transform, Vector3f color) {
+	protected void debugDrawSphere(IDebugDraw debugDrawer, float radius, Transform transform, Vector3f color) {
 		Vector3f start = new Vector3f(transform.origin);
 
 		Vector3f xoffs = new Vector3f();
@@ -793,47 +783,47 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		// XY
 		tmp1.sub(start, xoffs);
 		tmp2.add(start, yoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, yoffs);
 		tmp2.add(start, xoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, xoffs);
 		tmp2.sub(start, yoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.sub(start, yoffs);
 		tmp2.sub(start, xoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 
 		// XZ
 		tmp1.sub(start, xoffs);
 		tmp2.add(start, zoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, zoffs);
 		tmp2.add(start, xoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, xoffs);
 		tmp2.sub(start, zoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.sub(start, zoffs);
 		tmp2.sub(start, xoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 
 		// YZ
 		tmp1.sub(start, yoffs);
 		tmp2.add(start, zoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, zoffs);
 		tmp2.add(start, yoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.add(start, yoffs);
 		tmp2.sub(start, zoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 		tmp1.sub(start, zoffs);
 		tmp2.sub(start, yoffs);
-		getDebugDrawer().drawLine(tmp1, tmp2, color);
+		debugDrawer.drawLine(tmp1, tmp2, color);
 	}
 	
-	public void debugDrawObject(Transform worldTransform, CollisionShape shape, Vector3f color) {
+	public void debugDrawObject(IDebugDraw debugDrawer, Transform worldTransform, CollisionShape shape, Vector3f color) {
 		Vector3f tmp = new Vector3f();
 		Vector3f tmp2 = new Vector3f();
 
@@ -844,19 +834,19 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
         worldTransform.basis.transform(tmp);
         tmp.add(start);
         tmp2.set(1f, 0f, 0f);
-        getDebugDrawer().drawLine(start, tmp, tmp2);
+		debugDrawer.drawLine(start, tmp, tmp2);
 
         tmp.set(0f, 1f, 0f);
         worldTransform.basis.transform(tmp);
         tmp.add(start);
         tmp2.set(0f, 1f, 0f);
-        getDebugDrawer().drawLine(start, tmp, tmp2);
+		debugDrawer.drawLine(start, tmp, tmp2);
 
         tmp.set(0f, 0f, 1f);
         worldTransform.basis.transform(tmp);
         tmp.add(start);
         tmp2.set(0f, 0f, 1f);
-        getDebugDrawer().drawLine(start, tmp, tmp2);
+		debugDrawer.drawLine(start, tmp, tmp2);
 
         // JAVA TODO: debugDrawObject, note that this commented code is from old version, use actual version when implementing
 		

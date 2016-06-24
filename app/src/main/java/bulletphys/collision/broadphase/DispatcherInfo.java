@@ -37,7 +37,7 @@ public class DispatcherInfo {
 	public DispatchFunc dispatchFunc;
 	public float timeOfImpact;
 	public boolean useContinuous;
-	public IDebugDraw debugDraw;
+
 	public boolean enableSatConvex;
 	public boolean enableSPU = true;
 	public boolean useEpa = true;

@@ -31,6 +31,7 @@ import bulletphys.collision.dispatch.CollisionObject;
 import bulletphys.collision.narrowphase.PersistentManifold;
 import bulletphys.dynamics.constraintsolver.ConstraintSolver;
 import bulletphys.dynamics.constraintsolver.ContactSolverInfo;
+import bulletphys.linearmath.IDebugDraw;
 import bulletphys.linearmath.Transform;
 import bulletphys.util.ObjectArrayList;
 
@@ -101,7 +102,6 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		DispatcherInfo dispatchInfo = getDispatchInfo();
 		dispatchInfo.timeStep = timeStep;
 		dispatchInfo.stepCount = 0;
-		dispatchInfo.debugDraw = getDebugDrawer();
 
 		// perform collision detection
 		performDiscreteCollisionDetection();
@@ -115,8 +115,8 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 			ContactSolverInfo infoGlobal = new ContactSolverInfo();
 			infoGlobal.timeStep = timeStep;
 			constraintSolver.prepareSolve(0,numManifolds);
-			constraintSolver.solveGroup(null,0,manifoldPtr, 0, numManifolds, null,0,0,infoGlobal,debugDrawer/*, m_stackAlloc*/,dispatcher1);
-			constraintSolver.allSolved(infoGlobal,debugDrawer/*, m_stackAlloc*/);
+			constraintSolver.solveGroup(null,0,manifoldPtr, 0, numManifolds, null,0,0,infoGlobal/*, m_stackAlloc*/,dispatcher1);
+			constraintSolver.allSolved(infoGlobal /*, m_stackAlloc*/);
 		}
 
 		// integrate transforms
@@ -230,7 +230,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 	}
 	
 	@Override
-	public void debugDrawWorld() {
+	public void debugDrawWorld(IDebugDraw draw) {
 		// TODO: throw new UnsupportedOperationException("Not supported yet.");
 	}
 

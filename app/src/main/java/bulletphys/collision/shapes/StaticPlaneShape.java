@@ -37,8 +37,8 @@ import javax.vecmath.Vector3f;
  */
 public class StaticPlaneShape extends ConcaveShape {
 
-	protected final Vector3f localAabbMin = new Vector3f();
-	protected final Vector3f localAabbMax = new Vector3f();
+	//protected final Vector3f localAabbMin = new Vector3f();
+	//protected final Vector3f localAabbMax = new Vector3f();
 	
 	protected final Vector3f planeNormal = new Vector3f();
 	protected float planeConstant;
@@ -80,7 +80,7 @@ public class StaticPlaneShape extends ConcaveShape {
 		// tangentDir0/tangentDir1 can be precalculated
 		TransformUtil.planeSpace1(planeNormal, tangentDir0, tangentDir1);
 
-		Vector3f supVertex0 = new Vector3f(), supVertex1 = new Vector3f();
+		//Vector3f supVertex0 = new Vector3f(), supVertex1 = new Vector3f();
 
 		Vector3f projectedCenter = new Vector3f();
 		tmp.scale(planeNormal.dot(center) - planeConstant, planeNormal);

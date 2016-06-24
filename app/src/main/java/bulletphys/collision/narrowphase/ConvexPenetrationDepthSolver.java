@@ -39,7 +39,7 @@ public abstract class ConvexPenetrationDepthSolver {
 	public abstract boolean calcPenDepth(SimplexSolverInterface simplexSolver,
                                          ConvexShape convexA, ConvexShape convexB,
                                          Transform transA, Transform transB,
-                                         Vector3f v, Vector3f pa, Vector3f pb,
-                                         IDebugDraw debugDraw/*, btStackAlloc* stackAlloc*/);
+                                         Vector3f v, Vector3f pa, Vector3f pb
+                                         /*, btStackAlloc* stackAlloc*/);
 	
 }

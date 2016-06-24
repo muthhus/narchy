@@ -45,16 +45,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     }
 
-    // Unused routines
-    @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
-//        if (this.gl!= drawable.getGL().getGL2())
-//            throw new RuntimeException("gl context changed");
-    }
 
     public void printHardware() {
-        System.err.println("Entering initialization");
-        System.err.print("GL Profile: ");
+        //System.err.print("GL Profile: ");
         //System.err.println(GLProfile.getProfile());
         System.err.print("GL:");
         System.err.println(gl);

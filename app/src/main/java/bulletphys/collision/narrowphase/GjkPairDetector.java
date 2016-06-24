@@ -69,7 +69,7 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
 		this.minkowskiB = objectB;
 	}
 
-	public void getClosestPoints(ClosestPointInput input, Result output, IDebugDraw debugDraw, boolean swapResults) {
+	public void getClosestPoints(ClosestPointInput input, Result output, boolean swapResults) {
 		Vector3f tmp = new Vector3f();
 
 		float distance = 0f;
@@ -273,8 +273,8 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
                         simplexSolver,
                         minkowskiA, minkowskiB,
                         localTransA, localTransB,
-                        cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
-                        debugDraw/*,input.stackAlloc*/);
+                        cachedSeparatingAxis, tmpPointOnA, tmpPointOnB
+                        /*,input.stackAlloc*/);
 
                 if (isValid2) {
                     tmpNormalInB.sub(tmpPointOnB, tmpPointOnA);

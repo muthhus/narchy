@@ -115,7 +115,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		body0.getWorldTransform(input.transformA);
 		body1.getWorldTransform(input.transformB);
 
-		gjkPairDetector.getClosestPoints(input, resultOut, dispatchInfo.debugDraw);
+		gjkPairDetector.getClosestPoints(input, resultOut);
 
 		if (ownManifold) {
 			resultOut.refreshContactPoints();

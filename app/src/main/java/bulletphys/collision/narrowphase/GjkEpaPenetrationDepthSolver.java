@@ -43,8 +43,8 @@ public class GjkEpaPenetrationDepthSolver extends ConvexPenetrationDepthSolver {
 	public boolean calcPenDepth(SimplexSolverInterface simplexSolver,
                                 ConvexShape pConvexA, ConvexShape pConvexB,
                                 Transform transformA, Transform transformB,
-                                Vector3f v, Vector3f wWitnessOnA, Vector3f wWitnessOnB,
-                                IDebugDraw debugDraw/*, btStackAlloc* stackAlloc*/)
+                                Vector3f v, Vector3f wWitnessOnA, Vector3f wWitnessOnB
+                                /*, btStackAlloc* stackAlloc*/)
 	{
 		float radialmargin = 0f;
 

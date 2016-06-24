@@ -213,13 +213,13 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
         }
 
         gl.glShadeModel(gl.GL_SMOOTH);
+        gl.glShadeModel(GL2.GL_LINE_SMOOTH); // Enable Smooth Shading
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
         gl.glEnable(gl.GL_COLOR_MATERIAL);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
         gl.glDepthFunc(gl.GL_LESS);
 
-        gl.glClearColor(0.7f, 0.7f, 0.7f, 0f);
 
         // JAU
         gl.glEnable(gl.GL_CULL_FACE);
@@ -245,26 +245,21 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
     public void display(GLAutoDrawable drawable) {
 
-
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
-
         if (simulating) {
-            // simple dynamics world doesn't handle fixed-time-stepping
-            float ms = clock.getTimeMicroseconds();
+            // NOTE: simple dynamics world doesn't handle fixed-time-stepping
+            float ms = Math.max(clock.getTimeMicroseconds(), 1000000f / 60f);
+
             clock.reset();
-            float minFPS = 1000000f / 60f;
-            if (ms > minFPS) {
-                ms = minFPS;
-            }
 
             dyn.stepSimulation(ms / 1000000.f);
-
-            // optional but useful: debug drawing
-            dyn.debugDrawWorld();
-
-            renderWorld();
         }
+
+        // optional but useful: debug drawing
+        //dyn.debugDrawWorld(debug);
+
+        renderWorld();
 
     }
 
@@ -583,9 +578,9 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
                 break;
         }
 
-        if (getDyn() != null && getDyn().getDebugDrawer() != null) {
-            getDyn().getDebugDrawer().setDebugMode(debug);
-        }
+//        if (getDyn() != null && getDyn().debugDrawer != null) {
+//            getDyn().debugDrawer.setDebugMode(debug);
+//        }
 
         //LWJGL.postRedisplay();
     }
@@ -596,9 +591,9 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
     public void setDebug(int mode) {
         debug = mode;
-        if (getDyn() != null && getDyn().getDebugDrawer() != null) {
-            getDyn().getDebugDrawer().setDebugMode(mode);
-        }
+//        if (getDyn() != null && getDyn().debugDrawer != null) {
+//            getDyn().debugDrawer.setDebugMode(mode);
+//        }
     }
 
     public void specialKeyboard(int keycode) {
