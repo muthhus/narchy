@@ -31,7 +31,6 @@ import static java.util.stream.Collectors.toList;
 import static nars.$.$;
 import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.UtilityFunctions.w2c;
 
 /**
  * Agent interface wrapping a NAR

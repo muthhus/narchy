@@ -104,7 +104,7 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 
-		new GraphSpace(new GraphSpace.ConceptsSource(nar, 96)).show(800, 500);
+		new GraphSpace(new GraphSpace.ConceptsSource(nar, 512)).show(800, 500);
 
 		e.run(a, 256*8);
 

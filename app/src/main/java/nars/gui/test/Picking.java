@@ -12,17 +12,14 @@ package nars.gui.test;
 //---------------------------------------------------------------------------------
 
 import com.jogamp.common.nio.Buffers;
-
-
-import java.nio.*;
-
-
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import nars.util.JoglSpace;
+
+import java.nio.IntBuffer;
 
 
 public class Picking extends JoglSpace implements MouseListener {

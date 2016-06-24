@@ -1,10 +1,10 @@
 package nars.gui.graph;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.ui.JoglPhysics;
-import com.bulletphysics.util.Motion;
+import bulletphys.collision.shapes.BoxShape;
+import bulletphys.collision.shapes.CollisionShape;
+import bulletphys.dynamics.RigidBody;
+import bulletphys.ui.JoglPhysics;
+import bulletphys.util.Motion;
 import com.jogamp.opengl.GL2;
 import nars.budget.Budget;
 import nars.link.BLink;
@@ -224,32 +224,36 @@ public final class VDraw {
         motionLock = b;
     }
 
-    public void render(GL2 gl, float dt) {
-        //renderVertexBase(gl, dt, v);
+    public void update() {
 
-        if (body == null) {
-            final boolean collidesWithOthersLikeThis = false;
-            body = graphSpace.newBody(
-                    1f, //mass
-                    shape, motion,
-                    +1, //group
-                    collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
-            );
+        if (active()) {
 
-            body.setLinearVelocity(JoglPhysics.v());
-            body.setDamping(0.99f, 0.5f);
-            body.setFriction(0.9f);
+            if (body == null) {
+                final boolean collidesWithOthersLikeThis = false;
+                body = graphSpace.newBody(
+                        1f, //mass
+                        shape, motion,
+                        +1, //group
+                        collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
+                );
 
-            body.setUserPointer(this);
+                body.setLinearVelocity(JoglPhysics.v());
+                body.setDamping(0.99f, 0.5f);
+                body.setFriction(0.9f);
+
+                body.setUserPointer(this);
+            }
+
         }
+
+    }
+
+    public void preDraw(GL2 gl) {
 
         graphSpace.renderEdges(gl, this);
 
         graphSpace.renderLabel(gl, this);
 
-    }
-
-    public void preDraw(GL2 gl) {
         float p = graphSpace.h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),

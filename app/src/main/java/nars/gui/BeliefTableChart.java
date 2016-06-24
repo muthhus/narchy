@@ -1,6 +1,7 @@
 package nars.gui;
 
-import com.jogamp.opengl.*;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
@@ -8,8 +9,6 @@ import nars.concept.table.BeliefTable;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
 import nars.util.JoglSpace2D;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

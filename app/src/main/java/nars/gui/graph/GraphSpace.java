@@ -1,13 +1,12 @@
 package nars.gui.graph;
 
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.ui.JoglPhysics;
+import bulletphys.collision.dispatch.CollisionObject;
+import bulletphys.ui.JoglPhysics;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
@@ -38,15 +37,15 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
     public static void main(String[] args) {
 
         Default n = new Default(1024, 8, 6, 8);
-        n.nal(4);
+        //n.nal(4);
 
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
-        final int maxNodes = 64;
+        final int maxNodes = 16;
 
         new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
-        n.loop(15f);
+        n.loop(35f);
 
     }
 
@@ -56,7 +55,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
 
-    int maxEdgesPerVertex = 9;
+    int maxEdgesPerVertex = 4;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()
@@ -285,69 +284,63 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
     }
 
 
+    @Override protected final boolean valid(CollisionObject<X> c) {
+        X vd = c.getUserPointer();
+        if (vd !=null && !vd.active()) {
+            vd.body.setUserPointer(null); //remove reference so vd can be GC
+            vd.body = null;
+            return false;
+        }
+        return true;
+    }
 
     public synchronized void display(GLAutoDrawable drawable) {
 
-        dyn.removeIf( c -> {
-            X vd = c.getUserPointer();
-            if (!vd.active()) {
-                c.setUserPointer(null); //remove reference so vd can be GC
-                vd.body = null;
-                return true;
-            }
-            return false;
-        });
+        List<ConceptsSource> ss = this.sources;
 
+        ss.forEach( this::update );
 
         super.display(drawable);
-        //GL2 gl = (GL2) drawable.getGL();
 
-        //clear(gl);
-
-        //updateCamera(gl);
-
-        List<ConceptsSource> s = this.sources;
-        for (int i = 0, sourcesSize = s.size(); i < sourcesSize; i++) {
-            render(gl, s.get(i));
-        }
+        ss.forEach( ConceptsSource::ready );
 
     }
 
-    public void clear(GL2 gl) {
+    /*public void clear(GL2 gl) {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-    }
+    }*/
 
-    public void render(GL2 gl, ConceptsSource s) {
+//    public void render(GL2 gl, ConceptsSource s) {
+//
+//        @Deprecated float dt = Math.max(0.001f /* non-zero */, s.dt());
+//
+//        List<VDraw> toDraw = s.visible;
+//
+//        s.busy.set(true);
+//
+//        update(toDraw, dt);
+//
+//        for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
+//
+//            render(gl, toDraw.get(i1));
+//
+//        }
+//
+//        s.busy.set(false);
+//    }
 
-        @Deprecated float dt = Math.max(0.001f /* non-zero */, s.dt());
-
-        List<VDraw> toDraw = s.visible;
-
-        s.busy.set(true);
-
-        update(toDraw, dt);
-
-        for (int i1 = 0, toDrawSize = toDraw.size(); i1 < toDrawSize; i1++) {
-
-            render(gl, dt, toDraw.get(i1));
-
-        }
-
-        s.busy.set(false);
-    }
-
-    public void render(GL2 gl, float dt, VDraw v) {
-
-        gl.glPushMatrix();
-
-        gl.glTranslatef(v.x(), v.y(), v.z());
-
-        v.render(gl, dt);
-
-        gl.glPopMatrix();
-
-
-    }
+//    public void render(GL2 gl, VDraw v) {
+//
+//        gl.glPushMatrix();
+//
+//        gl.glTranslatef(v.x(), v.y(), v.z());
+//
+//        v.render(gl);
+//
+//        gl.glPopMatrix();
+//
+//
+//    }
 
     public void renderEdges(GL2 gl, VDraw v) {
         int n = v.edgeCount();
@@ -356,39 +349,39 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
             render(gl, v, eee[en]);
     }
 
-    public void renderVertexBase(GL2 gl, float dt, VDraw v) {
-
-        gl.glPushMatrix();
-
-
-        //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
-        //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
-
-
-        float pri = v.pri;
-
-
-        float r = v.radius;
-        gl.glScalef(r, r, r);
-
-        final float activationPeriods = 4f;
-        gl.glColor4f(h(pri),
-                pri * Math.min(1f, 1f / (1f + (v.lag / (activationPeriods * dt)))),
-                h(v.budget.dur()),
-                v.budget.qua() * 0.25f + 0.25f);
-        gl.glCallList(box);
-        //glut.glutSolidTetrahedron();
-
-        gl.glPopMatrix();
-    }
+//    public void renderVertexBase(GL2 gl, float dt, VDraw v) {
+//
+//        gl.glPushMatrix();
+//
+//
+//        //gl.glRotatef(45.0f - (2.0f * yloop) + xrot, 1.0f, 0.0f, 0.0f);
+//        //gl.glRotatef(45.0f + yrot, 0.0f, 1.0f, 0.0f);
+//
+//
+//        float pri = v.pri;
+//
+//
+//        float r = v.radius;
+//        gl.glScalef(r, r, r);
+//
+//        final float activationPeriods = 4f;
+//        gl.glColor4f(h(pri),
+//                pri * Math.min(1f, 1f / (1f + (v.lag / (activationPeriods * dt)))),
+//                h(v.budget.dur()),
+//                v.budget.qua() * 0.25f + 0.25f);
+//        gl.glCallList(box);
+//        //glut.glutSolidTetrahedron();
+//
+//        gl.glPopMatrix();
+//    }
 
     public void renderLabel(GL2 gl, VDraw v) {
 
 
         //float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
+        gl.glColor4f(0.5f, 0.5f, 0.5f, v.pri);
 
-        float fontThick = 2f;
+        float fontThick = 1f;
         gl.glLineWidth(fontThick);
 
         float div = 0.01f;
@@ -458,26 +451,22 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
         gl.glEnd();
     }
 
-    public void update(List<VDraw> toDraw, float dt) {
+    public void update(ConceptsSource s) {
+
+        s.busy.set(true);
+
+        float dt = Math.max(0.001f /* non-zero */, s.dt());
+        List<VDraw> toDraw = s.visible;
+
+        toDraw.forEach(VDraw::update);
+
         List<GraphLayout> ll = this.layout;
+
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
             ll.get(i1).update(this, toDraw, dt);
         }
     }
 
-    public void updateCamera(GL2 gl) {
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-//        gl.glRotatef(0,1,0,0);
-//        gl.glRotatef(0,0,1,0);
-//        gl.glRotatef(0,0,0,1);
-//        gl.glScalef(1f,1f,1f);
-        gl.glTranslatef(0, 0, -90f);
-//        gl.glRotatef(r0,    1.0f, 0.0f, 0.0f);
-//        gl.glRotatef(-r0/1.5f, 0.0f, 1.0f, 0.0f);
-//        gl.glRotatef(r0 / 2f, 0.0f, 0.0f, 1.0f);
-//        r0 += 0.3f;
-    }
 
     public float h(float p) {
         return p * 0.9f + 0.1f;
@@ -685,6 +674,10 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
         public float dt() {
             return dt;
+        }
+
+        public void ready() {
+            busy.set(false);
         }
 
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {
