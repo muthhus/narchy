@@ -40,7 +40,7 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
-        final int maxNodes = 16;
+        final int maxNodes = 64;
 
         new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
         n.loop(35f);
@@ -53,7 +53,7 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, Atomatter> vdraw;
 
-    int maxEdgesPerVertex = 4;
+    int maxEdgesPerVertex = 5;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()

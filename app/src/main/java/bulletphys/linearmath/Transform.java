@@ -138,12 +138,13 @@ public class Transform {
 		origin.set(m[12], m[13], m[14]);
 	}
 
-	public void getOpenGLMatrix(float[] m) {
+	public float[] getOpenGLMatrix(float[] m) {
 		MatrixUtil.getOpenGLSubMatrix(basis, m);
 		m[12] = origin.x;
 		m[13] = origin.y;
 		m[14] = origin.z;
 		m[15] = 1f;
+		return m;
 	}
 
 	public Matrix4f getMatrix(Matrix4f out) {

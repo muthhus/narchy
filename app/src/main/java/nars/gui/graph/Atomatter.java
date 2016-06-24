@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
+import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static nars.gui.graph.GraphSpace.h;
 import static nars.gui.test.Lesson14.renderString;
 
@@ -260,9 +261,10 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 
     @Override public void accept(GL2 gl, RigidBody body) {
 
-        renderEdges(gl, this);
+        gl.glPushMatrix();
+        ShapeDrawer.translate(gl, body.transform());
 
-        renderLabel(gl, this);
+        renderEdges(gl, this);
 
         float p = h(pri)/2f;
         gl.glColor4f(p,
@@ -272,6 +274,10 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
                 1f);
 
         ShapeDrawer.draw(gl, body);
+
+        renderLabel(gl, this);
+
+        gl.glPopMatrix();
 
     }
 
@@ -291,19 +297,20 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         float fontThick = 1f;
         gl.glLineWidth(fontThick);
 
-        float div = 0.01f;
-        float r = v.radius;
-        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                div * r, //scale
-                0, 0, (r/1.9f)/div); // Print GL Text To The Screen
+        float div = 0.003f;
+        //float r = v.radius;
+        renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, v.label,
+                div, //scale
+                0, 0, (1/1.9f)/div); // Print GL Text To The Screen
 
     }
 
     static public void render(GL2 gl, Atomatter v, GraphSpace.EDraw e) {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
+
         float width = e.width;
-        if (width <= 1f) {
+        if (width <= 1.25f) {
             renderLineEdge(gl, v, e, width);
         } else {
             renderHalfTriEdge(gl, v, e, width);
@@ -317,6 +324,8 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         gl.glPushMatrix();
 
         {
+
+            //TODO 3d line w/ correct normal calculation (ex: cross product)
 
             float x1 = src.x();
             float x2 = tgt.x();
@@ -338,7 +347,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 
             //gl.glCallList(isoTri);
             gl.glBegin(GL2.GL_TRIANGLES);
-            gl.glNormal3f(0.0f, 0f, 1.0f);
+            //gl.glNormal3f(0.0f, 0f, 1.0f);
 
             gl.glVertex3f(0, +0.5f,  0f); //right base
             gl.glVertex3f(0, -0.5f, 0f); //left base

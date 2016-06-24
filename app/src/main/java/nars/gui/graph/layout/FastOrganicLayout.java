@@ -36,7 +36,7 @@ public class FastOrganicLayout implements GraphLayout {
      * average radius there is of free space around each node. Default is 50.
      */
 
-    public final MutableFloat forceConstant = new MutableFloat(10f);
+    public final MutableFloat forceConstant = new MutableFloat(4f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);

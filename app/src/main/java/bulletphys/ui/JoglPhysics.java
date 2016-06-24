@@ -1073,7 +1073,10 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
     public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {
 
+        gl.glPushMatrix();
+        ShapeDrawer.translate(gl, body.transform());
         ShapeDrawer.draw(gl, body);
+        gl.glPopMatrix();
 
 /*
 //                if (body != null && body.getMotionState() != null) {

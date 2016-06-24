@@ -95,20 +95,20 @@ public enum ShapeDrawer {
     private static final float[] glMat = new float[16];
     final static BulletStack stack = new BulletStack();
 
-    public static void draw(GL2 gl, RigidBody b) {
-        draw(gl, b.transform(), b.getCollisionShape());
+    public static void translate(GL2 gl, Transform trans) {
+        gl.glMultMatrixf(trans.getOpenGLMatrix(glMat), 0);
     }
-    /** not thread safe, must be called from open GL thread */
-    public static void draw(GL2 gl, Transform trans, CollisionShape shape) {
 
+    public static void draw(GL2 gl, RigidBody b) {
+        draw(gl, b.getCollisionShape());
+    }
 
-        stack.pushCommonMath();
+    public static void draw(GL2 gl, CollisionShape shape) {
+
 
         //System.out.println("shape="+shape+" type="+BroadphaseNativeTypes.forValue(shape.getShapeType()));
 
-        gl.glPushMatrix();
-        trans.getOpenGLMatrix(glMat);
-        gl.glMultMatrixf(glMat, 0);
+
         //		if (shape.getShapeType() == BroadphaseNativeTypes.UNIFORM_SCALING_SHAPE_PROXYTYPE.getValue())
         //		{
         //			const btUniformScalingShape* scalingShape = static_cast<const btUniformScalingShape*>(shape);
@@ -135,7 +135,12 @@ public enum ShapeDrawer {
                 );
                 CollisionShape colShape = compoundShape.getChildShape(i);
 
-                draw(gl, childTrans, colShape);
+
+                gl.glPushMatrix();
+                stack.pushCommonMath();
+                draw(gl, colShape);
+                stack.popCommonMath();
+                gl.glPopMatrix();
             }
         } else {
 
@@ -369,8 +374,7 @@ public enum ShapeDrawer {
         }
 
 
-        gl.glPopMatrix();
-        stack.popCommonMath();
+
 
     }
 
