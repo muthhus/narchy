@@ -31,10 +31,7 @@ import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.*;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.Point2PointConstraint;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
@@ -44,7 +41,9 @@ import com.bulletphysics.util.ObjectArrayList;
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.math.FloatUtil;
+import nars.gui.graph.GraphSpace;
 import nars.util.JoglSpace;
+import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3f;
@@ -60,7 +59,6 @@ import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 public class JoglPhysics extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
-
     private boolean simulating = true;
 
     /**
@@ -73,20 +71,19 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     protected final BulletStack stack = BulletStack.get();
 
 
-
     public RigidBody pickedBody = null; // for deactivation state
 
 
     protected final Clock clock = new Clock();
 
     // this is the most important class
-    protected DynamicsWorld dyn = null;
+    @NotNull
+    protected final DynamicsWorld dyn;
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
     protected RigidBody directDrag;
 
-    protected CollisionShape shootBoxShape = null;
 
     protected int debug = 0;
 
@@ -100,14 +97,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     float top, bottom, nearPlane, tanFov, fov, farPlane;
 
 
-
     protected final Vector3f camUp = v(0f, 1f, 0f);
     protected int forwardAxis = 2;
 
     protected int screenWidth = 0;
     protected int screenHeight = 0;
 
-    protected float ShootBoxInitialSpeed = 40f;
+
 
     protected boolean stepping = true;
     protected int lastKey;
@@ -139,6 +135,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         //#endif
 
         dyn = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
+
+        //dyn =new SimpleDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
+        dyn.setGravity(v(0,0,0));
 
     }
 
@@ -223,12 +222,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     public void display(GLAutoDrawable drawable) {
 
-        gl = drawable.getGL().getGL2();
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
 
-        if (simulating) {
+        if (simulating && dyn!=null) {
             // simple dynamics world doesn't handle fixed-time-stepping
             float ms = clock.getTimeMicroseconds();
             clock.reset();
@@ -236,20 +234,15 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             if (ms > minFPS) {
                 ms = minFPS;
             }
-            if (dyn != null) {
-                dyn.stepSimulation(ms / 1000000.f);
-            }
-        }
 
-        if (dyn != null) {
+            dyn.stepSimulation(ms / 1000000.f);
+
             // optional but useful: debug drawing
             dyn.debugDrawWorld();
+
+            renderWorld();
         }
 
-        renderWorld();
-
-        //glFlush();
-        //glutSwapBuffers();
     }
 
     public void displayChanged() {
@@ -352,7 +345,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float)screenWidth/screenHeight, 4, 2000);
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, 4, 2000);
 
 
         glu.gluLookAt(camPos.x, camPos.y, camPos.z,
@@ -371,11 +364,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     private final float[] matTmp = new float[16];
 
     void perspective(final int m_off, final boolean initM,
-                            final float fovy_rad, final float aspect, final float zNear, final float zFar) throws GLException {
-        this.top =  (float)Math.tan(fovy_rad/2f) * zNear; // use tangent of half-fov !
-        this.bottom =  -1.0f * top;    //          -1f * fovhvTan.top * zNear
-        final float left   = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
-        final float right  = aspect * top;    // aspect * fovhvTan.top * zNear
+                     final float fovy_rad, final float aspect, final float zNear, final float zFar) throws GLException {
+        this.top = (float) Math.tan(fovy_rad / 2f) * zNear; // use tangent of half-fov !
+        this.bottom = -1.0f * top;    //          -1f * fovhvTan.top * zNear
+        final float left = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
+        final float right = aspect * top;    // aspect * fovhvTan.top * zNear
         nearPlane = zNear;
         farPlane = zFar;
         tanFov = (top - bottom) * 0.5f / zNear;
@@ -557,19 +550,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 break;
             }
 
-            case '.': {
-                shootBox(getCamPosTarget());
-                break;
-            }
-
-            case '+': {
-                ShootBoxInitialSpeed += 10f;
-                break;
-            }
-            case '-': {
-                ShootBoxInitialSpeed -= 10f;
-                break;
-            }
 
             default:
                 // std::cout << "unused key : " << key << std::endl;
@@ -643,39 +623,39 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         }
     }
 
-    public void shootBox(Vector3f destination) {
-        if (dyn != null) {
-            float mass = 10f;
-            Transform startTransform = new Transform();
-            startTransform.setIdentity();
-            Vector3f camPos = v(getCamPos());
-            startTransform.origin.set(camPos);
-
-            if (shootBoxShape == null) {
-                //#define TEST_UNIFORM_SCALING_SHAPE 1
-                //#ifdef TEST_UNIFORM_SCALING_SHAPE
-                //btConvexShape* childShape = new btBoxShape(btVector3(1.f,1.f,1.f));
-                //m_shootBoxShape = new btUniformScalingShape(childShape,0.5f);
-                //#else
-                shootBoxShape = new BoxShape(v(1f, 1f, 1f));
-                //#endif//
-            }
-
-            RigidBody body = this.newBody(mass, startTransform, shootBoxShape);
-
-            Vector3f linVel = v(destination.x - camPos.x, destination.y - camPos.y, destination.z - camPos.z);
-            linVel.normalize();
-            linVel.scale(ShootBoxInitialSpeed);
-
-            Transform ct = new Transform();
-            ct.origin.set(camPos);
-            ct.setRotation(new Quat4f(0f, 0f, 0f, 1f));
-            body.setWorldTransform(ct);
-
-            body.setLinearVelocity(linVel);
-            body.setAngularVelocity(v(0f, 0f, 0f));
-        }
-    }
+//    public void shootBox(Vector3f destination) {
+//        if (dyn != null) {
+//            float mass = 10f;
+//            Transform startTransform = new Transform();
+//            startTransform.setIdentity();
+//            Vector3f camPos = v(getCamPos());
+//            startTransform.origin.set(camPos);
+//
+//            if (shootBoxShape == null) {
+//                //#define TEST_UNIFORM_SCALING_SHAPE 1
+//                //#ifdef TEST_UNIFORM_SCALING_SHAPE
+//                //btConvexShape* childShape = new btBoxShape(btVector3(1.f,1.f,1.f));
+//                //m_shootBoxShape = new btUniformScalingShape(childShape,0.5f);
+//                //#else
+//                shootBoxShape = new BoxShape(v(1f, 1f, 1f));
+//                //#endif//
+//            }
+//
+//            RigidBody body = this.newBody(mass, startTransform, shootBoxShape);
+//
+//            Vector3f linVel = v(destination.x - camPos.x, destination.y - camPos.y, destination.z - camPos.z);
+//            linVel.normalize();
+//            linVel.scale(ShootBoxInitialSpeed);
+//
+//            Transform ct = new Transform();
+//            ct.origin.set(camPos);
+//            ct.setRotation(new Quat4f(0f, 0f, 0f, 1f));
+//            body.setWorldTransform(ct);
+//
+//            body.setLinearVelocity(linVel);
+//            body.setAngularVelocity(v(0f, 0f, 0f));
+//        }
+//    }
 
     public Vector3f getRayTo(int x, int y) {
 
@@ -728,7 +708,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
     private void mouseClick(int button, int x, int y) {
-        Vector3f rayTo = v(getRayTo(x, y));
+
 
         switch (button) {
 //            case MouseEvent.BUTTON3: {
@@ -737,24 +717,25 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //            }
             case MouseEvent.BUTTON2: {
                 // apply an impulse
-                if (dyn != null) {
-                    CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-                    dyn.rayTest(camPos, rayTo, rayCallback);
-                    if (rayCallback.hasHit()) {
-                        RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
-                        if (body != null) {
-                            body.setActivationState(CollisionObject.ACTIVE_TAG);
-                            Vector3f impulse = v(rayTo);
-                            impulse.normalize();
-                            float impulseStrength = 10f;
-                            impulse.scale(impulseStrength);
-                            Vector3f relPos = v();
 
-                            relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
-                            body.applyImpulse(impulse, relPos);
-                        }
+                Vector3f rayTo = v(getRayTo(x, y));
+                CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+                dyn.rayTest(camPos, rayTo, rayCallback);
+                if (rayCallback.hasHit()) {
+                    RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+                    if (body != null) {
+                        body.setActivationState(CollisionObject.ACTIVE_TAG);
+                        Vector3f impulse = v(rayTo);
+                        impulse.normalize();
+                        float impulseStrength = 10f;
+                        impulse.scale(impulseStrength);
+                        Vector3f relPos = v();
+
+                        relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
+                        body.applyImpulse(impulse, relPos);
                     }
                 }
+
                 break;
             }
         }
@@ -773,10 +754,10 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 break;
             }
             case MouseEvent.BUTTON2: {
-
+                break;
             }
             case MouseEvent.BUTTON3: {
-
+                break;
             }
         }
     }
@@ -784,13 +765,22 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     private void mouseGrabOff() {
         if (pickConstraint != null) {
             dyn.removeConstraint(pickConstraint);
-            // delete m_pickConstraint;
             pickConstraint = null;
+
             pickedBody.forceActivationState(CollisionObject.ACTIVE_TAG);
             pickedBody.setDeactivationTime(0f);
             pickedBody = null;
         }
-        if (directDrag!=null) {
+
+        if (directDrag != null) {
+            Object u = directDrag.getUserPointer();
+
+            System.out.println("UNDRAG: " + directDrag);
+
+            if (u instanceof GraphSpace.VDraw) {
+                ((GraphSpace.VDraw)u).motionLock(false);
+            }
+
             directDrag = null;
         }
     }
@@ -801,47 +791,55 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     private void mouseGrabOn(Vector3f rayTo) {
         // add a point to point constraint for picking
         //if (dyn != null) {
-            CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-            dyn.rayTest(camPos, rayTo, rayCallback);
-            if (rayCallback.hasHit()) {
-                RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
-                if (body != null) {
+        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
 
-                    // other exclusions?
-                    if (!(body.isStaticObject() || body.isKinematicObject())) {
-                        pickedBody = body;
-                        pickedBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+        dyn.rayTest(camPos, rayTo, rayCallback);
 
-                        Vector3f pickPos = v(rayCallback.hitPointWorld);
 
-                        Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
-                        tmpTrans.inverse();
-                        Vector3f localPivot = v(pickPos);
-                        tmpTrans.transform(localPivot);
+        if (rayCallback.hasHit()) {
+            RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+            if (body != null) {
 
-                        Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                        dyn.addConstraint(p2p);
-                        pickConstraint = p2p;
-                        // save mouse position for dragging
-                        gOldPickingPos.set(rayTo);
-                        Vector3f eyePos = v(camPos);
-                        Vector3f tmp = v();
-                        tmp.sub(pickPos, eyePos);
-                        gOldPickingDist = tmp.length();
-                        // very weak constraint for picking
-                        p2p.setting.tau = 0.1f;
-                    } else if (directDrag==null) {
-                        directDrag = pickedBody;
+                body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+                Vector3f pickPos = v(rayCallback.hitPointWorld);
+
+                Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
+                tmpTrans.inverse();
+                Vector3f localPivot = v(pickPos);
+                tmpTrans.transform(localPivot);
+                // save mouse position for dragging
+                gOldPickingPos.set(rayTo);
+                Vector3f eyePos = v(camPos);
+                Vector3f tmp = v();
+                tmp.sub(pickPos, eyePos);
+                gOldPickingDist = tmp.length();
+
+
+                // other exclusions?
+                if (!(body.isStaticObject() || body.isKinematicObject())) {
+                    pickedBody = body;
+
+
+                    Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
+                    dyn.addConstraint(p2p);
+                    pickConstraint = p2p;
+
+                    // very weak constraint for picking
+                    p2p.setting.tau = 0.1f;
+                } else {
+                    if (directDrag == null) {
+                        directDrag = body;
+
                     }
-
                 }
+
             }
+        }
         //}
     }
 
     private void mouseMotionFunc(int x, int y) {
-        if ((pickConstraint != null) || (directDrag!=null)) {
-
+        if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
             Vector3f newRayTo = v(getRayTo(x, y));
@@ -854,10 +852,23 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             Vector3f newPos = v();
             newPos.add(eyePos, dir);
 
-            if (directDrag!=null) {
+            if (directDrag != null) {
                 //directly move the 'static' object
-                //directDrag.move()
-            } else if (pickConstraint!=null) {
+
+                Object u = directDrag.getUserPointer();
+
+                System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
+
+                if (u instanceof GraphSpace.VDraw) {
+                    ((GraphSpace.VDraw)u).motionLock(true);
+                }
+
+                MotionState mm = directDrag.getMotionState();
+                if (mm instanceof Motion) {
+                    ((Motion) mm).center(newPos);
+                }
+
+            } else if (pickConstraint != null) {
                 // move the constraint pivot
                 Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
                 p2p.setPivotB(newPos);
@@ -888,8 +899,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
 
         public static boolean gDisableDeactivation = false;
-
-
 
 
 //        static {
@@ -955,7 +964,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //    }
 
 
-
     private final Transform m = new Transform();
 
     private final GLShapeDrawer drawer = new GLShapeDrawer(glu);
@@ -976,13 +984,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
                 if (/*body != null && */body.getMotionState() != null) {
                     Motion myMotionState = (Motion) body.getMotionState();
-                    m.set(myMotionState.graphicsWorldTrans);
+                    m.set(myMotionState.t);
                 } else {
                     colObj.getWorldTransform(m);
                 }
 
 
-                gl.glColor4f(0.5f,0.5f,0.5f, 1f);
+                gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
                 drawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), debug);
 
             }
@@ -1082,7 +1090,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 // JAU gl.glColor4f(0f, 0f, 0f, 0f);
 
 /*
-			if ((debugMode & DebugDrawModes.NO_HELP_TEXT) == 0) {
+            if ((debugMode & DebugDrawModes.NO_HELP_TEXT) == 0) {
 				setOrthographicProjection();
 
 				// TODO: showProfileInfo(xOffset,yStart,yIncr);

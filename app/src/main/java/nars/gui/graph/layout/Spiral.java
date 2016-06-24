@@ -36,11 +36,11 @@ public class Spiral implements GraphLayout {
         v.move(
                 (float) Math.sin(theta / 10f) * (baseRad + 0.2f * (theta)),
                 (float) Math.cos(theta / 10f) * (baseRad + 0.2f * (theta)),
-                0,
+                0);
                 //1f/(1f+v.lag) * (baseRad/2f);
                 //v.budget.qua() * (baseRad + rad)
                 //v.tp[2] = act*10f;
-                nodeSpeed);
+                //nodeSpeed);
 
     }
 

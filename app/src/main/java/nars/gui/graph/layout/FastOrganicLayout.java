@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class FastOrganicLayout implements GraphLayout {
 
-    @Range(min = 0, max = 1f)
-    public final MutableFloat nodeSpeed = new MutableFloat(0.03);
+//    @Range(min = 0, max = 1f)
+//    public final MutableFloat nodeSpeed = new MutableFloat(0.02);
 
     /**
      * Specifies if the top left corner of the input cells should be the origin
@@ -38,7 +38,7 @@ public class FastOrganicLayout implements GraphLayout {
      */
 
     //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(8f);
+    public final MutableFloat forceConstant = new MutableFloat(16f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -115,9 +115,9 @@ public class FastOrganicLayout implements GraphLayout {
 
         this.movementThreshold = 0.01f;
 
-        setInitialTemp(7f);
-        setMinDistanceLimit(5f);
-        setMaxDistanceLimit(250f);
+        setInitialTemp(0.1f);
+        setMinDistanceLimit(2f);
+        setMaxDistanceLimit(100f);
 
     }
 
@@ -339,7 +339,7 @@ public class FastOrganicLayout implements GraphLayout {
 
         float minx = 0, miny = 0, maxx = 0, maxy = 0;
 
-        float speed = nodeSpeed.floatValue();
+        //float speed = nodeSpeed.floatValue();
 
         float[] radius = this.radius;
 
@@ -357,7 +357,7 @@ public class FastOrganicLayout implements GraphLayout {
             float y = /*graph.snap*/(ci[1] - r);
 
 
-            vd.move((float) x, (float) y, 0, speed);
+            vd.move((float) x, (float) y, 0);
 
             if (i == 0) {
                 minx = maxx = x;
@@ -416,17 +416,16 @@ public class FastOrganicLayout implements GraphLayout {
 
             float deltaLengthSq = (xind * xind + yind * yind);
 
-            // Scale down by the current temperature if less than the
-            // displacement distance
+            // Normalize and scale the displacement vector if larger than max speed (temperature)
             float dtemp;
-            if (deltaLengthSq < movementThresholdSq) {
+            if (deltaLengthSq < tempSq) {
                 dtemp = 1;
             } else {
-                if (deltaLengthSq < tempSq) {
-                    dtemp = temperature;
-                } else {
+                //if (deltaLengthSq < tempSq) {
+                    //dtemp = temperature;
+                //} else {
                     dtemp = temperature / (float)Math.sqrt(deltaLengthSq);
-                }
+                //}
             }
 
             // Update the cached cell locations

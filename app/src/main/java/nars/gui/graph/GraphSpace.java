@@ -1,5 +1,6 @@
 package nars.gui.graph;
 
+import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Lists;
@@ -7,6 +8,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
+import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
@@ -15,6 +17,7 @@ import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
 import nars.bullet.JoglPhysics;
 import nars.bullet.Motion;
+import nars.gui.graph.layout.Spiral;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -23,6 +26,7 @@ import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.experiment.DeductiveMeshTest;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.geometry.partitioning.Transform;
 import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,10 +51,10 @@ public class GraphSpace extends JoglPhysics {
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
-        final int maxNodes = 128;
+        final int maxNodes = 16;
 
         new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
-        n.loop(75f);
+        n.loop(5f);
 
     }
 
@@ -190,7 +194,7 @@ public class GraphSpace extends JoglPhysics {
         /** scale: x, y, z -- should not modify directly, use scale(x,y,z) method to change */
         //@NotNull public final float[] s = new float[3];
 
-        private final RigidBodyX body;
+        private RigidBodyX body;
         private final CollisionShape shape;
 
         transient private final Vector3f center; //references a field in MotionState's transform
@@ -216,6 +220,7 @@ public class GraphSpace extends JoglPhysics {
         transient public float radius;
 
         public final Motion motion = new Motion();
+        public boolean motionLock;
 
         public VDraw(nars.term.Termed k, int edges) {
             this.key = k;
@@ -232,14 +237,9 @@ public class GraphSpace extends JoglPhysics {
             for (int i = 0; i < edges; i++)
                 this.edges[i] = new EDraw();
 
-
             //init physics
-
-
             shape = new BoxShape(v(1,1,1));
-            center = motion.graphicsWorldTrans.origin;
-
-            body = newBody(0f, shape, motion);
+            center = motion.t.origin;
 
             inactivate();
         }
@@ -322,16 +322,28 @@ public class GraphSpace extends JoglPhysics {
         public void activate(short order, BLink budget) {
             this.order = order;
             this.budget = budget;
-            body.setUserPointer(this);
         }
 
         public void inactivate() {
             order = -1;
-            body.setUserPointer(null); //remove reference to this so it may be collected
         }
 
         public void move(float x, float y, float z) {
-            motion.graphicsWorldTrans.origin.set(x, y, z);
+            if (!motionLock) {
+                //motion.t.origin.set(x, y, z);
+
+                if (body!=null) {
+                    //body.transform().origin.set(x,y,z);
+
+                    com.bulletphysics.linearmath.Transform t = new com.bulletphysics.linearmath.Transform();
+                    body.getCenterOfMassTransform(t);
+                    t.origin.set(x, y, z);
+                    body.setCenterOfMassTransform(t);
+
+                    if (!body.isActive())
+                        body.activate(true);
+                }
+            }
 
 //            float[] p = this.p;
 //            p[0] = x;
@@ -339,13 +351,13 @@ public class GraphSpace extends JoglPhysics {
 //            p[2] = z;
         }
 
-        public void move(float tx, float ty, float tz, float rate) {
-
-            move(
-              Util.lerp(tx, x(), rate),
-              Util.lerp(ty, y(), rate),
-              Util.lerp(tz, z(), rate));
-        }
+//        public void move(float tx, float ty, float tz, float rate) {
+//
+//            move(
+//              Util.lerp(tx, x(), rate),
+//              Util.lerp(ty, y(), rate),
+//              Util.lerp(tz, z(), rate));
+//        }
 
         public int edgeCount() {
             return numEdges;
@@ -369,6 +381,24 @@ public class GraphSpace extends JoglPhysics {
             this.radius = Math.max(Math.max(sx, sy), sz);
         }
 
+        public void motionLock(boolean b) {
+            motionLock = b;
+        }
+
+        public void render(GL2 gl, float dt) {
+            //renderVertexBase(gl, dt, v);
+
+            if (body == null) {
+                body = newBody(1f, shape, motion);
+                body.setDamping(0.1f, 0.1f);
+                body.setUserPointer(this);
+            }
+
+            renderEdges(gl, this);
+
+            renderLabel(gl, this);
+
+        }
     }
 
     public void init(GL2 gl) {
@@ -484,9 +514,24 @@ public class GraphSpace extends JoglPhysics {
     }
 
 
-    float r0 = 0f;
 
     public synchronized void display(GLAutoDrawable drawable) {
+
+        List<CollisionObject> undyn = Global.newArrayList();
+        dyn.getCollisionObjectArray().stream().forEach(c -> {
+            Object cp = c.getUserPointer();
+            if (cp instanceof VDraw) {
+                VDraw vd = (VDraw) cp;
+                if (!vd.active()) {
+                    undyn.add(c);
+                    c.setUserPointer(null); //remove reference so vd can be GC
+                    vd.body = null;
+                }
+            }
+        });
+        undyn.forEach(dyn::removeCollisionObject);
+        undyn.clear();
+
         super.display(drawable);
         //GL2 gl = (GL2) drawable.getGL();
 
@@ -528,14 +573,9 @@ public class GraphSpace extends JoglPhysics {
 
         gl.glPushMatrix();
 
-
         gl.glTranslatef(v.x(), v.y(), v.z());
 
-        //renderVertexBase(gl, dt, v);
-
-        renderEdges(gl, v);
-
-        renderLabel(gl, v);
+        v.render(gl, dt);
 
         gl.glPopMatrix();
 
@@ -846,7 +886,6 @@ public class GraphSpace extends JoglPhysics {
             //_maxPri = this.maxPri.floatValue();
 
             //final int maxNodes = this.maxNodes;
-
 
             visible.forEach(VDraw::inactivate);
 
