@@ -51,10 +51,10 @@ public class GraphSpace extends JoglPhysics {
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
-        final int maxNodes = 16;
+        final int maxNodes = 64;
 
         new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
-        n.loop(5f);
+        n.loop(15f);
 
     }
 
@@ -117,9 +117,9 @@ public class GraphSpace extends JoglPhysics {
         Budget b = v.budget;
         float p = v.pri = b.priIfFiniteElseZero();
 
-        float nodeScale = 0.1f + 2f * p;
+        float nodeScale = 1f + 2f * p;
         nodeScale /= Math.sqrt(tt.volume());
-        v.scale(nodeScale, nodeScale, nodeScale/2f);
+        v.scale(nodeScale, nodeScale, nodeScale/3f);
 
         if (tt instanceof Concept) {
             updateConcept(v, (Concept) tt, now);
@@ -330,18 +330,19 @@ public class GraphSpace extends JoglPhysics {
 
         public void move(float x, float y, float z) {
             if (!motionLock) {
-                //motion.t.origin.set(x, y, z);
 
                 if (body!=null) {
-                    //body.transform().origin.set(x,y,z);
+                    body.transform().origin.set(x,y,z);
 
-                    com.bulletphysics.linearmath.Transform t = new com.bulletphysics.linearmath.Transform();
-                    body.getCenterOfMassTransform(t);
-                    t.origin.set(x, y, z);
-                    body.setCenterOfMassTransform(t);
+//                    com.bulletphysics.linearmath.Transform t = new com.bulletphysics.linearmath.Transform();
+//                    body.getCenterOfMassTransform(t);
+//                    t.origin.set(x, y, z);
+//                    body.setCenterOfMassTransform(t);
 
                     if (!body.isActive())
                         body.activate(true);
+                } else {
+                    motion.t.origin.set(x, y, z);
                 }
             }
 
@@ -389,8 +390,17 @@ public class GraphSpace extends JoglPhysics {
             //renderVertexBase(gl, dt, v);
 
             if (body == null) {
-                body = newBody(1f, shape, motion);
-                body.setDamping(0.1f, 0.1f);
+                body = newBody(
+                        1f, //mass
+                        shape, motion,
+                        +1, //group
+                        -1 & ~(+1) //exclude collisions with self
+                );
+
+                body.setLinearVelocity(v());
+                body.setDamping(0.99f, 0.01f);
+                body.setFriction(0.9f);
+
                 body.setUserPointer(this);
             }
 

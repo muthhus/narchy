@@ -38,7 +38,7 @@ public class FastOrganicLayout implements GraphLayout {
      */
 
     //@Range(min = 1, max = 5f)
-    public final MutableFloat forceConstant = new MutableFloat(16f);
+    public final MutableFloat forceConstant = new MutableFloat(4f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);

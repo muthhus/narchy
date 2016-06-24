@@ -29,7 +29,6 @@ import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.*;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
@@ -60,6 +59,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
 
     private boolean simulating = true;
+
 
     /**
      * activate/deactivate the simulation; by default it is enabled
@@ -92,9 +92,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     protected final Vector3f camPos = v(0f, 0f, 0f);
     protected final Vector3f camPosTarget = v(0f, 0f, 0f); // look at
-    protected float cameraDistance = 15f;
+    protected float cameraDistance = 55f;
 
-    float top, bottom, nearPlane, tanFov, fov, farPlane;
+    float top, bottom, nearPlane, tanFovV, tanFovH, fov, farPlane, left, right;
 
 
     protected final Vector3f camUp = v(0f, 1f, 0f);
@@ -367,12 +367,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                      final float fovy_rad, final float aspect, final float zNear, final float zFar) throws GLException {
         this.top = (float) Math.tan(fovy_rad / 2f) * zNear; // use tangent of half-fov !
         this.bottom = -1.0f * top;    //          -1f * fovhvTan.top * zNear
-        final float left = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
-        final float right = aspect * top;    // aspect * fovhvTan.top * zNear
+        left = aspect * bottom; // aspect * -1f * fovhvTan.top * zNear
+        right = aspect * top;    // aspect * fovhvTan.top * zNear
         nearPlane = zNear;
         farPlane = zFar;
-        tanFov = (top - bottom) * 0.5f / zNear;
-        fov = 2f * (float) Math.atan(tanFov);
+        tanFovV = (top - bottom) * 0.5f / zNear;
+        tanFovH = (right - left) * 0.5f / zNear;
+        fov = 2f * (float) Math.atan(tanFovV);
         gl.glMultMatrixf(
                 makeFrustum(matTmp, m_off, initM, left, right, bottom, top, zNear, zFar),
                 0
@@ -657,7 +658,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //        }
 //    }
 
-    public Vector3f getRayTo(int x, int y) {
+    public Vector3f rayTo(int x, int y) {
 
 
         Vector3f rayFrom = v(getCamPos());
@@ -677,12 +678,15 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         vertical.cross(hor, rayForward);
         vertical.normalize();
 
-        hor.scale(2f * farPlane * tanFov);
-        vertical.scale(2f * farPlane * tanFov);
+        hor.scale(2f * farPlane * tanFovH);
+        vertical.scale(2f * farPlane * tanFovV);
+
         Vector3f rayToCenter = v();
         rayToCenter.add(rayFrom, rayForward);
+
         Vector3f dHor = v(hor);
         dHor.scale(1f / (float) screenWidth);
+
         Vector3f dVert = v(vertical);
         dVert.scale(1.f / (float) screenHeight);
 
@@ -718,8 +722,9 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             case MouseEvent.BUTTON2: {
                 // apply an impulse
 
-                Vector3f rayTo = v(getRayTo(x, y));
+                Vector3f rayTo = v(rayTo(x, y));
                 CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+
                 dyn.rayTest(camPos, rayTo, rayCallback);
                 if (rayCallback.hasHit()) {
                     RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
@@ -745,7 +750,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
         switch (button) {
             case MouseEvent.BUTTON1: {
-                Vector3f rayTo = v(getRayTo(x, y));
+                Vector3f rayTo = v(rayTo(x, y));
                 if (state == 1) {
                     mouseGrabOn(rayTo);
                 } else {
@@ -792,6 +797,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         // add a point to point constraint for picking
         //if (dyn != null) {
         CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+
+        rayCallback.collisionFilterGroup = (1 << 7);
 
         dyn.rayTest(camPos, rayTo, rayCallback);
 
@@ -842,7 +849,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
-            Vector3f newRayTo = v(getRayTo(x, y));
+            Vector3f newRayTo = v(rayTo(x, y));
             Vector3f eyePos = v(camPos);
             Vector3f dir = v();
             dir.sub(newRayTo, eyePos);
@@ -876,7 +883,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         }
     }
 
-    private static Vector3f v() {
+    public static Vector3f v() {
         return new Vector3f();
     }
 
@@ -921,10 +928,16 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     public RigidBodyX newBody(float mass, Transform startTransform, CollisionShape shape) {
         Motion myMotionState = new Motion(startTransform);
-        return newBody(mass, shape, myMotionState);
+
+        boolean isDynamic = (mass != 0f);
+        int collisionFilterGroup = isDynamic?1:2;
+        int collisionFilterMask = isDynamic?-1:-3;
+
+        return newBody(mass, shape, myMotionState, collisionFilterGroup, collisionFilterMask);
     }
 
-    public RigidBodyX newBody(float mass, CollisionShape shape, MotionState motion) {
+
+    public RigidBodyX newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
         Vector3f localInertia = v(0, 0, 0);
@@ -932,10 +945,11 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             shape.calculateLocalInertia(mass, localInertia);
         }
 
-        RigidBodyX body = new RigidBodyX(
-                new RigidBodyConstructionInfo(mass, motion, shape, localInertia));
+        RigidBodyConstructionInfo c = new RigidBodyConstructionInfo(mass, motion, shape, localInertia);
 
-        dyn.addRigidBody(body);
+        RigidBodyX body = new RigidBodyX( c );
+
+        ((DiscreteDynamicsWorld)dyn).addRigidBody(body, (short)group, (short)mask);
 
         return body;
     }
