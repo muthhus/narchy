@@ -26,27 +26,25 @@ package bulletphys.ui;
 
 import bulletphys.collision.broadphase.BroadphaseNativeType;
 import bulletphys.collision.shapes.*;
-import bulletphys.linearmath.DebugDrawModes;
+import bulletphys.dynamics.RigidBody;
 import bulletphys.linearmath.Transform;
 import bulletphys.linearmath.VectorUtil;
 import bulletphys.util.BulletStack;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.ImmModeSink;
+import nars.util.JoglSpace;
 
 import javax.vecmath.Vector3f;
 
 /**
  * @author jezek2
  */
-public class GLShapeDrawer {
+public enum ShapeDrawer {
+    ;
 
-    public final GLSRT glsrt;
+    public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
-    public GLShapeDrawer(GLU glu) {
-        glsrt = new GLSRT(glu);
-    }
 
 	/*
     private static Map<CollisionShape,TriMeshKey> g_display_lists = new HashMap<CollisionShape,TriMeshKey>();
@@ -94,10 +92,14 @@ public class GLShapeDrawer {
         vbo.glEnd(gl);
     }
 
-    private final float[] glMat = new float[16];
-    final BulletStack stack = new BulletStack();
+    private static final float[] glMat = new float[16];
+    final static BulletStack stack = new BulletStack();
 
-    public void drawOpenGL(GLSRT glsrt, GL2 gl, Transform trans, CollisionShape shape, int debugMode) {
+    public static void draw(GL2 gl, RigidBody b) {
+        draw(gl, b.transform(), b.getCollisionShape());
+    }
+    /** not thread safe, must be called from open GL thread */
+    public static void draw(GL2 gl, Transform trans, CollisionShape shape) {
 
 
         stack.pushCommonMath();
@@ -133,13 +135,14 @@ public class GLShapeDrawer {
                 );
                 CollisionShape colShape = compoundShape.getChildShape(i);
 
-                drawOpenGL(glsrt, gl, childTrans, colShape, debugMode);
+                draw(gl, childTrans, colShape);
             }
         } else {
 
             boolean useWireframeFallback = true;
 
-            if ((debugMode & DebugDrawModes.DRAW_WIREFRAME) == 0) {
+            //if ((debugMode & DebugDrawModes.DRAW_WIREFRAME) == 0) {
+            {
                 switch (shape.getShapeType()) {
                     case BOX_SHAPE_PROXYTYPE: {
                         BoxShape boxShape = (BoxShape) shape;
@@ -244,93 +247,93 @@ public class GLShapeDrawer {
 
                 }
 
-            }
 
-            if (useWireframeFallback) {
-                // for polyhedral shapes
-                if (shape.isPolyhedral()) {
-                    PolyhedralConvexShape polyshape = (PolyhedralConvexShape) shape;
+                if (useWireframeFallback) {
+                    // for polyhedral shapes
+                    if (shape.isPolyhedral()) {
+                        PolyhedralConvexShape polyshape = (PolyhedralConvexShape) shape;
 
-                    ImmModeSink vbo = ImmModeSink.createFixed(polyshape.getNumEdges() + 3,
-                            3, GL.GL_FLOAT,  // vertex
-                            0, GL.GL_FLOAT,  // color
-                            0, GL.GL_FLOAT,  // normal
-                            0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
+                        ImmModeSink vbo = ImmModeSink.createFixed(polyshape.getNumEdges() + 3,
+                                3, GL.GL_FLOAT,  // vertex
+                                0, GL.GL_FLOAT,  // color
+                                0, GL.GL_FLOAT,  // normal
+                                0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
 
-                    vbo.glBegin(gl.GL_LINES);
+                        vbo.glBegin(gl.GL_LINES);
 
-                    Vector3f a = stack.vectors.get(), b = stack.vectors.get();
-                    int i;
-                    for (i = 0; i < polyshape.getNumEdges(); i++) {
-                        polyshape.getEdge(i, a, b);
+                        Vector3f a = stack.vectors.get(), b = stack.vectors.get();
+                        int i;
+                        for (i = 0; i < polyshape.getNumEdges(); i++) {
+                            polyshape.getEdge(i, a, b);
 
-                        vbo.glVertex3f(a.x, a.y, a.z);
-                        vbo.glVertex3f(b.x, b.y, b.z);
+                            vbo.glVertex3f(a.x, a.y, a.z);
+                            vbo.glVertex3f(b.x, b.y, b.z);
+                        }
+                        vbo.glEnd(gl);
+
+                        //					if (debugMode==btIDebugDraw::DBG_DrawFeaturesText)
+                        //					{
+                        //						glRasterPos3f(0.0,  0.0,  0.0);
+                        //						//BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),polyshape->getExtraDebugInfo());
+                        //
+                        //						glColor3f(1.f, 1.f, 1.f);
+                        //						for (i=0;i<polyshape->getNumVertices();i++)
+                        //						{
+                        //							btPoint3 vtx;
+                        //							polyshape->getVertex(i,vtx);
+                        //							glRasterPos3f(vtx.x(),  vtx.y(),  vtx.z());
+                        //							char buf[12];
+                        //							sprintf(buf," %d",i);
+                        //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
+                        //						}
+                        //
+                        //						for (i=0;i<polyshape->getNumPlanes();i++)
+                        //						{
+                        //							btVector3 normal;
+                        //							btPoint3 vtx;
+                        //							polyshape->getPlane(normal,vtx,i);
+                        //							btScalar d = vtx.dot(normal);
+                        //
+                        //							glRasterPos3f(normal.x()*d,  normal.y()*d, normal.z()*d);
+                        //							char buf[12];
+                        //							sprintf(buf," plane %d",i);
+                        //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
+                        //
+                        //						}
+                        //					}
+
+
                     }
-                    vbo.glEnd(gl);
-
-                    //					if (debugMode==btIDebugDraw::DBG_DrawFeaturesText)
-                    //					{
-                    //						glRasterPos3f(0.0,  0.0,  0.0);
-                    //						//BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),polyshape->getExtraDebugInfo());
-                    //
-                    //						glColor3f(1.f, 1.f, 1.f);
-                    //						for (i=0;i<polyshape->getNumVertices();i++)
-                    //						{
-                    //							btPoint3 vtx;
-                    //							polyshape->getVertex(i,vtx);
-                    //							glRasterPos3f(vtx.x(),  vtx.y(),  vtx.z());
-                    //							char buf[12];
-                    //							sprintf(buf," %d",i);
-                    //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-                    //						}
-                    //
-                    //						for (i=0;i<polyshape->getNumPlanes();i++)
-                    //						{
-                    //							btVector3 normal;
-                    //							btPoint3 vtx;
-                    //							polyshape->getPlane(normal,vtx,i);
-                    //							btScalar d = vtx.dot(normal);
-                    //
-                    //							glRasterPos3f(normal.x()*d,  normal.y()*d, normal.z()*d);
-                    //							char buf[12];
-                    //							sprintf(buf," plane %d",i);
-                    //							BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-                    //
-                    //						}
-                    //					}
-
-
                 }
-            }
 
-            //		#ifdef USE_DISPLAY_LISTS
-            //
-            //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
-            //			{
-            //				GLuint dlist =   OGL_get_displaylist_for_shape((btCollisionShape * )shape);
-            //				if (dlist)
-            //				{
-            //					glCallList(dlist);
-            //				}
-            //				else
-            //				{
-            //		#else
-            if (shape.isConcave())//>getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
-            //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
-            {
-                ConcaveShape concaveMesh = (ConcaveShape) shape;
-                //btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
-                //btVector3 aabbMax(100,100,100);//btScalar(1e30),btScalar(1e30),btScalar(1e30));
+                //		#ifdef USE_DISPLAY_LISTS
+                //
+                //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
+                //			{
+                //				GLuint dlist =   OGL_get_displaylist_for_shape((btCollisionShape * )shape);
+                //				if (dlist)
+                //				{
+                //					glCallList(dlist);
+                //				}
+                //				else
+                //				{
+                //		#else
+                if (shape.isConcave())//>getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE||shape->getShapeType() == GIMPACT_SHAPE_PROXYTYPE)
+                //		if (shape->getShapeType() == TRIANGLE_MESH_SHAPE_PROXYTYPE)
+                {
+                    ConcaveShape concaveMesh = (ConcaveShape) shape;
+                    //btVector3 aabbMax(btScalar(1e30),btScalar(1e30),btScalar(1e30));
+                    //btVector3 aabbMax(100,100,100);//btScalar(1e30),btScalar(1e30),btScalar(1e30));
 
-                //todo pass camera, for some culling
-                Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
-                Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
+                    //todo pass camera, for some culling
+                    Vector3f aabbMax = stack.vectors.get(1e30f, 1e30f, 1e30f);
+                    Vector3f aabbMin = stack.vectors.get(-1e30f, -1e30f, -1e30f);
 
-                GlDrawcallback drawCallback = new GlDrawcallback(gl);
-                drawCallback.wireframe = (debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0;
+                    GlDrawcallback drawCallback = new GlDrawcallback(gl);
+                    drawCallback.wireframe = false; //(debugMode & DebugDrawModes.DRAW_WIREFRAME) != 0;
 
-                concaveMesh.processAllTriangles(drawCallback, aabbMin, aabbMax);
+                    concaveMesh.processAllTriangles(drawCallback, aabbMin, aabbMax);
+                }
             }
             //#endif
 

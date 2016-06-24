@@ -7,6 +7,6 @@ import java.util.List;
  */
 public interface GraphLayout {
 
-    void update(GraphSpace g, List<VDraw> verts, float dt);
+    void update(GraphSpace g, List<Atomatter> verts, float dt);
 
 }

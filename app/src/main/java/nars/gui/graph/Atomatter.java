@@ -3,9 +3,12 @@ package nars.gui.graph;
 import bulletphys.collision.shapes.BoxShape;
 import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.RigidBody;
+import bulletphys.ui.ShapeDrawer;
 import bulletphys.ui.JoglPhysics;
 import bulletphys.util.Motion;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.gl2.GLUT;
 import nars.budget.Budget;
 import nars.link.BLink;
 import nars.task.Task;
@@ -14,12 +17,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.vecmath.Vector3f;
+import java.util.function.BiConsumer;
+
+import static nars.gui.graph.GraphSpace.h;
+import static nars.gui.test.Lesson14.renderString;
 
 /**
- * vertex draw info
+ * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public final class VDraw {
-    private GraphSpace graphSpace;
+public final class Atomatter implements BiConsumer<GL2, RigidBody> {
+
+
     public final nars.term.Termed key;
     public final int hash;
     @NotNull
@@ -59,8 +67,7 @@ public final class VDraw {
     public final Motion motion = new Motion();
     public boolean motionLock;
 
-    public VDraw(GraphSpace graphSpace, nars.term.Termed k, int edges) {
-        this.graphSpace = graphSpace;
+    public Atomatter(nars.term.Termed k, int edges) {
         this.key = k;
         this.label = k.toString();
         this.hash = k.hashCode();
@@ -86,7 +93,7 @@ public final class VDraw {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || key.equals(((VDraw) obj).key);
+        return this == obj || key.equals(((Atomatter) obj).key);
     }
 
     @Override
@@ -115,7 +122,7 @@ public final class VDraw {
 
         GraphSpace.EDraw[] ee = this.edges;
 
-        VDraw target = grapher.getIfActive(ll);
+        Atomatter target = grapher.getIfActive(ll);
         if (target == null)
             return true;
 
@@ -224,7 +231,7 @@ public final class VDraw {
         motionLock = b;
     }
 
-    public void update() {
+    public void update(GraphSpace graphSpace) {
 
         if (active()) {
 
@@ -242,23 +249,120 @@ public final class VDraw {
                 body.setFriction(0.9f);
 
                 body.setUserPointer(this);
+
+                body.setRenderer(this);
             }
 
         }
 
     }
 
-    public void preDraw(GL2 gl) {
 
-        graphSpace.renderEdges(gl, this);
+    @Override public void accept(GL2 gl, RigidBody body) {
 
-        graphSpace.renderLabel(gl, this);
+        renderEdges(gl, this);
 
-        float p = graphSpace.h(pri)/2f;
+        renderLabel(gl, this);
+
+        float p = h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),
                 p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
                 p,
                 1f);
+
+        ShapeDrawer.draw(gl, body);
+
     }
+
+    static void renderEdges(GL2 gl, Atomatter v) {
+        int n = v.edgeCount();
+        GraphSpace.EDraw[] eee = v.edges;
+        for (int en = 0; en < n; en++)
+            render(gl, v, eee[en]);
+    }
+
+    static public void renderLabel(GL2 gl, Atomatter v) {
+
+
+        //float p = v.pri * 0.75f + 0.25f;
+        gl.glColor4f(0.5f, 0.5f, 0.5f, v.pri);
+
+        float fontThick = 1f;
+        gl.glLineWidth(fontThick);
+
+        float div = 0.01f;
+        float r = v.radius;
+        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
+                div * r, //scale
+                0, 0, (r/1.9f)/div); // Print GL Text To The Screen
+
+    }
+
+    static public void render(GL2 gl, Atomatter v, GraphSpace.EDraw e) {
+
+        gl.glColor4f(e.r, e.g, e.b, e.a);
+        float width = e.width;
+        if (width <= 1f) {
+            renderLineEdge(gl, v, e, width);
+        } else {
+            renderHalfTriEdge(gl, v, e, width);
+        }
+    }
+
+    static public void renderHalfTriEdge(GL2 gl, Atomatter src, GraphSpace.EDraw e, float width) {
+        Atomatter tgt = e.key;
+
+
+        gl.glPushMatrix();
+
+        {
+
+            float x1 = src.x();
+            float x2 = tgt.x();
+            float dx = (x2 - x1);
+            //float cx = 0.5f * (x1 + x2);
+            float y1 = src.y();
+            float y2 = tgt.y();
+            float dy = (y2 - y1);
+            //float cy = 0.5f * (y1 + y2);
+
+            //gl.glTranslatef(cx, cy, 0f);
+
+            float rotAngle = (float) Math.atan2(dy, dx) * 180f / 3.14159f;
+            gl.glRotatef(rotAngle, 0f, 0f, 1f);
+
+
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+            gl.glScalef(len, width, 1f);
+
+            //gl.glCallList(isoTri);
+            gl.glBegin(GL2.GL_TRIANGLES);
+            gl.glNormal3f(0.0f, 0f, 1.0f);
+
+            gl.glVertex3f(0, +0.5f,  0f); //right base
+            gl.glVertex3f(0, -0.5f, 0f); //left base
+            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
+
+            gl.glEnd();
+        }
+
+        gl.glPopMatrix();
+
+    }
+
+    public static void renderLineEdge(GL2 gl, Atomatter src, GraphSpace.EDraw e, float width) {
+        Atomatter tgt = e.key;
+        gl.glLineWidth(width);
+        gl.glBegin(GL.GL_LINES);
+        {
+            gl.glVertex3f(0,0,0);//vp[0], vp[1], vp[2]);
+            gl.glVertex3f(
+                    tgt.x()-src.x(),
+                    tgt.y()-src.y(),
+                    tgt.z()-src.z() );
+        }
+        gl.glEnd();
+    }
+
 }

@@ -50,7 +50,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
-import nars.gui.graph.VDraw;
+import nars.gui.graph.Atomatter;
 import nars.util.JoglSpace;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,6 +59,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 
@@ -66,11 +67,10 @@ import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
  * @author jezek2
  */
 
-public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
+public class JoglPhysics<X extends Atomatter> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
     private boolean simulating = true;
-
 
 
     /**
@@ -115,7 +115,6 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
     protected int screenHeight = 0;
 
 
-
     protected boolean stepping = true;
     protected int lastKey;
 
@@ -155,11 +154,13 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
         };
 
         //dyn =new SimpleDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
-        dyn.setGravity(v(0,0,0));
+        dyn.setGravity(v(0, 0, 0));
 
     }
 
-    /** return false to remove this object during the beginning of the physics frame  */
+    /**
+     * return false to remove this object during the beginning of the physics frame
+     */
     protected boolean valid(CollisionObject<X> c) {
         return true;
     }
@@ -187,7 +188,6 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
         printHardware();
 
-        glsrt = drawer.glsrt;
         if (useLight0) {
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, light_diffuse, 0);
@@ -803,8 +803,8 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
             System.out.println("UNDRAG: " + directDrag);
 
-            if (u instanceof VDraw) {
-                ((VDraw)u).motionLock(false);
+            if (u instanceof Atomatter) {
+                ((Atomatter) u).motionLock(false);
             }
 
             directDrag = null;
@@ -887,8 +887,8 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
                 //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 
-                if (u instanceof VDraw) {
-                    ((VDraw)u).motionLock(true);
+                if (u instanceof Atomatter) {
+                    ((Atomatter) u).motionLock(true);
                 }
 
                 MotionState mm = directDrag.getMotionState();
@@ -1010,8 +1010,8 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
         Motion myMotionState = new Motion(startTransform);
 
         boolean isDynamic = (mass != 0f);
-        int collisionFilterGroup = isDynamic?1:2;
-        int collisionFilterMask = isDynamic?-1:-3;
+        int collisionFilterGroup = isDynamic ? 1 : 2;
+        int collisionFilterMask = isDynamic ? -1 : -3;
 
         return newBody(mass, shape, myMotionState, collisionFilterGroup, collisionFilterMask);
     }
@@ -1027,9 +1027,10 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 
         RigidBodyConstructionInfo c = new RigidBodyConstructionInfo(mass, motion, shape, localInertia);
 
-        RigidBody body = new RigidBody( c );
+        RigidBody body = new RigidBody(c);
 
-        ((DiscreteDynamicsWorld)dyn).addRigidBody(body, (short)group, (short)mask);
+        ((DiscreteDynamicsWorld) dyn).addRigidBody(body, (short) group, (short) mask);
+
 
         return body;
     }
@@ -1058,42 +1059,39 @@ public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseList
 //    }
 
 
-    private final Transform m = new Transform();
 
-    private final GLShapeDrawer drawer = new GLShapeDrawer(glu);
 
     public void renderWorld() {
         updateCamera();
 
-        if (dyn != null) {
+        List<CollisionObject<X>> objects = dyn.getCollisionObjectArray();
 
+        for (int i = 0, n = objects.size(); i < n; i++)
+            render( objects.get(i) );
 
-            int numObjects = dyn.getNumCollisionObjects();
-            int debug = this.debug;
-            List<CollisionObject<X>> objects = dyn.getCollisionObjectArray();
-            for (int i = 0; i < numObjects; i++) {
+    }
 
-                //return array[index];
-                RigidBody<X> body = RigidBody.upcast(objects.get(i));
-                if (body == null)
-                    continue;
+    public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {
 
+        ShapeDrawer.draw(gl, body);
 
-
+/*
 //                if (body != null && body.getMotionState() != null) {
 //                    Motion myMotionState = (Motion) body.getMotionState();
 //                    m.set(myMotionState.t);
 //                } else {
 //                    body.getWorldTransform(m);
 //                }
+ */
 
-                VDraw u = body.getUserPointer();
-                if (u!=null)
-                    u.preDraw(gl);
+    };
 
-                drawer.drawOpenGL(glsrt, gl, body.transform(), body.getCollisionShape(), debug);
-            }
-
+    public final void render(CollisionObject<X> c) {
+        RigidBody<X> body = RigidBody.upcast(c);
+        if (body != null) {
+            BiConsumer<GL2,RigidBody> r = body.renderer();
+            if (r != null)
+                r.accept(gl, body);
         }
     }
 

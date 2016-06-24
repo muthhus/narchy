@@ -3,10 +3,8 @@ package nars.gui.graph;
 import bulletphys.collision.dispatch.CollisionObject;
 import bulletphys.ui.JoglPhysics;
 import com.google.common.collect.Lists;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.util.gl2.GLUT;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
@@ -31,7 +29,7 @@ import static nars.gui.test.Lesson14.renderString;
 /**
  * Created by me on 6/20/16.
  */
-public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
+public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
 
     public static void main(String[] args) {
@@ -53,7 +51,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
     //private final GleemControl gleem = new GleemControl();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
-    final WeakValueHashMap<Termed, VDraw> vdraw;
+    final WeakValueHashMap<Termed, Atomatter> vdraw;
 
     int maxEdgesPerVertex = 4;
 
@@ -77,32 +75,28 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
         c.start(this);
     }
 
-    @NotNull
-    public VDraw update(int order, BLink<? extends Termed> t) {
+    public @NotNull Atomatter update(int order, BLink<? extends Termed> t) {
         return pre(order, getOrAdd(t.get()), t);
     }
 
-    @NotNull
-    public VDraw getOrAdd(Termed t) {
-        return vdraw.computeIfAbsent(t, x -> new VDraw(this, x, maxEdgesPerVertex));
+    public @NotNull Atomatter getOrAdd(Termed t) {
+        return vdraw.computeIfAbsent(t, x -> new Atomatter(x, maxEdgesPerVertex));
     }
 
-    @Nullable
-    public VDraw getIfActive(Termed t) {
-        VDraw v = vdraw.get(t);
+    public @Nullable Atomatter getIfActive(Termed t) {
+        Atomatter v = vdraw.get(t);
         return v != null && v.active() ? v : null;
     }
 
     /**
      * get the latest info into the draw object
      */
-    @NotNull
-    protected VDraw pre(int i, VDraw v, BLink<? extends Termed> b) {
+    protected @NotNull Atomatter pre(int i, Atomatter v, BLink<? extends Termed> b) {
         v.activate((short)i, b);
         return v;
     }
 
-    protected void post(float now, VDraw v) {
+    protected void post(float now, Atomatter v) {
         Termed tt = v.key;
 
         Budget b = v.budget;
@@ -119,7 +113,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
         }
     }
 
-    private void updateConcept(VDraw v, Concept cc, float now) {
+    private void updateConcept(Atomatter v, Concept cc, float now) {
 
         float lastConceptForget = v.budget.getLastForgetTime();
         if (lastConceptForget != lastConceptForget)
@@ -148,10 +142,10 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
 
     public static final class EDraw {
-        public VDraw key;
+        public Atomatter key;
         public float width, r, g, b, a;
 
-        public void set(VDraw x, float width, float r, float g, float b, float a) {
+        public void set(Atomatter x, float width, float r, float g, float b, float a) {
             this.key = x;
             this.width = width;
             this.r = r;
@@ -281,7 +275,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
     @Override protected final boolean valid(CollisionObject<X> c) {
         X vd = c.getUserPointer();
-        if (vd !=null && !vd.active()) {
+        if (vd!=null && !vd.active()) {
             vd.body.setUserPointer(null); //remove reference so vd can be GC
             vd.body = null;
             return false;
@@ -337,12 +331,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 //
 //    }
 
-    public void renderEdges(GL2 gl, VDraw v) {
-        int n = v.edgeCount();
-        EDraw[] eee = v.edges;
-        for (int en = 0; en < n; en++)
-            render(gl, v, eee[en]);
-    }
+
 
 //    public void renderVertexBase(GL2 gl, float dt, VDraw v) {
 //
@@ -370,100 +359,26 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 //        gl.glPopMatrix();
 //    }
 
-    public void renderLabel(GL2 gl, VDraw v) {
 
 
-        //float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(0.5f, 0.5f, 0.5f, v.pri);
+    public final void update(ConceptsSource s) {
 
-        float fontThick = 1f;
-        gl.glLineWidth(fontThick);
+        float dt = s.busy();
 
-        float div = 0.01f;
-        float r = v.radius;
-        renderString(gl, GLUT.STROKE_ROMAN /*STROKE_MONO_ROMAN*/, v.label,
-                div * r, //scale
-                0, 0, (r/1.9f)/div); // Print GL Text To The Screen
-
-
-    }
-
-    public void render(GL2 gl, VDraw v, EDraw e) {
-
-        gl.glColor4f(e.r, e.g, e.b, e.a);
-        float width = e.width;
-        if (width <= 1f) {
-            renderLineEdge(gl, v, e, width);
-        } else {
-            renderHalfTriEdge(gl, v, e, width);
+        List<Atomatter> toDraw = s.visible;
+        for (int i = 0, toDrawSize = toDraw.size(); i < toDrawSize; i++) {
+            toDraw.get(i).update(this);
         }
-    }
-
-    public void renderHalfTriEdge(GL2 gl, VDraw src, EDraw e, float width) {
-        VDraw tgt = e.key;
-
-
-        gl.glPushMatrix();
-
-        {
-
-            float x1 = src.x();
-            float x2 = tgt.x();
-            float dx = (x2 - x1);
-            //float cx = 0.5f * (x1 + x2);
-            float y1 = src.y();
-            float y2 = tgt.y();
-            float dy = (y2 - y1);
-            //float cy = 0.5f * (y1 + y2);
-
-            //gl.glTranslatef(cx, cy, 0f);
-
-            float rotAngle = (float) Math.atan2(dy, dx) * 180f / 3.14159f;
-            gl.glRotatef(rotAngle, 0f, 0f, 1f);
-
-
-            float len = (float) Math.sqrt(dx * dx + dy * dy);
-            gl.glScalef(len, width, 1f);
-
-            gl.glCallList(isoTri);
-        }
-
-        gl.glPopMatrix();
-
-    }
-
-    public static void renderLineEdge(GL2 gl, VDraw src, EDraw e, float width) {
-        VDraw tgt = e.key;
-        gl.glLineWidth(width);
-        gl.glBegin(GL.GL_LINES);
-        {
-            gl.glVertex3f(0,0,0);//vp[0], vp[1], vp[2]);
-            gl.glVertex3f(
-                tgt.x()-src.x(),
-                tgt.y()-src.y(),
-                tgt.z()-src.z() );
-        }
-        gl.glEnd();
-    }
-
-    public void update(ConceptsSource s) {
-
-        s.busy.set(true);
-
-        float dt = Math.max(0.001f /* non-zero */, s.dt());
-        List<VDraw> toDraw = s.visible;
-
-        toDraw.forEach(VDraw::update);
 
         List<GraphLayout> ll = this.layout;
-
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
             ll.get(i1).update(this, toDraw, dt);
         }
+
     }
 
 
-    public float h(float p) {
+    public static float h(float p) {
         return p * 0.9f + 0.1f;
     }
 
@@ -476,7 +391,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
         private final int capacity;
 
 
-        private FasterList<VDraw> visible = new FasterList(0);
+        private FasterList<Atomatter> visible = new FasterList(0);
 
 
         public final MutableFloat maxPri = new MutableFloat(1.0f);
@@ -638,9 +553,9 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
             //final int maxNodes = this.maxNodes;
 
-            visible.forEach(VDraw::inactivate);
+            visible.forEach(Atomatter::inactivate);
 
-            FasterList<VDraw> v = visible = new FasterList(capacity);
+            FasterList<Atomatter> v = visible = new FasterList(capacity);
             Bag<Concept> x = ((Default) nar).core.concepts;
             x.topWhile(this::accept, capacity);
 
@@ -659,7 +574,7 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
                 return true;
             }
 
-            FasterList<VDraw> v = this.visible;
+            FasterList<Atomatter> v = this.visible;
             return v.add(grapher.update(v.size(), b));
         }
 
@@ -673,6 +588,11 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
         public void ready() {
             busy.set(false);
+        }
+
+        public final float busy() {
+            busy.set(true);
+            return dt();
         }
 
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {

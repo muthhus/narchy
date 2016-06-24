@@ -3,7 +3,7 @@ package nars.gui.graph.layout;
 import nars.gui.graph.GraphLayout;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.GraphSpace.EDraw;
-import nars.gui.graph.VDraw;
+import nars.gui.graph.Atomatter;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.awt.*;
@@ -215,7 +215,7 @@ public class FastOrganicLayout implements GraphLayout {
 
 
     @Override
-    public void update(GraphSpace graph, List<VDraw> vertices, float dt) {
+    public void update(GraphSpace graph, List<Atomatter> vertices, float dt) {
 
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
@@ -246,7 +246,7 @@ public class FastOrganicLayout implements GraphLayout {
         for (int ii = 0; ii < n; ii++) {
             final int i = ii;
 
-            VDraw V = vertices.get(i);
+            Atomatter V = vertices.get(i);
 
             //TODO is this necessary?
             /*if (!graph.containsVertex(vd.getVertex()))
@@ -340,7 +340,7 @@ public class FastOrganicLayout implements GraphLayout {
         float[] radius = this.radius;
 
         for (int i = 0; i < n; i++) {
-            VDraw vd = vertices.get(i);
+            Atomatter vd = vertices.get(i);
             float[] ci = cl[i];
 
             //cellLocation[i][0] -= 1/2.0; //geo.getWidth() / 2.0;

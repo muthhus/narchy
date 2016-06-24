@@ -32,10 +32,14 @@ import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.constraintsolver.TypedConstraint;
 import bulletphys.linearmath.*;
 import bulletphys.util.ObjectArrayList;
+import com.jogamp.opengl.GL2;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.function.BiConsumer;
+
+import static bulletphys.ui.JoglPhysics.defaultRenderer;
 
 /**
  * RigidBody is the main class for rigid body objects. It is derived from
@@ -101,7 +105,7 @@ public class RigidBody<X> extends CollisionObject<X> {
 	
 	private static int uniqueId;
 	public int debugBodyId;
-	
+
 	public RigidBody(RigidBodyConstructionInfo constructionInfo) {
 		super(CollisionObjectType.RIGID_BODY);
 		setupRigidBody(constructionInfo);
@@ -626,5 +630,15 @@ public class RigidBody<X> extends CollisionObject<X> {
 	public int getNumConstraintRefs() {
 		return constraintRefs.size();
 	}
-	
+
+
+	private BiConsumer<GL2,RigidBody> renderer = defaultRenderer;
+
+	public final BiConsumer<GL2,RigidBody> renderer() {
+		return renderer;
+	}
+
+	public final void setRenderer(BiConsumer<GL2,RigidBody> renderer) {
+		this.renderer = renderer;
+	}
 }
