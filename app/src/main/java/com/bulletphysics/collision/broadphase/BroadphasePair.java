@@ -64,9 +64,13 @@ public class BroadphasePair {
 		@Override
         public int compare(com.bulletphysics.collision.broadphase.BroadphasePair a, com.bulletphysics.collision.broadphase.BroadphasePair b) {
 			// JAVA TODO:
-			boolean result = a.pProxy0.getUid() > b.pProxy0.getUid() ||
-					(a.pProxy0.getUid() == b.pProxy0.getUid() && a.pProxy1.getUid() > b.pProxy1.getUid()) ||
-					(a.pProxy0.getUid() == b.pProxy0.getUid() && a.pProxy1.getUid() == b.pProxy1.getUid() /*&& a.algorithm > b.m_algorithm*/);
+			BroadphaseProxy a0 = a.pProxy0;
+			BroadphaseProxy b0 = b.pProxy0;
+			BroadphaseProxy a1 = a.pProxy1;
+			BroadphaseProxy b1 = b.pProxy1;
+			boolean result = a0.uid > b0.uid ||
+					(a0.uid == b0.uid && a1.uid > b1.uid) ||
+					(a0.uid == b0.uid && a1.uid == b1.uid /*&& a.algorithm > b.m_algorithm*/);
 			return result? -1 : 1;
 		}
 	};

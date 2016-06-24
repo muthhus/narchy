@@ -388,11 +388,11 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	 * Call before process collision.
 	 */
 	protected void checkManifold(CollisionObject body0, CollisionObject body1) {
-		if (getLastManifold() == null) {
+        if (manifoldPtr == null) {
 			newContactManifold(body0, body1);
 		}
 
-		resultOut.setPersistentManifold(getLastManifold());
+        resultOut.setPersistentManifold(manifoldPtr);
 	}
 	
 	/**
@@ -401,7 +401,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	protected CollisionAlgorithm newAlgorithm(CollisionObject body0, CollisionObject body1) {
 		checkManifold(body0, body1);
 
-		CollisionAlgorithm convex_algorithm = dispatcher.findAlgorithm(body0, body1, getLastManifold());
+        CollisionAlgorithm convex_algorithm = dispatcher.findAlgorithm(body0, body1, manifoldPtr);
 		return convex_algorithm;
 	}
 	

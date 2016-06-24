@@ -51,7 +51,8 @@ public class ConvexHullShape extends PolyhedralConvexShape {
 		// JAVA NOTE: rewritten
 		
 		for (int i=0; i<points.size(); i++) {
-			this.points.add(new Vector3f(points.getQuick(i)));
+            //return array[index];
+            this.points.add(new Vector3f(points.get(i)));
 		}
 		
 		recalcLocalAabb();
@@ -95,7 +96,8 @@ public class ConvexHullShape extends PolyhedralConvexShape {
 
 		Vector3f vtx = new Vector3f();
 		for (int i = 0; i < points.size(); i++) {
-			VectorUtil.mul(vtx, points.getQuick(i), localScaling);
+            //return array[index];
+            VectorUtil.mul(vtx, points.get(i), localScaling);
 
 			newDot = vec.dot(vtx);
 			if (newDot > maxDot) {
@@ -121,7 +123,8 @@ public class ConvexHullShape extends PolyhedralConvexShape {
         }
 		Vector3f vtx = new Vector3f();
 		for (int i = 0; i < points.size(); i++) {
-			VectorUtil.mul(vtx, points.getQuick(i), localScaling);
+            //return array[index];
+            VectorUtil.mul(vtx, points.get(i), localScaling);
 
 			for (int j = 0; j < numVectors; j++) {
 				Vector3f vec = vectors[j];
@@ -171,13 +174,16 @@ public class ConvexHullShape extends PolyhedralConvexShape {
 	public void getEdge(int i, Vector3f pa, Vector3f pb) {
 		int index0 = i % points.size();
 		int index1 = (i + 1) % points.size();
-		VectorUtil.mul(pa, points.getQuick(index0), localScaling);
-		VectorUtil.mul(pb, points.getQuick(index1), localScaling);
+        //return array[index];
+        VectorUtil.mul(pa, points.get(index0), localScaling);
+        //return array[index];
+        VectorUtil.mul(pb, points.get(index1), localScaling);
 	}
 
 	@Override
 	public void getVertex(int i, Vector3f vtx) {
-		VectorUtil.mul(vtx, points.getQuick(i), localScaling);
+        //return array[index];
+        VectorUtil.mul(vtx, points.get(i), localScaling);
 	}
 
 	@Override

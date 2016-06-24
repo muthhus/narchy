@@ -87,7 +87,7 @@ public class CapsuleShape extends ConvexInternalShape {
 
 		{
 			pos.set(0f, 0f, 0f);
-			VectorUtil.setCoord(pos, getUpAxis(), getHalfHeight());
+			VectorUtil.setCoord(pos, upAxis, getHalfHeight());
 			
 			VectorUtil.mul(tmp1, vec, localScaling);
 			tmp1.scale(radius);
@@ -101,7 +101,7 @@ public class CapsuleShape extends ConvexInternalShape {
 			}
 		}
 		pos.set(0f, 0f, 0f);
-		VectorUtil.setCoord(pos, getUpAxis(), -getHalfHeight());
+		VectorUtil.setCoord(pos, upAxis, -getHalfHeight());
 
 		VectorUtil.mul(tmp1, vec, localScaling);
 		tmp1.scale(radius);
@@ -134,7 +134,7 @@ public class CapsuleShape extends ConvexInternalShape {
 
 		Vector3f halfExtents = new Vector3f();
 		halfExtents.set(radius, radius, radius);
-		VectorUtil.setCoord(halfExtents, getUpAxis(), radius + getHalfHeight());
+		VectorUtil.setCoord(halfExtents, upAxis, radius + getHalfHeight());
 
 		float margin = BulletGlobals.CONVEX_DISTANCE_MARGIN;
 

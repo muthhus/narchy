@@ -323,7 +323,7 @@ public class HeightfieldTerrainShape extends ConcaveShape {
 	 *
 	 * "with clamp" means that we restrict the point to be in the heightfield's axis-aligned bounding box.
 	 */
-	private void quantizeWithClamp(int[] out, Vector3f clampedPoint) {
+	private static void quantizeWithClamp(int[] out, Vector3f clampedPoint) {
 
 		/*
 		 * btVector3 clampedPoint(point); XXX

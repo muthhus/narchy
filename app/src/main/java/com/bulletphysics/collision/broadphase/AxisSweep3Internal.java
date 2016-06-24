@@ -51,12 +51,12 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 
 	protected int numHandles;                               // number of active handles
 	protected int maxHandles;                               // max number of handles
-	protected Handle[] pHandles;                            // handles pool
+	protected final Handle[] pHandles;                            // handles pool
 	protected int firstFreeHandle;		                    // free handles list
 
-	protected EdgeArray[] pEdges = new EdgeArray[3];      // edge arrays for the 3 axes (each array has m_maxHandles * 2 + 2 sentinel entries)
+	protected final EdgeArray[] pEdges = new EdgeArray[3];      // edge arrays for the 3 axes (each array has m_maxHandles * 2 + 2 sentinel entries)
 
-	protected OverlappingPairCache pairCache;
+	protected final OverlappingPairCache pairCache;
 	
 	// OverlappingPairCallback is an additional optional user callback for adding/removing overlapping pairs, similar interface to OverlappingPairCache.
 	protected OverlappingPairCallback userPairCallback = null;
@@ -71,14 +71,12 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 	AxisSweep3Internal(Vector3f worldAabbMin, Vector3f worldAabbMax, int handleMask, int handleSentinel, int userMaxHandles/* = 16384*/, OverlappingPairCache pairCache/*=0*/) {
 		this.bpHandleMask = handleMask;
 		this.handleSentinel = handleSentinel;
-		this.pairCache = pairCache;
+
 
 		int maxHandles = userMaxHandles + 1; // need to add one sentinel handle
 
-		if (this.pairCache == null) {
-			this.pairCache = new HashedOverlappingPairCache();
-			ownsPairCache = true;
-		}
+		this.pairCache = (this.ownsPairCache = (pairCache!=null)) ? pairCache : new HashedOverlappingPairCache();
+
 
 		//assert(bounds.HasVolume());
 
@@ -157,7 +155,7 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 		numHandles--;
 	}
 	
-	protected boolean testOverlap(int ignoreAxis, Handle pHandleA, Handle pHandleB) {
+	protected static boolean testOverlap(int ignoreAxis, Handle pHandleA, Handle pHandleB) {
 		// optimization 1: check the array index (memory address), instead of the m_pos
 
 		for (int axis=0; axis<3; axis++) {
@@ -388,7 +386,8 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 			previousPair.algorithm = null;
 
 			for (i=0; i<overlappingPairArray.size(); i++) {
-				BroadphasePair pair = overlappingPairArray.getQuick(i);
+				//return array[index];
+				BroadphasePair pair = overlappingPairArray.get(i);
 
 				boolean isDuplicate = (pair.equals(previousPair));
 
@@ -447,7 +446,7 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 
 		Handle pHandle = getHandle(handle);
 
-		pHandle.uniqueId = handle;
+		pHandle.uid = handle;
 		//pHandle->m_pOverlaps = 0;
 		pHandle.clientObject = pOwner;
 		pHandle.collisionFilterGroup = collisionFilterGroup;
@@ -586,16 +585,16 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 	@Override
     public void destroyProxy(BroadphaseProxy proxy, Dispatcher dispatcher) {
 		Handle handle = (Handle)proxy;
-		removeHandle(handle.uniqueId, dispatcher);
+		removeHandle(handle.uid, dispatcher);
 	}
 
 	@Override
     public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
 		Handle handle = (Handle) proxy;
-		updateHandle(handle.uniqueId, aabbMin, aabbMax, dispatcher);
+		updateHandle(handle.uid, aabbMin, aabbMax, dispatcher);
 	}
 	
-	public boolean testAabbOverlap(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
+	public static boolean testAabbOverlap(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
 		Handle pHandleA = (Handle)proxy0;
 		Handle pHandleB = (Handle)proxy1;
 

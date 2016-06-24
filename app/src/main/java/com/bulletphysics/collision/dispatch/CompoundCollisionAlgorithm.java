@@ -72,7 +72,8 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		int numChildren = childCollisionAlgorithms.size();
 		for (int i=0; i<numChildren; i++) {
 			//childCollisionAlgorithms.get(i).destroy();
-			dispatcher.freeCollisionAlgorithm(childCollisionAlgorithms.getQuick(i));
+            //return array[index];
+            dispatcher.freeCollisionAlgorithm(childCollisionAlgorithms.get(i));
 		}
 		childCollisionAlgorithms.clear();
 	}
@@ -116,7 +117,8 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			// the contactpoint is still projected back using the original inverted worldtrans
 			CollisionShape tmpShape = colObj.getCollisionShape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
-			childCollisionAlgorithms.getQuick(i).processCollision(colObj, otherObj, dispatchInfo, resultOut);
+            //return array[index];
+            childCollisionAlgorithms.get(i).processCollision(colObj, otherObj, dispatchInfo, resultOut);
 			// revert back
 			colObj.internalSetTemporaryCollisionShape(tmpShape);
 			colObj.setWorldTransform(orgTrans);
@@ -162,7 +164,8 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 
 			CollisionShape tmpShape = colObj.getCollisionShape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
-			float frac = childCollisionAlgorithms.getQuick(i).calculateTimeOfImpact(colObj, otherObj, dispatchInfo, resultOut);
+            //return array[index];
+            float frac = childCollisionAlgorithms.get(i).calculateTimeOfImpact(colObj, otherObj, dispatchInfo, resultOut);
 			if (frac < hitFraction) {
 				hitFraction = frac;
 			}
@@ -176,7 +179,8 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	@Override
 	public void getAllContactManifolds(ObjectArrayList<PersistentManifold> manifoldArray) {
 		for (int i=0; i<childCollisionAlgorithms.size(); i++) {
-			childCollisionAlgorithms.getQuick(i).getAllContactManifolds(manifoldArray);
+            //return array[index];
+            childCollisionAlgorithms.get(i).getAllContactManifolds(manifoldArray);
 		}
 	}
 

@@ -54,11 +54,9 @@ public class CompoundShape extends CollisionShape {
 	public void addChildShape(Transform localTransform, CollisionShape shape) {
 		//m_childTransforms.push_back(localTransform);
 		//m_childShapes.push_back(shape);
-		CompoundShapeChild child = new CompoundShapeChild();
+		CompoundShapeChild child = new CompoundShapeChild(shape);
 		child.transform.set(localTransform);
-		child.childShape = shape;
-		child.childShapeType = shape.getShapeType();
-		child.childMargin = shape.getMargin();
+		//child.childMargin = shape.getMargin();
 
 		children.add(child);
 
@@ -93,7 +91,8 @@ public class CompoundShape extends CollisionShape {
 			done_removing = true;
 
 			for (int i = 0; i < children.size(); i++) {
-				if (children.getQuick(i).childShape == shape) {
+				//return array[index];
+				if (children.get(i).childShape == shape) {
 					children.removeQuick(i);
 					done_removing = false;  // Do another iteration pass after removing from the vector
 					break;
@@ -110,11 +109,13 @@ public class CompoundShape extends CollisionShape {
 	}
 
 	public CollisionShape getChildShape(int index) {
-		return children.getQuick(index).childShape;
+		//return array[index];
+		return children.get(index).childShape;
 	}
 
 	public Transform getChildTransform(int index, Transform out) {
-		out.set(children.getQuick(index).transform);
+		//return array[index];
+		out.set(children.get(index).transform);
 		return out;
 	}
 
@@ -130,9 +131,9 @@ public class CompoundShape extends CollisionShape {
 		Vector3f localHalfExtents = new Vector3f();
 		localHalfExtents.sub(localAabbMax, localAabbMin);
 		localHalfExtents.scale(0.5f);
-		localHalfExtents.x += getMargin();
-		localHalfExtents.y += getMargin();
-		localHalfExtents.z += getMargin();
+		localHalfExtents.x += collisionMargin;
+		localHalfExtents.y += collisionMargin;
+		localHalfExtents.z += collisionMargin;
 
 		Vector3f localCenter = new Vector3f();
 		localCenter.add(localAabbMax, localAabbMin);
@@ -173,7 +174,9 @@ public class CompoundShape extends CollisionShape {
 
 		// extend the local aabbMin/aabbMax
 		for (int j = 0; j < children.size(); j++) {
-			children.getQuick(j).childShape.getAabb(children.getQuick(j).transform, tmpLocalAabbMin, tmpLocalAabbMax);
+			//return array[index];
+			//return array[index];
+			children.get(j).childShape.getAabb(children.get(j).transform, tmpLocalAabbMin, tmpLocalAabbMax);
 			
 			for (int i = 0; i < 3; i++) {
 				if (VectorUtil.getCoord(localAabbMin, i) > VectorUtil.getCoord(tmpLocalAabbMin, i)) {
@@ -262,7 +265,8 @@ public class CompoundShape extends CollisionShape {
 		Vector3f center = new Vector3f();
 		center.set(0, 0, 0);
 		for (int k = 0; k < n; k++) {
-			center.scaleAdd(masses[k], children.getQuick(k).transform.origin, center);
+			//return array[index];
+			center.scaleAdd(masses[k], children.get(k).transform.origin, center);
 			totalMass += masses[k];
 		}
 		center.scale(1f / totalMass);
@@ -273,9 +277,11 @@ public class CompoundShape extends CollisionShape {
 
 		for (int k = 0; k < n; k++) {
 			Vector3f i = new Vector3f();
-			children.getQuick(k).childShape.calculateLocalInertia(masses[k], i);
+			//return array[index];
+			children.get(k).childShape.calculateLocalInertia(masses[k], i);
 
-			Transform t = children.getQuick(k).transform;
+			//return array[index];
+			Transform t = children.get(k).transform;
 			Vector3f o = new Vector3f();
 			o.sub(t.origin, center);
 

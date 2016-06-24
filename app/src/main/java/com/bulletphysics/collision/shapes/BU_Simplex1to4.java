@@ -177,7 +177,7 @@ public class BU_Simplex1to4 extends PolyhedralConvexShape {
 	public void getPlane(Vector3f planeNormal, Vector3f planeSupport, int i) {
 	}
 	
-	public int getIndex(int i) {
+	public static int getIndex(int i) {
 		return 0;
 	}
 

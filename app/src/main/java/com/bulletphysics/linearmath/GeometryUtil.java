@@ -39,7 +39,8 @@ public class GeometryUtil {
 	public static boolean isPointInsidePlanes(ObjectArrayList<Vector4f> planeEquations, Vector3f point, float margin) {
 		int numbrushes = planeEquations.size();
 		for (int i = 0; i < numbrushes; i++) {
-			Vector4f N1 = planeEquations.getQuick(i);
+            //return array[index];
+            Vector4f N1 = planeEquations.get(i);
 			float dist = com.bulletphysics.linearmath.VectorUtil.dot3(N1, point) + N1.w - margin;
 			if (dist > 0f) {
 				return false;
@@ -51,7 +52,8 @@ public class GeometryUtil {
 	public static boolean areVerticesBehindPlane(Vector4f planeNormal, ObjectArrayList<Vector3f> vertices, float margin) {
 		int numvertices = vertices.size();
 		for (int i = 0; i < numvertices; i++) {
-			Vector3f N1 = vertices.getQuick(i);
+            //return array[index];
+            Vector3f N1 = vertices.get(i);
 			float dist = com.bulletphysics.linearmath.VectorUtil.dot3(planeNormal, N1) + planeNormal.w - margin;
 			if (dist > 0f) {
 				return false;
@@ -63,7 +65,8 @@ public class GeometryUtil {
 	private static boolean notExist(Vector4f planeEquation, ObjectArrayList<Vector4f> planeEquations) {
 		int numbrushes = planeEquations.size();
 		for (int i = 0; i < numbrushes; i++) {
-			Vector4f N1 = planeEquations.getQuick(i);
+            //return array[index];
+            Vector4f N1 = planeEquations.get(i);
 			if (com.bulletphysics.linearmath.VectorUtil.dot3(planeEquation, N1) > 0.999f) {
 				return false;
 			}
@@ -79,13 +82,16 @@ public class GeometryUtil {
 		int numvertices = vertices.size();
 		// brute force:
 		for (int i = 0; i < numvertices; i++) {
-			Vector3f N1 = vertices.getQuick(i);
+            //return array[index];
+            Vector3f N1 = vertices.get(i);
 
 			for (int j = i + 1; j < numvertices; j++) {
-				Vector3f N2 = vertices.getQuick(j);
+                //return array[index];
+                Vector3f N2 = vertices.get(j);
 
 				for (int k = j + 1; k < numvertices; k++) {
-					Vector3f N3 = vertices.getQuick(k);
+                    //return array[index];
+                    Vector3f N3 = vertices.get(k);
 
 					edge0.sub(N2, N1);
 					edge1.sub(N3, N1);
@@ -123,13 +129,16 @@ public class GeometryUtil {
 		int numbrushes = planeEquations.size();
 		// brute force:
 		for (int i = 0; i < numbrushes; i++) {
-			Vector4f N1 = planeEquations.getQuick(i);
+            //return array[index];
+            Vector4f N1 = planeEquations.get(i);
 
 			for (int j = i + 1; j < numbrushes; j++) {
-				Vector4f N2 = planeEquations.getQuick(j);
+                //return array[index];
+                Vector4f N2 = planeEquations.get(j);
 
 				for (int k = j + 1; k < numbrushes; k++) {
-					Vector4f N3 = planeEquations.getQuick(k);
+                    //return array[index];
+                    Vector4f N3 = planeEquations.get(k);
 
 					com.bulletphysics.linearmath.VectorUtil.cross3(n2n3, N2, N3);
 					com.bulletphysics.linearmath.VectorUtil.cross3(n3n1, N3, N1);

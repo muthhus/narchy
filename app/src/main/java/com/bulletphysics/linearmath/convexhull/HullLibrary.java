@@ -45,7 +45,7 @@ public class HullLibrary {
 
 	public final IntArrayList vertexIndexMapping = new IntArrayList();
 
-	private ObjectArrayList<com.bulletphysics.linearmath.convexhull.Tri> tris = new ObjectArrayList<com.bulletphysics.linearmath.convexhull.Tri>();
+	private final ObjectArrayList<com.bulletphysics.linearmath.convexhull.Tri> tris = new ObjectArrayList<com.bulletphysics.linearmath.convexhull.Tri>();
 
 	/**
 	 * Converts point cloud to polygonal representation.
@@ -75,7 +75,8 @@ public class HullLibrary {
 			//		if ( 1 ) // scale vertices back to their original size.
 			{
 				for (int i=0; i<ovcount[0]; i++) {
-					Vector3f v = vertexSource.getQuick(i);
+					//return array[index];
+					Vector3f v = vertexSource.get(i);
 					VectorUtil.mul(v, v, scale);
 				}
 			}
@@ -101,7 +102,9 @@ public class HullLibrary {
 					MiscUtil.resize(result.indices, hr.indexCount, 0);
 
 					for (int i=0; i<ovcount[0]; i++) {
-						result.outputVertices.getQuick(i).set(vertexScratch.getQuick(i));
+						//return array[index];
+						//return array[index];
+						result.outputVertices.get(i).set(vertexScratch.get(i));
 					}
 
 					if (desc.hasHullFlag(HullFlags.REVERSE_ORDER)) {
@@ -133,7 +136,9 @@ public class HullLibrary {
 					result.numIndices = hr.indexCount + hr.faceCount;
 					MiscUtil.resize(result.indices, result.numIndices, 0);
 					for (int i=0; i<ovcount[0]; i++) {
-						result.outputVertices.getQuick(i).set(vertexScratch.getQuick(i));
+						//return array[index];
+						//return array[index];
+						result.outputVertices.get(i).set(vertexScratch.get(i));
 					}
 
 					//				if ( 1 )
@@ -172,8 +177,8 @@ public class HullLibrary {
 	/**
 	 * Release memory allocated for this result, we are done with it.
 	 */
-	public boolean releaseResult(HullResult result) {
-		if (result.outputVertices.size() != 0) {
+	public static boolean releaseResult(HullResult result) {
+		if (!result.outputVertices.isEmpty()) {
 			result.numOutputVertices = 0;
 			result.outputVertices.clear();
 		}
@@ -204,7 +209,8 @@ public class HullLibrary {
 	}
 
 	private void deAllocateTriangle(com.bulletphysics.linearmath.convexhull.Tri tri) {
-		assert (tris.getQuick(tri.id) == tri);
+		//return array[index];
+		assert (tris.get(tri.id) == tri);
 		tris.setQuick(tri.id, null);
 	}
 
@@ -214,10 +220,14 @@ public class HullLibrary {
 			int i2 = (i + 2) % 3;
 			int a = s.getCoord(i1);
 			int b = s.getCoord(i2);
-			assert (tris.getQuick(s.neib(a, b).get()).neib(b, a).get() == s.id);
-			assert (tris.getQuick(t.neib(a, b).get()).neib(b, a).get() == t.id);
-			tris.getQuick(s.neib(a, b).get()).neib(b, a).set(t.neib(b, a).get());
-			tris.getQuick(t.neib(b, a).get()).neib(a, b).set(s.neib(a, b).get());
+			//return array[index];
+			assert (tris.get(s.neib(a, b).get()).neib(b, a).get() == s.id);
+			//return array[index];
+			assert (tris.get(t.neib(a, b).get()).neib(b, a).get() == t.id);
+			//return array[index];
+			tris.get(s.neib(a, b).get()).neib(b, a).set(t.neib(b, a).get());
+			//return array[index];
+			tris.get(t.neib(b, a).get()).neib(a, b).set(s.neib(a, b).get());
 		}
 	}
 
@@ -229,7 +239,8 @@ public class HullLibrary {
 	}
 
 	private void checkit(com.bulletphysics.linearmath.convexhull.Tri t) {
-		assert (tris.getQuick(t.id) == t);
+		//return array[index];
+		assert (tris.get(t.id) == t);
 		for (int i=0; i<3; i++) {
 			int i1 = (i + 1) % 3;
 			int i2 = (i + 2) % 3;
@@ -237,15 +248,19 @@ public class HullLibrary {
 			int b = t.getCoord(i2);
 
 			assert (a != b);
-			assert (tris.getQuick(t.n.getCoord(i)).neib(b, a).get() == t.id);
+			//return array[index];
+			assert (tris.get(t.n.getCoord(i)).neib(b, a).get() == t.id);
 		}
 	}
 
 	private com.bulletphysics.linearmath.convexhull.Tri extrudable(float epsilon) {
 		com.bulletphysics.linearmath.convexhull.Tri t = null;
 		for (int i=0; i<tris.size(); i++) {
-			if (t == null || (tris.getQuick(i) != null && t.rise < tris.getQuick(i).rise)) {
-				t = tris.getQuick(i);
+			//return array[index];
+			//return array[index];
+			if (t == null || (tris.get(i) != null && t.rise < tris.get(i).rise)) {
+				//return array[index];
+				t = tris.get(i);
 			}
 		}
 		return (t.rise > epsilon) ? t : null;
@@ -258,11 +273,14 @@ public class HullLibrary {
 		IntArrayList ts = new IntArrayList();
 
 		for (int i=0; i<tris.size(); i++) {
-			if (tris.getQuick(i) != null) {
+			//return array[index];
+			if (tris.get(i) != null) {
 				for (int j = 0; j < 3; j++) {
-					ts.add((tris.getQuick(i)).getCoord(j));
+					//return array[index];
+					ts.add((tris.get(i)).getCoord(j));
 				}
-				deAllocateTriangle(tris.getQuick(i));
+				//return array[index];
+				deAllocateTriangle(tris.get(i));
 			}
 		}
 		tris_count[0] = ts.size() / 3;
@@ -287,8 +305,10 @@ public class HullLibrary {
 			vlimit = 1000000000;
 		}
 		//int j;
-		Vector3f bmin = new Vector3f((Vector3f) verts.getQuick(0));
-		Vector3f bmax = new Vector3f((Vector3f) verts.getQuick(0));
+		//return array[index];
+		Vector3f bmin = new Vector3f(verts.get(0));
+		//return array[index];
+		Vector3f bmax = new Vector3f(verts.get(0));
 		IntArrayList isextreme = new IntArrayList();
 		//isextreme.reserve(verts_count);
 		IntArrayList allow = new IntArrayList();
@@ -297,8 +317,10 @@ public class HullLibrary {
 		for (int j=0; j<verts_count; j++) {
 			allow.add(1);
 			isextreme.add(0);
-			VectorUtil.setMin(bmin, verts.getQuick(j));
-			VectorUtil.setMax(bmax, verts.getQuick(j));
+			//return array[index];
+			VectorUtil.setMin(bmin, verts.get(j));
+			//return array[index];
+			VectorUtil.setMax(bmax, verts.get(j));
 		}
 		tmp.sub(bmax, bmin);
 		float epsilon = tmp.length() * 0.001f;
@@ -311,7 +333,11 @@ public class HullLibrary {
 		// a valid interior point
 		}
 		Vector3f center = new Vector3f();
-		VectorUtil.add(center, verts.getQuick(p.getCoord(0)), verts.getQuick(p.getCoord(1)), verts.getQuick(p.getCoord(2)), verts.getQuick(p.getCoord(3)));
+		//return array[index];
+		//return array[index];
+		//return array[index];
+		//return array[index];
+		VectorUtil.add(center, verts.get(p.getCoord(0)), verts.get(p.getCoord(1)), verts.get(p.getCoord(2)), verts.get(p.getCoord(3)));
 		center.scale(1f / 4f);
 
 		com.bulletphysics.linearmath.convexhull.Tri t0 = allocateTriangle(p.getCoord(2), p.getCoord(3), p.getCoord(1));
@@ -334,12 +360,18 @@ public class HullLibrary {
 		Vector3f n = new Vector3f();
 
 		for (int j=0; j<tris.size(); j++) {
-			com.bulletphysics.linearmath.convexhull.Tri t = tris.getQuick(j);
+			//return array[index];
+			com.bulletphysics.linearmath.convexhull.Tri t = tris.get(j);
 			assert (t != null);
 			assert (t.vmax < 0);
-			triNormal(verts.getQuick(t.getCoord(0)), verts.getQuick(t.getCoord(1)), verts.getQuick(t.getCoord(2)), n);
+			//return array[index];
+			//return array[index];
+			//return array[index];
+			triNormal(verts.get(t.getCoord(0)), verts.get(t.getCoord(1)), verts.get(t.getCoord(2)), n);
 			t.vmax = maxdirsterid(verts, verts_count, n, allow);
-			tmp.sub(verts.getQuick(t.vmax), verts.getQuick(t.getCoord(0)));
+			//return array[index];
+			//return array[index];
+			tmp.sub(verts.get(t.vmax), verts.get(t.getCoord(0)));
 			t.rise = n.dot(tmp);
 		}
 		com.bulletphysics.linearmath.convexhull.Tri te;
@@ -353,29 +385,42 @@ public class HullLibrary {
 			//if(v==p0 || v==p1 || v==p2 || v==p3) continue; // done these already
 			int j = tris.size();
 			while ((j--) != 0) {
-				if (tris.getQuick(j) == null) {
+				//return array[index];
+				if (tris.get(j) == null) {
 					continue;
 				}
-				com.bulletphysics.linearmath.convexhull.Int3 t = tris.getQuick(j);
-				if (above(verts, t, verts.getQuick(v), 0.01f * epsilon)) {
-					extrude(tris.getQuick(j), v);
+				//return array[index];
+				com.bulletphysics.linearmath.convexhull.Int3 t = tris.get(j);
+				//return array[index];
+				if (above(verts, t, verts.get(v), 0.01f * epsilon)) {
+					//return array[index];
+					extrude(tris.get(j), v);
 				}
 			}
 			// now check for those degenerate cases where we have a flipped triangle or a really skinny triangle
 			j = tris.size();
 			while ((j--) != 0) {
-				if (tris.getQuick(j) == null) {
+				//return array[index];
+				if (tris.get(j) == null) {
 					continue;
 				}
-				if (!hasvert(tris.getQuick(j), v)) {
+				//return array[index];
+				if (!hasvert(tris.get(j), v)) {
 					break;
 				}
-				com.bulletphysics.linearmath.convexhull.Int3 nt = tris.getQuick(j);
-				tmp1.sub(verts.getQuick(nt.getCoord(1)), verts.getQuick(nt.getCoord(0)));
-				tmp2.sub(verts.getQuick(nt.getCoord(2)), verts.getQuick(nt.getCoord(1)));
+				//return array[index];
+				com.bulletphysics.linearmath.convexhull.Int3 nt = tris.get(j);
+				//return array[index];
+				//return array[index];
+				tmp1.sub(verts.get(nt.getCoord(1)), verts.get(nt.getCoord(0)));
+				//return array[index];
+				//return array[index];
+				tmp2.sub(verts.get(nt.getCoord(2)), verts.get(nt.getCoord(1)));
 				tmp.cross(tmp1, tmp2);
 				if (above(verts, nt, center, 0.01f * epsilon) || tmp.length() < epsilon * epsilon * 0.1f) {
-					com.bulletphysics.linearmath.convexhull.Tri nb = tris.getQuick(tris.getQuick(j).n.getCoord(0));
+					//return array[index];
+					//return array[index];
+					com.bulletphysics.linearmath.convexhull.Tri nb = tris.get(tris.get(j).n.getCoord(0));
 					assert (nb != null);
 					assert (!hasvert(nb, v));
 					assert (nb.id < j);
@@ -385,20 +430,26 @@ public class HullLibrary {
 			}
 			j = tris.size();
 			while ((j--) != 0) {
-				com.bulletphysics.linearmath.convexhull.Tri t = tris.getQuick(j);
+				//return array[index];
+				com.bulletphysics.linearmath.convexhull.Tri t = tris.get(j);
 				if (t == null) {
 					continue;
 				}
 				if (t.vmax >= 0) {
 					break;
 				}
-				triNormal(verts.getQuick(t.getCoord(0)), verts.getQuick(t.getCoord(1)), verts.getQuick(t.getCoord(2)), n);
+				//return array[index];
+				//return array[index];
+				//return array[index];
+				triNormal(verts.get(t.getCoord(0)), verts.get(t.getCoord(1)), verts.get(t.getCoord(2)), n);
 				t.vmax = maxdirsterid(verts, verts_count, n, allow);
 				if (isextreme.get(t.vmax) != 0) {
 					t.vmax = -1; // already done that vertex - algorithm needs to be able to terminate.
 				}
 				else {
-					tmp.sub(verts.getQuick(t.vmax), verts.getQuick(t.getCoord(0)));
+					//return array[index];
+					//return array[index];
+					tmp.sub(verts.get(t.vmax), verts.get(t.getCoord(0)));
 					t.rise = n.dot(tmp);
 				}
 			}
@@ -407,7 +458,7 @@ public class HullLibrary {
 		return 1;
 	}
 
-	private com.bulletphysics.linearmath.convexhull.Int4 findSimplex(ObjectArrayList<Vector3f> verts, int verts_count, IntArrayList allow, com.bulletphysics.linearmath.convexhull.Int4 out) {
+	private static com.bulletphysics.linearmath.convexhull.Int4 findSimplex(ObjectArrayList<Vector3f> verts, int verts_count, IntArrayList allow, com.bulletphysics.linearmath.convexhull.Int4 out) {
 		Vector3f tmp = new Vector3f();
 		Vector3f tmp1 = new Vector3f();
 		Vector3f tmp2 = new Vector3f();
@@ -417,7 +468,9 @@ public class HullLibrary {
 		int p0 = maxdirsterid(verts, verts_count, basis[0], allow);
 		tmp.negate(basis[0]);
 		int p1 = maxdirsterid(verts, verts_count, tmp, allow);
-		basis[0].sub(verts.getQuick(p0), verts.getQuick(p1));
+		//return array[index];
+		//return array[index];
+		basis[0].sub(verts.get(p0), verts.get(p1));
 		if (p0 == p1 || (basis[0].x == 0f && basis[0].y == 0f && basis[0].z == 0f)) {
 			out.set(-1, -1, -1, -1);
 			return out;
@@ -442,7 +495,9 @@ public class HullLibrary {
 			out.set(-1, -1, -1, -1);
 			return out;
 		}
-		basis[1].sub(verts.getQuick(p2), verts.getQuick(p0));
+		//return array[index];
+		//return array[index];
+		basis[1].sub(verts.get(p2), verts.get(p0));
 		basis[2].cross(basis[1], basis[0]);
 		basis[2].normalize();
 		int p3 = maxdirsterid(verts, verts_count, basis[2], allow);
@@ -456,10 +511,16 @@ public class HullLibrary {
 		}
 		assert (!(p0 == p1 || p0 == p2 || p0 == p3 || p1 == p2 || p1 == p3 || p2 == p3));
 
-		tmp1.sub(verts.getQuick(p1), verts.getQuick(p0));
-		tmp2.sub(verts.getQuick(p2), verts.getQuick(p0));
+		//return array[index];
+		//return array[index];
+		tmp1.sub(verts.get(p1), verts.get(p0));
+		//return array[index];
+		//return array[index];
+		tmp2.sub(verts.get(p2), verts.get(p0));
 		tmp2.cross(tmp1, tmp2);
-		tmp1.sub(verts.getQuick(p3), verts.getQuick(p0));
+		//return array[index];
+		//return array[index];
+		tmp1.sub(verts.get(p3), verts.get(p0));
 		if (tmp1.dot(tmp2) < 0) {
 			int swap_tmp = p2;
 			p2 = p3;
@@ -476,24 +537,33 @@ public class HullLibrary {
 		int n = tris.size();
 		com.bulletphysics.linearmath.convexhull.Tri ta = allocateTriangle(v, t.getCoord(1), t.getCoord(2));
 		ta.n.set(t0.n.getCoord(0), n + 1, n + 2);
-		tris.getQuick(t0.n.getCoord(0)).neib(t.getCoord(1), t.getCoord(2)).set(n + 0);
+		//return array[index];
+		tris.get(t0.n.getCoord(0)).neib(t.getCoord(1), t.getCoord(2)).set(n + 0);
 		com.bulletphysics.linearmath.convexhull.Tri tb = allocateTriangle(v, t.getCoord(2), t.getCoord(0));
 		tb.n.set(t0.n.getCoord(1), n + 2, n + 0);
-		tris.getQuick(t0.n.getCoord(1)).neib(t.getCoord(2), t.getCoord(0)).set(n + 1);
+		//return array[index];
+		tris.get(t0.n.getCoord(1)).neib(t.getCoord(2), t.getCoord(0)).set(n + 1);
 		com.bulletphysics.linearmath.convexhull.Tri tc = allocateTriangle(v, t.getCoord(0), t.getCoord(1));
 		tc.n.set(t0.n.getCoord(2), n + 0, n + 1);
-		tris.getQuick(t0.n.getCoord(2)).neib(t.getCoord(0), t.getCoord(1)).set(n + 2);
+		//return array[index];
+		tris.get(t0.n.getCoord(2)).neib(t.getCoord(0), t.getCoord(1)).set(n + 2);
 		checkit(ta);
 		checkit(tb);
 		checkit(tc);
-		if (hasvert(tris.getQuick(ta.n.getCoord(0)), v)) {
-			removeb2b(ta, tris.getQuick(ta.n.getCoord(0)));
+		//return array[index];
+		if (hasvert(tris.get(ta.n.getCoord(0)), v)) {
+			//return array[index];
+			removeb2b(ta, tris.get(ta.n.getCoord(0)));
 		}
-		if (hasvert(tris.getQuick(tb.n.getCoord(0)), v)) {
-			removeb2b(tb, tris.getQuick(tb.n.getCoord(0)));
+		//return array[index];
+		if (hasvert(tris.get(tb.n.getCoord(0)), v)) {
+			//return array[index];
+			removeb2b(tb, tris.get(tb.n.getCoord(0)));
 		}
-		if (hasvert(tris.getQuick(tc.n.getCoord(0)), v)) {
-			removeb2b(tc, tris.getQuick(tc.n.getCoord(0)));
+		//return array[index];
+		if (hasvert(tris.get(tc.n.getCoord(0)), v)) {
+			//return array[index];
+			removeb2b(tc, tris.get(tc.n.getCoord(0)));
 		}
 		deAllocateTriangle(t0);
 	}
@@ -532,7 +602,9 @@ public class HullLibrary {
 			else {
 				indices.set(i, ocount[0]);      // new index mapping
 
-				overts.getQuick(ocount[0]).set(verts.getQuick(v)); // copy old vert to new vert array
+				//return array[index];
+				//return array[index];
+				overts.get(ocount[0]).set(verts.get(v)); // copy old vert to new vert array
 
 				for (int k = 0; k < vertexIndexMapping.size(); k++) {
 					if (tmpIndices.get(k) == v) {
@@ -582,7 +654,8 @@ public class HullLibrary {
 		//	if ( 1 )
 		{
 			for (int i=0; i<svcount; i++) {
-				Vector3f p = vtx_ptr.getQuick(vtx_idx);
+				//return array[index];
+				Vector3f p = vtx_ptr.get(vtx_idx);
 
 				vtx_idx +=/*stride*/ 1;
 
@@ -664,7 +737,8 @@ public class HullLibrary {
 		vtx_idx = 0;
 
 		for (int i=0; i<svcount; i++) {
-			Vector3f p = vtx_ptr.getQuick(vtx_idx);
+			//return array[index];
+			Vector3f p = vtx_ptr.get(vtx_idx);
 			vtx_idx +=/*stride*/ 1;
 
 			float px = p.x;
@@ -678,49 +752,49 @@ public class HullLibrary {
 			}
 
 			//		if ( 1 )
-			{
-				int j;
+			int j;
 
-				for (j=0; j<vcount[0]; j++) {
-					/// XXX might be broken
-					Vector3f v = vertices.getQuick(j);
+			for (j=0; j<vcount[0]; j++) {
+                /// XXX might be broken
+				//return array[index];
+				Vector3f v = vertices.get(j);
 
-					float x = v.x;
-					float y = v.y;
-					float z = v.z;
+                float x = v.x;
+                float y = v.y;
+                float z = v.z;
 
-					dx = Math.abs(x - px);
-					dy = Math.abs(y - py);
-					dz = Math.abs(z - pz);
+                dx = Math.abs(x - px);
+                dy = Math.abs(y - py);
+                dz = Math.abs(z - pz);
 
-					if (dx < normalepsilon && dy < normalepsilon && dz < normalepsilon) {
-						// ok, it is close enough to the old one
-						// now let us see if it is further from the center of the point cloud than the one we already recorded.
-						// in which case we keep this one instead.
+                if (dx < normalepsilon && dy < normalepsilon && dz < normalepsilon) {
+                    // ok, it is close enough to the old one
+                    // now let us see if it is further from the center of the point cloud than the one we already recorded.
+                    // in which case we keep this one instead.
 
-						float dist1 = getDist(px, py, pz, center);
-						float dist2 = getDist(v.x, v.y, v.z, center);
+                    float dist1 = getDist(px, py, pz, center);
+                    float dist2 = getDist(v.x, v.y, v.z, center);
 
-						if (dist1 > dist2) {
-							v.x = px;
-							v.y = py;
-							v.z = pz;
-						}
+                    if (dist1 > dist2) {
+                        v.x = px;
+                        v.y = py;
+                        v.z = pz;
+                    }
 
-						break;
-					}
-				}
+                    break;
+                }
+            }
 
-				if (j == vcount[0]) {
-					Vector3f dest = vertices.getQuick(vcount[0]);
-					dest.x = px;
-					dest.y = py;
-					dest.z = pz;
-					vcount[0]++;
-				}
+			if (j == vcount[0]) {
+				//return array[index];
+				Vector3f dest = vertices.get(vcount[0]);
+                dest.x = px;
+                dest.y = py;
+                dest.z = pz;
+                vcount[0]++;
+            }
 
-				vertexIndexMapping.add(j);
-			}
+			vertexIndexMapping.add(j);
 		}
 
 		// ok..now make sure we didn't prune so many vertices it is now invalid.
@@ -729,7 +803,8 @@ public class HullLibrary {
 		bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
 
 		for (int i=0; i<vcount[0]; i++) {
-            Vector3f p = vertices.getQuick(i);
+			//return array[index];
+			Vector3f p = vertices.get(i);
             for (int j = 0; j < 3; j++) {
                 if (VectorUtil.getCoord(p, j) < bmin[j]) {
                     bmin[j] = VectorUtil.getCoord(p, j);
@@ -820,7 +895,9 @@ public class HullLibrary {
 		int m = -1;
 		for (int i=0; i<count; i++) {
 			if (allow.get(i) != 0) {
-				if (m == -1 || p.getQuick(i).dot(dir) > p.getQuick(m).dot(dir)) {
+				//return array[index];
+				//return array[index];
+				if (m == -1 || p.get(i).dot(dir) > p.get(m).dot(dir)) {
 					m = i;
 				}
 			}
@@ -908,9 +985,13 @@ public class HullLibrary {
 	}
 
 	private static boolean above(ObjectArrayList<Vector3f> vertices, com.bulletphysics.linearmath.convexhull.Int3 t, Vector3f p, float epsilon) {
-		Vector3f n = triNormal(vertices.getQuick(t.getCoord(0)), vertices.getQuick(t.getCoord(1)), vertices.getQuick(t.getCoord(2)), new Vector3f());
+		//return array[index];
+		//return array[index];
+		//return array[index];
+		Vector3f n = triNormal(vertices.get(t.getCoord(0)), vertices.get(t.getCoord(1)), vertices.get(t.getCoord(2)), new Vector3f());
 		Vector3f tmp = new Vector3f();
-		tmp.sub(p, vertices.getQuick(t.getCoord(0)));
+		//return array[index];
+		tmp.sub(p, vertices.get(t.getCoord(0)));
 		return (n.dot(tmp) > epsilon); // EPSILON???
 	}
 
@@ -926,7 +1007,8 @@ public class HullLibrary {
 	
 	private static void addPoint(int[] vcount, ObjectArrayList<Vector3f> p, float x, float y, float z) {
 		// XXX, might be broken
-		Vector3f dest = p.getQuick(vcount[0]);
+		//return array[index];
+		Vector3f dest = p.get(vcount[0]);
 		dest.x = x;
 		dest.y = y;
 		dest.z = z;

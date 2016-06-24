@@ -156,7 +156,8 @@ public class CollisionDispatcher extends Dispatcher {
 		int findIndex = manifold.index1a;
 		assert (findIndex < manifoldsPtr.size());
 		Collections.swap(manifoldsPtr, findIndex, manifoldsPtr.size()-1);
-		manifoldsPtr.getQuick(findIndex).index1a = findIndex;
+        //return array[index];
+        manifoldsPtr.get(findIndex).index1a = findIndex;
 		manifoldsPtr.removeQuick(manifoldsPtr.size()-1);
 
 	}
@@ -236,8 +237,9 @@ public class CollisionDispatcher extends Dispatcher {
 
 	@Override
 	public PersistentManifold getManifoldByIndexInternal(int index) {
-		return manifoldsPtr.getQuick(index);
-	}
+        return manifoldsPtr.get(index);
+        //return array[index];
+    }
 
 	@Override
 	public ObjectArrayList<PersistentManifold> getInternalManifoldPointer() {

@@ -44,7 +44,7 @@ public class BroadphaseProxy {
 	
 	public Object multiSapParentProxy;
 	
-	public int uniqueId; // uniqueId is introduced for paircache. could get rid of this, by calculating the address offset etc.
+	public int uid; // uniqueId is introduced for paircache. could get rid of this, by calculating the address offset etc.
 
 	public BroadphaseProxy() {
 	}
@@ -60,8 +60,4 @@ public class BroadphaseProxy {
 		this.multiSapParentProxy = multiSapParentProxy;
 	}
 
-	public int getUid() {
-		return uniqueId;
-	}
-	
 }

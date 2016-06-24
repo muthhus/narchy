@@ -31,21 +31,28 @@ import com.bulletphysics.linearmath.Transform;
  * 
  * @author jezek2
  */
-public class CompoundShapeChild {
+public final class CompoundShapeChild {
 	
 	public final Transform transform = new Transform();
-	public CollisionShape childShape;
-	public BroadphaseNativeType childShapeType;
-	public float childMargin;
+	public final CollisionShape childShape;
+	//public final BroadphaseNativeType childShapeType;
+	//public float childMargin;
+
+	public CompoundShapeChild(CollisionShape childShape) {
+		this.childShape = childShape;
+		//this.childShapeType = childShapeType;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof com.bulletphysics.collision.shapes.CompoundShapeChild)) return false;
 		com.bulletphysics.collision.shapes.CompoundShapeChild child = (com.bulletphysics.collision.shapes.CompoundShapeChild)obj;
 		return transform.equals(child.transform) &&
-		       childShape == child.childShape &&
-		       childShapeType == child.childShapeType &&
-		       childMargin == child.childMargin;
+		       childShape == child.childShape
+				//&&
+		       //childShape.getShapeType() == child.childShape.getShapeType()  &&
+		       //childMargin == child.childMargin
+		;
 	}
 
 	@Override
@@ -53,8 +60,8 @@ public class CompoundShapeChild {
 		int hash = 7;
 		hash = 19 * hash + transform.hashCode();
 		hash = 19 * hash + childShape.hashCode();
-		hash = 19 * hash + childShapeType.hashCode();
-		hash = 19 * hash + Float.floatToIntBits(childMargin);
+		hash = 19 * hash + childShape.getShapeType().hashCode();
+		hash = 19 * hash + Float.floatToIntBits(childShape.getMargin());
 		return hash;
 	}
 

@@ -27,6 +27,7 @@ import com.bulletphysics.BulletStats;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.util.IntArrayList;
 import com.bulletphysics.util.ObjectArrayList;
+import nars.util.Util;
 
 /**
  * Hash-space based {@link OverlappingPairCache}.
@@ -69,13 +70,13 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	@Override
     public Object removeOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1, Dispatcher dispatcher) {
 		BulletStats.gRemovePairs++;
-		if (proxy0.getUid() > proxy1.getUid()) {
+		if (proxy0.uid > proxy1.uid) {
 			BroadphaseProxy tmp = proxy0;
 			proxy0 = proxy1;
 			proxy1 = tmp;
 		}
-		int proxyId1 = proxy0.getUid();
-		int proxyId2 = proxy1.getUid();
+		int proxyId1 = proxy0.uid;
+		int proxyId2 = proxy1.uid;
 
 		/*if (proxyId1 > proxyId2)
 		btSwap(proxyId1, proxyId2);*/
@@ -91,8 +92,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		Object userData = pair.userInfo;
 
-		assert (pair.pProxy0.getUid() == proxyId1);
-		assert (pair.pProxy1.getUid() == proxyId2);
+		assert (pair.pProxy0.uid == proxyId1);
+		assert (pair.pProxy1.uid == proxyId2);
 
 		// JAVA TODO: optimize
 		//int pairIndex = int(pair - &m_overlappingPairArray[0]);
@@ -136,9 +137,10 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		}
 
 		// Remove the last pair from the hash table.
-		BroadphasePair last = overlappingPairArray.getQuick(lastPairIndex);
+		//return array[index];
+		BroadphasePair last = overlappingPairArray.get(lastPairIndex);
 		/* missing swap here too, Nat. */
-		int lastHash = getHash(last.pProxy0.getUid(), last.pProxy1.getUid()) & (overlappingPairArray.capacity() - 1);
+		int lastHash = getHash(last.pProxy0.uid, last.pProxy1.uid) & (overlappingPairArray.capacity() - 1);
 
 		index = hashTable.get(lastHash);
 		assert (index != NULL_PAIR);
@@ -158,7 +160,9 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		}
 
 		// Copy the last pair into the remove pair's spot.
-		overlappingPairArray.getQuick(pairIndex).set(overlappingPairArray.getQuick(lastPairIndex));
+		//return array[index];
+		//return array[index];
+		overlappingPairArray.get(pairIndex).set(overlappingPairArray.get(lastPairIndex));
 
 		// Insert the last pair into the hash table
 		next.set(pairIndex, hashTable.get(lastHash));
@@ -185,7 +189,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		//	printf("m_overlappingPairArray.size()=%d\n",m_overlappingPairArray.size());
 		for (int i=0; i<overlappingPairArray.size(); ) {
 
-			BroadphasePair pair = overlappingPairArray.getQuick(i);
+			//return array[index];
+			BroadphasePair pair = overlappingPairArray.get(i);
 			if (callback.processOverlap(pair)) {
 				removeOverlappingPair(pair.pProxy0, pair.pProxy1, dispatcher);
 
@@ -224,26 +229,28 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	@Override
 	public BroadphasePair findPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
 		BulletStats.gFindPairs++;
-		if (proxy0.getUid() > proxy1.getUid()) {
+		if (proxy0.uid > proxy1.uid) {
 			BroadphaseProxy tmp = proxy0;
 			proxy0 = proxy1;
-			proxy1 = proxy0;
+			proxy1 = tmp;
 		}
-		int proxyId1 = proxy0.getUid();
-		int proxyId2 = proxy1.getUid();
+		int proxyId1 = proxy0.uid;
+		int proxyId2 = proxy1.uid;
 
 		/*if (proxyId1 > proxyId2)
 			btSwap(proxyId1, proxyId2);*/
 
 		int hash = getHash(proxyId1, proxyId2) & (overlappingPairArray.capacity()-1);
 
-		if (hash >= hashTable.size())
-		{
+		IntArrayList table = this.hashTable;
+
+		if (hash >= table.size()) {
 			return null;
 		}
 
-		int index = hashTable.get(hash);
-		while (index != NULL_PAIR && equalsPair(overlappingPairArray.getQuick(index), proxyId1, proxyId2) == false)
+		int index = table.get(hash);
+		//return array[index];
+		while (index != NULL_PAIR && equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2) == false)
 		{
 			index = next.get(index);
 		}
@@ -255,7 +262,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		assert(index < overlappingPairArray.size());
 
-		return overlappingPairArray.getQuick(index);
+		return overlappingPairArray.get(index);
+		//return array[index];
 	}
 
 	public int getCount() {
@@ -283,13 +291,13 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	}
 
 	private BroadphasePair internalAddPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
-		if (proxy0.getUid() > proxy1.getUid()) {
+		if (proxy0.uid > proxy1.uid) {
 			BroadphaseProxy tmp = proxy0;
 			proxy0 = proxy1;
 			proxy1 = tmp;
 		}
-		int proxyId1 = proxy0.getUid();
-		int proxyId2 = proxy1.getUid();
+		int proxyId1 = proxy0.uid;
+		int proxyId2 = proxy1.uid;
 
 		/*if (proxyId1 > proxyId2)
 		btSwap(proxyId1, proxyId2);*/
@@ -359,9 +367,10 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 			for (int i=0; i<curHashtableSize; i++) {
 
-				BroadphasePair pair = overlappingPairArray.getQuick(i);
-				int proxyId1 = pair.pProxy0.getUid();
-				int proxyId2 = pair.pProxy1.getUid();
+				//return array[index];
+				BroadphasePair pair = overlappingPairArray.get(i);
+				int proxyId1 = pair.pProxy0.uid;
+				int proxyId2 = pair.pProxy1.uid;
 				/*if (proxyId1 > proxyId2)
 				btSwap(proxyId1, proxyId2);*/
 				int hashValue = getHash(proxyId1, proxyId2) & (overlappingPairArray.capacity() - 1); // New hash value with new mask
@@ -371,11 +380,17 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		}
 	}
 
-	private boolean equalsPair(BroadphasePair pair, int proxyId1, int proxyId2) {
-		return pair.pProxy0.getUid() == proxyId1 && pair.pProxy1.getUid() == proxyId2;
+	private static boolean equalsPair(BroadphasePair pair, int proxyId1, int proxyId2) {
+		return pair.pProxy0.uid == proxyId1 && pair.pProxy1.uid == proxyId2;
 	}
 
-	private int getHash(int proxyId1, int proxyId2) {
+	public static int getHash(int seed, int hash) {
+		/** from clojure.Util */
+		return seed ^ ( hash + 0x9e3779b9 + (seed << 6) + (seed >> 2) );
+	}
+
+	public static int getHash0(int proxyId1, int proxyId2) {
+
 		int key = (proxyId1) | (proxyId2 << 16);
 		// Thomas Wang's hash
 
@@ -389,8 +404,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	}
 
 	private BroadphasePair internalFindPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1, int hash) {
-		int proxyId1 = proxy0.getUid();
-		int proxyId2 = proxy1.getUid();
+		int proxyId1 = proxy0.uid;
+		int proxyId2 = proxy1.uid;
 		//#if 0 // wrong, 'equalsPair' use unsorted uids, copy-past devil striked again. Nat.
 		//if (proxyId1 > proxyId2)
 		//	btSwap(proxyId1, proxyId2);
@@ -398,7 +413,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		int index = hashTable.get(hash);
 
-		while (index != NULL_PAIR && equalsPair(overlappingPairArray.getQuick(index), proxyId1, proxyId2) == false) {
+		//return array[index];
+		while (index != NULL_PAIR && equalsPair(overlappingPairArray.get(index), proxyId1, proxyId2) == false) {
 			index = next.get(index);
 		}
 
@@ -408,7 +424,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 		assert (index < overlappingPairArray.size());
 
-		return overlappingPairArray.getQuick(index);
+		return overlappingPairArray.get(index);
+		//return array[index];
 	}
 
 	@Override
@@ -432,7 +449,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		}
 	}
 
-	private static class CleanPairCallback extends OverlapCallback {
+	private static final class CleanPairCallback extends OverlapCallback {
 		private final BroadphaseProxy cleanProxy;
 		private final OverlappingPairCache pairCache;
 		private final Dispatcher dispatcher;

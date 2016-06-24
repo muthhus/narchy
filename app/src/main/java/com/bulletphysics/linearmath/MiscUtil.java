@@ -126,18 +126,23 @@ public class MiscUtil {
 		/*  PRE: a[k+1..N] is a heap */
 		/* POST:  a[k..N]  is a heap */
 
-		T temp = pArr.getQuick(k - 1);
+        //return array[index];
+        T temp = pArr.get(k - 1);
 		/* k has child(s) */
 		while (k <= n / 2) {
 			int child = 2 * k;
 
-			if ((child < n) && comparator.compare(pArr.getQuick(child - 1), pArr.getQuick(child)) < 0) {
+            //return array[index];
+            //return array[index];
+            if ((child < n) && comparator.compare(pArr.get(child - 1), pArr.get(child)) < 0) {
 				child++;
 			}
 			/* pick larger child */
-			if (comparator.compare(temp, pArr.getQuick(child - 1)) < 0) {
+            //return array[index];
+            if (comparator.compare(temp, pArr.get(child - 1)) < 0) {
 				/* move child up */
-				pArr.setQuick(k - 1, pArr.getQuick(child - 1));
+                //return array[index];
+                pArr.setQuick(k - 1, pArr.get(child - 1));
 				k = child;
 			}
 			else {
@@ -171,8 +176,10 @@ public class MiscUtil {
 	}
 
 	private static <T> void swap(ObjectArrayList<T> list, int index0, int index1) {
-		T temp = list.getQuick(index0);
-		list.setQuick(index0, list.getQuick(index1));
+        //return array[index];
+        T temp = list.get(index0);
+        //return array[index];
+        list.setQuick(index0, list.get(index1));
 		list.setQuick(index1, temp);
 	}
 	
@@ -190,12 +197,15 @@ public class MiscUtil {
 		// lo is the lower index, hi is the upper index
 		// of the region of array a that is to be sorted
 		int i = lo, j = hi;
-		T x = list.getQuick((lo + hi) / 2);
+        //return array[index];
+        T x = list.get((lo + hi) / 2);
 
 		// partition
 		do {
-			while (comparator.compare(list.getQuick(i), x) < 0) i++;
-			while (comparator.compare(x, list.getQuick(j)) < 0) j--;
+            //return array[index];
+            while (comparator.compare(list.get(i), x) < 0) i++;
+            //return array[index];
+            while (comparator.compare(x, list.get(j)) < 0) j--;
 			
 			if (i <= j) {
 				swap(list, i, j);

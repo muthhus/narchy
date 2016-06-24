@@ -246,7 +246,7 @@ class GImpactBvh {
 	}
 
 	public int getLeftNode(int nodeindex) {
-		return box_tree.getLeftNode(nodeindex);
+		return BvhTree.getLeftNode(nodeindex);
 	}
 
 	public int getRightNode(int nodeindex) {

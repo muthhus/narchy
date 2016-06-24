@@ -83,7 +83,8 @@ public class TriangleContact {
 		int[] point_indices = intArrays.getFixed(MAX_TRI_CLIPPING);
 
 		for (int _k = 0; _k < point_count; _k++) {
-			float _dist = -ClipPolygon.distance_point_plane(plane, points.getQuick(_k)) + margin;
+            //return array[index];
+            float _dist = -ClipPolygon.distance_point_plane(plane, points.get(_k)) + margin;
 
 			if (_dist >= 0.0f) {
 				if (_dist > penetration_depth) {
@@ -99,7 +100,8 @@ public class TriangleContact {
 		}
 
 		for (int _k = 0; _k < this.point_count; _k++) {
-			this.points[_k].set(points.getQuick(point_indices[_k]));
+            //return array[index];
+            this.points[_k].set(points.get(point_indices[_k]));
 		}
 		
 		intArrays.release(point_indices);

@@ -36,8 +36,8 @@ import javax.vecmath.Vector3f;
  */
 public class SimpleBroadphase extends BroadphaseInterface {
 
-	private final ObjectArrayList<SimpleBroadphaseProxy> handles = new ObjectArrayList<SimpleBroadphaseProxy>();
-	private int maxHandles;						// max number of handles
+	private final ObjectArrayList<SimpleBroadphaseProxy> handles = new ObjectArrayList<>();
+	//private int maxHandles;						// max number of handles
 	private OverlappingPairCache pairCache;
 	private boolean ownsPairCache;
 
@@ -63,7 +63,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		assert (aabbMin.x <= aabbMax.x && aabbMin.y <= aabbMax.y && aabbMin.z <= aabbMax.z);
 
 		SimpleBroadphaseProxy proxy = new SimpleBroadphaseProxy(aabbMin, aabbMax, shapeType, userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
-		proxy.uniqueId = handles.size();
+		proxy.uid = handles.size();
 		handles.add(proxy);
 		return proxy;
 	}
@@ -91,9 +91,11 @@ public class SimpleBroadphase extends BroadphaseInterface {
 	@Override
     public void calculateOverlappingPairs(Dispatcher dispatcher) {
 		for (int i=0; i<handles.size(); i++) {
-			SimpleBroadphaseProxy proxy0 = handles.getQuick(i);
+            //return array[index];
+            SimpleBroadphaseProxy proxy0 = handles.get(i);
 			for (int j=0; j<handles.size(); j++) {
-				SimpleBroadphaseProxy proxy1 = handles.getQuick(j);
+                //return array[index];
+                SimpleBroadphaseProxy proxy1 = handles.get(j);
 				if (proxy0 == proxy1) continue;
 				
 				if (aabbOverlap(proxy0, proxy1)) {

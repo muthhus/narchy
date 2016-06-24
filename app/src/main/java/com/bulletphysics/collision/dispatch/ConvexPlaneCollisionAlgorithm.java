@@ -114,7 +114,7 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 		Vector3f vtxInPlaneWorld = new Vector3f(vtxInPlaneProjected);
 		planeObj.getWorldTransform(tmpTrans).transform(vtxInPlaneWorld);
 
-		hasCollision = distance < manifoldPtr.getContactBreakingThreshold();
+		hasCollision = distance < PersistentManifold.getContactBreakingThreshold();
 		resultOut.setPersistentManifold(manifoldPtr);
 		if (hasCollision) {
 			// report a contact. internally this will be kept persistent, and contact reduction is done

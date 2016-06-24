@@ -44,7 +44,7 @@ import javax.vecmath.Vector3f;
  */
 public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
-	private GjkPairDetector gjkPairDetector = new GjkPairDetector();
+	private final GjkPairDetector gjkPairDetector = new GjkPairDetector();
 
 	public boolean ownManifold;
 	public PersistentManifold manifoldPtr;
@@ -107,7 +107,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		// JAVA NOTE: original: TODO: if (dispatchInfo.m_useContinuous)
 		gjkPairDetector.setMinkowskiA(min0);
 		gjkPairDetector.setMinkowskiB(min1);
-		input.maximumDistanceSquared = min0.getMargin() + min1.getMargin() + manifoldPtr.getContactBreakingThreshold();
+		input.maximumDistanceSquared = min0.getMargin() + min1.getMargin() + PersistentManifold.getContactBreakingThreshold();
 		input.maximumDistanceSquared *= input.maximumDistanceSquared;
 		//input.m_stackAlloc = dispatchInfo.m_stackAllocator;
 
@@ -123,7 +123,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		}
 	}
 
-	private static boolean disableCcd = false;
+	private static final boolean disableCcd = false;
 
 	@Override
 	public float calculateTimeOfImpact(CollisionObject col0, CollisionObject col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {

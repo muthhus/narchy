@@ -61,11 +61,13 @@ class ClipPolygon {
 		boolean _classif = (dist1 > BulletGlobals.SIMD_EPSILON);
 		if (_classif != _prevclassif) {
 			float blendfactor = -dist0 / (dist1 - dist0);
-			vec_blend(clipped.getQuick(clipped_count[0]), point0, point1, blendfactor);
+            //return array[index];
+            vec_blend(clipped.get(clipped_count[0]), point0, point1, blendfactor);
 			clipped_count[0]++;
 		}
 		if (!_classif) {
-			clipped.getQuick(clipped_count[0]).set(point1);
+            //return array[index];
+            clipped.get(clipped_count[0]).set(point1);
 			clipped_count[0]++;
 		}
 	}
@@ -82,18 +84,24 @@ class ClipPolygon {
 		clipped_count[0] = 0;
 
 		// clip first point
-		float firstdist = distance_point_plane(plane, polygon_points.getQuick(0));
+        //return array[index];
+        float firstdist = distance_point_plane(plane, polygon_points.get(0));
 		if (!(firstdist > BulletGlobals.SIMD_EPSILON)) {
-			clipped.getQuick(clipped_count[0]).set(polygon_points.getQuick(0));
+            //return array[index];
+            //return array[index];
+            clipped.get(clipped_count[0]).set(polygon_points.get(0));
 			clipped_count[0]++;
 		}
 
 		float olddist = firstdist;
 		for (int i=1; i<polygon_point_count; i++) {
-			float dist = distance_point_plane(plane, polygon_points.getQuick(i));
+            //return array[index];
+            float dist = distance_point_plane(plane, polygon_points.get(i));
 
-			plane_clip_polygon_collect(
-					polygon_points.getQuick(i - 1), polygon_points.getQuick(i),
+            //return array[index];
+            //return array[index];
+            plane_clip_polygon_collect(
+                    polygon_points.get(i - 1), polygon_points.get(i),
 					olddist,
 					dist,
 					clipped,
@@ -105,8 +113,10 @@ class ClipPolygon {
 
 		// RETURN TO FIRST point
 
-		plane_clip_polygon_collect(
-				polygon_points.getQuick(polygon_point_count - 1), polygon_points.getQuick(0),
+        //return array[index];
+        //return array[index];
+        plane_clip_polygon_collect(
+                polygon_points.get(polygon_point_count - 1), polygon_points.get(0),
 				olddist,
 				firstdist,
 				clipped,
@@ -132,7 +142,8 @@ class ClipPolygon {
 		// clip first point0
 		float firstdist = distance_point_plane(plane, point0);
 		if (!(firstdist > BulletGlobals.SIMD_EPSILON)) {
-			clipped.getQuick(clipped_count[0]).set(point0);
+            //return array[index];
+            clipped.get(clipped_count[0]).set(point0);
 			clipped_count[0]++;
 		}
 

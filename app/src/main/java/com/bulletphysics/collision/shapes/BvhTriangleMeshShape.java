@@ -170,7 +170,7 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 	 * For a fast incremental refit of parts of the tree. Note: the entire AABB of the tree will become more conservative, it never shrinks.
 	 */
 	public void partialRefitTree(Vector3f aabbMin, Vector3f aabbMax) {
-		bvh.refitPartial(meshInterface,aabbMin,aabbMax );
+		OptimizedBvh.refitPartial(meshInterface,aabbMin,aabbMax );
 
 		VectorUtil.setMin(localAabbMin, aabbMin);
 		VectorUtil.setMax(localAabbMax, aabbMax);

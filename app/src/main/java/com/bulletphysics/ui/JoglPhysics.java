@@ -1070,7 +1070,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             ObjectArrayList<CollisionObject> objects = dyn.getCollisionObjectArray();
             for (int i = 0; i < numObjects; i++) {
 
-                CollisionObject colObj = objects.getQuick(i);
+                //return array[index];
+                CollisionObject colObj = objects.get(i);
                 RigidBody body = RigidBody.upcast(colObj);
 
                 if (/*body != null && */body.getMotionState() != null) {

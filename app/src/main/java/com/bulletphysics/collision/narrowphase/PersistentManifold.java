@@ -170,7 +170,7 @@ public class PersistentManifold {
 		this.body1 = body1;
 	}
 	
-	public void clearUserCache(ManifoldPoint pt) {
+	public static void clearUserCache(ManifoldPoint pt) {
 		Object oldPtr = pt.userPersistentData;
 		if (oldPtr != null) {
 //#ifdef DEBUG_PERSISTENCY
@@ -207,13 +207,13 @@ public class PersistentManifold {
 	}
 
 	// todo: get this margin from the current physics / collision environment
-	public float getContactBreakingThreshold() {
+	public static float getContactBreakingThreshold() {
 		return BulletGlobals.getContactBreakingThreshold();
 	}
 
 	public int getCacheEntry(ManifoldPoint newPoint) {
 		float shortestDist = getContactBreakingThreshold() * getContactBreakingThreshold();
-		int size = getNumContacts();
+        int size = cachedPoints;
 		int nearestPoint = -1;
 		Vector3f diffA = new Vector3f();
 		for (int i = 0; i < size; i++) {
@@ -233,7 +233,7 @@ public class PersistentManifold {
 	public int addManifoldPoint(ManifoldPoint newPoint) {
 		assert (validContactDistance(newPoint));
 
-		int insertIndex = getNumContacts();
+        int insertIndex = cachedPoints;
 		if (insertIndex == MANIFOLD_CACHE_SIZE) {
 			//#if MANIFOLD_CACHE_SIZE >= 4
 			if (MANIFOLD_CACHE_SIZE >= 4) {
@@ -259,7 +259,7 @@ public class PersistentManifold {
 	public void removeContactPoint(int index) {
 		clearUserCache(pointCache[index]);
 
-		int lastUsedIndex = getNumContacts() - 1;
+        int lastUsedIndex = cachedPoints - 1;
 //		m_pointCache[index] = m_pointCache[lastUsedIndex];
 		if (index != lastUsedIndex) {
 			// TODO: possible bug
@@ -304,7 +304,7 @@ public class PersistentManifold {
 //#endif
 	}
 
-	private boolean validContactDistance(ManifoldPoint pt) {
+	private static boolean validContactDistance(ManifoldPoint pt) {
 		return pt.distance1 <= getContactBreakingThreshold();
 	}
 
@@ -323,6 +323,7 @@ public class PersistentManifold {
 //#endif //DEBUG_PERSISTENCY
 		// first refresh worldspace positions and distance
 		for (i = getNumContacts() - 1; i >= 0; i--) {
+
 			ManifoldPoint manifoldPoint = pointCache[i];
 
 			manifoldPoint.positionWorldOnA.set(manifoldPoint.localPointA);

@@ -58,7 +58,9 @@ public class ShapeHull {
 
 		MiscUtil.resize(unitSpherePoints, NUM_UNITSPHERE_POINTS+ com.bulletphysics.collision.shapes.ConvexShape.MAX_PREFERRED_PENETRATION_DIRECTIONS*2, Vector3f.class);
 		for (int i=0; i<constUnitSpherePoints.size(); i++) {
-			unitSpherePoints.getQuick(i).set(constUnitSpherePoints.getQuick(i));
+            //return array[index];
+            //return array[index];
+            unitSpherePoints.get(i).set(constUnitSpherePoints.get(i));
 		}
 	}
 
@@ -70,7 +72,8 @@ public class ShapeHull {
 		if (numPDA != 0) {
             for (int i=0; i<numPDA; i++) {
                 shape.getPreferredPenetrationDirection(i, norm);
-                unitSpherePoints.getQuick(numSampleDirections).set(norm);
+                //return array[index];
+                unitSpherePoints.get(numSampleDirections).set(norm);
                 numSampleDirections++;
             }
         }
@@ -79,7 +82,9 @@ public class ShapeHull {
 		MiscUtil.resize(supportPoints, NUM_UNITSPHERE_POINTS + ConvexShape.MAX_PREFERRED_PENETRATION_DIRECTIONS * 2, Vector3f.class);
 
 		for (int i=0; i<numSampleDirections; i++) {
-			shape.localGetSupportingVertex(unitSpherePoints.getQuick(i), supportPoints.getQuick(i));
+            //return array[index];
+            //return array[index];
+            shape.localGetSupportingVertex(unitSpherePoints.get(i), supportPoints.get(i));
 		}
 
 		HullDesc hd = new HullDesc();
@@ -103,7 +108,9 @@ public class ShapeHull {
 		MiscUtil.resize(vertices, hr.numOutputVertices, Vector3f.class);
 
 		for (int i=0; i<hr.numOutputVertices; i++) {
-			vertices.getQuick(i).set(hr.outputVertices.getQuick(i));
+            //return array[index];
+            //return array[index];
+            vertices.get(i).set(hr.outputVertices.get(i));
 		}
 		numIndices = hr.numIndices;
 		MiscUtil.resize(indices, numIndices, 0);
@@ -112,7 +119,7 @@ public class ShapeHull {
 		}
 
 		// free temporary hull result that we just copied
-		hl.releaseResult(hr);
+		HullLibrary.releaseResult(hr);
 
 		return true;
 	}

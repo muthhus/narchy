@@ -37,12 +37,12 @@ public abstract class TypedConstraint {
 	//protected final BulletStack stack = BulletStack.get();
 	
 	// TODO: stack allocation
-	private static /*final*/ RigidBody s_fixed;// = new RigidBody(0, null, null);
+	private static final RigidBody s_fixed = new RigidBody(0, null, null);
 	
-	protected static synchronized RigidBody getFixed() {
-		if (s_fixed == null) {
-			s_fixed = new RigidBody(0, null, null);
-		}
+	@Deprecated protected static /*synchronized*/ RigidBody getFixed() {
+//		if (s_fixed == null) {
+//			s_fixed = new RigidBody(0, null, null);
+//		}
 		return s_fixed;
 	}
 

@@ -119,6 +119,7 @@ public class HeightfieldTerrainShape extends ConcaveShape
 				// float offset (4 for sizeof)
 				int index = ((y * m_heightStickWidth) + x);
 				val = m_heightFieldDataFloat[index];
+				break;
 			}
 			else
 			{

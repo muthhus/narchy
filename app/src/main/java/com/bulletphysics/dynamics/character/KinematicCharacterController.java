@@ -383,7 +383,8 @@ public class KinematicCharacterController extends ActionInterface {
 		for (int i=0; i<ghostObject.getOverlappingPairCache().getNumOverlappingPairs(); i++) {
 			manifoldArray.clear();
 
-			BroadphasePair collisionPair = ghostObject.getOverlappingPairCache().getOverlappingPairArray().getQuick(i);
+			//return array[index];
+			BroadphasePair collisionPair = ghostObject.getOverlappingPairCache().getOverlappingPairArray().get(i);
                         //XXX: added no contact response
                         if (!((CollisionObject)collisionPair.pProxy0.clientObject).hasContactResponse()
                                  || !((CollisionObject)collisionPair.pProxy1.clientObject).hasContactResponse())
@@ -393,7 +394,8 @@ public class KinematicCharacterController extends ActionInterface {
 			}
 
 			for (int j=0; j<manifoldArray.size(); j++) {
-				PersistentManifold manifold = manifoldArray.getQuick(j);
+				//return array[index];
+				PersistentManifold manifold = manifoldArray.get(j);
 				float directionSign = manifold.getBody0() == ghostObject? -1.0f : 1.0f;
 				for (int p=0; p<manifold.getNumContacts(); p++) {
 					ManifoldPoint pt = manifold.getContactPoint(p);
@@ -446,8 +448,8 @@ public class KinematicCharacterController extends ActionInterface {
 		Vector3f up = new Vector3f();
 		up.scale(-1f, upAxisDirection[upAxis]);
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, up, 0.7071f);
-		callback.collisionFilterGroup = getGhostObject().getBroadphaseHandle().collisionFilterGroup;
-		callback.collisionFilterMask = getGhostObject().getBroadphaseHandle().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, world.getDispatchInfo().allowedCcdPenetration);
@@ -542,8 +544,8 @@ public class KinematicCharacterController extends ActionInterface {
 
 			KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, sweepDirNegative, -1.0f);
 
-			callback.collisionFilterGroup = getGhostObject().getBroadphaseHandle().collisionFilterGroup;
-			callback.collisionFilterMask = getGhostObject().getBroadphaseHandle().collisionFilterMask;
+            callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
+            callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
 
 			float margin = convexShape.getMargin();
 			convexShape.setMargin(margin + addedMargin);
@@ -629,8 +631,8 @@ public class KinematicCharacterController extends ActionInterface {
 		end.origin.set(targetPosition);
 
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, upAxisDirection[upAxis], maxSlopeCosine);
-		callback.collisionFilterGroup = getGhostObject().getBroadphaseHandle().collisionFilterGroup;
-		callback.collisionFilterMask = getGhostObject().getBroadphaseHandle().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, collisionWorld.getDispatchInfo().allowedCcdPenetration);

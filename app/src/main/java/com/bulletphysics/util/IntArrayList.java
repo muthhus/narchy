@@ -27,17 +27,19 @@ package com.bulletphysics.util;
  *
  * @author jezek2
  */
-public class IntArrayList {
+public final class IntArrayList {
 
 	private int[] array = new int[16];
 	private int size;
 	
 	public void add(int value) {
-		if (size == array.length) {
+		int[] a = this.array;
+		if (size == a.length) {
 			expand();
+			a = this.array;
 		}
 		
-		array[size++] = value;
+		a[size++] = value;
 	}
 	
 	private void expand() {
@@ -47,20 +49,23 @@ public class IntArrayList {
 	}
 
 	public int remove(int index) {
-		if (index >= size) throw new IndexOutOfBoundsException();
-		int old = array[index];
-		System.arraycopy(array, index+1, array, index, size - index - 1);
-		size--;
+		int s = this.size;
+		if (index >= s) throw new IndexOutOfBoundsException();
+		int[] a = this.array;
+		int old = a[index];
+		if (index!= this.size -1)
+			System.arraycopy(a, index+1, a, index, s - index - 1);
+		this.size--;
 		return old;
 	}
 
 	public int get(int index) {
-		if (index >= size) throw new IndexOutOfBoundsException();
+		//if (index >= size) throw new IndexOutOfBoundsException();
 		return array[index];
 	}
 
 	public void set(int index, int value) {
-		if (index >= size) throw new IndexOutOfBoundsException();
+		//if (index >= size) throw new IndexOutOfBoundsException();
 		array[index] = value;
 	}
 

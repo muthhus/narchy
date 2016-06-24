@@ -164,7 +164,7 @@ public class RigidBody extends CollisionObject {
 	public void destroy() {
 		// No constraints should point to this rigidbody
 		// Remove constraints from the dynamics world before you delete the related rigidbodies. 
-		assert (constraintRefs.size() == 0);
+		assert (constraintRefs.isEmpty());
 	}
 
 	public void proceedToTransform(Transform newTrans) {
@@ -193,8 +193,8 @@ public class RigidBody extends CollisionObject {
 		//todo: clamp to some (user definable) safe minimum timestep, to limit maximum angular/linear velocities
 		if (timeStep != 0f) {
 			//if we use motionstate to synchronize world transforms, get the new kinematic/animated world transform
-			if (getMotionState() != null) {
-				getMotionState().getWorldTransform(worldTransform);
+            if (optionalMotionState != null) {
+                optionalMotionState.getWorldTransform(worldTransform);
 			}
 			//Vector3f linVel = new Vector3f(), angVel = new Vector3f();
 
@@ -575,7 +575,7 @@ public class RigidBody extends CollisionObject {
 	 * Is this rigidbody added to a CollisionWorld/DynamicsWorld/Broadphase?
 	 */
 	public boolean isInWorld() {
-		return (getBroadphaseProxy() != null);
+        return (broadphaseHandle != null);
 	}
 
 	@Override
@@ -587,7 +587,8 @@ public class RigidBody extends CollisionObject {
 		}
 
 		for (int i = 0; i < constraintRefs.size(); ++i) {
-			TypedConstraint c = constraintRefs.getQuick(i);
+			//return array[index];
+			TypedConstraint c = constraintRefs.get(i);
 			if (c.getRigidBodyA() == otherRb || c.getRigidBodyB() == otherRb) {
 				return false;
 			}
@@ -607,11 +608,12 @@ public class RigidBody extends CollisionObject {
 	
 	public void removeConstraintRef(TypedConstraint c) {
 		constraintRefs.remove(c);
-		checkCollideWith = (constraintRefs.size() > 0);
+		checkCollideWith = (!constraintRefs.isEmpty());
 	}
 
 	public TypedConstraint getConstraintRef(int index) {
-		return constraintRefs.getQuick(index);
+		return constraintRefs.get(index);
+		//return array[index];
 	}
 
 	public int getNumConstraintRefs() {

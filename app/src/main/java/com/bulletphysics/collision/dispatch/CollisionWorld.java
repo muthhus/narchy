@@ -63,15 +63,16 @@ public class CollisionWorld {
 	public void destroy() {
 		// clean up remaining objects
 		for (int i = 0; i < collisionObjects.size(); i++) {
-			CollisionObject collisionObject = collisionObjects.getQuick(i);
+			//return array[index];
+			CollisionObject collisionObject = collisionObjects.get(i);
 
 			BroadphaseProxy bp = collisionObject.getBroadphaseHandle();
 			if (bp != null) {
 				//
 				// only clear the cached algorithms
 				//
-				getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
-				getBroadphase().destroyProxy(bp, dispatcher1);
+				broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
+				broadphasePairCache.destroyProxy(bp, dispatcher1);
 			}
 		}
 	}
@@ -95,7 +96,7 @@ public class CollisionWorld {
 		collisionObject.getCollisionShape().getAabb(trans, minAabb, maxAabb);
 
 		BroadphaseNativeType type = collisionObject.getCollisionShape().getShapeType();
-		collisionObject.setBroadphaseHandle(getBroadphase().createProxy(
+		collisionObject.setBroadphaseHandle(broadphasePairCache.createProxy(
 				minAabb,
 				maxAabb,
 				type,
@@ -120,7 +121,7 @@ public class CollisionWorld {
 				BulletStats.popProfile();
 			}
 
-			Dispatcher dispatcher = getDispatcher();
+			Dispatcher dispatcher = dispatcher1;
 			{
 				BulletStats.pushProfile("dispatchAllCollisionPairs");
 				try {
@@ -146,8 +147,8 @@ public class CollisionWorld {
             //
             // only clear the cached algorithms
             //
-            getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
-            getBroadphase().destroyProxy(bp, dispatcher1);
+			broadphasePairCache.getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
+			broadphasePairCache.destroyProxy(bp, dispatcher1);
             collisionObject.setBroadphaseHandle(null);
         }
 
@@ -216,7 +217,8 @@ public class CollisionWorld {
 		BulletStats.pushProfile("updateAabbs");
 		try {
 			for (int i=0; i<collisionObjects.size(); i++) {
-				CollisionObject colObj = collisionObjects.getQuick(i);
+				//return array[index];
+				CollisionObject colObj = collisionObjects.get(i);
 
 				// only update aabb of active objects
 				if (colObj.isActive()) {
@@ -526,7 +528,8 @@ public class CollisionWorld {
 				break;
 			}
 
-			CollisionObject collisionObject = collisionObjects.getQuick(i);
+			//return array[index];
+			CollisionObject collisionObject = collisionObjects.get(i);
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
@@ -577,7 +580,8 @@ public class CollisionWorld {
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)
 		for (int i = 0; i < collisionObjects.size(); i++) {
-			CollisionObject collisionObject = collisionObjects.getQuick(i);
+			//return array[index];
+			CollisionObject collisionObject = collisionObjects.get(i);
 
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
@@ -593,7 +597,7 @@ public class CollisionWorld {
 					                  collisionObject.getCollisionShape(),
 					                  tmpTrans,
 					                  resultCallback,
-					                  getDispatchInfo().allowedCcdPenetration);
+					                  dispatchInfo.allowedCcdPenetration);
 				}
 			}
 		}

@@ -67,14 +67,16 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 
 	public void addIndexedMesh(IndexedMesh mesh, ScalarType indexType) {
 		indexedMeshes.add(mesh);
-		indexedMeshes.getQuick(indexedMeshes.size() - 1).indexType = indexType;
+        //return array[index];
+        indexedMeshes.get(indexedMeshes.size() - 1).indexType = indexType;
 	}
 
 	@Override
 	public VertexData getLockedVertexIndexBase(int subpart) {
 		assert (subpart < getNumSubParts());
 
-		IndexedMesh mesh = indexedMeshes.getQuick(subpart);
+        //return array[index];
+        IndexedMesh mesh = indexedMeshes.get(subpart);
 
 		data.vertexCount = mesh.numVertices;
 		data.vertexData = mesh.vertexBase;

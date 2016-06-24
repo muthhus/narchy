@@ -85,7 +85,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		assert (manifoldPtr != null);
 		//order in manifold needs to match
 
-		if (depth > manifoldPtr.getContactBreakingThreshold()) {
+		if (depth > PersistentManifold.getContactBreakingThreshold()) {
 			return;
 		}
 

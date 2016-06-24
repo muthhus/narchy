@@ -129,9 +129,10 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		// clean up:
         //SPC(m_profiling.m_cleanup);
         ObjectArrayList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
-        if (pairs.size() > 0) {
+        if (!pairs.isEmpty()) {
             for (int i=0, ni=pairs.size(); i<ni; i++) {
-                BroadphasePair p = pairs.getQuick(i);
+                //return array[index];
+                BroadphasePair p = pairs.get(i);
                 DbvtProxy pa = (DbvtProxy) p.pProxy0;
                 DbvtProxy pb = (DbvtProxy) p.pProxy1;
                 if (!DbvtAabbMm.Intersect(pa.aabb, pb.aabb)) {
@@ -178,7 +179,7 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		DbvtAabbMm.FromMM(aabbMin, aabbMax, proxy.aabb);
 		proxy.leaf = sets[0].insert(proxy.aabb, proxy);
 		proxy.stage = stageCurrent;
-		proxy.uniqueId = ++gid;
+		proxy.uid = ++gid;
 		stageRoots[stageCurrent] = listappend(proxy, stageRoots[stageCurrent]);
 		return (proxy);
 	}

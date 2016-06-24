@@ -80,7 +80,7 @@ public class RagDoll extends JoglPhysics {
 
 
 	public void spawnRagdoll() {
-		RagDollModel ragDoll = new RagDollModel(dyn, new Vector3f(0f, 0f, 10f), 5f);
+		RagDollModel ragDoll = new RagDollModel(dyn, new Vector3f(0f, 0f, -10f), 5f);
 		ragdolls.add(ragDoll);
 	}
 

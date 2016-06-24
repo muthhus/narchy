@@ -69,7 +69,8 @@ public class Dbvt {
 			ObjectArrayList<Node> leaves = new ObjectArrayList<Node>(this.leaves);
 			fetchleaves(this, root, leaves);
 			bottomup(this, leaves);
-			root = leaves.getQuick(0);
+            //return array[index];
+            root = leaves.get(0);
 		}
 	}
 
@@ -278,7 +279,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() > 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -320,7 +321,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() > 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -348,7 +349,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() > 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -374,7 +375,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() != 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -419,7 +420,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() != 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -451,7 +452,8 @@ public class Dbvt {
 			do {
 				// JAVA NOTE: check
 				int id = stack.remove(stack.size() - 1);
-				sStkNPS se = stock.getQuick(id);
+                //return array[index];
+                sStkNPS se = stock.get(id);
 				ifree.add(id);
 				if (se.mask != inside) {
 					boolean out = false;
@@ -535,7 +537,7 @@ public class Dbvt {
 					}
 				}
 			}
-			while (stack.size() > 0);
+			while (!stack.isEmpty());
 		}
 	}
 
@@ -543,7 +545,8 @@ public class Dbvt {
 		int m = 0;
 		while (l < h) {
 			m = (l + h) >> 1;
-			if (a.getQuick(i.get(m)).value >= v) {
+            //return array[index];
+            if (a.get(i.get(m)).value >= v) {
 				l = m + 1;
 			}
 			else {
@@ -558,7 +561,8 @@ public class Dbvt {
 		if (ifree.size() > 0) {
 			i = ifree.get(ifree.size() - 1);
 			ifree.remove(ifree.size() - 1);
-			stock.getQuick(i).set(value);
+            //return array[index];
+            stock.get(i).set(value);
 		}
 		else {
 			i = stock.size();
@@ -718,21 +722,26 @@ public class Dbvt {
 		MiscUtil.resize(left, 0, Node.class);
 		MiscUtil.resize(right, 0, Node.class);
 		for (int i=0, ni=leaves.size(); i<ni; i++) {
-			leaves.getQuick(i).volume.Center(tmp);
+            //return array[index];
+            leaves.get(i).volume.Center(tmp);
 			tmp.sub(org);
 			if (axis.dot(tmp) < 0f) {
-				left.add(leaves.getQuick(i));
+                //return array[index];
+                left.add(leaves.get(i));
 			}
 			else {
-				right.add(leaves.getQuick(i));
+                //return array[index];
+                right.add(leaves.get(i));
 			}
 		}
 	}
 
 	private static com.bulletphysics.collision.broadphase.DbvtAabbMm bounds(ObjectArrayList<Node> leaves) {
-		com.bulletphysics.collision.broadphase.DbvtAabbMm volume = new com.bulletphysics.collision.broadphase.DbvtAabbMm(leaves.getQuick(0).volume);
+        //return array[index];
+        com.bulletphysics.collision.broadphase.DbvtAabbMm volume = new com.bulletphysics.collision.broadphase.DbvtAabbMm(leaves.get(0).volume);
 		for (int i=1, ni=leaves.size(); i<ni; i++) {
-			merge(volume, leaves.getQuick(i).volume, volume);
+            //return array[index];
+            merge(volume, leaves.get(i).volume, volume);
 		}
 		return volume;
 	}
@@ -744,7 +753,9 @@ public class Dbvt {
 			int[] minidx = new int[] { -1, -1 };
 			for (int i=0; i<leaves.size(); i++) {
 				for (int j=i+1; j<leaves.size(); j++) {
-					float sz = size(merge(leaves.getQuick(i).volume, leaves.getQuick(j).volume, tmpVolume));
+                    //return array[index];
+                    //return array[index];
+                    float sz = size(merge(leaves.get(i).volume, leaves.get(j).volume, tmpVolume));
 					if (sz < minsize) {
 						minsize = sz;
 						minidx[0] = i;
@@ -752,7 +763,9 @@ public class Dbvt {
 					}
 				}
 			}
-			Node[] n = new Node[] { leaves.getQuick(minidx[0]), leaves.getQuick(minidx[1]) };
+            //return array[index];
+            //return array[index];
+            Node[] n = new Node[] {leaves.get(minidx[0]), leaves.get(minidx[1])};
 			Node p = createnode(pdbvt, null, merge(n[0].volume, n[1].volume, new com.bulletphysics.collision.broadphase.DbvtAabbMm()), null);
 			p.childs[0] = n[0];
 			p.childs[1] = n[1];
@@ -783,7 +796,8 @@ public class Dbvt {
 				Vector3f x = new Vector3f();
 
 				for (int i=0; i<leaves.size(); i++) {
-					leaves.getQuick(i).volume.Center(x);
+                    //return array[index];
+                    leaves.get(i).volume.Center(x);
 					x.sub(org);
 					for (int j=0; j<3; j++) {
 						splitcount[j][x.dot(axis[j]) > 0f? 1 : 0]++;
@@ -807,7 +821,8 @@ public class Dbvt {
 					//sets[0].reserve(leaves.size()/2+1);
 					//sets[1].reserve(leaves.size()/2);
 					for (int i=0, ni=leaves.size(); i<ni; i++) {
-						sets[i & 1].add(leaves.getQuick(i));
+                        //return array[index];
+                        sets[i & 1].add(leaves.get(i));
 					}
 				}
 				Node node = createnode(pdbvt, null, vol, null);
@@ -819,11 +834,13 @@ public class Dbvt {
 			}
 			else {
 				bottomup(pdbvt, leaves);
-				return leaves.getQuick(0);
-			}
+                return leaves.get(0);
+                //return array[index];
+            }
 		}
-		return leaves.getQuick(0);
-	}
+        return leaves.get(0);
+        //return array[index];
+    }
 
 	private static Node sort(Node n, Node[] r) {
 		Node p = n.parent;

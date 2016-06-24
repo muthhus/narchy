@@ -75,7 +75,7 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 
 	@Override
 	public T remove(int index) {
-		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
+		//if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
 		T prev = array[index];
 		System.arraycopy(array, index+1, array, index, size-index-1);
 		array[size-1] = null;
@@ -98,17 +98,13 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 
 	@Override
     public T get(int index) {
-		if (index >= size) throw new IndexOutOfBoundsException();
-		return array[index];
-	}
-
-	public T getQuick(int index) {
+		//if (index >= size) throw new IndexOutOfBoundsException();
 		return array[index];
 	}
 
 	@Override
 	public T set(int index, T value) {
-		if (index >= size) throw new IndexOutOfBoundsException();
+		//if (index >= size) throw new IndexOutOfBoundsException();
 		T old = array[index];
 		array[index] = value;
 		return old;

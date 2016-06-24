@@ -41,7 +41,7 @@ class BvhTree {
 	protected int num_nodes;
 	protected BvhTreeNodeArray node_array = new BvhTreeNodeArray();
 	
-	protected int _calc_splitting_axis(BvhDataArray primitive_boxes, int startIndex, int endIndex) {
+	protected static int _calc_splitting_axis(BvhDataArray primitive_boxes, int startIndex, int endIndex) {
 		Vector3f means = new Vector3f();
 		means.set(0f, 0f, 0f);
 		Vector3f variance = new Vector3f();
@@ -78,7 +78,7 @@ class BvhTree {
 		return VectorUtil.maxAxis(variance);
 	}
 
-	protected int _sort_and_calc_splitting_index(BvhDataArray primitive_boxes, int startIndex, int endIndex, int splitAxis) {
+	protected static int _sort_and_calc_splitting_index(BvhDataArray primitive_boxes, int startIndex, int endIndex, int splitAxis) {
 		int splitIndex = startIndex;
 		int numIndices = endIndex - startIndex;
 
@@ -222,7 +222,7 @@ class BvhTree {
 		node_array.setBound(nodeindex, bound);
 	}
 
-	public int getLeftNode(int nodeindex) {
+	public static int getLeftNode(int nodeindex) {
 		return nodeindex + 1;
 	}
 

@@ -54,8 +54,9 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	public GImpactMeshShapePart getMeshPart(int index) {
-		return mesh_parts.getQuick(index);
-	}
+        return mesh_parts.get(index);
+        //return array[index];
+    }
 
 	@Override
 	public void setLocalScaling(Vector3f scaling) {
@@ -63,7 +64,8 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
-			GImpactMeshShapePart part = mesh_parts.getQuick(i);
+            //return array[index];
+            GImpactMeshShapePart part = mesh_parts.get(i);
 			part.setLocalScaling(scaling);
 		}
 
@@ -76,7 +78,8 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
-			GImpactMeshShapePart part = mesh_parts.getQuick(i);
+            //return array[index];
+            GImpactMeshShapePart part = mesh_parts.get(i);
 			part.setMargin(margin);
 		}
 
@@ -87,7 +90,8 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	public void postUpdate() {
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
-			GImpactMeshShapePart part = mesh_parts.getQuick(i);
+            //return array[index];
+            GImpactMeshShapePart part = mesh_parts.get(i);
 			part.postUpdate();
 		}
 
@@ -215,7 +219,8 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	public void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
-			mesh_parts.getQuick(i).processAllTriangles(callback, aabbMin, aabbMax);
+            //return array[index];
+            mesh_parts.get(i).processAllTriangles(callback, aabbMin, aabbMax);
 		}
 	}
 	
@@ -233,8 +238,10 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 		localAABB.invalidate();
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
-			mesh_parts.getQuick(i).updateBound();
-			localAABB.merge(mesh_parts.getQuick(i).getLocalBox(tmpAABB));
+            //return array[index];
+            mesh_parts.get(i).updateBound();
+            //return array[index];
+            localAABB.merge(mesh_parts.get(i).getLocalBox(tmpAABB));
 		}
 	}
 

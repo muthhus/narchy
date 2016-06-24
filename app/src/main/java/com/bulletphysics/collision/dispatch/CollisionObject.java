@@ -177,7 +177,7 @@ public class CollisionObject {
 	}
 
 	public boolean isActive() {
-		return ((getActivationState() != ISLAND_SLEEPING) && (getActivationState() != DISABLE_SIMULATION));
+        return ((activationState1 != ISLAND_SLEEPING) && (getActivationState() != DISABLE_SIMULATION));
 	}
 
 	public float getRestitution() {
