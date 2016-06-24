@@ -122,10 +122,10 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 					Vector3f to = simplexVectorW[1];
 					Vector3f nearest = new Vector3f();
 
-					Vector3f p = new Vector3f();
-					p.set(0f, 0f, 0f);
+
+
 					Vector3f diff = new Vector3f();
-					diff.sub(p, from);
+					diff.setNegative(from);
 
 					Vector3f v = new Vector3f();
 					v.sub(to, from);

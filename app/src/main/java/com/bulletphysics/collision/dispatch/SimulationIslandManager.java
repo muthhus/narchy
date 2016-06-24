@@ -70,7 +70,7 @@ public class SimulationIslandManager {
 		}
 	}
 
-	public void updateActivationState(com.bulletphysics.collision.dispatch.CollisionWorld colWorld, Dispatcher dispatcher) {
+	public void updateActivationState(com.bulletphysics.collision.dispatch.CollisionWorld<?> colWorld, Dispatcher dispatcher) {
 		initUnionFind(colWorld.getCollisionObjectArray().size());
 
 		// put the index into m_controllers into m_tag
@@ -91,7 +91,7 @@ public class SimulationIslandManager {
 		findUnions(dispatcher, colWorld);
 	}
 
-	public void storeIslandActivationState(CollisionWorld colWorld) {
+	public void storeIslandActivationState(CollisionWorld<?> colWorld) {
 		// put the islandId ('find' value) into m_tag
         int index = 0;
         int i;

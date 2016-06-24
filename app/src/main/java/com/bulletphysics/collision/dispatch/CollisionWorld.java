@@ -31,21 +31,28 @@ import com.bulletphysics.collision.narrowphase.ConvexCast.CastResult;
 import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.linearmath.*;
 import com.bulletphysics.util.ObjectArrayList;
+import nars.bag.impl.ArrayBag;
+import nars.concept.table.ArrayListTable;
+import nars.concept.table.DefaultListTable;
+import nars.util.CollectorMap;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.HashMap;
 
 /**
  * CollisionWorld is interface and container for the collision detection.
  * 
  * @author jezek2
  */
-public class CollisionWorld {
+public class CollisionWorld<X> {
 
 	//protected final BulletStack stack = BulletStack.get();
-	
-	protected ObjectArrayList<CollisionObject> collisionObjects = new ObjectArrayList<CollisionObject>();
+
+	protected ObjectArrayList<CollisionObject<X>> collisionObjects =
+			new ObjectArrayList<>();
+
 	protected Dispatcher dispatcher1;
 	protected DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
@@ -620,7 +627,7 @@ public class CollisionWorld {
 		}
 	}
 
-	public ObjectArrayList<CollisionObject> getCollisionObjectArray() {
+	public ObjectArrayList<CollisionObject<X>> getCollisionObjectArray() {
 		return collisionObjects;
 	}
 	

@@ -1,10 +1,9 @@
 package nars.gui.graph.layout;
 
-import nars.data.Range;
 import nars.gui.graph.GraphLayout;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.GraphSpace.EDraw;
-import nars.gui.graph.GraphSpace.VDraw;
+import nars.gui.graph.VDraw;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.awt.*;

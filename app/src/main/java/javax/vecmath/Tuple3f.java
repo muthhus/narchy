@@ -133,11 +133,16 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @param y the y coordinate
      * @param z the z coordinate
      */
-    public final void set(float x, float y, float z)
-    {
-	this.x = x;
-	this.y = y;
-	this.z = z;
+    public final void set(float x, float y, float z)     {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public final void setNegative(Vector3f v) {
+        this.x = -v.x;
+        this.y = -v.y;
+        this.z = -v.z;
     }
 
     public final void zero() { this.x = 0; this.y = 0; this.z = 0; }
@@ -686,4 +691,6 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 	public final void setZ(float z) {
 		this.z = z;
 	}
+
+
 }

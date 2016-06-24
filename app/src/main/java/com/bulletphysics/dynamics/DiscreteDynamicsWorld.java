@@ -50,7 +50,7 @@ import java.util.Comparator;
  * 
  * @author jezek2
  */
-public class DiscreteDynamicsWorld extends DynamicsWorld {
+public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 	protected ConstraintSolver constraintSolver;
 	protected SimulationIslandManager islandManager;

@@ -62,7 +62,7 @@ import javax.vecmath.Vector3f;
  * 
  * @author jezek2
  */
-public class RigidBody extends CollisionObject {
+public class RigidBody<X> extends CollisionObject<X> {
 
 	private static final float MAX_ANGVEL = BulletGlobals.SIMD_HALF_PI;
 	
@@ -166,6 +166,11 @@ public class RigidBody extends CollisionObject {
 		// No constraints should point to this rigidbody
 		// Remove constraints from the dynamics world before you delete the related rigidbodies. 
 		assert (constraintRefs.isEmpty());
+		userObjectPointer = null;
+	}
+
+	public final Transform transform() {
+		return worldTransform;
 	}
 
 	public void proceedToTransform(Transform newTrans) {
@@ -176,7 +181,7 @@ public class RigidBody extends CollisionObject {
 	 * To keep collision detection and dynamics separate we don't store a rigidbody pointer,
 	 * but a rigidbody is derived from CollisionObject, so we can safely perform an upcast.
 	 */
-	public static com.bulletphysics.dynamics.RigidBody upcast(CollisionObject colObj) {
+	public static <X> com.bulletphysics.dynamics.RigidBody<X> upcast(CollisionObject<X> colObj) {
 		return colObj.getInternalType() == CollisionObjectType.RIGID_BODY ? (RigidBody) colObj : null;
 	}
 

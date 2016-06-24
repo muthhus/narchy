@@ -36,7 +36,7 @@ import javax.vecmath.Vector3f;
  * 
  * @author jezek2
  */
-public class CollisionObject {
+public class CollisionObject<X> {
 	
 	//protected final BulletStack stack = BulletStack.get();
 
@@ -46,7 +46,7 @@ public class CollisionObject {
 	public static final int WANTS_DEACTIVATION = 3;
 	public static final int DISABLE_DEACTIVATION = 4;
 	public static final int DISABLE_SIMULATION = 5;
-	protected Transform worldTransform = new Transform();
+	protected final Transform worldTransform = new Transform();
 
 	///m_interpolationWorldTransform is used for CCD and interpolation
 	///it can be either previous or future (predicted) transform
@@ -72,7 +72,7 @@ public class CollisionObject {
 	protected float restitution;
 
 	///users can point to their objects, m_userPointer is not used by Bullet, see setUserPointer/getUserPointer
-	protected Object userObjectPointer;
+	protected X userObjectPointer;
 
 	// internalType is reserved to distinguish Bullet's CollisionObject, RigidBody, SoftBody etc.
 	// do not assign your own internalType unless you write a new dynamics object class.
@@ -306,11 +306,11 @@ public class CollisionObject {
 		this.ccdMotionThreshold = ccdMotionThreshold;
 	}
 
-	public Object getUserPointer() {
+	public X getUserPointer() {
 		return userObjectPointer;
 	}
 
-	public void setUserPointer(Object userObjectPointer) {
+	public void setUserPointer(X userObjectPointer) {
 		this.userObjectPointer = userObjectPointer;
 	}
 

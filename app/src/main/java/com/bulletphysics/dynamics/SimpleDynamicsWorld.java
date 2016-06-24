@@ -43,7 +43,7 @@ import javax.vecmath.Vector3f;
  * 
  * @author jezek2
  */
-public class SimpleDynamicsWorld extends DynamicsWorld {
+public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 
 	protected ConstraintSolver constraintSolver;
 	protected boolean ownsConstraintSolver;
@@ -134,6 +134,7 @@ public class SimpleDynamicsWorld extends DynamicsWorld {
 	@Override
 	public void clearForces() {
 		// todo: iterate over awake simulation islands!
+
 		for (int i = 0; i < collisionObjects.size(); i++) {
             //return array[index];
             CollisionObject colObj = collisionObjects.get(i);

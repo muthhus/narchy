@@ -41,8 +41,6 @@ import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.*;
 import com.bulletphysics.util.BulletStack;
 import com.bulletphysics.util.Motion;
-import com.bulletphysics.util.ObjectArrayList;
-import com.bulletphysics.util.RigidBodyX;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
@@ -52,7 +50,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
-import nars.gui.graph.GraphSpace;
+import nars.gui.graph.VDraw;
 import nars.util.JoglSpace;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +67,7 @@ import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
  * @author jezek2
  */
 
-public class JoglPhysics extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
+public class JoglPhysics<X extends VDraw> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
     private boolean simulating = true;
@@ -93,7 +91,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     // this is the most important class
     @NotNull
-    protected final DynamicsWorld dyn;
+    protected final DynamicsWorld<X> dyn;
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
@@ -151,7 +149,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         ConstraintSolver constraintSolver = new SequentialImpulseConstraintSolver();
         //#endif
 
-        dyn = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
+        dyn = new DiscreteDynamicsWorld<>(dispatcher, overlappingPairCache, constraintSolver, collision_config);
 
         //dyn =new SimpleDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collision_config);
         dyn.setGravity(v(0,0,0));
@@ -606,7 +604,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
             case KeyEvent.VK_END: {
                 int numObj = getDyn().getNumCollisionObjects();
                 if (numObj != 0) {
-                    CollisionObject obj = getDyn().getCollisionObjectArray().get(numObj - 1);
+                    CollisionObject<X> obj = getDyn().getCollisionObjectArray().get(numObj - 1);
 
                     getDyn().removeCollisionObject(obj);
                     RigidBody body = RigidBody.upcast(obj);
@@ -802,8 +800,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
             System.out.println("UNDRAG: " + directDrag);
 
-            if (u instanceof GraphSpace.VDraw) {
-                ((GraphSpace.VDraw)u).motionLock(false);
+            if (u instanceof VDraw) {
+                ((VDraw)u).motionLock(false);
             }
 
             directDrag = null;
@@ -886,8 +884,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
                 //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 
-                if (u instanceof GraphSpace.VDraw) {
-                    ((GraphSpace.VDraw)u).motionLock(true);
+                if (u instanceof VDraw) {
+                    ((VDraw)u).motionLock(true);
                 }
 
                 MotionState mm = directDrag.getMotionState();
@@ -1005,7 +1003,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     }
 
-    public RigidBodyX newBody(float mass, Transform startTransform, CollisionShape shape) {
+    public RigidBody newBody(float mass, Transform startTransform, CollisionShape shape) {
         Motion myMotionState = new Motion(startTransform);
 
         boolean isDynamic = (mass != 0f);
@@ -1016,7 +1014,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
 
-    public RigidBodyX newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
+    public RigidBody newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
         Vector3f localInertia = v(0, 0, 0);
@@ -1026,7 +1024,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
         RigidBodyConstructionInfo c = new RigidBodyConstructionInfo(mass, motion, shape, localInertia);
 
-        RigidBodyX body = new RigidBodyX( c );
+        RigidBody body = new RigidBody( c );
 
         ((DiscreteDynamicsWorld)dyn).addRigidBody(body, (short)group, (short)mask);
 
@@ -1069,31 +1067,28 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
             int numObjects = dyn.getNumCollisionObjects();
             int debug = this.debug;
-            List<CollisionObject> objects = dyn.getCollisionObjectArray();
+            List<CollisionObject<X>> objects = dyn.getCollisionObjectArray();
             for (int i = 0; i < numObjects; i++) {
 
                 //return array[index];
-                CollisionObject colObj = objects.get(i);
-                RigidBody body = RigidBody.upcast(colObj);
-
-                if (body != null && body.getMotionState() != null) {
-                    Motion myMotionState = (Motion) body.getMotionState();
-                    m.set(myMotionState.t);
-                } else {
-                    colObj.getWorldTransform(m);
-                }
+                RigidBody<X> body = RigidBody.upcast(objects.get(i));
+                if (body == null)
+                    continue;
 
 
-                Object u = colObj.getUserPointer();
-                if (u instanceof GraphSpace.VDraw) {
-                    GraphSpace.VDraw v = (GraphSpace.VDraw)u;
-                    v.preDraw(gl);
-                } else {
-                    gl.glColor4f(0.5f, 0.5f, 0.5f, 1f);
-                }
 
-                drawer.drawOpenGL(glsrt, gl, m, colObj.getCollisionShape(), debug);
+//                if (body != null && body.getMotionState() != null) {
+//                    Motion myMotionState = (Motion) body.getMotionState();
+//                    m.set(myMotionState.t);
+//                } else {
+//                    body.getWorldTransform(m);
+//                }
 
+                VDraw u = body.getUserPointer();
+                if (u!=null)
+                    u.preDraw(gl);
+
+                drawer.drawOpenGL(glsrt, gl, body.transform(), body.getCollisionShape(), debug);
             }
 
         }
@@ -1143,7 +1138,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //        }
 //    }
 
-    public DynamicsWorld getDyn() {
+    public DynamicsWorld<X> getDyn() {
         return dyn;
     }
 

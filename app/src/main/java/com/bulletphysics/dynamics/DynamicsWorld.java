@@ -40,7 +40,7 @@ import javax.vecmath.Vector3f;
  * 
  * @author jezek2
  */
-public abstract class DynamicsWorld extends CollisionWorld {
+public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 
 	protected InternalTickCallback internalTickCallback;
 	protected Object worldUserInfo;
