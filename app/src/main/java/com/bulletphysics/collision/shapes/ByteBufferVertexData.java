@@ -23,9 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ScalarType;
-import com.bulletphysics.collision.shapes.VertexData;
-
 import javax.vecmath.Tuple3f;
 import java.nio.ByteBuffer;
 

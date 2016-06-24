@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.dispatch.CollisionAlgorithmCreateFunc;
 
 /**
  * CollisionConfiguration allows to configure Bullet default collision algorithms.

@@ -133,7 +133,7 @@ public abstract class Tuple4b implements java.io.Serializable, Cloneable {
         return("("  + ((int)this.x & 0xff) +
 	       ", " + ((int)this.y & 0xff) +
 	       ", " + ((int)this.z & 0xff) +
-	       ", " + ((int)this.w & 0xff) + ")");
+	       ", " + ((int)this.w & 0xff) + ')');
     }
 
 
@@ -236,7 +236,7 @@ public abstract class Tuple4b implements java.io.Serializable, Cloneable {
      * @return the integer hash code value
      */  
     public int hashCode() {
-	return ((((int)x & 0xff) <<  0) |
+	return ((((int) x & 0xff)) |
 		(((int)y & 0xff) <<  8) |
 		(((int)z & 0xff) << 16) |
 		(((int)w & 0xff) << 24));
@@ -250,6 +250,7 @@ public abstract class Tuple4b implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

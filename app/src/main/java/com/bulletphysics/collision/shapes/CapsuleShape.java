@@ -25,9 +25,6 @@ package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.CapsuleShapeX;
-import com.bulletphysics.collision.shapes.CapsuleShapeZ;
-import com.bulletphysics.collision.shapes.ConvexInternalShape;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
@@ -103,21 +100,19 @@ public class CapsuleShape extends ConvexInternalShape {
 				supVec.set(vtx);
 			}
 		}
-		{
-			pos.set(0f, 0f, 0f);
-			VectorUtil.setCoord(pos, getUpAxis(), -getHalfHeight());
-			
-			VectorUtil.mul(tmp1, vec, localScaling);
-			tmp1.scale(radius);
-			tmp2.scale(getMargin(), vec);
-			vtx.add(pos, tmp1);
-			vtx.sub(tmp2);
-			newDot = vec.dot(vtx);
-			if (newDot > maxDot) {
-				maxDot = newDot;
-				supVec.set(vtx);
-			}
-		}
+		pos.set(0f, 0f, 0f);
+		VectorUtil.setCoord(pos, getUpAxis(), -getHalfHeight());
+
+		VectorUtil.mul(tmp1, vec, localScaling);
+		tmp1.scale(radius);
+		tmp2.scale(getMargin(), vec);
+		vtx.add(pos, tmp1);
+		vtx.sub(tmp2);
+		newDot = vec.dot(vtx);
+		if (newDot > maxDot) {
+            maxDot = newDot;
+            supVec.set(vtx);
+        }
 
 		return out;
 	}

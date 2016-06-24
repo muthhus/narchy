@@ -192,36 +192,34 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		}
 
 		// Sphere (for convex0) against Convex1
-		{
-			ConvexShape convex1 = (ConvexShape) col1.getCollisionShape();
+        ConvexShape convex1 = (ConvexShape) col1.getCollisionShape();
 
-			SphereShape sphere0 = new SphereShape(col0.getCcdSweptSphereRadius()); // todo: allow non-zero sphere sizes, for better approximation
-			ConvexCast.CastResult result = new ConvexCast.CastResult();
-			VoronoiSimplexSolver voronoiSimplex = new VoronoiSimplexSolver();
-			//SubsimplexConvexCast ccd0(&sphere,min0,&voronoiSimplex);
-			///Simplification, one object is simplified as a sphere
-			GjkConvexCast ccd1 = new GjkConvexCast(sphere0, convex1, voronoiSimplex);
-			//ContinuousConvexCollision ccd(min0,min1,&voronoiSimplex,0);
-			if (ccd1.calcTimeOfImpact(col0.getWorldTransform(tmpTrans1), col0.getInterpolationWorldTransform(tmpTrans2),
-					col1.getWorldTransform(tmpTrans3), col1.getInterpolationWorldTransform(tmpTrans4), result)) {
-				//store result.m_fraction in both bodies
+        SphereShape sphere0 = new SphereShape(col0.getCcdSweptSphereRadius()); // todo: allow non-zero sphere sizes, for better approximation
+        ConvexCast.CastResult result = new ConvexCast.CastResult();
+        VoronoiSimplexSolver voronoiSimplex = new VoronoiSimplexSolver();
+        //SubsimplexConvexCast ccd0(&sphere,min0,&voronoiSimplex);
+        ///Simplification, one object is simplified as a sphere
+        GjkConvexCast ccd1 = new GjkConvexCast(sphere0, convex1, voronoiSimplex);
+        //ContinuousConvexCollision ccd(min0,min1,&voronoiSimplex,0);
+        if (ccd1.calcTimeOfImpact(col0.getWorldTransform(tmpTrans1), col0.getInterpolationWorldTransform(tmpTrans2),
+                col1.getWorldTransform(tmpTrans3), col1.getInterpolationWorldTransform(tmpTrans4), result)) {
+            //store result.m_fraction in both bodies
 
-				if (col0.getHitFraction() > result.fraction) {
-					col0.setHitFraction(result.fraction);
-				}
+            if (col0.getHitFraction() > result.fraction) {
+                col0.setHitFraction(result.fraction);
+            }
 
-				if (col1.getHitFraction() > result.fraction) {
-					col1.setHitFraction(result.fraction);
-				}
+            if (col1.getHitFraction() > result.fraction) {
+                col1.setHitFraction(result.fraction);
+            }
 
-				if (resultFraction > result.fraction) {
-					resultFraction = result.fraction;
-				}
+            if (resultFraction > result.fraction) {
+                resultFraction = result.fraction;
+            }
 
-			}
-		}
+        }
 
-		return resultFraction;
+        return resultFraction;
 	}
 
 	@Override

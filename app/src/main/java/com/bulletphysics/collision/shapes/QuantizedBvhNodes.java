@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.OptimizedBvh;
-
 import java.io.Serializable;
 
 /**
@@ -50,7 +48,7 @@ public class QuantizedBvhNodes implements Serializable {
 	private static final int STRIDE = 4; // 16 bytes
 	
 	private int[] buf;
-	private int size = 0;
+	private int size;
 
 	public QuantizedBvhNodes() {
 		resize(16);

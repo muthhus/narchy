@@ -26,8 +26,6 @@ package com.bulletphysics.collision.dispatch;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.BulletStats;
 import com.bulletphysics.collision.broadphase.*;
-import com.bulletphysics.collision.dispatch.CollisionConfiguration;
-import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.narrowphase.*;
 import com.bulletphysics.collision.narrowphase.ConvexCast.CastResult;
 import com.bulletphysics.collision.shapes.*;
@@ -143,17 +141,15 @@ public class CollisionWorld {
 	public void removeCollisionObject(CollisionObject collisionObject) {
 		//bool removeFromBroadphase = false;
 
-		{
-			BroadphaseProxy bp = collisionObject.getBroadphaseHandle();
-			if (bp != null) {
-				//
-				// only clear the cached algorithms
-				//
-				getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
-				getBroadphase().destroyProxy(bp, dispatcher1);
-				collisionObject.setBroadphaseHandle(null);
-			}
-		}
+		BroadphaseProxy bp = collisionObject.getBroadphaseHandle();
+		if (bp != null) {
+            //
+            // only clear the cached algorithms
+            //
+            getBroadphase().getOverlappingPairCache().cleanProxyFromPairs(bp, dispatcher1);
+            getBroadphase().destroyProxy(bp, dispatcher1);
+            collisionObject.setBroadphaseHandle(null);
+        }
 
 		//swapremove
 		collisionObjects.remove(collisionObject);
@@ -565,15 +561,13 @@ public class CollisionWorld {
 		Vector3f castShapeAabbMax = new Vector3f();
 
 		// Compute AABB that encompasses angular movement
-		{
-			Vector3f linVel = new Vector3f();
-			Vector3f angVel = new Vector3f();
-			TransformUtil.calculateVelocity(convexFromTrans, convexToTrans, 1f, linVel, angVel);
-			Transform R = new Transform();
-			R.setIdentity();
-			R.setRotation(convexFromTrans.getRotation(new Quat4f()));
-			castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
-		}
+		Vector3f linVel = new Vector3f();
+		Vector3f angVel = new Vector3f();
+		TransformUtil.calculateVelocity(convexFromTrans, convexToTrans, 1f, linVel, angVel);
+		Transform R = new Transform();
+		R.setIdentity();
+		R.setRotation(convexFromTrans.getRotation(new Quat4f()));
+		castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
 
 		Transform tmpTrans = new Transform();
 		Vector3f collisionObjectAabbMin = new Vector3f();
@@ -777,6 +771,7 @@ public class CollisionWorld {
 			this.triangleMesh = triangleMesh;
 		}
 	
+		@Override
 		public float reportHit(Vector3f hitNormalLocal, float hitFraction, int partId, int triangleIndex) {
 			LocalShapeInfo shapeInfo = new LocalShapeInfo();
 			shapeInfo.shapePart = partId;

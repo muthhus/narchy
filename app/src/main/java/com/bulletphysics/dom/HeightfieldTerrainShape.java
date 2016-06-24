@@ -169,18 +169,17 @@ public class HeightfieldTerrainShape extends ConcaveShape {
 			break;
 		}
 
-		case 2: {
-			if (quantizedAabbMin[0] > startX)
-				startX = quantizedAabbMin[0];
-			if (quantizedAabbMax[0] < endX)
-				endX = quantizedAabbMax[0];
-			if (quantizedAabbMin[1] > startJ)
-				startJ = quantizedAabbMin[1];
-			if (quantizedAabbMax[1] < endJ)
-				endJ = quantizedAabbMax[1];
-			break;
-		}
-		}
+		case 2:
+            if (quantizedAabbMin[0] > startX)
+                startX = quantizedAabbMin[0];
+            if (quantizedAabbMax[0] < endX)
+                endX = quantizedAabbMax[0];
+            if (quantizedAabbMin[1] > startJ)
+                startJ = quantizedAabbMin[1];
+            if (quantizedAabbMax[1] < endJ)
+                endJ = quantizedAabbMax[1];
+            break;
+        }
 
 		for (int j = startJ; j < endJ; j++) {
 			for (int x = startX; x < endX; x++) {
@@ -226,20 +225,17 @@ public class HeightfieldTerrainShape extends ConcaveShape {
 		float height = getRawHeightFieldValue(x, y);
 
 		switch (m_upAxis) {
-		case 0: {
-			vertex.set(height - m_localOrigin.x, (-m_width / 2.0f) + x, (-m_length / 2.0f) + y);
-			break;
-		}
-		case 1: {
-			vertex.set((-m_width / 2.0f) + x, height - m_localOrigin.y, (-m_length / 2.0f) + y);
-			break;
-		}
+		case 0:
+            vertex.set(height - m_localOrigin.x, (-m_width / 2.0f) + x, (-m_length / 2.0f) + y);
+            break;
+            case 1:
+            vertex.set((-m_width / 2.0f) + x, height - m_localOrigin.y, (-m_length / 2.0f) + y);
+            break;
 
-		case 2: {
-			vertex.set((-m_width / 2.0f) + x, (-m_length / 2.0f) + y, height - m_localOrigin.z);
-			break;
-		}
-		}
+            case 2:
+            vertex.set((-m_width / 2.0f) + x, (-m_length / 2.0f) + y, height - m_localOrigin.z);
+            break;
+        }
 
 		vertex.x = vertex.x * m_localScaling.x;
 		vertex.y = vertex.y * m_localScaling.y;

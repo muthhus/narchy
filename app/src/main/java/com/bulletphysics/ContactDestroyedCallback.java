@@ -23,8 +23,6 @@
 
 package com.bulletphysics;
 
-import com.bulletphysics.BulletGlobals;
-
 /**
  * Called when contact has been destroyed between two collision objects.
  *

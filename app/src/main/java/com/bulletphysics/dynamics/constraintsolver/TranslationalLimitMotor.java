@@ -107,10 +107,7 @@ public class TranslationalLimitMotor {
 	 */
         public boolean needApplyForces(int idx)
         {
-            if(currentLimit[idx] == 0 && enableMotor[idx] == false) {
-                return false;
-            } 
-            return true;
+            return !(currentLimit[idx] == 0 && enableMotor[idx] == false);
         }
 
         public int testLimitValue(int limitIndex, float test_value)

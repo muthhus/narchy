@@ -25,7 +25,6 @@ package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.PolyhedralConvexShape;
 import com.bulletphysics.linearmath.VectorUtil;
 import com.bulletphysics.util.ObjectArrayList;
 
@@ -116,12 +115,10 @@ public class ConvexHullShape extends PolyhedralConvexShape {
 		float[] wcoords = new float[numVectors];
 
 		// use 'w' component of supportVerticesOut?
-		{
-			for (int i = 0; i < numVectors; i++) {
-				//supportVerticesOut[i][3] = btScalar(-1e30);
-				wcoords[i] = -1e30f;
-			}
-		}
+		for (int i = 0; i < numVectors; i++) {
+            //supportVerticesOut[i][3] = btScalar(-1e30);
+            wcoords[i] = -1e30f;
+        }
 		Vector3f vtx = new Vector3f();
 		for (int i = 0; i < points.size(); i++) {
 			VectorUtil.mul(vtx, points.getQuick(i), localScaling);

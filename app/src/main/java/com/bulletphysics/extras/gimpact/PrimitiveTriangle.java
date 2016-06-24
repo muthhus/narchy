@@ -100,11 +100,8 @@ public class PrimitiveTriangle {
 
 		dis2 = ClipPolygon.distance_point_plane(other.plane, vertices[2]) - total_margin;
 
-		if (dis0 > 0.0f && dis1 > 0.0f && dis2 > 0.0f) {
-			return false;
-		}
-		return true;
-	}
+        return !(dis0 > 0.0f && dis1 > 0.0f && dis2 > 0.0f);
+    }
 	
 	/**
 	 * Calcs the plane which is paralele to the edge and perpendicular to the triangle plane.

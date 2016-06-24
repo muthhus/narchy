@@ -23,8 +23,6 @@
 
 package com.bulletphysics.util;
 
-import com.bulletphysics.util.StackList;
-
 import javax.vecmath.Vector4f;
 
 /**

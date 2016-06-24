@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.OptimizedBvh;
-
 /**
  * Callback for operating with {@link OptimizedBvh}.
  * 

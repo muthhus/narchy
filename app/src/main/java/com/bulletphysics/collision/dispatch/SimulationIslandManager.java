@@ -89,23 +89,21 @@ public class SimulationIslandManager {
 
 	public void storeIslandActivationState(CollisionWorld colWorld) {
 		// put the islandId ('find' value) into m_tag
-		{
-			int index = 0;
-			int i;
-			for (i = 0; i < colWorld.getCollisionObjectArray().size(); i++) {
-				CollisionObject collisionObject = colWorld.getCollisionObjectArray().getQuick(i);
-				if (!collisionObject.isStaticOrKinematicObject()) {
-					collisionObject.setIslandTag(unionFind.find(index));
-					collisionObject.setCompanionId(-1);
-				}
-				else {
-					collisionObject.setIslandTag(-1);
-					collisionObject.setCompanionId(-2);
-				}
-				index++;
-			}
-		}
-	}
+        int index = 0;
+        int i;
+        for (i = 0; i < colWorld.getCollisionObjectArray().size(); i++) {
+            CollisionObject collisionObject = colWorld.getCollisionObjectArray().getQuick(i);
+            if (!collisionObject.isStaticOrKinematicObject()) {
+                collisionObject.setIslandTag(unionFind.find(index));
+                collisionObject.setCompanionId(-1);
+            }
+            else {
+                collisionObject.setIslandTag(-1);
+                collisionObject.setCompanionId(-2);
+            }
+            index++;
+        }
+    }
 
 	private static int getIslandId(PersistentManifold lhs) {
 		int islandId;
@@ -334,7 +332,8 @@ public class SimulationIslandManager {
 	}
 	
 	private static final Comparator<PersistentManifold> persistentManifoldComparator = new Comparator<PersistentManifold>() {
-		public int compare(PersistentManifold lhs, PersistentManifold rhs) {
+		@Override
+        public int compare(PersistentManifold lhs, PersistentManifold rhs) {
 			return getIslandId(lhs) < getIslandId(rhs)? -1 : +1;
 		}
 	};

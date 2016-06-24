@@ -89,17 +89,15 @@ public class GhostObject extends CollisionObject {
 		Vector3f castShapeAabbMax = new Vector3f();
 
 		// compute AABB that encompasses angular movement
-		{
-			Vector3f linVel = new Vector3f();
-			Vector3f angVel = new Vector3f();
-			TransformUtil.calculateVelocity(convexFromTrans, convexToTrans, 1f, linVel, angVel);
-			Transform R = new Transform();
-			R.setIdentity();
-			R.setRotation(convexFromTrans.getRotation(new Quat4f()));
-			castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
-		}
+        Vector3f linVel = new Vector3f();
+        Vector3f angVel = new Vector3f();
+        TransformUtil.calculateVelocity(convexFromTrans, convexToTrans, 1f, linVel, angVel);
+        Transform R = new Transform();
+        R.setIdentity();
+        R.setRotation(convexFromTrans.getRotation(new Quat4f()));
+        castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
 
-		Transform tmpTrans = new Transform();
+        Transform tmpTrans = new Transform();
 
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)

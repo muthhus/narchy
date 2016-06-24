@@ -23,9 +23,6 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.broadphase.BroadphaseProxy;
-
 import javax.vecmath.Vector3f;
 
 /**

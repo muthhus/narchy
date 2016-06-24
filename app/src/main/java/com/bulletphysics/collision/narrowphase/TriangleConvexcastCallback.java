@@ -24,9 +24,6 @@
 package com.bulletphysics.collision.narrowphase;
 
 import com.bulletphysics.collision.narrowphase.ConvexCast.CastResult;
-import com.bulletphysics.collision.narrowphase.GjkEpaPenetrationDepthSolver;
-import com.bulletphysics.collision.narrowphase.SubsimplexConvexCast;
-import com.bulletphysics.collision.narrowphase.VoronoiSimplexSolver;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.collision.shapes.TriangleCallback;
 import com.bulletphysics.collision.shapes.TriangleShape;
@@ -56,6 +53,7 @@ public abstract class TriangleConvexcastCallback extends TriangleCallback {
 		this.triangleCollisionMargin = triangleCollisionMargin;
 	}
 	
+	@Override
 	public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 		TriangleShape triangleShape = new TriangleShape(triangle[0], triangle[1], triangle[2]);
 		triangleShape.setMargin(triangleCollisionMargin);

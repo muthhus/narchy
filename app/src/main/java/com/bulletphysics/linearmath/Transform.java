@@ -24,7 +24,6 @@
 package com.bulletphysics.linearmath;
 
 import com.bulletphysics.collision.shapes.UniformScalingShape;
-import com.bulletphysics.linearmath.MatrixUtil;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;

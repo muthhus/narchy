@@ -43,16 +43,16 @@ public class HullResult {
 	public boolean polygons = true;
 	
 	/** Number of vertices in the output hull. */
-	public int numOutputVertices = 0;
+	public int numOutputVertices;
 	
 	/** Array of vertices. */
 	public final ObjectArrayList<Vector3f> outputVertices = new ObjectArrayList<Vector3f>();
 	
 	/** Number of faces produced. */
-	public int numFaces = 0;
+	public int numFaces;
 	
 	/** Total number of indices. */
-	public int numIndices = 0;
+	public int numIndices;
 	
 	/** Array of indices. */
 	public final IntArrayList indices = new IntArrayList();

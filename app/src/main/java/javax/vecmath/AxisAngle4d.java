@@ -323,9 +323,9 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
      */
     public final void set(Matrix3f m1)
     {
-        x = (float)(m1.m21 - m1.m12);
-        y = (float)(m1.m02 - m1.m20);
-        z = (float)(m1.m10 - m1.m01);
+        x = m1.m21 - m1.m12;
+        y = m1.m02 - m1.m20;
+        z = m1.m10 - m1.m01;
         double mag = x*x + y*y + z*z;
 
 	if (mag > EPS ) {
@@ -448,7 +448,7 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
      * @return the String representation
      */  
     public String toString() {
-	return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.angle + ")";
+	return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.angle + ')';
     }
 
 
@@ -498,10 +498,9 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
      */
     public boolean epsilonEquals(AxisAngle4d a1, double epsilon)
     {
-       double diff;
 
-       diff = x - a1.x;
-       if((diff<0?-diff:diff) > epsilon) return false;
+		double diff = x - a1.x;
+		if((diff<0?-diff:diff) > epsilon) return false;
 
        diff = y - a1.y;
        if((diff<0?-diff:diff) > epsilon) return false;
@@ -510,9 +509,8 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
        if((diff<0?-diff:diff) > epsilon) return false;
 
        diff = angle - a1.angle;
-       if((diff<0?-diff:diff) > epsilon) return false;
+        return (diff < 0 ? -diff : diff) <= epsilon;
 
-       return true;
     }
 
 
@@ -541,6 +539,7 @@ public class AxisAngle4d implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

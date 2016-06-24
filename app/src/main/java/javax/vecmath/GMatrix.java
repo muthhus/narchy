@@ -65,18 +65,15 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	this.nRow = nRow;
 	this.nCol = nCol;
 
-	int i, j;
-	for (i = 0; i < nRow; i++) {
-	    for (j = 0; j < nCol; j++) {
+	int i;
+		for (i = 0; i < nRow; i++) {
+	    for (int j = 0; j < nCol; j++) {
 		values[i][j] = 0.0;
 	    }
 	}
 
 	int l;
-	if (nRow < nCol)
-	    l = nRow;
-        else
-	    l = nCol;
+		l = nRow < nCol ? nRow : nCol;
 
 	for (i = 0; i < l; i++) {
 	    values[i][i] = 1.0;
@@ -101,8 +98,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	this.nRow = nRow;
 	this.nCol = nCol;
 
-	int i, j;
-	for (i = 0; i < nRow; i++) {
+	int j;
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = matrix[i*nCol+j];
 	    }
@@ -120,8 +117,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	nCol = matrix.nCol;
         values = new double[nRow][nCol];
 
-	int i, j;
-	for (i = 0; i < nRow; i++) {
+	int j;
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = matrix.values[i][j];
 	    }
@@ -135,7 +132,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void mul(GMatrix m1)
     {
-	int i, j, k;
+	int j, k;
 
 	if (nCol != m1.nRow ||  nCol != m1.nCol)
 	    throw new MismatchedSizeException
@@ -143,7 +140,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
 	double [][] tmp = new double[nRow][nCol];
 
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		tmp[i][j] = 0.0;
 		for (k = 0; k < nCol; k++) {
@@ -163,7 +160,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void mul(GMatrix m1, GMatrix m2)
     {
-	int i, j, k;
+	int j, k;
 
 	if (m1.nCol != m2.nRow || nRow != m1.nRow || nCol != m2.nCol)
 	    throw new MismatchedSizeException
@@ -171,7 +168,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
 	double[][] tmp = new double[nRow][nCol];
 
-	for (i = 0; i < m1.nRow; i++) {
+	for (int i = 0; i < m1.nRow; i++) {
 	    for (j = 0; j < m2.nCol; j++) {
 		tmp[i][j] = 0.0;
 		for (k = 0; k < m1.nCol; k++) {
@@ -193,7 +190,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void mul(GVector v1, GVector v2)
     {
-	int i, j;
+	int j;
 
 	if (nRow < v1.getSize())
 	    throw new MismatchedSizeException
@@ -203,7 +200,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix3"));
 
-	for (i = 0; i < v1.getSize(); i++ ) {
+	for (int i = 0; i < v1.getSize(); i++ ) {
 	    for (j = 0; j < v2.getSize(); j++ ) {
 		values[i][j] = v1.values[i]*v2.values[j];
 	    }
@@ -216,7 +213,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void add(GMatrix m1)
     {
-	int i, j;
+	int j;
 
 	if (nRow != m1.nRow) 
 	    throw new MismatchedSizeException
@@ -226,7 +223,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix5"));
 
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = values[i][j] + m1.values[i][j];
 	    }
@@ -240,7 +237,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void add(GMatrix m1, GMatrix m2)
     {
-	int i, j;
+	int j;
 
 	if (m2.nRow != m1.nRow) 
 	    throw new MismatchedSizeException
@@ -254,7 +251,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix8"));
 
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = m1.values[i][j] + m2.values[i][j];
 	    }
@@ -268,7 +265,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void sub(GMatrix m1) 
     { 
-	int i, j; 
+	int j;
 	if (nRow != m1.nRow)  
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix9")); 
@@ -277,7 +274,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix28")); 
  
-	for (i = 0; i < nRow; i++) { 
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) { 
 		values[i][j] = values[i][j] - m1.values[i][j];
 	    } 
@@ -292,7 +289,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void sub(GMatrix m1, GMatrix m2) 
     {
-	int i, j;
+	int j;
 	if (m2.nRow != m1.nRow) 
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix10"));
@@ -305,7 +302,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix12"));
 	  
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = m1.values[i][j] - m2.values[i][j];
 	    }
@@ -317,8 +314,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void negate()
     {
-	int i, j;
-	for (i = 0; i < nRow; i++) {
+	int j;
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0;j < nCol; j++) {
 		values[i][j] = -values[i][j];
 	    }
@@ -332,12 +329,12 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void negate(GMatrix m1)
     {
-	int i, j;
+	int j;
 	if (nRow != m1.nRow  || nCol != m1.nCol)
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix13"));
 
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] =  -m1.values[i][j];
 	    }
@@ -349,18 +346,15 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void setIdentity()
     {
-        int i, j;
-        for (i = 0; i < nRow; i++) {
-	    for (j = 0; j < nCol; j++) {
+        int i;
+		for (i = 0; i < nRow; i++) {
+	    for (int j = 0; j < nCol; j++) {
 		values[i][j] = 0.0;
 	    }
         }
 
         int l;
-        if (nRow < nCol)
-	    l = nRow;
-        else
-	    l = nCol;
+		l = nRow < nCol ? nRow : nCol;
 
         for (i = 0; i < l; i++) {
 	    values[i][i] = 1.0;
@@ -372,8 +366,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void setZero()
     {
-	int i, j;
-	for (i = 0; i < nRow; i++) {
+	int j;
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = 0.0; 
 	    }
@@ -386,19 +380,16 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void identityMinus()
     {
-	int i, j;
- 
-	for(i = 0; i < nRow; i++) {
-	    for(j = 0; j < nCol; j++) { 
+	int i;
+
+		for(i = 0; i < nRow; i++) {
+	    for(int j = 0; j < nCol; j++) {
 		values[i][j] = -values[i][j]; 
 	    } 
 	}    
 
-        int l; 
-        if( nRow < nCol) 
-	    l = nRow; 
-        else 
-	    l = nCol;
+        int l;
+		l = nRow < nCol ? nRow : nCol;
  
         for(i = 0; i < l; i++) { 
 	    values[i][i] += 1.0; 
@@ -477,20 +468,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void setSize(int nRow, int nCol)
     {
-	double[][] tmp = new double[nRow][nCol];
-	int i, j, maxRow, maxCol;
+		int j, maxRow, maxCol;
 
-	if (this.nRow < nRow)
-	    maxRow = this.nRow;
-	else
-	    maxRow = nRow;
+		maxRow = this.nRow < nRow ? this.nRow : nRow;
 
-	if (this.nCol < nCol)
-	    maxCol = this.nCol;
-	else
-	    maxCol = nCol;
+		maxCol = this.nCol < nCol ? this.nCol : nCol;
 
-	for (i = 0; i < maxRow; i++) {
+		double[][] tmp = new double[nRow][nCol];
+		for (int i = 0; i < maxRow; i++) {
 	    for (j = 0; j < maxCol; j++) {
 		tmp[i][j] = values[i][j];
 	    }
@@ -512,9 +497,9 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void set(double[] matrix)
     {
-	int i, j;
+	int j;
         
-	for (i = 0; i < nRow; i++) { 
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = matrix[nCol*i+j];
 	    } 
@@ -527,7 +512,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void set(Matrix3f m1)
     {
-	int i, j;
+	int j;
 
 	if (nCol < 3 || nRow < 3) { // expand matrix if too small 
 	    nCol = 3;
@@ -547,7 +532,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
         values[2][1] = m1.m21;
         values[2][2] = m1.m22;
 
-        for (i = 3; i < nRow; i++) {   // pad rest or matrix with zeros 
+        for (int i = 3; i < nRow; i++) {   // pad rest or matrix with zeros
 	    for (j = 3; j < nCol; j++) {
 		values[i][j] = 0.0;
 	    }
@@ -670,7 +655,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void set(GMatrix m1)
     {
-	int i, j;
+	int j;
 
 	if (nRow < m1.nRow || nCol < m1.nCol) {
 	    nRow = m1.nRow;
@@ -678,7 +663,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    values = new double[nRow][nCol];
 	}
 
-	for (i = 0; i < Math.min(nRow, m1.nRow); i++) {
+		int i;
+		for (i = 0; i < Math.min(nRow, m1.nRow); i++) {
 	    for (j = 0; j < Math.min(nCol, m1.nCol); j++) {
 		values[i][j] = m1.values[i][j];
 	    }
@@ -739,9 +725,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void getRow(int row, double[] array)
     {
-	for (int i = 0; i < nCol; i++) {
-            array[i] = values[row][i];
-	}
+        System.arraycopy(values[row], 0, array, 0, nCol);
     }
 
     /**
@@ -753,10 +737,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     {
 	if (vector.getSize() < nCol)
 	    vector.setSize(nCol);
-        
-	for (int i = 0; i < nCol; i++) {
-            vector.values[i] = values[row][i];
-	}
+
+        System.arraycopy(values[row], 0, vector.values, 0, nCol);
     }
 
     /**
@@ -1087,19 +1069,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void get(GMatrix m1) 
     { 
-	int i, j, nc, nr;
+	int j, nc, nr;
 
-	if (nCol < m1.nCol)
-	    nc = nCol;
-	else
-	    nc = m1.nCol;
+		nc = nCol < m1.nCol ? nCol : m1.nCol;
 
-	if (nRow < m1.nRow)
-	    nr = nRow;
-	else
-	    nr = m1.nRow;
+		nr = nRow < m1.nRow ? nRow : m1.nRow;
 
-	for (i = 0; i < nr; i++) {
+		int i;
+		for (i = 0; i < nr; i++) {
 	    for (j = 0; j < nc; j++) {
 		m1.values[i][j] = values[i][j];
 	    }
@@ -1125,9 +1102,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void setRow(int row, double[] array)
     {
-	for (int i = 0; i < nCol; i++) {
-            values[row][i] = array[i];
-	}
+        System.arraycopy(array, 0, values[row], 0, nCol);
     }
 
     /**
@@ -1139,9 +1114,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void setRow(int row, GVector vector)
     {
-	for(int i = 0; i < nCol; i++) {
-            values[row][i] = vector.values[i];
-	}
+        System.arraycopy(vector.values, 0, values[row], 0, nCol);
     }
 
     /**
@@ -1181,13 +1154,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void mulTransposeBoth(GMatrix m1, GMatrix m2)
     {    
-	int i, j, k;
+	int j, k;
 
 	if (m1.nRow != m2.nCol || nRow != m1.nCol || nCol != m2.nRow)
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix14"));
 
-	if (m1 == this || m2 == this) {
+		int i;
+		if (m1 == this || m2 == this) {
 	    double[][] tmp = new double[nRow][nCol];
 	    for (i = 0; i < nRow; i++) { 
 		for (j = 0; j < nCol; j++) {
@@ -1218,13 +1192,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void mulTransposeRight(GMatrix m1, GMatrix m2)
     {    
-	int i, j, k;
+	int j, k;
 
 	if (m1.nCol != m2.nCol || nCol != m2.nRow || nRow != m1.nRow)
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix15"));
 
-	if (m1 == this || m2 == this) {
+		int i;
+		if (m1 == this || m2 == this) {
 	    double[][] tmp = new double[nRow][nCol];
 	    for (i = 0; i < nRow; i++) { 
 		for (j = 0; j < nCol; j++) {
@@ -1257,13 +1232,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public final void mulTransposeLeft(GMatrix m1, GMatrix m2)
     {
-	int i, j, k;
+	int j, k;
 
 	if (m1.nRow != m2.nRow || nCol != m2.nCol || nRow != m1.nCol)
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix16"));
 
-	if (m1 == this || m2 == this) {
+		int i;
+		if (m1 == this || m2 == this) {
 	    double[][] tmp = new double[nRow][nCol];
 	    for (i = 0; i < nRow; i++) { 
 		for (j = 0; j < nCol; j++) {
@@ -1295,23 +1271,21 @@ public class GMatrix implements java.io.Serializable, Cloneable {
         int i, j;
 
         if (nRow != nCol) {
-	    double[][] tmp;
-	    i=nRow;
+			i=nRow;
 	    nRow = nCol;
 	    nCol = i;
-	    tmp = new double[nRow][nCol];
-	    for (i = 0; i < nRow; i++) { 
+			double[][] tmp = new double[nRow][nCol];
+			for (i = 0; i < nRow; i++) {
 		for (j = 0; j < nCol; j++) {
 		    tmp[i][j] = values[j][i]; 
 		}  
 	    }  
 	    values = tmp;
         } else {
-	    double swap;
-	    for (i = 0; i < nRow; i++) { 
+			for (i = 0; i < nRow; i++) {
 		for (j = 0; j < i; j++) {
-		    swap = values[i][j];
-		    values[i][j] = values[j][i];
+			double swap = values[i][j];
+			values[i][j] = values[j][i];
 		    values[j][i] = swap;
 		}  
 	    }  
@@ -1324,14 +1298,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final void transpose(GMatrix m1)
     {
-        int i, j;
+        int j;
 
         if (nRow != m1.nCol || nCol != m1.nRow)
 	    throw new MismatchedSizeException
 		(VecMathI18N.getString("GMatrix17"));
 
         if (m1 != this) {
-	    for (i = 0; i < nRow; i++) {
+	    for (int i = 0; i < nRow; i++) {
 		for (j = 0;j < nCol; j++) {
 		    values[i][j] = m1.values[j][i];
 		}
@@ -1347,15 +1321,15 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public String toString()
     {
-	StringBuffer buffer = new StringBuffer(nRow*nCol*8);
+	StringBuilder buffer = new StringBuilder(nRow*nCol*8);
 
-	int i, j;
+	int j;
 
-	for (i = 0; i < nRow; i++) {
+	for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
-		buffer.append(values[i][j]).append(" ");
+		buffer.append(values[i][j]).append(' ');
 	    }
-	    buffer.append("\n");
+	    buffer.append('\n');
 	}
 
 	return buffer.toString();
@@ -1363,9 +1337,9 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
     private static void checkMatrix( GMatrix m) 
     {
-	int i, j;
+	int j;
 
-	for (i = 0; i < m.nRow; i++) {
+	for (int i = 0; i < m.nRow; i++) {
 	    for (j = 0; j < m.nCol; j++) {
 		if (Math.abs(m.values[i][j]) < 0.0000000001) {
 		    System.out.print(" 0.0     ");
@@ -1412,12 +1386,12 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     public boolean equals(GMatrix m1)
     {
 	try { 
-	    int i, j;
+	    int j;
 
 	    if (nRow != m1.nRow || nCol != m1.nCol)
 		return false;
 
-	    for (i = 0;i < nRow; i++) {
+	    for (int i = 0; i < nRow; i++) {
 		for (j = 0; j < nCol; j++) {
 		    if (values[i][j] != m1.values[i][j])
 			return false;
@@ -1441,11 +1415,11 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     {
         try { 
 	    GMatrix m2 = (GMatrix) o1;
-	    int i, j;
+	    int j;
 	    if (nRow != m2.nRow || nCol != m2.nCol)
 		return false;
 
-	    for (i = 0; i < nRow; i++) {
+	    for (int i = 0; i < nRow; i++) {
                 for (j = 0; j < nCol; j++) {
 		    if (values[i][j] != m2.values[i][j])
 			return false;
@@ -1479,15 +1453,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */  
     public boolean epsilonEquals(GMatrix m1, double epsilon)
     {
-	int i, j;
-	double diff;
-	if (nRow != m1.nRow || nCol != m1.nCol)
+	int j;
+		if (nRow != m1.nRow || nCol != m1.nCol)
 	    return false;
 
-        for (i = 0; i < nRow; i++) {
+        for (int i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
-		diff = values[i][j] - m1.values[i][j];
-		if ((diff < 0 ? -diff : diff) > epsilon)
+			double diff = values[i][j] - m1.values[i][j];
+			if ((diff < 0 ? -diff : diff) > epsilon)
 		    return false;
 	    }
         }
@@ -1500,16 +1473,12 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     public final double trace()
     {
-	int i, l;
-	double t;
+	int l;
 
-	if (nRow < nCol) 
-	    l = nRow;
-	else 
-	    l = nCol;
+		l = nRow < nCol ? nRow : nCol;
 
-	t = 0.0;
-	for (i = 0; i < l; i++) {
+		double t = 0.0;
+		for (int i = 0; i < l; i++) {
 	    t += values[i][i];
 	}
 	return t;
@@ -1568,16 +1537,16 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		    return 2;
 		}
 
-		double[] sinl = new double[1];
-		double[] sinr = new double[1];
-		double[] cosl = new double[1];
-		double[] cosr = new double[1];
-		double[] single_values = new double[2];
+			double[] single_values = new double[2];
 
 		single_values[0] = values[0][0];
 		single_values[1] = values[1][1];
 
-		compute_2X2(values[0][0], values[0][1], values[1][1],
+			double[] cosr = new double[1];
+			double[] cosl = new double[1];
+			double[] sinr = new double[1];
+			double[] sinl = new double[1];
+			compute_2X2(values[0][0], values[0][1], values[1][1],
 			    single_values, sinl, cosl, sinr, cosr, 0);
 
 		update_u(0, U, cosl, sinl);
@@ -1613,10 +1582,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     public final int LUD(GMatrix LU, GVector permutation)
     {
         int size = LU.nRow*LU.nCol;
-        double[] temp = new double[size];
-	int[] even_row_exchange = new int[1];
-	int[] row_perm = new int[LU.nRow];
-	int i, j;
+		int[] row_perm = new int[LU.nRow];
+	int j;
 
         if (nRow != nCol) {
 	    throw new MismatchedSizeException
@@ -1638,14 +1605,17 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		(VecMathI18N.getString("GMatrix20"));
         }
 
-	for (i = 0; i < nRow; i++) {
+		int i;
+		double[] temp = new double[size];
+		for (i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		temp[i*nCol+j] = values[i][j];
 	    }
         }
 
         // Calculate LU decomposition: Is the matrix singular? 
-        if (!luDecomposition(LU.nRow, temp, row_perm, even_row_exchange)) {
+		int[] even_row_exchange = new int[1];
+		if (!luDecomposition(LU.nRow, temp, row_perm, even_row_exchange)) {
             // Matrix has no inverse 
             throw new SingularMatrixException
 		(VecMathI18N.getString("GMatrix21"));
@@ -1671,14 +1641,12 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */   
     public final void setScale(double scale) 
     { 
-	int i, j, l;
+	int j, l;
 
-	if (nRow < nCol) 
-	    l = nRow;
-	else 
-	    l = nCol;
+		l = nRow < nCol ? nRow : nCol;
 
-	for (i = 0; i < nRow; i++) {
+		int i;
+		for (i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		values[i][j] = 0.0;
 	    }
@@ -1699,11 +1667,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      */
     final void invertGeneral(GMatrix  m1) {
         int size = m1.nRow*m1.nCol;
-	double temp[] = new double[size];
-	double result[] = new double[size];
-	int row_perm[] = new int[m1.nRow];
-	int[] even_row_exchange = new int[1];
-	int i, j;
+		int row_perm[] = new int[m1.nRow];
+		int j;
 
 	// Use LU decomposition and backsubstitution code specifically
 	// for floating-point nxn matrices.
@@ -1714,21 +1679,25 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	}
 
 	// Copy source matrix to temp 
-	for (i = 0; i < nRow; i++) {
+		int i;
+		double[] temp = new double[size];
+		for (i = 0; i < nRow; i++) {
 	    for (j = 0; j < nCol; j++) {
 		temp[i*nCol+j] = m1.values[i][j];
 	    }
 	}
 
 	// Calculate LU decomposition: Is the matrix singular? 
-	if (!luDecomposition(m1.nRow, temp, row_perm, even_row_exchange)) {
+		int[] even_row_exchange = new int[1];
+		if (!luDecomposition(m1.nRow, temp, row_perm, even_row_exchange)) {
 	    // Matrix has no inverse 
 	    throw new SingularMatrixException
 		(VecMathI18N.getString("GMatrix21"));
 	}
 
 	// Perform back substitution on the identity matrix 
-        for (i = 0; i < size; i++)
+		double[] result = new double[size];
+		for (i = 0; i < size; i++)
 	    result[i] = 0.0;
 
         for (i = 0; i < nCol; i++)
@@ -1763,20 +1732,20 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     static boolean luDecomposition(int dim, double[] matrix0,
 				   int[] row_perm, int[] even_row_xchg) {
 
-	double row_scale[] = new double[dim];
+		// Determine implicit scaling information by looping over rows
+	int j;
+	int rs, mtx;
+	double temp;
 
-	// Determine implicit scaling information by looping over rows 
-	int i, j;
-	int ptr, rs, mtx;
-	double big, temp;
-
-	ptr = 0;
-	rs = 0;
+		int ptr = 0;
+		rs = 0;
 	even_row_xchg[0] = 1;
 
 	// For each row ... 
-	i = dim;
-	while (i-- != 0) {
+		int i = dim;
+		double big;
+		double[] row_scale = new double[dim];
+		while (i-- != 0) {
 	    big = 0.0;
 
 	    // For each column, find the largest element in the row 
@@ -1799,7 +1768,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	// For all columns, execute Crout's method 
 	mtx = 0;
 	for (j = 0; j < dim; j++) {
-	    int imax, k;
+	    int k;
 	    int target, p1, p2;
 	    double sum;
 
@@ -1821,8 +1790,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    // Search for largest pivot element and calculate
 	    // intermediate elements of lower diagonal matrix L.
 	    big = 0.0;
-	    imax = -1;
-	    for (i = j; i < dim; i++) {
+		int imax = -1;
+		for (i = j; i < dim; i++) {
 		target = mtx + (dim*i) + j;
 		sum = matrix0[target];
 		k = j;
@@ -1909,27 +1878,25 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 				   int[] row_perm,
 				   double[] matrix2) {
 
-	int i, ii, ip, j, k;
-	int rp;
-	int cv, rv, ri;
-	double tt;
-	
-	// rp = row_perm;
-	rp = 0;
+	int ii, ip, j, k;
+		int rv, ri;
 
-	// For each column vector of matrix2 ... 
+		// rp = row_perm;
+		int rp = 0;
+
+		// For each column vector of matrix2 ...
 	for (k = 0; k < dim; k++) {
 	    // cv = &(matrix2[0][k]);
-	    cv = k;
-	    ii = -1;
+		int cv = k;
+		ii = -1;
 
 	    // Forward substitution 
-	    for (i = 0; i < dim; i++) {
-		double sum;
+		int i;
+		for (i = 0; i < dim; i++) {
 
-		ip = row_perm[rp+i];
-		sum = matrix2[cv+dim*ip];
-		matrix2[cv+dim*ip] = matrix2[cv+dim*i];
+			ip = row_perm[rp+i];
+			double sum = matrix2[cv + dim * ip];
+			matrix2[cv+dim*ip] = matrix2[cv+dim*i];
 		if (ii >= 0) {
 		    // rv = &(matrix1[i][0]);
 		    rv = i*dim;
@@ -1947,8 +1914,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    for (i = 0; i < dim; i++) {
 		ri = (dim-1-i);
 		rv = dim*(ri);
-		tt = 0.0;
-		for(j=1;j<=i;j++) {
+			double tt = 0.0;
+			for(j=1;j<=i;j++) {
 		    tt += matrix1[rv+dim-j] * matrix2[cv+dim*(dim-j)]; 	  
 		}
 		matrix2[cv+dim*ri]= (matrix2[cv+dim*ri] - tt) / matrix1[rv+ri];
@@ -1957,14 +1924,14 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     }
 
     static int computeSVD(GMatrix mat, GMatrix U, GMatrix W, GMatrix V) {
-	int i, j, k;
-	int nr, nc, si;
+	int j, k;
+	int nc, si;
 
-	int converged, rank;
-	double cs, sn, r, mag,scale, t;
-	int eLength, sLength, vecLength;
+	int converged;
+		double cs, sn, r,scale, t;
+	int eLength, sLength;
 
-	GMatrix tmp = new GMatrix(mat.nRow, mat.nCol);
+		GMatrix tmp = new GMatrix(mat.nRow, mat.nCol);
 	GMatrix u = new GMatrix(mat.nRow, mat.nCol);
 	GMatrix v = new GMatrix(mat.nRow, mat.nCol);
 	GMatrix m = new GMatrix(mat);
@@ -1978,10 +1945,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    eLength = m.nRow;
 	}
 
-	if (m.nRow > m.nCol) 
-	    vecLength = m.nRow;
-	else
-	    vecLength = m.nCol;
+		int vecLength;
+		vecLength = m.nRow > m.nCol ? m.nRow : m.nCol;
 
 	double[] vec = new double[vecLength];
 	double[] single_values = new double[sLength];
@@ -1991,19 +1956,21 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    System.out.println("input to compute_svd = \n"+m.toString());
 	}
 
-	rank = 0;
+		int rank = 0;
 
-	U.setIdentity();
+		U.setIdentity();
 	V.setIdentity();
 
-	nr = m.nRow;
-	nc = m.nCol;
+		int nr = m.nRow;
+		nc = m.nCol;
 
 	// householder reduction 
-	for (si = 0; si < sLength; si++) {
+		int i;
+		for (si = 0; si < sLength; si++) {
 	    // for each singular value
 
-	    if (nr > 1) {
+		double mag;
+		if (nr > 1) {
 		// zero out column
 		if (debug)
 		    System.out.println
@@ -2020,11 +1987,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		}
 
 		mag = Math.sqrt(mag);
-		if (m.values[si][si] == 0.0) {
-		    vec[0] = mag;
-		} else {
-		    vec[0] = m.values[si][si] + d_sign(mag, m.values[si][si]);
-		}
+			vec[0] = m.values[si][si] == 0.0 ? mag : m.values[si][si] + d_sign(mag, m.values[si][si]);
 
 		for (i = 1; i < nr; i++) {
 		    vec[i] =  m.values[si+i][si];
@@ -2123,12 +2086,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		// generate the reflection vector, compute the first entry and
 		// copy the rest from the row to be zeroed
 		mag = Math.sqrt(mag);
-		if (m.values[si][si+1] == 0.0) {
-		    vec[0] = mag;
-		} else {
-		    vec[0] = m.values[si][si+1] +
-			d_sign(mag, m.values[si][si+1]);
-		}
+			vec[0] = m.values[si][si + 1] == 0.0 ? mag : m.values[si][si + 1] +
+					d_sign(mag, m.values[si][si + 1]);
 
 		for (i = 1; i < nc - 1; i++){
 		    vec[i] =  m.values[si][si+i+1];
@@ -2258,19 +2217,11 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     static void compute_qr(int start, int end, double[] s, double[] e,
 			   GMatrix u, GMatrix v) {
 
-	int i, j, k, n, sl;
-	boolean converged;
-	double shift, r, utemp, vtemp, f, g;
-	double[] cosl = new double[1];
-	double[] cosr = new double[1];
-	double[] sinl = new double[1];
-	double[] sinr = new double[1];
-	GMatrix m = new GMatrix(u.nCol, v.nRow);
- 
-	final int MAX_INTERATIONS = 2;
-	final double CONVERGE_TOL = 4.89E-15;
+	int i, j, n, sl;
+		double r, utemp, vtemp, f, g;
+		GMatrix m = new GMatrix(u.nCol, v.nRow);
 
-	if (debug) {
+		if (debug) {
 	    System.out.println("start =" + start);
 	    System.out.println("s =\n");
 	    for(i=0;i<s.length;i++) {
@@ -2292,29 +2243,32 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    System.out.println("\nm =\n" + m.toString());
 	}
 
-	double c_b48 =  1.0;
-	double c_b71 = -1.0;
-	converged = false;
+		double c_b71 = -1.0;
+		boolean converged = false;
 
-	if (debug)
+		if (debug)
 	    print_svd(s, e, u, v);
 
 	f = 0.0;
 	g = 0.0;
-   
-	for (k = 0; k < MAX_INTERATIONS && !converged;k++) {
+
+		double c_b48 = 1.0;
+		final double CONVERGE_TOL = 4.89E-15;
+		final int MAX_INTERATIONS = 2;
+		double[] sinr = new double[1];
+		double[] sinl = new double[1];
+		double[] cosr = new double[1];
+		double[] cosl = new double[1];
+		for (int k = 0; k < MAX_INTERATIONS && !converged; k++) {
 	    for (i = start; i <= end; i++) {
 
 		// if at start of iterfaction compute shift 
-		if (i == start) { 
-		    if (e.length == s.length)
-			sl = end;
-		    else
-			sl = end + 1;
+		if (i == start) {
+			sl = e.length == s.length ? end : end + 1;
 
-		    shift = compute_shift(s[sl-1], e[end], s[sl]);
+			double shift = compute_shift(s[sl - 1], e[end], s[sl]);
 
-		    f = (Math.abs(s[i]) - shift) *
+			f = (Math.abs(s[i]) - shift) *
 			(d_sign(c_b48, s[i]) + shift/s[i]);
 		    g = e[i];
 		} 
@@ -2420,22 +2374,19 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    print_svd(s, e, u, v);
 	}
 
-	return;
-    }
+	}
 
     private static void print_se(double[] s, double[] e) {
-	System.out.println("\ns =" + s[0] + " " + s[1] + " " + s[2]);
-	System.out.println("e =" + e[0] + " " + e[1]);
+	System.out.println("\ns =" + s[0] + ' ' + s[1] + " " + s[2]);
+	System.out.println("e =" + e[0] + ' ' + e[1]);
     }
 
     private static void update_v(int index, GMatrix v,
 				 double[] cosr, double[] sinr) {
-	int j;
-	double vtemp;
 
-	for (j = 0; j < v.nRow; j++) {
-	    vtemp = v.values[j][index];
-	    v.values[j][index] =
+		for (int j = 0; j < v.nRow; j++) {
+			double vtemp = v.values[j][index];
+			v.values[j][index] =
 		cosr[0]*vtemp + sinr[0]*v.values[j][index+1];
 	    v.values[j][index+1] =
 	       -sinr[0]*vtemp + cosr[0]*v.values[j][index+1];
@@ -2443,10 +2394,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     }
 
     private static void chase_up(double[] s, double[] e, int k, GMatrix v) {
-	double f, g, r;
-	double[] cosr = new double[1];
-	double[] sinr = new double[1];
-	int i;
+	double g, r;
+		int i;
 	GMatrix t = new GMatrix(v.nRow, v.nCol);
 	GMatrix m = new GMatrix(v.nRow, v.nCol);
 
@@ -2460,10 +2409,12 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    }
 	}
 
-	f = e[k];
-	g = s[k];
+		double f = e[k];
+		g = s[k];
 
-	for (i = k; i > 0; i--) {
+		double[] sinr = new double[1];
+		double[] cosr = new double[1];
+		for (i = k; i > 0; i--) {
 	    r = compute_rot(f, g, sinr, cosr);
 	    f = -e[i-1] * sinr[0];
 	    g = s[i-1];
@@ -2477,10 +2428,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     }
     
     private static void chase_across(double[] s, double[] e, int k, GMatrix u) {
-	double f, g, r;
-	double[] cosl = new double[1];
-	double[] sinl = new double[1];
-	int i;
+	double g, r;
+		int i;
 	GMatrix t = new GMatrix(u.nRow, u.nCol);
 	GMatrix m = new GMatrix(u.nRow, u.nCol);
 
@@ -2495,9 +2444,11 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	}
 
 	g = e[k];
-	f = s[k+1];
+		double f = s[k + 1];
 
-	for (i = k; i < u.nCol-2; i++){
+		double[] sinl = new double[1];
+		double[] cosl = new double[1];
+		for (i = k; i < u.nCol-2; i++){
 	    r = compute_rot(f, g, sinl, cosl);
 	    g = -e[i+1] * sinl[0];
 	    f = s[i+2];
@@ -2579,12 +2530,10 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
     private static void update_u(int index, GMatrix u,
 				 double[] cosl, double[] sinl) {
-	int j;
-	double utemp;
 
-	for (j = 0; j < u.nCol; j++) {
-	    utemp = u.values[index][j];
-	    u.values[index][j] =
+		for (int j = 0; j < u.nCol; j++) {
+			double utemp = u.values[index][j];
+			u.values[index][j] =
 		cosl[0]*utemp + sinl[0]*u.values[index+1][j];
 	    u.values[index+1][j] =
 	       -sinl[0]*utemp + cosl[0]*u.values[index+1][j];
@@ -2596,35 +2545,35 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
 	mtmp.mul(u, mtmp);
 	mtmp.mul(mtmp, v);
-	System.out.println("\n m = \n" + mtmp.toString(mtmp));
+	System.out.println("\n m = \n" + toString(mtmp));
             
     }
 
     private static String toString(GMatrix m)
     {
-	StringBuffer buffer = new StringBuffer(m.nRow * m.nCol * 8);
-	int i, j;
+	StringBuilder buffer = new StringBuilder(m.nRow * m.nCol * 8);
+	int j;
 
-	for (i = 0; i < m.nRow; i++) {
+	for (int i = 0; i < m.nRow; i++) {
 	    for(j = 0; j < m.nCol; j++) {
 		if (Math.abs(m.values[i][j]) < .000000001) {
 		    buffer.append("0.0000 ");
 		} else {
-		    buffer.append(m.values[i][j]).append(" ");
+		    buffer.append(m.values[i][j]).append(' ');
 		}
 	    }
-	    buffer.append("\n");
+	    buffer.append('\n');
 	}
 	return buffer.toString();
     }
 
     private static void print_svd(double[] s, double[] e,
 				  GMatrix u, GMatrix v) {
-	int i;
-	GMatrix mtmp = new GMatrix(u.nCol, v.nRow);
+		GMatrix mtmp = new GMatrix(u.nCol, v.nRow);
 
 	System.out.println(" \ns = ");
-	for (i = 0; i < s.length; i++) {
+		int i;
+		for (i = 0; i < s.length; i++) {
 	    System.out.println(" " + s[i]);
 	}
 
@@ -2653,31 +2602,26 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     }
 
     static double max(double a, double b) {
-	if (a > b) 
-	    return a;
-	else
-	    return b;
+		return a > b ? a : b;
     }
 
     static double min(double a, double b) {
-	if (a < b) 
-	    return a;
-	else
-	    return b;
+		return a < b ? a : b;
     }
 
     static double compute_shift(double f, double g, double h) {
-	double d__1, d__2;
-	double fhmn, fhmx, c, fa, ga, ha, as, at, au;
-	double ssmin;
- 
-	fa = Math.abs(f);
+	double d__2;
+	double fhmx, c, fa, ga, ha, as, at, au;
+
+		fa = Math.abs(f);
 	ga = Math.abs(g);
 	ha = Math.abs(h);
-	fhmn = min(fa,ha);
-	fhmx = max(fa,ha);
+		double fhmn = min(fa, ha);
+		fhmx = max(fa,ha);
 
-	if (fhmn == 0.0) {
+		double ssmin;
+		double d__1;
+		if (fhmn == 0.0) {
 	    ssmin = 0.0;
 	    if (fhmx == 0.0) {
 	    } else {
@@ -2715,42 +2659,31 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 			   double[] single_values, double[] snl, double[] csl,
 			   double[] snr, double[] csr, int index) {
 
-	double c_b3 = 2.0;
-	double c_b4 = 1.0;
- 
-	double d__1;
-	int pmax;
-	double temp;
-	boolean swap;
-	double a, d, l, m, r, s, t, tsign, fa, ga, ha;
-	double ft, gt, ht, mm;
-	boolean gasmal;
-	double tt, clt, crt, slt, srt;
-	double ssmin,ssmax;
+		double d, l, m, r, s, t, tsign, fa, ga, ha;
+	double gt, ht, mm;
+		double clt, crt, slt, srt;
+	double ssmax;
  
 	ssmax = single_values[0];
-	ssmin = single_values[1];
-	clt = 0.0;
+		double ssmin = single_values[1];
+		clt = 0.0;
 	crt = 0.0;
 	slt = 0.0;
 	srt = 0.0;
 	tsign = 0.0;
 
-	ft = f;
-	fa = Math.abs(ft);
+		double ft = f;
+		fa = Math.abs(ft);
 	ht = h;
 	ha = Math.abs(h);
- 
-	pmax = 1;
-	if (ha > fa) 
-	    swap = true;
-	else 
-	    swap = false;
 
-	if (swap) {
+		int pmax = 1;
+		boolean swap = ha > fa;
+
+		if (swap) {
 	    pmax = 3;
-	    temp = ft;
-	    ft = ht;
+			double temp = ft;
+			ft = ht;
 	    ht = temp;
 	    temp = fa;
 	    fa = ha;
@@ -2768,56 +2701,40 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    slt = 0.0;
 	    srt = 0.0;
 	} else {
-	    gasmal = true;
-	    if (ga > fa) {
+		boolean gasmal = true;
+		if (ga > fa) {
 		pmax = 2;
 		if (fa / ga < EPS) {
 		    gasmal = false;
 		    ssmax = ga;
 
-		    if (ha > 1.0) {
-			ssmin = fa / (ga / ha);
-		    } else {
-			ssmin = fa / ga * ha;
-		    }
+			ssmin = ha > 1.0 ? fa / (ga / ha) : fa / ga * ha;
 		    clt = 1.0;
 		    slt = ht / gt;
 		    srt = 1.0;
 		    crt = ft / gt;
 		}
 	    }
-	    if (gasmal) {
+		double c_b4 = 1.0;
+		if (gasmal) {
 		d = fa - ha;
-		if (d == fa) {
- 
-		    l = 1.0;
-		} else {
-		    l = d / fa;
-		}
+			l = d == fa ? 1.0 : d / fa;
  
 		m = gt / ft;
  		t = 2.0 - l;
  		mm = m * m;
-		tt = t * t;
-		s = Math.sqrt(tt + mm);
- 
-		if (l == 0.0) {
-		    r = Math.abs(m);
-		} else {
-		    r = Math.sqrt(l * l + mm);
-		}
- 
-		a = (s + r) * 0.5;
-		if (ga > fa) {
+			double tt = t * t;
+			s = Math.sqrt(tt + mm);
+
+			r = l == 0.0 ? Math.abs(m) : Math.sqrt(l * l + mm);
+
+			double a = (s + r) * 0.5;
+			if (ga > fa) {
 		    pmax = 2;
 		    if (fa / ga < EPS) {
 			gasmal = false;
 			ssmax = ga;
-			if (ha > 1.0) {
-			    ssmin = fa / (ga / ha);
-			} else {
-			    ssmin = fa / ga * ha;
-			}
+				ssmin = ha > 1.0 ? fa / (ga / ha) : fa / ga * ha;
 			clt = 1.0;
 			slt = ht / gt;
 			srt = 1.0;
@@ -2826,11 +2743,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		}
 		if (gasmal) {
 		    d = fa - ha;
-		    if (d == fa) {
-			l = 1.0;
-		    } else {
-			l = d / fa;
-		    }
+			l = d == fa ? 1.0 : d / fa;
  
 		    m = gt / ft;
 		    t = 2.0 - l;
@@ -2838,12 +2751,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 		    mm = m * m;
 		    tt = t * t;
 		    s = Math.sqrt(tt + mm);
- 
-		    if (l == 0.) {
-			r = Math.abs(m);
-		    } else {
-			r = Math.sqrt(l * l + mm);
-		    }
+
+			r = l == 0. ? Math.abs(m) : Math.sqrt(l * l + mm);
  
 		    a = (s + r) * 0.5;
 		    ssmin = ha / a;
@@ -2851,7 +2760,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 
 		    if (mm == 0.0) {
 			if (l == 0.0) {
-			    t = d_sign(c_b3, ft) * d_sign(c_b4, gt);
+				double c_b3 = 2.0;
+				t = d_sign(c_b3, ft) * d_sign(c_b4, gt);
 			} else {
 			    t = gt / d_sign(d, ft) + m / t;
 			}
@@ -2892,26 +2802,20 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    }
 
 	    single_values[index] = d_sign(ssmax, tsign);
-	    d__1 = tsign * d_sign(c_b4, f) * d_sign(c_b4, h);
-	    single_values[index+1] = d_sign(ssmin, d__1);
+		double d__1 = tsign * d_sign(c_b4, f) * d_sign(c_b4, h);
+		single_values[index+1] = d_sign(ssmin, d__1);
 	}  
 
 	return 0;
     }
 
     static double compute_rot(double f, double g, double[] sin, double[] cos) {
-	int i__1;
-	double d__1, d__2;
+		double d__1, d__2;
 	double cs, sn;
-	int i;
-	double scale;
-	int count;
-	double f1, g1;
+		double g1;
 	double r;
-	final double safmn2 = 2.002083095183101E-146;
-	final double safmx2 = 4.994797680505588E+145;
- 
-	if (g == 0.0) {
+
+		if (g == 0.0) {
 	    cs = 1.0;
 	    sn = 0.0;
 	    r = f;
@@ -2920,10 +2824,15 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	    sn = 1.0;
 	    r = g;
 	} else {
-	    f1 = f;
-	    g1 = g;
-	    scale = max(Math.abs(f1), Math.abs(g1));
-	    if (scale >= safmx2) {
+			double f1 = f;
+			g1 = g;
+			double scale = max(Math.abs(f1), Math.abs(g1));
+			final double safmx2 = 4.994797680505588E+145;
+			final double safmn2 = 2.002083095183101E-146;
+			int count;
+			int i;
+			int i__1;
+			if (scale >= safmx2) {
 		count = 0;
 		while(scale >= safmx2) {
 		    ++count;
@@ -2970,9 +2879,8 @@ public class GMatrix implements java.io.Serializable, Cloneable {
     }
 
     static double d_sign(double a, double b) {
-	double x;
-	x = (a >= 0 ? a : - a);
-	return (b >= 0 ? x : -x);
+		double x = (a >= 0 ? a : -a);
+		return (b >= 0 ? x : -x);
     }
 
     /**
@@ -2983,6 +2891,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	GMatrix m1 = null;
 	try {
@@ -2995,9 +2904,7 @@ public class GMatrix implements java.io.Serializable, Cloneable {
 	// Also need to clone array of values
         m1.values = new double[nRow][nCol];
 	for (int i = 0; i < nRow; i++) {
-	   for(int j = 0; j < nCol; j++) {
-	       m1.values[i][j] = values[i][j];
-	   }
+        System.arraycopy(values[i], 0, m1.values[i], 0, nCol);
 	}
 
 	return m1;

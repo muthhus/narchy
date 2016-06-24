@@ -45,10 +45,10 @@ public class OptimizedBvh implements Serializable {
 	//protected final BulletStack stack = BulletStack.get();
 	
 	private static final boolean DEBUG_TREE_BUILDING = false;
-	private static int gStackDepth = 0;
-	private static int gMaxStackDepth = 0;
+	private static int gStackDepth;
+	private static int gMaxStackDepth;
 	
-	private static int maxIterations = 0;
+	private static int maxIterations;
 	
 	// Note: currently we have 16 bytes per quantized node
 	public static final int MAX_SUBTREE_SIZE_IN_BYTES = 2048;
@@ -62,8 +62,8 @@ public class OptimizedBvh implements Serializable {
 	private final ObjectArrayList<OptimizedBvhNode> leafNodes = new ObjectArrayList<OptimizedBvhNode>();
 	private final ObjectArrayList<OptimizedBvhNode> contiguousNodes = new ObjectArrayList<OptimizedBvhNode>();
 
-	private QuantizedBvhNodes quantizedLeafNodes = new QuantizedBvhNodes();
-	private QuantizedBvhNodes quantizedContiguousNodes = new QuantizedBvhNodes();
+	private final QuantizedBvhNodes quantizedLeafNodes = new QuantizedBvhNodes();
+	private final QuantizedBvhNodes quantizedContiguousNodes = new QuantizedBvhNodes();
 	
 	private int curNodeIndex;
 
@@ -199,7 +199,8 @@ public class OptimizedBvh implements Serializable {
 
 		private final Vector3f aabbMin = new Vector3f(), aabbMax = new Vector3f();
 
-		public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
 			OptimizedBvhNode node = new OptimizedBvhNode();
 			aabbMin.set(1e30f, 1e30f, 1e30f);
 			aabbMax.set(-1e30f, -1e30f, -1e30f);
@@ -234,7 +235,8 @@ public class OptimizedBvh implements Serializable {
 			this.optimizedTree = tree;
 		}
 
-		public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
 			// The partId and triangle index must fit in the same (positive) integer
 			assert (partId < (1 << MAX_NUM_PARTS_IN_BITS));
 			assert (triangleIndex < (1 << (31 - MAX_NUM_PARTS_IN_BITS)));
@@ -564,9 +566,9 @@ public class OptimizedBvh implements Serializable {
 		int aabbMax2_2 = QuantizedBvhNodes.getCoord(aabbMax2, 2);
 
 		boolean overlap = true;
-		overlap = (aabbMin1_0 > aabbMax2_0 || aabbMax1_0 < aabbMin2_0) ? false : overlap;
-		overlap = (aabbMin1_2 > aabbMax2_2 || aabbMax1_2 < aabbMin2_2) ? false : overlap;
-		overlap = (aabbMin1_1 > aabbMax2_1 || aabbMax1_1 < aabbMin2_1) ? false : overlap;
+		overlap = !(aabbMin1_0 > aabbMax2_0 || aabbMax1_0 < aabbMin2_0) && overlap;
+		overlap = !(aabbMin1_2 > aabbMax2_2 || aabbMax1_2 < aabbMin2_2) && overlap;
+		overlap = !(aabbMin1_1 > aabbMax2_1 || aabbMax1_1 < aabbMin2_1) && overlap;
 		return overlap;
 	}
 
@@ -786,7 +788,7 @@ public class OptimizedBvh implements Serializable {
 				int leftChildNodeId = currentNodeId + 1;
 				walkRecursiveQuantizedTreeAgainstQueryAabb(currentNodes, leftChildNodeId, nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
 
-				int rightChildNodeId = currentNodes.isLeafNode(leftChildNodeId) ? leftChildNodeId + 1 : leftChildNodeId + currentNodes.getEscapeIndex(leftChildNodeId);
+				int rightChildNodeId = leftChildNodeId + (currentNodes.isLeafNode(leftChildNodeId) ? 1 : currentNodes.getEscapeIndex(leftChildNodeId));
 				walkRecursiveQuantizedTreeAgainstQueryAabb(currentNodes, rightChildNodeId, nodeCallback, quantizedQueryAabbMin, quantizedQueryAabbMax);
 			}
 		}

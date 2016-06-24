@@ -29,9 +29,6 @@ import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.shapes.ShapeHull;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.linearmath.VectorUtil;
-import com.bulletphysics.linearmath.convexhull.HullDesc;
-import com.bulletphysics.linearmath.convexhull.HullFlags;
-import com.bulletphysics.linearmath.convexhull.HullResult;
 import com.bulletphysics.util.IntArrayList;
 import com.bulletphysics.util.ObjectArrayList;
 
@@ -728,69 +725,67 @@ public class HullLibrary {
 
 		// ok..now make sure we didn't prune so many vertices it is now invalid.
 		//	if ( 1 )
-		{
-			bmin = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
-			bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
+		bmin = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
+		bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
 
-			for (int i=0; i<vcount[0]; i++) {
-				Vector3f p = vertices.getQuick(i);
-				for (int j = 0; j < 3; j++) {
-					if (VectorUtil.getCoord(p, j) < bmin[j]) {
-						bmin[j] = VectorUtil.getCoord(p, j);
-					}
-					if (VectorUtil.getCoord(p, j) > bmax[j]) {
-						bmax[j] = VectorUtil.getCoord(p, j);
-					}
-				}
-			}
+		for (int i=0; i<vcount[0]; i++) {
+            Vector3f p = vertices.getQuick(i);
+            for (int j = 0; j < 3; j++) {
+                if (VectorUtil.getCoord(p, j) < bmin[j]) {
+                    bmin[j] = VectorUtil.getCoord(p, j);
+                }
+                if (VectorUtil.getCoord(p, j) > bmax[j]) {
+                    bmax[j] = VectorUtil.getCoord(p, j);
+                }
+            }
+        }
 
-			dx = bmax[0] - bmin[0];
-			dy = bmax[1] - bmin[1];
-			dz = bmax[2] - bmin[2];
+		dx = bmax[0] - bmin[0];
+		dy = bmax[1] - bmin[1];
+		dz = bmax[2] - bmin[2];
 
-			if (dx < EPSILON || dy < EPSILON || dz < EPSILON || vcount[0] < 3) {
-				float cx = dx * 0.5f + bmin[0];
-				float cy = dy * 0.5f + bmin[1];
-				float cz = dz * 0.5f + bmin[2];
+		if (dx < EPSILON || dy < EPSILON || dz < EPSILON || vcount[0] < 3) {
+            float cx = dx * 0.5f + bmin[0];
+            float cy = dy * 0.5f + bmin[1];
+            float cz = dz * 0.5f + bmin[2];
 
-				float len = Float.MAX_VALUE;
+            float len = Float.MAX_VALUE;
 
-				if (dx >= EPSILON && dx < len) len = dx;
-				if (dy >= EPSILON && dy < len) len = dy;
-				if (dz >= EPSILON && dz < len) len = dz;
+            if (dx >= EPSILON && dx < len) len = dx;
+            if (dy >= EPSILON && dy < len) len = dy;
+            if (dz >= EPSILON && dz < len) len = dz;
 
-				if (len == Float.MAX_VALUE) {
-					dx = dy = dz = 0.01f; // one centimeter
-				}
-				else {
-					if (dx < EPSILON) dx = len * 0.05f; // 1/5th the shortest non-zero edge.
-					if (dy < EPSILON) dy = len * 0.05f;
-					if (dz < EPSILON) dz = len * 0.05f;
-				}
+            if (len == Float.MAX_VALUE) {
+                dx = dy = dz = 0.01f; // one centimeter
+            }
+            else {
+                if (dx < EPSILON) dx = len * 0.05f; // 1/5th the shortest non-zero edge.
+                if (dy < EPSILON) dy = len * 0.05f;
+                if (dz < EPSILON) dz = len * 0.05f;
+            }
 
-				float x1 = cx - dx;
-				float x2 = cx + dx;
+            float x1 = cx - dx;
+            float x2 = cx + dx;
 
-				float y1 = cy - dy;
-				float y2 = cy + dy;
+            float y1 = cy - dy;
+            float y2 = cy + dy;
 
-				float z1 = cz - dz;
-				float z2 = cz + dz;
+            float z1 = cz - dz;
+            float z2 = cz + dz;
 
-				vcount[0] = 0; // add box
+            vcount[0] = 0; // add box
 
-				addPoint(vcount, vertices, x1, y1, z1);
-				addPoint(vcount, vertices, x2, y1, z1);
-				addPoint(vcount, vertices, x2, y2, z1);
-				addPoint(vcount, vertices, x1, y2, z1);
-				addPoint(vcount, vertices, x1, y1, z2);
-				addPoint(vcount, vertices, x2, y1, z2);
-				addPoint(vcount, vertices, x2, y2, z2);
-				addPoint(vcount, vertices, x1, y2, z2);
+            addPoint(vcount, vertices, x1, y1, z1);
+            addPoint(vcount, vertices, x2, y1, z1);
+            addPoint(vcount, vertices, x2, y2, z1);
+            addPoint(vcount, vertices, x1, y2, z1);
+            addPoint(vcount, vertices, x1, y1, z2);
+            addPoint(vcount, vertices, x2, y1, z2);
+            addPoint(vcount, vertices, x2, y2, z2);
+            addPoint(vcount, vertices, x1, y2, z2);
 
-				return true;
-			}
-		}
+            return true;
+        }
 
 		return true;
 	}

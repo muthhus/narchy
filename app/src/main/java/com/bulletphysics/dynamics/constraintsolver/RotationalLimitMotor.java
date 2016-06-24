@@ -93,8 +93,7 @@ public class RotationalLimitMotor {
 	 */
     public boolean isLimited()
     {
-    	if(loLimit>=hiLimit) return false;
-    	return true;
+        return loLimit < hiLimit;
     }
 
 	/**
@@ -102,8 +101,7 @@ public class RotationalLimitMotor {
 	 */
     public boolean needApplyTorques()
     {
-    	if(currentLimit == 0 && enableMotor == false) return false;
-    	return true;
+        return !(currentLimit == 0 && enableMotor == false);
     }
 
 	/**

@@ -53,9 +53,9 @@ public class SubsimplexConvexCast extends ConvexCast {
 	
 	private static final int MAX_ITERATIONS = 32;
 	
-	private SimplexSolverInterface simplexSolver;
-	private ConvexShape convexA;
-	private ConvexShape convexB;
+	private final SimplexSolverInterface simplexSolver;
+	private final ConvexShape convexA;
+	private final ConvexShape convexB;
 
 	public SubsimplexConvexCast(ConvexShape shapeA, ConvexShape shapeB, SimplexSolverInterface simplexSolver) {
 		this.convexA = shapeA;
@@ -63,7 +63,8 @@ public class SubsimplexConvexCast extends ConvexCast {
 		this.simplexSolver = simplexSolver;
 	}
 	
-	public boolean calcTimeOfImpact(Transform fromA, Transform toA, Transform fromB, Transform toB, CastResult result) {
+	@Override
+    public boolean calcTimeOfImpact(Transform fromA, Transform toA, Transform fromB, Transform toB, CastResult result) {
 		Vector3f tmp = new Vector3f();
 		
 		simplexSolver.reset();

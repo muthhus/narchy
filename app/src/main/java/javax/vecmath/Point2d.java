@@ -116,10 +116,10 @@ public class Point2d extends Tuple2d implements java.io.Serializable {
    */
   public final double distanceSquared(Point2d p1)
     {
-      double dx, dy;
+      double dy;
 
-      dx = this.x-p1.x;  
-      dy = this.y-p1.y;
+        double dx = this.x - p1.x;
+        dy = this.y-p1.y;
       return dx*dx+dy*dy;
     }
 
@@ -129,10 +129,10 @@ public class Point2d extends Tuple2d implements java.io.Serializable {
    */    
   public final double distance(Point2d p1)
     {
-      double  dx, dy;
+      double dy;
 
-      dx = this.x-p1.x;  
-      dy = this.y-p1.y;
+        double dx = this.x - p1.x;
+        dy = this.y-p1.y;
       return Math.sqrt(dx*dx+dy*dy);
     }
 

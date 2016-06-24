@@ -37,16 +37,16 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 
 	private static final int NULL_PAIR = 0xffffffff;
 
-	private ObjectArrayList<BroadphasePair> overlappingPairArray = new ObjectArrayList<BroadphasePair>();
+	private final ObjectArrayList<BroadphasePair> overlappingPairArray = new ObjectArrayList<BroadphasePair>();
 	private com.bulletphysics.collision.broadphase.OverlapFilterCallback overlapFilterCallback;
-	private boolean blockedForChanges = false;
+	//private boolean blockedForChanges;
 
-	private IntArrayList hashTable = new IntArrayList();
-	private IntArrayList next = new IntArrayList();
+	private final IntArrayList hashTable = new IntArrayList();
+	private final IntArrayList next = new IntArrayList();
 	protected OverlappingPairCallback ghostPairCallback;
 
 	public HashedOverlappingPairCache() {
-		int initialAllocatedSize = 2;
+		//int initialAllocatedSize = 2;
 		// JAVA TODO: overlappingPairArray.ensureCapacity(initialAllocatedSize);
 		growTables();
 	}
@@ -55,7 +55,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	 * Add a pair and return the new pair. If the pair already exists,
 	 * no new pair is created and the old one is returned.
 	 */
-	public BroadphasePair addOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
+	@Override
+    public BroadphasePair addOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
 		BulletStats.gAddedPairs++;
 
 		if (!needsBroadphaseCollision(proxy0, proxy1)) {
@@ -65,7 +66,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		return internalAddPair(proxy0,proxy1);
 	}
 
-	public Object removeOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1, Dispatcher dispatcher) {
+	@Override
+    public Object removeOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1, Dispatcher dispatcher) {
 		BulletStats.gRemovePairs++;
 		if (proxy0.getUid() > proxy1.getUid()) {
 			BroadphaseProxy tmp = proxy0;
@@ -195,7 +197,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		}
 	}
 
-	public void removeOverlappingPairsContainingProxy(BroadphaseProxy proxy, Dispatcher dispatcher) {
+	@Override
+    public void removeOverlappingPairsContainingProxy(BroadphaseProxy proxy, Dispatcher dispatcher) {
 		processAllOverlappingPairs(new RemovePairCallback(proxy), dispatcher);
 	}
 
@@ -408,29 +411,31 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		return overlappingPairArray.getQuick(index);
 	}
 
-	public void setInternalGhostPairCallback(OverlappingPairCallback ghostPairCallback) {
+	@Override
+    public void setInternalGhostPairCallback(OverlappingPairCallback ghostPairCallback) {
 		this.ghostPairCallback = ghostPairCallback;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
 
 	private static class RemovePairCallback extends OverlapCallback {
-		private BroadphaseProxy obsoleteProxy;
+		private final BroadphaseProxy obsoleteProxy;
 
 		public RemovePairCallback(BroadphaseProxy obsoleteProxy) {
 			this.obsoleteProxy = obsoleteProxy;
 		}
 
-		public boolean processOverlap(BroadphasePair pair) {
+		@Override
+        public boolean processOverlap(BroadphasePair pair) {
 			return ((pair.pProxy0 == obsoleteProxy) ||
 					(pair.pProxy1 == obsoleteProxy));
 		}
 	}
 
 	private static class CleanPairCallback extends OverlapCallback {
-		private BroadphaseProxy cleanProxy;
-		private OverlappingPairCache pairCache;
-		private Dispatcher dispatcher;
+		private final BroadphaseProxy cleanProxy;
+		private final OverlappingPairCache pairCache;
+		private final Dispatcher dispatcher;
 
 		public CleanPairCallback(BroadphaseProxy cleanProxy, OverlappingPairCache pairCache, Dispatcher dispatcher) {
 			this.cleanProxy = cleanProxy;
@@ -438,7 +443,8 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 			this.dispatcher = dispatcher;
 		}
 
-		public boolean processOverlap(BroadphasePair pair) {
+		@Override
+        public boolean processOverlap(BroadphasePair pair) {
 			if ((pair.pProxy0 == cleanProxy) ||
 					(pair.pProxy1 == cleanProxy)) {
 				pairCache.cleanOverlappingPair(pair, dispatcher);

@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.PolyhedralConvexShape;
 
 import javax.vecmath.Vector3f;
 
@@ -36,7 +35,7 @@ import javax.vecmath.Vector3f;
  */
 public class BU_Simplex1to4 extends PolyhedralConvexShape {
 
-	protected int numVertices = 0;
+	protected int numVertices;
 	protected Vector3f[] vertices = new Vector3f[4];
 
 	public BU_Simplex1to4() {

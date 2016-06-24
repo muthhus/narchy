@@ -110,13 +110,11 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 			pHandles[maxHandles - 1].setNextFree(0);
 		}
 
-		{
-			// allocate edge buffers
-			for (int i=0; i<3; i++) {
-				pEdges[i] = createEdgeArray(maxHandles*2);
-			}
-		}
-		//removed overlap management
+        // allocate edge buffers
+        for (int i=0; i<3; i++) {
+            pEdges[i] = createEdgeArray(maxHandles*2);
+        }
+        //removed overlap management
 
 		// make boundary sentinels
 
@@ -371,7 +369,8 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 		return numHandles;
 	}
 
-	public void calculateOverlappingPairs(Dispatcher dispatcher) {
+	@Override
+    public void calculateOverlappingPairs(Dispatcher dispatcher) {
 		if (pairCache.hasDeferredRemoval()) {
 			ObjectArrayList<BroadphasePair> overlappingPairArray = pairCache.getOverlappingPairArray();
 
@@ -400,12 +399,7 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 				if (!isDuplicate) {
 					boolean hasOverlap = testAabbOverlap(pair.pProxy0, pair.pProxy1);
 
-					if (hasOverlap) {
-						needsRemoval = false;//callback->processOverlap(pair);
-					}
-					else {
-						needsRemoval = true;
-					}
+                    needsRemoval = !hasOverlap;
 				}
 				else {
 					// remove duplicate
@@ -547,8 +541,8 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 			int emin = pHandle.getMinEdges(axis);
 			int emax = pHandle.getMaxEdges(axis);
 
-			int dmin = (int) min[axis] - (int) pEdges[axis].getPos(emin);
-			int dmax = (int) max[axis] - (int) pEdges[axis].getPos(emax);
+			int dmin = min[axis] - pEdges[axis].getPos(emin);
+			int dmax = max[axis] - pEdges[axis].getPos(emax);
 
 			pEdges[axis].setPos(emin, min[axis]);
 			pEdges[axis].setPos(emax, max[axis]);
@@ -580,7 +574,8 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 	//public void processAllOverlappingPairs(OverlapCallback callback) {
 	//}
 	
-	public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
+	@Override
+    public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
 		int handleId = addHandle(aabbMin, aabbMax, userPtr, collisionFilterGroup, collisionFilterMask, dispatcher, multiSapProxy);
 
 		Handle handle = getHandle(handleId);
@@ -588,12 +583,14 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 		return handle;
 	}
 	
-	public void destroyProxy(BroadphaseProxy proxy, Dispatcher dispatcher) {
+	@Override
+    public void destroyProxy(BroadphaseProxy proxy, Dispatcher dispatcher) {
 		Handle handle = (Handle)proxy;
 		removeHandle(handle.uniqueId, dispatcher);
 	}
 
-	public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
+	@Override
+    public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
 		Handle handle = (Handle) proxy;
 		updateHandle(handle.uniqueId, aabbMin, aabbMax, dispatcher);
 	}
@@ -613,7 +610,8 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 		return true;
 	}
 
-	public OverlappingPairCache getOverlappingPairCache() {
+	@Override
+    public OverlappingPairCache getOverlappingPairCache() {
 		return pairCache;
 	}
 
@@ -627,12 +625,14 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 	
 	// getAabb returns the axis aligned bounding box in the 'global' coordinate frame
 	// will add some transform later
-	public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
+	@Override
+    public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
 		aabbMin.set(worldAabbMin);
 		aabbMax.set(worldAabbMax);
 	}
 
-	public void printStats() {
+	@Override
+    public void printStats() {
 		/*
 		printf("btAxisSweep3.h\n");
 		printf("numHandles = %d, maxHandles = %d\n",m_numHandles,m_maxHandles);

@@ -117,10 +117,10 @@ public class Point2f extends Tuple2f implements java.io.Serializable {
    */
   public final float distanceSquared(Point2f p1)
     {
-      float dx, dy;
+      float dy;
 
-      dx = this.x-p1.x;  
-      dy = this.y-p1.y;
+        float dx = this.x - p1.x;
+        dy = this.y-p1.y;
       return dx*dx+dy*dy;
     }
 
@@ -130,10 +130,10 @@ public class Point2f extends Tuple2f implements java.io.Serializable {
    */    
   public final float distance(Point2f p1)
     {
-      float  dx, dy;
+      float dy;
 
-      dx = this.x-p1.x;  
-      dy = this.y-p1.y;
+        float dx = this.x - p1.x;
+        dy = this.y-p1.y;
       return (float) Math.sqrt(dx*dx+dy*dy);
     }
 

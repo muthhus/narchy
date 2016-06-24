@@ -322,52 +322,50 @@ public class ConeTwistConstraint extends TypedConstraint {
 			}
 		}
 
-		{
-			// solve angular part
-			Vector3f angVelA = getRigidBodyA().getAngularVelocity(new Vector3f());
-			Vector3f angVelB = getRigidBodyB().getAngularVelocity(new Vector3f());
+        // solve angular part
+        Vector3f angVelA = getRigidBodyA().getAngularVelocity(new Vector3f());
+        Vector3f angVelB = getRigidBodyB().getAngularVelocity(new Vector3f());
 
-			// solve swing limit
-			if (solveSwingLimit) {
-				tmp.sub(angVelB, angVelA);
-				float amplitude = ((tmp).dot(swingAxis) * relaxationFactor * relaxationFactor + swingCorrection * (1f / timeStep) * biasFactor);
-				float impulseMag = amplitude * kSwing;
+        // solve swing limit
+        if (solveSwingLimit) {
+            tmp.sub(angVelB, angVelA);
+            float amplitude = ((tmp).dot(swingAxis) * relaxationFactor * relaxationFactor + swingCorrection * (1f / timeStep) * biasFactor);
+            float impulseMag = amplitude * kSwing;
 
-				// Clamp the accumulated impulse
-				float temp = accSwingLimitImpulse;
-				accSwingLimitImpulse = Math.max(accSwingLimitImpulse + impulseMag, 0.0f);
-				impulseMag = accSwingLimitImpulse - temp;
+            // Clamp the accumulated impulse
+            float temp = accSwingLimitImpulse;
+            accSwingLimitImpulse = Math.max(accSwingLimitImpulse + impulseMag, 0.0f);
+            impulseMag = accSwingLimitImpulse - temp;
 
-				Vector3f impulse = new Vector3f();
-				impulse.scale(impulseMag, swingAxis);
+            Vector3f impulse = new Vector3f();
+            impulse.scale(impulseMag, swingAxis);
 
-				rbA.applyTorqueImpulse(impulse);
+            rbA.applyTorqueImpulse(impulse);
 
-				tmp.negate(impulse);
-				rbB.applyTorqueImpulse(tmp);
-			}
+            tmp.negate(impulse);
+            rbB.applyTorqueImpulse(tmp);
+        }
 
-			// solve twist limit
-			if (solveTwistLimit) {
-				tmp.sub(angVelB, angVelA);
-				float amplitude = ((tmp).dot(twistAxis) * relaxationFactor * relaxationFactor + twistCorrection * (1f / timeStep) * biasFactor);
-				float impulseMag = amplitude * kTwist;
+        // solve twist limit
+        if (solveTwistLimit) {
+            tmp.sub(angVelB, angVelA);
+            float amplitude = ((tmp).dot(twistAxis) * relaxationFactor * relaxationFactor + twistCorrection * (1f / timeStep) * biasFactor);
+            float impulseMag = amplitude * kTwist;
 
-				// Clamp the accumulated impulse
-				float temp = accTwistLimitImpulse;
-				accTwistLimitImpulse = Math.max(accTwistLimitImpulse + impulseMag, 0.0f);
-				impulseMag = accTwistLimitImpulse - temp;
+            // Clamp the accumulated impulse
+            float temp = accTwistLimitImpulse;
+            accTwistLimitImpulse = Math.max(accTwistLimitImpulse + impulseMag, 0.0f);
+            impulseMag = accTwistLimitImpulse - temp;
 
-				Vector3f impulse = new Vector3f();
-				impulse.scale(impulseMag, twistAxis);
+            Vector3f impulse = new Vector3f();
+            impulse.scale(impulseMag, twistAxis);
 
-				rbA.applyTorqueImpulse(impulse);
+            rbA.applyTorqueImpulse(impulse);
 
-				tmp.negate(impulse);
-				rbB.applyTorqueImpulse(tmp);
-			}
-		}
-	}
+            tmp.negate(impulse);
+            rbB.applyTorqueImpulse(tmp);
+        }
+    }
 
 	public void updateRHS(float timeStep) {
 	}

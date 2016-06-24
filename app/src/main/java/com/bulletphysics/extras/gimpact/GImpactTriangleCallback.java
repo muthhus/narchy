@@ -29,9 +29,6 @@ package com.bulletphysics.extras.gimpact;
 
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.shapes.TriangleCallback;
-import com.bulletphysics.extras.gimpact.GImpactCollisionAlgorithm;
-import com.bulletphysics.extras.gimpact.GImpactShapeInterface;
-import com.bulletphysics.extras.gimpact.TriangleShapeEx;
 
 import javax.vecmath.Vector3f;
 
@@ -48,6 +45,7 @@ class GImpactTriangleCallback extends TriangleCallback {
 	public boolean swapped;
 	public float margin;
 
+	@Override
 	public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 		TriangleShapeEx tri1 = new TriangleShapeEx(triangle[0], triangle[1], triangle[2]);
 		tri1.setMargin(margin);

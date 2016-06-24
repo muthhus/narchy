@@ -23,11 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ByteBufferVertexData;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.ScalarType;
-import com.bulletphysics.collision.shapes.StridingMeshInterface;
-import com.bulletphysics.collision.shapes.VertexData;
 import com.bulletphysics.util.ObjectArrayList;
 
 import java.nio.ByteBuffer;
@@ -45,7 +40,7 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 
 	protected ObjectArrayList<IndexedMesh> indexedMeshes = new ObjectArrayList<IndexedMesh>();
 
-	private ByteBufferVertexData data = new ByteBufferVertexData();
+	private final ByteBufferVertexData data = new ByteBufferVertexData();
 
 	public TriangleIndexVertexArray() {
 	}

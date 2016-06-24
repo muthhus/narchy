@@ -109,7 +109,7 @@ public class SimpleDynamicsWorld extends DynamicsWorld {
 		int numManifolds = dispatcher1.getNumManifolds();
 		if (numManifolds != 0)
 		{
-			ObjectArrayList<PersistentManifold> manifoldPtr = ((CollisionDispatcher)dispatcher1).getInternalManifoldPointer();
+			ObjectArrayList<PersistentManifold> manifoldPtr = dispatcher1.getInternalManifoldPointer();
 
 			ContactSolverInfo infoGlobal = new ContactSolverInfo();
 			infoGlobal.timeStep = timeStep;

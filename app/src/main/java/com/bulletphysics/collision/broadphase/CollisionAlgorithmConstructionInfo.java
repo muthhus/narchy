@@ -23,7 +23,6 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import com.bulletphysics.collision.broadphase.Dispatcher;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
 
 /**

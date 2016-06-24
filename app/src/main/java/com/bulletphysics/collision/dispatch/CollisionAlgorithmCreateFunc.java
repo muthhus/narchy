@@ -25,7 +25,6 @@ package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.CollisionAlgorithm;
 import com.bulletphysics.collision.broadphase.CollisionAlgorithmConstructionInfo;
-import com.bulletphysics.collision.dispatch.CollisionObject;
 
 /**
  * Used by the CollisionDispatcher to register and create instances for CollisionAlgorithm.

@@ -37,7 +37,7 @@ import javax.vecmath.Vector3f;
  */
 class BvhDataArray {
 
-	private int size = 0;
+	private int size;
 	
 	float[] bound = new float[0];
 	int[] data = new int[0];

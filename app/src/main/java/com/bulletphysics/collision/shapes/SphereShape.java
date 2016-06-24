@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.ConvexInternalShape;
 import com.bulletphysics.linearmath.Transform;
 
 import javax.vecmath.Vector3f;

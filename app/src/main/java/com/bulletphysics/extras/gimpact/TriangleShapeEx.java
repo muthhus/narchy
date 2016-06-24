@@ -107,10 +107,7 @@ public class TriangleShapeEx extends TriangleShape {
 
 		dis2 = ClipPolygon.distance_point_plane(plane1, vertices1[2]) - total_margin;
 
-		if (dis0 > 0.0f && dis1 > 0.0f && dis2 > 0.0f) {
-			return false;
-		}
-		return true;
-	}
+        return !(dis0 > 0.0f && dis1 > 0.0f && dis2 > 0.0f);
+    }
 	
 }

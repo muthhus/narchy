@@ -53,7 +53,7 @@ public abstract class TypedConstraint {
 	
 	protected RigidBody rbA;
 	protected RigidBody rbB;
-	protected float appliedImpulse = 0f;
+	protected float appliedImpulse;
 
 	public TypedConstraint(TypedConstraintType type) {
 		this(type, getFixed(), getFixed());

@@ -25,7 +25,6 @@ package com.bulletphysics.linearmath;
 
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.linearmath.VectorUtil;
 
 import javax.vecmath.Vector3f;
 

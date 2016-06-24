@@ -23,9 +23,6 @@
 
 package com.bulletphysics.linearmath;
 
-import com.bulletphysics.linearmath.MotionState;
-import com.bulletphysics.linearmath.Transform;
-
 /**
  * DefaultMotionState provides a common implementation to synchronize world transforms
  * with offsets.
@@ -72,12 +69,14 @@ public class DefaultMotionState extends MotionState {
 		this.startWorldTrans.set(startTrans);
 	}
 
+	@Override
 	public Transform getWorldTransform(Transform out) {
 		out.inverse(centerOfMassOffset);
 		out.mul(graphicsWorldTrans);
 		return out;
 	}
 
+	@Override
 	public void setWorldTransform(Transform centerOfMassWorldTrans) {
 		graphicsWorldTrans.set(centerOfMassWorldTrans);
 		graphicsWorldTrans.mul(centerOfMassOffset);

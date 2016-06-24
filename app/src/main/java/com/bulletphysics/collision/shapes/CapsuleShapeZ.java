@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.CapsuleShape;
-
 /**
  * CapsuleShapeZ represents a capsule around the Z axis.<p>
  * 

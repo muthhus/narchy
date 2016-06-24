@@ -24,7 +24,6 @@
 package com.bulletphysics.linearmath;
 
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.linearmath.VectorUtil;
 import com.bulletphysics.util.ArrayPool;
 
 import javax.vecmath.Matrix3f;
@@ -253,8 +252,7 @@ public class MatrixUtil {
 			float cos;
 			float sin;
 			if ((theta2 * theta2) < (10f / BulletGlobals.SIMD_EPSILON)) {
-				t = (theta >= 0f) ? 1f / (theta + (float) Math.sqrt(1f + theta2))
-						: 1f / (theta - (float) Math.sqrt(1f + theta2));
+				t = 1f / (theta >= 0f ? theta + (float) Math.sqrt(1f + theta2) : theta - (float) Math.sqrt(1f + theta2));
 				cos = 1f / (float) Math.sqrt(1f + t * t);
 				sin = cos * t;
 			}

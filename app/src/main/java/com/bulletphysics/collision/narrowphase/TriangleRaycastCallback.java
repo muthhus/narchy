@@ -83,38 +83,36 @@ public abstract class TriangleRaycastCallback extends TriangleCallback {
 			edge_tolerance *= -0.0001f;
 			Vector3f point = new Vector3f();
 			VectorUtil.setInterpolate3(point, from, to, distance);
-			{
-				Vector3f v0p = new Vector3f();
-				v0p.sub(vert0, point);
-				Vector3f v1p = new Vector3f();
-				v1p.sub(vert1, point);
-				Vector3f cp0 = new Vector3f();
-				cp0.cross(v0p, v1p);
+            Vector3f v0p = new Vector3f();
+            v0p.sub(vert0, point);
+            Vector3f v1p = new Vector3f();
+            v1p.sub(vert1, point);
+            Vector3f cp0 = new Vector3f();
+            cp0.cross(v0p, v1p);
 
-				if (cp0.dot(triangleNormal) >= edge_tolerance) {
-					Vector3f v2p = new Vector3f();
-					v2p.sub(vert2, point);
-					Vector3f cp1 = new Vector3f();
-					cp1.cross(v1p, v2p);
-					if (cp1.dot(triangleNormal) >= edge_tolerance) {
-						Vector3f cp2 = new Vector3f();
-						cp2.cross(v2p, v0p);
+            if (cp0.dot(triangleNormal) >= edge_tolerance) {
+                Vector3f v2p = new Vector3f();
+                v2p.sub(vert2, point);
+                Vector3f cp1 = new Vector3f();
+                cp1.cross(v1p, v2p);
+                if (cp1.dot(triangleNormal) >= edge_tolerance) {
+                    Vector3f cp2 = new Vector3f();
+                    cp2.cross(v2p, v0p);
 
-						if (cp2.dot(triangleNormal) >= edge_tolerance) {
+                    if (cp2.dot(triangleNormal) >= edge_tolerance) {
 
-							if (dist_a > 0f) {
-								hitFraction = reportHit(triangleNormal, distance, partId, triangleIndex);
-							}
-							else {
-								Vector3f tmp = new Vector3f();
-								tmp.negate(triangleNormal);
-								hitFraction = reportHit(tmp, distance, partId, triangleIndex);
-							}
-						}
-					}
-				}
-			}
-		}
+                        if (dist_a > 0f) {
+                            hitFraction = reportHit(triangleNormal, distance, partId, triangleIndex);
+                        }
+                        else {
+                            Vector3f tmp = new Vector3f();
+                            tmp.negate(triangleNormal);
+                            hitFraction = reportHit(tmp, distance, partId, triangleIndex);
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	public abstract float reportHit(Vector3f hitNormalLocal, float hitFraction, int partId, int triangleIndex );

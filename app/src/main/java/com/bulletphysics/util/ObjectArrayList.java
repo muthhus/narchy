@@ -96,7 +96,8 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 		size--;
 	}
 
-	public T get(int index) {
+	@Override
+    public T get(int index) {
 		if (index >= size) throw new IndexOutOfBoundsException();
 		return array[index];
 	}
@@ -117,7 +118,8 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 		array[index] = value;
 	}
 
-	public int size() {
+	@Override
+    public int size() {
 		return size;
 	}
 	
@@ -142,14 +144,16 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 		return -1;
 	}
 
-	public void writeExternal(ObjectOutput out) throws IOException {
+	@Override
+    public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeInt(size);
 		for (int i=0; i<size; i++) {
 			out.writeObject(array[i]);
 		}
 	}
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	@Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		size = in.readInt();
 		int cap = 16;
 		while (cap < size) cap <<= 1;

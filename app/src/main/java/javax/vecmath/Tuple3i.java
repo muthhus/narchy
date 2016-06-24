@@ -290,7 +290,7 @@ public abstract class Tuple3i implements java.io.Serializable, Cloneable {
      * @return the String representation
      */
     public String toString() {
-        return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+        return "(" + this.x + ", " + this.y + ", " + this.z + ')';
     }
 
 
@@ -372,23 +372,11 @@ public abstract class Tuple3i implements java.io.Serializable, Cloneable {
      *  @param t   the source tuple, which will not be modified
      */
     public final void clampMin(int min, Tuple3i t) {
-        if( t.x < min ) {
-	    x = min;
-        } else {
-	    x = t.x;
-        }
+		x = t.x < min ? min : t.x;
 
-        if( t.y < min ) {
-	    y = min;
-        } else {
-	    y = t.y;
-        }
+		y = t.y < min ? min : t.y;
 
-        if( t.z < min ) {
-	    z = min;
-        } else {
-	    z = t.z;
-        }
+		z = t.z < min ? min : t.z;
     }
 
 
@@ -399,23 +387,11 @@ public abstract class Tuple3i implements java.io.Serializable, Cloneable {
      *  @param t   the source tuple, which will not be modified
      */
     public final void clampMax(int max, Tuple3i t) {
-        if( t.x > max ) {
-	    x = max;
-        } else {
-	    x = t.x;
-        }
+		x = t.x > max ? max : t.x;
 
-        if( t.y > max ) {
-	    y = max;
-        } else {
-	    y = t.y;
-        }
+		y = t.y > max ? max : t.y;
 
-        if( t.z > max ) {
-	    z = max;
-        } else {
-	    z = t.z;
-        }
+		z = t.z > max ? max : t.z;
     }
 
 
@@ -506,6 +482,7 @@ public abstract class Tuple3i implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

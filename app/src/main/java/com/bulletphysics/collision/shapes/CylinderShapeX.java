@@ -24,8 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 
-import com.bulletphysics.collision.shapes.CylinderShape;
-
 import javax.vecmath.Vector3f;
 
 /**

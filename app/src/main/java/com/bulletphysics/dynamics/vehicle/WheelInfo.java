@@ -24,7 +24,6 @@
 package com.bulletphysics.dynamics.vehicle;
 
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.vehicle.WheelInfoConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 
 import javax.vecmath.Vector3f;

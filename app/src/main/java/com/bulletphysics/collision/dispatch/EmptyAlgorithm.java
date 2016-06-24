@@ -67,6 +67,6 @@ public class EmptyAlgorithm extends CollisionAlgorithm {
 		@Override
 		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
 		}
-	};
+	}
 
 }

@@ -23,7 +23,6 @@
 
 package com.bulletphysics.linearmath.convexhull;
 
-import com.bulletphysics.linearmath.convexhull.HullFlags;
 import com.bulletphysics.util.ObjectArrayList;
 
 import javax.vecmath.Vector3f;
@@ -39,7 +38,7 @@ public class HullDesc {
 	public int flags = HullFlags.DEFAULT;
 	
 	/** Number of vertices in the input point cloud. */
-	public int vcount = 0;
+	public int vcount;
 	
 	/** Array of vertices. */
 	public ObjectArrayList<Vector3f> vertices;
@@ -73,10 +72,7 @@ public class HullDesc {
 	}
 
 	public boolean hasHullFlag(int flag) {
-		if ((flags & flag) != 0) {
-			return true;
-		}
-		return false;
+		return (flags & flag) != 0;
 	}
 
 	public void setHullFlag(int flag) {

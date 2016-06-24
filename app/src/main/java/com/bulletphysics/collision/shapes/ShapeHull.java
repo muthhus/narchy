@@ -25,7 +25,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.linearmath.convexhull.HullDesc;
 import com.bulletphysics.linearmath.convexhull.HullFlags;
@@ -67,16 +66,14 @@ public class ShapeHull {
 		Vector3f norm = new Vector3f();
 
 		int numSampleDirections = NUM_UNITSPHERE_POINTS;
-		{
-			int numPDA = shape.getNumPreferredPenetrationDirections();
-			if (numPDA != 0) {
-				for (int i=0; i<numPDA; i++) {
-					shape.getPreferredPenetrationDirection(i, norm);
-					unitSpherePoints.getQuick(numSampleDirections).set(norm);
-					numSampleDirections++;
-				}
-			}
-		}
+		int numPDA = shape.getNumPreferredPenetrationDirections();
+		if (numPDA != 0) {
+            for (int i=0; i<numPDA; i++) {
+                shape.getPreferredPenetrationDirection(i, norm);
+                unitSpherePoints.getQuick(numSampleDirections).set(norm);
+                numSampleDirections++;
+            }
+        }
 
 		ObjectArrayList<Vector3f> supportPoints = new ObjectArrayList<Vector3f>();
 		MiscUtil.resize(supportPoints, NUM_UNITSPHERE_POINTS + ConvexShape.MAX_PREFERRED_PENETRATION_DIRECTIONS * 2, Vector3f.class);
@@ -142,9 +139,9 @@ public class ShapeHull {
 
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static int NUM_UNITSPHERE_POINTS = 42;
+	private static final int NUM_UNITSPHERE_POINTS = 42;
 	
-	private static ObjectArrayList<Vector3f> constUnitSpherePoints = new ObjectArrayList<Vector3f>();
+	private static final ObjectArrayList<Vector3f> constUnitSpherePoints = new ObjectArrayList<Vector3f>();
 	
 	static {
 		constUnitSpherePoints.add(new Vector3f(0.000000f, -0.000000f, -1.000000f));

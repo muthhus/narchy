@@ -450,24 +450,20 @@ public class HeightfieldTerrainShape extends ConcaveShape
 			break;
 		}
 		case 2:
-		{
-			if (quantizedAabbMin[0] > startX)
-				startX = quantizedAabbMin[0];
-			if (quantizedAabbMax[0] < endX)
-				endX = quantizedAabbMax[0];
-			if (quantizedAabbMin[1] > startJ)
-				startJ = quantizedAabbMin[1];
-			if (quantizedAabbMax[1] < endJ)
-				endJ = quantizedAabbMax[1];
-			break;
-		}
-		default:
-		{
-			//need to get valid m_upAxis
-			assert (false);
-			break;
-		}
-		}
+            if (quantizedAabbMin[0] > startX)
+                startX = quantizedAabbMin[0];
+            if (quantizedAabbMax[0] < endX)
+                endX = quantizedAabbMax[0];
+            if (quantizedAabbMin[1] > startJ)
+                startJ = quantizedAabbMin[1];
+            if (quantizedAabbMax[1] < endJ)
+                endJ = quantizedAabbMax[1];
+            break;
+            default:
+            //need to get valid m_upAxis
+            assert (false);
+            break;
+        }
 
 		// debug draw the boxes?
 		for (int j = startJ; j < endJ; j++)
@@ -520,25 +516,29 @@ public class HeightfieldTerrainShape extends ConcaveShape
 		}
 	}
 
-	public void calculateLocalInertia(float mass, Vector3f inertia)
+	@Override
+    public void calculateLocalInertia(float mass, Vector3f inertia)
 	{
 		//moving concave objects not supported
 		inertia.set(0f, 0f, 0f);
 	}
 
-	public void setLocalScaling(Vector3f scaling)
+	@Override
+    public void setLocalScaling(Vector3f scaling)
 	{
 		m_localScaling.set(scaling);
 	}
 
-	public Vector3f getLocalScaling(Vector3f localScaling)
+	@Override
+    public Vector3f getLocalScaling(Vector3f localScaling)
 	{
 		localScaling.set(m_localScaling);
 		return localScaling;
 	}
 
 	//debugging
-	public String getName()
+	@Override
+    public String getName()
 	{
 		return "HEIGHTFIELD";
 	}

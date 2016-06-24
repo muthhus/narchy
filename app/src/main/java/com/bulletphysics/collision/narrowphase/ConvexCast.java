@@ -53,7 +53,7 @@ public abstract class ConvexCast {
 		public final Vector3f normal = new Vector3f();
 		public final Vector3f hitPoint = new Vector3f();
 		public float fraction = 1e30f; // input and output
-		public float allowedPenetration = 0f;
+		public float allowedPenetration;
 		
 		public IDebugDraw debugDrawer;
 		

@@ -23,7 +23,6 @@
 
 package com.bulletphysics.linearmath;
 
-import com.bulletphysics.linearmath.VectorUtil;
 import com.bulletphysics.util.ObjectArrayList;
 
 import javax.vecmath.Vector3f;

@@ -24,8 +24,6 @@
 package com.bulletphysics.util;
 
 
-import nars.util.data.list.FasterList;
-
 import javax.vecmath.Vector3f;
 
 /**

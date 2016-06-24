@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.narrowphase;
 
 
-import com.bulletphysics.collision.narrowphase.SimplexSolverInterface;
 import com.bulletphysics.linearmath.VectorUtil;
 
 import javax.vecmath.Vector3f;
@@ -207,63 +206,59 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 					break; 
 				}
 			case 4:
-				{
-					Vector3f tmp1 = new Vector3f();
-					Vector3f tmp2 = new Vector3f();
-					Vector3f tmp3 = new Vector3f();
-					Vector3f tmp4 = new Vector3f();
-					
-					Vector3f p = new Vector3f();
-					p.set(0f, 0f, 0f);
+				Vector3f tmp1 = new Vector3f();
+				Vector3f tmp2 = new Vector3f();
+				Vector3f tmp3 = new Vector3f();
+				Vector3f tmp4 = new Vector3f();
 
-					Vector3f a = simplexVectorW[0];
-					Vector3f b = simplexVectorW[1];
-					Vector3f c = simplexVectorW[2];
-					Vector3f d = simplexVectorW[3];
+				Vector3f p = new Vector3f();
+				p.set(0f, 0f, 0f);
 
-					boolean hasSeperation = closestPtPointTetrahedron(p,a,b,c,d,cachedBC);
+				Vector3f a = simplexVectorW[0];
+				Vector3f b = simplexVectorW[1];
+				Vector3f c = simplexVectorW[2];
+				Vector3f d = simplexVectorW[3];
 
-					if (hasSeperation)
-					{
-						tmp1.scale(cachedBC.barycentricCoords[0], simplexPointsP[0]);
-						tmp2.scale(cachedBC.barycentricCoords[1], simplexPointsP[1]);
-						tmp3.scale(cachedBC.barycentricCoords[2], simplexPointsP[2]);
-						tmp4.scale(cachedBC.barycentricCoords[3], simplexPointsP[3]);
-						VectorUtil.add(cachedP1, tmp1, tmp2, tmp3, tmp4);
+				boolean hasSeperation = closestPtPointTetrahedron(p,a,b,c,d,cachedBC);
 
-						tmp1.scale(cachedBC.barycentricCoords[0], simplexPointsQ[0]);
-						tmp2.scale(cachedBC.barycentricCoords[1], simplexPointsQ[1]);
-						tmp3.scale(cachedBC.barycentricCoords[2], simplexPointsQ[2]);
-						tmp4.scale(cachedBC.barycentricCoords[3], simplexPointsQ[3]);
-						VectorUtil.add(cachedP2, tmp1, tmp2, tmp3, tmp4);
+				if (hasSeperation)
+                {
+                    tmp1.scale(cachedBC.barycentricCoords[0], simplexPointsP[0]);
+                    tmp2.scale(cachedBC.barycentricCoords[1], simplexPointsP[1]);
+                    tmp3.scale(cachedBC.barycentricCoords[2], simplexPointsP[2]);
+                    tmp4.scale(cachedBC.barycentricCoords[3], simplexPointsP[3]);
+                    VectorUtil.add(cachedP1, tmp1, tmp2, tmp3, tmp4);
 
-						cachedV.sub(cachedP1, cachedP2);
-						reduceVertices (cachedBC.usedVertices);
-					} else
-					{
-	//					printf("sub distance got penetration\n");
+                    tmp1.scale(cachedBC.barycentricCoords[0], simplexPointsQ[0]);
+                    tmp2.scale(cachedBC.barycentricCoords[1], simplexPointsQ[1]);
+                    tmp3.scale(cachedBC.barycentricCoords[2], simplexPointsQ[2]);
+                    tmp4.scale(cachedBC.barycentricCoords[3], simplexPointsQ[3]);
+                    VectorUtil.add(cachedP2, tmp1, tmp2, tmp3, tmp4);
 
-						if (cachedBC.degenerate)
-						{
-							cachedValidClosest = false;
-						} else
-						{
-							cachedValidClosest = true;
-							//degenerate case == false, penetration = true + zero
-							cachedV.set(0f, 0f, 0f);
-						}
-						break;
-					}
+                    cachedV.sub(cachedP1, cachedP2);
+                    reduceVertices (cachedBC.usedVertices);
+                } else
+                {
+//					printf("sub distance got penetration\n");
 
-					cachedValidClosest = cachedBC.isValid();
+                    if (cachedBC.degenerate)
+                    {
+                        cachedValidClosest = false;
+                    } else
+                    {
+                        cachedValidClosest = true;
+                        //degenerate case == false, penetration = true + zero
+                        cachedV.set(0f, 0f, 0f);
+                    }
+                    break;
+                }
 
-					//closest point origin from tetrahedron
-					break;
-				}
-			default:
-				{
-					cachedValidClosest = false;
-				}
+				cachedValidClosest = cachedBC.isValid();
+
+				//closest point origin from tetrahedron
+				break;
+				default:
+				cachedValidClosest = false;
 			}
 		}
 
@@ -589,6 +584,7 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 	/**
 	 * Clear the simplex, remove all the vertices.
 	 */
+	@Override
 	public void reset() {
 		cachedValidClosest = false;
 		numVertices = 0;
@@ -597,6 +593,7 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 		cachedBC.reset();
 	}
 
+	@Override
 	public void addVertex(Vector3f w, Vector3f p, Vector3f q) {
 		lastW.set(w);
 		needsUpdate = true;
@@ -611,12 +608,14 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 	/**
 	 * Return/calculate the closest vertex.
 	 */
+	@Override
 	public boolean closest(Vector3f v) {
 		boolean succes = updateClosestVectorAndPoints();
 		v.set(cachedV);
 		return succes;
 	}
 
+	@Override
 	public float maxVertex() {
 		int i, numverts = numVertices();
 		float maxV = 0f;
@@ -629,10 +628,12 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 		return maxV;
 	}
 
+	@Override
 	public boolean fullSimplex() {
 		return (numVertices == 4);
 	}
 
+	@Override
 	public int getSimplex(Vector3f[] pBuf, Vector3f[] qBuf, Vector3f[] yBuf) {
 		for (int i = 0; i < numVertices(); i++) {
 			yBuf[i].set(simplexVectorW[i]);
@@ -642,6 +643,7 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 		return numVertices();
 	}
 
+	@Override
 	public boolean inSimplex(Vector3f w) {
 		boolean found = false;
 		int i, numverts = numVertices();
@@ -662,20 +664,24 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 		return found;
 	}
 
+	@Override
 	public void backup_closest(Vector3f v) {
 		v.set(cachedV);
 	}
 
+	@Override
 	public boolean emptySimplex() {
 		return (numVertices() == 0);
 	}
 
+	@Override
 	public void compute_points(Vector3f p1, Vector3f p2) {
 		updateClosestVectorAndPoints();
 		p1.set(cachedP1);
 		p2.set(cachedP2);
 	}
 
+	@Override
 	public int numVertices() {
 		return numVertices;
 	}

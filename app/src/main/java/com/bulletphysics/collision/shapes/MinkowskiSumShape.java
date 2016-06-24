@@ -24,8 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.ConvexInternalShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 
@@ -41,8 +39,8 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 
 	private final Transform transA = new Transform();
 	private final Transform transB = new Transform();
-	private ConvexShape shapeA;
-	private ConvexShape shapeB;
+	private final ConvexShape shapeA;
+	private final ConvexShape shapeB;
 
 	public MinkowskiSumShape(ConvexShape shapeA, ConvexShape shapeB) {
 		this.shapeA = shapeA;

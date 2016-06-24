@@ -38,7 +38,7 @@ import javax.vecmath.Vector3f;
  */
 class BvhTree {
 
-	protected int num_nodes = 0;
+	protected int num_nodes;
 	protected BvhTreeNodeArray node_array = new BvhTreeNodeArray();
 	
 	protected int _calc_splitting_axis(BvhDataArray primitive_boxes, int startIndex, int endIndex) {

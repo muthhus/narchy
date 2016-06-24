@@ -127,29 +127,27 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		}
 
 		// clean up:
-		{
-			//SPC(m_profiling.m_cleanup);
-			ObjectArrayList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
-			if (pairs.size() > 0) {
-				for (int i=0, ni=pairs.size(); i<ni; i++) {
-					BroadphasePair p = pairs.getQuick(i);
-					DbvtProxy pa = (DbvtProxy) p.pProxy0;
-					DbvtProxy pb = (DbvtProxy) p.pProxy1;
-					if (!DbvtAabbMm.Intersect(pa.aabb, pb.aabb)) {
-						//if(pa>pb) btSwap(pa,pb);
-						if (pa.hashCode() > pb.hashCode()) {
-							DbvtProxy tmp = pa;
-							pa = pb;
-							pb = tmp;
-						}
-						paircache.removeOverlappingPair(pa, pb, dispatcher);
-						ni--;
-						i--;
-					}
-				}
-			}
-		}
-		pid++;
+        //SPC(m_profiling.m_cleanup);
+        ObjectArrayList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
+        if (pairs.size() > 0) {
+            for (int i=0, ni=pairs.size(); i<ni; i++) {
+                BroadphasePair p = pairs.getQuick(i);
+                DbvtProxy pa = (DbvtProxy) p.pProxy0;
+                DbvtProxy pb = (DbvtProxy) p.pProxy1;
+                if (!DbvtAabbMm.Intersect(pa.aabb, pb.aabb)) {
+                    //if(pa>pb) btSwap(pa,pb);
+                    if (pa.hashCode() > pb.hashCode()) {
+                        DbvtProxy tmp = pa;
+                        pa = pb;
+                        pb = tmp;
+                    }
+                    paircache.removeOverlappingPair(pa, pb, dispatcher);
+                    ni--;
+                    i--;
+                }
+            }
+        }
+        pid++;
 	}
 
 	private static DbvtProxy listappend(DbvtProxy item, DbvtProxy list) {
@@ -174,7 +172,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		return list;
 	}
 
-	public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
+	@Override
+    public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
 		DbvtProxy proxy = new DbvtProxy(userPtr, collisionFilterGroup, collisionFilterMask);
 		DbvtAabbMm.FromMM(aabbMin, aabbMax, proxy.aabb);
 		proxy.leaf = sets[0].insert(proxy.aabb, proxy);
@@ -184,7 +183,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		return (proxy);
 	}
 
-	public void destroyProxy(BroadphaseProxy absproxy, Dispatcher dispatcher) {
+	@Override
+    public void destroyProxy(BroadphaseProxy absproxy, Dispatcher dispatcher) {
 		DbvtProxy proxy = (DbvtProxy)absproxy;
 		if (proxy.stage == STAGECOUNT) {
 			sets[1].remove(proxy.leaf);
@@ -197,7 +197,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		//btAlignedFree(proxy);
 	}
 
-	public void setAabb(BroadphaseProxy absproxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
+	@Override
+    public void setAabb(BroadphaseProxy absproxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
 		DbvtProxy proxy = (DbvtProxy)absproxy;
 		DbvtAabbMm aabb = DbvtAabbMm.FromMM(aabbMin, aabbMax, new DbvtAabbMm());
 		if (proxy.stage == STAGECOUNT) {
@@ -231,7 +232,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		stageRoots[stageCurrent] = listappend(proxy, stageRoots[stageCurrent]);
 	}
 
-	public void calculateOverlappingPairs(Dispatcher dispatcher) {
+	@Override
+    public void calculateOverlappingPairs(Dispatcher dispatcher) {
 		collide(dispatcher);
 
 		//#if DBVT_BP_PROFILE
@@ -257,11 +259,13 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		//#endif
 	}
 
-	public OverlappingPairCache getOverlappingPairCache() {
+	@Override
+    public OverlappingPairCache getOverlappingPairCache() {
 		return paircache;
 	}
 
-	public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
+	@Override
+    public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
 		DbvtAabbMm bounds = new DbvtAabbMm();
 		if (!sets[0].empty()) {
 			if (!sets[1].empty()) {
@@ -281,7 +285,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		aabbMax.set(bounds.Maxs());
 	}
 
-	public void printStats() {
+	@Override
+    public void printStats() {
 	}
 
 }

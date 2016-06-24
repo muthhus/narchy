@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ConeShape;
-
 /**
  * ConeShape implements a cone shape, around the Z axis.
  *

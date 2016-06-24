@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ScalarType;
-
 import java.nio.ByteBuffer;
 
 /**

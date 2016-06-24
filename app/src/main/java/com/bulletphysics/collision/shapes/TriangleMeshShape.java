@@ -185,7 +185,8 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 			MatrixUtil.transposeTransform(supportVecLocal, supportVecWorld, worldTrans.basis);
 		}
 
-		public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 			for (int i = 0; i < 3; i++) {
 				float dot = supportVecLocal.dot(triangle[i]);
 				if (dot > maxDot) {
@@ -218,7 +219,8 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 			this.aabbMax.set(aabbMax);
 		}
 
-		public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
 			if (AabbUtil2.testTriangleAgainstAabb2(triangle, aabbMin, aabbMax)) {
 				// check aabb in triangle-space, before doing this
 				callback.processTriangle(triangle, partId, triangleIndex);

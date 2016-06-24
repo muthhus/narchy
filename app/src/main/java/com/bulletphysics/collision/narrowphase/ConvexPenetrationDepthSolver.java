@@ -23,7 +23,6 @@
 
 package com.bulletphysics.collision.narrowphase;
 
-import com.bulletphysics.collision.narrowphase.SimplexSolverInterface;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.IDebugDraw;
 import com.bulletphysics.linearmath.Transform;

@@ -32,9 +32,9 @@ public enum DispatchFunc {
 	DISPATCH_DISCRETE(1),
 	DISPATCH_CONTINUOUS(2);
 	
-	private int value;
+	private final int value;
 	
-	private DispatchFunc(int value) {
+	DispatchFunc(int value) {
 		this.value = value;
 	}
 

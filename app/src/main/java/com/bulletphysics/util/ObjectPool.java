@@ -23,8 +23,6 @@
 
 package com.bulletphysics.util;
 
-import com.bulletphysics.util.ObjectArrayList;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +33,8 @@ import java.util.Map;
  */
 public class ObjectPool<T> {
 	
-	private Class<T> cls;
-	private ObjectArrayList<T> list = new ObjectArrayList<T>();
+	private final Class<T> cls;
+	private final ObjectArrayList<T> list = new ObjectArrayList<T>();
 	
 	public ObjectPool(Class<T> cls) {
 		this.cls = cls;
@@ -79,7 +77,7 @@ public class ObjectPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static ThreadLocal<Map> threadLocal = new ThreadLocal<Map>() {
+	private static final ThreadLocal<Map> threadLocal = new ThreadLocal<Map>() {
 		@Override
 		protected Map initialValue() {
 			return new HashMap();

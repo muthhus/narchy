@@ -23,8 +23,6 @@
 
 package com.bulletphysics.linearmath;
 
-import com.bulletphysics.linearmath.Transform;
-
 /**
  * MotionState allows the dynamics world to synchronize the updated world transforms
  * with graphics. For optimizations, potentially only moving objects get synchronized

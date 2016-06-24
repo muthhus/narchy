@@ -156,6 +156,6 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
 
 		}
-	};
-	
+	}
+
 }

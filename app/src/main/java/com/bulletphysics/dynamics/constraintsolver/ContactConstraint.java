@@ -369,58 +369,56 @@ public class ContactConstraint {
 		//	body2.applyImpulse(-normal*(normalImpulse), rel_pos2);
 		//#endif //USE_INTERNAL_APPLY_IMPULSE
 
-		{
-			//friction
-			body1.getVelocityInLocalPoint(rel_pos1, vel1);
-			body2.getVelocityInLocalPoint(rel_pos2, vel2);
-			vel.sub(vel1, vel2);
+        //friction
+        body1.getVelocityInLocalPoint(rel_pos1, vel1);
+        body2.getVelocityInLocalPoint(rel_pos2, vel2);
+        vel.sub(vel1, vel2);
 
-			rel_vel = normal.dot(vel);
+        rel_vel = normal.dot(vel);
 
-			tmp.scale(rel_vel, normal);
-			Vector3f lat_vel = new Vector3f();
-			lat_vel.sub(vel, tmp);
-			float lat_rel_vel = lat_vel.length();
+        tmp.scale(rel_vel, normal);
+        Vector3f lat_vel = new Vector3f();
+        lat_vel.sub(vel, tmp);
+        float lat_rel_vel = lat_vel.length();
 
-			float combinedFriction = cpd.friction;
+        float combinedFriction = cpd.friction;
 
-			if (cpd.appliedImpulse > 0) {
-				if (lat_rel_vel > BulletGlobals.FLT_EPSILON) {
-					lat_vel.scale(1f / lat_rel_vel);
+        if (cpd.appliedImpulse > 0) {
+            if (lat_rel_vel > BulletGlobals.FLT_EPSILON) {
+                lat_vel.scale(1f / lat_rel_vel);
 
-					Vector3f temp1 = new Vector3f();
-					temp1.cross(rel_pos1, lat_vel);
-					body1.getInvInertiaTensorWorld(new Matrix3f()).transform(temp1);
+                Vector3f temp1 = new Vector3f();
+                temp1.cross(rel_pos1, lat_vel);
+                body1.getInvInertiaTensorWorld(new Matrix3f()).transform(temp1);
 
-					Vector3f temp2 = new Vector3f();
-					temp2.cross(rel_pos2, lat_vel);
-					body2.getInvInertiaTensorWorld(new Matrix3f()).transform(temp2);
+                Vector3f temp2 = new Vector3f();
+                temp2.cross(rel_pos2, lat_vel);
+                body2.getInvInertiaTensorWorld(new Matrix3f()).transform(temp2);
 
-					Vector3f java_tmp1 = new Vector3f();
-					java_tmp1.cross(temp1, rel_pos1);
+                Vector3f java_tmp1 = new Vector3f();
+                java_tmp1.cross(temp1, rel_pos1);
 
-					Vector3f java_tmp2 = new Vector3f();
-					java_tmp2.cross(temp2, rel_pos2);
+                Vector3f java_tmp2 = new Vector3f();
+                java_tmp2.cross(temp2, rel_pos2);
 
-					tmp.add(java_tmp1, java_tmp2);
+                tmp.add(java_tmp1, java_tmp2);
 
-					float friction_impulse = lat_rel_vel /
-							(body1.getInvMass() + body2.getInvMass() + lat_vel.dot(tmp));
-					float normal_impulse = cpd.appliedImpulse * combinedFriction;
+                float friction_impulse = lat_rel_vel /
+                        (body1.getInvMass() + body2.getInvMass() + lat_vel.dot(tmp));
+                float normal_impulse = cpd.appliedImpulse * combinedFriction;
 
-					friction_impulse = Math.min(friction_impulse, normal_impulse);
-					friction_impulse = Math.max(friction_impulse, -normal_impulse);
+                friction_impulse = Math.min(friction_impulse, normal_impulse);
+                friction_impulse = Math.max(friction_impulse, -normal_impulse);
 
-					tmp.scale(-friction_impulse, lat_vel);
-					body1.applyImpulse(tmp, rel_pos1);
+                tmp.scale(-friction_impulse, lat_vel);
+                body1.applyImpulse(tmp, rel_pos1);
 
-					tmp.scale(friction_impulse, lat_vel);
-					body2.applyImpulse(tmp, rel_pos2);
-				}
-			}
-		}
+                tmp.scale(friction_impulse, lat_vel);
+                body2.applyImpulse(tmp, rel_pos2);
+            }
+        }
 
-		return normalImpulse;
+        return normalImpulse;
 	}
 
 	public static float resolveSingleFrictionEmpty(

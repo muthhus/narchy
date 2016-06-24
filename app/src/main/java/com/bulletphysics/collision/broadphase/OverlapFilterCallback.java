@@ -23,9 +23,6 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import com.bulletphysics.collision.broadphase.BroadphaseProxy;
-import com.bulletphysics.collision.broadphase.OverlappingPairCache;
-
 /**
  * Callback for filtering broadphase collisions.
  * 

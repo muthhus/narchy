@@ -636,26 +636,24 @@ public class DiscreteDynamicsWorld extends DynamicsWorld {
 		try {
 			getSimulationIslandManager().updateActivationState(getCollisionWorld(), getCollisionWorld().getDispatcher());
 
-			{
-				int i;
-				int numConstraints = constraints.size();
-				for (i = 0; i < numConstraints; i++) {
-					TypedConstraint constraint = constraints.getQuick(i);
+            int i;
+            int numConstraints = constraints.size();
+            for (i = 0; i < numConstraints; i++) {
+                TypedConstraint constraint = constraints.getQuick(i);
 
-					RigidBody colObj0 = constraint.getRigidBodyA();
-					RigidBody colObj1 = constraint.getRigidBodyB();
+                RigidBody colObj0 = constraint.getRigidBodyA();
+                RigidBody colObj1 = constraint.getRigidBodyB();
 
-					if (((colObj0 != null) && (!colObj0.isStaticOrKinematicObject())) &&
-						((colObj1 != null) && (!colObj1.isStaticOrKinematicObject())))
-					{
-						if (colObj0.isActive() || colObj1.isActive()) {
-							getSimulationIslandManager().getUnionFind().unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
-						}
-					}
-				}
-			}
+                if (((colObj0 != null) && (!colObj0.isStaticOrKinematicObject())) &&
+                    ((colObj1 != null) && (!colObj1.isStaticOrKinematicObject())))
+                {
+                    if (colObj0.isActive() || colObj1.isActive()) {
+                        getSimulationIslandManager().getUnionFind().unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
+                    }
+                }
+            }
 
-			// Store the island id in each body
+            // Store the island id in each body
 			getSimulationIslandManager().storeIslandActivationState(getCollisionWorld());
 		}
 		finally {
@@ -816,29 +814,27 @@ public class DiscreteDynamicsWorld extends DynamicsWorld {
 		Vector3f tmp2 = new Vector3f();
 
 		// Draw a small simplex at the center of the object
-		{
-			Vector3f start = new Vector3f(worldTransform.origin);
+        Vector3f start = new Vector3f(worldTransform.origin);
 
-			tmp.set(1f, 0f, 0f);
-			worldTransform.basis.transform(tmp);
-			tmp.add(start);
-			tmp2.set(1f, 0f, 0f);
-			getDebugDrawer().drawLine(start, tmp, tmp2);
+        tmp.set(1f, 0f, 0f);
+        worldTransform.basis.transform(tmp);
+        tmp.add(start);
+        tmp2.set(1f, 0f, 0f);
+        getDebugDrawer().drawLine(start, tmp, tmp2);
 
-			tmp.set(0f, 1f, 0f);
-			worldTransform.basis.transform(tmp);
-			tmp.add(start);
-			tmp2.set(0f, 1f, 0f);
-			getDebugDrawer().drawLine(start, tmp, tmp2);
+        tmp.set(0f, 1f, 0f);
+        worldTransform.basis.transform(tmp);
+        tmp.add(start);
+        tmp2.set(0f, 1f, 0f);
+        getDebugDrawer().drawLine(start, tmp, tmp2);
 
-			tmp.set(0f, 0f, 1f);
-			worldTransform.basis.transform(tmp);
-			tmp.add(start);
-			tmp2.set(0f, 0f, 1f);
-			getDebugDrawer().drawLine(start, tmp, tmp2);
-		}
+        tmp.set(0f, 0f, 1f);
+        worldTransform.basis.transform(tmp);
+        tmp.add(start);
+        tmp2.set(0f, 0f, 1f);
+        getDebugDrawer().drawLine(start, tmp, tmp2);
 
-		// JAVA TODO: debugDrawObject, note that this commented code is from old version, use actual version when implementing
+        // JAVA TODO: debugDrawObject, note that this commented code is from old version, use actual version when implementing
 		
 //		if (shape->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 //		{
@@ -1057,7 +1053,8 @@ public class DiscreteDynamicsWorld extends DynamicsWorld {
 	////////////////////////////////////////////////////////////////////////////
 	
 	private static final Comparator<TypedConstraint> sortConstraintOnIslandPredicate = new Comparator<TypedConstraint>() {
-		public int compare(TypedConstraint lhs, TypedConstraint rhs) {
+		@Override
+        public int compare(TypedConstraint lhs, TypedConstraint rhs) {
 			int rIslandId0, lIslandId0;
 			rIslandId0 = getConstraintIslandId(rhs);
 			lIslandId0 = getConstraintIslandId(lhs);
@@ -1097,10 +1094,10 @@ public class DiscreteDynamicsWorld extends DynamicsWorld {
 //	}
 
 	private static class ClosestNotMeConvexResultCallback extends ClosestConvexResultCallback {
-		private CollisionObject me;
-		private float allowedPenetration = 0f;
-		private OverlappingPairCache pairCache;
-		private Dispatcher dispatcher;
+		private final CollisionObject me;
+		private float allowedPenetration;
+		private final OverlappingPairCache pairCache;
+		private final Dispatcher dispatcher;
 
 		public ClosestNotMeConvexResultCallback(CollisionObject me, Vector3f fromA, Vector3f toA, OverlappingPairCache pairCache, Dispatcher dispatcher) {
 			super(fromA, toA);

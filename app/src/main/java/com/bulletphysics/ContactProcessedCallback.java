@@ -23,7 +23,6 @@
 
 package com.bulletphysics;
 
-import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 
 /**

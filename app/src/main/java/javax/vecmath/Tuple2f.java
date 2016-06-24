@@ -101,8 +101,8 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      */
     public Tuple2f()
     {
-	this.x = (float) 0.0;
-	this.y = (float) 0.0;
+	this.x = 0.0f;
+	this.y = 0.0f;
     }
 
 
@@ -345,17 +345,15 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      */
     public boolean epsilonEquals(Tuple2f t1, float epsilon)
     {
-       float diff;
 
-       diff = x - t1.x;
-       if(Float.isNaN(diff)) return false;
+        float diff = x - t1.x;
+        if(Float.isNaN(diff)) return false;
        if((diff<0?-diff:diff) > epsilon) return false;
 
        diff = y - t1.y;
        if(Float.isNaN(diff)) return false;
-       if((diff<0?-diff:diff) > epsilon) return false;
+        return (diff < 0 ? -diff : diff) <= epsilon;
 
-       return true;
     }
 
    /**
@@ -365,7 +363,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      */  
    public String toString()
    {
-        return("(" + this.x + ", " + this.y + ")");
+        return("(" + this.x + ", " + this.y + ')');
    }
 
 
@@ -404,18 +402,10 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
     *  @param t   the source tuple, which will not be modified
     */   
    public final void clampMin(float min, Tuple2f t) 
-   { 
-        if( t.x < min ) { 
-          x = min;
-        } else {
-          x = t.x;
-        }
+   {
+       x = t.x < min ? min : t.x;
 
-        if( t.y < min ) { 
-          y = min;
-        } else {
-          y = t.y;
-        }
+       y = t.y < min ? min : t.y;
 
    } 
 
@@ -427,18 +417,10 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
     *  @param t   the source tuple, which will not be modified
     */    
    public final void clampMax(float max, Tuple2f t)  
-   {  
-        if( t.x > max ) { 
-          x = max;
-        } else { 
-          x = t.x;
-        }
- 
-        if( t.y > max ) {
-          y = max;
-        } else {
-          y = t.y;
-        }
+   {
+       x = t.x > max ? max : t.x;
+
+       y = t.y > max ? max : t.y;
 
    } 
 
@@ -547,6 +529,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

@@ -23,9 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.TriangleCallback;
-
 import javax.vecmath.Vector3f;
 
 /**
@@ -35,14 +32,16 @@ import javax.vecmath.Vector3f;
  */
 public abstract class ConcaveShape extends CollisionShape {
 
-	protected float collisionMargin = 0f;
+	protected float collisionMargin;
 
 	public abstract void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax);
 
+	@Override
 	public float getMargin() {
 		return collisionMargin;
 	}
 
+	@Override
 	public void setMargin(float margin) {
 		this.collisionMargin = margin;
 	}

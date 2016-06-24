@@ -264,7 +264,7 @@ public abstract class Tuple2i implements java.io.Serializable, Cloneable {
      * @return the String representation
      */
     public String toString() {
-        return "(" + this.x + ", " + this.y + ")";
+        return "(" + this.x + ", " + this.y + ')';
     }
 
 
@@ -337,17 +337,9 @@ public abstract class Tuple2i implements java.io.Serializable, Cloneable {
      *  @param t   the source tuple, which will not be modified
      */
     public final void clampMin(int min, Tuple2i t) {
-        if( t.x < min ) {
-	    x = min;
-        } else {
-	    x = t.x;
-        }
+        x = t.x < min ? min : t.x;
 
-        if( t.y < min ) {
-	    y = min;
-        } else {
-	    y = t.y;
-        }
+        y = t.y < min ? min : t.y;
     }
 
 
@@ -358,17 +350,9 @@ public abstract class Tuple2i implements java.io.Serializable, Cloneable {
      *  @param t   the source tuple, which will not be modified
      */
     public final void clampMax(int max, Tuple2i t) {
-        if( t.x > max ) {
-	    x = max;
-        } else {
-	    x = t.x;
-        }
+        x = t.x > max ? max : t.x;
 
-        if( t.y > max ) {
-	    y = max;
-        } else {
-	    y = t.y;
-        }
+        y = t.y > max ? max : t.y;
     }
 
 
@@ -444,6 +428,7 @@ public abstract class Tuple2i implements java.io.Serializable, Cloneable {
      * @exception OutOfMemoryError if there is not enough memory.
      * @see java.lang.Cloneable
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

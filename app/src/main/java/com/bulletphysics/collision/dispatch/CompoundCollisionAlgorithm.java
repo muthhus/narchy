@@ -26,9 +26,6 @@ package com.bulletphysics.collision.dispatch;
 import com.bulletphysics.collision.broadphase.CollisionAlgorithm;
 import com.bulletphysics.collision.broadphase.CollisionAlgorithmConstructionInfo;
 import com.bulletphysics.collision.broadphase.DispatcherInfo;
-import com.bulletphysics.collision.dispatch.CollisionAlgorithmCreateFunc;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.ManifoldResult;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
@@ -198,7 +195,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
 
 		}
-	};
+	}
 
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 
@@ -213,6 +210,6 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
 
 		}
-	};
+	}
 
 }

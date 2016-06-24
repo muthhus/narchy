@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.StridingMeshInterface;
-
 import javax.vecmath.Vector3f;
 
 /**

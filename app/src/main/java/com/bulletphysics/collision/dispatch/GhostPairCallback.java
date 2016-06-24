@@ -24,8 +24,6 @@
 package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.*;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.GhostObject;
 
 /**
  * GhostPairCallback interfaces and forwards adding and removal of overlapping
@@ -35,6 +33,7 @@ import com.bulletphysics.collision.dispatch.GhostObject;
  */
 public class GhostPairCallback extends OverlappingPairCallback {
 
+	@Override
 	public BroadphasePair addOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1) {
 		com.bulletphysics.collision.dispatch.CollisionObject colObj0 = (com.bulletphysics.collision.dispatch.CollisionObject)proxy0.clientObject;
 		com.bulletphysics.collision.dispatch.CollisionObject colObj1 = (com.bulletphysics.collision.dispatch.CollisionObject)proxy1.clientObject;
@@ -50,6 +49,7 @@ public class GhostPairCallback extends OverlappingPairCallback {
 		return null;
 	}
 
+	@Override
 	public Object removeOverlappingPair(BroadphaseProxy proxy0, BroadphaseProxy proxy1, Dispatcher dispatcher) {
 		com.bulletphysics.collision.dispatch.CollisionObject colObj0 = (com.bulletphysics.collision.dispatch.CollisionObject)proxy0.clientObject;
 		com.bulletphysics.collision.dispatch.CollisionObject colObj1 = (CollisionObject)proxy1.clientObject;
@@ -65,6 +65,7 @@ public class GhostPairCallback extends OverlappingPairCallback {
 		return null;
 	}
 
+	@Override
 	public void removeOverlappingPairsContainingProxy(BroadphaseProxy proxy0, Dispatcher dispatcher) {
 		assert (false);
 

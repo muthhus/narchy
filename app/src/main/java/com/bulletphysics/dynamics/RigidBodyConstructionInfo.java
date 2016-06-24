@@ -57,13 +57,13 @@ public class RigidBodyConstructionInfo {
 
 	public CollisionShape collisionShape;
 	public final Vector3f localInertia = new Vector3f();
-	public float linearDamping = 0f;
-	public float angularDamping = 0f;
+	public float linearDamping;
+	public float angularDamping;
 
 	/** Best simulation results when friction is non-zero. */
 	public float friction = 0.5f;
 	/** Best simulation results using zero restitution. */
-	public float restitution = 0f;
+	public float restitution;
 
 	public float linearSleepingThreshold = 0.8f;
 	public float angularSleepingThreshold = 1.0f;
@@ -73,7 +73,7 @@ public class RigidBodyConstructionInfo {
 	 * Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics
 	 * system has improved, this should become obsolete.
 	 */
-	public boolean additionalDamping = false;
+	public boolean additionalDamping;
 	public float additionalDampingFactor = 0.005f;
 	public float additionalLinearDampingThresholdSqr = 0.01f;
 	public float additionalAngularDampingThresholdSqr = 0.01f;

@@ -34,10 +34,10 @@ import javax.vecmath.Vector3f;
  */
 class PHullResult {
 	
-	public int vcount = 0;
-	public int indexCount = 0;
-	public int faceCount = 0;
-	public ObjectArrayList<Vector3f> vertices = null;
+	public int vcount;
+	public int indexCount;
+	public int faceCount;
+	public ObjectArrayList<Vector3f> vertices;
 	public IntArrayList indices = new IntArrayList();
 	
 }

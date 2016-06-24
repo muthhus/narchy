@@ -24,11 +24,7 @@
 package com.bulletphysics.collision.narrowphase;
 
 
-import com.bulletphysics.collision.narrowphase.ConvexCast;
 import com.bulletphysics.collision.narrowphase.DiscreteCollisionDetectorInterface.ClosestPointInput;
-import com.bulletphysics.collision.narrowphase.GjkPairDetector;
-import com.bulletphysics.collision.narrowphase.PointCollector;
-import com.bulletphysics.collision.narrowphase.SimplexSolverInterface;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
@@ -48,11 +44,11 @@ public class GjkConvexCast extends ConvexCast {
 	private static final int MAX_ITERATIONS = 32;
 //#endif
 	
-	private SimplexSolverInterface simplexSolver;
-	private ConvexShape convexA;
-	private ConvexShape convexB;
+	private final SimplexSolverInterface simplexSolver;
+	private final ConvexShape convexA;
+	private final ConvexShape convexB;
 	
-	private GjkPairDetector gjk = new GjkPairDetector();
+	private final GjkPairDetector gjk = new GjkPairDetector();
 
 	public GjkConvexCast(ConvexShape convexA, ConvexShape convexB, SimplexSolverInterface simplexSolver) {
 		this.simplexSolver = simplexSolver;
@@ -60,6 +56,7 @@ public class GjkConvexCast extends ConvexCast {
 		this.convexB = convexB;
 	}
 	
+	@Override
 	public boolean calcTimeOfImpact(Transform fromA, Transform toA, Transform fromB, Transform toB, CastResult result) {
 		simplexSolver.reset();
 

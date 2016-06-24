@@ -26,10 +26,6 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import com.bulletphysics.collision.broadphase.AxisSweep3;
-import com.bulletphysics.collision.broadphase.AxisSweep3Internal;
-import com.bulletphysics.collision.broadphase.OverlappingPairCache;
-
 import javax.vecmath.Vector3f;
 
 /**
@@ -65,13 +61,14 @@ public class AxisSweep3_32 extends AxisSweep3Internal {
 		return new HandleImpl();
 	}
 	
+	@Override
 	protected int getMask() {
 		return 0xFFFFFFFF;
 	}
 	
 	protected static class EdgeArrayImpl extends EdgeArray {
-		private int[] pos;
-		private int[] handle;
+		private final int[] pos;
+		private final int[] handle;
 
 		public EdgeArrayImpl(int size) {
 			pos = new int[size];

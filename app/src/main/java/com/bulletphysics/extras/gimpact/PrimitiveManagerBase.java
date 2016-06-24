@@ -28,7 +28,6 @@
 package com.bulletphysics.extras.gimpact;
 
 import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
-import com.bulletphysics.extras.gimpact.PrimitiveTriangle;
 
 /**
  * Prototype Base class for primitive classification.<p>

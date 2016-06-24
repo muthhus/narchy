@@ -23,9 +23,6 @@
 
 package com.bulletphysics;
 
-import com.bulletphysics.ContactAddedCallback;
-import com.bulletphysics.ContactDestroyedCallback;
-import com.bulletphysics.ContactProcessedCallback;
 import com.bulletphysics.util.ArrayPool;
 
 
@@ -51,7 +48,7 @@ public class BulletGlobals {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static ThreadLocal<com.bulletphysics.BulletGlobals> threadLocal = new ThreadLocal<com.bulletphysics.BulletGlobals>() {
+	private static final ThreadLocal<com.bulletphysics.BulletGlobals> threadLocal = new ThreadLocal<com.bulletphysics.BulletGlobals>() {
 		@Override
 		protected com.bulletphysics.BulletGlobals initialValue() {
 			return new com.bulletphysics.BulletGlobals();
@@ -65,7 +62,7 @@ public class BulletGlobals {
 	private float contactBreakingThreshold = 0.02f;
 	// RigidBody
 	private float deactivationTime = 2f;
-	private boolean disableDeactivation = false;
+	private boolean disableDeactivation;
 
 	public static com.bulletphysics.ContactAddedCallback getContactAddedCallback() {
 		return threadLocal.get().gContactAddedCallback;

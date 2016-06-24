@@ -605,36 +605,34 @@ public class RaycastVehicle extends TypedConstraint {
 		}
 
 		// apply the impulses
-		{
-			for (int wheel = 0; wheel < getNumWheels(); wheel++) {
-				WheelInfo wheel_info = wheelInfo.getQuick(wheel);
+        for (int wheel = 0; wheel < getNumWheels(); wheel++) {
+            WheelInfo wheel_info = wheelInfo.getQuick(wheel);
 
-				Vector3f rel_pos = new Vector3f();
-				rel_pos.sub(wheel_info.raycastInfo.contactPointWS, chassisBody.getCenterOfMassPosition(tmp));
+            Vector3f rel_pos = new Vector3f();
+            rel_pos.sub(wheel_info.raycastInfo.contactPointWS, chassisBody.getCenterOfMassPosition(tmp));
 
-				if (forwardImpulse.get(wheel) != 0f) {
-					tmp.scale(forwardImpulse.get(wheel), forwardWS.getQuick(wheel));
-					chassisBody.applyImpulse(tmp, rel_pos);
-				}
-				if (sideImpulse.get(wheel) != 0f) {
-					RigidBody groundObject = (RigidBody) wheelInfo.getQuick(wheel).raycastInfo.groundObject;
+            if (forwardImpulse.get(wheel) != 0f) {
+                tmp.scale(forwardImpulse.get(wheel), forwardWS.getQuick(wheel));
+                chassisBody.applyImpulse(tmp, rel_pos);
+            }
+            if (sideImpulse.get(wheel) != 0f) {
+                RigidBody groundObject = (RigidBody) wheelInfo.getQuick(wheel).raycastInfo.groundObject;
 
-					Vector3f rel_pos2 = new Vector3f();
-					rel_pos2.sub(wheel_info.raycastInfo.contactPointWS, groundObject.getCenterOfMassPosition(tmp));
+                Vector3f rel_pos2 = new Vector3f();
+                rel_pos2.sub(wheel_info.raycastInfo.contactPointWS, groundObject.getCenterOfMassPosition(tmp));
 
-					Vector3f sideImp = new Vector3f();
-					sideImp.scale(sideImpulse.get(wheel), axle.getQuick(wheel));
+                Vector3f sideImp = new Vector3f();
+                sideImp.scale(sideImpulse.get(wheel), axle.getQuick(wheel));
 
-					rel_pos.z *= wheel_info.rollInfluence;
-					chassisBody.applyImpulse(sideImp, rel_pos);
+                rel_pos.z *= wheel_info.rollInfluence;
+                chassisBody.applyImpulse(sideImp, rel_pos);
 
-					// apply friction impulse on the ground
-					tmp.negate(sideImp);
-					groundObject.applyImpulse(tmp, rel_pos2);
-				}
-			}
-		}
-	}
+                // apply friction impulse on the ground
+                tmp.negate(sideImp);
+                groundObject.applyImpulse(tmp, rel_pos2);
+            }
+        }
+    }
 	
 	@Override
 	public void buildJacobian() {

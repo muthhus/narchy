@@ -106,212 +106,210 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
 
 		lastUsedMethod = -1;
 
-		{
-			float squaredDistance = BulletGlobals.SIMD_INFINITY;
-			float delta = 0f;
+        float squaredDistance = BulletGlobals.SIMD_INFINITY;
+        float delta = 0f;
 
-			float margin = marginA + marginB;
+        float margin = marginA + marginB;
 
-			simplexSolver.reset();
+        simplexSolver.reset();
 
-			Vector3f seperatingAxisInA = new Vector3f();
-			Vector3f seperatingAxisInB = new Vector3f();
-			
-			Vector3f pInA = new Vector3f();
-			Vector3f qInB = new Vector3f();
-			
-			Vector3f pWorld = new Vector3f();
-			Vector3f qWorld = new Vector3f();
-			Vector3f w = new Vector3f();
-			
-			Vector3f tmpPointOnA = new Vector3f(), tmpPointOnB = new Vector3f();
-			Vector3f tmpNormalInB = new Vector3f();
-			
-			for (;;) //while (true)
-			{
-				seperatingAxisInA.negate(cachedSeparatingAxis);
-				MatrixUtil.transposeTransform(seperatingAxisInA, seperatingAxisInA, input.transformA.basis);
+        Vector3f seperatingAxisInA = new Vector3f();
+        Vector3f seperatingAxisInB = new Vector3f();
 
-				seperatingAxisInB.set(cachedSeparatingAxis);
-				MatrixUtil.transposeTransform(seperatingAxisInB, seperatingAxisInB, input.transformB.basis);
+        Vector3f pInA = new Vector3f();
+        Vector3f qInB = new Vector3f();
 
-				minkowskiA.localGetSupportingVertexWithoutMargin(seperatingAxisInA, pInA);
-				minkowskiB.localGetSupportingVertexWithoutMargin(seperatingAxisInB, qInB);
+        Vector3f pWorld = new Vector3f();
+        Vector3f qWorld = new Vector3f();
+        Vector3f w = new Vector3f();
 
-				pWorld.set(pInA);
-				localTransA.transform(pWorld);
-				
-				qWorld.set(qInB);
-				localTransB.transform(qWorld);
+        Vector3f tmpPointOnA = new Vector3f(), tmpPointOnB = new Vector3f();
+        Vector3f tmpNormalInB = new Vector3f();
 
-				w.sub(pWorld, qWorld);
+        for (;;) //while (true)
+        {
+            seperatingAxisInA.negate(cachedSeparatingAxis);
+            MatrixUtil.transposeTransform(seperatingAxisInA, seperatingAxisInA, input.transformA.basis);
 
-				delta = cachedSeparatingAxis.dot(w);
+            seperatingAxisInB.set(cachedSeparatingAxis);
+            MatrixUtil.transposeTransform(seperatingAxisInB, seperatingAxisInB, input.transformB.basis);
 
-				// potential exit, they don't overlap
-				if ((delta > 0f) && (delta * delta > squaredDistance * input.maximumDistanceSquared)) {
-					checkPenetration = false;
-					break;
-				}
+            minkowskiA.localGetSupportingVertexWithoutMargin(seperatingAxisInA, pInA);
+            minkowskiB.localGetSupportingVertexWithoutMargin(seperatingAxisInB, qInB);
 
-				// exit 0: the new point is already in the simplex, or we didn't come any closer
-				if (simplexSolver.inSimplex(w)) {
-					degenerateSimplex = 1;
-					checkSimplex = true;
-					break;
-				}
-				// are we getting any closer ?
-				float f0 = squaredDistance - delta;
-				float f1 = squaredDistance * REL_ERROR2;
+            pWorld.set(pInA);
+            localTransA.transform(pWorld);
 
-				if (f0 <= f1) {
-					if (f0 <= 0f) {
-						degenerateSimplex = 2;
-					}
-					checkSimplex = true;
-					break;
-				}
-				// add current vertex to simplex
-				simplexSolver.addVertex(w, pWorld, qWorld);
+            qWorld.set(qInB);
+            localTransB.transform(qWorld);
 
-				// calculate the closest point to the origin (update vector v)
-				if (!simplexSolver.closest(cachedSeparatingAxis)) {
-					degenerateSimplex = 3;
-					checkSimplex = true;
-					break;
-				}
+            w.sub(pWorld, qWorld);
 
-				if (cachedSeparatingAxis.lengthSquared() < REL_ERROR2) {
-					degenerateSimplex = 6;
-					checkSimplex = true;
-					break;
-				}
-				
-				float previousSquaredDistance = squaredDistance;
-				squaredDistance = cachedSeparatingAxis.lengthSquared();
+            delta = cachedSeparatingAxis.dot(w);
 
-				// redundant m_simplexSolver->compute_points(pointOnA, pointOnB);
+            // potential exit, they don't overlap
+            if ((delta > 0f) && (delta * delta > squaredDistance * input.maximumDistanceSquared)) {
+                checkPenetration = false;
+                break;
+            }
 
-				// are we getting any closer ?
-				if (previousSquaredDistance - squaredDistance <= BulletGlobals.FLT_EPSILON * previousSquaredDistance) {
-					simplexSolver.backup_closest(cachedSeparatingAxis);
-					checkSimplex = true;
-					break;
-				}
+            // exit 0: the new point is already in the simplex, or we didn't come any closer
+            if (simplexSolver.inSimplex(w)) {
+                degenerateSimplex = 1;
+                checkSimplex = true;
+                break;
+            }
+            // are we getting any closer ?
+            float f0 = squaredDistance - delta;
+            float f1 = squaredDistance * REL_ERROR2;
 
-				// degeneracy, this is typically due to invalid/uninitialized worldtransforms for a CollisionObject   
-				if (curIter++ > gGjkMaxIter) {
-					//#if defined(DEBUG) || defined (_DEBUG)   
-					if (BulletGlobals.DEBUG) {
-						System.err.printf("btGjkPairDetector maxIter exceeded:%i\n", curIter);
-						System.err.printf("sepAxis=(%f,%f,%f), squaredDistance = %f, shapeTypeA=%i,shapeTypeB=%i\n",
-								cachedSeparatingAxis.x,
-								cachedSeparatingAxis.y,
-								cachedSeparatingAxis.z,
-								squaredDistance,
-								minkowskiA.getShapeType(),
-								minkowskiB.getShapeType());
-					}
-					//#endif   
-					break;
+            if (f0 <= f1) {
+                if (f0 <= 0f) {
+                    degenerateSimplex = 2;
+                }
+                checkSimplex = true;
+                break;
+            }
+            // add current vertex to simplex
+            simplexSolver.addVertex(w, pWorld, qWorld);
 
-				}
+            // calculate the closest point to the origin (update vector v)
+            if (!simplexSolver.closest(cachedSeparatingAxis)) {
+                degenerateSimplex = 3;
+                checkSimplex = true;
+                break;
+            }
 
-				boolean check = (!simplexSolver.fullSimplex());
-				//bool check = (!m_simplexSolver->fullSimplex() && squaredDistance > SIMD_EPSILON * m_simplexSolver->maxVertex());
+            if (cachedSeparatingAxis.lengthSquared() < REL_ERROR2) {
+                degenerateSimplex = 6;
+                checkSimplex = true;
+                break;
+            }
 
-				if (!check) {
-					// do we need this backup_closest here ?
-					simplexSolver.backup_closest(cachedSeparatingAxis);
-					break;
-				}
-			}
+            float previousSquaredDistance = squaredDistance;
+            squaredDistance = cachedSeparatingAxis.lengthSquared();
 
-			if (checkSimplex) {
-				simplexSolver.compute_points(pointOnA, pointOnB);
-				normalInB.sub(pointOnA, pointOnB);
-				float lenSqr = cachedSeparatingAxis.lengthSquared();
-				// valid normal
-				if (lenSqr < 0.0001f) {
-					degenerateSimplex = 5;
-				}
-				if (lenSqr > BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON) {
-					float rlen = 1f / (float) Math.sqrt(lenSqr);
-					normalInB.scale(rlen); // normalize
-					float s = (float) Math.sqrt(squaredDistance);
+            // redundant m_simplexSolver->compute_points(pointOnA, pointOnB);
 
-					assert (s > 0f);
+            // are we getting any closer ?
+            if (previousSquaredDistance - squaredDistance <= BulletGlobals.FLT_EPSILON * previousSquaredDistance) {
+                simplexSolver.backup_closest(cachedSeparatingAxis);
+                checkSimplex = true;
+                break;
+            }
 
-					tmp.scale((marginA / s), cachedSeparatingAxis);
-					pointOnA.sub(tmp);
+            // degeneracy, this is typically due to invalid/uninitialized worldtransforms for a CollisionObject
+            if (curIter++ > gGjkMaxIter) {
+                //#if defined(DEBUG) || defined (_DEBUG)
+                if (BulletGlobals.DEBUG) {
+                    System.err.printf("btGjkPairDetector maxIter exceeded:%i\n", curIter);
+                    System.err.printf("sepAxis=(%f,%f,%f), squaredDistance = %f, shapeTypeA=%i,shapeTypeB=%i\n",
+                            cachedSeparatingAxis.x,
+                            cachedSeparatingAxis.y,
+                            cachedSeparatingAxis.z,
+                            squaredDistance,
+                            minkowskiA.getShapeType(),
+                            minkowskiB.getShapeType());
+                }
+                //#endif
+                break;
 
-					tmp.scale((marginB / s), cachedSeparatingAxis);
-					pointOnB.add(tmp);
+            }
 
-					distance = ((1f / rlen) - margin);
-					isValid = true;
+            boolean check = (!simplexSolver.fullSimplex());
+            //bool check = (!m_simplexSolver->fullSimplex() && squaredDistance > SIMD_EPSILON * m_simplexSolver->maxVertex());
 
-					lastUsedMethod = 1;
-				}
-				else {
-					lastUsedMethod = 2;
-				}
-			}
+            if (!check) {
+                // do we need this backup_closest here ?
+                simplexSolver.backup_closest(cachedSeparatingAxis);
+                break;
+            }
+        }
 
-			boolean catchDegeneratePenetrationCase =
-					(catchDegeneracies != 0 && penetrationDepthSolver != null && degenerateSimplex != 0 && ((distance + margin) < 0.01f));
+        if (checkSimplex) {
+            simplexSolver.compute_points(pointOnA, pointOnB);
+            normalInB.sub(pointOnA, pointOnB);
+            float lenSqr = cachedSeparatingAxis.lengthSquared();
+            // valid normal
+            if (lenSqr < 0.0001f) {
+                degenerateSimplex = 5;
+            }
+            if (lenSqr > BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON) {
+                float rlen = 1f / (float) Math.sqrt(lenSqr);
+                normalInB.scale(rlen); // normalize
+                float s = (float) Math.sqrt(squaredDistance);
 
-			//if (checkPenetration && !isValid)
-			if (checkPenetration && (!isValid || catchDegeneratePenetrationCase)) {
-				// penetration case
+                assert (s > 0f);
 
-				// if there is no way to handle penetrations, bail out
-				if (penetrationDepthSolver != null) {
-					// Penetration depth case.
-					BulletStats.gNumDeepPenetrationChecks++;
+                tmp.scale((marginA / s), cachedSeparatingAxis);
+                pointOnA.sub(tmp);
 
-					boolean isValid2 = penetrationDepthSolver.calcPenDepth(
-							simplexSolver,
-							minkowskiA, minkowskiB,
-							localTransA, localTransB,
-							cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
-							debugDraw/*,input.stackAlloc*/);
+                tmp.scale((marginB / s), cachedSeparatingAxis);
+                pointOnB.add(tmp);
 
-					if (isValid2) {
-						tmpNormalInB.sub(tmpPointOnB, tmpPointOnA);
+                distance = ((1f / rlen) - margin);
+                isValid = true;
 
-						float lenSqr = tmpNormalInB.lengthSquared();
-						if (lenSqr > (BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON)) {
-							tmpNormalInB.scale(1f / (float) Math.sqrt(lenSqr));
-							tmp.sub(tmpPointOnA, tmpPointOnB);
-							float distance2 = -tmp.length();
-							// only replace valid penetrations when the result is deeper (check)
-							if (!isValid || (distance2 < distance)) {
-								distance = distance2;
-								pointOnA.set(tmpPointOnA);
-								pointOnB.set(tmpPointOnB);
-								normalInB.set(tmpNormalInB);
-								isValid = true;
-								lastUsedMethod = 3;
-							}
-							else {
+                lastUsedMethod = 1;
+            }
+            else {
+                lastUsedMethod = 2;
+            }
+        }
 
-							}
-						}
-						else {
-							//isValid = false;
-							lastUsedMethod = 4;
-						}
-					}
-					else {
-						lastUsedMethod = 5;
-					}
+        boolean catchDegeneratePenetrationCase =
+                (catchDegeneracies != 0 && penetrationDepthSolver != null && degenerateSimplex != 0 && ((distance + margin) < 0.01f));
 
-				}
-			}
-		}
+        //if (checkPenetration && !isValid)
+        if (checkPenetration && (!isValid || catchDegeneratePenetrationCase)) {
+            // penetration case
 
-		if (isValid) {
+            // if there is no way to handle penetrations, bail out
+            if (penetrationDepthSolver != null) {
+                // Penetration depth case.
+                BulletStats.gNumDeepPenetrationChecks++;
+
+                boolean isValid2 = penetrationDepthSolver.calcPenDepth(
+                        simplexSolver,
+                        minkowskiA, minkowskiB,
+                        localTransA, localTransB,
+                        cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
+                        debugDraw/*,input.stackAlloc*/);
+
+                if (isValid2) {
+                    tmpNormalInB.sub(tmpPointOnB, tmpPointOnA);
+
+                    float lenSqr = tmpNormalInB.lengthSquared();
+                    if (lenSqr > (BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON)) {
+                        tmpNormalInB.scale(1f / (float) Math.sqrt(lenSqr));
+                        tmp.sub(tmpPointOnA, tmpPointOnB);
+                        float distance2 = -tmp.length();
+                        // only replace valid penetrations when the result is deeper (check)
+                        if (!isValid || (distance2 < distance)) {
+                            distance = distance2;
+                            pointOnA.set(tmpPointOnA);
+                            pointOnB.set(tmpPointOnB);
+                            normalInB.set(tmpNormalInB);
+                            isValid = true;
+                            lastUsedMethod = 3;
+                        }
+                        else {
+
+                        }
+                    }
+                    else {
+                        //isValid = false;
+                        lastUsedMethod = 4;
+                    }
+                }
+                else {
+                    lastUsedMethod = 5;
+                }
+
+            }
+        }
+
+        if (isValid) {
 			//#ifdef __SPU__
 			//		//spu_printf("distance\n");
 			//#endif //__CELLOS_LV2__

@@ -239,7 +239,7 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 		public StridingMeshInterface meshInterface;
 		public TriangleCallback callback;
 
-		private Vector3f[] triangle/*[3]*/ = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
+		private final Vector3f[] triangle/*[3]*/ = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
 
 		public MyNodeOverlapCallback() {
 		}
@@ -249,7 +249,8 @@ public class BvhTriangleMeshShape extends TriangleMeshShape {
 			this.callback = callback;
 		}
 
-		public void processNode(int nodeSubPart, int nodeTriangleIndex) {
+		@Override
+        public void processNode(int nodeSubPart, int nodeTriangleIndex) {
 			VertexData data = meshInterface.getLockedReadOnlyVertexIndexBase(nodeSubPart);
 
 			Vector3f meshScaling = meshInterface.getScaling(new Vector3f());

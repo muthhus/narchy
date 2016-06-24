@@ -144,11 +144,8 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	 * Determines if this class has a hierarchy structure for sorting its primitives.
 	 */
 	public boolean hasBoxSet() {
-		if (box_set.getNodeCount() == 0) {
-			return false;
-		}
-		return true;
-	}
+        return box_set.getNodeCount() != 0;
+    }
 
 	/**
 	 * Obtains the primitive manager.

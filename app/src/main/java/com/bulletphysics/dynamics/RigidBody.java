@@ -29,7 +29,6 @@ import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionObjectType;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.*;
 import com.bulletphysics.util.ObjectArrayList;
@@ -100,7 +99,7 @@ public class RigidBody extends CollisionObject {
 	public int contactSolverType;
 	public int frictionSolverType;
 	
-	private static int uniqueId = 0;
+	private static int uniqueId;
 	public int debugBodyId;
 	
 	public RigidBody(com.bulletphysics.dynamics.RigidBodyConstructionInfo constructionInfo) {
@@ -542,10 +541,7 @@ public class RigidBody extends CollisionObject {
 			return true;
 		}
 
-		if (deactivationTime > BulletGlobals.getDeactivationTime()) {
-			return true;
-		}
-		return false;
+		return deactivationTime > BulletGlobals.getDeactivationTime();
 	}
 	
 	public BroadphaseProxy getBroadphaseProxy() {

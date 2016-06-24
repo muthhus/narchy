@@ -23,8 +23,6 @@
 
 package com.bulletphysics.dynamics;
 
-import com.bulletphysics.dynamics.DynamicsWorld;
-
 /**
  * Callback called for each internal tick.
  * 

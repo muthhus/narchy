@@ -55,8 +55,7 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public Quat4d(double x, double y, double z, double w)
   {
-      double mag;
-      mag = 1.0/ Math.sqrt( x*x + y*y + z*z + w*w );
+      double mag = 1.0 / Math.sqrt(x * x + y * y + z * z + w * w);
       this.x =  x*mag;
       this.y =  y*mag;
       this.z =  z*mag;
@@ -70,8 +69,7 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public Quat4d(double[] q)
   {
-      double mag; 
-      mag = 1.0/ Math.sqrt( q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
+      double mag = 1.0 / Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
       x =  q[0]*mag;
       y =  q[1]*mag;
       z =  q[2]*mag;
@@ -103,10 +101,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
      * @param t1 the Tuple4f containing the initialization x y z w data 
      */  
     public Quat4d(Tuple4f t1)  
-    { 
-      double mag;
-      mag = 1.0/ Math.sqrt( t1.x*t1.x + t1.y*t1.y + t1.z*t1.z + t1.w*t1.w );
-      x =  t1.x*mag;
+    {
+        double mag = 1.0 / Math.sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z + t1.w * t1.w);
+        x =  t1.x*mag;
       y =  t1.y*mag;
       z =  t1.z*mag;
       w =  t1.w*mag;
@@ -120,9 +117,8 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
      */  
     public Quat4d(Tuple4d t1)
     {
-      double mag;
-      mag = 1.0/ Math.sqrt( t1.x*t1.x + t1.y*t1.y + t1.z*t1.z + t1.w*t1.w );
-      x =  t1.x*mag;
+        double mag = 1.0 / Math.sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z + t1.w * t1.w);
+        x =  t1.x*mag;
       y =  t1.y*mag;
       z =  t1.z*mag;
       w =  t1.w*mag;
@@ -178,11 +174,11 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
       this.y = q1.w*q2.y + q2.w*q1.y - q1.x*q2.z + q1.z*q2.x;
       this.z = q1.w*q2.z + q2.w*q1.z + q1.x*q2.y - q1.y*q2.x;
     } else {
-      double	x, y, w;
+      double y, w;
 
       w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      x = q1.w*q2.x + q2.w*q1.x + q1.y*q2.z - q1.z*q2.y;
-      y = q1.w*q2.y + q2.w*q1.y - q1.x*q2.z + q1.z*q2.x;
+        double x = q1.w * q2.x + q2.w * q1.x + q1.y * q2.z - q1.z * q2.y;
+        y = q1.w*q2.y + q2.w*q1.y - q1.x*q2.z + q1.z*q2.x;
       this.z = q1.w*q2.z + q2.w*q1.z + q1.x*q2.y - q1.y*q2.x;
       this.w = w;
       this.x = x;
@@ -198,11 +194,11 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public final void mul(Quat4d q1)
   {
-      double     x, y, w; 
+      double y, w;
 
        w = this.w*q1.w - this.x*q1.x - this.y*q1.y - this.z*q1.z;
-       x = this.w*q1.x + q1.w*this.x + this.y*q1.z - this.z*q1.y;
-       y = this.w*q1.y + q1.w*this.y - this.x*q1.z + this.z*q1.x;
+      double x = this.w * q1.x + q1.w * this.x + this.y * q1.z - this.z * q1.y;
+      y = this.w*q1.y + q1.w*this.y - this.x*q1.z + this.z*q1.x;
        this.z = this.w*q1.z + q1.w*this.z + this.x*q1.y - this.y*q1.x;
        this.w = w;
        this.x = x;
@@ -248,10 +244,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public final void inverse(Quat4d q1)
   {
-    double norm;
 
-    norm = 1.0/(q1.w*q1.w + q1.x*q1.x + q1.y*q1.y + q1.z*q1.z);
-    this.w =  norm*q1.w;
+      double norm = 1.0 / (q1.w * q1.w + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z);
+      this.w =  norm*q1.w;
     this.x = -norm*q1.x;
     this.y = -norm*q1.y;
     this.z = -norm*q1.z;
@@ -263,10 +258,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public final void inverse()
   {
-    double norm;  
- 
-    norm = 1.0/(this.w*this.w + this.x*this.x + this.y*this.y + this.z*this.z);
-    this.w *=  norm;
+
+      double norm = 1.0 / (this.w * this.w + this.x * this.x + this.y * this.y + this.z * this.z);
+      this.w *=  norm;
     this.x *= -norm;
     this.y *= -norm;
     this.z *= -norm;
@@ -280,11 +274,10 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public final void normalize(Quat4d q1)
   {
-    double norm;
 
-    norm = (q1.x*q1.x + q1.y*q1.y + q1.z*q1.z + q1.w*q1.w);
+      double norm = (q1.x * q1.x + q1.y * q1.y + q1.z * q1.z + q1.w * q1.w);
 
-    if (norm > 0.0) {
+      if (norm > 0.0) {
       norm = 1.0/ Math.sqrt(norm);
       this.x = norm*q1.x;
       this.y = norm*q1.y;
@@ -304,11 +297,10 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
    */
   public final void normalize()
   {
-    double norm;
 
-    norm = (this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+      double norm = (this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
 
-    if (norm > 0.0) {
+      if (norm > 0.0) {
       norm = 1.0 / Math.sqrt(norm);
       this.x *= norm;
       this.y *= norm;
@@ -553,7 +545,7 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
      */
     public final void set(AxisAngle4f a)
     {
-	double mag,amag;
+	double amag;
 	// Quat = cos(theta/2) + sin(theta/2)(roation_axis) 
 
 	amag = Math.sqrt( a.x*a.x + a.y*a.y + a.z*a.z);
@@ -563,8 +555,8 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
 	    y = 0.0;
 	    z = 0.0;
 	} else {
-	    mag = Math.sin(a.angle/2.0);
-	    amag = 1.0/amag;
+        double mag = Math.sin(a.angle / 2.0);
+        amag = 1.0/amag;
 	    w = Math.cos(a.angle/2.0);
 	    x = a.x*amag*mag;
 	    y = a.y*amag*mag;
@@ -580,7 +572,7 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
      */
     public final void set(AxisAngle4d a)
     {
-	double mag,amag;
+	double amag;
 	// Quat = cos(theta/2) + sin(theta/2)(roation_axis) 
 	
 	amag = Math.sqrt( a.x*a.x + a.y*a.y + a.z*a.z);
@@ -590,9 +582,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
 	    y = 0.0;
 	    z = 0.0;
 	} else {  
-	    amag = 1.0/amag; 
-	    mag = Math.sin(a.angle/2.0);
-	    w = Math.cos(a.angle/2.0);
+	    amag = 1.0/amag;
+        double mag = Math.sin(a.angle / 2.0);
+        w = Math.cos(a.angle/2.0);
        x = a.x*amag*mag;
        y = a.y*amag*mag;
        z = a.z*amag*mag;
@@ -614,9 +606,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
       // covering. Resulting in change of direction for rotations.
       // Fixed function to negate the first quaternion in the case that the
       // dot product of q1 and this is negative. Second case was not needed.
-      double dot,s1,s2,om,sinom;
+      double s1,s2,om,sinom;
 
-      dot = x*q1.x + y*q1.y + z*q1.z + w*q1.w;
+      double dot = x * q1.x + y * q1.y + z * q1.z + w * q1.w;
 
       if ( dot < 0 ) {
         // negate quaternion
@@ -654,9 +646,9 @@ public class Quat4d extends Tuple4d implements java.io.Serializable {
       // covering. Resulting in change of direction for rotations.
       // Fixed function to negate the first quaternion in the case that the
       // dot product of q1 and this is negative. Second case was not needed.
-      double dot,s1,s2,om,sinom;
+      double s1,s2,om,sinom;
 
-      dot = q2.x*q1.x + q2.y*q1.y + q2.z*q1.z + q2.w*q1.w;
+      double dot = q2.x * q1.x + q2.y * q1.y + q2.z * q1.z + q2.w * q1.w;
 
       if ( dot < 0 ) {
         // negate quaternion

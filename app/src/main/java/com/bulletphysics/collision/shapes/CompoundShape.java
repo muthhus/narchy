@@ -24,10 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShapeChild;
-import com.bulletphysics.collision.shapes.OptimizedBvh;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
@@ -50,9 +46,9 @@ public class CompoundShape extends CollisionShape {
 	private final Vector3f localAabbMin = new Vector3f(1e30f, 1e30f, 1e30f);
 	private final Vector3f localAabbMax = new Vector3f(-1e30f, -1e30f, -1e30f);
 
-	private OptimizedBvh aabbTree = null;
+	private final OptimizedBvh aabbTree = new OptimizedBvh();
 
-	private float collisionMargin = 0f;
+	private float collisionMargin;
 	protected final Vector3f localScaling = new Vector3f(1f, 1f, 1f);
 
 	public void addChildShape(Transform localTransform, CollisionShape shape) {

@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.OptimizedBvh;
-
 /**
  * Traversal mode for {@link OptimizedBvh}.
  * 

@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.narrowphase;
 
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 

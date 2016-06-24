@@ -23,8 +23,6 @@
 
 package com.bulletphysics.linearmath.convexhull;
 
-import com.bulletphysics.linearmath.convexhull.HullDesc;
-
 /**
  * Flags that affects convex hull generation, used in {@link HullDesc#flags}.
  * 

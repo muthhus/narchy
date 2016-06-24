@@ -23,8 +23,6 @@
 
 package com.bulletphysics.util;
 
-import com.bulletphysics.util.ObjectArrayList;
-
 import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,10 +36,10 @@ import java.util.Map;
  */
 public class ArrayPool<T> {
 
-	private Class componentType;
-	private ObjectArrayList list = new ObjectArrayList();
-	private Comparator comparator;
-	private IntValue key = new IntValue();
+	private final Class componentType;
+	private final ObjectArrayList list = new ObjectArrayList();
+	private final Comparator comparator;
+	private final IntValue key = new IntValue();
 	
 	/**
 	 * Creates object pool.
@@ -132,7 +130,8 @@ public class ArrayPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 
-	private static Comparator floatComparator = new Comparator() {
+	private static final Comparator floatComparator = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {
 			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((float[])o1).length;
 			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((float[])o2).length;
@@ -140,7 +139,8 @@ public class ArrayPool<T> {
 		}
 	};
 
-	private static Comparator intComparator = new Comparator() {
+	private static final Comparator intComparator = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {
 			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((int[])o1).length;
 			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((int[])o2).length;
@@ -148,7 +148,8 @@ public class ArrayPool<T> {
 		}
 	};
 	
-	private static Comparator objectComparator = new Comparator() {
+	private static final Comparator objectComparator = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {
 			int len1 = (o1 instanceof IntValue)? ((IntValue)o1).value : ((Object[])o1).length;
 			int len2 = (o2 instanceof IntValue)? ((IntValue)o2).value : ((Object[])o2).length;
@@ -162,7 +163,7 @@ public class ArrayPool<T> {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static ThreadLocal<Map> threadLocal = new ThreadLocal<Map>() {
+	private static final ThreadLocal<Map> threadLocal = new ThreadLocal<Map>() {
 		@Override
 		protected Map initialValue() {
 			return new HashMap();

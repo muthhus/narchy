@@ -25,7 +25,6 @@ package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.BroadphasePair;
 import com.bulletphysics.collision.broadphase.DispatcherInfo;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 
 /**
  * Callback for overriding collision filtering and more fine-grained control over

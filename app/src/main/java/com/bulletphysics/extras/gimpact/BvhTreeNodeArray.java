@@ -35,7 +35,7 @@ import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
  */
 class BvhTreeNodeArray {
 
-	private int size = 0;
+	private int size;
 	
 	private float[] bound = new float[0];
 	private int[] escapeIndexOrDataIndex = new int[0];

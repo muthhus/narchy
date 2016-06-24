@@ -25,7 +25,6 @@ package com.bulletphysics.dynamics.constraintsolver;
 
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.constraintsolver.ContactSolverInfo;
 
 /**
  * Contact solving function.

@@ -58,7 +58,8 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		}
 	}
 
-	public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
+	@Override
+    public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
 		assert (aabbMin.x <= aabbMax.x && aabbMin.y <= aabbMax.y && aabbMin.z <= aabbMax.z);
 
 		SimpleBroadphaseProxy proxy = new SimpleBroadphaseProxy(aabbMin, aabbMax, shapeType, userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
@@ -67,13 +68,15 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		return proxy;
 	}
 
-	public void destroyProxy(BroadphaseProxy proxyOrg, Dispatcher dispatcher) {
+	@Override
+    public void destroyProxy(BroadphaseProxy proxyOrg, Dispatcher dispatcher) {
 		handles.remove(proxyOrg);
 
 		pairCache.removeOverlappingPairsContainingProxy(proxyOrg, dispatcher);
 	}
 
-	public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
+	@Override
+    public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
 		SimpleBroadphaseProxy sbp = (SimpleBroadphaseProxy)proxy;
 		sbp.min.set(aabbMin);
 		sbp.max.set(aabbMax);
@@ -85,7 +88,8 @@ public class SimpleBroadphase extends BroadphaseInterface {
 				proxy0.min.z <= proxy1.max.z && proxy1.min.z <= proxy0.max.z;
 	}
 
-	public void calculateOverlappingPairs(Dispatcher dispatcher) {
+	@Override
+    public void calculateOverlappingPairs(Dispatcher dispatcher) {
 		for (int i=0; i<handles.size(); i++) {
 			SimpleBroadphaseProxy proxy0 = handles.getQuick(i);
 			for (int j=0; j<handles.size(); j++) {
@@ -110,16 +114,19 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		}
 	}
 
-	public OverlappingPairCache getOverlappingPairCache() {
+	@Override
+    public OverlappingPairCache getOverlappingPairCache() {
 		return pairCache;
 	}
 
-	public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
+	@Override
+    public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
 		aabbMin.set(-1e30f, -1e30f, -1e30f);
 		aabbMax.set(1e30f, 1e30f, 1e30f);
 	}
 
-	public void printStats() {
+	@Override
+    public void printStats() {
 //		System.out.printf("btSimpleBroadphase.h\n");
 //		System.out.printf("numHandles = %d, maxHandles = %d\n", /*numHandles*/ handles.size(), maxHandles);
 	}

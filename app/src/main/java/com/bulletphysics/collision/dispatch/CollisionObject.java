@@ -84,7 +84,7 @@ public class CollisionObject {
 	protected float ccdSweptSphereRadius;
 
 	/// Don't do continuous collision detection if the motion (in one step) is less then ccdMotionThreshold
-	protected float ccdMotionThreshold = 0f;
+	protected float ccdMotionThreshold;
 	/// If some object should have elaborate collision filtering by sub-classes
 	protected boolean checkCollideWith;
 

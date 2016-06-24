@@ -52,7 +52,7 @@ import javax.vecmath.Vector3f;
  */
 public class KinematicCharacterController extends ActionInterface {
 
-	private static Vector3f[] upAxisDirection = new Vector3f[] {
+	private static final Vector3f[] upAxisDirection = new Vector3f[] {
 		new Vector3f(1.0f, 0.0f, 0.0f),
 		new Vector3f(0.0f, 1.0f, 0.0f),
 		new Vector3f(0.0f, 0.0f, 1.0f),
@@ -138,13 +138,15 @@ public class KinematicCharacterController extends ActionInterface {
 	}
 
 	// ActionInterface interface
-	public void updateAction(CollisionWorld collisionWorld, float deltaTime) {
+	@Override
+    public void updateAction(CollisionWorld collisionWorld, float deltaTime) {
 		preStep(collisionWorld);
 		playerStep(collisionWorld, deltaTime);
 	}
 
 	// ActionInterface interface
-	public void debugDraw(IDebugDraw debugDrawer) {
+	@Override
+    public void debugDraw(IDebugDraw debugDrawer) {
 	}
 
 	public void setUpAxis(int axis) {
@@ -312,7 +314,7 @@ public class KinematicCharacterController extends ActionInterface {
 	
 	public void setMaxSlope(float slopeRadians) {
 		maxSlopeRadians = slopeRadians;
-		maxSlopeCosine = (float) Math.cos((float)slopeRadians);
+		maxSlopeCosine = (float) Math.cos(slopeRadians);
 	}
 	
 	public float getMaxSlope() {

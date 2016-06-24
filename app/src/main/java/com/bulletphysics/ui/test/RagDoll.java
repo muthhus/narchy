@@ -27,16 +27,19 @@
 package com.bulletphysics.ui.test;
 
 import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.*;
-import com.bulletphysics.dynamics.constraintsolver.*;
 import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.DynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.constraintsolver.Generic6DofConstraint;
+import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.ui.JoglPhysics;
 import com.bulletphysics.util.BulletStack;
 import com.bulletphysics.util.Motion;
 import com.jogamp.newt.event.MouseEvent;
-import com.bulletphysics.ui.JoglPhysics;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;

@@ -69,11 +69,8 @@ class BoxCollision {
 		float abs_dir0 = VectorUtil.getCoord(absolute_edge, i_dir_0);
 		float abs_dir1 = VectorUtil.getCoord(absolute_edge, i_dir_1);
 		float rad = VectorUtil.getCoord(_extend, i_comp_0) * abs_dir0 + VectorUtil.getCoord(_extend, i_comp_1) * abs_dir1;
-		if (pmin > rad || -rad > pmax) {
-			return false;
-		}
-		return true;
-	}
+        return !(pmin > rad || -rad > pmax);
+    }
 
 	public static boolean TEST_CROSS_EDGE_BOX_X_AXIS_MCR(Vector3f edge, Vector3f absolute_edge, Vector3f pointa, Vector3f pointb, Vector3f _extend) {
 		return TEST_CROSS_EDGE_BOX_MCR(edge, absolute_edge, pointa, pointb, _extend, 2, 1, 1, 2);
@@ -375,16 +372,13 @@ class BoxCollision {
 		}
 
 		public boolean has_collision(AABB other) {
-			if (min.x > other.max.x ||
-			    max.x < other.min.x ||
-			    min.y > other.max.y ||
-			    max.y < other.min.y ||
-			    min.z > other.max.z ||
-			    max.z < other.min.z) {
-				return false;
-			}
-			return true;
-		}
+            return !(min.x > other.max.x ||
+                    max.x < other.min.x ||
+                    min.y > other.max.y ||
+                    max.y < other.min.y ||
+                    min.z > other.max.z ||
+                    max.z < other.min.z);
+        }
 		
 		/**
 		 * Finds the Ray intersection parameter.
@@ -412,10 +406,9 @@ class BoxCollision {
 			if (Math.abs(f) > extents.x * Math.abs(vdir.z) + extents.z * Math.abs(vdir.x)) return false;
 			
 			f = vdir.x * Dy - vdir.y * Dx;
-			if (Math.abs(f) > extents.x * Math.abs(vdir.y) + extents.y * Math.abs(vdir.x)) return false;
-			
-			return true;
-		}
+            return Math.abs(f) <= extents.x * Math.abs(vdir.y) + extents.y * Math.abs(vdir.x);
+
+        }
 	
 		public void projection_interval(Vector3f direction, float[] vmin, float[] vmax) {
 			Vector3f tmp = new Vector3f();

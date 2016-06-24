@@ -23,8 +23,6 @@
 
 package com.bulletphysics.util;
 
-import com.bulletphysics.util.StackList;
-
 /**
  * Per-thread stack based object pools for common types.
  * 

@@ -25,10 +25,6 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import com.bulletphysics.collision.broadphase.BroadphaseProxy;
-import com.bulletphysics.collision.broadphase.Dbvt;
-import com.bulletphysics.collision.broadphase.DbvtAabbMm;
-
 /**
  *
  * @author jezek2

@@ -25,9 +25,6 @@ package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CylinderShapeX;
-import com.bulletphysics.collision.shapes.CylinderShapeZ;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 

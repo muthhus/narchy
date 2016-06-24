@@ -82,7 +82,7 @@ public enum BroadphaseNativeType {
 	
 	MAX_BROADPHASE_COLLISION_TYPES;
 	
-	private static com.bulletphysics.collision.broadphase.BroadphaseNativeType[] values = values();
+	private static final com.bulletphysics.collision.broadphase.BroadphaseNativeType[] values = values();
 	
 	public static com.bulletphysics.collision.broadphase.BroadphaseNativeType forValue(int value) {
 		return values[value];

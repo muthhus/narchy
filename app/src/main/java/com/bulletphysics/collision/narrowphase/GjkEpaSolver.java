@@ -341,28 +341,25 @@ public class GjkEpaSolver {
 				if (FetchSupport()) {
 					boolean found = false;
 					switch (order) {
-						case 1: {
-							tmp1.negate(simplex[1].w);
-							tmp2.sub(simplex[0].w, simplex[1].w);
-							found = SolveSimplex2(tmp1, tmp2);
-							break;
-						}
-						case 2: {
-							tmp1.negate(simplex[2].w);
-							tmp2.sub(simplex[1].w, simplex[2].w);
-							tmp3.sub(simplex[0].w, simplex[2].w);
-							found = SolveSimplex3(tmp1, tmp2, tmp3);
-							break;
-						}
-						case 3: {
-							tmp1.negate(simplex[3].w);
-							tmp2.sub(simplex[2].w, simplex[3].w);
-							tmp3.sub(simplex[1].w, simplex[3].w);
-							tmp4.sub(simplex[0].w, simplex[3].w);
-							found = SolveSimplex4(tmp1, tmp2, tmp3, tmp4);
-							break;
-						}
-					}
+						case 1:
+                            tmp1.negate(simplex[1].w);
+                            tmp2.sub(simplex[0].w, simplex[1].w);
+                            found = SolveSimplex2(tmp1, tmp2);
+                            break;
+                        case 2:
+                            tmp1.negate(simplex[2].w);
+                            tmp2.sub(simplex[1].w, simplex[2].w);
+                            tmp3.sub(simplex[0].w, simplex[2].w);
+                            found = SolveSimplex3(tmp1, tmp2, tmp3);
+                            break;
+                        case 3:
+                            tmp1.negate(simplex[3].w);
+                            tmp2.sub(simplex[2].w, simplex[3].w);
+                            tmp3.sub(simplex[1].w, simplex[3].w);
+                            tmp4.sub(simplex[0].w, simplex[3].w);
+                            found = SolveSimplex4(tmp1, tmp2, tmp3, tmp4);
+                            break;
+                    }
 					if (found) {
 						return true;
 					}
@@ -385,56 +382,57 @@ public class GjkEpaSolver {
 				case 0:
 					break;
 				// Line
-				case 1: {
-					Vector3f ab = new Vector3f();
-					ab.sub(simplex[1].w, simplex[0].w);
+				case 1:
+                    Vector3f ab = new Vector3f();
+                    ab.sub(simplex[1].w, simplex[0].w);
 
-					Vector3f[] b = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
-					b[0].set(1f, 0f, 0f);
-					b[1].set(0f, 1f, 0f);
-					b[2].set(0f, 0f, 1f);
-					
-					b[0].cross(ab, b[0]);
-					b[1].cross(ab, b[1]);
-					b[2].cross(ab, b[2]);
+                    Vector3f[] b = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
+                    b[0].set(1f, 0f, 0f);
+                    b[1].set(0f, 1f, 0f);
+                    b[2].set(0f, 0f, 1f);
 
-					float m[] = new float[] { b[0].lengthSquared(), b[1].lengthSquared(), b[2].lengthSquared() };
+                    b[0].cross(ab, b[0]);
+                    b[1].cross(ab, b[1]);
+                    b[2].cross(ab, b[2]);
 
-					Quat4f tmpQuat = new Quat4f();
-					tmp.normalize(ab);
-					QuaternionUtil.setRotation(tmpQuat, tmp, cst2Pi / 3f);
+                    float m[] = new float[] { b[0].lengthSquared(), b[1].lengthSquared(), b[2].lengthSquared() };
 
-					Matrix3f r = new Matrix3f();
-					MatrixUtil.setRotation(r, tmpQuat);
+                    Quat4f tmpQuat = new Quat4f();
+                    tmp.normalize(ab);
+                    QuaternionUtil.setRotation(tmpQuat, tmp, cst2Pi / 3f);
 
-					Vector3f w = new Vector3f();
-					w.set(b[m[0] > m[1] ? m[0] > m[2] ? 0 : 2 : m[1] > m[2] ? 1 : 2]);
+                    Matrix3f r = new Matrix3f();
+                    MatrixUtil.setRotation(r, tmpQuat);
 
-					tmp.normalize(w);
-					Support(tmp, simplex[4]); r.transform(w);
-					tmp.normalize(w);
-					Support(tmp, simplex[2]); r.transform(w);
-					tmp.normalize(w);
-					Support(tmp, simplex[3]); r.transform(w);
-					order = 4;
-					return (true);
-				}
-				// Triangle
-				case 2: {
-					tmp1.sub(simplex[1].w, simplex[0].w);
-					tmp2.sub(simplex[2].w, simplex[0].w);
-					Vector3f n = new Vector3f();
-					n.cross(tmp1, tmp2);
-					n.normalize();
+                    Vector3f w = new Vector3f();
+                    w.set(b[m[0] > m[1] ? m[0] > m[2] ? 0 : 2 : m[1] > m[2] ? 1 : 2]);
 
-					Support(n, simplex[3]);
+                    tmp.normalize(w);
+                    Support(tmp, simplex[4]);
+                    r.transform(w);
+                    tmp.normalize(w);
+                    Support(tmp, simplex[2]);
+                    r.transform(w);
+                    tmp.normalize(w);
+                    Support(tmp, simplex[3]);
+                    r.transform(w);
+                    order = 4;
+                    return (true);
+                // Triangle
+				case 2:
+                    tmp1.sub(simplex[1].w, simplex[0].w);
+                    tmp2.sub(simplex[2].w, simplex[0].w);
+                    Vector3f n = new Vector3f();
+                    n.cross(tmp1, tmp2);
+                    n.normalize();
 
-					tmp.negate(n);
-					Support(tmp, simplex[4]);
-					order = 4;
-					return (true);
-				}
-				// Tetrahedron
+                    Support(n, simplex[3]);
+
+                    tmp.negate(n);
+                    Support(tmp, simplex[4]);
+                    order = 4;
+                    return (true);
+                // Tetrahedron
 				case 3:
 					return (true);
 				// Hexahedron
@@ -448,7 +446,7 @@ public class GjkEpaSolver {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static int[] mod3 = new int[] { 0, 1, 2, 0, 1 };
+	private static final int[] mod3 = new int[] { 0, 1, 2, 0, 1 };
 
 	private static final int[][] tetrahedron_fidx/*[4][3]*/ = new int[][] {{2,1,0},{3,0,1},{3,1,2},{3,2,0}};
 	private static final int[][] tetrahedron_eidx/*[6][4]*/ = new int[][] {{0,0,2,1},{0,1,1,1},{0,2,3,1},{1,0,3,2},{2,0,1,2},{3,0,2,2}};
@@ -683,36 +681,32 @@ public class GjkEpaSolver {
 					switch (gjk.order) {
 						// Tetrahedron
 						case 3:
-							 {
-								//pfidx=(const U*)fidx;
-								pfidx_ptr = tetrahedron_fidx;
-								pfidx_index = 0;
+                            //pfidx=(const U*)fidx;
+                            pfidx_ptr = tetrahedron_fidx;
+                            pfidx_index = 0;
 
-								nfidx = 4;
+                            nfidx = 4;
 
-								//peidx=(const U*)eidx;
-								peidx_ptr = tetrahedron_eidx;
-								peidx_index = 0;
+                            //peidx=(const U*)eidx;
+                            peidx_ptr = tetrahedron_eidx;
+                            peidx_index = 0;
 
-								neidx = 6;
-							}
-							break;
+                            neidx = 6;
+                            break;
 						// Hexahedron
 						case 4:
-							 {
-								//pfidx=(const U*)fidx;
-								pfidx_ptr = hexahedron_fidx;
-								pfidx_index = 0;
+                            //pfidx=(const U*)fidx;
+                            pfidx_ptr = hexahedron_fidx;
+                            pfidx_index = 0;
 
-								nfidx = 6;
+                            nfidx = 6;
 
-								//peidx=(const U*)eidx;
-								peidx_ptr = hexahedron_eidx;
-								peidx_index = 0;
+                            //peidx=(const U*)eidx;
+                            peidx_ptr = hexahedron_eidx;
+                            peidx_index = 0;
 
-								neidx = 9;
-							}
-							break;
+                            neidx = 9;
+                            break;
 					}
 					int i;
 
@@ -802,7 +796,7 @@ public class GjkEpaSolver {
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private GJK gjk = new GJK();
+	private final GJK gjk = new GJK();
 	
 	public boolean collide(ConvexShape shape0, Transform wtrs0,
                            ConvexShape shape1, Transform wtrs1,

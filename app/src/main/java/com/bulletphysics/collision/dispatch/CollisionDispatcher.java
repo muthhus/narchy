@@ -38,10 +38,10 @@ import java.util.Collections;
 public class CollisionDispatcher extends Dispatcher {
 
 	private static final int MAX_BROADPHASE_COLLISION_TYPES = BroadphaseNativeType.MAX_BROADPHASE_COLLISION_TYPES.ordinal();
-	private int count = 0;
+	//private int count;
 	private final ObjectArrayList<PersistentManifold> manifoldsPtr = new ObjectArrayList<PersistentManifold>();
-	private boolean useIslands = true;
-	private boolean staticWarningReported = false;
+	//private final boolean useIslands = true;
+	private boolean staticWarningReported;
 	private ManifoldResult defaultManifoldResult;
 	private NearCallback nearCallback;
 	//private PoolAllocator*	m_collisionAlgorithmPoolAllocator;
@@ -50,7 +50,7 @@ public class CollisionDispatcher extends Dispatcher {
 	private CollisionConfiguration collisionConfiguration;
 	//private static int gNumManifold = 0;
 
-	private CollisionAlgorithmConstructionInfo tmpCI = new CollisionAlgorithmConstructionInfo();
+	private final CollisionAlgorithmConstructionInfo tmpCI = new CollisionAlgorithmConstructionInfo();
 
 	public CollisionDispatcher(CollisionConfiguration collisionConfiguration) {
 		this.collisionConfiguration = collisionConfiguration;
@@ -212,13 +212,14 @@ public class CollisionDispatcher extends Dispatcher {
 			this.dispatcher = dispatcher;
 		}
 		
-		public boolean processOverlap(BroadphasePair pair) {
+		@Override
+        public boolean processOverlap(BroadphasePair pair) {
 			dispatcher.getNearCallback().handleCollision(pair, dispatcher, dispatchInfo);
 			return false;
 		}
 	}
 	
-	private CollisionPairCallback collisionPairCallback = new CollisionPairCallback();
+	private final CollisionPairCallback collisionPairCallback = new CollisionPairCallback();
 	
 	@Override
 	public void dispatchAllCollisionPairs(OverlappingPairCache pairCache, DispatcherInfo dispatchInfo, Dispatcher dispatcher) {

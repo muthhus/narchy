@@ -23,8 +23,6 @@
 
 package com.bulletphysics.dynamics.constraintsolver;
 
-import com.bulletphysics.dynamics.constraintsolver.SolverConstraintType;
-
 import javax.vecmath.Vector3f;
 
 /**

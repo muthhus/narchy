@@ -39,33 +39,33 @@ public class BulletStats {
 	
 	// GjkPairDetector
 	// temp globals, to improve GJK/EPA/penetration calculations
-	public static int gNumDeepPenetrationChecks = 0;
-	public static int gNumGjkChecks = 0;
-	public static int gNumSplitImpulseRecoveries = 0;
+	public static int gNumDeepPenetrationChecks;
+	public static int gNumGjkChecks;
+	public static int gNumSplitImpulseRecoveries;
 	
 	public static int gNumAlignedAllocs;
 	public static int gNumAlignedFree;
 	public static int gTotalBytesAlignedAllocs;	
 	
-	public static int gPickingConstraintId = 0;
+	public static int gPickingConstraintId;
 	public static final Vector3f gOldPickingPos = new Vector3f();
-	public static float gOldPickingDist = 0.f;
+	public static float gOldPickingDist;
 	
-	public static int gOverlappingPairs = 0;
-	public static int gRemovePairs = 0;
-	public static int gAddedPairs = 0;
-	public static int gFindPairs = 0;
+	public static int gOverlappingPairs;
+	public static int gRemovePairs;
+	public static int gAddedPairs;
+	public static int gFindPairs;
 	
 	public static final Clock gProfileClock = new Clock();
 
 	// DiscreteDynamicsWorld:
-	public static int gNumClampedCcdMotions = 0;
+	public static int gNumClampedCcdMotions;
 
 	// JAVA NOTE: added for statistics in applet demo
 	public static long stepSimulationTime;
 	public static long updateTime;
 	
-	private static boolean enableProfile = false;
+	private static boolean enableProfile;
 	
 	////////////////////////////////////////////////////////////////////////////
 	

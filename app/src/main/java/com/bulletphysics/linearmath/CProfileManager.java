@@ -32,7 +32,6 @@
 package com.bulletphysics.linearmath;
 
 import com.bulletphysics.BulletStats;
-import com.bulletphysics.linearmath.CProfileIterator;
 
 /**
  * Manager for the profile system.
@@ -41,10 +40,10 @@ import com.bulletphysics.linearmath.CProfileIterator;
  */
 public class CProfileManager {
 
-	private static com.bulletphysics.linearmath.CProfileNode root = new com.bulletphysics.linearmath.CProfileNode("Root", null);
+	private static final com.bulletphysics.linearmath.CProfileNode root = new com.bulletphysics.linearmath.CProfileNode("Root", null);
 	private static com.bulletphysics.linearmath.CProfileNode currentNode = root;
-	private static int frameCounter = 0;
-	private static long resetTime = 0;
+	private static int frameCounter;
+	private static long resetTime;
 
 	/**
 	 * @param name must be {@link String#intern interned} String (not needed for String literals)

@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
@@ -95,19 +94,23 @@ public abstract class ConvexInternalShape extends ConvexShape {
 		return out;
 	}
 	
+	@Override
 	public void setLocalScaling(Vector3f scaling) {
 		localScaling.absolute(scaling);
 	}
 	
+	@Override
 	public Vector3f getLocalScaling(Vector3f out) {
 		out.set(localScaling);
 		return out;
 	}
 
+	@Override
 	public float getMargin() {
 		return collisionMargin;
 	}
 
+	@Override
 	public void setMargin(float margin) {
 		this.collisionMargin = margin;
 	}

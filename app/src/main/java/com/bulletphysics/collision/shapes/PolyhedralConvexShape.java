@@ -23,7 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.ConvexInternalShape;
 import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
@@ -37,7 +36,7 @@ import javax.vecmath.Vector3f;
  */
 public abstract class PolyhedralConvexShape extends ConvexInternalShape {
 
-	private static Vector3f[] _directions = new Vector3f[] {
+	private static final Vector3f[] _directions = new Vector3f[] {
 		new Vector3f( 1f,  0f,  0f),
 		new Vector3f( 0f,  1f,  0f),
 		new Vector3f( 0f,  0f,  1f),
@@ -46,7 +45,7 @@ public abstract class PolyhedralConvexShape extends ConvexInternalShape {
 		new Vector3f( 0f,  0f, -1f)
 	};
 
-	private static Vector3f[] _supporting = new Vector3f[] {
+	private static final Vector3f[] _supporting = new Vector3f[] {
 		new Vector3f(0f, 0f, 0f),
 		new Vector3f(0f, 0f, 0f),
 		new Vector3f(0f, 0f, 0f),
@@ -57,7 +56,7 @@ public abstract class PolyhedralConvexShape extends ConvexInternalShape {
 	
 	protected final Vector3f localAabbMin = new Vector3f(1f, 1f, 1f);
 	protected final Vector3f localAabbMax = new Vector3f(-1f, -1f, -1f);
-	protected boolean isLocalAabbValid = false;
+	protected boolean isLocalAabbValid;
 
 //	/** optional Hull is for optional Separating Axis Test Hull collision detection, see Hull.cpp */
 //	public Hull optionalHull = null;

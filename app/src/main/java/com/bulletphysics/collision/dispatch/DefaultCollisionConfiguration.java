@@ -24,14 +24,6 @@
 package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.dispatch.CollisionAlgorithmCreateFunc;
-import com.bulletphysics.collision.dispatch.CollisionConfiguration;
-import com.bulletphysics.collision.dispatch.CompoundCollisionAlgorithm;
-import com.bulletphysics.collision.dispatch.ConvexConcaveCollisionAlgorithm;
-import com.bulletphysics.collision.dispatch.ConvexConvexAlgorithm;
-import com.bulletphysics.collision.dispatch.ConvexPlaneCollisionAlgorithm;
-import com.bulletphysics.collision.dispatch.EmptyAlgorithm;
-import com.bulletphysics.collision.dispatch.SphereSphereCollisionAlgorithm;
 import com.bulletphysics.collision.narrowphase.ConvexPenetrationDepthSolver;
 import com.bulletphysics.collision.narrowphase.GjkEpaPenetrationDepthSolver;
 import com.bulletphysics.collision.narrowphase.VoronoiSimplexSolver;

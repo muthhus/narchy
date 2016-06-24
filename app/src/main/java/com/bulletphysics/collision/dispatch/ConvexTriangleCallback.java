@@ -27,8 +27,6 @@ import com.bulletphysics.collision.broadphase.CollisionAlgorithm;
 import com.bulletphysics.collision.broadphase.CollisionAlgorithmConstructionInfo;
 import com.bulletphysics.collision.broadphase.Dispatcher;
 import com.bulletphysics.collision.broadphase.DispatcherInfo;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.ManifoldResult;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.TriangleCallback;
@@ -47,15 +45,15 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 	//protected final BulletStack stack = BulletStack.get();
 	
-	private CollisionObject convexBody;
-	private CollisionObject triBody;
+	private final CollisionObject convexBody;
+	private final CollisionObject triBody;
 
 	private final Vector3f aabbMin = new Vector3f();
 	private final Vector3f aabbMax = new Vector3f();
 
 	private ManifoldResult resultOut;
 
-	private Dispatcher dispatcher;
+	private final Dispatcher dispatcher;
 	private DispatcherInfo dispatchInfoPtr;
 	private float collisionMarginTriangle;
 	
@@ -94,7 +92,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 		convexInTriangleSpace.inverse();
 		convexInTriangleSpace.mul(convexBody.getWorldTransform(new Transform()));
 
-		CollisionShape convexShape = (CollisionShape)convexBody.getCollisionShape();
+		CollisionShape convexShape = convexBody.getCollisionShape();
 		//CollisionShape* triangleShape = static_cast<btCollisionShape*>(triBody->m_collisionShape);
 		convexShape.getAabb(convexInTriangleSpace, aabbMin, aabbMax);
 		float extraMargin = collisionMarginTriangle;
@@ -105,9 +103,10 @@ class ConvexTriangleCallback extends TriangleCallback {
 		aabbMin.sub(extra);
 	}
 
-	private CollisionAlgorithmConstructionInfo ci = new CollisionAlgorithmConstructionInfo();
-	private TriangleShape tm = new TriangleShape();
+	private final CollisionAlgorithmConstructionInfo ci = new CollisionAlgorithmConstructionInfo();
+	private final TriangleShape tm = new TriangleShape();
 	
+	@Override
 	public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 		// just for debugging purposes
 		//printf("triangle %d",m_triangleCount++);
@@ -116,7 +115,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 		ci.dispatcher1 = dispatcher;
 
-		CollisionObject ob = (CollisionObject) triBody;
+		CollisionObject ob = triBody;
 
 		// debug drawing of the overlapping triangles
 		if (dispatchInfoPtr != null && dispatchInfoPtr.debugDraw != null && dispatchInfoPtr.debugDraw.getDebugMode() > 0) {

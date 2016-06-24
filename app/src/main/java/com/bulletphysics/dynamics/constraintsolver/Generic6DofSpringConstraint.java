@@ -26,10 +26,10 @@ import javax.vecmath.Vector3f;
  */
 public class Generic6DofSpringConstraint extends Generic6DofConstraint {
 
-    private boolean springEnabled[] = new boolean[6];
-    private float equilibriumPoint[] = new float[6];
-    private float springStiffness[] = new float[6];
-    private float springDamping[] = new float[6]; // between 0 and 1 (1 == no damping)
+    private final boolean[] springEnabled = new boolean[6];
+    private final float[] equilibriumPoint = new float[6];
+    private final float[] springStiffness = new float[6];
+    private final float[] springDamping = new float[6]; // between 0 and 1 (1 == no damping)
 
     public Generic6DofSpringConstraint(RigidBody rbA, RigidBody rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
         super(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA);

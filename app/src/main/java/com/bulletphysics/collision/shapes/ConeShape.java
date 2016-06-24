@@ -25,9 +25,6 @@ package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.ConeShapeX;
-import com.bulletphysics.collision.shapes.ConeShapeZ;
-import com.bulletphysics.collision.shapes.ConvexInternalShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 
@@ -42,10 +39,10 @@ import javax.vecmath.Vector3f;
  */
 public class ConeShape extends ConvexInternalShape {
 
-	private float sinAngle;
-	private float radius;
-	private float height;
-	private int[] coneIndices = new int[3];
+	private final float sinAngle;
+	private final float radius;
+	private final float height;
+	private final int[] coneIndices = new int[3];
 
 	public ConeShape(float radius, float height) {
 		this.radius = radius;

@@ -71,7 +71,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	protected int triface1;
 	protected int part1;
 
-	private PairSet tmpPairset = new PairSet();
+	private final PairSet tmpPairset = new PairSet();
 	
 	public void init(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
 		super.init(ci);
@@ -495,19 +495,17 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 		body0.internalSetTemporaryCollisionShape(shape0);
 		body1.internalSetTemporaryCollisionShape(shape1);
 
-		{
-			CollisionAlgorithm algor = newAlgorithm(body0, body1);
-			// post :	checkManifold is called
+        CollisionAlgorithm algor = newAlgorithm(body0, body1);
+        // post :	checkManifold is called
 
-			resultOut.setShapeIdentifiers(part0, triface0, part1, triface1);
+        resultOut.setShapeIdentifiers(part0, triface0, part1, triface1);
 
-			algor.processCollision(body0, body1, dispatchInfo, resultOut);
+        algor.processCollision(body0, body1, dispatchInfo, resultOut);
 
-			//algor.destroy();
-			dispatcher.freeCollisionAlgorithm(algor);
-		}
+        //algor.destroy();
+        dispatcher.freeCollisionAlgorithm(algor);
 
-		body0.internalSetTemporaryCollisionShape(tmpShape0);
+        body0.internalSetTemporaryCollisionShape(tmpShape0);
 		body1.internalSetTemporaryCollisionShape(tmpShape1);
 	}
 	

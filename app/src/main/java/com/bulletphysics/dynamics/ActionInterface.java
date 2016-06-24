@@ -24,7 +24,6 @@
 package com.bulletphysics.dynamics;
 
 import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.linearmath.IDebugDraw;
 
 /**

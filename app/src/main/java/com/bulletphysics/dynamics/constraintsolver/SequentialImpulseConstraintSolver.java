@@ -442,21 +442,20 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 			//int sizeofSC = sizeof(btSolverConstraint);
 
 			//if (1)
-			{
-				//if m_stackAlloc, try to pack bodies/constraints to speed up solving
-				//		btBlock*					sablock;
-				//		sablock = stackAlloc->beginBlock();
+            //if m_stackAlloc, try to pack bodies/constraints to speed up solving
+            //		btBlock*					sablock;
+            //		sablock = stackAlloc->beginBlock();
 
-				//	int memsize = 16;
-				//		unsigned char* stackMemory = stackAlloc->allocate(memsize);
+            //	int memsize = 16;
+            //		unsigned char* stackMemory = stackAlloc->allocate(memsize);
 
 
-				// todo: use stack allocator for this temp memory
-				//int minReservation = numManifolds * 2;
+            // todo: use stack allocator for this temp memory
+            //int minReservation = numManifolds * 2;
 
-				//m_tmpSolverBodyPool.reserve(minReservation);
+            //m_tmpSolverBodyPool.reserve(minReservation);
 
-				//don't convert all bodies, only the one we need so solver the constraints
+            //don't convert all bodies, only the one we need so solver the constraints
 				/*
 				{
 				for (int i=0;i<numBodies;i++)
@@ -474,278 +473,277 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 				}
 				*/
 
-				//m_tmpSolverConstraintPool.reserve(minReservation);
-				//m_tmpSolverFrictionConstraintPool.reserve(minReservation);
+            //m_tmpSolverConstraintPool.reserve(minReservation);
+            //m_tmpSolverFrictionConstraintPool.reserve(minReservation);
 
-				{
-					int i;
+            {
+                int i;
 
-					Vector3f rel_pos1 = new Vector3f();
-					Vector3f rel_pos2 = new Vector3f();
+                Vector3f rel_pos1 = new Vector3f();
+                Vector3f rel_pos2 = new Vector3f();
 
-					Vector3f pos1 = new Vector3f();
-					Vector3f pos2 = new Vector3f();
-					Vector3f vel = new Vector3f();
-					Vector3f torqueAxis0 = new Vector3f();
-					Vector3f torqueAxis1 = new Vector3f();
-					Vector3f vel1 = new Vector3f();
-					Vector3f vel2 = new Vector3f();
-					Vector3f frictionDir1 = new Vector3f();
-					Vector3f frictionDir2 = new Vector3f();
-					Vector3f vec = new Vector3f();
+                Vector3f pos1 = new Vector3f();
+                Vector3f pos2 = new Vector3f();
+                Vector3f vel = new Vector3f();
+                Vector3f torqueAxis0 = new Vector3f();
+                Vector3f torqueAxis1 = new Vector3f();
+                Vector3f vel1 = new Vector3f();
+                Vector3f vel2 = new Vector3f();
+                Vector3f frictionDir1 = new Vector3f();
+                Vector3f frictionDir2 = new Vector3f();
+                Vector3f vec = new Vector3f();
 
-					Matrix3f tmpMat = new Matrix3f();
+                Matrix3f tmpMat = new Matrix3f();
 
-					for (i = 0; i < numManifolds; i++) {
-						manifold = manifoldPtr.getQuick(manifold_offset+i);
-						colObj0 = (CollisionObject) manifold.getBody0();
-						colObj1 = (CollisionObject) manifold.getBody1();
+                for (i = 0; i < numManifolds; i++) {
+                    manifold = manifoldPtr.getQuick(manifold_offset+i);
+                    colObj0 = (CollisionObject) manifold.getBody0();
+                    colObj1 = (CollisionObject) manifold.getBody1();
 
-						int solverBodyIdA = -1;
-						int solverBodyIdB = -1;
+                    int solverBodyIdA = -1;
+                    int solverBodyIdB = -1;
 
-						if (manifold.getNumContacts() != 0) {
-							if (colObj0.getIslandTag() >= 0) {
-								if (colObj0.getCompanionId() >= 0) {
-									// body has already been converted
-									solverBodyIdA = colObj0.getCompanionId();
-								}
-								else {
-									solverBodyIdA = tmpSolverBodyPool.size();
-									SolverBody solverBody = new SolverBody();
-									tmpSolverBodyPool.add(solverBody);
-									initSolverBody(solverBody, colObj0);
-									colObj0.setCompanionId(solverBodyIdA);
-								}
-							}
-							else {
-								// create a static body
-								solverBodyIdA = tmpSolverBodyPool.size();
-								SolverBody solverBody = new SolverBody();
-								tmpSolverBodyPool.add(solverBody);
-								initSolverBody(solverBody, colObj0);
-							}
+                    if (manifold.getNumContacts() != 0) {
+                        if (colObj0.getIslandTag() >= 0) {
+                            if (colObj0.getCompanionId() >= 0) {
+                                // body has already been converted
+                                solverBodyIdA = colObj0.getCompanionId();
+                            }
+                            else {
+                                solverBodyIdA = tmpSolverBodyPool.size();
+                                SolverBody solverBody = new SolverBody();
+                                tmpSolverBodyPool.add(solverBody);
+                                initSolverBody(solverBody, colObj0);
+                                colObj0.setCompanionId(solverBodyIdA);
+                            }
+                        }
+                        else {
+                            // create a static body
+                            solverBodyIdA = tmpSolverBodyPool.size();
+                            SolverBody solverBody = new SolverBody();
+                            tmpSolverBodyPool.add(solverBody);
+                            initSolverBody(solverBody, colObj0);
+                        }
 
-							if (colObj1.getIslandTag() >= 0) {
-								if (colObj1.getCompanionId() >= 0) {
-									solverBodyIdB = colObj1.getCompanionId();
-								}
-								else {
-									solverBodyIdB = tmpSolverBodyPool.size();
-									SolverBody solverBody = new SolverBody();
-									tmpSolverBodyPool.add(solverBody);
-									initSolverBody(solverBody, colObj1);
-									colObj1.setCompanionId(solverBodyIdB);
-								}
-							}
-							else {
-								// create a static body
-								solverBodyIdB = tmpSolverBodyPool.size();
-								SolverBody solverBody = new SolverBody();
-								tmpSolverBodyPool.add(solverBody);
-								initSolverBody(solverBody, colObj1);
-							}
-						}
+                        if (colObj1.getIslandTag() >= 0) {
+                            if (colObj1.getCompanionId() >= 0) {
+                                solverBodyIdB = colObj1.getCompanionId();
+                            }
+                            else {
+                                solverBodyIdB = tmpSolverBodyPool.size();
+                                SolverBody solverBody = new SolverBody();
+                                tmpSolverBodyPool.add(solverBody);
+                                initSolverBody(solverBody, colObj1);
+                                colObj1.setCompanionId(solverBodyIdB);
+                            }
+                        }
+                        else {
+                            // create a static body
+                            solverBodyIdB = tmpSolverBodyPool.size();
+                            SolverBody solverBody = new SolverBody();
+                            tmpSolverBodyPool.add(solverBody);
+                            initSolverBody(solverBody, colObj1);
+                        }
+                    }
 
-						float relaxation;
+                    float relaxation;
 
-						for (int j = 0; j < manifold.getNumContacts(); j++) {
+                    for (int j = 0; j < manifold.getNumContacts(); j++) {
 
-							ManifoldPoint cp = manifold.getContactPoint(j);
+                        ManifoldPoint cp = manifold.getContactPoint(j);
 
-							if (cp.getDistance() <= 0f) {
-								cp.getPositionWorldOnA(pos1);
-								cp.getPositionWorldOnB(pos2);
+                        if (cp.getDistance() <= 0f) {
+                            cp.getPositionWorldOnA(pos1);
+                            cp.getPositionWorldOnB(pos2);
 
-								rel_pos1.sub(pos1, colObj0.getWorldTransform(tmpTrans).origin);
-								rel_pos2.sub(pos2, colObj1.getWorldTransform(tmpTrans).origin);
+                            rel_pos1.sub(pos1, colObj0.getWorldTransform(tmpTrans).origin);
+                            rel_pos2.sub(pos2, colObj1.getWorldTransform(tmpTrans).origin);
 
-								relaxation = 1f;
-								float rel_vel;
+                            relaxation = 1f;
+                            float rel_vel;
 
-								int frictionIndex = tmpSolverConstraintPool.size();
+                            int frictionIndex = tmpSolverConstraintPool.size();
 
-								{
-									SolverConstraint solverConstraint = new SolverConstraint();
-									tmpSolverConstraintPool.add(solverConstraint);
-									RigidBody rb0 = RigidBody.upcast(colObj0);
-									RigidBody rb1 = RigidBody.upcast(colObj1);
+                            {
+                                SolverConstraint solverConstraint = new SolverConstraint();
+                                tmpSolverConstraintPool.add(solverConstraint);
+                                RigidBody rb0 = RigidBody.upcast(colObj0);
+                                RigidBody rb1 = RigidBody.upcast(colObj1);
 
-									solverConstraint.solverBodyIdA = solverBodyIdA;
-									solverConstraint.solverBodyIdB = solverBodyIdB;
-									solverConstraint.constraintType = SolverConstraintType.SOLVER_CONTACT_1D;
+                                solverConstraint.solverBodyIdA = solverBodyIdA;
+                                solverConstraint.solverBodyIdB = solverBodyIdB;
+                                solverConstraint.constraintType = SolverConstraintType.SOLVER_CONTACT_1D;
 
-									solverConstraint.originalContactPoint = cp;
+                                solverConstraint.originalContactPoint = cp;
 
-									torqueAxis0.cross(rel_pos1, cp.normalWorldOnB);
+                                torqueAxis0.cross(rel_pos1, cp.normalWorldOnB);
 
-									if (rb0 != null) {
-										solverConstraint.angularComponentA.set(torqueAxis0);
-										rb0.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentA);
-									}
-									else {
-										solverConstraint.angularComponentA.set(0f, 0f, 0f);
-									}
+                                if (rb0 != null) {
+                                    solverConstraint.angularComponentA.set(torqueAxis0);
+                                    rb0.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentA);
+                                }
+                                else {
+                                    solverConstraint.angularComponentA.set(0f, 0f, 0f);
+                                }
 
-									torqueAxis1.cross(rel_pos2, cp.normalWorldOnB);
+                                torqueAxis1.cross(rel_pos2, cp.normalWorldOnB);
 
-									if (rb1 != null) {
-										solverConstraint.angularComponentB.set(torqueAxis1);
-										rb1.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentB);
-									}
-									else {
-										solverConstraint.angularComponentB.set(0f, 0f, 0f);
-									}
+                                if (rb1 != null) {
+                                    solverConstraint.angularComponentB.set(torqueAxis1);
+                                    rb1.getInvInertiaTensorWorld(tmpMat).transform(solverConstraint.angularComponentB);
+                                }
+                                else {
+                                    solverConstraint.angularComponentB.set(0f, 0f, 0f);
+                                }
 
-									{
-										//#ifdef COMPUTE_IMPULSE_DENOM
-										//btScalar denom0 = rb0->computeImpulseDenominator(pos1,cp.m_normalWorldOnB);
-										//btScalar denom1 = rb1->computeImpulseDenominator(pos2,cp.m_normalWorldOnB);
-										//#else
-										float denom0 = 0f;
-										float denom1 = 0f;
-										if (rb0 != null) {
-											vec.cross(solverConstraint.angularComponentA, rel_pos1);
-											denom0 = rb0.getInvMass() + cp.normalWorldOnB.dot(vec);
-										}
-										if (rb1 != null) {
-											vec.cross(solverConstraint.angularComponentB, rel_pos2);
-											denom1 = rb1.getInvMass() + cp.normalWorldOnB.dot(vec);
-										}
-										//#endif //COMPUTE_IMPULSE_DENOM
+                                {
+                                    //#ifdef COMPUTE_IMPULSE_DENOM
+                                    //btScalar denom0 = rb0->computeImpulseDenominator(pos1,cp.m_normalWorldOnB);
+                                    //btScalar denom1 = rb1->computeImpulseDenominator(pos2,cp.m_normalWorldOnB);
+                                    //#else
+                                    float denom0 = 0f;
+                                    float denom1 = 0f;
+                                    if (rb0 != null) {
+                                        vec.cross(solverConstraint.angularComponentA, rel_pos1);
+                                        denom0 = rb0.getInvMass() + cp.normalWorldOnB.dot(vec);
+                                    }
+                                    if (rb1 != null) {
+                                        vec.cross(solverConstraint.angularComponentB, rel_pos2);
+                                        denom1 = rb1.getInvMass() + cp.normalWorldOnB.dot(vec);
+                                    }
+                                    //#endif //COMPUTE_IMPULSE_DENOM
 
-										float denom = relaxation / (denom0 + denom1);
-										solverConstraint.jacDiagABInv = denom;
-									}
+                                    float denom = relaxation / (denom0 + denom1);
+                                    solverConstraint.jacDiagABInv = denom;
+                                }
 
-									solverConstraint.contactNormal.set(cp.normalWorldOnB);
-									solverConstraint.relpos1CrossNormal.cross(rel_pos1, cp.normalWorldOnB);
-									solverConstraint.relpos2CrossNormal.cross(rel_pos2, cp.normalWorldOnB);
+                                solverConstraint.contactNormal.set(cp.normalWorldOnB);
+                                solverConstraint.relpos1CrossNormal.cross(rel_pos1, cp.normalWorldOnB);
+                                solverConstraint.relpos2CrossNormal.cross(rel_pos2, cp.normalWorldOnB);
 
-									if (rb0 != null) {
-										rb0.getVelocityInLocalPoint(rel_pos1, vel1);
-									}
-									else {
-										vel1.set(0f, 0f, 0f);
-									}
+                                if (rb0 != null) {
+                                    rb0.getVelocityInLocalPoint(rel_pos1, vel1);
+                                }
+                                else {
+                                    vel1.set(0f, 0f, 0f);
+                                }
 
-									if (rb1 != null) {
-										rb1.getVelocityInLocalPoint(rel_pos2, vel2);
-									}
-									else {
-										vel2.set(0f, 0f, 0f);
-									}
+                                if (rb1 != null) {
+                                    rb1.getVelocityInLocalPoint(rel_pos2, vel2);
+                                }
+                                else {
+                                    vel2.set(0f, 0f, 0f);
+                                }
 
-									vel.sub(vel1, vel2);
+                                vel.sub(vel1, vel2);
 
-									rel_vel = cp.normalWorldOnB.dot(vel);
+                                rel_vel = cp.normalWorldOnB.dot(vel);
 
-									solverConstraint.penetration = Math.min(cp.getDistance() + infoGlobal.linearSlop, 0f);
-									//solverConstraint.m_penetration = cp.getDistance();
+                                solverConstraint.penetration = Math.min(cp.getDistance() + infoGlobal.linearSlop, 0f);
+                                //solverConstraint.m_penetration = cp.getDistance();
 
-									solverConstraint.friction = cp.combinedFriction;
-									solverConstraint.restitution = restitutionCurve(rel_vel, cp.combinedRestitution);
-									if (solverConstraint.restitution <= 0f) {
-										solverConstraint.restitution = 0f;
-									}
+                                solverConstraint.friction = cp.combinedFriction;
+                                solverConstraint.restitution = restitutionCurve(rel_vel, cp.combinedRestitution);
+                                if (solverConstraint.restitution <= 0f) {
+                                    solverConstraint.restitution = 0f;
+                                }
 
-									float penVel = -solverConstraint.penetration / infoGlobal.timeStep;
+                                float penVel = -solverConstraint.penetration / infoGlobal.timeStep;
 
-									if (solverConstraint.restitution > penVel) {
-										solverConstraint.penetration = 0f;
-									}
+                                if (solverConstraint.restitution > penVel) {
+                                    solverConstraint.penetration = 0f;
+                                }
 
-									Vector3f tmp = new Vector3f();
+                                Vector3f tmp = new Vector3f();
 
-									// warm starting (or zero if disabled)
-									if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
-										solverConstraint.appliedImpulse = cp.appliedImpulse * infoGlobal.warmstartingFactor;
-										if (rb0 != null) {
-											tmp.scale(rb0.getInvMass(), solverConstraint.contactNormal);
-											tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, solverConstraint.angularComponentA, solverConstraint.appliedImpulse);
-										}
-										if (rb1 != null) {
-											tmp.scale(rb1.getInvMass(), solverConstraint.contactNormal);
-											tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, solverConstraint.angularComponentB, -solverConstraint.appliedImpulse);
-										}
-									}
-									else {
-										solverConstraint.appliedImpulse = 0f;
-									}
+                                // warm starting (or zero if disabled)
+                                if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
+                                    solverConstraint.appliedImpulse = cp.appliedImpulse * infoGlobal.warmstartingFactor;
+                                    if (rb0 != null) {
+                                        tmp.scale(rb0.getInvMass(), solverConstraint.contactNormal);
+                                        tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, solverConstraint.angularComponentA, solverConstraint.appliedImpulse);
+                                    }
+                                    if (rb1 != null) {
+                                        tmp.scale(rb1.getInvMass(), solverConstraint.contactNormal);
+                                        tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, solverConstraint.angularComponentB, -solverConstraint.appliedImpulse);
+                                    }
+                                }
+                                else {
+                                    solverConstraint.appliedImpulse = 0f;
+                                }
 
-									solverConstraint.appliedPushImpulse = 0f;
+                                solverConstraint.appliedPushImpulse = 0f;
 
-									solverConstraint.frictionIndex = tmpSolverFrictionConstraintPool.size();
-									if (!cp.lateralFrictionInitialized) {
-										cp.lateralFrictionDir1.scale(rel_vel, cp.normalWorldOnB);
-										cp.lateralFrictionDir1.sub(vel, cp.lateralFrictionDir1);
+                                solverConstraint.frictionIndex = tmpSolverFrictionConstraintPool.size();
+                                if (!cp.lateralFrictionInitialized) {
+                                    cp.lateralFrictionDir1.scale(rel_vel, cp.normalWorldOnB);
+                                    cp.lateralFrictionDir1.sub(vel, cp.lateralFrictionDir1);
 
-										float lat_rel_vel = cp.lateralFrictionDir1.lengthSquared();
-										if (lat_rel_vel > BulletGlobals.FLT_EPSILON)//0.0f)
-										{
-											cp.lateralFrictionDir1.scale(1f / (float) Math.sqrt(lat_rel_vel));
-											addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-											cp.lateralFrictionDir2.cross(cp.lateralFrictionDir1, cp.normalWorldOnB);
-											cp.lateralFrictionDir2.normalize(); //??
-											addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-										}
-										else {
-											// re-calculate friction direction every frame, todo: check if this is really needed
+                                    float lat_rel_vel = cp.lateralFrictionDir1.lengthSquared();
+                                    if (lat_rel_vel > BulletGlobals.FLT_EPSILON)//0.0f)
+                                    {
+                                        cp.lateralFrictionDir1.scale(1f / (float) Math.sqrt(lat_rel_vel));
+                                        addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                        cp.lateralFrictionDir2.cross(cp.lateralFrictionDir1, cp.normalWorldOnB);
+                                        cp.lateralFrictionDir2.normalize(); //??
+                                        addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                    }
+                                    else {
+                                        // re-calculate friction direction every frame, todo: check if this is really needed
 
-											TransformUtil.planeSpace1(cp.normalWorldOnB, cp.lateralFrictionDir1, cp.lateralFrictionDir2);
-											addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-											addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-										}
-										cp.lateralFrictionInitialized = true;
+                                        TransformUtil.planeSpace1(cp.normalWorldOnB, cp.lateralFrictionDir1, cp.lateralFrictionDir2);
+                                        addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                        addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                    }
+                                    cp.lateralFrictionInitialized = true;
 
-									}
-									else {
-										addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-										addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
-									}
+                                }
+                                else {
+                                    addFrictionConstraint(cp.lateralFrictionDir1, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                    addFrictionConstraint(cp.lateralFrictionDir2, solverBodyIdA, solverBodyIdB, frictionIndex, cp, rel_pos1, rel_pos2, colObj0, colObj1, relaxation);
+                                }
 
-									{
-										SolverConstraint frictionConstraint1 = tmpSolverFrictionConstraintPool.getQuick(solverConstraint.frictionIndex);
-										if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
-											frictionConstraint1.appliedImpulse = cp.appliedImpulseLateral1 * infoGlobal.warmstartingFactor;
-											if (rb0 != null) {
-												tmp.scale(rb0.getInvMass(), frictionConstraint1.contactNormal);
-												tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint1.angularComponentA, frictionConstraint1.appliedImpulse);
-											}
-											if (rb1 != null) {
-												tmp.scale(rb1.getInvMass(), frictionConstraint1.contactNormal);
-												tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint1.angularComponentB, -frictionConstraint1.appliedImpulse);
-											}
-										}
-										else {
-											frictionConstraint1.appliedImpulse = 0f;
-										}
-									}
-									{
-										SolverConstraint frictionConstraint2 = tmpSolverFrictionConstraintPool.getQuick(solverConstraint.frictionIndex + 1);
-										if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
-											frictionConstraint2.appliedImpulse = cp.appliedImpulseLateral2 * infoGlobal.warmstartingFactor;
-											if (rb0 != null) {
-												tmp.scale(rb0.getInvMass(), frictionConstraint2.contactNormal);
-												tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint2.angularComponentA, frictionConstraint2.appliedImpulse);
-											}
-											if (rb1 != null) {
-												tmp.scale(rb1.getInvMass(), frictionConstraint2.contactNormal);
-												tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint2.angularComponentB, -frictionConstraint2.appliedImpulse);
-											}
-										}
-										else {
-											frictionConstraint2.appliedImpulse = 0f;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+                                {
+                                    SolverConstraint frictionConstraint1 = tmpSolverFrictionConstraintPool.getQuick(solverConstraint.frictionIndex);
+                                    if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
+                                        frictionConstraint1.appliedImpulse = cp.appliedImpulseLateral1 * infoGlobal.warmstartingFactor;
+                                        if (rb0 != null) {
+                                            tmp.scale(rb0.getInvMass(), frictionConstraint1.contactNormal);
+                                            tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint1.angularComponentA, frictionConstraint1.appliedImpulse);
+                                        }
+                                        if (rb1 != null) {
+                                            tmp.scale(rb1.getInvMass(), frictionConstraint1.contactNormal);
+                                            tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint1.angularComponentB, -frictionConstraint1.appliedImpulse);
+                                        }
+                                    }
+                                    else {
+                                        frictionConstraint1.appliedImpulse = 0f;
+                                    }
+                                }
+                                {
+                                    SolverConstraint frictionConstraint2 = tmpSolverFrictionConstraintPool.getQuick(solverConstraint.frictionIndex + 1);
+                                    if ((infoGlobal.solverMode & SolverMode.SOLVER_USE_WARMSTARTING) != 0) {
+                                        frictionConstraint2.appliedImpulse = cp.appliedImpulseLateral2 * infoGlobal.warmstartingFactor;
+                                        if (rb0 != null) {
+                                            tmp.scale(rb0.getInvMass(), frictionConstraint2.contactNormal);
+                                            tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdA).internalApplyImpulse(tmp, frictionConstraint2.angularComponentA, frictionConstraint2.appliedImpulse);
+                                        }
+                                        if (rb1 != null) {
+                                            tmp.scale(rb1.getInvMass(), frictionConstraint2.contactNormal);
+                                            tmpSolverBodyPool.getQuick(solverConstraint.solverBodyIdB).internalApplyImpulse(tmp, frictionConstraint2.angularComponentB, -frictionConstraint2.appliedImpulse);
+                                        }
+                                    }
+                                    else {
+                                        frictionConstraint2.appliedImpulse = 0f;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-			// TODO: btContactSolverInfo info = infoGlobal;
+            // TODO: btContactSolverInfo info = infoGlobal;
 
 			{
 				int j;
@@ -1263,13 +1261,11 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 	}
 
 	protected float solveFriction(RigidBody body0, RigidBody body1, ManifoldPoint cp, ContactSolverInfo info, int iter, IDebugDraw debugDrawer) {
-		{
-			if (cp.getDistance() <= 0f) {
-				ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
-				cpd.frictionSolverFunc.resolveContact(body0, body1, cp, info);
-			}
-		}
-		return 0f;
+        if (cp.getDistance() <= 0f) {
+            ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
+            cpd.frictionSolverFunc.resolveContact(body0, body1, cp, info);
+        }
+        return 0f;
 	}
 	
 	@Override

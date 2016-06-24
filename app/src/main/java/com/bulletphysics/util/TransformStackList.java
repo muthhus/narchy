@@ -24,7 +24,6 @@
 package com.bulletphysics.util;
 
 import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.util.StackList;
 
 import javax.vecmath.Matrix3f;
 

@@ -23,14 +23,18 @@
 
 package com.bulletphysics.ui;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLUquadric;
+import com.jogamp.opengl.util.GLBuffers;
+import com.jogamp.opengl.util.ImmModeSink;
+
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+
 // import javabullet.demos.opengl.FontRender.GLFont;
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.glu.*;
-import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.ImmModeSink;
 
 /**
  *

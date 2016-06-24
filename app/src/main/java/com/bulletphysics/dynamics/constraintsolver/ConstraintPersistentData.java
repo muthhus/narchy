@@ -23,8 +23,6 @@
 
 package com.bulletphysics.dynamics.constraintsolver;
 
-import com.bulletphysics.dynamics.constraintsolver.ContactSolverFunc;
-
 import javax.vecmath.Vector3f;
 
 /**
@@ -37,18 +35,18 @@ import javax.vecmath.Vector3f;
 public class ConstraintPersistentData {
 	
 	/** total applied impulse during most recent frame */
-	public float appliedImpulse = 0f;
-	public float prevAppliedImpulse = 0f;
-	public float accumulatedTangentImpulse0 = 0f;
-	public float accumulatedTangentImpulse1 = 0f;
+	public float appliedImpulse;
+	public float prevAppliedImpulse;
+	public float accumulatedTangentImpulse0;
+	public float accumulatedTangentImpulse1;
 
-	public float jacDiagABInv = 0f;
+	public float jacDiagABInv;
 	public float jacDiagABInvTangent0;
 	public float jacDiagABInvTangent1;
-	public int persistentLifeTime = 0;
-	public float restitution = 0f;
-	public float friction = 0f;
-	public float penetration = 0f;
+	public int persistentLifeTime;
+	public float restitution;
+	public float friction;
+	public float penetration;
 	public final Vector3f frictionWorldTangential0 = new Vector3f();
 	public final Vector3f frictionWorldTangential1 = new Vector3f();
 
@@ -61,8 +59,8 @@ public class ConstraintPersistentData {
 	public final Vector3f angularComponentA = new Vector3f();
 	public final Vector3f angularComponentB = new Vector3f();
 
-	public com.bulletphysics.dynamics.constraintsolver.ContactSolverFunc contactSolverFunc = null;
-	public ContactSolverFunc frictionSolverFunc = null;
+	public com.bulletphysics.dynamics.constraintsolver.ContactSolverFunc contactSolverFunc;
+	public ContactSolverFunc frictionSolverFunc;
 	
 	public void reset() {
 		appliedImpulse = 0f;

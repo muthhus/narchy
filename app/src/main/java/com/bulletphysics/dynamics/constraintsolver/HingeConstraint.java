@@ -440,68 +440,66 @@ public class HingeConstraint extends TypedConstraint {
 			Vector3f velrelOrthog = new Vector3f();
 			velrelOrthog.sub(angAorthog, angBorthog);
 
-			{
-				// solve orthogonal angular velocity correction
-				float relaxation = 1f;
-				float len = velrelOrthog.length();
-				if (len > 0.00001f) {
-					Vector3f normal = new Vector3f();
-					normal.normalize(velrelOrthog);
+            // solve orthogonal angular velocity correction
+            float relaxation = 1f;
+            float len = velrelOrthog.length();
+            if (len > 0.00001f) {
+                Vector3f normal = new Vector3f();
+                normal.normalize(velrelOrthog);
 
-					float denom = getRigidBodyA().computeAngularImpulseDenominator(normal) +
-							getRigidBodyB().computeAngularImpulseDenominator(normal);
-					// scale for mass and relaxation
-					// todo:  expose this 0.9 factor to developer
-					velrelOrthog.scale((1f / denom) * relaxationFactor);
-				}
+                float denom = getRigidBodyA().computeAngularImpulseDenominator(normal) +
+                        getRigidBodyB().computeAngularImpulseDenominator(normal);
+                // scale for mass and relaxation
+                // todo:  expose this 0.9 factor to developer
+                velrelOrthog.scale((1f / denom) * relaxationFactor);
+            }
 
-				// solve angular positional correction
-				// TODO: check
-				//Vector3f angularError = -axisA.cross(axisB) *(btScalar(1.)/timeStep);
-				Vector3f angularError = new Vector3f();
-				angularError.cross(axisA, axisB);
-				angularError.negate();
-				angularError.scale(1f / timeStep);
-				float len2 = angularError.length();
-				if (len2 > 0.00001f) {
-					Vector3f normal2 = new Vector3f();
-					normal2.normalize(angularError);
+            // solve angular positional correction
+            // TODO: check
+            //Vector3f angularError = -axisA.cross(axisB) *(btScalar(1.)/timeStep);
+            Vector3f angularError = new Vector3f();
+            angularError.cross(axisA, axisB);
+            angularError.negate();
+            angularError.scale(1f / timeStep);
+            float len2 = angularError.length();
+            if (len2 > 0.00001f) {
+                Vector3f normal2 = new Vector3f();
+                normal2.normalize(angularError);
 
-					float denom2 = getRigidBodyA().computeAngularImpulseDenominator(normal2) +
-							getRigidBodyB().computeAngularImpulseDenominator(normal2);
-					angularError.scale((1f / denom2) * relaxation);
-				}
+                float denom2 = getRigidBodyA().computeAngularImpulseDenominator(normal2) +
+                        getRigidBodyB().computeAngularImpulseDenominator(normal2);
+                angularError.scale((1f / denom2) * relaxation);
+            }
 
-				tmp.negate(velrelOrthog);
-				tmp.add(angularError);
-				rbA.applyTorqueImpulse(tmp);
+            tmp.negate(velrelOrthog);
+            tmp.add(angularError);
+            rbA.applyTorqueImpulse(tmp);
 
-				tmp.sub(velrelOrthog, angularError);
-				rbB.applyTorqueImpulse(tmp);
+            tmp.sub(velrelOrthog, angularError);
+            rbB.applyTorqueImpulse(tmp);
 
-				// solve limit
-				if (solveLimit) {
-					tmp.sub(angVelB, angVelA);
-					float amplitude = ((tmp).dot(axisA) * relaxationFactor + correction * (1f / timeStep) * biasFactor) * limitSign;
+            // solve limit
+            if (solveLimit) {
+                tmp.sub(angVelB, angVelA);
+                float amplitude = ((tmp).dot(axisA) * relaxationFactor + correction * (1f / timeStep) * biasFactor) * limitSign;
 
-					float impulseMag = amplitude * kHinge;
+                float impulseMag = amplitude * kHinge;
 
-					// Clamp the accumulated impulse
-					float temp = accLimitImpulse;
-					accLimitImpulse = Math.max(accLimitImpulse + impulseMag, 0f);
-					impulseMag = accLimitImpulse - temp;
+                // Clamp the accumulated impulse
+                float temp = accLimitImpulse;
+                accLimitImpulse = Math.max(accLimitImpulse + impulseMag, 0f);
+                impulseMag = accLimitImpulse - temp;
 
-					Vector3f impulse = new Vector3f();
-					impulse.scale(impulseMag * limitSign, axisA);
+                Vector3f impulse = new Vector3f();
+                impulse.scale(impulseMag * limitSign, axisA);
 
-					rbA.applyTorqueImpulse(impulse);
+                rbA.applyTorqueImpulse(impulse);
 
-					tmp.negate(impulse);
-					rbB.applyTorqueImpulse(tmp);
-				}
-			}
+                tmp.negate(impulse);
+                rbB.applyTorqueImpulse(tmp);
+            }
 
-			// apply motor
+            // apply motor
 			if (enableAngularMotor) {
 				// todo: add limits too
 				Vector3f angularLimit = new Vector3f();

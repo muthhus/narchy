@@ -151,10 +151,10 @@ public class Point4d extends Tuple4d implements java.io.Serializable {
    */
     public final double distanceSquared(Point4d p1)
     {
-      double dx, dy, dz, dw;
+      double dy, dz, dw;
 
-      dx = this.x-p1.x;
-      dy = this.y-p1.y;
+        double dx = this.x - p1.x;
+        dy = this.y-p1.y;
       dz = this.z-p1.z;
       dw = this.w-p1.w;
       return (dx*dx+dy*dy+dz*dz+dw*dw);
@@ -168,10 +168,10 @@ public class Point4d extends Tuple4d implements java.io.Serializable {
    */
     public final double distance(Point4d p1)
     {
-      double dx, dy, dz, dw;
+      double dy, dz, dw;
 
-      dx = this.x-p1.x;
-      dy = this.y-p1.y;
+        double dx = this.x - p1.x;
+        dy = this.y-p1.y;
       dz = this.z-p1.z;
       dw = this.w-p1.w;
       return Math.sqrt(dx*dx+dy*dy+dz*dz+dw*dw);
@@ -198,9 +198,9 @@ public class Point4d extends Tuple4d implements java.io.Serializable {
      * @return  the L-infinite distance
      */
     public final double distanceLinf(Point4d p1) {
-	double t1, t2;
-	t1 = Math.max( Math.abs(this.x-p1.x), Math.abs(this.y-p1.y));
-	t2 = Math.max( Math.abs(this.z-p1.z), Math.abs(this.w-p1.w));
+	double t2;
+        double t1 = Math.max(Math.abs(this.x - p1.x), Math.abs(this.y - p1.y));
+        t2 = Math.max( Math.abs(this.z-p1.z), Math.abs(this.w-p1.w));
  
 	return Math.max(t1,t2);
     }
@@ -212,11 +212,10 @@ public class Point4d extends Tuple4d implements java.io.Serializable {
     *  @param  p1  the source Point4d, which is not modified 
     */   
    public final void project(Point4d p1)
-   { 
-     double oneOw;
+   {
 
-     oneOw = 1/p1.w;
-     x = p1.x*oneOw;
+       double oneOw = 1 / p1.w;
+       x = p1.x*oneOw;
      y = p1.y*oneOw;
      z = p1.z*oneOw;
      w = 1.0;

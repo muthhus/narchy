@@ -369,7 +369,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      * @return the String representation
      */  
     public String toString() {
-        return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ")";
+        return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ')';
     }
 
 
@@ -420,10 +420,9 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      */
     public boolean epsilonEquals(Tuple4d t1, double epsilon)
     {
-       double diff;
 
-       diff = x - t1.x;
-       if(Double.isNaN(diff)) return false;
+        double diff = x - t1.x;
+        if(Double.isNaN(diff)) return false;
        if((diff<0?-diff:diff) > epsilon) return false;
 
        diff = y - t1.y;
@@ -436,9 +435,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
 
        diff = w - t1.w;
        if(Double.isNaN(diff)) return false;
-       if((diff<0?-diff:diff) > epsilon) return false;
-
-       return true;
+        return (diff < 0 ? -diff : diff) <= epsilon;
 
     }
 
@@ -526,30 +523,14 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      *  @param min   the lowest value in the tuple after clamping 
      *  @param t   the source tuple, which will not be modified
      */   
-    public final void clampMin(double min, Tuple4d t) { 
-        if( t.x < min ) {
-          x = min;
-        } else {
-          x = t.x;
-        }
- 
-        if( t.y < min ) {
-          y = min;
-        } else {
-          y = t.y;
-        }
- 
-        if( t.z < min ) {
-          z = min;
-        } else {
-          z = t.z;
-        }
- 
-        if( t.w < min ) {
-          w = min;
-        } else {
-          w = t.w;
-        }
+    public final void clampMin(double min, Tuple4d t) {
+        x = t.x < min ? min : t.x;
+
+        y = t.y < min ? min : t.y;
+
+        z = t.z < min ? min : t.z;
+
+        w = t.w < min ? min : t.w;
 
    } 
 
@@ -568,30 +549,14 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      *  @param max   the highest value in the tuple after clamping  
      *  @param t   the source tuple, which will not be modified
      */    
-    public final void clampMax(double max, Tuple4d t) {  
-        if( t.x > max ) {
-          x = max;
-        } else {
-          x = t.x;
-        }
- 
-        if( t.y > max ) {
-          y = max;
-        } else {
-          y = t.y;
-        }
- 
-        if( t.z > max ) {
-          z = max;
-        } else {
-          z = t.z;
-        }
- 
-        if( t.w > max ) {
-          w = max;
-        } else {
-          w = t.z;
-        }
+    public final void clampMax(double max, Tuple4d t) {
+        x = t.x > max ? max : t.x;
+
+        y = t.y > max ? max : t.y;
+
+        z = t.z > max ? max : t.z;
+
+        w = t.w > max ? max : t.z;
 
    } 
 
@@ -759,6 +724,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

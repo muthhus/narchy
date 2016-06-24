@@ -61,7 +61,8 @@ public class BroadphasePair {
 	}
 	
 	public static final Comparator<com.bulletphysics.collision.broadphase.BroadphasePair> broadphasePairSortPredicate = new Comparator<com.bulletphysics.collision.broadphase.BroadphasePair>() {
-		public int compare(com.bulletphysics.collision.broadphase.BroadphasePair a, com.bulletphysics.collision.broadphase.BroadphasePair b) {
+		@Override
+        public int compare(com.bulletphysics.collision.broadphase.BroadphasePair a, com.bulletphysics.collision.broadphase.BroadphasePair b) {
 			// JAVA TODO:
 			boolean result = a.pProxy0.getUid() > b.pProxy0.getUid() ||
 					(a.pProxy0.getUid() == b.pProxy0.getUid() && a.pProxy1.getUid() > b.pProxy1.getUid()) ||

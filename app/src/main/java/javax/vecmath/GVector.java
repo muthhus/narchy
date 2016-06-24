@@ -51,11 +51,10 @@ public class GVector implements java.io.Serializable, Cloneable {
      */
     public GVector(int length)
 	{
-	    int i;
-            
-            this.length = length;	    
+
+        this.length = length;
 	    values = new double[length];
-	    for(i = 0; i < length; i++) values[i] = 0.0;
+	    for(int i = 0; i < length; i++) values[i] = 0.0;
 	}
     
     /**
@@ -67,11 +66,10 @@ public class GVector implements java.io.Serializable, Cloneable {
      */
     public GVector(double[] vector)
 	{
-	    int i;
-	    
-            length = vector.length;	    
+
+        length = vector.length;
 	    values = new double[vector.length];
-	    for(i = 0; i < length; i++) values[i] = vector[i];
+	    for(int i = 0; i < length; i++) values[i] = vector[i];
 	}
 							  
     /**
@@ -81,11 +79,10 @@ public class GVector implements java.io.Serializable, Cloneable {
      */
     public GVector(GVector vector)
 	{
-	    int i;
-	
-	    values = new double[vector.length];
+
+        values = new double[vector.length];
 	    length = vector.length;
-	    for(i = 0; i < length; i++) values[i] = vector.values[i];
+	    for(int i = 0; i < length; i++) values[i] = vector.values[i];
 	}
 
     /**
@@ -170,11 +167,10 @@ public class GVector implements java.io.Serializable, Cloneable {
      * @param  length   The number of values copied from the array.
      */
     public GVector(double vector[], int length) {
-	int i;
 
         this.length = length;
 	values = new double [length];
-	for(i=0;i<length;i++) {
+	for(int i = 0; i<length; i++) {
 	    values[i] = vector[i];
         }
     }
@@ -188,9 +184,8 @@ public class GVector implements java.io.Serializable, Cloneable {
     public final double norm()
     {
       double sq = 0.0;
-      int i;
 
-	for(i=0;i<length;i++) {
+        for(int i = 0; i<length; i++) {
 	    sq += values[i]*values[i];
         }	     
 
@@ -206,9 +201,8 @@ public class GVector implements java.io.Serializable, Cloneable {
     public final double normSquared() 
     { 
         double sq = 0.0;
-        int i;
 
-	for(i=0;i<length;i++) {
+        for(int i = 0; i<length; i++) {
 	    sq += values[i]*values[i];
         }	     
 
@@ -221,20 +215,19 @@ public class GVector implements java.io.Serializable, Cloneable {
      */  
     public final void normalize(GVector v1)
     {
-      double sq = 0.0;
-      int i;
 
-      if( length != v1.length)
+        if( length != v1.length)
           throw new MismatchedSizeException(VecMathI18N.getString("GVector0"));
 
-       for(i=0;i<length;i++) {
+        int i;
+        double sq = 0.0;
+        for(i=0; i<length; i++) {
 	    sq += v1.values[i]*v1.values[i];
-       }	     
+       }
 
-       double invMag;
-       invMag = 1.0/ Math.sqrt(sq);
+        double invMag = 1.0 / Math.sqrt(sq);
 
-       for(i=0;i<length;i++) {
+        for(i=0;i<length;i++) {
           values[i] = v1.values[i]*invMag;
        }
     }
@@ -250,10 +243,9 @@ public class GVector implements java.io.Serializable, Cloneable {
 
         for(i=0;i<length;i++) {
             sq += values[i]*values[i];
-        }        
+        }
 
-        double invMag;
-	invMag = 1.0/ Math.sqrt(sq);
+        double invMag = 1.0 / Math.sqrt(sq);
 
         for(i=0;i<length;i++) {
             values[i] = values[i]*invMag;
@@ -269,11 +261,10 @@ public class GVector implements java.io.Serializable, Cloneable {
      */  
     public final void scale(double s, GVector v1)
     {
-        int i;
-	if( length != v1.length)
+        if( length != v1.length)
           throw new MismatchedSizeException(VecMathI18N.getString("GVector1"));
 
-        for(i=0;i<length;i++) {
+        for(int i = 0; i<length; i++) {
             values[i] = v1.values[i]*s;
         }
     }
@@ -283,10 +274,9 @@ public class GVector implements java.io.Serializable, Cloneable {
      * @param s the scalar value 
      */   
     public final void scale(double s) 
-    { 
-      int i;
+    {
 
-        for(i=0;i<length;i++) {
+        for(int i = 0; i<length; i++) {
             values[i] = values[i]*s;
         }
     } 
@@ -301,15 +291,13 @@ public class GVector implements java.io.Serializable, Cloneable {
     public final void scaleAdd(double s, GVector v1, GVector v2)
     {
 
-      int i;
-
-      if( v2.length != v1.length ) 
+        if( v2.length != v1.length )
 	 throw new MismatchedSizeException(VecMathI18N.getString("GVector2"));
 
        if( length  != v1.length )
 	  throw new MismatchedSizeException(VecMathI18N.getString("GVector3"));
 
-        for(i=0;i<length;i++) {
+        for(int i = 0; i<length; i++) {
             values[i] = v1.values[i]*s + v2.values[i];
         }
     }
@@ -321,12 +309,11 @@ public class GVector implements java.io.Serializable, Cloneable {
       */  
     public final void add(GVector vector)
 	{
-	    int i;
-	    
-          if( length  != vector.length )
+
+        if( length  != vector.length )
 	     throw new MismatchedSizeException(VecMathI18N.getString("GVector4"));
 
-	   for(i = 0; i < length; i++) {
+	   for(int i = 0; i < length; i++) {
 		this.values[i] += vector.values[i];
 	   }
 	}
@@ -339,15 +326,14 @@ public class GVector implements java.io.Serializable, Cloneable {
       */  
     public final void add(GVector vector1, GVector vector2)
 	{
-         int i;
 
-         if( vector1.length != vector2.length ) 
+        if( vector1.length != vector2.length )
    	   throw new MismatchedSizeException(VecMathI18N.getString("GVector5"));
 
        if( length  != vector1.length )
 	  throw new MismatchedSizeException(VecMathI18N.getString("GVector6"));
 	    
-	    for(i = 0; i < length; i++)
+	    for(int i = 0; i < length; i++)
 		this.values[i] = vector1.values[i] + vector2.values[i];
 	}
 
@@ -357,13 +343,12 @@ public class GVector implements java.io.Serializable, Cloneable {
       * @param vector the other vector
       */  
     public final void sub(GVector vector) 
-	{ 
-	    int i;
-	    
-           if( length  != vector.length )
+	{
+
+        if( length  != vector.length )
     	        throw new MismatchedSizeException(VecMathI18N.getString("GVector7"));
 
-	    for(i = 0; i < length; i++) {
+	    for(int i = 0; i < length; i++) {
 		this.values[i] -= vector.values[i];
 	    }
 	} 
@@ -376,7 +361,7 @@ public class GVector implements java.io.Serializable, Cloneable {
       */  
     public final void sub(GVector vector1, GVector vector2) 
 	{
-	    int i,l;
+	    int l;
 	    
 
 	if( vector1.length != vector2.length ) 
@@ -385,7 +370,7 @@ public class GVector implements java.io.Serializable, Cloneable {
        if( length  != vector1.length )
 	  throw new MismatchedSizeException(VecMathI18N.getString("GVector9"));
 
-	    for(i = 0; i < length; i++)
+	    for(int i = 0; i < length; i++)
 		this.values[i] = vector1.values[i] - vector2.values[i];
 	}
 
@@ -403,11 +388,7 @@ public class GVector implements java.io.Serializable, Cloneable {
 	  throw new MismatchedSizeException(VecMathI18N.getString("GVector11"));
 
        double v[];
-       if (v1 != this) {
-	   v = v1.values;
-       } else {
-	   v = (double []) values.clone();
-       }
+        v = v1 != this ? v1.values : values.clone();
 
        for(int j=length-1; j>=0; j--){
 	  values[j] = 0.0;
@@ -435,11 +416,7 @@ public class GVector implements java.io.Serializable, Cloneable {
 	  throw new MismatchedSizeException(VecMathI18N.getString("GVector13"));
 
        double v[];
-       if (v1 != this) {
-	   v = v1.values;
-       } else {
-	   v = (double []) values.clone();
-       }
+        v = v1 != this ? v1.values : values.clone();
 
        for (int j=length-1; j>=0; j--){
 	  values[j] = 0.0;
@@ -474,15 +451,12 @@ public class GVector implements java.io.Serializable, Cloneable {
       * @param length  number of desired elements in this vector
       */
     public final void setSize(int length) {
-	   double[] tmp = new double[length];
-	   int i,max;
+        int max;
 
-           if( this.length < length)
-	      max = this.length;
-           else
-	       max = length;
+        max = this.length < length ? this.length : length;
 
-	   for(i=0;i<max;i++) {
+        double[] tmp = new double[length];
+        for(int i = 0; i<max; i++) {
 	      tmp[i] = values[i];
            }
 	   this.length = length;
@@ -498,8 +472,7 @@ public class GVector implements java.io.Serializable, Cloneable {
       * @param vector  the source array
       */  
     public final void set(double[] vector) {
-	for(int i = length-1; i >=0; i--) 
-	    values[i] = vector[i];
+        System.arraycopy(vector, 0, values, 0, length - 1 + 1);
     }
 
     /**
@@ -639,12 +612,10 @@ public class GVector implements java.io.Serializable, Cloneable {
       * @return the String representation
       */  
     public String toString() {
-      StringBuffer buffer = new StringBuffer(length*8);
+      StringBuilder buffer = new StringBuilder(length*8);
 
-      int i;
-
-      for(i=0;i<length;i++) {
-           buffer.append(values[i]).append(" ");
+        for(int i = 0; i<length; i++) {
+           buffer.append(values[i]).append(' ');
       }
 
       return buffer.toString();
@@ -727,12 +698,11 @@ public class GVector implements java.io.Serializable, Cloneable {
      */
     public boolean epsilonEquals(GVector v1, double epsilon)
     {
-       double diff;
 
-	    if( length != v1.length)   return false;
+        if( length != v1.length)   return false;
 
             for(int i = 0;i<length;i++) {
-	        diff = values[i] - v1.values[i];
+                double diff = values[i] - v1.values[i];
                 if( (diff<0?-diff:diff) > epsilon) return false;
             }
 	    return true;
@@ -805,10 +775,8 @@ public class GVector implements java.io.Serializable, Cloneable {
    {
        int size = LU.nRow*LU.nCol;
 
-       double[] temp = new double[size];
-       double[] result = new double[size];
-       int[] row_perm = new int[b.getSize()]; 
-       int i,j;
+       int[] row_perm = new int[b.getSize()];
+       int j;
 
        if( LU.nRow != b.getSize() ) {
             throw new MismatchedSizeException(VecMathI18N.getString("GVector16"));
@@ -822,13 +790,16 @@ public class GVector implements java.io.Serializable, Cloneable {
             throw new MismatchedSizeException(VecMathI18N.getString("GVector25"));
        }
 
-        for(i=0;i<LU.nRow;i++) {
+       int i;
+       double[] temp = new double[size];
+       for(i=0; i<LU.nRow; i++) {
            for(j=0;j<LU.nCol;j++) {
                temp[i*LU.nCol+j] = LU.values[i][j];
            }
         }
 
-       for(i=0;i<size;i++) result[i] = 0.0; 
+       double[] result = new double[size];
+       for(i=0; i<size; i++) result[i] = 0.0;
        for(i=0;i<LU.nRow;i++) result[i*LU.nCol] = b.values[i]; 
        for(i=0;i<LU.nCol;i++) row_perm[i] = (int)permutation.values[i]; 
 
@@ -910,6 +881,7 @@ public class GVector implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	GVector v1 = null;
 	try {
@@ -921,9 +893,7 @@ public class GVector implements java.io.Serializable, Cloneable {
 
 	// Also need to clone array of values
 	v1.values = new double[length];
-	for (int i = 0; i < length; i++) {
-	    v1.values[i] = values[i];
-	}
+        System.arraycopy(values, 0, v1.values, 0, length);
 
 	return v1;
     }

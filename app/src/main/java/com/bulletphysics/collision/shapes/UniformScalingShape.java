@@ -24,7 +24,6 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 
 import javax.vecmath.Vector3f;
@@ -38,8 +37,8 @@ import javax.vecmath.Vector3f;
  */
 public class UniformScalingShape extends com.bulletphysics.collision.shapes.ConvexShape {
 
-	private com.bulletphysics.collision.shapes.ConvexShape childConvexShape;
-	private float uniformScalingFactor;
+	private final com.bulletphysics.collision.shapes.ConvexShape childConvexShape;
+	private final float uniformScalingFactor;
 
 	public UniformScalingShape(com.bulletphysics.collision.shapes.ConvexShape convexChildShape, float uniformScalingFactor) {
 		this.childConvexShape = convexChildShape;

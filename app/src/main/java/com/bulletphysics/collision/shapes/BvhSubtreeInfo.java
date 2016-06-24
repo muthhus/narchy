@@ -23,8 +23,6 @@
 
 package com.bulletphysics.collision.shapes;
 
-import com.bulletphysics.collision.shapes.QuantizedBvhNodes;
-
 import java.io.Serializable;
 
 /**

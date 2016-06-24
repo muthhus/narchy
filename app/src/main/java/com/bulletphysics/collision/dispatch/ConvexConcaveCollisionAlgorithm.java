@@ -192,7 +192,8 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			ident.setIdentity();
 		}
 
-		public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 			// do a swept sphere for now
 
 			//btTransform ident;

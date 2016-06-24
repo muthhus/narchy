@@ -65,13 +65,13 @@ public class ScaledBvhTriangleMeshShape extends ConcaveShape {
 		Vector3f scaledAabbMax = new Vector3f();
 
 		// support negative scaling
-		scaledAabbMin.x = localScaling.x >= 0f ? aabbMin.x * invLocalScaling.x : aabbMax.x * invLocalScaling.x;
-		scaledAabbMin.y = localScaling.y >= 0f ? aabbMin.y * invLocalScaling.y : aabbMax.y * invLocalScaling.y;
-		scaledAabbMin.z = localScaling.z >= 0f ? aabbMin.z * invLocalScaling.z : aabbMax.z * invLocalScaling.z;
+		scaledAabbMin.x = (localScaling.x >= 0f ? aabbMin.x : aabbMax.x) * invLocalScaling.x;
+		scaledAabbMin.y = (localScaling.y >= 0f ? aabbMin.y : aabbMax.y) * invLocalScaling.y;
+		scaledAabbMin.z = (localScaling.z >= 0f ? aabbMin.z : aabbMax.z) * invLocalScaling.z;
 
-		scaledAabbMax.x = localScaling.x <= 0f ? aabbMin.x * invLocalScaling.x : aabbMax.x * invLocalScaling.x;
-		scaledAabbMax.y = localScaling.y <= 0f ? aabbMin.y * invLocalScaling.y : aabbMax.y * invLocalScaling.y;
-		scaledAabbMax.z = localScaling.z <= 0f ? aabbMin.z * invLocalScaling.z : aabbMax.z * invLocalScaling.z;
+		scaledAabbMax.x = (localScaling.x <= 0f ? aabbMin.x : aabbMax.x) * invLocalScaling.x;
+		scaledAabbMax.y = (localScaling.y <= 0f ? aabbMin.y : aabbMax.y) * invLocalScaling.y;
+		scaledAabbMax.z = (localScaling.z <= 0f ? aabbMin.z : aabbMax.z) * invLocalScaling.z;
 
 		bvhTriMeshShape.processAllTriangles(scaledCallback, scaledAabbMin, scaledAabbMax);
 	}
@@ -153,9 +153,9 @@ public class ScaledBvhTriangleMeshShape extends ConcaveShape {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static class ScaledTriangleCallback extends TriangleCallback {
-		private TriangleCallback originalCallback;
-		private Vector3f localScaling;
-		private Vector3f[] newTriangle = new Vector3f[3];
+		private final TriangleCallback originalCallback;
+		private final Vector3f localScaling;
+		private final Vector3f[] newTriangle = new Vector3f[3];
 
 		public ScaledTriangleCallback(TriangleCallback originalCallback, Vector3f localScaling) {
 			this.originalCallback = originalCallback;
@@ -166,7 +166,8 @@ public class ScaledBvhTriangleMeshShape extends ConcaveShape {
 			}
 		}
 
-		public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+		@Override
+        public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
 			VectorUtil.mul(newTriangle[0], triangle[0], localScaling);
 			VectorUtil.mul(newTriangle[1], triangle[1], localScaling);
 			VectorUtil.mul(newTriangle[2], triangle[2], localScaling);

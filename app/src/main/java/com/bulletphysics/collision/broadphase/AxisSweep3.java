@@ -64,13 +64,14 @@ public class AxisSweep3 extends AxisSweep3Internal {
 		return new HandleImpl();
 	}
 	
-	protected int getMask() {
+	@Override
+    protected int getMask() {
 		return 0xFFFF;
 	}
 	
 	protected static class EdgeArrayImpl extends EdgeArray {
-		private short[] pos;
-		private short[] handle;
+		private final short[] pos;
+		private final short[] handle;
 
 		public EdgeArrayImpl(int size) {
 			pos = new short[size];

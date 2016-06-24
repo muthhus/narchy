@@ -23,8 +23,6 @@
 
 package com.bulletphysics.dynamics.vehicle;
 
-import com.bulletphysics.dynamics.vehicle.VehicleRaycasterResult;
-
 import javax.vecmath.Vector3f;
 
 /**

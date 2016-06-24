@@ -26,7 +26,6 @@
 package com.bulletphysics.collision.broadphase;
 
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.broadphase.DbvtAabbMm;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.IntArrayList;
@@ -44,11 +43,11 @@ public class Dbvt {
 	public static final int SIMPLE_STACKSIZE = 64;
 	public static final int DOUBLE_STACKSIZE = SIMPLE_STACKSIZE * 2;
 	
-	public Node root = null;
-	public Node free = null;
+	public Node root;
+	public Node free;
 	public int lkhd = -1;
-	public int leaves = 0;
-	public /*unsigned*/ int opath = 0;
+	public int leaves;
+	public /*unsigned*/ int opath;
 
 	public Dbvt() {
 	}
@@ -766,7 +765,7 @@ public class Dbvt {
 		}
 	}
 
-	private static Vector3f[] axis = new Vector3f[] { new Vector3f(1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, 0, 1) };
+	private static final Vector3f[] axis = new Vector3f[] { new Vector3f(1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, 0, 1) };
 
 	private static Node topdown(com.bulletphysics.collision.broadphase.Dbvt pdbvt, ObjectArrayList<Node> leaves, int bu_treshold) {
 		if (leaves.size() > 1) {

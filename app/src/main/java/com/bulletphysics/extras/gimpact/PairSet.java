@@ -34,7 +34,7 @@ package com.bulletphysics.extras.gimpact;
 class PairSet {
 
 	private Pair[] array;
-	private int size = 0;
+	private int size;
 	
 	public PairSet() {
 		array = new Pair[32];

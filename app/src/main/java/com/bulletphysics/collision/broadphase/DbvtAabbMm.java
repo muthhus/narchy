@@ -237,11 +237,8 @@ public class DbvtAabbMm {
 		if (s0[0] > (s1[1])) {
 			return false;
 		}
-		if (s0[1] < (s1[0])) {
-			return false;
-		}
-		return true;
-	}
+        return s0[1] >= (s1[0]);
+    }
 
 	public static boolean Intersect(com.bulletphysics.collision.broadphase.DbvtAabbMm a, Vector3f b) {
 		return ((b.x >= a.mi.x) &&

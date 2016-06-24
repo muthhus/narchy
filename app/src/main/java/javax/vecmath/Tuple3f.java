@@ -123,7 +123,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @return the String representation
      */  
     public String toString() {
-	return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+	return "(" + this.x + ", " + this.y + ", " + this.z + ')';
     }
 
 
@@ -377,10 +377,9 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      */
     public boolean epsilonEquals(Tuple3f t1, float epsilon)
     {
-       float diff;
 
-       diff = x - t1.x;
-       if(Float.isNaN(diff)) return false;
+        float diff = x - t1.x;
+        if(Float.isNaN(diff)) return false;
        if((diff<0?-diff:diff) > epsilon) return false;
 
        diff = y - t1.y;
@@ -389,9 +388,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 
        diff = z - t1.z;
        if(Float.isNaN(diff)) return false;
-       if((diff<0?-diff:diff) > epsilon) return false;
-
-       return true;
+        return (diff < 0 ? -diff : diff) <= epsilon;
 
     }
 
@@ -457,24 +454,12 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     *  @param t   the source tuple, which will not be modified
     */    
    public final void clampMin(float min, Tuple3f t)  
-   {  
-        if( t.x < min ) {
-          x = min;
-        } else {
-          x = t.x;
-        }
- 
-        if( t.y < min ) {
-          y = min;
-        } else {
-          y = t.y;
-        }
- 
-        if( t.z < min ) {
-          z = min;
-        } else {
-          z = t.z;
-        }
+   {
+       x = t.x < min ? min : t.x;
+
+       y = t.y < min ? min : t.y;
+
+       z = t.z < min ? min : t.z;
 
    }  
  
@@ -486,24 +471,12 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     *  @param t   the source tuple, which will not be modified
     */     
    public final void clampMax(float max, Tuple3f t)   
-   { 
-        if( t.x > max ) {
-          x = max;
-        } else {
-          x = t.x;
-        }
- 
-        if( t.y > max ) {
-          y = max;
-        } else {
-          y = t.y;
-        }
- 
-        if( t.z > max ) {
-          z = max;
-        } else {
-          z = t.z;
-        }
+   {
+       x = t.x > max ? max : t.x;
+
+       y = t.y > max ? max : t.y;
+
+       z = t.z > max ? max : t.z;
 
    } 
  
@@ -628,6 +601,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @see java.lang.Cloneable
      * @since vecmath 1.3
      */
+    @Override
     public Object clone() {
 	// Since there are no arrays we can just use Object.clone()
 	try {

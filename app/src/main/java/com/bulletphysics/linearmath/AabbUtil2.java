@@ -24,10 +24,6 @@
 package com.bulletphysics.linearmath;
 
 
-import com.bulletphysics.linearmath.MatrixUtil;
-import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.linearmath.VectorUtil;
-
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
@@ -113,9 +109,9 @@ public class AabbUtil2 {
 	 */
 	public static boolean testAabbAgainstAabb2(Vector3f aabbMin1, Vector3f aabbMax1, Vector3f aabbMin2, Vector3f aabbMax2) {
 		boolean overlap = true;
-		overlap = (aabbMin1.x > aabbMax2.x || aabbMax1.x < aabbMin2.x) ? false : overlap;
-		overlap = (aabbMin1.z > aabbMax2.z || aabbMax1.z < aabbMin2.z) ? false : overlap;
-		overlap = (aabbMin1.y > aabbMax2.y || aabbMax1.y < aabbMin2.y) ? false : overlap;
+		overlap = !(aabbMin1.x > aabbMax2.x || aabbMax1.x < aabbMin2.x) && overlap;
+		overlap = !(aabbMin1.z > aabbMax2.z || aabbMax1.z < aabbMin2.z) && overlap;
+		overlap = !(aabbMin1.y > aabbMax2.y || aabbMax1.y < aabbMin2.y) && overlap;
 		return overlap;
 	}
 
@@ -134,9 +130,8 @@ public class AabbUtil2 {
 		if (Math.max(Math.max(p1.z, p2.z), p3.z) < aabbMin.z) return false;
 
 		if (Math.min(Math.min(p1.y, p2.y), p3.y) > aabbMax.y) return false;
-		if (Math.max(Math.max(p1.y, p2.y), p3.y) < aabbMin.y) return false;
+		return Math.max(Math.max(p1.y, p2.y), p3.y) >= aabbMin.y;
 
-		return true;
 	}
 
 	public static void transformAabb(Vector3f halfExtents, float margin, Transform t, Vector3f aabbMinOut, Vector3f aabbMaxOut) {

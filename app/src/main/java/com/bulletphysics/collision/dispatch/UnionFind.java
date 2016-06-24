@@ -142,7 +142,8 @@ public class UnionFind {
 	}
 	
 	private static final Comparator<Element> elementComparator = new Comparator<Element>() {
-		public int compare(Element o1, Element o2) {
+		@Override
+        public int compare(Element o1, Element o2) {
 			return o1.id < o2.id? -1 : +1;
 		}
 	};
