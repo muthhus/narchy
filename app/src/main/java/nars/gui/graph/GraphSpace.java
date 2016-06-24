@@ -3,6 +3,9 @@ package nars.gui.graph;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.ui.JoglPhysics;
+import com.bulletphysics.util.Motion;
+import com.bulletphysics.util.RigidBodyX;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -12,21 +15,15 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
-import nars.bullet.RigidBodyX;
 import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
-import nars.bullet.JoglPhysics;
-import nars.bullet.Motion;
-import nars.gui.graph.layout.Spiral;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
-import nars.util.Util;
 import nars.util.data.list.FasterList;
 import nars.util.experiment.DeductiveMeshTest;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.geometry.partitioning.Transform;
 import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +61,7 @@ public class GraphSpace extends JoglPhysics {
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, VDraw> vdraw;
 
-    int maxEdgesPerVertex = 4;
+    int maxEdgesPerVertex = 9;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()
@@ -334,7 +331,7 @@ public class GraphSpace extends JoglPhysics {
                 if (body!=null) {
                     body.transform().origin.set(x,y,z);
 
-//                    com.bulletphysics.linearmath.Transform t = new com.bulletphysics.linearmath.Transform();
+//                    com.Transform t = new com.Transform();
 //                    body.getCenterOfMassTransform(t);
 //                    t.origin.set(x, y, z);
 //                    body.setCenterOfMassTransform(t);

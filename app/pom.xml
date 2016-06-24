@@ -105,12 +105,12 @@
     </dependency>
 
 
-    <!-- https://mvnrepository.com/artifact/cz.advel.jbullet/jbullet -->
-    <dependency>
-      <groupId>cz.advel.jbullet</groupId>
-      <artifactId>jbullet</artifactId>
-      <version>20101010-1</version>
-    </dependency>
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/cz.advel.jbullet/jbullet &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>cz.advel.jbullet</groupId>-->
+      <!--<artifactId>jbullet</artifactId>-->
+      <!--<version>20101010-1</version>-->
+    <!--</dependency>-->
 
     <!--&lt;!&ndash; http://mvnrepository.com/artifact/net.sourceforge.tess4j/tess4j &ndash;&gt;-->
     <!--<dependency>-->

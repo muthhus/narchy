@@ -48,7 +48,7 @@ package org.jbox2d.common;
 
 // updated to rev 100
 /**
- * Similar to javax.vecmath.Color3f holder
+ * Similar to javax.Color3f holder
  * @author ewjordan
  *
  */
