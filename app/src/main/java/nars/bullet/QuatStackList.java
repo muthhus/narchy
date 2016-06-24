@@ -21,39 +21,39 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package nars.gui.test.bullet;
+package nars.bullet;
 
 import com.bulletphysics.util.StackList;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Quat4f;
 
 /**
- * Stack-based object pool for {@link Vector3f}.
+ * Stack-based object pool for {@link Quat4f}.
  * 
  * @author jezek2
  */
-public class VectorStackList extends StackList<Vector3f> {
+public class QuatStackList extends StackList<Quat4f> {
 
-	public Vector3f get(float x, float y, float z) {
-		Vector3f v = get();
-		v.set(x, y, z);
+	public Quat4f get(float x, float y, float z, float w) {
+		Quat4f v = get();
+		v.set(x, y, z, w);
 		return v;
 	}
 
-	public Vector3f get(Vector3f vec) {
-		Vector3f v = get();
-		v.set(vec);
-		return v;
+	public Quat4f get(Quat4f quat) {
+		Quat4f obj = get();
+		obj.set(quat);
+		return obj;
 	}
 
 	@Override
-	protected Vector3f create() {
-		return new Vector3f();
+	protected Quat4f create() {
+		return new Quat4f();
 	}
 
 	@Override
-	protected void copy(Vector3f dest, Vector3f src) {
+	protected void copy(Quat4f dest, Quat4f src) {
 		dest.set(src);
 	}
-
+	
 }

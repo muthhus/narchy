@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package nars.gui.test.bullet;
+package nars.bullet;
 
 
 import javax.vecmath.Vector3f;
@@ -32,12 +32,19 @@ import com.bulletphysics.linearmath.DebugDrawModes;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.ImmModeSink;
 
 /**
  * @author jezek2
  */
 public class GLShapeDrawer {
+
+    public final GLSRT glsrt;
+
+    public GLShapeDrawer(GLU glu) {
+        glsrt = new GLSRT(glu);
+    }
 
 	/*
     private static Map<CollisionShape,TriMeshKey> g_display_lists = new HashMap<CollisionShape,TriMeshKey>();

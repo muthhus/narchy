@@ -24,7 +24,7 @@
  * Written by: Marten Svanfeldt
  */
 
-package nars.gui.test.bullet;
+package nars.bullet.test;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
@@ -34,6 +34,9 @@ import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.jogamp.newt.event.MouseEvent;
+import nars.bullet.BulletStack;
+import nars.bullet.JoglPhysics;
+import nars.bullet.Motion;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;

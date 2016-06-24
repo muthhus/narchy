@@ -21,33 +21,41 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package nars.gui.test.bullet;
+package nars.bullet;
 
+import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.StackList;
 
 import javax.vecmath.Matrix3f;
 
 /**
- * Stack-based object pool for {@link Matrix3f}.
+ * Stack-based object pool for {@link Transform}.
  * 
  * @author jezek2
  */
-public class MatrixStackList extends StackList<Matrix3f> {
-
-	public Matrix3f get(Matrix3f mat) {
-		Matrix3f obj = get();
-		obj.set(mat);
+public class TransformStackList extends StackList<Transform> {
+	
+	public Transform get(Transform tr) {
+		Transform obj = get();
+		obj.set(tr);
 		return obj;
+	}
+
+	public Transform get(Matrix3f mat) {
+		Transform obj = get();
+		obj.basis.set(mat);
+		obj.origin.set(0f, 0f, 0f);
+		return obj;
+	}
+
+	@Override
+	protected Transform create() {
+		return new Transform();
 	}
 	
 	@Override
-	protected Matrix3f create() {
-		return new Matrix3f();
-	}
-
-	@Override
-	protected void copy(Matrix3f dest, Matrix3f src) {
+	protected void copy(Transform dest, Transform src) {
 		dest.set(src);
 	}
-
+	
 }

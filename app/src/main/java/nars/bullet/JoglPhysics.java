@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package nars.gui.test.bullet;
+package nars.bullet;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.SimpleBroadphase;
@@ -74,7 +74,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
 
 
-    public static RigidBody pickedBody = null; // for deactivation state
+    public RigidBody pickedBody = null; // for deactivation state
 
 
     protected final Clock clock = new Clock();
@@ -84,6 +84,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
+    protected RigidBody directDrag;
 
     protected CollisionShape shootBoxShape = null;
 
@@ -164,7 +165,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
         printHardware();
 
-        glsrt = new GLSRT(glu);
+        glsrt = drawer.glsrt;
         if (useLight0) {
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, light_diffuse, 0);
@@ -730,10 +731,10 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         Vector3f rayTo = v(getRayTo(x, y));
 
         switch (button) {
-            case MouseEvent.BUTTON3: {
-                shootBox(rayTo);
-                break;
-            }
+//            case MouseEvent.BUTTON3: {
+//                shootBox(rayTo);
+//                break;
+//            }
             case MouseEvent.BUTTON2: {
                 // apply an impulse
                 if (dyn != null) {
@@ -760,80 +761,105 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     }
 
     private void pickConstrain(int button, int state, int x, int y) {
-        Vector3f rayTo = v(getRayTo(x, y));
 
         switch (button) {
             case MouseEvent.BUTTON1: {
+                Vector3f rayTo = v(getRayTo(x, y));
                 if (state == 1) {
-                    // add a point to point constraint for picking
-                    if (dyn != null) {
-                        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-                        dyn.rayTest(camPos, rayTo, rayCallback);
-                        if (rayCallback.hasHit()) {
-                            RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
-                            if (body != null) {
-                                // other exclusions?
-                                if (!(body.isStaticObject() || body.isKinematicObject())) {
-                                    pickedBody = body;
-                                    pickedBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
-
-                                    Vector3f pickPos = v(rayCallback.hitPointWorld);
-
-                                    Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
-                                    tmpTrans.inverse();
-                                    Vector3f localPivot = v(pickPos);
-                                    tmpTrans.transform(localPivot);
-
-                                    Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                                    dyn.addConstraint(p2p);
-                                    pickConstraint = p2p;
-                                    // save mouse position for dragging
-                                    ExtraGlobals.gOldPickingPos.set(rayTo);
-                                    Vector3f eyePos = v(camPos);
-                                    Vector3f tmp = v();
-                                    tmp.sub(pickPos, eyePos);
-                                    ExtraGlobals.gOldPickingDist = tmp.length();
-                                    // very weak constraint for picking
-                                    p2p.setting.tau = 0.1f;
-                                }
-                            }
-                        }
-                    }
-
+                    mouseGrabOn(rayTo);
                 } else {
-
-                    if (pickConstraint != null && dyn != null) {
-                        dyn.removeConstraint(pickConstraint);
-                        // delete m_pickConstraint;
-                        pickConstraint = null;
-                        pickedBody.forceActivationState(CollisionObject.ACTIVE_TAG);
-                        pickedBody.setDeactivationTime(0f);
-                        pickedBody = null;
-                    }
+                    mouseGrabOff();
                 }
                 break;
             }
-            default: {
+            case MouseEvent.BUTTON2: {
+
+            }
+            case MouseEvent.BUTTON3: {
+
             }
         }
     }
 
-    private void mouseMotionFunc(int x, int y) {
+    private void mouseGrabOff() {
         if (pickConstraint != null) {
-            // move the constraint pivot
-            Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
-            if (p2p != null) {
-                // keep it at the same picking distance
+            dyn.removeConstraint(pickConstraint);
+            // delete m_pickConstraint;
+            pickConstraint = null;
+            pickedBody.forceActivationState(CollisionObject.ACTIVE_TAG);
+            pickedBody.setDeactivationTime(0f);
+            pickedBody = null;
+        }
+        if (directDrag!=null) {
+            directDrag = null;
+        }
+    }
 
-                Vector3f newRayTo = v(getRayTo(x, y));
-                Vector3f eyePos = v(camPos);
-                Vector3f dir = v();
-                dir.sub(newRayTo, eyePos);
-                dir.normalize();
-                dir.scale(ExtraGlobals.gOldPickingDist);
+    final Vector3f gOldPickingPos = v();
+    float gOldPickingDist = 0.f;
 
-                Vector3f newPos = v();
-                newPos.add(eyePos, dir);
+    private void mouseGrabOn(Vector3f rayTo) {
+        // add a point to point constraint for picking
+        //if (dyn != null) {
+            CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+            dyn.rayTest(camPos, rayTo, rayCallback);
+            if (rayCallback.hasHit()) {
+                RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+                if (body != null) {
+
+                    // other exclusions?
+                    if (!(body.isStaticObject() || body.isKinematicObject())) {
+                        pickedBody = body;
+                        pickedBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+
+                        Vector3f pickPos = v(rayCallback.hitPointWorld);
+
+                        Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
+                        tmpTrans.inverse();
+                        Vector3f localPivot = v(pickPos);
+                        tmpTrans.transform(localPivot);
+
+                        Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
+                        dyn.addConstraint(p2p);
+                        pickConstraint = p2p;
+                        // save mouse position for dragging
+                        gOldPickingPos.set(rayTo);
+                        Vector3f eyePos = v(camPos);
+                        Vector3f tmp = v();
+                        tmp.sub(pickPos, eyePos);
+                        gOldPickingDist = tmp.length();
+                        // very weak constraint for picking
+                        p2p.setting.tau = 0.1f;
+                    } else if (directDrag==null) {
+                        directDrag = pickedBody;
+                    }
+
+                }
+            }
+        //}
+    }
+
+    private void mouseMotionFunc(int x, int y) {
+        if ((pickConstraint != null) || (directDrag!=null)) {
+
+
+            // keep it at the same picking distance
+            Vector3f newRayTo = v(getRayTo(x, y));
+            Vector3f eyePos = v(camPos);
+            Vector3f dir = v();
+            dir.sub(newRayTo, eyePos);
+            dir.normalize();
+            dir.scale(gOldPickingDist);
+
+            Vector3f newPos = v();
+            newPos.add(eyePos, dir);
+
+            if (directDrag!=null) {
+                //directly move the 'static' object
+                //directDrag.move()
+            } else if (pickConstraint!=null) {
+                // move the constraint pivot
+                Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
                 p2p.setPivotB(newPos);
             }
         }
@@ -848,7 +874,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
      *
      * @author jezek2
      */
-    static class ExtraGlobals {
+    public static class ExtraGlobals {
 
         public static final boolean DEBUG = true;
 
@@ -864,8 +890,6 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         public static boolean gDisableDeactivation = false;
 
 
-        public static final Vector3f gOldPickingPos = v();
-        public static float gOldPickingDist = 0.f;
 
 
 //        static {
@@ -879,28 +903,13 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 //            }
 //        }
 
-        private static class ProfileBlock {
-            public String name;
-            public long startTime;
-        }
+//        private static class ProfileBlock {
+//            public String name;
+//            public long startTime;
+//        }
 
     }
 
-    public static class RigidBodyX extends RigidBody {
-
-        public RigidBodyX(float mass, MotionState motionState, CollisionShape collisionShape) {
-            super(mass, motionState, collisionShape);
-        }
-
-        public RigidBodyX(RigidBodyConstructionInfo rigidBodyConstructionInfo) {
-            super(rigidBodyConstructionInfo);
-        }
-
-        public final Transform transform() {
-            return worldTransform;
-        }
-
-    }
     public RigidBodyX newBody(float mass, Transform startTransform, CollisionShape shape) {
         Motion myMotionState = new Motion(startTransform);
         return newBody(mass, shape, myMotionState);
@@ -926,46 +935,30 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         return new Vector3f(a, b, c);
     }
 
-    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
-    public void setOrthographicProjection() {
-        // switch to projection mode
-        gl.glMatrixMode(gl.GL_PROJECTION);
-        // save previous matrix which contains the
-        //settings for the perspective projection
-        // gl.glPushMatrix();
-        // reset matrix
-        gl.glLoadIdentity();
-        // set a 2D orthographic projection
-        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
-        // invert the y axis, down is positive
-        gl.glScalef(1f, -1f, 1f);
-        // mover the origin from the bottom left corner
-        // to the upper left corner
-        gl.glTranslatef(0f, -screenHeight, 0f);
-        gl.glMatrixMode(gl.GL_MODELVIEW);
-    }
+//    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
+//    public void setOrthographicProjection() {
+//        // switch to projection mode
+//        gl.glMatrixMode(gl.GL_PROJECTION);
+//        // save previous matrix which contains the
+//        //settings for the perspective projection
+//        // gl.glPushMatrix();
+//        // reset matrix
+//        gl.glLoadIdentity();
+//        // set a 2D orthographic projection
+//        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
+//        // invert the y axis, down is positive
+//        gl.glScalef(1f, -1f, 1f);
+//        // mover the origin from the bottom left corner
+//        // to the upper left corner
+//        gl.glTranslatef(0f, -screenHeight, 0f);
+//        gl.glMatrixMode(gl.GL_MODELVIEW);
+//    }
 
-    /**
-     * public void resetPerspectiveProjection() {
-     * gl.glMatrixMode(gl.GL_PROJECTION);
-     * gl.glPopMatrix();
-     * gl.glMatrixMode(gl.GL_MODELVIEW);
-     * }
-     * <p>
-     * private void displayProfileString(int xOffset, int yStart, String message) {
-     * //glRasterPos3f(xOffset, yStart, 0);
-     * // TODO: BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),message);
-     * }
-     * <p>
-     * // TODO: protected void showProfileInfo(float& xOffset,float& yStart, float yIncr);
-     */
+
 
     private final Transform m = new Transform();
-    private final Vector3f wireColor = v();
-    private final GLShapeDrawer drawer = new GLShapeDrawer();
 
-    //private Color3f TEXT_COLOR = new Color3f(0f, 0f, 0f);
-    // private StringBuilder buf = new StringBuilder();
+    private final GLShapeDrawer drawer = new GLShapeDrawer(glu);
 
     public void renderWorld() {
         updateCamera();

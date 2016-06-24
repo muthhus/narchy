@@ -2,9 +2,6 @@ package nars.gui.graph;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.linearmath.MotionState;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -13,10 +10,11 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.bullet.RigidBodyX;
 import nars.concept.Concept;
 import nars.gui.graph.layout.FastOrganicLayout;
-import nars.gui.test.bullet.JoglPhysics;
-import nars.gui.test.bullet.Motion;
+import nars.bullet.JoglPhysics;
+import nars.bullet.Motion;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -533,7 +531,7 @@ public class GraphSpace extends JoglPhysics {
 
         gl.glTranslatef(v.x(), v.y(), v.z());
 
-        renderVertexBase(gl, dt, v);
+        //renderVertexBase(gl, dt, v);
 
         renderEdges(gl, v);
 

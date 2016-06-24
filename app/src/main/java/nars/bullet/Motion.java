@@ -1,4 +1,4 @@
-package nars.gui.test.bullet;
+package nars.bullet;
 
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;

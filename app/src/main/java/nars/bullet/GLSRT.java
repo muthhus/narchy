@@ -21,11 +21,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package nars.gui.test.bullet;
+package nars.bullet;
 
-import java.net.URL;
-import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
