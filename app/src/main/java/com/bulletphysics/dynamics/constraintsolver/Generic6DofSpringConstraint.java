@@ -32,8 +32,7 @@ public class Generic6DofSpringConstraint extends Generic6DofConstraint {
     private final float[] springDamping = new float[6]; // between 0 and 1 (1 == no damping)
 
     public Generic6DofSpringConstraint(RigidBody rbA, RigidBody rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
-        super(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA);
-        this.constraintType = TypedConstraintType.D6_SPRING_CONSTRAINT_TYPE;
+        super(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA, TypedConstraintType.D6_SPRING_CONSTRAINT_TYPE);
 
         for (int i = 0; i < 6; i++) {
             springEnabled[i] = false;

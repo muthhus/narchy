@@ -120,7 +120,11 @@ public class Generic6DofConstraint extends com.bulletphysics.dynamics.constraint
         }
 
 	public Generic6DofConstraint(RigidBody rbA, RigidBody rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA) {
-		super(TypedConstraintType.D6_CONSTRAINT_TYPE, rbA, rbB);
+		this(rbA, rbB, frameInA, frameInB, useLinearReferenceFrameA, TypedConstraintType.D6_CONSTRAINT_TYPE);
+	}
+
+	protected Generic6DofConstraint(RigidBody rbA, RigidBody rbB, Transform frameInA, Transform frameInB, boolean useLinearReferenceFrameA, TypedConstraintType type) {
+		super(type, rbA, rbB);
 		this.frameInA.set(frameInA);
 		this.frameInB.set(frameInB);
 		this.useLinearReferenceFrameA = useLinearReferenceFrameA;

@@ -103,6 +103,7 @@ public class RigidBody extends CollisionObject {
 	public int debugBodyId;
 	
 	public RigidBody(com.bulletphysics.dynamics.RigidBodyConstructionInfo constructionInfo) {
+		super(CollisionObjectType.RIGID_BODY);
 		setupRigidBody(constructionInfo);
 	}
 
@@ -111,13 +112,13 @@ public class RigidBody extends CollisionObject {
 	}
 
 	public RigidBody(float mass, MotionState motionState, CollisionShape collisionShape, Vector3f localInertia) {
+		super(CollisionObjectType.RIGID_BODY);
 		com.bulletphysics.dynamics.RigidBodyConstructionInfo cinfo = new com.bulletphysics.dynamics.RigidBodyConstructionInfo(mass, motionState, collisionShape, localInertia);
 		setupRigidBody(cinfo);
 	}
 
 	private void setupRigidBody(RigidBodyConstructionInfo constructionInfo) {
-		internalType = CollisionObjectType.RIGID_BODY;
-		
+
 		linearVelocity.set(0f, 0f, 0f);
 		angularVelocity.set(0f, 0f, 0f);
 		angularFactor = 1f;
@@ -176,10 +177,7 @@ public class RigidBody extends CollisionObject {
 	 * but a rigidbody is derived from CollisionObject, so we can safely perform an upcast.
 	 */
 	public static com.bulletphysics.dynamics.RigidBody upcast(CollisionObject colObj) {
-		if (colObj.getInternalType() == CollisionObjectType.RIGID_BODY) {
-			return (com.bulletphysics.dynamics.RigidBody)colObj;
-		}
-		return null;
+		return colObj.getInternalType() == CollisionObjectType.RIGID_BODY ? (RigidBody) colObj : null;
 	}
 
 	/**

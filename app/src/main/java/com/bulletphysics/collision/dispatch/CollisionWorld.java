@@ -245,9 +245,26 @@ public class CollisionWorld {
 
 	// TODO
 	public static void rayTestSingle(Transform rayFromTrans, Transform rayToTrans,
+									 CollisionObject collisionObject,
+									 CollisionShape collisionShape,
+									 Transform colObjWorldTransform,
+									 RayResultCallback resultCallback) {
+		rayTestSingle(
+				rayFromTrans,
+				rayToTrans,
+				collisionObject,
+				collisionShape,
+				colObjWorldTransform,
+				new VoronoiSimplexSolver(),
+				resultCallback);
+
+	}
+
+	public static void rayTestSingle(Transform rayFromTrans, Transform rayToTrans,
                                      CollisionObject collisionObject,
                                      CollisionShape collisionShape,
                                      Transform colObjWorldTransform,
+									 VoronoiSimplexSolver simplexSolver,
                                      RayResultCallback resultCallback) {
 		SphereShape pointShape = new SphereShape(0f);
 		pointShape.setMargin(0f);
@@ -258,7 +275,7 @@ public class CollisionWorld {
 			castResult.fraction = resultCallback.closestHitFraction;
 
 			ConvexShape convexShape = (ConvexShape) collisionShape;
-			VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
+			simplexSolver.reset();
 
 			//#define USE_SUBSIMPLEX_CONVEX_CAST 1
 			//#ifdef USE_SUBSIMPLEX_CONVEX_CAST

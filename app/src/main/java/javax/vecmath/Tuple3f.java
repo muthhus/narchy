@@ -140,6 +140,10 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 	this.z = z;
     }
 
+    public final void zero() { this.x = 0; this.y = 0; this.z = 0; }
+
+
+
 
     /**
      * Sets the value of this tuple to the xyz coordinates specified in

@@ -61,6 +61,8 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import java.util.List;
+
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 
 /**
@@ -1067,14 +1069,14 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
             int numObjects = dyn.getNumCollisionObjects();
             int debug = this.debug;
-            ObjectArrayList<CollisionObject> objects = dyn.getCollisionObjectArray();
+            List<CollisionObject> objects = dyn.getCollisionObjectArray();
             for (int i = 0; i < numObjects; i++) {
 
                 //return array[index];
                 CollisionObject colObj = objects.get(i);
                 RigidBody body = RigidBody.upcast(colObj);
 
-                if (/*body != null && */body.getMotionState() != null) {
+                if (body != null && body.getMotionState() != null) {
                     Motion myMotionState = (Motion) body.getMotionState();
                     m.set(myMotionState.t);
                 } else {

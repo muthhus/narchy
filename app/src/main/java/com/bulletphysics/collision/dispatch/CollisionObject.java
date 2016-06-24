@@ -76,7 +76,7 @@ public class CollisionObject {
 
 	// internalType is reserved to distinguish Bullet's CollisionObject, RigidBody, SoftBody etc.
 	// do not assign your own internalType unless you write a new dynamics object class.
-	protected CollisionObjectType internalType = CollisionObjectType.COLLISION_OBJECT;
+	protected final CollisionObjectType internalType;
 
 	///time of impact calculation
 	protected float hitFraction;
@@ -89,6 +89,10 @@ public class CollisionObject {
 	protected boolean checkCollideWith;
 
 	public CollisionObject() {
+		 this(CollisionObjectType.COLLISION_OBJECT);
+	}
+	public CollisionObject(CollisionObjectType type) {
+		this.internalType = type;
 		this.collisionFlags = CollisionFlags.STATIC_OBJECT;
 		this.islandTag1 = -1;
 		this.companionId = -1;
@@ -143,7 +147,7 @@ public class CollisionObject {
 		this.collisionShape = collisionShape;
 	}
 
-	public int getActivationState() {
+	public final int getActivationState() {
 		return activationState1;
 	}
 
@@ -176,8 +180,9 @@ public class CollisionObject {
 		}
 	}
 
-	public boolean isActive() {
-        return ((activationState1 != ISLAND_SLEEPING) && (getActivationState() != DISABLE_SIMULATION));
+	public final boolean isActive() {
+		int s = this.activationState1;
+		return ((s != ISLAND_SLEEPING) && (s != DISABLE_SIMULATION));
 	}
 
 	public float getRestitution() {

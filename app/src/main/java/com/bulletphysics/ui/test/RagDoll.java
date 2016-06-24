@@ -34,6 +34,7 @@ import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.Generic6DofConstraint;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
+import com.bulletphysics.dynamics.constraintsolver.TypedConstraintType;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.ui.JoglPhysics;
@@ -66,7 +67,9 @@ public class RagDoll extends JoglPhysics {
 		setCameraDistance(10f);
 
 		spawnGround();
-		spawnRagdoll();
+
+		for (int i = 0; i < 10; i++)
+			spawnRagdoll();
 	}
 
 	public void spawnGround() {
@@ -305,7 +308,7 @@ public class RagDoll extends JoglPhysics {
 				localB.setIdentity();
 
 				localA.origin.set(0.2f * scale_ragdoll, 0.15f * scale_ragdoll, 0f);
-				MatrixUtil.setEulerZYX(localB.basis, (float) 0, 0, ExtraGlobals.SIMD_HALF_PI);
+				MatrixUtil.setEulerZYX(localB.basis, 0f, 0f, ExtraGlobals.SIMD_HALF_PI);
 				localB.origin.set(0f, -0.18f * scale_ragdoll, 0f);
 				joint6DOF = new Generic6DofConstraint(bodies[BodyPart.BODYPART_SPINE.ordinal()], bodies[BodyPart.BODYPART_RIGHT_UPPER_ARM.ordinal()], localA, localB, useLinearReferenceFrameA);
 

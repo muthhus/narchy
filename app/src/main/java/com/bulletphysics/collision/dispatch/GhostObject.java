@@ -25,6 +25,7 @@ package com.bulletphysics.collision.dispatch;
 
 import com.bulletphysics.collision.broadphase.BroadphaseProxy;
 import com.bulletphysics.collision.broadphase.Dispatcher;
+import com.bulletphysics.collision.narrowphase.VoronoiSimplexSolver;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.Transform;
@@ -46,7 +47,7 @@ public class GhostObject extends CollisionObject {
 	protected ObjectArrayList<CollisionObject> overlappingObjects = new ObjectArrayList<CollisionObject>();
 
 	public GhostObject() {
-		this.internalType = CollisionObjectType.GHOST_OBJECT;
+		super(CollisionObjectType.GHOST_OBJECT);
 	}
 
 	/**
@@ -137,6 +138,8 @@ public class GhostObject extends CollisionObject {
 
 		Transform tmpTrans = new Transform();
 
+		VoronoiSimplexSolver solver = new VoronoiSimplexSolver();
+
 		for (int i=0; i<overlappingObjects.size(); i++) {
             //return array[index];
             CollisionObject collisionObject = overlappingObjects.get(i);
@@ -147,6 +150,7 @@ public class GhostObject extends CollisionObject {
 				                             collisionObject,
 				                             collisionObject.getCollisionShape(),
 				                             collisionObject.getWorldTransform(tmpTrans),
+											 solver,
 				                             resultCallback);
 			}
 		}

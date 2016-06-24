@@ -30,7 +30,9 @@ import com.bulletphysics.collision.narrowphase.PersistentManifold;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.util.ObjectArrayList;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * SimulationIslandManager creates and handles simulation islands, using {@link UnionFind}.
@@ -116,7 +118,7 @@ public class SimulationIslandManager {
 		return islandId;
 	}
 
-	public void buildIslands(Dispatcher dispatcher, ObjectArrayList<CollisionObject> collisionObjects) {
+	public void buildIslands(Dispatcher dispatcher, List<CollisionObject> collisionObjects) {
 		BulletStats.pushProfile("islandUnionFindAndQuickSort");
 		try {
 			islandmanifold.clear();
@@ -241,7 +243,7 @@ public class SimulationIslandManager {
 		}
 	}
 
-	public void buildAndProcessIslands(Dispatcher dispatcher, ObjectArrayList<CollisionObject> collisionObjects, IslandCallback callback) {
+	public void buildAndProcessIslands(Dispatcher dispatcher, List<CollisionObject> collisionObjects, IslandCallback callback) {
 		buildIslands(dispatcher, collisionObjects);
 
 		int endIslandIndex = 1;

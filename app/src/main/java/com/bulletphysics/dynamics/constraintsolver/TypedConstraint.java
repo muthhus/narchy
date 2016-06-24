@@ -49,10 +49,10 @@ public abstract class TypedConstraint {
 	private int userConstraintType = -1;
 	private int userConstraintId = -1;
 
-	protected TypedConstraintType constraintType;
+	protected final TypedConstraintType constraintType;
 	
-	protected RigidBody rbA;
-	protected RigidBody rbB;
+	protected final RigidBody rbA;
+	protected final RigidBody rbB;
 	protected float appliedImpulse;
 
 	public TypedConstraint(TypedConstraintType type) {

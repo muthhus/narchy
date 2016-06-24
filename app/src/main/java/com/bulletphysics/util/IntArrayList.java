@@ -68,6 +68,9 @@ public final class IntArrayList {
 		//if (index >= size) throw new IndexOutOfBoundsException();
 		array[index] = value;
 	}
+	public void setBoth(int indexValue) {
+		array[indexValue] = indexValue;
+	}
 
 	public int size() {
 		return size;
