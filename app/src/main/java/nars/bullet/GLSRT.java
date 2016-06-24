@@ -78,7 +78,7 @@ public class GLSRT {
                                   0, GL.GL_FLOAT,  // color
                                   3, GL.GL_FLOAT,  // normal
                                   0, GL.GL_FLOAT); // texture*/
-					ImmModeSink.createFixed(9,
+					ImmModeSink.createFixed(24,
 					3, GL.GL_FLOAT, // vertex
 					0, GL.GL_FLOAT, // color
 					3, GL.GL_FLOAT, // normal

@@ -514,8 +514,8 @@ public class GraphSpace extends JoglPhysics {
             gl.glNormal3f(0.0f, 0f, 1.0f);
 
             final float h = 0.5f;
-            gl.glVertex3f(0, -h, 0f); //left base
             gl.glVertex3f(0, h,  0f); //right base
+            gl.glVertex3f(0, -h, 0f); //left base
             gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
 
             gl.glEnd();

@@ -49,6 +49,8 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import java.util.Arrays;
+
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
 
 /**
@@ -59,6 +61,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
 
     private boolean simulating = true;
+
 
 
     /**
@@ -88,7 +91,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
     protected int debug = 0;
 
     protected float ele = 20f;
-    protected float azi = 0f;
+    protected float azi = -180f;
 
     protected final Vector3f camPos = v(0f, 0f, 0f);
     protected final Vector3f camPosTarget = v(0f, 0f, 0f); // look at
@@ -112,6 +115,8 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     protected boolean useLight0 = true;
     protected boolean useLight1 = true;
+
+    private int mouseDragPrevX, mouseDragPrevY;
 
     public JoglPhysics() {
         super();
@@ -270,13 +275,16 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
     public void mouseReleased(MouseEvent e) {
         pickConstrain(e.getButton(), 0, e.getX(), e.getY());
+
+        mouseDragPrevX = mouseDragPrevY = -1; //HACK todo do this on a per-button basis
     }
 
     //
     // MouseMotionListener
     //
     public void mouseDragged(MouseEvent e) {
-        mouseMotionFunc(e.getX(), e.getY());
+
+        mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -345,7 +353,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, 4, 2000);
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, 4, 500);
 
 
         glu.gluLookAt(camPos.x, camPos.y, camPos.z,
@@ -845,7 +853,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
         //}
     }
 
-    private void mouseMotionFunc(int x, int y) {
+    private void mouseMotionFunc(int x, int y, short[] buttons) {
         if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
@@ -864,7 +872,7 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
 
                 Object u = directDrag.getUserPointer();
 
-                System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
+                //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 
                 if (u instanceof GraphSpace.VDraw) {
                     ((GraphSpace.VDraw)u).motionLock(true);
@@ -880,6 +888,61 @@ public class JoglPhysics extends JoglSpace implements MouseListener, GLEventList
                 Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
                 p2p.setPivotB(newPos);
             }
+        } else {
+
+            float dx, dy;
+            if (mouseDragPrevX >= 0) {
+                dx = (x) - mouseDragPrevX;
+                dy = (y) - mouseDragPrevY;
+
+
+                ///only if ALT key is pressed (Maya style)
+                //            if (m_modifierKeys & BT_ACTIVE_ALT)
+                //            {
+                //                if (m_mouseButtons & 4) {
+                //                    btVector3 hor = getRayTo(0, 0) - getRayTo(1, 0);
+                //                    btVector3 vert = getRayTo(0, 0) - getRayTo(0, 1);
+                //                    btScalar multiplierX = btScalar(0.001);
+                //                    btScalar multiplierY = btScalar(0.001);
+                //                    if (m_ortho) {
+                //                        multiplierX = 1;
+                //                        multiplierY = 1;
+                //                    }
+                //
+                //
+                //                    m_cameraTargetPosition += hor * dx * multiplierX;
+                //                    m_cameraTargetPosition += vert * dy * multiplierY;
+                //                }
+                //            }
+                {
+
+                    for (short b : buttons) {
+                        switch (b) {
+                            case 3:
+                                //right mouse
+                                //                        nextAzi += dx * btScalar(0.2);
+                                //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
+                                //                        nextEle += dy * btScalar(0.2);
+                                //                        nextEle = fmodf(nextEle, btScalar(180.f));
+                                azi += dx * 0.2f;
+                                //nextAzi = fmodf(nextAzi, btScalar(360.f));
+                                ele += dy * (0.2f);
+                                //nextEle = fmodf(nextEle, btScalar(180.f));
+                                break;
+                            case 2:
+                                //middle mouse
+                                cameraDistance -= dy * 0.05f;
+                                //                        nextDist -= dy * btScalar(0.01f);
+                                //                        if (nextDist < minDist)
+                                //                            nextDist = minDist;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            mouseDragPrevX = x;
+            mouseDragPrevY = y;
         }
     }
 
