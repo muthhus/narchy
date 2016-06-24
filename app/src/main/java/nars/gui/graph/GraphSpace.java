@@ -288,17 +288,16 @@ public class GraphSpace<X extends VDraw> extends JoglPhysics<X> {
 
     public synchronized void display(GLAutoDrawable drawable) {
 
-        List<CollisionObject<X>> undyn = Global.newArrayList();
-        dyn.getCollisionObjectArray().stream().forEach(c -> {
+        dyn.removeIf( c -> {
             X vd = c.getUserPointer();
             if (!vd.active()) {
-                undyn.add(c);
                 c.setUserPointer(null); //remove reference so vd can be GC
                 vd.body = null;
+                return true;
             }
+            return false;
         });
-        undyn.forEach(dyn::removeCollisionObject);
-        undyn.clear();
+
 
         super.display(drawable);
         //GL2 gl = (GL2) drawable.getGL();

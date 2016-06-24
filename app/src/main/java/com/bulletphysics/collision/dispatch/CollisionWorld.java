@@ -40,6 +40,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.HashMap;
+import java.util.function.Predicate;
 
 /**
  * CollisionWorld is interface and container for the collision detection.
@@ -90,7 +91,7 @@ public class CollisionWorld<X> {
 
 	public void addCollisionObject(CollisionObject collisionObject, short collisionFilterGroup, short collisionFilterMask) {
 		// check that the object isn't already added
-		assert (!collisionObjects.contains(collisionObject));
+		//assert (!collisionObjects.contains(collisionObject));
 
 		collisionObjects.add(collisionObject);
 
@@ -145,10 +146,24 @@ public class CollisionWorld<X> {
 			BulletStats.popProfile();
 		}
 	}
-	
-	public void removeCollisionObject(CollisionObject collisionObject) {
-		//bool removeFromBroadphase = false;
 
+	public void removeIf(Predicate<CollisionObject<X>> removalCondition) {
+		collisionObjects.removeIf((c -> {
+			if (removalCondition.test(c)) {
+				removeFromBroadphase(c);
+				return true;
+			}
+			return false;
+		}));
+	}
+
+	public final void removeCollisionObject(CollisionObject collisionObject) {
+		removeFromBroadphase(collisionObject);
+
+		collisionObjects.remove(collisionObject);
+	}
+
+	final void removeFromBroadphase(CollisionObject collisionObject) {
 		BroadphaseProxy bp = collisionObject.getBroadphaseHandle();
 		if (bp != null) {
             //
@@ -158,9 +173,6 @@ public class CollisionWorld<X> {
 			broadphasePairCache.destroyProxy(bp, dispatcher1);
             collisionObject.setBroadphaseHandle(null);
         }
-
-		//swapremove
-		collisionObjects.remove(collisionObject);
 	}
 
 	public void setBroadphase(BroadphaseInterface pairCache) {
