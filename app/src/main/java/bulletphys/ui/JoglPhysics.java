@@ -62,6 +62,7 @@ import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
+import static javax.vecmath.Vector3f.v;
 
 /**
  * @author jezek2
@@ -151,11 +152,11 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             }
         };
 
-        camPos = new AnimVector3f(0,1,0,dyn, 0.25f);
-        camPosTarget = new AnimVector3f(0,0,0,dyn, 0.25f);
-        camUp = new AnimVector3f(0f, 1f, 0f, dyn, 0.25f);
+        camPos = new Vector3f();
+        camPosTarget = new AnimVector3f(0,0,0,dyn, 10f);
+        camUp = new Vector3f(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
-        dyn.setGravity(Vector3f.v(0, 0, 0));
+        dyn.setGravity(v(0, 0, 0));
 
     }
 
@@ -267,10 +268,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     public void displayChanged() {
     }
 
-
-
     public void mouseClicked(MouseEvent e) {
-        mouseClick(e.getButton(), e.getX(), e.getY());
+        //overriden: called by mouseRelease
     }
 
     public void mouseEntered(MouseEvent e) {
@@ -280,13 +279,19 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     }
 
     public void mousePressed(MouseEvent e) {
+        mouseDragDX = mouseDragDY = 0;
+
         pickConstrain(e.getButton(), 1, e.getX(), e.getY());
+
     }
 
     public void mouseReleased(MouseEvent e) {
+        int dragThresh = 1;
+        if (Math.abs(mouseDragDX) < dragThresh && mouseClick(e.getButton(), e.getX(), e.getY()))
+            return;
+
         pickConstrain(e.getButton(), 0, e.getX(), e.getY());
 
-        mouseDragDX = mouseDragDY = 0;
         mouseDragPrevX = mouseDragPrevY = -1; //HACK todo do this on a per-button basis
     }
 
@@ -341,14 +346,14 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         Quat4f rot = stack.quats.get();
         QuaternionUtil.setRotation(rot, camUp, razi);
 
-        Vector3f eyePos = stack.vectors.get(0f, 0f, 0f);
+        Vector3f eyePos = v();
         VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance);
 
-        Vector3f forward = stack.vectors.get(eyePos.x, eyePos.y, eyePos.z);
+        Vector3f forward = v(eyePos.x, eyePos.y, eyePos.z);
         if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
             forward.set(1f, 0f, 0f);
         }
-        Vector3f right = stack.vectors.get();
+        Vector3f right = v();
         right.cross(camUp, forward);
         Quat4f roll = stack.quats.get();
         QuaternionUtil.setRotation(roll, right, -rele);
@@ -680,16 +685,16 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     public Vector3f rayTo(int x, int y) {
 
 
-        Vector3f rayFrom = Vector3f.v(getCamPos());
-        Vector3f rayForward = Vector3f.v();
+        Vector3f rayFrom = v(getCamPos());
+        Vector3f rayForward = v();
         rayForward.sub(getCamPosTarget(), getCamPos());
         rayForward.normalize();
         rayForward.scale(farPlane);
 
         //Vector3f rightOffset = new Vector3f();
-        Vector3f vertical = Vector3f.v(camUp);
+        Vector3f vertical = v(camUp);
 
-        Vector3f hor = Vector3f.v();
+        Vector3f hor = v();
         // TODO: check: hor = rayForward.cross(vertical);
         hor.cross(rayForward, vertical);
         hor.normalize();
@@ -700,21 +705,21 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         hor.scale(2f * farPlane * tanFovH);
         vertical.scale(2f * farPlane * tanFovV);
 
-        Vector3f rayToCenter = Vector3f.v();
+        Vector3f rayToCenter = v();
         rayToCenter.add(rayFrom, rayForward);
 
-        Vector3f dHor = Vector3f.v(hor);
+        Vector3f dHor = v(hor);
         dHor.scale(1f / (float) screenWidth);
 
-        Vector3f dVert = Vector3f.v(vertical);
+        Vector3f dVert = v(vertical);
         dVert.scale(1.f / (float) screenHeight);
 
-        Vector3f tmp1 = Vector3f.v();
-        Vector3f tmp2 = Vector3f.v();
+        Vector3f tmp1 = v();
+        Vector3f tmp2 = v();
         tmp1.scale(0.5f, hor);
         tmp2.scale(0.5f, vertical);
 
-        Vector3f rayTo = Vector3f.v();
+        Vector3f rayTo = v();
         rayTo.sub(rayToCenter, tmp1);
         rayTo.add(tmp2);
 
@@ -735,7 +740,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         }
     }
 
-    private void mouseClick(int button, int x, int y) {
+    private boolean mouseClick(int button, int x, int y) {
 
         switch (button) {
             case MouseEvent.BUTTON3: {
@@ -746,20 +751,14 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
                     //TODO not entirely correct yet
 
-                    Vector3f delta = new Vector3f();
-                    delta.sub(camPos ,camPosTarget);
-                    delta.normalize();
-                    float d = cameraDistance = co.getCollisionShape().getBoundingRadius() * 1.5f + nearPlane;
-                    delta.scale(d);
-
                     Vector3f objTarget = co.getWorldOrigin();
-                    camPos.add(objTarget, delta);
                     camPosTarget.set(objTarget);
 
 
                 }
             }
-            break;
+            return true;
+
 
 //            case MouseEvent.BUTTON3: {
 //                shootBox(rayTo);
@@ -790,6 +789,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 //                break;
 //            }
         }
+        return false;
     }
 
     private void pickConstrain(int button, int state, int x, int y) {
@@ -836,7 +836,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         }
     }
 
-    final Vector3f gOldPickingPos = Vector3f.v();
+    final Vector3f gOldPickingPos = v();
     float gOldPickingDist = 0.f;
 
     private void mouseGrabOn(int sx, int sy) {
@@ -848,16 +848,16 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             if (body != null) {
 
                 body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
-                Vector3f pickPos = Vector3f.v(rayCallback.hitPointWorld);
+                Vector3f pickPos = v(rayCallback.hitPointWorld);
 
                 Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
                 tmpTrans.inverse();
-                Vector3f localPivot = Vector3f.v(pickPos);
+                Vector3f localPivot = v(pickPos);
                 tmpTrans.transform(localPivot);
                 // save mouse position for dragging
                 gOldPickingPos.set(rayCallback.rayToWorld);
-                Vector3f eyePos = Vector3f.v(camPos);
-                Vector3f tmp = Vector3f.v();
+                Vector3f eyePos = v(camPos);
+                Vector3f tmp = v();
                 tmp.sub(pickPos, eyePos);
                 gOldPickingDist = tmp.length();
 
@@ -886,7 +886,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     }
 
     public CollisionWorld.ClosestRayResultCallback mousePick(int sx, int sy) {
-        return mousePick(Vector3f.v(rayTo(sx, sy)));
+        return mousePick(v(rayTo(sx, sy)));
     }
 
     public CollisionWorld.ClosestRayResultCallback mousePick(Vector3f rayTo) {
@@ -907,14 +907,14 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
-            Vector3f newRayTo = Vector3f.v(rayTo(x, y));
-            Vector3f eyePos = Vector3f.v(camPos);
-            Vector3f dir = Vector3f.v();
+            Vector3f newRayTo = v(rayTo(x, y));
+            Vector3f eyePos = v(camPos);
+            Vector3f dir = v();
             dir.sub(newRayTo, eyePos);
             dir.normalize();
             dir.scale(gOldPickingDist);
 
-            Vector3f newPos = Vector3f.v();
+            Vector3f newPos = v();
             newPos.add(eyePos, dir);
 
             if (directDrag != null) {
@@ -1050,7 +1050,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     public RigidBody newBody(float mass, CollisionShape shape, MotionState motion, int group, int mask) {
         // rigidbody is dynamic if and only if mass is non zero, otherwise static
         boolean isDynamic = (mass != 0f);
-        Vector3f localInertia = Vector3f.v(0, 0, 0);
+        Vector3f localInertia = v(0, 0, 0);
         if (isDynamic) {
             shape.calculateLocalInertia(mass, localInertia);
         }

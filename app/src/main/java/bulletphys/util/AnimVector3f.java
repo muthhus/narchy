@@ -45,16 +45,45 @@ public class AnimVector3f extends Vector3f implements Animated {
             //invalidated
             super.set(target);
         } else {
-            //HACK use constant velocity
-            float rate = speed.floatValue();
-            super.set(
-                    Util.lerp(target.x, x, rate),
-                    Util.lerp(target.y, y, rate),
-                    Util.lerp(target.z, z, rate)
-            );
+            //interpLinear(dt);
+            interpLERP(dt);
         }
 
         return running;
+    }
+
+    public void interpLERP(float dt) {
+        float rate = speed.floatValue() * dt;
+        super.set(
+                Util.lerp(target.x, x, rate),
+                Util.lerp(target.y, y, rate),
+                Util.lerp(target.z, z, rate)
+        );
+    }
+
+    public void interpLinear(float dt) {
+        //HACK use constant velocity
+        float dx = target.x - x;
+        float dy = target.y - y;
+        float dz = target.z - z;
+
+        float rate = speed.floatValue() * dt;
+        float lenSq = dx*dx+dy*dy+dz*dz;
+        float len = (float)Math.sqrt(lenSq);
+
+        if (len < rate) {
+            //within one distance
+            //System.out.println(dt + " " + "target==" + target);
+            super.set(target);
+        } else {
+            float v = rate/len;
+            //System.out.println(dt + " " + "target.." + target + " " + len + " " + v);
+
+            super.set(
+              x + dx * v,
+              y + dy * v,
+              z + dz * v );
+        }
     }
 
     public void set(Vector3f v) {
