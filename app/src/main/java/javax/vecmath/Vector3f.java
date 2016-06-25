@@ -148,7 +148,7 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
      * @param v1 the first vector
      * @param v2 the second vector
      */
-    public final void cross(Vector3f v1, Vector3f v2)
+    public final Vector3f cross(Vector3f v1, Vector3f v2)
     {
 
 
@@ -162,6 +162,7 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
              v2x * v1z - v2z * v1x,
              v1x * v2y - v1y * v2x);
 
+        return this;
 
     }
 

@@ -48,12 +48,11 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
     }
 
 
-    //private final GleemControl gleem = new GleemControl();
 
     final FasterList<ConceptsSource> sources = new FasterList<>(1);
     final WeakValueHashMap<Termed, Atomatter> vdraw;
 
-    int maxEdgesPerVertex = 5;
+    int maxEdgesPerVertex = 10;
 
     List<GraphLayout> layout = Lists.newArrayList(
         //new Spiral()

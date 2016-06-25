@@ -7,9 +7,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
-import static io.netty.handler.codec.ProtocolDetectionResult.invalid;
-
-
 public class AnimVector3f extends Vector3f implements Animated {
 
     final Vector3f target = new Vector3f();

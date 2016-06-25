@@ -39,9 +39,7 @@ import bulletphys.dynamics.constraintsolver.Point2PointConstraint;
 import bulletphys.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import bulletphys.dynamics.constraintsolver.TypedConstraint;
 import bulletphys.linearmath.*;
-import bulletphys.util.AnimVector3f;
-import bulletphys.util.BulletStack;
-import bulletphys.util.Motion;
+import bulletphys.util.*;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.MouseEvent;
@@ -53,6 +51,7 @@ import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.gui.graph.Atomatter;
 import nars.util.JoglSpace;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Color3f;
@@ -100,12 +99,13 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
     protected int debug = 0;
 
-    protected float ele = 20f;
-    protected float azi = -180f;
 
-    protected final Vector3f camPos;
+    protected final Vector3f camPos = new Vector3f();
     protected final Vector3f camPosTarget;
-    protected float cameraDistance = 55f;
+    protected final Vector3f camDir = new Vector3f();
+    protected final MutableFloat cameraDistance;
+    protected final MutableFloat ele;
+    protected final MutableFloat azi;
 
     float top, bottom, nearPlane, tanFovV, tanFovH, fov, farPlane, left, right;
 
@@ -152,7 +152,10 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             }
         };
 
-        camPos = new Vector3f();
+        cameraDistance = new AnimFloat(55f, dyn, 4f);
+        azi = new AnimFloatAngle(-180, dyn, 30f);
+        ele = new AnimFloatAngle(20, dyn, 30f);
+
         camPosTarget = new AnimVector3f(0,0,0,dyn, 10f);
         camUp = new Vector3f(0, 1, 0); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
@@ -325,13 +328,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     //
 
     public void setCameraDistance(float dist) {
-        cameraDistance = dist;
+        final float minCameraDistance = nearPlane;
+        cameraDistance.setValue(Math.max(minCameraDistance, dist));
     }
-
-    public float getCameraDistance() {
-        return cameraDistance;
-    }
-
 
     public void updateCamera() {
         stack.vectors.push();
@@ -340,23 +339,25 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
         gl.glMatrixMode(gl.GL_PROJECTION);
         gl.glLoadIdentity();
-        float rele = ele * 0.01745329251994329547f; // rads per deg
-        float razi = azi * 0.01745329251994329547f; // rads per deg
+        float rele = ele.floatValue() * 0.01745329251994329547f; // rads per deg
+        float razi = azi.floatValue() * 0.01745329251994329547f; // rads per deg
 
         Quat4f rot = stack.quats.get();
         QuaternionUtil.setRotation(rot, camUp, razi);
 
         Vector3f eyePos = v();
-        VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance);
+        VectorUtil.setCoord(eyePos, forwardAxis, -cameraDistance.floatValue());
 
         Vector3f forward = v(eyePos.x, eyePos.y, eyePos.z);
         if (forward.lengthSquared() < ExtraGlobals.FLT_EPSILON) {
             forward.set(1f, 0f, 0f);
         }
-        Vector3f right = v();
-        right.cross(camUp, forward);
+
+        Vector3f camRight = v();
+        camRight.cross(camUp, forward);
+        camRight.normalize();
         Quat4f roll = stack.quats.get();
-        QuaternionUtil.setRotation(roll, right, -rele);
+        QuaternionUtil.setRotation(roll, camRight, -rele);
 
         Matrix3f tmpMat1 = stack.matrices.get();
         Matrix3f tmpMat2 = stack.matrices.get();
@@ -371,6 +372,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
         perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, 4, 500);
 
+
+        camDir.sub(camPosTarget, camPos);
+        camDir.normalize();
 
         glu.gluLookAt(camPos.x, camPos.y, camPos.z,
                 camPosTarget.x, camPosTarget.y, camPosTarget.z,
@@ -404,46 +408,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         );
     }
 
-    private static final float STEPSIZE = 5;
-
-    public void stepLeft() {
-        azi -= STEPSIZE;
-        if (azi < 0) {
-            azi += 360;
-        }
-    }
-
-    public void stepRight() {
-        azi += STEPSIZE;
-        if (azi >= 360) {
-            azi -= 360;
-        }
-    }
-
-    public void stepFront() {
-        ele += STEPSIZE;
-        if (ele >= 360) {
-            ele -= 360;
-        }
-    }
-
-    public void stepBack() {
-        ele -= STEPSIZE;
-        if (ele < 0) {
-            ele += 360;
-        }
-    }
-
-    public void zoomIn() {
-        cameraDistance -= 0.4f;
-        if (cameraDistance < 0.1f) {
-            cameraDistance = 0.1f;
-        }
-    }
-
-    public void zoomOut() {
-        cameraDistance += 0.4f;
-    }
 
     public void keyboardCallback(char key) {
         lastKey = 0;
@@ -457,25 +421,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         }
 
         switch (key) {
-            case 'l':
-                stepLeft();
-                break;
-            case 'r':
-                stepRight();
-                break;
-            case 'f':
-                stepFront();
-                break;
-            case 'b':
-                stepBack();
-                break;
-            case 'z':
-                zoomIn();
-                break;
-            case 'x':
-                zoomOut();
-                break;
-
             case 'h':
                 if ((debug & DebugDrawModes.NO_HELP_TEXT) != 0) {
                     debug = debug & (~DebugDrawModes.NO_HELP_TEXT);
@@ -621,18 +566,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                 }
                 break;
             }
-            case KeyEvent.VK_LEFT:
-                stepLeft();
-                break;
-            case KeyEvent.VK_RIGHT:
-                stepRight();
-                break;
-            case KeyEvent.VK_UP:
-                stepFront();
-                break;
-            case KeyEvent.VK_DOWN:
-                stepBack();
-                break;
             /*
             case KeyEvent.VK_PRIOR:
 				zoomIn();
@@ -685,9 +618,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     public Vector3f rayTo(int x, int y) {
 
 
-        Vector3f rayFrom = v(getCamPos());
+        Vector3f rayFrom = v(camPos);
         Vector3f rayForward = v();
-        rayForward.sub(getCamPosTarget(), getCamPos());
+        rayForward.sub(camPosTarget, camPos);
         rayForward.normalize();
         rayForward.scale(farPlane);
 
@@ -736,7 +669,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         //System.out.println("wheel=" + Arrays.toString(e.getRotation()));
         float y = e.getRotation()[1];
         if (y!=0) {
-            cameraDistance += 0.1f * y;
+            setCameraDistance( cameraDistance.floatValue() + 0.1f * y );
         }
     }
 
@@ -749,10 +682,15 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                     CollisionObject co = c.collisionObject;
                     System.out.println("zooming to " + co);
 
-                    //TODO not entirely correct yet
+                    //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
+
 
                     Vector3f objTarget = co.getWorldOrigin();
                     camPosTarget.set(objTarget);
+
+                    setCameraDistance(
+                        co.getCollisionShape().getBoundingRadius() * 1.25f + nearPlane * 1.25f
+                    );
 
 
                 }
@@ -965,27 +903,41 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
                     for (short b : buttons) {
                         switch (b) {
+                            case 1:
+                                CollisionWorld.ClosestRayResultCallback m = mousePick(x, y);
+                                if (!m.hasHit()) {
+                                    //drag on background space
+                                    float px = mouseDragDX * 0.1f;
+                                    float py = mouseDragDY * 0.1f;
+
+                                    //TODO finish:
+
+                                    //Vector3f vx = v().cross(camDir, camUp);
+                                    //vx.normalize();
+                                    //System.out.println(px + " " + py + " " + camDir + " x " + camUp + " " + vx);
+
+                                    //camPosTarget.scaleAdd(px, vx);
+                                    //camPosTarget.scaleAdd(py, camUp);
+                                }
+                                break;
                             case 3:
                                 //right mouse
                                 //                        nextAzi += dx * btScalar(0.2);
                                 //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
                                 //                        nextEle += dy * btScalar(0.2);
                                 //                        nextEle = fmodf(nextEle, btScalar(180.f));
-                                azi += mouseDragDX * 0.2f;
+                                azi.setValue(azi.floatValue() + mouseDragDX * 0.2f );
                                 //nextAzi = fmodf(nextAzi, btScalar(360.f));
-                                ele += mouseDragDY * (0.2f);
+                                ele.setValue(ele.floatValue() + mouseDragDY * (0.2f));
                                 //nextEle = fmodf(nextEle, btScalar(180.f));
                                 break;
                             case 2:
                                 //middle mouse
-                                cameraDistance -= mouseDragDY * 0.15f;
-                                final float minCameraDistance = nearPlane;
-                                if (cameraDistance < minCameraDistance)
-                                    cameraDistance = minCameraDistance; //limit
 
-                                //                        nextDist -= dy * btScalar(0.01f);
-                                //                        if (nextDist < minDist)
-                                //                            nextDist = minDist;
+                                setCameraDistance( cameraDistance.floatValue() - mouseDragDY * 0.5f );
+
+
+
                                 break;
                         }
                     }

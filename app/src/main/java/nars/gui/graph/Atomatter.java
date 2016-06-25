@@ -132,9 +132,10 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         float dur = l.dur();
         float qua = l.qua();
 
-        float minLineWidth = 1f;
-        float maxLineWidth = 7f;
-        float width = minLineWidth + (maxLineWidth - minLineWidth) * ((dur) * (qua));
+        //width relative to the radius of the atom
+        float minLineWidth = 0.25f;
+        float maxLineWidth = 0.85f;
+        float width = minLineWidth + (maxLineWidth - minLineWidth) * (pri + (dur) * (qua));
 
         float r, g, b;
         float hp = 0.4f + 0.6f * pri;
@@ -310,7 +311,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
-        float width = e.width;
+        float width = e.width * v.radius;
         if (width <= 1.25f) {
             renderLineEdge(gl, v, e, width);
         } else {
@@ -344,11 +345,15 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
             vv.set(dx,dy,dz);
             vv.cross(ww, vv);
             vv.normalize();
+            vv.scale(width);
 
 
             gl.glBegin(GL2.GL_TRIANGLES);
             gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
-            gl.glVertex3f(sx+-vv.x, sy+-vv.y, sz+-vv.z); //right base
+            gl.glVertex3f( //right base
+                    //sx+-vv.x, sy+-vv.y, sz+-vv.z
+                    sx, sy, sz
+            );
             gl.glVertex3f(tx, ty, tz); //right base
             gl.glEnd();
 
@@ -363,11 +368,10 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         {
-            gl.glVertex3f(0,0,0);//vp[0], vp[1], vp[2]);
-            gl.glVertex3f(
-                    tgt.x()-src.x(),
-                    tgt.y()-src.y(),
-                    tgt.z()-src.z() );
+            Vector3f s = src.center;
+            gl.glVertex3f(s.x, s.y, s.z);
+            Vector3f t = tgt.center;
+            gl.glVertex3f(t.x, t.y, t.z);
         }
         gl.glEnd();
     }
