@@ -625,7 +625,7 @@ public class CollisionWorld<X> {
 		}
 	}
 
-	public ObjectArrayList<CollisionObject<X>> getCollisionObjectArray() {
+	public ObjectArrayList<CollisionObject<X>> objects() {
 		return collisionObjects;
 	}
 	

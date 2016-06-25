@@ -70,15 +70,15 @@ public class SimulationIslandManager {
 	}
 
 	public void updateActivationState(CollisionWorld<?> colWorld, Dispatcher dispatcher) {
-		initUnionFind(colWorld.getCollisionObjectArray().size());
+		initUnionFind(colWorld.objects().size());
 
 		// put the index into m_controllers into m_tag
 		{
 			int index = 0;
 			int i;
-			for (i = 0; i < colWorld.getCollisionObjectArray().size(); i++) {
+			for (i = 0; i < colWorld.objects().size(); i++) {
 				//return array[index];
-				CollisionObject collisionObject = colWorld.getCollisionObjectArray().get(i);
+				CollisionObject collisionObject = colWorld.objects().get(i);
 				collisionObject.setIslandTag(index);
 				collisionObject.setCompanionId(-1);
 				collisionObject.setHitFraction(1f);
@@ -94,9 +94,9 @@ public class SimulationIslandManager {
 		// put the islandId ('find' value) into m_tag
         int index = 0;
         int i;
-        for (i = 0; i < colWorld.getCollisionObjectArray().size(); i++) {
+        for (i = 0; i < colWorld.objects().size(); i++) {
 			//return array[index];
-			CollisionObject collisionObject = colWorld.getCollisionObjectArray().get(i);
+			CollisionObject collisionObject = colWorld.objects().get(i);
             if (!collisionObject.isStaticOrKinematicObject()) {
                 collisionObject.setIslandTag(unionFind.find(index));
                 collisionObject.setCompanionId(-1);

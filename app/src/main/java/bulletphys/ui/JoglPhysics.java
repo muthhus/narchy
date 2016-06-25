@@ -58,7 +58,6 @@ import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
@@ -607,7 +606,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             case KeyEvent.VK_END: {
                 int numObj = getDyn().getNumCollisionObjects();
                 if (numObj != 0) {
-                    CollisionObject<X> obj = getDyn().getCollisionObjectArray().get(numObj - 1);
+                    CollisionObject<X> obj = getDyn().objects().get(numObj - 1);
 
                     getDyn().removeCollisionObject(obj);
                     RigidBody body = RigidBody.upcast(obj);
@@ -736,34 +735,45 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
 
         switch (button) {
+            case MouseEvent.BUTTON3: {
+                CollisionWorld.ClosestRayResultCallback c = mousePick(x, y);
+                if (c.hasHit()) {
+                    CollisionObject co = c.collisionObject;
+                    System.out.println("zooming to " + co);
+                    camPosTarget.set(co.getWorldOrigin());
+                    cameraDistance = co.getCollisionShape().getBoundingRadius() * 1.5f + nearPlane;
+                }
+            }
+            break;
+
 //            case MouseEvent.BUTTON3: {
 //                shootBox(rayTo);
 //                break;
 //            }
-            case MouseEvent.BUTTON2: {
-                // apply an impulse
-
-                Vector3f rayTo = v(rayTo(x, y));
-                CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-
-                dyn.rayTest(camPos, rayTo, rayCallback);
-                if (rayCallback.hasHit()) {
-                    RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
-                    if (body != null) {
-                        body.setActivationState(CollisionObject.ACTIVE_TAG);
-                        Vector3f impulse = v(rayTo);
-                        impulse.normalize();
-                        float impulseStrength = 10f;
-                        impulse.scale(impulseStrength);
-                        Vector3f relPos = v();
-
-                        relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
-                        body.applyImpulse(impulse, relPos);
-                    }
-                }
-
-                break;
-            }
+//            case MouseEvent.BUTTON2: {
+//                // apply an impulse
+//
+//                Vector3f rayTo = v(rayTo(x, y));
+//                CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+//
+//                dyn.rayTest(camPos, rayTo, rayCallback);
+//                if (rayCallback.hasHit()) {
+//                    RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+//                    if (body != null) {
+//                        body.setActivationState(CollisionObject.ACTIVE_TAG);
+//                        Vector3f impulse = v(rayTo);
+//                        impulse.normalize();
+//                        float impulseStrength = 10f;
+//                        impulse.scale(impulseStrength);
+//                        Vector3f relPos = v();
+//
+//                        relPos.sub(rayCallback.hitPointWorld, body.getCenterOfMassPosition(v()));
+//                        body.applyImpulse(impulse, relPos);
+//                    }
+//                }
+//
+//                break;
+//            }
         }
     }
 
@@ -771,9 +781,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
         switch (button) {
             case MouseEvent.BUTTON1: {
-                Vector3f rayTo = v(rayTo(x, y));
+
                 if (state == 1) {
-                    mouseGrabOn(rayTo);
+                    mouseGrabOn(x,y);
                 } else {
                     mouseGrabOff();
                 }
@@ -814,15 +824,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     final Vector3f gOldPickingPos = v();
     float gOldPickingDist = 0.f;
 
-    private void mouseGrabOn(Vector3f rayTo) {
+    private void mouseGrabOn(int sx, int sy) {
         // add a point to point constraint for picking
-        //if (dyn != null) {
-        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-
-        rayCallback.collisionFilterGroup = (1 << 7);
-
-        dyn.rayTest(camPos, rayTo, rayCallback);
-
+        CollisionWorld.ClosestRayResultCallback rayCallback = mousePick(sx, sy);
 
         if (rayCallback.hasHit()) {
             RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
@@ -836,7 +840,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                 Vector3f localPivot = v(pickPos);
                 tmpTrans.transform(localPivot);
                 // save mouse position for dragging
-                gOldPickingPos.set(rayTo);
+                gOldPickingPos.set(rayCallback.rayToWorld);
                 Vector3f eyePos = v(camPos);
                 Vector3f tmp = v();
                 tmp.sub(pickPos, eyePos);
@@ -864,6 +868,19 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             }
         }
         //}
+    }
+
+    public CollisionWorld.ClosestRayResultCallback mousePick(int sx, int sy) {
+        return mousePick(v(rayTo(sx, sy)));
+    }
+
+    public CollisionWorld.ClosestRayResultCallback mousePick(Vector3f rayTo) {
+        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
+
+        rayCallback.collisionFilterGroup = (1 << 7);
+
+        dyn.rayTest(camPos, rayTo, rayCallback);
+        return rayCallback;
     }
 
     private void mouseMotionFunc(int x, int y, short[] buttons) {
@@ -1063,12 +1080,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
     public void renderWorld() {
         updateCamera();
-
-        List<CollisionObject<X>> objects = dyn.getCollisionObjectArray();
-
-        for (int i = 0, n = objects.size(); i < n; i++)
-            render( objects.get(i) );
-
+        dyn.objects().forEach(this::render);
     }
 
     public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {

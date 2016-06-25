@@ -44,8 +44,11 @@ public abstract class CollisionShape {
 	///getAabb returns the axis aligned bounding box in the coordinate frame of the given transform t.
 	public abstract void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax);
 
+	public float getBoundingRadius() {
+		return getBoundingSphere(null);
+	}
+
 	public float getBoundingSphere(Vector3f center) {
-		Vector3f tmp = new Vector3f();
 
 		Transform tr = new Transform();
 		tr.setIdentity();
@@ -53,11 +56,14 @@ public abstract class CollisionShape {
 
 		getAabb(tr, aabbMin, aabbMax);
 
+		Vector3f tmp = new Vector3f();
 		tmp.sub(aabbMax, aabbMin);
 		float radius = tmp.length() * 0.5f;
 
-		tmp.add(aabbMin, aabbMax);
-		center.scale(0.5f, tmp);
+		if (center!=null) {
+			tmp.add(aabbMin, aabbMax);
+			center.scale(0.5f, tmp);
+		}
 		return radius;
 	}
 

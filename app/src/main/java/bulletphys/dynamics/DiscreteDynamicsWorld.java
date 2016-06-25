@@ -633,7 +633,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			constraintSolver.prepareSolve(getCollisionWorld().getNumCollisionObjects(), getCollisionWorld().getDispatcher().getNumManifolds());
 
 			// solve all the constraints for this island
-			islandManager.buildAndProcessIslands(getCollisionWorld().getDispatcher(), getCollisionWorld().getCollisionObjectArray(), solverCallback);
+			islandManager.buildAndProcessIslands(getCollisionWorld().getDispatcher(), getCollisionWorld().objects(), solverCallback);
 
 			constraintSolver.allSolved(solverInfo /*, m_stackAlloc*/);
 		}

@@ -321,4 +321,9 @@ public class CollisionObject<X> {
 
 		return true;
 	}
+
+	public Vector3f getWorldOrigin() {
+		return worldTransform.origin;
+	}
+
 }
