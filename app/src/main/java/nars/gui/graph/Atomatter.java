@@ -14,7 +14,6 @@ import nars.link.BLink;
 import nars.task.Task;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
@@ -59,9 +58,9 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
     /**
      * the draw order if being drawn
      */
-    public short order;
+    transient public short order;
 
-    transient private GraphSpace grapher;
+    transient private GraphSpace space;
 
     transient public float radius;
 
@@ -107,26 +106,23 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
     transient int numEdges = 0;
 
 
-    public boolean addTermLink(BLink<Termed> ll) {
-        return addEdge(ll, ll.get(), false);
-    }
+    public boolean addLink(BLink<? extends Termed> ll) {
 
-    public boolean addTaskLink(BLink<Task> ll) {
-        if (ll == null)
+        Termed gg = ll.get();
+        if (gg == null)
             return true;
-        @Nullable Task t = ll.get();
-        if (t == null)
-            return true;
-        return addEdge(ll, t.term(), true);
-    }
-
-    public boolean addEdge(BLink l, Termed ll, boolean task) {
-
-        GraphSpace.EDraw[] ee = this.edges;
-
-        Atomatter target = grapher.getIfActive(ll);
+        Atomatter target = space.getIfActive(gg);
         if (target == null)
             return true;
+
+        return addEdge(ll, target, gg instanceof Task);
+    }
+
+
+
+    public boolean addEdge(BLink l, Atomatter target, boolean task) {
+
+        GraphSpace.EDraw[] ee = this.edges;
 
         float pri = l.pri();
         float dur = l.dur();
@@ -158,21 +154,22 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         return (n - 1 <= ee.length);
     }
 
-    public void clearEdges(GraphSpace grapher) {
+    public void clearEdges() {
         this.numEdges = 0;
-        this.grapher = grapher;
     }
 
     public boolean active() {
         return order >= 0;
     }
 
-    public void activate(short order, BLink budget) {
+    public void activate(GraphSpace space, short order, BLink budget) {
         this.order = order;
+        this.space = space;
         this.budget = budget;
     }
 
     public void inactivate() {
+        space = null;
         order = -1;
     }
 

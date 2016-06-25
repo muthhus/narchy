@@ -1,8 +1,10 @@
 package nars.gui.graph;
 
 import bulletphys.collision.dispatch.CollisionObject;
+import bulletphys.ui.GLConsole;
 import bulletphys.ui.JoglPhysics;
 import com.google.common.collect.Lists;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.NAR;
@@ -91,53 +93,11 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
      * get the latest info into the draw object
      */
     protected @NotNull Atomatter pre(int i, Atomatter v, BLink<? extends Termed> b) {
-        v.activate((short)i, b);
+        v.activate(this, (short)i, b);
         return v;
     }
 
-    protected void post(float now, Atomatter v) {
-        Termed tt = v.key;
 
-        Budget b = v.budget;
-        float p = v.pri = b.priIfFiniteElseZero();
-
-        float nodeScale = 1f + 2f * p;
-        nodeScale /= Math.sqrt(tt.volume());
-        v.scale(nodeScale, nodeScale, nodeScale/3f);
-
-        if (tt instanceof Concept) {
-            updateConcept(v, (Concept) tt, now);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private void updateConcept(Atomatter v, Concept cc, float now) {
-
-        float lastConceptForget = v.budget.getLastForgetTime();
-        if (lastConceptForget != lastConceptForget)
-            lastConceptForget = now;
-
-        @NotNull Bag<Termed> termlinks = cc.termlinks();
-        @NotNull Bag<Task> tasklinks = cc.tasklinks();
-//
-//        if (!termlinks.isEmpty()) {
-//            float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
-//            if (lastTermlinkForget != lastTermlinkForget)
-//                lastTermlinkForget = lastConceptForget;
-//        }
-
-        //v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
-        v.lag = now - lastConceptForget;
-        //float act = 1f / (1f + (timeSinceLastUpdate/3f));
-
-        v.clearEdges(this);
-        int maxEdges = v.edges.length;
-
-        tasklinks.topWhile(v::addTaskLink, maxEdges / 2);
-        termlinks.topWhile(v::addTermLink, maxEdges - v.edgeCount()); //fill remaining edges
-
-    }
 
 
     public static final class EDraw {
@@ -169,11 +129,8 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
-
-
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.01f); // Black Background
         //gl.glClearDepth(1f); // Depth Buffer Setup
-
 
         // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
         //gl.glEnable(GL2.GL_LIGHT0);
@@ -187,89 +144,11 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
         //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
 
         //loadGLTexture(gl);
-        buildLists(gl);
-
-
-
 
 //        gleem.start(Vec3f.Y_AXIS, window);
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
-    private void buildLists(GL2 gl) {
-        box = gl.glGenLists(2); // Generate 2 Different Lists
-        gl.glNewList(box, GL2.GL_COMPILE); // Start With The Box List
-
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glNormal3f(0.0f, -1.0f, 0.0f);
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Bottom Face
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-
-        gl.glNormal3f(0.0f, 0.0f, 1.0f);
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f); // Front Face
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-
-        gl.glNormal3f(0.0f, 0.0f, -1.0f);
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Back Face
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f);
-
-        gl.glNormal3f(1.0f, 0.0f, 0.0f);
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(1.0f, -1.0f, -1.0f); // Right face
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(1.0f, -1.0f, 1.0f);
-
-        gl.glNormal3f(-1.0f, 0.0f, 0.0f);
-        //gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Left Face
-        //gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
-        //gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-        //gl.glTexCoord2f(0.0f, 1.0f);
-        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
-        gl.glEnd();
-
-        gl.glEndList();
-
-        {
-            isoTri = box + 1; // Storage For "Top" Is "Box" Plus One
-            gl.glNewList(isoTri, GL2.GL_COMPILE); // Now The "Top" Display List
-
-            gl.glBegin(GL2.GL_TRIANGLES);
-            gl.glNormal3f(0.0f, 0f, 1.0f);
-
-            final float h = 0.5f;
-            gl.glVertex3f(0, h,  0f); //right base
-            gl.glVertex3f(0, -h, 0f); //left base
-            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
-
-            gl.glEnd();
-            gl.glEndList();
-        }
-    }
 
 
     @Override protected final boolean valid(CollisionObject<X> c) {
@@ -292,6 +171,16 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
         ss.forEach( ConceptsSource::ready );
 
+        renderHUD();
+    }
+
+    final GLConsole terminal = new GLConsole(50, 20, 0.05f);
+
+    protected void renderHUD() {
+        ortho();
+        gl.glColor4f(1f,1f,1f, 1f);
+        //gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        terminal.render(gl);
     }
 
     /*public void clear(GL2 gl) {
@@ -561,8 +450,52 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
             GraphSpace g = grapher;
             long now = this.now;
             for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
-                g.post(now, v.get(i1));
+                post(now, v.get(i1));
             }
+        }
+
+        protected void post(float now, Atomatter v) {
+            Termed tt = v.key;
+
+            Budget b = v.budget;
+            float p = v.pri = b.priIfFiniteElseZero();
+
+            float nodeScale = 1f + 2f * p;
+            nodeScale /= Math.sqrt(tt.volume());
+            v.scale(nodeScale, nodeScale, nodeScale/3f);
+
+            if (tt instanceof Concept) {
+                updateConcept(v, (Concept) tt, now);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        private void updateConcept(Atomatter v, Concept cc, float now) {
+
+            float lastConceptForget = v.budget.getLastForgetTime();
+            if (lastConceptForget != lastConceptForget)
+                lastConceptForget = now;
+
+            @NotNull Bag<Termed> termlinks = cc.termlinks();
+            @NotNull Bag<Task> tasklinks = cc.tasklinks();
+//
+//        if (!termlinks.isEmpty()) {
+//            float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
+//            if (lastTermlinkForget != lastTermlinkForget)
+//                lastTermlinkForget = lastConceptForget;
+//        }
+
+            //v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
+            v.lag = now - lastConceptForget;
+            //float act = 1f / (1f + (timeSinceLastUpdate/3f));
+
+            v.clearEdges();
+            int maxEdges = v.edges.length;
+
+            tasklinks.topWhile(v::addLink, maxEdges / 2);
+            termlinks.topWhile(v::addLink, maxEdges - v.edgeCount()); //fill remaining edges
+
         }
 
         public boolean accept(BLink<Concept> b) {
@@ -676,3 +609,77 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
     }
 
 }
+//    private void buildLists(GL2 gl) {
+//        box = gl.glGenLists(2); // Generate 2 Different Lists
+//        gl.glNewList(box, GL2.GL_COMPILE); // Start With The Box List
+//
+//        gl.glBegin(GL2.GL_QUADS);
+//        gl.glNormal3f(0.0f, -1.0f, 0.0f);
+//        //gl.glTexCoord2f(1.0f, 1.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Bottom Face
+//        //gl.glTexCoord2f(0.0f, 1.0f);
+//        gl.glVertex3f(1.0f, -1.0f, -1.0f);
+//        //gl.glTexCoord2f(0.0f, 0.0f);
+//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
+//        //gl.glTexCoord2f(1.0f, 0.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+//
+//        gl.glNormal3f(0.0f, 0.0f, 1.0f);
+//        //gl.glTexCoord2f(0.0f, 0.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, 1.0f); // Front Face
+//        //gl.glTexCoord2f(1.0f, 0.0f);
+//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
+//        //gl.glTexCoord2f(1.0f, 1.0f);
+//        gl.glVertex3f(1.0f, 1.0f, 1.0f);
+//        //gl.glTexCoord2f(0.0f, 1.0f);
+//        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+//
+//        gl.glNormal3f(0.0f, 0.0f, -1.0f);
+//        //gl.glTexCoord2f(1.0f, 0.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Back Face
+//        //gl.glTexCoord2f(1.0f, 1.0f);
+//        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+//        //gl.glTexCoord2f(0.0f, 1.0f);
+//        gl.glVertex3f(1.0f, 1.0f, -1.0f);
+//        //gl.glTexCoord2f(0.0f, 0.0f);
+//        gl.glVertex3f(1.0f, -1.0f, -1.0f);
+//
+//        gl.glNormal3f(1.0f, 0.0f, 0.0f);
+//        //gl.glTexCoord2f(1.0f, 0.0f);
+//        gl.glVertex3f(1.0f, -1.0f, -1.0f); // Right face
+//        //gl.glTexCoord2f(1.0f, 1.0f);
+//        gl.glVertex3f(1.0f, 1.0f, -1.0f);
+//        //gl.glTexCoord2f(0.0f, 1.0f);
+//        gl.glVertex3f(1.0f, 1.0f, 1.0f);
+//        //gl.glTexCoord2f(0.0f, 0.0f);
+//        gl.glVertex3f(1.0f, -1.0f, 1.0f);
+//
+//        gl.glNormal3f(-1.0f, 0.0f, 0.0f);
+//        //gl.glTexCoord2f(0.0f, 0.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Left Face
+//        //gl.glTexCoord2f(1.0f, 0.0f);
+//        gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+//        //gl.glTexCoord2f(1.0f, 1.0f);
+//        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+//        //gl.glTexCoord2f(0.0f, 1.0f);
+//        gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+//        gl.glEnd();
+//
+//        gl.glEndList();
+//
+//        {
+//            isoTri = box + 1; // Storage For "Top" Is "Box" Plus One
+//            gl.glNewList(isoTri, GL2.GL_COMPILE); // Now The "Top" Display List
+//
+//            gl.glBegin(GL2.GL_TRIANGLES);
+//            gl.glNormal3f(0.0f, 0f, 1.0f);
+//
+//            final float h = 0.5f;
+//            gl.glVertex3f(0, h,  0f); //right base
+//            gl.glVertex3f(0, -h, 0f); //left base
+//            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
+//
+//            gl.glEnd();
+//            gl.glEndList();
+//        }
+//    }

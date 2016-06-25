@@ -244,7 +244,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         screenHeight = height;
 
 
-        updateCamera();
+        //updateCamera();
 
     }
 
@@ -264,12 +264,11 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         // optional but useful: debug drawing
         //dyn.debugDrawWorld(debug);
 
-        renderWorld();
+        updateCamera();
+        dyn.objects().forEach(this::render);
 
     }
 
-    public void displayChanged() {
-    }
 
     public void mouseClicked(MouseEvent e) {
         //overriden: called by mouseRelease
@@ -1017,8 +1016,14 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         return body;
     }
 
-    //    // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
-//    public void setOrthographicProjection() {
+        // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
+    public void ortho() {
+        gl.glViewport(0, 0, screenWidth, screenHeight);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
+        gl.glLoadIdentity();
+
+        gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
+
 //        // switch to projection mode
 //        gl.glMatrixMode(gl.GL_PROJECTION);
 //        // save previous matrix which contains the
@@ -1029,20 +1034,15 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 //        // set a 2D orthographic projection
 //        glu.gluOrtho2D(0f, screenWidth, 0f, screenHeight);
 //        // invert the y axis, down is positive
-//        gl.glScalef(1f, -1f, 1f);
+//        //gl.glScalef(1f, -1f, 1f);
 //        // mover the origin from the bottom left corner
 //        // to the upper left corner
-//        gl.glTranslatef(0f, -screenHeight, 0f);
-//        gl.glMatrixMode(gl.GL_MODELVIEW);
-//    }
+//        //gl.glTranslatef(0f, -screenHeight, 0f);
+        gl.glMatrixMode(gl.GL_MODELVIEW);
+        //gl.glLoadIdentity();
 
-
-
-
-    public void renderWorld() {
-        updateCamera();
-        dyn.objects().forEach(this::render);
     }
+
 
     public static final BiConsumer<GL2,RigidBody> defaultRenderer = (gl, body) -> {
 
