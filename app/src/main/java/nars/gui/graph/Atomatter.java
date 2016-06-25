@@ -3,12 +3,13 @@ package nars.gui.graph;
 import bulletphys.collision.shapes.BoxShape;
 import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.RigidBody;
+import bulletphys.linearmath.Transform;
 import bulletphys.ui.ShapeDrawer;
 import bulletphys.ui.JoglPhysics;
 import bulletphys.util.Motion;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.gl2.GLUT;
+import com.jogamp.opengl.math.Quaternion;
 import nars.budget.Budget;
 import nars.link.BLink;
 import nars.task.Task;
@@ -90,6 +91,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         inactivate();
     }
 
+    public final Transform transform() { return motion.t; }
 
 
     @Override
@@ -261,10 +263,17 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 
     @Override public void accept(GL2 gl, RigidBody body) {
 
-        gl.glPushMatrix();
-        ShapeDrawer.translate(gl, body.transform());
+//        gl.glPushMatrix();
+
+//        ShapeDrawer.translate(gl, body.transform());
 
         renderEdges(gl, this);
+
+//        gl.glPopMatrix();
+
+        gl.glPushMatrix();
+
+        ShapeDrawer.transform(gl, body.transform());
 
         float p = h(pri)/2f;
         gl.glColor4f(p,
@@ -276,6 +285,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         ShapeDrawer.draw(gl, body);
 
         renderLabel(gl, this);
+
 
         gl.glPopMatrix();
 
@@ -317,43 +327,40 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         }
     }
 
+    static final Quaternion tmpQ = new Quaternion();
+    static final float[] tmpV = new float[3];
+    static final Vector3f ww = new Vector3f();
+    static final Vector3f vv = new Vector3f();
+
     static public void renderHalfTriEdge(GL2 gl, Atomatter src, GraphSpace.EDraw e, float width) {
         Atomatter tgt = e.key;
-
 
         gl.glPushMatrix();
 
         {
+            float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
+            ww.set(tmpV);
+            float sx = src.x();
+            float tx = tgt.x();
+            float dx = tx - sx;
+            float sy = src.y();
+            float ty = tgt.y();
+            float dy = ty - sy;
+            float sz = src.z();
+            float tz = tgt.z();
+            float dz = tz - sz;
 
-            //TODO 3d line w/ correct normal calculation (ex: cross product)
-
-            float x1 = src.x();
-            float x2 = tgt.x();
-            float dx = (x2 - x1);
-            //float cx = 0.5f * (x1 + x2);
-            float y1 = src.y();
-            float y2 = tgt.y();
-            float dy = (y2 - y1);
-            //float cy = 0.5f * (y1 + y2);
-
-            //gl.glTranslatef(cx, cy, 0f);
-
-            float rotAngle = (float) Math.atan2(dy, dx) * 180f / 3.14159f;
-            gl.glRotatef(rotAngle, 0f, 0f, 1f);
+            vv.set(dx,dy,dz);
+            vv.cross(ww, vv);
+            vv.normalize();
 
 
-            float len = (float) Math.sqrt(dx * dx + dy * dy);
-            gl.glScalef(len, width, 1f);
-
-            //gl.glCallList(isoTri);
             gl.glBegin(GL2.GL_TRIANGLES);
-            //gl.glNormal3f(0.0f, 0f, 1.0f);
-
-            gl.glVertex3f(0, +0.5f,  0f); //right base
-            gl.glVertex3f(0, -0.5f, 0f); //left base
-            gl.glVertex3f(1,  0, 0f);  //midpoint on opposite end
-
+            gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
+            gl.glVertex3f(sx+-vv.x, sy+-vv.y, sz+-vv.z); //right base
+            gl.glVertex3f(tx, ty, tz); //right base
             gl.glEnd();
+
         }
 
         gl.glPopMatrix();

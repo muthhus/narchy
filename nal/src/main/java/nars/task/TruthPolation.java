@@ -102,7 +102,7 @@ public class TruthPolation {
         //double whenNormalized = ((double)when - tmin) / range;
 
 
-        float exp = 1f;
+        float exp = 2f;
         float[] v = this.s.value(new float[]{
                 when
         }, times, freq, conf, exp,

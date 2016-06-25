@@ -138,13 +138,19 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
      */
     public final void cross(Vector3f v1, Vector3f v2)
     {
-        float y;
 
-        float x = v1.y * v2.z - v1.z * v2.y;
-        y = v2.x*v1.z - v2.z*v1.x;
-        this.z = v1.x*v2.y - v1.y*v2.x;
-        this.x = x;
-        this.y = y;
+
+        float v1z = v1.z;
+        float v2y = v2.y;
+        float v2z = v2.z;
+        float v1y = v1.y;
+        this.x = v1y * v2z - v1z * v2y;
+        float v1x = v1.x;
+        float v2x = v2.x;
+        this.y = v2x * v1z - v2z * v1x;
+        this.z = v1x * v2y - v1y * v2x;
+
+
     }
 
  /**

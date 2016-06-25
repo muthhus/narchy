@@ -111,8 +111,8 @@ public class FastOrganicLayout implements GraphLayout {
     public FastOrganicLayout() {
 
 
-        setInitialTemp(0.3f);
-        setMinDistanceLimit(2f);
+        setInitialTemp(0.2f);
+        setMinDistanceLimit(3f);
         setMaxDistanceLimit(100f);
 
     }

@@ -23,6 +23,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
+import nars.gui.graph.GraphSpace;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -63,7 +64,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
-				1024, 4, 2, 3, rng,
+				1024, 6, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng))
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -110,6 +111,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
 			new BeliefTableChart(n.nar, n.actions).show(400, 100);
+			new GraphSpace(new GraphSpace.ConceptsSource(nar, 64)).show(800, 500);
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

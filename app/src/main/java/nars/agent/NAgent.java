@@ -363,9 +363,12 @@ public class NAgent implements Agent {
     }
 
     private void init(MotorConcept m) {
+
+//        nar.goal(m, Tense.Eternal, 1f, epsilon);
+
+
         //nar.ask($.$("(?x &&+0 " + m + ")"), '@');
         //nar.goal(m, Tense.Present, 1f, epsilon);
-        nar.goal(m, Tense.Eternal, 1f, epsilon);
         //nar.goal(m, Tense.Present, 0f, epsilon);
 
 

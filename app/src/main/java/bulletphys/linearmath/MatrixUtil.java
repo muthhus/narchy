@@ -25,6 +25,7 @@ package bulletphys.linearmath;
 
 import bulletphys.BulletGlobals;
 import bulletphys.util.ArrayPool;
+import com.jogamp.opengl.math.Quaternion;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
@@ -119,13 +120,17 @@ public class MatrixUtil {
 	}
 	
 	public static void setRotation(Matrix3f dest, Quat4f q) {
-		float d = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+		float x = q.x;
+		float y = q.y;
+		float z = q.z;
+		float w = q.w;
+		float d = x * x + y * y + z * z + w * w;
 		assert (d != 0f);
 		float s = 2f / d;
-		float xs = q.x * s, ys = q.y * s, zs = q.z * s;
-		float wx = q.w * xs, wy = q.w * ys, wz = q.w * zs;
-		float xx = q.x * xs, xy = q.x * ys, xz = q.x * zs;
-		float yy = q.y * ys, yz = q.y * zs, zz = q.z * zs;
+		float xs = x * s, ys = y * s, zs = z * s;
+		float wx = w * xs, wy = w * ys, wz = w * zs;
+		float xx = x * xs, xy = x * ys, xz = x * zs;
+		float yy = y * ys, yz = y * zs, zz = z * zs;
 		dest.m00 = 1f - (yy + zz);
 		dest.m01 = xy - wz;
 		dest.m02 = xz + wy;
@@ -136,7 +141,30 @@ public class MatrixUtil {
 		dest.m21 = yz + wx;
 		dest.m22 = 1f - (xx + yy);
 	}
-	
+	public static void setRotation(Matrix3f dest, Quaternion q) {
+		float w = q.getW();
+		float x = q.getX();
+		float y = q.getY();
+		float z = q.getZ();
+
+		float d = x * x + y * y + z * z + w * w;
+		assert (d != 0f);
+		float s = 2f / d;
+		float xs = x * s, ys = y * s, zs = z * s;
+		float wx = w * xs, wy = w * ys, wz = w * zs;
+		float xx = x * xs, xy = x * ys, xz = x * zs;
+		float yy = y * ys, yz = y * zs, zz = z * zs;
+		dest.m00 = 1f - (yy + zz);
+		dest.m01 = xy - wz;
+		dest.m02 = xz + wy;
+		dest.m10 = xy + wz;
+		dest.m11 = 1f - (xx + zz);
+		dest.m12 = yz - wx;
+		dest.m20 = xz - wy;
+		dest.m21 = yz + wx;
+		dest.m22 = 1f - (xx + yy);
+	}
+
 	public static void getRotation(Matrix3f mat, Quat4f dest) {
 		ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
 		
@@ -168,6 +196,44 @@ public class MatrixUtil {
 		dest.set(temp[0], temp[1], temp[2], temp[3]);
 		
 		floatArrays.release(temp);
+	}
+	public static void setQuat(Quaternion q, int i, float v) {
+		switch (i) {
+			case 0: q.setW(v); break;
+			case 1: q.setX(v); break;
+			case 2: q.setY(v); break;
+			case 3: q.setZ(v); break;
+		}
+	}
+	public static void getRotation(Matrix3f mat, Quaternion q) {
+		//ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
+
+		float trace = mat.m00 + mat.m11 + mat.m22;
+		//float[] temp = floatArrays.getFixed(4);
+
+		if (trace > 0f) {
+			float s = (float) Math.sqrt(trace + 1f);
+			setQuat(q, 3, s * 0.5f);
+			s = 0.5f / s;
+
+			setQuat(q, 0, ((mat.m21 - mat.m12) * s) );
+			setQuat(q, 0, ((mat.m02 - mat.m20) * s) );
+			setQuat(q, 0, ((mat.m10 - mat.m01) * s) );
+		}
+		else {
+			int i = mat.m00 < mat.m11 ? (mat.m11 < mat.m22 ? 2 : 1) : (mat.m00 < mat.m22 ? 2 : 0);
+			int j = (i + 1) % 3;
+			int k = (i + 2) % 3;
+
+			float s = (float) Math.sqrt(mat.getElement(i, i) - mat.getElement(j, j) - mat.getElement(k, k) + 1f);
+			setQuat(q, i, s * 0.5f);
+			s = 0.5f / s;
+
+			setQuat(q, 3, (mat.getElement(k, j) - mat.getElement(j, k)) * s);
+			setQuat(q, j, (mat.getElement(j, i) + mat.getElement(i, j)) * s);
+			setQuat(q, k, (mat.getElement(k, i) + mat.getElement(i, k)) * s);
+		}
+
 	}
 
 	private static float cofac(Matrix3f mat, int r1, int c1, int r2, int c2) {

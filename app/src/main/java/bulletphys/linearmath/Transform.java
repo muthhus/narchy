@@ -24,6 +24,7 @@
 package bulletphys.linearmath;
 
 import bulletphys.collision.shapes.UniformScalingShape;
+import com.jogamp.opengl.math.Quaternion;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
@@ -128,8 +129,15 @@ public class Transform {
 		MatrixUtil.getRotation(basis, out);
 		return out;
 	}
+	public Quaternion getRotation(Quaternion out) {
+		MatrixUtil.getRotation(basis, out);
+		return out;
+	}
 
 	public void setRotation(Quat4f q) {
+		MatrixUtil.setRotation(basis, q);
+	}
+	public void setRotation(Quaternion q) {
 		MatrixUtil.setRotation(basis, q);
 	}
 

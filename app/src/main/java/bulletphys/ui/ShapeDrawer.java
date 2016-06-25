@@ -96,6 +96,11 @@ public enum ShapeDrawer {
     final static BulletStack stack = new BulletStack();
 
     public static void translate(GL2 gl, Transform trans) {
+        Vector3f o = trans.origin;
+        gl.glTranslatef(o.x, o.y, o.z);
+    }
+
+    public static void transform(GL2 gl, Transform trans) {
         gl.glMultMatrixf(trans.getOpenGLMatrix(glMat), 0);
     }
 
