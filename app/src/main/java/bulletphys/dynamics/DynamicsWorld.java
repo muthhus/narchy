@@ -32,8 +32,11 @@ import bulletphys.dynamics.constraintsolver.ContactSolverInfo;
 import bulletphys.dynamics.constraintsolver.TypedConstraint;
 import bulletphys.dynamics.vehicle.RaycastVehicle;
 import bulletphys.linearmath.IDebugDraw;
+import bulletphys.util.Animated;
+import nars.util.data.list.FasterList;
 
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * DynamicsWorld is the interface class for several dynamics implementation,
@@ -53,11 +56,13 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 	}
 
 	public final int stepSimulation(float timeStep) {
-		return stepSimulation(timeStep, 1, 1f / 60f);
+		return stepSimulation(timeStep, 1);
 	}
 
-	public final int stepSimulation(float timeStep, int maxSubSteps) {
-		return stepSimulation(timeStep, maxSubSteps, 1f / 60f);
+	public final int stepSimulation(float dt, int maxSubSteps) {
+		curDT = dt;
+		updateAnimations();
+		return stepSimulation(dt, maxSubSteps, 1f / 60f);
 	}
 
 	/**
@@ -154,5 +159,20 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 	public ContactSolverInfo getSolverInfo() {
 		return solverInfo;
 	}
-	
+
+	private final List<Animated> animations = new FasterList();
+
+	public void addAnimation(Animated a) {
+		animations.add(a);
+	}
+
+	private float curDT;
+	public final void updateAnimations() {
+		animations.removeIf(this::updateAnimation);
+	}
+
+	private final boolean updateAnimation(Animated animated) {
+		return !animated.animate(curDT); //invert for the 'removeIf'
+	}
+
 }

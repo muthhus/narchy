@@ -110,8 +110,20 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
         super();
     }
 
+    public static Vector3f v(Vector3f copied) {
+        return new Vector3f(copied);
+    }
 
-   /**
+    public static Vector3f v() {
+        return new Vector3f();
+    }
+
+    public static Vector3f v(float a, float b, float c) {
+        return new Vector3f(a, b, c);
+    }
+
+
+    /**
      * Returns the squared length of this vector.
      * @return the squared length of this vector
      */
@@ -144,11 +156,11 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
         float v2y = v2.y;
         float v2z = v2.z;
         float v1y = v1.y;
-        this.x = v1y * v2z - v1z * v2y;
         float v1x = v1.x;
         float v2x = v2.x;
-        this.y = v2x * v1z - v2z * v1x;
-        this.z = v1x * v2y - v1y * v2x;
+        set( v1y * v2z - v1z * v2y,
+             v2x * v1z - v2z * v1x,
+             v1x * v2y - v1y * v2x);
 
 
     }
@@ -169,11 +181,10 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
      */
     public final void normalize(Vector3f v1)
     {
-
         float norm = (float) (1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z));
-        this.x = v1.x*norm;
-        this.y = v1.y*norm;
-        this.z = v1.z*norm;
+        set( v1.x*norm,
+             v1.y*norm,
+             v1.z*norm);
     }
 
     /**
@@ -184,9 +195,9 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
 
         float norm = (float)
                 (1.0 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
-        this.x *= norm;
-        this.y *= norm;
-        this.z *= norm;
+        set(this.x * norm,
+            this.y *  norm,
+            this.z * norm);
     }
 
 

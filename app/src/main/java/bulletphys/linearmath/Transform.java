@@ -165,6 +165,7 @@ public class Transform {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj) return true;
 		if (obj == null || !(obj instanceof Transform)) return false;
 		Transform tr = (Transform)obj;
 		return basis.equals(tr.basis) && origin.equals(tr.origin);

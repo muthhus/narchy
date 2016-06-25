@@ -5,7 +5,6 @@ import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.RigidBody;
 import bulletphys.linearmath.Transform;
 import bulletphys.ui.ShapeDrawer;
-import bulletphys.ui.JoglPhysics;
 import bulletphys.util.Motion;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -85,7 +84,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
             this.edges[i] = new GraphSpace.EDraw();
 
         //init physics
-        shape = new BoxShape(JoglPhysics.v(1,1,1));
+        shape = new BoxShape(Vector3f.v(1,1,1));
         center = motion.t.origin;
 
         inactivate();
@@ -200,14 +199,6 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 //            p[2] = z;
     }
 
-//        public void move(float tx, float ty, float tz, float rate) {
-//
-//            move(
-//              Util.lerp(tx, x(), rate),
-//              Util.lerp(ty, y(), rate),
-//              Util.lerp(tz, z(), rate));
-//        }
-
     public int edgeCount() {
         return numEdges;
     }
@@ -226,7 +217,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
     }
 
     public void scale(float sx, float sy, float sz) {
-        this.shape.setLocalScaling(JoglPhysics.v(sx, sy, sz));
+        this.shape.setLocalScaling(Vector3f.v(sx, sy, sz));
         this.radius = Math.max(Math.max(sx, sy), sz);
     }
 
@@ -247,7 +238,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
                         collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
                 );
 
-                body.setLinearVelocity(JoglPhysics.v());
+                body.setLinearVelocity(Vector3f.v());
                 body.setDamping(0.99f, 0.5f);
                 body.setFriction(0.9f);
 
