@@ -50,7 +50,7 @@ public class SliderSurface extends Surface {
                 Lists.newArrayList(
                     //new SliderSurface(0.75f, 0, 1),
                     new XYPadSurface(),
-                    new SliderSurface(0.25f, 0, 1),
+//                    new SliderSurface(0.25f, 0, 1),
                     new SliderSurface(0.5f,  0, 1)
                 )
 
@@ -88,13 +88,17 @@ public class SliderSurface extends Surface {
 
     @Override
     protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
-        //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+        if (leftButton(buttons)) {
+            System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+
+            float y = hitPoint.x; //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
+            value.setValue(r(y));
+
+            return true;
+        }
         return false;
     }
 
-    public float v() {
-        return value.floatValue();
-    }
 
     /**
      * normalizesa a value to the specified numeric bounds
@@ -106,10 +110,9 @@ public class SliderSurface extends Surface {
     }
 
     /** unnormalize */
-    public final float r(float p) {
+    public final float r(float nn) {
         float mn = this.min.floatValue();
         float mx = this.max.floatValue();
-        float nn = value();
         float v = (nn) * (mx - mn) + mn;
         if (v < mn) v = mn; //clip to bounds
         if (v > mx) v = mx;

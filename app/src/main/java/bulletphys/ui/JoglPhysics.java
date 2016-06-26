@@ -288,7 +288,11 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     public void mousePressed(MouseEvent e) {
         mouseDragDX = mouseDragDY = 0;
 
-        pickConstrain(e.getButton(), 1, e.getX(), e.getY());
+        int x = e.getX();
+        int y = e.getY();
+        if (!mouseMotionFunc(x, y, e.getButtonsDown())) {
+            pickConstrain(e.getButton(), 1, x, y);
+        }
 
     }
 
@@ -306,7 +310,19 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     // MouseMotionListener
     //
     public void mouseDragged(MouseEvent e) {
-        mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
+
+        int x = e.getX();
+        int y = e.getY();
+
+        if (mouseDragPrevX >= 0) {
+            mouseDragDX = (x) - mouseDragPrevX;
+            mouseDragDY = (y) - mouseDragPrevY;
+        }
+
+        mouseMotionFunc(x, y, e.getButtonsDown());
+
+        mouseDragPrevX = x;
+        mouseDragPrevY = y;
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -839,10 +855,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     }
 
     private boolean mouseMotionFunc(int x, int y, short[] buttons) {
-        if (mouseDragPrevX >= 0) {
-            mouseDragDX = (x) - mouseDragPrevX;
-            mouseDragDY = (y) - mouseDragPrevY;
-        }
 
         Vector3f ray = v(rayTo(x, y));
         CollisionWorld.ClosestRayResultCallback mouseTouch = mousePick(ray);
@@ -854,7 +866,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             Object t = mouseTouch.collisionObject.getUserPointer();
             if (t instanceof Atomatter) {
                 Atomatter a = ((Atomatter)t);
-                if (!a.onTouch(mouseTouch.hitPointWorld, buttons)) {
+                if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
                     //absorbed
                     return true;
                 }
@@ -962,8 +974,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                 }
             }
 
-            mouseDragPrevX = x;
-            mouseDragPrevY = y;
         }
 
         return false;

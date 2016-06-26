@@ -1,6 +1,7 @@
 package nars.gui.graph;
 
 import com.jogamp.opengl.GL2;
+import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -10,6 +11,7 @@ import java.util.List;
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
 public class Surface {
+
 
     public Vector3f translateLocal;
     public Vector2f scaleLocal;
@@ -108,5 +110,9 @@ public class Surface {
         gl.glPopMatrix();
     }
 
+
+    public static boolean leftButton(@NotNull short[] buttons) {
+        return buttons.length > 0 && buttons[0]>0;
+    }
 
 }

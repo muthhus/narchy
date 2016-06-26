@@ -19,9 +19,13 @@ public class XYPadSurface extends Surface {
 
     @Override
     protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
-        knob.set(hitPoint);
-        return true;
+        if (leftButton(buttons)) {
+            knob.set(hitPoint);
+            return true;
+        }
+        return false;
     }
+
 
     @Override
     public void paint(GL2 gl) {
