@@ -29,6 +29,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     @NotNull
     public final GraphSpace.EDraw[] edges;
+    private final BoxShape shape;
 
     /** position: x, y, z */
     //@NotNull public final float p[] = new float[3];
@@ -58,7 +59,15 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     public final Motion motion = new Motion();
     public boolean motionLock;
 
-    public Atomatter(O k, int edges) {
+    public Atomatter() {
+        this(null);
+    }
+
+    public Atomatter(O k) {
+        this(k, 0);
+    }
+
+    @Deprecated public Atomatter(O k, int edges) {
         this.key = k!=null ? k : (O) this;
         this.label = key!=null ? key.toString() : super.toString();
         this.hash = k!=null ? k.hashCode() : super.hashCode();
@@ -70,6 +79,8 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         move(GraphSpace.r(initDistanceEpsilon),
              GraphSpace.r(initDistanceEpsilon),
              GraphSpace.r(initDistanceEpsilon));
+
+        shape = new BoxShape(Vector3f.v(1, 1, 1));
 
         for (int i = 0; i < edges; i++)
             this.edges[i] = new GraphSpace.EDraw();
@@ -89,17 +100,17 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         return this == obj || key.equals(((Atomatter) obj).key);
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hash;
     }
 
 
-    public transient int numEdges = 0;
+    @Deprecated public transient int numEdges = 0;
 
 
 
@@ -122,16 +133,17 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     public void move(float x, float y, float z) {
         if (!motionLock) {
 
-            if (body!=null) {
-                body.transform().origin.set(x,y,z);
+            RigidBody b = this.body;
+            if (b !=null) {
+                b.transform().origin.set(x,y,z);
 
 //                    com.Transform t = new com.Transform();
 //                    body.getCenterOfMassTransform(t);
 //                    t.origin.set(x, y, z);
 //                    body.setCenterOfMassTransform(t);
 
-                if (!body.isActive())
-                    body.activate(true);
+                if (!b.isActive())
+                    b.activate(true);
             } else {
                 motion.t.origin.set(x, y, z);
             }
@@ -161,7 +173,8 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public void scale(float sx, float sy, float sz) {
-        this.body.shape().setLocalScaling(Vector3f.v(sx, sy, sz));
+        if (body!=null)
+            this.body.shape().setLocalScaling(Vector3f.v(sx, sy, sz));
         this.radius = Math.max(Math.max(sx, sy), sz);
     }
 
@@ -174,7 +187,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         if (active()) {
 
             if (body == null) {
-                RigidBody b = body = newBody(graphSpace);
+                RigidBody b = body = newBody(graphSpace, shape, false);
                 b.setUserPointer(this);
                 b.setRenderer(this);
             }

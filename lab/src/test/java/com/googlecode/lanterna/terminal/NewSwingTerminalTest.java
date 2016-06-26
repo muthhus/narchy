@@ -25,6 +25,7 @@ import com.googlecode.lanterna.terminal.swing.SwingTerminal;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -51,11 +52,15 @@ public class NewSwingTerminalTest extends javax.swing.JFrame {
         Timer timer = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawRandomHello(leftTerminal);
-                drawRandomHello(rightTerminal);
+                try {
+                    drawRandomHello(leftTerminal);
+                    drawRandomHello(rightTerminal);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
 
-            private void drawRandomHello(IOSafeTerminal terminal) {
+            private void drawRandomHello(IOSafeTerminal terminal) throws IOException {
                 TerminalPosition size = terminal.terminalSize();
                 if(size.column > 6 && size.row > 1) {
                     int positionX = RANDOM.nextInt(size.column - 6);

@@ -53,7 +53,7 @@ import static javax.vecmath.Vector3f.v;
 public class RagDoll extends Atomatter {
 
     public RagDoll() {
-        super(null, 0);
+        super();
     }
 
     public static void main(String[] args) {
