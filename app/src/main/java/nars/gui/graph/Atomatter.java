@@ -26,6 +26,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     public final O key;
     public final int hash;
+
     @NotNull
     public final GraphSpace.EDraw[] edges;
 
@@ -36,20 +37,15 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     //@NotNull public final float[] s = new float[3];
 
     public RigidBody body;
-    public final CollisionShape shape;
 
     transient private final Vector3f center; //references a field in MotionState's transform
 
 
     public String label;
 
-    public O instance;
     public float pri;
 
-    /**
-     * measure of inactivity, in time units
-     */
-    public float lag;
+
 
     /**
      * the draw order if being drawn
@@ -63,11 +59,12 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     public boolean motionLock;
 
     public Atomatter(O k, int edges) {
-        this.key = k;
-        this.label = toString();
-        this.hash = k.hashCode();
+        this.key = k!=null ? k : (O) this;
+        this.label = key!=null ? key.toString() : super.toString();
+        this.hash = k!=null ? k.hashCode() : super.hashCode();
         this.edges = new GraphSpace.EDraw[edges];
         this.radius = 0;
+        this.pri = 0.5f;
 
         final float initDistanceEpsilon = 0.5f;
         move(GraphSpace.r(initDistanceEpsilon),
@@ -78,7 +75,6 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
             this.edges[i] = new GraphSpace.EDraw();
 
         //init physics
-        shape = new BoxShape(Vector3f.v(1,1,1));
         center = motion.t.origin;
 
         inactivate();
@@ -86,7 +82,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     @Override
     public String toString() {
-        return key.toString();
+        return label;
     }
 
     public final Transform transform() { return motion.t; }
@@ -115,9 +111,8 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         return order >= 0;
     }
 
-    public final void activate(short order, O instance) {
+    public final void activate(short order) {
         this.order = order;
-        this.instance = instance;
     }
 
     public final void inactivate() {
@@ -166,7 +161,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public void scale(float sx, float sy, float sz) {
-        this.shape.setLocalScaling(Vector3f.v(sx, sy, sz));
+        this.body.shape().setLocalScaling(Vector3f.v(sx, sy, sz));
         this.radius = Math.max(Math.max(sx, sy), sz);
     }
 
@@ -179,25 +174,36 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         if (active()) {
 
             if (body == null) {
-                final boolean collidesWithOthersLikeThis = false;
-                body = graphSpace.newBody(
-                        1f, //mass
-                        shape, motion,
-                        +1, //group
-                        collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
-                );
-
-                body.setLinearVelocity(Vector3f.v());
-                body.setDamping(0.99f, 0.5f);
-                body.setFriction(0.9f);
-
-                body.setUserPointer(this);
-
-                body.setRenderer(this);
+                RigidBody b = body = newBody(graphSpace);
+                b.setUserPointer(this);
+                b.setRenderer(this);
             }
 
         }
 
+    }
+
+    public RigidBody newBody(GraphSpace graphSpace) {
+        final boolean collidesWithOthersLikeThis = false;
+        RigidBody b;
+
+        BoxShape shape = new BoxShape(Vector3f.v(1, 1, 1));
+        b = newBody(graphSpace, shape, collidesWithOthersLikeThis);
+        return b;
+    }
+
+    public RigidBody newBody(GraphSpace graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+        RigidBody b;
+        b = graphSpace.newBody(
+                1f, //mass
+                shape, motion,
+                +1, //group
+                collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
+        );
+
+        b.setDamping(0.99f, 0.5f);
+        b.setFriction(0.9f);
+        return b;
     }
 
 

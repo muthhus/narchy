@@ -168,7 +168,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 	public void addRigidBody(RigidBody body) {
 		body.setGravity(gravity);
 
-		if (body.getCollisionShape() != null) {
+		if (body.shape() != null) {
 			addCollisionObject(body);
 		}
 	}
@@ -190,7 +190,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				if (body.isActive() && (!body.isStaticObject())) {
-					colObj.getCollisionShape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
+					colObj.shape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
 					BroadphaseInterface bp = getBroadphase();
 					bp.setAabb(body.getBroadphaseHandle(), minAabb, maxAabb, dispatcher1);
 				}

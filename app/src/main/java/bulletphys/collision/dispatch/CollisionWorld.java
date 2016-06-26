@@ -94,9 +94,9 @@ public class CollisionWorld<X> {
 
 		Vector3f minAabb = new Vector3f();
 		Vector3f maxAabb = new Vector3f();
-		collisionObject.getCollisionShape().getAabb(trans, minAabb, maxAabb);
+		collisionObject.shape().getAabb(trans, minAabb, maxAabb);
 
-		BroadphaseNativeType type = collisionObject.getCollisionShape().getShapeType();
+		BroadphaseNativeType type = collisionObject.shape().getShapeType();
 		collisionObject.setBroadphaseHandle(broadphasePairCache.createProxy(
 				minAabb,
 				maxAabb,
@@ -194,7 +194,7 @@ public class CollisionWorld<X> {
 		Vector3f tmp = new Vector3f();
 		Transform tmpTrans = new Transform();
 
-		colObj.getCollisionShape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
+		colObj.shape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
 		// need to increase the aabb for contact thresholds
 		Vector3f contactThreshold = new Vector3f();
 		contactThreshold.set(BulletGlobals.getContactBreakingThreshold(), BulletGlobals.getContactBreakingThreshold(), BulletGlobals.getContactBreakingThreshold());
@@ -360,7 +360,7 @@ public class CollisionWorld<X> {
 						Transform childWorldTrans = new Transform(colObjWorldTransform);
 						childWorldTrans.mul(childTrans);
 						// replace collision shape so that callback can determine the triangle
-						CollisionShape saveCollisionShape = collisionObject.getCollisionShape();
+						CollisionShape saveCollisionShape = collisionObject.shape();
 						collisionObject.internalSetTemporaryCollisionShape(childCollisionShape);
 						rayTestSingle(rayFromTrans, rayToTrans,
 								collisionObject,
@@ -509,7 +509,7 @@ public class CollisionWorld<X> {
 						Transform childWorldTrans = new Transform();
 						childWorldTrans.mul(colObjWorldTransform, childTrans);
 						// replace collision shape so that callback can determine the triangle
-						CollisionShape saveCollisionShape = collisionObject.getCollisionShape();
+						CollisionShape saveCollisionShape = collisionObject.shape();
 						collisionObject.internalSetTemporaryCollisionShape(childCollisionShape);
 						objectQuerySingle(castShape, convexFromTrans, convexToTrans,
 						                  collisionObject,
@@ -553,14 +553,14 @@ public class CollisionWorld<X> {
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
-				collisionObject.getCollisionShape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
+				collisionObject.shape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
 
 				hitLambda[0] = resultCallback.closestHitFraction;
 				Vector3f hitNormal = new Vector3f();
 				if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					rayTestSingle(rayFromTrans, rayToTrans,
 							collisionObject,
-							collisionObject.getCollisionShape(),
+							collisionObject.shape(),
 							collisionObject.getWorldTransform(tmpTrans),
 							resultCallback);
 				}
@@ -607,14 +607,14 @@ public class CollisionWorld<X> {
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
 				collisionObject.getWorldTransform(tmpTrans);
-				collisionObject.getCollisionShape().getAabb(tmpTrans, collisionObjectAabbMin, collisionObjectAabbMax);
+				collisionObject.shape().getAabb(tmpTrans, collisionObjectAabbMin, collisionObjectAabbMax);
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
 				hitLambda[0] = 1f; // could use resultCallback.closestHitFraction, but needs testing
 				Vector3f hitNormal = new Vector3f();
 				if (AabbUtil2.rayAabb(convexFromWorld.origin, convexToWorld.origin, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					objectQuerySingle(castShape, convexFromTrans, convexToTrans,
 					                  collisionObject,
-					                  collisionObject.getCollisionShape(),
+					                  collisionObject.shape(),
 					                  tmpTrans,
 					                  resultCallback,
 					                  dispatchInfo.allowedCcdPenetration);

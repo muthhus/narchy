@@ -112,14 +112,14 @@ public class GhostObject extends CollisionObject {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
 				Vector3f collisionObjectAabbMin = new Vector3f();
 				Vector3f collisionObjectAabbMax = new Vector3f();
-				collisionObject.getCollisionShape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
+				collisionObject.shape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
 				float[] hitLambda = new float[]{1f}; // could use resultCallback.closestHitFraction, but needs testing
 				Vector3f hitNormal = new Vector3f();
 				if (AabbUtil2.rayAabb(convexFromWorld.origin, convexToWorld.origin, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					CollisionWorld.objectQuerySingle(castShape, convexFromTrans, convexToTrans,
 					                                 collisionObject,
-					                                 collisionObject.getCollisionShape(),
+					                                 collisionObject.shape(),
 					                                 collisionObject.getWorldTransform(tmpTrans),
 					                                 resultCallback,
 					                                 allowedCcdPenetration);
@@ -148,7 +148,7 @@ public class GhostObject extends CollisionObject {
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
 				CollisionWorld.rayTestSingle(rayFromTrans, rayToTrans,
 				                             collisionObject,
-				                             collisionObject.getCollisionShape(),
+				                             collisionObject.shape(),
 				                             collisionObject.getWorldTransform(tmpTrans),
 											 solver,
 				                             resultCallback);

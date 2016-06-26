@@ -96,7 +96,7 @@ public class CollisionDispatcher extends Dispatcher {
 		CollisionAlgorithmConstructionInfo ci = tmpCI;
 		ci.dispatcher1 = this;
 		ci.manifold = sharedManifold;
-		CollisionAlgorithmCreateFunc createFunc = doubleDispatch[body0.getCollisionShape().getShapeType().ordinal()][body1.getCollisionShape().getShapeType().ordinal()];
+		CollisionAlgorithmCreateFunc createFunc = doubleDispatch[body0.shape().getShapeType().ordinal()][body1.shape().getShapeType().ordinal()];
 		CollisionAlgorithm algo = createFunc.createCollisionAlgorithm(ci, body0, body1);
 		algo.internalSetCreateFunc(createFunc);
 

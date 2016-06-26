@@ -498,7 +498,7 @@ public class RigidBody<X> extends CollisionObject<X> {
 	}
 	
 	public void getAabb(Vector3f aabbMin, Vector3f aabbMax) {
-		getCollisionShape().getAabb(worldTransform, aabbMin, aabbMax);
+		shape().getAabb(worldTransform, aabbMin, aabbMax);
 	}
 
 	public float computeImpulseDenominator(Vector3f pos, Vector3f normal) {

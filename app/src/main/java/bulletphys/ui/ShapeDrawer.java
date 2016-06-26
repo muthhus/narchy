@@ -107,7 +107,7 @@ public enum ShapeDrawer {
     }
 
     public static void draw(GL2 gl, RigidBody b) {
-        draw(gl, b.getCollisionShape());
+        draw(gl, b.shape());
     }
 
     public static void draw(GL2 gl, CollisionShape shape) {
@@ -411,6 +411,14 @@ public enum ShapeDrawer {
         gl.glVertex2f(x1+w, y1);
         gl.glVertex2f(x1+w, y1+h);
         gl.glVertex2f(x1, y1+h);
+        gl.glEnd();
+    }
+    public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex3f(x1, y1, z);
+        gl.glVertex3f(x1+w, y1, z);
+        gl.glVertex3f(x1+w, y1+h, z);
+        gl.glVertex3f(x1, y1+h, z);
         gl.glEnd();
     }
 

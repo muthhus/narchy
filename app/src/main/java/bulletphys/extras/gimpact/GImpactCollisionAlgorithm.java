@@ -92,27 +92,27 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 		GImpactShapeInterface gimpactshape0;
 		GImpactShapeInterface gimpactshape1;
 
-		if (body0.getCollisionShape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE)
+		if (body0.shape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE)
 		{
-			gimpactshape0 = (GImpactShapeInterface)body0.getCollisionShape();
+			gimpactshape0 = (GImpactShapeInterface)body0.shape();
 
-			if( body1.getCollisionShape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE )
+			if( body1.shape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE )
 			{
-				gimpactshape1 = (GImpactShapeInterface)body1.getCollisionShape();
+				gimpactshape1 = (GImpactShapeInterface)body1.shape();
 
 				gimpact_vs_gimpact(body0,body1,gimpactshape0,gimpactshape1);
 			}
 			else
 			{
-				gimpact_vs_shape(body0,body1,gimpactshape0,body1.getCollisionShape(),false);
+				gimpact_vs_shape(body0,body1,gimpactshape0,body1.shape(),false);
 			}
 
 		}
-		else if (body1.getCollisionShape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE )
+		else if (body1.shape().getShapeType()== BroadphaseNativeType.GIMPACT_SHAPE_PROXYTYPE )
 		{
-			gimpactshape1 = (GImpactShapeInterface)body1.getCollisionShape();
+			gimpactshape1 = (GImpactShapeInterface)body1.shape();
 
-			gimpact_vs_shape(body1,body0,gimpactshape1,body0.getCollisionShape(),true);
+			gimpact_vs_shape(body1,body0,gimpactshape1,body0.shape(),true);
 		}
 	}
 	
@@ -488,8 +488,8 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	protected void shape_vs_shape_collision(CollisionObject body0, CollisionObject body1, CollisionShape shape0, CollisionShape shape1) {
-		CollisionShape tmpShape0 = body0.getCollisionShape();
-		CollisionShape tmpShape1 = body1.getCollisionShape();
+		CollisionShape tmpShape0 = body0.shape();
+		CollisionShape tmpShape1 = body1.shape();
 
 		body0.internalSetTemporaryCollisionShape(shape0);
 		body1.internalSetTemporaryCollisionShape(shape1);
@@ -509,8 +509,8 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	}
 	
 	protected void convex_vs_convex_collision(CollisionObject body0, CollisionObject body1, CollisionShape shape0, CollisionShape shape1) {
-		CollisionShape tmpShape0 = body0.getCollisionShape();
-		CollisionShape tmpShape1 = body1.getCollisionShape();
+		CollisionShape tmpShape0 = body0.shape();
+		CollisionShape tmpShape1 = body1.shape();
 
 		body0.internalSetTemporaryCollisionShape(shape0);
 		body1.internalSetTemporaryCollisionShape(shape1);

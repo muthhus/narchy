@@ -15,6 +15,7 @@ import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.function.Function;
 
@@ -62,6 +63,10 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
     final List<GraphTransform<O>> transforms = Global.newArrayList();
 
+    public GraphSpace(Function<O, Atomatter<O>> materializer, O... c) {
+        this(materializer, new FixedAtomatterList<>(c));
+    }
+
     public GraphSpace(GraphInput<O,?> c) {
         this(null, c);
     }
@@ -83,13 +88,13 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
     }
 
     public @NotNull Atomatter update(int order, O instance) {
-        return update(order, getOrAdd(instance), instance);
+        return update(order, getOrAdd(instance));
     }
     public @NotNull Atomatter<O> update(int order, Function<? super O, Atomatter<O>> materializer, O instance) {
-        return update(order, getOrAdd(instance, materializer), instance);
+        return update(order, getOrAdd(instance, materializer));
     }
-    public @NotNull Atomatter<O> update(int order, Atomatter<O> t, O instance) {
-        t.activate((short) order, instance);
+    public @NotNull Atomatter<O> update(int order, Atomatter<O> t) {
+        t.activate((short) order);
         return t;
     }
 
@@ -109,12 +114,14 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
     /**
      * get the latest info into the draw object
      */
-    protected @NotNull Atomatter<O> pre(int i, Atomatter<O> v, O b) {
-        v.activate((short)i, b);
+    protected @NotNull Atomatter<O> pre(int i, Atomatter<O> v) {
+        v.activate((short)i);
         return v;
     }
 
-
+    public void setGravity(Vector3f v) {
+        dyn.setGravity(v);
+    }
 
 
     public static final class EDraw {

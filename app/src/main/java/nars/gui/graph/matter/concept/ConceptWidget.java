@@ -10,7 +10,10 @@ import nars.term.Termed;
  */
 class ConceptWidget extends Atomatter<Termed> {
 
-
+    /**
+     * measure of inactivity, in time units
+     */
+    public float lag;
 
     public ConceptWidget(Termed x, int maxEdges) {
         super(x, maxEdges);
@@ -22,4 +25,7 @@ class ConceptWidget extends Atomatter<Termed> {
 
         renderLabel(gl);
     }
+
+
+
 }

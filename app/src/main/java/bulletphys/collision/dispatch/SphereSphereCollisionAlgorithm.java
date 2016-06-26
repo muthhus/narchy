@@ -80,8 +80,8 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 
 		resultOut.setPersistentManifold(manifoldPtr);
 
-		SphereShape sphere0 = (SphereShape) col0.getCollisionShape();
-		SphereShape sphere1 = (SphereShape) col1.getCollisionShape();
+		SphereShape sphere0 = (SphereShape) col0.shape();
+		SphereShape sphere1 = (SphereShape) col1.shape();
 
 		Vector3f diff = new Vector3f();
 		diff.sub(col0.getWorldTransform(tmpTrans1).origin, col1.getWorldTransform(tmpTrans2).origin);

@@ -126,7 +126,7 @@ public class CollisionObject<X> {
 		return (collisionFlags & CollisionFlags.NO_CONTACT_RESPONSE) == 0;
 	}
 
-	public CollisionShape getCollisionShape() {
+	public CollisionShape shape() {
 		return collisionShape;
 	}
 

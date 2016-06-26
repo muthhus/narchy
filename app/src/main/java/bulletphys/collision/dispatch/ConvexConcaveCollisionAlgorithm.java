@@ -67,11 +67,11 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 		CollisionObject convexBody = isSwapped ? body1 : body0;
 		CollisionObject triBody = isSwapped ? body0 : body1;
 
-		if (triBody.getCollisionShape().isConcave()) {
+		if (triBody.shape().isConcave()) {
 			CollisionObject triOb = triBody;
-			ConcaveShape concaveShape = (ConcaveShape)triOb.getCollisionShape();
+			ConcaveShape concaveShape = (ConcaveShape)triOb.shape();
 
-			if (convexBody.getCollisionShape().isConvex()) {
+			if (convexBody.shape().isConvex()) {
 				float collisionMarginTriangle = concaveShape.getMargin();
 
 				resultOut.setPersistentManifold(btConvexTriangleCallback.manifoldPtr);
@@ -124,7 +124,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 		Transform convexToLocal = new Transform();
 		convexToLocal.mul(triInv, convexbody.getInterpolationWorldTransform(tmpTrans));
 
-		if (triBody.getCollisionShape().isConcave()) {
+		if (triBody.shape().isConcave()) {
 			Vector3f rayAabbMin = new Vector3f(convexFromLocal.origin);
 			VectorUtil.setMin(rayAabbMin, convexToLocal.origin);
 
@@ -144,7 +144,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 
 			CollisionObject concavebody = triBody;
 
-			ConcaveShape triangleMesh = (ConcaveShape)concavebody.getCollisionShape();
+			ConcaveShape triangleMesh = (ConcaveShape)concavebody.shape();
 
 			if (triangleMesh != null) {
 				triangleMesh.processAllTriangles(raycastCallback, rayAabbMin, rayAabbMax);

@@ -51,15 +51,15 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 
 		CollisionObject colObj = isSwapped ? body1 : body0;
 		CollisionObject otherObj = isSwapped ? body0 : body1;
-		assert (colObj.getCollisionShape().isCompound());
+		assert (colObj.shape().isCompound());
 
-		CompoundShape compoundShape = (CompoundShape) colObj.getCollisionShape();
+		CompoundShape compoundShape = (CompoundShape) colObj.shape();
 		int numChildren = compoundShape.getNumChildShapes();
 		int i;
 
 		//childCollisionAlgorithms.resize(numChildren);
 		for (i = 0; i < numChildren; i++) {
-			CollisionShape tmpShape = colObj.getCollisionShape();
+			CollisionShape tmpShape = colObj.shape();
 			CollisionShape childShape = compoundShape.getChildShape(i);
 			colObj.internalSetTemporaryCollisionShape(childShape);
 			childCollisionAlgorithms.add(ci.dispatcher1.findAlgorithm(colObj, otherObj));
@@ -83,8 +83,8 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		CollisionObject colObj = isSwapped ? body1 : body0;
 		CollisionObject otherObj = isSwapped ? body0 : body1;
 
-		assert (colObj.getCollisionShape().isCompound());
-		CompoundShape compoundShape = (CompoundShape) colObj.getCollisionShape();
+		assert (colObj.shape().isCompound());
+		CompoundShape compoundShape = (CompoundShape) colObj.shape();
 
 		// We will use the OptimizedBVH, AABB tree to cull potential child-overlaps
 		// If both proxies are Compound, we will deal with that directly, by performing sequential/parallel tree traversals
@@ -115,7 +115,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			colObj.setInterpolationWorldTransform(newChildWorldTrans);
 
 			// the contactpoint is still projected back using the original inverted worldtrans
-			CollisionShape tmpShape = colObj.getCollisionShape();
+			CollisionShape tmpShape = colObj.shape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
             //return array[index];
             childCollisionAlgorithms.get(i).processCollision(colObj, otherObj, dispatchInfo, resultOut);
@@ -131,9 +131,9 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		CollisionObject colObj = isSwapped ? body1 : body0;
 		CollisionObject otherObj = isSwapped ? body0 : body1;
 
-		assert (colObj.getCollisionShape().isCompound());
+		assert (colObj.shape().isCompound());
 
-		CompoundShape compoundShape = (CompoundShape) colObj.getCollisionShape();
+		CompoundShape compoundShape = (CompoundShape) colObj.shape();
 
 		// We will use the OptimizedBVH, AABB tree to cull potential child-overlaps
 		// If both proxies are Compound, we will deal with that directly, by performing sequential/parallel tree traversals
@@ -162,7 +162,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			tmpTrans.mul(childTrans);
 			colObj.setWorldTransform(tmpTrans);
 
-			CollisionShape tmpShape = colObj.getCollisionShape();
+			CollisionShape tmpShape = colObj.shape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
             //return array[index];
             float frac = childCollisionAlgorithms.get(i).calculateTimeOfImpact(colObj, otherObj, dispatchInfo, resultOut);

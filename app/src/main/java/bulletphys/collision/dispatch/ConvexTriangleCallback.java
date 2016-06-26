@@ -92,7 +92,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 		convexInTriangleSpace.inverse();
 		convexInTriangleSpace.mul(convexBody.getWorldTransform(new Transform()));
 
-		CollisionShape convexShape = convexBody.getCollisionShape();
+		CollisionShape convexShape = convexBody.shape();
 		//CollisionShape* triangleShape = static_cast<btCollisionShape*>(triBody->m_collisionShape);
 		convexShape.getAabb(convexInTriangleSpace, aabbMin, aabbMax);
 		float extraMargin = collisionMarginTriangle;
@@ -147,11 +147,11 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 		//btCollisionObject* colObj = static_cast<btCollisionObject*>(m_convexProxy->m_clientObject);
 
-		if (convexBody.getCollisionShape().isConvex()) {
+		if (convexBody.shape().isConvex()) {
 			tm.init(triangle[0], triangle[1], triangle[2]);
 			tm.setMargin(collisionMarginTriangle);
 
-			CollisionShape tmpShape = ob.getCollisionShape();
+			CollisionShape tmpShape = ob.shape();
 			ob.internalSetTemporaryCollisionShape(tm);
 
 			CollisionAlgorithm colAlgo = ci.dispatcher1.findAlgorithm(convexBody, triBody, manifoldPtr);

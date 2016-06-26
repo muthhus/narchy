@@ -97,8 +97,8 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 //			}
 //	#else
 
-		ConvexShape min0 = (ConvexShape) body0.getCollisionShape();
-		ConvexShape min1 = (ConvexShape) body1.getCollisionShape();
+		ConvexShape min0 = (ConvexShape) body0.shape();
+		ConvexShape min1 = (ConvexShape) body1.shape();
 
 		DiscreteCollisionDetectorInterface.ClosestPointInput input = new DiscreteCollisionDetectorInterface.ClosestPointInput();
 		input.init();
@@ -163,7 +163,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
 		// Convex0 against sphere for Convex1
 		{
-			ConvexShape convex0 = (ConvexShape) col0.getCollisionShape();
+			ConvexShape convex0 = (ConvexShape) col0.shape();
 
 			SphereShape sphere1 = new SphereShape(col1.getCcdSweptSphereRadius()); // todo: allow non-zero sphere sizes, for better approximation
 			ConvexCast.CastResult result = new ConvexCast.CastResult();
@@ -191,7 +191,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		}
 
 		// Sphere (for convex0) against Convex1
-        ConvexShape convex1 = (ConvexShape) col1.getCollisionShape();
+        ConvexShape convex1 = (ConvexShape) col1.shape();
 
         SphereShape sphere0 = new SphereShape(col0.getCcdSweptSphereRadius()); // todo: allow non-zero sphere sizes, for better approximation
         ConvexCast.CastResult result = new ConvexCast.CastResult();

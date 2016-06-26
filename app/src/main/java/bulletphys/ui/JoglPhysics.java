@@ -90,7 +90,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     protected final Clock clock = new Clock();
 
     // this is the most important class
-    protected final @NotNull DynamicsWorld<X> dyn;
+    public final @NotNull DynamicsWorld<X> dyn;
 
     // constraint for mouse picking
     protected TypedConstraint pickConstraint = null;
@@ -106,6 +106,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     protected final MutableFloat cameraDistance;
     protected final MutableFloat ele;
     protected final MutableFloat azi;
+    int zNear = 1;
+    int zFar = 500;
 
     float top, bottom, nearPlane, tanFovV, tanFovH, fov, farPlane, left, right;
 
@@ -369,7 +371,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
         //gl.glFrustumf(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 10000.0f);
         //glu.gluPerspective(45, (float) screenWidth / screenHeight, 4, 2000);
-        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, 4, 500);
+        perspective(0, true, 45 * FloatUtil.PI / 180.0f, (float) screenWidth / screenHeight, zNear, zFar);
 
 
         camDir.sub(camPosTarget, camPos);
@@ -688,7 +690,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                     camPosTarget.set(objTarget);
 
                     setCameraDistance(
-                        co.getCollisionShape().getBoundingRadius() * 1.25f + nearPlane * 1.25f
+                        co.shape().getBoundingRadius() * 1.25f + nearPlane * 1.25f
                     );
 
 

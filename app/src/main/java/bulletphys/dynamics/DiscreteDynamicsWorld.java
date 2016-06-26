@@ -167,11 +167,11 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 						}
 					}
 
-					debugDrawObject(debugDrawer, colObj.getWorldTransform(tmpTrans), colObj.getCollisionShape(), color);
+					debugDrawObject(debugDrawer, colObj.getWorldTransform(tmpTrans), colObj.shape(), color);
 				}
 				if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_AABB) != 0) {
 					colorvec.set(1f, 0f, 0f);
-					colObj.getCollisionShape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
+					colObj.shape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
 					debugDrawer.drawAabb(minAabb, maxAabb, colorvec);
 				}
 			}
@@ -424,7 +424,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			body.setGravity(gravity);
 		}
 
-		if (body.getCollisionShape() != null) {
+		if (body.shape() != null) {
 			boolean isDynamic = !(body.isStaticObject() || body.isKinematicObject());
 			short collisionFilterGroup = isDynamic ? CollisionFilterGroups.DEFAULT_FILTER : CollisionFilterGroups.STATIC_FILTER;
 			short collisionFilterMask = isDynamic ? CollisionFilterGroups.ALL_FILTER : (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER);
@@ -438,7 +438,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			body.setGravity(gravity);
 		}
 
-		if (body.getCollisionShape() != null) {
+		if (body.shape() != null) {
 			addCollisionObject(body, group, mask);
 		}
 	}
@@ -696,7 +696,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 						if (body.getCcdSquareMotionThreshold() != 0f && body.getCcdSquareMotionThreshold() < squareMotion) {
 							BulletStats.pushProfile("CCD motion clamping");
 							try {
-								if (body.getCollisionShape().isConvex()) {
+								if (body.shape().isConvex()) {
 									BulletStats.gNumClampedCcdMotions++;
 
 									ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, body.getWorldTransform(tmpTrans).origin, predictedTrans.origin, getBroadphase().getOverlappingPairCache(), getDispatcher());
