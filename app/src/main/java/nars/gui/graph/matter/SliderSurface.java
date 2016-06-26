@@ -1,24 +1,50 @@
 package nars.gui.graph.matter;
 
 import bulletphys.ui.ShapeDrawer;
+import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Surface;
 import nars.gui.graph.SurfaceMount;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
+import java.util.List;
+
 /**
  * Created by me on 6/26/16.
  */
 public class SliderSurface extends Surface {
 
-    public static void main(String[] args) {
-        new GraphSpace<>(
-                (SliderSurface vt) -> new SurfaceMount<>(null, vt),
-                new SliderSurface(0.5f, 0, 1)
-        ).show(800,800);
+    public final MutableFloat value;
+    public final MutableFloat min;
+    public final MutableFloat max;
+
+
+    public SliderSurface(float v, float min, float max) {
+        this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
     }
 
+    public SliderSurface(MutableFloat value, MutableFloat min, MutableFloat max) {
+        this.value = value;
+        this.min = min;
+        this.max = max;
+    }
+
+
+    public static void main(String[] args) {
+        new GraphSpace<>(
+
+                (List<SliderSurface> vt) -> new SurfaceMount<>(null,
+                    new GridSurface(vt, GridSurface.VERTICAL)),
+
+                Lists.newArrayList(
+                    new SliderSurface(0.75f, 0, 1),
+                    new SliderSurface(0.25f, 0, 1),
+                    new SliderSurface(0.5f,  0, 1)
+                )
+
+        ).show(800,800);
+    }
 
 
     public float value() {
@@ -44,24 +70,10 @@ public class SliderSurface extends Surface {
         //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
         float barSize = W * p;
-        ShapeDrawer.rect(gl, mh, mh, barSize - mh * 2, H - mh * 2);
+        ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
     }
 
 
-    public final MutableFloat value;
-    public final MutableFloat min;
-    public final MutableFloat max;
-
-
-    public SliderSurface(float v, float min, float max) {
-        this(new MutableFloat(v), new MutableFloat(min), new MutableFloat(max));
-    }
-
-    public SliderSurface(MutableFloat value, MutableFloat min, MutableFloat max) {
-        this.value = value;
-        this.min = min;
-        this.max = max;
-    }
 
     public float v() {
         return value.floatValue();

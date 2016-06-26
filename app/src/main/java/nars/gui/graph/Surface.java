@@ -11,18 +11,30 @@ import java.util.List;
  */
 public class Surface {
 
-    Vector3f translateLocal;
-    Vector2f sizeLocal;
+    public Vector3f translateLocal;
+    public Vector2f scaleLocal;
 
     public Surface parent;
-    public List<Surface> children;
+    public List<? extends Surface> children;
 
     public Surface() {
-
+        translateLocal = new Vector3f();
+        scaleLocal = new Vector2f(1f,1f);
     }
 
     public void setParent(Surface s) {
         parent = s;
+    }
+
+    protected void layout() {
+        //nothing by default
+    }
+
+    public void setChildren(List<? extends Surface> children) {
+        if (this.children == null || !this.children.equals(children)) {
+            this.children = children;
+            layout();
+        }
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
@@ -42,14 +54,29 @@ public class Surface {
     public final void render(GL2 gl) {
         paint(gl);
 
-        List<Surface> c = this.children;
-        if (c !=null) {
-            for (int i = 0, childrenSize = c.size(); i < childrenSize; i++) {
-                c.get(i).render(gl);
-            }
+        List<? extends Surface> cc = this.children;
+        if (cc != null) {
+            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++)
+                render(gl, cc.get(i));
         }
     }
 
+    protected final void render(GL2 gl, Surface c) {
+        gl.glPushMatrix();
+
+
+        Vector3f translate = c.translateLocal;
+        if (translate!=null)
+            gl.glTranslatef(translate.x, translate.y, translate.z);
+
+        Vector2f scale = c.scaleLocal;
+        if (scale!=null)
+            gl.glScalef(scale.x, scale.y, 1f);
+
+        c.render(gl);
+
+        gl.glPopMatrix();
+    }
 
 
 }
