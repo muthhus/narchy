@@ -1,6 +1,6 @@
 package nars.gui.graph.layout;
 
-import nars.gui.graph.GraphLayout;
+import nars.gui.graph.GraphTransform;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.GraphSpace.EDraw;
 import nars.gui.graph.Atomatter;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Fast organic layout algorithm, adapted from JGraph
  */
-public class FastOrganicLayout implements GraphLayout {
+public class FastOrganicLayout<O> implements GraphTransform<O> {
 
 //    @Range(min = 0, max = 1f)
 //    public final MutableFloat nodeSpeed = new MutableFloat(0.02);
@@ -212,10 +212,8 @@ public class FastOrganicLayout implements GraphLayout {
         temperature = initialTemp * (1.0f - iteration / maxIterations);
     }
 
-
-
     @Override
-    public void update(GraphSpace graph, List<Atomatter> vertices, float dt) {
+    public void update(GraphSpace<O, ?> g, List<Atomatter<O>> vertices, float dt) {
 
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;

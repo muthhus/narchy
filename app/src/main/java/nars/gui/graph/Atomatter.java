@@ -25,10 +25,10 @@ import static nars.gui.test.Lesson14.renderString;
 /**
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public final class Atomatter implements BiConsumer<GL2, RigidBody> {
+public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
 
-    public final nars.term.Termed key;
+    public final O key;
     public final int hash;
     @NotNull
     public final GraphSpace.EDraw[] edges;
@@ -47,7 +47,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
 
     public String label;
 
-    public Budget budget;
+    public O instance;
     public float pri;
 
     /**
@@ -60,16 +60,16 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
      */
     transient public short order;
 
-    transient private GraphSpace space;
+    transient private GraphSpace<O,?> space;
 
     transient public float radius;
 
     public final Motion motion = new Motion();
     public boolean motionLock;
 
-    public Atomatter(nars.term.Termed k, int edges) {
+    public Atomatter(O k, int edges) {
         this.key = k;
-        this.label = k.toString();
+        this.label = toString();
         this.hash = k.hashCode();
         this.edges = new GraphSpace.EDraw[edges];
         this.radius = 0;
@@ -89,6 +89,11 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         inactivate();
     }
 
+    @Override
+    public String toString() {
+        return key.toString();
+    }
+
     public final Transform transform() { return motion.t; }
 
 
@@ -103,56 +108,9 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
     }
 
 
-    transient int numEdges = 0;
+    public transient int numEdges = 0;
 
 
-    public boolean addLink(BLink<? extends Termed> ll) {
-
-        Termed gg = ll.get();
-        if (gg == null)
-            return true;
-        Atomatter target = space.getIfActive(gg);
-        if (target == null)
-            return true;
-
-        return addEdge(ll, target, gg instanceof Task);
-    }
-
-
-
-    public boolean addEdge(BLink l, Atomatter target, boolean task) {
-
-        GraphSpace.EDraw[] ee = this.edges;
-
-        float pri = l.pri();
-        float dur = l.dur();
-        float qua = l.qua();
-
-        //width relative to the radius of the atom
-        float minLineWidth = 0.25f;
-        float maxLineWidth = 0.85f;
-        float width = minLineWidth + (maxLineWidth - minLineWidth) * (pri + (dur) * (qua));
-
-        float r, g, b;
-        float hp = 0.4f + 0.6f * pri;
-        //float qh = 0.5f + 0.5f * qua;
-        if (task) {
-            r = hp;
-            g = dur/3f;
-            b = 0;
-        } else {
-            b = hp;
-            g = dur/3f;
-            r = 0;
-        }
-        float a = 0.25f + 0.75f * (pri);
-
-        int n;
-        ee[n = (numEdges++)].set(target, width,
-                r, g, b, a
-        );
-        return (n - 1 <= ee.length);
-    }
 
     public void clearEdges() {
         this.numEdges = 0;
@@ -162,13 +120,13 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         return order >= 0;
     }
 
-    public void activate(GraphSpace space, short order, BLink budget) {
+    public final void activate(GraphSpace<O,?> space, short order, O instance) {
         this.order = order;
         this.space = space;
-        this.budget = budget;
+        this.instance = instance;
     }
 
-    public void inactivate() {
+    public final void inactivate() {
         space = null;
         order = -1;
     }
@@ -309,7 +267,7 @@ public final class Atomatter implements BiConsumer<GL2, RigidBody> {
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
         float width = e.width * v.radius;
-        if (width <= 1.25f) {
+        if (width <= 1.5f) {
             renderLineEdge(gl, v, e, width);
         } else {
             renderHalfTriEdge(gl, v, e, width);

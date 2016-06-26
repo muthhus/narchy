@@ -4,35 +4,29 @@ import bulletphys.collision.dispatch.CollisionObject;
 import bulletphys.ui.GLConsole;
 import bulletphys.ui.JoglPhysics;
 import com.google.common.collect.Lists;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import nars.NAR;
-import nars.bag.Bag;
-import nars.budget.Budget;
-import nars.concept.Concept;
+import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.gui.graph.layout.FastOrganicLayout;
-import nars.link.BLink;
+import nars.gui.graph.matter.concept.ConceptMaterializer;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.list.FasterList;
 import nars.util.experiment.DeductiveMeshTest;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import static nars.gui.test.Lesson14.renderString;
 
 /**
  * Created by me on 6/20/16.
  */
-public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
-
+public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
 
     public static void main(String[] args) {
 
@@ -43,56 +37,75 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
         final int maxNodes = 64;
+        final int maxEdges = 8;
 
-        new GraphSpace(new ConceptsSource(n, maxNodes)).show(900, 900);
+        new GraphSpace<Termed,Atomatter<Termed>>(
+            new ConceptBagInput(n, maxNodes, maxEdges)
+        ).show(900, 900);
+
         n.loop(35f);
 
     }
 
 
+    final FasterList<ConceptBagInput> inputs = new FasterList<>(1);
+    private Function<O, ? extends X> materialize;
 
-    final FasterList<ConceptsSource> sources = new FasterList<>(1);
-    final WeakValueHashMap<Termed, Atomatter> vdraw;
+    final WeakValueHashMap<O, X> atoms;
 
-    int maxEdgesPerVertex = 10;
 
-    List<GraphLayout> layout = Lists.newArrayList(
+    List<GraphTransform<O>> transforms = Lists.newArrayList(
         //new Spiral()
         new FastOrganicLayout()
     );
 
-    private int box, isoTri;
+    public GraphSpace(ConceptBagInput c) {
+        this(c, null);
+    }
 
-    public GraphSpace(ConceptsSource c) {
+    public GraphSpace(ConceptBagInput c, Function<O, ? extends X> defaultMaterializer) {
         super();
 
-        vdraw = new WeakValueHashMap<>(1024);
+        atoms = new WeakValueHashMap<>(1024);
+
+        this.materialize = defaultMaterializer;
 
         enable(c);
     }
 
-    public void enable(ConceptsSource c) {
-        sources.add(c);
+    public void enable(ConceptBagInput c) {
+        inputs.add(c);
         c.start(this);
     }
 
-    public @NotNull Atomatter update(int order, BLink<? extends Termed> t) {
-        return pre(order, getOrAdd(t.get()), t);
+    public @NotNull X update(int order, O instance) {
+        return update(order, getOrAdd(instance), instance);
+    }
+    public @NotNull X update(int order, Function<? super O, X> materializer, O instance) {
+        return update(order, getOrAdd(instance, materializer), instance);
+    }
+    public @NotNull X update(int order, X t, O instance) {
+        t.activate(this, (short) order, instance);
+        return t;
     }
 
-    public @NotNull Atomatter getOrAdd(Termed t) {
-        return vdraw.computeIfAbsent(t, x -> new Atomatter(x, maxEdgesPerVertex));
+
+    public @NotNull X getOrAdd(O t) {
+        return atoms.computeIfAbsent(t, materialize);
+    }
+    public @NotNull X getOrAdd(O t, Function<? super O, ? extends X> materializer) {
+        return atoms.computeIfAbsent(t, materializer);
     }
 
-    public @Nullable Atomatter getIfActive(Termed t) {
-        Atomatter v = vdraw.get(t);
+    public @Nullable X getIfActive(O t) {
+        X v = atoms.get(t);
         return v != null && v.active() ? v : null;
     }
 
     /**
      * get the latest info into the draw object
      */
-    protected @NotNull Atomatter pre(int i, Atomatter v, BLink<? extends Termed> b) {
+    protected @NotNull X pre(int i, X v, O b) {
         v.activate(this, (short)i, b);
         return v;
     }
@@ -163,13 +176,13 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
     public synchronized void display(GLAutoDrawable drawable) {
 
-        List<ConceptsSource> ss = this.sources;
+        List<ConceptBagInput> ss = this.inputs;
 
         ss.forEach( this::update );
 
         super.display(drawable);
 
-        ss.forEach( ConceptsSource::ready );
+        ss.forEach( ConceptBagInput::ready );
 
         renderHUD();
     }
@@ -249,16 +262,16 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
 
 
-    public final void update(ConceptsSource s) {
+    public final void update(GraphInput s) {
 
-        float dt = s.busy();
+        float dt = s.setBusy();
 
-        List<Atomatter> toDraw = s.visible;
+        List<Atomatter<O>> toDraw = s.visible();
         for (int i = 0, toDrawSize = toDraw.size(); i < toDrawSize; i++) {
             toDraw.get(i).update(this);
         }
 
-        List<GraphLayout> ll = this.layout;
+        List<GraphTransform<O>> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
             ll.get(i1).update(this, toDraw, dt);
         }
@@ -272,47 +285,15 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
 
 
 
-    public static class ConceptsSource {
+    abstract public static class GraphInput<O, M extends Atomatter<O>> {
 
-
-        public final NAR nar;
-        private final int capacity;
-
-
-        private FasterList<Atomatter> visible = new FasterList(0);
-
-
-        public final MutableFloat maxPri = new MutableFloat(1.0f);
-        public final MutableFloat minPri = new MutableFloat(0.0f);
-
-
-        //private String keywordFilter;
-        //private final ConceptFilter eachConcept = new ConceptFilter();
-
+        protected List<M> visible = new FasterList(0);
         final AtomicBoolean busy = new AtomicBoolean(true);
-        private long now;
-        private GraphSpace grapher;
+        protected GraphSpace grapher;
+        private float now;
         private float dt;
 
-        public ConceptsSource(NAR nar, int maxNodes) {
 
-
-            this.nar = nar;
-            now = nar.time();
-
-            this.capacity = maxNodes;
-
-            nar.onFrame(nn -> {
-                if (!busy.get()) {
-                    update();
-                }
-            });
-
-//            includeString.addListener((e) -> {
-//                //System.out.println(includeString.getValue());
-//                //setUpdateable();
-//            });
-        }
 
         public void start(GraphSpace grapher) {
             this.grapher = grapher;
@@ -322,289 +303,50 @@ public class GraphSpace<X extends Atomatter> extends JoglPhysics<X> {
             this.grapher = null;
         }
 
-//        @Override
-//        public void updateEdge(TermEdge ee, Object link) {
-//            //rolling average
-//        /*ee.pri = lerp(
-//                ((BLink)link).pri(), ee.pri,
-//                      0.1f);*/
-//
-//            ee.pri.addValue( ((BLink) link).pri() );
-//        }
-
-
-//        @Override
-//        public void updateNode(SpaceGrapher g, Termed s, TermNode sn) {
-//            sn.pri(nar.conceptPriority(s));
-//            super.updateNode(g, s, sn);
-//        }
-//
-//        @Override
-//        public void forEachOutgoingEdgeOf(Termed cc,
-//                                          Consumer eachTarget) {
-//
-//
-//            SpaceGrapher sg = grapher;
-////        if (sg == null)
-////            throw new RuntimeException("grapher null");
-//
-//
-//            Term cct = cc.term();
-//
-//
-//            final int[] count = {0};
-//            final int[] max = {0};
-//            Predicate linkUpdater = link -> {
-//
-//                Termed target = ((BLink<Termed>) link).get();
-//
-//                //if (cct.equals(target)) //self-loop
-//                //    return true;
-//
-//                TermNode tn = sg.getTermNode(target);
-//                if (tn != null) {
-//                    eachTarget.accept(link); //tn.c);
-//                    return (count[0]++) < max[0];
-//                }
-//
-//                return true;
-//
-////            TermEdge.TLinkEdge ee = (TermEdge.TLinkEdge) getEdge(sg, sn, tn, edgeBuilder);
-////
-////            if (ee != null) {
-////                ee.linkFrom(tn, link);
-////            }
-////
-////            //missing.remove(tn.term);
-//            };
-//
-//            max[0] = maxNodeLinks;
-//            ((Concept) cc).termlinks().topWhile(linkUpdater);
-//            max[0] = maxNodeLinks; //equal chance for both link types
-//            ((Concept) cc).tasklinks().topWhile(linkUpdater);
-//
-//            //sn.removeEdges(missing);
-//
-//        }
-//
-//        @Override
-//        public Termed getTargetVertex(Termed edge) {
-//
-//            return grapher.getTermNode(edge).c;
-//        }
-//
-//
-//        @Override
-//        public void start(SpaceGrapher g) {
-//
-//            if (g != null) {
-//
-//                //.stdout()
-//                //.stdoutTrace()
-//                //                .input("<a --> b>. %1.00;0.7%", //$0.9;0.75;0.2$
-//                //                        "<b --> c>. %1.00;0.7%")
-//
-//                if (regs != null)
-//                    throw new RuntimeException("already started");
-//
-//
-//                regs = new Active(
-//                    /*nar.memory.eventConceptActivated.on(
-//                            c -> refresh.set(true)
-//                    ),*/
-//                        nar.eventFrameStart.on(h -> {
-//                            //refresh.set(true);
-//                            updateGraph();
-//                        })
-//                );
-//
-//                super.start(g);
-//            } else {
-//                if (regs == null)
-//                    throw new RuntimeException("already stopped");
-//
-//                regs.off();
-//                regs = null;
-//            }
-//        }
-
-
-        protected void update() {
-            float last = this.now;
-            this.dt = (this.now = nar.time()) - last;
-
-            //String _keywordFilter = includeString.get();
-            //this.keywordFilter = _keywordFilter != null && _keywordFilter.isEmpty() ? null : _keywordFilter;
-
-            //_minPri = this.minPri.floatValue();
-            //_maxPri = this.maxPri.floatValue();
-
-            //final int maxNodes = this.maxNodes;
-
-            visible.forEach(Atomatter::inactivate);
-
-            FasterList<Atomatter> v = visible = new FasterList(capacity);
-            Bag<Concept> x = ((Default) nar).core.concepts;
-            x.topWhile(this::accept, capacity);
-
-            GraphSpace g = grapher;
-            long now = this.now;
-            for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
-                post(now, v.get(i1));
-            }
-        }
-
-        protected void post(float now, Atomatter v) {
-            Termed tt = v.key;
-
-            Budget b = v.budget;
-            float p = v.pri = b.priIfFiniteElseZero();
-
-            float nodeScale = 1f + 2f * p;
-            nodeScale /= Math.sqrt(tt.volume());
-            v.scale(nodeScale, nodeScale, nodeScale/3f);
-
-            if (tt instanceof Concept) {
-                updateConcept(v, (Concept) tt, now);
-            } else {
-                throw new UnsupportedOperationException();
-            }
-        }
-
-        private void updateConcept(Atomatter v, Concept cc, float now) {
-
-            float lastConceptForget = v.budget.getLastForgetTime();
-            if (lastConceptForget != lastConceptForget)
-                lastConceptForget = now;
-
-            @NotNull Bag<Termed> termlinks = cc.termlinks();
-            @NotNull Bag<Task> tasklinks = cc.tasklinks();
-//
-//        if (!termlinks.isEmpty()) {
-//            float lastTermlinkForget = ((BLink) (((ArrayBag) termlinks).get(0))).getLastForgetTime();
-//            if (lastTermlinkForget != lastTermlinkForget)
-//                lastTermlinkForget = lastConceptForget;
-//        }
-
-            //v.lag = now - Math.max(lastConceptForget, lastTermlinkForget);
-            v.lag = now - lastConceptForget;
-            //float act = 1f / (1f + (timeSinceLastUpdate/3f));
-
-            v.clearEdges();
-            int maxEdges = v.edges.length;
-
-            tasklinks.topWhile(v::addLink, maxEdges / 2);
-            termlinks.topWhile(v::addLink, maxEdges - v.edgeCount()); //fill remaining edges
-
-        }
-
-        public boolean accept(BLink<Concept> b) {
-
-            float pri = b.pri();
-            if (pri != pri) {
-                //throw new RuntimeException("deleted item: " + b);
-                return true;
-            }
-
-            FasterList<Atomatter> v = this.visible;
-            return v.add(grapher.update(v.size(), b));
-        }
-
-        public long time() {
-            return nar.time();
-        }
-
-        public float dt() {
-            return dt;
+        public final List<M> visible() {
+            return visible;
         }
 
         public void ready() {
             busy.set(false);
         }
 
-        public final float busy() {
+        public final float setBusy() {
             busy.set(true);
-            return dt();
+            return dt;
         }
 
-//        private class ConceptFilter implements Predicate<BLink<Concept>> {
-//
-//            int count;
-//
-//            public void reset() {
-//                count = 0;
-//            }
-//
-//            @Override
-//            public boolean test(BLink<Concept> cc) {
-//
-//
-//                float p = cc.pri();
-//                if ((p < _minPri) || (p > _maxPri)) {
-//                    return true;
-//                }
-//
-//                Concept c = cc.get();
-//
-//                String keywordFilter1 = keywordFilter;
-//                if (keywordFilter1 != null) {
-//                    if (!c.toString().contains(keywordFilter1)) {
-//                        return true;
-//                    }
-//                }
-//
-//                concepts.add(c);
-//                return count++ <= maxNodes;
-//
-//            }
-//        }
+        public boolean isBusy() {
+            return busy.get();
+        }
+
+        public float dt() {
+            return dt;
+        }
+
+        /** rewinds the buffer of visible items, when collecting a new batch */
+        public List<M> rewind(int capacity) {
+            visible.forEach(Atomatter::inactivate);
+            return visible = new FasterList<>(capacity);
+        }
 
 
-//    public static void updateConceptEdges(SpaceGrapher g, TermNode s, TLink link, DoubleSummaryReusableStatistics accumulator) {
-//
-//
-//        Term t = link.getTerm();
-//        TermNode target = g.getTermNode(t);
-//        if ((target == null) || (s.equals(target))) return;
-//
-//        TermEdge ee = getConceptEdge(g, s, target);
-//        if (ee != null) {
-//            ee.linkFrom(s, link);
-//            accumulator.accept(link.getPriority());
-//        }
-//    }
+        public void update() {
+            float last = this.now;
+            this.dt = (this.now = now()) - last;
+            updateImpl();
+        }
 
+        /** for thread-safe usage */
+        public void updateIfNotBusy() {
+            if (!isBusy()) {
+                update();
+            }
+        }
 
-//    public final void updateNodeOLD(SpaceGrapher sg, BagBudget<Concept> cc, TermNode sn) {
-//
-//        sn.c = cc.get();
-//        sn.priNorm = cc.getPriority();
-//
-//
-//
-//        //final Term t = tn.term;
-//        //final DoubleSummaryReusableStatistics ta = tn.taskLinkStat;
-//        //final DoubleSummaryReusableStatistics te = tn.termLinkStat;
-//
-//
-////        System.out.println("refresh " + Thread.currentThread() + " " + termLinkMean.getResult() + " #" + termLinkMean.getN() );
-//
-//
-////        Consumer<TLink> tLinkConsumer = t -> {
-////            Term target = t.getTerm();
-////            if (!source.equals(target.getTerm())) {
-////                TermNode tn = getTermNode(graph, target);
-////                //TermEdge edge = getConceptEdge(graph, sn, tn);
-////
-////            }
-////        };
-////
-////        c.getTaskLinks().forEach(tLinkConsumer);
-////        c.getTermLinks().forEach(tLinkConsumer);
-//
-//
-//    }
+        abstract protected void updateImpl();
 
+        abstract public float now();
 
     }
 

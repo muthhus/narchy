@@ -23,11 +23,12 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
+import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.gui.graph.GraphSpace;
+import nars.gui.graph.matter.concept.ConceptMaterializer;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
@@ -111,7 +112,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
 			new BeliefTableChart(n.nar, n.actions).show(400, 100);
-			new GraphSpace(new GraphSpace.ConceptsSource(nar, 64)).show(800, 500);
+			new GraphSpace(
+					new ConceptBagInput(nar, 64),
+					new ConceptMaterializer()).show(800, 500);
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

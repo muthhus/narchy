@@ -1,6 +1,6 @@
 package nars.gui.graph.layout;
 
-import nars.gui.graph.GraphLayout;
+import nars.gui.graph.GraphTransform;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Atomatter;
 
@@ -9,14 +9,15 @@ import java.util.List;
 /**
  * Created by me on 6/21/16.
  */
-public class Spiral implements GraphLayout {
+public class Spiral<O> implements GraphTransform<O> {
 
     float nodeSpeed = 0.05f;
 
     @Override
-    public void update(GraphSpace g, List<Atomatter> verts, float dt) {
+    public void update(GraphSpace<O, ?> g, List<Atomatter<O>> verts, float dt) {
         verts.forEach(this::update);
     }
+
 
     protected void update(Atomatter v) {
         //TODO abstract
