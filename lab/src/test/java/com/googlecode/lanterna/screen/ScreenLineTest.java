@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -62,7 +61,7 @@ public class ScreenLineTest {
                 break;
             }
             screen.doResizeIfNecessary();
-            TerminalSize size = textGraphics.getSize();
+            TerminalPosition size = textGraphics.getSize();
             TextColor color;
             if(useAnsiColors) {
                 color = TextColor.ANSI.values()[random.nextInt(TextColor.ANSI.values().length)];
@@ -75,20 +74,20 @@ public class ScreenLineTest {
             TerminalPosition p1;
             TerminalPosition p2;
             if(circle) {
-                p1 = new TerminalPosition(size.getColumns() / 2, size.getRows() / 2);
+                p1 = new TerminalPosition(size.column / 2, size.row / 2);
                 if(CIRCLE_LAST_POSITION == null) {
                     CIRCLE_LAST_POSITION = new TerminalPosition(0, 0);
                 }
-                else if(CIRCLE_LAST_POSITION.getRow() == 0) {
-                    if(CIRCLE_LAST_POSITION.getColumn() < size.getColumns() - 1) {
+                else if(CIRCLE_LAST_POSITION.row == 0) {
+                    if(CIRCLE_LAST_POSITION.column < size.column - 1) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeColumn(1);
                     }
                     else {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeRow(1);
                     }
                 }
-                else if(CIRCLE_LAST_POSITION.getRow() < size.getRows() - 1) {
-                    if(CIRCLE_LAST_POSITION.getColumn() == 0) {
+                else if(CIRCLE_LAST_POSITION.row < size.row - 1) {
+                    if(CIRCLE_LAST_POSITION.column == 0) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeRow(-1);
                     }
                     else {
@@ -96,7 +95,7 @@ public class ScreenLineTest {
                     }
                 }
                 else {
-                    if(CIRCLE_LAST_POSITION.getColumn() > 0) {
+                    if(CIRCLE_LAST_POSITION.column > 0) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeColumn(-1);
                     }
                     else {
@@ -106,14 +105,14 @@ public class ScreenLineTest {
                 p2 = CIRCLE_LAST_POSITION;
             }
             else {
-                p1 = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
-                p2 = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
+                p1 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+                p2 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
             }
             textGraphics.setBackgroundColor(color);
             textGraphics.drawLine(p1, p2, ' ');
             textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
             textGraphics.setForegroundColor(TextColor.ANSI.WHITE);
-            textGraphics.putString(4, size.getRows() - 1, "P1 " + p1 + " -> P2 " + p2);
+            textGraphics.putString(4, size.row - 1, "P1 " + p1 + " -> P2 " + p2);
             screen.refresh(Screen.RefreshType.DELTA);
             if(slow) {
                 Thread.sleep(500);

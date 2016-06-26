@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.googlecode.lanterna.screen.Screen;
@@ -60,7 +60,7 @@ public class DialogsTextGUIBasicTest {
                 public void run() {
                     String result = new TextInputDialogBuilder()
                             .setTitle("Multi-line editor")
-                            .setTextBoxSize(new TerminalSize(35, 5))
+                            .setTextBoxSize(new TerminalPosition(35, 5))
                             .build()
                             .showDialog(textGUI);
                     System.out.println("Result was: " + result);
@@ -132,7 +132,7 @@ public class DialogsTextGUIBasicTest {
             });
 
             mainPanel.addComponent(dialogsListBox);
-            mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+            mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
             mainPanel.addComponent(new Button("Exit", new Runnable() {
                 @Override
                 public void run() {

@@ -85,22 +85,20 @@ public class CapsuleShape extends ConvexInternalShape {
 		Vector3f tmp2 = new Vector3f();
 		Vector3f pos = new Vector3f();
 
-		{
-			pos.set(0f, 0f, 0f);
-			VectorUtil.setCoord(pos, upAxis, getHalfHeight());
-			
-			VectorUtil.mul(tmp1, vec, localScaling);
-			tmp1.scale(radius);
-			tmp2.scale(getMargin(), vec);
-			vtx.add(pos, tmp1);
-			vtx.sub(tmp2);
-			newDot = vec.dot(vtx);
-			if (newDot > maxDot) {
-				maxDot = newDot;
-				supVec.set(vtx);
-			}
-		}
-		pos.set(0f, 0f, 0f);
+        pos.set(0f, 0f, 0f);
+        VectorUtil.setCoord(pos, upAxis, getHalfHeight());
+
+        VectorUtil.mul(tmp1, vec, localScaling);
+        tmp1.scale(radius);
+        tmp2.scale(getMargin(), vec);
+        vtx.add(pos, tmp1);
+        vtx.sub(tmp2);
+        newDot = vec.dot(vtx);
+        if (newDot > maxDot) {
+            maxDot = newDot;
+            supVec.set(vtx);
+        }
+        pos.set(0f, 0f, 0f);
 		VectorUtil.setCoord(pos, upAxis, -getHalfHeight());
 
 		VectorUtil.mul(tmp1, vec, localScaling);

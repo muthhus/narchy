@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.terminal.ansi.CygwinTerminal;
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.googlecode.lanterna.terminal.ansi.UnixTerminal;
@@ -49,7 +49,7 @@ public final class DefaultTerminalFactory implements TerminalFactory {
     private final InputStream inputStream;
     private final Charset charset;
 
-    private TerminalSize initialTerminalSize;
+    private TerminalPosition initialTerminalPosition;
     private boolean forceTextTerminal;
     private boolean forceAWTOverSwing;
     private String title;
@@ -129,7 +129,7 @@ public final class DefaultTerminalFactory implements TerminalFactory {
     public AWTTerminalFrame createAWTTerminal() {
         return new AWTTerminalFrame(
                 title,
-                initialTerminalSize,
+                initialTerminalPosition,
                 deviceConfiguration,
                 fontConfiguration,
                 colorConfiguration,
@@ -139,14 +139,14 @@ public final class DefaultTerminalFactory implements TerminalFactory {
     public SwingTerminalFrame createSwingTerminal() {
         return new SwingTerminalFrame(
                 title,
-                initialTerminalSize,
+                initialTerminalPosition,
                 deviceConfiguration,
                 fontConfiguration instanceof SwingTerminalFontConfiguration ? (SwingTerminalFontConfiguration)fontConfiguration : null,
                 colorConfiguration,
                 autoCloseTriggers.toArray(new TerminalEmulatorAutoCloseTrigger[autoCloseTriggers.size()]));
     }
 
-    private boolean hasSwing() {
+    private static boolean hasSwing() {
         try {
             Class.forName("javax.swing.JComponent");
             return true;
@@ -160,11 +160,11 @@ public final class DefaultTerminalFactory implements TerminalFactory {
      * Sets a hint to the TerminalFactory of what size to use when creating the terminal. Most terminals are not created
      * on request but for example the SwingTerminal and SwingTerminalFrame are and this value will be passed down on
      * creation.
-     * @param initialTerminalSize Size (in rows and columns) of the newly created terminal
+     * @param initialTerminalPosition Size (in rows and columns) of the newly created terminal
      * @return Reference to itself, so multiple .set-calls can be chained
      */
-    public DefaultTerminalFactory setInitialTerminalSize(TerminalSize initialTerminalSize) {
-        this.initialTerminalSize = initialTerminalSize;
+    public DefaultTerminalFactory setInitialTerminalSize(TerminalPosition initialTerminalPosition) {
+        this.initialTerminalPosition = initialTerminalPosition;
         return this;
     }
 
@@ -289,7 +289,7 @@ public final class DefaultTerminalFactory implements TerminalFactory {
         }
     }
     
-    private Terminal createCygwinTerminal(OutputStream outputStream, InputStream inputStream, Charset charset) throws IOException {
+    private static Terminal createCygwinTerminal(OutputStream outputStream, InputStream inputStream, Charset charset) throws IOException {
         return new CygwinTerminal(inputStream, outputStream, charset);
     }
 

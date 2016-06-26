@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal.swing;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 
@@ -41,7 +41,7 @@ class AWTTerminalImplementation extends GraphicalTerminalImplementation {
      * Creates a new {@code AWTTerminalImplementation}
      * @param component Component that is the AWT terminal surface
      * @param fontConfiguration Font configuration to use
-     * @param initialTerminalSize Initial size of the terminal
+     * @param initialTerminalPosition Initial size of the terminal
      * @param deviceConfiguration Device configuration
      * @param colorConfiguration Color configuration
      * @param scrollController Controller to be used when inspecting scroll status
@@ -49,12 +49,12 @@ class AWTTerminalImplementation extends GraphicalTerminalImplementation {
     AWTTerminalImplementation(
             Component component,
             AWTTerminalFontConfiguration fontConfiguration,
-            TerminalSize initialTerminalSize,
+            TerminalPosition initialTerminalPosition,
             TerminalEmulatorDeviceConfiguration deviceConfiguration,
             TerminalEmulatorColorConfiguration colorConfiguration,
             TerminalScrollController scrollController) {
 
-        super(initialTerminalSize, deviceConfiguration, colorConfiguration, scrollController);
+        super(initialTerminalPosition, deviceConfiguration, colorConfiguration, scrollController);
         this.component = component;
         this.fontConfiguration = fontConfiguration;
 
@@ -125,12 +125,7 @@ class AWTTerminalImplementation extends GraphicalTerminalImplementation {
             component.repaint();
         }
         else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    component.repaint();
-                }
-            });
+            EventQueue.invokeLater(component::repaint);
         }
     }
 

@@ -86,7 +86,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
      * Creates a new GraphicalTerminalImplementation component using custom settings and a custom scroll controller. The
      * scrolling controller will be notified when the terminal's history size grows and will be called when this class
      * needs to figure out the current scrolling position.
-     * @param initialTerminalSize Initial size of the terminal, which will be used when calculating the preferred size
+     * @param initialTerminalPosition Initial size of the terminal, which will be used when calculating the preferred size
      *                            of the component. If null, it will default to 80x25. If the AWT layout manager forces
      *                            the component to a different size, the value of this parameter won't have any meaning
      * @param deviceConfiguration Device configuration to use for this SwingTerminal
@@ -95,18 +95,18 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
      *                         scrollable area has changed
      */
     protected GraphicalTerminalImplementation(
-            TerminalSize initialTerminalSize,
+            TerminalPosition initialTerminalPosition,
             TerminalEmulatorDeviceConfiguration deviceConfiguration,
             TerminalEmulatorColorConfiguration colorConfiguration,
             TerminalScrollController scrollController) {
 
         //This is kind of meaningless since we don't know how large the
         //component is at this point, but we should set it to something
-        if(initialTerminalSize == null) {
-            initialTerminalSize = new TerminalSize(80, 24);
+        if(initialTerminalPosition == null) {
+            initialTerminalPosition = new TerminalPosition(80, 24);
         }
-        this.virtualTerminal = new DefaultVirtualTerminal(initialTerminalSize);
-        this.keyQueue = new LinkedBlockingQueue<KeyStroke>();
+        this.virtualTerminal = new DefaultVirtualTerminal(initialTerminalPosition);
+        this.keyQueue = new LinkedBlockingQueue<>();
         this.deviceConfiguration = deviceConfiguration;
         this.colorConfiguration = colorConfiguration;
         this.scrollController = scrollController;
@@ -234,8 +234,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
      * @return Preferred size of this terminal
      */
     synchronized Dimension getPreferredSize() {
-        return new Dimension(getFontWidth() * virtualTerminal.getTerminalSize().getColumns(),
-                getFontHeight() * virtualTerminal.getTerminalSize().getRows());
+        return new Dimension(getFontWidth() * virtualTerminal.terminalSize().column,
+                getFontHeight() * virtualTerminal.terminalSize().row);
     }
 
     /**
@@ -262,8 +262,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         if(width != lastComponentWidth || height != lastComponentHeight) {
             int columns = width / getFontWidth();
             int rows = height / getFontHeight();
-            TerminalSize terminalSize = virtualTerminal.getTerminalSize().withColumns(columns).withRows(rows);
-            virtualTerminal.setTerminalSize(terminalSize);
+            TerminalPosition terminalPosition = virtualTerminal.terminalSize().withColumn(columns).withRow(rows);
+            virtualTerminal.resize(terminalPosition);
 
             // Back buffer needs to be updated since the component size has changed
             needToUpdateBackBuffer = true;
@@ -313,8 +313,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         final int fontHeight = getFontHeight();
 
         //Retrieve the position of the cursor, relative to the scrolling state
-        final TerminalPosition cursorPosition = virtualTerminal.getCursorBufferPosition();
-        final TerminalSize viewportSize = virtualTerminal.getTerminalSize();
+        final TerminalPosition cursorPosition = virtualTerminal.bufferPos();
+        final TerminalPosition viewportSize = virtualTerminal.terminalSize();
 
         final int firstVisibleRowIndex = scrollOffsetFromTopInPixels / fontHeight;
         final int lastVisibleRowIndex = (scrollOffsetFromTopInPixels + getHeight()) / fontHeight;
@@ -334,7 +334,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         // Detect scrolling
         if(lastBufferUpdateScrollPosition < scrollOffsetFromTopInPixels) {
             int gap = scrollOffsetFromTopInPixels - lastBufferUpdateScrollPosition;
-            if(gap / fontHeight < viewportSize.getRows()) {
+            if(gap / fontHeight < viewportSize.row) {
                 Graphics2D graphics = copybuffer.createGraphics();
                 graphics.setClip(0, 0, getWidth(), getHeight() - gap);
                 graphics.drawImage(backbuffer, 0, -gap, null);
@@ -354,7 +354,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         }
         else if(lastBufferUpdateScrollPosition > scrollOffsetFromTopInPixels) {
             int gap = lastBufferUpdateScrollPosition - scrollOffsetFromTopInPixels;
-            if(gap / fontHeight < viewportSize.getRows()) {
+            if(gap / fontHeight < viewportSize.row) {
                 Graphics2D graphics = copybuffer.createGraphics();
                 graphics.setClip(0, 0, getWidth(), getHeight() - gap);
                 graphics.drawImage(backbuffer, 0, 0, null);
@@ -397,15 +397,15 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         virtualTerminal.forEachLine(firstVisibleRowIndex, lastVisibleRowIndex, new VirtualTerminal.BufferWalker() {
             @Override
             public void onLine(int rowNumber, VirtualTerminal.BufferLine bufferLine) {
-                for(int column = 0; column < viewportSize.getColumns(); column++) {
+                for(int column = 0; column < viewportSize.column; column++) {
                     TextCharacter textCharacter = bufferLine.getCharacterAt(column);
                     boolean atCursorLocation = cursorPosition.equals(column, rowNumber);
                     //If next position is the cursor location and this is a CJK character (i.e. cursor is on the padding),
                     //consider this location the cursor position since otherwise the cursor will be skipped
                     if(!atCursorLocation &&
-                            cursorPosition.getColumn() == column + 1 &&
-                            cursorPosition.getRow() == rowNumber &&
-                            TerminalTextUtils.isCharCJK(textCharacter.getCharacter())) {
+                            cursorPosition.column == column + 1 &&
+                            cursorPosition.row == rowNumber &&
+                            TerminalTextUtils.isCharCJK(textCharacter.c)) {
                         atCursorLocation = true;
                     }
                     boolean isBlinking = textCharacter.getModifiers().contains(SGR.BLINK);
@@ -413,7 +413,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
                         foundBlinkingCharacters.set(true);
                     }
                     if(dirtyCellsLookupTable.isAllDirty() || dirtyCellsLookupTable.isDirty(rowNumber, column) || isBlinking) {
-                        int characterWidth = fontWidth * (TerminalTextUtils.isCharCJK(textCharacter.getCharacter()) ? 2 : 1);
+                        int characterWidth = fontWidth * (TerminalTextUtils.isCharCJK(textCharacter.c) ? 2 : 1);
                         Color foregroundColor = deriveTrueForegroundColor(textCharacter, atCursorLocation);
                         Color backgroundColor = deriveTrueBackgroundColor(textCharacter, atCursorLocation);
                         boolean drawCursor = atCursorLocation &&
@@ -439,7 +439,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
                                 scrollOffsetFromTopInPixels,
                                 drawCursor);
                     }
-                    if(TerminalTextUtils.isCharCJK(textCharacter.getCharacter())) {
+                    if(TerminalTextUtils.isCharCJK(textCharacter.c)) {
                         column++; //Skip the trailing space after a CJK character
                     }
                 }
@@ -463,16 +463,16 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
             return;
         }
 
-        TerminalSize viewportSize = virtualTerminal.getTerminalSize();
-        TerminalPosition cursorPosition = virtualTerminal.getCursorBufferPosition();
+        TerminalPosition viewportSize = virtualTerminal.terminalSize();
+        TerminalPosition cursorPosition = virtualTerminal.bufferPos();
 
-        dirtyCellsLookupTable.resetAndInitialize(firstRowOffset, lastRowOffset, viewportSize.getColumns());
+        dirtyCellsLookupTable.resetAndInitialize(firstRowOffset, lastRowOffset, viewportSize.column);
         dirtyCellsLookupTable.setDirty(cursorPosition);
         if(lastDrawnCursorPosition != null && !lastDrawnCursorPosition.equals(cursorPosition)) {
-            if(virtualTerminal.getCharacter(lastDrawnCursorPosition).isDoubleWidth()) {
+            if(virtualTerminal.getView(lastDrawnCursorPosition).isDoubleWidth()) {
                 dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition.withRelativeColumn(1));
             }
-            if(lastDrawnCursorPosition.getColumn() > 0 && virtualTerminal.getCharacter(lastDrawnCursorPosition.withRelativeColumn(-1)).isDoubleWidth()) {
+            if(lastDrawnCursorPosition.column > 0 && virtualTerminal.getView(lastDrawnCursorPosition.withRelativeColumn(-1)).isDoubleWidth()) {
                 dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition.withRelativeColumn(-1));
             }
             dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition);
@@ -533,7 +533,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         Font font = getFontForCharacter(character);
         g.setFont(font);
         FontMetrics fontMetrics = g.getFontMetrics();
-        g.drawString(Character.toString(character.getCharacter()), x, y + fontHeight - fontMetrics.getDescent() + 1);
+        g.drawString(Character.toString(character.c), x, y + fontHeight - fontMetrics.getDescent() + 1);
 
         if(character.isCrossedOut()) {
             //noinspection UnnecessaryLocalVariable
@@ -568,8 +568,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
 
 
     private Color deriveTrueForegroundColor(TextCharacter character, boolean atCursorLocation) {
-        TextColor foregroundColor = character.getForegroundColor();
-        TextColor backgroundColor = character.getBackgroundColor();
+        TextColor foregroundColor = character.fore;
+        TextColor backgroundColor = character.back;
         boolean reverse = character.isReversed();
         boolean blink = character.isBlinking();
 
@@ -592,8 +592,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
     }
 
     private Color deriveTrueBackgroundColor(TextCharacter character, boolean atCursorLocation) {
-        TextColor foregroundColor = character.getForegroundColor();
-        TextColor backgroundColor = character.getBackgroundColor();
+        TextColor foregroundColor = character.fore;
+        TextColor backgroundColor = character.back;
         boolean reverse = character.isReversed();
 
         if(cursorIsVisible && atCursorLocation) {
@@ -680,24 +680,24 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
     }
 
     @Override
-    public synchronized void setCursorPosition(int x, int y) {
-        setCursorPosition(new TerminalPosition(x, y));
+    public synchronized void moveCursorTo(int x, int y) {
+        moveCursorTo(new TerminalPosition(x, y));
     }
 
     @Override
-    public synchronized void setCursorPosition(TerminalPosition position) {
-        if(position.getColumn() < 0) {
+    public synchronized void moveCursorTo(TerminalPosition position) {
+        if(position.column < 0) {
             position = position.withColumn(0);
         }
-        if(position.getRow() < 0) {
+        if(position.row < 0) {
             position = position.withRow(0);
         }
-        virtualTerminal.setCursorPosition(position);
+        virtualTerminal.moveCursorTo(position);
     }
 
     @Override
-    public TerminalPosition getCursorPosition() {
-        return virtualTerminal.getCursorPosition();
+    public TerminalPosition cursor() {
+        return virtualTerminal.cursor();
     }
 
     @Override
@@ -706,8 +706,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
     }
 
     @Override
-    public synchronized void putCharacter(final char c) {
-        virtualTerminal.putCharacter(c);
+    public synchronized void put(final char c) {
+        virtualTerminal.put(c);
     }
 
     @Override
@@ -731,18 +731,18 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
     }
 
     @Override
-    public void setForegroundColor(final TextColor color) {
-        virtualTerminal.setForegroundColor(color);
+    public void fore(final TextColor color) {
+        virtualTerminal.fore(color);
     }
 
     @Override
-    public void setBackgroundColor(final TextColor color) {
-        virtualTerminal.setBackgroundColor(color);
+    public void back(final TextColor color) {
+        virtualTerminal.back(color);
     }
 
     @Override
-    public synchronized TerminalSize getTerminalSize() {
-        return virtualTerminal.getTerminalSize();
+    public synchronized TerminalPosition terminalSize() {
+        return virtualTerminal.terminalSize();
     }
 
     @Override
@@ -799,7 +799,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
     ///////////
     // Remaining are private internal classes used by SwingTerminal
     ///////////
-    private static final Set<Character> TYPED_KEYS_TO_IGNORE = new HashSet<Character>(Arrays.asList('\n', '\t', '\r', '\b', '\33', (char)127));
+    private static final Set<Character> TYPED_KEYS_TO_IGNORE = new HashSet<>(Arrays.asList('\n', '\t', '\r', '\b', '\33', (char) 127));
 
     /**
      * Class that translates AWT key events into Lanterna {@link KeyStroke}
@@ -923,7 +923,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         private boolean allDirty;
 
         DirtyCellsLookupTable() {
-            table = new ArrayList<BitSet>();
+            table = new ArrayList<>();
             firstRowIndex = -1;
             allDirty = false;
         }
@@ -957,13 +957,13 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         }
 
         void setDirty(TerminalPosition position) {
-            if(position.getRow() < firstRowIndex ||
-                    position.getRow() >= firstRowIndex + table.size()) {
+            if(position.row < firstRowIndex ||
+                    position.row >= firstRowIndex + table.size()) {
                 return;
             }
-            BitSet tableRow = table.get(position.getRow() - firstRowIndex);
-            if(position.getColumn() < tableRow.size()) {
-                tableRow.set(position.getColumn());
+            BitSet tableRow = table.get(position.row - firstRowIndex);
+            if(position.column < tableRow.size()) {
+                tableRow.set(position.column);
             }
         }
 

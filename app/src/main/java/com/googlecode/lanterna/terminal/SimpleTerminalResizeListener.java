@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 /**
  * This class is a simple implementation of Terminal.ResizeListener which will keep track of the size of the terminal
@@ -30,15 +30,15 @@ import com.googlecode.lanterna.TerminalSize;
 @SuppressWarnings("WeakerAccess")
 public class SimpleTerminalResizeListener implements TerminalResizeListener {
 
-    boolean wasResized;
-    TerminalSize lastKnownSize;
+    private boolean wasResized;
+    TerminalPosition lastKnownSize;
 
     /**
      * Creates a new SimpleTerminalResizeListener
      * @param initialSize Before any resize event, this listener doesn't know the size of the terminal. By supplying a
      * value here, you control what getLastKnownSize() will return if invoked before any resize events has reached us.
      */
-    public SimpleTerminalResizeListener(TerminalSize initialSize) {
+    public SimpleTerminalResizeListener(TerminalPosition initialSize) {
         this.wasResized = false;
         this.lastKnownSize = initialSize;
     }
@@ -65,12 +65,12 @@ public class SimpleTerminalResizeListener implements TerminalResizeListener {
      * 
      * @return Size of the terminal, as of the last resize update
      */
-    public TerminalSize getLastKnownSize() {
+    public TerminalPosition getLastKnownSize() {
         return lastKnownSize;
     }
     
     @Override
-    public synchronized void onResized(Terminal terminal, TerminalSize newSize) {
+    public synchronized void onResized(Terminal terminal, TerminalPosition newSize) {
         this.wasResized = true;
         this.lastKnownSize = newSize;
     }

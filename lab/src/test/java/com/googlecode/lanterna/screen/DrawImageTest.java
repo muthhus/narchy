@@ -33,7 +33,7 @@ public class DrawImageTest {
         //Setup a standard Screen
         Screen screen = new TestTerminalFactory(args).createScreen();
         screen.startScreen();
-        screen.setCursorPosition(null);
+        screen.moveCursorTo(null);
 
         //Create an 'image' that we fill with recognizable characters
         TextImage image = new BasicTextImage(5, 5);
@@ -41,23 +41,23 @@ public class DrawImageTest {
         TextGraphics textGraphics = image.newTextGraphics();
         textGraphics.drawRectangle(
                 TerminalPosition.TOP_LEFT_CORNER,
-                new TerminalSize(5, 5),
+                new TerminalPosition(5, 5),
                 imageCharacter.withBackgroundColor(TextColor.ANSI.RED));
         textGraphics.drawRectangle(
                 TerminalPosition.OFFSET_1x1,
-                new TerminalSize(3, 3),
+                new TerminalPosition(3, 3),
                 imageCharacter.withBackgroundColor(TextColor.ANSI.MAGENTA));
-        textGraphics.setCharacter(2, 2,
+        textGraphics.set(2, 2,
                 imageCharacter.withBackgroundColor(TextColor.ANSI.CYAN));
 
         TextGraphics screenGraphics = screen.newTextGraphics();
         screenGraphics.setBackgroundColor(TextColor.Indexed.fromRGB(50, 50, 50));
         screenGraphics.fill(' ');
         screenGraphics.drawImage(TerminalPosition.OFFSET_1x1, image);
-        screenGraphics.drawImage(new TerminalPosition(8, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumns(-4));
-        screenGraphics.drawImage(new TerminalPosition(10, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumns(-3));
-        screenGraphics.drawImage(new TerminalPosition(13, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumns(-2));
-        screenGraphics.drawImage(new TerminalPosition(17, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumns(-1));
+        screenGraphics.drawImage(new TerminalPosition(8, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumn(-4));
+        screenGraphics.drawImage(new TerminalPosition(10, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumn(-3));
+        screenGraphics.drawImage(new TerminalPosition(13, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumn(-2));
+        screenGraphics.drawImage(new TerminalPosition(17, 1), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumn(-1));
         screenGraphics.drawImage(new TerminalPosition(22, 1), image);
         screenGraphics.drawImage(new TerminalPosition(28, 1), image, new TerminalPosition(1, 0), image.getSize());
         screenGraphics.drawImage(new TerminalPosition(33, 1), image, new TerminalPosition(2, 0), image.getSize());
@@ -65,10 +65,10 @@ public class DrawImageTest {
         screenGraphics.drawImage(new TerminalPosition(40, 1), image, new TerminalPosition(4, 0), image.getSize());
 
         //Try to draw bigger than the image size, this should ignore the extra size
-        screenGraphics.drawImage(new TerminalPosition(1, 7), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumns(10));
+        screenGraphics.drawImage(new TerminalPosition(1, 7), image, TerminalPosition.TOP_LEFT_CORNER, image.getSize().withRelativeColumn(10));
 
         //0 size should draw nothing
-        screenGraphics.drawImage(new TerminalPosition(8, 7), image, TerminalPosition.TOP_LEFT_CORNER, TerminalSize.ZERO);
+        screenGraphics.drawImage(new TerminalPosition(8, 7), image, TerminalPosition.TOP_LEFT_CORNER, TerminalPosition.ZERO);
 
         //Drawing with a negative source image offset will move the target position
         screenGraphics.drawImage(new TerminalPosition(8, 7), image, new TerminalPosition(-2, -2), image.getSize());

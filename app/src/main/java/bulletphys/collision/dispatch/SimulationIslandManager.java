@@ -73,19 +73,17 @@ public class SimulationIslandManager {
 		initUnionFind(colWorld.objects().size());
 
 		// put the index into m_controllers into m_tag
-		{
-			int index = 0;
-			int i;
-			for (i = 0; i < colWorld.objects().size(); i++) {
-				//return array[index];
-				CollisionObject collisionObject = colWorld.objects().get(i);
-				collisionObject.setIslandTag(index);
-				collisionObject.setCompanionId(-1);
-				collisionObject.setHitFraction(1f);
-				index++;
-			}
-		}
-		// do the union find
+        int index = 0;
+        int i;
+        for (i = 0; i < colWorld.objects().size(); i++) {
+            //return array[index];
+            CollisionObject collisionObject = colWorld.objects().get(i);
+            collisionObject.setIslandTag(index);
+            collisionObject.setCompanionId(-1);
+            collisionObject.setHitFraction(1f);
+            index++;
+        }
+        // do the union find
 
 		findUnions(dispatcher, colWorld);
 	}

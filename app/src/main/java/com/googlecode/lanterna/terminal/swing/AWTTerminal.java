@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -82,7 +81,7 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
 
     /**
      * Creates a new AWTTerminal component using custom settings and no scroll controller.
-     * @param initialTerminalSize Initial size of the terminal, which will be used when calculating the preferred size
+     * @param initialTerminalPosition Initial size of the terminal, which will be used when calculating the preferred size
      *                            of the component. If null, it will default to 80x25. If the AWT layout manager forces
      *                            the component to a different size, the value of this parameter won't have any meaning
      * @param deviceConfiguration Device configuration to use for this AWTTerminal
@@ -90,12 +89,12 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
      * @param colorConfiguration Color configuration to use for this AWTTerminal
      */
     public AWTTerminal(
-            TerminalSize initialTerminalSize,
+            TerminalPosition initialTerminalPosition,
             TerminalEmulatorDeviceConfiguration deviceConfiguration,
             AWTTerminalFontConfiguration fontConfiguration,
             TerminalEmulatorColorConfiguration colorConfiguration) {
 
-        this(initialTerminalSize,
+        this(initialTerminalPosition,
                 deviceConfiguration,
                 fontConfiguration,
                 colorConfiguration,
@@ -127,7 +126,7 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
      * Creates a new AWTTerminal component using custom settings and a custom scroll controller. The scrolling
      * controller will be notified when the terminal's history size grows and will be called when this class needs to
      * figure out the current scrolling position.
-     * @param initialTerminalSize Initial size of the terminal, which will be used when calculating the preferred size
+     * @param initialTerminalPosition Initial size of the terminal, which will be used when calculating the preferred size
      *                            of the component. If null, it will default to 80x25. If the AWT layout manager forces
      *                            the component to a different size, the value of this parameter won't have any meaning
      * @param deviceConfiguration Device configuration to use for this AWTTerminal
@@ -137,7 +136,7 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
      *                         scrollable area has changed
      */
     public AWTTerminal(
-            TerminalSize initialTerminalSize,
+            TerminalPosition initialTerminalPosition,
             TerminalEmulatorDeviceConfiguration deviceConfiguration,
             AWTTerminalFontConfiguration fontConfiguration,
             TerminalEmulatorColorConfiguration colorConfiguration,
@@ -157,7 +156,7 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
         terminalImplementation = new AWTTerminalImplementation(
                 this,
                 fontConfiguration,
-                initialTerminalSize,
+                initialTerminalPosition,
                 deviceConfiguration,
                 colorConfiguration,
                 scrollController);
@@ -211,18 +210,18 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
     }
 
     @Override
-    public void setCursorPosition(int x, int y) {
-        terminalImplementation.setCursorPosition(x, y);
+    public void moveCursorTo(int x, int y) {
+        terminalImplementation.moveCursorTo(x, y);
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) {
-        terminalImplementation.setCursorPosition(position);
+    public void moveCursorTo(TerminalPosition position) {
+        terminalImplementation.moveCursorTo(position);
     }
 
     @Override
-    public TerminalPosition getCursorPosition() {
-        return terminalImplementation.getCursorPosition();
+    public TerminalPosition cursor() {
+        return terminalImplementation.cursor();
     }
 
     @Override
@@ -231,8 +230,8 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
     }
 
     @Override
-    public void putCharacter(char c) {
-        terminalImplementation.putCharacter(c);
+    public void put(char c) {
+        terminalImplementation.put(c);
     }
 
     @Override
@@ -251,18 +250,18 @@ public class AWTTerminal extends Panel implements IOSafeTerminal {
     }
 
     @Override
-    public void setForegroundColor(TextColor color) {
-        terminalImplementation.setForegroundColor(color);
+    public void fore(TextColor color) {
+        terminalImplementation.fore(color);
     }
 
     @Override
-    public void setBackgroundColor(TextColor color) {
-        terminalImplementation.setBackgroundColor(color);
+    public void back(TextColor color) {
+        terminalImplementation.back(color);
     }
 
     @Override
-    public TerminalSize getTerminalSize() {
-        return terminalImplementation.getTerminalSize();
+    public TerminalPosition terminalSize() {
+        return terminalImplementation.terminalSize();
     }
 
     @Override

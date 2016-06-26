@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 /**
  * Listener interface that can be used to be alerted on terminal resizing
@@ -35,5 +35,5 @@ public interface TerminalResizeListener {
      * @param newSize Size of the terminal after the resize
      */
     @SuppressWarnings("UnusedParameters")
-    void onResized(Terminal terminal, TerminalSize newSize);
+    void onResized(Terminal terminal, TerminalPosition newSize);
 }

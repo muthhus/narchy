@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -81,12 +81,12 @@ public class ScrollBarTest extends TestBase {
         controlPanel.addComponent(new Label("Vertical view size:")).addComponent(textBoxVerticalSize);
         controlPanel.addComponent(new Label("Vertical scroll position:")).addComponent(textBoxVerticalPosition);
         controlPanel.addComponent(new Label("Vertical scroll max:")).addComponent(textBoxVerticalMax);
-        controlPanel.addComponent(new EmptySpace(TerminalSize.ONE)).addComponent(new EmptySpace(TerminalSize.ONE));
+        controlPanel.addComponent(new EmptySpace(TerminalPosition.ONE)).addComponent(new EmptySpace(TerminalPosition.ONE));
         controlPanel.addComponent(new Label("Horizontal tracker grows:")).addComponent(checkHorizontalTrackerGrow);
         controlPanel.addComponent(new Label("Horizontal view size:")).addComponent(textBoxHorizontalSize);
         controlPanel.addComponent(new Label("Horizontal scroll position:")).addComponent(textBoxHorizontalPosition);
         controlPanel.addComponent(new Label("Horizontal scroll max:")).addComponent(textBoxHorizontalMax);
-        controlPanel.addComponent(new EmptySpace(TerminalSize.ONE)).addComponent(new EmptySpace(TerminalSize.ONE));
+        controlPanel.addComponent(new EmptySpace(TerminalPosition.ONE)).addComponent(new EmptySpace(TerminalPosition.ONE));
         controlPanel.addComponent(buttonRefresh);
         contentPanel.addComponent(closeButton);
 

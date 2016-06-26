@@ -86,9 +86,9 @@ public class TableModel<V> {
      * @param columnLabels Labels for the column headers
      */
     public TableModel(String... columnLabels) {
-        this.columns = new ArrayList<String>(Arrays.asList(columnLabels));
-        this.rows = new ArrayList<List<V>>();
-        this.listeners = new ArrayList<Listener<V>>();
+        this.columns = new ArrayList<>(Arrays.asList(columnLabels));
+        this.rows = new ArrayList<>();
+        this.listeners = new ArrayList<>();
     }
 
     /**
@@ -112,9 +112,9 @@ public class TableModel<V> {
      * @return All rows in the model as a list of lists containing the data as elements
      */
     public synchronized List<List<V>> getRows() {
-        List<List<V>> copy = new ArrayList<List<V>>();
+        List<List<V>> copy = new ArrayList<>();
         for(List<V> row: rows) {
-            copy.add(new ArrayList<V>(row));
+            copy.add(new ArrayList<>(row));
         }
         return copy;
     }
@@ -124,7 +124,7 @@ public class TableModel<V> {
      * @return All column header label as a list of strings
      */
     public synchronized List<String> getColumnLabels() {
-        return new ArrayList<String>(columns);
+        return new ArrayList<>(columns);
     }
 
     /**
@@ -133,7 +133,7 @@ public class TableModel<V> {
      * @return Row from the table as a list of the cell data
      */
     public synchronized List<V> getRow(int index) {
-        return new ArrayList<V>(rows.get(index));
+        return new ArrayList<>(rows.get(index));
     }
 
     /**
@@ -164,7 +164,7 @@ public class TableModel<V> {
      * @return Itself
      */
     public synchronized TableModel<V> insertRow(int index, Collection<V> values) {
-        ArrayList<V> list = new ArrayList<V>(values);
+        ArrayList<V> list = new ArrayList<>(values);
         rows.add(index, list);
         for(Listener<V> listener: listeners) {
             listener.onRowAdded(this, index);
@@ -257,7 +257,7 @@ public class TableModel<V> {
      */
     public synchronized TableModel<V> removeColumn(int index) {
         String removedColumnHeader = columns.remove(index);
-        List<V> removedColumn = new ArrayList<V>();
+        List<V> removedColumn = new ArrayList<>();
         for(List<V> row : rows) {
             removedColumn.add(row.remove(index));
         }
@@ -275,7 +275,7 @@ public class TableModel<V> {
      */
     public synchronized V getCell(int columnIndex, int rowIndex) {
         if(rowIndex < 0 || columnIndex < 0) {
-            throw new IndexOutOfBoundsException("Invalid row or column index: " + rowIndex + " " + columnIndex);
+            throw new IndexOutOfBoundsException("Invalid row or column index: " + rowIndex + ' ' + columnIndex);
         }
         else if (rowIndex >= getRowCount()) {
             throw new IndexOutOfBoundsException("TableModel has " + getRowCount() + " rows, invalid access at rowIndex " + rowIndex);

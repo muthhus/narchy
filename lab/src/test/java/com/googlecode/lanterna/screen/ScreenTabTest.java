@@ -38,7 +38,7 @@ public class ScreenTabTest {
     public ScreenTabTest(String[] args) throws InterruptedException, IOException {
         screen = new TestTerminalFactory(args).createScreen();
         screen.startScreen();
-        screen.setCursorPosition(new TerminalPosition(0, 0));
+        screen.moveCursorTo(new TerminalPosition(0, 0));
         putStrings("Trying out some tabs!");
 
         long now = System.currentTimeMillis();
@@ -74,22 +74,22 @@ public class ScreenTabTest {
         writer.putString(10, 9, "Default behaviour is: " + screen.getTabBehaviour());
         writer.putString(10, 10, "Testing Screen's tab replacement:");
         writer.putString(10, 11, "XXXXXXXXXXXXXXXX");
-        screen.setCharacter(12, 11, new TextCharacter('\t'));
+        screen.set(12, 11, new TextCharacter('\t'));
         screen.setTabBehaviour(TabBehaviour.CONVERT_TO_ONE_SPACE);
-        screen.setCharacter(20, 11, new TextCharacter('\t'));
+        screen.set(20, 11, new TextCharacter('\t'));
         screen.refresh();
 
         //Verify
-        if(' ' != screen.getBackCharacter(new TerminalPosition(20, 11)).getCharacter()) {
+        if(' ' != screen.back(new TerminalPosition(20, 11)).c) {
             throw new IllegalStateException("Expected tab to be replaced with space");
         }
-        if('X' != screen.getBackCharacter(new TerminalPosition(21, 11)).getCharacter()) {
+        if('X' != screen.back(new TerminalPosition(21, 11)).c) {
             throw new IllegalStateException("Expected X in back buffer");
         }
-        if(' ' != screen.getFrontCharacter(new TerminalPosition(20, 11)).getCharacter()) {
+        if(' ' != screen.front(new TerminalPosition(20, 11)).c) {
             throw new IllegalStateException("Expected tab to be replaced with space");
         }
-        if('X' != screen.getFrontCharacter(new TerminalPosition(21, 11)).getCharacter()) {
+        if('X' != screen.front(new TerminalPosition(21, 11)).c) {
             throw new IllegalStateException("Expected X in front buffer");
         }
     }

@@ -157,19 +157,18 @@ public class HeightfieldTerrainShape extends ConcaveShape {
 				endJ = quantizedAabbMax[2];
 			break;
 		}
-		case 1: {
-			if (quantizedAabbMin[0] > startX)
-				startX = quantizedAabbMin[0];
-			if (quantizedAabbMax[0] < endX)
-				endX = quantizedAabbMax[0];
-			if (quantizedAabbMin[2] > startJ)
-				startJ = quantizedAabbMin[2];
-			if (quantizedAabbMax[2] < endJ)
-				endJ = quantizedAabbMax[2];
-			break;
-		}
+		case 1:
+            if (quantizedAabbMin[0] > startX)
+                startX = quantizedAabbMin[0];
+            if (quantizedAabbMax[0] < endX)
+                endX = quantizedAabbMax[0];
+            if (quantizedAabbMin[2] > startJ)
+                startJ = quantizedAabbMin[2];
+            if (quantizedAabbMax[2] < endJ)
+                endJ = quantizedAabbMax[2];
+            break;
 
-		case 2:
+            case 2:
             if (quantizedAabbMin[0] > startX)
                 startX = quantizedAabbMin[0];
             if (quantizedAabbMax[0] < endX)

@@ -57,7 +57,7 @@ public abstract class AbstractTextGUI implements TextGUI {
             throw new IllegalArgumentException("Creating a TextGUI requires an underlying Screen");
         }
         this.screen = screen;
-        this.listeners = new CopyOnWriteArrayList<Listener>();
+        this.listeners = new CopyOnWriteArrayList<>();
         this.blockingIO = false;
         this.dirty = false;
         this.guiTheme = new PropertiesTheme(loadDefaultThemeProperties());
@@ -131,7 +131,7 @@ public abstract class AbstractTextGUI implements TextGUI {
     public synchronized void updateScreen() throws IOException {
         screen.doResizeIfNecessary();
         drawGUI(new TextGUIGraphics(this, screen.newTextGraphics(), guiTheme));
-        screen.setCursorPosition(getCursorPosition());
+        screen.moveCursorTo(getCursorPosition());
         screen.refresh();
         dirty = false;
     }

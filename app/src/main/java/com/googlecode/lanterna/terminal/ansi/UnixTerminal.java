@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.terminal.ansi;
 
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,11 +189,11 @@ public class UnixTerminal extends UnixLikeTerminal {
     }
 
     @Override
-    public TerminalSize findTerminalSize() throws IOException {
+    public TerminalPosition findTerminalSize() throws IOException {
         if(terminalSizeQuerier != null) {
             return terminalSizeQuerier.queryTerminalSize();
         }
         
-        return super.getTerminalSize();
+        return super.terminalSize();
     }
 }

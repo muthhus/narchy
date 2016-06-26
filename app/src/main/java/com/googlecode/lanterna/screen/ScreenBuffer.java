@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -39,7 +38,7 @@ public class ScreenBuffer implements TextImage {
      * @param size Size of the buffer
      * @param filler What character to set as the initial content of the buffer
      */
-    public ScreenBuffer(TerminalSize size, TextCharacter filler) {
+    public ScreenBuffer(TerminalPosition size, TextCharacter filler) {
         this(new BasicTextImage(size, filler));
     }
     
@@ -48,7 +47,7 @@ public class ScreenBuffer implements TextImage {
     }
     
     @Override
-    public ScreenBuffer resize(TerminalSize newSize, TextCharacter filler) {
+    public ScreenBuffer resize(TerminalPosition newSize, TextCharacter filler) {
         BasicTextImage resizedBackend = backend.resize(newSize, filler);
         return new ScreenBuffer(resizedBackend);
     }
@@ -59,9 +58,9 @@ public class ScreenBuffer implements TextImage {
                     + " This is probably a bug in Lanterna.");
         }
         int differences = 0;
-        for(int y = 0; y < getSize().getRows(); y++) {
-            for(int x = 0; x < getSize().getColumns(); x++) {
-                if(!getCharacterAt(x, y).equals(other.getCharacterAt(x, y))) {
+        for(int y = 0; y < getSize().row; y++) {
+            for(int x = 0; x < getSize().column; x++) {
+                if(!get(x, y).equals(other.get(x, y))) {
                     if(++differences >= threshold) {
                         return true;
                     }
@@ -74,28 +73,28 @@ public class ScreenBuffer implements TextImage {
     ///////////////////////////////////////////////////////////////////////////////
     //  Delegate all TextImage calls (except resize) to the backend BasicTextImage
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return backend.getSize();
     }
 
     @Override
-    public TextCharacter getCharacterAt(TerminalPosition position) {
-        return backend.getCharacterAt(position);
+    public TextCharacter get(TerminalPosition position) {
+        return backend.get(position);
     }
 
     @Override
-    public TextCharacter getCharacterAt(int column, int row) {
-        return backend.getCharacterAt(column, row);
+    public TextCharacter get(int column, int row) {
+        return backend.get(column, row);
     }
 
     @Override
-    public void setCharacterAt(TerminalPosition position, TextCharacter character) {
-        backend.setCharacterAt(position, character);
+    public void set(TerminalPosition position, TextCharacter character) {
+        backend.set(position, character);
     }
 
     @Override
-    public void setCharacterAt(int column, int row, TextCharacter character) {
-        backend.setCharacterAt(column, row, character);
+    public void set(int column, int row, TextCharacter character) {
+        backend.set(column, row, character);
     }
 
     @Override

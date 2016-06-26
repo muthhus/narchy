@@ -64,7 +64,7 @@ public class SGRTest {
         textGraphics.enableModifiers(SGR.REVERSE);
         textGraphics.putString(10, 16, string);
         textGraphics.disableModifiers(SGR.REVERSE);
-        rawTerminal.setCursorPosition(0, 0);
+        rawTerminal.moveCursorTo(0, 0);
         rawTerminal.flush();
         try {
             while(rawTerminal.pollInput() == null) {

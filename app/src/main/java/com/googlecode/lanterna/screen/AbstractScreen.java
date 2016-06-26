@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -43,12 +42,12 @@ public abstract class AbstractScreen implements Screen {
     private TabBehaviour tabBehaviour;
 
     //Current size of the screen
-    private TerminalSize terminalSize;
+    private TerminalPosition terminalPosition;
 
     //Pending resize of the screen
-    private TerminalSize latestResizeRequest;
+    private TerminalPosition latestResizeRequest;
 
-    public AbstractScreen(TerminalSize initialSize) {
+    public AbstractScreen(TerminalPosition initialSize) {
         this(initialSize, DEFAULT_CHARACTER);
     }
 
@@ -61,13 +60,13 @@ public abstract class AbstractScreen implements Screen {
      * @param defaultCharacter What character to use for the initial state of the screen and expanded areas
      */
     @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
-    public AbstractScreen(TerminalSize initialSize, TextCharacter defaultCharacter) {
+    public AbstractScreen(TerminalPosition initialSize, TextCharacter defaultCharacter) {
         this.frontBuffer = new ScreenBuffer(initialSize, defaultCharacter);
         this.backBuffer = new ScreenBuffer(initialSize, defaultCharacter);
         this.defaultCharacter = defaultCharacter;
         this.cursorPosition = new TerminalPosition(0, 0);
         this.tabBehaviour = TabBehaviour.ALIGN_TO_COLUMN_4;
-        this.terminalSize = initialSize;
+        this.terminalPosition = initialSize;
         this.latestResizeRequest = null;
     }
 
@@ -76,7 +75,7 @@ public abstract class AbstractScreen implements Screen {
      * cursor is not visible
      */
     @Override
-    public TerminalPosition getCursorPosition() {
+    public TerminalPosition cursorPosition() {
         return cursorPosition;
     }
 
@@ -87,23 +86,23 @@ public abstract class AbstractScreen implements Screen {
      * @param position 0-indexed column and row numbers of the new position, or if {@code null}, hides the cursor
      */
     @Override
-    public void setCursorPosition(TerminalPosition position) {
+    public void moveCursorTo(TerminalPosition position) {
         if(position == null) {
             //Skip any validation checks if we just want to hide the cursor
             this.cursorPosition = null;
             return;
         }
-        if(position.getColumn() < 0) {
+        if(position.column < 0) {
             position = position.withColumn(0);
         }
-        if(position.getRow() < 0) {
+        if(position.row < 0) {
             position = position.withRow(0);
         }
-        if(position.getColumn() >= terminalSize.getColumns()) {
-            position = position.withColumn(terminalSize.getColumns() - 1);
+        if(position.column >= terminalPosition.column) {
+            position = position.withColumn(terminalPosition.column - 1);
         }
-        if(position.getRow() >= terminalSize.getRows()) {
-            position = position.withRow(terminalSize.getRows() - 1);
+        if(position.row >= terminalPosition.row) {
+            position = position.withRow(terminalPosition.row - 1);
         }
         this.cursorPosition = position;
     }
@@ -121,68 +120,68 @@ public abstract class AbstractScreen implements Screen {
     }
 
     @Override
-    public void setCharacter(TerminalPosition position, TextCharacter screenCharacter) {
-        setCharacter(position.getColumn(), position.getRow(), screenCharacter);
+    public void set(TerminalPosition position, TextCharacter screenCharacter) {
+        set(position.column, position.row, screenCharacter);
     }
 
     @Override
     public TextGraphics newTextGraphics() {
         return new ScreenTextGraphics(this) {
             @Override
-            public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalSize sourceImageSize) {
-                backBuffer.copyFrom(image, sourceImageTopLeft.getRow(), sourceImageSize.getRows(), sourceImageTopLeft.getColumn(), sourceImageSize.getColumns(), topLeft.getRow(), topLeft.getColumn());
+            public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalPosition sourceImageSize) {
+                backBuffer.copyFrom(image, sourceImageTopLeft.row, sourceImageSize.row, sourceImageTopLeft.column, sourceImageSize.column, topLeft.row, topLeft.column);
                 return this;
             }
         };
     }
 
     @Override
-    public synchronized void setCharacter(int column, int row, TextCharacter screenCharacter) {
+    public synchronized void set(int column, int row, TextCharacter screenCharacter) {
         //It would be nice if we didn't have to care about tabs at this level, but we have no such luxury
-        if(screenCharacter.getCharacter() == '\t') {
+        if(screenCharacter.c == '\t') {
             //Swap out the tab for a space
             screenCharacter = screenCharacter.withCharacter(' ');
 
             //Now see how many times we have to put spaces...
             for(int i = 0; i < tabBehaviour.replaceTabs("\t", column).length(); i++) {
-                backBuffer.setCharacterAt(column + i, row, screenCharacter);
+                backBuffer.set(column + i, row, screenCharacter);
             }
         }
         else {
             //This is the normal case, no special character
-            backBuffer.setCharacterAt(column, row, screenCharacter);
+            backBuffer.set(column, row, screenCharacter);
         }
 
         //Pad CJK character with a trailing space
-        if(TerminalTextUtils.isCharCJK(screenCharacter.getCharacter())) {
-            backBuffer.setCharacterAt(column + 1, row, screenCharacter.withCharacter(' '));
+        if(TerminalTextUtils.isCharCJK(screenCharacter.c)) {
+            backBuffer.set(column + 1, row, screenCharacter.withCharacter(' '));
         }
         //If there's a CJK character immediately to our left, reset it
         if(column > 0) {
-            TextCharacter cjkTest = backBuffer.getCharacterAt(column - 1, row);
-            if(cjkTest != null && TerminalTextUtils.isCharCJK(cjkTest.getCharacter())) {
-                backBuffer.setCharacterAt(column - 1, row, backBuffer.getCharacterAt(column - 1, row).withCharacter(' '));
+            TextCharacter cjkTest = backBuffer.get(column - 1, row);
+            if(cjkTest != null && TerminalTextUtils.isCharCJK(cjkTest.c)) {
+                backBuffer.set(column - 1, row, backBuffer.get(column - 1, row).withCharacter(' '));
             }
         }
     }
 
     @Override
-    public synchronized TextCharacter getFrontCharacter(TerminalPosition position) {
-        return getFrontCharacter(position.getColumn(), position.getRow());
+    public synchronized TextCharacter front(TerminalPosition position) {
+        return front(position.column, position.row);
     }
 
     @Override
-    public TextCharacter getFrontCharacter(int column, int row) {
+    public TextCharacter front(int column, int row) {
         return getCharacterFromBuffer(frontBuffer, column, row);
     }
 
     @Override
-    public synchronized TextCharacter getBackCharacter(TerminalPosition position) {
-        return getBackCharacter(position.getColumn(), position.getRow());
+    public synchronized TextCharacter back(TerminalPosition position) {
+        return back(position.column, position.row);
     }
 
     @Override
-    public TextCharacter getBackCharacter(int column, int row) {
+    public TextCharacter back(int column, int row) {
         return getCharacterFromBuffer(backBuffer, column, row);
     }
 
@@ -197,8 +196,8 @@ public abstract class AbstractScreen implements Screen {
     }
 
     @Override
-    public synchronized TerminalSize doResizeIfNecessary() {
-        TerminalSize pendingResize = getAndClearPendingResize();
+    public synchronized TerminalPosition doResizeIfNecessary() {
+        TerminalPosition pendingResize = getAndClearPendingResize();
         if(pendingResize == null) {
             return null;
         }
@@ -209,8 +208,8 @@ public abstract class AbstractScreen implements Screen {
     }
 
     @Override
-    public TerminalSize getTerminalSize() {
-        return terminalSize;
+    public TerminalPosition terminalSize() {
+        return terminalPosition;
     }
 
     /**
@@ -229,11 +228,11 @@ public abstract class AbstractScreen implements Screen {
         return backBuffer;
     }
 
-    private synchronized TerminalSize getAndClearPendingResize() {
+    private synchronized TerminalPosition getAndClearPendingResize() {
         if(latestResizeRequest != null) {
-            terminalSize = latestResizeRequest;
+            terminalPosition = latestResizeRequest;
             latestResizeRequest = null;
-            return terminalSize;
+            return terminalPosition;
         }
         return null;
     }
@@ -242,23 +241,23 @@ public abstract class AbstractScreen implements Screen {
      * Tells this screen that the size has changed and it should, at next opportunity, resize itself and its buffers
      * @param newSize New size the 'real' terminal now has
      */
-    protected void addResizeRequest(TerminalSize newSize) {
+    protected void addResizeRequest(TerminalPosition newSize) {
         latestResizeRequest = newSize;
     }
 
-    private TextCharacter getCharacterFromBuffer(ScreenBuffer buffer, int column, int row) {
+    private static TextCharacter getCharacterFromBuffer(ScreenBuffer buffer, int column, int row) {
         if(column > 0) {
             //If we are picking the padding of a CJK character, pick the actual CJK character instead of the padding
-            TextCharacter leftOfSpecifiedCharacter = buffer.getCharacterAt(column - 1, row);
+            TextCharacter leftOfSpecifiedCharacter = buffer.get(column - 1, row);
             if(leftOfSpecifiedCharacter == null) {
                 //If the character left of us doesn't exist, we don't exist either
                 return null;
             }
-            else if(TerminalTextUtils.isCharCJK(leftOfSpecifiedCharacter.getCharacter())) {
+            else if(TerminalTextUtils.isCharCJK(leftOfSpecifiedCharacter.c)) {
                 return leftOfSpecifiedCharacter;
             }
         }
-        return buffer.getCharacterAt(column, row);
+        return buffer.get(column, row);
     }
     
     @Override

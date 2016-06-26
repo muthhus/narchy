@@ -42,12 +42,7 @@ public abstract class AbstractTextGraphics implements TextGraphics {
         this.tabBehaviour = TabBehaviour.ALIGN_TO_COLUMN_4;
         this.foregroundColor = TextColor.ANSI.DEFAULT;
         this.backgroundColor = TextColor.ANSI.DEFAULT;
-        this.shapeRenderer = new DefaultShapeRenderer(new DefaultShapeRenderer.Callback() {
-            @Override
-            public void onPoint(int column, int row, TextCharacter character) {
-                setCharacter(column, row, character);
-            }
-        });
+        this.shapeRenderer = new DefaultShapeRenderer(this::set);
     }
 
     @Override
@@ -130,19 +125,19 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int column, int row, char character) {
-        return setCharacter(column, row, newTextCharacter(character));
+    public TextGraphics set(int column, int row, char character) {
+        return set(column, row, newTextCharacter(character));
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, TextCharacter textCharacter) {
-        setCharacter(position.getColumn(), position.getRow(), textCharacter);
+    public TextGraphics set(TerminalPosition position, TextCharacter textCharacter) {
+        set(position.column, position.row, textCharacter);
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, char character) {
-        return setCharacter(position.getColumn(), position.getRow(), character);
+    public TextGraphics set(TerminalPosition position, char character) {
+        return set(position.column, position.row, character);
     }
 
     @Override
@@ -189,23 +184,23 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         return drawRectangle(topLeft, size, newTextCharacter(character));
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         shapeRenderer.drawRectangle(topLeft, size, character);
         return this;
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         return fillRectangle(topLeft, size, newTextCharacter(character));
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         shapeRenderer.fillRectangle(topLeft, size, character);
         return this;
     }
@@ -220,44 +215,44 @@ public abstract class AbstractTextGraphics implements TextGraphics {
             TerminalPosition topLeft,
             TextImage image,
             TerminalPosition sourceImageTopLeft,
-            TerminalSize sourceImageSize) {
+            TerminalPosition sourceImageSize) {
 
         // If the source image position is negative, offset the whole image
-        if(sourceImageTopLeft.getColumn() < 0) {
-            topLeft = topLeft.withRelativeColumn(-sourceImageTopLeft.getColumn());
-            sourceImageSize = sourceImageSize.withRelativeColumns(sourceImageTopLeft.getColumn());
+        if(sourceImageTopLeft.column < 0) {
+            topLeft = topLeft.withRelativeColumn(-sourceImageTopLeft.column);
+            sourceImageSize = sourceImageSize.withRelativeColumn(sourceImageTopLeft.column);
             sourceImageTopLeft = sourceImageTopLeft.withColumn(0);
         }
-        if(sourceImageTopLeft.getRow() < 0) {
-            topLeft = topLeft.withRelativeRow(-sourceImageTopLeft.getRow());
-            sourceImageSize = sourceImageSize.withRelativeRows(sourceImageTopLeft.getRow());
+        if(sourceImageTopLeft.row < 0) {
+            topLeft = topLeft.withRelativeRow(-sourceImageTopLeft.row);
+            sourceImageSize = sourceImageSize.withRelativeRow(sourceImageTopLeft.row);
             sourceImageTopLeft = sourceImageTopLeft.withRow(0);
         }
 
         // cropping specified image-subrectangle to the image itself:
-        int fromRow = Math.max(sourceImageTopLeft.getRow(), 0);
-        int untilRow = Math.min(sourceImageTopLeft.getRow() + sourceImageSize.getRows(), image.getSize().getRows());
-        int fromColumn = Math.max(sourceImageTopLeft.getColumn(), 0);
-        int untilColumn = Math.min(sourceImageTopLeft.getColumn() + sourceImageSize.getColumns(), image.getSize().getColumns());
+        int fromRow = Math.max(sourceImageTopLeft.row, 0);
+        int untilRow = Math.min(sourceImageTopLeft.row + sourceImageSize.row, image.getSize().row);
+        int fromColumn = Math.max(sourceImageTopLeft.column, 0);
+        int untilColumn = Math.min(sourceImageTopLeft.column + sourceImageSize.column, image.getSize().column);
 
         // difference between position in image and position on target:
-        int diffRow = topLeft.getRow() - sourceImageTopLeft.getRow();
-        int diffColumn = topLeft.getColumn() - sourceImageTopLeft.getColumn();
+        int diffRow = topLeft.row - sourceImageTopLeft.row;
+        int diffColumn = topLeft.column - sourceImageTopLeft.column;
 
         // top/left-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
         fromRow = Math.max(fromRow, -diffRow);
         fromColumn = Math.max(fromColumn, -diffColumn);
 
         // bot/right-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
-        untilRow = Math.min(untilRow, getSize().getRows() - diffRow);
-        untilColumn = Math.min(untilColumn, getSize().getColumns() - diffColumn);
+        untilRow = Math.min(untilRow, getSize().row - diffRow);
+        untilColumn = Math.min(untilColumn, getSize().column - diffColumn);
 
         if (fromRow >= untilRow || fromColumn >= untilColumn) {
             return this;
         }
         for (int row = fromRow; row < untilRow; row++) {
             for (int column = fromColumn; column < untilColumn; column++) {
-                setCharacter(column + diffColumn, row + diffRow, image.getCharacterAt(column, row));
+                set(column + diffColumn, row + diffRow, image.get(column, row));
             }
         }
         return this;
@@ -266,16 +261,16 @@ public abstract class AbstractTextGraphics implements TextGraphics {
     @Override
     public TextGraphics putString(int column, int row, String string) {
         if(string.contains("\n")) {
-            string = string.substring(0, string.indexOf("\n"));
+            string = string.substring(0, string.indexOf('\n'));
         }
         if(string.contains("\r")) {
-            string = string.substring(0, string.indexOf("\r"));
+            string = string.substring(0, string.indexOf('\r'));
         }
         string = tabBehaviour.replaceTabs(string, column);
         int offset = 0;
         for(int i = 0; i < string.length(); i++) {
             char character = string.charAt(i);
-            setCharacter(
+            set(
                     column + offset,
                     row,
                     new TextCharacter(
@@ -298,7 +293,7 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics putString(TerminalPosition position, String string) {
-        putString(position.getColumn(), position.getRow(), string);
+        putString(position.column, position.row, string);
         return this;
     }
 
@@ -318,22 +313,22 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics putString(TerminalPosition position, String string, SGR extraModifier, SGR... optionalExtraModifiers) {
-        putString(position.getColumn(), position.getRow(), string, extraModifier, optionalExtraModifiers);
+        putString(position.column, position.row, string, extraModifier, optionalExtraModifiers);
         return this;
     }
 
     @Override
-    public TextCharacter getCharacter(TerminalPosition position) {
-        return getCharacter(position.getColumn(), position.getRow());
+    public TextCharacter get(TerminalPosition position) {
+        return get(position.column, position.row);
     }
 
     @Override
-    public TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalSize size) throws IllegalArgumentException {
-        TerminalSize writableArea = getSize();
-        if(topLeftCorner.getColumn() + size.getColumns() <= 0 ||
-                topLeftCorner.getColumn() >= writableArea.getColumns() ||
-                topLeftCorner.getRow() + size.getRows() <= 0 ||
-                topLeftCorner.getRow() >= writableArea.getRows()) {
+    public TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalPosition size) throws IllegalArgumentException {
+        TerminalPosition writableArea = getSize();
+        if(topLeftCorner.column + size.column <= 0 ||
+                topLeftCorner.column >= writableArea.column ||
+                topLeftCorner.row + size.row <= 0 ||
+                topLeftCorner.row >= writableArea.row) {
             //The area selected is completely outside of this TextGraphics, so we can return a "null" object that doesn't
             //do anything because it is impossible to change anything anyway
             return new NullTextGraphics(size);

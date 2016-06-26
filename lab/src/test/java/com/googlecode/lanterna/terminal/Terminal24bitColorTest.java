@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextColor;
 
@@ -38,7 +38,7 @@ public class Terminal24bitColorTest {
         Terminal terminal = new TestTerminalFactory(args).createTerminal();
         terminal.enterPrivateMode();
         terminal.clearScreen();
-        TerminalSize size = terminal.getTerminalSize();
+        TerminalPosition size = terminal.terminalSize();
 
         while(true) {
             if(terminal.pollInput() != null) {
@@ -46,9 +46,9 @@ public class Terminal24bitColorTest {
                 return;
             }
 
-            terminal.setForegroundColor(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-            terminal.setBackgroundColor(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-            terminal.setCursorPosition(random.nextInt(size.getColumns() - string.length()), random.nextInt(size.getRows()));
+            terminal.fore(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+            terminal.back(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+            terminal.moveCursorTo(random.nextInt(size.column - string.length()), random.nextInt(size.row));
             printString(terminal, string);
 
             try {
@@ -61,7 +61,7 @@ public class Terminal24bitColorTest {
 
     private static void printString(Terminal terminal, String string) throws IOException {
         for(int i = 0; i < string.length(); i++) {
-            terminal.putCharacter(string.charAt(i));
+            terminal.put(string.charAt(i));
         }
         terminal.flush();
     }

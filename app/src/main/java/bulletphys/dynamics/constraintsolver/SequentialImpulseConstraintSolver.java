@@ -1285,15 +1285,13 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 
 		{
 			if (cp.getDistance() <= 0f) {
-				{
-					ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
-					float impulse = cpd.contactSolverFunc.resolveContact(body0, body1, cp, info);
+                ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
+                float impulse = cpd.contactSolverFunc.resolveContact(body0, body1, cp, info);
 
-					if (maxImpulse < impulse) {
-						maxImpulse = impulse;
-					}
-				}
-			}
+                if (maxImpulse < impulse) {
+                    maxImpulse = impulse;
+                }
+            }
 		}
 
 		return maxImpulse;

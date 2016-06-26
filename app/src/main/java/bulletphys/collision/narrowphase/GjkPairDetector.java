@@ -69,7 +69,8 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
 		this.minkowskiB = objectB;
 	}
 
-	public void getClosestPoints(ClosestPointInput input, Result output, boolean swapResults) {
+	@Override
+    public void getClosestPoints(ClosestPointInput input, Result output, boolean swapResults) {
 		Vector3f tmp = new Vector3f();
 
 		float distance = 0f;

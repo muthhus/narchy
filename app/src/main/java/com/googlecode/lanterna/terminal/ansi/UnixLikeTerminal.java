@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal.ansi;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import java.io.IOException;
@@ -103,7 +103,7 @@ public abstract class UnixLikeTerminal extends ANSITerminal {
             public void run() {
                 // This will trigger a resize notification as the size will be different than before
                 try {
-                    getTerminalSize();
+                    terminalSize();
                 }
                 catch(IOException ignore) {
                     // Not much to do here, we can't re-throw it
@@ -114,10 +114,10 @@ public abstract class UnixLikeTerminal extends ANSITerminal {
     }
 
     @Override
-    protected TerminalSize findTerminalSize() throws IOException {
-        TerminalSize terminalSize = deviceControlStrategy.getTerminalSize();
-        if(terminalSize != null) {
-            return terminalSize;
+    protected TerminalPosition findTerminalSize() throws IOException {
+        TerminalPosition terminalPosition = deviceControlStrategy.getTerminalSize();
+        if(terminalPosition != null) {
+            return terminalPosition;
         }
         return super.findTerminalSize();
     }
@@ -223,8 +223,8 @@ public abstract class UnixLikeTerminal extends ANSITerminal {
                         exitPrivateMode();
                     }
                 }
-                catch(IOException ignored) {}
-                catch(IllegalStateException ignored) {} // still possible!
+                catch(IOException | IllegalStateException ignored) {}
+                // still possible!
 
                 try {
                     restoreTerminalSettings();

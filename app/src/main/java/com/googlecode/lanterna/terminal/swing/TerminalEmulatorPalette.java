@@ -22,6 +22,7 @@ package com.googlecode.lanterna.terminal.swing;
 import com.googlecode.lanterna.TextColor;
 
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * This class specifies the palette of colors the terminal will use for the normally available 8 + 1 ANSI colors but
@@ -340,61 +341,61 @@ public class TerminalEmulatorPalette {
             return false;
         }
         final TerminalEmulatorPalette other = (TerminalEmulatorPalette) obj;
-        if(this.defaultColor != other.defaultColor && (this.defaultColor == null || !this.defaultColor.equals(other.defaultColor))) {
+        if(!Objects.equals(defaultColor, defaultColor)) {
             return false;
         }
-        if(this.defaultBrightColor != other.defaultBrightColor && (this.defaultBrightColor == null || !this.defaultBrightColor.equals(other.defaultBrightColor))) {
+        if(!Objects.equals(defaultBrightColor, defaultBrightColor)) {
             return false;
         }
-        if(this.defaultBackgroundColor != other.defaultBackgroundColor && (this.defaultBackgroundColor == null || !this.defaultBackgroundColor.equals(other.defaultBackgroundColor))) {
+        if(!Objects.equals(defaultBackgroundColor, defaultBackgroundColor)) {
             return false;
         }
-        if(this.normalBlack != other.normalBlack && (this.normalBlack == null || !this.normalBlack.equals(other.normalBlack))) {
+        if(!Objects.equals(normalBlack, normalBlack)) {
             return false;
         }
-        if(this.brightBlack != other.brightBlack && (this.brightBlack == null || !this.brightBlack.equals(other.brightBlack))) {
+        if(!Objects.equals(brightBlack, brightBlack)) {
             return false;
         }
-        if(this.normalRed != other.normalRed && (this.normalRed == null || !this.normalRed.equals(other.normalRed))) {
+        if(!Objects.equals(normalRed, normalRed)) {
             return false;
         }
-        if(this.brightRed != other.brightRed && (this.brightRed == null || !this.brightRed.equals(other.brightRed))) {
+        if(!Objects.equals(brightRed, brightRed)) {
             return false;
         }
-        if(this.normalGreen != other.normalGreen && (this.normalGreen == null || !this.normalGreen.equals(other.normalGreen))) {
+        if(!Objects.equals(normalGreen, normalGreen)) {
             return false;
         }
-        if(this.brightGreen != other.brightGreen && (this.brightGreen == null || !this.brightGreen.equals(other.brightGreen))) {
+        if(!Objects.equals(brightGreen, brightGreen)) {
             return false;
         }
-        if(this.normalYellow != other.normalYellow && (this.normalYellow == null || !this.normalYellow.equals(other.normalYellow))) {
+        if(!Objects.equals(normalYellow, normalYellow)) {
             return false;
         }
-        if(this.brightYellow != other.brightYellow && (this.brightYellow == null || !this.brightYellow.equals(other.brightYellow))) {
+        if(!Objects.equals(brightYellow, brightYellow)) {
             return false;
         }
-        if(this.normalBlue != other.normalBlue && (this.normalBlue == null || !this.normalBlue.equals(other.normalBlue))) {
+        if(!Objects.equals(normalBlue, normalBlue)) {
             return false;
         }
-        if(this.brightBlue != other.brightBlue && (this.brightBlue == null || !this.brightBlue.equals(other.brightBlue))) {
+        if(!Objects.equals(brightBlue, brightBlue)) {
             return false;
         }
-        if(this.normalMagenta != other.normalMagenta && (this.normalMagenta == null || !this.normalMagenta.equals(other.normalMagenta))) {
+        if(!Objects.equals(normalMagenta, normalMagenta)) {
             return false;
         }
-        if(this.brightMagenta != other.brightMagenta && (this.brightMagenta == null || !this.brightMagenta.equals(other.brightMagenta))) {
+        if(!Objects.equals(brightMagenta, brightMagenta)) {
             return false;
         }
-        if(this.normalCyan != other.normalCyan && (this.normalCyan == null || !this.normalCyan.equals(other.normalCyan))) {
+        if(!Objects.equals(normalCyan, normalCyan)) {
             return false;
         }
-        if(this.brightCyan != other.brightCyan && (this.brightCyan == null || !this.brightCyan.equals(other.brightCyan))) {
+        if(!Objects.equals(brightCyan, brightCyan)) {
             return false;
         }
-        if(this.normalWhite != other.normalWhite && (this.normalWhite == null || !this.normalWhite.equals(other.normalWhite))) {
+        if(!Objects.equals(normalWhite, normalWhite)) {
             return false;
         }
-        return !(this.brightWhite != other.brightWhite && (this.brightWhite == null || !this.brightWhite.equals(other.brightWhite)));
+        return !(!Objects.equals(brightWhite, brightWhite));
     }
 
     @SuppressWarnings("ConstantConditions")

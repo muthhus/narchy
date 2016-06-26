@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal.ansi;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.terminal.ExtendedTerminal;
@@ -30,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class containing graphics code for ANSI compliant text terminals and terminal emulators. All the methods inside of
@@ -40,6 +41,7 @@ import java.nio.charset.Charset;
  */
 public abstract class ANSITerminal extends StreamBasedTerminal implements ExtendedTerminal {
 
+    private static final Pattern oo7 = Pattern.compile("\007", Pattern.LITERAL);
     private MouseCaptureMode mouseCaptureMode;
     private boolean inPrivateMode;
 
@@ -59,7 +61,7 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
      * This method can be overridden in a custom terminal implementation to change the default key decoders.
      * @return The KeyDecodingProfile used by the terminal when translating character sequences to keystrokes
      */
-    protected KeyDecodingProfile getDefaultKeyDecodingProfile() {
+    protected static KeyDecodingProfile getDefaultKeyDecodingProfile() {
         return new DefaultKeyDecodingProfile();
     }
 
@@ -90,45 +92,45 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
 
     // Final because we handle the onResized logic here; extending classes should override #findTerminalSize instead
     @Override
-    public final synchronized TerminalSize getTerminalSize() throws IOException {
-        TerminalSize size = findTerminalSize();
+    public final synchronized TerminalPosition terminalSize() throws IOException {
+        TerminalPosition size = findTerminalSize();
         onResized(size);
         return size;
     }
 
-    protected TerminalSize findTerminalSize() throws IOException {
+    protected TerminalPosition findTerminalSize() throws IOException {
         saveCursorPosition();
-        setCursorPosition(5000, 5000);
+        moveCursorTo(5000, 5000);
         resetMemorizedCursorPosition();
         reportPosition();
         restoreCursorPosition();
         TerminalPosition terminalPosition = waitForCursorPositionReport();
-        return new TerminalSize(terminalPosition.getColumn(), terminalPosition.getRow());
+        return new TerminalPosition(terminalPosition.column, terminalPosition.row);
     }
 
     @Override
     public void setTerminalSize(int columns, int rows) throws IOException {
-        writeCSISequenceToTerminal(("8;" + rows + ";" + columns + "t").getBytes());
+        writeCSISequenceToTerminal(("8;" + rows + ';' + columns + "t").getBytes());
 
         //We can't trust that the previous call was honoured by the terminal so force a re-query here, which will
         //trigger a resize event if one actually took place
-        getTerminalSize();
+        terminalSize();
     }
 
     @Override
     public void setTitle(String title) throws IOException {
         //The bell character is our 'null terminator', make sure there's none in the title
-        title = title.replace("\007", "");
-        writeOSCSequenceToTerminal(("2;" + title + "\007").getBytes());
+        title = oo7.matcher(title).replaceAll(Matcher.quoteReplacement(""));
+        writeOSCSequenceToTerminal(("2;" + title + '\007').getBytes());
     }
 
     @Override
-    public void setForegroundColor(TextColor color) throws IOException {
+    public void fore(TextColor color) throws IOException {
         writeSGRSequenceToTerminal(color.getForegroundSGRSequence());
     }
 
     @Override
-    public void setBackgroundColor(TextColor color) throws IOException {
+    public void back(TextColor color) throws IOException {
         writeSGRSequenceToTerminal(color.getBackgroundSGRSequence());
     }
 
@@ -223,17 +225,17 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
     }
 
     @Override
-    public void setCursorPosition(int x, int y) throws IOException {
-        writeCSISequenceToTerminal(((y + 1) + ";" + (x + 1) + "H").getBytes());
+    public void moveCursorTo(int x, int y) throws IOException {
+        writeCSISequenceToTerminal(((y + 1) + ";" + (x + 1) + 'H').getBytes());
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) throws IOException {
-        setCursorPosition(position.getColumn(), position.getRow());
+    public void moveCursorTo(TerminalPosition position) throws IOException {
+        moveCursorTo(position.column, position.row);
     }
 
     @Override
-    public synchronized TerminalPosition getCursorPosition() throws IOException {
+    public synchronized TerminalPosition cursor() throws IOException {
         resetMemorizedCursorPosition();
         reportPosition();
 
@@ -293,12 +295,12 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
     }
 
     @Override
-    public void pushTitle() throws IOException {
+    public void pushTitle() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public void popTitle() throws IOException {
+    public void popTitle() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

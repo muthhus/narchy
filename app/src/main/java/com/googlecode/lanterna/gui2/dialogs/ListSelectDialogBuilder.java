@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelectDialogBuilder<T>, ListSelectDialog<T>> {
     private final List<T> content;
-    private TerminalSize listBoxSize;
+    private TerminalPosition listBoxSize;
     private boolean canCancel;
 
     /**
@@ -41,7 +41,7 @@ public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelect
         super("ListSelectDialog");
         this.listBoxSize = null;
         this.canCancel = true;
-        this.content = new ArrayList<T>();
+        this.content = new ArrayList<>();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelect
 
     @Override
     protected ListSelectDialog<T> buildDialog() {
-        return new ListSelectDialog<T>(
+        return new ListSelectDialog<>(
                 title,
                 description,
                 listBoxSize,
@@ -65,7 +65,7 @@ public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelect
      * @param listBoxSize Size of the list box in the dialog
      * @return Itself
      */
-    public ListSelectDialogBuilder<T> setListBoxSize(TerminalSize listBoxSize) {
+    public ListSelectDialogBuilder<T> setListBoxSize(TerminalPosition listBoxSize) {
         this.listBoxSize = listBoxSize;
         return this;
     }
@@ -74,7 +74,7 @@ public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelect
      * Size of the list box in the dialog or {@code null} if the dialog will ask for enough space to draw all items
      * @return Size of the list box in the dialog or {@code null} if the dialog will ask for enough space to draw all items
      */
-    public TerminalSize getListBoxSize() {
+    public TerminalPosition getListBoxSize() {
         return listBoxSize;
     }
 
@@ -122,6 +122,6 @@ public class ListSelectDialogBuilder<T> extends AbstractDialogBuilder<ListSelect
      * @return Copy of the list of items in the list box
      */
     public List<T> getListItems() {
-        return new ArrayList<T>(content);
+        return new ArrayList<>(content);
     }
 }

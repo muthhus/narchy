@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -195,18 +194,18 @@ public class ScrollingAWTTerminal extends Container implements IOSafeTerminal {
     }
 
     @Override
-    public void setCursorPosition(int x, int y) {
-        awtTerminal.setCursorPosition(x, y);
+    public void moveCursorTo(int x, int y) {
+        awtTerminal.moveCursorTo(x, y);
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) {
-        awtTerminal.setCursorPosition(position);
+    public void moveCursorTo(TerminalPosition position) {
+        awtTerminal.moveCursorTo(position);
     }
 
     @Override
-    public TerminalPosition getCursorPosition() {
-        return awtTerminal.getCursorPosition();
+    public TerminalPosition cursor() {
+        return awtTerminal.cursor();
     }
 
     @Override
@@ -215,8 +214,8 @@ public class ScrollingAWTTerminal extends Container implements IOSafeTerminal {
     }
 
     @Override
-    public void putCharacter(char c) {
-        awtTerminal.putCharacter(c);
+    public void put(char c) {
+        awtTerminal.put(c);
     }
 
     @Override
@@ -240,18 +239,18 @@ public class ScrollingAWTTerminal extends Container implements IOSafeTerminal {
     }
 
     @Override
-    public void setForegroundColor(TextColor color) {
-        awtTerminal.setForegroundColor(color);
+    public void fore(TextColor color) {
+        awtTerminal.fore(color);
     }
 
     @Override
-    public void setBackgroundColor(TextColor color) {
-        awtTerminal.setBackgroundColor(color);
+    public void back(TextColor color) {
+        awtTerminal.back(color);
     }
 
     @Override
-    public TerminalSize getTerminalSize() {
-        return awtTerminal.getTerminalSize();
+    public TerminalPosition terminalSize() {
+        return awtTerminal.terminalSize();
     }
 
     @Override

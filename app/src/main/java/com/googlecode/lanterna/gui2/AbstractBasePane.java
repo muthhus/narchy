@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.input.MouseAction;
@@ -38,7 +37,7 @@ public abstract class AbstractBasePane implements BasePane {
 
     protected AbstractBasePane() {
         this.contentHolder = new ContentHolder();
-        this.interactableLookupMap = new InteractableLookupMap(new TerminalSize(80, 25));
+        this.interactableLookupMap = new InteractableLookupMap(new TerminalPosition(80, 25));
         this.invalid = false;
         this.strictFocusChange = false;
         this.enableDirectionBasedMovements = true;
@@ -179,10 +178,10 @@ public abstract class AbstractBasePane implements BasePane {
             return null;
         }
         //Don't allow the component to set the cursor outside of its own boundaries
-        if(position.getColumn() < 0 ||
-                position.getRow() < 0 ||
-                position.getColumn() >= focusedInteractable.getSize().getColumns() ||
-                position.getRow() >= focusedInteractable.getSize().getRows()) {
+        if(position.column < 0 ||
+                position.row < 0 ||
+                position.column >= focusedInteractable.getSize().column ||
+                position.row >= focusedInteractable.getSize().row) {
             return null;
         }
         return focusedInteractable.toBasePane(position);
@@ -252,12 +251,12 @@ public abstract class AbstractBasePane implements BasePane {
 
         @Override
         protected ComponentRenderer<Container> createDefaultRenderer() {
-            return new ComponentRenderer<Container>() {
+            return new ComponentRenderer<>() {
                 @Override
-                public TerminalSize getPreferredSize(Container component) {
+                public TerminalPosition getPreferredSize(Container component) {
                     Component subComponent = getComponent();
-                    if(subComponent == null) {
-                        return TerminalSize.ZERO;
+                    if (subComponent == null) {
+                        return TerminalPosition.ZERO;
                     }
                     return subComponent.getPreferredSize();
                 }
@@ -265,7 +264,7 @@ public abstract class AbstractBasePane implements BasePane {
                 @Override
                 public void drawComponent(TextGUIGraphics graphics, Container component) {
                     Component subComponent = getComponent();
-                    if(subComponent == null) {
+                    if (subComponent == null) {
                         return;
                     }
                     subComponent.draw(graphics);

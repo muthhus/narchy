@@ -1,4 +1,4 @@
-package com.googlecode.lanterna.io;
+package com.googlecode.lanterna.input;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -49,8 +49,7 @@ public class WriteInput {
                             flush();
                         }
                     }
-                } catch (IOException e) {
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                 } finally {
                     try {
                         outputStream.close();
@@ -63,7 +62,7 @@ public class WriteInput {
 
     private void writeCharacter(char character) throws IOException {
         outputStream.write(character);
-        terminalEmulator.putCharacter(character);
+        terminalEmulator.put(character);
     }
 
     private void flush() throws IOException {

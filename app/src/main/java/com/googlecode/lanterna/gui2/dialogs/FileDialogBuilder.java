@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.LocalizedString;
 
 import java.io.File;
@@ -31,7 +31,7 @@ import java.io.File;
 public class FileDialogBuilder extends AbstractDialogBuilder<FileDialogBuilder, FileDialog> {
 
     private String actionLabel;
-    private TerminalSize suggestedSize;
+    private TerminalPosition suggestedSize;
     private File selectedFile;
     private boolean showHiddenDirectories;
 
@@ -41,7 +41,7 @@ public class FileDialogBuilder extends AbstractDialogBuilder<FileDialogBuilder, 
     public FileDialogBuilder() {
         super("FileDialog");
         actionLabel = LocalizedString.OK.toString();
-        suggestedSize = new TerminalSize(45, 10);
+        suggestedSize = new TerminalPosition(45, 10);
         showHiddenDirectories = false;
         selectedFile = null;
     }
@@ -76,7 +76,7 @@ public class FileDialogBuilder extends AbstractDialogBuilder<FileDialogBuilder, 
      * @param suggestedSize Suggested size for the file dialog
      * @return Itself
      */
-    public FileDialogBuilder setSuggestedSize(TerminalSize suggestedSize) {
+    public FileDialogBuilder setSuggestedSize(TerminalPosition suggestedSize) {
         this.suggestedSize = suggestedSize;
         return this;
     }
@@ -85,7 +85,7 @@ public class FileDialogBuilder extends AbstractDialogBuilder<FileDialogBuilder, 
      * Returns the suggested size for the file dialog
      * @return Suggested size for the file dialog
      */
-    public TerminalSize getSuggestedSize() {
+    public TerminalPosition getSuggestedSize() {
         return suggestedSize;
     }
 

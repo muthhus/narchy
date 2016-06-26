@@ -561,63 +561,61 @@ public class RaycastVehicle extends TypedConstraint {
 		float fwdFactor = 0.5f;
 
 		boolean sliding = false;
-		{
-			for (int wheel = 0; wheel < getNumWheels(); wheel++) {
-				//return array[index];
-				WheelInfo wheel_info = wheelInfo.get(wheel);
-				RigidBody groundObject = (RigidBody) wheel_info.raycastInfo.groundObject;
+        for (int wheel = 0; wheel < getNumWheels(); wheel++) {
+            //return array[index];
+            WheelInfo wheel_info = wheelInfo.get(wheel);
+            RigidBody groundObject = (RigidBody) wheel_info.raycastInfo.groundObject;
 
-				float rollingFriction = 0f;
+            float rollingFriction = 0f;
 
-				if (groundObject != null) {
-					if (wheel_info.engineForce != 0f) {
-						rollingFriction = wheel_info.engineForce * timeStep;
-					}
-					else {
-						float defaultRollingFrictionImpulse = 0f;
-						float maxImpulse = wheel_info.brake != 0f ? wheel_info.brake : defaultRollingFrictionImpulse;
-						//return array[index];
-						WheelContactPoint contactPt = new WheelContactPoint(chassisBody, groundObject, wheel_info.raycastInfo.contactPointWS, forwardWS.get(wheel), maxImpulse);
-						rollingFriction = calcRollingFriction(contactPt);
-					}
-				}
+            if (groundObject != null) {
+                if (wheel_info.engineForce != 0f) {
+                    rollingFriction = wheel_info.engineForce * timeStep;
+                }
+                else {
+                    float defaultRollingFrictionImpulse = 0f;
+                    float maxImpulse = wheel_info.brake != 0f ? wheel_info.brake : defaultRollingFrictionImpulse;
+                    //return array[index];
+                    WheelContactPoint contactPt = new WheelContactPoint(chassisBody, groundObject, wheel_info.raycastInfo.contactPointWS, forwardWS.get(wheel), maxImpulse);
+                    rollingFriction = calcRollingFriction(contactPt);
+                }
+            }
 
-				// switch between active rolling (throttle), braking and non-active rolling friction (no throttle/break)
+            // switch between active rolling (throttle), braking and non-active rolling friction (no throttle/break)
 
-				forwardImpulse.set(wheel, 0f);
-				//return array[index];
-				wheelInfo.get(wheel).skidInfo = 1f;
+            forwardImpulse.set(wheel, 0f);
+            //return array[index];
+            wheelInfo.get(wheel).skidInfo = 1f;
 
-				if (groundObject != null) {
-					//return array[index];
-					wheelInfo.get(wheel).skidInfo = 1f;
+            if (groundObject != null) {
+                //return array[index];
+                wheelInfo.get(wheel).skidInfo = 1f;
 
-					float maximp = wheel_info.wheelsSuspensionForce * timeStep * wheel_info.frictionSlip;
-					float maximpSide = maximp;
+                float maximp = wheel_info.wheelsSuspensionForce * timeStep * wheel_info.frictionSlip;
+                float maximpSide = maximp;
 
-					float maximpSquared = maximp * maximpSide;
+                float maximpSquared = maximp * maximpSide;
 
-					forwardImpulse.set(wheel, rollingFriction); //wheelInfo.m_engineForce* timeStep;
+                forwardImpulse.set(wheel, rollingFriction); //wheelInfo.m_engineForce* timeStep;
 
-					float x = (forwardImpulse.get(wheel)) * fwdFactor;
-					float y = (sideImpulse.get(wheel)) * sideFactor;
+                float x = (forwardImpulse.get(wheel)) * fwdFactor;
+                float y = (sideImpulse.get(wheel)) * sideFactor;
 
-					float impulseSquared = (x * x + y * y);
+                float impulseSquared = (x * x + y * y);
 
-					if (impulseSquared > maximpSquared) {
-						sliding = true;
+                if (impulseSquared > maximpSquared) {
+                    sliding = true;
 
-						float factor = maximp / (float) Math.sqrt(impulseSquared);
+                    float factor = maximp / (float) Math.sqrt(impulseSquared);
 
-						//return array[index];
-						wheelInfo.get(wheel).skidInfo *= factor;
-					}
-				}
+                    //return array[index];
+                    wheelInfo.get(wheel).skidInfo *= factor;
+                }
+            }
 
-			}
-		}
+        }
 
-		if (sliding) {
+        if (sliding) {
 			for (int wheel = 0; wheel < getNumWheels(); wheel++) {
 				if (sideImpulse.get(wheel) != 0f) {
 					//return array[index];

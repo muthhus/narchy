@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.terminal.swing.ScrollingAWTTerminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorColorConfiguration;
@@ -154,9 +154,9 @@ public class ScrollingAWTTerminalTest extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonPrint1LineActionPerformed
 
     private void buttonMoveCursorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMoveCursorActionPerformed
-        TerminalSize terminalSize = scrollingAwtTerminal.getTerminalSize();
+        TerminalPosition terminalPosition = scrollingAwtTerminal.terminalSize();
         Random random = new Random();
-        scrollingAwtTerminal.setCursorPosition(random.nextInt(terminalSize.getColumns()), random.nextInt(terminalSize.getRows()));
+        scrollingAwtTerminal.moveCursorTo(random.nextInt(terminalPosition.column), random.nextInt(terminalPosition.row));
         scrollingAwtTerminal.flush();
     }//GEN-LAST:event_buttonMoveCursorActionPerformed
 
@@ -168,11 +168,11 @@ public class ScrollingAWTTerminalTest extends javax.swing.JFrame {
             for(int j = 0; j < words; j++) {
                 int length = random.nextInt(10) + 2;
                 for(int k = 0; k < length; k++) {
-                    scrollingAwtTerminal.putCharacter(selection.charAt(random.nextInt(selection.length())));
+                    scrollingAwtTerminal.put(selection.charAt(random.nextInt(selection.length())));
                 }
-                scrollingAwtTerminal.putCharacter(' ');
+                scrollingAwtTerminal.put(' ');
             }
-            scrollingAwtTerminal.putCharacter('\n');
+            scrollingAwtTerminal.put('\n');
         }
         scrollingAwtTerminal.flush();
     }

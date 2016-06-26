@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.util.List;
 
@@ -79,5 +79,5 @@ public interface WindowManager {
      * @param allWindows All windows that are going to be drawn, in the order they will be drawn
      * @param screenSize Size of the terminal that is available to draw on
      */
-    void prepareWindows(WindowBasedTextGUI textGUI, List<Window> allWindows, TerminalSize screenSize);
+    void prepareWindows(WindowBasedTextGUI textGUI, List<Window> allWindows, TerminalPosition screenSize);
 }

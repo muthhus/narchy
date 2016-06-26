@@ -1,7 +1,7 @@
 package nars.rover.run;
 
 import com.artemis.Component;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
@@ -21,8 +21,6 @@ import nars.rover.physics.j2d.LayerDraw;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
-
-import com.artemis.Component;
 
 /**
  * Created by me on 4/1/16.
@@ -56,39 +54,39 @@ public class DemoTerminal {
 
                 com.googlecode.lanterna.gui2.Panel leftGridPanel = new com.googlecode.lanterna.gui2.Panel();
                 leftGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(4));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalSize(4, 2)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalSize(4, 2)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalSize(4, 2)));
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2)));
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalPosition(4, 2)));
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalPosition(4, 2)));
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalPosition(4, 2)));
 
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.END, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+                leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
 
                 com.googlecode.lanterna.gui2.Panel rightGridPanel = new com.googlecode.lanterna.gui2.Panel();
                 rightGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(5));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2)));
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, false, true, 1, 4)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, false, true, 1, 4)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.END, false, true, 1, 4)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
                         .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, false, true, 1, 4)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalSize(4, 2)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalSize(4, 2)));
-                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalSize(4, 2)));
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalPosition(4, 2)));
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalPosition(4, 2)));
+                rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalPosition(4, 2)));
 
                 com.googlecode.lanterna.gui2.Panel contentPanel = new com.googlecode.lanterna.gui2.Panel();
                 contentPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-                contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalSize.ONE), rightGridPanel));
-                contentPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+                contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalPosition.ONE), rightGridPanel));
+                contentPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
                 contentPanel.addComponent(new com.googlecode.lanterna.gui2.Button("Close", new Runnable() {
                     @Override
                     public void run() {
@@ -201,16 +199,16 @@ public class DemoTerminal {
 
         @Override
         public void drawSky(JoglAbstractDraw draw, World2D w) {
-            TerminalSize ts = term.getTerminalSize();
+            TerminalPosition ts = term.terminalSize();
 
             float cw = scale /2f ;
             float ch = scale;
 
             GL2 gl = draw.gl();
 
-            int rows = ts.getRows();
+            int rows = ts.row;
             for (int j = 0; j < rows; j++) {
-                for (int i = 0; i < ts.getColumns(); i++) {
+                for (int i = 0; i < ts.column; i++) {
 
 
 
@@ -218,11 +216,11 @@ public class DemoTerminal {
                     int r = rows - 1 - j;
                     float y = j * ch;
 
-                    TextCharacter c = term.getCharacter(i, r);
-                    char cc = c.getCharacter();
+                    TextCharacter c = term.getView(i, r);
+                    char cc = c.c;
 
-                    Color bg = c.getBackgroundColor().toColor();
-                    Color fg = c.getForegroundColor().toColor();
+                    Color bg = c.back.toColor();
+                    Color fg = c.fore.toColor();
 
                     draw.drawSolidRect(x, y, cw, ch, -0.1f, bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
 
@@ -268,7 +266,9 @@ public class DemoTerminal {
 
 
         public TerminalSwing(int w, int h, float scale) {
-            super(new TerminalSize(w, h), TerminalEmulatorDeviceConfiguration.getDefault(),
+            final int column = w;
+            final int row = h;
+            super(new TerminalPosition(column, row), TerminalEmulatorDeviceConfiguration.getDefault(),
                     TerminalEmulatorColorConfiguration.getDefault(),
                     new TerminalScrollController.Null()
             );

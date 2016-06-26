@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.screen;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.AbstractTextGraphics;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -41,19 +41,19 @@ class ScreenTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+    public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
         //Let the screen do culling
-        screen.setCharacter(columnIndex, rowIndex, textCharacter);
+        screen.set(columnIndex, rowIndex, textCharacter);
         return this;
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
-        return screen.getBackCharacter(column, row);
+    public TextCharacter get(int column, int row) {
+        return screen.back(column, row);
     }
 
     @Override
-    public TerminalSize getSize() {
-        return screen.getTerminalSize();
+    public TerminalPosition getSize() {
+        return screen.terminalSize();
     }
 }

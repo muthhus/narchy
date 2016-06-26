@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public interface LayoutManager {
      * @param components List of components
      * @return Size the layout manager would like to have
      */
-    TerminalSize getPreferredSize(List<Component> components);
+    TerminalPosition getPreferredSize(List<Component> components);
 
     /**
      * Given a size constraint, update the location and size of each component in the component list by laying them out
@@ -50,7 +50,7 @@ public interface LayoutManager {
      * @param area Size available to this layout manager to lay out the components on
      * @param components List of components to lay out
      */
-    void doLayout(TerminalSize area, List<Component> components);
+    void doLayout(TerminalPosition area, List<Component> components);
 
     /**
      * Returns true if the internal state of this LayoutManager has changed since the last call to doLayout. This will

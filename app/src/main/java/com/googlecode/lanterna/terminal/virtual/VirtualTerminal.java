@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.terminal.virtual;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
@@ -38,7 +37,7 @@ public interface VirtualTerminal extends IOSafeTerminal {
      * that is different from the current size of the virtual terminal, the resize event will be fired on all listeners.
      * @param newSize New size of the virtual terminal
      */
-    void setTerminalSize(TerminalSize newSize);
+    void resize(TerminalPosition newSize);
 
     /**
      * Adds a listener to receive notifications when certain events happens on the virtual terminal. Notice that this is
@@ -74,57 +73,57 @@ public interface VirtualTerminal extends IOSafeTerminal {
      * {@link #pollInput()} or {@link #readInput()} is called, assuming there are no other events before it in the queue.
      * @param keyStroke {@link KeyStroke} to add to the input queue of this virtual terminal
      */
-    void addInput(KeyStroke keyStroke);
+    void input(KeyStroke keyStroke);
 
     /**
      * Returns the position of the terminal cursor where the row index is counted from the top of the text buffer,
      * including all backlog. This means, if there is 500 lines of backlog but the cursor position is set to 0x0, this
      * method will return 0x500. If you want to get the cursor's position in the viewport, please use
-     * {@link #getCursorPosition()} instead.
+     * {@link #cursor()} instead.
      * @return Cursor position as an offset from the top-left position of the text buffer including any backlog
      */
-    TerminalPosition getCursorBufferPosition();
+    TerminalPosition bufferPos();
 
     /**
      * Returns a character from this virtual terminal, relative to the top-left position of the text buffer including
      * any backlog. If you want to get a character from the bottom viewport, please use
-     * {@link #getCharacter(TerminalPosition)} instead.
+     * {@link #getView(TerminalPosition)} instead.
      *
      * @param position Position to get the character from
      * @return Text character at the specific position in the text buffer
      */
-    TextCharacter getBufferCharacter(TerminalPosition position);
+    TextCharacter getBuffer(TerminalPosition position);
 
 
     /**
      * Returns a character from this virtual terminal, relative to the top-left position of the text buffer including
      * any backlog. If you want to get a character from the bottom viewport, please use
-     * {@link #getCharacter(int, int)} instead.
+     * {@link #getView(int, int)} instead.
      *
      * @param column Column to get the character from
      * @param row Row, counting from the first line in the backlog, to get the character from
      * @return Text character at the specific position in the text buffer
      */
-    TextCharacter getBufferCharacter(int column, int row);
+    TextCharacter getBuffer(int column, int row);
 
     /**
      * Returns a character from the viewport at the specified coordinates. This method cannot access the backlog, if you
-     * want to fetch a character potentially from the backlog, please use {@link #getBufferCharacter(TerminalPosition)}
+     * want to fetch a character potentially from the backlog, please use {@link #getBuffer(TerminalPosition)}
      * instead.
      * @param position Position of the character to return
      * @return Text character at the specific position in the viewport
      */
-    TextCharacter getCharacter(TerminalPosition position);
+    TextCharacter getView(TerminalPosition position);
 
     /**
      * Returns a character from the viewport at the specified coordinates. This method cannot access the backlog, if you
-     * want to fetch a character potentially from the backlog, please use {@link #getBufferCharacter(int,int)}
+     * want to fetch a character potentially from the backlog, please use {@link #getBuffer(int,int)}
      * instead.
      * @param column Column in the viewport to get the character from
      * @param row Row in the viewport to get the character form
      * @return Text character at the specific position in the viewport
      */
-    TextCharacter getCharacter(int column, int row);
+    TextCharacter getView(int column, int row);
 
     /**
      * Returns the number of lines in the entire text buffer, including any backlog

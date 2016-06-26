@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class ListBoxTest extends TestBase {
         Panel horizontalPanel = new Panel();
         horizontalPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        TerminalSize size = new TerminalSize(14, 10);
+        TerminalPosition size = new TerminalPosition(14, 10);
         CheckBoxList<String> checkBoxList = new CheckBoxList<String>(size);
         RadioBoxList<String> radioBoxList = new RadioBoxList<String>(size);
         ActionListBox actionListBox = new ActionListBox(size);

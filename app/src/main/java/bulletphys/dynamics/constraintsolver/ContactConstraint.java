@@ -39,19 +39,22 @@ import javax.vecmath.Vector3f;
 public class ContactConstraint {
 	
 	public static final ContactSolverFunc resolveSingleCollision = new ContactSolverFunc() {
-		public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+		@Override
+        public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleCollision(body1, body2, contactPoint, info);
 		}
 	};
 
 	public static final ContactSolverFunc resolveSingleFriction = new ContactSolverFunc() {
-		public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+		@Override
+        public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleFriction(body1, body2, contactPoint, info);
 		}
 	};
 
 	public static final ContactSolverFunc resolveSingleCollisionCombined = new ContactSolverFunc() {
-		public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
+		@Override
+        public float resolveContact(RigidBody body1, RigidBody body2, ManifoldPoint contactPoint, ContactSolverInfo info) {
 			return resolveSingleCollisionCombined(body1, body2, contactPoint, info);
 		}
 	};
@@ -258,22 +261,20 @@ public class ContactConstraint {
 				cpd.accumulatedTangentImpulse0 = Math.max(cpd.accumulatedTangentImpulse0, -limit);
 				j1 = cpd.accumulatedTangentImpulse0 - oldTangentImpulse;
 			}
-			{
-				// 2nd tangent
+            // 2nd tangent
 
-				float vrel = cpd.frictionWorldTangential1.dot(vel);
+            float vrel = cpd.frictionWorldTangential1.dot(vel);
 
-				// calculate j that moves us to zero relative velocity
-				j2 = -vrel * cpd.jacDiagABInvTangent1;
-				float oldTangentImpulse = cpd.accumulatedTangentImpulse1;
-				cpd.accumulatedTangentImpulse1 = oldTangentImpulse + j2;
+            // calculate j that moves us to zero relative velocity
+            j2 = -vrel * cpd.jacDiagABInvTangent1;
+            float oldTangentImpulse = cpd.accumulatedTangentImpulse1;
+            cpd.accumulatedTangentImpulse1 = oldTangentImpulse + j2;
 
-				cpd.accumulatedTangentImpulse1 = Math.min(cpd.accumulatedTangentImpulse1, limit);
-				cpd.accumulatedTangentImpulse1 = Math.max(cpd.accumulatedTangentImpulse1, -limit);
-				j2 = cpd.accumulatedTangentImpulse1 - oldTangentImpulse;
-			}
+            cpd.accumulatedTangentImpulse1 = Math.min(cpd.accumulatedTangentImpulse1, limit);
+            cpd.accumulatedTangentImpulse1 = Math.max(cpd.accumulatedTangentImpulse1, -limit);
+            j2 = cpd.accumulatedTangentImpulse1 - oldTangentImpulse;
 
-			//#ifdef USE_INTERNAL_APPLY_IMPULSE
+            //#ifdef USE_INTERNAL_APPLY_IMPULSE
 			Vector3f tmp = new Vector3f();
 
 			if (body1.getInvMass() != 0f) {

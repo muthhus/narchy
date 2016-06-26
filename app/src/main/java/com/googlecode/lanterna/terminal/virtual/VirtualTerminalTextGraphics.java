@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.terminal.virtual;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.AbstractTextGraphics;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -36,31 +35,31 @@ class VirtualTerminalTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
-        TerminalSize size = getSize();
-        if(columnIndex < 0 || columnIndex >= size.getColumns() ||
-                rowIndex < 0 || rowIndex >= size.getRows()) {
+    public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+        TerminalPosition size = getSize();
+        if(columnIndex < 0 || columnIndex >= size.column ||
+                rowIndex < 0 || rowIndex >= size.row) {
             return this;
         }
         synchronized(virtualTerminal) {
-            virtualTerminal.setCursorPosition(new TerminalPosition(columnIndex, rowIndex));
+            virtualTerminal.moveCursorTo(new TerminalPosition(columnIndex, rowIndex));
             virtualTerminal.putCharacter(textCharacter);
         }
         return this;
     }
 
     @Override
-    public TextCharacter getCharacter(TerminalPosition position) {
-        return virtualTerminal.getCharacter(position);
+    public TextCharacter get(TerminalPosition position) {
+        return virtualTerminal.getView(position);
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
-        return getCharacter(new TerminalPosition(column, row));
+    public TextCharacter get(int column, int row) {
+        return get(new TerminalPosition(column, row));
     }
 
     @Override
-    public TerminalSize getSize() {
-        return virtualTerminal.getTerminalSize();
+    public TerminalPosition getSize() {
+        return virtualTerminal.terminalSize();
     }
 }

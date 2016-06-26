@@ -72,7 +72,7 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		sets[1] = new Dbvt();
 
 		//Dbvt.benchmark();
-		releasepaircache = (paircache != null? false : true);
+		releasepaircache = (paircache == null);
 		predictedframes = 2;
 		stageCurrent = 0;
 		fupdates = 1;
@@ -114,19 +114,13 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		}
 
 		// collide dynamics:
-		{
-			DbvtTreeCollider collider = new DbvtTreeCollider(this);
-			{
-				//SPC(m_profiling.m_fdcollide);
-				Dbvt.collideTT(sets[0].root, sets[1].root, collider);
-			}
-			{
-				//SPC(m_profiling.m_ddcollide);
-				Dbvt.collideTT(sets[0].root, sets[0].root, collider);
-			}
-		}
+        DbvtTreeCollider collider = new DbvtTreeCollider(this);
+        //SPC(m_profiling.m_fdcollide);
+        Dbvt.collideTT(sets[0].root, sets[1].root, collider);
+        //SPC(m_profiling.m_ddcollide);
+        Dbvt.collideTT(sets[0].root, sets[0].root, collider);
 
-		// clean up:
+        // clean up:
         //SPC(m_profiling.m_cleanup);
         ObjectArrayList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
         if (!pairs.isEmpty()) {

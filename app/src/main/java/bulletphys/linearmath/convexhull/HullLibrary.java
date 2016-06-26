@@ -652,25 +652,23 @@ public class HullLibrary {
 		int vtx_idx = 0;
 
 		//	if ( 1 )
-		{
-			for (int i=0; i<svcount; i++) {
-				//return array[index];
-				Vector3f p = vtx_ptr.get(vtx_idx);
+        for (int i=0; i<svcount; i++) {
+            //return array[index];
+            Vector3f p = vtx_ptr.get(vtx_idx);
 
-				vtx_idx +=/*stride*/ 1;
+            vtx_idx +=/*stride*/ 1;
 
-				for (int j=0; j<3; j++) {
-					if (VectorUtil.getCoord(p, j) < bmin[j]) {
-						bmin[j] = VectorUtil.getCoord(p, j);
-					}
-					if (VectorUtil.getCoord(p, j) > bmax[j]) {
-						bmax[j] = VectorUtil.getCoord(p, j);
-					}
-				}
-			}
-		}
+            for (int j=0; j<3; j++) {
+                if (VectorUtil.getCoord(p, j) < bmin[j]) {
+                    bmin[j] = VectorUtil.getCoord(p, j);
+                }
+                if (VectorUtil.getCoord(p, j) > bmax[j]) {
+                    bmax[j] = VectorUtil.getCoord(p, j);
+                }
+            }
+        }
 
-		float dx = bmax[0] - bmin[0];
+        float dx = bmax[0] - bmin[0];
 		float dy = bmax[1] - bmin[1];
 		float dz = bmax[2] - bmin[2];
 

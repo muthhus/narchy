@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.*;
 
 import java.math.BigInteger;
@@ -38,7 +38,7 @@ public class TextInputDialog extends DialogWindow {
     TextInputDialog(
                 String title,
                 String description,
-                TerminalSize textBoxPreferredSize,
+                TerminalPosition textBoxPreferredSize,
                 String initialContent,
                 TextInputDialogResultValidator validator,
                 boolean password) {
@@ -54,18 +54,8 @@ public class TextInputDialog extends DialogWindow {
 
         Panel buttonPanel = new Panel();
         buttonPanel.setLayoutManager(new GridLayout(2).setHorizontalSpacing(1));
-        buttonPanel.addComponent(new Button(LocalizedString.OK.toString(), new Runnable() {
-            @Override
-            public void run() {
-                onOK();
-            }
-        }).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
-        buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), new Runnable() {
-            @Override
-            public void run() {
-                onCancel();
-            }
-        }));
+        buttonPanel.addComponent(new Button(LocalizedString.OK.toString(), this::onOK).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
+        buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), this::onCancel));
 
         Panel mainPanel = new Panel();
         mainPanel.setLayoutManager(
@@ -75,7 +65,7 @@ public class TextInputDialog extends DialogWindow {
         if(description != null) {
             mainPanel.addComponent(new Label(description));
         }
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         textBox.setLayoutData(
                 GridLayout.createLayoutData(
                         GridLayout.Alignment.FILL,
@@ -83,7 +73,7 @@ public class TextInputDialog extends DialogWindow {
                         true,
                         false))
                 .addTo(mainPanel);
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         buttonPanel.setLayoutData(
                 GridLayout.createLayoutData(
                         GridLayout.Alignment.END,

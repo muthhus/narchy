@@ -37,9 +37,9 @@ import java.io.IOException;
 public class VirtualScreen extends AbstractScreen {
     private final Screen realScreen;
     private final FrameRenderer frameRenderer;
-    private TerminalSize minimumSize;
+    private TerminalPosition minimumSize;
     private TerminalPosition viewportTopLeft;
-    private TerminalSize viewportSize;
+    private TerminalPosition viewportSize;
 
     /**
      * Creates a new VirtualScreen that wraps a supplied Screen. The screen passed in here should be the real screen
@@ -51,10 +51,10 @@ public class VirtualScreen extends AbstractScreen {
      * @param screen Real screen that will be used when drawing the whole or partial virtual screen
      */
     public VirtualScreen(Screen screen) {
-        super(screen.getTerminalSize());
+        super(screen.terminalSize());
         this.frameRenderer = new DefaultFrameRenderer();
         this.realScreen = screen;
-        this.minimumSize = screen.getTerminalSize();
+        this.minimumSize = screen.terminalSize();
         this.viewportTopLeft = TerminalPosition.TOP_LEFT_CORNER;
         this.viewportSize = minimumSize;
     }
@@ -64,14 +64,14 @@ public class VirtualScreen extends AbstractScreen {
      * smaller than this, the virtual screen will refuse to make it smaller and add scrollbars to the view.
      * @param minimumSize Minimum size we want the screen to have
      */
-    public void setMinimumSize(TerminalSize minimumSize) {
+    public void setMinimumSize(TerminalPosition minimumSize) {
         this.minimumSize = minimumSize;
-        TerminalSize virtualSize = minimumSize.max(realScreen.getTerminalSize());
+        TerminalPosition virtualSize = minimumSize.max(realScreen.terminalSize());
         if(!minimumSize.equals(virtualSize)) {
             addResizeRequest(virtualSize);
             super.doResizeIfNecessary();
         }
-        calculateViewport(realScreen.getTerminalSize());
+        calculateViewport(realScreen.terminalSize());
     }
 
     /**
@@ -79,7 +79,7 @@ public class VirtualScreen extends AbstractScreen {
      * virtual screen will draw scrollbars and implement scrolling
      * @return Minimum size configured for this virtual screen
      */
-    public TerminalSize getMinimumSize() {
+    public TerminalPosition getMinimumSize() {
         return minimumSize;
     }
 
@@ -94,55 +94,55 @@ public class VirtualScreen extends AbstractScreen {
     }
 
     @Override
-    public TextCharacter getFrontCharacter(TerminalPosition position) {
+    public TextCharacter front(TerminalPosition position) {
         return null;
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) {
-        super.setCursorPosition(position);
+    public void moveCursorTo(TerminalPosition position) {
+        super.moveCursorTo(position);
         if(position == null) {
-            realScreen.setCursorPosition(null);
+            realScreen.moveCursorTo(null);
             return;
         }
-        position = position.withRelativeColumn(-viewportTopLeft.getColumn()).withRelativeRow(-viewportTopLeft.getRow());
-        if(position.getColumn() >= 0 && position.getColumn() < viewportSize.getColumns() &&
-                position.getRow() >= 0 && position.getRow() < viewportSize.getRows()) {
-            realScreen.setCursorPosition(position);
+        position = position.withRelativeColumn(-viewportTopLeft.column).withRelativeRow(-viewportTopLeft.row);
+        if(position.column >= 0 && position.column < viewportSize.column &&
+                position.row >= 0 && position.row < viewportSize.row) {
+            realScreen.moveCursorTo(position);
         }
         else {
-            realScreen.setCursorPosition(null);
+            realScreen.moveCursorTo(null);
         }
     }
 
     @Override
-    public synchronized TerminalSize doResizeIfNecessary() {
-        TerminalSize underlyingSize = realScreen.doResizeIfNecessary();
+    public synchronized TerminalPosition doResizeIfNecessary() {
+        TerminalPosition underlyingSize = realScreen.doResizeIfNecessary();
         if(underlyingSize == null) {
             return null;
         }
 
-        TerminalSize newVirtualSize = calculateViewport(underlyingSize);
-        if(!getTerminalSize().equals(newVirtualSize)) {
+        TerminalPosition newVirtualSize = calculateViewport(underlyingSize);
+        if(!terminalSize().equals(newVirtualSize)) {
             addResizeRequest(newVirtualSize);
             return super.doResizeIfNecessary();
         }
         return newVirtualSize;
     }
 
-    private TerminalSize calculateViewport(TerminalSize realTerminalSize) {
-        TerminalSize newVirtualSize = minimumSize.max(realTerminalSize);
-        if(newVirtualSize.equals(realTerminalSize)) {
-            viewportSize = realTerminalSize;
+    private TerminalPosition calculateViewport(TerminalPosition realTerminalPosition) {
+        TerminalPosition newVirtualSize = minimumSize.max(realTerminalPosition);
+        if(newVirtualSize.equals(realTerminalPosition)) {
+            viewportSize = realTerminalPosition;
             viewportTopLeft = TerminalPosition.TOP_LEFT_CORNER;
         }
         else {
-            TerminalSize newViewportSize = frameRenderer.getViewportSize(realTerminalSize, newVirtualSize);
-            if(newViewportSize.getRows() > viewportSize.getRows()) {
-                viewportTopLeft = viewportTopLeft.withRow(Math.max(0, viewportTopLeft.getRow() - (newViewportSize.getRows() - viewportSize.getRows())));
+            TerminalPosition newViewportSize = frameRenderer.getViewportSize(realTerminalPosition, newVirtualSize);
+            if(newViewportSize.row > viewportSize.row) {
+                viewportTopLeft = viewportTopLeft.withRow(Math.max(0, viewportTopLeft.row - (newViewportSize.row - viewportSize.row)));
             }
-            if(newViewportSize.getColumns() > viewportSize.getColumns()) {
-                viewportTopLeft = viewportTopLeft.withColumn(Math.max(0, viewportTopLeft.getColumn() - (newViewportSize.getColumns() - viewportSize.getColumns())));
+            if(newViewportSize.column > viewportSize.column) {
+                viewportTopLeft = viewportTopLeft.withColumn(Math.max(0, viewportTopLeft.column - (newViewportSize.column - viewportSize.column)));
             }
             viewportSize = newViewportSize;
         }
@@ -151,12 +151,12 @@ public class VirtualScreen extends AbstractScreen {
 
     @Override
     public void refresh(RefreshType refreshType) throws IOException {
-        setCursorPosition(getCursorPosition()); //Make sure the cursor is at the correct position
-        if(!viewportSize.equals(realScreen.getTerminalSize())) {
+        moveCursorTo(cursorPosition()); //Make sure the cursor is at the correct position
+        if(!viewportSize.equals(realScreen.terminalSize())) {
             frameRenderer.drawFrame(
                     realScreen.newTextGraphics(),
-                    realScreen.getTerminalSize(),
-                    getTerminalSize(),
+                    realScreen.terminalSize(),
+                    terminalSize(),
                     viewportTopLeft);
         }
 
@@ -166,22 +166,22 @@ public class VirtualScreen extends AbstractScreen {
             AbstractScreen asAbstractScreen = (AbstractScreen)realScreen;
             getBackBuffer().copyTo(
                     asAbstractScreen.getBackBuffer(),
-                    viewportTopLeft.getRow(),
-                    viewportSize.getRows(),
-                    viewportTopLeft.getColumn(),
-                    viewportSize.getColumns(),
-                    viewportOffset.getRow(),
-                    viewportOffset.getColumn());
+                    viewportTopLeft.row,
+                    viewportSize.row,
+                    viewportTopLeft.column,
+                    viewportSize.column,
+                    viewportOffset.row,
+                    viewportOffset.column);
         }
         else {
-            for(int y = 0; y < viewportSize.getRows(); y++) {
-                for(int x = 0; x < viewportSize.getColumns(); x++) {
-                    realScreen.setCharacter(
-                            x + viewportOffset.getColumn(),
-                            y + viewportOffset.getRow(),
-                            getBackBuffer().getCharacterAt(
-                                    x + viewportTopLeft.getColumn(),
-                                    y + viewportTopLeft.getRow()));
+            for(int y = 0; y < viewportSize.row; y++) {
+                for(int x = 0; x < viewportSize.column; x++) {
+                    realScreen.set(
+                            x + viewportOffset.column,
+                            y + viewportOffset.row,
+                            getBackBuffer().get(
+                                    x + viewportTopLeft.column,
+                                    y + viewportTopLeft.row));
                 }
             }
         }
@@ -203,31 +203,31 @@ public class VirtualScreen extends AbstractScreen {
             return null;
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowLeft) {
-            if(viewportTopLeft.getColumn() > 0) {
+            if(viewportTopLeft.column > 0) {
                 viewportTopLeft = viewportTopLeft.withRelativeColumn(-1);
                 refresh();
                 return null;
             }
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowRight) {
-            if(viewportTopLeft.getColumn() + viewportSize.getColumns() < getTerminalSize().getColumns()) {
+            if(viewportTopLeft.column + viewportSize.column < terminalSize().column) {
                 viewportTopLeft = viewportTopLeft.withRelativeColumn(1);
                 refresh();
                 return null;
             }
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowUp) {
-            if(viewportTopLeft.getRow() > 0) {
+            if(viewportTopLeft.row > 0) {
                 viewportTopLeft = viewportTopLeft.withRelativeRow(-1);
-                realScreen.scrollLines(0,viewportSize.getRows()-1,-1);
+                realScreen.scrollLines(0, viewportSize.row -1,-1);
                 refresh();
                 return null;
             }
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowDown) {
-            if(viewportTopLeft.getRow() + viewportSize.getRows() < getTerminalSize().getRows()) {
+            if(viewportTopLeft.row + viewportSize.row < terminalSize().row) {
                 viewportTopLeft = viewportTopLeft.withRelativeRow(1);
-                realScreen.scrollLines(0,viewportSize.getRows()-1,1);
+                realScreen.scrollLines(0, viewportSize.row -1,1);
                 refresh();
                 return null;
             }
@@ -240,8 +240,8 @@ public class VirtualScreen extends AbstractScreen {
         // do base class stuff (scroll own back buffer)
         super.scrollLines(firstLine, lastLine, distance);
         // vertical range visible in realScreen:
-        int vpFirst = viewportTopLeft.getRow(),
-            vpRows = viewportSize.getRows();
+        int vpFirst = viewportTopLeft.row,
+            vpRows = viewportSize.row;
         // adapt to realScreen range:
         firstLine = Math.max(0, firstLine - vpFirst);
         lastLine = Math.min(vpRows - 1, lastLine - vpFirst);
@@ -262,7 +262,7 @@ public class VirtualScreen extends AbstractScreen {
          * @param virtualSize Size of the virtual screen
          * @return Size of the viewport, according to this FrameRenderer
          */
-        TerminalSize getViewportSize(TerminalSize realSize, TerminalSize virtualSize);
+        TerminalPosition getViewportSize(TerminalPosition realSize, TerminalPosition virtualSize);
 
         /**
          * Where in the virtual screen should the top-left position of the viewport be? To draw the viewport from the
@@ -281,16 +281,16 @@ public class VirtualScreen extends AbstractScreen {
          */
         void drawFrame(
                 TextGraphics graphics,
-                TerminalSize realSize,
-                TerminalSize virtualSize,
+                TerminalPosition realSize,
+                TerminalPosition virtualSize,
                 TerminalPosition virtualScrollPosition);
     }
 
     private static class DefaultFrameRenderer implements FrameRenderer {
         @Override
-        public TerminalSize getViewportSize(TerminalSize realSize, TerminalSize virtualSize) {
-            if(realSize.getColumns() > 1 && realSize.getRows() > 2) {
-                return realSize.withRelativeColumns(-1).withRelativeRows(-2);
+        public TerminalPosition getViewportSize(TerminalPosition realSize, TerminalPosition virtualSize) {
+            if(realSize.column > 1 && realSize.row > 2) {
+                return realSize.withRelativeColumn(-1).withRelativeRow(-2);
             }
             else {
                 return realSize;
@@ -305,34 +305,34 @@ public class VirtualScreen extends AbstractScreen {
         @Override
         public void drawFrame(
                 TextGraphics graphics,
-                TerminalSize realSize,
-                TerminalSize virtualSize,
+                TerminalPosition realSize,
+                TerminalPosition virtualSize,
                 TerminalPosition virtualScrollPosition) {
 
-            if(realSize.getColumns() == 1 || realSize.getRows() <= 2) {
+            if(realSize.column == 1 || realSize.row <= 2) {
                 return;
             }
-            TerminalSize viewportSize = getViewportSize(realSize, virtualSize);
+            TerminalPosition viewportSize = getViewportSize(realSize, virtualSize);
 
             graphics.setForegroundColor(TextColor.ANSI.WHITE);
             graphics.setBackgroundColor(TextColor.ANSI.BLACK);
             graphics.fill(' ');
-            graphics.putString(0, graphics.getSize().getRows() - 1, "Terminal too small, use ALT+arrows to scroll");
+            graphics.putString(0, graphics.getSize().row - 1, "Terminal too small, use ALT+arrows to scroll");
 
-            int horizontalSize = (int)(((double)(viewportSize.getColumns()) / (double)virtualSize.getColumns()) * (viewportSize.getColumns()));
-            int scrollable = viewportSize.getColumns() - horizontalSize - 1;
-            int horizontalPosition = (int)((double)scrollable * ((double)virtualScrollPosition.getColumn() / (double)(virtualSize.getColumns() - viewportSize.getColumns())));
+            int horizontalSize = (int)(((double)(viewportSize.column) / (double) virtualSize.column) * (viewportSize.column));
+            int scrollable = viewportSize.column - horizontalSize - 1;
+            int horizontalPosition = (int)((double)scrollable * ((double) virtualScrollPosition.column / (double)(virtualSize.column - viewportSize.column)));
             graphics.drawLine(
-                    new TerminalPosition(horizontalPosition, graphics.getSize().getRows() - 2),
-                    new TerminalPosition(horizontalPosition + horizontalSize, graphics.getSize().getRows() - 2),
+                    new TerminalPosition(horizontalPosition, graphics.getSize().row - 2),
+                    new TerminalPosition(horizontalPosition + horizontalSize, graphics.getSize().row - 2),
                     Symbols.BLOCK_MIDDLE);
 
-            int verticalSize = (int)(((double)(viewportSize.getRows()) / (double)virtualSize.getRows()) * (viewportSize.getRows()));
-            scrollable = viewportSize.getRows() - verticalSize - 1;
-            int verticalPosition = (int)((double)scrollable * ((double)virtualScrollPosition.getRow() / (double)(virtualSize.getRows() - viewportSize.getRows())));
+            int verticalSize = (int)(((double)(viewportSize.row) / (double) virtualSize.row) * (viewportSize.row));
+            scrollable = viewportSize.row - verticalSize - 1;
+            int verticalPosition = (int)((double)scrollable * ((double) virtualScrollPosition.row / (double)(virtualSize.row - viewportSize.row)));
             graphics.drawLine(
-                    new TerminalPosition(graphics.getSize().getColumns() - 1, verticalPosition),
-                    new TerminalPosition(graphics.getSize().getColumns() - 1, verticalPosition + verticalSize),
+                    new TerminalPosition(graphics.getSize().column - 1, verticalPosition),
+                    new TerminalPosition(graphics.getSize().column - 1, verticalPosition + verticalSize),
                     Symbols.BLOCK_MIDDLE);
         }
     }

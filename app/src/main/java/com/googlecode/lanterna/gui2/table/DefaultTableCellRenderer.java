@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
@@ -30,7 +30,7 @@ import com.googlecode.lanterna.gui2.TextGUIGraphics;
  */
 public class DefaultTableCellRenderer<V> implements TableCellRenderer<V> {
     @Override
-    public TerminalSize getPreferredSize(Table<V> table, V cell, int columnIndex, int rowIndex) {
+    public TerminalPosition getPreferredSize(Table<V> table, V cell, int columnIndex, int rowIndex) {
         String[] lines = getContent(cell);
         int maxWidth = 0;
         for(String line: lines) {
@@ -39,7 +39,7 @@ public class DefaultTableCellRenderer<V> implements TableCellRenderer<V> {
                 maxWidth = length;
             }
         }
-        return new TerminalSize(maxWidth, lines.length);
+        return new TerminalPosition(maxWidth, lines.length);
     }
 
     @Override

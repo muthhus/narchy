@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.TestTerminalFactory;
-import com.googlecode.lanterna.io.WriteInput;
+import com.googlecode.lanterna.input.WriteInput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +86,7 @@ public class PseudoTerminal {
                         while(readCharacters != -1 && !stop) {
                             if(readCharacters > 0) {
                                 for(int i = 0; i < readCharacters; i++) {
-                                    terminalEmulator.putCharacter(buffer[i]);
+                                    terminalEmulator.put(buffer[i]);
                                 }
                                 terminalEmulator.flush();
                             }

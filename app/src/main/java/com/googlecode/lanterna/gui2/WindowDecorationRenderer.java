@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 
 /**
  * Interface that defines a class that draws window decorations, i.e. a surrounding layer around the window that usually
@@ -44,7 +43,7 @@ public interface WindowDecorationRenderer {
      * @param contentAreaSize Size of the content area in the window
      * @return Full size of the window, including decorations
      */
-    TerminalSize getDecoratedSize(Window window, TerminalSize contentAreaSize);
+    TerminalPosition getDecoratedSize(Window window, TerminalPosition contentAreaSize);
 
     /**
      * Returns how much to step right and down from the top left position of the window decorations to the top left

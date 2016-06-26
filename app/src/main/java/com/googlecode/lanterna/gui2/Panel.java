@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ import java.util.List;
 public class Panel extends AbstractComponent<Panel> implements Container {
     private final List<Component> components;
     private LayoutManager layoutManager;
-    private TerminalSize cachedPreferredSize;
+    private TerminalPosition cachedPreferredSize;
 
     /**
      * Default constructor, creates a new panel with no child components and by default set to a vertical
      * {@code LinearLayout} layout manager.
      */
     public Panel() {
-        components = new ArrayList<Component>();
+        components = new ArrayList<>();
         layoutManager = new LinearLayout();
         cachedPreferredSize = null;
     }
@@ -117,7 +117,7 @@ public class Panel extends AbstractComponent<Panel> implements Container {
      * @return Itself
      */
     public synchronized Panel removeAllComponents() {
-        for(Component component: new ArrayList<Component>(components)) {
+        for(Component component: new ArrayList<>(components)) {
             removeComponent(component);
         }
         return this;
@@ -157,26 +157,26 @@ public class Panel extends AbstractComponent<Panel> implements Container {
     @Override
     public Collection<Component> getChildren() {
         synchronized(components) {
-            return new ArrayList<Component>(components);
+            return new ArrayList<>(components);
         }
     }
 
     @Override
     protected ComponentRenderer<Panel> createDefaultRenderer() {
-        return new ComponentRenderer<Panel>() {
+        return new ComponentRenderer<>() {
 
             @Override
-            public TerminalSize getPreferredSize(Panel component) {
+            public TerminalPosition getPreferredSize(Panel component) {
                 cachedPreferredSize = layoutManager.getPreferredSize(components);
                 return cachedPreferredSize;
             }
 
             @Override
             public void drawComponent(TextGUIGraphics graphics, Panel component) {
-                if(isInvalid()) {
+                if (isInvalid()) {
                     layout(graphics.getSize());
                 }
-                for(Component child: components) {
+                for (Component child : components) {
                     TextGUIGraphics componentGraphics = graphics.newTextGraphics(child.getPosition(), child.getSize());
                     child.draw(componentGraphics);
                 }
@@ -185,7 +185,7 @@ public class Panel extends AbstractComponent<Panel> implements Container {
     }
 
     @Override
-    public TerminalSize calculatePreferredSize() {
+    public TerminalPosition calculatePreferredSize() {
         if(cachedPreferredSize != null && !isInvalid()) {
             return cachedPreferredSize;
         }
@@ -244,7 +244,7 @@ public class Panel extends AbstractComponent<Panel> implements Container {
     public Interactable previousFocus(Interactable fromThis) {
         boolean chooseNextAvailable = (fromThis == null);
 
-        List<Component> revComponents = new ArrayList<Component>(components);
+        List<Component> revComponents = new ArrayList<>(components);
         Collections.reverse(revComponents);
 
         for (Component component : revComponents) {
@@ -308,7 +308,7 @@ public class Panel extends AbstractComponent<Panel> implements Container {
         }
     }
 
-    private void layout(TerminalSize size) {
+    private void layout(TerminalPosition size) {
         layoutManager.doLayout(size, components);
     }
 }

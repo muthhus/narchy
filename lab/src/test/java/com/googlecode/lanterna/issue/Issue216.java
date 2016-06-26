@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.issue;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
@@ -55,7 +55,7 @@ public class Issue216 {
         tableModel.addRow("hi");
         panel.addComponent(table);
 
-        panel.addComponent(new EmptySpace(new TerminalSize(0,0))); // Empty space underneath labels
+        panel.addComponent(new EmptySpace(new TerminalPosition(0, 0))); // Empty space underneath labels
         panel.addComponent(new Button("Submit", new Runnable() {
             @Override
             public void run() {

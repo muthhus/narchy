@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -63,7 +62,7 @@ public class ScreenRectangleTest {
                 break;
             }
             screen.doResizeIfNecessary();
-            TerminalSize size = textGraphics.getSize();
+            TerminalPosition size = textGraphics.getSize();
             TextColor color;
             if(useAnsiColors) {
                 color = TextColor.ANSI.values()[random.nextInt(TextColor.ANSI.values().length)];
@@ -73,8 +72,10 @@ public class ScreenRectangleTest {
                 color = new TextColor.Indexed(random.nextInt(256));
             }
 
-            TerminalPosition topLeft = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
-            TerminalSize rectangleSize = new TerminalSize(random.nextInt(size.getColumns() - topLeft.getColumn()), random.nextInt(size.getRows() - topLeft.getRow()));
+            TerminalPosition topLeft = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+            final int column = random.nextInt(size.column - topLeft.column);
+            final int row = random.nextInt(size.row - topLeft.row);
+            TerminalPosition rectangleSize = new TerminalPosition(column, row);
 
             textGraphics.setBackgroundColor(color);
             if(useFilled) {

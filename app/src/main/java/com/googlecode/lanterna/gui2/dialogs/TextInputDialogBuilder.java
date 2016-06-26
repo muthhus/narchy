@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class TextInputDialogBuilder extends AbstractDialogBuilder<TextInputDialogBuilder, TextInputDialog> {
     private String initialContent;
-    private TerminalSize textBoxSize;
+    private TerminalPosition textBoxSize;
     private TextInputDialogResultValidator validator;
     private boolean passwordInput;
 
@@ -52,9 +52,9 @@ public class TextInputDialogBuilder extends AbstractDialogBuilder<TextInputDialo
 
     @Override
     protected TextInputDialog buildDialog() {
-        TerminalSize size = textBoxSize;
-        if ((initialContent == null || initialContent.trim().equals("")) && size == null) {
-            size = new TerminalSize(40, 1);
+        TerminalPosition size = textBoxSize;
+        if ((initialContent == null || initialContent.trim().isEmpty()) && size == null) {
+            size = new TerminalPosition(40, 1);
         }
         return new TextInputDialog(
                 title,
@@ -88,7 +88,7 @@ public class TextInputDialogBuilder extends AbstractDialogBuilder<TextInputDialo
      * @param textBoxSize Size of the text box the dialog will have
      * @return Itself
      */
-    public TextInputDialogBuilder setTextBoxSize(TerminalSize textBoxSize) {
+    public TextInputDialogBuilder setTextBoxSize(TerminalPosition textBoxSize) {
         this.textBoxSize = textBoxSize;
         return this;
     }
@@ -97,7 +97,7 @@ public class TextInputDialogBuilder extends AbstractDialogBuilder<TextInputDialo
      * Returns the size of the text box the dialog will have
      * @return Size of the text box the dialog will have
      */
-    public TerminalSize getTextBoxSize() {
+    public TerminalPosition getTextBoxSize() {
         return textBoxSize;
     }
 

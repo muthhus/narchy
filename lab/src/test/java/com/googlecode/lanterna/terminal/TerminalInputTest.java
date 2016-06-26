@@ -55,7 +55,7 @@ public class TerminalInputTest {
         }
 
         int currentRow = 0;
-        rawTerminal.setCursorPosition(0, 0);
+        rawTerminal.moveCursorTo(0, 0);
         while(true) {
             KeyStroke key = rawTerminal.pollInput();
             if(key == null) {
@@ -71,10 +71,10 @@ public class TerminalInputTest {
                 rawTerminal.clearScreen();
             }
 
-            rawTerminal.setCursorPosition(0, currentRow++);
+            rawTerminal.moveCursorTo(0, currentRow++);
             putString(rawTerminal, key.toString());
 
-            if(currentRow >= rawTerminal.getTerminalSize().getRows()) {
+            if(currentRow >= rawTerminal.terminalSize().row) {
                 currentRow = 0;
             }
         }
@@ -87,7 +87,7 @@ public class TerminalInputTest {
 
     private static void putString(Terminal rawTerminal, String string) throws IOException {
         for(int i = 0; i < string.length(); i++) {
-            rawTerminal.putCharacter(string.charAt(i));
+            rawTerminal.put(string.charAt(i));
         }
         rawTerminal.flush();
     }

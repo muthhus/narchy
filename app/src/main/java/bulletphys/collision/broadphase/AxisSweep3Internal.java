@@ -101,12 +101,10 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 
 		// handle 0 is reserved as the null index, and is also used as the sentinel
 		firstFreeHandle = 1;
-		{
-			for (int i=firstFreeHandle; i<maxHandles; i++) {
-				pHandles[i].setNextFree(i+1);
-			}
-			pHandles[maxHandles - 1].setNextFree(0);
-		}
+        for (int i=firstFreeHandle; i<maxHandles; i++) {
+            pHandles[i].setNextFree(i+1);
+        }
+        pHandles[maxHandles - 1].setNextFree(0);
 
         // allocate edge buffers
         for (int i=0; i<3; i++) {

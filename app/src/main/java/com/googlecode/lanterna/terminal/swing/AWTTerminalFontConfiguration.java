@@ -59,7 +59,7 @@ public class AWTTerminalFontConfiguration {
         ;
     }
 
-    private static final Set<String> MONOSPACE_CHECK_OVERRIDE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+    private static final Set<String> MONOSPACE_CHECK_OVERRIDE = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "VL Gothic Regular",
             "NanumGothic",
             "WenQuanYi Zen Hei Mono",
@@ -133,7 +133,7 @@ public class AWTTerminalFontConfiguration {
      * @return Array with the fonts from the input parameter that were monospaced
      */
     public static Font[] filterMonospaced(Font... fonts) {
-        List<Font> result = new ArrayList<Font>(fonts.length);
+        List<Font> result = new ArrayList<>(fonts.length);
         for(Font font: fonts) {
             if (isFontMonospaced(font)) {
                 result.add(font);
@@ -168,7 +168,7 @@ public class AWTTerminalFontConfiguration {
         }
         this.useAntiAliasing = useAntiAliasing;
         this.boldMode = boldMode;
-        this.fontPriority = new ArrayList<Font>(Arrays.asList(fontsInOrderOfPriority));
+        this.fontPriority = new ArrayList<>(Arrays.asList(fontsInOrderOfPriority));
         this.fontWidth = getFontWidth(fontPriority.get(0));
         this.fontHeight = getFontHeight(fontPriority.get(0));
 
@@ -202,8 +202,8 @@ public class AWTTerminalFontConfiguration {
      * @return Font which the {@code character} should be drawn using
      */
     Font getFontForCharacter(TextCharacter character) {
-        Font normalFont = getFontForCharacter(character.getCharacter());
-        if(boldMode == BoldMode.EVERYTHING || (boldMode == BoldMode.EVERYTHING_BUT_SYMBOLS && isNotASymbol(character.getCharacter()))) {
+        Font normalFont = getFontForCharacter(character.c);
+        if(boldMode == BoldMode.EVERYTHING || (boldMode == BoldMode.EVERYTHING_BUT_SYMBOLS && isNotASymbol(character.c))) {
             if(character.isBold()) {
                 normalFont = normalFont.deriveFont(Font.BOLD);
             }
@@ -275,7 +275,7 @@ public class AWTTerminalFontConfiguration {
     }
 
     
-    private static final Set<Character> SYMBOLS_CACHE = new HashSet<Character>();
+    private static final Set<Character> SYMBOLS_CACHE = new HashSet<>();
     static {
         for(Field field: Symbols.class.getFields()) {
             if(field.getType() == char.class &&
@@ -284,17 +284,14 @@ public class AWTTerminalFontConfiguration {
                 try {
                     SYMBOLS_CACHE.add(field.getChar(null));
                 }
-                catch(IllegalArgumentException ignore) {
-                    //Should never happen!
-                }
-                catch(IllegalAccessException ignore) {
+                catch(IllegalArgumentException | IllegalAccessException ignore) {
                     //Should never happen!
                 }
             }
         }
     }
     
-    private boolean isNotASymbol(char character) {
+    private static boolean isNotASymbol(char character) {
         return !SYMBOLS_CACHE.contains(character);
     }
 }

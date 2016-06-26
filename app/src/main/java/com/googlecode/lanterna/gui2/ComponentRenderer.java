@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 /**
  * This interface defines a renderer for a component, an external class that does the sizing and rendering. All
@@ -36,7 +36,7 @@ public interface ComponentRenderer<T extends Component> {
      * @param component Component to calculate the preferred size of
      * @return The size this renderer would like the component to take up
      */
-    TerminalSize getPreferredSize(T component);
+    TerminalPosition getPreferredSize(T component);
 
     /**
      * Using the supplied graphics object, draws the component passed in.

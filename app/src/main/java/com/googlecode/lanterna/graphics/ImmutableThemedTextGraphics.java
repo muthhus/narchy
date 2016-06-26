@@ -85,12 +85,12 @@ public class ImmutableThemedTextGraphics implements ThemedTextGraphics {
     }
 
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return backend.getSize();
     }
 
     @Override
-    public ImmutableThemedTextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalSize size) throws IllegalArgumentException {
+    public ImmutableThemedTextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalPosition size) throws IllegalArgumentException {
         return new ImmutableThemedTextGraphics(backend.newTextGraphics(topLeftCorner, size), theme);
     }
 
@@ -163,25 +163,25 @@ public class ImmutableThemedTextGraphics implements ThemedTextGraphics {
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         backend.fillRectangle(topLeft, size, character);
         return this;
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         backend.fillRectangle(topLeft, size, character);
         return this;
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         backend.drawRectangle(topLeft, size, character);
         return this;
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         backend.drawRectangle(topLeft, size, character);
         return this;
     }
@@ -241,32 +241,32 @@ public class ImmutableThemedTextGraphics implements ThemedTextGraphics {
     }
 
     @Override
-    public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalSize sourceImageSize) {
+    public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalPosition sourceImageSize) {
         backend.drawImage(topLeft, image, sourceImageTopLeft, sourceImageSize);
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, char character) {
-        backend.setCharacter(position, character);
+    public TextGraphics set(TerminalPosition position, char character) {
+        backend.set(position, character);
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, TextCharacter character) {
-        backend.setCharacter(position, character);
+    public TextGraphics set(TerminalPosition position, TextCharacter character) {
+        backend.set(position, character);
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(int column, int row, char character) {
-        backend.setCharacter(column, row, character);
+    public TextGraphics set(int column, int row, char character) {
+        backend.set(column, row, character);
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(int column, int row, TextCharacter character) {
-        backend.setCharacter(column, row, character);
+    public TextGraphics set(int column, int row, TextCharacter character) {
+        backend.set(column, row, character);
         return this;
     }
 
@@ -301,12 +301,12 @@ public class ImmutableThemedTextGraphics implements ThemedTextGraphics {
     }
 
     @Override
-    public TextCharacter getCharacter(TerminalPosition position) {
-        return backend.getCharacter(position);
+    public TextCharacter get(TerminalPosition position) {
+        return backend.get(position);
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
-        return backend.getCharacter(column, row);
+    public TextCharacter get(int column, int row) {
+        return backend.get(column, row);
     }
 }

@@ -20,7 +20,6 @@ package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.input.KeyStroke;
 
@@ -55,8 +54,8 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
      * @param size Preferred size that the list should be asking for instead of invoking the preferred size calculation,
      *             or if set to {@code null} will ask to be big enough to display all items.
      */
-    protected AbstractListBox(TerminalSize size) {
-        this.items = new ArrayList<V>();
+    protected AbstractListBox(TerminalPosition size) {
+        this.items = new ArrayList<>();
         this.selectedIndex = -1;
         setPreferredSize(size);
         setListItemRenderer(createDefaultListItemRenderer());
@@ -64,7 +63,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
 
     @Override
     protected InteractableRenderer<T> createDefaultRenderer() {
-        return new DefaultListBoxRenderer<V, T>();
+        return new DefaultListBoxRenderer<>();
     }
 
     /**
@@ -74,7 +73,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
      * @return {@code ListItemRenderer} to use when drawing the items in the list
      */
     protected ListItemRenderer<V,T> createDefaultListItemRenderer() {
-        return new ListItemRenderer<V,T>();
+        return new ListItemRenderer<>();
     }
     
     ListItemRenderer<V,T> getListItemRenderer() {
@@ -138,13 +137,13 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
 
                 case PageUp:
                     if(getSize() != null) {
-                        setSelectedIndex(getSelectedIndex() - getSize().getRows());
+                        setSelectedIndex(getSelectedIndex() - getSize().row);
                     }
                     return Result.HANDLED;
 
                 case PageDown:
                     if(getSize() != null) {
-                        setSelectedIndex(getSelectedIndex() + getSize().getRows());
+                        setSelectedIndex(getSelectedIndex() + getSize().row);
                     }
                     return Result.HANDLED;
 
@@ -242,7 +241,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
      * @return Copy of all the items in this list box
      */
     public synchronized List<V> getItems() {
-        return new ArrayList<V>(items);
+        return new ArrayList<>(items);
     }
 
     /**
@@ -314,7 +313,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
         }
 
         @Override
-        public TerminalSize getPreferredSize(T listBox) {
+        public TerminalPosition getPreferredSize(T listBox) {
             int maxWidth = 5;   //Set it to something...
             int index = 0;
             for (V item : listBox.getItems()) {
@@ -324,14 +323,14 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
                     maxWidth = stringLengthInColumns;
                 }
             }
-            return new TerminalSize(maxWidth + 1, listBox.getItemCount());
+            return new TerminalPosition(maxWidth + 1, listBox.getItemCount());
         }
 
         @Override
         public void drawComponent(TextGUIGraphics graphics, T listBox) {
             //update the page size, used for page up and page down keys
-            int componentHeight = graphics.getSize().getRows();
-            int componentWidth = graphics.getSize().getColumns();
+            int componentHeight = graphics.getSize().row;
+            int componentWidth = graphics.getSize().column;
             int selectedIndex = listBox.getSelectedIndex();
             List<V> items = listBox.getItems();
             ListItemRenderer<V,T> listItemRenderer = listBox.getListItemRenderer();
@@ -354,7 +353,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
             graphics.applyThemeStyle(graphics.getThemeDefinition(AbstractListBox.class).getNormal());
             graphics.fill(' ');
 
-            TerminalSize itemSize = graphics.getSize().withRows(1);
+            TerminalPosition itemSize = graphics.getSize().withRow(1);
             for(int i = scrollTopIndex; i < items.size(); i++) {
                 if(i - scrollTopIndex >= componentHeight) {
                     break;
@@ -441,7 +440,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
                 graphics.applyThemeStyle(graphics.getThemeDefinition(AbstractListBox.class).getNormal());
             }
             String label = getLabel(listBox, index, item);
-            label = TerminalTextUtils.fitString(label, graphics.getSize().getColumns());
+            label = TerminalTextUtils.fitString(label, graphics.getSize().column);
             graphics.putString(0, 0, label);
         }
     }

@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 
@@ -55,7 +55,7 @@ public class FileDialog extends DialogWindow {
             String title,
             String description,
             String actionLabel,
-            TerminalSize dialogSize,
+            TerminalPosition dialogSize,
             boolean showHiddenFilesAndDirs,
             File selectedObject) {
         super(title);
@@ -83,8 +83,8 @@ public class FileDialog extends DialogWindow {
                     .addTo(contentPane);
         }
 
-        int unitWidth = dialogSize.getColumns() / 3;
-        int unitHeight = dialogSize.getRows();
+        int unitWidth = dialogSize.column / 3;
+        int unitHeight = dialogSize.row;
 
         new FileSystemLocationLabel()
                 .setLayoutData(GridLayout.createLayoutData(
@@ -96,7 +96,7 @@ public class FileDialog extends DialogWindow {
                         1))
                 .addTo(contentPane);
 
-        fileListBox = new ActionListBox(new TerminalSize(unitWidth * 2, unitHeight));
+        fileListBox = new ActionListBox(new TerminalPosition(unitWidth * 2, unitHeight));
         fileListBox.withBorder(Borders.singleLine())
                 .setLayoutData(GridLayout.createLayoutData(
                         GridLayout.Alignment.BEGINNING,
@@ -104,7 +104,7 @@ public class FileDialog extends DialogWindow {
                         false,
                         false))
                 .addTo(contentPane);
-        directoryListBox = new ActionListBox(new TerminalSize(unitWidth, unitHeight));
+        directoryListBox = new ActionListBox(new TerminalPosition(unitWidth, unitHeight));
         directoryListBox.withBorder(Borders.singleLine())
                 .addTo(contentPane);
 
@@ -181,7 +181,7 @@ public class FileDialog extends DialogWindow {
         }
     }
 
-    private class DoNothing implements Runnable {
+    private static class DoNothing implements Runnable {
         @Override
         public void run() {
         }
@@ -238,16 +238,16 @@ public class FileDialog extends DialogWindow {
     private class FileSystemLocationLabel extends Label {
         public FileSystemLocationLabel() {
             super("");
-            setPreferredSize(TerminalSize.ONE);
+            setPreferredSize(TerminalPosition.ONE);
         }
 
         @Override
         public void onBeforeDrawing() {
-            TerminalSize area = getSize();
+            TerminalPosition area = getSize();
             String absolutePath = directory.getAbsolutePath();
             int absolutePathLengthInColumns = TerminalTextUtils.getColumnWidth(absolutePath);
-            if(area.getColumns() < absolutePathLengthInColumns) {
-                absolutePath = absolutePath.substring(absolutePathLengthInColumns - area.getColumns());
+            if(area.column < absolutePathLengthInColumns) {
+                absolutePath = absolutePath.substring(absolutePathLengthInColumns - area.column);
                 absolutePath = "..." + absolutePath.substring(Math.min(absolutePathLengthInColumns, 3));
             }
             setText(absolutePath);

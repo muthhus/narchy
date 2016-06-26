@@ -50,7 +50,7 @@ public interface TextGraphics {
      * this area will be silently ignored.
      * @return Size of the writable area that this TextGraphics can write too
      */
-    TerminalSize getSize();
+    TerminalPosition getSize();
 
     /**
      * Creates a new TextGraphics of the same type as this one, using the same underlying subsystem. Using this method,
@@ -66,7 +66,7 @@ public interface TextGraphics {
      * @throws IllegalArgumentException If the size the of new TextGraphics exceeds the dimensions of this
      * TextGraphics in any way.
      */
-    TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalSize size) throws IllegalArgumentException;
+    TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalPosition size) throws IllegalArgumentException;
 
     /**
      * Returns the current background color
@@ -154,7 +154,7 @@ public interface TextGraphics {
      * @param character Character to set at the current position
      * @return Itself
      */
-    TextGraphics setCharacter(int column, int row, char character);
+    TextGraphics set(int column, int row, char character);
 
     /**
      * Sets the character at the current position to the specified value, without using the current colors and modifiers
@@ -164,7 +164,7 @@ public interface TextGraphics {
      * @param character Character data to set at the current position
      * @return Itself
      */
-    TextGraphics setCharacter(int column, int row, TextCharacter character);
+    TextGraphics set(int column, int row, TextCharacter character);
 
     /**
      * Sets the character at the current position to the specified value
@@ -172,7 +172,7 @@ public interface TextGraphics {
      * @param character Character to set at the current position
      * @return Itself
      */
-    TextGraphics setCharacter(TerminalPosition position, char character);
+    TextGraphics set(TerminalPosition position, char character);
 
     /**
      * Sets the character at the current position to the specified value, without using the current colors and modifiers
@@ -181,7 +181,7 @@ public interface TextGraphics {
      * @param character Character data to set at the current position
      * @return Itself
      */
-    TextGraphics setCharacter(TerminalPosition position, TextCharacter character);
+    TextGraphics set(TerminalPosition position, TextCharacter character);
 
     /**
      * Draws a line from a specified position to a specified position, using a supplied character. The current
@@ -285,7 +285,7 @@ public interface TextGraphics {
      * @param size Size (in columns and rows) of the area to draw
      * @param character What character to use when drawing the outline of the rectangle
      */
-    TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, char character);
+    TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, char character);
 
     /**
      * Draws the outline of a rectangle with a particular TextCharacter, ignoring the current colors and modifiers of
@@ -299,7 +299,7 @@ public interface TextGraphics {
      * @param size Size (in columns and rows) of the area to draw
      * @param character What character data to use when drawing the outline of the rectangle
      */
-    TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character);
+    TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character);
 
     /**
      * Takes a rectangle and fills it with a particular character (and the currently active colors and
@@ -313,7 +313,7 @@ public interface TextGraphics {
      * @param size Size (in columns and rows) of the area to draw
      * @param character What character to use when filling the rectangle
      */
-    TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, char character);
+    TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, char character);
 
     /**
      * Takes a rectangle and fills it using a particular TextCharacter, ignoring the current colors and modifiers of
@@ -327,7 +327,7 @@ public interface TextGraphics {
      * @param size Size (in columns and rows) of the area to draw
      * @param character What character data to use when filling the rectangle
      */
-    TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character);
+    TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character);
     
     /**
      * Takes a TextImage and draws it on the surface this TextGraphics is targeting, given the coordinates on the target
@@ -351,7 +351,7 @@ public interface TextGraphics {
      *                        position
      * @return Itself
      */
-    TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalSize sourceImageSize);
+    TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalPosition sourceImageSize);
 
     /**
      * Puts a string on the screen at the specified position with the current colors and modifiers. If the string
@@ -421,7 +421,7 @@ public interface TextGraphics {
      * @param position Position to return the character for
      * @return The text character at the specified position or {@code null} if not available
      */
-    TextCharacter getCharacter(TerminalPosition position);
+    TextCharacter get(TerminalPosition position);
 
     /**
      * Returns the character at the specific position in the terminal. May return {@code null} if the TextGraphics
@@ -430,5 +430,5 @@ public interface TextGraphics {
      * @param row Row to return the character for
      * @return The text character at the specified position or {@code null} if not available
      */
-    TextCharacter getCharacter(int column, int row);
+    TextCharacter get(int column, int row);
 }

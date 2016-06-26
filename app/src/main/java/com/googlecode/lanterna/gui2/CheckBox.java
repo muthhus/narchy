@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -70,7 +69,7 @@ public class CheckBox extends AbstractInteractableComponent<CheckBox> {
         else if(label.contains("\n") || label.contains("\r")) {
             throw new IllegalArgumentException("Multiline checkbox labels are not supported");
         }
-        this.listeners = new CopyOnWriteArrayList<Listener>();
+        this.listeners = new CopyOnWriteArrayList<>();
         this.label = label;
         this.checked = false;
     }
@@ -179,12 +178,12 @@ public class CheckBox extends AbstractInteractableComponent<CheckBox> {
         }
 
         @Override
-        public TerminalSize getPreferredSize(CheckBox component) {
+        public TerminalPosition getPreferredSize(CheckBox component) {
             int width = 3;
             if(!component.label.isEmpty()) {
                 width += 1 + TerminalTextUtils.getColumnWidth(component.label);
             }
-            return new TerminalSize(width, 1);
+            return new TerminalPosition(width, 1);
         }
 
         @Override
@@ -200,7 +199,7 @@ public class CheckBox extends AbstractInteractableComponent<CheckBox> {
             graphics.fill(' ');
             graphics.putString(4, 0, component.label);
 
-            String head = "[" + (component.isChecked() ? themeDefinition.getCharacter("MARKER", 'x') : " ") + "]";
+            String head = "[" + (component.isChecked() ? themeDefinition.getCharacter("MARKER", 'x') : " ") + ']';
             if(component.isFocused()) {
                 graphics.applyThemeStyle(themeDefinition.getPreLight());
             }

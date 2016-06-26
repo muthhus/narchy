@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.screen.Screen;
 
@@ -41,7 +41,7 @@ public class MultiButtonTest {
             contentArea.addComponent(new Button("TRE"));
             contentArea.addComponent(new Button("Button"));
             contentArea.addComponent(new Button("Another button"));
-            contentArea.addComponent(new EmptySpace(new TerminalSize(5, 1)));
+            contentArea.addComponent(new EmptySpace(new TerminalPosition(5, 1)));
             //contentArea.addComponent(new Button("Here is a\nmulti-line\ntext segment that is using \\n"));
             contentArea.addComponent(new Button("OK", new Runnable() {
                 @Override

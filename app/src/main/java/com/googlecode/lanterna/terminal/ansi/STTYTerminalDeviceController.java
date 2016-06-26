@@ -1,6 +1,6 @@
 package com.googlecode.lanterna.terminal.ansi;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.*;
 import java.lang.reflect.InvocationHandler;
@@ -55,14 +55,14 @@ public class STTYTerminalDeviceController implements TerminalDeviceControlStrate
     }
 
     @Override
-    public TerminalSize getTerminalSize() throws IOException {
+    public TerminalPosition getTerminalSize() {
         // We could read the terminal dimensions through stty, but let's not, as it would involve a lot of spawning new
         // processes. Better to use the ANSI escape code hack
         return null;
     }
 
     @Override
-    public void registerTerminalResizeListener(final Runnable onResize) throws IOException {
+    public void registerTerminalResizeListener(final Runnable onResize) {
         try {
             Class<?> signalClass = Class.forName("sun.misc.Signal");
             for(Method m : signalClass.getDeclaredMethods()) {
@@ -86,7 +86,7 @@ public class STTYTerminalDeviceController implements TerminalDeviceControlStrate
         }
     }
 
-    protected String getSTTYCommand() {
+    protected static String getSTTYCommand() {
         return "/bin/stty";
     }
 

@@ -33,7 +33,7 @@ public class CJKTerminalTest {
         terminal.enterPrivateMode();
         terminal.clearScreen();
         for(int i = 1; i < 5; i++) {
-            terminal.setCursorPosition(i, i);
+            terminal.moveCursorTo(i, i);
             printString(terminal, "あ い う え お");
         }
         int pos = 0;
@@ -42,9 +42,9 @@ public class CJKTerminalTest {
             if(terminal.pollInput() != null) {
                 break;
             }
-            terminal.setCursorPosition(0, 0);
+            terminal.moveCursorTo(0, 0);
             printString(terminal, pos + "x" + line);            
-            terminal.setCursorPosition(pos++, line);
+            terminal.moveCursorTo(pos++, line);
             if(pos == 10) {
                 pos = 0;
                 line++;
@@ -52,15 +52,15 @@ public class CJKTerminalTest {
             terminal.flush();
             Thread.sleep(2000);
         }
-        terminal.setForegroundColor(TextColor.ANSI.WHITE);
-        terminal.setBackgroundColor(TextColor.ANSI.RED);
+        terminal.fore(TextColor.ANSI.WHITE);
+        terminal.back(TextColor.ANSI.RED);
         for(int i = 0; i < 5; i++) {
             if(terminal.pollInput() != null) {
                 break;
             }
-            terminal.setCursorPosition(5, i + 1);
+            terminal.moveCursorTo(5, i + 1);
             printString(terminal, "X");
-            terminal.setCursorPosition(0, 0);
+            terminal.moveCursorTo(0, 0);
             terminal.flush();
             Thread.sleep(2000);
         }
@@ -69,7 +69,7 @@ public class CJKTerminalTest {
 
     private static void printString(Terminal rawTerminal, String string) throws IOException {
         for(int i = 0; i < string.length(); i++) {
-            rawTerminal.putCharacter(string.charAt(i));
+            rawTerminal.put(string.charAt(i));
         }
     }
 }

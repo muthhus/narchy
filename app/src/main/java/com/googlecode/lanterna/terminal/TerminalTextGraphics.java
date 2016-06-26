@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.AbstractTextGraphics;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -28,6 +27,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class TerminalTextGraphics extends AbstractTextGraphics {
 
     private final Terminal terminal;
-    private final TerminalSize terminalSize;
+    private final TerminalPosition terminalPosition;
 
     private final Map<TerminalPosition, TextCharacter> writeHistory;
 
@@ -53,36 +53,36 @@ class TerminalTextGraphics extends AbstractTextGraphics {
 
     TerminalTextGraphics(Terminal terminal) throws IOException {
         this.terminal = terminal;
-        this.terminalSize = terminal.getTerminalSize();
+        this.terminalPosition = terminal.terminalSize();
         this.manageCallStackSize = new AtomicInteger(0);
-        this.writeHistory = new HashMap<TerminalPosition, TextCharacter>();
+        this.writeHistory = new HashMap<>();
         this.lastCharacter = null;
         this.lastPosition = null;
     }
 
     @Override
-    public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
-        return setCharacter(new TerminalPosition(columnIndex, rowIndex), textCharacter);
+    public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+        return set(new TerminalPosition(columnIndex, rowIndex), textCharacter);
     }
 
     @Override
-    public synchronized TextGraphics setCharacter(TerminalPosition position, TextCharacter textCharacter) {
+    public synchronized TextGraphics set(TerminalPosition position, TextCharacter textCharacter) {
         try {
             if(manageCallStackSize.get() > 0) {
-                if(lastCharacter == null || !lastCharacter.equals(textCharacter)) {
+                if(!Objects.equals(lastCharacter, textCharacter)) {
                     applyGraphicState(textCharacter);
                     lastCharacter = textCharacter;
                 }
-                if(lastPosition == null || !lastPosition.equals(position)) {
-                    terminal.setCursorPosition(position.getColumn(), position.getRow());
+                if(!Objects.equals(lastPosition, position)) {
+                    terminal.moveCursorTo(position.column, position.row);
                     lastPosition = position;
                 }
             }
             else {
-                terminal.setCursorPosition(position.getColumn(), position.getRow());
+                terminal.moveCursorTo(position.column, position.row);
                 applyGraphicState(textCharacter);
             }
-            terminal.putCharacter(textCharacter.getCharacter());
+            terminal.put(textCharacter.c);
             if(manageCallStackSize.get() > 0) {
                 lastPosition = position.withRelativeColumn(1);
             }
@@ -95,27 +95,27 @@ class TerminalTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
-        return getCharacter(new TerminalPosition(column, row));
+    public TextCharacter get(int column, int row) {
+        return get(new TerminalPosition(column, row));
     }
 
     @Override
-    public synchronized TextCharacter getCharacter(TerminalPosition position) {
+    public synchronized TextCharacter get(TerminalPosition position) {
         return writeHistory.get(position);
     }
 
     private void applyGraphicState(TextCharacter textCharacter) throws IOException {
         terminal.resetColorAndSGR();
-        terminal.setForegroundColor(textCharacter.getForegroundColor());
-        terminal.setBackgroundColor(textCharacter.getBackgroundColor());
+        terminal.fore(textCharacter.fore);
+        terminal.back(textCharacter.back);
         for(SGR sgr: textCharacter.getModifiers()) {
             terminal.enableSGR(sgr);
         }
     }
 
     @Override
-    public TerminalSize getSize() {
-        return terminalSize;
+    public TerminalPosition getSize() {
+        return terminalPosition;
     }
 
     @Override
@@ -155,7 +155,7 @@ class TerminalTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public synchronized TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public synchronized TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         try {
             enterAtomic();
             super.fillRectangle(topLeft, size, character);
@@ -167,7 +167,7 @@ class TerminalTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public synchronized TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public synchronized TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         try {
             enterAtomic();
             super.drawRectangle(topLeft, size, character);

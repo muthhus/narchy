@@ -1,7 +1,6 @@
 package com.googlecode.lanterna.examples;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -30,7 +29,7 @@ public class DrawRectangle {
 		screen.clear();
 
 		tGraphics.drawRectangle(
-			new TerminalPosition(3,3), new TerminalSize(10,10), '*');
+			new TerminalPosition(3,3), new TerminalPosition(10,10), '*');
 		screen.refresh();
 
 		screen.readInput();

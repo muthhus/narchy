@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -52,7 +52,7 @@ public class MultiWindowManagerTest extends TestBase {
                 onNewWindow(textGUI);
             }
         }));
-        contentArea.addComponent(new EmptySpace(TerminalSize.ONE));
+        contentArea.addComponent(new EmptySpace(TerminalPosition.ONE));
         contentArea.addComponent(new Button("Close", new Runnable() {
             @Override
             public void run() {
@@ -107,13 +107,13 @@ public class MultiWindowManagerTest extends TestBase {
             Panel contentArea = new Panel();
             contentArea.setLayoutManager(new GridLayout(1));
             contentArea.addComponent(statsTableContainer);
-            contentArea.addComponent(new EmptySpace(TerminalSize.ONE));
+            contentArea.addComponent(new EmptySpace(TerminalPosition.ONE));
             contentArea.addComponent(
                     new Label(
                             "Move window with ALT+Arrow\n" +
                             "Resize window with CTRL+Arrow\n" +
                             " (need to disabled managed mode to resize)"));
-            contentArea.addComponent(new EmptySpace(TerminalSize.ONE).setLayoutData(
+            contentArea.addComponent(new EmptySpace(TerminalPosition.ONE).setLayoutData(
                     GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true)));
             contentArea.addComponent(
                     Panels.horizontal(
@@ -154,7 +154,7 @@ public class MultiWindowManagerTest extends TestBase {
                             setPosition(getPosition().withRelativeRow(1));
                         }
                         else if(key.isCtrlDown()) {
-                            setSize(getSize().withRelativeRows(1));
+                            setSize(getSize().withRelativeRow(1));
                         }
                         handled = true;
                         break;
@@ -162,8 +162,8 @@ public class MultiWindowManagerTest extends TestBase {
                         if(key.isAltDown()) {
                             setPosition(getPosition().withRelativeColumn(-1));
                         }
-                        else if(key.isCtrlDown() && getSize().getColumns() > 1) {
-                            setSize(getSize().withRelativeColumns(-1));
+                        else if(key.isCtrlDown() && getSize().column > 1) {
+                            setSize(getSize().withRelativeColumn(-1));
                         }
                         handled = true;
                         break;
@@ -172,7 +172,7 @@ public class MultiWindowManagerTest extends TestBase {
                             setPosition(getPosition().withRelativeColumn(1));
                         }
                         else if(key.isCtrlDown()) {
-                            setSize(getSize().withRelativeColumns(1));
+                            setSize(getSize().withRelativeColumn(1));
                         }
                         handled = true;
                         break;
@@ -180,8 +180,8 @@ public class MultiWindowManagerTest extends TestBase {
                         if(key.isAltDown()) {
                             setPosition(getPosition().withRelativeRow(-1));
                         }
-                        else if(key.isCtrlDown() && getSize().getRows() > 1) {
-                            setSize(getSize().withRelativeRows(-1));
+                        else if(key.isCtrlDown() && getSize().row > 1) {
+                            setSize(getSize().withRelativeRow(-1));
                         }
                         handled = true;
                         break;
@@ -203,8 +203,8 @@ public class MultiWindowManagerTest extends TestBase {
         protected ComponentRenderer<BackgroundComponent> createDefaultRenderer() {
             return new ComponentRenderer<BackgroundComponent>() {
                 @Override
-                public TerminalSize getPreferredSize(BackgroundComponent component) {
-                    return TerminalSize.ONE;
+                public TerminalPosition getPreferredSize(BackgroundComponent component) {
+                    return TerminalPosition.ONE;
                 }
 
                 @Override
@@ -213,7 +213,7 @@ public class MultiWindowManagerTest extends TestBase {
                     graphics.setBackgroundColor(TextColor.ANSI.BLUE);
                     graphics.fill(' ');
                     String text = "Press <CTRL+Tab> and <CTRL+Shift+Tab> to cycle active window";
-                    graphics.putString(graphics.getSize().getColumns() - text.length() - 4, graphics.getSize().getRows() - 1, text, SGR.BOLD);
+                    graphics.putString(graphics.getSize().column - text.length() - 4, graphics.getSize().row - 1, text, SGR.BOLD);
                 }
             };
         }

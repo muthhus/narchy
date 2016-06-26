@@ -69,7 +69,7 @@ public class ConeTwistConstraint extends TypedConstraint {
 	private float accSwingLimitImpulse;
 	private float accTwistLimitImpulse;
 
-	private boolean angularOnly = false;
+	private boolean angularOnly;
 	private boolean solveTwistLimit;
 	private boolean solveSwingLimit;
 

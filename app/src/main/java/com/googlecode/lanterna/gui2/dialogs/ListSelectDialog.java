@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 
@@ -36,7 +36,7 @@ public class ListSelectDialog<T> extends DialogWindow {
     ListSelectDialog(
             String title,
             String description,
-            TerminalSize listBoxPreferredSize,
+            TerminalPosition listBoxPreferredSize,
             boolean canCancel,
             List<T> content) {
 
@@ -63,7 +63,7 @@ public class ListSelectDialog<T> extends DialogWindow {
                         .setRightMarginSize(1));
         if(description != null) {
             mainPanel.addComponent(new Label(description));
-            mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+            mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         }
         listBox.setLayoutData(
                 GridLayout.createLayoutData(
@@ -72,17 +72,12 @@ public class ListSelectDialog<T> extends DialogWindow {
                         true,
                         false))
                 .addTo(mainPanel);
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
 
         if(canCancel) {
             Panel buttonPanel = new Panel();
             buttonPanel.setLayoutManager(new GridLayout(2).setHorizontalSpacing(1));
-            buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), new Runnable() {
-                @Override
-                public void run() {
-                    onCancel();
-                }
-            }).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
+            buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), this::onCancel).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
             buttonPanel.setLayoutData(
                     GridLayout.createLayoutData(
                             GridLayout.Alignment.END,
@@ -145,7 +140,7 @@ public class ListSelectDialog<T> extends DialogWindow {
             width = Math.max(width, TerminalTextUtils.getColumnWidth(item.toString()));
         }
         width += 2;
-        return showDialog(textGUI, title, description, new TerminalSize(width, listBoxHeight), items);
+        return showDialog(textGUI, title, description, new TerminalPosition(width, listBoxHeight), items);
     }
 
     /**
@@ -158,7 +153,7 @@ public class ListSelectDialog<T> extends DialogWindow {
      * @param <T> Type of items in the dialog
      * @return The selected item or {@code null} if cancelled
      */
-    public static <T> T showDialog(WindowBasedTextGUI textGUI, String title, String description, TerminalSize listBoxSize, T... items) {
+    public static <T> T showDialog(WindowBasedTextGUI textGUI, String title, String description, TerminalPosition listBoxSize, T... items) {
         ListSelectDialog<T> listSelectDialog = new ListSelectDialogBuilder<T>()
                 .setTitle(title)
                 .setDescription(description)

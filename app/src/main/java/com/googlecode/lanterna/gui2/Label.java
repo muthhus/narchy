@@ -18,23 +18,23 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TerminalTextUtils;
-import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Label is a simple read-only text display component. It supports customized colors and multi-line text.
  * @author Martin
  */
 public class Label extends AbstractComponent<Label> {
+    private static final Pattern slashR = Pattern.compile("\r", Pattern.LITERAL);
     private String[] lines;
     private Integer labelWidth;
-    private TerminalSize labelSize;
+    private TerminalPosition labelSize;
     private TextColor foregroundColor;
     private TextColor backgroundColor;
     private final EnumSet<SGR> additionalStyles;
@@ -45,7 +45,7 @@ public class Label extends AbstractComponent<Label> {
      */
     public Label(String text) {
         this.lines = null;
-        this.labelSize = TerminalSize.ZERO;
+        this.labelSize = TerminalPosition.ZERO;
         this.labelWidth = 0;
         this.foregroundColor = null;
         this.backgroundColor = null;
@@ -84,7 +84,7 @@ public class Label extends AbstractComponent<Label> {
         }
         StringBuilder bob = new StringBuilder(lines[0]);
         for(int i = 1; i < lines.length; i++) {
-            bob.append("\n").append(lines[i]);
+            bob.append('\n').append(lines[i]);
         }
         return bob.toString();
     }
@@ -95,8 +95,8 @@ public class Label extends AbstractComponent<Label> {
      * @param text Text to split
      * @return Array of strings that forms the lines of the original string
      */
-    protected String[] splitIntoMultipleLines(String text) {
-        return text.replace("\r", "").split("\n");
+    protected static String[] splitIntoMultipleLines(String text) {
+        return slashR.matcher(text).replaceAll(Matcher.quoteReplacement("")).split("\n");
     }
 
     /**
@@ -107,11 +107,11 @@ public class Label extends AbstractComponent<Label> {
      *                      reference of this size will avoid creating new {@code TerminalSize} objects every time
      * @return Size that is required to draw the lines
      */
-    protected TerminalSize getBounds(String[] lines, TerminalSize currentBounds) {
+    protected TerminalPosition getBounds(String[] lines, TerminalPosition currentBounds) {
         if(currentBounds == null) {
-            currentBounds = TerminalSize.ZERO;
+            currentBounds = TerminalPosition.ZERO;
         }
-        currentBounds = currentBounds.withRows(lines.length);
+        currentBounds = currentBounds.withRow(lines.length);
         if(labelWidth == null || labelWidth == 0) {
             int preferredWidth = 0;
             for(String line : lines) {
@@ -120,11 +120,11 @@ public class Label extends AbstractComponent<Label> {
                     preferredWidth = lineWidth;
                 }
             }
-            currentBounds = currentBounds.withColumns(preferredWidth);
+            currentBounds = currentBounds.withColumn(preferredWidth);
         }
         else {
             List<String> wordWrapped = TerminalTextUtils.getWordWrappedText(labelWidth, lines);
-            currentBounds = currentBounds.withColumns(labelWidth).withRows(wordWrapped.size());
+            currentBounds = currentBounds.withColumn(labelWidth).withRow(wordWrapped.size());
         }
         return currentBounds;
     }
@@ -231,9 +231,9 @@ public class Label extends AbstractComponent<Label> {
 
     @Override
     protected ComponentRenderer<Label> createDefaultRenderer() {
-        return new ComponentRenderer<Label>() {
+        return new ComponentRenderer<>() {
             @Override
-            public TerminalSize getPreferredSize(Label Label) {
+            public TerminalPosition getPreferredSize(Label Label) {
                 return labelSize;
             }
 
@@ -241,31 +241,30 @@ public class Label extends AbstractComponent<Label> {
             public void drawComponent(TextGUIGraphics graphics, Label component) {
                 ThemeDefinition themeDefinition = graphics.getThemeDefinition(Label.class);
                 graphics.applyThemeStyle(themeDefinition.getNormal());
-                if(foregroundColor != null) {
+                if (foregroundColor != null) {
                     graphics.setForegroundColor(foregroundColor);
                 }
-                if(backgroundColor != null) {
+                if (backgroundColor != null) {
                     graphics.setBackgroundColor(backgroundColor);
                 }
-                for(SGR sgr: additionalStyles) {
+                for (SGR sgr : additionalStyles) {
                     graphics.enableModifiers(sgr);
                 }
 
                 String[] linesToDraw;
-                if(component.getLabelWidth() == null) {
+                if (component.getLabelWidth() == null) {
                     linesToDraw = component.lines;
-                }
-                else {
-                    linesToDraw = TerminalTextUtils.getWordWrappedText(graphics.getSize().getColumns(), component.lines).toArray(new String[0]);
+                } else {
+                    List<String> var = TerminalTextUtils.getWordWrappedText(graphics.getSize().column, component.lines);
+                    linesToDraw = var.toArray(new String[var.size()]);
                 }
 
-                for(int row = 0; row < Math.min(graphics.getSize().getRows(), linesToDraw.length); row++) {
+                for (int row = 0; row < Math.min(graphics.getSize().row, linesToDraw.length); row++) {
                     String line = linesToDraw[row];
-                    if(graphics.getSize().getColumns() >= labelSize.getColumns()) {
+                    if (graphics.getSize().column >= labelSize.column) {
                         graphics.putString(0, row, line);
-                    }
-                    else {
-                        int availableColumns = graphics.getSize().getColumns();
+                    } else {
+                        int availableColumns = graphics.getSize().column;
                         String fitString = TerminalTextUtils.fitString(line, availableColumns);
                         graphics.putString(0, row, fitString);
                     }

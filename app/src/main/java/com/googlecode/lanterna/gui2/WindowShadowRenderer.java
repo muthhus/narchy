@@ -20,7 +20,6 @@ package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
@@ -37,14 +36,14 @@ public class WindowShadowRenderer implements WindowPostRenderer {
             Window window) {
 
         TerminalPosition windowPosition = window.getPosition();
-        TerminalSize decoratedWindowSize = window.getDecoratedSize();
+        TerminalPosition decoratedWindowSize = window.getDecoratedSize();
         textGraphics.setForegroundColor(TextColor.ANSI.BLACK);
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
         textGraphics.enableModifiers(SGR.BOLD);
-        TerminalPosition lowerLeft = windowPosition.withRelativeColumn(2).withRelativeRow(decoratedWindowSize.getRows());
-        TerminalPosition lowerRight = lowerLeft.withRelativeColumn(decoratedWindowSize.getColumns() - 1);
+        TerminalPosition lowerLeft = windowPosition.withRelativeColumn(2).withRelativeRow(decoratedWindowSize.row);
+        TerminalPosition lowerRight = lowerLeft.withRelativeColumn(decoratedWindowSize.column - 1);
         textGraphics.drawLine(lowerLeft, lowerRight, ' ');
-        TerminalPosition upperRight = lowerRight.withRelativeRow(-decoratedWindowSize.getRows() + 1);
+        TerminalPosition upperRight = lowerRight.withRelativeRow(-decoratedWindowSize.row + 1);
         textGraphics.drawLine(lowerRight, upperRight, ' ');
 
         //Fill the remaining hole

@@ -20,7 +20,6 @@ package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.Symbols;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 
@@ -47,40 +46,40 @@ public class DefaultWindowDecorationRenderer implements WindowDecorationRenderer
         char bottomRightCorner = themeDefinition.getCharacter("BOTTOM_RIGHT_CORNER", Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);
         char topRightCorner = themeDefinition.getCharacter("TOP_RIGHT_CORNER", Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
 
-        TerminalSize drawableArea = graphics.getSize();
+        TerminalPosition drawableArea = graphics.getSize();
         graphics.applyThemeStyle(themeDefinition.getPreLight());
-        graphics.drawLine(new TerminalPosition(0, drawableArea.getRows() - 2), new TerminalPosition(0, 1), verticalLine);
-        graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.getColumns() - 2, 0), horizontalLine);
-        graphics.setCharacter(0, 0, topLeftCorner);
-        graphics.setCharacter(0, drawableArea.getRows() - 1, bottomLeftCorner);
+        graphics.drawLine(new TerminalPosition(0, drawableArea.row - 2), new TerminalPosition(0, 1), verticalLine);
+        graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.column - 2, 0), horizontalLine);
+        graphics.set(0, 0, topLeftCorner);
+        graphics.set(0, drawableArea.row - 1, bottomLeftCorner);
 
         graphics.applyThemeStyle(themeDefinition.getNormal());
 
         graphics.drawLine(
-                new TerminalPosition(drawableArea.getColumns() - 1, 1),
-                new TerminalPosition(drawableArea.getColumns() - 1, drawableArea.getRows() - 2),
+                new TerminalPosition(drawableArea.column - 1, 1),
+                new TerminalPosition(drawableArea.column - 1, drawableArea.row - 2),
                 verticalLine);
         graphics.drawLine(
-                new TerminalPosition(1, drawableArea.getRows() - 1),
-                new TerminalPosition(drawableArea.getColumns() - 2, drawableArea.getRows() - 1),
+                new TerminalPosition(1, drawableArea.row - 1),
+                new TerminalPosition(drawableArea.column - 2, drawableArea.row - 1),
                 horizontalLine);
 
-        graphics.setCharacter(drawableArea.getColumns() - 1, 0, topRightCorner);
-        graphics.setCharacter(drawableArea.getColumns() - 1, drawableArea.getRows() - 1, bottomRightCorner);
+        graphics.set(drawableArea.column - 1, 0, topRightCorner);
+        graphics.set(drawableArea.column - 1, drawableArea.row - 1, bottomRightCorner);
 
         if(!title.isEmpty()) {
-            graphics.putString(2, 0, TerminalTextUtils.fitString(title, drawableArea.getColumns() - 3));
+            graphics.putString(2, 0, TerminalTextUtils.fitString(title, drawableArea.column - 3));
         }
 
-        return graphics.newTextGraphics(new TerminalPosition(1, 1), graphics.getSize().withRelativeColumns(-2).withRelativeRows(-2));
+        return graphics.newTextGraphics(new TerminalPosition(1, 1), graphics.getSize().withRelativeColumn(-2).withRelativeRow(-2));
     }
 
     @Override
-    public TerminalSize getDecoratedSize(Window window, TerminalSize contentAreaSize) {
+    public TerminalPosition getDecoratedSize(Window window, TerminalPosition contentAreaSize) {
         return contentAreaSize
-                .withRelativeColumns(2)
-                .withRelativeRows(2)
-                .max(new TerminalSize(TerminalTextUtils.getColumnWidth(window.getTitle()) + 4, 1));  //Make sure the title fits!
+                .withRelativeColumn(2)
+                .withRelativeRow(2)
+                .max(new TerminalPosition(TerminalTextUtils.getColumnWidth(window.getTitle()) + 4, 1));  //Make sure the title fits!
     }
 
     private static final TerminalPosition OFFSET = new TerminalPosition(1, 1);

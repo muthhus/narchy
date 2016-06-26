@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
@@ -59,15 +59,15 @@ public class CheckBoxList<V> extends AbstractListBox<V, CheckBoxList<V>> {
      * there are more items that can fit in this size, the list box will use scrollbars.
      * @param preferredSize Size the list box should request, no matter how many items it contains
      */
-    public CheckBoxList(TerminalSize preferredSize) {
+    public CheckBoxList(TerminalPosition preferredSize) {
         super(preferredSize);
-        this.listeners = new CopyOnWriteArrayList<Listener>();
-        this.itemStatus = new ArrayList<Boolean>();
+        this.listeners = new CopyOnWriteArrayList<>();
+        this.itemStatus = new ArrayList<>();
     }
 
     @Override
     protected ListItemRenderer<V,CheckBoxList<V>> createDefaultListItemRenderer() {
-        return new CheckBoxListItemRenderer<V>();
+        return new CheckBoxListItemRenderer<>();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class CheckBoxList<V> extends AbstractListBox<V, CheckBoxList<V>> {
      * @return List of all items in the list box that has checked state on
      */
     public synchronized List<V> getCheckedItems() {
-        List<V> result = new ArrayList<V>();
+        List<V> result = new ArrayList<>();
         for(int i = 0; i < itemStatus.size(); i++) {
             if(itemStatus.get(i)) {
                 result.add(getItemAt(i));
@@ -215,7 +215,7 @@ public class CheckBoxList<V> extends AbstractListBox<V, CheckBoxList<V>> {
                 check = "x";
 
             String text = item.toString();
-            return "[" + check + "] " + text;
+            return '[' + check + "] " + text;
         }
     }
 }

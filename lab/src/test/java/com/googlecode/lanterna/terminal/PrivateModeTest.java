@@ -57,7 +57,7 @@ public class PrivateModeTest {
         if(!normalTerminal) {
             terminal.exitPrivateMode();
         }
-        terminal.putCharacter('\n');
+        terminal.put('\n');
         if(terminal instanceof Window) {
             ((Window) terminal).dispose();
         }
@@ -65,20 +65,20 @@ public class PrivateModeTest {
 
     private static void printNormalTerminalText(Terminal terminal) throws IOException {
         terminal.clearScreen();
-        terminal.setCursorPosition(5, 3);
+        terminal.moveCursorTo(5, 3);
         String text = "Normal terminal, press space to switch";
         for(int i = 0; i < text.length(); i++) {
-            terminal.putCharacter(text.charAt(i));
+            terminal.put(text.charAt(i));
         }
         terminal.flush();
     }
 
     private static void printPrivateModeTerminalText(Terminal terminal) throws IOException {
         terminal.clearScreen();
-        terminal.setCursorPosition(5, 3);
+        terminal.moveCursorTo(5, 3);
         String text = "Private mode terminal, press space to switch";
         for(int i = 0; i < text.length(); i++) {
-            terminal.putCharacter(text.charAt(i));
+            terminal.put(text.charAt(i));
         }
         terminal.flush();
     }

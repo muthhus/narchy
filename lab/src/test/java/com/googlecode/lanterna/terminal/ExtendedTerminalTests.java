@@ -46,8 +46,8 @@ public class ExtendedTerminalTests {
         extendedTerminal.clearScreen();
         textGraphics.putString(4, 4, "Check the title, did it change?");
         textGraphics.setForegroundColor(TextColor.ANSI.RED);
-        textGraphics.putString(0, textGraphics.getSize().getRows() - 1, "Will terminate in 3 seconds...", SGR.BLINK);
-        extendedTerminal.setCursorPosition(0, 0);
+        textGraphics.putString(0, textGraphics.getSize().row - 1, "Will terminate in 3 seconds...", SGR.BLINK);
+        extendedTerminal.moveCursorTo(0, 0);
         extendedTerminal.flush();
         Thread.sleep(3 * 1000);
         extendedTerminal.clearScreen();

@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 
 /**
@@ -32,14 +31,14 @@ public interface TextImage extends Scrollable {
      * Returns the dimensions of this TextImage, in columns and rows
      * @return Size of this TextImage
      */
-    TerminalSize getSize();
+    TerminalPosition getSize();
     
     /**
      * Returns the character stored at a particular position in this image
      * @param position Coordinates of the character
      * @return TextCharacter stored at the specified position
      */
-    TextCharacter getCharacterAt(TerminalPosition position);
+    TextCharacter get(TerminalPosition position);
     
     /**
      * Returns the character stored at a particular position in this image
@@ -47,7 +46,7 @@ public interface TextImage extends Scrollable {
      * @param row Row coordinate of the character
      * @return TextCharacter stored at the specified position
      */
-    TextCharacter getCharacterAt(int column, int row);
+    TextCharacter get(int column, int row);
             
     /**
      * Sets the character at a specific position in the image to a particular TextCharacter. If the position is outside
@@ -55,7 +54,7 @@ public interface TextImage extends Scrollable {
      * @param position Coordinates of the character
      * @param character What TextCharacter to assign at the specified position
      */
-    void setCharacterAt(TerminalPosition position, TextCharacter character);
+    void set(TerminalPosition position, TextCharacter character);
             
     /**
      * Sets the character at a specific position in the image to a particular TextCharacter. If the position is outside
@@ -64,7 +63,7 @@ public interface TextImage extends Scrollable {
      * @param row Row coordinate of the character
      * @param character What TextCharacter to assign at the specified position
      */
-    void setCharacterAt(int column, int row, TextCharacter character);
+    void set(int column, int row, TextCharacter character);
     
     /**
      * Sets the text image content to one specified character (including color and style)
@@ -86,7 +85,7 @@ public interface TextImage extends Scrollable {
      * @param filler Filler character to use on the new areas when enlarging the image (is not used when shrinking)
      * @return Copy of this image, but resized
      */
-    TextImage resize(TerminalSize newSize, TextCharacter filler);
+    TextImage resize(TerminalPosition newSize, TextCharacter filler);
     
     
     /**

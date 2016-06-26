@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.input.KeyStroke;
 
@@ -34,14 +34,14 @@ public class TerminalResizeTest implements TerminalResizeListener {
         Terminal terminal = new TestTerminalFactory(args).createTerminal();
         terminal.enterPrivateMode();
         terminal.clearScreen();
-        terminal.setCursorPosition(10, 5);
-        terminal.putCharacter('H');
-        terminal.putCharacter('e');
-        terminal.putCharacter('l');
-        terminal.putCharacter('l');
-        terminal.putCharacter('o');
-        terminal.putCharacter('!');
-        terminal.setCursorPosition(0, 0);
+        terminal.moveCursorTo(10, 5);
+        terminal.put('H');
+        terminal.put('e');
+        terminal.put('l');
+        terminal.put('l');
+        terminal.put('o');
+        terminal.put('!');
+        terminal.moveCursorTo(0, 0);
         terminal.flush();
         terminal.addResizeListener(new TerminalResizeTest());
 
@@ -58,13 +58,13 @@ public class TerminalResizeTest implements TerminalResizeListener {
     }
 
     @Override
-    public void onResized(Terminal terminal, TerminalSize newSize) {
+    public void onResized(Terminal terminal, TerminalPosition newSize) {
         try {
-            terminal.setCursorPosition(0, 0);
-            String string = newSize.getColumns() + "x" + newSize.getRows() + "                     ";
+            terminal.moveCursorTo(0, 0);
+            String string = newSize.column + "x" + newSize.row + "                     ";
             char[] chars = string.toCharArray();
             for(char c : chars) {
-                terminal.putCharacter(c);
+                terminal.put(c);
             }
             terminal.flush();
         }

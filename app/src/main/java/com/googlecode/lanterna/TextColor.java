@@ -411,7 +411,7 @@ public interface TextColor {
 
         @Override
         public String toString() {
-            return "{IndexedColor:" + colorIndex + "}";
+            return "{IndexedColor:" + colorIndex + '}';
         }
 
         @Override
@@ -523,12 +523,12 @@ public interface TextColor {
 
         @Override
         public byte[] getForegroundSGRSequence() {
-            return ("38;2;" + getRed() + ";" + getGreen() + ";" + getBlue()).getBytes();
+            return ("38;2;" + getRed() + ';' + getGreen() + ";" + getBlue()).getBytes();
         }
 
         @Override
         public byte[] getBackgroundSGRSequence() {
-            return ("48;2;" + getRed() + ";" + getGreen() + ";" + getBlue()).getBytes();
+            return ("48;2;" + getRed() + ';' + getGreen() + ";" + getBlue()).getBytes();
         }
 
         @Override
@@ -559,7 +559,7 @@ public interface TextColor {
 
         @Override
         public String toString() {
-            return "{RGB:" + getRed() + "," + getGreen() + "," + getBlue() + "}";
+            return "{RGB:" + getRed() + ',' + getGreen() + "," + getBlue() + "}";
         }
 
         @Override

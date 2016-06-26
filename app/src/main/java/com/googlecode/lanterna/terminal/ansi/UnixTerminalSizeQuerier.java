@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal.ansi;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 /**
  * This class allows you to override by what means Lanterna detects the size of
@@ -38,5 +38,5 @@ public interface UnixTerminalSizeQuerier {
      * @return Size of the terminal at this point in time
      */
     @Deprecated
-    TerminalSize queryTerminalSize();
+    TerminalPosition queryTerminalSize();
 }

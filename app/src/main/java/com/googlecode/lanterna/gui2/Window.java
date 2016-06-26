@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import java.util.Collection;
@@ -160,7 +159,7 @@ public interface Window extends BasePane {
      * Returns the size this window would like to be
      * @return Desired size of this window
      */
-    TerminalSize getPreferredSize();
+    TerminalPosition getPreferredSize();
 
     /**
      * Closes the window, which will remove it from the GUI
@@ -200,7 +199,7 @@ public interface Window extends BasePane {
      * area the window was allowed to draw on. This size does not include window decorations.
      * @return Size of the window
      */
-    TerminalSize getSize();
+    TerminalPosition getSize();
 
     /**
      * This method is called by the GUI system to update the window on how large it is, excluding window decorations.
@@ -210,14 +209,14 @@ public interface Window extends BasePane {
      * the window to be.
      * @param size New size of the window
      */
-    void setSize(TerminalSize size);
+    void setSize(TerminalPosition size);
 
     /**
      * Returns the last known size of the window including window decorations put on by the window manager. The value
      * returned here is passed in during drawing by the TextGUI through {@code setDecoratedSize(..)}.
      * @return Size of the window, including window decorations
      */
-    TerminalSize getDecoratedSize();
+    TerminalPosition getDecoratedSize();
 
     /**
      * This method is called by the GUI system to update the window on how large it is, counting window decorations too.
@@ -225,7 +224,7 @@ public interface Window extends BasePane {
      * the next redraw.
      * @param decoratedSize Size of the window, including window decorations
      */
-    void setDecoratedSize(TerminalSize decoratedSize);
+    void setDecoratedSize(TerminalPosition decoratedSize);
 
     /**
      * This method is called by the GUI system to update the window on, as of the last drawing operation, the distance

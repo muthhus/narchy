@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.issue;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 public class Issue190 {
     public static void main(String[] args) throws IOException {
         DefaultTerminalFactory factory = new DefaultTerminalFactory();
-        factory.setInitialTerminalSize(new TerminalSize(150,50));
+        factory.setInitialTerminalSize(new TerminalPosition(150, 50));
         factory.setTerminalEmulatorTitle("name");
         Terminal terminal = factory.createTerminal();
         TerminalScreen screen = new TerminalScreen(terminal);

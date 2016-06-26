@@ -51,7 +51,7 @@ public abstract class AbstractTextGUIThread implements TextGUIThread {
             }
         };
         this.textGUI = textGUI;
-        this.customTasks = new LinkedBlockingQueue<Runnable>();
+        this.customTasks = new LinkedBlockingQueue<>();
     }
 
     @Override

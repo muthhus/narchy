@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class FullScreenTextGUITest {
     public static void main(String[] args) throws IOException, InterruptedException {
-        Screen screen = new TestTerminalFactory(args).withInitialTerminalSize(new TerminalSize(80, 25)).createScreen();
+        Screen screen = new TestTerminalFactory(args).withInitialTerminalSize(new TerminalPosition(80, 25)).createScreen();
         screen.startScreen();
 
         final AtomicBoolean stop = new AtomicBoolean(false);
@@ -92,38 +92,38 @@ public class FullScreenTextGUITest {
             BIOSButton button13 = new BIOSButton("Save & Exit Setup", "...and then you can have some cake!");
             BIOSButton button14 = new BIOSButton("Exit Without Saving", "僕の事が思い出せなくても泣かないでね");
             
-            button1.setSize(new TerminalSize(35, 1));
+            button1.setSize(new TerminalPosition(35, 1));
             button1.setPosition(new TerminalPosition(3, 3));
-            button2.setSize(new TerminalSize(35, 1));
+            button2.setSize(new TerminalPosition(35, 1));
             button2.setPosition(new TerminalPosition(3, 5));
-            button3.setSize(new TerminalSize(35, 1));
+            button3.setSize(new TerminalPosition(35, 1));
             button3.setPosition(new TerminalPosition(3, 7));
-            button4.setSize(new TerminalSize(35, 1));
+            button4.setSize(new TerminalPosition(35, 1));
             button4.setPosition(new TerminalPosition(3, 9));
-            button5.setSize(new TerminalSize(35, 1));
+            button5.setSize(new TerminalPosition(35, 1));
             button5.setPosition(new TerminalPosition(3, 11));
-            button6.setSize(new TerminalSize(35, 1));
+            button6.setSize(new TerminalPosition(35, 1));
             button6.setPosition(new TerminalPosition(3, 13));
-            button7.setSize(new TerminalSize(35, 1));
+            button7.setSize(new TerminalPosition(35, 1));
             button7.setPosition(new TerminalPosition(3, 15));
             
-            button8.setSize(new TerminalSize(35, 1));
+            button8.setSize(new TerminalPosition(35, 1));
             button8.setPosition(new TerminalPosition(43, 3));
-            button9.setSize(new TerminalSize(35, 1));
+            button9.setSize(new TerminalPosition(35, 1));
             button9.setPosition(new TerminalPosition(43, 5));
-            button10.setSize(new TerminalSize(35, 1));
+            button10.setSize(new TerminalPosition(35, 1));
             button10.setPosition(new TerminalPosition(43, 7));
-            button11.setSize(new TerminalSize(35, 1));
+            button11.setSize(new TerminalPosition(35, 1));
             button11.setPosition(new TerminalPosition(43, 9));
-            button12.setSize(new TerminalSize(35, 1));
+            button12.setSize(new TerminalPosition(35, 1));
             button12.setPosition(new TerminalPosition(43, 11));
-            button13.setSize(new TerminalSize(35, 1));
+            button13.setSize(new TerminalPosition(35, 1));
             button13.setPosition(new TerminalPosition(43, 13));
-            button14.setSize(new TerminalSize(35, 1));
+            button14.setSize(new TerminalPosition(35, 1));
             button14.setPosition(new TerminalPosition(43, 15));
             
             helpLabel.setPosition(new TerminalPosition(2, 22));
-            helpLabel.setSize(new TerminalSize(76, 1));
+            helpLabel.setSize(new TerminalPosition(76, 1));
             addComponent(helpLabel);
             for(BIOSButton button: Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14)) {
                 addComponent(button);
@@ -141,25 +141,25 @@ public class FullScreenTextGUITest {
             graphics.enableModifiers(SGR.BOLD);
 
             graphics.putString(7, 0, "Reminds you of some BIOS, doesn't it?");
-            graphics.setCharacter(0, 1, Symbols.DOUBLE_LINE_TOP_LEFT_CORNER);
+            graphics.set(0, 1, Symbols.DOUBLE_LINE_TOP_LEFT_CORNER);
             graphics.drawLine(1, 1, 78, 1, Symbols.DOUBLE_LINE_HORIZONTAL);
-            graphics.setCharacter(79, 1, Symbols.DOUBLE_LINE_TOP_RIGHT_CORNER);
+            graphics.set(79, 1, Symbols.DOUBLE_LINE_TOP_RIGHT_CORNER);
             graphics.drawLine(79, 2, 79, 23, Symbols.DOUBLE_LINE_VERTICAL);
-            graphics.setCharacter(79, 24, Symbols.DOUBLE_LINE_BOTTOM_RIGHT_CORNER);
+            graphics.set(79, 24, Symbols.DOUBLE_LINE_BOTTOM_RIGHT_CORNER);
             graphics.drawLine(1, 24, 78, 24, Symbols.DOUBLE_LINE_HORIZONTAL);
-            graphics.setCharacter(0, 24, Symbols.DOUBLE_LINE_BOTTOM_LEFT_CORNER);
+            graphics.set(0, 24, Symbols.DOUBLE_LINE_BOTTOM_LEFT_CORNER);
             graphics.drawLine(0, 2, 0, 23, Symbols.DOUBLE_LINE_VERTICAL);
 
-            graphics.setCharacter(0, 17, Symbols.DOUBLE_LINE_T_SINGLE_RIGHT);
+            graphics.set(0, 17, Symbols.DOUBLE_LINE_T_SINGLE_RIGHT);
             graphics.drawLine(1, 17, 78, 17, Symbols.SINGLE_LINE_HORIZONTAL);
-            graphics.setCharacter(79, 17, Symbols.DOUBLE_LINE_T_SINGLE_LEFT);
-            graphics.setCharacter(40, 17, Symbols.SINGLE_LINE_T_UP);
+            graphics.set(79, 17, Symbols.DOUBLE_LINE_T_SINGLE_LEFT);
+            graphics.set(40, 17, Symbols.SINGLE_LINE_T_UP);
             graphics.drawLine(40, 2, 40, 16, Symbols.SINGLE_LINE_VERTICAL);
-            graphics.setCharacter(40, 1, Symbols.DOUBLE_LINE_T_SINGLE_DOWN);
+            graphics.set(40, 1, Symbols.DOUBLE_LINE_T_SINGLE_DOWN);
 
-            graphics.setCharacter(0, 20, Symbols.DOUBLE_LINE_T_SINGLE_RIGHT);
+            graphics.set(0, 20, Symbols.DOUBLE_LINE_T_SINGLE_RIGHT);
             graphics.drawLine(1, 20, 78, 20, Symbols.SINGLE_LINE_HORIZONTAL);
-            graphics.setCharacter(79, 20, Symbols.DOUBLE_LINE_T_SINGLE_LEFT);
+            graphics.set(79, 20, Symbols.DOUBLE_LINE_T_SINGLE_LEFT);
             
             graphics.putString(2, 18, "Esc : Quit");
             graphics.putString(42, 18, Symbols.ARROW_UP + " " + Symbols.ARROW_DOWN + " " + Symbols.ARROW_RIGHT + " " + 
@@ -173,8 +173,8 @@ public class FullScreenTextGUITest {
             final ComponentRenderer<Panel> panelRenderer = super.createDefaultRenderer();
             return new ComponentRenderer<Panel>() {
                 @Override
-                public TerminalSize getPreferredSize(Panel component) {
-                    return new TerminalSize(80, 24);
+                public TerminalPosition getPreferredSize(Panel component) {
+                    return new TerminalPosition(80, 24);
                 }
 
                 @Override
@@ -213,8 +213,9 @@ public class FullScreenTextGUITest {
                     }
 
                     @Override
-                    public TerminalSize getPreferredSize(Button component) {
-                        return new TerminalSize(TerminalTextUtils.getColumnWidth(getLabel()), 1);
+                    public TerminalPosition getPreferredSize(Button component) {
+                        final int column = TerminalTextUtils.getColumnWidth(getLabel());
+                        return new TerminalPosition(column, 1);
                     }
 
                     @Override

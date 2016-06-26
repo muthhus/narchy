@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
@@ -49,10 +49,10 @@ public class LineWrappingLabelTest extends TestBase {
         new LineWrappingLabelTest().run(args);
     }
 
-    private TerminalSize windowSize;
+    private TerminalPosition windowSize;
 
     public LineWrappingLabelTest() {
-        windowSize = new TerminalSize(70, 15);
+        windowSize = new TerminalPosition(70, 15);
     }
 
     @Override
@@ -87,20 +87,20 @@ public class LineWrappingLabelTest extends TestBase {
                 if(keyStroke.isCtrlDown()) {
                     switch(keyStroke.getKeyType()) {
                         case ArrowUp:
-                            if(windowSize.getRows() > 1) {
-                                windowSize = windowSize.withRelativeRows(-1);
+                            if(windowSize.row > 1) {
+                                windowSize = windowSize.withRelativeRow(-1);
                                 return true;
                             }
                         case ArrowDown:
-                            windowSize = windowSize.withRelativeRows(1);
+                            windowSize = windowSize.withRelativeRow(1);
                             return true;
                         case ArrowLeft:
-                            if(windowSize.getColumns() > 1) {
-                                windowSize = windowSize.withRelativeColumns(-1);
+                            if(windowSize.column > 1) {
+                                windowSize = windowSize.withRelativeColumn(-1);
                                 return true;
                             }
                         case ArrowRight:
-                            windowSize = windowSize.withRelativeColumns(1);
+                            windowSize = windowSize.withRelativeColumn(1);
                             return true;
                     }
                 }
@@ -113,7 +113,7 @@ public class LineWrappingLabelTest extends TestBase {
 
     private class MyWindowManager extends DefaultWindowManager {
         @Override
-        protected void prepareWindow(TerminalSize screenSize, Window window) {
+        protected void prepareWindow(TerminalPosition screenSize, Window window) {
             super.prepareWindow(screenSize, window);
             window.setDecoratedSize(getWindowDecorationRenderer(window).getDecoratedSize(window, windowSize));
         }

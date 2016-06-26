@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 
 /**
@@ -30,7 +29,7 @@ import com.googlecode.lanterna.TextCharacter;
 interface ShapeRenderer {
     void drawLine(TerminalPosition p1, TerminalPosition p2, TextCharacter character);
     void drawTriangle(TerminalPosition p1, TerminalPosition p2, TerminalPosition p3, TextCharacter character);
-    void drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character);
+    void drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character);
     void fillTriangle(TerminalPosition p1, TerminalPosition p2, TerminalPosition p3, TextCharacter character);
-    void fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character);
+    void fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character);
 }

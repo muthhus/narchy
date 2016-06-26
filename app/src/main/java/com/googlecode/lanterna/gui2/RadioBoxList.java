@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
@@ -64,15 +64,15 @@ public class RadioBoxList<V> extends AbstractListBox<V, RadioBoxList<V>> {
      * @param preferredSize Size of the {@code RadioBoxList} or {@code null} to have it try to be as big as necessary to
      *                      be able to draw all items
      */
-    public RadioBoxList(TerminalSize preferredSize) {
+    public RadioBoxList(TerminalPosition preferredSize) {
         super(preferredSize);
-        this.listeners = new CopyOnWriteArrayList<Listener>();
+        this.listeners = new CopyOnWriteArrayList<>();
         this.checkedIndex = -1;
     }
 
     @Override
     protected ListItemRenderer<V,RadioBoxList<V>> createDefaultListItemRenderer() {
-        return new RadioBoxListItemRenderer<V>();
+        return new RadioBoxListItemRenderer<>();
     }
 
     @Override
@@ -227,7 +227,7 @@ public class RadioBoxList<V> extends AbstractListBox<V, RadioBoxList<V>> {
                 check = "o";
 
             String text = (item != null ? item : "<null>").toString();
-            return "<" + check + "> " + text;
+            return '<' + check + "> " + text;
         }
     }
 

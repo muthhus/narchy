@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.Symbols;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 
 /**
@@ -72,8 +72,8 @@ public class Separator extends AbstractComponent<Separator> {
      */
     public static class DefaultSeparatorRenderer extends SeparatorRenderer {
         @Override
-        public TerminalSize getPreferredSize(Separator component) {
-            return TerminalSize.ONE;
+        public TerminalPosition getPreferredSize(Separator component) {
+            return TerminalPosition.ONE;
         }
 
         @Override

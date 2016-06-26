@@ -1,6 +1,6 @@
 package bulletphys.ui;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
@@ -92,7 +92,7 @@ public class GLConsole {
                 //screen.startScreen();
                 //screen.clear();
                 /*tGraphics.drawRectangle(
-                        new TerminalPosition(3,3), new TerminalSize(10,10), '*');*/
+                        new TerminalPosition(3,3), new TerminalPosition(10,10), '*');*/
                 //screen.refresh();
 
                 //PrintStream ps = new PrintStream(new ByteArrayOutputStream());
@@ -156,26 +156,26 @@ public class GLConsole {
 //        }
 
     public void render(GL2 gl) {
-        TerminalSize ts = term.getTerminalSize();
+        TerminalPosition ts = term.terminalSize();
 
         float cw = scale / 2f;
         float ch = scale;
 
 
-        int rows = ts.getRows();
+        int rows = ts.row;
         for (int j = 0; j < rows; j++) {
-            for (int i = 0; i < ts.getColumns(); i++) {
+            for (int i = 0; i < ts.column; i++) {
 
 
                 float x = i * cw;
                 int r = rows - 1 - j;
                 float y = j * ch;
 
-                TextCharacter c = term.getCharacter(i, r);
-                char cc = c.getCharacter();
+                TextCharacter c = term.getView(i, r);
+                char cc = c.c;
 
-                Color bg = c.getBackgroundColor().toColor();
-                Color fg = c.getForegroundColor().toColor();
+                Color bg = c.back.toColor();
+                Color fg = c.fore.toColor();
 
                 //draw.drawSolidRect(x, y, cw, ch, -0.1f, bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
                 gl.glColor3f(bg.getRed() / 256f, bg.getGreen() / 256f, bg.getBlue() / 256f);
@@ -214,13 +214,13 @@ public class GLConsole {
         add(leftGridPanel, TextColor.ANSI.CYAN, 4, 2);
         add(leftGridPanel, TextColor.ANSI.GREEN, 4, 2);
 
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.END, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
 
         Panel rightGridPanel = new Panel();
@@ -229,13 +229,13 @@ public class GLConsole {
         int columns = 4;
         int rows = 2;
         add(rightGridPanel, c, columns, rows);
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.END, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
                 .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, false, true, 1, 4)));
         add(rightGridPanel, TextColor.ANSI.BLUE, 4, 2);
         add(rightGridPanel, TextColor.ANSI.CYAN, 4, 2);
@@ -243,8 +243,8 @@ public class GLConsole {
 
         Panel contentPanel = new Panel();
         contentPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalSize.ONE), rightGridPanel));
-        contentPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalPosition.ONE), rightGridPanel));
+        contentPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         contentPanel.addComponent(new Button("Close", new Runnable() {
             @Override
             public void run() {
@@ -256,7 +256,7 @@ public class GLConsole {
     }
 
     public static void add(Panel rightGridPanel, TextColor.ANSI c, int columns, int rows) {
-        rightGridPanel.addComponent(new EmptySpace(c, new TerminalSize(columns, rows)));
+        rightGridPanel.addComponent(new EmptySpace(c, new TerminalPosition(columns, rows)));
     }
 
     public static void add(Panel leftGridPanel) {

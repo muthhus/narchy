@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class AnimatedLabel extends Label {
     private static Timer TIMER;
-    private static final WeakHashMap<AnimatedLabel, TimerTask> SCHEDULED_TASKS = new WeakHashMap<AnimatedLabel, TimerTask>();
+    private static final WeakHashMap<AnimatedLabel, TimerTask> SCHEDULED_TASKS = new WeakHashMap<>();
 
     /**
      * Creates a classic spinning bar which can be used to signal to the user that an operation in is process.
@@ -55,7 +55,7 @@ public class AnimatedLabel extends Label {
     }
 
     private final List<String[]> frames;
-    private TerminalSize combinedMaximumPreferredSize;
+    private TerminalPosition combinedMaximumPreferredSize;
     private int currentFrame;
 
     /**
@@ -66,9 +66,9 @@ public class AnimatedLabel extends Label {
      */
     public AnimatedLabel(String firstFrameText) {
         super(firstFrameText);
-        frames = new ArrayList<String[]>();
+        frames = new ArrayList<>();
         currentFrame = 0;
-        combinedMaximumPreferredSize = TerminalSize.ZERO;
+        combinedMaximumPreferredSize = TerminalPosition.ZERO;
 
         String[] lines = splitIntoMultipleLines(firstFrameText);
         frames.add(lines);
@@ -147,7 +147,7 @@ public class AnimatedLabel extends Label {
         private final WeakReference<AnimatedLabel> labelRef;
 
         private AnimationTimerTask(AnimatedLabel label) {
-            this.labelRef = new WeakReference<AnimatedLabel>(label);
+            this.labelRef = new WeakReference<>(label);
         }
 
         @Override

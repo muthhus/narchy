@@ -73,8 +73,8 @@ public class TestTerminalFactory {
 
     }
 
-    public TestTerminalFactory withInitialTerminalSize(TerminalSize initialTerminalSize) {
-        factory.setInitialTerminalSize(initialTerminalSize);
+    public TestTerminalFactory withInitialTerminalSize(TerminalPosition initialTerminalPosition) {
+        factory.setInitialTerminalSize(initialTerminalPosition);
         return this;
     }
 

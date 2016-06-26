@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.*;
 
 /**
@@ -59,7 +59,7 @@ public class MessageDialog extends DialogWindow {
                         .setLeftMarginSize(1)
                         .setRightMarginSize(1));
         mainPanel.addComponent(new Label(text));
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         buttonPanel.setLayoutData(
                 GridLayout.createLayoutData(
                         GridLayout.Alignment.END,

@@ -18,10 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TestTerminalFactory;
-import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
@@ -40,7 +37,7 @@ public class MultiLabelTest {
             contentArea.setLayoutManager(new LinearLayout(Direction.VERTICAL));
             contentArea.addComponent(new Label("This is a single line label"));
             contentArea.addComponent(new Label("This is another label on the second line"));
-            contentArea.addComponent(new EmptySpace(new TerminalSize(5, 1)));
+            contentArea.addComponent(new EmptySpace(new TerminalPosition(5, 1)));
             contentArea.addComponent(new Label("Here is a\nmulti-line\ntext segment that is using \\n"));
             Label label = new Label("We can change foreground color...");
             label.setForegroundColor(TextColor.ANSI.BLUE);
@@ -52,7 +49,7 @@ public class MultiLabelTest {
             label.addStyle(SGR.BOLD);
             label.addStyle(SGR.UNDERLINE);
             contentArea.addComponent(label);
-            contentArea.addComponent(new EmptySpace(new TerminalSize(5, 1)));
+            contentArea.addComponent(new EmptySpace(new TerminalPosition(5, 1)));
             contentArea.addComponent(new Label("Here is an animated label:"));
             contentArea.addComponent(AnimatedLabel.createClassicSpinningLine());
             contentArea.addComponent(new EmptySpace());

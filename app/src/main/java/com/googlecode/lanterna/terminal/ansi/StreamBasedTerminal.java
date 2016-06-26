@@ -65,7 +65,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
             this.terminalCharset = terminalCharset;
         }
         this.inputDecoder = new InputDecoder(new InputStreamReader(this.terminalInput, this.terminalCharset));
-        this.keyQueue = new LinkedList<KeyStroke>();
+        this.keyQueue = new LinkedList<>();
         this.readLock = new ReentrantLock();
         this.lastReportedCursorPosition = null;
         //noinspection ConstantConditions
@@ -78,7 +78,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
      * attached to this {@code Terminal} isn't UTF-8.
      */
     @Override
-    public void putCharacter(char c) throws IOException {
+    public void put(char c) throws IOException {
         if(TerminalTextUtils.isPrintableCharacter(c)) {
             writeToTerminal(translateCharacter(c));
         }
@@ -317,7 +317,7 @@ public abstract class StreamBasedTerminal extends AbstractTerminal {
         }
     }
 
-    private byte[] convertToVT100(char code) {
+    private static byte[] convertToVT100(char code) {
         //Warning! This might be terminal type specific!!!!
         //So far it's worked everywhere I've tried it (xterm, gnome-terminal, putty)
         return new byte[]{27, 40, 48, (byte) code, 27, 40, 66};

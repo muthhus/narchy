@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextImage;
@@ -181,8 +180,8 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
             }
         };
         this.backgroundPane.setComponent(background);
-        this.windows = new LinkedList<Window>();
-        this.windowRenderBufferCache = new IdentityHashMap<Window, TextImage>();
+        this.windows = new LinkedList<>();
+        this.windowRenderBufferCache = new IdentityHashMap<>();
         this.postRenderer = postRenderer;
         this.eofWhenNoWindows = false;
     }
@@ -199,7 +198,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
 
     @Override
     public synchronized void updateScreen() throws IOException {
-        TerminalSize minimumTerminalSize = TerminalSize.ZERO;
+        TerminalPosition minimumTerminalPosition = TerminalPosition.ZERO;
         for(Window window: windows) {
             if(window.isVisible()) {
                 if (window.getHints().contains(Window.Hint.FULL_SCREEN) ||
@@ -209,14 +208,14 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
                     continue;
                 }
                 TerminalPosition lastPosition = window.getPosition();
-                minimumTerminalSize = minimumTerminalSize.max(
+                minimumTerminalPosition = minimumTerminalPosition.max(
                         //Add position to size to get the bottom-right corner of the window
                         window.getDecoratedSize().withRelative(
-                                Math.max(lastPosition.getColumn(), 0),
-                                Math.max(lastPosition.getRow(), 0)));
+                                Math.max(lastPosition.column, 0),
+                                Math.max(lastPosition.row, 0)));
             }
         }
-        virtualScreen.setMinimumSize(minimumTerminalSize);
+        virtualScreen.setMinimumSize(minimumTerminalPosition);
         super.updateScreen();
     }
 
@@ -334,7 +333,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
     public synchronized WindowBasedTextGUI addWindow(Window window) {
         //To protect against NPE if the user forgot to set a content component
         if(window.getComponent() == null) {
-            window.setComponent(new EmptySpace(TerminalSize.ONE));
+            window.setComponent(new EmptySpace(TerminalPosition.ONE));
         }
 
         if(window.getTextGUI() != null) {
@@ -409,7 +408,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
 
     @Override
     public synchronized Collection<Window> getWindows() {
-        return Collections.unmodifiableList(new ArrayList<Window>(windows));
+        return Collections.unmodifiableList(new ArrayList<>(windows));
     }
 
     @Override

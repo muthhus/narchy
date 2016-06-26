@@ -21,6 +21,7 @@ package com.googlecode.lanterna;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Objects;
 
 /**
  * Represents a single character with additional metadata such as colors and modifiers. This class is immutable and
@@ -39,45 +40,45 @@ public class TextCharacter {
 
     public static final TextCharacter DEFAULT_CHARACTER = new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.DEFAULT);
 
-    private final char character;
-    private final TextColor foregroundColor;
-    private final TextColor backgroundColor;
+    public final char c;
+    public final TextColor fore;
+    public final TextColor back;
     private final EnumSet<SGR> modifiers;  //This isn't immutable, but we should treat it as such and not expose it!
 
     /**
      * Creates a {@code ScreenCharacter} based on a supplied character, with default colors and no extra modifiers.
-     * @param character Physical character to use
+     * @param c Physical character to use
      */
-    public TextCharacter(char character) {
-        this(character, TextColor.ANSI.DEFAULT, TextColor.ANSI.DEFAULT);
+    public TextCharacter(char c) {
+        this(c, TextColor.ANSI.DEFAULT, TextColor.ANSI.DEFAULT);
     }
     
     /**
      * Copies another {@code ScreenCharacter}
-     * @param character screenCharacter to copy from
+     * @param c screenCharacter to copy from
      */
-    public TextCharacter(TextCharacter character) {
-        this(character.getCharacter(),
-                character.getForegroundColor(), 
-                character.getBackgroundColor(),
-                character.getModifiers().toArray(new SGR[character.getModifiers().size()]));
+    public TextCharacter(TextCharacter c) {
+        this(c.c,
+                c.fore,
+                c.back,
+                c.getModifiers().toArray(new SGR[c.getModifiers().size()]));
     }
 
     /**
      * Creates a new {@code ScreenCharacter} based on a physical character, color information and optional modifiers.
-     * @param character Physical character to refer to
+     * @param c Physical character to refer to
      * @param foregroundColor Foreground color the character has
      * @param backgroundColor Background color the character has
      * @param styles Optional list of modifiers to apply when drawing the character
      */
     @SuppressWarnings("WeakerAccess")
     public TextCharacter(
-            char character,
+            char c,
             TextColor foregroundColor,
             TextColor backgroundColor,
             SGR... styles) {
         
-        this(character, 
+        this(c,
                 foregroundColor, 
                 backgroundColor, 
                 toEnumSet(styles));
@@ -85,13 +86,13 @@ public class TextCharacter {
 
     /**
      * Creates a new {@code ScreenCharacter} based on a physical character, color information and a set of modifiers.
-     * @param character Physical character to refer to
+     * @param c Physical character to refer to
      * @param foregroundColor Foreground color the character has
      * @param backgroundColor Background color the character has
      * @param modifiers Set of modifiers to apply when drawing the character
      */
     public TextCharacter(
-            char character,
+            char c,
             TextColor foregroundColor,
             TextColor backgroundColor,
             EnumSet<SGR> modifiers) {
@@ -99,8 +100,8 @@ public class TextCharacter {
         // Don't allow creating a TextCharacter containing a control character
         // For backward-compatibility, do allow tab for now
         // TODO: In lanterna 3.1, don't allow tab
-        if(TerminalTextUtils.isControlCharacter(character) && character != '\t') {
-            throw new IllegalArgumentException("Cannot create a TextCharacter from a control character (0x" + Integer.toHexString(character) + ")");
+        if(TerminalTextUtils.isControlCharacter(c) && c != '\t') {
+            throw new IllegalArgumentException("Cannot create a TextCharacter from a control character (0x" + Integer.toHexString(c) + ')');
         }
 
         if(foregroundColor == null) {
@@ -110,34 +111,10 @@ public class TextCharacter {
             backgroundColor = TextColor.ANSI.DEFAULT;
         }
 
-        this.character = character;
-        this.foregroundColor = foregroundColor;
-        this.backgroundColor = backgroundColor;
+        this.c = c;
+        this.fore = foregroundColor;
+        this.back = backgroundColor;
         this.modifiers = EnumSet.copyOf(modifiers);
-    }
-
-    /**
-     * The actual character this TextCharacter represents
-     * @return character of the TextCharacter
-     */
-    public char getCharacter() {
-        return character;
-    }
-
-    /**
-     * Foreground color specified for this TextCharacter
-     * @return Foreground color of this TextCharacter
-     */
-    public TextColor getForegroundColor() {
-        return foregroundColor;
-    }
-
-    /**
-     * Background color specified for this TextCharacter
-     * @return Background color of this TextCharacter
-     */
-    public TextColor getBackgroundColor() {
-        return backgroundColor;
     }
 
     /**
@@ -203,10 +180,10 @@ public class TextCharacter {
      */
     @SuppressWarnings("SameParameterValue")
     public TextCharacter withCharacter(char character) {
-        if(this.character == character) {
+        if(this.c == character) {
             return this;
         }
-        return new TextCharacter(character, foregroundColor, backgroundColor, modifiers);
+        return new TextCharacter(character, fore, back, modifiers);
     }
 
     /**
@@ -215,10 +192,10 @@ public class TextCharacter {
      * @return Copy of the TextCharacter with a different foreground color
      */
     public TextCharacter withForegroundColor(TextColor foregroundColor) {
-        if(this.foregroundColor == foregroundColor || this.foregroundColor.equals(foregroundColor)) {
+        if(this.fore == foregroundColor || this.fore.equals(foregroundColor)) {
             return this;
         }
-        return new TextCharacter(character, foregroundColor, backgroundColor, modifiers);
+        return new TextCharacter(c, foregroundColor, back, modifiers);
     }
 
     /**
@@ -227,10 +204,10 @@ public class TextCharacter {
      * @return Copy of the TextCharacter with a different background color
      */
     public TextCharacter withBackgroundColor(TextColor backgroundColor) {
-        if(this.backgroundColor == backgroundColor || this.backgroundColor.equals(backgroundColor)) {
+        if(this.back == backgroundColor || this.back.equals(backgroundColor)) {
             return this;
         }
-        return new TextCharacter(character, foregroundColor, backgroundColor, modifiers);
+        return new TextCharacter(c, fore, backgroundColor, modifiers);
     }
 
     /**
@@ -244,7 +221,7 @@ public class TextCharacter {
         if(modifiers.equals(newSet)) {
             return this;
         }
-        return new TextCharacter(character, foregroundColor, backgroundColor, newSet);
+        return new TextCharacter(c, fore, back, newSet);
     }
 
     /**
@@ -259,7 +236,7 @@ public class TextCharacter {
         }
         EnumSet<SGR> newSet = EnumSet.copyOf(this.modifiers);
         newSet.add(modifier);
-        return new TextCharacter(character, foregroundColor, backgroundColor, newSet);
+        return new TextCharacter(c, fore, back, newSet);
     }
 
     /**
@@ -275,11 +252,11 @@ public class TextCharacter {
         }
         EnumSet<SGR> newSet = EnumSet.copyOf(this.modifiers);
         newSet.remove(modifier);
-        return new TextCharacter(character, foregroundColor, backgroundColor, newSet);
+        return new TextCharacter(c, fore, back, newSet);
     }
 
     public boolean isDoubleWidth() {
-        return TerminalTextUtils.isCharDoubleWidth(character);
+        return TerminalTextUtils.isCharDoubleWidth(c);
     }
 
     @SuppressWarnings("SimplifiableIfStatement")
@@ -292,30 +269,30 @@ public class TextCharacter {
             return false;
         }
         final TextCharacter other = (TextCharacter) obj;
-        if(this.character != other.character) {
+        if(this.c != other.c) {
             return false;
         }
-        if(this.foregroundColor != other.foregroundColor && (this.foregroundColor == null || !this.foregroundColor.equals(other.foregroundColor))) {
+        if(!Objects.equals(fore, fore)) {
             return false;
         }
-        if(this.backgroundColor != other.backgroundColor && (this.backgroundColor == null || !this.backgroundColor.equals(other.backgroundColor))) {
+        if(!Objects.equals(back, back)) {
             return false;
         }
-        return !(this.modifiers != other.modifiers && (this.modifiers == null || !this.modifiers.equals(other.modifiers)));
+        return !(!Objects.equals(modifiers, modifiers));
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + this.character;
-        hash = 37 * hash + (this.foregroundColor != null ? this.foregroundColor.hashCode() : 0);
-        hash = 37 * hash + (this.backgroundColor != null ? this.backgroundColor.hashCode() : 0);
+        hash = 37 * hash + this.c;
+        hash = 37 * hash + (this.fore != null ? this.fore.hashCode() : 0);
+        hash = 37 * hash + (this.back != null ? this.back.hashCode() : 0);
         hash = 37 * hash + (this.modifiers != null ? this.modifiers.hashCode() : 0);
         return hash;
     }
 
     @Override
     public String toString() {
-        return "TextCharacter{" + "character=" + character + ", foregroundColor=" + foregroundColor + ", backgroundColor=" + backgroundColor + ", modifiers=" + modifiers + '}';
+        return "TextCharacter{" + "character=" + c + ", foregroundColor=" + fore + ", backgroundColor=" + back + ", modifiers=" + modifiers + '}';
     }
 }

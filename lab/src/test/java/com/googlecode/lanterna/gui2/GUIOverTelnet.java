@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -91,7 +90,7 @@ public class GUIOverTelnet {
             }).withBorder(Borders.singleLine("This is a button")));
 
 
-            final TextBox textBox = new TextBox(new TerminalSize(20, 4)) {
+            final TextBox textBox = new TextBox(new TerminalPosition(20, 4)) {
                 @Override
                 public Result handleKeyStroke(KeyStroke keyStroke) {
                     try {
@@ -114,8 +113,8 @@ public class GUIOverTelnet {
                 protected InteractableRenderer createDefaultRenderer() {
                     return new InteractableRenderer() {
                         @Override
-                        public TerminalSize getPreferredSize(Component component) {
-                            return new TerminalSize(30, 1);
+                        public TerminalPosition getPreferredSize(Component component) {
+                            return new TerminalPosition(30, 1);
                         }
 
                         @Override

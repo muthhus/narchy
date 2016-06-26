@@ -19,7 +19,7 @@
 
 package com.googlecode.lanterna.terminal.ansi;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 /**
  * Using this terminal size provider, your terminal will be set to a fixed size and will never receive any resize
@@ -28,19 +28,19 @@ import com.googlecode.lanterna.TerminalSize;
  * @author martin
  */
 public class FixedTerminalSizeProvider implements UnixTerminalSizeQuerier {
-    private final TerminalSize size;
+    private final TerminalPosition size;
 
     /**
      * Creating a {@code FixedTerminalSizeProvider} set to a particular size that it will always report whenever the
      * associated {@code Terminal} interface queries.
      * @param size Size the terminal should be statically initialized to
      */
-    public FixedTerminalSizeProvider(TerminalSize size) {
+    public FixedTerminalSizeProvider(TerminalPosition size) {
         this.size = size;
     }
 
     @Override
-    public TerminalSize queryTerminalSize() {
+    public TerminalPosition queryTerminalSize() {
         return size;
     }
 }

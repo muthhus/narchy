@@ -36,6 +36,7 @@ public class AnimVector3f extends Vector3f implements Animated {
         super.set(Float.NaN, Float.NaN, Float.NaN);
     }
 
+    @Override
     public boolean animate(float dt) {
 
         if (x!=x) {
@@ -89,12 +90,14 @@ public class AnimVector3f extends Vector3f implements Animated {
         target.set(v);
     }
 
+    @Override
     public void set(float x, float y, float z) {
         //if invalidated, use the target value immediately
         if (x != x) super.set(x, y, z);
         target.set(x, y, z);
     }
 
+    @Override
     public void set(float[] v) {
         //if invalidated, use the target value immediately
         if (x != x) super.set(v);

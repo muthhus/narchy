@@ -19,7 +19,7 @@
 
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextColor;
 
@@ -37,7 +37,7 @@ public class Terminal8bitIndexedColorTest {
         Terminal terminal = new TestTerminalFactory(args).createTerminal();
         terminal.enterPrivateMode();
         terminal.clearScreen();
-        TerminalSize size = terminal.getTerminalSize();
+        TerminalPosition size = terminal.terminalSize();
 
         while(true) {
             if(terminal.pollInput() != null) {
@@ -48,9 +48,9 @@ public class Terminal8bitIndexedColorTest {
             TextColor.Indexed foregroundIndex = TextColor.Indexed.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
             TextColor.Indexed backgroundIndex = TextColor.Indexed.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
 
-            terminal.setForegroundColor(foregroundIndex);
-            terminal.setBackgroundColor(backgroundIndex);
-            terminal.setCursorPosition(random.nextInt(size.getColumns() - string.length()), random.nextInt(size.getRows()));
+            terminal.fore(foregroundIndex);
+            terminal.back(backgroundIndex);
+            terminal.moveCursorTo(random.nextInt(size.column - string.length()), random.nextInt(size.row));
             printString(terminal, string);
 
             try {
@@ -63,7 +63,7 @@ public class Terminal8bitIndexedColorTest {
 
     private static void printString(Terminal terminal, String string) throws IOException {
         for(int i = 0; i < string.length(); i++)
-            terminal.putCharacter(string.charAt(i));
+            terminal.put(string.charAt(i));
         terminal.flush();
     }
 }

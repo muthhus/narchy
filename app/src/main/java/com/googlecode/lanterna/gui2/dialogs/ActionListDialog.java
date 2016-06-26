@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.*;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class ActionListDialog extends DialogWindow {
     ActionListDialog(
             String title,
             String description,
-            TerminalSize actionListPreferredSize,
+            TerminalPosition actionListPreferredSize,
             boolean canCancel,
             List<Runnable> actions) {
 
@@ -59,7 +59,7 @@ public class ActionListDialog extends DialogWindow {
                         .setRightMarginSize(1));
         if(description != null) {
             mainPanel.addComponent(new Label(description));
-            mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+            mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         }
         listBox.setLayoutData(
                 GridLayout.createLayoutData(
@@ -68,17 +68,12 @@ public class ActionListDialog extends DialogWindow {
                         true,
                         false))
                 .addTo(mainPanel);
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
 
         if(canCancel) {
             Panel buttonPanel = new Panel();
             buttonPanel.setLayoutManager(new GridLayout(2).setHorizontalSpacing(1));
-            buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), new Runnable() {
-                @Override
-                public void run() {
-                    onCancel();
-                }
-            }).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
+            buttonPanel.addComponent(new Button(LocalizedString.Cancel.toString(), this::onCancel).setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false)));
             buttonPanel.setLayoutData(
                     GridLayout.createLayoutData(
                             GridLayout.Alignment.END,

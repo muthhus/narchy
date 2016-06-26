@@ -34,6 +34,7 @@ public class AnimFloat extends MutableFloat implements Animated {
         super.setValue(Float.NaN);
     }
 
+    @Override
     public boolean animate(float dt) {
 
         float x = floatValue();

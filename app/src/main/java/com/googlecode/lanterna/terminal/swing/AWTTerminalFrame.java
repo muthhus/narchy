@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -92,20 +91,20 @@ public class AWTTerminalFrame extends Frame implements IOSafeTerminal {
     /**
      * Creates a new AWTTerminalFrame using a specified title and a series of AWT terminal configuration objects
      * @param title What title to use for the window
-     * @param terminalSize Initial size of the terminal, in rows and columns. If null, it will default to 80x25.
+     * @param terminalPosition Initial size of the terminal, in rows and columns. If null, it will default to 80x25.
      * @param deviceConfiguration Device configuration for the embedded AWTTerminal
      * @param fontConfiguration Font configuration for the embedded AWTTerminal
      * @param colorConfiguration Color configuration for the embedded AWTTerminal
      * @param autoCloseTriggers What to trigger automatic disposal of the Frame
      */
     public AWTTerminalFrame(String title,
-                            TerminalSize terminalSize,
+                            TerminalPosition terminalPosition,
                             TerminalEmulatorDeviceConfiguration deviceConfiguration,
                             AWTTerminalFontConfiguration fontConfiguration,
                             TerminalEmulatorColorConfiguration colorConfiguration,
                             TerminalEmulatorAutoCloseTrigger... autoCloseTriggers) {
         this(title,
-                new AWTTerminal(terminalSize, deviceConfiguration, fontConfiguration, colorConfiguration),
+                new AWTTerminal(terminalPosition, deviceConfiguration, fontConfiguration, colorConfiguration),
                 autoCloseTriggers);
     }
     
@@ -194,18 +193,18 @@ public class AWTTerminalFrame extends Frame implements IOSafeTerminal {
     }
 
     @Override
-    public void setCursorPosition(int x, int y) {
-        awtTerminal.setCursorPosition(x, y);
+    public void moveCursorTo(int x, int y) {
+        awtTerminal.moveCursorTo(x, y);
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) {
-        awtTerminal.setCursorPosition(position);
+    public void moveCursorTo(TerminalPosition position) {
+        awtTerminal.moveCursorTo(position);
     }
 
     @Override
-    public TerminalPosition getCursorPosition() {
-        return awtTerminal.getCursorPosition();
+    public TerminalPosition cursor() {
+        return awtTerminal.cursor();
     }
 
     @Override
@@ -214,8 +213,8 @@ public class AWTTerminalFrame extends Frame implements IOSafeTerminal {
     }
 
     @Override
-    public void putCharacter(char c) {
-        awtTerminal.putCharacter(c);
+    public void put(char c) {
+        awtTerminal.put(c);
     }
 
     @Override
@@ -239,18 +238,18 @@ public class AWTTerminalFrame extends Frame implements IOSafeTerminal {
     }
 
     @Override
-    public void setForegroundColor(TextColor color) {
-        awtTerminal.setForegroundColor(color);
+    public void fore(TextColor color) {
+        awtTerminal.fore(color);
     }
 
     @Override
-    public void setBackgroundColor(TextColor color) {
-        awtTerminal.setBackgroundColor(color);
+    public void back(TextColor color) {
+        awtTerminal.back(color);
     }
 
     @Override
-    public TerminalSize getTerminalSize() {
-        return awtTerminal.getTerminalSize();
+    public TerminalPosition terminalSize() {
+        return awtTerminal.terminalSize();
     }
 
     @Override

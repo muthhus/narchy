@@ -30,15 +30,15 @@ import java.util.regex.Pattern;
  * @author Martin
  */
 public final class PropertiesTheme implements Theme {
-    private static final String STYLE_NORMAL = "";
-    private static final String STYLE_PRELIGHT = "PRELIGHT";
-    private static final String STYLE_SELECTED = "SELECTED";
-    private static final String STYLE_ACTIVE = "ACTIVE";
-    private static final String STYLE_INSENSITIVE = "INSENSITIVE";
+    public static final String STYLE_NORMAL = "";
+    public static final String STYLE_PRELIGHT = "PRELIGHT";
+    public static final String STYLE_SELECTED = "SELECTED";
+    public static final String STYLE_ACTIVE = "ACTIVE";
+    public static final String STYLE_INSENSITIVE = "INSENSITIVE";
 
-    private static final Pattern STYLE_FORMAT = Pattern.compile("([a-zA-Z]+)(\\[([a-zA-Z0-9-_]+)\\])?");
-    private static final Pattern INDEXED_COLOR = Pattern.compile("#[0-9]{1,3}");
-    private static final Pattern RGB_COLOR = Pattern.compile("#[0-9a-fA-F]{6}");
+    public static final Pattern STYLE_FORMAT = Pattern.compile("([a-zA-Z]+)(\\[([a-zA-Z0-9-_]+)\\])?");
+    public static final Pattern INDEXED_COLOR = Pattern.compile("#[0-9]{1,3}");
+    public static final Pattern RGB_COLOR = Pattern.compile("#[0-9a-fA-F]{6}");
 
     private final ThemeTreeNode rootNode;
 
@@ -60,13 +60,13 @@ public final class PropertiesTheme implements Theme {
 
     private ThemeTreeNode getNode(String definition) {
         ThemeTreeNode parentNode;
-        if(definition.equals("")) {
+        if(definition.isEmpty()) {
             return rootNode;
         }
         else if(definition.contains(".")) {
-            String parent = definition.substring(0, definition.lastIndexOf("."));
+            String parent = definition.substring(0, definition.lastIndexOf('.'));
             parentNode = getNode(parent);
-            definition = definition.substring(definition.lastIndexOf(".") + 1);
+            definition = definition.substring(definition.lastIndexOf('.') + 1);
         }
         else {
             parentNode = rootNode;
@@ -77,21 +77,21 @@ public final class PropertiesTheme implements Theme {
         return parentNode.childMap.get(definition);
     }
 
-    private String getDefinition(String propertyName) {
+    private static String getDefinition(String propertyName) {
         if(!propertyName.contains(".")) {
             return "";
         }
         else {
-            return propertyName.substring(0, propertyName.lastIndexOf("."));
+            return propertyName.substring(0, propertyName.lastIndexOf('.'));
         }
     }
 
-    private String getStyle(String propertyName) {
+    private static String getStyle(String propertyName) {
         if(!propertyName.contains(".")) {
             return propertyName;
         }
         else {
-            return propertyName.substring(propertyName.lastIndexOf(".") + 1);
+            return propertyName.substring(propertyName.lastIndexOf('.') + 1);
         }
     }
 
@@ -103,19 +103,20 @@ public final class PropertiesTheme implements Theme {
     @Override
     public ThemeDefinition getDefinition(Class<?> clazz) {
         String name = clazz.getName();
-        List<ThemeTreeNode> path = new ArrayList<ThemeTreeNode>();
+        List<ThemeTreeNode> path = new ArrayList<>();
         ThemeTreeNode currentNode = rootNode;
-        while(!name.equals("")) {
+        while(!name.isEmpty()) {
             path.add(currentNode);
             String nextNodeName = name;
             if(nextNodeName.contains(".")) {
-                nextNodeName = nextNodeName.substring(0, name.indexOf("."));
-                name = name.substring(name.indexOf(".") + 1);
+                nextNodeName = nextNodeName.substring(0, name.indexOf('.'));
+                name = name.substring(name.indexOf('.') + 1);
             }
-            if(currentNode.childMap.containsKey(nextNodeName)) {
-                currentNode = currentNode.childMap.get(nextNodeName);
-            }
-            else {
+
+            ThemeTreeNode nextCurrentNode;
+            if ((nextCurrentNode = currentNode.childMap.get(nextNodeName))!=null)  {
+                currentNode = nextCurrentNode;
+            } else {
                 break;
             }
         }
@@ -178,10 +179,7 @@ public final class PropertiesTheme implements Theme {
         @Override
         public char getCharacter(String name, char fallback) {
             Character character = path.get(path.size() - 1).characterMap.get(name);
-            if(character == null) {
-                return fallback;
-            }
-            return character;
+            return character == null ? fallback : character;
         }
 
         @Override
@@ -190,7 +188,7 @@ public final class PropertiesTheme implements Theme {
         }
     }
 
-    private class StyleImpl implements ThemeStyle {
+    private static class StyleImpl implements ThemeStyle {
         private final List<ThemeTreeNode> path;
         private final String name;
 
@@ -201,47 +199,59 @@ public final class PropertiesTheme implements Theme {
 
         @Override
         public TextColor getForeground() {
-            ListIterator<ThemeTreeNode> iterator = path.listIterator(path.size());
-            while(iterator.hasPrevious()) {
-                ThemeTreeNode node = iterator.previous();
-                if(node.foregroundMap.containsKey(name)) {
-                    return node.foregroundMap.get(name);
+            StyleImpl other = this;
+            while (true) {
+                ListIterator<ThemeTreeNode> iterator = other.path.listIterator(other.path.size());
+                while (iterator.hasPrevious()) {
+                    ThemeTreeNode node = iterator.previous();
+                    if (node.foregroundMap.containsKey(other.name)) {
+                        return node.foregroundMap.get(other.name);
+                    }
                 }
+                if (!other.name.equals(STYLE_NORMAL)) {
+                    other = new StyleImpl(other.path, STYLE_NORMAL);
+                    continue;
+                }
+                return TextColor.ANSI.WHITE;
             }
-            if(!name.equals(STYLE_NORMAL)) {
-                return new StyleImpl(path, STYLE_NORMAL).getForeground();
-            }
-            return TextColor.ANSI.WHITE;
         }
 
         @Override
         public TextColor getBackground() {
-            ListIterator<ThemeTreeNode> iterator = path.listIterator(path.size());
-            while(iterator.hasPrevious()) {
-                ThemeTreeNode node = iterator.previous();
-                if(node.backgroundMap.containsKey(name)) {
-                    return node.backgroundMap.get(name);
+            StyleImpl other = this;
+            while (true) {
+                ListIterator<ThemeTreeNode> iterator = other.path.listIterator(other.path.size());
+                while (iterator.hasPrevious()) {
+                    ThemeTreeNode node = iterator.previous();
+                    if (node.backgroundMap.containsKey(other.name)) {
+                        return node.backgroundMap.get(other.name);
+                    }
                 }
+                if (!other.name.equals(STYLE_NORMAL)) {
+                    other = new StyleImpl(other.path, STYLE_NORMAL);
+                    continue;
+                }
+                return TextColor.ANSI.BLACK;
             }
-            if(!name.equals(STYLE_NORMAL)) {
-                return new StyleImpl(path, STYLE_NORMAL).getBackground();
-            }
-            return TextColor.ANSI.BLACK;
         }
 
         @Override
         public EnumSet<SGR> getSGRs() {
-            ListIterator<ThemeTreeNode> iterator = path.listIterator(path.size());
-            while(iterator.hasPrevious()) {
-                ThemeTreeNode node = iterator.previous();
-                if(node.sgrMap.containsKey(name)) {
-                    return node.sgrMap.get(name);
+            StyleImpl other = this;
+            while (true) {
+                ListIterator<ThemeTreeNode> iterator = other.path.listIterator(other.path.size());
+                while (iterator.hasPrevious()) {
+                    ThemeTreeNode node = iterator.previous();
+                    if (node.sgrMap.containsKey(other.name)) {
+                        return node.sgrMap.get(other.name);
+                    }
                 }
+                if (!other.name.equals(STYLE_NORMAL)) {
+                    other = new StyleImpl(other.path, STYLE_NORMAL);
+                    continue;
+                }
+                return EnumSet.noneOf(SGR.class);
             }
-            if(!name.equals(STYLE_NORMAL)) {
-                return new StyleImpl(path, STYLE_NORMAL).getSGRs();
-            }
-            return EnumSet.noneOf(SGR.class);
         }
     }
 
@@ -254,11 +264,11 @@ public final class PropertiesTheme implements Theme {
         private String renderer;
 
         private ThemeTreeNode() {
-            childMap = new HashMap<String, ThemeTreeNode>();
-            foregroundMap = new HashMap<String, TextColor>();
-            backgroundMap = new HashMap<String, TextColor>();
-            sgrMap = new HashMap<String, EnumSet<SGR>>();
-            characterMap = new HashMap<String, Character>();
+            childMap = new HashMap<>();
+            foregroundMap = new HashMap<>();
+            backgroundMap = new HashMap<>();
+            sgrMap = new HashMap<>();
+            characterMap = new HashMap<>();
             renderer = null;
         }
 
@@ -286,11 +296,11 @@ public final class PropertiesTheme implements Theme {
                 renderer = value.trim().isEmpty() ? null : value.trim();
             }
             else {
-                throw new IllegalArgumentException("Unknown style component \"" + styleComponent + "\" in style \"" + style + "\"");
+                throw new IllegalArgumentException("Unknown style component \"" + styleComponent + "\" in style \"" + style + '"');
             }
         }
 
-        private TextColor parseValue(String value) {
+        private static TextColor parseValue(String value) {
             value = value.trim();
             if(RGB_COLOR.matcher(value).matches()) {
                 int r = Integer.parseInt(value.substring(1, 3), 16);
@@ -306,11 +316,11 @@ public final class PropertiesTheme implements Theme {
                 return TextColor.ANSI.valueOf(value.toUpperCase());
             }
             catch(IllegalArgumentException e) {
-                throw new IllegalArgumentException("Unknown color definition \"" + value + "\"", e);
+                throw new IllegalArgumentException("Unknown color definition \"" + value + '"', e);
             }
         }
 
-        private EnumSet<SGR> parseSGR(String value) {
+        private static EnumSet<SGR> parseSGR(String value) {
             value = value.trim();
             String[] sgrEntries = value.split(",");
             EnumSet<SGR> sgrSet = EnumSet.noneOf(SGR.class);
@@ -321,14 +331,14 @@ public final class PropertiesTheme implements Theme {
                         sgrSet.add(SGR.valueOf(entry));
                     }
                     catch(IllegalArgumentException e) {
-                        throw new IllegalArgumentException("Unknown SGR code \"" + entry + "\"", e);
+                        throw new IllegalArgumentException("Unknown SGR code \"" + entry + '"', e);
                     }
                 }
             }
             return sgrSet;
         }
 
-        private String getCategory(String group) {
+        private static String getCategory(String group) {
             if(group == null) {
                 return STYLE_NORMAL;
             }

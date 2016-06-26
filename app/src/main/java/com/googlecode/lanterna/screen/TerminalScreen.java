@@ -39,7 +39,7 @@ import java.util.TreeMap;
  * @author martin
  */
 public class TerminalScreen extends AbstractScreen {
-    private final Terminal terminal;
+    public final Terminal terminal;
     private boolean isStarted;
     private boolean fullRedrawHint;
     private ScrollHint scrollHint;
@@ -74,7 +74,7 @@ public class TerminalScreen extends AbstractScreen {
      * @throws IOException If there was an underlying I/O error when querying the size of the terminal
      */
     public TerminalScreen(Terminal terminal, TextCharacter defaultCharacter) throws IOException {
-        super(terminal.getTerminalSize(), defaultCharacter);
+        super(terminal.terminalSize(), defaultCharacter);
         this.terminal = terminal;
         this.terminal.addResizeListener(new TerminalScreenResizeListener());
         this.isStarted = false;
@@ -88,16 +88,16 @@ public class TerminalScreen extends AbstractScreen {
         }
 
         isStarted = true;
-        getTerminal().enterPrivateMode();
-        getTerminal().getTerminalSize();
-        getTerminal().clearScreen();
+        terminal.enterPrivateMode();
+        terminal.terminalSize();
+        terminal.clearScreen();
         this.fullRedrawHint = true;
-        TerminalPosition cursorPosition = getCursorPosition();
+        TerminalPosition cursorPosition = cursorPosition();
         if(cursorPosition != null) {
-            getTerminal().setCursorVisible(true);
-            getTerminal().setCursorPosition(cursorPosition.getColumn(), cursorPosition.getRow());
+            terminal.setCursorVisible(true);
+            terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
         } else {
-            getTerminal().setCursorVisible(false);
+            terminal.setCursorVisible(false);
         }
     }
 
@@ -120,7 +120,7 @@ public class TerminalScreen extends AbstractScreen {
             while(keyStroke != null && keyStroke.getKeyType() != KeyType.EOF);
         }
 
-        getTerminal().exitPrivateMode();
+        terminal.exitPrivateMode();
         isStarted = false;
     }
 
@@ -135,7 +135,7 @@ public class TerminalScreen extends AbstractScreen {
         }
         else if(refreshType == RefreshType.AUTOMATIC &&
                 (scrollHint == null || scrollHint == ScrollHint.INVALID)) {
-            double threshold = getTerminalSize().getRows() * getTerminalSize().getColumns() * 0.75;
+            double threshold = terminalSize().row * terminalSize().column * 0.75;
             if(getBackBuffer().isVeryDifferent(getFrontBuffer(), (int) threshold)) {
                 refreshFull();
             }
@@ -147,20 +147,20 @@ public class TerminalScreen extends AbstractScreen {
             refreshByDelta();
         }
         getBackBuffer().copyTo(getFrontBuffer());
-        TerminalPosition cursorPosition = getCursorPosition();
+        TerminalPosition cursorPosition = cursorPosition();
         if(cursorPosition != null) {
-            getTerminal().setCursorVisible(true);
+            terminal.setCursorVisible(true);
             //If we are trying to move the cursor to the padding of a CJK character, put it on the actual character instead
-            if(cursorPosition.getColumn() > 0 && TerminalTextUtils.isCharCJK(getFrontBuffer().getCharacterAt(cursorPosition.withRelativeColumn(-1)).getCharacter())) {
-                getTerminal().setCursorPosition(cursorPosition.getColumn() - 1, cursorPosition.getRow());
+            if(cursorPosition.column > 0 && TerminalTextUtils.isCharCJK(getFrontBuffer().get(cursorPosition.withRelativeColumn(-1)).c)) {
+                terminal.moveCursorTo(cursorPosition.column - 1, cursorPosition.row);
             }
             else {
-                getTerminal().setCursorPosition(cursorPosition.getColumn(), cursorPosition.getRow());
+                terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
             }
         } else {
-            getTerminal().setCursorVisible(false);
+            terminal.setCursorVisible(false);
         }
-        getTerminal().flush();
+        terminal.flush();
     }
 
     private void useScrollHint() throws IOException {
@@ -168,7 +168,7 @@ public class TerminalScreen extends AbstractScreen {
 
         try {
             if (scrollHint == ScrollHint.INVALID) { return; }
-            Terminal term = getTerminal();
+            Terminal term = terminal;
             if (term instanceof Scrollable) {
                 // just try and see if it cares:
                 scrollHint.applyTo( (Scrollable)term );
@@ -181,18 +181,18 @@ public class TerminalScreen extends AbstractScreen {
     }
 
     private void refreshByDelta() throws IOException {
-        Map<TerminalPosition, TextCharacter> updateMap = new TreeMap<TerminalPosition, TextCharacter>(new ScreenPointComparator());
-        TerminalSize terminalSize = getTerminalSize();
+        Map<TerminalPosition, TextCharacter> updateMap = new TreeMap<>(new ScreenPointComparator());
+        TerminalPosition terminalPosition = terminalSize();
 
         useScrollHint();
 
-        for(int y = 0; y < terminalSize.getRows(); y++) {
-            for(int x = 0; x < terminalSize.getColumns(); x++) {
-                TextCharacter backBufferCharacter = getBackBuffer().getCharacterAt(x, y);
-                if(!backBufferCharacter.equals(getFrontBuffer().getCharacterAt(x, y))) {
+        for(int y = 0; y < terminalPosition.row; y++) {
+            for(int x = 0; x < terminalPosition.column; x++) {
+                TextCharacter backBufferCharacter = getBackBuffer().get(x, y);
+                if(!backBufferCharacter.equals(getFrontBuffer().get(x, y))) {
                     updateMap.put(new TerminalPosition(x, y), backBufferCharacter);
                 }
-                if(TerminalTextUtils.isCharCJK(backBufferCharacter.getCharacter())) {
+                if(TerminalTextUtils.isCharCJK(backBufferCharacter.c)) {
                     x++;    //Skip the trailing padding
                 }
             }
@@ -202,44 +202,44 @@ public class TerminalScreen extends AbstractScreen {
             return;
         }
         TerminalPosition currentPosition = updateMap.keySet().iterator().next();
-        getTerminal().setCursorPosition(currentPosition.getColumn(), currentPosition.getRow());
+        terminal.moveCursorTo(currentPosition.column, currentPosition.row);
 
         TextCharacter firstScreenCharacterToUpdate = updateMap.values().iterator().next();
         EnumSet<SGR> currentSGR = firstScreenCharacterToUpdate.getModifiers();
-        getTerminal().resetColorAndSGR();
+        terminal.resetColorAndSGR();
         for(SGR sgr: currentSGR) {
-            getTerminal().enableSGR(sgr);
+            terminal.enableSGR(sgr);
         }
-        TextColor currentForegroundColor = firstScreenCharacterToUpdate.getForegroundColor();
-        TextColor currentBackgroundColor = firstScreenCharacterToUpdate.getBackgroundColor();
-        getTerminal().setForegroundColor(currentForegroundColor);
-        getTerminal().setBackgroundColor(currentBackgroundColor);
+        TextColor currentForegroundColor = firstScreenCharacterToUpdate.fore;
+        TextColor currentBackgroundColor = firstScreenCharacterToUpdate.back;
+        terminal.fore(currentForegroundColor);
+        terminal.back(currentBackgroundColor);
         for(TerminalPosition position: updateMap.keySet()) {
             if(!position.equals(currentPosition)) {
-                getTerminal().setCursorPosition(position.getColumn(), position.getRow());
+                terminal.moveCursorTo(position.column, position.row);
                 currentPosition = position;
             }
             TextCharacter newCharacter = updateMap.get(position);
-            if(!currentForegroundColor.equals(newCharacter.getForegroundColor())) {
-                getTerminal().setForegroundColor(newCharacter.getForegroundColor());
-                currentForegroundColor = newCharacter.getForegroundColor();
+            if(!currentForegroundColor.equals(newCharacter.fore)) {
+                terminal.fore(newCharacter.fore);
+                currentForegroundColor = newCharacter.fore;
             }
-            if(!currentBackgroundColor.equals(newCharacter.getBackgroundColor())) {
-                getTerminal().setBackgroundColor(newCharacter.getBackgroundColor());
-                currentBackgroundColor = newCharacter.getBackgroundColor();
+            if(!currentBackgroundColor.equals(newCharacter.back)) {
+                terminal.back(newCharacter.back);
+                currentBackgroundColor = newCharacter.back;
             }
             for(SGR sgr: SGR.values()) {
                 if(currentSGR.contains(sgr) && !newCharacter.getModifiers().contains(sgr)) {
-                    getTerminal().disableSGR(sgr);
+                    terminal.disableSGR(sgr);
                     currentSGR.remove(sgr);
                 }
                 else if(!currentSGR.contains(sgr) && newCharacter.getModifiers().contains(sgr)) {
-                    getTerminal().enableSGR(sgr);
+                    terminal.enableSGR(sgr);
                     currentSGR.add(sgr);
                 }
             }
-            getTerminal().putCharacter(newCharacter.getCharacter());
-            if(TerminalTextUtils.isCharCJK(newCharacter.getCharacter())) {
+            terminal.put(newCharacter.c);
+            if(TerminalTextUtils.isCharCJK(newCharacter.c)) {
                 //CJK characters advances two columns
                 currentPosition = currentPosition.withRelativeColumn(2);
             }
@@ -251,48 +251,48 @@ public class TerminalScreen extends AbstractScreen {
     }
 
     private void refreshFull() throws IOException {
-        getTerminal().setForegroundColor(TextColor.ANSI.DEFAULT);
-        getTerminal().setBackgroundColor(TextColor.ANSI.DEFAULT);
-        getTerminal().clearScreen();
-        getTerminal().resetColorAndSGR();
+        terminal.fore(TextColor.ANSI.DEFAULT);
+        terminal.back(TextColor.ANSI.DEFAULT);
+        terminal.clearScreen();
+        terminal.resetColorAndSGR();
         scrollHint = null; // discard any scroll hint for full refresh
 
         EnumSet<SGR> currentSGR = EnumSet.noneOf(SGR.class);
         TextColor currentForegroundColor = TextColor.ANSI.DEFAULT;
         TextColor currentBackgroundColor = TextColor.ANSI.DEFAULT;
-        for(int y = 0; y < getTerminalSize().getRows(); y++) {
-            getTerminal().setCursorPosition(0, y);
+        for(int y = 0; y < terminalSize().row; y++) {
+            terminal.moveCursorTo(0, y);
             int currentColumn = 0;
-            for(int x = 0; x < getTerminalSize().getColumns(); x++) {
-                TextCharacter newCharacter = getBackBuffer().getCharacterAt(x, y);
+            for(int x = 0; x < terminalSize().column; x++) {
+                TextCharacter newCharacter = getBackBuffer().get(x, y);
                 if(newCharacter.equals(DEFAULT_CHARACTER)) {
                     continue;
                 }
 
-                if(!currentForegroundColor.equals(newCharacter.getForegroundColor())) {
-                    getTerminal().setForegroundColor(newCharacter.getForegroundColor());
-                    currentForegroundColor = newCharacter.getForegroundColor();
+                if(!currentForegroundColor.equals(newCharacter.fore)) {
+                    terminal.fore(newCharacter.fore);
+                    currentForegroundColor = newCharacter.fore;
                 }
-                if(!currentBackgroundColor.equals(newCharacter.getBackgroundColor())) {
-                    getTerminal().setBackgroundColor(newCharacter.getBackgroundColor());
-                    currentBackgroundColor = newCharacter.getBackgroundColor();
+                if(!currentBackgroundColor.equals(newCharacter.back)) {
+                    terminal.back(newCharacter.back);
+                    currentBackgroundColor = newCharacter.back;
                 }
                 for(SGR sgr: SGR.values()) {
                     if(currentSGR.contains(sgr) && !newCharacter.getModifiers().contains(sgr)) {
-                        getTerminal().disableSGR(sgr);
+                        terminal.disableSGR(sgr);
                         currentSGR.remove(sgr);
                     }
                     else if(!currentSGR.contains(sgr) && newCharacter.getModifiers().contains(sgr)) {
-                        getTerminal().enableSGR(sgr);
+                        terminal.enableSGR(sgr);
                         currentSGR.add(sgr);
                     }
                 }
                 if(currentColumn != x) {
-                    getTerminal().setCursorPosition(x, y);
+                    terminal.moveCursorTo(x, y);
                     currentColumn = x;
                 }
-                getTerminal().putCharacter(newCharacter.getCharacter());
-                if(TerminalTextUtils.isCharCJK(newCharacter.getCharacter())) {
+                terminal.put(newCharacter.c);
+                if(TerminalTextUtils.isCharCJK(newCharacter.c)) {
                     //CJK characters take up two columns
                     currentColumn += 2;
                     x++;
@@ -303,21 +303,6 @@ public class TerminalScreen extends AbstractScreen {
                 }
             }
         }
-    }
-    
-    /**
-     * Returns the underlying {@code Terminal} interface that this Screen is using. 
-     * <p>
-     * <b>Be aware:</b> directly modifying the underlying terminal will most likely result in unexpected behaviour if
-     * you then go on and try to interact with the Screen. The Screen's back-buffer/front-buffer will not know about
-     * the operations you are going on the Terminal and won't be able to properly generate a refresh unless you enforce
-     * a {@code Screen.RefreshType.COMPLETE}, at which the entire terminal area will be repainted according to the 
-     * back-buffer of the {@code Screen}.
-     * @return Underlying terminal used by the screen
-     */
-    @SuppressWarnings("WeakerAccess")
-    public Terminal getTerminal() {
-        return terminal;
     }
 
     @Override
@@ -338,8 +323,8 @@ public class TerminalScreen extends AbstractScreen {
     }
 
     @Override
-    public synchronized TerminalSize doResizeIfNecessary() {
-        TerminalSize newSize = super.doResizeIfNecessary();
+    public synchronized TerminalPosition doResizeIfNecessary() {
+        TerminalPosition newSize = super.doResizeIfNecessary();
         if(newSize != null) {
             fullRedrawHint = true;
         }
@@ -377,7 +362,7 @@ public class TerminalScreen extends AbstractScreen {
 
     private class TerminalScreenResizeListener implements TerminalResizeListener {
         @Override
-        public void onResized(Terminal terminal, TerminalSize newSize) {
+        public void onResized(Terminal terminal, TerminalPosition newSize) {
             addResizeRequest(newSize);
         }
     }
@@ -385,14 +370,14 @@ public class TerminalScreen extends AbstractScreen {
     private static class ScreenPointComparator implements Comparator<TerminalPosition> {
         @Override
         public int compare(TerminalPosition o1, TerminalPosition o2) {
-            if(o1.getRow() == o2.getRow()) {
-                if(o1.getColumn() == o2.getColumn()) {
+            if(o1.row == o2.row) {
+                if(o1.column == o2.column) {
                     return 0;
                 } else {
-                    return new Integer(o1.getColumn()).compareTo(o2.getColumn());
+                    return new Integer(o1.column).compareTo(o2.column);
                 }
             } else {
-                return new Integer(o1.getRow()).compareTo(o2.getRow());
+                return Integer.compare(o1.row, o2.row);
             }
         }
     }

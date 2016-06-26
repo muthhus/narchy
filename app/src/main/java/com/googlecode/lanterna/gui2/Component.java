@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 
 /**
  * This is the main interface defining a component in Lanterna, although you will probably not implement this directly
@@ -47,7 +46,7 @@ public interface Component extends TextGUIElement {
      * an empty size (0x0)
      * @return How large this component is
      */
-    TerminalSize getSize();
+    TerminalPosition getSize();
 
     /**
      * This method will be called by the layout manager when it has decided how large the component will be. If you call
@@ -55,14 +54,14 @@ public interface Component extends TextGUIElement {
      * @param size Current size of the component
      * @return Itself
      */
-    Component setSize(TerminalSize size);
+    Component setSize(TerminalPosition size);
 
     /**
      * Returns the ideal size this component would like to have, in order to draw itself properly. There are no
      * guarantees the GUI system will decide to give it this size though.
      * @return Size we would like to be
      */
-    TerminalSize getPreferredSize();
+    TerminalPosition getPreferredSize();
 
 
     /**
@@ -73,7 +72,7 @@ public interface Component extends TextGUIElement {
      * @param explicitPreferredSize Preferred size we want to use for this component
      * @return Itself
      */
-    Component setPreferredSize(TerminalSize explicitPreferredSize);
+    Component setPreferredSize(TerminalPosition explicitPreferredSize);
 
     /**
      * Sets optional layout data associated with this component. This meaning of this data is up to the layout manager

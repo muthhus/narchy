@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.DoublePrintingTextGraphics;
@@ -80,7 +79,7 @@ public class ScreenTriangleTest {
                 break;
             }
             screen.doResizeIfNecessary();
-            TerminalSize size = graphics.getSize();
+            TerminalPosition size = graphics.getSize();
             if(useAnsiColors) {
                 if(color == null || !rotating) {
                     color = TextColor.ANSI.values()[random.nextInt(TextColor.ANSI.values().length)];
@@ -99,21 +98,21 @@ public class ScreenTriangleTest {
             if(rotating) {
                 screen.clear();
                 double triangleSize = 15.0;
-                int x0 = (size.getColumns() / 2) + (int) (Math.cos(rad) * triangleSize);
-                int y0 = (size.getRows() / 2) + (int) (Math.sin(rad) * triangleSize);
-                int x1 = (size.getColumns() / 2) + (int) (Math.cos(rad + oneThirdOf2PI) * triangleSize);
-                int y1 = (size.getRows() / 2) + (int) (Math.sin(rad + oneThirdOf2PI) * triangleSize);
-                int x2 = (size.getColumns() / 2) + (int) (Math.cos(rad + twoThirdsOf2PI) * triangleSize);
-                int y2 = (size.getRows() / 2) + (int) (Math.sin(rad + twoThirdsOf2PI) * triangleSize);
+                int x0 = (size.column / 2) + (int) (Math.cos(rad) * triangleSize);
+                int y0 = (size.row / 2) + (int) (Math.sin(rad) * triangleSize);
+                int x1 = (size.column / 2) + (int) (Math.cos(rad + oneThirdOf2PI) * triangleSize);
+                int y1 = (size.row / 2) + (int) (Math.sin(rad + oneThirdOf2PI) * triangleSize);
+                int x2 = (size.column / 2) + (int) (Math.cos(rad + twoThirdsOf2PI) * triangleSize);
+                int y2 = (size.row / 2) + (int) (Math.sin(rad + twoThirdsOf2PI) * triangleSize);
                 p1 = new TerminalPosition(x0, y0);
                 p2 = new TerminalPosition(x1, y1);
                 p3 = new TerminalPosition(x2, y2);
                 rad += Math.PI / 90.0;
             }
             else {
-                p1 = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
-                p2 = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
-                p3 = new TerminalPosition(random.nextInt(size.getColumns()), random.nextInt(size.getRows()));
+                p1 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+                p2 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+                p3 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
             }
 
             graphics.setBackgroundColor(color);

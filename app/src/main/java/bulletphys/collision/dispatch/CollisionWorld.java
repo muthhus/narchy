@@ -123,18 +123,16 @@ public class CollisionWorld<X> {
 			}
 
 			Dispatcher dispatcher = dispatcher1;
-			{
-				BulletStats.pushProfile("dispatchAllCollisionPairs");
-				try {
-					if (dispatcher != null) {
-						dispatcher.dispatchAllCollisionPairs(broadphasePairCache.getOverlappingPairCache(), dispatchInfo, dispatcher1);
-					}
-				}
-				finally {
-					BulletStats.popProfile();
-				}
-			}
-		}
+            BulletStats.pushProfile("dispatchAllCollisionPairs");
+            try {
+                if (dispatcher != null) {
+                    dispatcher.dispatchAllCollisionPairs(broadphasePairCache.getOverlappingPairCache(), dispatchInfo, dispatcher1);
+                }
+            }
+            finally {
+                BulletStats.popProfile();
+            }
+        }
 		finally {
 			BulletStats.popProfile();
 		}
@@ -188,7 +186,7 @@ public class CollisionWorld<X> {
 		return dispatchInfo;
 	}
 	
-	private static boolean updateAabbs_reportMe = true;
+	private static final boolean updateAabbs_reportMe = true;
 
 	// JAVA NOTE: ported from 2.74, missing contact threshold stuff
 	public void updateSingleAabb(CollisionObject colObj) {

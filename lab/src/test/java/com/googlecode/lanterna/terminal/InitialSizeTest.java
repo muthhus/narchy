@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 
 import java.io.IOException;
@@ -34,13 +34,13 @@ public class InitialSizeTest {
         rawTerminal.enterPrivateMode();
         rawTerminal.clearScreen();
 
-        rawTerminal.setCursorPosition(5, 5);
+        rawTerminal.moveCursorTo(5, 5);
         printString(rawTerminal, "Waiting for initial size...");
         rawTerminal.flush();
 
-        TerminalSize initialSize = rawTerminal.getTerminalSize();
+        TerminalPosition initialSize = rawTerminal.terminalSize();
         rawTerminal.clearScreen();
-        rawTerminal.setCursorPosition(5, 5);
+        rawTerminal.moveCursorTo(5, 5);
         printString(rawTerminal, "Initial size: ");
         rawTerminal.enableSGR(SGR.BOLD);
         printString(rawTerminal, initialSize.toString());
@@ -55,6 +55,6 @@ public class InitialSizeTest {
     }
 
     private static void printString(Terminal rawTerminal, String string) throws IOException {
-        rawTerminal.putString(string);
+        rawTerminal.put(string);
     }
 }

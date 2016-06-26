@@ -37,7 +37,7 @@ public class MessageDialogBuilder {
     public MessageDialogBuilder() {
         this.title = "MessageDialog";
         this.text = "Text";
-        this.buttons = new ArrayList<MessageDialogButton>();
+        this.buttons = new ArrayList<>();
     }
 
     /**

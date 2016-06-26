@@ -114,65 +114,62 @@ public class VoronoiSimplexSolver extends SimplexSolverInterface {
 					break;
 				}
 			case 2:
-				{
-					Vector3f tmp = new Vector3f();
-					
-					//closest point origin from line segment
-					Vector3f from = simplexVectorW[0];
-					Vector3f to = simplexVectorW[1];
-					Vector3f nearest = new Vector3f();
+                Vector3f tmp = new Vector3f();
+
+                //closest point origin from line segment
+                Vector3f from = simplexVectorW[0];
+                Vector3f to = simplexVectorW[1];
+                Vector3f nearest = new Vector3f();
 
 
+                Vector3f diff = new Vector3f();
+                diff.setNegative(from);
 
-					Vector3f diff = new Vector3f();
-					diff.setNegative(from);
+                Vector3f v = new Vector3f();
+                v.sub(to, from);
 
-					Vector3f v = new Vector3f();
-					v.sub(to, from);
+                float t = v.dot(diff);
 
-					float t = v.dot(diff);
+                if (t > 0) {
+                    float dotVV = v.dot(v);
+                    if (t < dotVV) {
+                        t /= dotVV;
+                        tmp.scale(t, v);
+                        diff.sub(tmp);
+                        cachedBC.usedVertices.usedVertexA = true;
+                        cachedBC.usedVertices.usedVertexB = true;
+                    } else {
+                        t = 1;
+                        diff.sub(v);
+                        // reduce to 1 point
+                        cachedBC.usedVertices.usedVertexB = true;
+                    }
+                } else
+                {
+                    t = 0;
+                    //reduce to 1 point
+                    cachedBC.usedVertices.usedVertexA = true;
+                }
+                cachedBC.setBarycentricCoordinates(1f-t, t, 0f, 0f);
 
-					if (t > 0) {
-						float dotVV = v.dot(v);
-						if (t < dotVV) {
-							t /= dotVV;
-							tmp.scale(t, v);
-							diff.sub(tmp);
-							cachedBC.usedVertices.usedVertexA = true;
-							cachedBC.usedVertices.usedVertexB = true;
-						} else {
-							t = 1;
-							diff.sub(v);
-							// reduce to 1 point
-							cachedBC.usedVertices.usedVertexB = true;
-						}
-					} else
-					{
-						t = 0;
-						//reduce to 1 point
-						cachedBC.usedVertices.usedVertexA = true;
-					}
-					cachedBC.setBarycentricCoordinates(1f-t, t, 0f, 0f);
-					
-					tmp.scale(t, v);
-					nearest.add(from, tmp);
+                tmp.scale(t, v);
+                nearest.add(from, tmp);
 
-					tmp.sub(simplexPointsP[1], simplexPointsP[0]);
-					tmp.scale(t);
-					cachedP1.add(simplexPointsP[0], tmp);
+                tmp.sub(simplexPointsP[1], simplexPointsP[0]);
+                tmp.scale(t);
+                cachedP1.add(simplexPointsP[0], tmp);
 
-					tmp.sub(simplexPointsQ[1], simplexPointsQ[0]);
-					tmp.scale(t);
-					cachedP2.add(simplexPointsQ[0], tmp);
+                tmp.sub(simplexPointsQ[1], simplexPointsQ[0]);
+                tmp.scale(t);
+                cachedP2.add(simplexPointsQ[0], tmp);
 
-					cachedV.sub(cachedP1, cachedP2);
+                cachedV.sub(cachedP1, cachedP2);
 
-					reduceVertices(cachedBC.usedVertices);
+                reduceVertices(cachedBC.usedVertices);
 
-					cachedValidClosest = cachedBC.isValid();
-					break;
-				}
-			case 3: 
+                cachedValidClosest = cachedBC.isValid();
+                break;
+                case 3:
 				{ 
 					Vector3f tmp1 = new Vector3f();
 					Vector3f tmp2 = new Vector3f();

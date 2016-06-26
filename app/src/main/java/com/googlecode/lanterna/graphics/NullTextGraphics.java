@@ -30,7 +30,7 @@ import java.util.EnumSet;
  * @author martin
  */
 class NullTextGraphics implements TextGraphics {
-    private final TerminalSize size;
+    private final TerminalPosition size;
     private TextColor foregroundColor;
     private TextColor backgroundColor;
     private TabBehaviour tabBehaviour;
@@ -41,7 +41,7 @@ class NullTextGraphics implements TextGraphics {
      * than that ignore all other calls.
      * @param size The size to report
      */
-    public NullTextGraphics(TerminalSize size) {
+    public NullTextGraphics(TerminalPosition size) {
         this.size = size;
         this.foregroundColor = TextColor.ANSI.DEFAULT;
         this.backgroundColor = TextColor.ANSI.DEFAULT;
@@ -50,12 +50,12 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return size;
     }
 
     @Override
-    public TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalSize size) throws IllegalArgumentException {
+    public TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalPosition size) throws IllegalArgumentException {
         return this;
     }
 
@@ -128,22 +128,22 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int column, int row, char character) {
+    public TextGraphics set(int column, int row, char character) {
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(int column, int row, TextCharacter character) {
+    public TextGraphics set(int column, int row, TextCharacter character) {
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, char character) {
+    public TextGraphics set(TerminalPosition position, char character) {
         return this;
     }
 
     @Override
-    public TextGraphics setCharacter(TerminalPosition position, TextCharacter character) {
+    public TextGraphics set(TerminalPosition position, TextCharacter character) {
         return this;
     }
 
@@ -188,22 +188,22 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         return this;
     }
 
     @Override
-    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         return this;
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, char character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, char character) {
         return this;
     }
 
     @Override
-    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
+    public TextGraphics fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         return this;
     }
 
@@ -213,7 +213,7 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalSize sourceImageSize) {
+    public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalPosition sourceImageSize) {
         return this;
     }
 
@@ -243,12 +243,12 @@ class NullTextGraphics implements TextGraphics {
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
+    public TextCharacter get(int column, int row) {
         return null;
     }
 
     @Override
-    public TextCharacter getCharacter(TerminalPosition position) {
+    public TextCharacter get(TerminalPosition position) {
         return null;
     }
 }

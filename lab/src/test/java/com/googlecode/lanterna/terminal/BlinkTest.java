@@ -34,16 +34,16 @@ public class BlinkTest {
         Terminal rawTerminal = new TestTerminalFactory(args).createTerminal();
         rawTerminal.enterPrivateMode();
         rawTerminal.clearScreen();
-        rawTerminal.setForegroundColor(TextColor.ANSI.RED);
+        rawTerminal.fore(TextColor.ANSI.RED);
         rawTerminal.enableSGR(SGR.BLINK);
-        rawTerminal.setCursorPosition(10, 10);
-        rawTerminal.putCharacter('H');
-        rawTerminal.putCharacter('e');
-        rawTerminal.putCharacter('l');
-        rawTerminal.putCharacter('l');
-        rawTerminal.putCharacter('o');
-        rawTerminal.putCharacter('!');
-        rawTerminal.setCursorPosition(0, 0);
+        rawTerminal.moveCursorTo(10, 10);
+        rawTerminal.put('H');
+        rawTerminal.put('e');
+        rawTerminal.put('l');
+        rawTerminal.put('l');
+        rawTerminal.put('o');
+        rawTerminal.put('!');
+        rawTerminal.moveCursorTo(0, 0);
         rawTerminal.flush();
         try {
             Thread.sleep(5000);

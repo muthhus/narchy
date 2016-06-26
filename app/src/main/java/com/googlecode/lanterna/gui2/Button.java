@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -100,7 +99,7 @@ public class Button extends AbstractInteractableComponent<Button> {
 
     @Override
     public String toString() {
-        return "Button{" + label + "}";
+        return "Button{" + label + '}';
     }
 
     /**
@@ -120,8 +119,8 @@ public class Button extends AbstractInteractableComponent<Button> {
         }
 
         @Override
-        public TerminalSize getPreferredSize(Button button) {
-            return new TerminalSize(Math.max(8, TerminalTextUtils.getColumnWidth(button.getLabel()) + 2), 1);
+        public TerminalPosition getPreferredSize(Button button) {
+            return new TerminalPosition(Math.max(8, TerminalTextUtils.getColumnWidth(button.getLabel()) + 2), 1);
         }
 
         @Override
@@ -133,8 +132,8 @@ public class Button extends AbstractInteractableComponent<Button> {
                 graphics.applyThemeStyle(getThemeDefinition(graphics).getInsensitive());
             }
             graphics.fill(' ');
-            graphics.setCharacter(0, 0, getThemeDefinition(graphics).getCharacter("LEFT_BORDER", '<'));
-            graphics.setCharacter(graphics.getSize().getColumns() - 1, 0, getThemeDefinition(graphics).getCharacter("RIGHT_BORDER", '>'));
+            graphics.set(0, 0, getThemeDefinition(graphics).getCharacter("LEFT_BORDER", '<'));
+            graphics.set(graphics.getSize().column - 1, 0, getThemeDefinition(graphics).getCharacter("RIGHT_BORDER", '>'));
 
             if(button.isFocused()) {
                 graphics.applyThemeStyle(getThemeDefinition(graphics).getActive());
@@ -143,7 +142,7 @@ public class Button extends AbstractInteractableComponent<Button> {
                 graphics.applyThemeStyle(getThemeDefinition(graphics).getPreLight());
             }
             int labelShift = getLabelShift(button, graphics.getSize());
-            graphics.setCharacter(1 + labelShift, 0, button.getLabel().charAt(0));
+            graphics.set(1 + labelShift, 0, button.getLabel().charAt(0));
 
             if(TerminalTextUtils.getColumnWidth(button.getLabel()) == 1) {
                 return;
@@ -157,15 +156,15 @@ public class Button extends AbstractInteractableComponent<Button> {
             graphics.putString(1 + labelShift + 1, 0, button.getLabel().substring(1));
         }
 
-        private int getLabelShift(Button button, TerminalSize size) {
-            int availableSpace = size.getColumns() - 2;
+        private static int getLabelShift(Button button, TerminalPosition size) {
+            int availableSpace = size.column - 2;
             if(availableSpace <= 0) {
                 return 0;
             }
             int labelShift = 0;
             int widthInColumns = TerminalTextUtils.getColumnWidth(button.getLabel());
             if(availableSpace > widthInColumns) {
-                labelShift = (size.getColumns() - 2 - widthInColumns) / 2;
+                labelShift = (size.column - 2 - widthInColumns) / 2;
             }
             return labelShift;
         }
@@ -181,8 +180,8 @@ public class Button extends AbstractInteractableComponent<Button> {
         }
 
         @Override
-        public TerminalSize getPreferredSize(Button component) {
-            return new TerminalSize(TerminalTextUtils.getColumnWidth(component.getLabel()), 1);
+        public TerminalPosition getPreferredSize(Button component) {
+            return new TerminalPosition(TerminalTextUtils.getColumnWidth(component.getLabel()), 1);
         }
 
         @Override

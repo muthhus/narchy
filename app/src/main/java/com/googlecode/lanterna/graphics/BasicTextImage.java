@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 
@@ -32,7 +31,7 @@ import java.util.Arrays;
  * @author martin
  */
 public class BasicTextImage implements TextImage {
-    private final TerminalSize size;
+    private final TerminalPosition size;
     private final TextCharacter[][] buffer;
     
     /**
@@ -42,7 +41,7 @@ public class BasicTextImage implements TextImage {
      * @param rows Size of the image in number of rows
      */
     public BasicTextImage(int columns, int rows) {
-        this(new TerminalSize(columns, rows));
+        this(new TerminalPosition(columns, rows));
     }
     
     /**
@@ -50,7 +49,7 @@ public class BasicTextImage implements TextImage {
      * default foreground and background color
      * @param size Size to make the image
      */
-    public BasicTextImage(TerminalSize size) {
+    public BasicTextImage(TerminalPosition size) {
         this(size, new TextCharacter(' ', TextColor.ANSI.DEFAULT, TextColor.ANSI.DEFAULT));
     }
     
@@ -59,7 +58,7 @@ public class BasicTextImage implements TextImage {
      * @param size Size of the image
      * @param initialContent What character to set as the initial content
      */
-    public BasicTextImage(TerminalSize size, TextCharacter initialContent) {
+    public BasicTextImage(TerminalPosition size, TextCharacter initialContent) {
         this(size, new TextCharacter[0][], initialContent);
     }    
     
@@ -70,15 +69,15 @@ public class BasicTextImage implements TextImage {
      * @param toCopy Array to copy initial data from
      * @param initialContent Filler character to use if the source array is smaller than the requested size
      */
-    private BasicTextImage(TerminalSize size, TextCharacter[][] toCopy, TextCharacter initialContent) {
+    private BasicTextImage(TerminalPosition size, TextCharacter[][] toCopy, TextCharacter initialContent) {
         if(size == null || toCopy == null || initialContent == null) {
             throw new IllegalArgumentException("Cannot create BasicTextImage with null " +
                     (size == null ? "size" : (toCopy == null ? "toCopy" : "filler")));
         }
         this.size = size;
-        
-        int rows = size.getRows();
-        int columns = size.getColumns();
+
+        int rows = size.row;
+        int columns = size.column;
         buffer = new TextCharacter[rows][];
         for(int y = 0; y < rows; y++) {
             buffer[y] = new TextCharacter[columns];
@@ -94,7 +93,7 @@ public class BasicTextImage implements TextImage {
     }
 
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return size;
     }
     
@@ -109,28 +108,28 @@ public class BasicTextImage implements TextImage {
     }
 
     @Override
-    public BasicTextImage resize(TerminalSize newSize, TextCharacter filler) {
+    public BasicTextImage resize(TerminalPosition newSize, TextCharacter filler) {
         if(newSize == null || filler == null) {
             throw new IllegalArgumentException("Cannot resize BasicTextImage with null " +
                     (newSize == null ? "newSize" : "filler"));
         }
-        if(newSize.getRows() == buffer.length &&
-                (buffer.length == 0 || newSize.getColumns() == buffer[0].length)) {
+        if(newSize.row == buffer.length &&
+                (buffer.length == 0 || newSize.column == buffer[0].length)) {
             return this;
         }
         return new BasicTextImage(newSize, buffer, filler);
     }
 
     @Override
-    public void setCharacterAt(TerminalPosition position, TextCharacter character) {
+    public void set(TerminalPosition position, TextCharacter character) {
         if(position == null) {
             throw new IllegalArgumentException("Cannot call BasicTextImage.setCharacterAt(..) with null position");
         }
-        setCharacterAt(position.getColumn(), position.getRow(), character);
+        set(position.column, position.row, character);
     }
     
     @Override
-    public void setCharacterAt(int column, int row, TextCharacter character) {
+    public void set(int column, int row, TextCharacter character) {
         if(character == null) {
             throw new IllegalArgumentException("Cannot call BasicTextImage.setCharacterAt(..) with null character");
         }
@@ -153,15 +152,15 @@ public class BasicTextImage implements TextImage {
     }
 
     @Override
-    public TextCharacter getCharacterAt(TerminalPosition position) {
+    public TextCharacter get(TerminalPosition position) {
         if(position == null) {
             throw new IllegalArgumentException("Cannot call BasicTextImage.getCharacterAt(..) with null position");
         }
-        return getCharacterAt(position.getColumn(), position.getRow());
+        return get(position.column, position.row);
     }
     
     @Override
-    public TextCharacter getCharacterAt(int column, int row) {
+    public TextCharacter get(int column, int row) {
         if(column < 0 || row < 0 || row >= buffer.length || column >= buffer[0].length) {
             return null;
         }
@@ -213,17 +212,17 @@ public class BasicTextImage implements TextImage {
         rows = Math.min(buffer.length - startRowIndex, rows);
 
         //Adjust target lengths as well
-        columns = Math.min(destination.getSize().getColumns() - destinationColumnOffset, columns);
-        rows = Math.min(destination.getSize().getRows() - destinationRowOffset, rows);
+        columns = Math.min(destination.getSize().column - destinationColumnOffset, columns);
+        rows = Math.min(destination.getSize().row - destinationRowOffset, rows);
 
         if(columns <= 0 || rows <= 0) {
             return;
         }
 
-        TerminalSize destinationSize = destination.getSize();
+        TerminalPosition destinationSize = destination.getSize();
         if(destination instanceof BasicTextImage) {
             int targetRow = destinationRowOffset;
-            for(int y = startRowIndex; y < startRowIndex + rows && targetRow < destinationSize.getRows(); y++) {
+            for(int y = startRowIndex; y < startRowIndex + rows && targetRow < destinationSize.row; y++) {
                 System.arraycopy(buffer[y], startColumnIndex, ((BasicTextImage)destination).buffer[targetRow++], destinationColumnOffset, columns);
             }
         }
@@ -231,7 +230,7 @@ public class BasicTextImage implements TextImage {
             //Manually copy character by character
             for(int y = startRowIndex; y < startRowIndex + rows; y++) {
                 for(int x = startColumnIndex; x < startColumnIndex + columns; x++) {
-                    destination.setCharacterAt(
+                    destination.set(
                             x - startColumnIndex + destinationColumnOffset, 
                             y - startRowIndex + destinationRowOffset, 
                             buffer[y][x]);
@@ -244,25 +243,25 @@ public class BasicTextImage implements TextImage {
     public TextGraphics newTextGraphics() {
         return new AbstractTextGraphics() {
             @Override
-            public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
-                BasicTextImage.this.setCharacterAt(columnIndex, rowIndex, textCharacter);
+            public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+                BasicTextImage.this.set(columnIndex, rowIndex, textCharacter);
                 return this;
             }
 
             @Override
-            public TextCharacter getCharacter(int column, int row) {
-                return BasicTextImage.this.getCharacterAt(column, row);
+            public TextCharacter get(int column, int row) {
+                return BasicTextImage.this.get(column, row);
             }
 
             @Override
-            public TerminalSize getSize() {
+            public TerminalPosition getSize() {
                 return size;
             }
         };
     }
 
     private TextCharacter[] newBlankLine() {
-        TextCharacter[] line = new TextCharacter[size.getColumns()];
+        TextCharacter[] line = new TextCharacter[size.column];
         Arrays.fill(line, TextCharacter.DEFAULT_CHARACTER);
         return line;
     }
@@ -270,7 +269,8 @@ public class BasicTextImage implements TextImage {
     @Override
     public void scrollLines(int firstLine, int lastLine, int distance) {
         if (firstLine < 0) { firstLine = 0; }
-        if (lastLine >= size.getRows()) { lastLine = size.getRows() - 1; }
+        if (lastLine >= size.row) {
+            lastLine = size.row - 1; }
         if (firstLine < lastLine) {
             if (distance > 0) {
                 // scrolling up: start with first line as target:
@@ -301,11 +301,11 @@ public class BasicTextImage implements TextImage {
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(size.getRows()*(size.getColumns()+1)+50);
-        sb.append('{').append(size.getColumns()).append('x').append(size.getRows()).append('}').append('\n');
+        StringBuilder sb = new StringBuilder(size.row *(size.column +1)+50);
+        sb.append('{').append(size.column).append('x').append(size.row).append('}').append('\n');
         for (TextCharacter[] line : buffer) {
             for (TextCharacter tc : line) {
-                sb.append(tc.getCharacter());
+                sb.append(tc.c);
             }
             sb.append('\n');
         }

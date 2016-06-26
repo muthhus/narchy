@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
@@ -45,7 +44,7 @@ public class ActionListBox extends AbstractListBox<Runnable, ActionListBox> {
      * {@code new ActionListBox()}.
      * @param preferredSize Preferred size of this {@link ActionListBox}
      */
-    public ActionListBox(TerminalSize preferredSize) {
+    public ActionListBox(TerminalPosition preferredSize) {
         super(preferredSize);
     }
 

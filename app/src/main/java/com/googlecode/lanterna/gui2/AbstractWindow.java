@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 
@@ -38,8 +37,8 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
     private String title;
     private WindowBasedTextGUI textGUI;
     private boolean visible;
-    private TerminalSize lastKnownSize;
-    private TerminalSize lastKnownDecoratedSize;
+    private TerminalPosition lastKnownSize;
+    private TerminalPosition lastKnownDecoratedSize;
     private TerminalPosition lastKnownPosition;
     private TerminalPosition contentOffset;
     private Set<Hint> hints;
@@ -66,7 +65,7 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
         this.lastKnownDecoratedSize = null;
         this.closeWindowWithEscape = false;
 
-        this.hints = new HashSet<Hint>();
+        this.hints = new HashSet<>();
     }
 
     /**
@@ -153,18 +152,18 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
             return null;
         }
         return globalPosition.withRelative(
-                -lastKnownPosition.getColumn() - contentOffset.getColumn(),
-                -lastKnownPosition.getRow() - contentOffset.getRow());
+                -lastKnownPosition.column - contentOffset.column,
+                -lastKnownPosition.row - contentOffset.row);
     }
 
     @Override
-    public TerminalSize getPreferredSize() {
+    public TerminalPosition getPreferredSize() {
         return contentHolder.getPreferredSize();
     }
 
     @Override
     public void setHints(Collection<Hint> hints) {
-        this.hints = new HashSet<Hint>(hints);
+        this.hints = new HashSet<>(hints);
         invalidate();
     }
 
@@ -184,16 +183,16 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
     }
 
     @Override
-    public final TerminalSize getSize() {
+    public final TerminalPosition getSize() {
         return lastKnownSize;
     }
 
     @Override
-    public void setSize(TerminalSize size) {
+    public void setSize(TerminalPosition size) {
         setSize(size, true);
     }
 
-    private void setSize(TerminalSize size, boolean invalidate) {
+    private void setSize(TerminalPosition size, boolean invalidate) {
         this.lastKnownSize = size;
         if(invalidate) {
             invalidate();
@@ -201,12 +200,12 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
     }
 
     @Override
-    public final TerminalSize getDecoratedSize() {
+    public final TerminalPosition getDecoratedSize() {
         return lastKnownDecoratedSize;
     }
 
     @Override
-    public final void setDecoratedSize(TerminalSize decoratedSize) {
+    public final void setDecoratedSize(TerminalPosition decoratedSize) {
         this.lastKnownDecoratedSize = decoratedSize;
     }
 

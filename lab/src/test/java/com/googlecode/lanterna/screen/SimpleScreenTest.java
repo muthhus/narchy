@@ -63,27 +63,27 @@ public class SimpleScreenTest {
                     break mainLoop;
 
                 case ArrowUp:
-                    screen.setCursorPosition(screen.getCursorPosition().withRelativeRow(-1));
+                    screen.moveCursorTo(screen.cursorPosition().withRelativeRow(-1));
                     break;
 
                 case ArrowDown:
-                    screen.setCursorPosition(screen.getCursorPosition().withRelativeRow(1));
+                    screen.moveCursorTo(screen.cursorPosition().withRelativeRow(1));
                     break;
 
                 case ArrowLeft:
-                    screen.setCursorPosition(screen.getCursorPosition().withRelativeColumn(-1));
+                    screen.moveCursorTo(screen.cursorPosition().withRelativeColumn(-1));
                     break;
 
                 case ArrowRight:
-                    screen.setCursorPosition(screen.getCursorPosition().withRelativeColumn(1));
+                    screen.moveCursorTo(screen.cursorPosition().withRelativeColumn(1));
                     break;
 
                 case Character:
                     if(keyStroke.isCtrlDown()) {
                         switch(keyStroke.getCharacter()) {
                             case 'k':
-                                screen.setCharacter(screen.getCursorPosition(), new TextCharacter('桜', COLORS_TO_CYCLE[foregroundCycle], COLORS_TO_CYCLE[backgroundCycle]));
-                                screen.setCursorPosition(screen.getCursorPosition().withRelativeColumn(2));
+                                screen.set(screen.cursorPosition(), new TextCharacter('桜', COLORS_TO_CYCLE[foregroundCycle], COLORS_TO_CYCLE[backgroundCycle]));
+                                screen.moveCursorTo(screen.cursorPosition().withRelativeColumn(2));
                                 break;
 
                             case 'f':
@@ -107,7 +107,7 @@ public class SimpleScreenTest {
                             textGraphics.setBackgroundColor(TextColor.ANSI.WHITE);
                         }
                         textGraphics.setForegroundColor(COLORS_TO_CYCLE[foregroundCycle]);
-                        textGraphics.putString(0, screen.getTerminalSize().getRows() - 2, "Foreground color");
+                        textGraphics.putString(0, screen.terminalSize().row - 2, "Foreground color");
 
                         if(COLORS_TO_CYCLE[backgroundCycle] != TextColor.ANSI.BLACK) {
                             textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
@@ -116,11 +116,11 @@ public class SimpleScreenTest {
                             textGraphics.setBackgroundColor(TextColor.ANSI.WHITE);
                         }
                         textGraphics.setForegroundColor(COLORS_TO_CYCLE[backgroundCycle]);
-                        textGraphics.putString(0, screen.getTerminalSize().getRows() - 1, "Background color");
+                        textGraphics.putString(0, screen.terminalSize().row - 1, "Background color");
                     }
                     else {
-                        screen.setCharacter(screen.getCursorPosition(), new TextCharacter(keyStroke.getCharacter(), COLORS_TO_CYCLE[foregroundCycle], COLORS_TO_CYCLE[backgroundCycle]));
-                        screen.setCursorPosition(screen.getCursorPosition().withRelativeColumn(1));
+                        screen.set(screen.cursorPosition(), new TextCharacter(keyStroke.getCharacter(), COLORS_TO_CYCLE[foregroundCycle], COLORS_TO_CYCLE[backgroundCycle]));
+                        screen.moveCursorTo(screen.cursorPosition().withRelativeColumn(1));
                         break;
                     }
             }

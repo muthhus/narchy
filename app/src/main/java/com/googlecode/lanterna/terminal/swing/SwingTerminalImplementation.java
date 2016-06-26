@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal.swing;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 
 import javax.swing.*;
@@ -41,7 +41,7 @@ class SwingTerminalImplementation extends GraphicalTerminalImplementation {
      * Creates a new {@code SwingTerminalImplementation}
      * @param component JComponent that is the Swing terminal surface
      * @param fontConfiguration Font configuration to use
-     * @param initialTerminalSize Initial size of the terminal
+     * @param initialTerminalPosition Initial size of the terminal
      * @param deviceConfiguration Device configuration
      * @param colorConfiguration Color configuration
      * @param scrollController Controller to be used when inspecting scroll status
@@ -49,12 +49,12 @@ class SwingTerminalImplementation extends GraphicalTerminalImplementation {
     SwingTerminalImplementation(
             JComponent component,
             SwingTerminalFontConfiguration fontConfiguration,
-            TerminalSize initialTerminalSize,
+            TerminalPosition initialTerminalPosition,
             TerminalEmulatorDeviceConfiguration deviceConfiguration,
             TerminalEmulatorColorConfiguration colorConfiguration,
             TerminalScrollController scrollController) {
 
-        super(initialTerminalSize, deviceConfiguration, colorConfiguration, scrollController);
+        super(initialTerminalPosition, deviceConfiguration, colorConfiguration, scrollController);
         this.component = component;
         this.fontConfiguration = fontConfiguration;
 
@@ -136,12 +136,7 @@ class SwingTerminalImplementation extends GraphicalTerminalImplementation {
             component.repaint();
         }
         else {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    component.repaint();
-                }
-            });
+            SwingUtilities.invokeLater(component::repaint);
         }
     }
 

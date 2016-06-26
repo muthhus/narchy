@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestUtils;
 
 import java.io.IOException;
@@ -44,8 +44,8 @@ public class MiscComponentTest extends TestBase {
         }
 
         Panel textBoxPanel = new Panel();
-        textBoxPanel.addComponent(Panels.horizontal(new Label("Normal:   "), new TextBox(new TerminalSize(12, 1), "Text")));
-        textBoxPanel.addComponent(Panels.horizontal(new Label("Password: "), new TextBox(new TerminalSize(12, 1), "Text").setMask('*')));
+        textBoxPanel.addComponent(Panels.horizontal(new Label("Normal:   "), new TextBox(new TerminalPosition(12, 1), "Text")));
+        textBoxPanel.addComponent(Panels.horizontal(new Label("Password: "), new TextBox(new TerminalPosition(12, 1), "Text").setMask('*')));
 
         Panel buttonPanel = new Panel();
         buttonPanel.addComponent(new Button("Enable spacing", new Runnable() {
@@ -62,7 +62,7 @@ public class MiscComponentTest extends TestBase {
 
         Panel rightPanel = new Panel();
         textBoxPanel = new Panel();
-        TextBox readOnlyTextArea = new TextBox(new TerminalSize(16, 8));
+        TextBox readOnlyTextArea = new TextBox(new TerminalPosition(16, 8));
         readOnlyTextArea.setReadOnly(true);
         readOnlyTextArea.setText(TestUtils.downloadGPL());
         textBoxPanel.addComponent(readOnlyTextArea);

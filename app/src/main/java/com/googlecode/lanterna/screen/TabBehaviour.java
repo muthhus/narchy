@@ -106,7 +106,7 @@ public enum TabBehaviour {
             return "\t";
         }
         for(int i = 0; i < replaceCount; i++) {
-            replace.append(" ");
+            replace.append(' ');
         }
         return replace.toString();
     }

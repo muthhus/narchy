@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
 /**
@@ -34,7 +34,7 @@ public interface TableHeaderRenderer<V> {
      * @param columnIndex Column index of the header
      * @return Size this renderer would like the header to have
      */
-    TerminalSize getPreferredSize(Table<V> table, String label, int columnIndex);
+    TerminalPosition getPreferredSize(Table<V> table, String label, int columnIndex);
 
     /**
      * Called by the table when it's time to draw a header, you can see how much size is available by checking the size

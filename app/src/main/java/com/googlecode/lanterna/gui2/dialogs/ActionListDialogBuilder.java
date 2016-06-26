@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import java.util.List;
 public class ActionListDialogBuilder extends AbstractDialogBuilder<ActionListDialogBuilder, ActionListDialog> {
 
     private final List<Runnable> actions;
-    private TerminalSize listBoxSize;
+    private TerminalPosition listBoxSize;
     private boolean canCancel;
 
     /**
@@ -42,7 +42,7 @@ public class ActionListDialogBuilder extends AbstractDialogBuilder<ActionListDia
         super("ActionListDialogBuilder");
         this.listBoxSize = null;
         this.canCancel = true;
-        this.actions = new ArrayList<Runnable>();
+        this.actions = new ArrayList<>();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ActionListDialogBuilder extends AbstractDialogBuilder<ActionListDia
      * @param listBoxSize Size of the {@code ActionListBox}
      * @return Itself
      */
-    public ActionListDialogBuilder setListBoxSize(TerminalSize listBoxSize) {
+    public ActionListDialogBuilder setListBoxSize(TerminalPosition listBoxSize) {
         this.listBoxSize = listBoxSize;
         return this;
     }
@@ -76,7 +76,7 @@ public class ActionListDialogBuilder extends AbstractDialogBuilder<ActionListDia
      * box will attempt to take up enough size to draw all items
      * @return Specified size of the internal {@code ActionListBox} or {@code null} if there is no size
      */
-    public TerminalSize getListBoxSize() {
+    public TerminalPosition getListBoxSize() {
         return listBoxSize;
     }
 
@@ -147,6 +147,6 @@ public class ActionListDialogBuilder extends AbstractDialogBuilder<ActionListDia
      * @return Copy of the internal list of actions currently inside this builder
      */
     public List<Runnable> getActions() {
-        return new ArrayList<Runnable>(actions);
+        return new ArrayList<>(actions);
     }
 }

@@ -104,8 +104,8 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
                 throw new IllegalArgumentException("Cannot add null elements to a ComboBox");
             }
         }
-        this.items = new ArrayList<V>(items);
-        this.listeners = new CopyOnWriteArrayList<Listener>();
+        this.items = new ArrayList<>(items);
+        this.listeners = new CopyOnWriteArrayList<>();
         this.popupWindow = null;
         this.selectedIndex = selectedIndex;
         this.readOnly = true;
@@ -366,7 +366,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
 
     @Override
     protected InteractableRenderer<ComboBox<V>> createDefaultRenderer() {
-        return new DefaultComboBoxRenderer<V>();
+        return new DefaultComboBoxRenderer<>();
     }
 
     @Override
@@ -503,7 +503,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
             setHints(Arrays.asList(
                     Hint.NO_FOCUS,
                     Hint.FIXED_POSITION));
-            listBox = new ActionListBox(ComboBox.this.getSize().withRows(getItemCount()));
+            listBox = new ActionListBox(ComboBox.this.getSize().withRow(getItemCount()));
             for(int i = 0; i < getItemCount(); i++) {
                 V item = items.get(i);
                 final int index = i;
@@ -545,7 +545,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
         @Override
         public TerminalPosition getCursorLocation(ComboBox<V> comboBox) {
             if(comboBox.isDropDownFocused()) {
-                return new TerminalPosition(comboBox.getSize().getColumns() - 1, 0);
+                return new TerminalPosition(comboBox.getSize().column - 1, 0);
             }
             else {
                 int textInputPosition = comboBox.getTextInputPosition();
@@ -555,14 +555,14 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
         }
 
         @Override
-        public TerminalSize getPreferredSize(final ComboBox<V> comboBox) {
-            TerminalSize size = TerminalSize.ONE.withColumns(
-                    (comboBox.getItemCount() == 0 ? TerminalTextUtils.getColumnWidth(comboBox.getText()) : 0) + 2);
+        public TerminalPosition getPreferredSize(final ComboBox<V> comboBox) {
+            int i1 = (comboBox.getItemCount() == 0 ? TerminalTextUtils.getColumnWidth(comboBox.getText()) : 0) + 2;
+            TerminalPosition size = TerminalPosition.ONE.withColumn(i1);
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized(comboBox) {
                 for(int i = 0; i < comboBox.getItemCount(); i++) {
                     V item = comboBox.getItem(i);
-                    size = size.max(new TerminalSize(TerminalTextUtils.getColumnWidth(item.toString()) + 2 + 1, 1));   // +1 to add a single column of space
+                    size = size.max(new TerminalPosition(TerminalTextUtils.getColumnWidth(item.toString()) + 2 + 1, 1));   // +1 to add a single column of space
                 }
             }
             return size;
@@ -577,7 +577,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
                 graphics.enableModifiers(SGR.BOLD);
             }
             graphics.fill(' ');
-            int editableArea = graphics.getSize().getColumns() - 2; //This is exclusing the 'drop-down arrow'
+            int editableArea = graphics.getSize().column - 2; //This is exclusing the 'drop-down arrow'
             int textInputPosition = comboBox.getTextInputPosition();
             int columnsToInputPosition = TerminalTextUtils.getColumnWidth(comboBox.getText().substring(0, textInputPosition));
             if(columnsToInputPosition < textVisibleLeftPosition) {

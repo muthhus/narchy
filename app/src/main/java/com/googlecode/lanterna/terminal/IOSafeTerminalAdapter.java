@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -140,9 +139,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void setCursorPosition(int x, int y) {
+    public void moveCursorTo(int x, int y) {
         try {
-            backend.setCursorPosition(x, y);
+            backend.moveCursorTo(x, y);
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -150,9 +149,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void setCursorPosition(TerminalPosition position) {
+    public void moveCursorTo(TerminalPosition position) {
         try {
-            backend.setCursorPosition(position);
+            backend.moveCursorTo(position);
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -160,9 +159,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public TerminalPosition getCursorPosition() {
+    public TerminalPosition cursor() {
         try {
-            return backend.getCursorPosition();
+            return backend.cursor();
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -181,9 +180,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void putCharacter(char c) {
+    public void put(char c) {
         try {
-            backend.putCharacter(c);
+            backend.put(c);
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -226,9 +225,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void setForegroundColor(TextColor color) {
+    public void fore(TextColor color) {
         try {
-            backend.setForegroundColor(color);
+            backend.fore(color);
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -236,9 +235,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void setBackgroundColor(TextColor color) {
+    public void back(TextColor color) {
         try {
-            backend.setBackgroundColor(color);
+            backend.back(color);
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -256,9 +255,9 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public TerminalSize getTerminalSize() {
+    public TerminalPosition terminalSize() {
         try {
-            return backend.getTerminalSize();
+            return backend.terminalSize();
         }
         catch(IOException e) {
             exceptionHandler.onException(e);
@@ -352,22 +351,13 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
 
         @Override
         public void pushTitle() {
-            try {
+
                 backend.pushTitle();
-            }
-            catch(IOException e) {
-                exceptionHandler.onException(e);
-            }
         }
 
         @Override
         public void popTitle() {
-            try {
-                backend.popTitle();
-            }
-            catch(IOException e) {
-                exceptionHandler.onException(e);
-            }
+            backend.popTitle();
         }
 
         @Override

@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 
 import java.util.Arrays;
@@ -46,13 +45,13 @@ class DefaultShapeRenderer implements ShapeRenderer {
         //http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
         //Implementation from Graphics Programming Black Book by Michael Abrash
         //Available at http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/graphics-programming-black-book-r1698
-        if(p1.getRow() > p2.getRow()) {
+        if(p1.row > p2.row) {
             TerminalPosition temp = p1;
             p1 = p2;
             p2 = temp;
         }
-        int deltaX = p2.getColumn() - p1.getColumn();
-        int deltaY = p2.getRow() - p1.getRow();
+        int deltaX = p2.column - p1.column;
+        int deltaY = p2.row - p1.row;
         if(deltaX > 0) {
             if(deltaX > deltaY) {
                 drawLine0(p1, deltaX, deltaY, true, character);
@@ -73,8 +72,8 @@ class DefaultShapeRenderer implements ShapeRenderer {
     }
 
     private void drawLine0(TerminalPosition start, int deltaX, int deltaY, boolean leftToRight, TextCharacter character) {
-        int x = start.getColumn();
-        int y = start.getRow();
+        int x = start.column;
+        int y = start.row;
         int deltaYx2 = deltaY * 2;
         int deltaYx2MinusDeltaXx2 = deltaYx2 - (deltaX * 2);
         int errorTerm = deltaYx2 - deltaX;
@@ -93,8 +92,8 @@ class DefaultShapeRenderer implements ShapeRenderer {
     }
 
     private void drawLine1(TerminalPosition start, int deltaX, int deltaY, boolean leftToRight, TextCharacter character) {
-        int x = start.getColumn();
-        int y = start.getRow();
+        int x = start.column;
+        int y = start.row;
         int deltaXx2 = deltaX * 2;
         int deltaXx2MinusDeltaYx2 = deltaXx2 - (deltaY * 2);
         int errorTerm = deltaXx2 - deltaY;
@@ -120,10 +119,10 @@ class DefaultShapeRenderer implements ShapeRenderer {
     }
 
     @Override
-    public void drawRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
-        TerminalPosition topRight = topLeft.withRelativeColumn(size.getColumns() - 1);
-        TerminalPosition bottomRight = topRight.withRelativeRow(size.getRows() - 1);
-        TerminalPosition bottomLeft = topLeft.withRelativeRow(size.getRows() - 1);
+    public void drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
+        TerminalPosition topRight = topLeft.withRelativeColumn(size.column - 1);
+        TerminalPosition bottomRight = topRight.withRelativeRow(size.row - 1);
+        TerminalPosition bottomLeft = topLeft.withRelativeRow(size.row - 1);
         drawLine(topLeft, topRight, character);
         drawLine(topRight, bottomRight, character);
         drawLine(bottomRight, bottomLeft, character);
@@ -138,58 +137,58 @@ class DefaultShapeRenderer implements ShapeRenderer {
         Arrays.sort(points, new Comparator<TerminalPosition>() {
             @Override
             public int compare(TerminalPosition o1, TerminalPosition o2) {
-                return (o1.getRow() < o2.getRow()) ? -1 : ((o1.getRow() == o2.getRow()) ? 0 : 1);
+                return (o1.row < o2.row) ? -1 : ((o1.row == o2.row) ? 0 : 1);
             }
         });
 
         float dx1, dx2, dx3;
-        if (points[1].getRow() - points[0].getRow() > 0) {
-            dx1 = (float)(points[1].getColumn() - points[0].getColumn()) / (float)(points[1].getRow() - points[0].getRow());
+        if (points[1].row - points[0].row > 0) {
+            dx1 = (float)(points[1].column - points[0].column) / (float)(points[1].row - points[0].row);
         }
         else {
             dx1 = 0;
         }
-        if (points[2].getRow() - points[0].getRow() > 0) {
-            dx2 = (float)(points[2].getColumn() - points[0].getColumn()) / (float)(points[2].getRow() - points[0].getRow());
+        if (points[2].row - points[0].row > 0) {
+            dx2 = (float)(points[2].column - points[0].column) / (float)(points[2].row - points[0].row);
         }
         else {
             dx2 = 0;
         }
-        if (points[2].getRow() - points[1].getRow() > 0) {
-            dx3 = (float)(points[2].getColumn() - points[1].getColumn()) / (float)(points[2].getRow() - points[1].getRow());
+        if (points[2].row - points[1].row > 0) {
+            dx3 = (float)(points[2].column - points[1].column) / (float)(points[2].row - points[1].row);
         }
         else {
             dx3 = 0;
         }
 
         float startX, startY, endX;
-        startX = endX = points[0].getColumn();
-        startY =        points[0].getRow();
+        startX = endX = points[0].column;
+        startY = points[0].row;
         if (dx1 > dx2) {
-            for (; startY <= points[1].getRow(); startY++, startX += dx2, endX += dx1) {
+            for (; startY <= points[1].row; startY++, startX += dx2, endX += dx1) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
-            endX = points[1].getColumn();
-            for (; startY <= points[2].getRow(); startY++, startX += dx2, endX += dx3) {
+            endX = points[1].column;
+            for (; startY <= points[2].row; startY++, startX += dx2, endX += dx3) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
         } else {
-            for (; startY <= points[1].getRow(); startY++, startX += dx1, endX += dx2) {
+            for (; startY <= points[1].row; startY++, startX += dx1, endX += dx2) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
-            startX = points[1].getColumn();
-            startY = points[1].getRow();
-            for (; startY <= points[2].getRow(); startY++, startX += dx3, endX += dx2) {
+            startX = points[1].column;
+            startY = points[1].row;
+            for (; startY <= points[2].row; startY++, startX += dx3, endX += dx2) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
         }
     }
 
     @Override
-    public void fillRectangle(TerminalPosition topLeft, TerminalSize size, TextCharacter character) {
-        for(int y = 0; y < size.getRows(); y++) {
-            for(int x = 0; x < size.getColumns(); x++) {
-                callback.onPoint(topLeft.getColumn() + x, topLeft.getRow() + y, character);
+    public void fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
+        for(int y = 0; y < size.row; y++) {
+            for(int x = 0; x < size.column; x++) {
+                callback.onPoint(topLeft.column + x, topLeft.row + y, character);
             }
         }
     }

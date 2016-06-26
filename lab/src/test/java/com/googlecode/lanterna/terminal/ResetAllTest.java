@@ -34,18 +34,18 @@ public class ResetAllTest {
         Terminal terminal = new TestTerminalFactory(args).createTerminal();
         terminal.enterPrivateMode();
         terminal.clearScreen();
-        terminal.setCursorPosition(10, 5);
-        terminal.putCharacter('H');
-        terminal.putCharacter('e');
+        terminal.moveCursorTo(10, 5);
+        terminal.put('H');
+        terminal.put('e');
         terminal.enableSGR(SGR.BOLD);
-        terminal.putCharacter('l');
-        terminal.setForegroundColor(TextColor.ANSI.CYAN);
-        terminal.putCharacter('l');
+        terminal.put('l');
+        terminal.fore(TextColor.ANSI.CYAN);
+        terminal.put('l');
         terminal.enableSGR(SGR.REVERSE);
-        terminal.putCharacter('o');
+        terminal.put('o');
         terminal.resetColorAndSGR();
-        terminal.putCharacter('!');
-        terminal.setCursorPosition(0, 0);
+        terminal.put('!');
+        terminal.moveCursorTo(0, 0);
         terminal.flush();
 
         Thread.sleep(5000);

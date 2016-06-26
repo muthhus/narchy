@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.Scrollable;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -84,7 +83,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @return Position where the cursor will be located after the screen has been refreshed or {@code null} if the
      * cursor is not visible
      */
-    TerminalPosition getCursorPosition();
+    TerminalPosition cursorPosition();
     
     /**
      * A screen implementation typically keeps a location on the screen where the cursor will be placed after drawing
@@ -94,7 +93,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @param position TerminalPosition of the new position where the cursor should be placed after refresh(), or if 
      * {@code null}, hides the cursor
      */
-    void setCursorPosition(TerminalPosition position);
+    void moveCursorTo(TerminalPosition position);
 
     /**
      * Gets the behaviour for what to do about tab characters. If a tab character is written to the Screen, it would
@@ -124,7 +123,7 @@ public interface Screen extends InputProvider, Scrollable {
      *
      * @return Size of the screen, in columns and rows
      */
-    TerminalSize getTerminalSize();
+    TerminalPosition terminalSize();
 
     /**
      * Sets a character in the back-buffer to a specified value with specified colors and modifiers.
@@ -132,14 +131,14 @@ public interface Screen extends InputProvider, Scrollable {
      * @param row Row of the character to modify (y coordinate)
      * @param screenCharacter New data to put at the specified position
      */
-    void setCharacter(int column, int row, TextCharacter screenCharacter);
+    void set(int column, int row, TextCharacter screenCharacter);
     
     /**
      * Sets a character in the back-buffer to a specified value with specified colors and modifiers.
      * @param position Which position in the terminal to modify
      * @param screenCharacter New data to put at the specified position
      */
-    void setCharacter(TerminalPosition position, TextCharacter screenCharacter);
+    void set(TerminalPosition position, TextCharacter screenCharacter);
 
     /**
      * Creates a new TextGraphics objects that is targeting this Screen for writing to. Any operations done on this
@@ -156,7 +155,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @param row Which row to get the character from
      * @return A {@code ScreenCharacter} representation of the character in the front-buffer at the specified location
      */
-    TextCharacter getFrontCharacter(int column, int row);
+    TextCharacter front(int column, int row);
     
     /**
      * Reads a character and its associated meta-data from the front-buffer and returns it encapsulated as a 
@@ -164,7 +163,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @param position What position to read the character from
      * @return A {@code ScreenCharacter} representation of the character in the front-buffer at the specified location
      */
-    TextCharacter getFrontCharacter(TerminalPosition position);
+    TextCharacter front(TerminalPosition position);
 
     /**
      * Reads a character and its associated meta-data from the back-buffer and returns it encapsulated as a
@@ -173,7 +172,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @param row Which row to get the character from
      * @return A {@code ScreenCharacter} representation of the character in the back-buffer at the specified location
      */
-    TextCharacter getBackCharacter(int column, int row);
+    TextCharacter back(int column, int row);
 
     /**
      * Reads a character and its associated meta-data from the back-buffer and returns it encapsulated as a 
@@ -181,7 +180,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @param position What position to read the character from
      * @return A {@code ScreenCharacter} representation of the character in the back-buffer at the specified location
      */
-    TextCharacter getBackCharacter(TerminalPosition position);
+    TextCharacter back(TerminalPosition position);
 
     /**
      * This method will take the content from the back-buffer and move it into the front-buffer, making the changes
@@ -215,7 +214,7 @@ public interface Screen extends InputProvider, Scrollable {
      * @return If the terminal has been resized since this method was last called, it will return the new size of the
      * terminal. If not, it will return null.
      */
-    TerminalSize doResizeIfNecessary();
+    TerminalPosition doResizeIfNecessary();
 
     /**
      * Scroll a range of lines of this Screen according to given distance.

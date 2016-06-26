@@ -1,6 +1,6 @@
 package com.googlecode.lanterna.terminal.ansi;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.*;
 import java.lang.reflect.InvocationHandler;
@@ -30,14 +30,14 @@ public class CygwinSTTYTerminalDeviceController implements TerminalDeviceControl
             String stty = exec(findSTTY(), "-F", getPseudoTerminalDevice(), "-a");
             Matcher matcher = STTY_SIZE_PATTERN.matcher(stty);
             if(matcher.matches()) {
-                return new TerminalSize(Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(1)));
+                return new TerminalPosition(Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(1)));
             }
             else {
-                return new TerminalSize(80, 24);
+                return new TerminalPosition(80, 24);
             }
         }
         catch(Throwable e) {
-            return new TerminalSize(80, 24);
+            return new TerminalPosition(80, 24);
         }
     }
      */
@@ -73,12 +73,12 @@ public class CygwinSTTYTerminalDeviceController implements TerminalDeviceControl
     }
 
     @Override
-    public TerminalSize getTerminalSize() throws IOException {
+    public TerminalPosition getTerminalSize() {
         return null;
     }
 
     @Override
-    public void registerTerminalResizeListener(final Runnable onResize) throws IOException {
+    public void registerTerminalResizeListener(final Runnable onResize) {
         try {
             Class<?> signalClass = Class.forName("sun.misc.Signal");
             for(Method m : signalClass.getDeclaredMethods()) {
@@ -102,8 +102,8 @@ public class CygwinSTTYTerminalDeviceController implements TerminalDeviceControl
         }
     }
 
-    private String runSTTYCommand(String... parameters) throws IOException {
-        List<String> commandLine = new ArrayList<String>(Arrays.asList(
+    private static String runSTTYCommand(String... parameters) throws IOException {
+        List<String> commandLine = new ArrayList<>(Arrays.asList(
                 findSTTY(),
                 "-F",
                 getPseudoTerminalDevice()));
@@ -111,7 +111,7 @@ public class CygwinSTTYTerminalDeviceController implements TerminalDeviceControl
         return exec(commandLine.toArray(new String[commandLine.size()]));
     }
 
-    protected String exec(String... cmd) throws IOException {
+    protected static String exec(String... cmd) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(cmd);
         Process process = pb.start();
         ByteArrayOutputStream stdoutBuffer = new ByteArrayOutputStream();
@@ -132,11 +132,11 @@ public class CygwinSTTYTerminalDeviceController implements TerminalDeviceControl
         return builder.toString();
     }
 
-    private String findSTTY() {
+    private static String findSTTY() {
         return STTY_LOCATION;
     }
 
-    private String getPseudoTerminalDevice() {
+    private static String getPseudoTerminalDevice() {
         //This will only work if you only have one terminal window open, otherwise we'll need to figure out somehow
         //which pty to use, which could be very tricky...
         return "/dev/pty0";

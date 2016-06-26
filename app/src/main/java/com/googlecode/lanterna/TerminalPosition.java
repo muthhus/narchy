@@ -18,6 +18,8 @@
  */
 package com.googlecode.lanterna;
 
+import nars.util.Util;
+
 /**
  * A 2-d position in 'terminal space'. Please note that the coordinates are 0-indexed, meaning 0x0 is the top left
  * corner of the terminal. This object is immutable so you cannot change it after it has been created. Instead, you
@@ -25,7 +27,7 @@ package com.googlecode.lanterna;
  *
  * @author Martin
  */
-public class TerminalPosition implements Comparable<TerminalPosition> {
+public final class TerminalPosition implements Comparable<TerminalPosition> {
 
     /**
      * Constant for the top-left corner (0x0)
@@ -35,9 +37,21 @@ public class TerminalPosition implements Comparable<TerminalPosition> {
      * Constant for the 1x1 position (one offset in both directions from top-left)
      */
     public static final TerminalPosition OFFSET_1x1 = new TerminalPosition(1, 1);
+    public static final TerminalPosition ZERO = new TerminalPosition(0, 0);
+    public static final TerminalPosition ONE = new TerminalPosition(1, 1);
 
-    private final int row;
-    private final int column;
+
+    /**
+     * Returns the index of the column this position is representing, zero indexed (the first column has index 0)
+     * @return Index of the row this position has
+     */
+    public final int row;
+
+    /**
+     * Returns the index of the row this position is representing, zero indexed (the first row has index 0)
+     * @return Index of the row this position has
+     */
+    public final int column;
 
     /**
      * Creates a new TerminalPosition object, which represents a location on the screen. There is no check to verify
@@ -50,22 +64,6 @@ public class TerminalPosition implements Comparable<TerminalPosition> {
     public TerminalPosition(int column, int row) {
         this.row = row;
         this.column = column;
-    }
-
-    /**
-     * Returns the index of the column this position is representing, zero indexed (the first column has index 0).
-     * @return Index of the column this position has
-     */
-    public int getColumn() {
-        return column;
-    }
-
-    /**
-     * Returns the index of the row this position is representing, zero indexed (the first row has index 0)
-     * @return Index of the row this position has
-     */
-    public int getRow() {
-        return row;
     }
 
     /**
@@ -130,7 +128,7 @@ public class TerminalPosition implements Comparable<TerminalPosition> {
      * @return New TerminalPosition that is the result of the original with added translation
      */
     public TerminalPosition withRelative(TerminalPosition translate) {
-        return withRelative(translate.getColumn(), translate.getRow());
+        return withRelative(translate.column, translate.row);
     }
 
     /**
@@ -147,47 +145,68 @@ public class TerminalPosition implements Comparable<TerminalPosition> {
 
     @Override
     public int compareTo(TerminalPosition o) {
-        if(row < o.row) {
+        int r = this.row;
+        int or = o.row;
+        if(r < or) {
             return -1;
+        } else if(r > or) {
+            return 1;
         }
-        else if(row == o.row) {
-            if(column < o.column) {
-                return -1;
-            }
-            else if(column == o.column) {
-                return 0;
-            }
-        }
-        return 1;
+        return Integer.compare(this.column, o.column);
     }
 
     @Override
     public String toString() {
-        return "[" + column + ":" + row + "]";
+        return "[" + column + ':' + row + "]";
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 23 * hash + this.row;
-        hash = 23 * hash + this.column;
-        return hash;
+        return Util.hashCombine(row, column);
     }
 
     public boolean equals(int columnIndex, int rowIndex) {
-        return this.column == columnIndex &&
-                this.row == rowIndex;
+        return this.column == columnIndex && this.row == rowIndex;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) return true;
+        if (obj == null) return false;
+
+        if (obj instanceof TerminalPosition) {
+            final TerminalPosition other = (TerminalPosition) obj;
+            return equals(other.column, other.row);
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        return false;
+    }
+
+    /**
+     * Takes a different TerminalPosition and returns a new TerminalPosition that has the largest dimensions of the two,
+     * measured separately. So calling 3x5 on a 5x3 will return 5x5.
+     * @param other Other TerminalSize to compare with
+     * @return TerminalSize that combines the maximum width between the two and the maximum height
+     */
+    public TerminalPosition max(TerminalPosition other) {
+        return withColumn(Math.max(column, other.column))
+                .withRow(Math.max(row, other.row));
+    }
+
+    /**
+     * Takes a different TerminalPosition and returns a new TerminalPosition that has the smallest dimensions of the two,
+     * measured separately. So calling 3x5 on a 5x3 will return 3x3.
+     * @param other Other TerminalSize to compare with
+     * @return TerminalSize that combines the minimum width between the two and the minimum height
+     */
+    public TerminalPosition min(TerminalPosition other) {
+        return withColumn(Math.min(column, other.column))
+                .withRow(Math.min(row, other.row));
+    }
+    public TerminalPosition with(TerminalPosition size) {
+        if(equals(size)) {
+            return this;
         }
-        final TerminalPosition other = (TerminalPosition) obj;
-        return this.row == other.row && this.column == other.column;
+        return size;
     }
 }
+

@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.graphics;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 
 /**
@@ -41,23 +41,23 @@ public class DoublePrintingTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+    public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
         columnIndex = columnIndex * 2;
-        underlyingTextGraphics.setCharacter(columnIndex, rowIndex, textCharacter);
-        underlyingTextGraphics.setCharacter(columnIndex + 1, rowIndex, textCharacter);
+        underlyingTextGraphics.set(columnIndex, rowIndex, textCharacter);
+        underlyingTextGraphics.set(columnIndex + 1, rowIndex, textCharacter);
         return this;
     }
 
     @Override
-    public TextCharacter getCharacter(int columnIndex, int rowIndex) {
+    public TextCharacter get(int columnIndex, int rowIndex) {
         columnIndex = columnIndex * 2;
-        return underlyingTextGraphics.getCharacter(columnIndex, rowIndex);
+        return underlyingTextGraphics.get(columnIndex, rowIndex);
 
     }
 
     @Override
-    public TerminalSize getSize() {
-        TerminalSize size = underlyingTextGraphics.getSize();
-        return size.withColumns(size.getColumns() / 2);
+    public TerminalPosition getSize() {
+        TerminalPosition size = underlyingTextGraphics.getSize();
+        return size.withColumn(size.column / 2);
     }
 }

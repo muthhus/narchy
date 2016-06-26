@@ -52,14 +52,14 @@ public interface ExtendedTerminal extends Terminal, Scrollable {
      * Saves the current window title on a stack managed internally by the terminal.
      * @throws IOException If the was an underlying I/O error
      */
-    void pushTitle() throws IOException;
+    void pushTitle();
 
     /**
      * Replaces the terminal title with the top element from the title stack managed by the terminal (the element is
      * removed from the stack as expected)
      * @throws IOException If the was an underlying I/O error
      */
-    void popTitle() throws IOException;
+    void popTitle();
 
     /**
      * Iconifies the terminal, this likely means minimizing the window with most window managers

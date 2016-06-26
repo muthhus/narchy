@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -48,7 +48,7 @@ public class TelnetTerminalTest {
     private static void spawnColorTest(final TelnetTerminal terminal) {
         new Thread() {
             
-            private volatile TerminalSize size;
+            private volatile TerminalPosition size;
             
             @Override
             public void run() {
@@ -59,12 +59,12 @@ public class TelnetTerminalTest {
                     terminal.clearScreen();
                     terminal.addResizeListener(new TerminalResizeListener() {
                         @Override
-                        public void onResized(Terminal terminal, TerminalSize newSize) {
+                        public void onResized(Terminal terminal, TerminalPosition newSize) {
                             System.err.println("Resized to " + newSize);
                             size = newSize;
                         }
                     });
-                    size = terminal.getTerminalSize();
+                    size = terminal.terminalSize();
 
                     while(true) {
                         KeyStroke key = terminal.pollInput();
@@ -79,9 +79,9 @@ public class TelnetTerminalTest {
                         TextColor.Indexed foregroundIndex = TextColor.Indexed.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
                         TextColor.Indexed backgroundIndex = TextColor.Indexed.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
 
-                        terminal.setForegroundColor(foregroundIndex);
-                        terminal.setBackgroundColor(backgroundIndex);
-                        terminal.setCursorPosition(random.nextInt(size.getColumns() - string.length()), random.nextInt(size.getRows()));
+                        terminal.fore(foregroundIndex);
+                        terminal.back(backgroundIndex);
+                        terminal.moveCursorTo(random.nextInt(size.column - string.length()), random.nextInt(size.row));
                         printString(terminal, string);
 
                         try {
@@ -108,7 +108,7 @@ public class TelnetTerminalTest {
     
     private static void printString(Terminal terminal, String string) throws IOException {
         for(int i = 0; i < string.length(); i++)
-            terminal.putCharacter(string.charAt(i));
+            terminal.put(string.charAt(i));
         terminal.flush();
     }
 }

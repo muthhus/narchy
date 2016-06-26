@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,13 +48,13 @@ public class ComboBoxTest extends TestBase {
         comboBoxCJK.addItem("ウィキペディアは誰でも編集できるフリー百科事典です");
         comboBoxCJK.addItem("위키백과는 전 세계 여러 언어로 만들어 나가는 자유 백과사전으로, 누구나 참여하실 수 있습니다.");
         comboBoxCJK.addItem("This is a string without double-width characters");
-        comboBoxCJK.setPreferredSize(new TerminalSize(13, 1));
+        comboBoxCJK.setPreferredSize(new TerminalPosition(13, 1));
 
         mainPanel.addComponent(Panels.horizontal(
                 comboBoxReadOnly.withBorder(Borders.singleLine("Read-only")),
                 comboBoxEditable.withBorder(Borders.singleLine("Editable")),
                 comboBoxCJK.withBorder(Borders.singleLine("CJK"))));
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
 
         final TextBox textBoxNewItem = new TextBox();
         Button buttonAddItem = new Button("Add", new Runnable() {
@@ -68,7 +68,7 @@ public class ComboBoxTest extends TestBase {
         });
         mainPanel.addComponent(Panels.horizontal(textBoxNewItem, buttonAddItem));
 
-        mainPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+        mainPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
         mainPanel.addComponent(new Separator(Direction.HORIZONTAL).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill)));
         mainPanel.addComponent(new Button("OK", new Runnable() {
             @Override

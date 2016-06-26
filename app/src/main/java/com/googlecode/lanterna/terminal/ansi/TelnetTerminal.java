@@ -177,21 +177,21 @@ public class TelnetTerminal extends ANSITerminal {
             return extendedAscii;
         }
         
-        private void onUnsupportedStateCommand(boolean enabling, byte value) {
+        private static void onUnsupportedStateCommand(boolean enabling, byte value) {
             System.err.println("Unsupported operation: Client says it " + (enabling ? "will" : "won't") + " do " + TelnetProtocol.CODE_TO_NAME.get(value));
         }
 
-        private void onUnsupportedRequestCommand(boolean askedToDo, byte value) {
-            System.err.println("Unsupported request: Client asks us, " + (askedToDo ? "do" : "don't") + " " + TelnetProtocol.CODE_TO_NAME.get(value));
+        private static void onUnsupportedRequestCommand(boolean askedToDo, byte value) {
+            System.err.println("Unsupported request: Client asks us, " + (askedToDo ? "do" : "don't") + ' ' + TelnetProtocol.CODE_TO_NAME.get(value));
         }
 
-        private void onUnsupportedSubnegotiation(byte option, byte[] additionalData) {
+        private static void onUnsupportedSubnegotiation(byte option, byte[] additionalData) {
             System.err.println("Unsupported subnegotiation: Client send " + TelnetProtocol.CODE_TO_NAME.get(option) + " with extra data " +
                     toList(additionalData));
         }
         
         private static List<String> toList(byte[] array) {
-            List<String> list = new ArrayList<String>(array.length);
+            List<String> list = new ArrayList<>(array.length);
             for(byte b: array) {
                 list.add(String.format("%02X ", b));
             }
@@ -311,7 +311,7 @@ public class TelnetTerminal extends ANSITerminal {
                         eventListener.requestReply(command == COMMAND_DO, OPTION_EXTEND_ASCII);
                     }
                     else {
-                        negotiationState.onUnsupportedRequestCommand(command == COMMAND_DO, value);
+                        NegotiationState.onUnsupportedRequestCommand(command == COMMAND_DO, value);
                     }
                     break;
                 case COMMAND_WILL:
@@ -326,7 +326,7 @@ public class TelnetTerminal extends ANSITerminal {
                        negotiationState.clientResizeNotification = (command == COMMAND_WILL);
                     }
                     else {
-                        negotiationState.onUnsupportedStateCommand(command == COMMAND_WILL, value);
+                        NegotiationState.onUnsupportedStateCommand(command == COMMAND_WILL, value);
                     }
                     break;
                 default:
@@ -377,7 +377,7 @@ public class TelnetTerminal extends ANSITerminal {
                     //Let's leave it for now, fingers crossed
                     break;
                 default:
-                    negotiationState.onUnsupportedSubnegotiation(option, additionalData);
+                    NegotiationState.onUnsupportedSubnegotiation(option, additionalData);
                     break;
             }
         }

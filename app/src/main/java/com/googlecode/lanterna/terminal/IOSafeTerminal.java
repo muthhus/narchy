@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 
@@ -41,15 +40,15 @@ public interface IOSafeTerminal extends Terminal {
     @Override
     void clearScreen();
     @Override
-    void setCursorPosition(int x, int y);
+    void moveCursorTo(int x, int y);
     @Override
-    void setCursorPosition(TerminalPosition position);
+    void moveCursorTo(TerminalPosition position);
     @Override
-    TerminalPosition getCursorPosition();
+    TerminalPosition cursor();
     @Override
     void setCursorVisible(boolean visible);
     @Override
-    void putCharacter(char c);
+    void put(char c);
     @Override
     void enableSGR(SGR sgr);
     @Override
@@ -57,11 +56,11 @@ public interface IOSafeTerminal extends Terminal {
     @Override
     void resetColorAndSGR();
     @Override
-    void setForegroundColor(TextColor color);
+    void fore(TextColor color);
     @Override
-    void setBackgroundColor(TextColor color);
+    void back(TextColor color);
     @Override
-    TerminalSize getTerminalSize();
+    TerminalPosition terminalSize();
     @Override
     byte[] enquireTerminal(int timeout, TimeUnit timeoutUnit);
     @Override

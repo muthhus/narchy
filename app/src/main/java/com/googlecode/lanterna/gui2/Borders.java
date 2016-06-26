@@ -167,7 +167,7 @@ public class Borders {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "{" + title + "}";
+            return getClass().getSimpleName() + '{' + title + "}";
         }
     }
 
@@ -179,18 +179,18 @@ public class Borders {
         }
 
         @Override
-        public TerminalSize getPreferredSize(Border component) {
+        public TerminalPosition getPreferredSize(Border component) {
             StandardBorder border = (StandardBorder)component;
             Component wrappedComponent = border.getComponent();
-            TerminalSize preferredSize;
+            TerminalPosition preferredSize;
             if (wrappedComponent == null) {
-                preferredSize = TerminalSize.ZERO;
+                preferredSize = TerminalPosition.ZERO;
             } else {
                 preferredSize = wrappedComponent.getPreferredSize();
             }
-            preferredSize = preferredSize.withRelativeColumns(2).withRelativeRows(2);
+            preferredSize = preferredSize.withRelativeColumn(2).withRelativeRow(2);
             String borderTitle = border.getTitle();
-            return preferredSize.max(new TerminalSize((borderTitle.isEmpty() ? 2 : TerminalTextUtils.getColumnWidth(borderTitle) + 4), 2));
+            return preferredSize.max(new TerminalPosition((borderTitle.isEmpty() ? 2 : TerminalTextUtils.getColumnWidth(borderTitle) + 4), 2));
         }
 
         @Override
@@ -199,10 +199,10 @@ public class Borders {
         }
 
         @Override
-        public TerminalSize getWrappedComponentSize(TerminalSize borderSize) {
-            return borderSize
-                    .withRelativeColumns(-Math.min(2, borderSize.getColumns()))
-                    .withRelativeRows(-Math.min(2, borderSize.getRows()));
+        public TerminalPosition getWrappedComponentSize(TerminalPosition borderSize) {
+            int i = -Math.min(2, borderSize.column);
+            int i1 = -Math.min(2, borderSize.row);
+            return borderSize.withRelativeColumn(i).withRelativeRow(i1);
         }
 
         @Override
@@ -212,7 +212,7 @@ public class Borders {
             if(wrappedComponent == null) {
                 return;
             }
-            TerminalSize drawableArea = graphics.getSize();
+            TerminalPosition drawableArea = graphics.getSize();
 
             char horizontalLine = getHorizontalLine(graphics);
             char verticalLine = getVerticalLine(graphics);
@@ -227,13 +227,13 @@ public class Borders {
             else {
                 graphics.applyThemeStyle(graphics.getThemeDefinition(StandardBorder.class).getNormal());
             }
-            graphics.setCharacter(0, drawableArea.getRows() - 1, bottomLeftCorner);
-            if(drawableArea.getRows() > 2) {
-                graphics.drawLine(new TerminalPosition(0, drawableArea.getRows() - 2), new TerminalPosition(0, 1), verticalLine);
+            graphics.set(0, drawableArea.row - 1, bottomLeftCorner);
+            if(drawableArea.row > 2) {
+                graphics.drawLine(new TerminalPosition(0, drawableArea.row - 2), new TerminalPosition(0, 1), verticalLine);
             }
-            graphics.setCharacter(0, 0, topLeftCorner);
-            if(drawableArea.getColumns() > 2) {
-                graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.getColumns() - 2, 0), horizontalLine);
+            graphics.set(0, 0, topLeftCorner);
+            if(drawableArea.column > 2) {
+                graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.column - 2, 0), horizontalLine);
             }
 
             if(borderStyle == BorderStyle.ReverseBevel) {
@@ -242,20 +242,20 @@ public class Borders {
             else {
                 graphics.applyThemeStyle(graphics.getThemeDefinition(StandardBorder.class).getNormal());
             }
-            graphics.setCharacter(drawableArea.getColumns() - 1, 0, topRightCorner);
-            if(drawableArea.getRows() > 2) {
-                graphics.drawLine(new TerminalPosition(drawableArea.getColumns() - 1, 1),
-                        new TerminalPosition(drawableArea.getColumns() - 1, drawableArea.getRows() - 2),
+            graphics.set(drawableArea.column - 1, 0, topRightCorner);
+            if(drawableArea.row > 2) {
+                graphics.drawLine(new TerminalPosition(drawableArea.column - 1, 1),
+                        new TerminalPosition(drawableArea.column - 1, drawableArea.row - 2),
                         verticalLine);
             }
-            graphics.setCharacter(drawableArea.getColumns() - 1, drawableArea.getRows() - 1, bottomRightCorner);
-            if(drawableArea.getColumns() > 2) {
-                graphics.drawLine(new TerminalPosition(1, drawableArea.getRows() - 1),
-                        new TerminalPosition(drawableArea.getColumns() - 2, drawableArea.getRows() - 1),
+            graphics.set(drawableArea.column - 1, drawableArea.row - 1, bottomRightCorner);
+            if(drawableArea.column > 2) {
+                graphics.drawLine(new TerminalPosition(1, drawableArea.row - 1),
+                        new TerminalPosition(drawableArea.column - 2, drawableArea.row - 1),
                         horizontalLine);
             }
 
-            if(drawableArea.getColumns() >= TerminalTextUtils.getColumnWidth(border.getTitle()) + 4) {
+            if(drawableArea.column >= TerminalTextUtils.getColumnWidth(border.getTitle()) + 4) {
                 graphics.putString(2, 0, border.getTitle());
             }
 
@@ -281,16 +281,16 @@ public class Borders {
      * @param graphics Graphics to use when inspecting and joining characters
      */
     public static void joinLinesWithFrame(TextGraphics graphics) {
-        TerminalSize drawableArea = graphics.getSize();
-        if(drawableArea.getRows() <= 2 || drawableArea.getColumns() <= 2) {
+        TerminalPosition drawableArea = graphics.getSize();
+        if(drawableArea.row <= 2 || drawableArea.column <= 2) {
             //Too small
             return;
         }
 
         int upperRow = 0;
-        int lowerRow = drawableArea.getRows() - 1;
+        int lowerRow = drawableArea.row - 1;
         int leftRow = 0;
-        int rightRow = drawableArea.getColumns() - 1;
+        int rightRow = drawableArea.column - 1;
 
         List<Character> junctionFromBelowSingle = Arrays.asList(
                 Symbols.SINGLE_LINE_VERTICAL,
@@ -394,110 +394,110 @@ public class Borders {
                 Symbols.SINGLE_LINE_T_DOUBLE_LEFT);
 
         //Go horizontally and check vertical neighbours if it's possible to extend lines into the border
-        for(int column = 1; column < drawableArea.getColumns() - 1; column++) {
+        for(int column = 1; column < drawableArea.column - 1; column++) {
             //Check first row
-            TextCharacter borderCharacter = graphics.getCharacter(column, upperRow);
+            TextCharacter borderCharacter = graphics.get(column, upperRow);
             if(borderCharacter == null) {
                 continue;
             }
-            TextCharacter neighbourCharacter = graphics.getCharacter(column, upperRow + 1);
+            TextCharacter neighbourCharacter = graphics.get(column, upperRow + 1);
             if(neighbourCharacter != null) {
-                char neighbour = neighbourCharacter.getCharacter();
-                if(borderCharacter.getCharacter() == Symbols.SINGLE_LINE_HORIZONTAL) {
+                char neighbour = neighbourCharacter.c;
+                if(borderCharacter.c == Symbols.SINGLE_LINE_HORIZONTAL) {
                     if(junctionFromBelowSingle.contains(neighbour)) {
-                        graphics.setCharacter(column, upperRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOWN));
+                        graphics.set(column, upperRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOWN));
                     }
                     else if(junctionFromBelowDouble.contains(neighbour)) {
-                        graphics.setCharacter(column, upperRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_DOWN));
+                        graphics.set(column, upperRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_DOWN));
                     }
                 }
-                else if(borderCharacter.getCharacter() == Symbols.DOUBLE_LINE_HORIZONTAL) {
+                else if(borderCharacter.c == Symbols.DOUBLE_LINE_HORIZONTAL) {
                     if(junctionFromBelowSingle.contains(neighbour)) {
-                        graphics.setCharacter(column, upperRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_DOWN));
+                        graphics.set(column, upperRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_DOWN));
                     }
                     else if(junctionFromBelowDouble.contains(neighbour)) {
-                        graphics.setCharacter(column, upperRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_DOWN));
+                        graphics.set(column, upperRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_DOWN));
                     }
                 }
             }
 
             //Check last row
-            borderCharacter = graphics.getCharacter(column, lowerRow);
+            borderCharacter = graphics.get(column, lowerRow);
             if(borderCharacter == null) {
                 continue;
             }
-            neighbourCharacter = graphics.getCharacter(column, lowerRow - 1);
+            neighbourCharacter = graphics.get(column, lowerRow - 1);
             if(neighbourCharacter != null) {
-                char neighbour = neighbourCharacter.getCharacter();
-                if(borderCharacter.getCharacter() == Symbols.SINGLE_LINE_HORIZONTAL) {
+                char neighbour = neighbourCharacter.c;
+                if(borderCharacter.c == Symbols.SINGLE_LINE_HORIZONTAL) {
                     if(junctionFromAboveSingle.contains(neighbour)) {
-                        graphics.setCharacter(column, lowerRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_UP));
+                        graphics.set(column, lowerRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_UP));
                     }
                     else if(junctionFromAboveDouble.contains(neighbour)) {
-                        graphics.setCharacter(column, lowerRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_UP));
+                        graphics.set(column, lowerRow, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_UP));
                     }
                 }
-                else if(borderCharacter.getCharacter() == Symbols.DOUBLE_LINE_HORIZONTAL) {
+                else if(borderCharacter.c == Symbols.DOUBLE_LINE_HORIZONTAL) {
                     if(junctionFromAboveSingle.contains(neighbour)) {
-                        graphics.setCharacter(column, lowerRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_UP));
+                        graphics.set(column, lowerRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_UP));
                     }
                     else if(junctionFromAboveDouble.contains(neighbour)) {
-                        graphics.setCharacter(column, lowerRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_UP));
+                        graphics.set(column, lowerRow, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_UP));
                     }
                 }
             }
         }
 
         //Go vertically and check horizontal neighbours if it's possible to extend lines into the border
-        for(int row = 1; row < drawableArea.getRows() - 1; row++) {
+        for(int row = 1; row < drawableArea.row - 1; row++) {
             //Check first column
-            TextCharacter borderCharacter = graphics.getCharacter(leftRow, row);
+            TextCharacter borderCharacter = graphics.get(leftRow, row);
             if(borderCharacter == null) {
                 continue;
             }
-            TextCharacter neighbourCharacter = graphics.getCharacter(leftRow + 1, row);
+            TextCharacter neighbourCharacter = graphics.get(leftRow + 1, row);
             if(neighbourCharacter != null) {
-                char neighbour = neighbourCharacter.getCharacter();
-                if(borderCharacter.getCharacter() == Symbols.SINGLE_LINE_VERTICAL) {
+                char neighbour = neighbourCharacter.c;
+                if(borderCharacter.c == Symbols.SINGLE_LINE_VERTICAL) {
                     if(junctionFromRightSingle.contains(neighbour)) {
-                        graphics.setCharacter(leftRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_RIGHT));
+                        graphics.set(leftRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_RIGHT));
                     }
                     else if(junctionFromRightDouble.contains(neighbour)) {
-                        graphics.setCharacter(leftRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_RIGHT));
+                        graphics.set(leftRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_RIGHT));
                     }
                 }
-                else if(borderCharacter.getCharacter() == Symbols.DOUBLE_LINE_VERTICAL) {
+                else if(borderCharacter.c == Symbols.DOUBLE_LINE_VERTICAL) {
                     if(junctionFromRightSingle.contains(neighbour)) {
-                        graphics.setCharacter(leftRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_RIGHT));
+                        graphics.set(leftRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_RIGHT));
                     }
                     else if(junctionFromRightDouble.contains(neighbour)) {
-                        graphics.setCharacter(leftRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_RIGHT));
+                        graphics.set(leftRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_RIGHT));
                     }
                 }
             }
 
             //Check last column
-            borderCharacter = graphics.getCharacter(rightRow, row);
+            borderCharacter = graphics.get(rightRow, row);
             if(borderCharacter == null) {
                 continue;
             }
-            neighbourCharacter = graphics.getCharacter(rightRow - 1, row);
+            neighbourCharacter = graphics.get(rightRow - 1, row);
             if(neighbourCharacter != null) {
-                char neighbour = neighbourCharacter.getCharacter();
-                if(borderCharacter.getCharacter() == Symbols.SINGLE_LINE_VERTICAL) {
+                char neighbour = neighbourCharacter.c;
+                if(borderCharacter.c == Symbols.SINGLE_LINE_VERTICAL) {
                     if(junctionFromLeftSingle.contains(neighbour)) {
-                        graphics.setCharacter(rightRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_LEFT));
+                        graphics.set(rightRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_LEFT));
                     }
                     else if(junctionFromLeftDouble.contains(neighbour)) {
-                        graphics.setCharacter(rightRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_LEFT));
+                        graphics.set(rightRow, row, borderCharacter.withCharacter(Symbols.SINGLE_LINE_T_DOUBLE_LEFT));
                     }
                 }
-                else if(borderCharacter.getCharacter() == Symbols.DOUBLE_LINE_VERTICAL) {
+                else if(borderCharacter.c == Symbols.DOUBLE_LINE_VERTICAL) {
                     if(junctionFromLeftSingle.contains(neighbour)) {
-                        graphics.setCharacter(rightRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_LEFT));
+                        graphics.set(rightRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_SINGLE_LEFT));
                     }
                     else if(junctionFromLeftDouble.contains(neighbour)) {
-                        graphics.setCharacter(rightRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_LEFT));
+                        graphics.set(rightRow, row, borderCharacter.withCharacter(Symbols.DOUBLE_LINE_T_LEFT));
                     }
                 }
             }

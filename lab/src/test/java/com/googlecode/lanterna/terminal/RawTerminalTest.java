@@ -32,14 +32,14 @@ public class RawTerminalTest {
         Terminal terminal = new TestTerminalFactory(args).createTerminal();
         terminal.enterPrivateMode();
         terminal.clearScreen();
-        terminal.setCursorPosition(10, 5);
-        terminal.putCharacter('H');
-        terminal.putCharacter('e');
-        terminal.putCharacter('l');
-        terminal.putCharacter('l');
-        terminal.putCharacter('o');
-        terminal.putCharacter('!');
-        terminal.setCursorPosition(0, 0);
+        terminal.moveCursorTo(10, 5);
+        terminal.put('H');
+        terminal.put('e');
+        terminal.put('l');
+        terminal.put('l');
+        terminal.put('o');
+        terminal.put('!');
+        terminal.moveCursorTo(0, 0);
         terminal.flush();
 
         Thread.sleep(5000);

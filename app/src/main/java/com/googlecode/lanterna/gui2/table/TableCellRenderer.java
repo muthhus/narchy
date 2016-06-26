@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
 /**
@@ -36,7 +36,7 @@ public interface TableCellRenderer<V> {
      * @param rowIndex Row index of the cell
      * @return Size this renderer would like the cell to have
      */
-    TerminalSize getPreferredSize(Table<V> table, V cell, int columnIndex, int rowIndex);
+    TerminalPosition getPreferredSize(Table<V> table, V cell, int columnIndex, int rowIndex);
 
     /**
      * Called by the table when it's time to draw a cell, you can see how much size is available by checking the size of

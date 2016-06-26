@@ -35,12 +35,12 @@ class TextBuffer {
     private final LinkedList<List<TextCharacter>> lines;
 
     TextBuffer() {
-        this.lines = new LinkedList<List<TextCharacter>>();
+        this.lines = new LinkedList<>();
         newLine();
     }
 
     synchronized void newLine() {
-        lines.add(new ArrayList<TextCharacter>(200));
+        lines.add(new ArrayList<>(200));
     }
 
     synchronized void removeTopLines(int numberOfLinesToRemove) {
@@ -62,7 +62,7 @@ class TextBuffer {
         return lines.size();
     }
 
-    synchronized int setCharacter(int lineNumber, int columnIndex, TextCharacter textCharacter) {
+    synchronized int set(int lineNumber, int columnIndex, TextCharacter textCharacter) {
         if(lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.setCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);
@@ -94,12 +94,12 @@ class TextBuffer {
 
         if(textCharacter.isDoubleWidth()) {
             // We don't report this column as dirty (yet), it's implied since a double-width character is reported
-            setCharacter(lineNumber, columnIndex + 1, DOUBLE_WIDTH_CHAR_PADDING);
+            set(lineNumber, columnIndex + 1, DOUBLE_WIDTH_CHAR_PADDING);
         }
         return returnStyle;
     }
 
-    synchronized TextCharacter getCharacter(int lineNumber, int columnIndex) {
+    synchronized TextCharacter get(int lineNumber, int columnIndex) {
         if(lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.getCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);

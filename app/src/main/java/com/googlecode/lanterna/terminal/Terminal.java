@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.InputProvider;
@@ -86,7 +85,7 @@ public interface Terminal extends InputProvider {
      * @param y The 0-indexed row to place the cursor at
      * @throws IOException If there was an underlying I/O error
      */
-    void setCursorPosition(int x, int y) throws IOException;
+    void moveCursorTo(int x, int y) throws IOException;
 
     /**
      * Same as calling {@code setCursorPosition(position.getColumn(), position.getRow())}
@@ -94,7 +93,7 @@ public interface Terminal extends InputProvider {
      * @param position Position to place the cursor at
      * @throws IOException If there was an underlying I/O error
      */
-    void setCursorPosition(TerminalPosition position) throws IOException;
+    void moveCursorTo(TerminalPosition position) throws IOException;
 
     /**
      * Returns the position of the cursor, as reported by the terminal. The top-left corner has coordinates 0 x 0 and
@@ -102,7 +101,7 @@ public interface Terminal extends InputProvider {
      * @return Position of the cursor
      * @throws IOException In there was an underlying I/O error
      */
-    TerminalPosition getCursorPosition() throws IOException;
+    TerminalPosition cursor() throws IOException;
 
     /**
      * Hides or shows the text cursor, but not all terminal (-emulators) supports this. The text cursor is normally a
@@ -134,11 +133,11 @@ public interface Terminal extends InputProvider {
      * @param c Character to place on the terminal
      * @throws IOException If there was an underlying I/O error
      */
-    void putCharacter(char c) throws IOException;
+    void put(char c) throws IOException;
 
-    default void putString(String string) throws IOException {
+    default void put(String string) throws IOException {
         for(int i = 0; i < string.length(); i++) {
-            putCharacter(string.charAt(i));
+            put(string.charAt(i));
         }
     }
 
@@ -194,7 +193,7 @@ public interface Terminal extends InputProvider {
      * @param color Color to use for foreground
      * @throws IOException If there was an underlying I/O error
      */
-    void setForegroundColor(TextColor color) throws IOException;
+    void fore(TextColor color) throws IOException;
 
     /**
      * Changes the background color for all the following characters put to the terminal. The background color is the
@@ -209,7 +208,7 @@ public interface Terminal extends InputProvider {
      * @param color Color to use for the background
      * @throws IOException If there was an underlying I/O error
      */
-    void setBackgroundColor(TextColor color) throws IOException;
+    void back(TextColor color) throws IOException;
 
     /**
      * Adds a {@link TerminalResizeListener} to be called when the terminal has changed size. There is no guarantee that
@@ -247,7 +246,7 @@ public interface Terminal extends InputProvider {
      * @return Size of the terminal
      * @throws IOException if there was an I/O error trying to retrieve the size of the terminal
      */
-    TerminalSize getTerminalSize() throws IOException;
+    TerminalPosition terminalSize() throws IOException;
 
     /**
      * Retrieves optional information from the terminal by printing the ENQ ({@literal \}u005) character. Terminals and terminal

@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 
 /**
  * AbstractComponent provides some good default behaviour for a {@code Component}, all components in Lanterna extends
@@ -43,8 +42,8 @@ import com.googlecode.lanterna.TerminalSize;
 public abstract class AbstractComponent<T extends Component> implements Component {
     private ComponentRenderer<T> renderer;
     private Container parent;
-    private TerminalSize size;
-    private TerminalSize explicitPreferredSize;   //This is keeping the value set by the user (if setPreferredSize() is used)
+    private TerminalPosition size;
+    private TerminalPosition explicitPreferredSize;   //This is keeping the value set by the user (if setPreferredSize() is used)
     private TerminalPosition position;
     private LayoutData layoutData;
     private boolean invalid;
@@ -53,7 +52,7 @@ public abstract class AbstractComponent<T extends Component> implements Componen
      * Default constructor
      */
     public AbstractComponent() {
-        size = TerminalSize.ZERO;
+        size = TerminalPosition.ZERO;
         position = TerminalPosition.TOP_LEFT_CORNER;
         explicitPreferredSize = null;
         layoutData = null;
@@ -86,11 +85,7 @@ public abstract class AbstractComponent<T extends Component> implements Componen
         }
         try {
             return (ComponentRenderer<T>)Class.forName(className).newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (InstantiationException | ClassNotFoundException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -136,18 +131,18 @@ public abstract class AbstractComponent<T extends Component> implements Componen
     }
 
     @Override
-    public synchronized T setSize(TerminalSize size) {
+    public synchronized T setSize(TerminalPosition size) {
         this.size = size;
         return self();
     }
 
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return size;
     }
 
     @Override
-    public final TerminalSize getPreferredSize() {
+    public final TerminalPosition getPreferredSize() {
         if(explicitPreferredSize != null) {
             return explicitPreferredSize;
         }
@@ -157,7 +152,7 @@ public abstract class AbstractComponent<T extends Component> implements Componen
     }
 
     @Override
-    public final synchronized T setPreferredSize(TerminalSize explicitPreferredSize) {
+    public final synchronized T setPreferredSize(TerminalPosition explicitPreferredSize) {
         this.explicitPreferredSize = explicitPreferredSize;
         return self();
     }
@@ -167,7 +162,7 @@ public abstract class AbstractComponent<T extends Component> implements Componen
      * preferred size and isn't necessarily what it will eventually be assigned later on.
      * @return Size that the component renderer believes the component should be
      */
-    protected synchronized TerminalSize calculatePreferredSize() {
+    protected synchronized TerminalPosition calculatePreferredSize() {
         return getRenderer().getPreferredSize(self());
     }
 

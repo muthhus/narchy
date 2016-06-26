@@ -25,7 +25,7 @@ public class OutputChar {
 		screen.startScreen();
 		screen.clear();
 
-		screen.setCharacter(10, 10, new TextCharacter('*'));
+		screen.set(10, 10, new TextCharacter('*'));
 		screen.refresh();
 
 		screen.readInput();

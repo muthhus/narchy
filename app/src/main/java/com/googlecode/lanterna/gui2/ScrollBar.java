@@ -19,7 +19,7 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.Symbols;
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.graphics.ThemeDefinition;
 
 /**
@@ -129,10 +129,10 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
             return viewSize;
         }
         if(direction == Direction.HORIZONTAL) {
-            return getSize().getColumns();
+            return getSize().column;
         }
         else {
-            return getSize().getRows();
+            return getSize().row;
         }
     }
 
@@ -146,8 +146,8 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
      */
     public static abstract class ScrollBarRenderer implements ComponentRenderer<ScrollBar> {
         @Override
-        public TerminalSize getPreferredSize(ScrollBar component) {
-            return TerminalSize.ONE;
+        public TerminalPosition getPreferredSize(ScrollBar component) {
+            return TerminalPosition.ONE;
         }
     }
 
@@ -178,13 +178,13 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
 
         @Override
         public void drawComponent(TextGUIGraphics graphics, ScrollBar component) {
-            TerminalSize size = graphics.getSize();
+            TerminalPosition size = graphics.getSize();
             Direction direction = component.getDirection();
             int position = component.getScrollPosition();
             int maximum = component.getScrollMaximum();
             int viewSize = component.getViewSize();
 
-            if(size.getRows() == 0 || size.getColumns() == 0) {
+            if(size.row == 0 || size.column == 0) {
                 return;
             }
 
@@ -198,15 +198,15 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
             graphics.applyThemeStyle(themeDefinition.getNormal());
 
             if(direction == Direction.VERTICAL) {
-                if(size.getRows() == 1) {
-                    graphics.setCharacter(0, 0, themeDefinition.getCharacter("VERTICAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
+                if(size.row == 1) {
+                    graphics.set(0, 0, themeDefinition.getCharacter("VERTICAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
                 }
-                else if(size.getRows() == 2) {
-                    graphics.setCharacter(0, 0, themeDefinition.getCharacter("UP_ARROW", Symbols.ARROW_UP));
-                    graphics.setCharacter(0, 1, themeDefinition.getCharacter("DOWN_ARROW", Symbols.ARROW_DOWN));
+                else if(size.row == 2) {
+                    graphics.set(0, 0, themeDefinition.getCharacter("UP_ARROW", Symbols.ARROW_UP));
+                    graphics.set(0, 1, themeDefinition.getCharacter("DOWN_ARROW", Symbols.ARROW_DOWN));
                 }
                 else {
-                    int scrollableArea = size.getRows() - 2;
+                    int scrollableArea = size.row - 2;
                     int scrollTrackerSize = 1;
                     if(growScrollTracker) {
                         float ratio = clampRatio((float) viewSize / (float) maximum);
@@ -216,34 +216,34 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
                     float ratio = clampRatio((float)position / (float)(maximum - viewSize));
                     int scrollTrackerPosition = (int)(ratio * (float)(scrollableArea - scrollTrackerSize)) + 1;
 
-                    graphics.setCharacter(0, 0, themeDefinition.getCharacter("UP_ARROW", Symbols.ARROW_UP));
-                    graphics.drawLine(0, 1, 0, size.getRows() - 2, themeDefinition.getCharacter("VERTICAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
-                    graphics.setCharacter(0, size.getRows() - 1, themeDefinition.getCharacter("DOWN_ARROW", Symbols.ARROW_DOWN));
+                    graphics.set(0, 0, themeDefinition.getCharacter("UP_ARROW", Symbols.ARROW_UP));
+                    graphics.drawLine(0, 1, 0, size.row - 2, themeDefinition.getCharacter("VERTICAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
+                    graphics.set(0, size.row - 1, themeDefinition.getCharacter("DOWN_ARROW", Symbols.ARROW_DOWN));
                     if(scrollTrackerSize == 1) {
-                        graphics.setCharacter(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
+                        graphics.set(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
                     }
                     else if(scrollTrackerSize == 2) {
-                        graphics.setCharacter(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_TRACKER_TOP", (char)0x28c));
-                        graphics.setCharacter(0, scrollTrackerPosition + 1, themeDefinition.getCharacter("VERTICAL_TRACKER_BOTTOM", 'v'));
+                        graphics.set(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_TRACKER_TOP", (char)0x28c));
+                        graphics.set(0, scrollTrackerPosition + 1, themeDefinition.getCharacter("VERTICAL_TRACKER_BOTTOM", 'v'));
                     }
                     else {
-                        graphics.setCharacter(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_TRACKER_TOP", (char)0x28c));
+                        graphics.set(0, scrollTrackerPosition, themeDefinition.getCharacter("VERTICAL_TRACKER_TOP", (char)0x28c));
                         graphics.drawLine(0, scrollTrackerPosition + 1, 0, scrollTrackerPosition + scrollTrackerSize - 2, themeDefinition.getCharacter("VERTICAL_TRACKER_BACKGROUND", ' '));
-                        graphics.setCharacter(0, scrollTrackerPosition + (scrollTrackerSize / 2), themeDefinition.getCharacter("VERTICAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
-                        graphics.setCharacter(0, scrollTrackerPosition + scrollTrackerSize - 1, themeDefinition.getCharacter("VERTICAL_TRACKER_BOTTOM", 'v'));
+                        graphics.set(0, scrollTrackerPosition + (scrollTrackerSize / 2), themeDefinition.getCharacter("VERTICAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
+                        graphics.set(0, scrollTrackerPosition + scrollTrackerSize - 1, themeDefinition.getCharacter("VERTICAL_TRACKER_BOTTOM", 'v'));
                     }
                 }
             }
             else {
-                if(size.getColumns() == 1) {
-                    graphics.setCharacter(0, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
+                if(size.column == 1) {
+                    graphics.set(0, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
                 }
-                else if(size.getColumns() == 2) {
-                    graphics.setCharacter(0, 0, Symbols.ARROW_LEFT);
-                    graphics.setCharacter(1, 0, Symbols.ARROW_RIGHT);
+                else if(size.column == 2) {
+                    graphics.set(0, 0, Symbols.ARROW_LEFT);
+                    graphics.set(1, 0, Symbols.ARROW_RIGHT);
                 }
                 else {
-                    int scrollableArea = size.getColumns() - 2;
+                    int scrollableArea = size.column - 2;
                     int scrollTrackerSize = 1;
                     if(growScrollTracker) {
                         float ratio = clampRatio((float) viewSize / (float) maximum);
@@ -253,27 +253,27 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
                     float ratio = clampRatio((float)position / (float)(maximum - viewSize));
                     int scrollTrackerPosition = (int)(ratio * (float)(scrollableArea - scrollTrackerSize)) + 1;
 
-                    graphics.setCharacter(0, 0, themeDefinition.getCharacter("LEFT_ARROW", Symbols.ARROW_LEFT));
-                    graphics.drawLine(1, 0, size.getColumns() - 2, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
-                    graphics.setCharacter(size.getColumns() - 1, 0, themeDefinition.getCharacter("RIGHT_ARROW", Symbols.ARROW_RIGHT));
+                    graphics.set(0, 0, themeDefinition.getCharacter("LEFT_ARROW", Symbols.ARROW_LEFT));
+                    graphics.drawLine(1, 0, size.column - 2, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
+                    graphics.set(size.column - 1, 0, themeDefinition.getCharacter("RIGHT_ARROW", Symbols.ARROW_RIGHT));
                     if(scrollTrackerSize == 1) {
-                        graphics.setCharacter(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
+                        graphics.set(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
                     }
                     else if(scrollTrackerSize == 2) {
-                        graphics.setCharacter(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_LEFT", '<'));
-                        graphics.setCharacter(scrollTrackerPosition + 1, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_RIGHT", '>'));
+                        graphics.set(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_LEFT", '<'));
+                        graphics.set(scrollTrackerPosition + 1, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_RIGHT", '>'));
                     }
                     else {
-                        graphics.setCharacter(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_LEFT", '<'));
+                        graphics.set(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_LEFT", '<'));
                         graphics.drawLine(scrollTrackerPosition + 1, 0, scrollTrackerPosition + scrollTrackerSize - 2, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_BACKGROUND", ' '));
-                        graphics.setCharacter(scrollTrackerPosition + (scrollTrackerSize / 2), 0, themeDefinition.getCharacter("HORIZONTAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
-                        graphics.setCharacter(scrollTrackerPosition + scrollTrackerSize - 1, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_RIGHT", '>'));
+                        graphics.set(scrollTrackerPosition + (scrollTrackerSize / 2), 0, themeDefinition.getCharacter("HORIZONTAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
+                        graphics.set(scrollTrackerPosition + scrollTrackerSize - 1, 0, themeDefinition.getCharacter("HORIZONTAL_TRACKER_RIGHT", '>'));
                     }
                 }
             }
         }
 
-        private float clampRatio(float value) {
+        private static float clampRatio(float value) {
             if(value < 0.0f) {
                 return 0.0f;
             }

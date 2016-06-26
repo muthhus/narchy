@@ -20,7 +20,6 @@ package com.googlecode.lanterna.gui2;
 
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 
 /**
  * Abstract implementation of {@code Border} interface that has some of the methods filled out. If you want to create
@@ -42,7 +41,7 @@ public abstract class AbstractBorder extends AbstractComposite<Border> implement
     }
 
     @Override
-    public Border setSize(TerminalSize size) {
+    public Border setSize(TerminalPosition size) {
         super.setSize(size);
         getComponent().setSize(getWrappedComponentSize(size));
         return self();
@@ -73,7 +72,7 @@ public abstract class AbstractBorder extends AbstractComposite<Border> implement
         return getRenderer().getWrappedComponentTopLeftOffset();
     }
 
-    private TerminalSize getWrappedComponentSize(TerminalSize borderSize) {
+    private TerminalPosition getWrappedComponentSize(TerminalPosition borderSize) {
         return getRenderer().getWrappedComponentSize(borderSize);
     }
 }

@@ -19,7 +19,6 @@
 package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 
 /**
@@ -30,9 +29,9 @@ import com.googlecode.lanterna.TextCharacter;
 class SubTextGraphics extends AbstractTextGraphics {
     private final TextGraphics underlyingTextGraphics;
     private final TerminalPosition topLeft;
-    private final TerminalSize writableAreaSize;
+    private final TerminalPosition writableAreaSize;
 
-    SubTextGraphics(TextGraphics underlyingTextGraphics, TerminalPosition topLeft, TerminalSize writableAreaSize) {
+    SubTextGraphics(TextGraphics underlyingTextGraphics, TerminalPosition topLeft, TerminalPosition writableAreaSize) {
         this.underlyingTextGraphics = underlyingTextGraphics;
         this.topLeft = topLeft;
         this.writableAreaSize = writableAreaSize;
@@ -43,25 +42,25 @@ class SubTextGraphics extends AbstractTextGraphics {
     }
 
     @Override
-    public TextGraphics setCharacter(int columnIndex, int rowIndex, TextCharacter textCharacter) {
-        TerminalSize writableArea = getSize();
-        if(columnIndex < 0 || columnIndex >= writableArea.getColumns() ||
-                rowIndex < 0 || rowIndex >= writableArea.getRows()) {
+    public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
+        TerminalPosition writableArea = getSize();
+        if(columnIndex < 0 || columnIndex >= writableArea.column ||
+                rowIndex < 0 || rowIndex >= writableArea.row) {
             return this;
         }
         TerminalPosition projectedPosition = project(columnIndex, rowIndex);
-        underlyingTextGraphics.setCharacter(projectedPosition, textCharacter);
+        underlyingTextGraphics.set(projectedPosition, textCharacter);
         return this;
     }
 
     @Override
-    public TerminalSize getSize() {
+    public TerminalPosition getSize() {
         return writableAreaSize;
     }
 
     @Override
-    public TextCharacter getCharacter(int column, int row) {
+    public TextCharacter get(int column, int row) {
         TerminalPosition projectedPosition = project(column, row);
-        return underlyingTextGraphics.getCharacter(projectedPosition.getColumn(), projectedPosition.getRow());
+        return underlyingTextGraphics.get(projectedPosition.column, projectedPosition.row);
     }
 }
