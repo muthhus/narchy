@@ -54,7 +54,7 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
 
     final List<GraphInput<O,?>> inputs = new FasterList<>(1);
-    private Function<O, Atomatter<O>> materialize;
+    private Function<O, Atomatter<O>> materialize = x -> (Atomatter<O>)x;
 
     final WeakValueHashMap<O, Atomatter<O>> atoms;
 

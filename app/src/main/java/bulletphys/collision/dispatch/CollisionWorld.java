@@ -36,6 +36,8 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.function.Predicate;
 
+import static javax.vecmath.Vector3f.v;
+
 /**
  * CollisionWorld is interface and container for the collision detection.
  * 
@@ -528,45 +530,55 @@ public class CollisionWorld<X> {
 	 * rayTest performs a raycast on all objects in the CollisionWorld, and calls the resultCallback.
 	 * This allows for several queries: first hit, all hits, any hit, dependent on the value returned by the callback.
 	 */
-	public void rayTest(Vector3f rayFromWorld, Vector3f rayToWorld, RayResultCallback resultCallback) {
-		Transform rayFromTrans = new Transform(), rayToTrans = new Transform();
-		rayFromTrans.setIdentity();
-		rayFromTrans.origin.set(rayFromWorld);
-		rayToTrans.setIdentity();
+	public RayResultCallback rayTest(Vector3f rayFromWorld, Vector3f rayToWorld, RayResultCallback resultCallback) {
 
-		rayToTrans.origin.set(rayToWorld);
+
+		Transform rayFromTrans = new Transform(rayFromWorld);
+		Transform rayToTrans = new Transform(rayToWorld);
 
 		// go over all objects, and if the ray intersects their aabb, do a ray-shape query using convexCaster (CCD)
-		Vector3f collisionObjectAabbMin = new Vector3f(), collisionObjectAabbMax = new Vector3f();
+		Vector3f collisionObjectAabbMin = v(), collisionObjectAabbMax = v();
 		float[] hitLambda = new float[1];
 
 		Transform tmpTrans = new Transform();
-		
-		for (int i = 0; i < collisionObjects.size(); i++) {
+
+		ObjectArrayList<CollisionObject<X>> objs = this.collisionObjects;
+		int n = objs.size();
+		for (int i = 0; i < n; i++) {
 			// terminate further ray tests, once the closestHitFraction reached zero
 			if (resultCallback.closestHitFraction == 0f) {
 				break;
 			}
 
 			//return array[index];
-			CollisionObject collisionObject = collisionObjects.get(i);
+			CollisionObject collisionObject = objs.get(i);
+
+			BroadphaseProxy broadphaseHandle = collisionObject.getBroadphaseHandle();
+
 			// only perform raycast if filterMask matches
-			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
+			if (broadphaseHandle!=null && resultCallback.needsCollision(broadphaseHandle)) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
-				collisionObject.shape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
+				CollisionShape shape = collisionObject.shape();
+
+				Transform collisionObjWorld = collisionObject.getWorldTransform(tmpTrans);
+
+				shape.getAabb(collisionObjWorld, collisionObjectAabbMin, collisionObjectAabbMax);
 
 				hitLambda[0] = resultCallback.closestHitFraction;
-				Vector3f hitNormal = new Vector3f();
-				if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
+
+
+				if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda)) {
 					rayTestSingle(rayFromTrans, rayToTrans,
 							collisionObject,
-							collisionObject.shape(),
-							collisionObject.getWorldTransform(tmpTrans),
+							shape,
+							collisionObjWorld,
 							resultCallback);
 				}
 			}
 
 		}
+
+		return resultCallback;
 	}
 
 	/**
@@ -682,10 +694,23 @@ public class CollisionWorld<X> {
 
 		public final Vector3f hitNormalWorld = new Vector3f();
 		public final Vector3f hitPointWorld = new Vector3f();
-		
+
+		public ClosestRayResultCallback(short group) {
+			collisionFilterGroup = group;
+		}
+
 		public ClosestRayResultCallback(Vector3f rayFromWorld, Vector3f rayToWorld) {
+			set(rayFromWorld, rayToWorld);
+		}
+
+		public ClosestRayResultCallback set(Vector3f rayFromWorld, Vector3f rayToWorld) {
 			this.rayFromWorld.set(rayFromWorld);
 			this.rayToWorld.set(rayToWorld);
+			hitNormalWorld.zero();
+			hitPointWorld.zero();
+			closestHitFraction = 1f;
+			collisionObject = null;
+			return this;
 		}
 		
 		@Override

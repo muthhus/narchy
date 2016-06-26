@@ -110,8 +110,8 @@ public class Vector3f extends Tuple3f implements java.io.Serializable {
         super();
     }
 
-    public static Vector3f v(Vector3f copied) {
-        return new Vector3f(copied);
+    public static Vector3f v(Vector3f copy) {
+        return new Vector3f(copy);
     }
 
     public static Vector3f v() {

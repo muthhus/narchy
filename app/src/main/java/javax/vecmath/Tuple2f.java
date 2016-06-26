@@ -210,6 +210,9 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
         this.y -= t1.y;
     }
 
+    public final void sub(float dx, float dy) {
+        set(this.x - dx, this.y - dy);
+    }
 
     /**
      * Sets the value of this tuple to the negation of tuple t1.
@@ -255,7 +258,11 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
 	this.x *= s;
 	this.y *= s;
     }
-
+    public final void scale(float sx, float sy)
+    {
+        this.x *= sx;
+        this.y *= sy;
+    }
 
     /**
      * Sets the value of this tuple to the scalar multiplication
@@ -587,4 +594,8 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
 	public final void setY(float y) {
 		this.y = y;
 	}
+
+    public void add(float dx, float dy) {
+        set(x + dx, y + dy);
+    }
 }

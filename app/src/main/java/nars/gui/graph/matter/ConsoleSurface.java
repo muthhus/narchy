@@ -13,7 +13,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Surface;
-import nars.gui.graph.SurfaceMount;
 import nars.util.Util;
 
 import java.io.IOException;

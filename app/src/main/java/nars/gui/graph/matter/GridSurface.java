@@ -53,8 +53,8 @@ public class GridSurface extends Surface {
     }
 
     protected void layoutLinear(float dx, float dy) {
-        float x = 0;
-        float y = 0;
+        float x = 0f;
+        float y = 0f;
         int n = children.size();
         for (int i = 0; i < n; i++) {
             Surface c = children.get(i);

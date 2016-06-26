@@ -58,6 +58,7 @@ import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
@@ -103,16 +104,18 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     protected final Vector3f camPos = new Vector3f();
     protected final Vector3f camPosTarget;
     protected final Vector3f camDir = new Vector3f();
+    protected final Vector3f camUp;
     protected final MutableFloat cameraDistance;
     protected final MutableFloat ele;
     protected final MutableFloat azi;
+    float top, bottom, nearPlane, tanFovV, tanFovH, fov, farPlane, left, right;
+
     int zNear = 1;
     int zFar = 500;
 
-    float top, bottom, nearPlane, tanFovV, tanFovH, fov, farPlane, left, right;
 
+    final CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(((short)(1 << 7)));
 
-    protected final Vector3f camUp;
     protected int forwardAxis = 2;
 
     protected int screenWidth = 0;
@@ -303,11 +306,11 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     // MouseMotionListener
     //
     public void mouseDragged(MouseEvent e) {
-
         mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
     }
 
     public void mouseMoved(MouseEvent e) {
+        mouseMotionFunc(e.getX(), e.getY(), e.getButtonsDown());
     }
 
     //
@@ -829,27 +832,41 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     }
 
     public CollisionWorld.ClosestRayResultCallback mousePick(Vector3f rayTo) {
-        CollisionWorld.ClosestRayResultCallback rayCallback = new CollisionWorld.ClosestRayResultCallback(camPos, rayTo);
-
-        rayCallback.collisionFilterGroup = (1 << 7);
-
-        dyn.rayTest(camPos, rayTo, rayCallback);
-        return rayCallback;
+        CollisionWorld.ClosestRayResultCallback r = this.rayCallback;
+        Vector3f camPos = this.camPos;
+        dyn.rayTest(camPos, rayTo, r.set(camPos, rayTo));
+        return r;
     }
 
-    private void mouseMotionFunc(int x, int y, short[] buttons) {
+    private boolean mouseMotionFunc(int x, int y, short[] buttons) {
         if (mouseDragPrevX >= 0) {
             mouseDragDX = (x) - mouseDragPrevX;
             mouseDragDY = (y) - mouseDragPrevY;
         }
 
+        Vector3f ray = v(rayTo(x, y));
+        CollisionWorld.ClosestRayResultCallback mouseTouch = mousePick(ray);
+        /*System.out.println(mouseTouch.collisionObject + " touched with " +
+            Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
+        );*/
+
+        if (mouseTouch.collisionObject!=null) {
+            Object t = mouseTouch.collisionObject.getUserPointer();
+            if (t instanceof Atomatter) {
+                Atomatter a = ((Atomatter)t);
+                if (!a.onTouch(mouseTouch.hitPointWorld, buttons)) {
+                    //absorbed
+                    return true;
+                }
+            }
+        }
+
         if ((pickConstraint != null) || (directDrag != null)) {
 
             // keep it at the same picking distance
-            Vector3f newRayTo = v(rayTo(x, y));
             Vector3f eyePos = v(camPos);
             Vector3f dir = v();
-            dir.sub(newRayTo, eyePos);
+            dir.sub(ray, eyePos);
             dir.normalize();
             dir.scale(gOldPickingDist);
 
@@ -872,11 +889,14 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                     ((Motion) mm).center(newPos);
                 }
 
+                return true;
             } else if (pickConstraint != null) {
                 // move the constraint pivot
                 Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
                 p2p.setPivotB(newPos);
+                return true;
             }
+
         } else {
 
             if (mouseDragPrevX >= 0) {
@@ -920,9 +940,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                                     //camPosTarget.scaleAdd(px, vx);
                                     //camPosTarget.scaleAdd(py, camUp);
                                 }
-                                break;
+                                return true;
                             case 3:
-                                //right mouse
+                                //right mouse drag = rotate
                                 //                        nextAzi += dx * btScalar(0.2);
                                 //                        nextAzi = fmodf(nextAzi, btScalar(360.f));
                                 //                        nextEle += dy * btScalar(0.2);
@@ -931,15 +951,12 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
                                 //nextAzi = fmodf(nextAzi, btScalar(360.f));
                                 ele.setValue(ele.floatValue() + mouseDragDY * (0.2f));
                                 //nextEle = fmodf(nextEle, btScalar(180.f));
-                                break;
+                                return true;
                             case 2:
-                                //middle mouse
+                                //middle mouse drag = zoom
 
                                 setCameraDistance( cameraDistance.floatValue() - mouseDragDY * 0.5f );
-
-
-
-                                break;
+                                return true;
                         }
                     }
                 }
@@ -948,6 +965,9 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
             mouseDragPrevX = x;
             mouseDragPrevY = y;
         }
+
+        return false;
+
     }
 
     /**

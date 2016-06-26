@@ -53,6 +53,15 @@ public class Transform {
 	public Transform() {
 	}
 
+	public Transform(Vector3f v) {
+		setIdentity();
+		origin.set(v);
+	}
+
+	public static Transform t() {
+		return new Transform();
+	}
+
 	public Transform(Matrix3f mat) {
 		basis.set(mat);
 	}
@@ -64,7 +73,11 @@ public class Transform {
 	public Transform(Transform tr) {
 		set(tr);
 	}
-	
+
+	public static Transform t(Transform copy) {
+        return new Transform(copy);
+    }
+
 	public void set(Transform tr) {
 		basis.set(tr.basis);
 		origin.set(tr.origin);
@@ -80,25 +93,28 @@ public class Transform {
 		origin.set(mat.m03, mat.m13, mat.m23);
 	}
 	
-	public void transform(Vector3f v) {
+	public Vector3f transform(Vector3f v) {
 		basis.transform(v);
 		v.add(origin);
+		return v;
 	}
 
-	public void setIdentity() {
+	public Transform setIdentity() {
 		basis.setIdentity();
 		origin.set(0f, 0f, 0f);
+		return this;
 	}
 	
-	public void inverse() {
+	public Transform inverse() {
 		basis.transpose();
 		origin.scale(-1f);
 		basis.transform(origin);
+		return this;
 	}
 
-	public void inverse(Transform tr) {
+	public Transform  inverse(Transform tr) {
 		set(tr);
-		inverse();
+		return inverse();
 	}
 	
 	public void mul(Transform tr) {

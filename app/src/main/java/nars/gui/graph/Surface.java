@@ -38,12 +38,42 @@ public class Surface {
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onTouch(float x, float y, short[] buttons) {
+    public final boolean onTouch(Vector2f hitPoint, short[] buttons) {
+        return onTouching(hitPoint, buttons) || (children!=null && onChildTouching(hitPoint, buttons));
+    }
+
+    protected final boolean onChildTouching(Vector2f hitPoint, short[] buttons) {
+        Vector2f subHit = new Vector2f();
+
+        for (Surface c : children) {
+            //project to child's space
+            subHit.set(hitPoint);
+
+            float csx = c.scaleLocal.x;
+            float csy = c.scaleLocal.y;
+            subHit.scale(1f / csx, 1f / csy);
+            subHit.sub(c.translateLocal.x, c.translateLocal.y);
+
+            float hx = subHit.x, hy = subHit.y;
+            if (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) {
+                if (c.onTouch(subHit, buttons)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+
+    /** may be overridden to trap events on this surface (returning true), otherwise they pass through to any children */
+    protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
+        return false;
+    }
+
+
+
     /** returns true if the event has been absorbed, false if it should continue propagating */
-    public boolean onKey(float x, float y, char charCode) {
+    public boolean onKey(Vector2f hitPoint, char charCode) {
         return false;
     }
 

@@ -3,11 +3,13 @@ package nars.gui.graph.matter;
 import bulletphys.ui.ShapeDrawer;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import nars.gui.graph.FixedAtomatterList;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Surface;
-import nars.gui.graph.SurfaceMount;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
+import javax.vecmath.Vector2f;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,15 +32,24 @@ public class SliderSurface extends Surface {
         this.max = max;
     }
 
-
+//    public static void main(String[] args) {
+//        new GraphSpace<Surface>(
+//
+//                (Surface vt) -> new SurfaceMount(null, vt),
+//
+//                new XYPadSurface()
+//
+//        ).show(800,800);
+//    }
     public static void main(String[] args) {
         new GraphSpace<>(
 
-                (List<SliderSurface> vt) -> new SurfaceMount<>(null,
+                (List<Surface> vt) -> new SurfaceMount<>(null,
                     new GridSurface(vt, GridSurface.VERTICAL)),
 
                 Lists.newArrayList(
-                    new SliderSurface(0.75f, 0, 1),
+                    //new SliderSurface(0.75f, 0, 1),
+                    new XYPadSurface(),
                     new SliderSurface(0.25f, 0, 1),
                     new SliderSurface(0.5f,  0, 1)
                 )
@@ -55,25 +66,31 @@ public class SliderSurface extends Surface {
     public void paint(GL2 gl) {
 
         float p = value();
-        float margin = 0.1f;
-        float mh = margin / 2.0f;
+        //float margin = 0.1f;
+        //float mh = margin / 2.0f;
 
         float W = 1;
         float H = 1;
 
-        gl.glLineWidth(mh * 2);
-        gl.glColor3f(0.5f, 0.5f, 0.5f);
-        ShapeDrawer.strokeRect(gl, 0, 0, W, H);
+        //gl.glLineWidth(mh * 2);
+        //gl.glColor3f(0.5f, 0.5f, 0.5f);
+        //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
 
         //double hp = 0.5 + 0.5 * p;
         gl.glColor3f(0.8f, 0.4f, 0f);
         //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
         float barSize = W * p;
-        ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
+        //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
+        ShapeDrawer.rect(gl, 0, 0, barSize, H);
     }
 
 
+    @Override
+    protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
+        //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+        return false;
+    }
 
     public float v() {
         return value.floatValue();

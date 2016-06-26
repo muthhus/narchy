@@ -193,6 +193,17 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     }
 
+    /** returns true if the event has been absorbed, false if it should continue propagating */
+    public boolean onTouch(Vector3f hitPoint, short[] buttons) {
+        return false;
+    }
+
+    /** returns true if the event has been absorbed, false if it should continue propagating */
+    public boolean onKey(Vector3f hitPoint, char charCode) {
+        return false;
+    }
+
+
     //TODO make abstract
     protected CollisionShape newShape() {
         return new BoxShape(Vector3f.v(1, 1, 1));

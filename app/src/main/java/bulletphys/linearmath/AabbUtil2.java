@@ -27,6 +27,8 @@ package bulletphys.linearmath;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
+import static javax.vecmath.Vector3f.v;
+
 /**
  * Utility functions for axis aligned bounding boxes (AABB).
  * 
@@ -47,7 +49,11 @@ public class AabbUtil2 {
 				(p.z < -halfExtent.z ? 0x4 : 0x0) |
 				(p.z > halfExtent.z ? 0x20 : 0x0);
 	}
-	
+
+	public static boolean rayAabb(Vector3f rayFrom, Vector3f rayTo, Vector3f aabbMin, Vector3f aabbMax, float[] param) {
+		return rayAabb(rayFrom, rayTo, aabbMin, aabbMax, param, v() );
+	}
+
 	public static boolean rayAabb(Vector3f rayFrom, Vector3f rayTo, Vector3f aabbMin, Vector3f aabbMax, float[] param, Vector3f normal) {
 		Vector3f aabbHalfExtent = new Vector3f();
 		Vector3f aabbCenter = new Vector3f();
