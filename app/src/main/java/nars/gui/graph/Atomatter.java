@@ -60,7 +60,6 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
      */
     transient public short order;
 
-    transient private GraphSpace<O,?> space;
 
     transient public float radius;
 
@@ -120,14 +119,12 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         return order >= 0;
     }
 
-    public final void activate(GraphSpace<O,?> space, short order, O instance) {
+    public final void activate(short order, O instance) {
         this.order = order;
-        this.space = space;
         this.instance = instance;
     }
 
     public final void inactivate() {
-        space = null;
         order = -1;
     }
 

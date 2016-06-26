@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.gui.graph.Atomatter;
+import nars.gui.graph.GraphInput;
 import nars.gui.graph.GraphSpace;
 import nars.link.BLink;
 import nars.nar.Default;
@@ -12,13 +13,12 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Created by me on 6/26/16.
  */
-public class ConceptBagInput extends GraphSpace.GraphInput<Termed, ConceptWidget> implements ConceptMaterializer {
+public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implements ConceptMaterializer {
 
     public final NAR nar;
     private final int capacity;

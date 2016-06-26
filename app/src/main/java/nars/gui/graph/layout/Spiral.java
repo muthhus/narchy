@@ -14,7 +14,7 @@ public class Spiral<O> implements GraphTransform<O> {
     float nodeSpeed = 0.05f;
 
     @Override
-    public void update(GraphSpace<O, ?> g, List<Atomatter<O>> verts, float dt) {
+    public void update(GraphSpace<O> g, List<Atomatter<O>> verts, float dt) {
         verts.forEach(this::update);
     }
 

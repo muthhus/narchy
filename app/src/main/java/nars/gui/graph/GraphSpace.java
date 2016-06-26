@@ -8,7 +8,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.gui.graph.layout.FastOrganicLayout;
-import nars.gui.graph.matter.concept.ConceptMaterializer;
 import nars.nar.Default;
 import nars.term.Termed;
 import nars.util.data.list.FasterList;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import static nars.gui.test.Lesson14.renderString;
@@ -26,7 +24,7 @@ import static nars.gui.test.Lesson14.renderString;
 /**
  * Created by me on 6/20/16.
  */
-public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
+public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
     public static void main(String[] args) {
 
@@ -39,7 +37,7 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
         final int maxNodes = 64;
         final int maxEdges = 8;
 
-        new GraphSpace<Termed,Atomatter<Termed>>(
+        new GraphSpace<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
         ).show(900, 900);
 
@@ -48,10 +46,10 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
     }
 
 
-    final FasterList<ConceptBagInput> inputs = new FasterList<>(1);
-    private Function<O, ? extends X> materialize;
+    final List<GraphInput<O,?>> inputs = new FasterList<>(1);
+    private Function<O, Atomatter<O>> materialize;
 
-    final WeakValueHashMap<O, X> atoms;
+    final WeakValueHashMap<O, Atomatter<O>> atoms;
 
 
     List<GraphTransform<O>> transforms = Lists.newArrayList(
@@ -59,11 +57,11 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
         new FastOrganicLayout()
     );
 
-    public GraphSpace(ConceptBagInput c) {
+    public GraphSpace(GraphInput<O,?> c) {
         this(c, null);
     }
 
-    public GraphSpace(ConceptBagInput c, Function<O, ? extends X> defaultMaterializer) {
+    public GraphSpace(GraphInput<O,?> c, Function<O, Atomatter<O>> defaultMaterializer) {
         super();
 
         atoms = new WeakValueHashMap<>(1024);
@@ -73,40 +71,40 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
         enable(c);
     }
 
-    public void enable(ConceptBagInput c) {
+    public void enable(GraphInput<O,?> c) {
         inputs.add(c);
         c.start(this);
     }
 
-    public @NotNull X update(int order, O instance) {
+    public @NotNull Atomatter update(int order, O instance) {
         return update(order, getOrAdd(instance), instance);
     }
-    public @NotNull X update(int order, Function<? super O, X> materializer, O instance) {
+    public @NotNull Atomatter<O> update(int order, Function<? super O, Atomatter<O>> materializer, O instance) {
         return update(order, getOrAdd(instance, materializer), instance);
     }
-    public @NotNull X update(int order, X t, O instance) {
-        t.activate(this, (short) order, instance);
+    public @NotNull Atomatter<O> update(int order, Atomatter<O> t, O instance) {
+        t.activate((short) order, instance);
         return t;
     }
 
 
-    public @NotNull X getOrAdd(O t) {
+    public @NotNull Atomatter getOrAdd(O t) {
         return atoms.computeIfAbsent(t, materialize);
     }
-    public @NotNull X getOrAdd(O t, Function<? super O, ? extends X> materializer) {
+    public @NotNull Atomatter<O> getOrAdd(O t, Function<? super O, ? extends Atomatter<O>> materializer) {
         return atoms.computeIfAbsent(t, materializer);
     }
 
-    public @Nullable X getIfActive(O t) {
-        X v = atoms.get(t);
+    public @Nullable Atomatter getIfActive(O t) {
+        Atomatter v = atoms.get(t);
         return v != null && v.active() ? v : null;
     }
 
     /**
      * get the latest info into the draw object
      */
-    protected @NotNull X pre(int i, X v, O b) {
-        v.activate(this, (short)i, b);
+    protected @NotNull Atomatter<O> pre(int i, Atomatter<O> v, O b) {
+        v.activate((short)i, b);
         return v;
     }
 
@@ -164,8 +162,8 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
 
 
 
-    @Override protected final boolean valid(CollisionObject<X> c) {
-        X vd = c.getUserPointer();
+    @Override protected final boolean valid(CollisionObject<Atomatter<O>> c) {
+        Atomatter vd = c.getUserPointer();
         if (vd!=null && !vd.active()) {
             vd.body.setUserPointer(null); //remove reference so vd can be GC
             vd.body = null;
@@ -176,13 +174,13 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
 
     public synchronized void display(GLAutoDrawable drawable) {
 
-        List<ConceptBagInput> ss = this.inputs;
+        List<GraphInput<O,?>> ss = this.inputs;
 
         ss.forEach( this::update );
 
         super.display(drawable);
 
-        ss.forEach( ConceptBagInput::ready );
+        ss.forEach( GraphInput::ready );
 
         renderHUD();
     }
@@ -283,72 +281,6 @@ public class GraphSpace<O, X extends Atomatter<O>> extends JoglPhysics<X> {
         return p * 0.9f + 0.1f;
     }
 
-
-
-    abstract public static class GraphInput<O, M extends Atomatter<O>> {
-
-        protected List<M> visible = new FasterList(0);
-        final AtomicBoolean busy = new AtomicBoolean(true);
-        protected GraphSpace grapher;
-        private float now;
-        private float dt;
-
-
-
-        public void start(GraphSpace grapher) {
-            this.grapher = grapher;
-        }
-
-        public void stop() {
-            this.grapher = null;
-        }
-
-        public final List<M> visible() {
-            return visible;
-        }
-
-        public void ready() {
-            busy.set(false);
-        }
-
-        public final float setBusy() {
-            busy.set(true);
-            return dt;
-        }
-
-        public boolean isBusy() {
-            return busy.get();
-        }
-
-        public float dt() {
-            return dt;
-        }
-
-        /** rewinds the buffer of visible items, when collecting a new batch */
-        public List<M> rewind(int capacity) {
-            visible.forEach(Atomatter::inactivate);
-            return visible = new FasterList<>(capacity);
-        }
-
-
-        public void update() {
-            float last = this.now;
-            this.dt = (this.now = now()) - last;
-            updateImpl();
-        }
-
-        /** for thread-safe usage */
-        public void updateIfNotBusy() {
-            if (!isBusy()) {
-                update();
-            }
-        }
-
-        abstract protected void updateImpl();
-
-        abstract public float now();
-
-    }
 
 }
 //    private void buildLists(GL2 gl) {

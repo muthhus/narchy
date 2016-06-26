@@ -7,6 +7,6 @@ import java.util.List;
  */
 public interface GraphTransform<O> {
 
-    void update(GraphSpace<O,?> g, List<Atomatter<O>> verts, float dt);
+    void update(GraphSpace<O> g, List<Atomatter<O>> verts, float dt);
 
 }

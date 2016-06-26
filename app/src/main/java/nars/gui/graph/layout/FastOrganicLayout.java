@@ -213,7 +213,7 @@ public class FastOrganicLayout<O> implements GraphTransform<O> {
     }
 
     @Override
-    public void update(GraphSpace<O, ?> g, List<Atomatter<O>> vertices, float dt) {
+    public void update(GraphSpace<O> g, List<Atomatter<O>> vertices, float dt) {
 
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
