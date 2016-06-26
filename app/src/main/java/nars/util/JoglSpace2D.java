@@ -13,17 +13,6 @@ public abstract class JoglSpace2D extends JoglSpace {
         super();
     }
 
-    @Deprecated protected static void line(GL2 gl, double x1, double y1, double x2, double y2) {
-        line(gl, (float)x1, (float)y1, (float)x2, (float)y2 );
-    }
-
-
-    protected static void line(GL2 gl, float x1, float y1, float x2, float y2) {
-        gl.glBegin(GL2.GL_LINES);
-        gl.glVertex2f(x1, y1);
-        gl.glVertex2f(x2, y2);
-        gl.glEnd();
-    }
 
     public void clear(float opacity) {
 
@@ -36,23 +25,6 @@ public abstract class JoglSpace2D extends JoglSpace {
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
         }
     }
-
-    protected static void strokeRect(GL2 gl, float x1, float y1, float w, float h) {
-        line(gl, x1, y1, x1 + w, y1);
-        line(gl, x1, y1, x1, y1 + h);
-        line(gl, x1, y1+h, x1+w, y1 + h);
-        line(gl, x1+w, y1, x1+w, y1 + h);
-    }
-
-    protected static void rect(GL2 gl, float x1, float y1, float w, float h) {
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2f(x1, y1);
-        gl.glVertex2f(x1+w, y1);
-        gl.glVertex2f(x1+w, y1+h);
-        gl.glVertex2f(x1, y1+h);
-        gl.glEnd();
-    }
-
 
 
     @Override

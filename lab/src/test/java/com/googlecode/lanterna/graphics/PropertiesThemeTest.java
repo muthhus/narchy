@@ -20,6 +20,7 @@ package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TextColor;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -51,6 +52,7 @@ public class PropertiesThemeTest {
         assertNotNull(style.getSGRs());
     }
 
+    @Ignore
     @Test
     public void defaultThemeWorks() throws IOException {
         InputStream inputStream = new FileInputStream("src/main/resources/default-theme.properties");

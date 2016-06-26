@@ -112,9 +112,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
 			new BeliefTableChart(n.nar, n.actions).show(400, 100);
-			new GraphSpace(
-					new ConceptBagInput(nar, 64),
-					new ConceptMaterializer()).show(800, 500);
+//			new GraphSpace(
+//                    new ConceptMaterializer(), new ConceptBagInput(nar, 64)
+//            ).show(800, 500);
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

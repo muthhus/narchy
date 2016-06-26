@@ -23,6 +23,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,7 +49,7 @@ public interface IOSafeTerminal extends Terminal {
     @Override
     void setCursorVisible(boolean visible);
     @Override
-    void put(char c);
+    void put(char c) throws IOException;
     @Override
     void enableSGR(SGR sgr);
     @Override

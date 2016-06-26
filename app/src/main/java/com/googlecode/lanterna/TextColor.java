@@ -51,6 +51,10 @@ public interface TextColor {
      */
     Color toColor();
 
+    float red();
+    float green();
+    float blue();
+
     /**
      * This class represent classic ANSI colors that are likely to be very compatible with most terminal
      * implementations. It is limited to 8 colors (plus the 'default' color) but as a norm, using bold mode (SGR code)
@@ -71,10 +75,30 @@ public interface TextColor {
 
         private final byte index;
         private final Color color;
+        private final float red, green, blue;
 
         ANSI(byte index, int red, int green, int blue) {
             this.index = index;
+
             this.color = new Color(red, green, blue);
+            this.red = red/256f;
+            this.green = green/256f;
+            this.blue = blue/256f;
+        }
+
+        @Override
+        public final float red() {
+            return red;
+        }
+
+        @Override
+        public final float green() {
+            return green;
+        }
+
+        @Override
+        public final float blue() {
+            return blue;
         }
 
         @Override
@@ -377,6 +401,10 @@ public interface TextColor {
 
         private final int colorIndex;
         private final Color awtColor;
+        public final int b;
+        public final int r;
+        public final int g;
+        public final float red, green, blue;
 
         /**
          * Creates a new TextColor using the XTerm 256 color indexed mode, with the specified index value. You must
@@ -389,10 +417,21 @@ public interface TextColor {
                         ", must be in the range of 0-255");
             }
             this.colorIndex = colorIndex;
-            this.awtColor = new Color(COLOR_TABLE[colorIndex][0] & 0x000000ff,
-                    COLOR_TABLE[colorIndex][1] & 0x000000ff,
-                    COLOR_TABLE[colorIndex][2] & 0x000000ff);
+            r = COLOR_TABLE[colorIndex][0] & 0x000000ff;
+            g = COLOR_TABLE[colorIndex][1] & 0x000000ff;
+            b = COLOR_TABLE[colorIndex][2] & 0x000000ff;
+            this.awtColor = new Color(
+                    r,
+                    g,
+                    b);
+            this.red = r/256f;
+            this.green = g/256f;
+            this.blue = b/256f;
         }
+
+        public float red() { return red; }
+        public float green() { return green; }
+        public float blue() { return blue; }
 
         @Override
         public byte[] getForegroundSGRSequence() {
@@ -497,6 +536,8 @@ public interface TextColor {
     class RGB implements TextColor {
         private final Color color;
 
+        public final float red, green, blue;
+
         /**
          * This class can be used to specify a color in 24-bit color space (RGB with 8-bit resolution per color). Please be
          * aware that only a few terminal support 24-bit color control codes, please avoid using this class unless you know
@@ -519,8 +560,25 @@ public interface TextColor {
                 throw new IllegalArgumentException("RGB: b is outside of valid range (0-255)");
             }
             this.color = new Color(r, g, b);
+            this.red = r/256f;
+            this.green = g/256f;
+            this.blue = b/256f;
         }
 
+        @Override
+        public final float red() {
+            return red;
+        }
+
+        @Override
+        public final float green() {
+            return green;
+        }
+
+        @Override
+        public final float blue() {
+            return blue;
+        }
         @Override
         public byte[] getForegroundSGRSequence() {
             return ("38;2;" + getRed() + ';' + getGreen() + ";" + getBlue()).getBytes();

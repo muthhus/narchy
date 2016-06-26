@@ -1,5 +1,6 @@
 package nars.gui;
 
+import bulletphys.ui.ShapeDrawer;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.Global;
@@ -93,8 +94,8 @@ public class BeliefTableChart extends JoglSpace2D {
 
         gl.glLineWidth(1f);
         gl.glColor4f(1f, 1f, 1f, 0.3f);
-        strokeRect(gl, 0, 0, gew, geh);
-        strokeRect(gl, gew, 0, tew, teh);
+        ShapeDrawer.strokeRect(gl, 0, 0, gew, geh);
+        ShapeDrawer.strokeRect(gl, gew, 0, tew, teh);
 
     }
 
@@ -168,22 +169,22 @@ public class BeliefTableChart extends JoglSpace2D {
     //horizontal block
     final static TaskRenderer beliefRenderer = (ge, q, c, w, h, x, y) -> {
         ge.glColor4f(0.1f + 0.9f * c, 0.1f, 0.1f, 0.5f + 0.25f * q);
-        rect(ge, x - w / 2, y - h / 4, w, h / 2);
+        ShapeDrawer.rect(ge, x - w / 2, y - h / 4, w, h / 2);
     };
     final static TaskRenderer beliefProjRenderer = (ge, q, c, w, h, x, y) -> {
         float a = 0.1f + 0.9f * c;
         ge.glColor4f(a *0.8f, 0.1f, a *0.5f, 0.25f + 0.25f * q);
-        rect(ge, x - w / 2, y - h / 4, w/2, h / 2);
+        ShapeDrawer.rect(ge, x - w / 2, y - h / 4, w/2, h / 2);
     };
     //vertical block
     final static TaskRenderer goalRenderer = (ge, q, c, w, h, x, y) -> {
         ge.glColor4f(0.1f, 0.1f + 0.9f * c, 0.1f, 0.5f + 0.25f * q);
-        rect(ge, x - w / 4, y - h / 2, w / 2, h);
+        ShapeDrawer.rect(ge, x - w / 4, y - h / 2, w / 2, h);
     };
     final static TaskRenderer goalProjRenderer = (ge, q, c, w, h, x, y) -> {
         float a = 0.1f + 0.9f * c;
         ge.glColor4f(0.1f, a *0.8f, a * 0.5f, 0.25f + 0.25f * q);
-        rect(ge, x - w / 4, y - h / 2, w / 2, h/2);
+        ShapeDrawer.rect(ge, x - w / 4, y - h / 2, w / 2, h/2);
     };
 
     float[] beliefTheta, goalTheta;
@@ -204,12 +205,12 @@ public class BeliefTableChart extends JoglSpace2D {
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
-        line(gl, dx0+bcx, dy0+bcy, -dx0+bcx, -dy0+bcy);
+        ShapeDrawer.line(gl, dx0+bcx, dy0+bcy, -dx0+bcx, -dy0+bcy);
 
         double hpi = PI / 2.0;
         double dx1 = Math.cos(theta + hpi) * r;
         double dy1 = Math.sin(theta + hpi) * r;
-        line(gl, dx1+bcx, dy1+bcy, -dx1+bcx, -dy1+bcy);
+        ShapeDrawer.line(gl, dx1+bcx, dy1+bcy, -dx1+bcx, -dy1+bcy);
     }
 
     final float padding = 4;
@@ -251,7 +252,7 @@ public class BeliefTableChart extends JoglSpace2D {
             float nx = xTime(tew, padding, minT, maxT, now, nowLineWidth);
 
             gl.glColor4f(1f,1f,1f, 0.5f);
-            rect(gl, gew + nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
+            ShapeDrawer.rect(gl, gew + nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
         }
 
         /** drawn "pixel" dimensions*/

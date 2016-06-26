@@ -80,7 +80,7 @@ public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implement
         float p = v.pri = 1; //v.pri = v.key.priIfFiniteElseZero();
 
         float nodeScale = 1f + 2f * p;
-        //nodeScale /= Math.sqrt(tt.volume());
+        nodeScale /= Math.sqrt(tt.volume());
         v.scale(nodeScale, nodeScale, nodeScale / 3f);
 
         if (tt instanceof Concept) {

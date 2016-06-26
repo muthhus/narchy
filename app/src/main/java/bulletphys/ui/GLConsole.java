@@ -3,9 +3,11 @@ package bulletphys.ui;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.input.WriteInput;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
@@ -14,8 +16,13 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
 import nars.util.JoglSpace;
+import nars.util.Util;
 
-import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import static nars.util.JoglSpace.glut;
 
 
 /**
@@ -23,27 +30,27 @@ import java.awt.*;
  */
 public class GLConsole {
 
-    public static void main(String[] args) {
-
-        GLConsole terminal = new GLConsole(50, 20, 0.05f);
-
-
-        new JoglSpace() {
-
-            @Override
-            public void display(GLAutoDrawable drawable) {
-                terminal.render(gl);
-            }
-
-            @Override
-            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-
-            }
-
-        }.show(500, 500);
-
-        //sim.run(25);
-    }
+//    public static void main(String[] args) {
+//
+//        GLConsole terminal = new GLConsole(80, 20, 0.5f);
+//
+//
+//        new JoglSpace() {
+//
+//            @Override
+//            public void display(GLAutoDrawable drawable) {
+//                terminal.render(gl);
+//            }
+//
+//            @Override
+//            public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+//
+//            }
+//
+//        }.show(500, 500);
+//
+//        //sim.run(25);
+//    }
 
 
     /**
@@ -51,10 +58,10 @@ public class GLConsole {
      */
     final VirtualTerminal term;
     private final float scale;
-    final GLUT glut = new GLUT();
+
     final static int font = GLUT.STROKE_MONO_ROMAN;
     private final float fontWidth;
-    final float fontScale;
+    final float fontUnscale;
     private final float fontHeight;
 
     public GLConsole(int w, int h, float scale) {
@@ -66,7 +73,7 @@ public class GLConsole {
         fontWidth = glut.glutStrokeWidthf(font, 'X');
         fontHeight = glut.glutStrokeLengthf(font, "X");
 
-        fontScale = 1 / fontWidth;
+        fontUnscale = 1 / fontWidth;
         //term = new TerminalANSI(w, h, 1) {
                 /*@Override
                 public void repaint() {
@@ -79,46 +86,54 @@ public class GLConsole {
 
             Screen screen = null;
             try {
+
+                //term.clearScreen();
+
                 screen = new TerminalScreen(term);
                 screen.startScreen();
-
                 MultiWindowTextGUI gui = new MultiWindowTextGUI(
                         new SeparateTextGUIThread.Factory(),
                         screen);
 
+                gui.setBlockingIO(false);
+                gui.setEOFWhenNoWindows(false);
+
+
 
                 final BasicWindow window = new BasicWindow("Grid layout test");
-
-
                 addSampleWindow(gui, window);
+                gui.updateScreen();
 
-                //TextGraphics tGraphics = screen.newTextGraphics();
-                //screen.startScreen();
-                //screen.clear();
-                /*tGraphics.drawRectangle(
-                        new TerminalPosition(3,3), new TerminalPosition(10,10), '*');*/
-                //screen.refresh();
-
-                //PrintStream ps = new PrintStream(new ByteArrayOutputStream());
-                //new WriteInput(ps, terminal.term).start();
+//                TextGraphics tGraphics = screen.newTextGraphics();
+////
+//                tGraphics.setForegroundColor(new TextColor.RGB(0, 125, 255));
+//                tGraphics.setBackgroundColor(new TextColor.RGB(255, 125, 5));
+//                tGraphics.drawRectangle(
+//                        new TerminalPosition(3,3), new TerminalPosition(10,10), '*');
 
 
-                /*terminal.term.putString("abcd\nsjdfhkjsd\n\ndsfjsdflksdjf");
-                terminal.term.putCharacter('\n');
-                terminal.term.putCharacter('x');
-                terminal.term.putCharacter('y');*/
+//                PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+//                WriteInput w = new WriteInput(ps, term);
+//                w.start();
 
-                //screen.readInput();
-                //screen.stopScreen();
-
-
-                AsynchronousTextGUIThread guiThread = (AsynchronousTextGUIThread) gui.getGUIThread();
-                guiThread.start();
-                guiThread.waitForStop();
+                term.setCursorVisible(true);
+                term.fore(TextColor.ANSI.YELLOW);
+                term.back(TextColor.ANSI.BLUE);
+                term.moveCursorTo(0,0);
+                term.put("XYZ\nABC\nCDDFS");
 
 
-                screen.stopScreen();
-
+                new Thread(()->{
+                    Util.pause(1500);
+                    for (int i= 0; i < 100; i++) {
+                        try {
+                            term.put(Integer.toString(i, 2) + "\n");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Util.pause(1000);
+                    }
+                }).start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -128,7 +143,7 @@ public class GLConsole {
     }
 
 
-    void renderText(GL2 gl, float x, float y, float cw, float ch, char c) {
+    void renderText(GL2 gl, float x, float y, char c) {
         // Center Our Text On The Screen
         //float width = glut.glutStrokeLength(font, string);
         //gl.glTranslatef(-width / 2f, 0, 0);
@@ -137,11 +152,9 @@ public class GLConsole {
         gl.glPushMatrix();
 
 
-        float hw = 0.5f;
 
-        gl.glTranslatef(x - hw, y - hw, 0);
+        gl.glTranslatef(x, y, 0);
 
-        gl.glScalef(fontScale * cw, fontScale * ch, 1);
         glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, c);
         gl.glPopMatrix();
 
@@ -162,52 +175,88 @@ public class GLConsole {
     public void render(GL2 gl) {
         TerminalPosition ts = term.terminalSize();
 
-        float cw = scale / 2f;
-        float ch = scale;
-
-
         int rows = ts.row;
+        int cols = ts.column;
+
+        float cw = scale;
+        float ch = scale*2f;
+        float charUnscale = fontUnscale * scale;
+
+        gl.glPushMatrix();
+
+        //gl.glTranslatef(0, 0, 10);
+
         for (int j = 0; j < rows; j++) {
-            for (int i = 0; i < ts.column; i++) {
+            for (int i = 0; i < cols; i++) {
 
-
-                float x = i * cw;
+                float x = i;
                 int r = rows - 1 - j;
-                float y = j * ch;
+                float y = j;
+
+                gl.glPushMatrix();
+
+                gl.glTranslatef(x * cw, y * ch, 0);
 
                 TextCharacter c = term.getView(i, r);
-                char cc = c.c;
 
-                Color bg = c.back.toColor();
-                Color fg = c.fore.toColor();
+                TextColor backColor = c.back;
 
                 //draw.drawSolidRect(x, y, cw, ch, -0.1f, bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
-                gl.glColor3f(bg.getRed() / 256f, bg.getGreen() / 256f, bg.getBlue() / 256f);
-                float sf = 1;
-                gl.glRectf(x * sf, -y * sf, x * sf + sf, -y * sf - sf);
+                float bgAlpha = 0.75f;
 
-                //un-ANSIfy
-                switch (cc) {
-                    case 9474:
-                        cc = '|';
-                        break;
-                    case 9472:
-                        cc = '-';
-                        break;
-                    case 9492:
-                        //..
-                    case 9496:
-                        cc = '*';
-                        break;
-                }
+                gl.glColor4f(
+                        backColor.red(),
+                        backColor.green(), backColor.blue(), bgAlpha);
 
+                ShapeDrawer.rect(gl,
+                        0, 0,
+                        cw, ch
+                );
+
+                char cc = displayChar(c);
                 if ((cc != 0) && (cc != ' ')) {
-                    gl.glColor3f(fg.getRed() / 256f, fg.getGreen() / 256f, fg.getBlue() / 256f);
-                    renderText(gl, x, y, cw, ch, cc);
+                    TextColor fg = c.fore;
+                    gl.glColor3f(fg.red(), fg.green(), fg.blue());
+                    // Center Our Text On The Screen
+                    //float width = glut.glutStrokeLength(font, string);
+                    //gl.glTranslatef(-width / 2f, 0, 0);
+                    // Render The Text
+
+
+                    gl.glPushMatrix();
+
+                    gl.glScalef(charUnscale, charUnscale, charUnscale);
+                    glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
+                    gl.glPopMatrix();
+
                 }
+
+                gl.glPopMatrix();
             }
         }
 
+        gl.glPopMatrix();
+
+    }
+
+    public char displayChar(TextCharacter c) {
+        //HACK: un-ANSIfy
+
+        char cc = c.c;
+        switch (cc) {
+            case 9474:
+                cc = '|';
+                break;
+            case 9472:
+                cc = '-';
+                break;
+            case 9492:
+                //..
+            case 9496:
+                cc = '*';
+                break;
+        }
+        return cc;
     }
 
     public static void addSampleWindow(MultiWindowTextGUI gui, final BasicWindow window) {
@@ -264,6 +313,7 @@ public class GLConsole {
     }
 
     public static void add(Panel leftGridPanel) {
+
         add(leftGridPanel, TextColor.ANSI.BLACK, 4, 2);
     }
 

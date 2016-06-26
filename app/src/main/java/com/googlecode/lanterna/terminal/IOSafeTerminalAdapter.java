@@ -180,13 +180,8 @@ public class IOSafeTerminalAdapter implements IOSafeTerminal {
     }
 
     @Override
-    public void put(char c) {
-        try {
-            backend.put(c);
-        }
-        catch(IOException e) {
-            exceptionHandler.onException(e);
-        }
+    public void put(char c) throws IOException {
+        backend.put(c);
     }
 
     @Override

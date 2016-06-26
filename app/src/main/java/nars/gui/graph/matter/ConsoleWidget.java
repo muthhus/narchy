@@ -10,11 +10,11 @@ import nars.gui.graph.Atomatter;
 import nars.gui.graph.FixedAtomatterList;
 import nars.gui.graph.GraphSpace;
 
-public class ConsoleView extends Atomatter<VirtualTerminal> {
+public class ConsoleWidget extends Atomatter<VirtualTerminal> {
 
     private final GLConsole console;
 
-    public ConsoleView(VirtualTerminal k) {
+    public ConsoleWidget(VirtualTerminal k) {
         super(k, 0);
         this.console = new GLConsole(k, 0.05f);
         scale(1f,1f,1f);
@@ -34,11 +34,13 @@ public class ConsoleView extends Atomatter<VirtualTerminal> {
     }
 
     public static void main(String[] args) {
-        new GraphSpace<VirtualTerminal>(new FixedAtomatterList( new DefaultVirtualTerminal(80,25) ),
+        new GraphSpace<VirtualTerminal>(
                 vt -> {
-                    System.out.println("rendering: " + vt);
-                    return new ConsoleView(vt);
-                }
+                    return new ConsoleWidget(vt);
+                }, new FixedAtomatterList<>(
+                    new DefaultVirtualTerminal(80,25),
+                    new DefaultVirtualTerminal(40,16)
+                )
         ).show(800,800);
     }
 }

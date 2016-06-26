@@ -1,11 +1,10 @@
 package nars.gui.graph;
 
 import bulletphys.collision.dispatch.CollisionObject;
-import bulletphys.ui.GLConsole;
 import bulletphys.ui.JoglPhysics;
-import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
+import nars.Global;
 import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.gui.graph.layout.FastOrganicLayout;
 import nars.nar.Default;
@@ -39,10 +38,19 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
         new GraphSpace<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
+        ).withTransform(
+            //new Spiral()
+            new FastOrganicLayout()
         ).show(900, 900);
 
         n.loop(35f);
 
+    }
+
+    public GraphSpace withTransform(GraphTransform<O>... t) {
+        for (GraphTransform g : t)
+            this.transforms.add(g);
+        return this;
     }
 
 
@@ -52,23 +60,21 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
     final WeakValueHashMap<O, Atomatter<O>> atoms;
 
 
-    List<GraphTransform<O>> transforms = Lists.newArrayList(
-        //new Spiral()
-        new FastOrganicLayout()
-    );
+    final List<GraphTransform<O>> transforms = Global.newArrayList();
 
     public GraphSpace(GraphInput<O,?> c) {
-        this(c, null);
+        this(null, c);
     }
 
-    public GraphSpace(GraphInput<O,?> c, Function<O, Atomatter<O>> defaultMaterializer) {
+    public GraphSpace(Function<O, Atomatter<O>> defaultMaterializer, GraphInput<O, ?>... cc) {
         super();
 
         atoms = new WeakValueHashMap<>(1024);
 
         this.materialize = defaultMaterializer;
 
-        enable(c);
+        for (GraphInput c : cc)
+            enable(c);
     }
 
     public void enable(GraphInput<O,?> c) {
