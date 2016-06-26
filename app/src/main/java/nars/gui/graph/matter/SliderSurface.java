@@ -1,37 +1,11 @@
 package nars.gui.graph.matter;
 
 import bulletphys.ui.ShapeDrawer;
-import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
-import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import javafx.beans.InvalidationListener;
-import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.event.EventHandler;
-import javafx.scene.Cursor;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Surface;
-import nars.util.FX;
-import nars.util.Texts;
+import nars.gui.graph.SurfaceMount;
 import org.apache.commons.lang3.mutable.MutableFloat;
-
-import java.util.Arrays;
-import java.util.function.Consumer;
-
-import static javafx.application.Platform.runLater;
 
 /**
  * Created by me on 6/26/16.
@@ -39,9 +13,9 @@ import static javafx.application.Platform.runLater;
 public class SliderSurface extends Surface {
 
     public static void main(String[] args) {
-        new GraphSpace<VirtualTerminal>(
-                vt -> ConsoleSurface.widget(vt),
-                new DefaultVirtualTerminal(80,25)
+        new GraphSpace<>(
+                (SliderSurface vt) -> new SurfaceMount<>(null, vt),
+                new SliderSurface(0.5f, 0, 1)
         ).show(800,800);
     }
 

@@ -11,7 +11,6 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.gui.graph.FixedAtomatterList;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Surface;
 import nars.gui.graph.SurfaceMount;
@@ -136,23 +135,7 @@ public class ConsoleSurface extends Surface {
     }
 
 
-    void renderText(GL2 gl, float x, float y, char c) {
-        // Center Our Text On The Screen
-        //float width = glut.glutStrokeLength(font, string);
-        //gl.glTranslatef(-width / 2f, 0, 0);
-        // Render The Text
 
-        gl.glPushMatrix();
-
-
-
-        gl.glTranslatef(x, y, 0);
-
-        glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, c);
-        gl.glPopMatrix();
-
-
-    }
 
 //        void renderText(GL2 gl, int font, String string) {
 //            // Center Our Text On The Screen
@@ -195,7 +178,7 @@ public class ConsoleSurface extends Surface {
 
                 gl.glPushMatrix();
 
-                gl.glTranslatef(x * cw - tw/2f, y * ch - th/2f, 0);
+                gl.glTranslatef(x * cw, y * ch, 0);
 
                 TextCharacter c = term.getView(i, r);
 

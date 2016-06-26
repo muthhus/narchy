@@ -1,9 +1,9 @@
 package nars.gui.graph.layout;
 
-import nars.gui.graph.GraphTransform;
+import nars.gui.graph.Atomatter;
 import nars.gui.graph.GraphSpace;
 import nars.gui.graph.GraphSpace.EDraw;
-import nars.gui.graph.Atomatter;
+import nars.gui.graph.GraphTransform;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.awt.*;

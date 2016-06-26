@@ -5,8 +5,8 @@ import bulletphys.ui.JoglPhysics;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.Global;
-import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.gui.graph.layout.FastOrganicLayout;
+import nars.gui.graph.matter.concept.ConceptBagInput;
 import nars.nar.Default;
 import nars.term.Termed;
 import nars.util.data.list.FasterList;
@@ -18,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.vecmath.Vector3f;
 import java.util.List;
 import java.util.function.Function;
-
-import static nars.gui.test.Lesson14.renderString;
 
 /**
  * Created by me on 6/20/16.

@@ -1,6 +1,5 @@
 package nars.gui.graph.matter.concept;
 
-import nars.gui.graph.Atomatter;
 import nars.term.Termed;
 
 import java.util.function.Function;

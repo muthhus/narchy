@@ -1,8 +1,8 @@
 package nars.gui.graph.layout;
 
-import nars.gui.graph.GraphTransform;
-import nars.gui.graph.GraphSpace;
 import nars.gui.graph.Atomatter;
+import nars.gui.graph.GraphSpace;
+import nars.gui.graph.GraphTransform;
 
 import java.util.List;
 

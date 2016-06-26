@@ -29,7 +29,6 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     @NotNull
     public final GraphSpace.EDraw[] edges;
-    private final BoxShape shape;
 
     /** position: x, y, z */
     //@NotNull public final float p[] = new float[3];
@@ -79,8 +78,6 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         move(GraphSpace.r(initDistanceEpsilon),
              GraphSpace.r(initDistanceEpsilon),
              GraphSpace.r(initDistanceEpsilon));
-
-        shape = new BoxShape(Vector3f.v(1, 1, 1));
 
         for (int i = 0; i < edges; i++)
             this.edges[i] = new GraphSpace.EDraw();
@@ -187,7 +184,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         if (active()) {
 
             if (body == null) {
-                RigidBody b = body = newBody(graphSpace, shape, false);
+                RigidBody b = body = newBody(graphSpace, newShape(), false);
                 b.setUserPointer(this);
                 b.setRenderer(this);
             }
@@ -196,13 +193,14 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     }
 
+    //TODO make abstract
+    protected CollisionShape newShape() {
+        return new BoxShape(Vector3f.v(1, 1, 1));
+    }
+
     public RigidBody newBody(GraphSpace graphSpace) {
         final boolean collidesWithOthersLikeThis = false;
-        RigidBody b;
-
-        BoxShape shape = new BoxShape(Vector3f.v(1, 1, 1));
-        b = newBody(graphSpace, shape, collidesWithOthersLikeThis);
-        return b;
+        return newBody(graphSpace, newShape(), collidesWithOthersLikeThis);
     }
 
     public RigidBody newBody(GraphSpace graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
