@@ -44,20 +44,26 @@ import javax.vecmath.Vector4f;
 public class BoxShape extends PolyhedralConvexShape {
 
 	public BoxShape(Vector3f boxHalfExtents) {
-		Vector3f margin = new Vector3f(getMargin(), getMargin(), getMargin());
+
 		VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
-		implicitShapeDimensions.sub(margin);
+
+		float m = getMargin();
+
+		implicitShapeDimensions.add(-m, -m, -m);
 	}
 
 	public Vector3f getHalfExtentsWithMargin(Vector3f out) {
 		Vector3f halfExtents = getHalfExtentsWithoutMargin(out);
-		Vector3f margin = new Vector3f();
-		margin.set(getMargin(), getMargin(), getMargin());
-		halfExtents.add(margin);
-		return out;
+
+		float m = getMargin();
+		if (m!=0) {
+			halfExtents.add(m, m, m);
+		}
+
+		return halfExtents;
 	}
 
-	public Vector3f getHalfExtentsWithoutMargin(Vector3f out) {
+	public final Vector3f getHalfExtentsWithoutMargin(Vector3f out) {
 		out.set(implicitShapeDimensions); // changed in Bullet 2.63: assume the scaling and margin are included
 		return out;
 	}
@@ -109,21 +115,25 @@ public class BoxShape extends PolyhedralConvexShape {
 	@Override
 	public void setMargin(float margin) {
 		// correct the implicitShapeDimensions for the margin
-		Vector3f oldMargin = new Vector3f();
-		oldMargin.set(getMargin(), getMargin(), getMargin());
+		float m = getMargin();
+		Vector3f oldMargin = new Vector3f(m, m,m);
+
 		Vector3f implicitShapeDimensionsWithMargin = new Vector3f();
 		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
 
 		super.setMargin(margin);
-		Vector3f newMargin = new Vector3f();
-		newMargin.set(getMargin(), getMargin(), getMargin());
+
+		float n = getMargin();
+		Vector3f newMargin = new Vector3f(n, n, n);
 		implicitShapeDimensions.sub(implicitShapeDimensionsWithMargin, newMargin);
 	}
 
 	@Override
 	public void setLocalScaling(Vector3f scaling) {
-		Vector3f oldMargin = new Vector3f();
-		oldMargin.set(getMargin(), getMargin(), getMargin());
+
+		float m = getMargin();
+		Vector3f oldMargin = new Vector3f(m, m, m);
+
 		Vector3f implicitShapeDimensionsWithMargin = new Vector3f();
 		implicitShapeDimensionsWithMargin.add(implicitShapeDimensions, oldMargin);
 		Vector3f unScaledImplicitShapeDimensionsWithMargin = new Vector3f();

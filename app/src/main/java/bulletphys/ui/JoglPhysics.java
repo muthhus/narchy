@@ -227,8 +227,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
 
         // JAU
-        gl.glEnable(gl.GL_CULL_FACE);
-        gl.glCullFace(gl.GL_BACK);
+        //gl.glEnable(gl.GL_CULL_FACE);
+        //gl.glCullFace(gl.GL_BACK);
 
     }
 

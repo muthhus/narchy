@@ -273,9 +273,8 @@ public class HeightfieldTerrainShape extends ConcaveShape {
 		abs_b.getRow(2, tmp);
 		extent.z = tmp.dot(halfExtents);
 
-		Vector3f margin = new Vector3f();
-		margin.set(getMargin(), getMargin(), getMargin());
-		extent.add(margin);
+		float margin = getMargin();
+		extent.add(margin, margin, margin);
 
 		aabbMin.sub(center, extent);
 		aabbMax.add(center, extent);

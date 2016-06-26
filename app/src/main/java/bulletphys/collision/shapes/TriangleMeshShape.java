@@ -119,9 +119,8 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 		abs_b.getRow(2, tmp);
 		extent.z = tmp.dot(localHalfExtents);
 
-		Vector3f margin = new Vector3f();
-		margin.set(getMargin(), getMargin(), getMargin());
-		extent.add(margin);
+		float m = getMargin();
+		extent.add(m, m, m);
 
 		aabbMin.sub(center, extent);
 		aabbMax.add(center, extent);
@@ -138,7 +137,7 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	public void calculateLocalInertia(float mass, Vector3f inertia) {
 		// moving concave objects not supported
 		assert (false);
-		inertia.set(0f, 0f, 0f);
+		inertia.zero();
 	}
 
 

@@ -37,6 +37,8 @@ import nars.util.JoglSpace;
 
 import javax.vecmath.Vector3f;
 
+import static nars.util.JoglSpace.glut;
+
 /**
  * @author jezek2
  */
@@ -158,7 +160,8 @@ public enum ShapeDrawer {
                         BoxShape boxShape = (BoxShape) shape;
                         Vector3f halfExtent = stack.vectors.get(boxShape.getHalfExtentsWithMargin(new Vector3f()));
                         gl.glScalef(2f * halfExtent.x, 2f * halfExtent.y, 2f * halfExtent.z);
-                        glsrt.drawCube(gl, 1f);
+                        //glsrt.drawCube(gl, 1f);
+                        glut.glutSolidCube(1f);
                         useWireframeFallback = false;
                         break;
                     }

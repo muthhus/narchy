@@ -185,13 +185,13 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
         renderHUD();
     }
 
-    final GLConsole terminal = new GLConsole(50, 20, 0.05f);
+
 
     protected void renderHUD() {
         ortho();
-        gl.glColor4f(1f,1f,1f, 1f);
+        //gl.glColor4f(1f,1f,1f, 1f);
         //gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        terminal.render(gl);
+        //terminal.render(gl);
     }
 
     /*public void clear(GL2 gl) {

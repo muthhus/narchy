@@ -1,5 +1,7 @@
 package nars.gui.graph.matter.concept;
 
+import bulletphys.dynamics.RigidBody;
+import com.jogamp.opengl.GL2;
 import nars.gui.graph.Atomatter;
 import nars.term.Termed;
 
@@ -14,5 +16,10 @@ class ConceptWidget extends Atomatter<Termed> {
         super(x, maxEdges);
     }
 
+    @Override
+    protected void renderRelative(GL2 gl, RigidBody body) {
+        super.renderRelative(gl, body);
 
+        renderLabel(gl);
+    }
 }

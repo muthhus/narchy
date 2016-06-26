@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -48,7 +49,7 @@ public class GLConsole {
     /**
      * http://www.java-tips.org/other-api-tips-100035/112-jogl/1689-outline-fonts-nehe-tutorial-jogl-port.html
      */
-    final DefaultVirtualTerminal term;
+    final VirtualTerminal term;
     private final float scale;
     final GLUT glut = new GLUT();
     final static int font = GLUT.STROKE_MONO_ROMAN;
@@ -57,8 +58,11 @@ public class GLConsole {
     private final float fontHeight;
 
     public GLConsole(int w, int h, float scale) {
+        this(new DefaultVirtualTerminal(w, h), scale);
+    }
+    public GLConsole(VirtualTerminal term, float scale) {
+        this.term = term;
         this.scale = scale;
-        term = new DefaultVirtualTerminal(w, h);
         fontWidth = glut.glutStrokeWidthf(font, 'X');
         fontHeight = glut.glutStrokeLengthf(font, "X");
 

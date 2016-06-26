@@ -9,10 +9,6 @@ import bulletphys.util.Motion;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
-import nars.budget.Budget;
-import nars.link.BLink;
-import nars.task.Task;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Vector3f;
@@ -205,34 +201,38 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     }
 
 
-    @Override public void accept(GL2 gl, RigidBody body) {
+    @Override public final void accept(GL2 gl, RigidBody body) {
 
-//        gl.glPushMatrix();
-
-//        ShapeDrawer.translate(gl, body.transform());
-
-        renderEdges(gl, this);
-
-//        gl.glPopMatrix();
+        renderAbsolute(gl);
 
         gl.glPushMatrix();
-
         ShapeDrawer.transform(gl, body.transform());
+        renderRelative(gl, body);
+        gl.glPopMatrix();
+    }
 
+    protected void renderRelative(GL2 gl, RigidBody body) {
+
+        renderShape(gl, body);
+
+    }
+
+    protected void renderLabel(GL2 gl) {
+        renderLabel(gl, this);
+    }
+
+    protected void renderShape(GL2 gl, RigidBody body) {
         float p = h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),
                 p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
                 p,
                 1f);
-
         ShapeDrawer.draw(gl, body);
+    }
 
-        renderLabel(gl, this);
-
-
-        gl.glPopMatrix();
-
+    protected void renderAbsolute(GL2 gl) {
+        renderEdges(gl, this);
     }
 
     static void renderEdges(GL2 gl, Atomatter v) {
@@ -284,6 +284,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         {
             float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
             ww.set(tmpV);
+            //ww.normalize(); //used for the normal3f below
             float sx = src.x();
             float tx = tgt.x();
             float dx = tx - sx;
@@ -301,6 +302,10 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
 
             gl.glBegin(GL2.GL_TRIANGLES);
+
+
+            //gl.glNormal3f(ww.x, ww.y, ww.z);
+
             gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
             gl.glVertex3f( //right base
                     //sx+-vv.x, sy+-vv.y, sz+-vv.z
