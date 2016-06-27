@@ -1,7 +1,7 @@
 package spacegraph.obj;
 
-import spacegraph.Surface;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import spacegraph.Surface;
 
 import java.util.List;
 
@@ -33,6 +33,7 @@ public class GridSurface extends Surface {
         return children.size();
     }
 
+    @Override
     protected void layout() {
         int n = children.size();
         float a = aspect.floatValue();

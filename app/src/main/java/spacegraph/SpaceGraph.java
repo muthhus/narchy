@@ -1,12 +1,9 @@
 package spacegraph;
 
-import bulletphys.collision.dispatch.CollisionObject;
-import bulletphys.ui.JoglPhysics;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.Global;
-import spacegraph.layout.FastOrganicLayout;
-import nars.gui.concept.ConceptBagInput;
+import nars.gui.ConceptBagInput;
 import nars.nar.Default;
 import nars.term.Termed;
 import nars.util.data.list.FasterList;
@@ -14,6 +11,9 @@ import nars.util.experiment.DeductiveMeshTest;
 import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.layout.FastOrganicLayout;
+import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.render.JoglPhysics;
 
 import javax.vecmath.Vector3f;
 import java.util.List;

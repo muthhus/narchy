@@ -1,20 +1,17 @@
 package spacegraph.obj;
 
-import bulletphys.collision.shapes.BoxShape;
-import bulletphys.collision.shapes.CollisionShape;
-import bulletphys.dynamics.RigidBody;
-import bulletphys.linearmath.Transform;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.math.Quaternion;
+import nars.util.Util;
 import spacegraph.Spatial;
 import spacegraph.Surface;
-import nars.util.Util;
+import spacegraph.phys.collision.shapes.BoxShape;
+import spacegraph.phys.collision.shapes.CollisionShape;
+import spacegraph.phys.dynamics.RigidBody;
+import spacegraph.phys.linearmath.Transform;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
-import static bulletphys.linearmath.Transform.t;
 import static javax.vecmath.Vector3f.v;
 
 /**

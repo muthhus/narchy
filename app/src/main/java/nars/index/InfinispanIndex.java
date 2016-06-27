@@ -94,6 +94,7 @@ public class InfinispanIndex extends MaplikeIndex {
         return subtermsLocal.get(key(t));
     }
 
+    @Override
     protected Termed getNewCompound(@NotNull Compound x) {
 
         if (x.hasTemporal()) {

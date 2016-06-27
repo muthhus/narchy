@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.util.JoglSpace;
+import spacegraph.render.JoglSpace;
 
 import java.text.NumberFormat;
 
@@ -13,7 +13,6 @@ public class Lesson14 extends JoglSpace {
     private static final GLU glu = new GLU();
     private static final GLUT glut = new GLUT();
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance();
-    ;
 
     public static void main(String[] args) {
         new Lesson14().show(500, 400);
@@ -48,6 +47,7 @@ public class Lesson14 extends JoglSpace {
         gl.glPopMatrix();
     }
 
+    @Override
     public void init(GL2 gl2) {
         gl2.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
         gl2.glClearColor(0.0f, 0.0f, 0.0f, 0.1f); // Black Background
@@ -63,6 +63,7 @@ public class Lesson14 extends JoglSpace {
         gl2.glEnable(GL2.GL_COLOR_MATERIAL); // Enable Coloring Of Material
     }
 
+    @Override
     public void display(GLAutoDrawable glDrawable) {
         GL2 gl2 = (GL2) glDrawable.getGL();
 
@@ -87,6 +88,7 @@ public class Lesson14 extends JoglSpace {
         rotation += 0.5f; // Increase The Rotation Variable
     }
 
+    @Override
     public void reshape(GLAutoDrawable glDrawable, int x, int y, int w, int h) {
         if (h == 0) h = 1;
         GL2 gl2 = (GL2) glDrawable.getGL();

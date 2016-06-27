@@ -1,15 +1,15 @@
 package spacegraph;
 
-import bulletphys.collision.shapes.BoxShape;
-import bulletphys.collision.shapes.CollisionShape;
-import bulletphys.dynamics.RigidBody;
-import bulletphys.linearmath.Transform;
-import bulletphys.ui.ShapeDrawer;
-import bulletphys.util.Motion;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.phys.collision.shapes.BoxShape;
+import spacegraph.phys.collision.shapes.CollisionShape;
+import spacegraph.phys.dynamics.RigidBody;
+import spacegraph.phys.linearmath.Transform;
+import spacegraph.phys.util.Motion;
+import spacegraph.render.ShapeDrawer;
 
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
@@ -312,40 +312,35 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
         gl.glPushMatrix();
 
-        {
-            float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
-            ww.set(tmpV);
-            ww.normalize(); //used for the normal3f below
-            float sx = src.x();
-            float tx = tgt.x();
-            float dx = tx - sx;
-            float sy = src.y();
-            float ty = tgt.y();
-            float dy = ty - sy;
-            float sz = src.z();
-            float tz = tgt.z();
-            float dz = tz - sz;
+        float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
+        ww.set(tmpV);
+        ww.normalize(); //used for the normal3f below
+        float sx = src.x();
+        float tx = tgt.x();
+        float dx = tx - sx;
+        float sy = src.y();
+        float ty = tgt.y();
+        float dy = ty - sy;
+        float sz = src.z();
+        float tz = tgt.z();
+        float dz = tz - sz;
 
-            vv.set(dx,dy,dz);
-            vv.cross(ww, vv);
-            vv.normalize();
-            vv.scale(width);
-
-
-            gl.glBegin(GL2.GL_TRIANGLES);
+        vv.set(dx,dy,dz);
+        vv.cross(ww, vv);
+        vv.normalize();
+        vv.scale(width);
 
 
+        gl.glBegin(GL2.GL_TRIANGLES);
 
 
-            gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
-            gl.glVertex3f( //right base
-                    //sx+-vv.x, sy+-vv.y, sz+-vv.z
-                    sx, sy, sz
-            );
-            gl.glVertex3f(tx, ty, tz); //right base
-            gl.glEnd();
-
-        }
+        gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
+        gl.glVertex3f( //right base
+                //sx+-vv.x, sy+-vv.y, sz+-vv.z
+                sx, sy, sz
+        );
+        gl.glVertex3f(tx, ty, tz); //right base
+        gl.glEnd();
 
         gl.glPopMatrix();
 
@@ -355,12 +350,10 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         Spatial tgt = e.target;
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
-        {
-            Vector3f s = src.center;
-            gl.glVertex3f(s.x, s.y, s.z);
-            Vector3f t = tgt.center;
-            gl.glVertex3f(t.x, t.y, t.z);
-        }
+        Vector3f s = src.center;
+        gl.glVertex3f(s.x, s.y, s.z);
+        Vector3f t = tgt.center;
+        gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
     }
 

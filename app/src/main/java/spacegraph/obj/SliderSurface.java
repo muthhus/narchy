@@ -1,15 +1,16 @@
 package spacegraph.obj;
 
-import bulletphys.ui.ShapeDrawer;
-import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import org.apache.commons.lang3.mutable.MutableFloat;
+import spacegraph.render.ShapeDrawer;
 
 import javax.vecmath.Vector2f;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Created by me on 6/26/16.
@@ -46,26 +47,21 @@ public class SliderSurface extends Surface {
                 (List<Surface> vt) -> new SurfaceMount<>(null,
                     new GridSurface(vt, GridSurface.VERTICAL)),
 
-                Lists.newArrayList(
-                    //new SliderSurface(0.75f, 0, 1),
-                    new GridSurface(Lists.newArrayList(
+                newArrayList(
+                    new GridSurface(newArrayList(
                         new XYPadSurface(),
                         new XYPadSurface()
                     ), GridSurface.HORIZONTAL),
-                    new GridSurface(Lists.newArrayList(
+                    new GridSurface(newArrayList(
                             new SliderSurface(0.75f,  0, 1),
                             new SliderSurface(0.25f,  0, 1),
                             new SliderSurface(0.5f,  0, 1)
                     ), GridSurface.VERTICAL)
-//                    new SliderSurface(0.25f, 0, 1),
-
                 )
-
         );
 
         s.add(new Facial(new ConsoleSurface(80, 25)).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));
-
         s.show(800,800);
     }
 

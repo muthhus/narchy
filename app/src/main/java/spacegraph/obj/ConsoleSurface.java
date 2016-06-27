@@ -1,6 +1,5 @@
 package spacegraph.obj;
 
-import bulletphys.ui.ShapeDrawer;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
@@ -11,13 +10,14 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
+import nars.util.Util;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import nars.util.Util;
+import spacegraph.render.ShapeDrawer;
 
 import java.io.IOException;
 
-import static nars.util.JoglSpace.glut;
+import static spacegraph.render.JoglSpace.glut;
 
 /**
  * Created by me on 4/1/16.
@@ -28,8 +28,8 @@ public class ConsoleSurface extends Surface {
     public static void main(String[] args) {
         new SpaceGraph<VirtualTerminal>(
                 vt -> ConsoleSurface.widget(vt),
-                new DefaultVirtualTerminal(80,25)
-        ).show(800,800);
+                new DefaultVirtualTerminal(80, 25)
+        ).show(800, 800);
     }
 
 
@@ -65,88 +65,10 @@ public class ConsoleSurface extends Surface {
         fontHeight = fontWidth * 1.6f; //glut.glutStrokeLengthf(font, "X");
 
         fontUnscale = 1 / fontWidth;
-        //term = new TerminalANSI(w, h, 1) {
-                /*@Override
-                public void repaint() {
-                    System.out.println("repaint " + this);
-                    super.repaint();
-                }*/
-        //};
-
-        new Thread(() -> {
-
-            Screen screen = null;
-            try {
-
-                //term.clearScreen();
-
-                screen = new TerminalScreen(term);
-                screen.startScreen();
-                MultiWindowTextGUI gui = new MultiWindowTextGUI(
-                        new SeparateTextGUIThread.Factory(),
-                        screen);
-
-                gui.setBlockingIO(false);
-                gui.setEOFWhenNoWindows(false);
-
-
-
-                final BasicWindow window = new BasicWindow("Grid layout test");
-                addSampleWindow(gui, window);
-                gui.updateScreen();
-
-//                TextGraphics tGraphics = screen.newTextGraphics();
-////
-//                tGraphics.setForegroundColor(new TextColor.RGB(0, 125, 255));
-//                tGraphics.setBackgroundColor(new TextColor.RGB(255, 125, 5));
-//                tGraphics.drawRectangle(
-//                        new TerminalPosition(3,3), new TerminalPosition(10,10), '*');
-
-
-//                PrintStream ps = new PrintStream(new ByteArrayOutputStream());
-//                WriteInput w = new WriteInput(ps, term);
-//                w.start();
-
-                term.setCursorVisible(true);
-                term.fore(TextColor.ANSI.YELLOW);
-                term.back(TextColor.ANSI.BLUE);
-                term.moveCursorTo(0,0);
-                term.put("XYZ\nABC\nCDDFS");
-
-
-                new Thread(()->{
-                    Util.pause(1500);
-                    for (int i= 0; i < 100; i++) {
-                        try {
-                            term.put(Integer.toString(i, 2) + "\n");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Util.pause(1000);
-                    }
-                }).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }).start();
-
     }
 
 
-
-
-//        void renderText(GL2 gl, int font, String string) {
-//            // Center Our Text On The Screen
-//            //float width = glut.glutStrokeLength(font, string);
-//            //gl.glTranslatef(-width / 2f, 0, 0);
-//            // Render The Text
-//            for (int i = 0; i < string.length(); i++) {
-//                char c = string.charAt(i);
-//                glut.glutStrokeCharacter(font, c);
-//            }
-//        }
-
+    @Override
     public void paint(GL2 gl) {
         TerminalPosition ts = term.terminalSize();
 
@@ -164,7 +86,7 @@ public class ConsoleSurface extends Surface {
         float th = (rows * ch);
         float tw = (cols * cw);
 
-        gl.glScalef(1/tw, 1/th, 1f);
+        gl.glScalef(1 / tw, 1 / th, 1f);
 
         gl.glLineWidth(2f);
 
@@ -204,11 +126,6 @@ public class ConsoleSurface extends Surface {
                     float fgAlpha = 0.9f;
 
                     gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
-                    // Center Our Text On The Screen
-                    //float width = glut.glutStrokeLength(font, string);
-                    //gl.glTranslatef(-width / 2f, 0, 0);
-                    // Render The Text
-
 
                     gl.glPushMatrix();
 
@@ -246,63 +163,129 @@ public class ConsoleSurface extends Surface {
         return cc;
     }
 
-    public static void addSampleWindow(MultiWindowTextGUI gui, final BasicWindow window) {
-        Panel leftGridPanel = new Panel();
-        leftGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(4));
-        add(leftGridPanel);
-        add(leftGridPanel, TextColor.ANSI.BLUE, 4, 2);
-        add(leftGridPanel, TextColor.ANSI.CYAN, 4, 2);
-        add(leftGridPanel, TextColor.ANSI.GREEN, 4, 2);
 
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.END, GridLayout.Alignment.CENTER, true, false, 4, 1)));
-        leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.CENTER, true, false, 4, 1)));
 
-        Panel rightGridPanel = new Panel();
-        rightGridPanel.setLayoutManager(new GridLayout(5));
-        TextColor.ANSI c = TextColor.ANSI.BLACK;
-        int columns = 4;
-        int rows = 2;
-        add(rightGridPanel, c, columns, rows);
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.BEGINNING, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.END, false, true, 1, 4)));
-        rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
-                .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.FILL, false, true, 1, 4)));
-        add(rightGridPanel, TextColor.ANSI.BLUE, 4, 2);
-        add(rightGridPanel, TextColor.ANSI.CYAN, 4, 2);
-        add(rightGridPanel, TextColor.ANSI.GREEN, 4, 2);
+    public static class DummyTerminal extends DefaultVirtualTerminal {
+        public DummyTerminal(int c, int r) {
+            super(c, r);
 
-        Panel contentPanel = new Panel();
-        contentPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalPosition.ONE), rightGridPanel));
-        contentPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
-        contentPanel.addComponent(new Button("Close", new Runnable() {
-            @Override
-            public void run() {
-                window.close();
-            }
-        }));
-        window.setComponent(contentPanel);
-        gui.addWindow(window);
+            new Thread(() -> {
+
+                Screen screen = null;
+                try {
+
+                    //term.clearScreen();
+
+                    screen = new TerminalScreen(this);
+                    screen.startScreen();
+                    MultiWindowTextGUI gui = new MultiWindowTextGUI(
+                            new SeparateTextGUIThread.Factory(),
+                            screen);
+
+                    gui.setBlockingIO(false);
+                    gui.setEOFWhenNoWindows(false);
+
+
+                    final BasicWindow window = new BasicWindow("Grid layout test");
+                    addSampleWindow(gui, window);
+                    gui.updateScreen();
+
+//                TextGraphics tGraphics = screen.newTextGraphics();
+////
+//                tGraphics.setForegroundColor(new TextColor.RGB(0, 125, 255));
+//                tGraphics.setBackgroundColor(new TextColor.RGB(255, 125, 5));
+//                tGraphics.drawRectangle(
+//                        new TerminalPosition(3,3), new TerminalPosition(10,10), '*');
+
+
+//                PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+//                WriteInput w = new WriteInput(ps, term);
+//                w.start();
+
+                    setCursorVisible(true);
+                    fore(TextColor.ANSI.YELLOW);
+                    back(TextColor.ANSI.BLUE);
+                    moveCursorTo(0, 0);
+                    put("XYZ\nABC\nCDDFS");
+
+
+                    new Thread(() -> {
+                        Util.pause(1500);
+                        for (int i = 0; i < 100; i++) {
+                            try {
+                                put(Integer.toString(i, 2) + "\n");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Util.pause(1000);
+                        }
+                    }).start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
+
+
+        }
+
+        public static void addSampleWindow(MultiWindowTextGUI gui, final BasicWindow window) {
+            Panel leftGridPanel = new Panel();
+            leftGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(4));
+            add(leftGridPanel);
+            add(leftGridPanel, TextColor.ANSI.BLUE, 4, 2);
+            add(leftGridPanel, TextColor.ANSI.CYAN, 4, 2);
+            add(leftGridPanel, TextColor.ANSI.GREEN, 4, 2);
+
+            leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.CENTER, true, false, 4, 1)));
+            leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, true, false, 4, 1)));
+            leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.END, GridLayout.Alignment.CENTER, true, false, 4, 1)));
+            leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.CENTER, true, false, 4, 1)));
+
+            Panel rightGridPanel = new Panel();
+            rightGridPanel.setLayoutManager(new GridLayout(5));
+            TextColor.ANSI c = TextColor.ANSI.BLACK;
+            int columns = 4;
+            int rows = 2;
+            add(rightGridPanel, c, columns, rows);
+            rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.BEGINNING, false, true, 1, 4)));
+            rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.CENTER, false, true, 1, 4)));
+            rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.END, false, true, 1, 4)));
+            rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalPosition(4, 2))
+                    .setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.CENTER, GridLayout.Alignment.FILL, false, true, 1, 4)));
+            add(rightGridPanel, TextColor.ANSI.BLUE, 4, 2);
+            add(rightGridPanel, TextColor.ANSI.CYAN, 4, 2);
+            add(rightGridPanel, TextColor.ANSI.GREEN, 4, 2);
+
+            Panel contentPanel = new Panel();
+            contentPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+            contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalPosition.ONE), rightGridPanel));
+            contentPanel.addComponent(new EmptySpace(TerminalPosition.ONE));
+            contentPanel.addComponent(new Button("Close", new Runnable() {
+                @Override
+                public void run() {
+                    window.close();
+                }
+            }));
+            window.setComponent(contentPanel);
+            gui.addWindow(window);
+        }
+
+        public static void add(Panel rightGridPanel, TextColor.ANSI c, int columns, int rows) {
+            rightGridPanel.addComponent(new EmptySpace(c, new TerminalPosition(columns, rows)));
+        }
+
+        public static void add(Panel leftGridPanel) {
+
+            add(leftGridPanel, TextColor.ANSI.BLACK, 4, 2);
+        }
+
     }
-
-    public static void add(Panel rightGridPanel, TextColor.ANSI c, int columns, int rows) {
-        rightGridPanel.addComponent(new EmptySpace(c, new TerminalPosition(columns, rows)));
-    }
-
-    public static void add(Panel leftGridPanel) {
-
-        add(leftGridPanel, TextColor.ANSI.BLACK, 4, 2);
-    }
-
-
 }

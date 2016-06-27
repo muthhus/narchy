@@ -17,7 +17,7 @@ import com.jogamp.newt.event.MouseListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import nars.util.JoglSpace;
+import spacegraph.render.JoglSpace;
 
 import java.nio.IntBuffer;
 
@@ -39,8 +39,9 @@ public class Picking extends JoglSpace implements MouseListener {
     int cmd = UPDATE;
     int mouse_x, mouse_y;
 
-    private GLU glu = new GLU();
+    private final GLU glu = new GLU();
 
+    @Override
     public void init(GL2 gl) {
 
         gl.glEnable(GL2.GL_CULL_FACE);
@@ -49,6 +50,7 @@ public class Picking extends JoglSpace implements MouseListener {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
+    @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL2 gl = drawable.getGL().getGL2();
         gl.glViewport(0, 0, width, height);
@@ -57,9 +59,11 @@ public class Picking extends JoglSpace implements MouseListener {
         glu.gluOrtho2D(0.0f, 1.0f, 0.0f, 1.0f);
     }
 
+    @Override
     public void dispose(GLAutoDrawable drawable) {
     }
 
+    @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
         switch (cmd) {
@@ -189,35 +193,42 @@ public class Picking extends JoglSpace implements MouseListener {
 
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         cmd = SELECT;
         mouse_x = e.getX();
         mouse_y = e.getY();
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
+    @Override
     public void mouseDragged(MouseEvent e) {
     }
 
+    @Override
     public void mouseMoved(MouseEvent e) {
     }
 
     public abstract static class GLEntity {
         float x, y, z;
         float[] c;
-        int id = 0;
-        boolean outline = false;
+        int id;
+        boolean outline;
         GL2 gl;
         GLU glu;
 
@@ -242,6 +253,7 @@ public class Picking extends JoglSpace implements MouseListener {
             super(gl, glu);
         }
 
+        @Override
         public void _draw() {
             if (outline)
                 gl.glPolygonMode(GL2.GL_FRONT, GL2.GL_LINE);

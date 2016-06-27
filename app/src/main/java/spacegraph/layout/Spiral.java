@@ -1,8 +1,8 @@
 package spacegraph.layout;
 
-import spacegraph.Spatial;
 import spacegraph.SpaceGraph;
 import spacegraph.SpaceTransform;
+import spacegraph.Spatial;
 
 import java.util.List;
 

@@ -3,6 +3,7 @@ package nars.op.uibot;
 import boofcv.struct.image.InterleavedU8;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.StackPane;
@@ -101,7 +102,7 @@ public class RemoteDesktopView  {
                         if (u8img==null || u8img.width!=W || u8img.height!=H) {
                             u8img = new InterleavedU8(W, H, 4);
                         }
-                        WritablePixelFormat<ByteBuffer> format = WritablePixelFormat.getByteBgraInstance();
+                        WritablePixelFormat<ByteBuffer> format = PixelFormat.getByteBgraInstance();
                         image.getPixelReader().getPixels(0,0, W, H, format, u8img.data, 0, W*4);
 
 

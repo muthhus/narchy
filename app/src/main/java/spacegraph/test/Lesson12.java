@@ -34,7 +34,7 @@ import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
-import nars.util.JoglSpace;
+import spacegraph.render.JoglSpace;
 
 import javax.swing.*;
 
@@ -79,10 +79,12 @@ public class Lesson12 extends JoglSpace implements KeyListener {
     }
 
 
+    @Override
     public void keyPressed(KeyEvent e) {
         processKeyEvent(e, true);
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
         processKeyEvent(e, false);
     }
@@ -114,12 +116,12 @@ public class Lesson12 extends JoglSpace implements KeyListener {
     }
 
 
-    private float[][] boxcol = {{1.0f, 0.0f, 0.0f},
+    private final float[][] boxcol = {{1.0f, 0.0f, 0.0f},
             {1.0f, 0.5f, 0.0f},
             {1.0f, 1.0f, 0.0f},
             {0.0f, 1.0f, 0.0f},
             {0.0f, 1.0f, 1.0f}};
-    private float[][] topcol = {{0.5f, 0.0f, 0.0f},
+    private final float[][] topcol = {{0.5f, 0.0f, 0.0f},
             {0.5f, .25f, 0.0f},
             {0.5f, 0.5f, 0.0f},
             {0.0f, 0.5f, 0.0f},
@@ -248,6 +250,7 @@ public class Lesson12 extends JoglSpace implements KeyListener {
         gl.glEndList();
     }
 
+    @Override
     public void init(GL2 gl) {
         gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
         gl.glShadeModel(GL2.GL_SMOOTH); // Enable Smooth Shading
@@ -284,6 +287,7 @@ public class Lesson12 extends JoglSpace implements KeyListener {
 //            yrot += 8f;
 //    }
 
+    @Override
     public void display(GLAutoDrawable drawable) {
         GL2 gl = (GL2) drawable.getGL();
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
@@ -311,6 +315,7 @@ public class Lesson12 extends JoglSpace implements KeyListener {
         }
     }
 
+    @Override
     public void reshape(GLAutoDrawable drawable,
                         int xstart,
                         int ystart,

@@ -1,6 +1,5 @@
 package com.googlecode.lanterna.input;
 
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;

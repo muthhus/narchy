@@ -429,8 +429,11 @@ public interface TextColor {
             this.blue = b/256f;
         }
 
+        @Override
         public float red() { return red; }
+        @Override
         public float green() { return green; }
+        @Override
         public float blue() { return blue; }
 
         @Override

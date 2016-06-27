@@ -18,7 +18,10 @@
  */
 package com.googlecode.lanterna.graphics;
 
-import com.googlecode.lanterna.*;
+import com.googlecode.lanterna.SGR;
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.screen.TabBehaviour;
 
 import java.util.Collection;

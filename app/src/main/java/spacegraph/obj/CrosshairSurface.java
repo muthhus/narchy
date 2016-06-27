@@ -1,12 +1,12 @@
 package spacegraph.obj;
 
-import bulletphys.ui.ShapeDrawer;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.ShapeDrawer;
 
 /**
  * Created by me on 6/27/16.
@@ -15,7 +15,7 @@ public class CrosshairSurface extends Surface implements MouseListener {
 
     private final SpaceGraph space;
     int mx, my;
-    boolean mouseEnabled = false;
+    boolean mouseEnabled;
     private float smx, smy;
 
     public CrosshairSurface(SpaceGraph s) {

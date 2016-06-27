@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
 public class SwingCamera implements PixelCamera {
 
     private final JComponent component;
-    private BufferedImage big = null;
-    private BufferedImage small = null;
+    private BufferedImage big;
+    private BufferedImage small;
     int width, height;
     private Graphics2D smallGfx;
 
@@ -21,6 +21,7 @@ public class SwingCamera implements PixelCamera {
         this.height = targetHeight;
     }
 
+    @Override
     public void update(PerPixel p) {
 
         big = ScreenImage.get(component, big);

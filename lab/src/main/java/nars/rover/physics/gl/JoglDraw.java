@@ -2,12 +2,11 @@ package nars.rover.physics.gl;
 
 
 import com.jogamp.opengl.GL2;
-import nars.util.JoglSpace;
+import spacegraph.render.JoglSpace;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
-import org.jbox2d.dynamics.World2D;
 import org.jbox2d.particle.ParticleColor;
 
 /**

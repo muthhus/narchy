@@ -26,22 +26,22 @@
 
 package spacegraph.obj;
 
-import bulletphys.collision.shapes.BoxShape;
-import bulletphys.collision.shapes.CapsuleShape;
-import bulletphys.collision.shapes.CollisionShape;
-import bulletphys.dynamics.DynamicsWorld;
-import bulletphys.dynamics.RigidBody;
-import bulletphys.dynamics.RigidBodyConstructionInfo;
-import bulletphys.dynamics.constraintsolver.Generic6DofConstraint;
-import bulletphys.dynamics.constraintsolver.TypedConstraint;
-import bulletphys.linearmath.MatrixUtil;
-import bulletphys.linearmath.Transform;
-import bulletphys.ui.JoglPhysics;
-import bulletphys.ui.JoglPhysics.ExtraGlobals;
-import bulletphys.util.BulletStack;
-import bulletphys.util.Motion;
-import spacegraph.Spatial;
 import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
+import spacegraph.phys.collision.shapes.BoxShape;
+import spacegraph.phys.collision.shapes.CapsuleShape;
+import spacegraph.phys.collision.shapes.CollisionShape;
+import spacegraph.phys.dynamics.DynamicsWorld;
+import spacegraph.phys.dynamics.RigidBody;
+import spacegraph.phys.dynamics.RigidBodyConstructionInfo;
+import spacegraph.phys.dynamics.constraintsolver.Generic6DofConstraint;
+import spacegraph.phys.dynamics.constraintsolver.TypedConstraint;
+import spacegraph.phys.linearmath.MatrixUtil;
+import spacegraph.phys.linearmath.Transform;
+import spacegraph.phys.util.BulletStack;
+import spacegraph.phys.util.Motion;
+import spacegraph.render.JoglPhysics;
+import spacegraph.render.JoglPhysics.ExtraGlobals;
 
 import javax.vecmath.Vector3f;
 

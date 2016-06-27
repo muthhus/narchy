@@ -1,8 +1,8 @@
 package spacegraph.obj;
 
-import bulletphys.ui.ShapeDrawer;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
+import spacegraph.render.ShapeDrawer;
 
 import javax.vecmath.Vector2f;
 

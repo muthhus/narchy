@@ -2,7 +2,6 @@ package nars.index;
 
 import com.googlecode.concurrenttrees.common.CharSequences;
 import com.googlecode.concurrenttrees.common.PrettyPrinter;
-import nars.util.MyConcurrentRadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
@@ -13,6 +12,7 @@ import nars.$;
 import nars.index.symbol.SymbolMap;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.util.MyConcurrentRadixTree;
 
 import java.util.List;
 import java.util.function.Consumer;

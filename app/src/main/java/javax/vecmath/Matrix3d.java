@@ -2998,9 +2998,9 @@ static void  transpose_mat(double[] in, double[] out) {
 }
 static  double max3( double[] values) {
      if( values[0] > values[1] ) {
-		 return values[0] > values[2] ? values[0] : values[2];
+		 return values[values[0] > values[2] ? 0 : 2];
      } else {
-		 return values[1] > values[2] ? values[1] : values[2];
+		 return values[values[1] > values[2] ? 1 : 2];
      }
   }
 

@@ -6,7 +6,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import nars.rover.Sim;
 import nars.rover.physics.Display;
-import nars.util.JoglSpace;
+import spacegraph.render.JoglSpace;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;

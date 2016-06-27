@@ -121,8 +121,7 @@ public class ScreenImage
 	 *  @exception IOException if an error occurs during writing
 	 */
 	public static BufferedImage createDesktopImage()
-		throws AWTException, IOException
-	{
+		throws AWTException {
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		Rectangle region = new Rectangle(0, 0, d.width, d.height);
 		return ScreenImage.get(region);

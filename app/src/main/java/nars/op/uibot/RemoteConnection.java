@@ -44,7 +44,7 @@ public class RemoteConnection implements RenderProtocol, ImageProcess {
 
     WritableImage image;
 
-    protected InterleavedU8 u8img = null;
+    protected InterleavedU8 u8img;
 
 
     public RemoteConnection(String host, int port, String password) throws InterruptedException {

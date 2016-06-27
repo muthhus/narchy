@@ -39,7 +39,7 @@ public class NAgent implements Agent {
 
     public final NAR nar;
 
-    private IntFunction<Compound> sensorNamer = null;
+    private IntFunction<Compound> sensorNamer;
 
     float motivation[];
 
@@ -50,7 +50,7 @@ public class NAgent implements Agent {
     private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
-    private int clockMultiplier = 1; //introduces extra timing delay between frames
+    private final int clockMultiplier = 1; //introduces extra timing delay between frames
 
     float dReward;
 
@@ -85,15 +85,15 @@ public class NAgent implements Agent {
     private float lastMotivation;
     private int nextAction = -1;
     private SensorConcept dRewardSensor;
-    private Budgeted RewardAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
+    private final Budgeted RewardAttentionPerFrame; //b(0.9f,0.9f,0.9f);
     //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
-    private DecideAction decideAction;
-    private boolean synchronousGoalInput = false;
+    private final DecideAction decideAction;
+    private final boolean synchronousGoalInput;
 
-    private int motorBeliefCapacity = 16;
-    private int motorGoalCapacity = 16;
+    private final int motorBeliefCapacity = 16;
+    private final int motorGoalCapacity = 16;
 
 
     public NAgent(NAR n) {

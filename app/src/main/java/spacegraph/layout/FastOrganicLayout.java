@@ -1,10 +1,10 @@
 package spacegraph.layout;
 
-import spacegraph.Spatial;
-import spacegraph.SpaceGraph;
-import spacegraph.EDraw;
-import spacegraph.SpaceTransform;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import spacegraph.EDraw;
+import spacegraph.SpaceGraph;
+import spacegraph.SpaceTransform;
+import spacegraph.Spatial;
 
 import java.awt.*;
 import java.util.List;
