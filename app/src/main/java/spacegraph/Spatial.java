@@ -277,9 +277,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
 
         //float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(0.5f, 0.5f, 0.5f, v.pri);
+        gl.glColor4f(1f, 1f, 1f, v.pri);
 
-        float fontThick = 1f;
+        float fontThick = 2f;
         gl.glLineWidth(fontThick);
 
         float div = 0.003f;

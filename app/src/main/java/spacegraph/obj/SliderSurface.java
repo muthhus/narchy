@@ -63,7 +63,8 @@ public class SliderSurface extends Surface {
 
         );
 
-        s.add(new Facial(new ConsoleSurface(80, 25)).scale(0.5f));
+        s.add(new Facial(new ConsoleSurface(80, 25)).scale(500f, 400f));
+        s.add(new Facial(new CrosshairSurface(s)));
 
         s.show(800,800);
     }

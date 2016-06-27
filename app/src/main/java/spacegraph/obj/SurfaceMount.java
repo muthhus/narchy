@@ -41,6 +41,7 @@ public class SurfaceMount<X> extends Spatial<X> {
         s.setParent(null);
     }
 
+
     @Override
     public boolean onTouch(Vector3f hitPoint, short[] buttons) {
         if (!super.onTouch(hitPoint, buttons)) {

@@ -15,7 +15,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    protected GLWindow window;
+    public GLWindow window;
     protected GL2 gl;
 
     public static GLWindow window(JoglSpace j) {

@@ -48,6 +48,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
+import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 import com.jogamp.opengl.math.FloatUtil;
 import spacegraph.Spatial;
 import spacegraph.obj.ConsoleSurface;
@@ -128,7 +129,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     protected GLSRT glsrt = null;
 
     protected boolean useLight0 = true;
-    protected boolean useLight1 = true;
+    //protected boolean useLight1 = true;
 
     private int mouseDragPrevX, mouseDragPrevY;
 
@@ -184,12 +185,15 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         window.addMouseListener(this);
         window.addKeyListener(this);
 
-        float[] light_ambient = new float[]{0.2f, 0.2f, 0.2f, 1.0f};
+        gl.glLightModelf(GL2.GL_LIGHT_MODEL_AMBIENT, 0.6f);
+
+        float[] light_ambient = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
         float[] light_diffuse = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-        float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+        //float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+        float[] light_specular = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
         /* light_position is NOT default value */
-        float[] light_position0 = new float[]{1.0f, -10.0f, 1.0f, 0.0f};
-        float[] light_position1 = new float[]{-1.0f, -10.0f, -1.0f, 0.0f};
+        float[] light_position0 = new float[]{0f, 0f, 5f, 0.0f};
+        //float[] light_position1 = new float[]{-1.0f, -10.0f, -1.0f, 0.0f};
 
 //        if (gl.isGLES2()) {
 //            //gl.enableFixedFunctionEmulationMode(GLES2.FIXED_EMULATION_VERTEXCOLORTEXTURE);
@@ -205,27 +209,34 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
             gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, light_position0, 0);
         }
 
-        if (useLight1) {
-            gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, light_ambient, 0);
-            gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, light_diffuse, 0);
-            gl.glLightfv(gl.GL_LIGHT1, gl.GL_SPECULAR, light_specular, 0);
-            gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, light_position1, 0);
-        }
 
-        if (useLight0 || useLight1) {
+//        if (useLight1) {
+//            gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, light_ambient, 0);
+//            gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, light_diffuse, 0);
+//            gl.glLightfv(gl.GL_LIGHT1, gl.GL_SPECULAR, light_specular, 0);
+//            gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION, light_position1, 0);
+//        }
+
+        if (useLight0) {
             gl.glEnable(gl.GL_LIGHTING);
         }
         if (useLight0) {
             gl.glEnable(gl.GL_LIGHT0);
         }
-        if (useLight1) {
-            gl.glEnable(gl.GL_LIGHT1);
-        }
+//        if (useLight1) {
+//            gl.glEnable(gl.GL_LIGHT1);
+//        }
 
         gl.glShadeModel(gl.GL_SMOOTH);
         gl.glShadeModel(GL2.GL_LINE_SMOOTH); // Enable Smooth Shading
         gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
+
+        //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
+        gl.glColorMaterial ( GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE ) ;
         gl.glEnable(gl.GL_COLOR_MATERIAL);
+
+        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
+        //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
         //gl.glDepthFunc(gl.GL_LESS);
@@ -1059,7 +1070,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         gl.glLoadIdentity();
 
         //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
-        gl.glOrtho(0, 1, 0, 1, -1.5, 1.5);
+        gl.glOrtho(0, screenWidth, 0, screenHeight, -1.5, 1.5);
 
 //        // switch to projection mode
 //        gl.glMatrixMode(gl.GL_PROJECTION);
