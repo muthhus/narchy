@@ -59,5 +59,10 @@ public class Clock {
 	public long getTimeMicroseconds() {
 		return (System.nanoTime() - startTime) / 1000L;
 	}
+	public long getTimeThenReset() {
+		long x = getTimeMicroseconds();
+		reset();
+		return x;
+	}
 	
 }

@@ -50,8 +50,13 @@ public class SliderSurface extends Surface {
                 Lists.newArrayList(
                     //new SliderSurface(0.75f, 0, 1),
                     new XYPadSurface(),
+                        new GridSurface(Lists.newArrayList(
+                                new SliderSurface(0.75f,  0, 1),
+                                new SliderSurface(0.25f,  0, 1),
+                                new SliderSurface(0.5f,  0, 1)
+                        ), GridSurface.VERTICAL)
 //                    new SliderSurface(0.25f, 0, 1),
-                    new SliderSurface(0.5f,  0, 1)
+
                 )
 
         ).show(800,800);
@@ -63,7 +68,7 @@ public class SliderSurface extends Surface {
     }
 
     @Override
-    public void paint(GL2 gl) {
+    protected void paint(GL2 gl) {
 
         float p = value();
         //float margin = 0.1f;
@@ -77,7 +82,7 @@ public class SliderSurface extends Surface {
         //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
 
         //double hp = 0.5 + 0.5 * p;
-        gl.glColor3f(0.8f, 0.4f, 0f);
+        gl.glColor3f(0.9f, 0.2f, 0f);
         //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
 
         float barSize = W * p;
@@ -89,14 +94,17 @@ public class SliderSurface extends Surface {
     @Override
     protected boolean onTouching(Vector2f hitPoint, short[] buttons) {
         if (leftButton(buttons)) {
-            System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
+            //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
 
-            float y = hitPoint.x; //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
-            value.setValue(r(y));
+            value.setValue(r(decode(hitPoint)));
 
             return true;
         }
         return false;
+    }
+
+    private float decode(Vector2f hitPoint) {
+        return hitPoint.x; //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
     }
 
 

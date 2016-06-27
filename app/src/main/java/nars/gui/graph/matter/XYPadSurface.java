@@ -28,7 +28,7 @@ public class XYPadSurface extends Surface {
 
 
     @Override
-    public void paint(GL2 gl) {
+    protected void paint(GL2 gl) {
 
         //float margin = 0.1f;
         //float mh = margin / 2.0f;
@@ -41,7 +41,8 @@ public class XYPadSurface extends Surface {
 
 
         gl.glColor3f(0.8f, 0.4f, 0f);
-        ShapeDrawer.rect(gl, px - W / 2f, py - H / 2f, W, H);
+        ShapeDrawer.rect(gl, 0, py - H / 2f, 1, H); //horiz
+        ShapeDrawer.rect(gl, px - W / 2f, 0, W, 1); //vert
 
     }
 

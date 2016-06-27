@@ -7,6 +7,7 @@ import bulletphys.linearmath.Transform;
 import com.jogamp.opengl.GL2;
 import nars.gui.graph.Atomatter;
 import nars.gui.graph.Surface;
+import nars.util.Util;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -21,6 +22,7 @@ public class SurfaceMount<X> extends Atomatter<X> {
 
     public final Surface surface;
     private float padding;
+    private float thick;
 
     public SurfaceMount(X x, Surface s) {
         super(x);
@@ -30,6 +32,7 @@ public class SurfaceMount<X> extends Atomatter<X> {
 
         //scale(4f,3f,0.1f);
         this.radius = 0.5f; //HACK
+        this.thick = Float.NaN;
 
         this.padding = 0.04f;
 
@@ -39,9 +42,20 @@ public class SurfaceMount<X> extends Atomatter<X> {
     @Override
     public boolean onTouch(Vector3f hitPoint, short[] buttons) {
         if (!super.onTouch(hitPoint, buttons)) {
+
             Transform it = Transform.t(transform()).inverse();
             Vector3f localPoint = it.transform(v(hitPoint));
-            return surface.onTouch(new Vector2f(localPoint.x/2f+0.5f, localPoint.y/2f+0.5f), buttons);
+
+            if (this.thick!=this.thick) {
+                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
+                this.thick = h.z;
+            }
+
+            float depthEpsilon = thick/4f;
+
+            if (Util.equals(localPoint.z, thick, depthEpsilon)) { //top surface only, ignore sides and back
+                return surface.onTouch(new Vector2f(localPoint.x / 2f + 0.5f, localPoint.y / 2f + 0.5f), buttons);
+            }
         }
         return false;
     }

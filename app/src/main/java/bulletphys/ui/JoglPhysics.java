@@ -50,6 +50,7 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
 import nars.gui.graph.Atomatter;
+import nars.gui.graph.matter.ConsoleSurface;
 import nars.util.JoglSpace;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -258,20 +259,12 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 
         if (simulating) {
-            // NOTE: simple dynamics world doesn't handle fixed-time-stepping
-            float ms = Math.max(clock.getTimeMicroseconds(), 1000000f / 60f);
-
-            clock.reset();
-
-            dyn.stepSimulation(ms / 1000000.f);
+            // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
+            dyn.stepSimulation(Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f);
         }
-
-        // optional but useful: debug drawing
-        //dyn.debugDrawWorld(debug);
 
         updateCamera();
         dyn.objects().forEach(this::render);
-
     }
 
 
@@ -283,6 +276,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     }
 
     public void mouseExited(MouseEvent e) {
+        mouseDragDX = mouseDragDY = 0; //clear drag
+        mouseDragPrevX = mouseDragPrevY = -1;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -293,7 +288,6 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         if (!mouseMotionFunc(x, y, e.getButtonsDown())) {
             pickConstrain(e.getButton(), 1, x, y);
         }
-
     }
 
     public void mouseReleased(MouseEvent e) {
@@ -857,21 +851,28 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
     private boolean mouseMotionFunc(int x, int y, short[] buttons) {
 
         Vector3f ray = v(rayTo(x, y));
-        CollisionWorld.ClosestRayResultCallback mouseTouch = mousePick(ray);
-        /*System.out.println(mouseTouch.collisionObject + " touched with " +
-            Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
-        );*/
 
-        if (mouseTouch.collisionObject!=null) {
-            Object t = mouseTouch.collisionObject.getUserPointer();
-            if (t instanceof Atomatter) {
-                Atomatter a = ((Atomatter)t);
-                if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
-                    //absorbed
-                    return true;
+        //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"
+
+            CollisionWorld.ClosestRayResultCallback mouseTouch = mousePick(ray);
+
+            /*System.out.println(mouseTouch.collisionObject + " touched with " +
+                Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
+            );*/
+
+            if (mouseTouch.collisionObject != null) {
+                Object t = mouseTouch.collisionObject.getUserPointer();
+                if (t instanceof Atomatter) {
+                    Atomatter a = ((Atomatter) t);
+                    if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
+                        //absorbed
+                        mouseDragDX = mouseDragDY = 0;
+                        mouseDragPrevX = mouseDragPrevY = -1; //cancel any drag being enabled
+                        return true;
+                    }
                 }
             }
-        }
+        //}
 
         if ((pickConstraint != null) || (directDrag != null)) {
 
@@ -1048,6 +1049,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         return body;
     }
 
+    ConsoleSurface s = new ConsoleSurface(40, 20);
         // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
     public void ortho() {
         gl.glViewport(0, 0, screenWidth, screenHeight);

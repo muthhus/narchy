@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -53,8 +54,8 @@ public class Surface {
 
             float csx = c.scaleLocal.x;
             float csy = c.scaleLocal.y;
-            subHit.scale(1f / csx, 1f / csy);
             subHit.sub(c.translateLocal.x, c.translateLocal.y);
+            subHit.scale(1f / csx, 1f / csy);
 
             float hx = subHit.x, hy = subHit.y;
             if (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f) {
@@ -79,23 +80,29 @@ public class Surface {
         return false;
     }
 
-    public void paint(GL2 gl) {
+    protected void paint(GL2 gl) {
 
     }
 
     public final void render(GL2 gl) {
+        gl.glPushMatrix();
+
+        transform(gl);
+
         paint(gl);
 
         List<? extends Surface> cc = this.children;
         if (cc != null) {
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++)
-                render(gl, cc.get(i));
+                cc.get(i).render(gl);
         }
+
+        gl.glPopMatrix();
     }
 
-    protected final void render(GL2 gl, Surface c) {
-        gl.glPushMatrix();
 
+    public void transform(GL2 gl) {
+        final Surface c = this;
 
         Vector3f translate = c.translateLocal;
         if (translate!=null)
@@ -104,15 +111,11 @@ public class Surface {
         Vector2f scale = c.scaleLocal;
         if (scale!=null)
             gl.glScalef(scale.x, scale.y, 1f);
-
-        c.render(gl);
-
-        gl.glPopMatrix();
     }
 
 
     public static boolean leftButton(@NotNull short[] buttons) {
-        return buttons.length > 0 && buttons[0]>0;
+        return buttons.length == 1 && buttons[0]==1;
     }
 
 }
