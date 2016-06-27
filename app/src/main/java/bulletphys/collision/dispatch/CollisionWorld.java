@@ -552,27 +552,29 @@ public class CollisionWorld<X> {
 
 			//return array[index];
 			CollisionObject collisionObject = objs.get(i);
+			if (collisionObject!=null) {
 
-			BroadphaseProxy broadphaseHandle = collisionObject.getBroadphaseHandle();
+				BroadphaseProxy broadphaseHandle = collisionObject.getBroadphaseHandle();
 
-			// only perform raycast if filterMask matches
-			if (broadphaseHandle!=null && resultCallback.needsCollision(broadphaseHandle)) {
-				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
-				CollisionShape shape = collisionObject.shape();
+				// only perform raycast if filterMask matches
+				if (broadphaseHandle != null && resultCallback.needsCollision(broadphaseHandle)) {
+					//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
+					CollisionShape shape = collisionObject.shape();
 
-				Transform collisionObjWorld = collisionObject.getWorldTransform(tmpTrans);
+					Transform collisionObjWorld = collisionObject.getWorldTransform(tmpTrans);
 
-				shape.getAabb(collisionObjWorld, collisionObjectAabbMin, collisionObjectAabbMax);
+					shape.getAabb(collisionObjWorld, collisionObjectAabbMin, collisionObjectAabbMax);
 
-				hitLambda[0] = resultCallback.closestHitFraction;
+					hitLambda[0] = resultCallback.closestHitFraction;
 
 
-				if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda)) {
-					rayTestSingle(rayFromTrans, rayToTrans,
-							collisionObject,
-							shape,
-							collisionObjWorld,
-							resultCallback);
+					if (AabbUtil2.rayAabb(rayFromWorld, rayToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda)) {
+						rayTestSingle(rayFromTrans, rayToTrans,
+								collisionObject,
+								shape,
+								collisionObjWorld,
+								resultCallback);
+					}
 				}
 			}
 

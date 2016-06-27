@@ -407,14 +407,16 @@ public enum ShapeDrawer {
 
     public static void rect(GL2 gl, float x1, float y1, float w, float h) {
         gl.glBegin(GL2.GL_QUADS);
-        gl.glVertex2f(x1, y1);
-        gl.glVertex2f(x1+w, y1);
-        gl.glVertex2f(x1+w, y1+h);
-        gl.glVertex2f(x1, y1+h);
+        //gl.glNormal3f(0, 0, 1f);
+        gl.glVertex3f(x1, y1, 0);
+        gl.glVertex3f(x1+w, y1, 0);
+        gl.glVertex3f(x1+w, y1+h, 0);
+        gl.glVertex3f(x1, y1+h, 0);
         gl.glEnd();
     }
     public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
         gl.glBegin(GL2.GL_QUADS);
+        //gl.glNormal3f(0, 0, 1f);
         gl.glVertex3f(x1, y1, z);
         gl.glVertex3f(x1+w, y1, z);
         gl.glVertex3f(x1+w, y1+h, z);

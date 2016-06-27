@@ -5,10 +5,12 @@ import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.RigidBody;
 import bulletphys.linearmath.Transform;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.math.Quaternion;
 import spacegraph.Spatial;
 import spacegraph.Surface;
 import nars.util.Util;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
@@ -20,9 +22,9 @@ import static javax.vecmath.Vector3f.v;
  */
 public class SurfaceMount<X> extends Spatial<X> {
 
-    private final float thick = 0.05f;
+    private final float thick = 0.1f;
     public final Surface surface;
-    private float padding;
+    //private float padding;
 
 
     public SurfaceMount(X x, Surface s) {
@@ -34,7 +36,7 @@ public class SurfaceMount<X> extends Spatial<X> {
         //scale(4f,3f,0.1f);
         this.radius = 0.5f; //HACK
 
-        this.padding = 0.04f;
+        //this.padding = 0.04f;
 
         s.setParent(null);
     }
@@ -66,6 +68,8 @@ public class SurfaceMount<X> extends Spatial<X> {
         return new BoxShape(v(1, 1, thick));
     }
 
+
+
     @Override
     protected final void renderRelative(GL2 gl, RigidBody body) {
         super.renderRelative(gl, body);
@@ -75,12 +79,14 @@ public class SurfaceMount<X> extends Spatial<X> {
         gl.glPushMatrix();
 
         //float pp = 1f - (p / 2f);
-        float pp = 1f;
+        //float pp = 1f;
 
         gl.glTranslatef(-0.5f, -0.5f, radius*1.05f);
         //gl.glScalef(pp, pp, 1f);
 
+
         surface.render(gl);
+
         gl.glPopMatrix();
     }
 

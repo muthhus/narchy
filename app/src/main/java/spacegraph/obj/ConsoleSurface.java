@@ -182,24 +182,28 @@ public class ConsoleSurface extends Surface {
                 TextCharacter c = term.getView(i, r);
 
                 TextColor backColor = c.back;
+                if (!backColor.equals(TextColor.ANSI.DEFAULT)) {
 
-                //draw.drawSolidRect(x, y, cw, ch, -0.1f, bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
-                float bgAlpha = 0.75f;
+                    float bgAlpha = 0.5f;
 
-                gl.glColor4f(
-                        backColor.red(),
-                        backColor.green(), backColor.blue(), bgAlpha);
 
-                ShapeDrawer.rect(gl,
-                        0, 0,
-                        cw, ch
-                        //,-1f
-                );
+                    gl.glColor4f(
+                            backColor.red(),
+                            backColor.green(), backColor.blue(), bgAlpha);
+                    ShapeDrawer.rect(gl,
+                            0, 0,
+                            cw, ch
+                            //,-1f
+                    );
+                }
+
 
                 char cc = displayChar(c);
                 if ((cc != 0) && (cc != ' ')) {
                     TextColor fg = c.fore;
-                    gl.glColor3f(fg.red(), fg.green(), fg.blue());
+                    float fgAlpha = 0.9f;
+
+                    gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
                     // Center Our Text On The Screen
                     //float width = glut.glutStrokeLength(font, string);
                     //gl.glTranslatef(-width / 2f, 0, 0);

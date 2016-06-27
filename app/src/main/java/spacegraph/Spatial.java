@@ -315,7 +315,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         {
             float a = src.transform().getRotation(tmpQ).toAngleAxis(tmpV);
             ww.set(tmpV);
-            //ww.normalize(); //used for the normal3f below
+            ww.normalize(); //used for the normal3f below
             float sx = src.x();
             float tx = tgt.x();
             float dx = tx - sx;
@@ -335,7 +335,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
             gl.glBegin(GL2.GL_TRIANGLES);
 
 
-            //gl.glNormal3f(ww.x, ww.y, ww.z);
+
 
             gl.glVertex3f(sx+vv.x, sy+vv.y, sz+vv.z); //right base
             gl.glVertex3f( //right base

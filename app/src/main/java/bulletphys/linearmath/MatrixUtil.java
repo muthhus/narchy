@@ -199,10 +199,10 @@ public class MatrixUtil {
 	}
 	public static void setQuat(Quaternion q, int i, float v) {
 		switch (i) {
-			case 0: q.setW(v); break;
-			case 1: q.setX(v); break;
-			case 2: q.setY(v); break;
-			case 3: q.setZ(v); break;
+			case 0: q.setX(v); break;
+			case 1: q.setY(v); break;
+			case 2: q.setZ(v); break;
+			case 3: q.setW(v); break;
 		}
 	}
 	public static void getRotation(Matrix3f mat, Quaternion q) {
@@ -217,8 +217,8 @@ public class MatrixUtil {
 			s = 0.5f / s;
 
 			setQuat(q, 0, ((mat.m21 - mat.m12) * s) );
-			setQuat(q, 0, ((mat.m02 - mat.m20) * s) );
-			setQuat(q, 0, ((mat.m10 - mat.m01) * s) );
+			setQuat(q, 1, ((mat.m02 - mat.m20) * s) );
+			setQuat(q, 2, ((mat.m10 - mat.m01) * s) );
 		}
 		else {
 			int i = mat.m00 < mat.m11 ? (mat.m11 < mat.m22 ? 2 : 1) : (mat.m00 < mat.m22 ? 2 : 0);

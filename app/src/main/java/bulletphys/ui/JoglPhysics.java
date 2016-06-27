@@ -256,7 +256,9 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     public void display(GLAutoDrawable drawable) {
 
+
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+        gl.glEnable(GL2.GL_DEPTH_TEST);
 
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
@@ -1049,14 +1051,15 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         return body;
     }
 
-    ConsoleSurface s = new ConsoleSurface(40, 20);
+
         // See http://www.lighthouse3d.com/opengl/glut/index.php?bmpfontortho
     public void ortho() {
         gl.glViewport(0, 0, screenWidth, screenHeight);
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
+        //gl.glOrtho(-2.0, 2.0, -2.0, 2.0, -1.5, 1.5);
+        gl.glOrtho(0, 1, 0, 1, -1.5, 1.5);
 
 //        // switch to projection mode
 //        gl.glMatrixMode(gl.GL_PROJECTION);
@@ -1075,6 +1078,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         gl.glMatrixMode(gl.GL_MODELVIEW);
         //gl.glLoadIdentity();
 
+        gl.glDisable(GL2.GL_DEPTH_TEST);
     }
 
 

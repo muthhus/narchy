@@ -53,13 +53,20 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     }
 
 
+    final List<Facial> facials = new FasterList<>(1);
+
     final List<SpaceInput<O,?>> inputs = new FasterList<>(1);
+
     private Function<O, Spatial<O>> materialize = x -> (Spatial<O>)x;
 
-    final WeakValueHashMap<O, Spatial<O>> atoms;
+    final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
 
 
     final List<SpaceTransform<O>> transforms = Global.newArrayList();
+
+    public SpaceGraph() {
+        super();
+    }
 
     public SpaceGraph(Function<O, Spatial<O>> materializer, O... c) {
         this(materializer, new ListInput<>(c));
@@ -72,12 +79,15 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     public SpaceGraph(Function<O, Spatial<O>> defaultMaterializer, SpaceInput<O, ?>... cc) {
         super();
 
-        atoms = new WeakValueHashMap<>(1024);
-
         this.materialize = defaultMaterializer;
 
         for (SpaceInput c : cc)
             add(c);
+    }
+
+    public void add(Facial c) {
+        if (this.facials.add(c))
+            c.start(this);
     }
 
     public void add(SpaceInput<O,?> c) {
@@ -132,16 +142,19 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.01f); // Black Background
-        //gl.glClearDepth(1f); // Depth Buffer Setup
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); // Black Background
+        gl.glClearDepth(1f); // Depth Buffer Setup
 
         // Quick And Dirty Lighting (Assumes Light0 Is Set Up)
         //gl.glEnable(GL2.GL_LIGHT0);
 
         //gl.glEnable(GL2.GL_LIGHTING); // Enable Lighting
 
-        gl.glEnable(GL2.GL_BLEND);
+
         gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+        gl.glEnable(GL2.GL_BLEND);
+
 
 
         //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
@@ -181,6 +194,12 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     protected void renderHUD() {
         ortho();
+
+        GL2 gl = this.gl;
+        for (int i = 0, facialsSize = facials.size(); i < facialsSize; i++) {
+            facials.get(i).render(gl);
+        }
+
         //gl.glColor4f(1f,1f,1f, 1f);
         //gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         //terminal.render(gl);

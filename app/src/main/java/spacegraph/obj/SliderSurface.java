@@ -3,6 +3,7 @@ package spacegraph.obj;
 import bulletphys.ui.ShapeDrawer;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
+import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -40,7 +41,7 @@ public class SliderSurface extends Surface {
 //        ).show(800,800);
 //    }
     public static void main(String[] args) {
-        new SpaceGraph<>(
+        SpaceGraph s = new SpaceGraph<>(
 
                 (List<Surface> vt) -> new SurfaceMount<>(null,
                     new GridSurface(vt, GridSurface.VERTICAL)),
@@ -60,7 +61,11 @@ public class SliderSurface extends Surface {
 
                 )
 
-        ).show(800,800);
+        );
+
+        s.add(new Facial(new ConsoleSurface(80, 25)).scale(0.5f));
+
+        s.show(800,800);
     }
 
 
