@@ -11,7 +11,7 @@ import boofcv.struct.image.InterleavedU8;
 abstract public class ImageContext implements ImageProcess {
 
 
-    protected InterleavedU8 output = new InterleavedU8();
+    public InterleavedU8 output = new InterleavedU8();
 
     public static ImageContext seq(ImageProcess... stages) {
         return new ImageContext() {

@@ -49,7 +49,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 	private final int pacmanCyclesPerFrame = 8;
-	float bias; //pain of boredom
+	float bias = -0.1f; //pain of boredom
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -248,7 +248,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 						}
 
 
-						for (cghost g : ghosts) {
+						for (int i1 = 0, ghostsLength = ghosts.length; i1 < ghostsLength; i1++) {
+							cghost g = ghosts[i1];
 //							int ix = g.iX / 16;
 //							int iy = g.iY / 16;
 							int ix = Math.round(g.iX / 16f);
@@ -292,8 +293,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		ds += bias;
 
-		ds += interScore;
-		interScore = 0;
+		ds += deathPain;
+		deathPain *= 0.95f;
 
 		if (ds > 1f) ds = 1f;
 		if (ds < -1f) ds = -1f;
@@ -315,7 +316,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		}
 
 
-		if (interScore < bias*2f) {
+		if (deathPain < bias*2f) {
 			//too much pain
 			pacKeyDir = -1;
 		}
@@ -333,17 +334,16 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 	}
 
-	float interScore;
+	float deathPain;
 	@Override
 	public void killedByGhost() {
 		super.killedByGhost();
-		interScore -= 1f;
+		deathPain -= 1f;
 	}
 
 	@Override
 	public void killGhost() {
 		super.killGhost();
-		//interScore += 1f; //DISABLED FOR NOW TO NOT CONFUSE IT
 	}
 
 }

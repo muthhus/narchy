@@ -16,6 +16,7 @@ import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.op.RelativeSignalClassifier;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,12 +25,9 @@ import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.vision.SwingCamera;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import javax.swing.*;
 import java.util.function.Consumer;
-
-import static nars.$.logger;
 
 public class PongEnvironment extends Player implements Environment {
 
@@ -92,7 +90,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
-		new HappySad(nar, 8);
+		new HappySad(nar, 4);
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
@@ -504,46 +502,39 @@ public class PongEnvironment extends Player implements Environment {
 
 	}
 
-	private static class HappySad implements Consumer<NAR> {
-
-		private final DescriptiveStatistics happy;
+	private static class HappySad extends RelativeSignalClassifier implements Consumer<NAR> {
 
 		public HappySad(NAR nar, int windowSize) {
-			happy = new DescriptiveStatistics();
-			happy.setWindowSize(windowSize);
+			super(()->nar.emotion.happy(), windowSize, (i) -> {
+
+				Term e = null;
+				switch (i) {
+					case 0: return;
+					case +1: e = happy(nar); break;
+					case -1: e = sad(nar); break;
+					default:
+						throw new UnsupportedOperationException();
+				}
+
+				if (e!=null) {
+					nar.believe(e, Tense.Present);
+					//logger.info("{}", e);
+				}
+			});
 
 			nar.onFrame(this);
-
 		}
 
 		@Override
 		public void accept(NAR nar) {
-			float h = nar.emotion.happy();
-
-			float dMean = (float)(h - happy.getMean());
-			double varianceThresh = happy.getVariance();
-
-			Compound e;
-			if (dMean > varianceThresh) {
-				e = happy(nar);
-			} else if (dMean < -varianceThresh) {
-				e = sad(nar);
-			} else {
-				e = null;
-			}
-
-			if (e!=null) {
-				nar.believe(e, Tense.Present);
-				logger.info("{}", e);
-			}
-
-			happy.addValue(h);
+			run();
 		}
 
-		private Compound happy(NAR nar) {
+		private static Compound happy(NAR nar) {
 			return $.prop(nar.self, $.the("happy"));
 		}
-		private Compound sad(NAR nar) {
+
+		private static Compound sad(NAR nar) {
 			return $.prop(nar.self, $.the("sad"));
 
 		}

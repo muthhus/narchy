@@ -2,9 +2,7 @@ package nars.util.math;
 
 import nars.util.Util;
 
-/**
- * Created by me on 5/4/16.
- */
+
 public class RangeNormalizedFloat implements FloatSupplier {
 
     private final FloatSupplier in;
@@ -34,6 +32,10 @@ public class RangeNormalizedFloat implements FloatSupplier {
     @Override
     public float asFloat() {
         float raw = in.asFloat();
+        return normalize(raw);
+    }
+
+    public float normalize(float raw) {
         if (!Float.isFinite(raw))
             //throw new ArithmeticException();
             return 0.5f;
@@ -48,4 +50,5 @@ public class RangeNormalizedFloat implements FloatSupplier {
 
         return (raw - min) / (max - min);
     }
+
 }

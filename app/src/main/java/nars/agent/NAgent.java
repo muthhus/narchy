@@ -16,7 +16,7 @@ import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
-import nars.util.math.RangeNormalizedFloat;
+import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -193,7 +193,11 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect(toList());
 
         this.reward = new SensorConceptDebug("(R)", nar,
-                new RangeNormalizedFloat(() -> prevReward/*, -1, 1*/), sensorTruth)
+                //new RangeNormalizedFloat(
+                new PolarRangeNormalizedFloat(
+                    () -> prevReward/*, -1, 1*/
+                ),
+                sensorTruth)
                 .resolution(0.01f)
                 .pri(rewardPriority);
                 //.sensorDT(-1); //pertains to the prevoius frame
