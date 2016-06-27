@@ -185,11 +185,14 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         gl.glLightModelf(GL2.GL_LIGHT_MODEL_AMBIENT, 0.6f);
 
         float[] light_ambient = new float[]{0.3f, 0.3f, 0.3f, 1.0f};
-        float[] light_diffuse = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+        float[] light_diffuse = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
         //float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
         float[] light_specular = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
         /* light_position is NOT default value */
-        float[] light_position0 = new float[]{0f, 0f, 5f, 0.0f};
+
+        float distance = 25f;
+        float[] light_position0 = new float[]{0f, 0f, distance, 0.0f};
+
         //float[] light_position1 = new float[]{-1.0f, -10.0f, -1.0f, 0.0f};
 
 //        if (gl.isGLES2()) {

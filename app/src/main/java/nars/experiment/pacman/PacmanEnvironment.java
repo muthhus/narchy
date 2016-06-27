@@ -24,6 +24,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.experiment.Environment;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -35,7 +36,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.experiment.Environment;
 
 import java.util.Random;
 

@@ -62,9 +62,9 @@ public class RagDoll extends Spatial {
                 x -> x,
                 new RagDoll()
         );
-        gs.setGravity(v(0f, -30f, 0f));
+        //gs.setGravity(v(0f, -30f, 0f));
         gs.setCameraDistance(10f);
-        spawnGround(gs);
+        //spawnGround(gs);
 
         gs.show(1000, 800);
 

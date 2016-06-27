@@ -1,4 +1,4 @@
-package nars.op.uibot;
+package nars.remote;
 
 import boofcv.struct.image.InterleavedU8;
 import javafx.scene.Scene;
@@ -9,6 +9,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import nars.util.FX;
+import nars.vision.ImageContext;
+import nars.vision.ImageCrop;
 import org.jfxvnc.net.rfb.render.RenderCallback;
 import org.jfxvnc.net.rfb.render.rect.ImageRect;
 

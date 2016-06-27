@@ -1,4 +1,4 @@
-package nars.op.uibot;
+package nars.vision;
 
 import boofcv.struct.image.ImageBase;
 

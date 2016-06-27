@@ -89,6 +89,8 @@ public class Surface {
 
         transform(gl);
 
+        gl.glNormal3f(0,0,1);
+
         paint(gl);
 
         List<? extends Surface> cc = this.children;

@@ -1,4 +1,4 @@
-package nars.op.uibot;
+package nars.remote;
 
 /**
  * RDP/VNC Connections

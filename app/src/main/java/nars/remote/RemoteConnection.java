@@ -1,4 +1,4 @@
-package nars.op.uibot;
+package nars.remote;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.InterleavedU8;
@@ -16,6 +16,7 @@ import javafx.scene.ImageCursor;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import nars.vision.ImageProcess;
 import org.jfxvnc.net.rfb.codec.ProtocolHandler;
 import org.jfxvnc.net.rfb.codec.ProtocolState;
 import org.jfxvnc.net.rfb.codec.decoder.ServerDecoderEvent;

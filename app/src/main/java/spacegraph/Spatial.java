@@ -249,7 +249,11 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     protected void renderLabel(GL2 gl) {
+        gl.glPushMatrix();
+        gl.glNormal3f(0,0,1f);
+        gl.glTranslatef(0,0,0.5f);
         renderLabel(gl, this);
+        gl.glPopMatrix();
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {

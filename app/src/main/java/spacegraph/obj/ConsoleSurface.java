@@ -6,6 +6,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.ShellTerminal;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
@@ -25,10 +26,24 @@ import static spacegraph.render.JoglSpace.glut;
 public class ConsoleSurface extends Surface {
 
 
-    public static void main(String[] args) {
+    /** whether the background is not fully opaque */
+    boolean transparent = false;
+
+    public static void main(String[] args) throws IOException {
+
+        DefaultVirtualTerminal vt1 = ShellTerminal.build(80, 25,
+                "/bin/bash"
+                //"/bin/zsh"
+                //"/usr/bin/fish"
+        ).input(
+            //"htop\n"
+            "w\nfree\n"
+        );
+
+
         new SpaceGraph<VirtualTerminal>(
                 vt -> ConsoleSurface.widget(vt),
-                new DefaultVirtualTerminal(80, 25)
+                vt1
         ).show(800, 800);
     }
 
@@ -81,6 +96,8 @@ public class ConsoleSurface extends Surface {
         float charUnscaleX = fontUnscale * cw;
         float charUnscaleY = fontUnscale * ch;
 
+        float dz = 0.1f;
+
         gl.glPushMatrix();
 
         float th = (rows * ch);
@@ -99,14 +116,14 @@ public class ConsoleSurface extends Surface {
 
                 gl.glPushMatrix();
 
-                gl.glTranslatef(x * cw, y * ch, 0);
+                gl.glTranslatef(x * cw, y * ch, dz);
 
                 TextCharacter c = term.getView(i, r);
 
                 TextColor backColor = c.back;
-                if (!backColor.equals(TextColor.ANSI.DEFAULT)) {
+                if (!transparent || !backColor.equals(TextColor.ANSI.DEFAULT)) {
 
-                    float bgAlpha = 0.5f;
+                    float bgAlpha = 0.9f;
 
 
                     gl.glColor4f(
@@ -115,7 +132,7 @@ public class ConsoleSurface extends Surface {
                     ShapeDrawer.rect(gl,
                             0, 0,
                             cw, ch
-                            //,-1f
+                            ,-dz
                     );
                 }
 

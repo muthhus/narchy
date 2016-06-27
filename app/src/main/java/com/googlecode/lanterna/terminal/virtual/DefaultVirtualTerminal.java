@@ -273,6 +273,14 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
         inputQueue.add(keyStroke);
     }
 
+    public synchronized DefaultVirtualTerminal input(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            input(KeyStroke.fromString(String.valueOf(str.charAt(i))));
+        }
+        flush();
+        return this;
+    }
+
     public synchronized TreeSet<TerminalPosition> getDirtyCells() {
         return new TreeSet<>(dirtyTerminalCells);
     }

@@ -85,12 +85,12 @@ public class NAgent implements Agent {
     private float lastMotivation;
     private int nextAction = -1;
     private SensorConcept dRewardSensor;
-    private final Budgeted RewardAttentionPerFrame; //b(0.9f,0.9f,0.9f);
+    private final Budgeted RewardAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
     //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
     private final DecideAction decideAction;
-    private final boolean synchronousGoalInput;
+    private final boolean synchronousGoalInput = false;
 
     private final int motorBeliefCapacity = 16;
     private final int motorGoalCapacity = 16;
