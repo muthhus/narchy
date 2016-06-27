@@ -1,4 +1,4 @@
-package nars.gui.test;
+package spacegraph.test;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;

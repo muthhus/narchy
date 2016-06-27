@@ -2,7 +2,7 @@ package nars.guifx.demo;
 
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.gui.BeliefTableChart;
+import nars.gui.concept.BeliefTableChart;
 import nars.util.Texts;
 
 /**

@@ -1,25 +1,25 @@
-package nars.gui.graph.layout;
+package spacegraph.layout;
 
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.GraphSpace;
-import nars.gui.graph.GraphTransform;
+import spacegraph.Spatial;
+import spacegraph.SpaceGraph;
+import spacegraph.SpaceTransform;
 
 import java.util.List;
 
 /**
  * Created by me on 6/21/16.
  */
-public class Spiral<O> implements GraphTransform<O> {
+public class Spiral<O> implements SpaceTransform<O> {
 
     float nodeSpeed = 0.05f;
 
     @Override
-    public void update(GraphSpace<O> g, List<Atomatter<O>> verts, float dt) {
+    public void update(SpaceGraph<O> g, List<Spatial<O>> verts, float dt) {
         verts.forEach(this::update);
     }
 
 
-    protected void update(Atomatter v) {
+    protected void update(Spatial v) {
         //TODO abstract
         //int hash = v.hash;
         //int vol = v.key.volume();

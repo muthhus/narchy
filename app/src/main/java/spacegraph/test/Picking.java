@@ -1,4 +1,4 @@
-package nars.gui.test;
+package spacegraph.test;
 
 //=================================================================================
 // Picking 0.2                                                       (Thomas Bladh)

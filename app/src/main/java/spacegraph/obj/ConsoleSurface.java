@@ -1,4 +1,4 @@
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
 import bulletphys.ui.ShapeDrawer;
 import com.googlecode.lanterna.TerminalPosition;
@@ -11,8 +11,8 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
-import nars.gui.graph.GraphSpace;
-import nars.gui.graph.Surface;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import nars.util.Util;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class ConsoleSurface extends Surface {
 
 
     public static void main(String[] args) {
-        new GraphSpace<VirtualTerminal>(
+        new SpaceGraph<VirtualTerminal>(
                 vt -> ConsoleSurface.widget(vt),
                 new DefaultVirtualTerminal(80,25)
         ).show(800,800);

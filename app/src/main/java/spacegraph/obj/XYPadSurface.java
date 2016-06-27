@@ -1,8 +1,8 @@
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
 import bulletphys.ui.ShapeDrawer;
 import com.jogamp.opengl.GL2;
-import nars.gui.graph.Surface;
+import spacegraph.Surface;
 
 import javax.vecmath.Vector2f;
 
@@ -40,10 +40,14 @@ public class XYPadSurface extends Surface {
         float H = 0.1f;
 
 
-        gl.glColor3f(0.8f, 0.4f, 0f);
-        ShapeDrawer.rect(gl, 0, py - H / 2f, 1, H); //horiz
-        ShapeDrawer.rect(gl, px - W / 2f, 0, W, 1); //vert
+        gl.glColor3f(0f, 0.2f, 0.8f);
+        float h1 = py - H / 2f;
+        ShapeDrawer.rect(gl, 0, h1, 1, H); //horiz
+        float w1 = px - W / 2f;
+        ShapeDrawer.rect(gl, w1, 0, W, 1); //vert
 
+        gl.glColor3f(0f, 0.4f, 0.9f);
+        ShapeDrawer.rect(gl, w1, h1, W, H, 0.25f); //knob
     }
 
 }

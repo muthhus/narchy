@@ -49,8 +49,8 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.matter.ConsoleSurface;
+import spacegraph.Spatial;
+import spacegraph.obj.ConsoleSurface;
 import nars.util.JoglSpace;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,6 @@ import javax.vecmath.Color3f;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.math.FloatUtil.makeFrustum;
@@ -69,7 +68,7 @@ import static javax.vecmath.Vector3f.v;
  * @author jezek2
  */
 
-public class JoglPhysics<X extends Atomatter> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
+public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseListener, GLEventListener, KeyListener {
 
 
     private boolean simulating = true;
@@ -189,7 +188,7 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         float[] light_diffuse = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
         float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
         /* light_position is NOT default value */
-        float[] light_position0 = new float[]{1.0f, 10.0f, 1.0f, 0.0f};
+        float[] light_position0 = new float[]{1.0f, -10.0f, 1.0f, 0.0f};
         float[] light_position1 = new float[]{-1.0f, -10.0f, -1.0f, 0.0f};
 
 //        if (gl.isGLES2()) {
@@ -229,7 +228,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
         gl.glEnable(gl.GL_COLOR_MATERIAL);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
-        gl.glDepthFunc(gl.GL_LESS);
+        //gl.glDepthFunc(gl.GL_LESS);
+        gl.glDepthFunc(gl.GL_LEQUAL);
 
 
         // JAU
@@ -780,8 +780,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
             System.out.println("UNDRAG: " + directDrag);
 
-            if (u instanceof Atomatter) {
-                ((Atomatter) u).motionLock(false);
+            if (u instanceof Spatial) {
+                ((Spatial) u).motionLock(false);
             }
 
             directDrag = null;
@@ -862,8 +862,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
             if (mouseTouch.collisionObject != null) {
                 Object t = mouseTouch.collisionObject.getUserPointer();
-                if (t instanceof Atomatter) {
-                    Atomatter a = ((Atomatter) t);
+                if (t instanceof Spatial) {
+                    Spatial a = ((Spatial) t);
                     if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
                         //absorbed
                         mouseDragDX = mouseDragDY = 0;
@@ -893,8 +893,8 @@ public class JoglPhysics<X extends Atomatter> extends JoglSpace implements Mouse
 
                 //System.out.println("DRAG: " + directDrag + " " + u + " -> " + newPos);
 
-                if (u instanceof Atomatter) {
-                    ((Atomatter) u).motionLock(true);
+                if (u instanceof Spatial) {
+                    ((Spatial) u).motionLock(true);
                 }
 
                 MotionState mm = directDrag.getMotionState();

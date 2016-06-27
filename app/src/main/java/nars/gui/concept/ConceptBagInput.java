@@ -1,11 +1,11 @@
-package nars.gui.graph.matter.concept;
+package nars.gui.concept;
 
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.GraphInput;
-import nars.gui.graph.GraphSpace;
+import spacegraph.EDraw;
+import spacegraph.Spatial;
+import spacegraph.SpaceInput;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 6/26/16.
  */
-public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implements ConceptMaterializer {
+public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implements ConceptMaterializer {
 
     public final NAR nar;
     private final int capacity;
@@ -123,7 +123,7 @@ public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implement
         Termed gg = ll.get();
         if (gg == null)
             return true;
-        Atomatter target = grapher.getIfActive(gg.term());
+        Spatial target = space.getIfActive(gg.term());
         if (target == null)
             return true;
 
@@ -132,9 +132,9 @@ public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implement
     }
 
 
-    public boolean addEdge(ConceptWidget v, BLink l, Atomatter target, boolean task) {
+    public boolean addEdge(ConceptWidget v, BLink l, Spatial target, boolean task) {
 
-        GraphSpace.EDraw[] ee = v.edges;
+        EDraw[] ee = v.edges;
 
         float pri = l.pri();
         float dur = l.dur();
@@ -176,7 +176,7 @@ public class ConceptBagInput extends GraphInput<Termed, ConceptWidget> implement
         }
 
         int nextID = this.visible.size();
-        ConceptWidget w = (ConceptWidget) grapher.update(nextID, this, b.get());
+        ConceptWidget w = (ConceptWidget) space.update(nextID, this, b.get());
         return this.visible.add(w);
     }
 

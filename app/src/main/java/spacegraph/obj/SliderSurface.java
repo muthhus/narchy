@@ -1,15 +1,13 @@
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
 import bulletphys.ui.ShapeDrawer;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
-import nars.gui.graph.FixedAtomatterList;
-import nars.gui.graph.GraphSpace;
-import nars.gui.graph.Surface;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import javax.vecmath.Vector2f;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,19 +40,22 @@ public class SliderSurface extends Surface {
 //        ).show(800,800);
 //    }
     public static void main(String[] args) {
-        new GraphSpace<>(
+        new SpaceGraph<>(
 
                 (List<Surface> vt) -> new SurfaceMount<>(null,
                     new GridSurface(vt, GridSurface.VERTICAL)),
 
                 Lists.newArrayList(
                     //new SliderSurface(0.75f, 0, 1),
-                    new XYPadSurface(),
-                        new GridSurface(Lists.newArrayList(
-                                new SliderSurface(0.75f,  0, 1),
-                                new SliderSurface(0.25f,  0, 1),
-                                new SliderSurface(0.5f,  0, 1)
-                        ), GridSurface.VERTICAL)
+                    new GridSurface(Lists.newArrayList(
+                        new XYPadSurface(),
+                        new XYPadSurface()
+                    ), GridSurface.HORIZONTAL),
+                    new GridSurface(Lists.newArrayList(
+                            new SliderSurface(0.75f,  0, 1),
+                            new SliderSurface(0.25f,  0, 1),
+                            new SliderSurface(0.5f,  0, 1)
+                    ), GridSurface.VERTICAL)
 //                    new SliderSurface(0.25f, 0, 1),
 
                 )

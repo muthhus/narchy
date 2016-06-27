@@ -1,9 +1,9 @@
-package nars.gui.graph.layout;
+package spacegraph.layout;
 
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.GraphSpace;
-import nars.gui.graph.GraphSpace.EDraw;
-import nars.gui.graph.GraphTransform;
+import spacegraph.Spatial;
+import spacegraph.SpaceGraph;
+import spacegraph.EDraw;
+import spacegraph.SpaceTransform;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.awt.*;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Fast organic layout algorithm, adapted from JGraph
  */
-public class FastOrganicLayout<O> implements GraphTransform<O> {
+public class FastOrganicLayout<O> implements SpaceTransform<O> {
 
 //    @Range(min = 0, max = 1f)
 //    public final MutableFloat nodeSpeed = new MutableFloat(0.02);
@@ -213,7 +213,7 @@ public class FastOrganicLayout<O> implements GraphTransform<O> {
     }
 
     @Override
-    public void update(GraphSpace<O> g, List<Atomatter<O>> vertices, float dt) {
+    public void update(SpaceGraph<O> g, List<Spatial<O>> vertices, float dt) {
 
 
         //? graph.getBoundsForCells(vertexArray, false, false, true) : null;
@@ -244,7 +244,7 @@ public class FastOrganicLayout<O> implements GraphTransform<O> {
         for (int ii = 0; ii < n; ii++) {
             final int i = ii;
 
-            Atomatter V = vertices.get(i);
+            Spatial V = vertices.get(i);
 
             //TODO is this necessary?
             /*if (!graph.containsVertex(vd.getVertex()))
@@ -307,7 +307,7 @@ public class FastOrganicLayout<O> implements GraphTransform<O> {
 
             for (int j = 0; j < ne; j++) {
 
-                ni[j] = edges[j].key.order;
+                ni[j] = edges[j].target.order;
 
 
                 // Check the connected cell in part of the vertex list to be
@@ -338,7 +338,7 @@ public class FastOrganicLayout<O> implements GraphTransform<O> {
         float[] radius = this.radius;
 
         for (int i = 0; i < n; i++) {
-            Atomatter vd = vertices.get(i);
+            Spatial vd = vertices.get(i);
             float[] ci = cl[i];
 
             //cellLocation[i][0] -= 1/2.0; //geo.getWidth() / 2.0;

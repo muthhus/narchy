@@ -1,14 +1,14 @@
-package nars.gui.graph;
+package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.util.Arrays;
 import java.util.List;
 
 /**
+ * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
 public class Surface {

@@ -1,14 +1,14 @@
-package nars.gui.graph.matter.concept;
+package nars.gui.concept;
 
 import bulletphys.dynamics.RigidBody;
 import com.jogamp.opengl.GL2;
-import nars.gui.graph.Atomatter;
+import spacegraph.Spatial;
 import nars.term.Termed;
 
 /**
  * Created by me on 6/26/16.
  */
-class ConceptWidget extends Atomatter<Termed> {
+class ConceptWidget extends Spatial<Termed> {
 
     /**
      * measure of inactivity, in time units

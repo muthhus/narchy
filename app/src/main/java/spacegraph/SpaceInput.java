@@ -1,4 +1,4 @@
-package nars.gui.graph;
+package spacegraph;
 
 import nars.util.data.list.FasterList;
 
@@ -6,23 +6,23 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by me on 6/26/16.
+ * maintains a set of objects which are used as input for representation in a SpaceGraph
  */
-abstract public class GraphInput<O, M extends Atomatter<O>> {
+abstract public class SpaceInput<O, M extends Spatial<O>> {
 
     protected List<M> visible = new FasterList(0);
     final AtomicBoolean busy = new AtomicBoolean(true);
-    protected GraphSpace grapher;
+    protected SpaceGraph space;
     private float now;
     private float dt;
 
 
-    public void start(GraphSpace grapher) {
-        this.grapher = grapher;
+    public void start(SpaceGraph space) {
+        this.space = space;
     }
 
     public void stop() {
-        this.grapher = null;
+        this.space = null;
     }
 
     public final List<M> visible() {
@@ -50,7 +50,7 @@ abstract public class GraphInput<O, M extends Atomatter<O>> {
      * rewinds the buffer of visible items, when collecting a new batch
      */
     public List<M> rewind(int capacity) {
-        visible.forEach(Atomatter::inactivate);
+        visible.forEach(Spatial::inactivate);
         return visible = new FasterList<>(capacity);
     }
 
@@ -73,5 +73,6 @@ abstract public class GraphInput<O, M extends Atomatter<O>> {
     abstract protected void updateImpl();
 
     abstract public float now();
+
 
 }

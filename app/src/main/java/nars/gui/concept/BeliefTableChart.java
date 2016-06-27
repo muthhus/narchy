@@ -1,4 +1,4 @@
-package nars.gui;
+package nars.gui.concept;
 
 import bulletphys.ui.ShapeDrawer;
 import com.jogamp.opengl.GL2;

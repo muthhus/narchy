@@ -1,4 +1,4 @@
-package nars.gui.graph;
+package spacegraph;
 
 import bulletphys.collision.shapes.BoxShape;
 import bulletphys.collision.shapes.CollisionShape;
@@ -15,37 +15,42 @@ import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
-import static nars.gui.graph.GraphSpace.h;
-import static nars.gui.test.Lesson14.renderString;
+import static spacegraph.test.Lesson14.renderString;
 
 /**
+ * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
  */
-public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
-
+public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     public final O key;
     public final int hash;
 
     @NotNull
-    public final GraphSpace.EDraw[] edges;
+    public final EDraw[] edges;
 
-    /** position: x, y, z */
-    //@NotNull public final float p[] = new float[3];
 
-    /** scale: x, y, z -- should not modify directly, use scale(x,y,z) method to change */
-    //@NotNull public final float[] s = new float[3];
 
     public RigidBody body;
 
+    /** cached center reference */
     transient private final Vector3f center; //references a field in MotionState's transform
 
+    /** physics motion state */
+    public final Motion motion = new Motion();
 
+    /** prevents physics movement */
+    public boolean motionLock;
+
+
+
+    /** cached radius */
+    transient public float radius;
+
+    /** cached .toString() of the key */
     public String label;
 
     public float pri;
-
-
 
     /**
      * the draw order if being drawn
@@ -53,34 +58,32 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     transient public short order;
 
 
-    transient public float radius;
 
-    public final Motion motion = new Motion();
-    public boolean motionLock;
 
-    public Atomatter() {
+
+    public Spatial() {
         this(null);
     }
 
-    public Atomatter(O k) {
+    public Spatial(O k) {
         this(k, 0);
     }
 
-    @Deprecated public Atomatter(O k, int edges) {
+    @Deprecated public Spatial(O k, int edges) {
         this.key = k!=null ? k : (O) this;
         this.label = key!=null ? key.toString() : super.toString();
         this.hash = k!=null ? k.hashCode() : super.hashCode();
-        this.edges = new GraphSpace.EDraw[edges];
+        this.edges = new EDraw[edges];
         this.radius = 0;
         this.pri = 0.5f;
 
         final float initDistanceEpsilon = 0.5f;
-        move(GraphSpace.r(initDistanceEpsilon),
-             GraphSpace.r(initDistanceEpsilon),
-             GraphSpace.r(initDistanceEpsilon));
+        move(SpaceGraph.r(initDistanceEpsilon),
+             SpaceGraph.r(initDistanceEpsilon),
+             SpaceGraph.r(initDistanceEpsilon));
 
         for (int i = 0; i < edges; i++)
-            this.edges[i] = new GraphSpace.EDraw();
+            this.edges[i] = new EDraw();
 
         //init physics
         center = motion.t.origin;
@@ -98,7 +101,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     @Override
     public final boolean equals(Object obj) {
-        return this == obj || key.equals(((Atomatter) obj).key);
+        return this == obj || key.equals(((Spatial) obj).key);
     }
 
     @Override
@@ -179,7 +182,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         motionLock = b;
     }
 
-    public void update(GraphSpace graphSpace) {
+    public void update(SpaceGraph graphSpace) {
 
         if (active()) {
 
@@ -209,12 +212,12 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         return new BoxShape(Vector3f.v(1, 1, 1));
     }
 
-    public RigidBody newBody(GraphSpace graphSpace) {
+    public RigidBody newBody(SpaceGraph graphSpace) {
         final boolean collidesWithOthersLikeThis = false;
         return newBody(graphSpace, newShape(), collidesWithOthersLikeThis);
     }
 
-    public RigidBody newBody(GraphSpace graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
+    public RigidBody newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
         RigidBody b;
         b = graphSpace.newBody(
                 1f, //mass
@@ -250,7 +253,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {
-        float p = h(pri)/2f;
+        float p = SpaceGraph.h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),
                 p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
@@ -263,14 +266,14 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
         renderEdges(gl, this);
     }
 
-    static void renderEdges(GL2 gl, Atomatter v) {
+    static void renderEdges(GL2 gl, Spatial v) {
         int n = v.edgeCount();
-        GraphSpace.EDraw[] eee = v.edges;
+        EDraw[] eee = v.edges;
         for (int en = 0; en < n; en++)
             render(gl, v, eee[en]);
     }
 
-    static public void renderLabel(GL2 gl, Atomatter v) {
+    static public void renderLabel(GL2 gl, Spatial v) {
 
 
         //float p = v.pri * 0.75f + 0.25f;
@@ -287,7 +290,7 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     }
 
-    static public void render(GL2 gl, Atomatter v, GraphSpace.EDraw e) {
+    static public void render(GL2 gl, Spatial v, EDraw e) {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
@@ -304,8 +307,8 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
     static final Vector3f ww = new Vector3f();
     static final Vector3f vv = new Vector3f();
 
-    static public void renderHalfTriEdge(GL2 gl, Atomatter src, GraphSpace.EDraw e, float width) {
-        Atomatter tgt = e.key;
+    static public void renderHalfTriEdge(GL2 gl, Spatial src, EDraw e, float width) {
+        Spatial tgt = e.target;
 
         gl.glPushMatrix();
 
@@ -348,8 +351,8 @@ public class Atomatter<O> implements BiConsumer<GL2, RigidBody> {
 
     }
 
-    public static void renderLineEdge(GL2 gl, Atomatter src, GraphSpace.EDraw e, float width) {
-        Atomatter tgt = e.key;
+    public static void renderLineEdge(GL2 gl, Spatial src, EDraw e, float width) {
+        Spatial tgt = e.target;
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         {

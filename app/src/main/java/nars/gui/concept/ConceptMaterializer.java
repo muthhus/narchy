@@ -1,4 +1,4 @@
-package nars.gui.graph.matter.concept;
+package nars.gui.concept;
 
 import nars.term.Termed;
 

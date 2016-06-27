@@ -23,9 +23,6 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.gui.graph.matter.concept.ConceptBagInput;
-import nars.gui.graph.GraphSpace;
-import nars.gui.graph.matter.concept.ConceptMaterializer;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -36,7 +33,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.agent.NAgent;
-import nars.gui.BeliefTableChart;
+import nars.gui.concept.BeliefTableChart;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.experiment.Environment;
 

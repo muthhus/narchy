@@ -1,6 +1,6 @@
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
-import nars.gui.graph.Surface;
+import spacegraph.Surface;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.List;

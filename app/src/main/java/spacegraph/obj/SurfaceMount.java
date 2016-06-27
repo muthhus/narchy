@@ -1,12 +1,12 @@
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
 import bulletphys.collision.shapes.BoxShape;
 import bulletphys.collision.shapes.CollisionShape;
 import bulletphys.dynamics.RigidBody;
 import bulletphys.linearmath.Transform;
 import com.jogamp.opengl.GL2;
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.Surface;
+import spacegraph.Spatial;
+import spacegraph.Surface;
 import nars.util.Util;
 
 import javax.vecmath.Vector2f;
@@ -18,11 +18,12 @@ import static javax.vecmath.Vector3f.v;
 /**
  * A mount for a 2D surface (embeds a surface in 3D space)
  */
-public class SurfaceMount<X> extends Atomatter<X> {
+public class SurfaceMount<X> extends Spatial<X> {
 
+    private final float thick = 0.05f;
     public final Surface surface;
     private float padding;
-    private float thick;
+
 
     public SurfaceMount(X x, Surface s) {
         super(x);
@@ -32,7 +33,6 @@ public class SurfaceMount<X> extends Atomatter<X> {
 
         //scale(4f,3f,0.1f);
         this.radius = 0.5f; //HACK
-        this.thick = Float.NaN;
 
         this.padding = 0.04f;
 
@@ -46,10 +46,11 @@ public class SurfaceMount<X> extends Atomatter<X> {
             Transform it = Transform.t(transform()).inverse();
             Vector3f localPoint = it.transform(v(hitPoint));
 
-            if (this.thick!=this.thick) {
-                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
-                this.thick = h.z;
-            }
+//            //TODO maybe do this test with the normal vector of the hit ray
+//            if (this.thick!=this.thick) {
+//                Vector3f h = ((BoxShape) body.shape()).getHalfExtentsWithMargin(v());
+//                this.thick = h.z;
+//            }
 
             float depthEpsilon = thick/4f;
 
@@ -62,7 +63,7 @@ public class SurfaceMount<X> extends Atomatter<X> {
 
     @Override
     protected CollisionShape newShape() {
-        return new BoxShape(v(1, 1, 0.05f));
+        return new BoxShape(v(1, 1, thick));
     }
 
     @Override

@@ -24,7 +24,7 @@
  * Written by: Marten Svanfeldt
  */
 
-package nars.gui.graph.matter;
+package spacegraph.obj;
 
 import bulletphys.collision.shapes.BoxShape;
 import bulletphys.collision.shapes.CapsuleShape;
@@ -40,8 +40,8 @@ import bulletphys.ui.JoglPhysics;
 import bulletphys.ui.JoglPhysics.ExtraGlobals;
 import bulletphys.util.BulletStack;
 import bulletphys.util.Motion;
-import nars.gui.graph.Atomatter;
-import nars.gui.graph.GraphSpace;
+import spacegraph.Spatial;
+import spacegraph.SpaceGraph;
 
 import javax.vecmath.Vector3f;
 
@@ -50,7 +50,7 @@ import static javax.vecmath.Vector3f.v;
 /**
  * @author jezek2
  */
-public class RagDoll extends Atomatter {
+public class RagDoll extends Spatial {
 
     public RagDoll() {
         super();
@@ -58,7 +58,7 @@ public class RagDoll extends Atomatter {
 
     public static void main(String[] args) {
 
-        GraphSpace<RagDoll> gs = new GraphSpace(
+        SpaceGraph<RagDoll> gs = new SpaceGraph(
                 x -> x,
                 new RagDoll()
         );
@@ -73,7 +73,7 @@ public class RagDoll extends Atomatter {
 
 
     @Override
-    public RigidBody newBody(GraphSpace graphSpace) {
+    public RigidBody newBody(SpaceGraph graphSpace) {
         return newRagDoll(graphSpace.dyn, v(), 10f);
     }
 

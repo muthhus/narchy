@@ -1,4 +1,4 @@
-package nars.gui.test;
+package spacegraph.test;
  
 /*--. .-"-.
 / o_O / O o \

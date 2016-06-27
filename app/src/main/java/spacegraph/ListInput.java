@@ -1,23 +1,23 @@
-package nars.gui.graph;
+package spacegraph;
 
 import nars.Global;
 
 /**
  * Created by me on 6/26/16.
  */
-public class FixedAtomatterList<X,Y extends Atomatter<X>> extends GraphInput<X,Y> {
+public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
 
     private final X[] items;
 
-    public FixedAtomatterList(X... xx) {
+    public ListInput(X... xx) {
         super();
         this.items = xx;
 
     }
 
     @Override
-    public void start(GraphSpace grapher) {
-        super.start(grapher);
+    public void start(SpaceGraph space) {
+        super.start(space);
         refresh();
     }
 
@@ -32,7 +32,7 @@ public class FixedAtomatterList<X,Y extends Atomatter<X>> extends GraphInput<X,Y
         int n = 0;
         this.visible = Global.newArrayList(items.length);
         for (X x : items) {
-            visible.add((Y) grapher.update(n++, x));
+            visible.add((Y) space.update(n++, x));
         }
     }
 

@@ -1,12 +1,12 @@
-package nars.gui.graph;
+package spacegraph;
 
 import bulletphys.collision.dispatch.CollisionObject;
 import bulletphys.ui.JoglPhysics;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.Global;
-import nars.gui.graph.layout.FastOrganicLayout;
-import nars.gui.graph.matter.concept.ConceptBagInput;
+import spacegraph.layout.FastOrganicLayout;
+import nars.gui.concept.ConceptBagInput;
 import nars.nar.Default;
 import nars.term.Termed;
 import nars.util.data.list.FasterList;
@@ -22,7 +22,7 @@ import java.util.function.Function;
 /**
  * Created by me on 6/20/16.
  */
-public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
+public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     public static void main(String[] args) {
 
@@ -35,7 +35,7 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
         final int maxNodes = 64;
         final int maxEdges = 8;
 
-        new GraphSpace<Termed>(
+        new SpaceGraph<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
         ).withTransform(
             //new Spiral()
@@ -46,98 +46,79 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
     }
 
-    public GraphSpace withTransform(GraphTransform<O>... t) {
-        for (GraphTransform g : t)
+    public SpaceGraph withTransform(SpaceTransform<O>... t) {
+        for (SpaceTransform g : t)
             this.transforms.add(g);
         return this;
     }
 
 
-    final List<GraphInput<O,?>> inputs = new FasterList<>(1);
-    private Function<O, Atomatter<O>> materialize = x -> (Atomatter<O>)x;
+    final List<SpaceInput<O,?>> inputs = new FasterList<>(1);
+    private Function<O, Spatial<O>> materialize = x -> (Spatial<O>)x;
 
-    final WeakValueHashMap<O, Atomatter<O>> atoms;
+    final WeakValueHashMap<O, Spatial<O>> atoms;
 
 
-    final List<GraphTransform<O>> transforms = Global.newArrayList();
+    final List<SpaceTransform<O>> transforms = Global.newArrayList();
 
-    public GraphSpace(Function<O, Atomatter<O>> materializer, O... c) {
-        this(materializer, new FixedAtomatterList<>(c));
+    public SpaceGraph(Function<O, Spatial<O>> materializer, O... c) {
+        this(materializer, new ListInput<>(c));
     }
 
-    public GraphSpace(GraphInput<O,?> c) {
+    public SpaceGraph(SpaceInput<O,?> c) {
         this(null, c);
     }
 
-    public GraphSpace(Function<O, Atomatter<O>> defaultMaterializer, GraphInput<O, ?>... cc) {
+    public SpaceGraph(Function<O, Spatial<O>> defaultMaterializer, SpaceInput<O, ?>... cc) {
         super();
 
         atoms = new WeakValueHashMap<>(1024);
 
         this.materialize = defaultMaterializer;
 
-        for (GraphInput c : cc)
-            enable(c);
+        for (SpaceInput c : cc)
+            add(c);
     }
 
-    public void enable(GraphInput<O,?> c) {
-        inputs.add(c);
-        c.start(this);
+    public void add(SpaceInput<O,?> c) {
+        if (inputs.add(c))
+            c.start(this);
     }
 
-    public @NotNull Atomatter update(int order, O instance) {
+    public void remove(SpaceInput<O,?> c) {
+        if (inputs.remove(c)) {
+            c.stop();
+        }
+    }
+
+    public @NotNull Spatial update(int order, O instance) {
         return update(order, getOrAdd(instance));
     }
-    public @NotNull Atomatter<O> update(int order, Function<? super O, Atomatter<O>> materializer, O instance) {
+    public @NotNull Spatial<O> update(int order, Function<? super O, Spatial<O>> materializer, O instance) {
         return update(order, getOrAdd(instance, materializer));
     }
-    public @NotNull Atomatter<O> update(int order, Atomatter<O> t) {
+    public @NotNull Spatial<O> update(int order, Spatial<O> t) {
         t.activate((short) order);
         return t;
     }
 
 
-    public @NotNull Atomatter getOrAdd(O t) {
+    public @NotNull Spatial getOrAdd(O t) {
         return atoms.computeIfAbsent(t, materialize);
     }
-    public @NotNull Atomatter<O> getOrAdd(O t, Function<? super O, ? extends Atomatter<O>> materializer) {
+    public @NotNull Spatial<O> getOrAdd(O t, Function<? super O, ? extends Spatial<O>> materializer) {
         return atoms.computeIfAbsent(t, materializer);
     }
 
-    public @Nullable Atomatter getIfActive(O t) {
-        Atomatter v = atoms.get(t);
+    public @Nullable Spatial getIfActive(O t) {
+        Spatial v = atoms.get(t);
         return v != null && v.active() ? v : null;
     }
 
-    /**
-     * get the latest info into the draw object
-     */
-    protected @NotNull Atomatter<O> pre(int i, Atomatter<O> v) {
-        v.activate((short)i);
-        return v;
-    }
+
 
     public void setGravity(Vector3f v) {
         dyn.setGravity(v);
-    }
-
-
-    public static final class EDraw {
-        public Atomatter key;
-        public float width, r, g, b, a;
-
-        public void set(Atomatter x, float width, float r, float g, float b, float a) {
-            this.key = x;
-            this.width = width;
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
-        }
-
-        public void clear() {
-            key = null;
-        }
     }
 
 
@@ -173,8 +154,8 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
 
 
-    @Override protected final boolean valid(CollisionObject<Atomatter<O>> c) {
-        Atomatter vd = c.getUserPointer();
+    @Override protected final boolean valid(CollisionObject<Spatial<O>> c) {
+        Spatial vd = c.getUserPointer();
         if (vd!=null && !vd.active()) {
             vd.body.setUserPointer(null); //remove reference so vd can be GC
             vd.body = null;
@@ -185,13 +166,13 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
     public synchronized void display(GLAutoDrawable drawable) {
 
-        List<GraphInput<O,?>> ss = this.inputs;
+        List<SpaceInput<O,?>> ss = this.inputs;
 
         ss.forEach( this::update );
 
         super.display(drawable);
 
-        ss.forEach( GraphInput::ready );
+        ss.forEach( SpaceInput::ready );
 
         renderHUD();
     }
@@ -271,16 +252,16 @@ public class GraphSpace<O> extends JoglPhysics<Atomatter<O>> {
 
 
 
-    public final void update(GraphInput s) {
+    public final void update(SpaceInput s) {
 
         float dt = s.setBusy();
 
-        List<Atomatter<O>> toDraw = s.visible();
+        List<Spatial<O>> toDraw = s.visible();
         for (int i = 0, toDrawSize = toDraw.size(); i < toDrawSize; i++) {
             toDraw.get(i).update(this);
         }
 
-        List<GraphTransform<O>> ll = this.transforms;
+        List<SpaceTransform<O>> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
             ll.get(i1).update(this, toDraw, dt);
         }
