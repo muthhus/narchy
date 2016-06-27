@@ -51,8 +51,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 8;
-	float bias = -0.1f; //pain of boredom
+	private final int pacmanCyclesPerFrame = 12;
+	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
+	public float scoretoReward = 0.02f;
 
 	public PacmanEnvironment(int ghosts) {
 		super(ghosts);
@@ -75,13 +76,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		//nar.conceptActivation.setValue(0.01f);
 
-		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.95f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(256);
+		nar.cyclesPerFrame.set(128);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -294,8 +295,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 		//delta score from pacman game
-		float ds = score - lastScore;
+		float ds = (score - lastScore) * scoretoReward;
 		this.lastScore = score;
+
 
 		//ds/=2f;
 

@@ -491,13 +491,13 @@ public class PongEnvironment extends Player implements Environment {
 	public void actRelativeVelocity(int action) {
 		switch (action) {
 			case 0:
-				vel = -PongModel.SPEED*2;
+				vel = -PongModel.SPEED;
 				break;
 			case 1:
 				vel = 0;
 				break;
 			case 2:
-				vel = +PongModel.SPEED*2;
+				vel = +PongModel.SPEED;
 				break;
 		}
 		move(vel, pong);

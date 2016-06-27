@@ -40,8 +40,12 @@ public class RevisionTask extends MutableTask  {
     }
 
     private void budget(Task a, Task b, float aMix) {
-        budget(b.budget());
-        BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);
+        if (!b.isDeleted() && !a.isDeleted()) {
+            budget(b.budget());
+            BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);
+        } else {
+            delete();
+        }
     }
 
     public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {

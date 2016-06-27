@@ -6,7 +6,8 @@ import nars.util.Util;
 public class RangeNormalizedFloat implements FloatSupplier {
 
     private final FloatSupplier in;
-    private float min, max;
+    protected float min;
+    private float max;
     private final float minStart;
     private final float maxStart;
 
@@ -56,15 +57,19 @@ public class RangeNormalizedFloat implements FloatSupplier {
             //throw new ArithmeticException();
             return 0.5f;
 
+        updateRange(raw);
+
+        if (Util.equals(min,max,epsilon))
+            return 0.5f;
+        else
+            return (raw - min) / (max - min);
+    }
+
+    void updateRange(float raw) {
         if (min > raw)
             min = raw;
         if (max < raw)
             max = raw;
-
-        if (Util.equals(min,max,epsilon))
-            return 0.5f;
-
-        return (raw - min) / (max - min);
     }
 
 

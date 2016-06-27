@@ -129,8 +129,12 @@ public class NAgent implements Agent {
     private final DecideAction decideAction;
     private final boolean synchronousGoalInput = false;
 
+
     private final int motorBeliefCapacity = 16;
     private final int motorGoalCapacity = 16;
+
+    private final int rewardBeliefCapacity = 2 * motorBeliefCapacity;
+
     public SensorConcept happy;
     public SensorConcept sad;
 
@@ -232,20 +236,33 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect(toList());
 
 
-        float rewardResolution = 0.01f;
+        float rewardResolution = 0.05f;
         this.happy = new SensorConcept($.inst(nar.self, the("happy")), nar,
                 new PolarRangeNormalizedFloat(()->
                     prevReward
-                ), sensorFreqPos)
+                ), sensorFreqPos) {
+                    //HACK TODO make this a parameter for SensorConcept
+                    @Override protected void beliefCapacity(ConceptPolicy p) {
+                        beliefs().capacity(0, rewardBeliefCapacity);
+                        goals().capacity(1, motorGoalCapacity);
+                    }
+
+                }
                 .resolution(rewardResolution)
                 .pri(rewardPriority)
-
                 //.seek(true)
         ;
+
         this.sad = new SensorConcept($.inst(nar.self, the("sad")), nar,
                 new PolarRangeNormalizedFloat(()->
                     -prevReward
-                ), sensorFreqPos)
+                ), sensorFreqPos) {
+                    //HACK TODO make this a parameter for SensorConcept
+                    @Override protected void beliefCapacity(ConceptPolicy p) {
+                        beliefs().capacity(0, rewardBeliefCapacity);
+                        goals().capacity(1, motorGoalCapacity);
+                    }
+                }
                 .resolution(rewardResolution)
                 .pri(rewardPriority)
                 //.seek(false)
@@ -385,11 +402,12 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        nar.goal(happy, Tense.Eternal, 1f, 1f);
-        nar.goal(happy, Tense.Present, 1f, 1f);
+        float goalSeekingConfidence = 1f /* gamma */;
+        nar.goal(happy, Tense.Eternal, 1f, goalSeekingConfidence);
+        nar.goal(happy, Tense.Present, 1f, goalSeekingConfidence);
 
-        nar.goal(sad, Tense.Eternal, 0f, 1f);
-        nar.goal(sad, Tense.Present, 0f, 1f);
+        nar.goal(sad, Tense.Eternal, 0f, goalSeekingConfidence);
+        nar.goal(sad, Tense.Present, 0f, goalSeekingConfidence);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
         nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
@@ -403,7 +421,6 @@ public class NAgent implements Agent {
         //nar.goal("(dRn)", Tense.Eternal, 0f, 1f); //prefer increase
         //nar.goal("(dRn)", Tense.Present, 0f, 1f); //prefer increase
 
-        nar.ask($("(?x ==> (R))"), '?', ETERNAL);
         //Task whatCauseReward = nar.ask("(?x ==> (R))", ETERNAL, (Task causeOfIncreasedReward) -> {
             //System.out.println(causeOfIncreasedReward.explanation());
 
@@ -417,7 +434,7 @@ public class NAgent implements Agent {
             //return true;
         //});
         for (Term x : new Term[] { happy, sad } ) {
-            nar.ask($.impl($("?cause"), x), '?', ETERNAL);
+            nar.ask($.impl($("?w"), x), '?', ETERNAL);
             nar.ask(x, '@', ETERNAL);
         }
 

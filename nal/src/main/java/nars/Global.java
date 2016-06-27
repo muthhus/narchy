@@ -148,6 +148,8 @@ public enum Global {
 
     /** minimum durability and quality necessary for a derivation to form */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
+
+    /** relates time and evidence */
     public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 4f;
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
