@@ -630,9 +630,11 @@ public enum Util {
      * discretizes values to nearest finite resolution real number determined by epsilon spacing
      */
     public static float round(float value, float epsilon) {
+        return Math.round(value / epsilon) * epsilon;
+    }
 
-        return clamp(
-                Math.round(value / epsilon) * epsilon);
+    public static float clampround(float value, float epsilon) {
+        return clamp( round(value, epsilon ));
     }
 
     public static int hash(float f, int discretness) {

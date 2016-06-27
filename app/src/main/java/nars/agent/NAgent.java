@@ -1,10 +1,7 @@
 package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
+import nars.*;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.learn.Agent;
@@ -17,6 +14,7 @@ import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
+import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
@@ -30,7 +28,9 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
 import static nars.$.t;
+import static nars.$.the;
 import static nars.nal.Tense.ETERNAL;
+import static nars.util.Texts.n4;
 
 /**
  * Agent interface wrapping a NAR
@@ -47,7 +47,7 @@ public class NAgent implements Agent {
 
     public List<MotorConcept> actions;
     private List<SensorConcept> inputs;
-    private SensorConcept reward;
+    //private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
     private final int clockMultiplier = 1; //introduces extra timing delay between frames
@@ -71,11 +71,48 @@ public class NAgent implements Agent {
     float goalPriority;
 
 
-    final FloatToObjectFunction sensorTruth = (v) -> {
+    final FloatToObjectFunction sensorFreq = (v) -> {
         /*return new DefaultTruth(
                 v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
 
         return t(v, alpha);
+        //return new DefaultTruth(1f, v);
+        //0.5f + alpha /2f /* learning rate */);
+    };
+
+    /** values only on the positive half of the freq spectrum */
+    final FloatToObjectFunction sensorFreqPos = (v) -> {
+        float f;
+
+        if (Math.abs(v/2f) <= Global.TRUTH_EPSILON*2f) {
+            //f = 0f;
+            f = 0.5f;
+            //return null;
+        } else if (v > 0) { //if (v > 0f) {
+            f = 0.5f + v / 2f;
+        } else {
+            f = 0f;
+        }
+        return t(f, alpha);
+    };
+
+    final FloatToObjectFunction sensorFreqPosNeg = (v) -> {
+        float f;
+        if (Math.abs(v/2f) < Global.TRUTH_EPSILON) {
+            f = 0.5f;
+        } else if (v > 0f) {
+            f = 0.5f + v / 2f;
+        } else { //if (v < 0) {
+            f = 0.5f - (-v) / 2f;
+        }
+        return t(f, alpha);
+    };
+
+    final FloatToObjectFunction sensorConf = (v) -> {
+        /*return new DefaultTruth(
+                v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
+
+        return t(1f, alpha * v);
         //return new DefaultTruth(1f, v);
         //0.5f + alpha /2f /* learning rate */);
     };
@@ -94,6 +131,8 @@ public class NAgent implements Agent {
 
     private final int motorBeliefCapacity = 16;
     private final int motorGoalCapacity = 16;
+    public SensorConcept happy;
+    public SensorConcept sad;
 
 
     public NAgent(NAR n) {
@@ -189,49 +228,65 @@ public class NAgent implements Agent {
 
 
         this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
-            return getSensorConcepts(sensorTruth, i);
+            return getSensorConcepts(sensorFreq, i);
         }).flatMap(x -> x).collect(toList());
 
-        this.reward = new SensorConceptDebug("(R)", nar,
-                //new RangeNormalizedFloat(
-                new PolarRangeNormalizedFloat(
-                    () -> prevReward/*, -1, 1*/
-                ),
-                sensorTruth)
-                .resolution(0.01f)
-                .pri(rewardPriority);
-                //.sensorDT(-1); //pertains to the prevoius frame
 
-        final float dRewardThresh = 0.1f; //bigger than a change in X%
-        FloatSupplier differential = () -> {
-            if (Math.abs(dReward) < dRewardThresh)
-                return 0.0f;
-            else if (dReward < 0)
-                return 0.0f; //negative
-            else
-                return 1f; //positive
-        };
-        FloatSupplier differentialNeg = () -> {
-            if (Math.abs(dReward) < dRewardThresh)
-                return 0.0f;
-            else if (dReward > 0)
-                return 0.0f;
-            else
-                return 1f;
-        };
-
-        this.dRewardSensor = new SensorConcept("(dR)", nar, differential, sensorTruth)
+        float rewardResolution = 0.01f;
+        this.happy = new SensorConcept($.inst(nar.self, the("happy")), nar,
+                new PolarRangeNormalizedFloat(()->
+                    prevReward
+                ), sensorFreqPos)
+                .resolution(rewardResolution)
                 .pri(rewardPriority)
-                .resolution(0.01f);
-        this.dRewardSensorNeg = new SensorConcept("(dRn)", nar, differentialNeg, sensorTruth)
+
+                //.seek(true)
+        ;
+        this.sad = new SensorConcept($.inst(nar.self, the("sad")), nar,
+                new PolarRangeNormalizedFloat(()->
+                    -prevReward
+                ), sensorFreqPos)
+                .resolution(rewardResolution)
                 .pri(rewardPriority)
-                .resolution(0.01f);
+                //.seek(false)
+        ;
 
-//        FloatSupplier linearNegative = () -> dReward < -dRewardThresh ? 1 : 0;
-//        this.dRewardNeg = new SensorConcept("(dRn)", nar,
-//                linearNegative, sensorTruth)
-//                .resolution(0.01f).timing(-1, -1);
+//        this.reward = new SensorConceptDebug("(R)", nar,
+//                //new RangeNormalizedFloat(
+//                new PolarRangeNormalizedFloat(
+//                    () -> prevReward/*, -1, 1*/
+//                ),
+//                sensorTruth)
+//                .resolution(0.01f)
+//                .pri(rewardPriority);
+//                //.sensorDT(-1); //pertains to the prevoius frame
 
+
+
+//        final float dRewardThresh = 0.1f; //bigger than a change in X%
+//        FloatSupplier differential = () -> {
+//            if (Math.abs(dReward) < dRewardThresh)
+//                return 0.0f;
+//            else if (dReward < 0)
+//                return 0.0f; //negative
+//            else
+//                return 1f; //positive
+//        };
+//        FloatSupplier differentialNeg = () -> {
+//            if (Math.abs(dReward) < dRewardThresh)
+//                return 0.0f;
+//            else if (dReward > 0)
+//                return 0.0f;
+//            else
+//                return 1f;
+//        };
+//
+//        this.dRewardSensor = new SensorConcept("(dR)", nar, differential, sensorFreq)
+//                .pri(rewardPriority)
+//                .resolution(0.01f);
+//        this.dRewardSensorNeg = new SensorConcept("(dRn)", nar, differentialNeg, sensorFreq)
+//                .pri(rewardPriority)
+//                .resolution(0.01f);
         init();
     }
 
@@ -243,7 +298,8 @@ public class NAgent implements Agent {
         for (MotorConcept a : actions) {
             a.print();
         }
-
+        happy.print();
+        sad.print();
     }
 
     public class SensorConceptDebug extends SensorConcept {
@@ -270,12 +326,16 @@ public class NAgent implements Agent {
         long now = nar.time();
 
         return                    Texts.n2(motivation) + "\t + "
-                 + "rwrd=" + Texts.n4(reward.beliefs().truth(now).expectation()) + " "
-                 + "hapy=" + Texts.n4(emotion.happy()) + " "
-                 + "busy=" + Texts.n4(emotion.busy.getSum()) + " "
-                 + "lern=" + Texts.n4(emotion.learning()) + " "
-                 + "strs=" + Texts.n4(emotion.stress.getSum()) + " "
-                 + "alrt=" + Texts.n4(emotion.alert.getSum()) + " "
+                 + "rwrd=[" +
+                     n4( sad.beliefs().truth(now).motivation() )
+                             + "," +
+                     n4( happy.beliefs().truth(now).motivation() )
+                 + "] "
+                 + "hapy=" + n4(emotion.happy()) + " "
+                 + "busy=" + n4(emotion.busy.getSum()) + " "
+                 + "lern=" + n4(emotion.learning()) + " "
+                 + "strs=" + n4(emotion.stress.getSum()) + " "
+                 + "alrt=" + n4(emotion.alert.getSum()) + " "
                  + "\t" + nar.index.summary()
 
 //                + "," + dRewardPos.belief(nar.time()) +
@@ -325,8 +385,11 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        nar.goal("(R)", Tense.Eternal, 1f, 1f); //goal reward
-        nar.goal("(R)", Tense.Present, 1f, 1f); //prefer increase
+        nar.goal(happy, Tense.Eternal, 1f, 1f);
+        nar.goal(happy, Tense.Present, 1f, 1f);
+
+        nar.goal(sad, Tense.Eternal, 0f, 1f);
+        nar.goal(sad, Tense.Present, 0f, 1f);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
         nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
@@ -353,9 +416,11 @@ public class NAgent implements Agent {
 
             //return true;
         //});
-        nar.ask($("(?x ==> (dR))"), '?', ETERNAL);
-        nar.ask($("(dR)"), '@', ETERNAL);
-        nar.ask($("(R)"), '@', ETERNAL);
+        for (Term x : new Term[] { happy, sad } ) {
+            nar.ask($.impl($("?cause"), x), '?', ETERNAL);
+            nar.ask(x, '@', ETERNAL);
+        }
+
 //        for (MotorConcept a : actions) {
 //            nar.ask(a, ETERNAL, '@', how -> {
 //                //System.out.println(how.explanation());
@@ -393,7 +458,8 @@ public class NAgent implements Agent {
 
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         if (RewardAttentionPerFrame!=null) {
-            nar.conceptualize(reward, RewardAttentionPerFrame);
+            nar.conceptualize(happy, RewardAttentionPerFrame);
+            nar.conceptualize(sad, RewardAttentionPerFrame);
             nar.conceptualize(dRewardSensor, RewardAttentionPerFrame);
         }
 //        for (Concept a : actions) {

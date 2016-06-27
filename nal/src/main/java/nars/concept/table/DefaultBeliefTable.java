@@ -201,8 +201,11 @@ public class DefaultBeliefTable implements BeliefTable {
         @NotNull EternalTable et = this.eternal;
 
         int cap = et.capacity();
-        if (cap == 0)
-            return input;
+        if (cap == 0) {
+            if (input.isInput())
+                throw new RuntimeException(this + " has zero capacity and rejected input task: " + input);
+            return null;
+        }
         else if ((input.conf() >= 1f) && (cap != 1) && (et.isEmpty() || (et.top().conf() < 1f))) {
             //AXIOMATIC/CONSTANT BELIEF/GOAL
             addEternalAxiom(input, et);

@@ -6,6 +6,7 @@ import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -33,6 +34,7 @@ import nars.util.IO;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
+import nars.util.signal.SensorConcept;
 import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
@@ -958,7 +960,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         if (c == null)
             return null;
         if (!(c instanceof Concept)) {
-            throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
+            //throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
+            return null;
         }
         return (Concept) c;
 
@@ -1048,6 +1051,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public @NotNull NAR believe(Termed<Compound> c, Tense tense) {
         return believe(c, tense, 1f);
+    }
+
+    /** installs a concept in the index and activates it, used for setup of custom concept implementations
+     *  implementations should apply active concept capacity policy
+     * */
+    public final void on(Concept c) {
+        index.set(c);
     }
 
 

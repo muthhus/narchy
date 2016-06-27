@@ -11,7 +11,7 @@ public class RangeNormalizedFloat implements FloatSupplier {
     private final float maxStart;
 
     /** precision threshold */
-    static final float epsilon = 0.001f;
+    static final float epsilon = 0.01f;
 
     public RangeNormalizedFloat(FloatSupplier in) {
         this(in, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY);
@@ -22,6 +22,22 @@ public class RangeNormalizedFloat implements FloatSupplier {
         this.minStart = minStart;
         this.maxStart = maxStart;
         reset();
+    }
+
+    @Override
+    public String toString() {
+        return "RangeNormalizedFloat{" +
+                "min=" + min +
+                ", max=" + max +
+                '}';
+    }
+
+    public float min() {
+        return min;
+    }
+
+    public float max() {
+        return max;
     }
 
     public void reset() {
@@ -51,4 +67,9 @@ public class RangeNormalizedFloat implements FloatSupplier {
         return (raw - min) / (max - min);
     }
 
+
+    /** whether a min/max range has been set or measured */
+    public boolean ranged() {
+        return Float.isFinite(min) && Float.isFinite(max);
+    }
 }

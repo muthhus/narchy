@@ -52,7 +52,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         this.nar = n;
         this.isOperation = Op.isOperation(term);
         //ensureOperation(term);
-        n.index.set(this);
+        n.on(this);
     }
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {

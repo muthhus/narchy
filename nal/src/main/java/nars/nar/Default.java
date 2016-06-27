@@ -94,6 +94,8 @@ public class Default extends AbstractNAR {
         return c;
     }
 
+
+
     @Override
     public final float conceptPriority(@NotNull Termed termed) {
         //if (termed!=null) {

@@ -43,7 +43,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
                 return SensorConcept.this.pri();
             }
         };
-        n.index.set(this);
+        n.on(this);
 
         this.input = input;
 
@@ -120,7 +120,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     @Override
     protected void beliefCapacity(ConceptPolicy p) {
         DefaultConceptPolicy.beliefCapacityNonEternal(this, p);
-        DefaultConceptPolicy.goalCapacityNonEternal(this, p);
+        DefaultConceptPolicy.goalCapacityOneEternal(this, p);
     }
 
 

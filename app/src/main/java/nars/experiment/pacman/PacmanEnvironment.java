@@ -24,6 +24,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
@@ -37,6 +38,8 @@ import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -108,7 +111,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		NAgent n = new NAgent(nar);
 		n.nar.runLater(()->{
-			new BeliefTableChart(n.nar, n.actions).show(400, 100);
+
+			List<Concept> charted = new ArrayList(n.actions);
+			charted.add(n.happy);
+			charted.add(n.sad);
+			new BeliefTableChart(nar, charted).show(600, 300);
+
 //			new GraphSpace(
 //                    new ConceptMaterializer(), new ConceptBagInput(nar, 64)
 //            ).show(800, 500);

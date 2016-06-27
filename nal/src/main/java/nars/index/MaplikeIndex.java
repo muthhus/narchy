@@ -59,7 +59,8 @@ public abstract class MaplikeIndex implements TermIndex {
         Termed y = get(x);
         if (y == null) {
             y = buildCompound(x.subterms(), x.op(), x.dt()  /* TODO make this sometimes false */);
-            if (!(y.term() instanceof Compound && y.term().hasTemporal())) {
+            Term yt = y.term();
+            if (!(yt instanceof Compound && yt.hasTemporal())) {
                 set(y = buildConcept(y));
             }
         }

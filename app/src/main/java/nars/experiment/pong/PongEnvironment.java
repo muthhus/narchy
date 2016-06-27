@@ -8,8 +8,10 @@ package nars.experiment.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BeliefTableChart;
 import nars.index.Indexes;
@@ -27,6 +29,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class PongEnvironment extends Player implements Environment {
@@ -82,7 +86,10 @@ public class PongEnvironment extends Player implements Environment {
 			@Override
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
-				new BeliefTableChart(nar, actions).show(400, 100);
+				List<Concept> charted = new ArrayList(actions);
+				charted.add(happy);
+				charted.add(sad);
+				new BeliefTableChart(nar, charted).show(400, 100);
 			}
 		};
 		//a.epsilon = 0.6f;
@@ -90,7 +97,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
-		new HappySad(nar, 4);
+		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();
 		//HaiQAgent a = new HaiQAgent();
@@ -108,9 +115,9 @@ public class PongEnvironment extends Player implements Environment {
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
 		a.printActions();
-		nar.forEachConcept(c -> {
-			System.out.println(c);
-		});
+//		nar.forEachConcept(c -> {
+//			System.out.println(c);
+//		});
 
 
 		//nar.forEachConcept(System.out::println);
@@ -502,41 +509,41 @@ public class PongEnvironment extends Player implements Environment {
 
 	}
 
-	private static class HappySad extends RelativeSignalClassifier implements Consumer<NAR> {
-
-		public HappySad(NAR nar, int windowSize) {
-			super(()->nar.emotion.happy(), windowSize, (i) -> {
-
-				Term e = null;
-				switch (i) {
-					case 0: return;
-					case +1: e = happy(nar); break;
-					case -1: e = sad(nar); break;
-					default:
-						throw new UnsupportedOperationException();
-				}
-
-				if (e!=null) {
-					nar.believe(e, Tense.Present);
-					//logger.info("{}", e);
-				}
-			});
-
-			nar.onFrame(this);
-		}
-
-		@Override
-		public void accept(NAR nar) {
-			run();
-		}
-
-		private static Compound happy(NAR nar) {
-			return $.prop(nar.self, $.the("happy"));
-		}
-
-		private static Compound sad(NAR nar) {
-			return $.prop(nar.self, $.the("sad"));
-
-		}
-	}
+//	private static class HappySad extends RelativeSignalClassifier implements Consumer<NAR> {
+//
+//		public HappySad(NAR nar, int windowSize) {
+//			super(()->nar.emotion.happy(), windowSize, (i) -> {
+//
+//				Term e = null;
+//				switch (i) {
+//					case 0: return;
+//					case +1: e = happy(nar); break;
+//					case -1: e = sad(nar); break;
+//					default:
+//						throw new UnsupportedOperationException();
+//				}
+//
+//				if (e!=null) {
+//					nar.believe(e, Tense.Present);
+//					//logger.info("{}", e);
+//				}
+//			});
+//
+//			nar.onFrame(this);
+//		}
+//
+//		@Override
+//		public void accept(NAR nar) {
+//			run();
+//		}
+//
+//		private static Compound happy(NAR nar) {
+//			return $.prop(nar.self, $.the("happy"));
+//		}
+//
+//		private static Compound sad(NAR nar) {
+//			return $.prop(nar.self, $.the("sad"));
+//
+//		}
+//	}
 }

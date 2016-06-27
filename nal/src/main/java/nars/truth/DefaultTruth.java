@@ -6,6 +6,7 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.util.Util.clampround;
 import static nars.util.Util.round;
 
 
@@ -41,8 +42,8 @@ public class DefaultTruth implements Truth  {
 
         //assert(Float.isFinite(f) && Float.isFinite(c));
 
-        this.freq = f = round(f, epsilon);
-        this.conf = c = round(c, epsilon);
+        this.freq = f = clampround(f, epsilon);
+        this.conf = c = clampround(c, epsilon);
 
         if (c==0)
             throw new RuntimeException("zero conf");

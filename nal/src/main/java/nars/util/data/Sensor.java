@@ -110,11 +110,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         int timeSinceLastInput = (int) (now - lastInput);
 
 
-        double next = value.floatValueOf(term);
-        if (!Double.isFinite(next))
+        float next = value.floatValueOf(term);
+        if (!Float.isFinite(next))
             return; //allow the value function to prevent input by returning NaN
 
-        float f = Util.round((float) next, resolution);
+        float f = Util.round(next, resolution);
 
         int maxT = this.maxTimeBetweenUpdates;
         boolean limitsMaxTime = maxT > 0;

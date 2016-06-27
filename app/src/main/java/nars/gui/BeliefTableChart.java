@@ -147,7 +147,7 @@ public class BeliefTableChart extends JoglSpace2D {
         }
 
         for (int i = num-1; i >=0; i--) {
-            float my = dy * 0.15f;
+            float my = 0f;//dy * 0.15f;
             gl.glTranslatef(0,my/2,0);
             draw(gl, i, W, dy-my, minT, maxT);
             gl.glTranslatef(0,dy-my/2,0);
