@@ -271,7 +271,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float f2 = b.freq();
         float c1 = a.conf();
         float c2 = b.conf();
-        float c = and(c1, c2/*, f2*/);
+        float c = and(c1, c2, f2);
         return desire(minConf, a.freq(), f2, c1, c2, c);
     }
 

@@ -40,8 +40,8 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 4;
-	final int height = 4;
+	final int width = 3;
+	final int height = 3;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -88,11 +88,9 @@ public class PongEnvironment extends Player implements Environment {
 			@Override
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
-				List<Concept> charted = new ArrayList(actions);
-				charted.add(happy);
-				charted.add(sad);
-				new BeliefTableChart(nar, charted).show(400, 100);
+				beliefChart(this);
 			}
+
 		};
 		//a.epsilon = 0.6f;
 		//a.gamma /= 4f;
@@ -178,6 +176,12 @@ public class PongEnvironment extends Player implements Environment {
 
 
 
+	public static void beliefChart(NAgent a) {
+		List<Concept> charted = new ArrayList(a.actions);
+		charted.add(a.happy);
+		charted.add(a.sad);
+		new BeliefTableChart(a.nar, charted).show(400, 100);
+	}
 
 	@Override
 	public void preStart(Agent a) {

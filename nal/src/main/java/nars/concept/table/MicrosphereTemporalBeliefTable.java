@@ -58,7 +58,10 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
                     return null;
                 } else if (merged!=input) {
                     // else: the result of compression has freed a space for the incoming input
-                    nar.process(merged);
+                    //nar.runLater(()->{
+                        nar.process(merged);
+                    //});
+
 
                 }
                 else {

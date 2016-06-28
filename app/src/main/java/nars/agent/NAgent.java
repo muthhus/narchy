@@ -26,9 +26,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static nars.$.$;
-import static nars.$.t;
-import static nars.$.the;
+import static nars.$.*;
 import static nars.nal.Tense.ETERNAL;
 import static nars.util.Texts.n4;
 
@@ -50,7 +48,9 @@ public class NAgent implements Agent {
     //private SensorConcept reward;
     private int lastAction = -1;
     private float prevReward = Float.NaN;
-    private final int clockMultiplier = 1; //introduces extra timing delay between frames
+
+    private int ticksBeforeObserve = 1;
+    private int ticksBeforeDecide = 1;
 
     float dReward;
 
@@ -237,7 +237,7 @@ public class NAgent implements Agent {
 
 
         float rewardResolution = 0.05f;
-        this.happy = new SensorConcept($.inst(nar.self, the("happy")), nar,
+        this.happy = new SensorConcept($.prop(nar.self, the("happy")), nar,
                 new PolarRangeNormalizedFloat(()->
                     prevReward
                 ), sensorFreqPos) {
@@ -253,7 +253,10 @@ public class NAgent implements Agent {
                 //.seek(true)
         ;
 
-        this.sad = new SensorConcept($.inst(nar.self, the("sad")), nar,
+        this.sad = new SensorConcept(
+                //$.prop(nar.self, the("sad")),
+                $.inh(nar.self, $.neg($.seti(the("happy")))),
+                nar,
                 new PolarRangeNormalizedFloat(()->
                     -prevReward
                 ), sensorFreqPos) {
@@ -402,12 +405,12 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        float goalSeekingConfidence = 1f /* gamma */;
-        nar.goal(happy, Tense.Eternal, 1f, goalSeekingConfidence);
-        nar.goal(happy, Tense.Present, 1f, goalSeekingConfidence);
+        float eternalGoalSeekConf = 1f /* gamma */;
+        nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
+        nar.goal(happy, Tense.Present, 1f, gamma);
 
-        nar.goal(sad, Tense.Eternal, 0f, goalSeekingConfidence);
-        nar.goal(sad, Tense.Present, 0f, goalSeekingConfidence);
+        nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
+        nar.goal(sad, Tense.Present, 0f, gamma);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
         nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
@@ -488,12 +491,12 @@ public class NAgent implements Agent {
     }
 
     public void observe(float[] nextObservation) {
+
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
-        //nar.conceptualize(reward, UnitBudget.One);
-
+        nar.clock.tick(ticksBeforeObserve-1);
         nar.step();
-        nar.clock.tick(clockMultiplier-1);
+
 
     }
 
@@ -509,6 +512,9 @@ public class NAgent implements Agent {
     }
 
     private void decide(int lastAction) {
+
+        nar.clock.tick(ticksBeforeDecide);
+
         this.nextAction = -1;
         float nextMotivation;
 
@@ -532,7 +538,7 @@ public class NAgent implements Agent {
         if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
-            float off = 0f; //0.25f; //0.49f;
+            float off = 0.5f; //0.25f; //0.49f;
             float on = 1f; //0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;
@@ -601,7 +607,7 @@ public class NAgent implements Agent {
 
 
     private String actionConceptName(int i) {
-        return "(a" + i + ")";
+        return "a:a" + i;
         //return "A:a" + i;
         //return "A:{a" + i + "}";
         //return "(a,a" + i + ")";
@@ -615,7 +621,7 @@ public class NAgent implements Agent {
         } else {
             //return inputConceptName(i, -1);
             //return $("(i" + i + ")");
-            return $("I:i" + i);
+            return $("i:i" + i);
             //return "I:{i" + i + "}";
             //return $("{i" + i + "}");
 

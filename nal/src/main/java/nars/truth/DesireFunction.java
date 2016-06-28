@@ -48,7 +48,7 @@ public enum DesireFunction implements TruthOperator {
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return B == null ? null : TruthFunctions.desireDed(T, B, minConf);
+            return (T == null || B == null) ? null : TruthFunctions.desireDed(T, B, minConf);
         }
     },
 
