@@ -62,10 +62,11 @@ public class Talk {
                 //,new FrameClock()
                 ,new RealtimeMSClock()
         );
-        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.2f;
-        nar.DEFAULT_QUESTION_DURABILITY = 0.2f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.2f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_DURABILITY = 0.75f;
 
         nar.conceptActivation.setValue(0.01f);
@@ -86,7 +87,7 @@ public class Talk {
         //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
         //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
         //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
-        nar.believe("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
+        nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
 
         //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
         nar.ask($("hear(#y, (I,#c))"), '@', nar.time()); //what would i like to hear myself saying to someone
