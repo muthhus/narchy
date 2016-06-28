@@ -48,7 +48,7 @@ public class Talk {
 
     final static Operator hear = $.operator("hear");
 
-    long wordDelay = 50; //in milisec
+    long wordDelay = 100; //in milisec
 
     public static NAR nar() {
         Random rng = new XorShift128PlusRandom(1);
@@ -62,15 +62,15 @@ public class Talk {
                 //,new FrameClock()
                 ,new RealtimeMSClock()
         );
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.7f;
         nar.DEFAULT_GOAL_DURABILITY = 0.75f;
 
-        nar.conceptActivation.setValue(0.05f);
-        nar.cyclesPerFrame.set(32);
+        nar.conceptActivation.setValue(0.25f);
+        nar.cyclesPerFrame.set(8);
 
         //nar.logSummaryGT(System.out, 0.2f);
 
@@ -87,14 +87,14 @@ public class Talk {
         //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
         //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
         //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
-        nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
+        nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.75f);
 
         //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
-        nar.ask($("hear(#y, (I,#c))"), '@', nar.time()); //what would i like to hear myself saying to someone
+        //nar.ask($("hear(#y, (I,#c))"), '@', nar.time()+wordDelay*10); //what would i like to hear myself saying to someone
 
 
         //WORD ANALYSIS
-        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.25f);
+        nar.goal($("(hear(#x,#c1) &&+1 wordInfo(#x,#z))"), Tense.Eternal, 1f, 0.75f);
         //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
 
         //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
@@ -141,7 +141,7 @@ public class Talk {
                         return; //maybe randomly select a word
                     }
                     if (context.op() == Op.PROD && context.size() == 2 && ((Compound)context).term(0).equals(nar.self)) {
-                        say(content, (Compound) context);
+                        say(x, content, (Compound) context);
                     }
                 }
 
@@ -201,7 +201,7 @@ public class Talk {
                 "dunno."
         };
 
-        hear(corpus, sehToMe, 0.5f);
+        hear(corpus, sehToMe, 0.75f);
 
 
         new Thread(()->{
@@ -280,12 +280,15 @@ public class Talk {
                     1f, 0.5f + 0.5f * nar.confidenceDefault('.')*pri);
     }
 
-    public void say(Term content, Compound context) {
-        //System.err.println("SAY: " + content + " (" + context + ")");
-        Task belief = hear(context, nar.time(), content, 0.5f);
+    public void say(OperationConcept o, Term content, Compound context) {
+        long now = nar.time();
+        float exp = o.goals().expectation(now);
+        System.err.println("SAY: " + content + " (" + context + ")  " + exp );
+
+        Task belief = hear(context, now, content, exp);
 
         //apply negative-feedback for that output
-        nar.goal(belief.pri(), belief.term(), nar.time() + wordDelay, 0f, belief.conf()/2f);
+        nar.goal(belief.pri(), belief.term(), belief.occurrence(), 1f-belief.freq(), belief.conf());
     }
 
 
@@ -317,6 +320,8 @@ public class Talk {
                 Term result = $.seti( $.the(l + "_chars") );
 
                 x.put(the, result);
+
+                return result;
             }
             return null;
         }

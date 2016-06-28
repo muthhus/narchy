@@ -58,14 +58,14 @@ public final class AutoBag<V>  {
         // TODO formalize some relationship between cycles and priority
 
         //a load factor
-        final float massMeanTarget = 0.25f; //ex: 0.5 pri * 0.5 dur = 0.25 mass
+        //final float massMeanTarget = 0.25f; //ex: 0.5 pri * 0.5 dur = 0.25 mass
 
-        float overflow = (existing+pending) - (massMeanTarget * bag.capacity());
-        if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
-            return -1;
+        //float overflow = (existing+pending) - (massMeanTarget * bag.capacity());
+        //if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
+           //return -1;
 
         float decaySpeed = Global.AUTOBAG_NOVELTY_RATE; //< 1.0, smaller means slower forgetting rate / longer forgetting time
-        float period = existing / (overflow * decaySpeed);
+        float period = existing / (pending * decaySpeed);
 
         //System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);
 

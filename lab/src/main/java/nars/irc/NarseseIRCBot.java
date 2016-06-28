@@ -9,6 +9,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.experiment.Talk;
+import nars.gui.ConceptBagInput;
 import nars.index.TermIndex;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
@@ -17,6 +18,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.util.Texts;
 import nars.util.Wiki;
@@ -25,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spacegraph.SpaceGraph;
+import spacegraph.layout.FastOrganicLayout;
 
 import java.io.IOException;
 import java.util.List;
@@ -53,7 +57,7 @@ public class NarseseIRCBot extends Talk {
 
     final NAR nar;
     final IRCBot irc;
-    float ircMessagePri = 0.5f;
+    float ircMessagePri = 0.85f;
 
     public NarseseIRCBot(NAR nar) throws Exception {
         super(nar);
@@ -69,6 +73,16 @@ public class NarseseIRCBot extends Talk {
 
         this.nar = nar;
 
+        final int maxNodes = 128;
+        final int maxEdges = 8;
+
+        new SpaceGraph<Termed>(
+                new ConceptBagInput(nar, maxNodes, maxEdges)
+        ).withTransform(
+                //new Spiral()
+                new FastOrganicLayout()
+        ).show(900, 900);
+
         addOperators();
     }
 
@@ -77,6 +91,13 @@ public class NarseseIRCBot extends Talk {
 
             @Nullable @Override public Object function(Compound arguments) {
                 return "hahha you need to RTFM";
+            }
+        });
+        nar.onExec(new IRCBotOperator("clear") {
+            @Nullable @Override public Object function(Compound arguments) {
+                @NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
+                cbag.clear();
+                return "Conscious cleared";
             }
         });
         nar.onExec(new IRCBotOperator("memstat") {
@@ -98,7 +119,7 @@ public class NarseseIRCBot extends Talk {
         });
         nar.onExec(new IRCBotOperator("readWiki") {
 
-            float pri = 0.1f;
+            float pri = 0.5f;
 
             @Override
             protected Object function(Compound arguments) {
@@ -233,8 +254,8 @@ public class NarseseIRCBot extends Talk {
     int outputBufferLength = 64;
 
     @Override
-    public void say(Term content, Compound context) {
-        super.say(content, context);
+    public void say(OperationConcept o, Term content, Compound context) {
+        super.say(o, content, context);
 
         content.recurseTerms(v -> {
             if (v instanceof Atom) {
