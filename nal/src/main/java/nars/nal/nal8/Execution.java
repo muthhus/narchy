@@ -9,7 +9,9 @@ import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +60,11 @@ public interface Execution  {
 
         //final int numArgs = x0.length;
 
-        Term inh = resultTerm(operation, y);
+        Compound x = (Compound) operation.term(0);
+        if (x.op() != PROD)
+            throw new RuntimeException("invalid operation");
+
+        Term inh = resultTerm((Atomic)operation.term(1), x, y);
         if ((!(inh instanceof Compound))) {
             //TODO wrap a non-Compound result as some kind of statement
             return null;
@@ -101,20 +107,14 @@ public interface Execution  {
      * which will be replaced with the result term (y)
      */
     @Nullable
-    static Term resultTerm(@NotNull Compound operation, @Nullable Term y) {
-
-        Compound x = (Compound) operation.term(0);
-        if (x.op() != PROD)
-            throw new RuntimeException("invalid operation");
+    static Term resultTerm(Atomic oper, @NotNull Compound x, @Nullable Term y) {
 
         //add var dep as last term if missing
         Term xLast = x.last();
         if (xLast.op() != Op.VAR_DEP) {
-            //logger.warn(
-            throw new RuntimeException(
-                "feedback requires variable in last position: " + operation);
-            //return;
+            throw new RuntimeException("feedback requires variable in last position: " + oper + " :: " + x);
         }
+
         //x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
 
         //        } else {
@@ -127,7 +127,7 @@ public interface Execution  {
         if (y == null)
             y = xLast;
 
-        return $.inhImageExt(operation, y, x);
+        return $.inhImageExt(x, y, oper);
 
         //return $.exec(Operator.operatorTerm(operation), x);
     }

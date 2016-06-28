@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
+import java.util.function.Consumer;
 
 
 /**
@@ -23,35 +23,18 @@ import java.util.List;
  * motivation = desire - belief
  * motivation = (desirePositive - desireNegative) - (beliefPositive - beliefNegative)
  */
-public class OperationConcept extends CompoundConcept implements Runnable {
+public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
 
-    /** whether this is a concept for an actual Operation term, ex: x(a,b,c) */
-    private final boolean isOperation;
-
-
-
-
-    //TODO allocate this only for Operation (not negations)
-    //public transient final List<Task> pendingBeliefs = Global.newArrayList(0);
-    public transient final List<Task> pendingGoals = Global.newArrayList(0);
-
-    public transient NAR nar;
     private boolean pendingRun;
 
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
-        //ensureOperation(term);
-        this.isOperation = Op.isOperation(term);
-
     }
 
 
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
         super(term, n);
-        this.nar = n;
-        this.isOperation = Op.isOperation(term);
-        //ensureOperation(term);
         n.on(this);
     }
 
@@ -82,44 +65,24 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     }
 
     @Nullable
-    private final Task executeLater(@Nullable Task t, @NotNull NAR nar) {
-        if (t == null) return null;
+    private final synchronized Task executeLater(@Nullable Task t, @NotNull NAR nar) {
+        if (t != null) {
 
-        //if (op()!=NEGATE) {
-
-        if (t.isGoal()) {
-            pendingGoals.add(t);
-        } else {
-            //pendingBeliefs.add(t);
+            if (!pendingRun) {
+                pendingRun = true;
+                nar.runLater(this);
+            }
         }
 
-        executeLater(nar);
-
-        /*} else {
-            nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
-        }*/
         return t;
     }
 
-    protected void executeLater(@NotNull NAR nar) {
-        this.nar = nar;
-
-        if (!pendingRun) {
-            pendingRun = true;
-            nar.runLater(this);
-        }
-    }
-
-
-    /** called between frames */
-    @Override public void run() {
-        final NAR nar = this.nar;
-
+    /** called between frames if belief or goal state has changed */
+    @Override public void accept(NAR nar) {
+        pendingRun = false;
 
         //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
-        if (isOperation) {
-            /*if (isExecutingGoals(belief,desire))*/
-
+        if (nar!=null) {
             Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
             if (tt != null && !tt.isEmpty()) {
                 //beforeNextFrame( //<-- enqueue after this frame, before next
@@ -128,18 +91,6 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         }
 
 
-        //call Task.execute only for goals
-        pendingGoals.forEach(task -> {
-            if (task.isGoal()) {
-                if (Global.DEBUG)
-                    task.log("executed");
-                task.execute(this, nar); //call the task's custom event handler
-            }
-        });
-
-        //pendingBeliefs.clear();
-        pendingGoals.clear();
-        pendingRun = false;
     }
 
 

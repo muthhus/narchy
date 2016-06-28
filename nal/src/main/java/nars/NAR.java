@@ -115,8 +115,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = Global.newArrayList();
 
-    private final transient Deque<Runnable> nextTasks = //new CopyOnWriteArrayList();
-                                                    new ConcurrentLinkedDeque();
+    private final transient Deque<Consumer<NAR>> nextTasks =
+                                                    new ConcurrentLinkedDeque<>();
+                                                    //new CopyOnWriteArrayList<>();
 
     private NARLoop loop;
 
@@ -483,7 +484,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void input(@NotNull Task t) {
         if (t.isCommand()) {
-            t.execute(null, this); //direct execution
+            t.onConcept(null); //direct execution
         } else {
             process(t.normalize(this)); //accept into input buffer for eventual processing
         }
@@ -758,14 +759,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
      */
-    public final void runLater(@NotNull Runnable t) {
+    public final boolean runLater(@NotNull Runnable t) {
         //if (running.get()) {
             //in a frame, so schedule for after it
-            nextTasks.add(t);
+        return runLater(((NAR nn) -> t.run()));
         //} else {
             //not in a frame, can execute immediately
             //t.run();
         //}
+    }
+
+    public final boolean runLater(@NotNull Consumer<NAR> t) {
+        return nextTasks.add(t);
     }
 
 
@@ -774,10 +779,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     private final void runNextTasks() {
 
-        Deque<Runnable> n = this.nextTasks;
+        Deque<Consumer<NAR>> n = this.nextTasks;
         int s = n.size();
         for (int i = 0; i < s; i++) {
-            n.removeFirst().run();
+            n.removeFirst().accept(this);
         }
 
     }

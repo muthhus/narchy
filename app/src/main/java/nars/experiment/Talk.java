@@ -4,7 +4,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import com.google.common.io.CharStreams;
 import com.google.common.io.LineProcessor;
-import infinispan.com.google.common.io.NullOutputStream;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -17,6 +16,8 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.in.Twenglish;
+import nars.op.time.MySTMClustered;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
@@ -25,13 +26,16 @@ import nars.term.variable.Variable;
 import nars.time.RealtimeMSClock;
 import nars.util.Util;
 import nars.util.data.MultiOutputStream;
+import nars.util.data.map.CapacityLinkedHashMap;
+import nars.util.data.map.RUCache;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.$.$;
@@ -42,14 +46,13 @@ import static nars.$.$;
 public class Talk {
 
     final static Operator hear = $.operator("hear");
-    long wordDelay = 50;
-    float wordPri = 0.4f;
+    long wordDelay = 30;
 
     public static NAR nar() {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1024, 4, 2, 3, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng))
+                new CaffeineIndex(new DefaultConceptBuilder(rng), true)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -57,13 +60,18 @@ public class Talk {
                 //,new FrameClock()
                 ,new RealtimeMSClock()
         );
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.2f;
+        nar.DEFAULT_QUESTION_DURABILITY = 0.2f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.2f;
         nar.DEFAULT_GOAL_DURABILITY = 0.75f;
 
-        nar.conceptActivation.setValue(0.1f);
-        nar.cyclesPerFrame.set(64);
+        nar.conceptActivation.setValue(0.01f);
+        nar.cyclesPerFrame.set(32);
 
-        //new MySTMClustered(nar, 32, '.');
+        //nar.logSummaryGT(System.out, 0.2f);
+
+        new MySTMClustered(nar, 32, '.');
 
         return nar;
     }
@@ -75,14 +83,15 @@ public class Talk {
         //ECHO
         //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
         //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
-        nar.believe("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.9f);
+        nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) <=> (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
+        nar.believe("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
 
         //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
         nar.ask($("hear(#y, (I,#c))"), '@', nar.time()); //what would i like to hear myself saying to someone
 
 
         //WORD ANALYSIS
-        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.1f);
+        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.5f);
         //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
 
         //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
@@ -93,38 +102,6 @@ public class Talk {
 
     private final NAR nar;
 
-    public static class TeeOutputStream extends OutputStream {
-        OutputStream ostream1, ostream2;
-
-        /**
-         * sole TeeOutputStream constructor
-         */
-        TeeOutputStream(OutputStream o1, OutputStream o2) throws IOException {
-            ostream1 = o1;
-            ostream2 = o2;
-        }
-
-        public void close() throws IOException {
-            ostream1.close();
-            ostream2.close();
-        }
-
-        public void flush() throws IOException {
-            ostream1.flush();
-            ostream2.flush();
-        }
-
-        public void write(int b) throws IOException {
-            byte[] buf = new byte[1];
-            buf[0] = (byte) b;
-            write(buf, 0, 1);
-        }
-
-        public void write(byte[] b, int off, int len) throws IOException {
-            ostream1.write(b, off, len);
-            ostream2.write(b, off, len);
-        }
-    }
 
     boolean loopBack;
 
@@ -139,7 +116,7 @@ public class Talk {
                 if (loopBack) {
                     String m = e.getFormattedMessage();
                     nar.runLater(() -> {
-                        hear(m, nar.self, nar.self);
+                        hear(m, nar.self, nar.self, 0.5f);
                     });
                 }
             }
@@ -167,28 +144,11 @@ public class Talk {
 
             }
         });
-        nar.onExec(new TermFunction<Term>("wordInfo") {
-
-            @Nullable
-            @Override
-            public Term function(Compound arguments, TermIndex i) {
-                Term the = arguments.term(0);
-                if (the instanceof Compound && the.op() == Op.PROD ) //unwrap product
-                    the = ((Compound)the).term(0);
-
-                if (the instanceof Atom) {
-                    String s = ((Atom)the).toStringUnquoted();
-                    int l = s.length();
-                    return $.seti( $.the(l + "_chars") );
-                }
-                return null;
-            }
-
-        });
+        nar.onExec(new WordInfo());
 
         //nar.logSummaryGT(System.out, 0.25f);
 
-        Term sehToMe = $.p($.the("seh"), nar.self);
+        Compound sehToMe = $.p($.the("seh"), nar.self);
 
         final String[] corpus = new String[] {
                 "these words are false.",
@@ -242,7 +202,7 @@ public class Talk {
             while (true) {
                 for (String s : corpus) {
                     //System.out.println("IN: " + s);
-                    hear(s, sehToMe);
+                    hear(s, sehToMe, 0.25f);
                     Util.pause(1000);
                 }
             }
@@ -290,37 +250,76 @@ public class Talk {
         }).start();
     }
 
-    public void hear(String text, Term from, Term to) {
-        hear(text, $.p(from, to));
+    public List<Term> hear(String text, Term from, Term to, float pri) {
+        return hear(text, $.p(from, to), pri);
     }
 
-    public void hear(String text, Term context) {
+    public List<Term> hear(String text, Compound context, float pri) {
         List<Term> tokens = Twenglish.tokenize(text.toLowerCase());
         if (!tokens.isEmpty())
-            hear(context, tokens);
+            hear(context, tokens, pri);
+        return tokens;
     }
 
-    public void hear(Term context, List<Term> tokens) {
+    public void hear(Compound context, List<Term> tokens, float pri) {
         new Thread(()-> {
             for (Term x : tokens) {
-                x = $.p(x);
-                hear(context, nar.time(), x);
+                hear(context, nar.time(), x, pri);
                 Util.pause(wordDelay);
             }
         }).start();
     }
 
-    public synchronized void hear(Term context, float tt, Term x) {
+    public @Nullable Task hear(Term context, float tt, Term x, float pri) {
         //System.err.println("HEAR: " + x + " (" + context + ")");
-        nar.believe(wordPri, $.exec(hear, new Term[] { x, context } ), Math.round(tt), 1f, 0.1f);
+        return nar.believe(pri * nar.priorityDefault('.'),
+                    $.exec(hear, x, context ),
+                    Math.round(tt),
+                    1f, 0.5f + 0.5f * nar.confidenceDefault('.')*pri);
     }
 
     public void say(Term content, Compound context) {
         //System.err.println("SAY: " + content + " (" + context + ")");
-        hear(context, nar.time(), content);
+        Task belief = hear(context, nar.time(), content, 0.5f);
+
+        //apply negative-feedback for that output
+        nar.goal(belief.pri(), belief.term(), nar.time() + wordDelay, 0f, belief.conf()/2f);
     }
 
 
+    private static class WordInfo extends TermFunction<Term> {
+
+        final CapacityLinkedHashMap<Term,Object> x = new CapacityLinkedHashMap(512);
+
+        public WordInfo() {
+            super("wordInfo");
+        }
+
+        private static final Logger logger = LoggerFactory.getLogger(WordInfo.class);
+
+        @Nullable
+        @Override
+        public Term function(Compound arguments, TermIndex i) {
+            Term the = arguments.term(0);
+
+
+            if (the instanceof Atom) {
+
+                if (x.containsKey(the)) {
+                    return null; //recently looked-up
+                }
+
+                String s = ((Atom)the).toStringUnquoted();
+                logger.info("lookup: {}", s);
+                int l = s.length();
+                Term result = $.seti( $.the(l + "_chars") );
+
+                x.put(the, result);
+            }
+            return null;
+        }
+
+    }
 }
 
 

@@ -47,7 +47,7 @@ public class GoalPrecisionTest {
         Global.DEBUG = true;
         n.onExecution($.operator("x"), (OperationConcept c) -> {
 
-            for (Task a : c.pendingGoals) {
+            for (Task a : c.goals()) {
 
                 Term[] aa = Operator.argArray(a.term());
                 float pri = a.pri() * a.expectation();

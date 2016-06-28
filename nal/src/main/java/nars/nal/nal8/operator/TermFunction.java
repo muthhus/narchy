@@ -60,7 +60,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
      *
      * @param arguments - the product subject of an Operation
      * @param i
-     * @return y, or null if unsuccessful
+     * @return null if unsuccessful (generates no feedback), or the non-null value with which to construct a feedback task
      */
     @Nullable
     public abstract O function(Compound arguments, TermIndex i);
@@ -143,8 +143,6 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
 
-
-
         final Compound ttt = exec;
         Compound args = Operator.opArgs(ttt);
         //if (!tt.isCommand()) {
@@ -161,6 +159,8 @@ public abstract class TermFunction<O> extends AbstractOperator {
         //}
 
         O y = function(args, nar.index);
+        if (y == null)
+            return;
 
         //if (!tt.isCommand()) {
         if (feedback)

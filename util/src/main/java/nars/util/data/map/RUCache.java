@@ -1,6 +1,5 @@
 package nars.util.data.map;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -24,14 +23,10 @@ public class RUCache<K, V> {
     public RUCache(final int capacity) {
         LRUdata = new WeakHashMap<K, V>();
 
-        MRUdata = new LinkedHashMap<K, V>(capacity + 1, 1.0f, true) {
+        MRUdata = new CapacityLinkedHashMap<>(capacity) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<K, V> entry) {
-                if (this.size() > capacity) {
-                    LRUdata.put(entry.getKey(), entry.getValue());
-                    return true;
-                }
-                return false;
+            protected void overflow(Map.Entry<K, V> entry) {
+                LRUdata.put(entry.getKey(), entry.getValue());
             }
         };
     }
@@ -55,4 +50,5 @@ public class RUCache<K, V> {
         LRUdata.remove(key);
         MRUdata.put(key, value);
     }
+
 }

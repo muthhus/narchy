@@ -19,7 +19,7 @@ public abstract class IRCBot {
 
     private static final Logger logger = LoggerFactory.getLogger(IRCBot.class);
 
-    protected BufferedWriter writer;
+    protected final BufferedWriter writer;
 
     public void setOutputting(boolean outputting) {
         this.outputting = outputting;
@@ -113,10 +113,14 @@ public abstract class IRCBot {
 
     protected abstract void onMessage(String channel, String nick, String msg);
 
-    protected synchronized boolean send(String channel, String message) {
+    protected /*synchronized */ boolean send(String channel, String message) {
+        String x = "PRIVMSG " + channel + " :" + message + "\r\n";
+
         try {
-            writer.write("PRIVMSG " + channel + " :" + message + "\r\n");
-            writer.flush();
+            synchronized(writer) {
+                writer.write(x);
+                writer.flush();
+            }
             return true;
         } catch (IOException e) {
             e.printStackTrace();

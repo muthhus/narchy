@@ -6,6 +6,7 @@ package nars.util.io;
 
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

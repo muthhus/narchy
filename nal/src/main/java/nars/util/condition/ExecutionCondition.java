@@ -29,18 +29,8 @@ public class ExecutionCondition implements NARCondition {
 
         operator = $.operator(opTerm);
         n.onExecution(operator, tt -> {
-
             if (!success) {
-                for (Task t : tt.pendingGoals) {
-                    long now = n.time();
-                    if ((now >= start) && (now <= end)) {
-                        float expect = t.expectation();
-                        if ((expect >= minExpect) && (expect <= maxExpect)) {
-                            success = true;
-                            successTime = now;
-                        }
-                    }
-                }
+                this.success = (tt.goals().motivation(n.time()) > 0);
             }
         });
 

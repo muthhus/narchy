@@ -158,10 +158,12 @@ public class ControlFlowTest {
 
         @NotNull
         public final String id;
+        public final NAR nar;
 
         public ConceptGroup(@NotNull String id, @NotNull NAR nar) {
             super(id, nar);
             this.id = id;
+            this.nar = nar;
         }
 
         /* visitor */

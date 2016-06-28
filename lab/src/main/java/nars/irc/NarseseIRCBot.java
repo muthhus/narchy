@@ -1,23 +1,32 @@
 package nars.irc;
 
+import com.google.common.html.HtmlEscapers;
+import edu.cmu.sphinx.util.props.tools.HTMLDumper;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.bag.Bag;
+import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.experiment.Talk;
 import nars.index.TermIndex;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
+import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.util.Texts;
+import nars.util.Wiki;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -44,6 +53,7 @@ public class NarseseIRCBot extends Talk {
 
     final NAR nar;
     final IRCBot irc;
+    float ircMessagePri = 0.5f;
 
     public NarseseIRCBot(NAR nar) throws Exception {
         super(nar);
@@ -65,13 +75,59 @@ public class NarseseIRCBot extends Talk {
     private void addOperators() {
         nar.onExec(new IRCBotOperator("help") {
 
-            @Nullable @Override public Object function(Compound arguments, TermIndex i) {
+            @Nullable @Override public Object function(Compound arguments) {
                 return "hahha you need to RTFM";
             }
         });
         nar.onExec(new IRCBotOperator("memstat") {
-            @Nullable @Override public Object function(Compound arguments, TermIndex i) {
+            @Nullable @Override public Object function(Compound arguments) {
                 return nar.index.summary();
+            }
+        });
+        nar.onExec(new IRCBotOperator("top") {
+            @Nullable @Override public Object function(Compound arguments) {
+                StringBuilder b = new StringBuilder();
+                @NotNull Bag<Concept> cbag = ((Default) nar).core.concepts;
+                cbag.topWhile(c -> {
+                    b.append(c.toString()).append("  ");
+                    return true;
+                }, 10);
+                b.append(", pri: " + cbag.priMin() + "<" + Texts.n4(cbag.priHistogram(5)) + ">" + cbag.priMax());
+                return b.toString();
+            }
+        });
+        nar.onExec(new IRCBotOperator("readWiki") {
+
+            float pri = 0.1f;
+
+            @Override
+            protected Object function(Compound arguments) {
+
+                String base = "simple.wikipedia.org";
+                                //"en.wikipedia.org";
+                Wiki enWiki = new Wiki(base);
+
+                String lookup = arguments.term(0).toString();
+                try {
+                    //remove quotes
+                    String page = enWiki.normalize(lookup.replace("\"",""));
+                    //System.out.println(page);
+
+                    enWiki.setMaxLag(-1);
+
+                    String html = enWiki.getRenderedText(page);
+                    html = StringEscapeUtils.unescapeHtml4(html);
+                    String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+                    //System.out.println(strippedText);
+
+                    List<Term> tokens = hear(strippedText, $.the("wiki_" + page), nar.self, pri);
+
+                    return "Reading " + base + ":\"" + page + "\": " + strippedText.length() + " characters, " + tokens.size() + " tokens";
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return e.toString();
+                }
             }
         });
     }
@@ -88,16 +144,22 @@ public class NarseseIRCBot extends Talk {
             return true;
         }
 
+        @Nullable
         @Override
-        protected @Nullable MutableTask result(@NotNull OperationConcept goal, Term y) {
+        public Object function(Compound arguments, TermIndex i) {
+            Object y = function(arguments);
 
-            send("//" + Execution.resultTerm(goal,y).toString());
+            send("//" + y.toString());
 
             //loop back as hearing
             //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
 
-            return super.result(goal, y);
+            return y;
         }
+
+        protected abstract Object function(Compound arguments);
+
+
     }
 
 //    public synchronized void flush() {
@@ -120,13 +182,11 @@ public class NarseseIRCBot extends Talk {
     public static void main(String[] args) throws Exception {
         Global.DEBUG = false;
 
-
-
         NAR nar = Talk.nar();
 
         new NarseseIRCBot(nar);
 
-        nar.loop(15f);
+        nar.loop(25f);
 
     }
 
@@ -167,28 +227,33 @@ public class NarseseIRCBot extends Talk {
 //
 
 
-    String buffer = "";
+    final StringBuilder buffer = new StringBuilder();
     int outputBufferLength = 64;
 
     @Override
-    public synchronized void say(Term content, Compound context) {
+    public void say(Term content, Compound context) {
         super.say(content, context);
 
         content.recurseTerms(v -> {
             if (v instanceof Atom) {
                 Atom a = (Atom)v;
-                buffer += ' ' + a.toStringUnquoted();
+                @NotNull String s = a.toStringUnquoted();
+                synchronized(buffer) {
+                    buffer.append(' ').append(s);
+                }
             }
         });
 
-        if (buffer.length() > outputBufferLength) {
-
-            buffer = buffer.trim().replace(" .", ". ").replace(" !", "! ").replace(" ?", "? ");
-
-            send(buffer);
-
-            buffer = "";
+        String toSend = null;
+        synchronized(buffer) {
+            if (buffer.length() > outputBufferLength) {
+                toSend = buffer.toString().trim().replace(" .", ". ").replace(" !", "! ").replace(" ?", "? ");
+                buffer.setLength(0);
+            }
         }
+
+        if (toSend!=null)
+            send(toSend);
 
     }
 
@@ -255,13 +320,13 @@ public class NarseseIRCBot extends Talk {
             parsed.forEach(nar::input);
         } else {
             logger.info("hear({},{}): {}", channel, nick, msg);
-            hear(msg, context(channel, nick));
+            hear(msg, context(channel, nick), ircMessagePri);
         }
 
     }
 
-    private Term context(String channel, String nick) {
-        return $.quote(nick); //ignore channel for now
+    private Compound context(String channel, String nick) {
+        return $.p($.quote(nick), nar.self); //ignore channel for now
     }
 
 //    protected void hear(String msg, String context) {

@@ -160,8 +160,8 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     }
 
     @Override
-    public void run() {
-        super.run();
+    public void accept(NAR nar) {
+        super.accept(nar);
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+motorDT);
@@ -173,17 +173,12 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
         if (Float.isFinite(response)) {
             nextFeedback = response;
-            commit();
+            feedback.accept(nar);
         }
 
     }
 
-    /** ot manually commit */
-    public void commit() {
-        feedback.accept(nar);
-    }
-
-//    @Override
+    //    @Override
 //    public @Nullable
 //    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 //        //if (belief.evidence().length > 1) {

@@ -41,7 +41,7 @@ public class CaffeineIndex extends MaplikeIndex {
 
     private Caffeine<Object, Object> prepare(Caffeine<Object, Object> builder, boolean soft) {
         if (soft)
-            builder = builder.weakValues();
+            builder = builder.softValues();
 
         //.softValues()
         //.maximumSize(10_000)

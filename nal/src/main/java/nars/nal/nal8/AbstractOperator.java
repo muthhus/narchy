@@ -46,13 +46,6 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
         return atomicTerm.toString();
     }
 
-//    public AbstractOperator(@Nullable Term term) {
-//        if (term == null) {
-//            term = Operator.the(getClass().getSimpleName());
-//        }
-//        operatorTerm = term;
-//    }
-
 
     /**
      * use the class name as the operator name
@@ -71,13 +64,18 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
 
     @Override
     public void accept(@NotNull OperationConcept exec) {
-        if (async()) {
-            //asynch
-            NAR.runAsync(() -> execute(exec));
-        } else {
-            //synchronous
+
+        //only proceed with execution if positively motivated
+        if ((exec.goals().motivation(nar.time()) >= 0))
             execute(exec);
-        }
+
+//        if (async()) {
+//            //asynch
+//            NAR.runAsync(() -> execute(exec));
+//        } else {
+            //synchronous
+
+
     }
 
     /**
@@ -91,10 +89,6 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
     public abstract void execute(OperationConcept exec);
 
 
-    /** determines the execution strategy. currently there are only two: synch and async, and if
-     * we want to add more we can use a lambda Consumer<Runnable> or something
-     */
-    public boolean async() { return false; }
 
     public final @Nullable Operator operator() {
         return atomicTerm;

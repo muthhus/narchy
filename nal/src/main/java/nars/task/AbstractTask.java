@@ -250,14 +250,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     }
 
-    /**
-     *
-     * when executed; can be overridden in subclasses to handle this event;
-     * (for Operation and negation of Operation ONLY)
-     * */
-    @Override public void execute(@NotNull Concept c, @NotNull NAR n) {
-
-    }
 
     @Override
     public @Nullable Reference<Task>[] getParentsRef() {
