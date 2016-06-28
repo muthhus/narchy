@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -120,6 +121,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                                                     //new CopyOnWriteArrayList<>();
 
     private NARLoop loop;
+    private final Collection<On> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
     public NAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, rng, index);
@@ -517,10 +519,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
-        return concept(op,true)
+        On o = concept(op,true)
                 .<Topic<OperationConcept>>meta(Execution.class,
                         (k, v) -> v!=null ?  v : new DefaultTopic<>())
                 .on(each);
+        this.on.add(o);
+        return o;
     }
 
     /**

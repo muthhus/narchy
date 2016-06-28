@@ -69,12 +69,12 @@ public class Talk {
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_DURABILITY = 0.75f;
 
-        nar.conceptActivation.setValue(0.01f);
+        nar.conceptActivation.setValue(0.05f);
         nar.cyclesPerFrame.set(32);
 
         //nar.logSummaryGT(System.out, 0.2f);
 
-        new MySTMClustered(nar, 32, '.');
+        //new MySTMClustered(nar, 32, '.');
 
         return nar;
     }
@@ -94,7 +94,7 @@ public class Talk {
 
 
         //WORD ANALYSIS
-        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.1f);
+        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.25f);
         //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
 
         //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
@@ -149,7 +149,7 @@ public class Talk {
         });
         nar.onExec(new WordInfo());
 
-        nar.logSummaryGT(System.out, 0.25f);
+        nar.logSummaryGT(System.out, 0.5f);
 
         Compound sehToMe = $.p($.the("seh"), nar.self);
 
