@@ -8,7 +8,6 @@ package nars.experiment.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
@@ -16,30 +15,33 @@ import nars.experiment.Environment;
 import nars.gui.BeliefTableChart;
 import nars.index.Indexes;
 import nars.learn.Agent;
-import nars.nal.Tense;
 import nars.nar.Default;
-import nars.op.RelativeSignalClassifier;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
+import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.FloatSupplier;
+import nars.util.math.RangeNormalizedFloat;
+import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+
+import static nars.$.t;
 
 public class PongEnvironment extends Player implements Environment {
 
 	int actions = 3;
 
 
-	final int width = 16;
-	final int height = 16;
+	final int width = 4;
+	final int height = 4;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -106,9 +108,7 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 
-//		new GraphSpace(
-//                new ConceptMaterializer(), new ConceptBagInput(nar, 128)
-//        ).show(800, 500);
+		addCheats(a.nar, e);
 
 		e.run(a, 256*8);
 
@@ -121,6 +121,22 @@ public class PongEnvironment extends Player implements Environment {
 
 
 		//nar.forEachConcept(System.out::println);
+	}
+
+	/** direct inputs from pong for a nars agent */
+	private static void addCheats(NAR n, PongEnvironment e) {
+		PongModel pong = e.pong;
+
+		numericSensor("(ball --> x)", n, () -> pong.ball_x, 0.5f, 0.9f);
+		numericSensor("(ball --> y)", n, () -> pong.ball_y, 0.5f, 0.9f);
+		numericSensor("(mypad --> y)", n, () -> pong.player1.position, 0.5f, 0.9f);
+		numericSensor("(theirpad --> y)", n, () -> pong.player2.position, 0.5f, 0.9f);
+	}
+
+	private static void numericSensor(String term, NAR n, FloatSupplier input, float pri, float conf) {
+		new SensorConcept(term, n, new RangeNormalizedFloat(input),
+			(v) -> t(v, conf)
+		).pri(pri);
 	}
 
 

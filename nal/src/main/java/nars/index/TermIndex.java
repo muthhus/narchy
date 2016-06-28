@@ -589,7 +589,7 @@ public interface TermIndex {
         @NotNull
         @Override
         public String toString() {
-            return "InvalidConceptTerm: " + term;
+            return "InvalidConceptTerm: " + term + " (" + term.getClass() + ")";
         }
     }
 

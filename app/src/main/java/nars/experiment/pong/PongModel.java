@@ -21,13 +21,13 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	public static final int WIDTH = 30;
 	private static final int TOLERANCE = 5;
 	private static final int PADDING = 10;
-	
-	private final Player player1;
-	private final Player player2;
+
+	public final Player player1;
+	public final Player player2;
 	
 	private boolean new_game = true;
 	
-	private int ball_x;
+	public int ball_x;
 	int ball_y;
 	private double ball_x_speed;
 	private double ball_y_speed;
