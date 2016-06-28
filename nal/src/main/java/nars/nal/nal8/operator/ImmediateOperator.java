@@ -16,7 +16,7 @@ public abstract class ImmediateOperator extends NullOperator  {
     public final @NotNull Atomic op;
 
     protected ImmediateOperator() {
-        op = new Operator(getOperatorTerm());
+        op = new Operator(operator());
     }
 
 //    public Operation newOperation(Object...args) {

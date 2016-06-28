@@ -96,7 +96,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
      */
     public boolean async() { return false; }
 
-    public final @Nullable Operator getOperatorTerm() {
+    public final @Nullable Operator operator() {
         return atomicTerm;
     }
 

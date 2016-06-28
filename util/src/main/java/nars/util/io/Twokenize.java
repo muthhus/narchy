@@ -5,6 +5,8 @@
 package nars.util.io;
 
 
+import com.google.common.collect.Lists;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -313,6 +315,7 @@ public enum Twokenize {
             }
         }
 
+        Collections.sort(spans);
         return spans;
 
 //

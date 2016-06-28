@@ -235,7 +235,7 @@
 
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
-    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy)
+    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)

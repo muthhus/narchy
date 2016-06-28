@@ -254,8 +254,8 @@ public class NAgent implements Agent {
         ;
 
         this.sad = new SensorConcept(
-                //$.prop(nar.self, the("sad")),
-                $.inh(nar.self, $.neg($.seti(the("happy")))),
+                $.prop(nar.self, the("sad")),
+                //$.inh(nar.self, $.neg($.seti(the("happy")))),
                 nar,
                 new PolarRangeNormalizedFloat(()->
                     -prevReward
@@ -407,10 +407,10 @@ public class NAgent implements Agent {
         //TODO specify goal via a method in the sensor/digitizers
         float eternalGoalSeekConf = 1f /* gamma */;
         nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
-        nar.goal(happy, Tense.Present, 1f, gamma);
+        //nar.goal(happy, Tense.Present, 1f, gamma);
 
         nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
-        nar.goal(sad, Tense.Present, 0f, gamma);
+        //nar.goal(sad, Tense.Present, 0f, gamma);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
         nar.goal("(dR)", Tense.Present, 1f, 1f); //avoid decrease usually
@@ -538,7 +538,7 @@ public class NAgent implements Agent {
         if (synchronousGoalInput || lastAction != nextAction) {
 
             //belief/goal feedback levels
-            float off = 0.5f; //0.25f; //0.49f;
+            float off = 0f; //0.25f; //0.49f;
             float on = 1f; //0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;

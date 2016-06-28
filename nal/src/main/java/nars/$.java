@@ -665,10 +665,13 @@ public enum $ {
 
     @Nullable
     public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, @NotNull Compound x) {
-        return inh(
+        Term[] args = ((Compound) operation.term(0)).terms();
+        Term oper = operation.term(1);
+        return inh(y, imageMask( operation.size(), true, ArrayUtils.add(args, 0, oper)));
+        /*return inh(
                 y,
-                imge(x, operation.term(1)  /* position of the variable */)
-        );
+                imge(x, operation.term(1)  )
+        );*/
     }
 
     /**
@@ -700,7 +703,8 @@ public enum $ {
         argument[0] = relation;
         System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
 
-        return the(IMGe, argument);
+        return image(0, true, argument);
+        //return the(IMGe, argument);
     }
 
     @Nullable
@@ -714,12 +718,17 @@ public enum $ {
 
     @Nullable
     public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
-        Term[] elementsMasked = ArrayUtils.remove(elements, relation);
-        Term related = elements[relation];
-        Term img = compound(ext ? IMGe : IMGi, relation, elementsMasked);
+        Term img = imageMask(relation, ext, elements);
 
+        Term related = elements[relation];
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
+
+    public static Term imageMask(int relation, boolean ext, @NotNull Term[] elements) {
+        Term[] elementsMasked = ArrayUtils.remove(elements, relation);
+        return compound(ext ? IMGe : IMGi, relation, elementsMasked);
+    }
+
     @Nullable
     public static Compound imge(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PROD);

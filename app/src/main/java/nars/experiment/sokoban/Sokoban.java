@@ -1,7 +1,7 @@
-package nars.sokoban;
+package nars.experiment.sokoban;
 
-import automenta.vivisect.swing.NWindow;
 
+import javax.swing.*;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -606,8 +606,10 @@ public class Sokoban extends Applet {
     }
 
     public static void main(String[] args) throws Exception {
-        NWindow w = new NWindow("Sokoban", new Sokoban());
+        JFrame w = new JFrame("Sokoban");
+        w.setContentPane(new Sokoban());
         w.setSize(500, 500);
         w.setVisible(true);
+        w.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }

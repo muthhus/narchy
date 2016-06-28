@@ -180,21 +180,37 @@ public class Twenglish {
         return spanToTerm(c, false);
     }
 
+    //shorthand punctuations
+    public static final Atom EXCLAMATION = $.quote("!");
+    public static final Atom PERIOD = $.quote(".");
+    public static final Atom QUESTION_MARK = $.quote("?");
+    public static final Atom COMMA = $.quote(",");
+
     @Nullable
     public static Term spanToTerm(@NotNull Span c, boolean includeWordPOS) {
-        if ("word".equals(c.pattern)) {
-            //TODO support >1 and probabalistic POS
-            if (!includeWordPOS) {
-                return lexToTerm(c.content);
-            }
-            else {
-                String pos = POS.get(c.content.toLowerCase());
-                if (pos != null) {
-                    return $.prop(lexToTerm(c.content), tagToTerm(pos));
+        switch (c.pattern) {
+            case "word":
+                //TODO support >1 and probabalistic POS
+                if (!includeWordPOS) {
+                    return lexToTerm(c.content);
                 }
-            }
+                else {
+                    String pos = POS.get(c.content.toLowerCase());
+                    if (pos != null) {
+                        return $.prop(lexToTerm(c.content), tagToTerm(pos));
+                    }
+                }
+                break;
+            case "punct":
+                switch (c.content) {
+                    case "!": return EXCLAMATION;
+                    case ".": return PERIOD;
+                    case "?": return QUESTION_MARK;
+                    case ",": return COMMA;
+                }
+                break;
         }
-            
+
         return $.prop( lexToTerm(c.content), tagToTerm(c.pattern) );
     }
     
@@ -290,46 +306,4 @@ public class Twenglish {
                 Twenglish::spanToTerm);
     }
 
-    @NotNull
-    public static String learnSentence(@NotNull NAR nar, int wordDelay, @NotNull String message) {
-        List<Term> t = tokenize(message);
-
-        if (t.isEmpty()) return "silence";
-
-        String sentenceID = Integer.toString(message.hashCode());
-
-        //nar.input("speak:" + sentenceID + ". :|:");
-        //nar.input("say(sentence, " + sentenceID + ")! :|:");
-
-        //float f = 1f;
-        //float df = 0.5f / t.size();
-        for (Term w : t) {
-            //nar.input("sentence(" + sentenceID + "). :|:");// %" + f + ";0.95%");
-            //nar.frame(1);
-
-            //nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
-
-            nar.input("say(" + w + ")! :|:");
-
-            nar.run(wordDelay/2);
-
-            //nar.input("(--, say(" + w + "))! :|:");
-
-            nar.run(wordDelay/2);
-
-            //nar.input("say(" + w + "). %1|0.9%"); //silence
-            //nar.frame(wordDelay/2);
-
-
-            //f-=df;
-        }
-        //nar.input("say(sentence, " + sentenceID + "). :|: %0%");
-        //nar.input("(--, speak:" + sentenceID + "). :|:");
-
-        //nar.input("(--, sentence(" + sentenceID + ")). :|:");
-
-        //nar.input("(--, sentence(" + sentenceID + ")). :|:");
-
-        return sentenceID;
-    }
 }

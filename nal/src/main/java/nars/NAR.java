@@ -6,7 +6,6 @@ import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -34,7 +33,6 @@ import nars.util.IO;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
-import nars.util.signal.SensorConcept;
 import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
@@ -512,7 +510,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public final On onExec(@NotNull AbstractOperator r) {
         r.init(this);
-        return onExecution(r.getOperatorTerm(), r);
+        return onExecution(r.operator(), r);
     }
 
 

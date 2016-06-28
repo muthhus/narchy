@@ -36,7 +36,7 @@ abstract public class Algorithmic implements Environment {
     int nextAction = -1;
     private int time = 0, lastPredictionTime;
 
-    boolean trace = true;
+    boolean trace = false;
     private int rewPrintPeriod = 10;
 
     public Algorithmic(int[] space) {
@@ -106,7 +106,8 @@ abstract public class Algorithmic implements Environment {
                 float dt = time - lastPredictionTime;
                 float rewardFactor =
                         //1/dt; //less reward for delayed prediction caused by reading
-                        1f;
+                        //1f;
+                        1f/radix;
 
                 if (pred == target[y]) {
                     reward = (1f * rewardFactor);
@@ -261,16 +262,16 @@ abstract public class Algorithmic implements Environment {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = true;
+        //Global.DEBUG = true;
 
         Default n = new Default(1024, 4, 2, 2);
-        n.beliefConfidence(0.55f);
-        n.goalConfidence(0.55f);
+        n.beliefConfidence(0.95f);
+        n.goalConfidence(0.95f);
         n.DEFAULT_BELIEF_PRIORITY = 0.8f;
-        n.DEFAULT_GOAL_PRIORITY = 0.8f;
+        n.DEFAULT_GOAL_PRIORITY = 0.7f;
         n.DEFAULT_QUESTION_PRIORITY = 0.6f;
         n.DEFAULT_QUEST_PRIORITY = 0.6f;
-        n.cyclesPerFrame.set(128);
+        n.cyclesPerFrame.set(256);
         //n.logSummaryGT(System.out, 0.2f);
         //n.log();
 
@@ -282,23 +283,23 @@ abstract public class Algorithmic implements Environment {
             }
         };
 
-        n.onTask(tt -> {
-            if (tt.isGoal()) {
-                if ((tt.term().equals(a.happy) && tt.freq() < 0.5f) ||
-                        (tt.term().equals(a.sad) && tt.freq() > 0.5f))
-                {
-                    if (tt.conf() > 0.25f) {
-                        System.err.println("WTF psychotic");
-                        System.err.println(tt.explanation());
-                    }
-                }
-            }
-        });
+//        n.onTask(tt -> {
+//            if (tt.isGoal()) {
+//                if ((tt.term().equals(a.happy) && tt.freq() < 0.5f) ||
+//                        (tt.term().equals(a.sad) && tt.freq() > 0.5f))
+//                {
+//                    if (tt.conf() > 0.25f) {
+//                        System.err.println("WTF psychotic");
+//                        System.err.println(tt.explanation());
+//                    }
+//                }
+//            }
+//        });
 
-        new CopyTask(2, 3).run(
+        new CopyTask(4, 2).run(
                 a,
                 //new DQN(),
-                1024);
+                7024);
 
 
         a.printActions();

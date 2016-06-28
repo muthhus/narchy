@@ -81,9 +81,12 @@ public class Terms   {
         return l;
     }
 
-    public static boolean equalOrNegationOf(@NotNull Term a, @NotNull Term b) {
-        if (a.op() == b.op()) {
-            return a.equals(b);
+    public static boolean equalOrNegationOf(@Nullable Term a, @Nullable Term b) {
+        if (a == null || b == null)
+            return false;
+
+        if (a.equals(b)) {
+            return true;
         }
         if (a.op() == NEG) {
             return ((Compound)a).term(0).equals(b);
