@@ -31,11 +31,13 @@ public class NarseseTest {
     }
 
     @NotNull
-    static List<Task> tasks(@NotNull String s) throws Narsese.NarseseException {
+    static List<Task> tasks(@NotNull String s)  {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = Global.newArrayList(1);
-        Narsese.tasks(s, l, n);
+        List<Object[]> errors = Global.newArrayList(1);
+        Narsese.tasks(s, l, errors::add, n);
+        assertEquals(0, errors.size());
         return l;
     }
 

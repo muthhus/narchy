@@ -50,13 +50,18 @@ public class PeriodMeter extends FunctionMeter<Double> {
         stat.clear();
         return lastReset;
     }
-    
+
     public DescriptiveStatistics hit() {
+        return hit(1);
+    }
+
+    public DescriptiveStatistics hit(int n) {
         double now;
         now = sinceStart() > window ? reset() : now(nanoSeconds);
         if (Double.isFinite(prev)) {
             double dt = now - prev;
-            stat.addValue(dt);
+            for (int i = 0; i < n; i++)
+                stat.addValue(dt);
         }
         prev = now;
         return stat;

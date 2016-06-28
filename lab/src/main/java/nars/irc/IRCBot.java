@@ -1,6 +1,9 @@
 package nars.irc;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ public abstract class IRCBot {
     protected final String channel;
     boolean outputting = true;
 
-    static final String pingHead = "PING ";
+    private static final Logger logger = LoggerFactory.getLogger(IRCBot.class);
 
     protected BufferedWriter writer;
 
@@ -35,30 +38,20 @@ public abstract class IRCBot {
         this.login = login;
         this.channel = channel;
 
-        //new NWindow(this.toString(), new ReflectPanel(this)).show(500,300);
+        int port = 6667;
 
+        logger.info("connecting {} {}", server, port);
 
-        /*
-        new BufferedOutput(nar, 1, 1000, 64) {
+        Socket socket = new Socket(server, port);
 
-            @Override
-            protected void output(List<BufferedOutput.OutputItem> buffer) {
-               System.out.println(buffer);
-            }
-        };
-        */
-
-
-        //new TextOutput(nar, System.out).setShowErrors(true).setOutputPriorityMin(0.95f);
-
-        // Connect directly to the IRC server.
-        Socket socket = new Socket(server, 6667);
         writer = new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream( )));
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(socket.getInputStream( )));
 
         // Log on to the server.
+        logger.info("identifying {} {}", login, nick);
+
         writer.write("NICK " + nick + "\r\n");
         writer.write("USER " + login + " 8 * : " + nick + "\r\n");
         writer.flush();
@@ -80,16 +73,17 @@ public abstract class IRCBot {
                     }
                 }
 
+                logger.info("joining {}", channel);
 
                 writer.write("JOIN " + channel + "\r\n");
                 writer.flush();
+
+
                 // Keep reading lines from the server.
                 while ((line = reader.readLine( )) != null) {
 
                     try {
                         Message m = Message.parse(line);
-
-                        System.err.println("in: " + m + " from " + line);
 
                         switch (m.command) {
                             case "PING":
@@ -98,25 +92,26 @@ public abstract class IRCBot {
                                 break;
                             case "PRIVMSG":
                                 //System.err.println(line);
-                                onMessage(IRCBot.this, m.params.get(0), m.nick, m.params.get(1));
+                                logger.info("in: {}", line);
+                                onMessage(m.params.get(0), m.nick, m.params.get(1));
                                 break;
                             default:
-                                System.err.println("unknown: " + m + " from " + line);
+                                logger.error("unparsed: {}", line);
                         }
                     }
                     catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("exception: {} from input: {}", e, line);
                     }
                 }
             } catch (IOException e) {
+                logger.error("connect: {}", e);
                 e.printStackTrace();
             }
-
 
         }).start();
     }
 
-    protected abstract void onMessage(IRCBot bot, String channel, String nick, String msg);
+    protected abstract void onMessage(String channel, String nick, String msg);
 
     protected synchronized boolean send(String channel, String message) {
         try {
@@ -142,7 +137,7 @@ public abstract class IRCBot {
         String prefix;
         String nick;
         String command;
-        ArrayList<String> params = new ArrayList<>();
+        final ArrayList<String> params = new ArrayList<>();
 
         @Override
         public String toString() {

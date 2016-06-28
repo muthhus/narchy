@@ -39,7 +39,7 @@ public interface Execution  {
 
 //    }
 
-    static MutableTask result(@NotNull NAR nar, @NotNull OperationConcept operation, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
+    static MutableTask resultTerm(@NotNull NAR nar, @NotNull OperationConcept operation, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
 
 
         //Variable var=new Variable("$1");
@@ -58,7 +58,7 @@ public interface Execution  {
 
         //final int numArgs = x0.length;
 
-        Term inh = result(operation, y);
+        Term inh = resultTerm(operation, y);
         if ((!(inh instanceof Compound))) {
             //TODO wrap a non-Compound result as some kind of statement
             return null;
@@ -101,7 +101,7 @@ public interface Execution  {
      * which will be replaced with the result term (y)
      */
     @Nullable
-    static Term result(@NotNull Compound operation, @Nullable Term y) {
+    static Term resultTerm(@NotNull Compound operation, @Nullable Term y) {
 
         Compound x = (Compound) operation.term(0);
         if (x.op() != PROD)

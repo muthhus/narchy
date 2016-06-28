@@ -23,8 +23,9 @@ import java.util.function.Function;
  * Access to library of examples/unit tests
  * TODO use getClass().getResource ?
  */
-public class LibraryInput extends TextInput {
+public class LibraryInput {
 
+    private final List<Task> tasks;
     private String input;
 
     public static final String[] directories =
@@ -50,7 +51,7 @@ public class LibraryInput extends TextInput {
 
 
     protected LibraryInput(@NotNull NAR n, @NotNull String path) throws IOException {
-        super(n, FileInput.load(path));
+        tasks = FileInput.tasks(n, new File(path));
     }
     
     @NotNull

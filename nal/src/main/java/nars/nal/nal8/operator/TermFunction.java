@@ -17,6 +17,7 @@ import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
     @Nullable
     protected MutableTask result(@NotNull OperationConcept goal, Term y/*, Term[] x0, Term lastTerm*/) {
-        return Execution.result(nar, goal, y, getResultTense());
+        return Execution.resultTerm(nar, goal, y, getResultTense());
     }
 
     /**
@@ -145,17 +146,32 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
         final Compound ttt = exec;
-        final Compound args = Operator.opArgs(ttt);
+        Compound args = Operator.opArgs(ttt);
         //if (!tt.isCommand()) {
-            if (!validArgs(args))
+
+        boolean feedback = true;
+        if (!validArgs(args)) {
+            if (autoReturnVariable()) {
+                args = $.p(ArrayUtils.add(args.terms(), $.varDep(0))); //HACK
+                feedback = false; //HACK
+            } else {
                 return;
+            }
+        }
         //}
+
         O y = function(args, nar.index);
+
         //if (!tt.isCommand()) {
-        feedback(exec, y);
+        if (feedback)
+            feedback(exec, y);
         //}
 
+    }
 
+    /** if true, then an operation without a trailing variable will be replaced with it appended */
+    public boolean autoReturnVariable() {
+        return false;
     }
 
     protected void feedback(@NotNull OperationConcept cause, @Nullable Object y) {
@@ -213,10 +229,9 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
         if (t != null) {
             Execution.feedback(cause, result(cause, t/*, x, lastTerm*/), nar);
-            return;
+        } else {
+            throw new RuntimeException(this + " return value invalid: " + y);
         }
-
-        throw new RuntimeException(this + " return value invalid: " + y);
     }
 
     ///** the term that the output will inherit from; analogous to the 'Range' of a function in mathematical terminology */

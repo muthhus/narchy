@@ -667,7 +667,8 @@ public enum $ {
     public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, @NotNull Compound x) {
         Term[] args = ((Compound) operation.term(0)).terms();
         Term oper = operation.term(1);
-        return inh(y, imageMask( operation.size(), true, ArrayUtils.add(args, 0, oper)));
+        Term[] aa = ArrayUtils.add(args, 0, oper);
+        return inh(y, imageMask( aa.length-1, true, aa));
         /*return inh(
                 y,
                 imge(x, operation.term(1)  )

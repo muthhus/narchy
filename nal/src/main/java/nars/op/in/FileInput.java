@@ -2,23 +2,27 @@ package nars.op.in;
 
 import com.google.common.io.Files;
 import nars.NAR;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
     Given a filepath, loads the file as task input
  */
-public class FileInput extends TextInput {
+public class FileInput {
 
-
-    public FileInput(@NotNull NAR p, @NotNull File input) throws IOException {
-        super(p, load(input));
+    public static void load(@NotNull NAR p, @NotNull File input) throws IOException {
+        p.input(tasks(p, input));
+    }
+    public static List<Task> tasks(final NAR nar, @NotNull File input) throws IOException {
+        return nar.tasks(load(input));
     }
 
     public static String load(@NotNull String path) throws IOException {

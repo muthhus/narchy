@@ -99,7 +99,7 @@ public class TaskTest {
 
         n.reset();
 
-        TaskQueue z = n.inputs("<e --> f>.  <g --> h>. "); //test when they are input on the same parse
+        n.input("<e --> f>.  <g --> h>. "); //test when they are input on the same parse
 
         n.run(10);
 

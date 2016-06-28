@@ -1,9 +1,13 @@
 package nars.op.in;
 
 import nars.NAR;
+import nars.task.Task;
 import nars.task.flow.Input;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * TextInput subclass that only inputs when the next input value changes from
@@ -12,8 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class ChangedTextInput {
 
 	private final NAR nar;
-	@Nullable
-	private Input last;
+	private @NotNull List<Task> last = Collections.emptyList();
 	private boolean allowRepeats;
 
 	public ChangedTextInput(NAR n) {
@@ -21,15 +24,11 @@ public class ChangedTextInput {
 	}
 
 	public boolean set(@NotNull String s) {
-		if (!enable())
-			return false;
-		return set(new TextInput(nar, s));
+		return enable() && set(nar.tasks(s));
 	}
 
-	public boolean set(@NotNull Input s) {
-		if (!enable())
-			return false;
-		if (allowRepeats() || (last == null) || (!last.equals(s))) {
+	public boolean set(@NotNull List<Task> s) {
+		if (enable() && allowRepeats() || (!last.equals(s))) {
 			nar.input(s);
 			last = s;
 			return true;
@@ -41,7 +40,8 @@ public class ChangedTextInput {
 	public boolean allowRepeats() {
 		return allowRepeats;
 	}
-	public static boolean enable() {
+
+	public boolean enable() {
 		return true;
 	}
 

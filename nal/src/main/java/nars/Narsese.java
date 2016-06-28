@@ -1040,12 +1040,12 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Memory m) throws NarseseException  {
+    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull Memory m)  {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
             i[0]++;
-        }, m);
+        }, unparsed, m);
         return i[0];
     }
 
@@ -1054,11 +1054,12 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Memory m) throws NarseseException  {
+    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Consumer<Object[]> unparsed, @NotNull Memory m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
-                m.eventError.emit("Invalid task: " + input);
+                if (unparsed!=null)
+                    unparsed.accept(o);
             } else {
                 c.accept(t);
             }

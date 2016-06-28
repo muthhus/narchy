@@ -15,7 +15,6 @@ import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.op.in.FileInput;
-import nars.op.in.TextInput;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
@@ -184,10 +183,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public FileInput input(@NotNull File input) throws IOException {
-        FileInput fi = new FileInput(this, input);
-        input((Input) fi);
-        return fi;
+    public void input(@NotNull File input) throws IOException {
+        FileInput.load(this, input);
     }
 
     /**
@@ -216,21 +213,26 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse) throws NarseseException {
+    public List<Task> tasks(@NotNull String parse)  {
+        return tasks(parse, (o) -> {
+           logger.error("unparsed: {}", o );
+        });
+    }
+
+    @NotNull
+    public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed)  {
         List<Task> result = Global.newArrayList(1);
-        Narsese.the().tasks(parse, result, this);
+        Narsese.the().tasks(parse, result, unparsed, this);
         result.forEach(c->c.normalize(this));
         return result;
     }
 
-    @NotNull
-    public TaskQueue inputs(@NotNull String parse) {
-        return input(tasks(parse));
-    }
 
     @NotNull
-    public TextInput input(@NotNull String text) throws NarseseException {
-        return (TextInput) input((Input)new TextInput(this, text));
+    public List<Task> input(@NotNull String text) throws NarseseException {
+        List<Task> lt = tasks(text);
+        input(lt);
+        return lt;
     }
 
     @NotNull
