@@ -144,6 +144,8 @@ public class NarseseIRCBot extends Talk {
             return true;
         }
 
+
+
         @Nullable
         @Override
         public Object function(Compound arguments, TermIndex i) {

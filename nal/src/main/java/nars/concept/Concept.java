@@ -219,7 +219,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
     }
 
     /** link to a specific peer */
-    static <T> void linkPeer(Bag<T> bag, T x, Budget b, float v) {
+    static <T> void linkPeer(Bag<T> bag, T x, Budget b, float q) {
         //@NotNull Bag<Termed> bag = termlinks();
         BLink<T> existing = bag.get(x);
 
@@ -237,16 +237,16 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
         boolean init;
         if (existing == null ) {
-            bag.put(x, b, v, null);
+            bag.put(x, b, q, null);
             init = true;
         } else {
             init = false;
         }
 
-        float a = b.pri();
-        if (a == a /*!NaN */) {
+        float bp = b.pri();
+        if (bp == bp /*!NaN */) {
 
-            final float learningRate = v / bag.size();
+            final float learningRate = (bp * q) / bag.capacity();
             //System.out.println(this + " activating " + x);
             bag.forEach(tl -> {
                 boolean active = tl == existing;
@@ -257,9 +257,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
                 if (p!=p) //the link is currently deleted
                     return;
 
-                float outputTarget = active ? a : (1f - a);
-                float output = outputTarget - tl.pri(); //nar.conceptPriority(x);
-                float dp = output * learningRate;
+                float dp = (active ? learningRate : -learningRate);
                 tl.priAdd(dp);
                 //System.out.println(tl.toString2());
             });
@@ -268,18 +266,18 @@ public interface Concept extends Termed, Comparable<Termlike> {
 
     }
 
-    /** link to all existing termlinks, hierarchical and heterarchical */
-    default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
-        List<Termed> targets = Global.newArrayList(termlinks().size());
-        termlinks().forEach(tl -> targets.add(tl.get()));
-        float subScale = scale / targets.size();
-        targets.forEach(t -> {
-            //System.out.println(Concept.this + " activate " + t + " " + b + "x" + subScale);
-            termlinks().put(t, b, subScale, null); //activate the termlink
-            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
-        });
-
-    }
+//    /** link to all existing termlinks, hierarchical and heterarchical */
+//    default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
+//        List<Termed> targets = Global.newArrayList(termlinks().size());
+//        termlinks().forEach(tl -> targets.add(tl.get()));
+//        float subScale = scale / targets.size();
+//        targets.forEach(t -> {
+//            //System.out.println(Concept.this + " activate " + t + " " + b + "x" + subScale);
+//            termlinks().put(t, b, subScale, null); //activate the termlink
+//            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
+//        });
+//
+//    }
 
 
     default void visitTasks(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {

@@ -4,6 +4,7 @@ import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.concept.OperationConcept;
+import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -153,20 +154,26 @@ public abstract class TermFunction<O> extends AbstractOperator {
                 args = $.p(ArrayUtils.add(args.terms(), $.varDep(0))); //HACK
                 feedback = false; //HACK
             } else {
-                return;
+                args = null;
             }
         }
         //}
 
-        O y = function(args, nar.index);
-        if (y == null)
-            return;
+        if (args!=null) {
+            O y = function(args, nar.index);
+            if (y != null) {
 
-        //if (!tt.isCommand()) {
-        if (feedback)
-            feedback(exec, y);
-        //}
+                //if (!tt.isCommand()) {
+                if (feedback)
+                    feedback(exec, y);
+                //}
+            }
+        }
 
+        //prevent re-occurring goals
+        @NotNull BeliefTable g = exec.goals();
+        g.forEach(t -> t.delete());
+        g.clear();
     }
 
     /** if true, then an operation without a trailing variable will be replaced with it appended */

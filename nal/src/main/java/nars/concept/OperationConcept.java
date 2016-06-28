@@ -5,33 +5,28 @@ import nars.bag.Bag;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 
 /**
  * Has ability to measure (and cache) belief and desire state in order to execute Operations
  * and negations of Operations
- * <p>
- * motivation = desire - belief
- * motivation = (desirePositive - desireNegative) - (beliefPositive - beliefNegative)
+
  */
 public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
 
-    private boolean pendingRun;
+    private volatile boolean pendingRun;
 
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
     }
-
 
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
         super(term, n);
@@ -42,10 +37,6 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
         this($.$(compoundTermString), n);
     }
 
-//    static void ensureOperation(@NotNull Compound term) {
-//        if (!Op.isOperation(term))
-//            throw new RuntimeException(term + " is not an Operation");
-//    }
 
     /* subj contains the parameter product */
     public final TermContainer parameters() {
@@ -65,10 +56,10 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     }
 
     @Nullable
-    private final synchronized Task executeLater(@Nullable Task t, @NotNull NAR nar) {
+    private final Task executeLater(@Nullable Task t, @NotNull NAR nar) {
         if (t != null) {
 
-            if (!pendingRun) {
+            if (!pendingRun && beliefModificationRequiresUpdate(t, nar)) {
                 pendingRun = true;
                 nar.runLater(this);
             }
@@ -77,29 +68,36 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
         return t;
     }
 
+    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, NAR nar) {
+        return hasGoals() && operationExec(operationConcept(nar))!=null;
+    }
+
     /** called between frames if belief or goal state has changed */
-    @Override public void accept(NAR nar) {
+    @Override public void accept(@NotNull NAR nar) {
         pendingRun = false;
 
-        //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
-        if (nar!=null) {
-            Topic<OperationConcept> tt = nar.concept(Operator.operator(this)).get(Execution.class);
-            if (tt != null && !tt.isEmpty()) {
-                //beforeNextFrame( //<-- enqueue after this frame, before next
-                tt.emit(this);
-            }
+        Topic<OperationConcept> tt = operationExec(nar);
+        if (tt != null) {
+            //beforeNextFrame( //<-- enqueue after this frame, before next
+            tt.emit(this);
         }
-
 
     }
 
+    public @Nullable Topic<OperationConcept> operationExec(NAR nar) {
+        return operationExec(operationConcept(nar));
+    }
 
+    public @Nullable Topic<OperationConcept> operationExec(Concept c) {
+        return c == null ? null : c.get(Execution.class);
+    }
 
-    //    private final boolean updateNecessary(long now) {
-//        long last = this.lastMotivationUpdate;
-//        return (last == ETERNAL) || ((now - last) > 0);
-//    }
-//
+    public @Nullable Concept operationConcept(NAR nar) {
+        return nar.concept(
+            //Operator.operator(this)
+            term(1) //operator as predicate
+        );
+    }
 
 
 //    public OperationConcept positive(NAR n) {

@@ -2,6 +2,7 @@ package nars.experiment;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 import com.google.common.io.LineProcessor;
 import nars.$;
@@ -46,7 +47,8 @@ import static nars.$.$;
 public class Talk {
 
     final static Operator hear = $.operator("hear");
-    long wordDelay = 30;
+
+    long wordDelay = 50; //in milisec
 
     public static NAR nar() {
         Random rng = new XorShift128PlusRandom(1);
@@ -83,7 +85,7 @@ public class Talk {
         //ECHO
         //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
         //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
-        nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) <=> (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
+        //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
         nar.believe("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
 
         //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
@@ -91,7 +93,7 @@ public class Talk {
 
 
         //WORD ANALYSIS
-        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.5f);
+        nar.goal($("(hear(#x,#c1) && wordInfo(#x,#z)))"), Tense.Present, 1f, 0.1f);
         //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
 
         //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
@@ -146,7 +148,7 @@ public class Talk {
         });
         nar.onExec(new WordInfo());
 
-        //nar.logSummaryGT(System.out, 0.25f);
+        nar.logSummaryGT(System.out, 0.25f);
 
         Compound sehToMe = $.p($.the("seh"), nar.self);
 
@@ -198,15 +200,8 @@ public class Talk {
                 "dunno."
         };
 
-        new Thread(()-> {
-            while (true) {
-                for (String s : corpus) {
-                    //System.out.println("IN: " + s);
-                    hear(s, sehToMe, 0.25f);
-                    Util.pause(1000);
-                }
-            }
-        }).start();
+        hear(corpus, sehToMe, 0.5f);
+
 
         new Thread(()->{
             while (true) {
@@ -254,6 +249,10 @@ public class Talk {
         return hear(text, $.p(from, to), pri);
     }
 
+    public List<Term> hear(String[] text, Compound context, float pri) {
+        return hear(Joiner.on(" ").join(text), context, pri);
+    }
+
     public List<Term> hear(String text, Compound context, float pri) {
         List<Term> tokens = Twenglish.tokenize(text.toLowerCase());
         if (!tokens.isEmpty())
@@ -261,13 +260,15 @@ public class Talk {
         return tokens;
     }
 
-    public void hear(Compound context, List<Term> tokens, float pri) {
-        new Thread(()-> {
+    public Thread hear(Compound context, List<Term> tokens, float pri) {
+        Thread t = new Thread(()-> {
             for (Term x : tokens) {
                 hear(context, nar.time(), x, pri);
                 Util.pause(wordDelay);
             }
-        }).start();
+        });
+        t.start();
+        return t;
     }
 
     public @Nullable Task hear(Term context, float tt, Term x, float pri) {

@@ -300,7 +300,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //    }
 
     @Nullable
-    public NAR goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
+    public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
         return goal((Termed)$.$(goalTermString), tense, freq, conf);
     }
 
@@ -308,7 +308,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * desire goal
      */
     @Nullable
-    public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
+    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
         return goal(
                 priorityDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
@@ -322,7 +322,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
         return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
     }
-    @NotNull public NAR goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
+    @NotNull public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
         return goal(term, tense, freq, confidenceDefault(Symbols.GOAL));
     }
 
@@ -341,7 +341,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, Tense.Eternal, freq, conf);
     }
     @NotNull
-    public NAR goal(@NotNull Termed term, float freq, float conf)  {
+    public Task goal(@NotNull Termed term, float freq, float conf)  {
         return goal(term, Tense.Eternal, freq, conf);
     }
     @NotNull
@@ -360,7 +360,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public NAR goal(@NotNull String termString) throws NarseseException {
+    public Task goal(@NotNull String termString) throws NarseseException {
         return goal((Termed)term(termString), true);
     }
 
@@ -373,7 +373,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term(termString), isTrue);
     }
     @NotNull
-    public NAR goal(@NotNull String termString, boolean isTrue) throws NarseseException {
+    public Task goal(@NotNull String termString, boolean isTrue) throws NarseseException {
         return goal(term(termString), isTrue);
     }
     @NotNull
@@ -386,12 +386,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public NAR goal(@NotNull Termed<Compound> term)  {
+    public Task goal(@NotNull Termed<Compound> term)  {
         return goal(term, true);
     }
 
     @NotNull
-    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
+    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
         return goal(term, trueOrFalse, confidenceDefault(BELIEF));
     }
     @NotNull
@@ -399,7 +399,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
     @NotNull
-    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
+    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
         return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -409,13 +409,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf)  {
-        input(pri, durabilityDefault(GOAL), goal, GOAL, when, freq, conf);
-        return this;
+    @Nullable public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf)  {
+        return input(pri, durabilityDefault(GOAL), goal, GOAL, when, freq, conf);
     }
-    @Nullable public NAR goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf)  {
-        input(pri, durabilityDefault(GOAL), goal, GOAL, time(tense), freq, conf);
-        return this;
+
+    @Nullable public Task goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf)  {
+        return input(pri, durabilityDefault(GOAL), goal, GOAL, time(tense), freq, conf);
     }
 
     @Nullable

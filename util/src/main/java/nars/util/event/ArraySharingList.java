@@ -105,15 +105,17 @@ public class ArraySharingList<C> implements Iterable<C> {
     }
 
     public final void clear() {
-        if (isEmpty()) return;
-        data.clear();
-        change.set(true);
+        if (!isEmpty()) {
+            data.clear();
+            change.set(true);
+        } else {
+            return;
+        }
     }
 
     public final int size() {
         C[] a = getCachedNullTerminatedArray();
-        if (a == null) return 0;
-        return a.length-1; //not including the null
+        return a == null ? 0 : a.length - 1;
     }
 
     /** may be null; ignore its size, it will be at least 1 element larger than the size of the list */
@@ -145,7 +147,7 @@ public class ArraySharingList<C> implements Iterable<C> {
             a = null;
         }
 
-        return array = a;
+        return this.array = a;
     }
 
     @Override
@@ -159,8 +161,11 @@ public class ArraySharingList<C> implements Iterable<C> {
         if (max == -1) max = a.length;
         for (int i = 0; i < max; i++) {
             C c = a[i];
-            if (c == null) break;
-            with.accept(c);
+            if (c != null) {
+                with.accept(c);
+            } else {
+                break;
+            }
         }
     }
 

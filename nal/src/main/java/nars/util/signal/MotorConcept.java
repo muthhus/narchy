@@ -178,7 +178,13 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     }
 
-    //    @Override
+
+    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, NAR nar) {
+        //always update (calling .accept(nar) ) after every change
+        return true;
+    }
+
+        //    @Override
 //    public @Nullable
 //    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 //        //if (belief.evidence().length > 1) {

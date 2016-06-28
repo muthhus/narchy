@@ -2,16 +2,15 @@ package nars.util.event;
 
 import java.util.function.Consumer;
 
-/** single-thread synchronous (in-thread) event emitter with direct array access
- * */
+/**
+ * single-thread synchronous (in-thread) event emitter with direct array access
+ */
 public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements Topic<V> {
 
 
     //TODO extract this to Topics and a graph metamodel of the events
 
     //static Map<String, Topic<?>> topics = new HashMap();
-
-
 
 
 //    public static void register(Topic<?> t) {
@@ -43,7 +42,6 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
 //    }
 
 
-
     public DefaultTopic() {
         super(Consumer[]::new);
         //this.id = id;
@@ -51,21 +49,22 @@ public class DefaultTopic<V> extends ArraySharingList<Consumer<V>> implements To
     }
 
     @Override
-    public final void emit(V arg) {
+    public final void emit(Object /* V */ arg) {
         Consumer[] vv = getCachedNullTerminatedArray();
-        if (vv == null) return;
-
-        for (int i = 0; ; ) {
-            Consumer c = vv[i++];
-            if (c == null)
-                break; //null terminator hit
-            c.accept(arg);
+        if (vv != null) {
+            for (int i = 0; ; ) {
+                Consumer c = vv[i++];
+                if (c != null)
+                    c.accept(arg);
+                else
+                    break; //null terminator hit
+            }
         }
     }
 
     @Override
     public final On on(Consumer<V> o) {
-        On<V> d = new On<>(this,o);
+        On<V> d = new On<>(this, o);
         add(o);
         return d;
     }

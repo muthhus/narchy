@@ -66,7 +66,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
     public void accept(@NotNull OperationConcept exec) {
 
         //only proceed with execution if positively motivated
-        if ((exec.goals().motivation(nar.time()) >= 0))
+        if ((exec.goals().motivation(nar.time()) > 0))
             execute(exec);
 
 //        if (async()) {

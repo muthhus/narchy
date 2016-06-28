@@ -13,6 +13,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.UtilityFunctions.aveAri;
 import static nars.nal.UtilityFunctions.or;
 
 /**
@@ -61,9 +62,12 @@ public class TaskBudgeting {
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                        //* volRatioScale
+                //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
+                aveAri(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
         ;
+
+//        if (priority > 0.5f)
+//            System.err.println("fc");
 
         final float durability =
                 nal.taskLink.dur() * volRatioScale;

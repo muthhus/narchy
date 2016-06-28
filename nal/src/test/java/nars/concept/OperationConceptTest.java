@@ -32,7 +32,8 @@ public class OperationConceptTest {
         };
 
 
-        n.goal(op, 1f, 0.9f).step().step();
+        n.goal(op, 1f, 0.9f);
+        n.step().step();
         assertMotive(n, op, 0.5f, 0.95f);
 
         n.believe(op, 0f, 0.5f).step();
