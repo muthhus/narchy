@@ -12,10 +12,8 @@ public abstract class AtomicString implements Atomic {
     /** Assumes that the op()
      *  is encoded within its string such that additional op()
      *  comparison would be redundant. */
-    @Override public final boolean equals(Object u) {
+    @Override public boolean equals(Object u) {
         if (this == u) return true;
-
-        //if (hashCode()!=u.hashCode()) return false;
 
         if (u instanceof Atomic) {
             Atomic tu = (Atomic) u;
@@ -23,6 +21,7 @@ public abstract class AtomicString implements Atomic {
         }
         return false;
     }
+
 
     @Override
     public int complexity() {
@@ -37,10 +36,13 @@ public abstract class AtomicString implements Atomic {
     /**
      * @param that The Term to be compared with the current Term
      */
-    @Override public final int compareTo(@NotNull Termlike that) {
+    @Override public int compareTo(@NotNull Termlike that) {
         if (that==this) return 0;
 
-        Termed t = (Termed)that;
+        if (!(that instanceof Atomic))
+            return -1;
+
+        Atomic t = (Atomic)that;
         int d = op().compareTo(t.op());
         if (d!=0)
             return d;

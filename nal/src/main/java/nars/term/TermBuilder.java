@@ -1,5 +1,6 @@
 package nars.term;
 
+import alice.tuprolog.InvalidTermException;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Op;
@@ -31,7 +32,7 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTerm {
+    public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTerm {
 
         /* special handling */
         switch (op) {
@@ -351,21 +352,18 @@ public abstract class TermBuilder {
     @Nullable
     public Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
 
-        switch (u.length) {
-            case 2:
-                return statement2(op, t, u);
+        if (u.length != 2) {//throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
+            throw new InvalidTerm(op, t, u);
+            //return null;
+        } else {
+            return statement2(op, t, u[0], u[1]);
             //case 1:
-                //return u[0];
-            default:
-                //throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
-                return null;
+            //return u[0];
         }
     }
 
     @Nullable
-    public Term statement2(@NotNull Op op, int dt, final Term[] u) {
-        Term subject = u[0];
-        Term predicate = u[1];
+    public Term statement2(@NotNull Op op, int dt, final Term subject, Term predicate) {
 
         //if (subject.equals(predicate))
         //    return null; //subject;
@@ -408,15 +406,14 @@ public abstract class TermBuilder {
 
                         MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                         if (!common.isEmpty()) {
-                            subject = build(csub, TermContainer.except(subjs, common));
-                            if (subject == null)
+                            Term newSubject = build(csub, TermContainer.except(subjs, common));
+                            if (newSubject == null)
                                 return null;
-                            predicate = build(cpred, TermContainer.except(preds, common));
-                            if (predicate == null)
+                            Term newPredicate = build(cpred, TermContainer.except(preds, common));
+                            if (newPredicate == null)
                                 return null;
 
-                            if (Terms.equalsAnonymous(subject, predicate))
-                                return null;
+                            return statement2(op, dt, newSubject, newPredicate);
                         }
                     }
                 }

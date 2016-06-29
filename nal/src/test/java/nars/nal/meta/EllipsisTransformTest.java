@@ -50,7 +50,7 @@ public class EllipsisTransformTest {
                 $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
         EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
         assertEquals("(%386007808..%2=_..+)", u.toString());
-        assertEquals($.$("%2"), tt.from);
+        assertEquals($.$("%2").toString(), tt.from.toString());
         assertEquals(Imdex, tt.to);
     }
 }

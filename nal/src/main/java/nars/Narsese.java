@@ -1185,10 +1185,15 @@ public class Narsese extends BaseParser<Object> {
     public Term term(@NotNull String s, @Nullable TermIndex index, boolean normalize) throws NarseseException  {
         Term y = term(s);
         if (normalize) {
-            Termed x = index.normalized(y);
-            if (x == null)
-                throw new NarseseException("Un-normalizable: " + y);
-            y = x.term();
+            if (y instanceof Compound) {
+                Termed x = index.normalized(y);
+                if (x == null)
+                    throw new NarseseException("Un-normalizable: " + y);
+                y = x.term();
+            }
+//            else if (y instanceof GenericVariable) {
+//                return ((GenericVariable)y).normalize(1 /* starting variable index */);
+//            }
         }
         return y;
     }

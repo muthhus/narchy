@@ -88,15 +88,16 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final boolean equals(@Nullable Object that) {
 
         if (this == that) return true;
-        if (that!=null && hashCode() == that.hashCode()) {
-            if (that instanceof Compound) {
-                Compound cthat = (Compound) that;
-                return (
-                    dt() == cthat.dt() &&
-                    subterms().equals(cthat.subterms())
-                );
-            }
+
+        if (that instanceof Compound) {
+            Compound cthat = (Compound) that;
+            return (
+                op() == cthat.op() &&
+                dt() == cthat.dt() &&
+                subterms().equals(cthat.subterms())
+            );
         }
+
         return false;
     }
 

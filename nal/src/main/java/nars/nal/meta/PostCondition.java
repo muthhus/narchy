@@ -79,15 +79,14 @@ public class PostCondition implements Serializable, Level //since there can be m
 
     /**
      * @param rule             rule which contains and is constructing this postcondition
-     * @param term
+     * @param pattern
      * @param modifiers
      * @throws RuntimeException
      */
-    public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term term,
+    @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
                                      @NotNull Term... modifiers) throws RuntimeException {
 
 
-        //TruthOperator judgmentTruth = null,goalTruth = null;
         Term beliefTruth = null, goalTruth = null;
 
         //boolean negate = false;
@@ -175,23 +174,23 @@ public class PostCondition implements Serializable, Level //since there can be m
                     throw new RuntimeException("Unhandled postcondition: " + type + ':' + which);
             }
 
-
         }
 
+        PostCondition pc = new PostCondition(pattern, beliefTruth, goalTruth, puncOverride);
 
-        PostCondition pc = new PostCondition(term,
-                beliefTruth, goalTruth, puncOverride);
-
-        //pc.negate = negate;
-        pc.puncOverride = puncOverride;
-        if (pc.valid(rule)) {
-            return pc;
+        if (!pc.modifiesPunctuation() && pattern instanceof Compound) {
+            if (rule.getTask().equals(pattern)) {
+                rule.getTask().equals(pattern);
+                throw new RuntimeException("punctuation not modified yet rule task equals pattern");
+            }
+            if (rule.getBelief().equals(pattern))
+                throw new RuntimeException("punctuation not modified yet rule belief equals pattern");
         }
 
+        if (pc.minNAL != 0)
+            rule.minNAL = Math.min(rule.minNAL, pc.minNAL);
 
-        return null;
-
-
+        return pc;
     }
 
     @Override
@@ -201,24 +200,6 @@ public class PostCondition implements Serializable, Level //since there can be m
 
 
 
-    boolean valid(@NotNull PremiseRule rule) {
-        Term term = this.pattern;
-
-        if (!modifiesPunctuation() && term instanceof Compound) {
-            if (rule.getTask().equals(term) ||
-                    rule.getBelief().equals(term))
-                return false;
-        }
-
-        //assign the lowest non-zero, because non-zero will try them all anyway
-        /*if (rule.minNAL == 0)
-            rule.minNAL = minNAL;
-        else*/
-        if (minNAL != 0)
-            rule.minNAL = Math.min(rule.minNAL, minNAL);
-
-        return true;
-    }
 
     public final boolean modifiesPunctuation() {
         return puncOverride > 0;

@@ -45,12 +45,6 @@ public interface Variable extends Atomic {
         return 0;
     }
 
-    @Override
-    default int compareTo(@NotNull Termlike o) {
-        //hashcode can serve as the ordering too
-        if (o == this) return 0;
-        return o instanceof Variable ? Integer.compare(hashCode(), o.hashCode()) : 1;
-    }
 
     @Override
     default int init(@NotNull int[] meta) {

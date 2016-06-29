@@ -2,6 +2,8 @@ package nars.term.variable;
 
 import nars.$;
 import nars.Op;
+import nars.term.Termlike;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +28,24 @@ public class GenericVariable extends AtomicString implements Variable {
     @Override
     public int id() {
         throw new UnsupportedOperationException();
+    }
+    @Override public boolean equals(Object u) {
+        if (this == u) return true;
+
+        //prevent comparison with AbstractVariable
+        if (u instanceof GenericVariable) {
+            GenericVariable tu = (GenericVariable) u;
+            return toString().equals(tu.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public int compareTo(@NotNull Termlike that) {
+        if (this == that) return 0;
+        if (that instanceof AbstractVariable)
+            return -1; //prevent comparison with AbstractVariable
+        return super.compareTo(that);
     }
 
     @Override

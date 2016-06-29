@@ -279,17 +279,7 @@ public class PremiseRule extends GenericCompound {
 
             Term pattern = post.pattern;
 
-            if (Op.isOperation(pattern)) {
-                //TODO more correctly unwrap certain immediate transform operators to get the actual op
-                //if (p.trans Operator.operator((Compound)pattern) instanceof ImmediateTermTransform) {
-                this.pattern = $.varPattern(1);
-                //} else {
-                //    this.op = rawPatternOp;
-                //}
-
-            } else {
-                this.pattern = pattern;
-            }
+            this.pattern = pattern;
 
             char puncOverride = post.puncOverride;
             char puncSrc = puncOverride != 0 ? puncOverride : '_';
@@ -589,6 +579,7 @@ public class PremiseRule extends GenericCompound {
 
         Term[] precon = ((Compound) term(0)).terms();
         Term[] postcons = ((Compound) term(1)).terms();
+
 
 
         Set<BoolCondition> pres =
@@ -922,18 +913,17 @@ public class PremiseRule extends GenericCompound {
 
             Term[] modifiers = ((Compound) postcons[i++]).terms();
 
-            PostCondition pc = PostCondition.make(this, t,
-                    toSortedSetArray(modifiers));
-
-            if (pc != null)
-                postConditions.add(pc);
+            postConditions.add(PostCondition.make(this, t, toSortedSetArray(modifiers)));
         }
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
             throw new RuntimeException("postcondition duplicates:\n\t" + postConditions);
 
         postconditions = postConditions.toArray(new PostCondition[postConditions.size()]);
-
+        if (postconditions.length == 0) {
+            System.out.println(Arrays.toString(postcons));
+            //throw new RuntimeException("no postconditions");
+        }
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level

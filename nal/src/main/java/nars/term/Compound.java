@@ -455,7 +455,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      */
     @Nullable
     default int[] isSubterm(@NotNull Term t) {
-        if (containsTerm(t)) {
+        if (!impossibleSubterm(t)) {
             IntArrayList l = new IntArrayList();
 
             if (isSubterm(this, t, l)) {

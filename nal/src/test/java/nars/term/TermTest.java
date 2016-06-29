@@ -300,6 +300,7 @@ public class TermTest {
             assertTrue(true);
 
         } catch (Throwable ex) {
+            ex.printStackTrace();
             assertTrue(false);
         }
 

@@ -31,8 +31,7 @@ public interface Termlike extends Comparable<Termlike> {
 
     /** if contained within; doesnt match this term (if it's a term);
      *  false if term is atomic since it can contain nothing
-     *
-     * @param t*/
+     */
     boolean containsTerm(Termlike t);
 
     boolean hasTemporal();

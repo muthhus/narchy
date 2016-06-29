@@ -23,6 +23,7 @@ package nars.term.variable;
 
 import nars.Global;
 import nars.Op;
+import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,10 +56,17 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean equals(@NotNull Object obj) {
         return obj==this ||
-                (obj instanceof Variable && obj.hashCode() == hash); //hash first, it is more likely to differ
+                (obj instanceof AbstractVariable && obj.hashCode() == hash); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
-
     }
+
+    @Override
+    public final int compareTo(@NotNull Termlike o) {
+        //hashcode serves as the ordering too
+        if (o == this) return 0;
+        return o instanceof AbstractVariable ? Integer.compare(hash, o.hashCode()) : 1;
+    }
+
 
     @Override
     public final int hashCode() {

@@ -35,23 +35,26 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Statement {
 
-    /**
-     * Check the validity of a potential Statement. [To be refined]
-     * <p>
-     *
-     * @param subject   The first component
-     * @param predicate The second component
-     * @return Whether The Statement is invalid
-     */
-    static boolean invalidStatement(@NotNull Term subject, @NotNull Term predicate) {
-        return subject.equals(predicate) || invalidStatement2(subject, predicate);
-    }
+//    /**
+//     * Check the validity of a potential Statement. [To be refined]
+//     * <p>
+//     *
+//     * @param subject   The first component
+//     * @param predicate The second component
+//     * @return Whether The Statement is invalid
+//     */
+//    static boolean invalidStatement(@NotNull Term subject, @NotNull Term predicate) {
+//        return subject.equals(predicate) || invalidStatement2(subject, predicate);
+//    }
+//    static boolean coNegated(@NotNull Term subject, @NotNull Term predicate) {
+//        return subject.op() == Op.NEG && ((Compound) subject).term(0).equals(predicate);
+//    }
 
     /** skips the null and equality test */
     static boolean invalidStatement2(@NotNull Term subject, @NotNull Term predicate) {
 
         //TODO combine these mirrored invalidReflexive calls into one combined, unredundant operation
-        if (invalidReflexive(subject, predicate) || invalidReflexive(predicate, subject))
+        if (!validReflexive(subject, predicate) || !validReflexive(predicate, subject))
             return true;
 
         if (!subject.op().isStatement() || !predicate.op().isStatement())
@@ -63,9 +66,6 @@ public interface Statement {
         return cs.term(0).equals(cp.term(1)) && cs.term(1).equals(cp.term(0));
     }
 
-    static boolean coNegated(@NotNull Term subject, @NotNull Term predicate) {
-        return subject.op() == Op.NEG && ((Compound) subject).term(0).equals(predicate);
-    }
 
 
     @Nullable
@@ -84,14 +84,21 @@ public interface Statement {
      *
      * @param t1 The first term
      * @param t2 The second term
-     * @return Whether they cannot be related in a statement
+     * @return Whether they may be related in a statement
      */
-    static boolean invalidReflexive(Term t1, Term t2) {
+    static boolean validReflexive(Term t1, Term t2) {
 
-        return !(!(t1 instanceof Compound) || t1.op().isImage()
-                || !t1.containsTerm(t2)
-                //!((Compound) t1).containsTermRecursively(t2)
-        );
+        if (!(t1 instanceof Compound))
+            return true;
+
+        return !((Compound)t1).containsTerm(t2);
+        //return !((Compound)t1).containsTermRecursively(t2);
+
+//        return !(!(t1 instanceof Compound) || t1.op().isImage()
+//                ||
+//                //!t1.containsTerm(t2)
+//
+//        ) || ((Compound) t1).containsTermRecursively(t2);
     }
 
 
