@@ -387,8 +387,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     public final int sampleIndex() {
         int s = size();
-        if (s <= 1) return 0;
-        return index( sampler.sample(s), s );
+        return s <= 1 ? 0 : index(sampler.sample(s), s);
     }
 
 
