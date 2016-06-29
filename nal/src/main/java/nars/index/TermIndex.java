@@ -468,7 +468,9 @@ public interface TermIndex {
             target[i] = x;
         }
 
-        return modifications > 0 ? build(src, target) : src;
+        return modifications > 0 ?
+                builder().build(src.op(), src.dt(), target) : //must not allow subterms to be tested for equality, for variable normalization purpose the variables will seem equivalent but they are not
+                src;
     }
 
     /**
