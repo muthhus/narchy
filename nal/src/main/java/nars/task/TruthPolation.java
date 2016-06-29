@@ -29,12 +29,8 @@ public class TruthPolation {
     final float[] conf;
     int count;
 
-    public TruthPolation(int size, float eternalization) {
-        s = new InterpolatingMicrosphere(1, 2,
-                1f - eternalization,  //ratio of dark before eternal is used
-                eternalization != 0 ? Global.TRUTH_EPSILON : 0,
-                0.5f,
-                null);
+    public TruthPolation(int size) {
+        s = new InterpolatingMicrosphere(1, 2 /* must be 2 for 1D */, null);
 
         times = new float[size][];
         for (int i = 0; i < size; i++) {
@@ -51,13 +47,21 @@ public class TruthPolation {
         return truth(when, Lists.newArrayList(tasks), null);
     }
 
-    @Nullable
-    public Truth truth(long when, @NotNull List<Task> tasks) {
-        return truth(when, tasks, null);
+
+
+    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal) {
+        //float ecap = eternal.capacity();
+        //float eternalization = ecap / (ecap + tcap));
+
+        float eternalization = topEternal!=null ? 1f/tasks.size() : 0; //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
+
+        return truth(when, tasks, topEternal,
+                1f-eternalization,
+                eternalization != 0 ? Global.TRUTH_EPSILON : 0);
     }
 
-    @Nullable
-    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal /* background */) {
+
+    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal, /* background */float maxDarkFraction, float darkThresold) {
         assert(times.length <= tasks.size());
 
         int s = tasks.size();
@@ -107,6 +111,7 @@ public class TruthPolation {
                 when
         }, times, freq, conf, exp,
                 //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
+                maxDarkFraction, darkThresold,
                 s);
 
         return $.t(v[0], w2c(v[1]));

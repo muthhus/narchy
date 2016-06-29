@@ -172,7 +172,7 @@ public class IO {
         if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
 
-        return (Compound) t.normalized(t.builder().build(o, dt, v), true);
+        return (Compound) t.normalize(t.builder().build(o, dt, v), true);
     }
 
     /**

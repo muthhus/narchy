@@ -110,7 +110,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * */
     @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean input) {
 
-        t = memory.index.normalized(t, true);
+        t = memory.index.normalize(t, true);
         if (!(t instanceof Compound))
             throw new TermIndex.InvalidTaskTerm(t, "Task Term Does Not Normalize to Compound");
 

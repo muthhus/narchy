@@ -279,7 +279,7 @@ public abstract class TermBuilder {
                 if (u[0].equals(u[1]))
                     return u[0];
 
-                if (u[0].compareTo(u[1]) == +1) {
+                if (u[0].compareTo(u[1]) > 0) {
                     //it will be reversed in commutative sorting, so invert dt
                     dt = -dt;
                 }
@@ -426,15 +426,18 @@ public abstract class TermBuilder {
 
         //already tested equality, so go to invalidStatement2:
         if (Statement.validStatement(subject, predicate)) {
-            Termed xx = finish(op, subject, predicate);
-            if (xx != null) {
-                Compound x = (Compound) (xx.term());
-                if (dt != DTERNAL) {
-                    boolean reversed = (x.term(0) == predicate);
-                    x = x.dt(reversed ? -dt : dt);
-                }
-                return x;
-            }
+            if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
+                dt = -dt;
+            return finish(op, dt, subject, predicate);
+
+//            if (xx != null) {
+//                Compound x = (Compound) (xx.term());
+//                if (dt != DTERNAL) {
+//                    boolean reversed = (x.term(0) == predicate);
+//                    x = x.dt(reversed ? -dt : dt);
+//                }
+//                return x;
+//            }
         }
 
         return null;

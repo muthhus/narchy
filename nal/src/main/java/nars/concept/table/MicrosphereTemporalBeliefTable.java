@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 /** stores the items unsorted; revection manages their ranking and removal */
@@ -23,7 +22,12 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     private final SortedTable<Task, Task> eternal;
     long min, max;
-    private TruthPolation polation;
+
+    static final int MAX_TRUTHPOLATION_SIZE = 64;
+    static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(()->{
+        return new TruthPolation(MAX_TRUTHPOLATION_SIZE);
+    });
+
     private long lastUpdate = Tense.TIMELESS;
 
     public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task, Task> eternal, int initialCapacity) {
@@ -276,14 +280,11 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             return null;
 
         int c = capacity();
-        if (polation == null || polation.capacity() < c) {
-            float ecap = eternal.capacity();
-            polation = new TruthPolation(c, ecap / (ecap + c));
-        }
+
 
         //removeDeleted();
 
-        return polation.truth(when, list, eternal.top());
+        return truthpolations.get().truth(when, list, eternal.top());
     }
 
 

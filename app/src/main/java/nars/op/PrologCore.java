@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.nal.Tense.DTERNAL;
-import static nars.term.container.TermVector.the;
 
 /**
  * Prolog mental coprocessor for accelerating reasoning
@@ -261,21 +260,21 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
                     case "[":
-                        return $.compound(Op.SETi, the(nterms(s)));
+                        return $.compound(Op.SETi, (nterms(s)));
                     case "{":
-                        return $.compound(Op.SETe, the(nterms(s)));
+                        return $.compound(Op.SETe, (nterms(s)));
 
                     case "&":
-                        return $.compound(Op.SECTe, the(nterms(s)));
+                        return $.compound(Op.SECTe, (nterms(s)));
                     case "|":
-                        return $.compound(Op.SECTi, the(nterms(s)));
+                        return $.compound(Op.SECTi, (nterms(s)));
 
                     case "*":
-                        return $.compound(Op.PROD, the(nterms(s)));
+                        return $.compound(Op.PROD, (nterms(s)));
                     case "&&":
-                        return $.compound(Op.CONJ, the(nterms(s)));
+                        return $.compound(Op.CONJ, (nterms(s)));
                     case "||":
-                        return $.compound(Op.DISJ, the(nterms(s)));
+                        return $.compound(Op.DISJ, (nterms(s)));
                     case "not":
                         return $.neg(nterm(s, 0));
 
@@ -302,7 +301,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     private Term theTwoArity(Op inherit, Struct s) {
-        return $.compound(inherit, the(nterm(s, 0), nterm(s, 1)));
+        return $.compound(inherit, nterm(s, 0), nterm(s, 1));
     }
 
 

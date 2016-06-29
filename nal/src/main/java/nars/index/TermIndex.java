@@ -379,7 +379,7 @@ public interface TermIndex {
     }
 
 
-    default Termed<Compound> normalized(@NotNull Termed<Compound> t, boolean insert) {
+    default Termed<Compound> normalize(@NotNull Termed<Compound> t, boolean insert) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
@@ -499,7 +499,7 @@ public interface TermIndex {
      * applies normalization and anonymization to resolve the term of the concept the input term maps t
      */
     @Nullable
-    default Termed conceptTerm(@NotNull Termed term) {
+    default Concept concept(@NotNull Termed term, boolean createIfMissing) {
 
 
         if (term.op() == NEG) {
@@ -520,18 +520,31 @@ public interface TermIndex {
             if (term instanceof Variable)
                 throw new InvalidConceptTerm(term);
 
-            return term;
 
         } else {
 
             Termed prenormalized = term;
-            if ((term = normalized(term, true)) == null)
+            if ((term = normalize(term, createIfMissing)) == null)
                 throw new InvalidTerm(prenormalized);
 
-            return atemporalize((Compound)term);
-
+            if ((term = atemporalize((Compound)term)) == null)
+                //throw new InvalidTerm(prenormalizetd);
+                return null; //probably unforseeable
         }
 
+//        if (tt == null)
+//            return null;
+//
+//        Termed c = createIfMissing ? index.the(tt) : index.get(tt);
+//        if (c == null)
+//            return null;
+//        if (!(c instanceof Concept)) {
+//            //throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
+//            return null;
+//        }
+//        return (Concept) c;
+
+        return (Concept)get(term, createIfMissing);
     }
 
     /**

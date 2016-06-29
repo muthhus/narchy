@@ -942,13 +942,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
-        Termed tt;
-        if (t instanceof Task) {
-            tt = ((Task)t).termed();
 
-            if (tt instanceof Concept) {
+        if (t instanceof Task) {
+            t = ((Task)t).termed();
+
+            if (t instanceof Concept) {
                 //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-                return (Concept) tt;
+                return (Concept) t;
             }
 
         } else {
@@ -961,23 +961,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 return (Concept) t;
             }
 
-            tt = t;
         }
 
-
-        tt = index.conceptTerm(tt);
-        if (tt == null)
-            return null;
-
-        Termed c = createIfMissing ? index.the(tt) : index.get(tt);
-        if (c == null)
-            return null;
-        if (!(c instanceof Concept)) {
-            //throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
-            return null;
-        }
-        return (Concept) c;
-
+        return index.concept(t, createIfMissing);
     }
 
     @Nullable

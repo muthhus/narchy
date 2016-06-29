@@ -139,7 +139,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept
-        Termed<Compound> content = nar.index.normalized(raw, true);
+        Termed<Compound> content = nar.index.normalize(raw, true);
 
         if (content == null)
             return; //HACK why would this happen?
