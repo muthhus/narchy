@@ -1,5 +1,6 @@
 package nars.link;
 
+import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
@@ -7,12 +8,10 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.variable.Variable;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -21,7 +20,9 @@ public enum TermLinkBuilder {
 
     @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
 
-        Set<Termed> components = new LinkedHashSet<>(host.complexity() /* estimate */);
+        Set<Termed> components = new HashSet<>(//new LinkedHashSet<>(
+            host.complexity() /* estimate */
+        );
 
         for (int i = 0, ii = host.size(); i < ii; i++) {
 
@@ -43,16 +44,25 @@ public enum TermLinkBuilder {
 
     /** termlink templates with equal proportion shared, except variables and anything else which would not have a concept */
     @NotNull
-    public static List<TermTemplate> buildFlat(@NotNull Compound term, @NotNull NAR nar) {
+    public static List<Termed> buildFlat(@NotNull Compound term, @NotNull NAR nar) {
         Set<Termed> s = components(term, nar);
 
         //int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
 
-        //List<TermTemplate> sa = Global.newArrayList(total);
-        //float fraction = 1f / active;
-        float fraction = 1f / s.size();
+        return new FasterList(s);
 
-        return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
+//        int total = s.size();
+//        List<TermTemplate> ss = Global.newArrayList(total);
+//        //float fraction = 1f / active;
+//        float fraction = 1f / total;
+//        for (Termed x : s) {
+//            ss.add(new TermTemplate(x, fraction));
+//        }
+//        return ss;
+
+
+        //return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
+
     }
 
 
@@ -66,13 +76,12 @@ public enum TermLinkBuilder {
         if (t instanceof Variable) {
 
             if (t.op()!=Op.VAR_QUERY) {
-                //target.add(nar.index.the(t));
                 target.add(t);
             }
 
         } else {
 
-            Concept ct = nar.concept(t, true);
+            Concept ct = nar.concept(t, false /*true*/);
             if (ct != null) {
 
                 if (target.add(ct)) { //do not descend on repeats

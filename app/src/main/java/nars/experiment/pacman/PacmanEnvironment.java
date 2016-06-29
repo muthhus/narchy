@@ -82,7 +82,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(64);
 //		nar.conceptRemembering.setValue(1f);
 //		nar.termLinkRemembering.setValue(3f);
 //		nar.taskLinkRemembering.setValue(1f);
@@ -118,9 +118,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			charted.add(n.sad);
 			new BeliefTableChart(nar, charted).show(600, 300);
 
-//			new GraphSpace(
-//                    new ConceptMaterializer(), new ConceptBagInput(nar, 64)
-//            ).show(800, 500);
+
 		});
 
 		new PacmanEnvironment(1 /* ghosts  */).run(

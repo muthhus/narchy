@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  */
 public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
 
-    private volatile boolean pendingRun;
+    protected volatile boolean pendingRun;
 
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {

@@ -159,12 +159,7 @@ public enum $ {
 
     @Nullable
     public static Compound neg(@NotNull Term x) {
-        if (x.op() == NEG) {
-            //fast unwrap
-            return (Compound) ((Compound)x).term(0);
-        } else {
-            return (Compound) compound(NEG, x);
-        }
+        return (Compound) terms.negation(x);
     }
 
     @NotNull

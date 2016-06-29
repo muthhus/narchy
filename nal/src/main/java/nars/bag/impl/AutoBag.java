@@ -48,6 +48,10 @@ public final class AutoBag<V>  {
 
     protected float forgetPeriod(@NotNull ArrayBag<V> bag) {
 
+        if (!bag.isFull()) {
+            return -1f;
+        }
+
         float[] b = bag.preCommit();
 
         float pending = b[1];

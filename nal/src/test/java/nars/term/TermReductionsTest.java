@@ -382,8 +382,10 @@ public class TermReductionsTest {
 
         // \neg(P\and Q)\iff(\neg P)\or(\neg Q)
         assertEquals("(--,((p)&&(q)))",
-                   $("(--(p) || --(q))").toString());
+                $("(--(p) || --(q))").toString());
+    }
 
+    @Test public void testDemorgan2() {
 
         // \neg(P\or Q)\iff(\neg P)\and(\neg Q),
         assertEquals("(--,((p)||(q)))",

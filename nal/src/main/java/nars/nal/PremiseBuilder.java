@@ -67,8 +67,8 @@ public enum PremiseBuilder {
 
                 Term termLinkTerm = tl.term();
 
-                //if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
-                if (!taskTerm.equals( termLinkTerm )) {
+                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
+                //if (!taskTerm.equals( termLinkTerm )) {
                     if (matcher.run(
                         newPremise(nar, conceptLink, termLink, taskLink, task, tl)
                     )) {

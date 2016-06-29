@@ -6,6 +6,7 @@ import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
+import nars.util.data.map.UnifriedMap;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -275,8 +276,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
     }
 
     protected Map<V, RawBudget> newPendingMap() {
-        //return new HashMap<>();
-        return new LinkedHashMap<>(1+capacity()/4);
+        int s = 1+capacity()/2;
+        return new HashMap<>();
+        //return new LinkedHashMap<>(s);
     }
 
 

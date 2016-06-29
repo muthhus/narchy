@@ -11,7 +11,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.TermLinkBuilder;
-import nars.link.TermTemplate;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -39,7 +38,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
-    @Nullable Reference<List<TermTemplate>> termLinkTemplates;
+    @Nullable Reference<List<Termed>> termLinkTemplates;
 
     @Nullable
     private final QuestionTable questions;
@@ -285,19 +284,8 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
     /** link to subterms, hierarchical downward */
     public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
-        //3. Link the termlink templates
-        List<TermTemplate> templates = Global.dereference(this.termLinkTemplates);
-        if (templates == null) {
-            templates = TermLinkBuilder.buildFlat(this, nar);
-//                if (this.termLinkTemplates!=null) {
-//                    System.err.println("GC'd");
-//                }
-            this.termLinkTemplates = Global.reference(templates);
-        } /*else {
-//                if (this.termLinkTemplates!=null) {
-//                    System.err.println("exist");
-//                }
-        }*/
+
+        List<Termed> templates = templates(nar);
 
         linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
 
@@ -351,14 +339,34 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 //                }
     }
 
-    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
-        for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-            TermTemplate tt = templates.get(i);
-            float subScale = scale * tt.strength;
+    public List<Termed> templates(@NotNull NAR nar) {
+        List<Termed> templates = Global.dereference(this.termLinkTemplates);
+        if (templates == null) {
+            templates = TermLinkBuilder.buildFlat(this, nar);
+//                if (this.termLinkTemplates!=null) {
+//                    System.err.println("GC'd");
+//                }
+            this.termLinkTemplates = Global.reference(templates);
+        } /*else {
+//                if (this.termLinkTemplates!=null) {
+//                    System.err.println("exist");
+//                }
+        }*/
+        return templates;
+    }
+
+    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<Termed> templates, MutableFloat subConceptOverflow) {
+
+        int n = templates.size();
+        float tStrength = 1f/n;
+
+        for (int i = 0; i < n; i++) {
+            Termed tt = templates.get(i);
+            float subScale = scale * tStrength;
 
             //Link the peer termlink bidirectionally
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                Concept target = AbstractConcept.linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+                Concept target = AbstractConcept.linkSub(this, tt, b, subScale, true, subConceptOverflow, null, nar);
 
                 if (target!=null && b instanceof Task) {
                     //insert 2nd-order tasklink

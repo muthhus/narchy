@@ -158,8 +158,8 @@ public abstract class TermBuilder {
     @Nullable
     public Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
 
-        if (args.length == 0)
-            throw new InvalidTerm(op, args);
+//        if (args.length == 0)
+//            throw new InvalidTerm(op, args);
 
         return finish(op, dt, TermContainer.the(op, args));
     }
@@ -210,7 +210,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    final Term negation(@NotNull Term t) {
+    public final Term negation(@NotNull Term t) {
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
@@ -315,9 +315,9 @@ public abstract class TermBuilder {
         //UnifiedSet<Term> negs = new UnifiedSet(0);
 
         UnifiedSet<Term> negs = flatten(op, u, dt, s, null);
-        Term[] ss = s.toArray(new Term[s.size()]);
 
         boolean negate = false;
+        int n = s.size();
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
         if (negs!=null) {
@@ -327,14 +327,17 @@ public abstract class TermBuilder {
 
 
             //if all subterms negated; apply DeMorgan's Law
-            if ((dt == DTERNAL) && (negs.size() == s.size())) {
+            if ((dt == DTERNAL) && (negs.size() == n)) {
                 op = (op == CONJ) ? DISJ : CONJ;
                 negate = true;
             }
         }
 
-        Term x = finish(op, dt, ss);
-        return negate ? negation( x ) : x;
+        if (negate) {
+            return negation( finish(op, dt, negs.toArray(new Term[n])) );
+        } else {
+            return finish(op, dt, s.toArray(new Term[n]));
+        }
     }
 
     static UnifiedSet<Term> flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
