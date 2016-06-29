@@ -47,6 +47,17 @@ public final class Operator<T extends Term> extends Atom {
         Term o = operation.term(1);
         return (o.op() == Op.OPER) ? ((Atomic) o) : null;
     }
+    @Nullable public static Atomic operator(@NotNull Term maybeOperation) {
+        if (maybeOperation instanceof Compound) {
+            Compound c = (Compound)maybeOperation;
+            if (c.size() == 2) {
+                if (c.isTerm(1,Op.OPER) && c.isTerm(0, Op.PROD)) {
+                    return (Atomic) c.term(1);
+                }
+            }
+        }
+        return null;
+    }
 
     @NotNull
     @Override

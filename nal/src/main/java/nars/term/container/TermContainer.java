@@ -49,23 +49,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return TermSet.the(t);
     }
 
-    @Nullable
-    static Compound union(@NotNull TermBuilder b, @NotNull Compound term1, @NotNull Compound term2) {
-        return union(b, term1.op(), term1, term2);
-    }
-
-    @Nullable
-    static Compound union(@NotNull TermBuilder b, @NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
-        TermContainer u = TermContainer.union(term1, term2);
-        if (u == term1)
-            return term1;
-        else if (u == term2)
-            return term2;
-        else
-            return (Compound) b.build(o, u);
-    }
-
-
 
     /** gets subterm at index i */
     @Nullable T term(int i);
@@ -96,25 +79,13 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
     static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
-        return Sets.intersect(a.toSet(),b.toSet());
-    }
-
-    static @NotNull Compound intersect(@NotNull TermBuilder builder, @NotNull Compound a, @NotNull Compound b) {
-        return intersect(builder, a.op(), a, b);
-    }
-
-    static @NotNull Compound intersect(@NotNull TermBuilder builder, @NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-        if (a.equals(b))
-            return a;
-
         if ((a.structure() & b.structure())==0)
-            return null; //nothing in common
-
-        MutableSet<Term> s = TermContainer.intersect(
-                (TermContainer) a, (TermContainer) b
-        );
-        return s.isEmpty() ? null : (Compound) builder.build(o, s);
+            return Sets.mutable.empty(); //nothing in common
+        else
+            return Sets.intersect(a.toSet(),b.toSet());
     }
+
+
 
 
 
@@ -254,24 +225,12 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
         if (retained == size) { //same as 'a'
             return a;
-        }
-
-        if (terms.isEmpty()) {
+        } else if (retained == 0) {
             return null;
+        } else {
+            return (Compound) t.build(o, terms.toArray(new Term[retained]));
         }
 
-        return (Compound) t.build(o, terms);
-
-//        if (a.size() == 1 && b.size() == 1) {
-//            //special case
-//            return a.term(0).equals(b.term(0)) ?
-//                    Terms.Empty :
-//                    a.terms();
-//        } else {
-//            MutableSet dd = Sets.difference(a.toSet(), b.toSet());
-//            if (dd.isEmpty()) return Terms.Empty;
-//            return Terms.toArray(dd);
-//        }
     }
 
 
@@ -430,11 +389,26 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     default boolean equivalent(@NotNull List<Term> sub) {
         int s = size();
-        if (s!=sub.size()) return false;
-        for (int i = 0; i < s; i++) {
-            if (!term(i).equals(sub.get(i))) return false;
+        if (s==sub.size()) {
+            for (int i = 0; i < s; i++) {
+                if (!term(i).equals(sub.get(i)))
+                    return false;
+            }
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    default boolean equivalent(@NotNull Term[] sub) {
+        int s = size();
+        if (s==sub.length) {
+            for (int i = 0; i < s; i++) {
+                if (!term(i).equals(sub[i]))
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 

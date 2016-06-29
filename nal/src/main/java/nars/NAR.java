@@ -113,15 +113,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     //final Narjure rt = new Narjure();
 
-    //TODO use this to store all handler registrations, and decide if transient or not
-    public final transient List<Object> regs = Global.newArrayList();
 
     private final transient Deque<Consumer<NAR>> nextTasks =
                                                     new ConcurrentLinkedDeque<>();
                                                     //new CopyOnWriteArrayList<>();
 
     private NARLoop loop;
-    private final Collection<On> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
+
+    private final Collection<Object> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
     public NAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, rng, index);
@@ -1004,7 +1003,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * must be run per control frame. */
     @NotNull public On onFrame(@NotNull Consumer<NAR> each) {
         On r;
-        regs.add(r = eventFrameStart.on(each));
+        on.add(r = eventFrameStart.on(each));
         return r;
     }
 
@@ -1066,6 +1065,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * */
     public final void on(Concept c) {
         index.set(c);
+        on.add(c);
     }
 
 

@@ -261,21 +261,21 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
                     case "[":
-                        return $.the(Op.SETi, the(nterms(s)));
+                        return $.compound(Op.SETi, the(nterms(s)));
                     case "{":
-                        return $.the(Op.SETe, the(nterms(s)));
+                        return $.compound(Op.SETe, the(nterms(s)));
 
                     case "&":
-                        return $.the(Op.SECTe, the(nterms(s)));
+                        return $.compound(Op.SECTe, the(nterms(s)));
                     case "|":
-                        return $.the(Op.SECTi, the(nterms(s)));
+                        return $.compound(Op.SECTi, the(nterms(s)));
 
                     case "*":
-                        return $.the(Op.PROD, the(nterms(s)));
+                        return $.compound(Op.PROD, the(nterms(s)));
                     case "&&":
-                        return $.the(Op.CONJ, the(nterms(s)));
+                        return $.compound(Op.CONJ, the(nterms(s)));
                     case "||":
-                        return $.the(Op.DISJ, the(nterms(s)));
+                        return $.compound(Op.DISJ, the(nterms(s)));
                     case "not":
                         return $.neg(nterm(s, 0));
 
@@ -302,7 +302,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     private Term theTwoArity(Op inherit, Struct s) {
-        return $.the(inherit, the(nterm(s, 0), nterm(s, 1)));
+        return $.compound(inherit, the(nterm(s, 0), nterm(s, 1)));
     }
 
 

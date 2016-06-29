@@ -38,7 +38,7 @@ public interface Subst  {
 //    }
 
     @Nullable
-    default ImmediateTermTransform getTransform(@NotNull Atomic t) {
+    @Deprecated default ImmediateTermTransform getTransform(@NotNull Atomic t) {
         return null;
     }
 

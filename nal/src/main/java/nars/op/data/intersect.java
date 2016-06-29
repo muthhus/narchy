@@ -15,7 +15,7 @@ public class intersect extends BinaryTermOperator {
         if (!(a instanceof Compound) || !(b instanceof Compound))
             return null;
 
-        return TermContainer.intersect(i.builder(), (Compound)a, (Compound) b);
+        return i.builder().intersect(a.op(), (Compound)a, (Compound) b);
     }
 
 }

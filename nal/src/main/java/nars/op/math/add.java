@@ -63,7 +63,7 @@ public class add extends ImmediateTermTransform {
         if (r == null) {
             return z;
         } else if (r instanceof Variable) {
-            return i.buildTransformed(a, new Term[] { x, y, z });
+            return i.build(a, new Term[] { x, y, z });
         } else {
             throw new UnsupportedOperationException();
         }

@@ -34,13 +34,13 @@ public class TermContainerTest {
         Compound container = $("{a,b}");
         Compound contained = $("{a}");
         assertTrue(
-            TermContainer.union($.terms, container, contained) == container
+            $.terms.union(container.op(), container, contained) == container
         );
         assertTrue(
-            TermContainer.union($.terms, contained, container) == container  //reverse
+            $.terms.union(contained.op(), contained, container) == container  //reverse
         );
         assertTrue(
-            TermContainer.union($.terms, container, container) == container  //equal
+            $.terms.union(container.op(), container, container) == container  //equal
         );
     }
 
@@ -57,7 +57,7 @@ public class TermContainerTest {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
         assertTrue(
-                TermContainer.intersect($.terms, x, y) == x
+                $.terms.builder().intersect(x.op(), x, y) == x
         );
     }
 
@@ -66,9 +66,9 @@ public class TermContainerTest {
         Compound x = $("{e,f}");
         Compound y = $("{e,d}");
 
-        System.out.println(TermContainer.intersect($.terms, x, y));
+        System.out.println($.terms.builder().intersect(x.op(), x, y));
         System.out.println(TermContainer.difference($.terms, x, y));
-        System.out.println(TermContainer.union($.terms, x, y));
+        System.out.println($.terms.union(x.op(), x, y));
 
     }
 }

@@ -252,10 +252,10 @@ public class Revision {
             throw new RuntimeException();
         }
 
-        return (Compound)$.compound(a.op(), newDT, TermVector.the(
+        return (Compound)$.compound(a.op(), newDT,
                 (a0 instanceof Compound) ? dtMerge((Compound) a0, (Compound) (b.term(0)), balance, accumulatedDifference, depth / 2f) : a0,
                 (a1 instanceof Compound) ? dtMerge((Compound) a1, (Compound) (b.term(1)), balance, accumulatedDifference, depth / 2f) : a1
-        ));
+        );
         //if (a.op().temporal) //when would it not be temporal? this happens though
             //d = d.dt(newDT);
         //return d;

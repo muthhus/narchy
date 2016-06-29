@@ -12,7 +12,7 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends AbstractVariable {
+public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
 
 
 //    /** a placeholder that indicates an expansion of one or more terms that will be provided by an Ellipsis match.
@@ -38,7 +38,7 @@ public abstract class Ellipsis extends AbstractVariable {
 
     //public final Variable target;
 
-    public static class EllipsisPrototype extends GenericVariable {
+    public static class EllipsisPrototype extends GenericVariable implements Ellipsislike {
 
         public final int minArity;
 

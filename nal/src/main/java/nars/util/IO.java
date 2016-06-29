@@ -151,14 +151,14 @@ public class IO {
         }
     }
     @Nullable
-    public static TermContainer readTermContainer(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
+    public static Term[] readTermContainer(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
             s[i] = readTerm(in, t);
         }
 
-        return TermVector.the(s);
+        return s;
     }
 
     /**
@@ -167,12 +167,11 @@ public class IO {
     @Nullable
     static Compound readCompound(@NotNull ObjectInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
-        TermContainer v = readTermContainer(in, t);
+        Term[] v = readTermContainer(in, t);
 
         int dt = Tense.DTERNAL;
         if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
-
 
         return (Compound) t.normalized(t.builder().build(o, dt, v));
     }

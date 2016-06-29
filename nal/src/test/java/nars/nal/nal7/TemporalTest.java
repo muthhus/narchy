@@ -16,6 +16,7 @@ import nars.term.InvalidTerm;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import java.util.TreeSet;
 import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
+import static nars.Op.CONJ;
 import static nars.nal.Tense.DTERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -35,6 +37,13 @@ import static org.junit.Assert.assertTrue;
 public class TemporalTest {
 
     @NotNull NAR n = new Terminal(128); //for cycle/frame clock, not realtime like Terminal
+
+    /** warning: the dt may be reversed, make sure that the subterms are in the order corresponding to the desired result 'dt' */
+    @Nullable public static Term conj(Term x, int dt, Term y) {
+        if (dt!=0 && dt!=DTERNAL && x.compareTo(y) != -1)
+            dt = -dt;
+        return $.compound(CONJ, dt, x, y); //must be a vector, not set
+    }
 
 
     @Test public void parsedCorrectOccurrenceTime() {
@@ -232,8 +241,8 @@ public class TemporalTest {
     @Test public void testCommutiveWithCompoundSubterm() {
         Term a = $("(((--,(b0)) &&+0 (pre_1)) &&+10 (else_0))");
         Term b = $("((else_0) &&-10 ((--,(b0)) &&+0 (pre_1)))");
-        Term c = $.conj($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
-        Term d = $.conj($("(else_0)"), -10, $("((--,(b0)) &&+0 (pre_1))"));
+        Term c = conj($("((--,(b0)) &&+0 (pre_1))"), 10, $("(else_0)"));
+        Term d = conj($("(else_0)"), -10, $("((--,(b0)) &&+0 (pre_1))"));
 
 //        System.out.println(a);
 //        System.out.println(b);

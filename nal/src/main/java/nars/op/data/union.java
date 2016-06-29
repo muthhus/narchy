@@ -14,7 +14,7 @@ public class union extends BinaryTermOperator {
         if (!(a instanceof Compound) || !(b instanceof Compound))
             return null;
 
-        return TermContainer.union(i.builder(), (Compound) a, (Compound) b );
+        return i.builder().union(a.op(), (Compound) a, (Compound) b );
     }
 
 }

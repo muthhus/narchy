@@ -64,7 +64,7 @@ public class NarseseIRCBot extends Talk {
         irc = new IRCBot(
                 "irc.freenode.net",
                 //"localhost",
-                "NARchy", "#netention") {
+                "NARchy", "#dann") {
             @Override
             protected void onMessage(String channel, String nick, String msg) {
                 NarseseIRCBot.this.onMessage(channel, nick, msg);

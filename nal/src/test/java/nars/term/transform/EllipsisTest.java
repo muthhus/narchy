@@ -497,11 +497,11 @@ public class EllipsisTest {
             if (o.isStatement()) continue;
 
             assertEquals(o + " with normal term",
-                    a, $.the(o, a));
+                    a, $.compound(o, a));
 
             assertEquals(o + " with ellipsis not reduced",
                     o.isStatement() ? VAR_PATTERN : o,
-                    $.the(o,b).op());
+                    $.compound(o,b).op());
         }
     }
 

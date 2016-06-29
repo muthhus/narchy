@@ -52,12 +52,12 @@ public class TermTest {
 
     @Nullable
     public static Term imageInt(Term... x) {
-        return the(IMGi, x);
+        return $.compound(IMGi, x);
     }
 
     @Nullable
     public static Term imageExt(Term... x) {
-        return the(IMGe, x);
+        return $.compound(IMGe, x);
     }
 
 

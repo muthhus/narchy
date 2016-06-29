@@ -153,8 +153,8 @@ public interface TermIndex {
 //    }
 
     @Nullable
-    default Term buildTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
-        return builder().buildTransformed(csrc, subs);
+    default Term build(@NotNull Compound csrc, Term[] newSubs) {
+        return builder().build(csrc, newSubs);
     }
 
 
@@ -240,22 +240,15 @@ public interface TermIndex {
         //            //?
         //        }
 
-        if (sop.isStatement() && (sub.size() != 2 || sub.get(0).equals(sub.get(1))))
-            return null; //transformed to degenerate statement
-
-        return immediates(f, buildTransformed(crc, TermContainer.the(sop, sub)));
+        return immediates(f, build(crc, sub));
     }
 
     default Term immediates(@NotNull Subst f, Term result) {
-        if (result instanceof Compound) {
-
-            //post-process: apply any known immediate transform operators
-            if (isOperation(result)) {
-                Compound cres = (Compound)result;
-                ImmediateTermTransform tf = f.getTransform(Operator.operator(cres));
-                if (tf != null) {
-                    result = applyImmediateTransform(f, cres, tf);
-                }
+        Atomic op = Operator.operator(result);
+        if (op!=null) {
+            ImmediateTermTransform tf = f.getTransform(op);
+            if (tf != null) {
+                result = transform(f, (Compound) result, tf);
             }
         }
         return result;
@@ -263,7 +256,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term applyImmediateTransform(Subst f, @NotNull Compound result, ImmediateTermTransform tf) {
+    default Term transform(Subst f, @NotNull Compound result, ImmediateTermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
         Compound args = Operator.opArgs(result);
@@ -430,19 +423,8 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term buildTransformed(@NotNull Compound src, @NotNull Term[] newSubs) {
-
-        /* early test for invalid statement: */
-        if (src.op().isStatement()) {
-            if ((newSubs.length!=2) || (newSubs[0].equals(newSubs[1])))
-                return null;
-        }
-
-        return buildTransformed(src,
-                //theSubterms(
-                        TermContainer.the(src.op(), newSubs)
-                //)
-        );
+    default Term build(@NotNull Compound src, @NotNull List<Term> newSubs) {
+        return build(src, newSubs.toArray(new Term[newSubs.size()]) );
     }
 
 
@@ -467,26 +449,26 @@ public interface TermIndex {
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
 
-            Term cx = x;
+            Term y = x;
 
             if (trans.test(x)) {
-                cx = termOrNull(trans.apply(src, x));
+                y = termOrNull(trans.apply(src, x));
             } else if (x instanceof Compound) {
-                cx = transform((Compound) x, trans); //recurse
+                y = transform((Compound) x, trans); //recurse
             }
 
-            if (x!= cx) { //must be refernce equality test for some variable normalization cases
-                if (cx == null)
+            if (x != y) { //must be refernce equality test for some variable normalization cases
+                if (y == null)
                     return null;
 
                 modifications++;
-                x = cx;
+                x = y;
             }
 
             target[i] = x;
         }
 
-        return modifications > 0 ? buildTransformed(src, target) : src;
+        return modifications > 0 ? build(src, target) : src;
     }
 
     /**

@@ -1118,7 +1118,7 @@ public class PremiseRule extends GenericCompound {
         Compound newTask = (Compound) neg(tt);
         Term[] pp = getPremise().terms().clone();
         pp[0] = newTask;
-        Compound newPremise = (Compound) $.the(getPremise().op(), pp);
+        Compound newPremise = (Compound) $.compound(getPremise().op(), pp);
         Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
 
         @NotNull PremiseRule neg = PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);

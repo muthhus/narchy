@@ -303,6 +303,10 @@ public class TermVector implements TermContainer<Term> {
     public static TermVector the(@NotNull Term... t) {
         return t.length == 0 ? Terms.ZeroSubterms : new TermVector(t);
     }
+    @NotNull
+    public static TermVector the(@NotNull Term one) {
+        return new TermVector(one);
+    }
 
 
 //    /** thrown if a compound term contains itself as an immediate subterm */

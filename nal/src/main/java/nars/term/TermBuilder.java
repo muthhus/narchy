@@ -4,12 +4,11 @@ import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Op;
 import nars.index.TermIndex;
-import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.Ellipsislike;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +19,7 @@ import java.util.TreeSet;
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.term.Terms.empty;
 import static nars.term.compound.Statement.pred;
 import static nars.term.compound.Statement.subj;
 
@@ -28,10 +28,10 @@ import static nars.term.compound.Statement.subj;
  */
 public abstract class TermBuilder {
 
-    @Nullable
-    public Term build(@NotNull Op op, int dt, @NotNull TermContainer tt) throws InvalidTerm {
 
-        Term[] u = tt.terms();
+
+    @Nullable
+    public Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTerm {
 
         /* special handling */
         switch (op) {
@@ -64,14 +64,13 @@ public abstract class TermBuilder {
                     return image(op, u);
                 } else if ((dt < 0) || (dt > u.length)) {
                     throw new InvalidTerm(op,u);
-                } else {
-                    return finish(op, dt, tt);
                 }
+                break;
 
 
             case DIFFe:
             case DIFFi:
-                return newDiff(op, tt);
+                return newDiff(op, u);
             case SECTe:
                 return newIntersectEXT(u);
             case SECTi:
@@ -83,15 +82,14 @@ public abstract class TermBuilder {
             case IMPL:
                 return statement(op, dt, u);
 
-            default:
-                if (u.length == 0) {
-                    if (op == PROD)
-                        return Terms.ZeroProduct;
-                    else
-                        throw new InvalidTerm(op, u);
-                }
-                return finish(op, dt, tt);
+            case PROD:
+                if (u.length == 0)
+                    return Terms.ZeroProduct;
+                break;
+
         }
+
+        return finish(op, dt, u);
     }
 
 
@@ -119,64 +117,60 @@ public abstract class TermBuilder {
     public abstract Termed make(Op op, TermContainer subterms, int dt);
 
 
-
-
     @Nullable
-    public Term build(@NotNull Op op, @NotNull Collection<Term> t) {
-        return build(op, TermContainer.the(op, t));
-    }
-
-    @Nullable
-    public Term build(@NotNull Op op, Term singleton) {
-        return build(op, TermVector.the(singleton));
-    }
-
-
-    @Nullable
-    public Term build(@NotNull Op op, @NotNull TermContainer tt) {
+    public Term build(@NotNull Op op, @NotNull Term... tt) {
         return build(op, DTERNAL, tt);
     }
 
 
     @Nullable
-    public Term newDiff(@NotNull Op op, @NotNull TermContainer tt) {
+    public Term newDiff(@NotNull Op op, @NotNull Term[] t) {
 
         //corresponding set type for reduction:
         Op set = op == DIFFe ? SETe : SETi;
 
-        Term[] t = tt.terms();
         switch (t.length) {
             case 1:
                 Term t0 = t[0];
-                if (ellipsisoid(t0))
-                    return finish(op, tt);
+                //if (ellipsis(t0))
+                    //return finish(op, tt);
                 return t0;
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
                     return subtractSet(set, (Compound) et0, (Compound) et1);
-
-                if (et0.equals(et1))
-                    return Terms.empty(set);
-
-                return finish(op, TermContainer.the(op, t));
+                else
+                    return et0.equals(et1) ?
+                            empty(set) :
+                            finish(op, t);
             default:
                 return null;
         }
     }
 
+
+
     @Nullable
-    public Term finish(@NotNull Op op, @NotNull TermContainer tt) {
-        return finish(op, Tense.DTERNAL, tt);
+    public final Term finish(@NotNull Op op, @NotNull Term... args) {
+        return finish(op, DTERNAL, args);
     }
+
+    @Nullable
+    public Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
+
+        if (args.length == 0)
+            throw new InvalidTerm(op, args);
+
+        return finish(op, dt, TermContainer.the(op, args));
+    }
+
 
     /**
      * step before calling Make, do not call manually from outside
      */
     @Nullable
-    public Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
+    Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
-        //Term[] u = args.terms();
         int currentSize = args.size();
 
         if (op.minSize > 1 && currentSize == 1) {
@@ -202,30 +196,31 @@ public abstract class TermBuilder {
 
     @Nullable
     public Compound inst(Term subj, Term pred) {
-        return (Compound) build(INH, TermVector.the(build(SETe, subj), pred));
+        return (Compound) build(INH, build(SETe, subj), pred);
     }
 
     @Nullable
     public Compound prop(Term subj, Term pred) {
-        return (Compound) build(INH, TermVector.the(subj, build(SETi, pred)));
+        return (Compound) build(INH, subj, build(SETi, pred));
     }
 
     @Nullable
     public Compound instprop(@NotNull Term subj, @NotNull Term pred) {
-        return (Compound) build(INH, TermVector.the(build(SETe, subj), build(SETi, pred)));
+        return (Compound) build(INH, build(SETe, subj), build(SETi, pred));
     }
 
     @Nullable
-    public Term negation(@NotNull Term t) {
+    final Term negation(@NotNull Term t) {
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
+        } else {
+            return finish(NEG, t);
         }
-        return make(NEG, TermVector.the(t), DTERNAL).term();
     }
 
     @Nullable
-    public Term image(@NotNull Op o, @NotNull Term[] res) {
+    final Term image(@NotNull Op o, @NotNull Term[] res) {
 
         int index = DTERNAL, j = 0;
         for (Term x : res) {
@@ -242,11 +237,8 @@ public abstract class TermBuilder {
         Term[] ser = new Term[serN];
         System.arraycopy(res, 0, ser, 0, index);
         System.arraycopy(res, index + 1, ser, index, (serN - index));
-        res = ser;
 
-        return build(
-                o, index,
-                TermVector.the(res));
+        return finish( o, index, ser);
     }
 
     @Nullable
@@ -260,13 +252,17 @@ public abstract class TermBuilder {
 
         if (ul == 1) {
             Term only = u[0];
-            //preserve unitary ellipsis
-            return ellipsisoid(only) ?
-                    finish(op, dt, TermContainer.the(only)) : only;
+            //preserve unitary ellipsis for patterns etc
+            if (only instanceof Ellipsislike)
+                return finish(op, dt, TermContainer.the(only));
+            else
+                return only;
 
         }
 
-        if (dt != DTERNAL) {
+        if (dt == DTERNAL) {
+            return junctionFlat(op, dt, u);
+        } else {
             if (op == DISJ) {
                 throw new RuntimeException("invalid temporal disjunction");
             }
@@ -274,51 +270,36 @@ public abstract class TermBuilder {
             if (dt == 0) {
                 //special case: 0
                 Compound x = (Compound) junctionFlat(op, 0, u);
-                if (x == null)
+                if (x == null) {
                     return null;
-                if (x.size() == 1) {
+                } else if (x.size() == 1) {
                     return x.term(0);
+                } else {
+                    return x.op().temporal ? x.dt(0) : x;
                 }
-                //if (x.op(op))
-
-                return x.op().temporal ? x.dt(0) : x;
-
-                //return x;
-            }
+            } else {
 
 
+                if (ul != 2) {
+                    //if (Global.DEBUG)
+                    //throw new InvalidTerm(op, DTERNAL, t, u);
+                    //else
+                    return null;
+                }
 
-           if (ul == 2) {
                 if (u[0].equals(u[1]))
                     return u[0];
-            } else {
-                //if (Global.DEBUG)
-                    //throw new InvalidTerm(op, DTERNAL, t, u);
-                //else
-                    return null;
+
+                if (u[0].compareTo(u[1]) == +1) {
+                    //it will be reversed in commutative sorting, so invert dt
+                    dt = -dt;
+                }
+
+                return finish(op, dt, u);
             }
-
-            if (u[0].compareTo(u[1])==+1) {
-                //it will be reversed in commutative sorting, so invert dt
-                dt = -dt;
-            }
-
-
-            TermContainer su = TermContainer.the(op, u);
-            Term x = make(op, su, dt).term();
-
-            Compound cx = (Compound) x;
-            //boolean reversed = cx.term(0).equals( u[1] );
-            //return cx.dt(reversed ? -dt : dt);
-            return cx;
-        } else {
-            return junctionFlat(op, dt, u);
         }
     }
 
-    public static boolean ellipsisoid(Term only) {
-        return (only instanceof Ellipsis) || (only instanceof Ellipsis.EllipsisPrototype);
-    }
 
     /**
      * flattening junction builder, for multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
@@ -406,20 +387,21 @@ public abstract class TermBuilder {
 
 
             case EQUI:
-                if (!validEquivalenceTerm(subject)) return null;
-                if (!validEquivalenceTerm(predicate)) return null;
+                if (!validEquivalenceTerm(subject) || !validEquivalenceTerm(predicate))
+                    return null;
                 break;
 
             case IMPL:
-                if (subject.isAnyOf(TermIndex.InvalidEquivalenceTerm)) return null;
-                if (predicate.isAnyOf(TermIndex.InvalidImplicationPredicate)) return null;
+                if (subject.isAnyOf(TermIndex.InvalidEquivalenceTerm) ||
+                    predicate.isAnyOf(TermIndex.InvalidImplicationPredicate))
+                    return null;
 
                 if (predicate.op() == IMPL) {
                     Term oldCondition = subj(predicate);
                     if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
                         return null;
-
-                    return impl2Conj(dt, subject, predicate, oldCondition);
+                    else
+                        return impl2Conj(dt, subject, predicate, oldCondition);
                 }
 
 
@@ -435,10 +417,10 @@ public abstract class TermBuilder {
 
                         MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                         if (!common.isEmpty()) {
-                            subject = buildTransformed(csub, TermContainer.except(subjs, common));
+                            subject = build(csub, TermContainer.except(subjs, common));
                             if (subject == null)
                                 return null;
-                            predicate = buildTransformed(cpred, TermContainer.except(preds, common));
+                            predicate = build(cpred, TermContainer.except(preds, common));
                             if (predicate == null)
                                 return null;
 
@@ -456,12 +438,11 @@ public abstract class TermBuilder {
 
         //already tested equality, so go to invalidStatement2:
         if (!Statement.invalidStatement2(subject, predicate)) {
-            TermContainer cc = TermContainer.the(op, subject, predicate);
-            Termed xx = make(op, cc, DTERNAL);
+            Termed xx = finish(op, subject, predicate);
             if (xx != null) {
                 Compound x = (Compound) (xx.term());
                 if (dt != DTERNAL) {
-                    boolean reversed = cc.term(0) == predicate;
+                    boolean reversed = (x.term(0) == predicate);
                     x = x.dt(reversed ? -dt : dt);
                 }
                 return x;
@@ -479,7 +460,7 @@ public abstract class TermBuilder {
     @Nullable
     public Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
         Term s = junction(CONJ, t, subject, oldCondition);
-        return s != null ? build(IMPL, TermVector.the(s, pred(predicate))) : null;
+        return s != null ? build(IMPL, s, pred(predicate)) : null;
     }
 
     @Nullable
@@ -507,7 +488,7 @@ public abstract class TermBuilder {
                 Term single = t[0];
                 if (single instanceof Ellipsis) {
                     //allow
-                    single = finish(intersection, TermContainer.the(intersection, single));
+                    single = finish(intersection, single);
                 }
 
                 return single;
@@ -536,13 +517,13 @@ public abstract class TermBuilder {
 
         if ((o1 == setUnion) && (o2 == setUnion)) {
             //the set type that is united
-            return TermContainer.union(this, setUnion, (Compound) term1, (Compound) term2);
+            return union(setUnion, (Compound) term1, (Compound) term2);
         }
 
 
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
-            return TermContainer.intersect(this, setIntersection, (Compound) term1, (Compound) term2);
+            return intersect(setIntersection, (Compound) term1, (Compound) term2);
         }
 
         if (o2 == intersection && o1 != intersection) {
@@ -557,7 +538,7 @@ public abstract class TermBuilder {
         //reduction between one or both of the intersection type
 
         if (o1 == intersection) {
-            return finish(intersection,
+            return finish(intersection, DTERNAL,
                     TermSet.concat(
                         ((TermContainer) term1).terms(),
                         o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
@@ -565,18 +546,45 @@ public abstract class TermBuilder {
             );
         }
 
-        return finish(intersection, TermSet.the(term1, term2));
-
-
+        return finish(intersection, term1, term2);
     }
 
 
     @Nullable
-    public final Term buildTransformed(@NotNull Compound csrc, @NotNull TermContainer subs) {
-        if (csrc.subterms().equals(subs))
-            return csrc;
+    public Compound intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+        if (a.equals(b))
+            return a;
 
-        return build(csrc.op(), csrc.dt(), subs);
+        MutableSet<Term> s = TermContainer.intersect(
+                /*(TermContainer)*/ a, /*(TermContainer)*/ b
+        );
+        return s.isEmpty() ? null : (Compound) build(o, s.toArray(new Term[s.size()]));
+    }
+
+    @Nullable
+    public Compound union(@NotNull Op o, @NotNull Compound term1, @NotNull Compound term2) {
+        TermContainer u = TermContainer.union(term1, term2);
+        if (u == term1)
+            return term1;
+        else if (u == term2)
+            return term2;
+        else
+            return (Compound)finish(o, DTERNAL, u);
+    }
+
+    @Nullable
+    public final Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
+        if (csrc.subterms().equivalent(newSubs))
+            return csrc;
+        else
+            return build(csrc.op(), csrc.dt(), newSubs);
+    }
+
+    public final Term build(@NotNull Compound csrc, TermContainer newSubs) {
+        if (csrc.subterms().equals(newSubs))
+            return csrc;
+        else
+            return build(csrc.op(), csrc.dt(), newSubs.terms());
     }
 
 }
