@@ -788,6 +788,10 @@ public enum $ {
         return null;
     }
 
+    @Nullable public static Term conj(Term x, int dt, Term y) {
+        return compound(CONJ, dt, x, y); //must be a vector, not set
+    }
+
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 

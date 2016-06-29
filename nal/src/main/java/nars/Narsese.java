@@ -559,10 +559,7 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
-
-        return $.compound(o,
-                o.commutative && subj.compareTo(pred) == +1 ? -cycles : cycles, //reverse
-                subj, pred);
+        return $.compound(o, cycles, subj, pred);
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);

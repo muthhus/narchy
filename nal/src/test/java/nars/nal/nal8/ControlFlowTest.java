@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static nars.nal.nal7.TemporalTest.conj;
+import static nars.$.conj;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

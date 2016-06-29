@@ -315,6 +315,9 @@ public abstract class TermBuilder {
         //UnifiedSet<Term> negs = new UnifiedSet(0);
 
         UnifiedSet<Term> negs = flatten(op, u, dt, s, null);
+        Term[] ss = s.toArray(new Term[s.size()]);
+
+        boolean negate = false;
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
         if (negs!=null) {
@@ -325,17 +328,13 @@ public abstract class TermBuilder {
 
             //if all subterms negated; apply DeMorgan's Law
             if ((dt == DTERNAL) && (negs.size() == s.size())) {
-
-                op = op == CONJ ? DISJ : CONJ;
-
-                Term nn = finish(op, dt, TermSet.the(negs));
-                return build(NEG, nn);
+                op = (op == CONJ) ? DISJ : CONJ;
+                negate = true;
             }
         }
 
-        return finish(op, dt, TermSet.the(s));
-
-
+        Term x = finish(op, dt, ss);
+        return negate ? negation( x ) : x;
     }
 
     static UnifiedSet<Term> flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {

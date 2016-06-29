@@ -161,7 +161,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     @Override
     public void accept(NAR nar) {
-        super.accept(nar);
+        //super.accept(nar);
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+motorDT);
