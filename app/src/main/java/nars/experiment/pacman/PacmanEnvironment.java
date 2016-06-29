@@ -110,16 +110,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 
-		NAgent n = new NAgent(nar);
-		n.nar.runLater(()->{
+		NAgent n = new NAgent(nar) {
+			@Override
+			public void start(int inputs, int actions) {
+				super.start(inputs, actions);
 
-			List<Concept> charted = new ArrayList(n.actions);
-			charted.add(n.happy);
-			charted.add(n.sad);
-			new BeliefTableChart(nar, charted).show(600, 300);
+				List<Concept> charted = new ArrayList(super.actions);
+				charted.add(happy);
+				charted.add(sad);
+				new BeliefTableChart(nar, charted).show(600, 300);
 
-
-		});
+			}
+		};
 
 		new PacmanEnvironment(1 /* ghosts  */).run(
 				//new DQN(),
@@ -127,6 +129,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new HaiQAgent(),
 				n,
 				15512);
+
+
+
 
 		//nar.index.print(System.out);
 		NAR.printTasks(nar, true);

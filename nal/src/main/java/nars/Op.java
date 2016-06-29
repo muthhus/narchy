@@ -277,12 +277,12 @@ public enum Op {
         return false;
     }
 
-    public boolean validSize(int length) {
-        int min = this.minSize;
-        if (min!=-1 && length < min) return false;
-        int max = this.maxSize;
-        return !(max != -1 && length > max);
-    }
+//    public boolean validSize(int length) {
+//        int min = this.minSize;
+//        if (min!=-1 && length < min) return false;
+//        int max = this.maxSize;
+//        return !(max != -1 && length > max);
+//    }
 
     public final boolean isImage() {
         return this == Op.IMGe || this == Op.IMGi;

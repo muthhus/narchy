@@ -113,8 +113,7 @@ public abstract class TermBuilder {
     }
 
 
-    @NotNull
-    public abstract Termed make(Op op, TermContainer subterms, int dt);
+    public abstract Term newCompound(Op op, int dt, TermContainer subterms);
 
 
     @Nullable
@@ -132,9 +131,10 @@ public abstract class TermBuilder {
         switch (t.length) {
             case 1:
                 Term t0 = t[0];
-                //if (ellipsis(t0))
-                    //return finish(op, tt);
-                return t0;
+                if (t0 instanceof Ellipsislike)
+                    return finish(op, t0);
+                else
+                    return t0;
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
@@ -156,11 +156,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-
-//        if (args.length == 0)
-//            throw new InvalidTerm(op, args);
-
+    public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         return finish(op, dt, TermContainer.the(op, args));
     }
 
@@ -169,28 +165,20 @@ public abstract class TermBuilder {
      * step before calling Make, do not call manually from outside
      */
     @Nullable
-    Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
+    final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
-        int currentSize = args.size();
+        int s = args.size();
 
-        if (op.minSize > 1 && currentSize == 1) {
+        if (s == 1 && op.minSize > 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
-            Term u0 = args.term(0);
-            if ((u0 instanceof Ellipsis) || (u0 instanceof Ellipsis.EllipsisPrototype))
-                currentSize++; //increase to make it seem valid and allow constrct below
-            else
-                return u0; //reduction
+            Term a0 = args.term(0);
+            if (!(a0 instanceof Ellipsislike)) {
+                throw new RuntimeException("invalid size " + s + " for " + op);
+                //return u0; //reduction
+            }
         }
 
-        if (!op.validSize(currentSize)) {
-            //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
-            //if (Global.DEBUG)
-                //throw new InvalidTerm(op, relation, dt, args.terms());
-            //else
-                return null;
-        }
-
-        return make(op, TermContainer.the(op, args), dt).term();
+        return newCompound(op, dt, args);
     }
 
 
@@ -254,7 +242,7 @@ public abstract class TermBuilder {
             Term only = u[0];
             //preserve unitary ellipsis for patterns etc
             if (only instanceof Ellipsislike)
-                return finish(op, dt, TermContainer.the(only));
+                return finish(op, dt, only);
             else
                 return only;
 
@@ -312,12 +300,13 @@ public abstract class TermBuilder {
 
 
         TreeSet<Term> s = new TreeSet();
-        //UnifiedSet<Term> negs = new UnifiedSet(0);
-
         UnifiedSet<Term> negs = flatten(op, u, dt, s, null);
 
         boolean negate = false;
         int n = s.size();
+        if (n == 1) {
+            return s.iterator().next();
+        }
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
         if (negs!=null) {
@@ -488,12 +477,12 @@ public abstract class TermBuilder {
             case 1:
 
                 Term single = t[0];
-                if (single instanceof Ellipsis) {
+                if (single instanceof Ellipsislike) {
                     //allow
-                    single = finish(intersection, single);
+                    return finish(intersection, single);
+                } else {
+                    return single;
                 }
-
-                return single;
 
             case 2:
                 return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
@@ -513,6 +502,9 @@ public abstract class TermBuilder {
     @Nullable
     @Deprecated
     public Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+
+        if (term1.equals(term2))
+            return term1;
 
         Op o1 = term1.op();
         Op o2 = term2.op();

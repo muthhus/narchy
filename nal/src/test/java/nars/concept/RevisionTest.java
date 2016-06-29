@@ -81,7 +81,7 @@ public class RevisionTest {
 
         b.run(delay1);
 
-        b.print(beliefOrGoal);
+        //b.print(beliefOrGoal);
 
         assertEquals("revised", 3, b.size(beliefOrGoal));
 
@@ -118,7 +118,7 @@ public class RevisionTest {
         b.run(1);
         //b.printEnergy();
 
-        b.print();
+        //b.print();
         assertEquals(2, b.size());
 
         b.believe(1.0f, 0.9f, Tense.Present).run(offCycles)
@@ -126,7 +126,7 @@ public class RevisionTest {
 
         for (int i = 0; i < 16; i++) {
             //b.printEnergy();
-            b.print();
+            //b.print();
             n.run(1);
             //TODO test that they are sorted ?
         }
@@ -222,7 +222,7 @@ public class RevisionTest {
         float linksBeforeRevisionLink = tasklinks.priSum();
 
         b.believe(0.0f, 0.5f).run(1);
-        assertEquals(2, tasklinks.size());
+        assertEquals(3, tasklinks.size());
         printTaskLinks(b);        System.out.println("--------");
 
         b.run(1); //allow enough time for tasklinks bag to commit

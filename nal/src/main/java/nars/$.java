@@ -790,8 +790,8 @@ public enum $ {
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 
-        @NotNull @Override
-        public Termed make(@NotNull Op op, @NotNull TermContainer subterms, int dt) {
+        @Override
+        public Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
             return new GenericCompound(op, dt, subterms);
         }
 

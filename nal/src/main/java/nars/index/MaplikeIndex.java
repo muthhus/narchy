@@ -149,7 +149,7 @@ public abstract class MaplikeIndex implements TermIndex {
 
     @NotNull
     protected final Termed buildCompound(@NotNull TermContainer subs, @NotNull Op op, int dt) {
-        return termBuilder.make(op, theSubterms(subs), dt);
+        return termBuilder.newCompound(op, dt, theSubterms(subs));
     }
 
     @Override

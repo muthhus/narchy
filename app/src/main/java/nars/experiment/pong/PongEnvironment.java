@@ -40,8 +40,8 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 3;
-	final int height = 3;
+	final int width = 8;
+	final int height = 8;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
