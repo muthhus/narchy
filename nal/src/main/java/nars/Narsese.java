@@ -1189,13 +1189,11 @@ public class Narsese extends BaseParser<Object> {
                 Termed x = index.normalized(y);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
-                y = x.term();
+                return x.term();
             }
-//            else if (y instanceof GenericVariable) {
-//                return ((GenericVariable)y).normalize(1 /* starting variable index */);
-//            }
+
         }
-        return y;
+        return index.the(y).term(); //y;
     }
 
 //    public TaskRule taskRule(String input) {

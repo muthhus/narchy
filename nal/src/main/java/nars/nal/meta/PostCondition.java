@@ -180,7 +180,6 @@ public class PostCondition implements Serializable, Level //since there can be m
 
         if (!pc.modifiesPunctuation() && pattern instanceof Compound) {
             if (rule.getTask().equals(pattern)) {
-                rule.getTask().equals(pattern);
                 throw new RuntimeException("punctuation not modified yet rule task equals pattern");
             }
             if (rule.getBelief().equals(pattern))

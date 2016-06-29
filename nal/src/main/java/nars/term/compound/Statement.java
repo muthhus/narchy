@@ -51,19 +51,32 @@ public interface Statement {
 //    }
 
     /** skips the null and equality test */
-    static boolean invalidStatement2(@NotNull Term subject, @NotNull Term predicate) {
+    static boolean validStatement(@NotNull Term subject, @NotNull Term predicate) {
 
-        //TODO combine these mirrored invalidReflexive calls into one combined, unredundant operation
-        if (!validReflexive(subject, predicate) || !validReflexive(predicate, subject))
-            return true;
+        //TODO its possible to disqualify invalid statement if there is no structural overlap here
 
-        if (!subject.op().isStatement() || !predicate.op().isStatement())
+        Compound sc = subject instanceof Compound ? (Compound)subject : null;
+        if (sc!=null &&
+                sc.containsTermRecursively(predicate)
+                //sc.containsTerm(predicate)
+            ) {
             return false;
+        }
 
+        Compound pc = predicate instanceof Compound ? (Compound)predicate : null;
+        if (pc!=null) {
+            if (
+                    pc.containsTermRecursively(subject)
+                    //pc.containsTerm(subject)
+               )
+                return false;
 
-        Compound cs = (Compound) subject;
-        Compound cp = (Compound) predicate;
-        return cs.term(0).equals(cp.term(1)) && cs.term(1).equals(cp.term(0));
+            if (sc!=null && subject.op().statement && predicate.op().statement) {
+                return !sc.term(0).equals(pc.term(1)) && !sc.term(1).equals(pc.term(0));
+            }
+        }
+
+        return true;
     }
 
 
@@ -75,30 +88,6 @@ public interface Statement {
     @Nullable
     static Term pred(@NotNull Termed t) {
         return ((TermContainer)t.term()).term(1);
-    }
-
-    /**
-     * Check if one term is identical to or included in another one, except in a
-     * reflexive relation
-     * <p>
-     *
-     * @param t1 The first term
-     * @param t2 The second term
-     * @return Whether they may be related in a statement
-     */
-    static boolean validReflexive(Term t1, Term t2) {
-
-        if (!(t1 instanceof Compound))
-            return true;
-
-        return !((Compound)t1).containsTerm(t2);
-        //return !((Compound)t1).containsTermRecursively(t2);
-
-//        return !(!(t1 instanceof Compound) || t1.op().isImage()
-//                ||
-//                //!t1.containsTerm(t2)
-//
-//        ) || ((Compound) t1).containsTermRecursively(t2);
     }
 
 

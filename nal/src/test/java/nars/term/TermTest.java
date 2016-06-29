@@ -294,7 +294,7 @@ public class TermTest {
 
         Term subj = null, pred = null;
         try {
-            subj = n.term("$1").term();
+            subj = $.varIndep(1);
             pred = n.term("(~,{place4},$1)").term();
 
             assertTrue(true);
@@ -493,7 +493,7 @@ public class TermTest {
     @Test
     public void validStatement() {
         Compound t = $("<({tom},{vienna}) --> livingIn>");
-        assertFalse(Statement.invalidStatement2(t.term(0), t.term(1)));
+        assertTrue(Statement.validStatement(t.term(0), t.term(1)));
 
     }
 

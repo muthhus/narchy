@@ -425,7 +425,7 @@ public abstract class TermBuilder {
 
 
         //already tested equality, so go to invalidStatement2:
-        if (!Statement.invalidStatement2(subject, predicate)) {
+        if (Statement.validStatement(subject, predicate)) {
             Termed xx = finish(op, subject, predicate);
             if (xx != null) {
                 Compound x = (Compound) (xx.term());

@@ -92,6 +92,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (that instanceof Compound) {
             Compound cthat = (Compound) that;
             return (
+                hashCode() == cthat.hashCode() &&
                 op() == cthat.op() &&
                 dt() == cthat.dt() &&
                 subterms().equals(cthat.subterms())

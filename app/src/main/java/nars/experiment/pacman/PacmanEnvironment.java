@@ -67,7 +67,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 6, 2, 3, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng))
+				new CaffeineIndex(new DefaultConceptBuilder(rng), true)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)

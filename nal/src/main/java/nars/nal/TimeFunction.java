@@ -232,7 +232,7 @@ public interface TimeFunction {
             return dtDecomposed == DTERNAL ? derived : null;
         } else {
 
-            long occ;
+            long occ = ETERNAL;
 
             long shift = ETERNAL;
 
@@ -245,20 +245,29 @@ public interface TimeFunction {
                 } else {
 
                     Term d0 = p.resolveNormalized(decomposedTerm.term(0));
-                    Term d1 = p.resolveNormalized(decomposedTerm.term(1));
+                    boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
 
                     if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
-                        if (Terms.equalOrNegationOf(d0, derived)) {
+                        if (derivedIsDecomposedZero) {
                             shift = 0; //beginning, assume its relative to the occurrenc
                         } else {
                             shift = dtDecomposed;
                         }
                     } else {
-                        if (Terms.equalOrNegationOf(d0,derived) && Terms.equalOrNegationOf(d1,otherTerm)) {
+                        Term d1 = p.resolveNormalized(decomposedTerm.term(1));
+
+                        if (derivedIsDecomposedZero && Terms.equalOrNegationOf(d1,otherTerm)) {
                             shift = -dtDecomposed; //shift negative
-                        } else if (Terms.equalOrNegationOf(d1,derived) && Terms.equalOrNegationOf(d0,otherTerm)) {
-                            shift = dtDecomposed; //shift positive
+                        } else {
+                            boolean derivedIsDecomposedOne = Terms.equalOrNegationOf(d1, derived);
+
+                            if (derivedIsDecomposedOne && Terms.equalOrNegationOf(d0,otherTerm)) {
+                                shift = dtDecomposed; //shift positive
+                            } else if (derivedIsDecomposedZero || derivedIsDecomposedOne) {
+                                shift = 0; //shift zero
+                            }
                         }
+
                     }
 
                     if (shift == ETERNAL) {
@@ -269,7 +278,8 @@ public interface TimeFunction {
 
                 occ = occOther;
 
-            } else /*if (occDecomposed != ETERNAL && occOther == ETERNAL)*/ {
+            }
+            else {//if (occ == ETERNAL && occDecomposed != ETERNAL) {
 
 
                 if (decomposedTerm.size() != 2) {

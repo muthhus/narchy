@@ -98,6 +98,7 @@ public class TemporalStabilityTests {
     @Test public void testTemporalStabilityLinkedProd() {
         new T1(linkedproductor, 1, 2, 5).test(300, new Default(1024, 8, 4, 3));
     }
+
     @Test public void testTemporalStabilityLinkedInh() {
         new T1(linkedinh, 1, 2, 5).test(400, new Default(1024, 8, 4, 3));
     }

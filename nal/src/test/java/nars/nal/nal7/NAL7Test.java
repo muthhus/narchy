@@ -640,11 +640,11 @@ public class NAL7Test extends AbstractNALTest {
                 $.50;.50;.95$ (d-->c). 5+0 %1.0;.90% {5+0: 3} Input*/
         test()
                 //.log()
-                .inputAt(2, "(c-->b). :|:")
+                .inputAt(2, "(a-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
-                .mustBelieve(cycles, "((d-->c) ==>-3 (c-->b))", 1f, 0.45f, 2)
-                .mustNotOutput(cycles, "<c-->b>", '.', -1)
-                .mustNotOutput(cycles, "<c-->b>", '.', 5)
+                .mustBelieve(cycles, "((d-->c) ==>-3 (a-->b))", 1f, 0.45f, 2)
+                .mustNotOutput(cycles, "<a-->b>", '.', -1)
+                .mustNotOutput(cycles, "<a-->b>", '.', 5)
                 .mustNotOutput(cycles, "<d-->c>", '.', 2)
         ;
     }

@@ -170,34 +170,34 @@ public interface TermIndex {
 
         boolean strict = f instanceof PremiseEval;
 
-        //constant atom or zero-length compound, ex: ()
-        int len = src.size();
-        boolean variable;
-        if (len == 0) {
-            variable = (src instanceof Variable);
-            if (strict && !(variable))
-                return src; //constant term, of which none should be mapped in the subst
-        } else {
-            variable = false;
-        }
 
 
-        Op sop = src.op();
+        if (src instanceof Variable) {
 
-        if (variable) {
-            if (sop == VAR_PATTERN)
+
+
+            if (src.op() == VAR_PATTERN)
                 return null; //unassigned pattern variable
             else
                 return src; //unassigned but literal non-pattern var
-        } else if (!strict && len == 0) {
+
+        } else if (src instanceof Atomic) {
+            //constant atom or zero-length compound, ex: ()
             return src;
         }
 
+        //no variables that could be substituted, so return this constant
+        if (src.vars() + src.varPattern() == 0)
+            return src;
+
+        int len = src.size();
 
         Compound crc = (Compound) src;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
 
+
+        boolean changed = false;
         for (int i = 0; i < len; i++) {
             Term t = crc.term(i);
             Term u = resolve(t, f);
@@ -210,6 +210,7 @@ public interface TermIndex {
 //                }
 
                 Collections.addAll(sub, ((EllipsisMatch) u).term);
+                changed = true;
 
             } else {
 
@@ -226,21 +227,14 @@ public interface TermIndex {
 
                 } else {
                     sub.add(u);
+                    changed |= (u != t);
                 }
 
             }
         }
 
-
-        //Prefilters
-
-
-        //Prefilters?
-        //        if ((minArity!=-1) && (resultSize < minArity)) {
-        //            //?
-        //        }
-
-        return immediates(f, build(crc, sub));
+        @Nullable Term z = changed ? build(crc, sub) : crc;
+        return z!=null ? immediates(f, z) : null;
     }
 
     default Term immediates(@NotNull Subst f, Term result) {

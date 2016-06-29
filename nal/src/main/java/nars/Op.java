@@ -129,6 +129,7 @@ public enum Op {
     public final int bit;
     public final boolean var;
     private final boolean atomic;
+    public final boolean statement;
 
 
 //    Op(char c, int minLevel) {
@@ -173,6 +174,7 @@ public enum Op {
 
         this.var = (type == OpType.Variable);
 
+        this.statement = str.equals("-->") || str.equals("==>") || str.equals("<=>") || str.equals("<->");
         this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
             //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
@@ -295,7 +297,7 @@ public enum Op {
 
 
     public boolean isStatement() {
-        return in(StatementBits);
+        return statement;
     }
 
     /** true if matches any of the on bits of the vector */
@@ -344,11 +346,7 @@ public enum Op {
     public static final int OperationBits =
             Op.or(Op.INH, Op.PROD, OPER);
 
-    public static final int StatementBits =
-            Op.or(Op.INH, Op.SIM,
-                    Op.EQUI,
-                    Op.IMPL
-            );
+
 
 //    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
 //    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);

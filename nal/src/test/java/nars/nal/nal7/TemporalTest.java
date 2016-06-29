@@ -324,8 +324,8 @@ public class TemporalTest {
 
     }
     @Test public void testSubtermNonCommutivePosNeg() {
-        Term ct = $("((d-->c) ==>-3 (c-->b))");
-        assertEquals(-3, ct.subtermTime($("(c-->b)")));
+        Term ct = $("((d-->c) ==>-3 (a-->b))");
+        assertEquals(-3, ct.subtermTime($("(a-->b)")));
         assertEquals(0, ct.subtermTime($("(d-->c)")));
     }
 
