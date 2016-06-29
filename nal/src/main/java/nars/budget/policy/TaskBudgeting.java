@@ -4,6 +4,7 @@ import nars.Memory;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
+import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
@@ -21,83 +22,38 @@ import static nars.nal.UtilityFunctions.or;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget budgetInference(@NotNull Budget target, float qualRaw, @NotNull Termed derived, @NotNull ConceptProcess nal) {
-
-        //BLink<? extends Task> taskLink = nal.taskLink;
+    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess p) {
 
 
-        //if (task.isDeleted()) return null;
-
-
-        //(taskLink !=null) ? taskLink :  nal.task().budget();
-
-        //Task task = taskLink.get();
-
-
-//        BLink<? extends Termed> termLink = nal.termLink;
-//        BLink<? extends Task> taskLink = nal.taskLink;
-
-
-        //originally was OR, but this can explode because the result of OR can exceed the inputs
-        //float priority = or(taskLink.pri(), termLink.pri());
-        //float priority = and(taskLink.pri(), termLink.pri());
-
-        Task task = nal.task();
-        if (task == null)
+        Task parentTask = p.task();
+        if (parentTask == null)
             return null;
 
-//        float priority = //UtilityFunctions.aveGeo(
-//                //task!=null ? task.priIfFiniteElseZero() : 0,
-//                (aveGeo(taskLink.priIfFiniteElseZero(),
-//                    termLink.priIfFiniteElseZero()));
+        //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
+        int parentVol = parentTask.volume() + p.beliefTerm().volume();
+        float volRatioScale = Math.min(1f, parentVol / ((float) (parentVol + derived.volume())));
 
+        BLink<? extends Task> taskLink = p.taskLink;
+        BLink<? extends Termed> termLink = p.termLink;
 
-        //Penalize by complexity
-        //ORIGINAL METHOD
-        //volRatioScale = 1f / derived.term().volume();
-        //RELATIVE SIZE INCREASE METHOD
-        int tasktermVol = task.volume();
-        float volRatioScale = Math.min(1f, tasktermVol / ((float) (tasktermVol + derived.volume())));
+        float linkDur = aveAri( taskLink.dur(), termLink.dur() );
+        final float durability = linkDur * volRatioScale;
+        float minDur = p.nar().derivationDurabilityThreshold.floatValue();
+        if (durability < minDur)
+            return null;
 
         float priority =
                 //nal.taskLink.priIfFiniteElseZero() * volRatioScale;
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
-                aveAri(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
+                aveAri(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero())
         ;
 
-//        if (priority > 0.5f)
-//            System.err.println("fc");
-
-        final float durability =
-                nal.taskLink.dur() * volRatioScale;
-                //UtilityFunctions.and(taskLink.dur() * volRatioScale, termLink.dur());
-
-        final float quality = qualRaw * volRatioScale;
-
-
-        //Strengthen the termlink by the quality and termlink's & tasklink's concept priorities
-
-        //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-//
-//        if (!termLink.isDeleted()) {
-//            final float targetActivation = nal.nar.conceptPriority(nal.termLink.get());
-//            final float sourceActivation = nal.nar.conceptPriority(nal.task());
-//
-//            termLink.orPriority(quality,
-//                    and(sourceActivation, targetActivation)
-//                    //or(sourceActivation, targetActivation)
-//            ); //was: termLink.orPriority(or(quality, targetActivation));
-//            termLink.orDurability(quality);
-//        }
-
-//        termLink.orPriority(quality);
-//        termLink.orDurability(quality);
+        final float quality = qual * volRatioScale;
 
 
 
-
-        return target.budget(priority, durability, quality);
+        return new UnitBudget(priority, durability, quality);
 
 
         /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java
@@ -120,16 +76,6 @@ public class TaskBudgeting {
          */
     }
 
-    @Nullable
-    public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
-                                         @NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(
-                target,
-                BudgetFunctions.truthToQuality(truth),
-                content,
-                nal);
-    }
-
     /**
      * Backward logic with CompoundTerm conclusion, stronger case
      *
@@ -138,10 +84,7 @@ public class TaskBudgeting {
      */
     @Nullable
     public static Budget compoundQuestion(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(new UnitBudget(),
-                //1.0f
-                1.0f/content.term().complexity(),
-                content, nal);
+        return budgetInference(1.0f, content, nal);
     }
 
     /**
@@ -154,7 +97,10 @@ public class TaskBudgeting {
      */
     @Nullable
     public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
-        return compoundForward(new UnitBudget(), truth, content, nal);
+        return budgetInference(
+                BudgetFunctions.truthToQuality(truth),
+                content,
+                nal);
     }
 
     /**

@@ -20,7 +20,6 @@ import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
-import nars.term.container.TermContainer;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
@@ -1134,7 +1133,7 @@ public class Narsese extends BaseParser<Object> {
         Term contentRaw = (Term) x[1];
         if (contentRaw == null)
             throw new NarseseException("Invalid task term");
-        Termed content = m.index.normalized(contentRaw);
+        Termed content = m.index.normalized(contentRaw, true);
         if (content == null)
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
 
@@ -1186,7 +1185,7 @@ public class Narsese extends BaseParser<Object> {
         Term y = term(s);
         if (normalize) {
             if (y instanceof Compound) {
-                Termed x = index.normalized(y);
+                Termed x = index.normalized(y, true);
                 if (x == null)
                     throw new NarseseException("Un-normalizable: " + y);
                 return x.term();

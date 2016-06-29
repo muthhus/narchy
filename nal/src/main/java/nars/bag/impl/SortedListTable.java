@@ -21,10 +21,10 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     protected final @NotNull SortedArray<L> items;
 
 
-    public SortedListTable(IntFunction<L[]> builder, Map<V, L> map, SortedArray.SearchType searchType) {
+    public SortedListTable(IntFunction<L[]> builder, Map<V, L> map) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
-        this.items = new SortedArray<>(builder, this, searchType, 1);
+        this.items = new SortedArray<>(builder, 1);
     }
 
     @NotNull
@@ -119,12 +119,12 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @Override
     protected boolean listRemove(L removed) {
-        return items.remove(removed);
+        return items.remove(removed, this);
     }
 
     @Override
     protected void listAdd(L i) {
-        items.add(i);
+        items.add(i, this);
     }
 
     @Override
@@ -134,13 +134,13 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @Override @Nullable
     public L top() {
-        return isEmpty() ? null : item(0);
+        return isEmpty() ? null : get(0);
     }
 
     @Override @Nullable
     public L bottom() {
         int s = size();
-        return s == 0 ? null : item(s - 1);
+        return s == 0 ? null : get(s - 1);
     }
 
 
@@ -171,7 +171,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
             displaced = items.removeLast(); //remove last
         }
 
-        items.add(i);
+        items.add(i, this);
 
         return displaced;
     }

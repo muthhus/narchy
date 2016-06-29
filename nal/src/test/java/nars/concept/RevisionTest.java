@@ -209,11 +209,12 @@ public class RevisionTest {
         AbstractNAR n = newNAR(6);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
-        Bag<Task> tasklinks = b.concept().tasklinks();
 
         assertEquals(0, b.priSum(), 0.01f);
 
         b.believe(1.0f, 0.5f).run(1);
+
+        Bag<Task> tasklinks = b.concept().tasklinks();
 
         assertEquals(0.5f, b.beliefs().topEternalTruth(null).conf(), 0.01f);
 

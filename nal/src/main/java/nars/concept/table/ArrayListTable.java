@@ -91,10 +91,6 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     protected abstract void listAdd(L i);
 
-    @NotNull
-    public final L item(int index) {
-        return get(index);
-    }
 
     /**
      * Take out the first or last E in a level from the itemTable
@@ -104,7 +100,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
     @NotNull
     public final L removeItem(int index) {
 
-        L ii = item(index);
+        L ii = get(index);
         /*if (ii == null)
             throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
 

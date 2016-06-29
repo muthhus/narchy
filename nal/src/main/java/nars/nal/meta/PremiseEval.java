@@ -246,11 +246,9 @@ public class PremiseEval extends FindSubst {
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
         ConceptProcess p = this.premise;
-        Budget budget = truth != null ?
+        return (truth != null) ?
                     TaskBudgeting.compoundForward(truth, derived, p) :
                     TaskBudgeting.compoundQuestion(derived, p);
-        return (budget.dur() >= p.nar().derivationDurabilityThreshold.floatValue()) ?
-                budget : null;
     }
 
 

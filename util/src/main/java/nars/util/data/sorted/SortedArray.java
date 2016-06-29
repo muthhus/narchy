@@ -45,7 +45,7 @@ import java.util.function.IntFunction;
 public final class SortedArray<E> {
 
 
-    protected final int binarySearchThreshold = 8;
+    protected static final int binarySearchThreshold = 8;
     private final IntFunction<E[]> builder;
     private E[] list;
     private int size;
@@ -72,8 +72,8 @@ public final class SortedArray<E> {
         return previous;
     }
 
-    public boolean remove(E removed) {
-        int i = indexOf(removed);
+    public boolean remove(E removed, Comparator<E> cmp) {
+        int i = indexOf(removed, cmp);
         if (i == -1)
             return false;
         return remove(i)!=null;
@@ -87,54 +87,50 @@ public final class SortedArray<E> {
         }
     }
 
-    /**
-     * defines the sorting strategy for {@link SortedList_1x4}
-     *
-     * @author Andreas Hollmann
-     */
-    public enum SearchType {
-        /**
-         * uses binary search and is suitable for lists like {@link ArrayList}
-         * or {@link TreeList}, where elements can be cheaply accessed by their
-         * index.</br>
-         */
-        BinarySearch,
-        /**
-         * uses insertion sort to insert new elements. Insertion sort starts to
-         * search for element from the beginning of the list until the index for
-         * insertion is found and inserts then the new element. This type of
-         * sorting is suitable for {@link LinkedList}. insertion Sort has
-         * complexity between N (best-case) and N^2 (worst-case)
-         */
-        LinearSearch
-    }
+//    /**
+//     * defines the sorting strategy for {@link SortedList_1x4}
+//     *
+//     * @author Andreas Hollmann
+//     */
+//    public enum SearchType {
+//        /**
+//         * uses binary search and is suitable for lists like {@link ArrayList}
+//         * or {@link TreeList}, where elements can be cheaply accessed by their
+//         * index.</br>
+//         */
+//        BinarySearch,
+//        /**
+//         * uses insertion sort to insert new elements. Insertion sort starts to
+//         * search for element from the beginning of the list until the index for
+//         * insertion is found and inserts then the new element. This type of
+//         * sorting is suitable for {@link LinkedList}. insertion Sort has
+//         * complexity between N (best-case) and N^2 (worst-case)
+//         */
+//        LinearSearch
+//    }
 
-    private final Comparator<E> comparator;
-    /**
-     * the type of the sorting algorithm
-     */
-    private final SearchType sortType;
+
+
+//    /**
+//     * the type of the sorting algorithm
+//     */
+//    private final SearchType sortType;
 
 
     /**
      * constructor
      *
      * @param list       decorated List
-     * @param comparator comparator
-     * @param searchType type for the sorting strategy, there are two types for the
-     *                   LinkedList and for ArrayList with binary search-methods
      * @param inverted   if true the sorted order will be inverted, the list will be
      *                   sorted in descending order
      * @param preSort    if true the the list, which is the parameter in the
      *                   constructor will be sorted, before it will be decorated
      */
-    public SortedArray(final IntFunction<E[]> builder, final Comparator<E> comparator,
-                       final SearchType searchType, int initialCapacity) {
+    public SortedArray(final IntFunction<E[]> builder,
+                       int initialCapacity) {
         //this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
 
         this.builder = builder;
-        this.comparator = comparator;
-        this.sortType = searchType;
         setCapacity(initialCapacity);
     }
 
@@ -151,13 +147,12 @@ public final class SortedArray<E> {
     }
 
 
-    public boolean add(final E element) {
+    public boolean add(final E element, Comparator<E> cmp) {
         // use the linked-list sorting if the type is set or if the list-size
         // is to small
         int s = this.size;
 
-        Comparator<E> cmp = this.comparator;
-        if ((s < binarySearchThreshold) || SearchType.LinearSearch == this.sortType) {
+        if (s < binarySearchThreshold) {
             return addLinear(element, s, cmp);
         } else {
             return addBinary(element, s, cmp);
@@ -167,7 +162,7 @@ public final class SortedArray<E> {
 
     public boolean addBinary(E element, int s, Comparator<E> cmp) {
         // use the binary search
-        final int index = this.findInsertionIndex_TypeArray(element, 0, s - 1, new int[1]);
+        final int index = this.findInsertionIndex_TypeArray(element, 0, s - 1, new int[1], cmp);
         final int sz = s;
         final E last = list[sz - 1];
         if (index == sz || cmp.compare(last, element) < 0) {
@@ -222,17 +217,18 @@ public final class SortedArray<E> {
 
     private void addAtIndex(int index, E element) {
         int oldSize = this.size++;
-        if (this.list.length == oldSize) {
+        E[] list = this.list;
+        if (list.length == oldSize) {
             E[] newItems = builder.apply(grow(oldSize)); //new Object[this.sizePlusFiftyPercent(oldSize)];
             if (index > 0) {
-                System.arraycopy(this.list, 0, newItems, 0, index);
+                System.arraycopy(list, 0, newItems, 0, index);
             }
-            System.arraycopy(this.list, index, newItems, index + 1, oldSize - index);
-            this.list = newItems;
+            System.arraycopy(list, index, newItems, index + 1, oldSize - index);
+            this.list = list = newItems;
         } else {
-            System.arraycopy(this.list, index, this.list, index + 1, oldSize - index);
+            System.arraycopy(list, index, list, index + 1, oldSize - index);
         }
-        this.list[index] = element;
+        list[index] = element;
     }
 
     private int grow(int oldSize) {
@@ -288,16 +284,16 @@ public final class SortedArray<E> {
 //		list.add(index, element);
 //	}
 
-    /**
-     * adds all elements to the decorated list
-     */
-    public boolean addAll(final Collection<? extends E> c) {
-        boolean changed = false;
-        for (final E element : c) {
-            changed = this.add(element) || changed;
-        }
-        return changed;
-    }
+//    /**
+//     * adds all elements to the decorated list
+//     */
+//    public boolean addAll(final Collection<? extends E> c) {
+//        boolean changed = false;
+//        for (final E element : c) {
+//            changed = this.add(element) || changed;
+//        }
+//        return changed;
+//    }
 
 //	public boolean addAll(final int index, final Collection<? extends E> c) {
 //
@@ -390,14 +386,10 @@ public final class SortedArray<E> {
 
 
 	@SuppressWarnings("unchecked")
-	public int indexOf(@NotNull final E element) {
+	public int indexOf(@NotNull final E element, Comparator<E> cmp) {
 
-		if (element == null)
-			return -1;
-
-		if (SearchType.LinearSearch == this.sortType) {
-			return indexOfInternal(element);
-		}
+		/*if (element == null)
+			return -1;*/
 
 		int size = size();
 		if (size < binarySearchThreshold) {
@@ -406,7 +398,7 @@ public final class SortedArray<E> {
 
 
         final int[] rightBorder = new int[] { 0 };
-		final int left = this.findInsertionIndex_TypeArray(element, 0, size, rightBorder);
+		final int left = this.findInsertionIndex_TypeArray(element, 0, size, rightBorder, cmp);
 
         E[] l = this.list;
 		for (int index = left; index < rightBorder[0]; index++) {
@@ -495,7 +487,7 @@ public final class SortedArray<E> {
      */
     private int findInsertionIndex_TypeArray(
             final E element, final int left, final int right,
-            @NotNull final int[] rightBorder) {
+            @NotNull final int[] rightBorder, Comparator<E> cmp) {
 		/*if (rightBorder == null) {
 			throw new IllegalArgumentException("rightBorder can't be null");
 		}*/
@@ -507,17 +499,16 @@ public final class SortedArray<E> {
 
         if ((right - left) <= binarySearchThreshold) {
             rightBorder[0] = right;//.setObject(right);
-            return findFirstIndex_TypeLinked(element, left, right);
+            return findFirstIndex_TypeLinked(element, left, right, cmp);
         }
         final int midle = left + (right - left) / 2;
         final E midleE = list[midle];
 
-        final Comparator<E> cmp = this.comparator;
 
         final int comparedValue = cmp.compare(midleE, element);
         if (0 < comparedValue) {
             // element < middleE
-            return this.findInsertionIndex_TypeArray(element, left, midle, rightBorder);
+            return this.findInsertionIndex_TypeArray(element, left, midle, rightBorder, cmp);
         } else if (comparedValue == 0) {
             // find the first element
             int index = midle;
@@ -532,8 +523,7 @@ public final class SortedArray<E> {
             return index;
         }
 
-        return this.findInsertionIndex_TypeArray(element, midle, right,
-                rightBorder);
+        return this.findInsertionIndex_TypeArray(element, midle, right, rightBorder, cmp);
     }
 
     /**
@@ -546,10 +536,9 @@ public final class SortedArray<E> {
      * @return
      */
     private int findFirstIndex_TypeLinked(final E element,
-                                          final int left, final int right) {
+                                          final int left, final int right, Comparator<E> cmp) {
 
         int index = left;
-        final Comparator<E> cmp = this.comparator;
         for (; index < right; ) {
             if (0 <= cmp.compare(list[index], element)) {
                 return index;
@@ -586,14 +575,7 @@ public final class SortedArray<E> {
 //		return false;
 //	}
 
-    /**
-     * Returns the comparator used to order the elements in this list
-     *
-     * @return
-     */
-    public Comparator<E> comparator() {
-        return this.comparator;
-    }
+
 
     /**
      * Returns the first (lowest) element currently in this list.

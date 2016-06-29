@@ -106,7 +106,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //			return false;
 //		});
 
-		new Abbreviation2(nar, "_");
+		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 

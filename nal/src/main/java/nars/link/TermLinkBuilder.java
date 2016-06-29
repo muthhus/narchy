@@ -81,19 +81,22 @@ public enum TermLinkBuilder {
 
         } else {
 
-            Concept ct = nar.concept(t, false /*true*/);
-            if (ct != null) {
+            boolean autocreate = t.complexity() < Global.AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD;
+            Termed ct = nar.concept(t, autocreate);
+            if (ct == null) {
+                ct = t;
+            }
 
-                if (target.add(ct)) { //do not descend on repeats
+            if (target.add(ct)) { //do not descend on repeats
 
-                    if (level > 0 && ct instanceof Compound) {
-                        Compound cct = (Compound) ct;
-                        for (int i = 0, ii = cct.size(); i < ii; i++) {
-                            components(cct.term(i), level - 1, nar, target);
-                        }
+                if (level > 0 && ct instanceof Compound) {
+                    Compound cct = (Compound) ct;
+                    for (int i = 0, ii = cct.size(); i < ii; i++) {
+                        components(cct.term(i), level - 1, nar, target);
                     }
                 }
             }
+
         }
     }
 

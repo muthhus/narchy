@@ -6,7 +6,6 @@ import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.truth.Truth;
-import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +19,7 @@ import static nars.nal.Tense.ETERNAL;
 public class EternalTable extends SortedListTable<Task, Task> {
 
     public EternalTable(Map<Task, Task> index, int initialCapacity) {
-        super(Task[]::new, index, SortedArray.SearchType.BinarySearch);
+        super(Task[]::new, index);
         setCapacity(initialCapacity);
     }
 

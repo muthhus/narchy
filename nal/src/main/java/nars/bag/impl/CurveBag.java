@@ -74,7 +74,7 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
             int index = sampleIndex();
 
             BLink<V> i = remove ?
-                    removeItem(index) : item(index);
+                    removeItem(index) : get(index);
 
             if (!i.isDeleted()) {
                 return i;

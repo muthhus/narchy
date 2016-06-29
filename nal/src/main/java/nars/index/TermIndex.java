@@ -379,38 +379,31 @@ public interface TermIndex {
     }
 
 
-    @Nullable
-    default Termed<Compound> normalized(@NotNull Termed<Compound> t) {
+    default Termed<Compound> normalized(@NotNull Termed<Compound> t, boolean insert) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
             t = transform(ct,
-                    (ct.vars() == 1 && ct.varPattern() == 0) ?
+                    (numVars == 1 && ct.varPattern() == 0) ?
                             VariableNormalization.singleVariableNormalization :
                             new VariableNormalization(numVars)
             );
 
-            if (!(t instanceof Compound)) //includes null test
-                return null;
+//            if (!(t instanceof Compound)) //includes null test
+//                return null;
 
             ((GenericCompound) t).setNormalized();
 
         }
 
-
-
-//        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
-        if (t instanceof Compound && ((Compound)t).hasTemporal())
+        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
+        if (t instanceof Compound && ((Compound)t).hasTemporal()) {
             return t;
-
-//        return t;
-
-        //fast resolve to concept if not temporal:
-        Termed existing = the(t);
-        if (existing != null)
-            return existing;
-        else
-            return t;
+        } else {
+            //fast resolve to concept if not temporal:
+            Termed shared = insert ? the(t) : get(t);
+            return shared != null ? shared : t;
+        }
     }
 
 
@@ -451,9 +444,11 @@ public interface TermIndex {
                 y = transform((Compound) x, trans); //recurse
             }
 
+            if (y == null)
+                return null;
+
             if (x != y) { //must be refernce equality test for some variable normalization cases
-                if (y == null)
-                    return null;
+
 
                 modifications++;
                 x = y;
@@ -530,7 +525,7 @@ public interface TermIndex {
         } else {
 
             Termed prenormalized = term;
-            if ((term = normalized(term)) == null)
+            if ((term = normalized(term, true)) == null)
                 throw new InvalidTerm(prenormalized);
 
             return atemporalize((Compound)term);

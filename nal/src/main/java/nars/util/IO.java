@@ -15,7 +15,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -173,7 +172,7 @@ public class IO {
         if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
 
-        return (Compound) t.normalized(t.builder().build(o, dt, v));
+        return (Compound) t.normalized(t.builder().build(o, dt, v), true);
     }
 
     /**

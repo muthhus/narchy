@@ -1,14 +1,9 @@
 package nars.term.subst;
 
-import com.gs.collections.api.set.MutableSet;
 import nars.Global;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.meta.match.EllipsisTransform;
-import nars.nal.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -27,9 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 
@@ -395,7 +388,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Term resolveNormalized(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
         t = resolve(t);
-        return (t instanceof Compound) ? this.index.normalized((Compound) t).term() : t;
+        return (t instanceof Compound) ? this.index.normalized((Compound) t, true).term() : t;
     }
 
     @Nullable

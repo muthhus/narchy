@@ -6,14 +6,12 @@ import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
-import nars.util.data.map.UnifriedMap;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -39,10 +37,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
 
                 //new ConcurrentHashMapUnsafe<V, BLink<V>>(),
                 //new LinkedHashMap<>(cap),
-                new HashMap<>(cap),
+                new HashMap<>(cap)
                 //Global.newHashMap(cap),
 
-                SortedArray.SearchType.BinarySearch);
+        );
         setCapacity(cap);
         merge( BudgetMerge.errorMerge );
     }
