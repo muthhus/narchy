@@ -10,12 +10,9 @@ import nars.budget.merge.BudgetMerge;
 import nars.guifx.InputPane;
 import nars.guifx.concept.BagView;
 import nars.task.Task;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static javafx.application.Platform.runLater;
@@ -72,7 +69,7 @@ public class NARNotes extends BorderPane {
         //private final Button inputButton;
         private final BagView<Task> responseBox;
         private Task task = null;
-        Bag<Task> responses = new ArrayBag<Task>(16).merge(BudgetMerge.max);
+        Bag<Task> responses = new ArrayBag<Task>(16, BudgetMerge.max);
 
         public Note(Task t) {
             getStyleClass().add("note");

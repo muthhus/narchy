@@ -66,12 +66,8 @@ public class DefaultCore extends AbstractCore {
     @NotNull
     @Override
     protected Bag<Concept> newConceptBag() {
-        return new MonitoredCurveBag(nar, 1, nar.random)
-                .merge(BudgetMerge.
-                        plusDQBlend
-                        //avgDQBlend
-                        //plusDQDominant
-                );
+        return new MonitoredCurveBag(nar, 1, nar.random);
+
     }
 
     /** extends CurveBag to invoke entrance/exit event handler lambda */
@@ -80,7 +76,7 @@ public class DefaultCore extends AbstractCore {
         final NAR nar;
 
         public MonitoredCurveBag(NAR nar, int capacity, @NotNull Random rng) {
-            super(capacity, rng);
+            super(capacity, rng, BudgetMerge.plusDQBlend);
             this.nar = nar;
             setCapacity(capacity);
         }

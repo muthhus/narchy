@@ -14,6 +14,9 @@ import static nars.nal.UtilityFunctions.or;
 @FunctionalInterface
 public interface BudgetMerge {
 
+
+
+
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
      *  incomingScale is a factor (0 < s <= 1) by which the incoming budget's effect is multiplied,
      *  1.0 being complete merge and 0 being no effect at all.
@@ -92,6 +95,7 @@ public interface BudgetMerge {
 
         return overflow;
     }
+
     BudgetMerge errorMerge = (x, y, z) -> {
         throw new UnsupportedOperationException();
     };

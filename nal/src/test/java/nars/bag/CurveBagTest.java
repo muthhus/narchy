@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 
+import static nars.budget.merge.BudgetMerge.plusDQDominant;
 import static org.junit.Assert.*;
 
 /**
@@ -35,16 +36,13 @@ public class CurveBagTest  {
 
     @Test public void testBasicInsertionRemoval() {
         int cap = 1;
-        testBasicInsertionRemoval(new ArrayBag(cap));
-        testBasicInsertionRemoval(new CurveBag(cap, rng));
+
+        testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant));
+        testBasicInsertionRemoval(new CurveBag(cap, rng, plusDQDominant));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
-        //HACK
-        if (c instanceof CurveBag)
-            ((CurveBag)c).merge(BudgetMerge.plusDQDominant);
-        else
-            ((ArrayBag)c).merge(BudgetMerge.plusDQDominant);
+
 
         assertEquals(1, c.capacity());
         assertEquals(0, c.size());
@@ -64,8 +62,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testBudgetMerge() {
-        ArrayBag<String> a = new ArrayBag(4);
-        a.merge(BudgetMerge.plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(4, plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -80,8 +77,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testSort() {
-        ArrayBag<String> a = new ArrayBag(4);
-        a.merge(BudgetMerge.plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(4, plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -108,8 +104,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testCapacity() {
-        ArrayBag<String> a = new ArrayBag(2);
-        a.merge(BudgetMerge.plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -127,8 +122,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testRemoveByKey() {
-        ArrayBag<String> a = new ArrayBag(2);
-        a.merge(BudgetMerge.plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.commit();
@@ -143,8 +137,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testScalePut() {
-        ArrayBag<String> a = new ArrayBag(2);
-        a.merge(BudgetMerge.plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
@@ -268,8 +261,7 @@ public class CurveBagTest  {
     private CurveBag<String> populated(int n , @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = newNormalizedSamplingBag(rng, n);
-        a.merge(BudgetMerge.plusDQDominant);
+        CurveBag<String> a = newNormalizedSamplingBag(rng, n, plusDQDominant);
 
 
         //fill with uniform randomness
@@ -290,7 +282,7 @@ public class CurveBagTest  {
 
         float level = 0.04f;
 
-        CurveBag<String> a = newNormalizedSamplingBag(rng, n);
+        CurveBag<String> a = newNormalizedSamplingBag(rng, n, plusDQDominant);
 
         for (int i = 0; i < n; i++) {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
@@ -311,8 +303,8 @@ public class CurveBagTest  {
     }
 
     @NotNull
-    public CurveBag<String> newNormalizedSamplingBag(Random rng, int n) {
-        return new CurveBag(n, new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng));
+    public CurveBag<String> newNormalizedSamplingBag(Random rng, int n, BudgetMerge mergeFunction) {
+        return new CurveBag(n, new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng), mergeFunction);
     }
 
 //    /** maybe should be in ArrayBagTest */
@@ -352,11 +344,11 @@ public class CurveBagTest  {
 //
 //    }
 
-    @NotNull
-    public static CurveBag<String> newBag(int n) {
-        Random rng = new XorShift128PlusRandom(1);
-        return new CurveBag(n, rng);
-    }
+//    @NotNull
+//    public static CurveBag<String> newBag(int n) {
+//        Random rng = new XorShift128PlusRandom(1);
+//        return new CurveBag(n, rng);
+//    }
 
 
 //

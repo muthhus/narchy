@@ -2,6 +2,7 @@ package nars.bag.impl;
 
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.bag.Bag;
+import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,24 +30,22 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
     @NotNull final CurveSampler sampler;
 
-    public CurveBag(@NotNull Random rng) {
-        this(1, rng);
-    }
 
-    public CurveBag(int capacity, @NotNull Random rng) {
+
+    public CurveBag(int capacity, @NotNull Random rng, BudgetMerge mergeFunction) {
         this(capacity,
             //new NormalizedSampler(
             new DirectSampler(
                  power4BagCurve, rng
-        ));
+        ), mergeFunction);
     }
 
-    public CurveBag(@NotNull CurveSampler c) {
-        this(1, c);
+    public CurveBag(@NotNull CurveSampler c, BudgetMerge mergeFunction) {
+        this(1, c, mergeFunction);
     }
 
-    public CurveBag(int initialCapacity, @NotNull CurveSampler c) {
-        super(initialCapacity);
+    public CurveBag(int initialCapacity, @NotNull CurveSampler c, BudgetMerge mergeFunction) {
+        super(initialCapacity, mergeFunction);
         this.sampler = c;
     }
 

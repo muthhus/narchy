@@ -57,27 +57,28 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     };
 
 
+
     //return (!(t instanceof Space)) ?
     //new SpaceConcept((Space) t, taskLinks, termLinks);
 
     @NotNull
     @Override public Bag<Task> taskbag() {
 
-        return new CurveBag<Task>(rng) {
+        return new CurveBag<>(defaultCurveSampler, mergeDefault()) {
             @NotNull
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
                 //return new WeakBLinkToBudgeted<>(i, b, scale);
                 return new StrongBLinkToBudgeted<>(i, b, scale);
             }
-        }.merge(mergeDefault());
+        };
     }
 
 
     @NotNull
     @Override public Bag<Termed> termbag() {
 
-        return new CurveBag<Termed>(rng).merge(mergeDefault());
+        return new CurveBag<>(defaultCurveSampler, mergeDefault());
 
 //        //weak links may be conceptually wrong
 //        return new CurveBag<Termed>(rng) {
@@ -100,11 +101,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
 
     @NotNull
-    public final Random rng;
+    public final Random rng; //shared
+    public final CurveBag.CurveSampler defaultCurveSampler; //shared
 
 
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
+        this.defaultCurveSampler = new CurveBag.DirectSampler(CurveBag.power4BagCurve, rng);
     }
 
 

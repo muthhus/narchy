@@ -22,17 +22,15 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> {
+public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>, BiFunction<RawBudget, RawBudget, RawBudget> {
 
-    /** this default value must be changed */
-    @NotNull protected BudgetMerge mergeFunction;
 
+    private final BudgetMerge mergeFunction;
     //protected final FasterList<BLink<V>> pending = new FasterList();
     private Map<V,RawBudget> pending;
-    private BiFunction<RawBudget, RawBudget, RawBudget> pendingMerge;
 
 
-    public ArrayBag(int cap) {
+    public ArrayBag(int cap, BudgetMerge mergeFunction) {
         super(BLink[]::new,
 
                 //new ConcurrentHashMapUnsafe<V, BLink<V>>(),
@@ -41,8 +39,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
                 //Global.newHashMap(cap),
 
         );
+
         setCapacity(cap);
-        merge( BudgetMerge.errorMerge );
+
+        this.mergeFunction = mergeFunction;
     }
 
     @Override
@@ -82,23 +82,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
         //return b.priIfFiniteElseNeg1();
     }
 
-    @NotNull
-    public Bag<V> merge(@NotNull BudgetMerge mergeFunction) {
-        this.mergeFunction = mergeFunction;
 
-        synchronized (map) {
-            this.pendingMerge = (RawBudget bExisting, RawBudget bNext) -> {
-                if (bExisting != null) {
-                    mergeFunction.merge(bExisting, bNext, 1f);
-                    return bExisting;
-                } else {
-                    return bNext;
-                }
-            };
-        }
-
-        return this;
-    }
 
     @Override
     public final V key(@NotNull BLink<V> l) {
@@ -268,7 +252,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             Map<V, RawBudget> p = this.pending;
             if (p == null)
                 this.pending = p = newPendingMap();
-            p.merge(i, inc, pendingMerge);
+            p.merge(i, inc, this);
         }
 
     }
@@ -602,6 +586,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V> 
             pendingMass += (float)pending.values().stream().mapToDouble(v -> v.priIfFiniteElseZero() * v.dur()).sum();
         }
         return new float[] { mass, pendingMass };
+    }
+
+    @Override
+    public RawBudget apply(RawBudget bExisting, RawBudget bNext) {
+        if (bExisting != null) {
+            mergeFunction.merge(bExisting, bNext, 1f);
+            return bExisting;
+        } else {
+            return bNext;
+        }
     }
 
 //    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
