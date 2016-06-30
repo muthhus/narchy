@@ -494,42 +494,52 @@ public class Terms   {
     }
 
 
-
-
-
-    public static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
-        if (a.op().temporal && (a.op() == b.op()) && (a.volume() == b.volume())) {
-            return equalsAnonymous(a.subterms(), b.subterms());
+    public static boolean equalsAnonymous(@NotNull Term as, @NotNull Term bs) {
+        if (as instanceof Compound && bs instanceof Compound) {
+            return equalsAnonymous((Compound) as, (Compound) bs);
         } else {
-            return a.equals(b);
+            return as.equals(bs);
         }
     }
 
-    public static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
-        int n = a.size();
-        if (n == b.size()) {
-            for (int i = 0; i < n; i++) {
-                Term as = a.term(i);
-                Term bs = b.term(i);
-                if (!equalsAnonymous(as, bs))
+    private static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
+        int as = a.structure();
+        if (Op.hasAny(as, Op.TemporalBits)) {
+
+            Op ao = a.op();
+            if (ao == b.op()) {
+                if (ao.isImage() && a.dt()!=b.dt()) //must match dt for image
                     return false;
+
+                return equalsAnonymous(a.subterms(), b.subterms());
             }
-            return true;
+
+            return false;
+
+        } else {
+            //no temporal subterms
+            return a.equals(b);
+        }
+
+    }
+
+    private static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
+        if (a.volume() == b.volume() && a.structure() == b.structure()) {
+            int n = a.size();
+            if (n == b.size()) {
+                for (int i = 0; i < n; i++) {
+                    Term as = a.term(i);
+                    Term bs = b.term(i);
+                    if (!equalsAnonymous(as, bs))
+                        return false;
+                }
+                return true;
+            }
         }
         return false;
     }
 
-    public static boolean equalsAnonymous(@NotNull Term as, @NotNull Term bs) {
-        if (as.op() == bs.op()) {
-            if (as instanceof Compound && bs instanceof Compound) {
-                return equalsAnonymous((Compound) as, (Compound) bs);
-            } else {
-                return as.equals(bs);
-            }
-        } else {
-            return false;
-        }
-    }
+
 
     public static ImmutableSet<Term> unique(Term c, Predicate<Term> p) {
         UnifiedSet<Term> u = new UnifiedSet();

@@ -37,20 +37,20 @@ abstract public class substituteIfUnifies extends substitute {
 
         Term term = xx[0];
 
-        //final Term opT = xx[1];
         @Nullable Op op = op();
 
-        if (term.hasAny(op)) {
+        final Term x = xx[1];
+        final Term y = xx[2];
 
-            final Term x = xx[1];
-            final Term y = xx[2];
-
-            OneMatchFindSubst m = this.matcher;
-            term = m.tryMatch(op, r, term, x, y);
-            m.clear();
-        } else {
-            if (mustSubstitute())
-                term = null;
+        if (!x.equals(y)) {
+            if (term.hasAny(op)) {
+                OneMatchFindSubst m = this.matcher;
+                term = m.tryMatch(op, r, term, x, y);
+                m.clear();
+            } else {
+                if (mustSubstitute())
+                    term = null;
+            }
         }
         return term;
     }
@@ -92,4 +92,17 @@ abstract public class substituteIfUnifies extends substitute {
             return Op.VAR_INDEP;
         }
     }
+//    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
+//
+//
+//        public substituteOnlyIfUnifiesIndep(NAR nar) {
+//            super(nar);
+//        }
+//
+//        @Override protected boolean mustSubstitute() { return true; }
+//
+//        @Override public Op op() {
+//            return Op.VAR_INDEP;
+//        }
+//    }
 }

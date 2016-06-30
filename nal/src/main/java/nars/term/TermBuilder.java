@@ -79,7 +79,10 @@ public abstract class TermBuilder {
             case SIM:
             case EQUI:
             case IMPL:
-                return statement(op, dt, u);
+                if (u.length != 2) {//throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
+                    throw new InvalidTerm(op, dt, u);
+                }
+                return statement(op, dt, u[0], u[1]);
 
             case PROD:
                 if (u.length == 0)
@@ -348,23 +351,7 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
-
-        if (u.length != 2) {//throw new RuntimeException("invalid statement: args=" + Arrays.toString(u));
-            throw new InvalidTerm(op, t, u);
-            //return null;
-        } else {
-            return statement2(op, t, u[0], u[1]);
-            //case 1:
-            //return u[0];
-        }
-    }
-
-    @Nullable
-    public Term statement2(@NotNull Op op, int dt, final Term subject, Term predicate) {
-
-        //if (subject.equals(predicate))
-        //    return null; //subject;
+    public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
         if (Terms.equalsAnonymous(subject, predicate))
             return null;
@@ -411,7 +398,7 @@ public abstract class TermBuilder {
                             if (newPredicate == null)
                                 return null;
 
-                            return statement2(op, dt, newSubject, newPredicate);
+                            return statement(op, dt, newSubject, newPredicate);
                         }
                     }
                 }
@@ -421,21 +408,10 @@ public abstract class TermBuilder {
         }
 
 
-
-        //already tested equality, so go to invalidStatement2:
         if (Statement.validStatement(subject, predicate)) {
             if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
                 dt = -dt;
             return finish(op, dt, subject, predicate);
-
-//            if (xx != null) {
-//                Compound x = (Compound) (xx.term());
-//                if (dt != DTERNAL) {
-//                    boolean reversed = (x.term(0) == predicate);
-//                    x = x.dt(reversed ? -dt : dt);
-//                }
-//                return x;
-//            }
         }
 
         return null;

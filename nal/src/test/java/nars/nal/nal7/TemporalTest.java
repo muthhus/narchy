@@ -11,6 +11,7 @@ import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.io.NarseseTest;
 import nars.link.BLink;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
@@ -30,9 +31,8 @@ import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.nal.Tense.DTERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static nars.term.Terms.equalsAnonymous;
+import static org.junit.Assert.*;
 
 
 public class TemporalTest {
@@ -293,13 +293,32 @@ public class TemporalTest {
         assertEquals(10, d.core.concepts.size());
     }
 
-    @Test public void testConceptualization3() {
+    @Test public void testConceptualizationIntermpolationEternal() {
 
         Default d = new Default();
         d.believe("((\\,(a ==>+2 b),_)-->[pill])");
         d.believe("((\\,(a ==>+6 b),_)-->[pill])"); //same concept
         d.run(1);
-        @NotNull Bag<Concept> cb = d.core.concepts;
+
+        Bag<Concept> cb = d.core.concepts;
+        cb.print();
+        assertEquals(7, cb.size());
+        Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
+        assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
+        cc.print();
+        //INTERMPOLATION APPLIED DURING REVISION:
+        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().topEternal().term().toString());
+    }
+
+    @Test public void testConceptualizationIntermpolationTemporal() {
+
+        Default d = new Default();
+        d.believe("((\\,(a ==>+2 b),_)-->[pill])", Tense.Present, 1f, 0.9f);
+        d.run(4);
+        d.believe("((\\,(a ==>+6 b),_)-->[pill])", Tense.Present, 1f, 0.9f);
+        d.run(1);
+
+        Bag<Concept> cb = d.core.concepts;
         cb.print();
         assertEquals(7, cb.size());
         Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
@@ -399,6 +418,60 @@ public class TemporalTest {
         } catch (InvalidTerm e) {
             assertTrue(true);
         }
+    }
+    @Test public void testEqualsAnonymous() {
+        assertTrue(equalsAnonymous(
+                $("(x && y)"), $("(x &&+1 y)")
+        ));
+        assertTrue(equalsAnonymous(
+                $("(x && y)"), $("(y &&+1 x)")
+        ));
+        assertFalse(equalsAnonymous(
+                $("(x && y)"), $("(z &&+1 x)")
+        ));
+
+        assertTrue(equalsAnonymous(
+                $("(x ==> y)"), $("(x ==>+1 y)")
+        ));
+        assertFalse(equalsAnonymous(
+                $("(x ==> y)"), $("(y ==>+1 x)")
+        ));
+    }
+    @Test public void testEqualsAnonymous3() {
+        assertTrue(equalsAnonymous(
+                $("(x && (y ==> z))"), $("(x &&+1 (y ==> z))")
+        ));
+        assertTrue(equalsAnonymous(
+                $("(x && (y ==> z))"), $("(x &&+1 (y ==>+1 z))")
+        ));
+        assertFalse(equalsAnonymous(
+                $("(x && (y ==> z))"), $("(x &&+1 (z ==>+1 w))")
+        ));
+    }
+    @Test public void testEqualsAnonymous4() {
+        //temporal terms within non-temporal terms
+        assertTrue(equalsAnonymous(
+                $("(a <-> (y ==> z))"), $("(a <-> (y ==>+1 z))")
+        ));
+        assertFalse(equalsAnonymous(
+                $("(a <-> (y ==> z))"), $("(a <-> (w ==>+1 z))")
+        ));
+
+        assertTrue(equalsAnonymous(
+                $("((a ==> b),(b ==> c))"), $("((a ==> b),(b ==>+1 c))")
+        ));
+        assertTrue(equalsAnonymous(
+                $("((a ==>+1 b),(b ==> c))"), $("((a ==> b),(b ==>+1 c))")
+        ));
+    }
+    @Test public void testEqualsAnonymous5() {
+        //special handling for images
+        assertTrue(equalsAnonymous(
+                $("(/, (a ==> b), c, _)"), $("(/, (a ==>+1 b), c, _)")
+        ));
+        assertFalse(equalsAnonymous(
+                $("(/, a, b, _)"), $("(/, a, _, b)")
+        ));
     }
 
 //    @Test public void testRelationTaskNormalization() {
