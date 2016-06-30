@@ -26,11 +26,7 @@ public class CaffeineIndex extends MaplikeIndex {
     }
 
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, boolean soft) {
-        this($.terms, conceptBuilder, soft);
-    }
-
-    public CaffeineIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, boolean soft) {
-        super(termBuilder, conceptBuilder);
+        super(conceptBuilder);
 
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
         concepts = builder.build();

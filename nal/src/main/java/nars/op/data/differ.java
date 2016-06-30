@@ -10,6 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*/ {
 
+    public differ() {
+        super("differ");
+    }
+
     @Nullable
     @Override
     public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {

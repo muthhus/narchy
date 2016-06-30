@@ -27,7 +27,7 @@ public enum Indexes {
         public static class DefaultTermIndex extends MapIndex {
 
             public DefaultTermIndex(int capacity, @NotNull Random random) {
-                super($.terms,
+                super(
                         new DefaultConceptBuilder(random),
                         new HashMap<>(capacity),
                         new HashMap<>(capacity)
@@ -48,7 +48,7 @@ public enum Indexes {
     public static class WeakTermIndex extends MapIndex {
 
             public WeakTermIndex(int capacity, @NotNull Random random) {
-                super($.terms,
+                super(
                         new DefaultConceptBuilder(random),
                         //new SoftValueHashMap(capacity)
                         new WeakHashMap<>(capacity),
@@ -61,7 +61,7 @@ public enum Indexes {
     public static class SoftTermIndex extends MapIndex {
 
             public SoftTermIndex(int capacity, @NotNull Random random) {
-                super($.terms,
+                super(
                         new DefaultConceptBuilder(random),
                         new SoftValueHashMap(capacity),
                         new WeakHashMap(capacity)

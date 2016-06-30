@@ -2,11 +2,15 @@ package nars.index;
 
 import nars.$;
 import nars.Op;
+import nars.bag.Bag;
+import nars.concept.AtomConcept;
 import nars.nal.meta.PatternCompound;
+import nars.nal.op.ImmediateTermTransform;
 import nars.nal.rule.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +27,12 @@ public class PatternIndex extends RawTermIndex {
 //              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
 //    }
     public PatternIndex() {
-        super($.terms, null, 1024);
+        super(null, 1024);
+
+        PremiseRule.eachOperator(null, (c, o) -> {
+            ImmediateTransformConcept i = new ImmediateTransformConcept(o);
+            set(i, i);
+        });
     }
 
     @Override
@@ -88,4 +97,29 @@ public class PatternIndex extends RawTermIndex {
 
     }
 
+
+
+    @Override
+    protected final boolean transforms() {
+        return false;
+    }
+
+    public class ImmediateTransformConcept extends AtomConcept implements ImmediateTermTransform {
+
+        private final ImmediateTermTransform function;
+
+        public ImmediateTransformConcept(ImmediateTermTransform o) {
+            super($.operator(o.getClass().getSimpleName()), Bag.EMPTY, Bag.EMPTY);
+            this.function = o;
+        }
+
+        @Override
+        public Term function(Compound args, TermIndex index) {
+//            if (args.varPattern() > 0) {
+//                //return the operation which would have been constructed for the pattern
+//                return index.b(Op.INH, args, this);
+//            }
+            return function.function(args, index);
+        }
+    }
 }

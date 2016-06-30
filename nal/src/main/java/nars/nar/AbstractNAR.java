@@ -10,7 +10,6 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.op.data.*;
-import nars.op.math.add;
 import nars.op.math.length;
 import nars.op.mental.doubt;
 import nars.op.mental.schizo;
@@ -92,13 +91,13 @@ public abstract class AbstractNAR extends NAR {
 
     /* NAL8 plugins */
     public void initNAL8() {
-        /* derivation operators available at runtime */
-        try {
-            PremiseRule.eachOperator(this, (c, o) -> onExec(o));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+//        /* derivation operators available at runtime */
+//        try {
+//            PremiseRule.eachOperator(this, (c, o) -> onExec(o));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.exit(1);
+//        }
 
 
         //new shell(this);
@@ -239,7 +238,7 @@ public abstract class AbstractNAR extends NAR {
 
             // math operations
             new length(),
-            new add(),
+            //new add(),
 
             new intToBitSet(),
 

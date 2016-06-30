@@ -15,8 +15,8 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
 
     protected final Map<Termed,Termed> concepts;
 
-    public SimpleMapIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
-        super(termBuilder, conceptBuilder);
+    public SimpleMapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds) {
+        super(conceptBuilder);
         this.concepts = compounds;
     }
 

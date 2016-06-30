@@ -154,7 +154,7 @@ public interface TermIndex {
 
     @Nullable
     default Term build(@NotNull Compound csrc, Term[] newSubs) {
-        return builder().build(csrc, newSubs);
+        return builder().build(csrc.op(), csrc.dt(), newSubs);
     }
 
 
@@ -174,15 +174,12 @@ public interface TermIndex {
 
         if (src instanceof Variable) {
 
-
-
             if (src.op() == VAR_PATTERN)
                 return null; //unassigned pattern variable
             else
                 return src; //unassigned but literal non-pattern var
 
         } else if (src instanceof Atomic) {
-            //constant atom or zero-length compound, ex: ()
             return src;
         }
 
@@ -233,20 +230,19 @@ public interface TermIndex {
             }
         }
 
-        @Nullable Term z = changed ? build(crc, sub) : crc;
-        return z!=null ? immediates(f, z) : null;
+        return changed ? build(crc, sub.toArray(new Term[sub.size()])) : crc;
     }
 
-    default Term immediates(@NotNull Subst f, Term result) {
-        Atomic op = Operator.operator(result);
-        if (op!=null) {
-            ImmediateTermTransform tf = f.getTransform(op);
-            if (tf != null) {
-                result = transform(f, (Compound) result, tf);
-            }
-        }
-        return result;
-    }
+//    default Term immediates(@NotNull Subst f, Term result) {
+//        Atomic op = Operator.operator(result);
+//        if (op!=null) {
+//            ImmediateTermTransform tf = f.getTransform(op);
+//            if (tf != null) {
+//                result = transform(f, (Compound) result, tf);
+//            }
+//        }
+//        return result;
+//    }
 
 
     @Nullable

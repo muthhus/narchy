@@ -19,7 +19,6 @@ import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.op.math.add;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -40,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -81,7 +81,6 @@ public class PremiseRule extends GenericCompound {
             substituteIfUnifies.substituteOnlyIfUnifiesDep.class,
             substituteIfUnifies.substituteIfUnifiesIndep.class,
 
-            add.class
 //            ifUnifies.class
 //        occurrsForward.class,
 //        occurrsBackward.class
@@ -239,20 +238,34 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
-    public static void eachOperator(NAR nar, BiConsumer<Class, ImmediateTermTransform> eachTransform) throws Exception {
+    public static void eachOperator(NAR nar, BiConsumer<Class, ImmediateTermTransform> eachTransform) {
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
 
             Constructor<?>[] ccc = c.getConstructors();
-            Constructor cc = ccc[0];
-            ImmediateTermTransform o;
-            if (cc.getParameterCount() == 0) {
-                //default empty constructor
-                o = (c.newInstance());
-            } else {
-                //support 'NAR' only parameter constructor
-                o = ((ImmediateTermTransform) cc.newInstance(nar));
+            try {
+                int n = 0;
+                ImmediateTermTransform o = null;
+                do {
+                    Constructor cc = ccc[n++];
+
+                    if (Modifier.isPublic(cc.getModifiers())) {
+                        int params = cc.getParameterCount();
+                        if (params == 0) {
+                            //default empty constructor
+                            o = (c.newInstance());
+                        } else if (params == 1) {
+                            //HACK support 'NAR' only parameter constructor
+                            o = ((ImmediateTermTransform) cc.newInstance(nar));
+                        }
+                    }
+                } while (o == null && n < ccc.length);
+
+                eachTransform.accept(c, o);
+
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid ImmediateTermTransform: " + c);
             }
-            eachTransform.accept(c, o);
+
 
         }
     }
@@ -550,7 +563,7 @@ public class PremiseRule extends GenericCompound {
         try {
 
             //HACK
-            Term tt = terms.transform(
+            Term tt = index.transform(
                     (Compound) terms.transform(this, UppercaseAtomsToPatternVariables),
                     new PremiseRuleVariableNormalization());
 

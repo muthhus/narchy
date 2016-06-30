@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * as shown above, but is not an "Operator").
  *
  */
-public final class Operator<T extends Term> extends Atom {
+public class Operator<T extends Term> extends Atom {
 
 
     public Operator(@NotNull T the) {

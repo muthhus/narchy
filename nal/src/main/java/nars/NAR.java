@@ -4,8 +4,10 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
+import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -14,6 +16,7 @@ import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
+import nars.nal.rule.PremiseRule;
 import nars.op.in.FileInput;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -148,6 +151,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 logger.error(e.toString());
             }
         });
+
+
+
+
+        //    private void addTransform(Class c, ImmediateTermTransform i) {
+        //        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
+        //    }
 
     }
 

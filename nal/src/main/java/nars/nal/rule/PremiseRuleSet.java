@@ -1,6 +1,8 @@
 package nars.nal.rule;
 
 import nars.Global;
+import nars.bag.Bag;
+import nars.concept.AtomConcept;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
@@ -53,7 +55,9 @@ public class PremiseRuleSet  {
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
+
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
+
         this.rules = Global.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             this.rules.add(normalize ? p.normalizeRule(patterns) : p);

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 
-public final class AtomConcept extends Atom implements AbstractConcept  {
+public class AtomConcept extends Atom implements AbstractConcept  {
 
     private final Bag<Termed> termLinks;
     private final Bag<Task> taskLinks;

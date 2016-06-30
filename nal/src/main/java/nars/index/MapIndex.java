@@ -14,10 +14,12 @@ public class MapIndex extends SimpleMapIndex {
 
     private final Map<TermContainer, TermContainer> subterms;
 
-    public MapIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
-        super(termBuilder, conceptBuilder, compounds);
+    public MapIndex(Concept.ConceptBuilder conceptBuilder, Map<Termed,Termed> compounds, Map<TermContainer,TermContainer> subterms) {
+        super(conceptBuilder, compounds);
         this.subterms = subterms;
     }
+
+
 
     @Override
     public int subtermsCount() {

@@ -1,10 +1,12 @@
 package nars.term.subst;
 
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.substitute;
 import nars.term.Term;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,8 +21,8 @@ public final class OneMatchFindSubst extends FindSubst {
 
     @Nullable private Term result;
 
-    public OneMatchFindSubst(@NotNull NAR nar) {
-        super(nar.index, null, nar.random);
+    public OneMatchFindSubst() {
+        super($.terms, null, new XorShift128PlusRandom(1));
     }
 
     @Override

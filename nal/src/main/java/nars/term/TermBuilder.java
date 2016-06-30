@@ -2,9 +2,11 @@ package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import nars.$;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
+import nars.nal.op.ImmediateTermTransform;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
@@ -359,6 +361,17 @@ public abstract class TermBuilder {
         //special statement filters
         switch (op) {
 
+            case INH:
+                if (transforms() && predicate instanceof ImmediateTermTransform) {
+                    if (subject.op() == PROD) {
+                        return ((ImmediateTermTransform) predicate).function(
+                            (Compound) subject,
+                            ((TermIndex)this)//$.terms
+                        );
+                    }
+                }
+                break;
+
 
             case EQUI:
                 if (!validEquivalenceTerm(subject) || !validEquivalenceTerm(predicate))
@@ -416,6 +429,10 @@ public abstract class TermBuilder {
 
         return null;
     }
+
+    /** whether this builder applies immediate transforms */
+    protected abstract boolean transforms();
+
 
     @Nullable
     public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
@@ -542,10 +559,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public final Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
-        if (csrc.subterms().equivalent(newSubs))
-            return csrc;
-        else
-            return build(csrc.op(), csrc.dt(), newSubs);
+        return build(csrc.op(), csrc.dt(), newSubs);
     }
 
     public final Term build(@NotNull Compound csrc, TermContainer newSubs) {

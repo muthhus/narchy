@@ -10,6 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class intersect extends BinaryTermOperator {
 
+    public intersect() {
+        super("intersect");
+    }
+
     @Nullable
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
         if (!(a instanceof Compound) || !(b instanceof Compound))

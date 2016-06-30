@@ -796,6 +796,11 @@ public enum $ {
         }
 
         @Override
+        protected boolean transforms() {
+            return true;
+        }
+
+        @Override
         public
         @Nullable
         Termed get(Termed t, boolean createIfMissing) {

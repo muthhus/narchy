@@ -36,12 +36,9 @@ public class InfinispanIndex extends MaplikeIndex {
     private final AdvancedCache<ByteBuffer,Termed> conceptsLocalNoResult;
 
 
-    public InfinispanIndex(Concept.ConceptBuilder conceptBuilder) {
-        this($.terms, conceptBuilder);
-    }
 
-    public InfinispanIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
-        super(termBuilder, conceptBuilder);
+    public InfinispanIndex(Concept.ConceptBuilder conceptBuilder) {
+        super(conceptBuilder);
 
         this.codec = new IO.DefaultCodec(this);
 
@@ -106,7 +103,7 @@ public class InfinispanIndex extends MaplikeIndex {
 
     @NotNull
     private Termed buildCompound(@NotNull Compound x) {
-        return buildCompound(x.subterms(), x.op(), x.dt());
+        return buildCompound(x.op(), x.dt(), x.subterms());
     }
 
 

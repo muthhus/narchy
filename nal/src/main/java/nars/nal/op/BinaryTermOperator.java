@@ -9,12 +9,15 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 12/12/15.
  */
-public abstract class BinaryTermOperator extends ImmediateTermTransform {
+public abstract class BinaryTermOperator implements ImmediateTermTransform {
+
+    public BinaryTermOperator(@NotNull String id) {
+    }
 
     @Nullable
     @Override public final Term function(@NotNull Compound x, TermIndex i) {
-//        if (x.size()<2)
-//            throw new RuntimeException(this + " requires >= 2 args");
+        if (x.size()!=2)
+            return null;
 
         return apply(x.term(0), x.term(1), i);
     }

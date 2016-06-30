@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
@@ -17,23 +18,30 @@ import java.util.function.Consumer;
 /**
  * Index which is supported by Map/Cache-like operations
  */
-public abstract class MaplikeIndex implements TermIndex {
+public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
-    //public final SymbolMap atoms;
-    protected final TermBuilder termBuilder;
+
     protected final Concept.ConceptBuilder conceptBuilder;
 
-    public MaplikeIndex(TermBuilder termBuilder, Concept.ConceptBuilder conceptBuilder) {
-        this.termBuilder = termBuilder;
+    public MaplikeIndex(Concept.ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
 
+    @Override
+    public Term newCompound(Op op, int dt, TermContainer subterms) {
+        return new GenericCompound(op, dt, subterms);
+    }
 
     @Nullable
     protected Termed theCompound(@NotNull Compound x, boolean createIfMissing) {
         return createIfMissing ?
                 getNewCompound(x) :
                 get(x);
+    }
+
+    @Override
+    protected boolean transforms() {
+        return true;
     }
 
     @Nullable
@@ -58,7 +66,7 @@ public abstract class MaplikeIndex implements TermIndex {
     protected Termed getNewCompound(@NotNull Compound x) {
         Termed y = get(x);
         if (y == null) {
-            y = buildCompound(x.subterms(), x.op(), x.dt()  /* TODO make this sometimes false */);
+            y = buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
             Term yt = y.term();
             if (!(yt instanceof Compound && yt.hasTemporal())) {
                 set(y = buildConcept(y));
@@ -130,7 +138,7 @@ public abstract class MaplikeIndex implements TermIndex {
 
     @Override
     public final TermBuilder builder() {
-        return termBuilder;
+        return this;
     }
 
     @Nullable
@@ -147,9 +155,8 @@ public abstract class MaplikeIndex implements TermIndex {
         return conceptBuilder.apply( interned.term() );
     }
 
-    @NotNull
-    protected final Termed buildCompound(@NotNull TermContainer subs, @NotNull Op op, int dt) {
-        return termBuilder.newCompound(op, dt, theSubterms(subs));
+    protected final Termed buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
+        return newCompound(op, dt, theSubterms(subs));
     }
 
     @Override

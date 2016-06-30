@@ -495,23 +495,28 @@ public class Terms   {
 
 
     public static boolean equalsAnonymous(@NotNull Term as, @NotNull Term bs) {
-        if (as instanceof Compound && bs instanceof Compound) {
+        if (as == bs) {
+            return true;
+        } else if (as instanceof Compound && bs instanceof Compound) {
             return equalsAnonymous((Compound) as, (Compound) bs);
         } else {
             return as.equals(bs);
         }
     }
 
+    /** compare everything except dt() when not in image case */
     private static boolean equalsAnonymous(@NotNull Compound a, @NotNull Compound b) {
         int as = a.structure();
         if (Op.hasAny(as, Op.TemporalBits)) {
 
-            Op ao = a.op();
-            if (ao == b.op()) {
-                if (ao.isImage() && a.dt()!=b.dt()) //must match dt for image
-                    return false;
+            if (as == b.structure()) {
+                Op ao = a.op();
+                if (ao == b.op()) {
+                    if (ao.isImage() && a.dt() != b.dt()) //must match dt for image
+                        return false;
 
-                return equalsAnonymous(a.subterms(), b.subterms());
+                    return equalsAnonymous(a.subterms(), b.subterms());
+                }
             }
 
             return false;
@@ -524,7 +529,7 @@ public class Terms   {
     }
 
     private static boolean equalsAnonymous(@NotNull TermContainer a, @NotNull TermContainer b) {
-        if (a.volume() == b.volume() && a.structure() == b.structure()) {
+        if (a.volume() == b.volume()) {
             int n = a.size();
             if (n == b.size()) {
                 for (int i = 0; i < n; i++) {

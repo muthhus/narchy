@@ -5,6 +5,7 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.subst.FindSubst;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -12,34 +13,46 @@ import org.jetbrains.annotations.Nullable;
 
 
 /** TODO is this better named "substituteAny" */
-public class substitute extends ImmediateTermTransform implements PremiseAware {
+public class substitute implements ImmediateTermTransform /*implements PremiseAware*/ {
 
+    protected substitute(String id) {
+
+    }
+
+    public substitute() {
+        this("substitute");
+    }
 
     @NotNull
     @Override
     public Term function(Compound x, TermIndex i) {
-        throw new RuntimeException("n/a");
+        return null;
+        //throw new RuntimeException("n/a");
     }
 
-    @Nullable
-    @Override
-    public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
-        final Term[] xx = p.terms();
+//    @Nullable
+//    @Override
+//    public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
+//        final Term[] xx = p.terms();
+//
+//        //term to possibly transform
+//        final Term term = xx[0];
+//
+//        //original term (x)
+//        final Term x = xx[1];
+//
+//        //replacement term (y)
+//        final Term y = xx[2];
+//
+//        Term x1 = resolve(r, x);
+//        Term y1 = resolve(r, y);
+//
+//        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
+//    }
 
-        //term to possibly transform
-        final Term term = xx[0];
 
-        //original term (x)
-        final Term x = xx[1];
 
-        //replacement term (y)
-        final Term y = xx[2];
 
-        Term x1 = resolve(r, x);
-        Term y1 = resolve(r, y);
-
-        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
-    }
 //
 //    @Nullable
 //    public static Term resolve(@NotNull PremiseMatch r, Term x) {
@@ -63,7 +76,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     public
     @Nullable
-    static Term resolve(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
+    static Term resolve(@NotNull FindSubst r, @NotNull Subst m, @NotNull Term term) {
         return r.resolve(term, m);
     }
 

@@ -8,7 +8,11 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class union extends BinaryTermOperator {
-    
+
+    public union() {
+        super("union");
+    }
+
     @NotNull
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
         if (!(a instanceof Compound) || !(b instanceof Compound))

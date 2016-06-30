@@ -51,7 +51,7 @@ public class PremiseEval extends FindSubst {
     @NotNull
     @Deprecated public ProcTerm forEachMatch;
 
-    public final Map<Atomic, ImmediateTermTransform> transforms;
+
 
     /** run parameters */
     int termutes;
@@ -81,14 +81,6 @@ public class PremiseEval extends FindSubst {
     public PremiseEval(NAR nar, TermIndex index, Random r, Deriver deriver) {
         super(index, VAR_PATTERN, r );
 
-        transforms = new HashMap<>(PremiseRule.Operators.length);
-        try {
-            PremiseRule.eachOperator(nar, this::addTransform);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
 
         this.deriver = deriver;
         //occDelta = new Versioned(this);
@@ -97,13 +89,7 @@ public class PremiseEval extends FindSubst {
         punct = new Versioned(versioning);
     }
 
-    private void addTransform(Class c, ImmediateTermTransform i) {
-        transforms.put((Atomic) index.the($.operator(c.getSimpleName())).term(), i);
-    }
 
-    @Override public final ImmediateTermTransform getTransform(Atomic t) {
-        return transforms.get(t);
-    }
 
     /** only one thread should be in here at a time */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {

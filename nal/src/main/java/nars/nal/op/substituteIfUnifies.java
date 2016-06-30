@@ -2,34 +2,43 @@ package nars.nal.op;
 
 import nars.NAR;
 import nars.Op;
-import nars.nal.meta.PremiseEval;
+import nars.index.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** substituteIfUnifies(term, variableType, varFrom, varTo)
+/**
+ * substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
- * */
+ */
 abstract public class substituteIfUnifies extends substitute {
 
-    /** recycled
-     *  TODO initialize in construtor
-     * */
-    private final OneMatchFindSubst matcher;
+    private final ThreadLocal<OneMatchFindSubst> matcher;
 
-    public substituteIfUnifies(NAR nar) {
-        this.matcher = new OneMatchFindSubst(nar);
+    public substituteIfUnifies(String id) {
+        super(id);
+        this.matcher = ThreadLocal.withInitial(()->{
+            return new OneMatchFindSubst();
+        });
+        //this.matcher = new OneMatchFindSubst(nar);
     }
+
 
     abstract public Op op();
 
-    /** whether an actual substitution is required to happen; when true and no substitution occurrs, then fails */
-    protected boolean mustSubstitute() { return false; }
+    /**
+     * whether an actual substitution is required to happen; when true and no substitution occurrs, then fails
+     */
+    protected boolean mustSubstitute() {
+        return false;
+    }
 
     @Nullable
-    @Override public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
+    @Override
+    //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
+    public Term function(@NotNull Compound p, @NotNull TermIndex r) {
         final Term[] xx = p.terms();
 //        if (xx.length < 3) {
 //            throw new UnsupportedOperationException();
@@ -42,15 +51,18 @@ abstract public class substituteIfUnifies extends substitute {
         final Term x = xx[1];
         final Term y = xx[2];
 
-        if (!x.equals(y)) {
-            if (term.hasAny(op)) {
-                OneMatchFindSubst m = this.matcher;
-                term = m.tryMatch(op, r, term, x, y);
-                m.clear();
-            } else {
-                if (mustSubstitute())
-                    term = null;
-            }
+        boolean hasAnyOp = term.hasAny(op);
+
+        if (!hasAnyOp && mustSubstitute()) {
+            return null;
+        }
+
+        if (!x.equals(y) && hasAnyOp) {
+
+            OneMatchFindSubst m = this.matcher.get();
+            term = m.tryMatch(op, null, term, x, y);
+            m.clear();
+
         }
         return term;
     }
@@ -60,10 +72,11 @@ abstract public class substituteIfUnifies extends substitute {
 
 
         public substituteIfUnifiesDep(NAR nar) {
-            super(nar);
+            super("substituteIfUnifiesDep");
         }
 
-        @Override public Op op() {
+        @Override
+        public Op op() {
             return Op.VAR_DEP;
         }
     }
@@ -72,23 +85,30 @@ abstract public class substituteIfUnifies extends substitute {
 
 
         public substituteOnlyIfUnifiesDep(NAR nar) {
-            super(nar);
+
+            super("substituteOnlyIfUnifiesDep");
         }
 
-        @Override protected boolean mustSubstitute() { return true; }
+        @Override
+        protected boolean mustSubstitute() {
+            return true;
+        }
 
-        @Override public Op op() {
+        @Override
+        public Op op() {
             return Op.VAR_DEP;
         }
     }
+
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
 
         public substituteIfUnifiesIndep(NAR nar) {
-            super(nar);
+            super("substituteIfUnifiesIndep");
         }
 
-        @Override public Op op() {
+        @Override
+        public Op op() {
             return Op.VAR_INDEP;
         }
     }
