@@ -1,11 +1,9 @@
 package nars.term;
 
-import alice.tuprolog.InvalidTermException;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Op;
 import nars.index.TermIndex;
-import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.Ellipsislike;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
@@ -95,7 +93,7 @@ public abstract class TermBuilder {
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAnyOf(TermIndex.InvalidEquivalenceTerm);
+        return !t.isAny(TermIndex.InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -381,8 +379,8 @@ public abstract class TermBuilder {
                 break;
 
             case IMPL:
-                if (subject.isAnyOf(TermIndex.InvalidEquivalenceTerm) ||
-                    predicate.isAnyOf(TermIndex.InvalidImplicationPredicate))
+                if (subject.isAny(TermIndex.InvalidEquivalenceTerm) ||
+                    predicate.isAny(TermIndex.InvalidImplicationPredicate))
                     return null;
 
                 if (predicate.op() == IMPL) {

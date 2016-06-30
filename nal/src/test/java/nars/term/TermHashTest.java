@@ -22,7 +22,7 @@ public class TermHashTest {
                 .hasAny(or(Op.ATOM, Op.PROD)));
 
         assertFalse(inh(p("a"), $("b"))
-                .isAnyOf(or(SIM, Op.PROD)));
+                .isAny(or(SIM, Op.PROD)));
         assertFalse(inh(p("a"), $("b"))
                 .op() == Op.PROD);
 

@@ -3,11 +3,14 @@ package nars.nal.nal7;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
 import nars.budget.UnitBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.io.NarseseTest;
+import nars.link.BLink;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
@@ -279,6 +282,31 @@ public class TemporalTest {
 
         d.index.print(out);
         d.concept("(x==>y)").print();
+    }
+
+    @Test public void testConceptualization2() {
+        //test that an image is not considered temporal:
+        Default d = new Default();
+        d.believe("((\\,((#1-->[happy])&&(#1-->[sad])),((0-->v),(0-->h)),_)-->[pill])");
+        d.run(1);
+        //d.core.concepts.print();
+        assertEquals(10, d.core.concepts.size());
+    }
+
+    @Test public void testConceptualization3() {
+
+        Default d = new Default();
+        d.believe("((\\,(a ==>+2 b),_)-->[pill])");
+        d.believe("((\\,(a ==>+6 b),_)-->[pill])"); //same concept
+        d.run(1);
+        @NotNull Bag<Concept> cb = d.core.concepts;
+        cb.print();
+        assertEquals(7, cb.size());
+        Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
+        assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
+        cc.print();
+        //INTERMPOLATION APPLIED DURING REVISION:
+        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().topEternal().term().toString());
     }
 
     @Test public void testSubtermTimeRecursive() {

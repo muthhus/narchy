@@ -93,7 +93,7 @@ public interface Term extends Termed, Termlike {
     /**
      * true if the operator bit is included in the enabld bits of the provided vector
      */
-    default boolean isAnyOf(int bitsetOfOperators) {
+    default boolean isAny(int bitsetOfOperators) {
         int s = op().bit;
         return (s & bitsetOfOperators) == s;
     }
