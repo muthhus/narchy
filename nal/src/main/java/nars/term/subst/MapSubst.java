@@ -22,9 +22,9 @@ public class MapSubst implements Subst {
 //    }
 
 
-//    public MapSubst(@NotNull Term x, @NotNull Term y) {
-//        this(Map.of(x,y)); //JDK9 only
-//    }
+    public MapSubst(@NotNull Term x, @NotNull Term y) {
+        this(Map.of(x,y)); //JDK9 only
+    }
 
     public MapSubst(Map<Term, Term> xy) {
         this.xy = xy;

@@ -11,6 +11,8 @@ import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+
 
 /** TODO is this better named "substituteAny" */
 public class substitute implements ImmediateTermTransform /*implements PremiseAware*/ {
@@ -25,30 +27,29 @@ public class substitute implements ImmediateTermTransform /*implements PremiseAw
 
     @NotNull
     @Override
-    public Term function(Compound x, TermIndex i) {
-        return null;
-        //throw new RuntimeException("n/a");
-    }
+    public Term function(Compound p, TermIndex i) {
 
 //    @Nullable
 //    @Override
 //    public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
-//        final Term[] xx = p.terms();
-//
-//        //term to possibly transform
-//        final Term term = xx[0];
-//
-//        //original term (x)
-//        final Term x = xx[1];
-//
-//        //replacement term (y)
-//        final Term y = xx[2];
-//
-//        Term x1 = resolve(r, x);
-//        Term y1 = resolve(r, y);
-//
-//        return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
-//    }
+        final Term[] xx = p.terms();
+
+        //term to possibly transform
+        final Term term = xx[0];
+
+        //original term (x)
+        final Term x = xx[1];
+
+        //replacement term (y)
+        final Term y = xx[2];
+
+        Term x1 = x; //resolve(r, x);
+        Term y1 = y; //resolve(r, y);
+
+
+        return i.resolve(term, new MapSubst(x1, y1));
+        //return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
+    }
 
 
 

@@ -40,6 +40,8 @@ public final class OneMatchFindSubst extends FindSubst {
             target.replaceAllXY(this);
             if (xterm != null)
                 result = substitute.resolve(target, target, xterm);
+        } else {
+            result = substitute.resolve(this, this, xterm);
         }
         return false;
     }
