@@ -53,11 +53,11 @@ public class TruthPolation {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float eternalization = topEternal!=null ? 1f/tasks.size() : 0; //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
+        float eternalization = topEternal!=null ? 1f/(1+tasks.size()) : 0f; //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
 
         return truth(when, tasks, topEternal,
                 1f-eternalization,
-                eternalization != 0 ? Global.TRUTH_EPSILON : 0);
+                topEternal!= null ? Global.TRUTH_EPSILON : 0);
     }
 
 
@@ -85,8 +85,12 @@ public class TruthPolation {
             //offset the specified occurence time to a small window around the pure occurrence time,
             //so that tasks with equivalent truths but different evidence (and thus different hash) will
             //have a slightly different position on the time axis
+
+            //-when added is shifting relative to the target time, so the queried interpolation time will equal zero below
+            //this helps the floating point precision in calculations with numbers close together
+
             float window = 0.01f;
-            times[i][0] = t.occurrence() + (window * (-1f + 2f * (i)/(((float)s-1))  ));  /* keeps occurrence times unique */
+            times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)s-1))  ));  /* keeps occurrence times unique */
 
             freq[i] = t.freq();
             conf[i] = t.confWeight()/sum;
@@ -108,7 +112,7 @@ public class TruthPolation {
 
         float exp = 2f;
         float[] v = this.s.value(new float[]{
-                when
+                0
         }, times, freq, conf, exp,
                 //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
                 maxDarkFraction, darkThresold,

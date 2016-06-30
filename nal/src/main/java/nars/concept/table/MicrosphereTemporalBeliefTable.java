@@ -229,7 +229,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     public Task merge(@NotNull Task a, @NotNull Task b, long now) {
         float ac = a.confWeight();
         float bc = b.confWeight();
-        int mid = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
+        long mid = (long)((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
         Truth truth = truth(mid);
         if (truth == null)
             return null;
@@ -278,11 +278,6 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
     public Truth truth(long when) {
         if (isEmpty())
             return null;
-
-        int c = capacity();
-
-
-        //removeDeleted();
 
         return truthpolations.get().truth(when, list, eternal.top());
     }

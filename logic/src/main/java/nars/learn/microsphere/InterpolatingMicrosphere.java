@@ -236,7 +236,7 @@ public class InterpolatingMicrosphere {
         illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, true, darkThreshold);
         illuminate(targetPoint, samplePoints, sampleValues, sampleWeights, exponent, numSamples, false, darkThreshold);
 
-        return interpolate(maxDarkFraction, darkThreshold);
+        return interpolate(maxDarkFraction);
 
     }
 
@@ -409,10 +409,10 @@ public class InterpolatingMicrosphere {
      * microsphere.
      */
     @NotNull
-    private float[] interpolate(float maxDarkFraction, float maxDarkThreshold) {
-        // Number of non-illuminated facets.
-        int mm = microsphereData.size();
-        int size = mm;
+    private float[] interpolate(float maxDarkFraction) {
+
+        int size = this.size;
+
         int darkCount = 0;
 
         float value = 0;
@@ -420,7 +420,7 @@ public class InterpolatingMicrosphere {
         //float totalConfDen = 0, totalConfNum = 0;
         //float maxConf = 0;
         float confSum = 0;
-        for (int i = 0, microsphereDataSize = mm; i < microsphereDataSize; i++) {
+        for (int i = 0; i < size; i++) {
             float[] fd = microsphereData.get(i);
 
             float ill = fd[0]; /* illumination */
@@ -445,13 +445,11 @@ public class InterpolatingMicrosphere {
         final float darkFraction = darkCount / (float) size;
 
 
-        float mdf = maxDarkFraction;
-
-        if ((size == darkCount && mdf >= 1.0f)/* || (mdf < 1.0 && !float.isFinite(background)))*/) {
+        if ((size == darkCount && maxDarkFraction >= 1.0f)/* || (mdf < 1.0 && !float.isFinite(background)))*/) {
             throw new RuntimeException("no illumination accepted or background value not used or invalid");
         }
 
-        float v = darkFraction <= mdf ?
+        float v = darkFraction <= maxDarkFraction ?
             value / totalWeight :
             background;
 

@@ -470,6 +470,9 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     /** TODO for external use in MutableTask instances only */
     public final void setOccurrence(long o) {
+        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Global.DEBUG) {
+            System.err.println("Likely an invalid occurrence time being set");
+        }
         if (o != occurrence) {
             this.occurrence = o;
             invalidate();
@@ -496,7 +499,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final boolean equals(@NotNull Object that) {
 
         return this == that ||
-                (hashCode() == that.hashCode() && equivalentTo((Task) that, true, true, true, true, false));
+                (that!=null && hashCode() == that.hashCode() && equivalentTo((Task) that, true, true, true, true, false));
 
     }
 

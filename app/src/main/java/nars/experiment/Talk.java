@@ -276,7 +276,7 @@ public class Talk {
         //System.err.println("HEAR: " + x + " (" + context + ")");
         return nar.believe(pri * nar.priorityDefault('.'),
                     $.exec(hear, x, context ),
-                    Math.round(tt),
+                    (long)(tt),
                     1f, 0.5f + 0.5f * nar.confidenceDefault('.')*pri);
     }
 

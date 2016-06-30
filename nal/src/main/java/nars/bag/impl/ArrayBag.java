@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -43,6 +44,18 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         setCapacity(cap);
 
         this.mergeFunction = mergeFunction;
+    }
+
+    public void setCapacity(int newCapacity) {
+        if (newCapacity < this.capacity()) {
+//            //clear pending on shrink
+//            if (pending!=null) {
+//                synchronized (map) {
+//                    pending = null;
+//                }
+//            }
+        }
+        super.setCapacity(newCapacity);
     }
 
     @Override
@@ -259,7 +272,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     protected Map<V, RawBudget> newPendingMap() {
         int s = 1+capacity()/2;
-        return new HashMap<>();
+        //return new HashMap<>();
+        return new WeakHashMap<>(s);
         //return new LinkedHashMap<>(s);
     }
 
