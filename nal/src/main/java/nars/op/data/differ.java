@@ -1,5 +1,6 @@
 package nars.op.data;
 
+import nars.$;
 import nars.index.TermIndex;
 import nars.nal.op.BinaryTermOperator;
 import nars.term.Compound;
@@ -10,17 +11,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*/ {
 
-    public differ() {
-        super("differ");
-    }
 
     @Nullable
     @Override
-    public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+    public Term apply(@NotNull Term a, Term b) {
         if (!(a instanceof Compound) || !(b instanceof Compound))
             return null;
 
-        return TermContainer.difference(i.builder(),
+        return TermContainer.difference($.terms.builder(),
                 (Compound) a, (Compound) b
         );
     }

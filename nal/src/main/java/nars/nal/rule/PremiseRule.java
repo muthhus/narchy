@@ -72,14 +72,14 @@ public class PremiseRule extends GenericCompound {
                 '}';
     }
 
-    public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[]{
+    public static final Class<? extends TermTransform>[] Operators = new Class[]{
             intersect.class,
             differ.class,
             union.class,
             substitute.class,
-            substituteIfUnifies.substituteIfUnifiesDep.class,
-            substituteIfUnifies.substituteOnlyIfUnifiesDep.class,
-            substituteIfUnifies.substituteIfUnifiesIndep.class,
+//            substituteIfUnifies.substituteIfUnifiesDep.class,
+//            substituteIfUnifies.substituteOnlyIfUnifiesDep.class,
+//            substituteIfUnifies.substituteIfUnifiesIndep.class,
 
 //            ifUnifies.class
 //        occurrsForward.class,
@@ -238,13 +238,13 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
-    public static void eachOperator(NAR nar, BiConsumer<Class, ImmediateTermTransform> eachTransform) {
-        for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
+    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
+        for (Class<? extends TermTransform> c : PremiseRule.Operators) {
 
             Constructor<?>[] ccc = c.getConstructors();
             try {
                 int n = 0;
-                ImmediateTermTransform o = null;
+                TermTransform o = null;
                 do {
                     Constructor cc = ccc[n++];
 
@@ -255,7 +255,7 @@ public class PremiseRule extends GenericCompound {
                             o = (c.newInstance());
                         } else if (params == 1) {
                             //HACK support 'NAR' only parameter constructor
-                            o = ((ImmediateTermTransform) cc.newInstance(nar));
+                            o = ((TermTransform) cc.newInstance(nar));
                         }
                     }
                 } while (o == null && n < ccc.length);

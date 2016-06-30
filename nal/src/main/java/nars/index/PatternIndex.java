@@ -5,7 +5,7 @@ import nars.Op;
 import nars.bag.Bag;
 import nars.concept.AtomConcept;
 import nars.nal.meta.PatternCompound;
-import nars.nal.op.ImmediateTermTransform;
+import nars.nal.op.TermTransform;
 import nars.nal.rule.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
@@ -30,7 +30,7 @@ public class PatternIndex extends RawTermIndex {
         super(null, 1024);
 
         PremiseRule.eachOperator(null, (c, o) -> {
-            ImmediateTransformConcept i = new ImmediateTransformConcept(o);
+            TransformConcept i = new TransformConcept(o);
             set(i, i);
         });
     }
@@ -104,22 +104,22 @@ public class PatternIndex extends RawTermIndex {
         return false;
     }
 
-    public class ImmediateTransformConcept extends AtomConcept implements ImmediateTermTransform {
+    public class TransformConcept extends AtomConcept implements TermTransform {
 
-        private final ImmediateTermTransform function;
+        private final TermTransform function;
 
-        public ImmediateTransformConcept(ImmediateTermTransform o) {
+        public TransformConcept(TermTransform o) {
             super($.operator(o.getClass().getSimpleName()), Bag.EMPTY, Bag.EMPTY);
             this.function = o;
         }
 
         @Override
-        public Term function(Compound args, TermIndex index) {
+        public Term function(Compound args) {
 //            if (args.varPattern() > 0) {
 //                //return the operation which would have been constructed for the pattern
 //                return index.b(Op.INH, args, this);
 //            }
-            return function.function(args, index);
+            return function.function(args);
         }
     }
 }

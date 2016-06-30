@@ -9,7 +9,7 @@ import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.op.ImmediateTermTransform;
+import nars.nal.op.TermTransform;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
@@ -164,6 +164,8 @@ public interface TermIndex {
     @Nullable
     default Term resolve(@NotNull Term src, @NotNull Subst f) {
 
+
+
         Term y = f.term(src);
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
@@ -246,14 +248,14 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term transform(Subst f, @NotNull Compound result, ImmediateTermTransform tf) {
+    default Term transform(Subst f, @NotNull Compound result, TermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
         Compound args = Operator.opArgs(result);
 
         return ((tf instanceof PremiseAware) && (f instanceof PremiseEval)) ?
                 ((PremiseAware) tf).function(args, (PremiseEval) f) :
-                tf.function(args, this);
+                tf.function(args);
     }
 
 

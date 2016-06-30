@@ -1,5 +1,6 @@
 package nars.op.data;
 
+import nars.$;
 import nars.index.TermIndex;
 import nars.nal.op.BinaryTermOperator;
 import nars.term.Compound;
@@ -10,16 +11,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class intersect extends BinaryTermOperator {
 
-    public intersect() {
-        super("intersect");
-    }
-
     @Nullable
-    @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
+    @Override public Term apply(@NotNull Term a, Term b) {
         if (!(a instanceof Compound) || !(b instanceof Compound))
             return null;
 
-        return i.builder().intersect(a.op(), (Compound)a, (Compound) b);
+        return $.terms.builder().intersect(a.op(), (Compound)a, (Compound) b);
     }
 
 }

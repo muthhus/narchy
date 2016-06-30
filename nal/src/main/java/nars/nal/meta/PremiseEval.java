@@ -10,21 +10,18 @@ import nars.index.TermIndex;
 import nars.nal.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.op.ImmediateTermTransform;
-import nars.nal.rule.PremiseRule;
+import nars.nal.op.substituteIfUnifies;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
+import nars.term.subst.OneMatchFindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
@@ -36,6 +33,7 @@ import static nars.Op.VAR_PATTERN;
 public class PremiseEval extends FindSubst {
 
     private final Deriver deriver;
+    private final int start;
 
 
     /** the current premise being evaluated in this context TODO make private again */
@@ -75,10 +73,10 @@ public class PremiseEval extends FindSubst {
 
     /** initializes with the default static term index/builder */
     public PremiseEval(NAR nar, Random r, Deriver deriver) {
-        this(nar, $.terms, r, deriver);
+        this($.terms, r, deriver);
     }
 
-    public PremiseEval(NAR nar, TermIndex index, Random r, Deriver deriver) {
+    public PremiseEval(TermIndex index, Random r, Deriver deriver) {
         super(index, VAR_PATTERN, r );
 
 
@@ -87,8 +85,19 @@ public class PremiseEval extends FindSubst {
         //tDelta = new Versioned(this);
         truth = new Versioned(versioning);
         punct = new Versioned(versioning);
+
+        OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, r);
+        put(new substituteIfUnifies.substituteIfUnifiesDep(this, subMatcher));
+        put(new substituteIfUnifies.substituteOnlyIfUnifiesDep(this, subMatcher));
+        put(new substituteIfUnifies.substituteIfUnifiesIndep(this, subMatcher));
+
+        this.start = now();
+
     }
 
+    protected void put(Term t) {
+        putXY(t,t);
+    }
 
 
     /** only one thread should be in here at a time */
@@ -213,7 +222,7 @@ public class PremiseEval extends FindSubst {
 
         deriver.run(this);
 
-        clear();
+        revert(start);
 
         return true;
     }

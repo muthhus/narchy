@@ -2,11 +2,10 @@ package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.$;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
-import nars.nal.op.ImmediateTermTransform;
+import nars.nal.op.TermTransform;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
@@ -362,11 +361,11 @@ public abstract class TermBuilder {
         switch (op) {
 
             case INH:
-                if (transforms() && predicate instanceof ImmediateTermTransform) {
+                if (transforms() && predicate instanceof TermTransform) {
                     if (subject.op() == PROD) {
-                        return ((ImmediateTermTransform) predicate).function(
-                            (Compound) subject,
-                            ((TermIndex)this)//$.terms
+                        return ((TermTransform) predicate).function(
+                            (Compound) subject
+                                //$.terms
                         );
                     }
                 }

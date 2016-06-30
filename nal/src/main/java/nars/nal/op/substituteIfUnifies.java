@@ -1,10 +1,11 @@
 package nars.nal.op;
 
-import nars.NAR;
 import nars.Op;
-import nars.index.TermIndex;
+import nars.concept.OperationConcept;
+import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.AtomicStringConstant;
 import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,20 +14,17 @@ import org.jetbrains.annotations.Nullable;
  * substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
  */
-abstract public class substituteIfUnifies extends substitute {
+abstract public class substituteIfUnifies extends TermTransformOperator  {
 
-    private final ThreadLocal<OneMatchFindSubst> matcher;
+    private final OneMatchFindSubst subMatcher;
+    private final PremiseEval parent; //parent matcher context
 
-    public substituteIfUnifies(String id) {
-        super(id);
-        this.matcher = ThreadLocal.withInitial(()->{
-            return new OneMatchFindSubst();
-        });
-        //this.matcher = new OneMatchFindSubst(nar);
+    public substituteIfUnifies(PremiseEval parent, OneMatchFindSubst sub) {
+        super();
+        this.parent = parent;
+        this.subMatcher = sub;
     }
 
-
-    abstract public Op op();
 
     /**
      * whether an actual substitution is required to happen; when true and no substitution occurrs, then fails
@@ -35,10 +33,12 @@ abstract public class substituteIfUnifies extends substitute {
         return false;
     }
 
+    abstract protected Op unifying();
+
     @Nullable
     @Override
     //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
-    public Term function(@NotNull Compound p, @NotNull TermIndex r) {
+    public Term function(@NotNull Compound p) {
         final Term[] xx = p.terms();
 //        if (xx.length < 3) {
 //            throw new UnsupportedOperationException();
@@ -46,7 +46,7 @@ abstract public class substituteIfUnifies extends substitute {
 
         Term term = xx[0];
 
-        @Nullable Op op = op();
+        @Nullable Op op = unifying();
 
         final Term x = xx[1];
         final Term y = xx[2];
@@ -59,34 +59,31 @@ abstract public class substituteIfUnifies extends substitute {
 
         if (!x.equals(y) && hasAnyOp) {
 
-            OneMatchFindSubst m = this.matcher.get();
-            term = m.tryMatch(op, null, term, x, y);
+            OneMatchFindSubst m = this.subMatcher;
+            term = m.tryMatch(op, parent, term, x, y);
             m.clear();
 
         }
         return term;
     }
 
-
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
 
 
-        public substituteIfUnifiesDep(NAR nar) {
-            super("substituteIfUnifiesDep");
+        public substituteIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
+            super(parent, sub);
         }
 
         @Override
-        public Op op() {
+        public Op unifying() {
             return Op.VAR_DEP;
         }
     }
 
     public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 
-
-        public substituteOnlyIfUnifiesDep(NAR nar) {
-
-            super("substituteOnlyIfUnifiesDep");
+        public substituteOnlyIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
+            super(parent, sub);
         }
 
         @Override
@@ -95,34 +92,21 @@ abstract public class substituteIfUnifies extends substitute {
         }
 
         @Override
-        public Op op() {
+        public Op unifying() {
             return Op.VAR_DEP;
         }
     }
 
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
-
-        public substituteIfUnifiesIndep(NAR nar) {
-            super("substituteIfUnifiesIndep");
+        public substituteIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
+            super(parent, sub);
         }
 
         @Override
-        public Op op() {
+        public Op unifying() {
             return Op.VAR_INDEP;
         }
     }
-//    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
-//
-//
-//        public substituteOnlyIfUnifiesIndep(NAR nar) {
-//            super(nar);
-//        }
-//
-//        @Override protected boolean mustSubstitute() { return true; }
-//
-//        @Override public Op op() {
-//            return Op.VAR_INDEP;
-//        }
-//    }
+
 }

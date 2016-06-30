@@ -1,6 +1,6 @@
 package nars.term.subst;
 
-import nars.nal.op.ImmediateTermTransform;
+import nars.nal.op.TermTransform;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +37,7 @@ public interface Subst  {
 //        return b[0];
 //    }
 
-    @Nullable
-    @Deprecated default ImmediateTermTransform getTransform(@NotNull Atomic t) {
+    @Deprecated default @Nullable TermTransform getTransform(@NotNull Atomic t) {
         return null;
     }
 

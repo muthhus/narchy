@@ -111,7 +111,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
     }
 
     int matches;
-    final PremiseEval p = new PremiseEval(null, new XorShift128PlusRandom(1), Deriver.getDefaultDeriver()) {
+    final PremiseEval p = new PremiseEval($.terms, new XorShift128PlusRandom(1), Deriver.getDefaultDeriver()) {
 
         @Override
         public boolean onMatch() {

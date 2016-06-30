@@ -8,8 +8,8 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 
-public interface ImmediateTermTransform  {
+public interface TermTransform {
 
-    Term function(Compound args, TermIndex context);
+    Term function(Compound args);
 
 }

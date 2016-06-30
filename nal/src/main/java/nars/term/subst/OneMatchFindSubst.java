@@ -3,6 +3,7 @@ package nars.term.subst;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.substitute;
 import nars.term.Term;
@@ -10,6 +11,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Random;
 
 /**
  * Created by me on 5/24/16.
@@ -21,8 +24,12 @@ public final class OneMatchFindSubst extends FindSubst {
 
     @Nullable private Term result;
 
-    public OneMatchFindSubst() {
-        super($.terms, null, new XorShift128PlusRandom(1));
+    public OneMatchFindSubst(NAR nar) {
+        this(nar.index, nar.random);
+    }
+
+    public OneMatchFindSubst(TermIndex index, Random r) {
+        super(index, null, r);
     }
 
     @Override

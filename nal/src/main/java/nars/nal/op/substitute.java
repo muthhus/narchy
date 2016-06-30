@@ -1,7 +1,6 @@
 package nars.nal.op;
 
-import nars.index.TermIndex;
-import nars.nal.meta.PremiseAware;
+import nars.$;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
@@ -11,23 +10,15 @@ import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-
 
 /** TODO is this better named "substituteAny" */
-public class substitute implements ImmediateTermTransform /*implements PremiseAware*/ {
+public class substitute  implements TermTransform /*implements PremiseAware*/ {
 
-    protected substitute(String id) {
 
-    }
-
-    public substitute() {
-        this("substitute");
-    }
 
     @NotNull
     @Override
-    public Term function(Compound p, TermIndex i) {
+    public Term function(Compound p) {
 
 //    @Nullable
 //    @Override
@@ -47,7 +38,7 @@ public class substitute implements ImmediateTermTransform /*implements PremiseAw
         Term y1 = y; //resolve(r, y);
 
 
-        return i.resolve(term, new MapSubst(x1, y1));
+        return $.terms.resolve(term, new MapSubst(x1, y1));
         //return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
     }
 
@@ -80,6 +71,7 @@ public class substitute implements ImmediateTermTransform /*implements PremiseAw
     static Term resolve(@NotNull FindSubst r, @NotNull Subst m, @NotNull Term term) {
         return r.resolve(term, m);
     }
+
 
     //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {
 //        final Term type = p.term(1);
