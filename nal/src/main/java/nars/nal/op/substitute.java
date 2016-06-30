@@ -12,8 +12,13 @@ import org.jetbrains.annotations.Nullable;
 
 
 /** TODO is this better named "substituteAny" */
-public class substitute  implements TermTransform /*implements PremiseAware*/ {
+public class substitute extends TermTransformOperator /*implements PremiseAware*/ {
 
+    private final PremiseEval parent;
+
+    public substitute(PremiseEval parent) {
+        this.parent = parent;
+    }
 
 
     @NotNull
@@ -34,12 +39,11 @@ public class substitute  implements TermTransform /*implements PremiseAware*/ {
         //replacement term (y)
         final Term y = xx[2];
 
-        Term x1 = x; //resolve(r, x);
-        Term y1 = y; //resolve(r, y);
+        Term x1 = resolve(parent, x);
+        Term y1 = resolve(parent, y);
 
 
-        return $.terms.resolve(term, new MapSubst(x1, y1));
-        //return resolve(r, new MapSubst.MapSubstWithOverride(r.yx, x1, y1), term);
+        return resolve(parent, new MapSubst.MapSubstWithOverride(parent.yx, x1, y1), term);
     }
 
 

@@ -75,15 +75,7 @@ public class PremiseRule extends GenericCompound {
     public static final Class<? extends TermTransform>[] Operators = new Class[]{
             intersect.class,
             differ.class,
-            union.class,
-            substitute.class,
-//            substituteIfUnifies.substituteIfUnifiesDep.class,
-//            substituteIfUnifies.substituteOnlyIfUnifiesDep.class,
-//            substituteIfUnifies.substituteIfUnifiesIndep.class,
-
-//            ifUnifies.class
-//        occurrsForward.class,
-//        occurrsBackward.class
+            union.class
     };
 
 //    /**

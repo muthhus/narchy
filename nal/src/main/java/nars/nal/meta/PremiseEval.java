@@ -10,6 +10,7 @@ import nars.index.TermIndex;
 import nars.nal.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.task.Task;
 import nars.term.Compound;
@@ -85,6 +86,8 @@ public class PremiseEval extends FindSubst {
         //tDelta = new Versioned(this);
         truth = new Versioned(versioning);
         punct = new Versioned(versioning);
+
+        put(new substitute(this));
 
         OneMatchFindSubst subMatcher = new OneMatchFindSubst(index, r);
         put(new substituteIfUnifies.substituteIfUnifiesDep(this, subMatcher));
