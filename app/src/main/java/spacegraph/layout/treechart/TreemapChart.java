@@ -2,31 +2,37 @@ package spacegraph.layout.treechart;
 
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-import com.gs.collections.impl.factory.SortedSets;
 import com.jogamp.opengl.GL2;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.scene.Parent;
+import nars.Global;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.ConsoleSurface;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+
+import static spacegraph.layout.treechart.TreemapChart.WeightedString.w;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>
  */
-public class TreemapChart extends Surface {
+public class TreemapChart<X> extends Surface {
+
+
 
 	public static void main(String[] args) {
 		SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>();
 		s.show(800, 800);
-		TreemapChart tc = new TreemapChart(500, 400,
-				Item.get("x", 1f),
-				Item.get("y", 0.5f),
-				Item.get("z", 0.25f)
+		TreemapChart<WeightedString> tc = new TreemapChart<>(500, 400,
+				(w, v) -> {
+					v.update(w, w.weight);
+				},
+				w("z", 0.25f),
+				w("x", 1f),
+				w("y", 0.5f),
+				w("a", 0.1f),
+				w("b", 0.08f),
+				w("c", 0.07f)
 		);
 		System.out.println(tc.children);
 		s.add(new Facial(tc));
@@ -37,20 +43,26 @@ public class TreemapChart extends Surface {
 		VERTICAL, HORIZONTAL
 	}
 
-	private double height;
-	private double width;
+	protected double height;
+	protected double width;
 	private double heightLeft;
 	private double widthLeft;
 	private double left;
 	private double top;
 	private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
-	private final List<ItemVis> children = new ArrayList<>();
+	private List<ItemVis<X>> children;
+
+	public TreemapChart() {
+		this(0,0);
+	}
+
 
 	public TreemapChart(double width, double height ) {
-		update(width, height, Collections.emptyList() );
+		update(width, height, Collections.emptyList(), null );
 	}
-	public TreemapChart(double width, double height, Item... i ) {
-		update(width, height, Lists.newArrayList(i) );
+
+	public TreemapChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
+		update(width, height, Lists.newArrayList(i), apply );
 	}
 
 	@Override
@@ -60,38 +72,38 @@ public class TreemapChart extends Surface {
 
 		double totalArea = width * height;
 		for (ItemVis v : children) {
-			v.paint(gl, v.getArea() / totalArea);
+			v.paint(gl, v.area / totalArea);
 		}
 	}
 
-	public void update(double width, double height, Collection<Item> children) {
+	public void update(double width, double height, Iterable<X> children, BiConsumer<X, ItemVis<X>> update) {
+		update(width, height, 0, children, update );
+	}
+
+	public void update(double width, double height, int estimatedSize, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update) {
 		this.width = width;
 		this.height = height;
 		left = 0.0;
 		top = 0.0;
 
-		this.children.clear();
-		for (Item item : children) {
-			ItemVis treemapElement = new ItemVis(item);
-			this.children.add(treemapElement);
+		List<ItemVis<X>> newChildren = Global.newArrayList(estimatedSize);
+
+		for (X item : nextChildren) {
+			ItemVis<X> treemapElement = new ItemVis<X>();
+			update.accept(item, treemapElement);
+			newChildren.add(treemapElement);
 		}
-		layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
-		scaleArea(this.children);
-//        Collections.sort(this.children, new ChildComparator());
-//        LOG.log(Level.INFO, "Initial children: {0}", this.children);
-		heightLeft = this.height;
-		widthLeft = this.width;
-		squarify(new ArrayDeque<>(this.children), new ArrayDeque<>(), minimumSide());
-//        for (ItemVis child : children) {
-//            Node treeElementItem = elementFactory.createElement(child);
-//            if (child.getTop() > height) {
-//                throw new IllegalStateException("Top is bigger than height");
-//            }
-//            if (child.getLeft() > width) {
-//                throw new IllegalStateException("Left is bigger than width");
-//            }
-//            AnchorPane.setTopAnchor(treeElementItem, child.getTop());
-//        }
+
+		if (!newChildren.isEmpty()) {
+			layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
+			scaleArea(newChildren);
+			heightLeft = this.height;
+			widthLeft = this.width;
+
+			squarify(new ArrayDeque<>(newChildren), new ArrayDeque<>(), minimumSide());
+		}
+
+		this.children = newChildren;
 	}
 
 
@@ -124,7 +136,7 @@ public class TreemapChart extends Surface {
 		}
 		double areaSum = 0.0, maxArea = 0.0, minArea = Double.MAX_VALUE;
 		for (ItemVis item : ch) {
-			double area = item.getArea();
+			double area = item.area;
 			areaSum += area;
 			minArea = minArea < area ? minArea : area;
 			maxArea = maxArea > area ? maxArea : area;
@@ -139,7 +151,7 @@ public class TreemapChart extends Surface {
 
 		double totalArea = 0.0;
 		for (ItemVis item : row) {
-			double area = item.getArea();
+			double area = item.area;
 			totalArea += area;
 		}
 
@@ -150,7 +162,7 @@ public class TreemapChart extends Surface {
 			double topItem = 0;
 
 			for (ItemVis item : row) {
-				double area = item.getArea();
+				double area = item.area;
 				item.setTop(top + topItem);
 				item.setLeft(left);
 				item.setWidth(rowWidth);
@@ -172,7 +184,7 @@ public class TreemapChart extends Surface {
 			double rowLeft = 0;
 
 			for (ItemVis item : row) {
-				double area = item.getArea();
+				double area = item.area;
 				item.setTop(top);
 				item.setLeft(left + rowLeft);
 				item.setHeight(rowHeight);
@@ -206,17 +218,35 @@ public class TreemapChart extends Surface {
 		return Math.min(heightLeft, widthLeft);
 	}
 
-	private void scaleArea(List<ItemVis> children) {
+	private void scaleArea(List<ItemVis<X>> children) {
 		double areaGiven = width * height;
 		double areaTotalTaken = 0.0;
 		for (ItemVis child : children) {
-			double area = child.getArea();
+			double area = child.area;
 			areaTotalTaken += area;
 		}
 		double ratio = areaTotalTaken / areaGiven;
 		for (ItemVis child : children) {
-			double area = child.getArea() / ratio;
-			child.setArea(area);
+			child.setArea(child.area / ratio );
+		}
+	}
+
+	public static class WeightedString {
+		public final String label;
+		public final float weight;
+
+		public WeightedString(String label, float weight) {
+			this.label = label;
+			this.weight = weight;
+		}
+
+		@Override
+		public String toString() {
+			return label;
+		}
+
+		public static WeightedString w(String s, float w) {
+			return new WeightedString(s, w);
 		}
 	}
 

@@ -25,8 +25,6 @@ import java.util.function.Predicate;
 public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<V>> {
 
 
-
-
     /**
      * returns the bag to an empty state
      */

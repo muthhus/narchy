@@ -26,6 +26,7 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.experiment.Environment;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -74,7 +75,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		//nar.conceptActivation.setValue(0.01f);
+		nar.conceptActivation.setValue(0.1f);
 
 		nar.beliefConfidence(0.9f);
 		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
@@ -120,6 +121,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
+				BagChart.show((Default)nar);
 			}
 		};
 

@@ -544,7 +544,13 @@ public interface TermIndex {
 //        }
 //        return (Concept) c;
 
-        return (Concept)get(term, createIfMissing);
+        @Nullable Termed c = get(term, createIfMissing);
+        if (c == null)
+            return null;
+        if (!(c instanceof Concept)) {
+            throw new RuntimeException("not a concept: " + c + " (" + c.getClass() + ')');
+        }
+        return (Concept) c;
     }
 
     /**

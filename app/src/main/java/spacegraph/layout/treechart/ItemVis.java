@@ -6,64 +6,56 @@ import spacegraph.render.ShapeDrawer;
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>
  */
-class ItemVis {
+public class ItemVis<X> {
 
-    private double left;
-    private double top;
-    private double width;
-    private double height;
-    private double area;
-    private final String label;
-    private final Item item;
+    public double left;
+    public double top;
+    public double width;
+    public double height;
+    public double area;
+    public String label;
+    public X item;
+    private float r;
+    private float g;
+    private float b;
 
-    public ItemVis(Item item) {
-        area = item.weight();
-        label = item.label();
+    public ItemVis() {
+    }
+
+    public void update(X item, float weight) {
+        update(item, item.toString(), weight);
+    }
+
+    public void update(X item, String label, float weight) {
         this.item = item;
+        this.label = label;
+        this.area= weight;
+        this.r = -1; //auto
     }
 
-    public Item getItem() {
-        return item;
-    }
-
-    public double getArea() {
-        return area;
-    }
-
-    public double getLeft() {
-        return left;
+    public void update(X item, String label, float weight, float r, float g, float b) {
+        this.item = item;
+        this.label = label;
+        this.area= weight;
+        this.r = r;
+        this.g = g;
+        this.b = b;
     }
 
     public void setLeft(double left) {
         this.left = left;
     }
 
-    public double getTop() {
-        return top;
-    }
-
     public void setTop(double top) {
         this.top = top;
-    }
-
-    public double getWidth() {
-        return width;
     }
 
     public void setWidth(double width) {
         this.width = width;
     }
 
-    public double getHeight() {
-        return height;
-    }
-
     public void setHeight(double height) {
         this.height = height;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     @Override
@@ -80,36 +72,52 @@ class ItemVis {
         this.area = area;
     }
 
-    boolean isContainer() {
-        return item.isContainer();
-    }
+//    boolean isContainer() {
+//        return item.isContainer();
+//    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        return false;
 
-        ItemVis that = (ItemVis) o;
+        //if (o == null || getClass() != o.getClass()) return false;
 
-        if (item != null ? !item.equals(that.item) : that.item != null) return false;
-        return !(label != null ? !label.equals(that.label) : that.label != null);
+//        ItemVis that = (ItemVis) o;
+//
+//        if (item != null ? !item.equals(that.item) : that.item != null) return false;
+//        return !(label != null ? !label.equals(that.label) : that.label != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = label != null ? label.hashCode() : 0;
-        result = 31 * result + (item != null ? item.hashCode() : 0);
-        return result;
+        throw new UnsupportedOperationException();
+//        int result = label != null ? label.hashCode() : 0;
+//        result = 31 * result + (item != null ? item.hashCode() : 0);
+//        return result;
     }
 
     public void paint(GL2 gl, double percent) {
         float i = 0.25f + 0.75f * (float)percent;
-        gl.glColor3f(i, i/2f, i/2f);
+
+        if (r < 0) {
+            r = i;
+            g = 0.1f;
+            b = 0.1f;
+        }
+
+        gl.glColor3f(r, g, b);
 
         ShapeDrawer.rect(gl,
             (float)left, (float)top,
             (float)width, (float)height
         );
+
+        gl.glColor3f(1,1,1);
+        ShapeDrawer.renderLabel(gl,
+                (float)(height/4f*percent), //label size
+                label, (float)(left+width/2f), (float)(top+height/2f), 0.5f);
+
     }
 }

@@ -27,6 +27,7 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
+import spacegraph.Spatial;
 import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
 import spacegraph.phys.collision.shapes.*;
 import spacegraph.phys.dynamics.RigidBody;
@@ -36,7 +37,9 @@ import spacegraph.phys.util.BulletStack;
 
 import javax.vecmath.Vector3f;
 
+import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.render.JoglSpace.glut;
+import static spacegraph.test.Lesson14.renderString;
 
 /**
  * @author jezek2
@@ -421,6 +424,21 @@ public enum ShapeDrawer {
         gl.glVertex3f(x1+w, y1+h, z);
         gl.glVertex3f(x1, y1+h, z);
         gl.glEnd();
+    }
+
+    static public void renderLabel(GL2 gl, float scale, String label, float dx, float dy, float dz) {
+        gl.glPushMatrix();
+        gl.glNormal3f(0,0,1f);
+        gl.glTranslatef(dx, dy, dz);
+
+        float fontThick = 2f;
+        gl.glLineWidth(fontThick);
+
+        //float r = v.radius;
+        renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
+                scale,
+                0, 0, (1/1.9f)/scale); // Print GL Text To The Screen
+        gl.glPopMatrix();
     }
 
     ////////////////////////////////////////////////////////////////////////////

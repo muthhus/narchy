@@ -14,7 +14,6 @@ import spacegraph.render.ShapeDrawer;
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
-import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.test.Lesson14.renderString;
 
 /**
@@ -249,11 +248,10 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     protected void renderLabel(GL2 gl) {
-        gl.glPushMatrix();
-        gl.glNormal3f(0,0,1f);
-        gl.glTranslatef(0,0,0.5f);
-        renderLabel(gl, this);
-        gl.glPopMatrix();
+        //float p = v.pri * 0.75f + 0.25f;
+        gl.glColor4f(1f, 1f, 1f, pri);
+
+        ShapeDrawer.renderLabel(gl, 0.003f, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {
@@ -275,23 +273,6 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         EDraw[] eee = v.edges;
         for (int en = 0; en < n; en++)
             render(gl, v, eee[en]);
-    }
-
-    static public void renderLabel(GL2 gl, Spatial v) {
-
-
-        //float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(1f, 1f, 1f, v.pri);
-
-        float fontThick = 2f;
-        gl.glLineWidth(fontThick);
-
-        float div = 0.003f;
-        //float r = v.radius;
-        renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, v.label,
-                div, //scale
-                0, 0, (1/1.9f)/div); // Print GL Text To The Screen
-
     }
 
     static public void render(GL2 gl, Spatial v, EDraw e) {
