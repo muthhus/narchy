@@ -48,7 +48,7 @@ import java.util.Random;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 4;
+	final int visionRadius = 5;
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -67,7 +67,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
-				512, 6, 2, 3, rng,
+				1024, 4, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng), true)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -77,11 +77,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		nar.conceptActivation.setValue(0.1f);
 
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.7f);
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(32);
 //		nar.conceptRemembering.setValue(1f);

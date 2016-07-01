@@ -1,6 +1,5 @@
 package nars.index;
 
-import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
@@ -596,39 +595,7 @@ public interface TermIndex {
     }
 
 
-    default Compound atemporalize(@NotNull Compound c) {
-        if (!possiblyTemporal(c))
-            return c;
-        return _atemporalize(c);
-    }
 
-    @Nullable
-    default Compound _atemporalize(@NotNull Compound c) {
-        return (Compound) transform(
-                (c.op().temporal && c.dt()!=DTERNAL) ?
-                        //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
-                        (Compound)the((builder().build(c.op(), DTERNAL, c.subterms().terms()))) :
-                        c,
-                CompoundAtemporalizer);
-    }
-
-    static boolean possiblyTemporal(Term x) {
-        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
-    }
-
-    @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<>() {
-
-        @Override
-        public boolean test(Term term) {
-            return possiblyTemporal(term);
-        }
-
-        @NotNull
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm) {
-            return $.terms.atemporalize((Compound)subterm);
-        }
-    };
 
 
     default void loadBuiltins() {
@@ -637,4 +604,48 @@ public interface TermIndex {
         }
     }
 
+    static boolean possiblyTemporal(Term x) {
+        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
+    }
+
+    default Compound atemporalize(@NotNull Compound c) {
+        if (!possiblyTemporal(c))
+            return c;
+        return new CompoundAtemporalizer(this, c).result;
+    }
+
+
+
+
+    static final class CompoundAtemporalizer implements CompoundTransform<Compound,Term> {
+
+        private final TermIndex index;
+        private final Compound result;
+
+        public CompoundAtemporalizer(TermIndex index, Compound c) {
+            this.index = index;
+            result = _atemporalize(c);
+        }
+
+        @Nullable
+        Compound _atemporalize(@NotNull Compound c) {
+            TermIndex i = index;
+            return (Compound) i.transform(
+                    (c.op().temporal && c.dt()!=DTERNAL) ?
+                            //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
+                            (Compound)i.the((i.builder().build(c.op(), DTERNAL, c.subterms().terms()))) :
+                            c,
+                    this);
+        }
+
+        @Override
+        public boolean test(Term term) {
+            return possiblyTemporal(term);
+        }
+
+        @Override
+        public @NotNull Termed apply(Compound parent, @NotNull Term subterm) {
+            return _atemporalize((Compound)subterm);
+        }
+    }
 }

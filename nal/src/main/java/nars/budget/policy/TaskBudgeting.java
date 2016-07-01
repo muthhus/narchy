@@ -47,6 +47,7 @@ public class TaskBudgeting {
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 //or(nal.taskLink.priIfFiniteElseZero(), nal.termLink.priIfFiniteElseZero())
                 aveAri(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero())
+                    * volRatioScale
         ;
 
         final float quality = qual * volRatioScale;

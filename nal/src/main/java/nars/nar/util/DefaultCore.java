@@ -65,6 +65,7 @@ public class DefaultCore extends AbstractCore {
     @NotNull
     @Override
     protected Bag<Concept> newConceptBag() {
+
         return new MonitoredCurveBag(nar, 1, nar.random);
 
     }

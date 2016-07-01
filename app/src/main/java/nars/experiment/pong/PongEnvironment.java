@@ -8,6 +8,7 @@ package nars.experiment.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
@@ -15,7 +16,6 @@ import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
-import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -26,6 +26,7 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
@@ -43,8 +44,8 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 3;
-	final int height = 3;
+	final int width = 2;
+	final int height = 2;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -63,7 +64,7 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 8, 2, 3, rng,
+				1024, 4, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -71,20 +72,20 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.conceptActivation.setValue(0.5f);
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+		nar.beliefConfidence(0.95f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(32);
-		nar.conceptActivation.setValue(0.1f);
+		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+		nar.cyclesPerFrame.set(48);
+		nar.conceptActivation.setValue(0.05f);
 		nar.confMin.setValue(0.01f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
 		nar.conceptCold.termlinksCapacityMax.setValue(16);
 		nar.conceptWarm.termlinksCapacityMin.setValue(16);
-		nar.conceptWarm.termlinksCapacityMax.setValue(32);
+		nar.conceptWarm.termlinksCapacityMax.setValue(48);
 		nar.conceptCold.taskLinksCapacity.setValue(16);
 		nar.conceptWarm.taskLinksCapacity.setValue(32);
 		
@@ -101,7 +102,7 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.');
+		//new MySTMClustered(nar, 16, '.');
 		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();
@@ -113,7 +114,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		addCheats(a.nar, e);
 
-		e.run(a, 256*8);
+		e.run(a, 64*32);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -130,20 +131,113 @@ public class PongEnvironment extends Player implements Environment {
 	private static void addCheats(NAR n, PongEnvironment e) {
 		PongModel pong = e.pong;
 
-		numericSensor("(x,ball)", n, () -> pong.ball_x, 0.5f, 0.9f);
-		numericSensor("(y,ball)", n, () -> pong.ball_y, 0.5f, 0.9f);
-		numericSensor("(y,(pad,mine))", n, () -> pong.player1.position, 0.5f, 0.9f);
-		numericSensor("(y,(pad,theirs))", n, () -> pong.player2.position, 0.5f, 0.9f);
+		float pri = 0.5f;
 
-		numericSensor("(dy,ball,(pad,mine))", n, () -> pong.ball_y - pong.player1.position, 0.5f, 0.9f);
+		numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri, 0.9f);
+
+		numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri, 0.9f);
+		numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position, pri, 0.9f);
+		numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position, pri, 0.9f);
+
+		numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () -> pong.ball_y - pong.player1.position, pri, 0.9f);
 	}
 
-	private static void numericSensor(String term, NAR n, FloatSupplier input, float pri, float conf) {
-		new SensorConcept(term, n, new RangeNormalizedFloat(input),
-			(v) -> t(v, conf)
-		).pri(pri);
+	private static void numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri, float conf) {
+//		new SensorConcept(term, n, new RangeNormalizedFloat(input),
+//			(v) -> t(v, conf)
+//		).pri(pri);
+		new UnipolarAutoDiscretizer(input, n,
+				"(" + term + " --> [" + low + "])",
+				"(" + term + " --> [" + high +"])").pri(pri).conf(conf);
+	}
+	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri, float conf) {
+//		new SensorConcept(term, n, new RangeNormalizedFloat(input),
+//			(v) -> t(v, conf)
+//		).pri(pri);
+		new UnipolarAutoDiscretizer(input, n,
+				"({" + term + "} --> [" + low + "])",
+				"({" + term + "} --> [" + mid + "])",
+				"({" + term + "} --> [" + high +"])").pri(pri).conf(conf);
 	}
 
+	public static class UnipolarAutoDiscretizer  {
+
+
+		private final RangeNormalizedFloat normIn;
+		private final List<SensorConcept> sensors;
+		float conf;
+
+		public UnipolarAutoDiscretizer(FloatSupplier input, NAR nar, String... states) {
+
+			this.conf = 0.9f;
+			normIn = new RangeNormalizedFloat(input);
+
+
+
+			int numStates = states.length;
+			this.sensors = Global.newArrayList(numStates);
+			float dw = 1f / numStates;
+			float dr = 1f / (numStates-1);
+			float r = 0;
+			int i = 0;
+			for (String s : states) {
+				float c = r; //center of the range
+
+				sensors.add( new SensorConcept(s, nar, normIn,
+						(v) -> {
+							float cdist = Math.abs(v - c);
+							if (cdist > dw) return t(0,conf);
+							else {
+								return t(0.5f + (cdist/dw)*0.5f, conf);
+							}
+						}
+				));
+				r += dr;
+				i++;
+			}
+		}
+
+//		private Truth biangular(float v) {
+//			if (v < 0.5f) return t(0, conf);
+//			else {
+//				//return t(1f, conf * Math.min(1f,(v-0.5f)*2f));
+//				return t(v, conf);
+//			}
+//		}
+//
+//		private Truth triangular(float v) {
+//			float f, c;
+//			if (v < 0.66f && v > 0.33f) {
+//				f = 0.5f;
+//				c = (0.33f-Math.abs(v-0.5f)) * 3f;
+//			} else {
+//				f = (v > 0.5f) ? 1 : 0;
+//				if (v > 0.5f) {
+//					c = Math.abs(v - 0.66f) * 3f;
+//				} else {
+//					c = Math.abs(v - 0.33f) * 3f;
+//				}
+//			}
+//			c = Util.clamp(c);
+//
+//			return t(f, c * conf);
+//		}
+
+		public UnipolarAutoDiscretizer pri(float p) {
+			for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
+				sensors.get(i).pri(p);
+			}
+			return this;
+		}
+		public UnipolarAutoDiscretizer conf(float c) {
+			this.conf = c;
+			return this;
+		}
+
+
+
+
+	}
 
 	public PongEnvironment() {
 		super();

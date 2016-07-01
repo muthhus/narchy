@@ -152,7 +152,7 @@ public abstract class AbstractNAR extends NAR {
             return null;
         }
 
-        float business = input.pri() * activation;
+        float business = input.pri();
         emotion.busy(business);
 
         if (c.beliefs().capacity() == 0) {
@@ -169,7 +169,7 @@ public abstract class AbstractNAR extends NAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            conceptualize(c, t, activation, activation, overflow);
+            conceptualize(c, t, 1f, activation, overflow);
 
             emotion.stress(overflow);
 

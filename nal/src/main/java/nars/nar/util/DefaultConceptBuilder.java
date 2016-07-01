@@ -40,7 +40,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 //            (Variable v) -> new VariableConcept(v);
 
     @Nullable
-    final Function<Compound, Termed> compoundBuilder = (Compound t) -> {
+    final Termed newConcept(Compound t){
 
         switch (t.op()) {
             case INH:
@@ -55,7 +55,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
         }
 
         return new CompoundConcept(t, termbag(), taskbag());
-    };
+    }
 
 
 
@@ -65,7 +65,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @NotNull
     @Override public Bag<Task> taskbag() {
 
-        return new CurveBag<>(defaultCurveSampler, mergeDefault()) {
+        return new CurveBag<>(defaultCurveSampler, mergeDefault) {
             @NotNull
             @Override
             protected BLink<Task> newLink(Task i, Budgeted b, float scale) {
@@ -79,7 +79,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @NotNull
     @Override public Bag<Termed> termbag() {
 
-        return new CurveBag<>(defaultCurveSampler, mergeDefault());
+        return new CurveBag<>(defaultCurveSampler, mergeDefault);
 
 //        //weak links may be conceptually wrong
 //        return new CurveBag<Termed>(rng) {
@@ -90,12 +90,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 //        }.merge(mergeDefault());
     }
 
-    @NotNull
-    private BudgetMerge mergeDefault() {
-        //return BudgetMerge.avgDQBlend;
-        return BudgetMerge.plusDQBlend;
-        //return BudgetMerge.plusDQDominant;
-    }
+
+    private final BudgetMerge mergeDefault = BudgetMerge.plusDQBlend;
+
+
 
 
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
@@ -108,7 +106,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
-        this.defaultCurveSampler = new CurveBag.DirectSampler(CurveBag.power4BagCurve, rng);
+        this.defaultCurveSampler = new CurveBag.DirectSampler(CurveBag.power2BagCurve, rng);
     }
 
 
@@ -123,7 +121,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
         Termed result = null;
         if (term instanceof Compound) {
-            result = compoundBuilder.apply(  (Compound) term );
+            result = newConcept(  (Compound) term );
         } else {
 
             if (term instanceof Variable) {

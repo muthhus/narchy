@@ -238,16 +238,15 @@ public class NarseseIRCBot extends Talk {
         nar.conceptActivation.setValue(0.15f);
         nar.cyclesPerFrame.set(32);
 
-        nar.logSummaryGT(System.out, 0.6f);
+        nar.logSummaryGT(System.out, 0.4f);
 
-        new MySTMClustered(nar, 32, '.');
+        new MySTMClustered(nar, 4, '.');
 
         NarseseIRCBot bot = new NarseseIRCBot(nar);
 
-        nar.loop(5f);
+        nar.loop(25f);
 
 
-        nar.log();
         nar.input(new File("/home/me/quietwars.nal"));
 
         logger.info("Reading corpus..");
