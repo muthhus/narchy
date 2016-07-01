@@ -870,23 +870,6 @@ public class TermTest {
         assertEquals( $("()"),Terms.ZeroProduct);
     }
 
-    @Test public void testFilterCommutedWithCoNegatedSubterms() {
-        //any commutive terms with both a subterm and its negative are invalid
-
-
-        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) && (a1))") );
-        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) &&+0 (a1))") );
-        assertValidTerm(         $("((--,(a1)) &&+1 (a1))") );
-
-        assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
-
-
-
-        //invalid because of ordinary common subterm:
-        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) ==> (a1))") );
-        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) <-> (a1))") );
-
-    }
 
     public static void assertInvalidTerm(@NotNull Supplier<Term> o) {
         try {

@@ -303,7 +303,7 @@ public abstract class TermBuilder {
 
 
         TreeSet<Term> s = new TreeSet();
-        UnifiedSet<Term> negs = flatten(op, u, dt, s, null);
+        UnifiedSet<Term> unwrappedNegs = flatten(op, u, dt, s, null);
 
         boolean negate = false;
         int n = s.size();
@@ -312,21 +312,35 @@ public abstract class TermBuilder {
         }
 
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
-        if (negs!=null) {
-            if (op == DISJ && negs.anySatisfy(s::contains))
-                return null; //throw new InvalidTerm(op, u);
-            //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
+        if (unwrappedNegs!=null) {
+//            if (op == DISJ && unwrappedNegs.anySatisfy(s::contains))
+//                return null; //throw new InvalidTerm(op, u);
+//            //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
 
 
-            //if all subterms negated; apply DeMorgan's Law
-            if ((dt == DTERNAL) && (negs.size() == n)) {
-                op = (op == CONJ) ? DISJ : CONJ;
-                negate = true;
-            }
+//            if (s.removeAll(unwrappedNegs)) {
+//                //remove their negative counterparts
+//                s.removeIf(x -> {
+//                    return (x.op()==NEG) && unwrappedNegs.contains(((Compound)x).term(0));
+//                });
+//
+//                n = s.size();
+//                if (n == 0)
+//                    return null;
+//                if (n == 1)
+//                    return s.iterator().next();
+//
+//            } else {
+//                //if all subterms negated; apply DeMorgan's Law
+//                if ((dt == DTERNAL) && (unwrappedNegs.size() == n)) {
+//                    op = (op == CONJ) ? DISJ : CONJ;
+//                    negate = true;
+//                }
+//            }
         }
 
         if (negate) {
-            return negation( finish(op, dt, negs.toArray(new Term[n])) );
+            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
         } else {
             return finish(op, dt, s.toArray(new Term[n]));
         }

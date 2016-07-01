@@ -124,9 +124,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
         }
 
-        if (hasCoNegatedAtemporalConjunction(ct)) {
-            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
-        }
+//        if (hasCoNegatedAtemporalConjunction(ct)) {
+//            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
+//        }
 
         if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUI))
             throw new TermIndex.InvalidTaskTerm(t, "Goal/Quest task term may not be Implication or Equivalence");
@@ -134,31 +134,31 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return t;
     }
 
-    static boolean hasCoNegatedAtemporalConjunction(Term term) {
-        if (term instanceof Compound) {
-
-            Compound cterm = ((Compound) term);
-
-            int dt = cterm.dt();
-            if (term.op() == CONJ && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEG)) {
-                int s = cterm.size();
-                for (int i = 0; i < s; i++) {
-                    Term x = cterm.term(i);
-                    if (x.op() == NEG) {
-                        if (cterm.containsTerm(((Compound) x).term(0))) {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            if (term.hasAll(CONJUNCTION_WITH_NEGATION)) {
-                return term.or(Task::hasCoNegatedAtemporalConjunction);
-            }
-        }
-        return false;
-
-    }
+//    static boolean hasCoNegatedAtemporalConjunction(Term term) {
+//        if (term instanceof Compound) {
+//
+//            Compound cterm = ((Compound) term);
+//
+//            int dt = cterm.dt();
+//            if (term.op() == CONJ && (dt ==DTERNAL || dt == 0) && cterm.subterms().hasAny(NEG)) {
+//                int s = cterm.size();
+//                for (int i = 0; i < s; i++) {
+//                    Term x = cterm.term(i);
+//                    if (x.op() == NEG) {
+//                        if (cterm.containsTerm(((Compound) x).term(0))) {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (term.hasAll(CONJUNCTION_WITH_NEGATION)) {
+//                return term.or(Task::hasCoNegatedAtemporalConjunction);
+//            }
+//        }
+//        return false;
+//
+//    }
 
 //    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
 //        float f = 0;

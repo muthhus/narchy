@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static nars.$.*;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n4;
 
 /**
@@ -119,7 +120,7 @@ public class NAgent implements Agent {
 
 
 
-    private float lastMotivation;
+    private float[] lastMotivation;
     private int nextAction = -1;
     private SensorConcept dRewardSensor;
     private final Budgeted RewardAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
@@ -163,6 +164,7 @@ public class NAgent implements Agent {
         gamma = nar.confidenceDefault(Symbols.GOAL);
 
         motivation = new float[actions];
+        lastMotivation = new float[actions];
 
 
         input = new float[inputs];
@@ -511,6 +513,8 @@ public class NAgent implements Agent {
 
     }
 
+    float lastOnConf = 0;
+
     private void decide(int lastAction) {
 
         nar.clock.tick(ticksBeforeDecide);
@@ -520,25 +524,38 @@ public class NAgent implements Agent {
 
         nextAction = decideMotivation();
 
-        if (nextAction == -1)
+        if (nextAction == -1) {
             nextAction = randomMotivation();
+        }
 
         nextMotivation = motivation[nextAction];
 
         long now = nar.time();
 
-        float onConf = Math.max(
-                //w2c(d *motivation.length) * gamma,
-                //decisiveness(nextAction) * gamma,
-                gamma,
-                Global.TRUTH_EPSILON);
-        float offConf = onConf;
+//        float onConf = 0.5f + 0.5f * Math.max(
+//                //w2c(d *motivation.length) * gamma,
+//                //(decisiveness(nextAction) * 0.5f + 0.5f) * gamma,
+//                //w2c(decisiveness(nextAction) * 0.5f + 0.5f) * gamma,
+//                w2c(motivation[nextAction]),
+//                //gamma,
+//            Global.TRUTH_EPSILON);
+//
+//        float offConf = 0.5f + 0.5f * Math.max(
+//                lastAction!=-1 ? w2c(lastMotivation[lastAction]) : 0,
+//            Global.TRUTH_EPSILON);
+                //TODO find an accurate way to do this
+                //lastOnConf*(motivation[lastAction]-lastMotivation[lastAction]);
+
+        float onConf = gamma, offConf = gamma;
 
 
         if (synchronousGoalInput || lastAction != nextAction) {
 
+            float n = actions.size();
             //belief/goal feedback levels
-            float off = 0f; //0.25f; //0.49f;
+            float off =
+                    0.5f - (n-1)/n;
+                    //0f; //0.25f; //0.49f;
             float on = 1f; //0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
             float preOn = (on+off*2f)/3f; // 0.75f;
@@ -549,21 +566,23 @@ public class NAgent implements Agent {
                 //nar.believe(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
 
                 nar.goal(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
-                nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
+                nar.believe(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
             }
 
             MotorConcept nextAction = actions.get(this.nextAction);
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
             //nar.believe(goalPriority, nextAction, now, preOn, conf); //upward step function bottom
 
+
             nar.goal(goalPriority, nextAction, now, on, onConf); //upward step function top
-            nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
+            nar.believe(goalPriority, nextAction, now, on, onConf); //upward step function top
         }
 
         //updateMotors();
 
         this.lastAction = nextAction;
-        this.lastMotivation = nextMotivation;
+        System.arraycopy(motivation, 0, lastMotivation, 0, motivation.length);
+        this.lastOnConf = onConf;
     }
 
     /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions

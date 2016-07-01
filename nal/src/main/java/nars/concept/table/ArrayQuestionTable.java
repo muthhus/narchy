@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Task;
+import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,6 +122,9 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     /** returns true if a quality was modified as a signal whether the list needs sorted */
     public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
+        if (Stamp.overlapping(q.evidence(), a.evidence()))
+            return;
+
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
         float factor = 1f;
@@ -144,11 +148,14 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             remove(q);
         } else {
 
-            float aConf = a.conf();
+            //if there is a reduction in variables, link the (distinct) concepts
+            if (a.term().vars() < q.term().vars()) {
+                float aConf = a.conf();
 
-            Concept qc = nar.concept(q);
-            if (qc!=null) {
-                qc.crossLink(q, a, aConf, nar);
+                Concept qc = nar.concept(q);
+                if (qc != null) {
+                    qc.crossLink(q, a, aConf, nar);
+                }
             }
 
             //amount boosted will be in proportion to the lack of quality, so that a high quality q will survive longer by not being drained so quickly
@@ -156,6 +163,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         }
 
+        //generate a projected answer
         if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
             Concept ac = nar.concept(a);
             if (ac != null) { //??

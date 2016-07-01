@@ -10,6 +10,9 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertParseException;
+import static nars.term.TermTest.assertInvalidTerm;
+import static nars.term.TermTest.assertValidTerm;
+import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
 
 /**
@@ -391,4 +394,46 @@ public class TermReductionsTest {
         assertEquals("(--,((p)||(q)))",
                    $("(--(p) && --(q))").toString());
     }
+
+    @Test public void testCoNegatedJunction() {
+        //the conegation cancels itself out
+        assertEquals("x",
+                $("(&&,x,a:b,(--,a:b))").toString());
+
+        assertEquals("(x&&y)",
+                $("(&&,x,y,a:b,(--,a:b))").toString());
+
+        assertEquals("x",
+                $("(||,x,a:b,(--,a:b))").toString());
+
+        assertEquals("(x||y)",
+                $("(||,x,y,a:b,(--,a:b))").toString());
+    }
+
+    @Test public void testFilterCommutedWithCoNegatedSubterms() {
+        //any commutive terms with both a subterm and its negative are invalid
+
+
+        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) && (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( () -> $("((--,(a1)) &&+0 (a1))") );
+        assertValidTerm(         $("((--,(a1)) &&+1 (a1))") );
+
+        assertInvalidTerm( () -> $("((--,(a1)) || (a1))") );
+
+
+
+        //invalid because of ordinary common subterm:
+        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) ==> (a1))") );
+        assertValidTermValidConceptInvalidTaskContent( ()->   $("((--,(a1)) <-> (a1))") );
+
+    }
+
+
+    @Test public void testCoNegatedDifference() {
+        //..
+    }
+    @Test public void testCoNegatedIntersection() {
+        //..
+    }
+
 }
