@@ -121,10 +121,10 @@ public enum Global {
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMin = 6;
+    public static float matchTermutationsMin = 3;
 
     /** upper limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMax = 12;
+    public static float matchTermutationsMax = 6;
 
     public static int QUERY_ANSWERS_PER_MATCH = 2;
 
@@ -141,9 +141,7 @@ public enum Global {
     /** minimum difference necessary to indicate a significant modification in budget float number components */
     public static final float BUDGET_EPSILON = 0.0005f;
 
-    /** for autobag managed bags:
-     *  lower rate means that a bag's existing items are remembered longer relative to incoming activation */
-    public static final float AUTOBAG_NOVELTY_RATE = 1f;
+
 
 
     /** minimum durability and quality necessary for a derivation to form */

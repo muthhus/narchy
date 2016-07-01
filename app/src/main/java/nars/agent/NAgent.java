@@ -551,10 +551,11 @@ public class NAgent implements Agent {
 
         if (synchronousGoalInput || lastAction != nextAction) {
 
-            float n = actions.size();
+
             //belief/goal feedback levels
             float off =
-                    0.5f - (n-1)/n;
+                    0;
+                    //0.5f - (n-1)/n;
                     //0f; //0.25f; //0.49f;
             float on = 1f; //0.75f;
             float preOff = (off+on*2f)/3f; //0.75f;
@@ -566,7 +567,7 @@ public class NAgent implements Agent {
                 //nar.believe(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
 
                 nar.goal(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
-                nar.believe(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
+                nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
             }
 
             MotorConcept nextAction = actions.get(this.nextAction);
@@ -575,7 +576,7 @@ public class NAgent implements Agent {
 
 
             nar.goal(goalPriority, nextAction, now, on, onConf); //upward step function top
-            nar.believe(goalPriority, nextAction, now, on, onConf); //upward step function top
+            nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
         }
 
         //updateMotors();

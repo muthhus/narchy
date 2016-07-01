@@ -596,32 +596,37 @@ public interface TermIndex {
     }
 
 
-    @Nullable
     default Compound atemporalize(@NotNull Compound c) {
+        if (!possiblyTemporal(c))
+            return c;
+        return _atemporalize(c);
+    }
+
+    @Nullable
+    default Compound _atemporalize(@NotNull Compound c) {
         return (Compound) transform(
                 (c.op().temporal && c.dt()!=DTERNAL) ?
-                        (Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
+                        //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
+                        (Compound)the((builder().build(c.op(), DTERNAL, c.subterms().terms()))) :
                         c,
                 CompoundAtemporalizer);
+    }
+
+    static boolean possiblyTemporal(Term x) {
+        return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
     }
 
     @Nullable CompoundTransform<Compound,Term> CompoundAtemporalizer = new CompoundTransform<>() {
 
         @Override
         public boolean test(Term term) {
-            return true; // term.hasTemporal();
+            return possiblyTemporal(term);
         }
 
         @NotNull
         @Override
         public Termed apply(Compound parent, @NotNull Term subterm) {
-            if (subterm instanceof Compound) {
-                Compound csub = (Compound) subterm;
-                if (csub.hasTemporal()) {
-                    return /*the*/($.terms.atemporalize(csub));
-                }
-            }
-            return /*the*/(subterm);
+            return $.terms.atemporalize((Compound)subterm);
         }
     };
 

@@ -63,7 +63,7 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 4, 2, 3, rng,
+				1024, 8, 2, 3, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -71,15 +71,15 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.conceptActivation.setValue(0.5f);
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.6f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(32);
-		nar.conceptActivation.setValue(0.05f);
-		nar.confMin.setValue(0.05f);
+		nar.conceptActivation.setValue(0.1f);
+		nar.confMin.setValue(0.01f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
 		nar.conceptCold.termlinksCapacityMax.setValue(16);

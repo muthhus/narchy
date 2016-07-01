@@ -91,7 +91,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     static float priIfFiniteElseNeg1(Budgeted b) {
-        return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
+        float p = b.pri();
+        return p==p ? p : -1;
+        //return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
         //return b.priIfFiniteElseNeg1();
     }
 
