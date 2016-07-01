@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,10 +30,7 @@ public class PatternIndex extends RawTermIndex {
     public PatternIndex() {
         super(null, 1024);
 
-        PremiseRule.eachOperator(null, (c, o) -> {
-            TransformConcept i = new TransformConcept(o);
-            set(i, i);
-        });
+        loadBuiltins();
     }
 
     @Override
@@ -52,14 +50,17 @@ public class PatternIndex extends RawTermIndex {
     @NotNull
     public PatternCompound make(@NotNull Compound seed) {
 
-        TermContainer v = theSubterms(seed.subterms());
+        Term[] v = theSubterms(seed.subterms());
+        TermContainer vv = TermVector.the(v);
+
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
-                makeEllipsis(seed, v, e) :
-                new PatternCompound.PatternCompoundSimple(seed, v);
+                makeEllipsis(seed, vv, e) :
+                new PatternCompound.PatternCompoundSimple(seed, vv);
     }
 
     private static PatternCompound makeEllipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
+
 
         //this.ellipsisTransform = hasEllipsisTransform(this);
         boolean hasEllipsisTransform = false;
@@ -104,22 +105,4 @@ public class PatternIndex extends RawTermIndex {
         return false;
     }
 
-    public class TransformConcept extends AtomConcept implements TermTransform {
-
-        private final TermTransform function;
-
-        public TransformConcept(TermTransform o) {
-            super($.operator(o.getClass().getSimpleName()), Bag.EMPTY, Bag.EMPTY);
-            this.function = o;
-        }
-
-        @Override
-        public Term function(Compound args) {
-//            if (args.varPattern() > 0) {
-//                //return the operation which would have been constructed for the pattern
-//                return index.b(Op.INH, args, this);
-//            }
-            return function.function(args);
-        }
-    }
 }

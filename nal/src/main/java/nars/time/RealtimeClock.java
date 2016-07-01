@@ -61,7 +61,7 @@ public abstract class RealtimeClock implements Clock {
 
 
     @Override
-    public long time() {
+    public final long time() {
         return t;
     }
 

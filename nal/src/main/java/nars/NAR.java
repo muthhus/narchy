@@ -31,6 +31,7 @@ import nars.term.atom.Atom;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.IO;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -152,7 +153,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         });
 
-
+        index.loadBuiltins();
 
 
         //    private void addTransform(Class c, ImmediateTermTransform i) {
@@ -432,10 +433,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public Task input(float pri, float dur, @NotNull Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
-            return null;
+            throw new RuntimeException("null term for task");
         }
 
-        Task t = new MutableTask(term, punc, new DefaultTruth(freq, conf))
+        Task t = new MutableTask(term, punc, $.t(freq, conf))
                 .budget(pri, dur)
                 .time(time(), occurrenceTime);
 

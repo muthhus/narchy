@@ -94,12 +94,12 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
 
     @Override
-    public final @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
+    public final @Nullable Term[] theSubterms(@NotNull TermContainer s) {
 
         //early existence test:
         TermContainer existing = getSubterms(s);
         if (existing!=null)
-            return existing;
+            return existing.terms();
 
         int ss = s.size();
         Term[] bb = new Term[ss];
@@ -128,7 +128,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
             if (existing2 != null)
                 s = existing2;
         }
-        return s;
+        return s.terms();
     }
 
     /**
@@ -156,7 +156,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
     protected final Termed buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
-        return newCompound(op, dt, theSubterms(subs));
+        return build(op, dt, theSubterms(subs));
     }
 
     @Override

@@ -3,27 +3,29 @@ package nars.bag.impl;
 import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
-import nars.budget.forget.Forget;
+import nars.budget.forget.BudgetForget;
+import nars.link.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 /**
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is
  * under capacity.
  */
-public final class AutoBag<V>  {
+public final class AutoBag<V> implements BudgetForget {
+    private long now;
+    private float ratio;
 
-    private final Forget.AbstractForget forget;
+    //private final Forget.AbstractForget forget;
 
 
     public AutoBag(@NotNull MutableFloat perfection) {
         //this(new Forget.ExpForget(new MutableFloat(0), perfection));
-        this(new Forget.LinearForget(new MutableFloat(0), perfection));
+        //this(new Forget.PercentForget(new MutableFloat(0), perfection));
     }
 
-    public AutoBag(Forget.AbstractForget forget) {
-        this.forget = forget;
-    }
 
 
     /** @param bag
@@ -34,11 +36,12 @@ public final class AutoBag<V>  {
         ArrayBag<V> abag = (ArrayBag<V>) bag; //HACK
 
         synchronized (abag.map) {
-            float r = forgetPeriod(abag);
+            float r = forgetRatio(abag);
+            this.ratio = r;
 
             return abag.commit(
-                    (r > 0 && r <= Global.maxForgetPeriod) ?
-                            forget.setForgetCycles(Math.max(Global.minForgetPeriod, r)) :
+                    (r >= Global.BUDGET_EPSILON) ?
+                            this :
                             null /* no forgetting to be applied */
             );
         }
@@ -46,7 +49,7 @@ public final class AutoBag<V>  {
     }
 
 
-    protected float forgetPeriod(@NotNull ArrayBag<V> bag) {
+    protected float forgetRatio(@NotNull ArrayBag<V> bag) {
 
         if (!bag.isFull()) {
             return -1f;
@@ -68,21 +71,33 @@ public final class AutoBag<V>  {
         //if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
            //return -1;
 
-        float decaySpeed = Global.AUTOBAG_NOVELTY_RATE; //< 1.0, smaller means slower forgetting rate / longer forgetting time
-        float period = existing / (pending * decaySpeed);
+//        float decaySpeed = Global.AUTOBAG_NOVELTY_RATE; //< 1.0, smaller means slower forgetting rate / longer forgetting time
+//        float period = existing / (pending * decaySpeed);
+//
+//        //System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);
+//
+//        return period;
 
-        //System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);
-
-        return period;
-
+        //TODO consider age in diminishing existing's value
+        float ratio = 1f - (existing / (existing + pending));
+        //System.out.println("existing=" + existing + ", pending=" + pending + " .. ratio=" + ratio);
+        return ratio;
     }
 
     public final void update(NAR nar) {
-        forget.update(nar);
+
+        this.now = nar.time();
+        //forget.update(nar);
     }
 
     @Deprecated public final void cycle(float subCycle) {
-        forget.cycle(subCycle);
+
+        //forget.cycle(subCycle);
     }
 
+    @Override
+    public void accept(BLink bLink) {
+        bLink.setLastForgetTime(now);
+        bLink.priMult( 1f - (ratio * (1f - bLink.dur()) ));
+    }
 }

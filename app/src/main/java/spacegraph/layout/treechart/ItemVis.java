@@ -8,54 +8,39 @@ import spacegraph.render.ShapeDrawer;
  */
 public class ItemVis<X> {
 
+    public final String label;
+    public final X item;
     public double left;
     public double top;
     public double width;
     public double height;
     public double area;
-    public String label;
-    public X item;
     private float r;
     private float g;
     private float b;
 
-    public ItemVis() {
-    }
-
-    public void update(X item, float weight) {
-        update(item, item.toString(), weight);
-    }
-
-    public void update(X item, String label, float weight) {
+    public ItemVis(X item, String label) {
         this.item = item;
         this.label = label;
-        this.area= weight;
-        this.r = -1; //auto
     }
 
-    public void update(X item, String label, float weight, float r, float g, float b) {
-        this.item = item;
-        this.label = label;
+    public void update(float weight) {
+        this.area = weight;
+        this.r = -1;
+    }
+
+//    public void update(X item, String label, float weight) {
+//        this.item = item;
+//        this.label = label;
+//        this.area= weight;
+//        this.r = -1; //auto
+//    }
+
+    public void update(float weight, float r, float g, float b) {
         this.area= weight;
         this.r = r;
         this.g = g;
         this.b = b;
-    }
-
-    public void setLeft(double left) {
-        this.left = left;
-    }
-
-    public void setTop(double top) {
-        this.top = top;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
     }
 
     @Override

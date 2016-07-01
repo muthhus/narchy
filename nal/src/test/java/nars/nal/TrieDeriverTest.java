@@ -3,8 +3,8 @@ package nars.nal;
 import com.google.common.collect.Sets;
 import nars.concept.Concept;
 import nars.index.PatternIndex;
+import nars.index.TransformConcept;
 import nars.nal.meta.BoolCondition;
-import nars.nal.nal8.operator.ImmediateOperator;
 import nars.nal.rule.PremiseRule;
 import nars.nal.derive.TrieDeriver;
 import nars.nar.Default;
@@ -220,7 +220,7 @@ public class TrieDeriverTest {
         //out.println(p.atoms);
         p.forEach(t -> {
 
-            if (!(t instanceof PatternIndex.TransformConcept))
+            if (!(t instanceof TransformConcept))
                 assertFalse( t instanceof Concept);
 
             //test all subterms are in the pattern index too

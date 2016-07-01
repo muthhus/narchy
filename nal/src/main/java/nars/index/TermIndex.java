@@ -113,7 +113,7 @@ public interface TermIndex {
 
 
     @Nullable
-    TermContainer theSubterms(TermContainer s);
+    Term[] theSubterms(TermContainer s);
 
     @Nullable
     default TermContainer normalize(TermContainer s) {
@@ -631,5 +631,11 @@ public interface TermIndex {
         }
     };
 
+
+    default void loadBuiltins() {
+        for (TransformConcept t : TransformConcept.BuiltIn) {
+            set(t,t);
+        }
+    }
 
 }

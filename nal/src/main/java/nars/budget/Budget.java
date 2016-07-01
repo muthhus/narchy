@@ -141,9 +141,12 @@ public abstract class Budget implements Budgeted {
 //        return this;
 //    }
 //
-    public void priMult(float factor) {
-        setPriority(pri() * factor);
+    public final void priMult(float factor) {
+        float pri = pri();
+        if (pri==pri) //if not deleted
+            setPriority(pri * factor);
     }
+
     public void durMult(float factor) {
         setDurability(dur() * factor);
     }

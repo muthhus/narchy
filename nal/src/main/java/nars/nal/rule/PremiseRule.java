@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import nars.*;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
+import nars.index.TransformConcept;
 import nars.nal.TimeFunction;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.*;
@@ -72,13 +73,7 @@ public class PremiseRule extends GenericCompound {
                 '}';
     }
 
-    public static final Class<? extends TermTransform>[] Operators = new Class[]{
-            intersect.class,
-            differ.class,
-            union.class
-    };
-
-//    /**
+    //    /**
 //     * blank marker trie node indicating the derivation and terminating the branch
 //     */
 //    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseEval>() {
@@ -230,37 +225,37 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
-    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
-        for (Class<? extends TermTransform> c : PremiseRule.Operators) {
-
-            Constructor<?>[] ccc = c.getConstructors();
-            try {
-                int n = 0;
-                TermTransform o = null;
-                do {
-                    Constructor cc = ccc[n++];
-
-                    if (Modifier.isPublic(cc.getModifiers())) {
-                        int params = cc.getParameterCount();
-                        if (params == 0) {
-                            //default empty constructor
-                            o = (c.newInstance());
-                        } else if (params == 1) {
-                            //HACK support 'NAR' only parameter constructor
-                            o = ((TermTransform) cc.newInstance(nar));
-                        }
-                    }
-                } while (o == null && n < ccc.length);
-
-                eachTransform.accept(c, o);
-
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid ImmediateTermTransform: " + c);
-            }
-
-
-        }
-    }
+//    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
+//        for (Class<? extends TermTransform> c : PremiseRule.Operators) {
+//
+//            Constructor<?>[] ccc = c.getConstructors();
+//            try {
+//                int n = 0;
+//                TermTransform o = null;
+//                do {
+//                    Constructor cc = ccc[n++];
+//
+//                    if (Modifier.isPublic(cc.getModifiers())) {
+//                        int params = cc.getParameterCount();
+//                        if (params == 0) {
+//                            //default empty constructor
+//                            o = (c.newInstance());
+//                        } else if (params == 1) {
+//                            //HACK support 'NAR' only parameter constructor
+//                            o = ((TermTransform) cc.newInstance(nar));
+//                        }
+//                    }
+//                } while (o == null && n < ccc.length);
+//
+//                eachTransform.accept(c, o);
+//
+//            } catch (Exception e) {
+//                throw new RuntimeException("Invalid ImmediateTermTransform: " + c);
+//            }
+//
+//
+//        }
+//    }
 
 
     /**

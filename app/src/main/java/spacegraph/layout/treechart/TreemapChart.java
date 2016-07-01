@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
 import nars.Global;
+import nars.util.data.list.FasterList;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static spacegraph.layout.treechart.TreemapChart.WeightedString.w;
 
@@ -19,13 +21,14 @@ import static spacegraph.layout.treechart.TreemapChart.WeightedString.w;
 public class TreemapChart<X> extends Surface {
 
 
+	private int limit = -1;
 
 	public static void main(String[] args) {
 		SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>();
 		s.show(800, 800);
 		TreemapChart<WeightedString> tc = new TreemapChart<>(500, 400,
 				(w, v) -> {
-					v.update(w, w.weight);
+					v.update(w.weight);
 				},
 				w("z", 0.25f),
 				w("x", 1f),
@@ -50,7 +53,7 @@ public class TreemapChart<X> extends Surface {
 	private double left;
 	private double top;
 	private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
-	private List<ItemVis<X>> children;
+	private Collection<ItemVis<X>> children;
 
 	public TreemapChart() {
 		this(0,0);
@@ -77,21 +80,27 @@ public class TreemapChart<X> extends Surface {
 	}
 
 	public void update(double width, double height, Iterable<X> children, BiConsumer<X, ItemVis<X>> update) {
-		update(width, height, 0, children, update );
+		update(width, height, 0, children, update, i -> new ItemVis<>(i, i.toString()));
 	}
 
-	public void update(double width, double height, int estimatedSize, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update) {
+	final WeakHashMap<X,ItemVis<X>> cache = new WeakHashMap();
+
+	public void update(double width, double height, int estimatedSize, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
 		this.width = width;
 		this.height = height;
 		left = 0.0;
 		top = 0.0;
 
-		List<ItemVis<X>> newChildren = Global.newArrayList(estimatedSize);
+		ArrayDeque<ItemVis<X>> newChildren = new ArrayDeque<>(estimatedSize);
+
+		int i = limit == -1 ? Integer.MAX_VALUE : limit;
 
 		for (X item : nextChildren) {
-			ItemVis<X> treemapElement = new ItemVis<X>();
-			update.accept(item, treemapElement);
-			newChildren.add(treemapElement);
+			if (i-- <= 0)
+				break;
+			ItemVis<X> e = cache.computeIfAbsent(item, itemBuilder);
+			update.accept(item, e);
+			newChildren.add(e);
 		}
 
 		if (!newChildren.isEmpty()) {
@@ -100,37 +109,44 @@ public class TreemapChart<X> extends Surface {
 			heightLeft = this.height;
 			widthLeft = this.width;
 
-			squarify(new ArrayDeque<>(newChildren), new ArrayDeque<>(), minimumSide());
+			squarify(newChildren, new ArrayDeque<>(), minimumSide());
 		}
-
 		this.children = newChildren;
+
 	}
 
 
-	private void squarify(Deque<ItemVis> children, Deque<ItemVis> row, double w) {
-		ArrayDeque<ItemVis> remainPoped = new ArrayDeque<>(children);
+	private void squarify(ArrayDeque<ItemVis<X>> children, Collection<ItemVis> row, double w) {
+		ArrayDeque<ItemVis<X>> remainPoped = new ArrayDeque<>(children);
 		ItemVis c = remainPoped.pop();
-		Deque<ItemVis> concatRow = new ArrayDeque<>(row);
-		concatRow.add(c);
 
+		FasterList<ItemVis> concatRow = concat(row, c);
 
 		double worstConcat = worst(concatRow, w);
 		double worstRow = worst(row, w);
 
 		if (row.isEmpty() || (worstRow > worstConcat || isDoubleEqual(worstRow, worstConcat))) {
-			Deque<ItemVis> remaining = new ArrayDeque<>(remainPoped);
-			if (remaining.isEmpty()) {
+
+			if (remainPoped.isEmpty()) {
 				layoutrow(concatRow, w);
 			} else {
-				squarify(remaining, concatRow, w);
+				squarify(remainPoped, concatRow, w);
 			}
 		} else {
 			layoutrow(row, w);
-			squarify(children, new ArrayDeque<>(), minimumSide());
+			squarify(children, Collections.emptyList(), minimumSide());
 		}
 	}
 
-	private static double worst(Deque<ItemVis> ch, double w) {
+	private static FasterList<ItemVis> concat(Collection<ItemVis> row, ItemVis c) {
+		FasterList<ItemVis> concatRow = new FasterList<>(row.size()+1);
+		for (ItemVis i : row)
+			concatRow.add(i);
+		concatRow.add(c);
+		return concatRow;
+	}
+
+	private static double worst(Collection<ItemVis> ch, double w) {
 		if (ch.isEmpty()) {
 			return Double.MAX_VALUE;
 		}
@@ -147,12 +163,11 @@ public class TreemapChart<X> extends Surface {
 				sqAreaSum / (sqw * minArea));
 	}
 
-	private void layoutrow(Deque<ItemVis> row, double w) {
+	private void layoutrow(Iterable<ItemVis> row, double w) {
 
 		double totalArea = 0.0;
 		for (ItemVis item : row) {
-			double area = item.area;
-			totalArea += area;
+			totalArea += item.area;
 		}
 
 		if (layoutOrient == LayoutOrient.VERTICAL) {
@@ -163,11 +178,11 @@ public class TreemapChart<X> extends Surface {
 
 			for (ItemVis item : row) {
 				double area = item.area;
-				item.setTop(top + topItem);
-				item.setLeft(left);
-				item.setWidth(rowWidth);
+				item.top = top + topItem;
+				item.left = left;
+				item.width = rowWidth;
 				double h = (area / rowWidth);
-				item.setHeight(h);
+				item.height = h;
 
 				topItem += h;
 			}
@@ -185,11 +200,11 @@ public class TreemapChart<X> extends Surface {
 
 			for (ItemVis item : row) {
 				double area = item.area;
-				item.setTop(top);
-				item.setLeft(left + rowLeft);
-				item.setHeight(rowHeight);
+				item.top = top;
+				item.left = left + rowLeft;
+				item.height = rowHeight;
 				double wi = (area / rowHeight);
-				item.setWidth(wi);
+				item.width = wi;
 
 				rowLeft += wi;
 			}
@@ -218,7 +233,7 @@ public class TreemapChart<X> extends Surface {
 		return Math.min(heightLeft, widthLeft);
 	}
 
-	private void scaleArea(List<ItemVis<X>> children) {
+	private void scaleArea(Collection<ItemVis<X>> children) {
 		double areaGiven = width * height;
 		double areaTotalTaken = 0.0;
 		for (ItemVis child : children) {

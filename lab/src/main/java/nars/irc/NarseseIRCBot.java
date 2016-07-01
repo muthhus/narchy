@@ -9,19 +9,26 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.experiment.Talk;
+import nars.gui.BagChart;
 import nars.gui.ConceptBagInput;
+import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
+import nars.op.time.MySTMClustered;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.time.RealtimeMSClock;
 import nars.util.Texts;
+import nars.util.Util;
 import nars.util.Wiki;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +39,7 @@ import spacegraph.layout.FastOrganicLayout;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by me on 6/20/15.
@@ -39,6 +47,7 @@ import java.util.List;
 public class NarseseIRCBot extends Talk {
 
     private static final Logger logger = LoggerFactory.getLogger(NarseseIRCBot.class);
+
 
 
     public String toString(Object t) {
@@ -76,12 +85,13 @@ public class NarseseIRCBot extends Talk {
         final int maxNodes = 128;
         final int maxEdges = 8;
 
-        new SpaceGraph<Termed>(
-                new ConceptBagInput(nar, maxNodes, maxEdges)
-        ).withTransform(
-                //new Spiral()
-                new FastOrganicLayout()
-        ).show(900, 900);
+//        new SpaceGraph<Termed>(
+//                new ConceptBagInput(nar, maxNodes, maxEdges)
+//        ).withTransform(
+//                //new Spiral()
+//                new FastOrganicLayout()
+//        ).show(900, 900);
+        BagChart.show((Default) nar);
 
         addOperators();
     }
@@ -141,7 +151,7 @@ public class NarseseIRCBot extends Talk {
                     String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
                     //System.out.println(strippedText);
 
-                    List<Term> tokens = hear(strippedText, $.the("wiki_" + page), nar.self, pri);
+                    List<Term> tokens = hear(strippedText, $.the("wiki_" + page), pri);
 
                     return "Reading " + base + ":\"" + page + "\": " + strippedText.length() + " characters, " + tokens.size() + " tokens";
 
@@ -205,11 +215,92 @@ public class NarseseIRCBot extends Talk {
     public static void main(String[] args) throws Exception {
         Global.DEBUG = false;
 
-        NAR nar = Talk.nar();
+        Random rng = new XorShift128PlusRandom(1);
+        Default nar = new Default(
+                1024, 4, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), true)
+                //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
+                //new Indexes.WeakTermIndex(256 * 1024, rng)
+                //new Indexes.SoftTermIndex(128 * 1024, rng)
+                //new Indexes.DefaultTermIndex(128 *1024, rng)
+                //,new FrameClock()
+                ,new RealtimeMSClock()
+        );
+        nar.perfection.setValue(0);
 
-        new NarseseIRCBot(nar);
+        nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 
-        nar.loop(25f);
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+
+
+        nar.conceptActivation.setValue(0.15f);
+        nar.cyclesPerFrame.set(32);
+
+        nar.logSummaryGT(System.out, 0.6f);
+
+        new MySTMClustered(nar, 32, '.');
+
+        NarseseIRCBot bot = new NarseseIRCBot(nar);
+
+        nar.loop(20f);
+
+        Util.pause(1000);
+
+        logger.info("Reading corpus..");
+
+        Term sehToMe = $.the("seh");
+
+        final String[] corpus = new String[] {
+                "these words are false.",
+                "here is a word and the next word.",
+                "i hear words.",
+
+                "are these words true?",
+
+                "true is not false.",
+
+                "i say words.",
+                "hear my words!",
+                "say my words!",
+
+                "if i hear it maybe i say it.",
+                "a solution exists for each problem.", //https://simple.wikipedia.org/wiki/Problem
+                "talk in a way that helps and feels good!",
+                "language rules word combining to form statements and questions.",
+                "i learn meaning.",
+                "symbols represent ideas, objects, or quantities.",
+                "communication transcends literal meaning.", //https://simple.wikipedia.org/wiki/Pragmatics
+                "feelings, beliefs, desires, and emotions seem to originate spontaneously.",
+                "what is the origin of mental experience?",
+                "i am not you.",
+                "you are not me.",
+
+                "who am i?",
+                "who are you?",
+                "i am me.",
+                "you are you.",
+                "we are we.",
+                "they are they.",
+
+                "where is it?",
+                "it is here.",
+                "it is there.",
+
+                "why is it?",
+                "it is.",
+                "it is not.",
+                "it is because that.",
+
+                "when is it?",
+                "it is now.",
+                "it is then.",
+
+                "dunno."
+        };
+
+        bot.hear(corpus, sehToMe, 0.9f);
 
     }
 
@@ -254,21 +345,29 @@ public class NarseseIRCBot extends Talk {
     int outputBufferLength = 64;
 
     @Override
-    public void say(OperationConcept o, Term content, Compound context) {
+    public void say(OperationConcept o, Term content, Term context) {
         super.say(o, content, context);
 
-        content.recurseTerms(v -> {
-            if (v instanceof Atom) {
-                Atom a = (Atom)v;
-                @NotNull String s = a.toStringUnquoted();
-                synchronized(buffer) {
-                    buffer.append(' ').append(s);
-                }
-            }
-        });
+//        content.recurseTerms(v -> {
+//            String s = null;
+//            if (v instanceof Atom) {
+//                Atom a = (Atom) v;
+//                s = a.toStringUnquoted();
+//            } else {
+//                s = v.toString();
+//            }
+//            if (s!=null) {
+//                synchronized(buffer) {
+//                    buffer.append(' ').append(s);
+//                }
+//            }
+//        });
 
+        String x = content.toString().replace("\""," "); //HACK unquote everything
         String toSend = null;
         synchronized(buffer) {
+            buffer.append(x);
+
             if (buffer.length() > outputBufferLength) {
                 toSend = buffer.toString().trim().replace(" .", ". ").replace(" !", "! ").replace(" ?", "? ");
                 buffer.setLength(0);
@@ -331,7 +430,7 @@ public class NarseseIRCBot extends Talk {
 //        }
 //        else {
 
-        @NotNull List<Task> parsed = nar.tasks(msg, o -> {
+        @NotNull List<Task> parsed = nar.tasks(msg.replace("http://","") /* HACK */, o -> {
             //logger.error("unparsed narsese {} in: {}", o, msg);
         });
 
@@ -348,8 +447,9 @@ public class NarseseIRCBot extends Talk {
 
     }
 
-    private Compound context(String channel, String nick) {
-        return $.p($.quote(nick), nar.self); //ignore channel for now
+    private Term context(String channel, String nick) {
+        return $.quote(nick);
+        //return $.p($.quote(nick), nar.self); //ignore channel for now
     }
 
 //    protected void hear(String msg, String context) {
