@@ -21,7 +21,6 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
 
     final AtomicBoolean busy = new AtomicBoolean(false);
-    private final int limit;
 
     public static void main(String[] args) {
         Default d = new Default();

@@ -21,7 +21,7 @@ import static spacegraph.layout.treechart.TreemapChart.WeightedString.w;
 public class TreemapChart<X> extends Surface {
 
 
-	private int limit = -1;
+	protected int limit = -1;
 
 	public static void main(String[] args) {
 		SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>();
