@@ -49,7 +49,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 break;
 
             case NEG:
-                return t; //return new NegationConcept(t, termbag, taskbag);
+                throw new RuntimeException("building a negated concept should not be attempted");
+                //return t; //return new NegationConcept(t, termbag, taskbag);
 
         }
 

@@ -94,7 +94,7 @@ public class InfinispanIndex extends MaplikeIndex {
     @Override
     protected Termed getNewCompound(@NotNull Compound x) {
 
-        if (x.hasTemporal()) {
+        if (!canBuildConcept(x)) {
             return buildCompound(x);
         } else {
             return conceptsLocal.computeIfAbsent(key((Term)(x.term())), xx -> buildConcept(buildCompound(x)));

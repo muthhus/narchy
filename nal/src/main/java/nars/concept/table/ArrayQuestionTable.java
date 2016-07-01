@@ -160,8 +160,9 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             Concept ac = nar.concept(a);
             if (ac != null) { //??
                 Task ap = ac.merge(q, a, q.occurrence(), nar);
-                if (ap != null)
-                    nar.process(ap);
+                if (ap != null && !ap.isDeleted()) {
+                    nar.inputLater(ap);
+                }
             }
         }
     }
@@ -213,7 +214,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             } else {
                 // FIFO, remove oldest question (last)
                 float removedPri = remove(siz-1, "Table Pop");
-                t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
+                if (removedPri==removedPri) //not deleted
+                    t.budget().setPriority(Math.max(t.pri(), removedPri)); //utilize at least its priority since theyre sorted by other factor
             }
         }
 

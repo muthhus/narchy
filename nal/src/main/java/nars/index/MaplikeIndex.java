@@ -67,12 +67,15 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         Termed y = get(x);
         if (y == null) {
             y = buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
-            Term yt = y.term();
-            if (!(yt instanceof Compound && yt.hasTemporal())) {
-                set(y = buildConcept(y));
+            if (canBuildConcept(y)) {
+                set(y = buildConcept(y) );
             }
         }
         return y;
+    }
+
+    static protected boolean canBuildConcept(Termed y) {
+        return y.op()!= Op.NEG && !y.term().hasTemporal();
     }
 
 

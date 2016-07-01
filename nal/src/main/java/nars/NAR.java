@@ -1064,6 +1064,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         on.add(c);
     }
 
+    /** processes the input before the next frame has run */
+    public final void inputLater(Task ap) {
+        if (!running.get()) {
+            input(ap);
+        } else {
+            runLater((n) -> {
+                n.input(ap);
+            });
+        }
+    }
+
 
 //    @Nullable
 //    public Term eval(@NotNull String x) throws NarseseException {

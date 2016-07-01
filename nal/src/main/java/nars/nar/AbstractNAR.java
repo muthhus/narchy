@@ -138,6 +138,10 @@ public abstract class AbstractNAR extends NAR {
     @Nullable @Override
     public final Concept process(@NotNull Task input, float activation) {
 
+        if (input.isDeleted()) {
+            throw new RuntimeException(input + " deleted");
+        }
+
         Concept c = concept(input, true);
         if (c == null) {
             if (Global.DEBUG) {

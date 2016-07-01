@@ -43,8 +43,8 @@ public class PongEnvironment extends Player implements Environment {
 	int actions = 3;
 
 
-	final int width = 8;
-	final int height = 8;
+	final int width = 3;
+	final int height = 3;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -130,10 +130,12 @@ public class PongEnvironment extends Player implements Environment {
 	private static void addCheats(NAR n, PongEnvironment e) {
 		PongModel pong = e.pong;
 
-		numericSensor("(ball --> x)", n, () -> pong.ball_x, 0.5f, 0.9f);
-		numericSensor("(ball --> y)", n, () -> pong.ball_y, 0.5f, 0.9f);
-		numericSensor("(mypad --> y)", n, () -> pong.player1.position, 0.5f, 0.9f);
-		numericSensor("(theirpad --> y)", n, () -> pong.player2.position, 0.5f, 0.9f);
+		numericSensor("(x,ball)", n, () -> pong.ball_x, 0.5f, 0.9f);
+		numericSensor("(y,ball)", n, () -> pong.ball_y, 0.5f, 0.9f);
+		numericSensor("(y,(pad,mine))", n, () -> pong.player1.position, 0.5f, 0.9f);
+		numericSensor("(y,(pad,theirs))", n, () -> pong.player2.position, 0.5f, 0.9f);
+
+		numericSensor("(dy,ball,(pad,mine))", n, () -> pong.ball_y - pong.player1.position, 0.5f, 0.9f);
 	}
 
 	private static void numericSensor(String term, NAR n, FloatSupplier input, float pri, float conf) {

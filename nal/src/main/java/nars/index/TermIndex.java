@@ -530,17 +530,9 @@ public interface TermIndex {
                 return null; //probably unforseeable
         }
 
-//        if (tt == null)
-//            return null;
-//
-//        Termed c = createIfMissing ? index.the(tt) : index.get(tt);
-//        if (c == null)
-//            return null;
-//        if (!(c instanceof Concept)) {
-//            //throw new RuntimeException("not a concept: " + c + " while resolving: " + t + " create=" + createIfMissing);
-//            return null;
-//        }
-//        return (Concept) c;
+        //unwrap negation
+        if (term.op() == NEG)
+            term = ((Compound)term.term()).term(0);
 
         @Nullable Termed c = get(term, createIfMissing);
         if (c == null)
@@ -607,7 +599,9 @@ public interface TermIndex {
     @Nullable
     default Compound atemporalize(@NotNull Compound c) {
         return (Compound) transform(
-                (c.op().temporal) ? c.dt(DTERNAL) : c,
+                (c.op().temporal && c.dt()!=DTERNAL) ?
+                        (Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
+                        c,
                 CompoundAtemporalizer);
     }
 
