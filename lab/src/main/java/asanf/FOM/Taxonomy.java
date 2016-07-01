@@ -8,10 +8,10 @@ public class Taxonomy<E> implements Iterable<E>{
 	private double[][] relations;
     private ArrayList<E> concepts;
    
-    public Taxonomy(int size){
-    	relations = new double[size][size];
-    	concepts = new ArrayList<E>();
-    }
+//    public Taxonomy(int size){
+//    	relations = new double[size][size];
+//    	concepts = new ArrayList<E>();
+//    }
     
     public Taxonomy(ArrayList<E> concepts){
     	this.concepts = concepts;

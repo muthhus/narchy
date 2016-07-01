@@ -121,16 +121,6 @@ public class RawBudget extends Budget {
     }
 
     @Override
-    public float setLastForgetTime(float currentTime) {
-        throw new UnsupportedOperationException("Use UnitBudget");
-    }
-
-    @Override
-    public float getLastForgetTime() {
-        throw new UnsupportedOperationException("Use UnitBudget");
-    }
-
-    @Override
     public void _setPriority(float p) {
         this.priority = p;
     }

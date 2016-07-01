@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.FastOrganicLayout;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -226,7 +227,6 @@ public class NarseseIRCBot extends Talk {
                 //,new FrameClock()
                 ,new RealtimeMSClock()
         );
-        nar.perfection.setValue(0);
 
         nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
@@ -244,9 +244,11 @@ public class NarseseIRCBot extends Talk {
 
         NarseseIRCBot bot = new NarseseIRCBot(nar);
 
-        nar.loop(20f);
+        nar.loop(5f);
 
-        Util.pause(1000);
+
+        nar.log();
+        nar.input(new File("/home/me/quietwars.nal"));
 
         logger.info("Reading corpus..");
 

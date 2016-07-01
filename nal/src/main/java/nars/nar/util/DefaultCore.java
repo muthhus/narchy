@@ -3,7 +3,6 @@ package nars.nar.util;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.forget.Forget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
@@ -56,9 +55,9 @@ public class DefaultCore extends AbstractCore {
         //set capacity first in case there are any queued items, they may join during the commit */
         c.capacity(warm);
 
-        //clean out any deleted links since having been deactivated
-        c.tasklinks().commit(Forget.QualityToPriority);
-        c.termlinks().commit(Forget.QualityToPriority);
+//        //clean out any deleted links since having been deactivated
+        c.tasklinks().commit();//Forget.QualityToPriority);
+        c.termlinks().commit();//Forget.QualityToPriority);
 
         return true;
     }

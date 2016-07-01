@@ -31,11 +31,6 @@ public final class ROBudget extends Budget {
     }
 
     @Override
-    public float setLastForgetTime(float currentTime) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void _setDurability(float d) {
         throw new UnsupportedOperationException();
     }
@@ -66,8 +61,4 @@ public final class ROBudget extends Budget {
         return dur;
     }
 
-    @Override
-    public float getLastForgetTime() {
-        return Float.NaN;
-    }
 }

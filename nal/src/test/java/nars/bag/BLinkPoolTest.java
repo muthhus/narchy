@@ -14,7 +14,7 @@ public class BLinkPoolTest {
     public void test1() {
         int c = 4;
         BLinkPool<String> p = new BLinkPool<>(c);
-        assertEquals(p.b.length, c * 7);
+        assertEquals(p.b.length, c * 6);
 
 
         BLinkPool<String>.BLinkI b0 = p.get(0);

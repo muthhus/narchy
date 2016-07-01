@@ -85,11 +85,11 @@ public abstract class AbstractCore {
         this.conceptsFiredPerCycle = new MutableInteger(1);
 
         this.concepts = newConceptBag();
-        this.conceptUpdate = new AutoBag<>(nar.perfection);
+        this.conceptUpdate = new AutoBag<>();
 
 
-        this.termlinkUpdate = new AutoBag(nar.perfection);
-        this.tasklinkUpdate = new AutoBag(nar.perfection);
+        this.termlinkUpdate = new AutoBag();
+        this.tasklinkUpdate = new AutoBag();
 
     }
 

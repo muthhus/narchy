@@ -25,19 +25,7 @@ public abstract class Param extends Container implements Level {
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
-    /**
-     * Perfection determines a minimum budget prioritization of items
-     * in proportion to the budgeted quality. This means that the
-     * attention of a reasoner in higher perfection state
-     * will be more dominated by high-quality items.  In other words,
-     * it is driven more towards maximization of quality rather than
-     * allowing for exploration of that which has less quality.
-     *
-     * previously called "bag threshold" and had default value = 0.1
-     */
-    @NotNull
-    @Range(min=0, max=1f)
-    public final MutableFloat perfection = new MutableFloat(0.1f);
+
 
     @NotNull
     @Range(min=0, max=1f)

@@ -23,14 +23,6 @@ public abstract class BLink<X> extends Budget implements Link<X> {
 
     abstract public void init(float p, float d, float q);
 
-    public final void setPriority(float p, float now) {
-        setPriority(p);
-        setLastForgetTimeDirect(now);
-    }
-
-    protected abstract void setLastForgetTimeDirect(float now);
-
-
     abstract public float priDelta();
 
     @Override

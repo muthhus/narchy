@@ -21,7 +21,7 @@ public final class AutoBag<V> implements BudgetForget {
     //private final Forget.AbstractForget forget;
 
 
-    public AutoBag(@NotNull MutableFloat perfection) {
+    public AutoBag() {
         //this(new Forget.ExpForget(new MutableFloat(0), perfection));
         //this(new Forget.PercentForget(new MutableFloat(0), perfection));
     }
@@ -97,7 +97,6 @@ public final class AutoBag<V> implements BudgetForget {
 
     @Override
     public void accept(BLink bLink) {
-        bLink.setLastForgetTime(now);
         bLink.priMult( 1f - (ratio * (1f - bLink.dur()) ));
     }
 }

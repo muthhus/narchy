@@ -154,7 +154,7 @@ public enum Global {
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
-    public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 4;
+    public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 16;
 
 
     @NotNull

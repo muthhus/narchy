@@ -45,10 +45,6 @@ public class UnitBudget extends RawBudget {
     public static final Budget Zero = new ROBudget(0,0,0);
 
 
-    /**
-     * time at which this budget was last forgotten, for calculating accurate memory decay rates
-     */
-    protected float lastForgetTime = Float.NaN;
 
 
     public UnitBudget(float p, float d, @Nullable Truth qualityFromTruth) {
@@ -75,21 +71,17 @@ public class UnitBudget extends RawBudget {
     public UnitBudget() {
     }
 
-    public UnitBudget(Budget v) {
-        this(v, false);
-    }
+
 
     /**
      * Cloning constructor
      *
      * @param v Budget value to be cloned
      */
-    public UnitBudget(@Nullable Budget v, boolean copyLastForgetTime) {
+    public UnitBudget(@Nullable Budget v) {
         this();
         if (v != null) {
             budget(v);
-            if (!copyLastForgetTime)
-                setLastForgetTime(Float.NaN);
         }
     }
 
@@ -104,7 +96,7 @@ public class UnitBudget extends RawBudget {
     @NotNull
     @Override
     public final Budget clone() {
-        return new UnitBudget(this, true);
+        return new UnitBudget(this);
     }
 
 
@@ -126,22 +118,6 @@ public class UnitBudget extends RawBudget {
 //    public void andQuality(float v) {
 //        quality = and(quality, v);
 //    }
-
-
-    @Override
-    public final float setLastForgetTime(float currentTime) {
-
-        float period = (lastForgetTime == lastForgetTime /* NaN test */) ? 0 : currentTime - lastForgetTime;
-
-        lastForgetTime = currentTime;
-        return period;
-    }
-
-    @Override
-    public final float getLastForgetTime() {
-        return lastForgetTime;
-    }
-
 
 
 

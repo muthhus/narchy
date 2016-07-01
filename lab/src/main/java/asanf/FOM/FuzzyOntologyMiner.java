@@ -1,11 +1,15 @@
 package asanf.FOM;
 
+import asanf.FOM.Util.BMI;
 import asanf.FOM.Util.CorrelationFunction;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.tagger.common.Tagger;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import nars.$;
+import nars.term.Term;
+import nars.truth.Truth;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
@@ -16,6 +20,109 @@ import static edu.stanford.nlp.tagger.maxent.MaxentTagger.DEFAULT_NLP_GROUP_MODE
 
 
 public class FuzzyOntologyMiner {
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+        TermFrequencies<String> tf = new TermFrequencies<String>();
+        String[] tags = new String[2];
+        tags[0] = "NN";
+        //tags[1] = "NN";
+        int windowSize = 10;
+        // vecchi reuters 0.01 / 0.03
+        double lower = 0.03;
+        double upper = 0.55;
+        double alpha = 0.02;
+        double beta = 0.55;
+        double lambda = 0.022;
+
+        String path = "/tmp/u/silent_weapons_quiet_wars.txt";
+        String domain = "quietwars";
+
+        tf = FuzzyOntologyMiner.extractFrequencies(path, windowSize, tags);
+
+        //System.out.println("totWin: " + tf.getTotWindows());
+
+        tf.filterTerms(lower, upper);
+
+        //for(String e: tf){
+        //System.out.println(e + ": " + tf.getFrequency(e));
+        //}
+        Collection<String> concepts = tf.getTerms();
+        Term[] conceptTerms = concepts.stream().map(x -> $.quote(x)).toArray(i->new Term[i]);
+        System.out.println( $.inh( $.sete(conceptTerms), $.the(domain) ) + "." );
+
+        for(String i: tf){
+            for(String j: tf){
+                if(!i.equals(j)){
+                    double f = tf.getFrequency(i, j);
+                    if( f > 0 ) {
+                        correlation(i, j, f);
+                    }
+                }
+            }
+        }
+
+        ContextVectors<String> cv;
+        CorrelationFunction cf = new BMI(beta);
+        cv = FuzzyOntologyMiner.createContextVectors(tf, cf, alpha);
+
+        Collection<String> terms = tf.getTerms();
+
+        //System.out.println(concepts.size() != terms.size());
+
+
+        for(String concept: concepts)
+            for(String term: terms)
+                if(!concept.equals(term)){
+                    double mem = cv.getMembership(concept, term);
+                    inh(term, concept, mem);
+                }
+
+        Taxonomy<String> taxonomy;
+
+
+        taxonomy = FuzzyOntologyMiner.createTaxonomy(cv, lambda);
+        taxonomy.taxonomyPruning();
+
+        for(String c1: concepts)
+            for(String c2: concepts){
+                if (c1.equals(c2)) continue;
+                double spec = taxonomy.getSpecificity(c1, c2);
+                if(spec > 0) {
+                    sim(c1, c2, spec);
+                }
+            }
+
+    }
+
+    private static void inh(String term, String concept, double mem) {
+        Truth t = t(mem);
+        if (t!=null)
+            System.out.println("(" + q(term) + "-->" + q(concept) + "). " + t);
+    }
+    private static void sim(String term, String concept, double spec) {
+        Truth t = t(spec);
+        if (t!=null)
+            System.out.println("(" + q(term) + "<->" + q(concept) + "). " + t);
+    }
+
+    static void correlation(String i, String j, double f) {
+        Truth t = t(f);
+        if (t!=null)
+            System.out.println("(" + q(i) + "&" + q(j) + "). " + t);
+    }
+
+    private static String q(String j) {
+        return "\"" + j + "\"";
+    }
+
+    private static Truth t(double f) {
+        return $.t(1f, (float)f);
+    }
+
+
+
+    private static final int MIN_WORD_LENGTH = 2;
 
     /**
      * Metodo che restituisce la matrice di frequenze dei termini nella collezione di documenti
@@ -88,6 +195,9 @@ public class FuzzyOntologyMiner {
 						 * La parola ottenuta viene aggiunta ai termini filtrati solo se non è una stopword
 						 * e non è un segno di punteggiatura (ovvero rispetta la regexp [a-zA-Z0-9]+)
 						 */
+                if (word.word().length() < MIN_WORD_LENGTH)
+                    continue;
+
                 word.setWord(word.word().toLowerCase());
                 word.setWord(stemmer.lemma(word.word(), word.tag()));
                 if (!sw.isStopWord(word.word()) && word.word().matches("[a-zA-Z]+")) { //\\w+")){

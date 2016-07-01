@@ -33,8 +33,6 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     /** delta qua */
     private float dQua;
 
-    /** time of last forget */
-    private float lastForget;
 
     public DefaultBLink(X id, float p, float d, float q) {
         init(p, d, q);
@@ -52,7 +50,6 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         PRI = clamp(p);
         DUR = clamp(d);
         QUA = clamp(q);
-        lastForget = Float.NaN;
     }
 
     @Override
@@ -120,24 +117,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         changed = true;
     }
 
-    @Override
-    @Deprecated public final float setLastForgetTime(float currentTime) {
-        float lastForget = this.lastForget;
-        float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
-        this.lastForget = currentTime;
-        return diff;
-    }
 
-    /** doesnt compute the delta */
-    @Override
-    public final void setLastForgetTimeDirect(float currentTime) {
-        lastForget = currentTime;
-    }
-
-    @Override
-    public final float getLastForgetTime() {
-        return lastForget;
-    }
 
     @Override public String toString2() {
         return toString() + "+/-:" + dPri + ';' + dDur + ';' + dQua;

@@ -126,12 +126,6 @@ public abstract class Budget implements Budgeted {
     /** called from setPriority after validation */
     protected abstract void _setPriority(float p);
 
-    /**
-     * returns the period in time: currentTime - lastForgetTime and sets the lastForgetTime to currentTime
-     */
-
-    public abstract float setLastForgetTime(float currentTime);
-
    
 
 //    public Budget mult(float priFactor, float durFactor, float quaFactor) {
@@ -276,7 +270,6 @@ public abstract class Budget implements Budgeted {
             zero();
         } else {
             budget(source.pri(), source.dur(), source.qua());
-            setLastForgetTime(source.getLastForgetTime());
         }
 
         return this;

@@ -20,9 +20,6 @@ import nars.nal.rule.PremiseRule;
 import nars.op.in.FileInput;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.task.flow.Input;
-import nars.task.flow.TaskQueue;
-import nars.task.flow.TaskStream;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
@@ -508,17 +505,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     @NotNull
-    public TaskQueue input(@NotNull Collection<Task> t) {
-        TaskQueue tq = new TaskQueue(t);
-        input((Input) tq);
-        return tq;
+    public void input(@NotNull Collection<Task> t) {
+        //TaskQueue tq = new TaskQueue(t);
+        //input((Input) tq);
+        //return tq;
+        t.forEach(this::input);
     }
 
     @NotNull
-    public TaskQueue input(@NotNull Task... t) {
-        TaskQueue tq = new TaskQueue(t);
-        input((Input) tq);
-        return tq;
+    public void input(@NotNull Task... t) {
+//        TaskQueue tq = new TaskQueue(t);
+//        input((Input) tq);
+//        return tq;
+        for (Task x : t)
+            input(x);
     }
 
 
@@ -537,15 +537,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return o;
     }
 
-    /**
-     * Adds an input channel for input from an external sense / sensor.
-     * Will remain added until it closes or it is explicitly removed.
-     */
-    @NotNull
-    public Input input(@NotNull Input i) {
-        i.input(this, 1);
-        return i;
-    }
+
 
     /**
      * Exits an iteration loop if running
@@ -1022,7 +1014,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public void input(@NotNull Stream<Task> taskStream) {
-        input(new TaskStream(taskStream));
+        taskStream.forEach(this::input);
+        //input(new TaskStream(taskStream));
     }
 
 

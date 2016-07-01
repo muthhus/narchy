@@ -11,7 +11,6 @@ public class SATStream {
         Default d = new Default(1000, 1, 1, 3);
 
         d.conceptActivation.setValue(0.2f);
-        d.perfection.setValue(0.5f);
 
 
         d.log();

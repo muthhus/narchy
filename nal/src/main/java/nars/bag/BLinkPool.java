@@ -23,7 +23,7 @@ public class BLinkPool<X> {
 
     public BLinkPool(int capacity) {
         this.cap = capacity;
-        this.b = new float[7 * capacity];
+        this.b = new float[6 * capacity];
         this.changed = new FastBitSet(capacity);
     }
 
@@ -49,9 +49,6 @@ public class BLinkPool<X> {
     final static int DQUA = 5;
 
 
-
-    /** time of last forget */
-    final static int LASTFORGET = 6;
 
     /**
      * Buffered Budget Link (an entry in a bag) - Indexed version
@@ -90,7 +87,7 @@ public class BLinkPool<X> {
 
         public void init(float p, float d, float q) {
             float[] b = BLinkPool.this.b;
-            int x = o * 7;
+            int x = o * 6;
             b[x++] = clamp(p);
             b[x++] = 0;
             b[x++] = clamp(d);
@@ -122,7 +119,7 @@ public class BLinkPool<X> {
         public final boolean commit() {
             if (isChanged()) {
                 float[] b = BLinkPool.this.b;
-                int x = o * 7;
+                int x = o * 6;
                 b[x] = clamp(b[x] + b[++x]); b[x++] = 0;
                 b[x] = clamp(b[x] + b[++x]); b[x++] = 0;
                 b[x] = clamp(b[x] + b[++x]); b[x++] = 0;
@@ -134,7 +131,7 @@ public class BLinkPool<X> {
 
         @Override
         public final float pri() {
-            return b[o * 7 /*+ PRI*/];
+            return b[o * 6 /*+ PRI*/];
         }
 
         @Override
@@ -145,14 +142,14 @@ public class BLinkPool<X> {
 
         protected final void setValue(int x, float v) {
             float[] b = BLinkPool.this.b;
-            int xx = (o * 7) + 2 * x;
+            int xx = (o * 6) + 2 * x;
             float delta = v - b[xx];
             b[xx + 1] += delta;
             setChanged(true);
         }
         protected final float getValue(int x) {
             float[] b = BLinkPool.this.b;
-            int xx = (o * 7) + 2 * x;
+            int xx = (o * 6) + 2 * x;
             return b[xx];
         }
 
@@ -179,21 +176,6 @@ public class BLinkPool<X> {
         @Override
         public void _setQuality(float q) {
             setValue(2, q);
-        }
-
-        @Override
-        public final float setLastForgetTime(float currentTime) {
-            float[] b = BLinkPool.this.b;
-            int x = o * 7 + LASTFORGET;
-            float lastForget = b[x];
-            float diff = (lastForget != lastForget /* NaN test */) ? Global.SUBFRAME_EPSILON : (currentTime - lastForget);
-            b[x] = currentTime;
-            return diff;
-        }
-
-        @Override
-        public float getLastForgetTime() {
-            return b[LASTFORGET];
         }
 
 

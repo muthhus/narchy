@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Consumer;
 
-/** an input that generates tasks in batches, which are stored in a buffer */
+/** inputs a queue of tasks at a fixed rate per frame */
 public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task> {
 
     //private On reg=null;
@@ -71,9 +71,6 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
             add(task);
     }
 
-    public void input(@NotNull NAR nar) {
-        nar.input((Input)this);
-    }
 
 
 //    @Override
