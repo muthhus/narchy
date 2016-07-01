@@ -57,7 +57,7 @@ public class Revision {
     @Nullable
     public static Task merge(@NotNull Task a, @NotNull Task b, long now, long newOcc, @NotNull Truth newTruth) {
 
-        if (Compound.atemporallyEqual(a.term(), b.term())) {
+        if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Compound.atemporallyEqual(a.term(), b.term())) {
             float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
             float bw = c2w(b.conf());
 

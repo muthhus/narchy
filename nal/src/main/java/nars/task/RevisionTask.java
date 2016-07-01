@@ -24,6 +24,8 @@ public class RevisionTask extends MutableTask  {
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc(), conclusion, newBelief, oldBelief);
 
+        if (!newBelief.isBeliefOrGoal() || !oldBelief.isBeliefOrGoal() )
+            throw new UnsupportedOperationException("invalid punctuation");
 
         time(creationTime, occTime);
         budget(oldBelief, newBelief);
