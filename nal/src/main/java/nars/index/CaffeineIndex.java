@@ -2,42 +2,80 @@ package nars.index;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import nars.$;
+import com.github.benmanes.caffeine.cache.Weigher;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 
-public class CaffeineIndex extends MaplikeIndex {
+public class CaffeineIndex extends MaplikeIndex  {
 
     @NotNull
-    final Cache<Termed, Termed> concepts;
+    public final Cache<Termed, Termed> concepts;
     @NotNull
-    final Cache<TermContainer, TermContainer> subterms;
+    public final Cache<TermContainer, TermContainer> subterms;
 
-    public CaffeineIndex(int initialSize, Concept.ConceptBuilder builder) {
-        this(initialSize, builder, false);
+
+    private final Weigher<Termed, Termed> conceptWeigher = (k,v) -> {
+        if (v instanceof Atomic) {
+            return 1;
+        } else {
+            if (!(v instanceof CompoundConcept)) {
+                //special implementation, dont allow removal
+                return 0;
+            }
+            int w = v.volume();// * weightFactor;
+            //w/=(1f + maxConfidence((CompoundConcept)v));
+
+            return (int)w;
+        }
+    };
+
+    private float maxConfidence(CompoundConcept v) {
+        return Math.max(v.beliefs().confMax(), v.goals().confMax());
     }
 
-    public CaffeineIndex(int initialSize, Concept.ConceptBuilder conceptBuilder, boolean soft) {
+    private final Weigher<TermContainer, TermContainer> subtermWeigher = new Weigher<TermContainer, TermContainer>() {
+        @Override
+        public int weigh(@Nonnull TermContainer key, @Nonnull TermContainer value) {
+            return (int)value.volume();// * weightFactor);
+        }
+    };
+
+    public CaffeineIndex(int maxWeight, Concept.ConceptBuilder builder) {
+        this(maxWeight, builder, false);
+    }
+
+    public CaffeineIndex(int maxWeight, Concept.ConceptBuilder conceptBuilder, boolean soft) {
         super(conceptBuilder);
 
-        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), initialSize, soft);
+        Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
+
+        builder.weigher(conceptWeigher)
+               .maximumWeight(maxWeight)
+               .recordStats();
+
         concepts = builder.build();
 
-        Caffeine<Object, Object> subBuilder = prepare(Caffeine.newBuilder(), initialSize, soft);
+
+        Caffeine<TermContainer, TermContainer> subBuilder = prepare(Caffeine.newBuilder(), soft);
+        subBuilder.weigher(subtermWeigher)
+                .maximumWeight(maxWeight);
+
         subterms = subBuilder.build();
     }
 
-    private Caffeine<Object, Object> prepare(Caffeine<Object, Object> builder, int initialSize, boolean soft) {
 
-        builder = builder.initialCapacity(initialSize);
+    private Caffeine prepare(Caffeine<Object, Object> builder, boolean soft) {
+
+        //builder = builder.initialCapacity(initialSize);
 
         if (soft) {
             //builder = builder.softValues();
@@ -141,4 +179,5 @@ public class CaffeineIndex extends MaplikeIndex {
     public @NotNull String summary() {
         return concepts.estimatedSize() + " concepts, " + subterms.estimatedSize() + " subterms";
     }
+
 }

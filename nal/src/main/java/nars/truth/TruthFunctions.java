@@ -101,7 +101,7 @@ public final class TruthFunctions extends UtilityFunctions {
     public static Truth deductionR(@NotNull Truth a, float reliance, float minConf) {
         float f = a.freq();
         float c = and(f, a.conf(), reliance);
-        return t(f, c, minConf);
+        return c < minConf ? null : t(f, c);
     }
         /* ----- double argument functions, called in SyllogisticRules ----- */
 
@@ -202,7 +202,7 @@ public final class TruthFunctions extends UtilityFunctions {
     @NotNull
     public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
-        return t(1, c, minConf);
+        return c < minConf ? null : t(1, c);
     }
 
 

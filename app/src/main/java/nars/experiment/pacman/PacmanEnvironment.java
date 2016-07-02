@@ -19,9 +19,11 @@
 
 package nars.experiment.pacman;
 
+import com.github.benmanes.caffeine.cache.Policy;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
@@ -34,13 +36,19 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
+import nars.util.Texts;
+import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * the java application class of pacman 
@@ -67,7 +75,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
-				new CaffeineIndex(128*1024, new DefaultConceptBuilder(rng), true)
+				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), true)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -76,14 +84,16 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		nar.conceptActivation.setValue(0.1f);
 
+		new MemoryManager(nar);
+
 		nar.beliefConfidence(0.7f);
 		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
-		nar.confMin.setValue(0.05f);
+		nar.cyclesPerFrame.set(24);
+		nar.confMin.setValue(0.03f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -360,6 +370,93 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		super.killGhost();
 	}
 
+	private static class MemoryManager implements Consumer<NAR> {
+
+		private static final Logger logger = LoggerFactory.getLogger(MemoryManager.class);
+		private final Default nar;
+		private final CaffeineIndex index;
+
+		float linkMinLow = 4, linkMaxLow = 8, linkMinHigh = 16, linkMaxHigh = 32;
+		float confMinMin = 0.15f, confMinMax = 0.05f;
+		float durMinMin = 0.1f, durMinMax = Global.BUDGET_EPSILON*4f;
+
+		public MemoryManager(Default nar) {
+
+			this.nar = nar;
+
+			this.index = ((CaffeineIndex) nar.index);
+
+			nar.onFrame(this);
+		}
+
+		@Override
+		public void accept(NAR nar) {
+			update();
+		}
+
+		protected void update() {
+			long max  = Runtime.getRuntime().maxMemory();
+			long total = Runtime.getRuntime().totalMemory();
+			long free  = Runtime.getRuntime().freeMemory();
+			float ratio = ((float)total)/max;
+			logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
+
+			nar.conceptCold.termlinksCapacityMin.set(
+					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)/2
+			);
+			nar.conceptCold.termlinksCapacityMax.set(
+					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)/2
+			);
+			nar.conceptWarm.termlinksCapacityMin.set(
+					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)
+			);
+			nar.conceptWarm.termlinksCapacityMax.set(
+					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)
+			);
+			nar.confMin.setValue(
+					Util.lerp(confMinMin, confMinMax, ratio)
+			);
+			nar.durMin.setValue(
+					Util.lerp(durMinMin, durMinMax, ratio)
+			);
+			nar.cyclesPerFrame.setValue(
+					(int)Util.lerp(1, 32, ratio)
+			);
+//			index.setWeightFactor(
+//					Util.lerp(1, 16, ratio*ratio)
+//			);
+
+			//int targetSize = 8 * 1024;
+
+			//int m = (int) Util.lerp(2, 100, ratio) * targetSize;
+
+			Consumer<Policy.Eviction> evictionConsumer = e -> {
+				float warningRatio = 0.75f;
+				if (ratio > warningRatio) {
+					float over = ratio - warningRatio;
+					e.setMaximum((long) (e.weightedSize().getAsLong() * (1f - over))); //shrink
+				} else {
+					e.setMaximum((long) (Math.max(e.getMaximum(),e.weightedSize().getAsLong()) * 1.05f)); //grow
+				}
+			};
+			index.concepts.policy().eviction().ifPresent(evictionConsumer);
+			index.subterms.policy().eviction().ifPresent(evictionConsumer);
+
+
+			if (ratio > 0.5f) {
+
+				index.concepts.cleanUp();
+				index.subterms.cleanUp();
+
+				logger.error("{}", index.concepts.stats());
+
+			}
+			if (ratio > 0.99f) {
+				logger.error("memory alert");
+				System.gc();
+			}
+		}
+	}
 }
 
 

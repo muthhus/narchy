@@ -46,8 +46,8 @@ public abstract class Param extends Container implements Level {
 //    /** budget summary necessary to Conceptualize. this will compare the summary of the task during the TaskProcess */
 //    public final AtomicDouble newConceptThreshold = new AtomicDouble(0);
 
-    /** budget durability threshold  necessary to form a derived task. */
-    public final MutableFloat derivationDurabilityThreshold = new MutableFloat(0);
+    /** budget durability threshold necessary to form a derived task. */
+    public final MutableFloat durMin = new MutableFloat(0);
 
 
 //    /** budget summary necessary to execute a desired Goal */

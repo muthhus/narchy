@@ -84,13 +84,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
-//    /** tasks which are to be executed asynchronously by the next frame's start. if the tasks
-//     * are not finished by then, it will wait for them before proceeding with the next frame.
-//     */
-//    private ThreadPoolExecutor asyncPerFrame = null;
-
     private static final ExecutorService asyncs = //shared
-            (ThreadPoolExecutor) Executors.newCachedThreadPool();
+            ForkJoinPool.commonPool();
+            //(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
@@ -108,8 +104,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * Flag for running continuously
      */
     public final AtomicBoolean running = new AtomicBoolean();
-
-    //final Narjure rt = new Narjure();
 
 
     private final transient Deque<Consumer<NAR>> nextTasks =

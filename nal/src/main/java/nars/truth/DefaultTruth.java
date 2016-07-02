@@ -42,7 +42,7 @@ public class DefaultTruth implements Truth  {
 
         //assert(Float.isFinite(f) && Float.isFinite(c));
 
-        this.freq = f = clampround(f, epsilon);
+        this.freq /*= f*/ = clampround(f, epsilon);
         this.conf = c = clampround(c, epsilon);
 
         if (c==0)

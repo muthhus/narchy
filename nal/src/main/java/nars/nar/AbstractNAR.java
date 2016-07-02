@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.rule.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.op.data.*;
 import nars.op.math.length;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
-import java.util.function.Consumer;
 
 
 /**
@@ -52,7 +50,7 @@ public abstract class AbstractNAR extends NAR {
         conceptWarm = new DefaultConceptPolicy(12, 10, 4, 24, 12);
         conceptCold = new DefaultConceptPolicy(10, 8, 1, 16, 8);
 
-        derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
+        durMin.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
         taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 

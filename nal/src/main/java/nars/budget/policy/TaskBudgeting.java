@@ -38,7 +38,7 @@ public class TaskBudgeting {
 
         float linkDur = aveAri( taskLink.dur(), termLink.dur() );
         final float durability = linkDur * volRatioScale;
-        float minDur = p.nar().derivationDurabilityThreshold.floatValue();
+        float minDur = p.nar().durMin.floatValue();
         if (durability < minDur)
             return null;
 
