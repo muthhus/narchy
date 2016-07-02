@@ -42,7 +42,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @return The quality of the judgment, according to truth value only
      */
     public static float truthToQuality(@NotNull Truthed t) {
-        float exp = t.expectation();
+        //float exp = t.expectation();
 
         //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
         //return Math.max(exp, (1.0f - exp) * 0.75f);

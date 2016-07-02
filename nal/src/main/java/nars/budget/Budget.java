@@ -16,7 +16,7 @@ import static nars.nal.UtilityFunctions.or;
 /**
  * Created by me on 12/11/15.
  */
-public abstract class Budget implements Budgeted {
+public interface Budget extends Budgeted {
 
 
 
@@ -37,7 +37,7 @@ public abstract class Budget implements Budgeted {
 
 
     @Override
-    public final float priIfFiniteElseZero() {
+    default float priIfFiniteElseZero() {
         float p = pri();
         return /*Float.isFinite(p)*/ (p==p) ? p : 0;
     }
@@ -69,30 +69,27 @@ public abstract class Budget implements Budgeted {
      * set all quantities to zero
      */
     @Nullable
-    public Budget zero() {
+    default Budget zero() {
         return budget(0, 0, 0);
     }
 
-    /** the result of this should be that pri() is not finite (ex: NaN)
-     * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
-    abstract public boolean delete();
 
 
     @NotNull
     @Override
-    public final Budget budget() {
+    default Budget budget() {
         return this;
     }
 
-    public final void priAdd(float toAdd) {
+    default void priAdd(float toAdd) {
         setPriority(pri() + toAdd);
     }
-    public final void priSub(float toSubtract) {
+    default void priSub(float toSubtract) {
         priAdd(-toSubtract);
     }
 
     @NotNull
-    public Budgeted cloneMult(float p, float d, float q) {
+    default Budgeted cloneMult(float p, float d, float q) {
         Budget x = clone();
         x.mul(p, d, q);
         return x;
@@ -116,7 +113,7 @@ public abstract class Budget implements Budgeted {
      * @param p The new priority
      * @return whether the operation had any effect
      */
-    public final void setPriority(float p) {
+    default void setPriority(float p) {
         if (p!=p /* fast NaN test */)
             throw new InvalidPriorityException();
 
@@ -124,53 +121,53 @@ public abstract class Budget implements Budgeted {
     }
 
     /** called from setPriority after validation */
-    protected abstract void _setPriority(float p);
+    void _setPriority(float p);
 
    
 
-//    public Budget mult(float priFactor, float durFactor, float quaFactor) {
+//    default Budget mult(float priFactor, float durFactor, float quaFactor) {
 //        if (priFactor!=1) priMult(priFactor);
 //        if (durFactor!=1) durMult(durFactor);
 //        if (quaFactor!=1) quaMult(quaFactor);
 //        return this;
 //    }
 //
-    public final void priMult(float factor) {
+    default void priMult(float factor) {
         float pri = pri();
         if (pri==pri) //if not deleted
             setPriority(pri * factor);
     }
 
-    public void durMult(float factor) {
+    default void durMult(float factor) {
         setDurability(dur() * factor);
     }
-    public void quaMult(float factor) {
+    default void quaMult(float factor) {
         setQuality(qua() * factor);
     }
 
 
-//    public void durMult(float factor) {
+//    default void durMult(float factor) {
 //        setDurability(dur() * factor);
 //    }
-//    public void quaMult(float factor) {
+//    default void quaMult(float factor) {
 //        setQuality(qua() * factor);
 //    }
 
 
-    public final void setDurability(float d) {
+    default void setDurability(float d) {
         _setDurability(Util.clamp(d));
     }
 
     public abstract void _setDurability(float d);
 
 
-    public final void setQuality(float q) {
+    default void setQuality(float q) {
         _setQuality(Util.clamp(q));
     }
 
     public abstract void _setQuality(float q);
 
-    public boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
+    default boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
         return Util.equals(pri(), t.pri(), epsilon) &&
                 Util.equals(dur(), t.dur(), epsilon) &&
                 Util.equals(qua(), t.qua(), epsilon);
@@ -182,10 +179,10 @@ public abstract class Budget implements Budgeted {
      *
      * @param v The increasing percent
      */
-    public void orPriority(float v) {
+    default void orPriority(float v) {
         setPriority(or(pri(), v));
     }
-    public void orPriority(float x, float y) {
+    default void orPriority(float x, float y) {
         setPriority(or(pri(), x, y));
     }
 
@@ -194,26 +191,25 @@ public abstract class Budget implements Budgeted {
 
 
     @NotNull
-    @Override
-    public abstract Budget clone();
+    Budget clone();
 
-    public boolean summaryLessThan(float s) {
+    default boolean summaryLessThan(float s) {
         return !summaryNotLessThan(s);
     }
 
     /**
      * uses optimized aveGeoNotLessThan to avoid a cube root operation
      */
-    public boolean summaryNotLessThan(float min) {
+    default boolean summaryNotLessThan(float min) {
         return min == 0f || aveGeoNotLessThan(min, pri(), dur(), qua());
     }
 
 
-//    public void maxDurability(final float otherDurability) {
+//    default void maxDurability(final float otherDurability) {
 //        setDurability(Util.max(getDurability(), otherDurability)); //max durab
 //    }
 //
-//    public void maxQuality(final float otherQuality) {
+//    default void maxQuality(final float otherQuality) {
 //        setQuality(Util.max(getQuality(), otherQuality)); //max durab
 //    }
 
@@ -222,7 +218,7 @@ public abstract class Budget implements Budgeted {
      *
      * @param v The increasing percent
      */
-    public void orDurability(float v) {
+    default void orDurability(float v) {
         setDurability(or(dur(), v));
     }
 
@@ -231,14 +227,14 @@ public abstract class Budget implements Budgeted {
      *
      * @param v The decreasing percent
      */
-    public void andDurability(float v) {
+    default void andDurability(float v) {
         setDurability(and(dur(), v));
     }
 
     /**
      * AND's (multiplies) priority with another value
      */
-    public void andPriority(float v) {
+    default void andPriority(float v) {
         setPriority(and(pri(), v));
     }
 
@@ -250,7 +246,7 @@ public abstract class Budget implements Budgeted {
 //     *
 //     * @return The decision on whether to process the Item
 //     */
-//    public boolean summaryGreaterOrEqual(float budgetThreshold) {
+//    default boolean summaryGreaterOrEqual(float budgetThreshold) {
 //
 //        if (isDeleted()) return false;
 //
@@ -265,7 +261,7 @@ public abstract class Budget implements Budgeted {
      * copies a budget into this; if source is null, it deletes the budget
      */
     @NotNull
-    public Budget budget(@Nullable Budgeted source) {
+    default Budget budget(@Nullable Budgeted source) {
         if (source == null) {
             zero();
         } else {
@@ -279,7 +275,7 @@ public abstract class Budget implements Budgeted {
      * returns this budget, after being modified
      */
     @NotNull
-    public Budget budget(float p, float d, float q) {
+    default Budget budget(float p, float d, float q) {
         setPriority(p);
         setDurability(d);
         setQuality(q);
@@ -292,26 +288,26 @@ public abstract class Budget implements Budgeted {
      * @return String representation of the value with 2-digit accuracy
      */
     @NotNull
-    public StringBuilder toBudgetStringExternal() {
+    default StringBuilder toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
     @NotNull
-    public StringBuilder toBudgetStringExternal(StringBuilder sb) {
+    default StringBuilder toBudgetStringExternal(StringBuilder sb) {
         return toStringBuilder(sb, Texts.n2(pri()), Texts.n2(dur()), Texts.n2(qua()));
     }
 
     @NotNull
-    public String toBudgetString() {
+    default String toBudgetString() {
         return toBudgetStringExternal().toString();
     }
 
     @NotNull
-    public String getBudgetString() {
+    default String getBudgetString() {
         return toString(this);
     }
 
-    public final void set(@NotNull Budgeted b) {
+    default void set(@NotNull Budgeted b) {
         budget(b.pri(), b.dur(), b.qua());
     }
 
@@ -329,13 +325,13 @@ public abstract class Budget implements Budgeted {
         }
     }
 
-    public void mul(float pf, float df, float qf) {
+    default void mul(float pf, float df, float qf) {
         setPriority(pri()*pf);
         setDurability(dur()*df);
         setQuality(qua()*qf);
     }
     @NotNull
-    public Budget multiplied(float pf, float df, float qf) {
+    default Budget multiplied(float pf, float df, float qf) {
         mul(pf, df, qf);
         return this;
     }
@@ -349,7 +345,4 @@ public abstract class Budget implements Budgeted {
 //        }
 //    }
 
-    public void delete(@Nullable Object reason /* ignored */) {
-        delete();
-    }
 }

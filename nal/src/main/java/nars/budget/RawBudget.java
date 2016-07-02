@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
  * because this includes timestamp.
  */
-public class RawBudget extends Budget {
+public class RawBudget implements Budget {
 
     /**
      * The relative share of time resource to be allocated

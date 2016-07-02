@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 5/29/16.
  */
-public abstract class BLink<X> extends Budget implements Link<X> {
+public abstract class BLink<X> implements Budget, Link<X> {
 
 
 

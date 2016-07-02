@@ -336,7 +336,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 //    }
 
 
-    boolean delete();
 
 
 //    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
@@ -838,10 +837,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     }
 
-    default void delete(@Nullable Object removalReason) {
+    default boolean delete(@Nullable Object removalReason) {
         if (removalReason!=null)
             log(removalReason);
-        delete();
+        return delete();
     }
 
 }

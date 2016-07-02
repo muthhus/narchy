@@ -41,6 +41,13 @@ public interface Budgeted  {
 
     }
 
+
+    /** the result of this should be that pri() is not finite (ex: NaN)
+     * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
+    boolean delete();
+
+    default boolean delete(Object ignored) { return delete(); }
+
     @NotNull
     Budget budget();
 

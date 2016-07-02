@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * reverse osmosis read-only budget
  */
-public final class ROBudget extends Budget {
+public final class ROBudget implements Budget {
 
     private final float pri, dur, qua;
 
@@ -26,7 +26,7 @@ public final class ROBudget extends Budget {
     }
 
     @Override
-    protected void _setPriority(float p) {
+    public void _setPriority(float p) {
         throw new UnsupportedOperationException();
     }
 
