@@ -83,9 +83,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(32);
-//		nar.conceptRemembering.setValue(1f);
-//		nar.termLinkRemembering.setValue(3f);
-//		nar.taskLinkRemembering.setValue(1f);
+		nar.confMin.setValue(0.05f);
+
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
 		//nar.inputAt(100,"$1.0;0.8;1.0$ col:(?c,?x,?y)?");

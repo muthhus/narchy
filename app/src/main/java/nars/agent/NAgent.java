@@ -332,21 +332,7 @@ public class NAgent implements Agent {
         sad.print();
     }
 
-    public class SensorConceptDebug extends SensorConcept {
 
-        public SensorConceptDebug(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
-            super(term, n, input, truth);
-        }
-
-        @Override
-        protected void onConflict(@NotNull Task belief) {
-            NAgent.this.onConflict(this, belief);
-        }
-    }
-
-    protected void onConflict(SensorConceptDebug sensorConceptDebug, Task belief) {
-
-    }
 
     @Override
     public String summary() {

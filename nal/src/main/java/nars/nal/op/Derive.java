@@ -104,7 +104,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 //        if (!uniquePatternVar.allSatisfy(m.xy::containsKey))
 //            return;
 
-        Term r = m.resolve(conclusionPattern);
+        Term r = m.index.resolve(conclusionPattern, m);
         if (r instanceof Compound) { //includes null test
 
             derive(m, (Compound)r);

@@ -101,7 +101,7 @@ public class PatternIndex extends RawTermIndex {
 
 
     @Override
-    protected final boolean transforms() {
+    protected final boolean transform() {
         return false;
     }
 

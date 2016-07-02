@@ -1,9 +1,14 @@
 package nars.agent;
 
+import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.Global;
 import nars.NAR;
+import nars.Narsese;
 import nars.task.Task;
 import nars.truth.Truth;
+import nars.util.math.FloatSupplier;
+import nars.util.signal.SensorConcept;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -25,7 +30,18 @@ public class NAgentDebug extends NAgent  {
         log = System.out;
     }
 
-    @Override
+    public class SensorConceptDebug extends SensorConcept {
+
+        public SensorConceptDebug(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
+            super(term, n, input, truth);
+        }
+
+        @Override
+        protected void onConflict(@NotNull Task belief) {
+            NAgentDebug.this.onConflict(this, belief);
+        }
+    }
+
     protected void onConflict(SensorConceptDebug c, Task belief) {
         if (printConflict) {
             log.println("CONFLICT");

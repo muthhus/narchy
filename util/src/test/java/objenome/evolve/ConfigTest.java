@@ -63,7 +63,7 @@ public class ConfigTest extends TestCase {
 		config.set(Population.SIZE, 100);
 		assertNotNull(config.get(Population.SIZE));
 
-		config.clear();
+		config.reset();
 		assertNull(config.get(Population.SIZE));
 	}
 }

@@ -230,7 +230,6 @@ public class WebServer /*extends PathHandler*/ {
 
         //nar.conceptActivation.setValue(1f/numConceptsPerCycle);
         nar.cyclesPerFrame.set(4);
-        nar.perfection.setValue(0);
 
         //nar.log();
         nar.with(

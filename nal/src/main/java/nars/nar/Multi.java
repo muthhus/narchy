@@ -289,5 +289,11 @@ public class Multi extends AbstractNAR {
         return this;
     }
 
-
+    @Override
+    public synchronized void clear() {
+        //TODO may require additional synchronization
+        for (WorkerCore core : this.cores) {
+            core.concepts.clear();
+        }
+    }
 }

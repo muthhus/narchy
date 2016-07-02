@@ -796,7 +796,7 @@ public enum $ {
         }
 
         @Override
-        protected boolean transforms() {
+        protected boolean transform() {
             return true;
         }
 

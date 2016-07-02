@@ -363,7 +363,7 @@ public class Container extends AbstractPrototainer implements AbstractContainer 
         }
     }
 
-    public void clear() {
+    public void reset() {
         builders.clear();
         scopes.clear();
         constructorDependencies.clear();

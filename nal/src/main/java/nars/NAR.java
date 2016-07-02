@@ -177,16 +177,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * reactivated, a signal for them to empty their state (if necessary).
      */
     @NotNull
-    public synchronized NAR reset() {
+    public synchronized void reset() {
 
         nextTasks.clear();
 
         if (asyncs!=null)
             asyncs.shutdown();
 
-        clear();
+        super.reset();
 
-        return this;
     }
 
 
@@ -931,6 +930,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         return this;
     }
+
+    /** clears active memory (but not memory indices) */
+    abstract public void clear();
 
     @Nullable
     public final Concept concept(@NotNull Termed t) {

@@ -159,6 +159,11 @@ public abstract class TermBuilder {
     }
 
     @Nullable
+    public final Term finish(@NotNull Op op, @NotNull TermContainer args) {
+        return finish(op, DTERNAL, args);
+    }
+
+    @Nullable
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         return finish(op, dt, TermContainer.the(op, args));
     }
@@ -176,7 +181,8 @@ public abstract class TermBuilder {
             //special case: allow for ellipsis to occupy one item even if minArity>1
             Term a0 = args.term(0);
             if (!(a0 instanceof Ellipsislike)) {
-                throw new RuntimeException("invalid size " + s + " for " + op);
+                return null;
+                //throw new RuntimeException("invalid size " + s + " for " + op);
                 //return u0; //reduction
             }
         }
@@ -206,9 +212,13 @@ public abstract class TermBuilder {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         } else {
-            return finish(NEG, t);
+            if ((t instanceof Compound) || (t.op()==VAR_PATTERN))
+                return finish(NEG, t);
+            else
+                return null;
         }
     }
+
 
     @Nullable
     final Term image(@NotNull Op o, @NotNull Term[] res) {
@@ -305,7 +315,7 @@ public abstract class TermBuilder {
         TreeSet<Term> s = new TreeSet();
         UnifiedSet<Term> unwrappedNegs = flatten(op, u, dt, s, null);
 
-        boolean negate = false;
+        //boolean negate = false;
         int n = s.size();
         if (n == 1) {
             return s.iterator().next();
@@ -339,11 +349,11 @@ public abstract class TermBuilder {
 //            }
         }
 
-        if (negate) {
-            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
-        } else {
-            return finish(op, dt, s.toArray(new Term[n]));
-        }
+//        if (negate) {
+//            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
+//        } else {
+            return finish(op, dt, TermSet.the(s));
+        //}
     }
 
     static UnifiedSet<Term> flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
@@ -368,20 +378,14 @@ public abstract class TermBuilder {
     @Nullable
     public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
-        if (Terms.equalsAnonymous(subject, predicate))
-            return null;
+
 
         //special statement filters
         switch (op) {
 
             case INH:
-                if (transforms() && predicate instanceof TermTransform) {
-                    if (subject.op() == PROD) {
-                        return ((TermTransform) predicate).function(
-                            (Compound) subject
-                                //$.terms
-                        );
-                    }
+                if (predicate instanceof TermTransform && transform() && subject.op() == PROD) {
+                    return ((TermTransform) predicate).function( (Compound) subject );
                 }
                 break;
 
@@ -433,7 +437,6 @@ public abstract class TermBuilder {
 
         }
 
-
         if (Statement.validStatement(subject, predicate)) {
             if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
                 dt = -dt;
@@ -444,7 +447,7 @@ public abstract class TermBuilder {
     }
 
     /** whether this builder applies immediate transforms */
-    protected abstract boolean transforms();
+    protected abstract boolean transform();
 
 
     @Nullable
@@ -536,8 +539,7 @@ public abstract class TermBuilder {
         //reduction between one or both of the intersection type
 
         if (o1 == intersection) {
-            return finish(intersection, DTERNAL,
-                    TermSet.concat(
+            return finish(intersection, TermSet.concat(
                         ((TermContainer) term1).terms(),
                         o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
                     )
@@ -556,7 +558,7 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? null : (Compound) build(o, s.toArray(new Term[s.size()]));
+        return s.isEmpty() ? null : (Compound) finish(o, TermContainer.the(o, s));
     }
 
     @Nullable
@@ -567,7 +569,7 @@ public abstract class TermBuilder {
         else if (u == term2)
             return term2;
         else
-            return (Compound)finish(o, DTERNAL, u);
+            return (Compound)finish(o, u);
     }
 
     @Nullable

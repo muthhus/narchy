@@ -169,7 +169,6 @@ public interface TermIndex {
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
 
-        boolean strict = f instanceof PremiseEval;
 
 
 
@@ -194,6 +193,7 @@ public interface TermIndex {
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
 
+        boolean strict = f instanceof PremiseEval;
 
         boolean changed = false;
         for (int i = 0; i < len; i++) {

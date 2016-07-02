@@ -18,7 +18,6 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -33,8 +32,6 @@ import nars.vision.SwingCamera;
 import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import static nars.$.t;
@@ -71,14 +68,14 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.7f);
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(64);
-		nar.conceptActivation.setValue(0.1f);
+		nar.conceptActivation.setValue(0.02f);
 		nar.confMin.setValue(0.02f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
@@ -97,6 +94,11 @@ public class PongEnvironment extends Player implements Environment {
 				BagChart.show((Default) nar);
 			}
 
+//			@Override
+//			public int act(float rewardValue, float[] nextObservation) {
+//				nar.clear();
+//				return super.act(rewardValue, nextObservation);
+//			}
 		};
 
 		try {

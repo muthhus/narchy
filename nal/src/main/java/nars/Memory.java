@@ -150,7 +150,7 @@ public class Memory extends Param {
 //    }
 
     @Override
-    public void clear() {
+    public void reset() {
 
         eventReset.emit(this);
 

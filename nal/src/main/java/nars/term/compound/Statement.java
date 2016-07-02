@@ -24,6 +24,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,9 +54,20 @@ public interface Statement {
     /** skips the null and equality test */
     static boolean validStatement(@NotNull Term subject, @NotNull Term predicate) {
 
-        //TODO its possible to disqualify invalid statement if there is no structural overlap here
 
         Compound sc = subject instanceof Compound ? (Compound)subject : null;
+        Compound pc = predicate instanceof Compound ? (Compound)predicate : null;
+
+        if (sc!=null && pc!=null) {
+            if (Terms.equalsAnonymous(sc, pc))
+                return false;
+        } else {
+            if (subject.equals(predicate))
+                return false;
+        }
+
+        //TODO its possible to disqualify invalid statement if there is no structural overlap here
+
         if (sc!=null &&
                 sc.containsTermRecursively(predicate)
                 //sc.containsTerm(predicate)
@@ -63,7 +75,6 @@ public interface Statement {
             return false;
         }
 
-        Compound pc = predicate instanceof Compound ? (Compound)predicate : null;
         if (pc!=null) {
             if (
                     pc.containsTermRecursively(subject)

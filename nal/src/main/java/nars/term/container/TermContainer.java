@@ -460,13 +460,13 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-//    @NotNull
-//    static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
-//        //if (tt.isEmpty()) ...
-//        return requiresTermSet(op, tt.size()) ?
-//                TermSet.the(tt) :
-//                TermVector.the(tt.toArray(new Term[tt.size()]));
-//    }
+    @NotNull
+    static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
+        //if (tt.isEmpty()) ...
+        return requiresTermSet(op, tt.size()) ?
+                TermSet.the(tt) :
+                TermVector.the(tt.toArray(new Term[tt.size()]));
+    }
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {

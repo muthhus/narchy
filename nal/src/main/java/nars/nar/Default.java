@@ -127,5 +127,8 @@ public class Default extends AbstractNAR {
         return this;
     }
 
-
+    @Override
+    public void clear() {
+        core.concepts.clear();
+    }
 }

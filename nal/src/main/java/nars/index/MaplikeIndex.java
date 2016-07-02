@@ -40,7 +40,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
     @Override
-    protected boolean transforms() {
+    protected boolean transform() {
         return true;
     }
 
@@ -74,8 +74,8 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         return y;
     }
 
-    static protected boolean canBuildConcept(Termed y) {
-        return y.op()!= Op.NEG && !y.term().hasTemporal();
+    static protected boolean canBuildConcept(@Nullable Termed y) {
+        return y!=null && y.op()!= Op.NEG && !y.term().hasTemporal();
     }
 
 

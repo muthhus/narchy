@@ -42,6 +42,10 @@ public class Terminal extends AbstractNAR {
         return concept(termed, true); //ignore activation
     }
 
+    @Override
+    public void clear() {
+        //nothing to clear, terminal is always clear
+    }
 
     @Override
     public float conceptPriority(Termed termed) {

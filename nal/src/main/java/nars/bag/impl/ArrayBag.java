@@ -46,17 +46,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         this.mergeFunction = mergeFunction;
     }
 
-    public void setCapacity(int newCapacity) {
-        if (newCapacity < this.capacity()) {
-//            //clear pending on shrink
-//            if (pending!=null) {
-//                synchronized (map) {
-//                    pending = null;
-//                }
-//            }
-        }
-        super.setCapacity(newCapacity);
-    }
+//    public void setCapacity(int newCapacity) {
+//        if (newCapacity < this.capacity()) {
+////            //clear pending on shrink
+////            if (pending!=null) {
+////                synchronized (map) {
+////                    pending = null;
+////                }
+////            }
+//        }
+//        super.setCapacity(newCapacity);
+//    }
 
     @Override
     protected void removeWeakest(Object reason) {
@@ -67,7 +67,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         remove(weakest()).delete(reason);
     }
-
 
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {

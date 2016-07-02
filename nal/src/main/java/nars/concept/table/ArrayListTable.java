@@ -52,7 +52,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
 
     @Override
-    public final void clear() {
+    public void clear() {
         super.clear();
         listClear();
     }

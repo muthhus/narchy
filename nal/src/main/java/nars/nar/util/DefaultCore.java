@@ -83,6 +83,13 @@ public class DefaultCore extends AbstractCore {
 
 
         @Override
+        public void clear() {
+            forEach((BLink<Concept> v) -> { if (v!=null) deactivate(v.get()); }); //HACK allow opportunity to process removals
+            super.clear();
+        }
+
+
+        @Override
         protected @Nullable BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
             if (!activate(i))
                 return b;
