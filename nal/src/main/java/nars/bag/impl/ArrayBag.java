@@ -8,6 +8,7 @@ import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
+import nars.link.StrongBLinkToBudgeted;
 import nars.util.data.map.UnifriedMap;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -53,8 +54,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             //int s = 1+capacity/2;
             int s = 4;
             //return new HashMap<>();
-            return new UnifriedMap<>(8);
-            //return new WeakHashMap<>(s);
+            //return new UnifriedMap<>(8); //<-- not safe, grows huge
+            return new WeakHashMap<>(s);
             //return new LinkedHashMap<>(s);
         }
 
@@ -162,6 +163,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     static float priIfFiniteElseNeg1(Budgeted b) {
+        if (b == null) return -1;
         float p = b.pri();
         return p==p ? p : -1;
         //return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
@@ -354,7 +356,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     @NotNull protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
-        return new StrongBLink(i, p, d, q);
+        if (i instanceof Budgeted)
+            return new StrongBLinkToBudgeted((Budgeted)i, p, d, q);
+        else
+            return new StrongBLink(i, p, d, q);
     }
 
     protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {

@@ -64,30 +64,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     @Override public Bag<Task> taskbag() {
-
-        return new CurveBag<>(defaultCurveSampler, mergeDefault) {
-
-            @NotNull
-            @Override
-            protected BLink<Task> newLink(Task i, float p, float d, float q) {
-                return new StrongBLinkToBudgeted<>(i, p, d, q);
-            }
-        };
+        return new CurveBag<>(defaultCurveSampler, mergeDefault);
     }
 
 
     @NotNull
     @Override public Bag<Termed> termbag() {
-
         return new CurveBag<>(defaultCurveSampler, mergeDefault);
-
-//        //weak links may be conceptually wrong
-//        return new CurveBag<Termed>(rng) {
-//            @Override
-//            protected BLink<Termed> newLink(Termed i, Budgeted b, float scale) {
-//                return new BLink.WeakBLink<>(i, b, scale);
-//            }
-//        }.merge(mergeDefault());
     }
 
 

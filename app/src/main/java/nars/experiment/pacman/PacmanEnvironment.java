@@ -129,7 +129,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				BagChart.show((Default)nar);
+				//BagChart.show((Default)nar);
 			}
 		};
 
@@ -395,10 +395,15 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		}
 
 		protected void update() {
-			long max  = Runtime.getRuntime().maxMemory();
-			long total = Runtime.getRuntime().totalMemory();
-			long free  = Runtime.getRuntime().freeMemory();
-			float ratio = ((float)total)/max;
+			Runtime runtime = Runtime.getRuntime();
+			long total = runtime.totalMemory(); // current heap allocated to the VM process
+			long free = runtime.freeMemory(); // out of the current heap, how much is free
+			long max = runtime.maxMemory(); // Max heap VM can use e.g. Xmx setting
+			long usedMemory = total - free; // how much of the current heap the VM is using
+			long availableMemory = max - usedMemory; // available memory i.e. Maximum heap size minus the current amount used
+			float ratio = 1f - ((float)availableMemory) / max;
+
+
 			logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
 
 			nar.conceptCold.termlinksCapacityMin.set(
@@ -420,7 +425,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 					Util.lerp(durMinMin, durMinMax, ratio)
 			);
 			nar.cyclesPerFrame.setValue(
-					(int)Util.lerp(1, 32, ratio)
+					(int)Util.lerp(24, 32, ratio*ratio)
 			);
 //			index.setWeightFactor(
 //					Util.lerp(1, 16, ratio*ratio)
@@ -434,7 +439,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				float warningRatio = 0.75f;
 				if (ratio > warningRatio) {
 					float over = ratio - warningRatio;
-					e.setMaximum((long) (e.weightedSize().getAsLong() * (1f - over))); //shrink
+					e.setMaximum((long) (e.weightedSize().getAsLong() * (1f - over/2f))); //shrink
 				} else {
 					e.setMaximum((long) (Math.max(e.getMaximum(),e.weightedSize().getAsLong()) * 1.05f)); //grow
 				}
@@ -443,7 +448,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			index.subterms.policy().eviction().ifPresent(evictionConsumer);
 
 
-			if (ratio > 0.5f) {
+			if (ratio > 0.75f) {
 
 				index.concepts.cleanUp();
 				index.subterms.cleanUp();
@@ -451,9 +456,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				logger.error("{}", index.concepts.stats());
 
 			}
-			if (ratio > 0.99f) {
+			if (ratio > 0.95f) {
 				logger.error("memory alert");
-				System.gc();
+				//System.gc();
 			}
 		}
 	}
