@@ -177,8 +177,8 @@ public class NarseseExtendedTest {
     @Test
     public void testNegation3() {
         //without comma
-        assertEquals( "(--,x)", term("--x").toString() );
-        assertEquals( "(--,x)", term("-- x").toString() );
+        assertEquals( "(--,(x))", term("--(x)").toString() );
+        assertEquals( "(--,(x))", term("-- (x)").toString() );
 
         assertEquals( "(--,(x&&y))", term("-- (x && y)").toString() );
 

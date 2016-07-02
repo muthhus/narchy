@@ -9,7 +9,7 @@ object Property {
   /**
    * Try to make a new compound from two components. Called by the inference rules.
    * <p>
-   *  A --] B becomes A --> [B]
+   *  A -]- B becomes A --> [B]
    * @param subject The first compoment
    * @param predicate The second compoment
    * @param memory Reference to the memeory

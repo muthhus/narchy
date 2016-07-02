@@ -28,8 +28,70 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private final BudgetMerge mergeFunction;
     //protected final FasterList<BLink<V>> pending = new FasterList();
-    private Map<V,RawBudget> pending;
 
+
+    abstract public static class BagPendings<V> {
+        abstract public void capacity(int c);
+        abstract public void add(V v, float p, float d, float q, BiFunction<RawBudget, RawBudget, RawBudget> merge);
+        abstract public int size();
+        abstract public void apply(ArrayBag<V> target);
+
+        abstract public float mass();
+    }
+
+    public static class MapBagPendings<V> extends BagPendings<V>  {
+
+        private Map<V,RawBudget> pending;
+
+        protected Map<V, RawBudget> newPendingMap() {
+            //int s = 1+capacity/2;
+            int s = 4;
+            //return new HashMap<>();
+            return new WeakHashMap<>(s);
+            //return new LinkedHashMap<>(s);
+        }
+
+        public float mass() {
+            Map<V,RawBudget> pending = this.pending;
+            float sum = 0;
+            if (pending!=null) {
+                sum += (float)pending.values().stream().mapToDouble(v -> v.priIfFiniteElseZero() * v.dur()).sum();
+            }
+            return sum;
+        }
+
+        @Override
+        public void capacity(int c) {
+
+        }
+
+        @Override
+        public void add(V v, float p, float d, float q, BiFunction<RawBudget, RawBudget, RawBudget> merge) {
+            Map<V, RawBudget> m = this.pending;
+            if (m == null)
+                this.pending = m = newPendingMap();
+            m.merge(v, new RawBudget(p, d, q), merge);
+        }
+
+        @Override
+        public int size() {
+            return pending.size();
+        }
+
+        @Override
+        public void apply(ArrayBag<V> target) {
+            Map<V, RawBudget> m = this.pending;
+            if (m!=null) {
+                this.pending = null;
+                m.forEach((k, v) -> {
+                    target.commitPending(k, v.pri(), v.dur(), v.qua());
+                });
+            }
+        }
+
+    }
+
+    final BagPendings<V> pending = new MapBagPendings();
 
     public ArrayBag(int cap, BudgetMerge mergeFunction) {
         super(BLink[]::new,
@@ -241,14 +303,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final @Nullable BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         if (b.isDeleted())
-            return null;
+            throw new RuntimeException();
+            //return null;
 
         BLink<V> existing = get(i);
 
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
         } else {//if (isFull()) {
-            putPending(i, b, scale);
+            pending.add(i, b.pri()*scale, b.qua(), b.dur(), this);
             return null;
         }
 
@@ -256,27 +319,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    protected void putPending(@NotNull V i, @NotNull Budgeted b, float scale) {
-        if (b.isDeleted())
-            return;
-
-        RawBudget inc = new RawBudget(b, scale);
-
-        synchronized (map) {
-            Map<V, RawBudget> p = this.pending;
-            if (p == null)
-                this.pending = p = newPendingMap();
-            p.merge(i, inc, this);
-        }
-
-    }
-
-    protected Map<V, RawBudget> newPendingMap() {
-        int s = 1+capacity()/2;
-        //return new HashMap<>();
-        return new WeakHashMap<>(s);
-        //return new LinkedHashMap<>(s);
-    }
 
 
     /**
@@ -297,8 +339,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return newLink(i, b, 1f);
     }
 
-    @NotNull protected BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
-        return new StrongBLink(i, b, scale);
+    @NotNull protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
+        return newLink(i, scale * b.pri(), b.dur(), b.qua());
+    }
+
+    @NotNull protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
+        return new StrongBLink(i, p, d, q);
     }
 
     protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
@@ -326,11 +372,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             removeDeletedAtBottom();
         }
 
-        Map<V, RawBudget> p = this.pending;
+        BagPendings<V> p = this.pending;
         if (p!=null) {
-            this.pending = null;
             this.bottomPri = bottomPriIfFull();
-            p.forEach(eachPending);
+            p.apply(this);
         }
 
         return this;
@@ -338,7 +383,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     transient private float bottomPri;
 
-    final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
+    public final void commitPending(V key, float p, float d, float q) {
+    //final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
         //            if (key == null)
 //                continue; //link was destroyed before it could be processed
 
@@ -350,8 +396,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             else {*/
 
         float v = bottomPri;
-        if (v <= inc.pri()) {
-            putNew(key, newLink(key, inc));
+        if (v <= p) {
+            putNew(key, newLink(key, p, d, q));
             bottomPri = bottomPriIfFull();
         } else {
             putFail(key);
@@ -361,7 +407,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }*/
         //}
 
-    };
+    }
 
     protected void putFail(V key) {
 
@@ -444,6 +490,17 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 //                throw new RuntimeException("bag fault");
         }
         return removed > 0;
+    }
+
+
+    @Override
+    public RawBudget apply(RawBudget bExisting, RawBudget bNext) {
+        if (bExisting != null) {
+            mergeFunction.merge(bExisting, bNext, 1f);
+            return bExisting;
+        } else {
+            return bNext;
+        }
     }
 
 
@@ -596,22 +653,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             mass += d * b.priIfFiniteElseZero();
             pendingMass += d * b.priDelta();
         }
-        Map<V,RawBudget> pending = this.pending;
-        if (pending!=null) {
-            pendingMass += (float)pending.values().stream().mapToDouble(v -> v.priIfFiniteElseZero() * v.dur()).sum();
-        }
+        pendingMass += pending.mass();
         return new float[] { mass, pendingMass };
     }
 
-    @Override
-    public RawBudget apply(RawBudget bExisting, RawBudget bNext) {
-        if (bExisting != null) {
-            mergeFunction.merge(bExisting, bNext, 1f);
-            return bExisting;
-        } else {
-            return bNext;
-        }
-    }
 
 //    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
 //        forEach(receiver);

@@ -141,7 +141,7 @@
 //                            if (a.size() != 2) {
 //                                System.err.println("instance expects 2 arguments");
 //                            } else {
-//                                emit("<" + a.get(0) + " {-- " + a.get(1) + ">.");
+//                                emit("<" + a.get(0) + " -{- " + a.get(1) + ">.");
 //                            }
 //                        }
 //                        break;

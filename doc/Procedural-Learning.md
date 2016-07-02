@@ -19,7 +19,7 @@ As a general-purpose system, NARS can have any belief or goal, as far as its con
 
 ###Actions
 
-Each operation consists of an operator and an argument list, like Op(A1, ..., An). From a logical point of view, it is a statement <(*, Self, A1, ..., An) {-- Op>, where the subject is a product indicating a temporal relation between the system itself and the arguments, the predicate is the type of the relation, and the relation is Instance, since operations are countable.
+Each operation consists of an operator and an argument list, like Op(A1, ..., An). From a logical point of view, it is a statement <(*, Self, A1, ..., An) -{- Op>, where the subject is a product indicating a temporal relation between the system itself and the arguments, the predicate is the type of the relation, and the relation is Instance, since operations are countable.
 
 In the current implementation, adding an operator into the system means
 

@@ -9,10 +9,11 @@ public class StrongBLink<X> extends DefaultBLink<X> {
     ///** the referred item */
     public final X id;
 
-    public StrongBLink(X id, @NotNull Budgeted b, float scal) {
-        super(id, b, scal);
+    public StrongBLink(X id, float p, float d, float q) {
+        super(id, p, d, q);
         this.id = id;
     }
+
 
     @NotNull
     @Override

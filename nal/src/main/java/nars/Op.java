@@ -89,8 +89,8 @@ public enum Op {
 
     VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
 
-    INSTANCE("{--", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
-    PROPERTY("--]", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
+    INSTANCE("-{-", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
+    PROPERTY("-]-", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
     INSTANCE_PROPERTY("{-]", 2, OpType.Relation); //should not be given a compact representation because this will not exist internally after parsing
 
 

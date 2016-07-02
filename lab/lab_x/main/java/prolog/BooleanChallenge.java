@@ -483,7 +483,7 @@ public class BooleanChallenge implements Reaction<Class,Object[]> {
         return sb.toString();
 
 
-        //use the { } --> form and not {-- because this is the form answers will return in
+        //use the { } --> form and not -{- because this is the form answers will return in
         //return "<{(*," + b(a) + "," + b(b) + "," + b(y) + ")} --> " + op + ">";
 
         //return "<(*,(*," + b(a) + "," + b(b) + ")," + b(y) + ") --> " + op + ">";        

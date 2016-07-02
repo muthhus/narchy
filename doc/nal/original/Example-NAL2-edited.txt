@@ -89,13 +89,13 @@
 // A swan is a type of bird. 
 
 ********** translating instance into inheritance
-<Tweety {-- bird>.
+<Tweety -{- bird>.
 // Tweety is a bird.
   IN: <{Tweety} --> bird>. %1.00;0.90%
 // Tweety is a bird.
 
 ********** translating property into inheritance
-<raven --] black>.
+<raven -]- black>.
 // Ravens are black. 
   IN: <raven --> [black]>. %1.00;0.90%
 // Ravens are black. 

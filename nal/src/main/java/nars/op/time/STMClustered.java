@@ -169,8 +169,8 @@ public class STMClustered extends STM {
         /** current centroid */
         TasksNode node;
 
-        public TLink(@NotNull Task t, @NotNull Budgeted b, float scale) {
-            super(t, b, scale);
+        public TLink(@NotNull Task t, float p, float d, float q) {
+            super(t, p, d, q);
             this.coord = getCoord(t);
         }
 
@@ -243,8 +243,8 @@ public class STMClustered extends STM {
         this.bag = new ArrayBag<>(1, BudgetMerge.avgDQBlend) {
             @NotNull
             @Override
-            protected BLink<Task> newLink(@NotNull Task i, @NotNull Budgeted b, float scale) {
-                return new TLink(i, b, scale);
+            protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
+                return new TLink(i, p, d, q);
             }
         };
 

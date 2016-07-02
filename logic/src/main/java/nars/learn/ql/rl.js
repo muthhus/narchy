@@ -251,8 +251,8 @@ var R = {}; // the Recurrent library
         backward: function () {
             var bp = this.backprop;
             for (var i = bp.length - 1; i >= 0; ) {
-                var args = bp[i--];
-                var func = bp[i--];
+                var args = bp[i-]-;
+                var func = bp[i-]-;
                 func.apply(this, args);
 
                 //bp[i](); // tick!

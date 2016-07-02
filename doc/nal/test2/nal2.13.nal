@@ -3,7 +3,7 @@
 ''inputMustContain('<{Tweety} --> bird>. %1.00;0.90%')
 
 'Tweety is a bird.
-<Tweety {-- bird>.
+<Tweety -{- bird>.
 
 1
 

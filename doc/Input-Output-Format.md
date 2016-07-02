@@ -23,8 +23,8 @@ In a task, all the space characters are optional, and will be ignored by the sys
                         | "(^"<word> {","<term>} ")"         // an operation to be executed                         
              <copula> ::= "-->"                              // inheritance
                         | "<->"                              // similarity
-                        | "{--"                              // instance
-                        | "--]"                              // property
+                        | "-{-"                              // instance
+                        | "-]-"                              // property
                         | "{-]"                              // instance-property
                         | "==>"                              // implication
                         | "=/>"                              // predictive implication

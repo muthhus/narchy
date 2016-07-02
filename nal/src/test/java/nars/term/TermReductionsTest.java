@@ -436,11 +436,4 @@ public class TermReductionsTest {
         //..
     }
 
-    @Test public void testImplConj1() {
-
-        String s = "(((#1-->(#2-->[top]))&&(#1-->(--,((#2-->[right]) &&+0 (#2-->[top]))))) ==>-227 (--,#1))";
-        Term x = $(s);
-        System.out.println(s);
-        System.out.println(x);
-    }
 }

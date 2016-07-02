@@ -126,7 +126,7 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void instanceToInheritance() throws InvalidInputException {
         test()
-        .believe("<Tweety {-- bird>")//Tweety is a bird.");
+        .believe("<Tweety -{- bird>")//Tweety is a bird.");
         .mustBelieve(cycles,"<{Tweety} --> bird>",1.0f,0.9f)//Tweety is a bird.");
         .run();
     }*/
@@ -134,7 +134,7 @@ public class NAL2Test extends AbstractNALTest {
     /* Handled by parser, this copula is just syntactic sugar
     @Test
     public void propertyToInheritance() throws InvalidInputException {
-        test().believe("<raven --] black>")//Ravens are black.");
+        test().believe("<raven -]- black>")//Ravens are black.");
         .mustBelieve(cycles,"<raven --> [black]>",1.0f,0.9f)//Ravens are black.");
         .run();
     }*/

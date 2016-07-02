@@ -289,7 +289,7 @@ public class Twenglish {
 //
 //
 //                results.add(0, n.task(new StringBuilder(
-//                        "<{word,pronoun,qpronoun,prepos,conjunc} --] symbol>.").toString()));
+//                        "<{word,pronoun,qpronoun,prepos,conjunc} -]- symbol>.").toString()));
 //                results.add(0, n.task(new StringBuilder(
 //                        "$0.90;0.90$ <(*,<$a-->[$d]>,<is-->[verb]>,<$b-->[$d]>) =/> <$a <-> $b>>.").toString()));
 //

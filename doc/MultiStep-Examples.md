@@ -142,13 +142,13 @@ Input:
 
 ```
 *
-<Tweety {-- robin>.
+<Tweety -{- robin>.
 <robin --> bird>.
 <bird --> animal>.
 30 
-<Tweety {-- bird>?
+<Tweety -{- bird>?
 10
-<Tweety {-- animal>?
+<Tweety -{- animal>?
 1
 ```
 

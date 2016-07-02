@@ -46,6 +46,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
         init(b, scale);
     }
 
+
     @Override public void init(float p, float d, float q) {
         PRI = clamp(p);
         DUR = clamp(d);

@@ -9,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class StrongBLinkToBudgeted<B extends Budgeted> extends StrongBLink<B> {
 
-    public StrongBLinkToBudgeted(B id, @NotNull Budgeted b, float scal) {
-        super(id, b, scal);
+
+    public StrongBLinkToBudgeted(B id, float p, float d, float q) {
+        super(id, p, d, q);
     }
 
     @Override

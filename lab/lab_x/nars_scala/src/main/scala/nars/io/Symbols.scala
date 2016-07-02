@@ -65,9 +65,9 @@ object Symbols {
 
   val SIMILARITY_RELATION = "<->"
 
-  val INSTANCE_RELATION = "{--"
+  val INSTANCE_RELATION = "-{-"
 
-  val PROPERTY_RELATION = "--]"
+  val PROPERTY_RELATION = "-]-"
 
   val INSTANCE_PROPERTY_RELATION = "{-]"
 

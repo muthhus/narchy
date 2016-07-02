@@ -130,7 +130,7 @@ public class PremiseRuleTest {
         PatternIndex i = new PatternIndex();
 
 
-        Compound y = (Compound) p.term("<(S --> P), --S |- (P --> S), (Belief:Conversion)>");
+        Compound y = (Compound) p.term("<(S --> P), --%S |- (P --> S), (Belief:Conversion)>");
         assertNotNull(y);
         y = ((PremiseRule) y).normalizeRule(i);
         assertNotNull(y);
@@ -144,7 +144,7 @@ public class PremiseRuleTest {
 
     @Test
     public void printTermRecursive() {
-        Compound y = (Compound) p.term("<(S --> P), --S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)>");
+        Compound y = (Compound) p.term("<(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)>");
         printRecursive(y);
     }
 

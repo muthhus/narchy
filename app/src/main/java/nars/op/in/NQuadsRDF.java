@@ -359,7 +359,7 @@ public abstract class NQuadsRDF {
         }
         else if (predicate.equals(domain)) {
             // PROPERTY domain CLASS
-            //<PROPERTY($subj, $obj) ==> <$subj {-- CLASS>>.
+            //<PROPERTY($subj, $obj) ==> <$subj -{- CLASS>>.
 
 
             Term b = inst(varIndep("subj"), object);
@@ -367,14 +367,14 @@ public abstract class NQuadsRDF {
         }
         else if (predicate.equals(range)) {
             // PROPERTY range CLASS
-            //<PROPERTY($subj, $obj) ==> <$obj {-- CLASS>>.
+            //<PROPERTY($subj, $obj) ==> <$obj -{- CLASS>>.
 
             Term b = inst(varIndep("obj"), object);
             belief = conj(subjObjInst(subject, '#', '$', false),b);
 
 //            belief = nar.term(
-//                    //"<" + subject + "($subj,$obj) ==> <$obj {-- " + object + ">>"
-//                    "(" + subject + "($subj,$obj) && <$obj {-- " + object + ">)"
+//                    //"<" + subject + "($subj,$obj) ==> <$obj -{- " + object + ">>"
+//                    "(" + subject + "($subj,$obj) && <$obj -{- " + object + ">)"
 //            );
 
         }

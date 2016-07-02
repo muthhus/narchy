@@ -476,11 +476,6 @@ public class Narsese extends BaseParser<Object> {
 
                         Variable(),
 
-//                        //negation shorthand
-                        seq(NEG.str, s(), Term(), push(
-                                //Negation.make(popTerm(null, true)))),
-                                $.neg($.the(pop())))),
-
                         seq(SETe.str,
 
                                 firstOf(
@@ -509,6 +504,11 @@ public class Narsese extends BaseParser<Object> {
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true, true, false)
                                 )
                         ),
+
+                        //negation shorthand
+                        seq(NEG.str, s(), Term(), push(
+                                //Negation.make(popTerm(null, true)))),
+                                $.neg($.the(pop())))),
 
                         NumberAtom(),
                         Atom()
@@ -685,7 +685,7 @@ public class Narsese extends BaseParser<Object> {
      */
     Rule ColonReverseInheritance() {
         return sequence(
-                Term(false, true), s(), ':', s(), Term(),
+                Term(false, true), ':', Term(),
                 push($.inh((Term) pop(), (Term) pop()))
         );
     }

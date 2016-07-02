@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
  *        +------+     +------+     +------+
  *        | next | --} | next | --} | next | -| nil
  *        +------+     +------+     +------+
- * nil |- | prev | {-- | prev | {-- | prev |
+ * nil |- | prev | -{- | prev | -{- | prev |
  *        +------+     +------+     +------+
  *        |      |     |   2  |     |   0  |
  *        +------+     +------+     +------+

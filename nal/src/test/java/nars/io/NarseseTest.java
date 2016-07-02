@@ -119,8 +119,8 @@ public class NarseseTest {
     @Test
     public void testPropertyInstance() {
 
-        taskParses("<a --] b>.");
-        taskParses("<a {-- b>.");
+        taskParses("<a -{- b>.");
+        taskParses("<a -]- b>.");
         taskParses("<a {-] b>.");
     }
 
@@ -252,7 +252,7 @@ public class NarseseTest {
         taskParses("(--,(negated)).");
         taskParses("(--, (negated)).");
 
-        assertEquals("(--,negated)", term("(--, negated)").toString());
+        assertEquals("(--,(negated))", term("(--, (negated))").toString());
 
     }
 

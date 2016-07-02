@@ -21,7 +21,7 @@ public class FindSubstTest {
     @Test
     public void testFindSubst1() {
         testFindSubst($.$("<a-->b>"), $.$("<?C-->b>"), true);
-        testFindSubst($.$("(--,a)"), $.$("<?C-->b>"), false);
+        testFindSubst($.$("(--,(a))"), $.$("<?C-->(b)>"), false);
     }
 
 

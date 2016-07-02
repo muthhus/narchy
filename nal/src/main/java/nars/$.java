@@ -233,7 +233,7 @@ public enum $ {
     /**
      * Try to make a new compound from two components. Called by the logic rules.
      * <p>
-     *  A {-- B becomes {A} --> B
+     *  A -{- B becomes {A} --> B
      * @param subj The first component
      * @param pred The second component
      * @return A compound generated or null
@@ -336,7 +336,7 @@ public enum $ {
 //    /**
 //     * Try to make a new compound from two components. Called by the logic rules.
 //     * <p>
-//     *  A --] B becomes A --> [B]
+//     *  A -]- B becomes A --> [B]
 //     * @param subject The first component
 //     * @param predicate The second component
 //     * @return A compound generated or null
