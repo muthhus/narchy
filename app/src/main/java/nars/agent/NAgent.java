@@ -355,6 +355,7 @@ public class NAgent implements Agent {
 
         long now = nar.time();
 
+
         return                    Texts.n2(motivation) + "\t + "
                  + "rwrd=[" +
                      n4( sad.beliefs().truth(now).motivation() )
