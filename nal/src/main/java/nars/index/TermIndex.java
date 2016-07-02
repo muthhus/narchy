@@ -477,7 +477,7 @@ public interface TermIndex {
     }
 
     @Nullable
-    default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {
+    default <T extends Termed> T parse(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) /*the*/(fromString(termToParse));
     }
 

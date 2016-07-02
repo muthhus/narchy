@@ -35,7 +35,7 @@ public class IO {
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull DataInput in, TermIndex t) throws IOException, ClassNotFoundException {
+    public static MutableTask readTask(@NotNull DataInput in, TermIndex t) throws IOException {
 
         Term term = readTerm(in, t);
 
@@ -118,7 +118,7 @@ public class IO {
     @Nullable
     public static Atomic readAtomic(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
-        return t.the(s);
+        return (Atomic)t.the(t.parse(s));
     }
 
 

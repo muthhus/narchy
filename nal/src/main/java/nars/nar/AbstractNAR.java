@@ -162,6 +162,8 @@ public abstract class AbstractNAR extends NAR {
 
         Task t = c.process(input, this);
         if (t != null && !t.isDeleted()) {
+            ensureStampSerialGreater(t.evidence());
+
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
             t.onConcept(c);

@@ -251,7 +251,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() {
             final PatternIndex pi = new PatternIndex();
-            return pi.normalize(pi.the("<%1 --> (" + ellipsisTerm +  ")>"), true).term();
+            return pi.normalize(pi.parse("<%1 --> (" + ellipsisTerm +  ")>"), true).term();
         }
 
     }

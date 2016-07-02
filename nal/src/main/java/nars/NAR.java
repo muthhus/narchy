@@ -4,10 +4,8 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
-import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -16,8 +14,6 @@ import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
-import nars.nal.rule.PremiseRule;
-import nars.op.in.FileInput;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -27,15 +23,16 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.variable.Variable;
 import nars.time.Clock;
-import nars.truth.DefaultTruth;
-import nars.truth.Truth;
 import nars.util.IO;
+import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import net.openhft.affinity.AffinityLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
+import org.iq80.snappy.SnappyFramedInputStream;
+import org.iq80.snappy.SnappyFramedOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -192,9 +189,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    public @NotNull Collection<Task> input(@NotNull File input) throws IOException {
-        return FileInput.load(this, input);
-    }
+
 
     /**
      * inputs a task, only if the parsed text is valid; returns null if invalid
@@ -246,7 +241,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public <T extends Term> Termed<T> term(@NotNull String t) throws NarseseException {
-        Termed x = index.the(t);
+        Termed x = index.parse(t);
         if (x == null) {
             //if a NarseseException was not already thrown, this indicates that it parsed but the index failed to provide its output
             throw new NarseseException("Unindexed: " + t);
@@ -1130,16 +1125,34 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //    }
 //
 
+    public @NotNull NAR input(@NotNull File input) throws IOException {
+        return input(new FileInputStream(input));
+    }
+
+    @NotNull
+    public NAR output(File f, boolean append, @NotNull Predicate<Task> each) throws IOException {
+        FileOutputStream ff = new FileOutputStream(f, append);
+        output(ff, each);
+        ff.close();
+        return this;
+    }
+
     /** byte codec output of matching concept tasks (blocking) */
     @NotNull
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
 
-        DataOutputStream oo = new DataOutputStream(o);
+        SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
+
+        DataOutputStream oo = new DataOutputStream(os);
+
+        MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
 
         forEachConceptTask(t-> {
+            total.increment();
             if (each.test(t)) {
                 try {
                     IO.writeTask(oo, t);
+                    filtered.increment();
                 } catch (IOException e) {
                     logger.error("{} when trying to output to {}", t, e);
                     throw new RuntimeException(e);
@@ -1148,11 +1161,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         }, true, true, true, true);
 
-        try {
-            o.flush();
-        } catch (IOException e) {
-            logger.error("{}", e);
-        }
+        logger.info("Saved {}/{} tasks ({} bytes)", filtered, total, oo.size());
+
+        oo.flush();
+        os.flush();
 
         return this;
     }
@@ -1165,12 +1177,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** byte codec input stream of tasks, to be input after decode */
     @NotNull
-    public NAR input(@NotNull InputStream tasks) throws Exception {
+    public NAR input(@NotNull InputStream tasks) throws IOException {
 
-        DataInputStream ii = new DataInputStream(tasks);
+        SnappyFramedInputStream i = new SnappyFramedInputStream(tasks, true);
+        DataInputStream ii = new DataInputStream(i);
 
         int count = 0;
-        while (tasks.available() > 0) {
+
+        while ((tasks.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
             Task t = IO.readTask(ii, index);
             input(t);
             count++;

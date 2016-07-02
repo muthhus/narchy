@@ -33,6 +33,7 @@ import nars.vision.SwingCamera;
 import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class PongEnvironment extends Player implements Environment {
 		};
 
 		try {
-			nar.input(new FileInputStream(KNOWLEDGEFILE));
+			nar.input(new File(KNOWLEDGEFILE));
 		} catch (FileNotFoundException e) {
 
 		} catch (Exception e) {
@@ -122,12 +123,19 @@ public class PongEnvironment extends Player implements Environment {
 
 		addCheats(a.nar, e);
 
-		e.run(a, 4*32);
+		e.run(a, 64*8);
 
 		//NAR.printTasks(nar, true);
 		//NAR.printTasks(nar, false);
 		a.printActions();
-		nar.output(new FileOutputStream(KNOWLEDGEFILE), t -> t.conf() > 0.5f);
+		nar.output(new File(KNOWLEDGEFILE), false,
+				t -> {
+					if (t.conf() > 0.5f) {
+						//System.out.println(t + "\t" + Arrays.toString(t.evidence()));
+						return true;
+					}
+					return false;
+		});
 
 //		nar.forEachConcept(c -> {
 //			System.out.println(c);
