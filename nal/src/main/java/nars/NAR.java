@@ -158,7 +158,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
         TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
-        n.forEachConcept(c -> {
+        n.forEachActiveConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
 
             if (!table.isEmpty()) {
@@ -963,8 +963,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return index.concept(t, createIfMissing);
     }
 
-    @Nullable
-    public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
+    @NotNull
+    public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
+
+    @NotNull
+    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
+        index.forEach(x -> {
+            if (x instanceof Concept)
+                recip.accept((Concept)x);
+        });
+        return this;
+    }
+
 
     /** activate the concept and other features (termlinks, etc)
      * @param link whether to activate termlinks recursively

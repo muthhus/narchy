@@ -23,6 +23,6 @@ public class ActivationTest {
         n.run(15);
 
 
-        n.forEachConcept(System.out::println);
+        n.forEachActiveConcept(System.out::println);
     }
 }

@@ -282,7 +282,7 @@ public class Multi extends AbstractNAR {
 
     @NotNull
     @Override
-    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
+    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
         for (WorkerCore core : this.cores) {
             core.concepts.forEachKey(recip);
         }

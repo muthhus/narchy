@@ -1,5 +1,6 @@
 package nars.util;
 
+import nars.$;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
@@ -10,11 +11,14 @@ import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.variable.AbstractVariable;
+import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -114,11 +118,32 @@ public class IO {
         out.writeUTF(a.toString());
     }
 
+    @Nullable
+    public static Atomic readVariable(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
+        int x = in.readByte();
+        return $.v(o, x);
+    }
+    @Nullable
+    public static void writeVariable(@NotNull DataOutput out, AbstractVariable v) throws IOException {
+        out.writeByte(v.id);
+    }
 
     @Nullable
     public static Atomic readAtomic(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
-        return (Atomic)t.the(t.parse(s));
+        Term key;
+        switch (o) {
+            case ATOM:
+                key = new Atom(s);
+                break;
+            case OPER:
+                key = new Operator(s);
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        return (Atomic)t.the(key);
     }
 
 
@@ -127,9 +152,12 @@ public class IO {
 
         out.writeByte(term.op().ordinal());
 
-        if (term instanceof Atomic)
-            writeAtomic(out, (Atomic)term);
-        else
+        if (term instanceof Atomic) {
+            if (term instanceof Variable)
+                writeVariable(out, (AbstractVariable)term);
+            else
+                writeAtomic(out, (Atomic) term);
+        } else
             writeCompound(out, (Compound)term);
     }
 
@@ -180,7 +208,9 @@ public class IO {
     @Nullable
     static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         Op o = Op.values()[in.readByte()];
-        if (o.isAtomic())
+        if (o.var)
+            return readVariable(in, o, t);
+        else if (o.atomic)
             return readAtomic(in, o, t);
         else
             return readCompound(in, o, t);

@@ -143,7 +143,7 @@ public class LinkageTest extends AbstractNALTest {
                 .forEach( s -> System.out.println("\t" + s));
 
             ((Default)nar).core.concepts.print();
-            nar.forEachConcept(Concept::print);
+            nar.forEachActiveConcept(Concept::print);
 
         }
         assertTrue(g.isConnected());

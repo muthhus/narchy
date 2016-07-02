@@ -275,7 +275,7 @@ public class Thermostat6DQN {
 
     public static void printBeliefs(NAR n, boolean beliefsOrGoals) {
         TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
-        n.forEachConcept(c -> {
+        n.forEachActiveConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
             if (!table.isEmpty()) {
                 bt.add(table.top(n.time()));

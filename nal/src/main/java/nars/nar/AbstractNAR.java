@@ -359,10 +359,7 @@ public abstract class AbstractNAR extends NAR {
         return getClass().getSimpleName() + '[' + nal() + ']';
     }
 
-    /** reports all active concepts or those which can be reached */
-    @Override
-    @Nullable
-    public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
+
 
 
 

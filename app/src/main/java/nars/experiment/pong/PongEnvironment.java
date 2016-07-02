@@ -77,7 +77,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
+		nar.cyclesPerFrame.set(64);
 		nar.conceptActivation.setValue(0.1f);
 		nar.confMin.setValue(0.02f);
 
@@ -123,7 +123,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		addCheats(a.nar, e);
 
-		e.run(a, 64*8);
+		e.run(a, 64*16);
 
 		//NAR.printTasks(nar, true);
 		//NAR.printTasks(nar, false);

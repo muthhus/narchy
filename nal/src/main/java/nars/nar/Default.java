@@ -122,7 +122,7 @@ public class Default extends AbstractNAR {
 
     @NotNull
     @Override
-    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
+    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
         core.concepts.forEachKey(recip);
         return this;
     }

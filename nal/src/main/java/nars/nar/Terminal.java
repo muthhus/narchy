@@ -68,7 +68,7 @@ public class Terminal extends AbstractNAR {
 
     @Nullable
     @Override
-    public NAR forEachConcept(Consumer<Concept> recip) {
+    public NAR forEachActiveConcept(Consumer<Concept> recip) {
         return null;
     }
 

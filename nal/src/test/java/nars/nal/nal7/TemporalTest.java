@@ -8,9 +8,7 @@ import nars.bag.impl.ArrayBag;
 import nars.budget.UnitBudget;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.index.TermIndex;
 import nars.io.NarseseTest;
-import nars.link.BLink;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -384,7 +382,7 @@ public class TemporalTest {
 
         StringBuilder cc = new StringBuilder();
         TreeSet d = new TreeSet();
-        n.forEachConcept(d::add);
+        n.forEachActiveConcept(d::add);
 
         //2 unique impl concepts created
         assertEquals("[x, y, (x==>y), (y==>x)]", d.toString());

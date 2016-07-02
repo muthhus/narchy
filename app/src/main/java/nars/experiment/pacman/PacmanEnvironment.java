@@ -32,7 +32,6 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.mental.Abbreviation2;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -139,7 +138,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
 		n.printActions();
-		nar.forEachConcept(System.out::println);
+		nar.forEachActiveConcept(System.out::println);
+
 //		nar.index.forEach(t -> {
 //			if (t instanceof Concept) {
 //				Concept c = (Concept)t;

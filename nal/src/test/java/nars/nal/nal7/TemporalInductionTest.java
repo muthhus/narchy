@@ -44,7 +44,7 @@ public class TemporalInductionTest {
         n.input("a:b. %0.0|0.9%");
         n.run(1);
 
-        n.forEachConcept(Concept::print);
+        n.forEachActiveConcept(Concept::print);
 
         Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
@@ -66,7 +66,7 @@ public class TemporalInductionTest {
         n.input("(a ==>+5 b). %1.0;0.6%");
         n.run(1);
 
-        n.forEachConcept(Concept::print);
+        n.forEachActiveConcept(Concept::print);
 
         //Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());

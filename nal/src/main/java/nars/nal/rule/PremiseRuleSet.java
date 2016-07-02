@@ -1,8 +1,6 @@
 package nars.nal.rule;
 
 import nars.Global;
-import nars.bag.Bag;
-import nars.concept.AtomConcept;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
@@ -163,7 +161,7 @@ public class PremiseRuleSet  {
             List<PremiseRule> ur = Global.newArrayList(4);
             try {
 
-                Termed prt = index.fromStringRaw(src);
+                Termed prt = index.parseRaw(src);
 
                 PremiseRule preNorm = new PremiseRule((Compound) prt);
 

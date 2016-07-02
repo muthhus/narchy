@@ -128,7 +128,7 @@ public enum Op {
     public final boolean temporal;
     public final int bit;
     public final boolean var;
-    private final boolean atomic;
+    public final boolean atomic;
     public final boolean statement;
 
 
@@ -315,10 +315,6 @@ public enum Op {
 
     public static boolean hasAny(int structure, @NotNull Op o) {
         return hasAny(structure, o.bit);
-    }
-
-    public boolean isAtomic() {
-        return atomic;
     }
 
 

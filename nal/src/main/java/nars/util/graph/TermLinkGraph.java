@@ -137,7 +137,7 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
     @NotNull
     public TermLinkGraph add(@NotNull NAR n, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
 
-        n.forEachConcept(c -> add(c, includeTermLinks));
+        n.forEachActiveConcept(c -> add(c, includeTermLinks));
 
         return this;
     }

@@ -406,33 +406,63 @@ public enum Texts {
                 }
         }
     }
+    public static int i(String s, int offset, int ifMissing) {
+        int sl = s.length() - offset;
+        if (sl <= 0)
+            return ifMissing;
+
+        switch (sl) {
+            case 1: return i1(s, offset, ifMissing);
+            case 2: return i2(s, offset, ifMissing);
+            case 3: return i3(s, offset, ifMissing);
+            default:
+                try {
+                    return Integer.parseInt(offset!=0 ? s.substring(offset) : s);
+                }
+                catch (NumberFormatException e) {
+                    return ifMissing;
+                }
+        }
+    }
 
     private static int i3(String s, int ifMissing) {
-        int dig100 = i(s.charAt(0));
+        return i3(s, 0, ifMissing);
+    }
+
+    private static int i3(String s, int offset, int ifMissing) {
+        int dig100 = i(s.charAt(offset));
         if (dig100 == -1) return ifMissing;
 
-        int dig10 = i(s.charAt(1));
+        int dig10 = i(s.charAt(offset+1));
         if (dig10 == -1) return ifMissing;
 
-        int dig1 = i(s.charAt(2));
+        int dig1 = i(s.charAt(offset+2));
         if (dig1 == -1) return ifMissing;
 
         return dig100 * 100 + dig10 * 10 + dig1;
     }
 
     private static int i2(String s, int ifMissing) {
-        int dig10 = i(s.charAt(0));
+        return i2(s, 0, ifMissing);
+    }
+
+    private static int i2(String s, int offset, int ifMissing) {
+        int dig10 = i(s.charAt(offset));
         if (dig10 == -1) return ifMissing;
 
-        int dig1 = i(s.charAt(1));
+        int dig1 = i(s.charAt(offset+1));
         if (dig1 == -1) return ifMissing;
 
         return dig10 * 10 + dig1;
     }
 
     private static int i1(String s, int ifMissing) {
-        int dig1 = i(s.charAt(0));
-        if (dig1 != -1) return ifMissing;
+        return i1(s, 0, ifMissing);
+    }
+
+    private static int i1(String s, int offset, int ifMissing) {
+        int dig1 = i(s.charAt(offset));
+        if (dig1 == -1) return ifMissing;
         return dig1;
     }
 

@@ -890,7 +890,7 @@ public class UnificationTest {
         n.input(c);
         n.run(1);
 
-        n.forEachConcept(Concept::print);
+        n.forEachActiveConcept(Concept::print);
 
 //        TermLinkGraph g = new TermLinkGraph(n);
 //        assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());
