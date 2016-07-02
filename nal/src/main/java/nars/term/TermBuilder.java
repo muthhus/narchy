@@ -153,17 +153,17 @@ public abstract class TermBuilder {
 
 
 
-    @Nullable
+    @NotNull
     public final Term finish(@NotNull Op op, @NotNull Term... args) {
         return finish(op, DTERNAL, args);
     }
 
-    @Nullable
+    @NotNull
     public final Term finish(@NotNull Op op, @NotNull TermContainer args) {
         return finish(op, DTERNAL, args);
     }
 
-    @Nullable
+    @NotNull
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         return finish(op, dt, TermContainer.the(op, args));
     }
@@ -172,7 +172,7 @@ public abstract class TermBuilder {
     /**
      * step before calling Make, do not call manually from outside
      */
-    @Nullable
+    @NotNull
     final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
         int s = args.size();
@@ -181,9 +181,9 @@ public abstract class TermBuilder {
             //special case: allow for ellipsis to occupy one item even if minArity>1
             Term a0 = args.term(0);
             if (!(a0 instanceof Ellipsislike)) {
-                return null;
+                //return null;
                 //throw new RuntimeException("invalid size " + s + " for " + op);
-                //return u0; //reduction
+                return a0; //reduction
             }
         }
 

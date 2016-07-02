@@ -62,26 +62,26 @@ public class PongEnvironment extends Player implements Environment {
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
+				new CaffeineIndex(128*1024,new DefaultConceptBuilder(rng) , true )
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.7f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+		nar.beliefConfidence(0.8f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(64);
-		nar.conceptActivation.setValue(0.02f);
-		nar.confMin.setValue(0.02f);
+		nar.cyclesPerFrame.set(12);
+		nar.conceptActivation.setValue(0.2f);
+		nar.confMin.setValue(0.05f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
 		nar.conceptCold.termlinksCapacityMax.setValue(16);
 		nar.conceptWarm.termlinksCapacityMin.setValue(16);
-		nar.conceptWarm.termlinksCapacityMax.setValue(48);
+		nar.conceptWarm.termlinksCapacityMax.setValue(32);
 		nar.conceptCold.taskLinksCapacity.setValue(16);
 		nar.conceptWarm.taskLinksCapacity.setValue(32);
 
@@ -125,14 +125,18 @@ public class PongEnvironment extends Player implements Environment {
 
 		addCheats(a.nar, e);
 
-		e.run(a, 64*16);
+		//nar.logSummaryGT(System.out, 0.25f);
 
-		//NAR.printTasks(nar, true);
-		//NAR.printTasks(nar, false);
+		e.run(a, 264*16);
+
+		NAR.printTasks(nar, true);
+		NAR.printTasks(nar, false);
+
 		a.printActions();
+
 		nar.output(new File(KNOWLEDGEFILE), false,
 				t -> {
-					if (t.conf() > 0.5f) {
+					if (!t.isInput() && t.conf() > 0.5f) {
 						//System.out.println(t + "\t" + Arrays.toString(t.evidence()));
 						return true;
 					}
@@ -169,9 +173,9 @@ public class PongEnvironment extends Player implements Environment {
 	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 
 		new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
-				"(" + term + " --> [" + low + "])",
-				"(" + term + " --> [" + mid + "])",
-				"(" + term + " --> [" + high +"])").pri(pri);
+				"(" + term + " --> " + low + ")",
+				"(" + term + " --> " + mid + ")",
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
 	}
 
 	public PongEnvironment() {

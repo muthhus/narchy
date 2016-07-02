@@ -317,7 +317,8 @@ public class NAgent implements Agent {
     }
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
-        return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar, "(I --> [sad])", "(I --> [neutral])", "(I --> [happy])");
+        return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar,
+                "(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.1f);
     }
 
     public void setSensorNamer(IntFunction<Compound> sensorNamer) {

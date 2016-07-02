@@ -16,7 +16,7 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	private static final int ACCELERATION = 110; // Ogni quanti frame aumenta di 1 pixel la velocità
 
 	// Proprietà dei carrelli
-	public static final int SPEED = 20; // Velocità dei carrelli
+	public static final int SPEED = 15; // Velocità dei carrelli
 	public static final int PADDLE_HEIGHT = 40; // SEMI-altezza del carrello
 	public static final int WIDTH = 20;
 	private static final int TOLERANCE = 5;

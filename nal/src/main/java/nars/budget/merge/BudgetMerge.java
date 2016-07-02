@@ -5,6 +5,8 @@ import nars.budget.Budgeted;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BiFunction;
+
 import static nars.Global.BUDGET_EPSILON;
 import static nars.nal.UtilityFunctions.or;
 
@@ -12,9 +14,7 @@ import static nars.nal.UtilityFunctions.or;
  * Budget merge function, with input scale factor
  */
 @FunctionalInterface
-public interface BudgetMerge {
-
-
+public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
@@ -24,6 +24,15 @@ public interface BudgetMerge {
      * @return any resultng overflow priority which was not absorbed by the target, >=0
      * */
     float merge(Budget existing, Budgeted incoming, float incomingScale);
+
+    default Budget apply(Budget existing, Budget incoming) {
+        if (existing == null)
+            return incoming;
+        else {
+            merge(existing, incoming, 1f);
+            return existing;
+        }
+    }
 
     static float dqBlendByOrDurQua(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean plusOrAvg) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;

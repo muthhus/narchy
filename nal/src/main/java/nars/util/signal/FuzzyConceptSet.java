@@ -88,6 +88,13 @@ public class FuzzyConceptSet {
         }
         return this;
     }
+    public FuzzyConceptSet resolution(float r) {
+        for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
+            sensors.get(i).resolution(r);
+        }
+        return this;
+    }
+
     public FuzzyConceptSet conf(float c) {
         this.conf = c;
         return this;
@@ -107,4 +114,6 @@ public class FuzzyConceptSet {
     public void clear() {
         sensors.forEach(s -> s.beliefs().clear());
     }
+
+
 }

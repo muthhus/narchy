@@ -380,14 +380,19 @@ public interface TermIndex {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
-            t = transform(ct,
+            Term t2 = transform(ct,
                     (numVars == 1 && ct.varPattern() == 0) ?
                             VariableNormalization.singleVariableNormalization :
                             new VariableNormalization(numVars)
             );
 
-//            if (!(t instanceof Compound)) //includes null test
-//                return null;
+            if (!(t2 instanceof Compound)) { //includes null test
+                if (Global.DEBUG)
+                    System.err.println(t + " TermIndex.normalize() produced null");
+                return null;
+            }
+
+            t = t2;
 
             ((GenericCompound) t).setNormalized();
 
@@ -414,7 +419,7 @@ public interface TermIndex {
 
     @Nullable
     default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        return !t.testSuperTerm(src) ? src : _transform(src, t);
+        return src==null || !t.testSuperTerm(src) ? src : _transform(src, t);
     }
 
 
@@ -423,6 +428,7 @@ public interface TermIndex {
      */
     @Nullable
     default Term _transform(@NotNull Compound src, @NotNull CompoundTransform trans) {
+
 
         int n = src.size();
 
@@ -594,7 +600,7 @@ public interface TermIndex {
         }
     }
 
-    static boolean possiblyTemporal(Term x) {
+    static boolean possiblyTemporal(Termlike x) {
         return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
     }
 
@@ -623,7 +629,9 @@ public interface TermIndex {
             return (Compound) i.transform(
                     (c.op().temporal && c.dt()!=DTERNAL) ?
                             //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
-                            (Compound)i.the((i.builder().build(c.op(), DTERNAL, c.subterms().terms()))) :
+                            (Compound)i.the((i.builder().build(c.op(), DTERNAL,
+                                    c.subterms().terms()
+                            ))) :
                             c,
                     this);
         }

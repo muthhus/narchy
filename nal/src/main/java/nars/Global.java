@@ -121,12 +121,12 @@ public enum Global {
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMin = 3;
+    public static float matchTermutationsMin = 1;
 
     /** upper limit for # of termutations derived, determined by premise's priority */
-    public static float matchTermutationsMax = 6;
+    public static float matchTermutationsMax = 3;
 
-    public static int QUERY_ANSWERS_PER_MATCH = 2;
+    public static int QUERY_ANSWERS_PER_MATCH = 1;
 
 
     /** smallest non-zero sub-cycle time measurement; # of cycles per frame should not exceed 1 / SUBFRAME_EPSILON */
@@ -148,11 +148,11 @@ public enum Global {
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 4f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
-    public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 16;
+    public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 32;
 
 
     @NotNull

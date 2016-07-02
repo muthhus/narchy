@@ -2,10 +2,7 @@ package nars.index;
 
 import nars.Op;
 import nars.concept.Concept;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermBuilder;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -52,7 +49,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
     /** default lowest common denominator impl, subclasses may reimpl for more efficiency */
-    @Nullable
+    @NotNull
     protected Termed getNewAtom(@NotNull Atomic x) {
         Termed y = get(x);
         if (y == null)  {
@@ -67,6 +64,10 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         Termed y = get(x);
         if (y == null) {
             y = buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
+
+//            if (y == null)
+//                throw new InvalidTerm(x.op(), x.dt(), x.subterms().terms());
+
             if (canBuildConcept(y)) {
                 set(y = buildConcept(y) );
             }
@@ -158,7 +159,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         return conceptBuilder.apply( interned.term() );
     }
 
-    protected final Termed buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
+    @Nullable protected final Termed buildCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
         return build(op, dt, theSubterms(subs));
     }
 

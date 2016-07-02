@@ -21,23 +21,30 @@ public class CaffeineIndex extends MaplikeIndex {
     @NotNull
     final Cache<TermContainer, TermContainer> subterms;
 
-    public CaffeineIndex(Concept.ConceptBuilder builder) {
-        this(builder, false);
+    public CaffeineIndex(int initialSize, Concept.ConceptBuilder builder) {
+        this(initialSize, builder, false);
     }
 
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, boolean soft) {
+    public CaffeineIndex(int initialSize, Concept.ConceptBuilder conceptBuilder, boolean soft) {
         super(conceptBuilder);
 
-        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
+        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), initialSize, soft);
         concepts = builder.build();
 
-        Caffeine<Object, Object> subBuilder = prepare(Caffeine.newBuilder(), soft);
+        Caffeine<Object, Object> subBuilder = prepare(Caffeine.newBuilder(), initialSize, soft);
         subterms = subBuilder.build();
     }
 
-    private Caffeine<Object, Object> prepare(Caffeine<Object, Object> builder, boolean soft) {
-        if (soft)
-            builder = builder.softValues();
+    private Caffeine<Object, Object> prepare(Caffeine<Object, Object> builder, int initialSize, boolean soft) {
+
+        builder = builder.initialCapacity(initialSize);
+
+        if (soft) {
+            //builder = builder.softValues();
+            builder = builder.weakValues();
+
+
+        }
 
         //.softValues()
         //.maximumSize(10_000)
