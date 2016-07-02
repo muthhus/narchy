@@ -87,7 +87,7 @@ public class TermIOTest {
 
     @Test public void testNARTaskDump() throws Exception {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(16384);
 
         NAR a = new Default()
                         .input("a:b.", "b:c.", "c:d!")

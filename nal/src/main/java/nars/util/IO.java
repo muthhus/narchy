@@ -21,9 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 /**
  * Created by me on 5/29/16.
@@ -37,8 +35,9 @@ public class IO {
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull ObjectInput in, TermIndex t) throws IOException, ClassNotFoundException {
-        Term term = (Term) in.readObject();
+    public static MutableTask readTask(@NotNull DataInput in, TermIndex t) throws IOException, ClassNotFoundException {
+
+        Term term = readTerm(in, t);
 
         //TODO combine these into one byte
         char punc = (char) in.readByte();
@@ -71,7 +70,7 @@ public class IO {
     }
 
     @NotNull
-    public static Truth readTruth(@NotNull ObjectInput in) throws IOException {
+    public static Truth readTruth(@NotNull DataInput in) throws IOException {
         Truth truth;
         float f = in.readFloat();
         float c = in.readFloat();
@@ -79,8 +78,9 @@ public class IO {
         return truth;
     }
 
-    public static void writeTask(@NotNull ObjectOutput out, @NotNull Task t) throws IOException {
-        out.writeObject(t.term());
+    public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+
+        writeTerm(out, t.term());
 
         char p = t.punc();
         long[] evi = t.evidence();
@@ -105,25 +105,25 @@ public class IO {
         out.writeFloat(t.qua());
     }
 
-    public static void writeTruth(@NotNull ObjectOutput out, float freq, float conf) throws IOException {
+    public static void writeTruth(@NotNull DataOutput out, float freq, float conf) throws IOException {
         out.writeFloat(freq);
         out.writeFloat(conf);
     }
 
-    public static void writeAtomic(@NotNull ObjectOutput out, @NotNull Atomic a) throws IOException {
+    public static void writeAtomic(@NotNull DataOutput out, @NotNull Atomic a) throws IOException {
         out.writeUTF(a.toString());
     }
 
 
     @Nullable
-    public static Atomic readAtomic(@NotNull ObjectInput in, Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
         return t.the(s);
     }
 
 
 
-    static void writeTerm(@NotNull ObjectOutput out, @NotNull Term term) throws IOException {
+    static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
         out.writeByte(term.op().ordinal());
 
@@ -133,7 +133,7 @@ public class IO {
             writeCompound(out, (Compound)term);
     }
 
-    static void writeCompound(@NotNull ObjectOutput out, @NotNull Compound c) throws IOException {
+    static void writeCompound(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
 
         //how many subterms to follow
         writeTermContainer(out, c.subterms());
@@ -142,7 +142,7 @@ public class IO {
             out.writeInt(c.dt());
     }
 
-    static void writeTermContainer(@NotNull ObjectOutput out, @NotNull TermContainer c) throws IOException {
+    static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
         out.writeByte(siz);
         for (int i = 0; i < siz; i++) {
@@ -150,7 +150,7 @@ public class IO {
         }
     }
     @Nullable
-    public static Term[] readTermContainer(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
+    public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
@@ -164,7 +164,7 @@ public class IO {
      * called by readTerm after determining the op type
      * TODO make a version which reads directlyinto TermIndex */
     @Nullable
-    static Compound readCompound(@NotNull ObjectInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    static Compound readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         Term[] v = readTermContainer(in, t);
 
@@ -178,7 +178,7 @@ public class IO {
     /**
      * called by readTerm after determining the op type */
     @Nullable
-    static Term readTerm(@NotNull ObjectInput in, @NotNull TermIndex t) throws IOException {
+    static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         Op o = Op.values()[in.readByte()];
         if (o.isAtomic())
             return readAtomic(in, o, t);
@@ -200,6 +200,7 @@ public class IO {
             createDefaultConfiguration();
             //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
             setForceSerializable(true);
+
 
             //setCrossPlatform(false);
             setShareReferences(false);

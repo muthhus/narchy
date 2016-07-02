@@ -18,6 +18,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -30,13 +31,16 @@ import nars.util.signal.FuzzyConceptSet;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static nars.$.t;
 
 public class PongEnvironment extends Player implements Environment {
 
+	public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
 	int actions = 3;
 
 	final int width = 2;
@@ -53,7 +57,7 @@ public class PongEnvironment extends Player implements Environment {
 
 
 
-	public static void main (String[] args) {
+	public static void main (String[] args) throws IOException {
 		//Global.TRUTH_EPSILON = 0.2f;
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
@@ -66,14 +70,13 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		//nar.conceptActivation.setValue(0.5f);
-		nar.beliefConfidence(0.95f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(128);
+		nar.cyclesPerFrame.set(32);
 		nar.conceptActivation.setValue(0.1f);
 		nar.confMin.setValue(0.02f);
 
@@ -83,7 +86,8 @@ public class PongEnvironment extends Player implements Environment {
 		nar.conceptWarm.termlinksCapacityMax.setValue(48);
 		nar.conceptCold.taskLinksCapacity.setValue(16);
 		nar.conceptWarm.taskLinksCapacity.setValue(32);
-		
+
+
 		NAgent a = new NAgent(nar) {
 			@Override
 			public void start(int inputs, int ac) {
@@ -93,6 +97,15 @@ public class PongEnvironment extends Player implements Environment {
 			}
 
 		};
+
+		try {
+			nar.input(new FileInputStream(KNOWLEDGEFILE));
+		} catch (FileNotFoundException e) {
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		//a.epsilon = 0.6f;
 		//a.gamma /= 4f;
 
@@ -109,11 +122,13 @@ public class PongEnvironment extends Player implements Environment {
 
 		addCheats(a.nar, e);
 
-		e.run(a, 64*32);
+		e.run(a, 4*32);
 
-		NAR.printTasks(nar, true);
-		NAR.printTasks(nar, false);
+		//NAR.printTasks(nar, true);
+		//NAR.printTasks(nar, false);
 		a.printActions();
+		nar.output(new FileOutputStream(KNOWLEDGEFILE), t -> t.conf() > 0.5f);
+
 //		nar.forEachConcept(c -> {
 //			System.out.println(c);
 //		});
@@ -136,16 +151,17 @@ public class PongEnvironment extends Player implements Environment {
 
 		numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () ->
 				//pong.ball_y - pong.player1.position,
-				(float)Math.pow(pong.ball_y - pong.player1.position, 2f),
-				pri);
+				//(float)Math.pow(
+						pong.ball_y - pong.player1.position //, 2f),
+				,pri);
 	}
 
 	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 
 		new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
-				"({" + term + "} --> [" + low + "])",
-				"({" + term + "} --> [" + mid + "])",
-				"({" + term + "} --> [" + high +"])").pri(pri);
+				"(" + term + " --> [" + low + "])",
+				"(" + term + " --> [" + mid + "])",
+				"(" + term + " --> [" + high +"])").pri(pri);
 	}
 
 	public PongEnvironment() {

@@ -192,9 +192,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    @NotNull
-    public void input(@NotNull File input) throws IOException {
-        FileInput.load(this, input);
+    public @NotNull Collection<Task> input(@NotNull File input) throws IOException {
+        return FileInput.load(this, input);
     }
 
     /**
@@ -504,12 +503,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @NotNull
-    public void input(@NotNull Collection<Task> t) {
+    public @NotNull Collection<Task> input(@NotNull Collection<Task> t) {
         //TaskQueue tq = new TaskQueue(t);
         //input((Input) tq);
         //return tq;
         t.forEach(this::input);
+        return t;
     }
 
     @NotNull
@@ -1035,18 +1034,28 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
-    public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
-        PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
-        index.forEach(t -> {
-            if (t instanceof Concept) {
-                Concept cc = (Concept)t;
-                cc.print(pw);
-            } else {
-                pw.append(t.toString());
-            }
-        });
-        pw.close();
+    /** text output */
+    public void outputTasks(Predicate<Task> filter, PrintStream out) {
+        forEachConceptTask(c-> {
+            if (filter.test(c))
+                out.println(c.term().toString() + c.punc() + " " + c.truth()); //TODO occurence time
+        }, true, true, true, true);
     }
+
+
+
+//    public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
+//        PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
+//        index.forEach(t -> {
+//            if (t instanceof Concept) {
+//                Concept cc = (Concept)t;
+//                cc.print(pw);
+//            } else {
+//                pw.append(t.toString());
+//            }
+//        });
+//        pw.close();
+//    }
 
     public On onTask(Consumer<Task> o) {
         return eventTaskProcess.on(o);
@@ -1123,14 +1132,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** byte codec output of matching concept tasks (blocking) */
     @NotNull
-    public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) {
+    public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
 
-        IO.DefaultCodec c = new IO.DefaultCodec(index);
+        DataOutputStream oo = new DataOutputStream(o);
 
         forEachConceptTask(t-> {
             if (each.test(t)) {
                 try {
-                    c.encodeToStream(o, t);
+                    IO.writeTask(oo, t);
                 } catch (IOException e) {
                     logger.error("{} when trying to output to {}", t, e);
                     throw new RuntimeException(e);
@@ -1150,7 +1159,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     @NotNull
-    public NAR output(@NotNull OutputStream o) {
+    public NAR output(@NotNull OutputStream o) throws IOException {
         return output(o, x -> true);
     }
 
@@ -1158,12 +1167,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR input(@NotNull InputStream tasks) throws Exception {
 
-        IO.DefaultCodec c = new IO.DefaultCodec(index);
+        DataInputStream ii = new DataInputStream(tasks);
 
+        int count = 0;
         while (tasks.available() > 0) {
-            Task t = (Task) c.decodeFromStream(tasks);
+            Task t = IO.readTask(ii, index);
             input(t);
+            count++;
         }
+
+        logger.info("Loaded {} tasks from {}", count, tasks);
+
         return this;
     }
 

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -18,8 +19,8 @@ import java.util.stream.Collectors;
  */
 public class FileInput {
 
-    public static void load(@NotNull NAR p, @NotNull File input) throws IOException {
-        p.input(tasks(p, input));
+    public static @NotNull Collection<Task> load(@NotNull NAR p, @NotNull File input) throws IOException {
+        return p.input(tasks(p, input));
     }
     public static List<Task> tasks(final NAR nar, @NotNull File input) throws IOException {
         return nar.tasks(load(input));

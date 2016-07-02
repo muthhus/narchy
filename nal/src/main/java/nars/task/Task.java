@@ -111,18 +111,16 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean input) {
 
         t = memory.index.normalize(t, true);
+
         if (!(t instanceof Compound))
             throw new TermIndex.InvalidTaskTerm(t, "Task Term Does Not Normalize to Compound");
 
+
+        /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
-        @NotNull Compound ct = t.term();
-
-        if (op.isStatement()) {
-            /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
-            if (subjectOrPredicateIsIndependentVar(ct))
-                throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
-        }
+        if (op.isStatement() && subjectOrPredicateIsIndependentVar(t.term()))
+            throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
 
 //        if (hasCoNegatedAtemporalConjunction(ct)) {
 //            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
