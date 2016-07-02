@@ -200,7 +200,10 @@ public class IO {
         if (o.isImage() || o.temporal) //TODO o.hasNumeric
             dt = in.readInt();
 
-        return (Compound) t.normalize(t.builder().build(o, dt, v), true);
+        return (Compound) t.builder().build(o, dt, v);
+//        if (key == null)
+//            throw new UnsupportedOperationException();
+//        return (Compound) t.normalize(key, true);
     }
 
     /**
