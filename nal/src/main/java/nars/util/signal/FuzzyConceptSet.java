@@ -1,8 +1,11 @@
 package nars.util.signal;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
+import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
 
 import java.util.List;
@@ -15,32 +18,40 @@ public class FuzzyConceptSet {
 
     private final FloatSupplier input;
     public final List<SensorConcept> sensors;
+    private final NAR nar;
     float conf;
 
     public FuzzyConceptSet(FloatSupplier input, NAR nar, String... states) {
 
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
         this.input = input;
+        this.nar = nar;
 
         int numStates = states.length;
         this.sensors = Global.newArrayList(numStates);
         float dw = 1f / numStates;
         float dr = 1f / (numStates-1);
-        float r = 0;
+        float center = 0;
         int i = 0;
         for (String s : states) {
-            float c = r; //center of the range
 
-            sensors.add( new SensorConcept(s, nar, this.input,
-                    (v) -> {
-                        float cdist = Math.abs(v - c);
-                        if (cdist > dw) return t(0,conf);
-                        else {
-                            return t(0.5f + (cdist/dw)*0.5f, conf);
+
+            float fCenter = center;
+            sensors.add( new SensorConcept(s, nar,
+                    this.input,
+                    (x) -> {
+                        float cdist = Math.abs(x - fCenter);
+                        Truth y;
+                        if (cdist > dw) {
+                            y = t(0, conf);
+                        } else {
+                            y = t(0.5f + (1f-(cdist/dw))*0.5f, conf);
                         }
+                        //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
+                        return y;
                     }
             ));
-            r += dr;
+            center += dr;
             i++;
         }
     }
@@ -83,6 +94,17 @@ public class FuzzyConceptSet {
     }
 
 
+    @Override
+    public String toString() {
+        return Joiner.on("\t").join(Iterators.transform(
+                sensors.iterator(), s -> {
+                    return s.term() + " " + s.beliefs().truth(nar.time()).toString();
+                }
+        ));
+    }
 
-
+    /** clear all sensor's belief state */
+    public void clear() {
+        sensors.forEach(s -> s.beliefs().clear());
+    }
 }

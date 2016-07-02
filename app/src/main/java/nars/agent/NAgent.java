@@ -14,7 +14,6 @@ import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
-import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
@@ -29,7 +28,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static nars.$.*;
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.UtilityFunctions.w2c;
 import static nars.util.Texts.n4;
 
 /**
@@ -49,7 +47,7 @@ public class NAgent implements Agent {
     private List<SensorConcept> inputs;
     //private SensorConcept reward;
     private int lastAction = -1;
-    private float prevReward = Float.NaN;
+    private float reward = Float.NaN;
 
     private int ticksBeforeObserve = 1;
     private int ticksBeforeDecide = 1;
@@ -239,10 +237,7 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect(toList());
 
 
-        FuzzyConceptSet reward = new FuzzyConceptSet(new PolarRangeNormalizedFloat(() ->
-                prevReward
-        ), nar, "(I --> [sad])", "(I --> [neutral])", "(I --> [happy])")
-            .pri(rewardPriority);
+        FuzzyConceptSet reward = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
 
         this.sad = reward.sensors.get(0);
         this.happy = reward.sensors.get(2);
@@ -319,6 +314,10 @@ public class NAgent implements Agent {
 //                .pri(rewardPriority)
 //                .resolution(0.01f);
         init();
+    }
+
+    public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
+        return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar, "(I --> [sad])", "(I --> [neutral])", "(I --> [happy])");
     }
 
     public void setSensorNamer(IntFunction<Compound> sensorNamer) {
@@ -513,12 +512,13 @@ public class NAgent implements Agent {
 
     private void learn(float[] input, int action, float reward) {
 
+        float prevReward = this.reward;
         if (Float.isFinite(prevReward))
             this.dReward = (reward - prevReward);
         else
             this.dReward = 0;
 
-        this.prevReward = reward;
+        this.reward = reward;
 
     }
 

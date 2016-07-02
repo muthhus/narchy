@@ -7,7 +7,7 @@ public class RangeNormalizedFloat implements FloatSupplier {
 
     private final FloatSupplier in;
     protected float min;
-    private float max;
+    protected float max;
     private final float minStart;
     private final float maxStart;
 

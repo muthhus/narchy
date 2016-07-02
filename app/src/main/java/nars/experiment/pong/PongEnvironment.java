@@ -39,7 +39,6 @@ public class PongEnvironment extends Player implements Environment {
 
 	int actions = 3;
 
-
 	final int width = 2;
 	final int height = 2;
 	final int pixels = width * height;

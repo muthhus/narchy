@@ -2,7 +2,9 @@ package nars.util.math;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 
-/** balances at zero, normalizes positive and negative ranges independently */
+/** balances at zero, balanced normalization of positive and negative ranges (radius)
+ *  output is normalized to range 0..1.0
+ * */
 public class PolarRangeNormalizedFloat extends RangeNormalizedFloat {
 
     public PolarRangeNormalizedFloat(FloatSupplier in) {
@@ -15,7 +17,12 @@ public class PolarRangeNormalizedFloat extends RangeNormalizedFloat {
         float araw = Math.abs(raw);
         float n = super.normalize(araw);
         if (raw < 0) n = -n;
-        return n;
+        return n/2f + 0.5f;
+    }
+
+    public void set(float radius) {
+        this.min = 0;
+        this.max = radius;
     }
 
     //    final RangeNormalizedFloat positive;
