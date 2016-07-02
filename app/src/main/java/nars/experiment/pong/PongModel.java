@@ -13,14 +13,14 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 	// Proprietà della palla
 	private static final int RADIUS = 15; // Raggio
 	private static final int START_SPEED = 6; // Velocità iniziale
-	private static final int ACCELERATION = 125; // Ogni quanti frame aumenta di 1 pixel la velocità 
+	private static final int ACCELERATION = 110; // Ogni quanti frame aumenta di 1 pixel la velocità
 
 	// Proprietà dei carrelli
 	public static final int SPEED = 20; // Velocità dei carrelli
-	public static final int HEIGHT = 50; // SEMI-altezza del carrello
+	public static final int PADDLE_HEIGHT = 25; // SEMI-altezza del carrello
 	public static final int WIDTH = 30;
 	private static final int TOLERANCE = 5;
-	private static final int PADDING = 10;
+	private static final int PADDING = 0;
 
 	public final Player player1;
 	public final Player player2;
@@ -81,10 +81,10 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 			
 			player.position += direction * distance;
 			
-			if (player.position - HEIGHT < 0)
-				player.position = HEIGHT;
-			if (player.position + HEIGHT > getHeight())
-				player.position = getHeight() - HEIGHT;
+			if (player.position - PADDLE_HEIGHT < 0)
+				player.position = PADDLE_HEIGHT;
+			if (player.position + PADDLE_HEIGHT > getHeight())
+				player.position = getHeight() - PADDLE_HEIGHT;
 		}
 	}
 	
@@ -154,12 +154,12 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 
 		if (ball_x <= bounceLX) {
 			int collision_point = ball_y + (int)(ball_y_speed / ball_x_speed * (PADDING + WIDTH + RADIUS - ball_x));
-			if (ball_x <= bounceLX && collision_point > player1.position - HEIGHT - TOLERANCE &&
-			    collision_point < player1.position + HEIGHT + TOLERANCE) {
+			if (ball_x <= bounceLX && collision_point > player1.position - PADDLE_HEIGHT - TOLERANCE &&
+			    collision_point < player1.position + PADDLE_HEIGHT + TOLERANCE) {
 				ball_x = 2 * (PADDING + WIDTH + RADIUS) - ball_x;
 				player1.bounce();
 				ball_x_speed = Math.abs (ball_x_speed);
-				ball_y_speed -= Math.sin ((double)(player1.position - ball_y) / HEIGHT * Math.PI / 4)
+				ball_y_speed -= Math.sin ((double)(player1.position - ball_y) / PADDLE_HEIGHT * Math.PI / 4)
 				                * Math.hypot (ball_x_speed, ball_y_speed);
 				//if (player2.getType() == Player.CPU_HARD)
 					computeDestination (player2);
@@ -176,12 +176,12 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		int dieRX = getWidth() - RADIUS;
 		if (ball_x >= bounceRX) {
 			int collision_point = ball_y - (int)(ball_y_speed / ball_x_speed * (ball_x - getWidth() + PADDING + WIDTH + RADIUS));
-			if (ball_x >= bounceRX && collision_point > player2.position - HEIGHT - TOLERANCE &&
-			    collision_point < player2.position + HEIGHT + TOLERANCE) {
+			if (ball_x >= bounceRX && collision_point > player2.position - PADDLE_HEIGHT - TOLERANCE &&
+			    collision_point < player2.position + PADDLE_HEIGHT + TOLERANCE) {
 				ball_x = 2 * (bounceRX) - ball_x;
 				ball_x_speed = -1 * Math.abs (ball_x_speed);
 				player2.bounce();
-				ball_y_speed -= Math.sin ((double)(player2.position - ball_y) / HEIGHT * Math.PI / 4)
+				ball_y_speed -= Math.sin ((double)(player2.position - ball_y) / PADDLE_HEIGHT * Math.PI / 4)
 				                * Math.hypot (ball_x_speed, ball_y_speed);
 				//if (player1.getType() == Player.CPU_HARD)
 					computeDestination (player1);
@@ -210,8 +210,8 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 		//g.setColor (Color.WHITE);
 		g.setColor (new Color(1f-bgFlash, 1f-bgFlash, 1f-bgFlash));
 
-		g.fillRect (PADDING, player1.position - HEIGHT, WIDTH, HEIGHT * 2);
-		g.fillRect (getWidth() - PADDING - WIDTH, player2.position - HEIGHT, WIDTH, HEIGHT * 2);
+		g.fillRect (PADDING, player1.position - PADDLE_HEIGHT, WIDTH, PADDLE_HEIGHT * 2);
+		g.fillRect (getWidth() - PADDING - WIDTH, player2.position - PADDLE_HEIGHT, WIDTH, PADDLE_HEIGHT * 2);
 		
 		// Disegna la palla
 		g.fillOval (ball_x - RADIUS, ball_y - RADIUS, RADIUS*2, RADIUS*2);

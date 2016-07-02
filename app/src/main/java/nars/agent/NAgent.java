@@ -16,6 +16,7 @@ import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
+import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
@@ -238,40 +239,48 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect(toList());
 
 
-        float rewardResolution = 0.05f;
-        this.happy = new SensorConcept($.prop(nar.self, the("happy")), nar,
-                new PolarRangeNormalizedFloat(()->
-                    prevReward
-                ), sensorFreqPos) {
-                    //HACK TODO make this a parameter for SensorConcept
-                    @Override protected void beliefCapacity(ConceptPolicy p) {
-                        beliefs().capacity(0, rewardBeliefCapacity);
-                        goals().capacity(1, motorGoalCapacity);
-                    }
+        FuzzyConceptSet reward = new FuzzyConceptSet(new PolarRangeNormalizedFloat(() ->
+                prevReward
+        ), nar, "(I --> [sad])", "(I --> [neutral])", "(I --> [happy])")
+            .pri(rewardPriority);
 
-                }
-                .resolution(rewardResolution)
-                .pri(rewardPriority)
-                //.seek(true)
-        ;
+        this.sad = reward.sensors.get(0);
+        this.happy = reward.sensors.get(2);
 
-        this.sad = new SensorConcept(
-                $.prop(nar.self, the("sad")),
-                //$.inh(nar.self, $.neg($.seti(the("happy")))),
-                nar,
-                new PolarRangeNormalizedFloat(()->
-                    -prevReward
-                ), sensorFreqPos) {
-                    //HACK TODO make this a parameter for SensorConcept
-                    @Override protected void beliefCapacity(ConceptPolicy p) {
-                        beliefs().capacity(0, rewardBeliefCapacity);
-                        goals().capacity(1, motorGoalCapacity);
-                    }
-                }
-                .resolution(rewardResolution)
-                .pri(rewardPriority)
-                //.seek(false)
-        ;
+//        float rewardResolution = 0.05f;
+//        this.happy = new SensorConcept($.prop(nar.self, the("happy")), nar,
+//                new PolarRangeNormalizedFloat(()->
+//                    prevReward
+//                ), sensorFreqPos) {
+//                    //HACK TODO make this a parameter for SensorConcept
+//                    @Override protected void beliefCapacity(ConceptPolicy p) {
+//                        beliefs().capacity(0, rewardBeliefCapacity);
+//                        goals().capacity(1, motorGoalCapacity);
+//                    }
+//
+//                }
+//                .resolution(rewardResolution)
+//                .pri(rewardPriority)
+//                //.seek(true)
+//        ;
+//
+//        this.sad = new SensorConcept(
+//                $.prop(nar.self, the("sad")),
+//                //$.inh(nar.self, $.neg($.seti(the("happy")))),
+//                nar,
+//                new PolarRangeNormalizedFloat(()->
+//                    -prevReward
+//                ), sensorFreqPos) {
+//                    //HACK TODO make this a parameter for SensorConcept
+//                    @Override protected void beliefCapacity(ConceptPolicy p) {
+//                        beliefs().capacity(0, rewardBeliefCapacity);
+//                        goals().capacity(1, motorGoalCapacity);
+//                    }
+//                }
+//                .resolution(rewardResolution)
+//                .pri(rewardPriority)
+//                //.seek(false)
+//        ;
 
 //        this.reward = new SensorConceptDebug("(R)", nar,
 //                //new RangeNormalizedFloat(

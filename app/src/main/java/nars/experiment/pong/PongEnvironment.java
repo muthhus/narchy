@@ -8,7 +8,6 @@ package nars.experiment.pong;/*
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
@@ -19,18 +18,15 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
-import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
-import nars.util.signal.SensorConcept;
+import nars.util.signal.FuzzyConceptSet;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
@@ -78,9 +74,9 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(48);
-		nar.conceptActivation.setValue(0.05f);
-		nar.confMin.setValue(0.01f);
+		nar.cyclesPerFrame.set(128);
+		nar.conceptActivation.setValue(0.1f);
+		nar.confMin.setValue(0.02f);
 
 		nar.conceptCold.termlinksCapacityMin.setValue(8);
 		nar.conceptCold.termlinksCapacityMax.setValue(16);
@@ -133,110 +129,24 @@ public class PongEnvironment extends Player implements Environment {
 
 		float pri = 0.5f;
 
-		numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri, 0.9f);
+		numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri);
 
-		numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri, 0.9f);
-		numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position, pri, 0.9f);
-		numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position, pri, 0.9f);
+		numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri);
+		numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position, pri);
+		numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position, pri);
 
-		numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () -> pong.ball_y - pong.player1.position, pri, 0.9f);
+		numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () ->
+				//pong.ball_y - pong.player1.position,
+				(float)Math.pow(pong.ball_y - pong.player1.position, 2f),
+				pri);
 	}
 
-	private static void numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri, float conf) {
-//		new SensorConcept(term, n, new RangeNormalizedFloat(input),
-//			(v) -> t(v, conf)
-//		).pri(pri);
-		new UnipolarAutoDiscretizer(input, n,
-				"(" + term + " --> [" + low + "])",
-				"(" + term + " --> [" + high +"])").pri(pri).conf(conf);
-	}
-	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri, float conf) {
-//		new SensorConcept(term, n, new RangeNormalizedFloat(input),
-//			(v) -> t(v, conf)
-//		).pri(pri);
-		new UnipolarAutoDiscretizer(input, n,
+	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+
+		new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
 				"({" + term + "} --> [" + low + "])",
 				"({" + term + "} --> [" + mid + "])",
-				"({" + term + "} --> [" + high +"])").pri(pri).conf(conf);
-	}
-
-	public static class UnipolarAutoDiscretizer  {
-
-
-		private final RangeNormalizedFloat normIn;
-		private final List<SensorConcept> sensors;
-		float conf;
-
-		public UnipolarAutoDiscretizer(FloatSupplier input, NAR nar, String... states) {
-
-			this.conf = 0.9f;
-			normIn = new RangeNormalizedFloat(input);
-
-
-
-			int numStates = states.length;
-			this.sensors = Global.newArrayList(numStates);
-			float dw = 1f / numStates;
-			float dr = 1f / (numStates-1);
-			float r = 0;
-			int i = 0;
-			for (String s : states) {
-				float c = r; //center of the range
-
-				sensors.add( new SensorConcept(s, nar, normIn,
-						(v) -> {
-							float cdist = Math.abs(v - c);
-							if (cdist > dw) return t(0,conf);
-							else {
-								return t(0.5f + (cdist/dw)*0.5f, conf);
-							}
-						}
-				));
-				r += dr;
-				i++;
-			}
-		}
-
-//		private Truth biangular(float v) {
-//			if (v < 0.5f) return t(0, conf);
-//			else {
-//				//return t(1f, conf * Math.min(1f,(v-0.5f)*2f));
-//				return t(v, conf);
-//			}
-//		}
-//
-//		private Truth triangular(float v) {
-//			float f, c;
-//			if (v < 0.66f && v > 0.33f) {
-//				f = 0.5f;
-//				c = (0.33f-Math.abs(v-0.5f)) * 3f;
-//			} else {
-//				f = (v > 0.5f) ? 1 : 0;
-//				if (v > 0.5f) {
-//					c = Math.abs(v - 0.66f) * 3f;
-//				} else {
-//					c = Math.abs(v - 0.33f) * 3f;
-//				}
-//			}
-//			c = Util.clamp(c);
-//
-//			return t(f, c * conf);
-//		}
-
-		public UnipolarAutoDiscretizer pri(float p) {
-			for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
-				sensors.get(i).pri(p);
-			}
-			return this;
-		}
-		public UnipolarAutoDiscretizer conf(float c) {
-			this.conf = c;
-			return this;
-		}
-
-
-
-
+				"({" + term + "} --> [" + high +"])").pri(pri);
 	}
 
 	public PongEnvironment() {

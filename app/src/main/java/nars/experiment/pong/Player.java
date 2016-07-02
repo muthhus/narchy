@@ -32,8 +32,8 @@ abstract public class Player {
 	}
 
 	public void clip(PongModel pong) {
-		int maxPos = pong.getHeight() - PongModel.HEIGHT;
-		int minPos = PongModel.HEIGHT;
+		int maxPos = pong.getHeight() - PongModel.PADDLE_HEIGHT;
+		int minPos = PongModel.PADDLE_HEIGHT;
 		if (position > maxPos)
 			position = maxPos;
 		if (position < minPos)
