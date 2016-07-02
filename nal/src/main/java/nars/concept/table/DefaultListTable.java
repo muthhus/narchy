@@ -18,25 +18,23 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
     }
 
     @Override
-    protected boolean listRemove(L removed) {
+    protected final boolean listRemove(L removed) {
         return list.remove(removed);
     }
 
     @Override
-    public L get(int i) {
+    public final L get(int i) {
         return list.get(i);
     }
 
 
     @Override
-    protected void listAdd(@NotNull L i) {
-        if (i == null)
-            throw new NullPointerException();
+    protected final void listAdd(@NotNull L i) {
         list.add(i);
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return list.size();
     }
 
@@ -50,4 +48,5 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
     protected void listClear() {
         list.clear();
     }
+
 }

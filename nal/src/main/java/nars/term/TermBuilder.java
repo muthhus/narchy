@@ -352,11 +352,11 @@ public abstract class TermBuilder {
                 unwrappedNegations = flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
             } else {
                 if (s.add(x)) { //ordinary term, add
-                    if (x.op() == NEG) {
-                        if (unwrappedNegations == null)
-                            unwrappedNegations = new UnifiedSet<>(1);
-                        unwrappedNegations.add(((Compound) x).term(0));
-                    }
+//                    if (x.op() == NEG) {
+//                        if (unwrappedNegations == null)
+//                            unwrappedNegations = new UnifiedSet<>(1);
+//                        unwrappedNegations.add(((Compound) x).term(0));
+//                    }
                 }
             }
         }

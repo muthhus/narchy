@@ -275,11 +275,16 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     @Nullable
     @Override
-    public Truth truth(long when) {
-        if (isEmpty())
-            return null;
-
-        return truthpolations.get().truth(when, list, eternal.top());
+    public final Truth truth(long when) {
+        int s = size();
+        switch (s) {
+            case 0:
+                return null;
+            case 1:
+                return get(0).truth();
+            default:
+                return truthpolations.get().truth(when, list, eternal.top());
+        }
     }
 
 

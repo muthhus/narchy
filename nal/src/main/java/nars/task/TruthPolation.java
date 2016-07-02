@@ -18,19 +18,16 @@ import static nars.nal.UtilityFunctions.w2c;
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  */
-public class TruthPolation {
+public final class TruthPolation extends InterpolatingMicrosphere {
 
-    final @Nullable InterpolatingMicrosphere s;
-    @NotNull
-    final float[][] times;
-    @NotNull
-    final float[] freq;
-    @NotNull
-    final float[] conf;
-    int count;
+    public static final float[] ZERO = { 0 };
+
+    @NotNull final float[][] times;
+    @NotNull final float[] freq;
+    @NotNull final float[] conf;
 
     public TruthPolation(int size) {
-        s = new InterpolatingMicrosphere(1, 2 /* must be 2 for 1D */, null);
+        super(1, 2 /* must be 2 for 1D */, null);
 
         times = new float[size][];
         for (int i = 0; i < size; i++) {
@@ -39,15 +36,12 @@ public class TruthPolation {
         freq = new float[size];
         conf = new float[size];
 
-        count = 0;
     }
 
     @Nullable
     public Truth truth(long when, Task... tasks) {
         return truth(when, Lists.newArrayList(tasks), null);
     }
-
-
 
     public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal) {
         //float ecap = eternal.capacity();
@@ -64,21 +58,18 @@ public class TruthPolation {
     public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal, /* background */float maxDarkFraction, float darkThresold) {
         assert(times.length <= tasks.size());
 
-        int s = tasks.size();
-        if (s == 1)
-            return tasks.get(0).truth();
+        int n = tasks.size();
+        assert(n >= 2);
 
-        this.count = s;
-        //this.tasks = tasks;
+//        float sum = 0;
+//        for (int i = 0; i < n; i++) {
+//            Task t = tasks.get(i);
+//            sum += t.confWeight();
+//            //sum += t.conf();
+//        }
+//        System.out.println(tasks + " sum=" + sum);
 
-        float sum = 0;
-        for (int i = 0; i < s; i++) {
-            Task t = tasks.get(i);
-            //sum += t.confWeight();
-            sum += t.conf();
-        }
-
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < n; i++) {
             Task t = tasks.get(i);
             //times[i][0] = (((double)t.occurrence() - tmin) / range); //NORMALIZED TO ITS OWN RANGE
 
@@ -90,33 +81,27 @@ public class TruthPolation {
             //this helps the floating point precision in calculations with numbers close together
 
             float window = 0.01f;
-            times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)s-1))  ));  /* keeps occurrence times unique */
 
+            times[i][0] = -when + t.occurrence() + (window * (-1f + 2f * (i)/(((float)n-1))  ));  /* keeps occurrence times unique */
             freq[i] = t.freq();
-            conf[i] = t.confWeight()/sum;
-
+            conf[i] = t.confWeight();
 
             //TODO dt
         }
 
-
-
         if (topEternal!=null) {
-            this.s.setBackground(topEternal.freq(), topEternal.conf());
+            this.setBackground(topEternal.freq(), topEternal.conf());
         } else {
-            this.s.setBackground(Float.NaN, 0);
+            this.setBackground(Float.NaN, 0);
         }
 
-        //double whenNormalized = ((double)when - tmin) / range;
-
-
         float exp = 2f;
-        float[] v = this.s.value(new float[]{
-                0
-        }, times, freq, conf, exp,
-                //(((range == 0) && (when == tmin)) ? -1 : 0.5), /* if no range, always interpolate since otherwise repeat points wont accumulate confidence */
+        float[] v = this.value(
+                ZERO, times,
+                freq, conf,
+                exp,
                 maxDarkFraction, darkThresold,
-                s);
+                n);
 
         return $.t(v[0], w2c(v[1]));
     }
@@ -148,7 +133,7 @@ public class TruthPolation {
     }
 
     public void print() {
-        System.out.println(Joiner.on("\n").join(this.s.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
+        System.out.println(Joiner.on("\n").join(this.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
     }
 
 //    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */
