@@ -3,7 +3,6 @@ package nars.truth;
 import nars.NAR;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,7 +80,7 @@ public class TruthWave {
         this.current = b.truth(now);
     }
 
-    public void load(float[] t, Truthed x, int j, long occ, float q) {
+    public static void load(float[] t, Truthed x, int j, long occ, float q) {
         t[j++] = x.freq();
         t[j++] = x.conf();
         t[j++] = occ== Tense.ETERNAL ? Float.NaN : occ;

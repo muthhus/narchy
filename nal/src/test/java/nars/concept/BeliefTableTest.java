@@ -3,7 +3,6 @@ package nars.concept;
 import nars.Global;
 import nars.NAR;
 import nars.concept.table.BeliefTable;
-import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;

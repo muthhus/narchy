@@ -520,25 +520,6 @@ public enum $ {
         return compound(op, subterms.toArray(new Term[subterms.size()]));
     }
 
-//    @Nullable
-//    public static Term compound(@NotNull Op op, @NotNull TermContainer subterms) {
-//        return compound(op, DTERNAL, subterms);
-//    }
-
-    /** returns null if the result is not a compound */
-    @Nullable public static Compound compound(@NotNull Op op, @NotNull TermContainer subterms) {
-        Term t = compound(op, subterms);
-        if (!(t instanceof Compound))
-            return null;
-        return (Compound)t;
-    }
-
-
-
-
-
-
-
 
 
     /** create a literal atom from a class (it's name) */

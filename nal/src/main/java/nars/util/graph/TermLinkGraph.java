@@ -121,10 +121,10 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
         Bag<Termed> tl = c.termlinks();
 
         tl.forEach(t -> {
-            if (t instanceof Variable)
+            Termed target = t.get();
+            if (target instanceof Variable)
                 return;
 
-            Termed target = t.get();
             if (!containsVertex(target)) {
                 addVertex(target);
             }

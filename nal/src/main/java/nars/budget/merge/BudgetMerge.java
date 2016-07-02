@@ -25,6 +25,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      * */
     float merge(Budget existing, Budgeted incoming, float incomingScale);
 
+    @Override
     default Budget apply(Budget existing, Budget incoming) {
         if (existing == null)
             return incoming;

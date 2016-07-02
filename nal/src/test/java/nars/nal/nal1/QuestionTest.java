@@ -7,7 +7,6 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.nar.util.Answerer;
 import nars.nar.util.OperationAnswerer;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

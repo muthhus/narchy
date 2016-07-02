@@ -239,29 +239,27 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
             }
 
             short maxErrorNeighborID = -1;
-            {
-                //if (e has edges for maxErrorID..)
-                final double[] maxError = {Double.NEGATIVE_INFINITY};
-                short _maxErrorNeighbour[] = new short[]{-1};
-                e.edgesOf(maxErrorID, (otherNodeID) -> {
+            //if (e has edges for maxErrorID..)
+            final double[] maxError = {Double.NEGATIVE_INFINITY};
+            short _maxErrorNeighbour[] = new short[]{-1};
+            e.edgesOf(maxErrorID, (otherNodeID) -> {
 
-                    Node otherNode = node[otherNodeID];
+                Node otherNode = node[otherNodeID];
 
-                    if (otherNode.getLocalError() > maxError[0]) {
-                        _maxErrorNeighbour[0] = otherNodeID;
-                        maxError[0] = otherNode.getLocalError();
-                    }
-                });
+                if (otherNode.getLocalError() > maxError[0]) {
+                    _maxErrorNeighbour[0] = otherNodeID;
+                    maxError[0] = otherNode.getLocalError();
+                }
+            });
 
-                if (_maxErrorNeighbour[0] != -1) {
-                    maxErrorNeighborID = _maxErrorNeighbour[0];
-                } else {
+            if (_maxErrorNeighbour[0] != -1) {
+                maxErrorNeighborID = _maxErrorNeighbour[0];
+            } else {
 
-                    if (maxErrorNeighborID == -1) {
-                        do {
-                            maxErrorNeighborID = randomNode();
-                        } while (maxErrorID == maxErrorNeighborID);
-                    }
+                if (maxErrorNeighborID == -1) {
+                    do {
+                        maxErrorNeighborID = randomNode();
+                    } while (maxErrorID == maxErrorNeighborID);
                 }
             }
 

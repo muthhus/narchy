@@ -3,6 +3,7 @@ package nars.nal.nal8.operator;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.budget.Budgeted;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.index.TermIndex;
@@ -172,7 +173,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
         //prevent re-occurring goals
         @NotNull BeliefTable g = exec.goals();
-        g.forEach(t -> t.delete());
+        g.forEach(Budgeted::delete);
         g.clear();
     }
 

@@ -147,7 +147,8 @@ abstract public class HaiQ implements Agent {
 		return maxk != -1 ? maxk : randomAction();
 	}
 
-	public void start(int inputs, int outputs) {
+	@Override
+    public void start(int inputs, int outputs) {
 
 		this.actions = outputs;
 		this.inputs = inputs;
@@ -170,7 +171,8 @@ abstract public class HaiQ implements Agent {
 	/**
 	 * main control function
 	 */
-	public final int act(float reward, float[] input) {
+	@Override
+    public final int act(float reward, float[] input) {
 		return learn(perceive(input), reward);
 	}
 

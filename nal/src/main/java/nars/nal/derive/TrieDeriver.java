@@ -11,7 +11,6 @@ import nars.nal.meta.op.MatchTermPrototype;
 import nars.nal.op.Derive;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
-import nars.term.SubtermVisitorX;
 import nars.term.Term;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
@@ -132,7 +131,7 @@ public class TrieDeriver extends Deriver {
         return optimize(bb);
     }
 
-    protected List<ProcTerm> optimize(List<ProcTerm> bb) {
+    protected static List<ProcTerm> optimize(List<ProcTerm> bb) {
 
         bb = factorSubOpToSwitch(bb, 0, 2);
         bb = factorSubOpToSwitch(bb, 1, 2);
@@ -141,7 +140,7 @@ public class TrieDeriver extends Deriver {
     }
 
     @NotNull
-    private List<ProcTerm> factorSubOpToSwitch(@NotNull List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
+    private static List<ProcTerm> factorSubOpToSwitch(@NotNull List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
         Map<PatternOp, ProcTerm> cases = Global.newHashMap();
         List<ProcTerm> removed = Global.newArrayList(); //in order to undo
         bb.removeIf(p -> {
@@ -211,7 +210,7 @@ public class TrieDeriver extends Deriver {
     }
 
     /** final processing step before finalized usable form */
-    private ProcTerm build(ProcTerm p) {
+    private static ProcTerm build(ProcTerm p) {
         if (p instanceof IfThen) {
             IfThen it = (IfThen) p;
             return new IfThen( (BoolCondition)build(it.cond), build(it.conseq) ); //HACK wasteful
@@ -258,7 +257,7 @@ public class TrieDeriver extends Deriver {
 
     }
 
-    public Term recurse(Term pred, Term curr, CauseEffect each) {
+    public static Term recurse(Term pred, Term curr, CauseEffect each) {
 
         each.accept(pred, curr);
 
@@ -300,7 +299,7 @@ public class TrieDeriver extends Deriver {
         return curr;
     }
 
-    public void print(Object p, @NotNull PrintStream out, int indent) {
+    public static void print(Object p, @NotNull PrintStream out, int indent) {
 
         if (p instanceof IfThen) {
 

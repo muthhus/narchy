@@ -1007,4 +1007,18 @@ public enum Util {
         }
         return new float[] { min, max/*, sum */};
     }
+
+    /** slightly more streamlined variatoin of Arrays.equals which assumes there are no null values */
+    public static boolean equals(@NotNull Object[] a, @NotNull Object[] b) {
+        if (a == b) return true;
+        int al = a.length;
+        if (al == b.length) {
+            for (int i = 0; i < al; i++) {
+                if (!a[i].equals(b[i]))
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
 }

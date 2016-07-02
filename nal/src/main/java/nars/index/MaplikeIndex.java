@@ -2,7 +2,10 @@ package nars.index;
 
 import nars.Op;
 import nars.concept.Concept;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.TermBuilder;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;

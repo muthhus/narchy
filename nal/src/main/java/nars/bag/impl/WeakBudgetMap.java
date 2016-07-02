@@ -18,6 +18,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     /**
      * Returns a set of the mappings contained in this hash table.
      */
+    @Override
     public Set entrySet() {
         processQueue();
         return hash.entrySet();
@@ -72,6 +73,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      * <code>Map</code> interface, the time required by this operation is
      * linear in the size of the map.</em>
      */
+    @Override
     public int size() {
         processQueue();
         return hash.size();
@@ -85,6 +87,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     /**
      * Returns <code>true</code> if this map contains no key-value mappings.
      */
+    @Override
     public boolean isEmpty() {
         processQueue();
         return hash.isEmpty();
@@ -96,6 +99,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      *
      * @param key The key whose presence in this map is to be tested.
      */
+    @Override
     public boolean containsKey(Object key) {
         processQueue();
         return hash.containsKey(key);
@@ -110,6 +114,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      *
      * @param key The key whose associated value, if any, is to be returned.
      */
+    @Override
     public X get(Object key) {
         processQueue();
         WeakBudget<X> ref = (WeakBudget) hash.get(key);
@@ -135,7 +140,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
 
         WeakBudget<X> rtn = hash.get(key);
         if (rtn == null) {
-            hash.put(key, rtn = new WeakBudget<X>(key, queue, p, d, q));
+            hash.put(key, rtn = new WeakBudget<>(key, queue, p, d, q));
         } else {
             mergeFunction.merge(rtn, new RawBudget(p, d, q), 1f);
         }
@@ -150,6 +155,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      * @return The value to which this key was mapped, or <code>null</code> if
      * there was no mapping for the key.
      */
+    @Override
     public Object remove(Object key) {
         processQueue();
         return hash.remove(key);
@@ -158,6 +164,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     /**
      * Removes all mappings from this map.
      */
+    @Override
     public void clear() {
         processQueue();
         hash.clear();

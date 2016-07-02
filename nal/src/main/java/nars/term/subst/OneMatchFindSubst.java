@@ -1,13 +1,11 @@
 package nars.term.subst;
 
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.substitute;
 import nars.term.Term;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

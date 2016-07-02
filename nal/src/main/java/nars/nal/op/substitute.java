@@ -1,6 +1,5 @@
 package nars.nal.op;
 
-import nars.$;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;

@@ -1,6 +1,5 @@
 package nars.nal.nal8;
 
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.nal.Tense;

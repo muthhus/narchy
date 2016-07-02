@@ -7,6 +7,7 @@ import nars.term.Compound;
 import nars.term.SubtermVisitorX;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.util.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -248,17 +249,11 @@ public class TermVector implements TermContainer<Term> {
         if (this == obj) {
             return true;
         } else if (obj instanceof TermVector) {
-            return (equalTerms((TermVector) obj));
-        } else if (obj instanceof TermContainer) {
-            return (equalTo((TermContainer) obj));
+            TermVector ot = (TermVector) obj;
+            return (hash == ot.hash && Util.equals(term, ot.term));
         } else {
-            return false;
+            return (obj instanceof TermContainer) && (equalTo((TermContainer) obj));
         }
-    }
-
-    /** accelerated implementation */
-    final boolean equalTerms(@NotNull TermVector c) {
-         return hash == c.hash && Arrays.equals(term, c.term);
     }
 
     /** accelerated implementation */

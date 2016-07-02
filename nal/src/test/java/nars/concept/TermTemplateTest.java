@@ -7,7 +7,6 @@ import nars.task.Task;
 import nars.term.Termed;
 import org.junit.Test;
 
-import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import static nars.Global.dereference;

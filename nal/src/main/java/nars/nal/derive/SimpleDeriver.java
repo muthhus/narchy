@@ -2,7 +2,9 @@ package nars.nal.derive;
 
 import nars.Global;
 import nars.nal.Deriver;
-import nars.nal.meta.*;
+import nars.nal.meta.BoolCondition;
+import nars.nal.meta.PostCondition;
+import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
 import nars.term.Term;

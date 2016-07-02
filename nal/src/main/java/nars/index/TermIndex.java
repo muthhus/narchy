@@ -613,7 +613,7 @@ public interface TermIndex {
 
 
 
-    static final class CompoundAtemporalizer implements CompoundTransform<Compound,Term> {
+    final class CompoundAtemporalizer implements CompoundTransform<Compound,Term> {
 
         private final TermIndex index;
         private final Compound result;

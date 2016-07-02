@@ -1,7 +1,6 @@
 package nars.link;
 
 import nars.budget.Budgeted;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Adds an additional condition that deletes the link if the referenced

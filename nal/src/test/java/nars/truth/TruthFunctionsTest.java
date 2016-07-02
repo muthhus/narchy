@@ -1,10 +1,7 @@
 package nars.truth;
 
-import org.junit.Test;
-
 import static nars.$.t;
 import static nars.Global.TRUTH_EPSILON;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 5/26/16.

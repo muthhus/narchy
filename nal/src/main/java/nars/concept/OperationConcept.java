@@ -1,6 +1,8 @@
 package nars.concept;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
 import nars.bag.Bag;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
@@ -88,7 +90,8 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
         return operationExec(operationConcept(nar));
     }
 
-    public @Nullable Topic<OperationConcept> operationExec(Concept c) {
+    public @Nullable
+    static Topic<OperationConcept> operationExec(Concept c) {
         return c == null ? null : c.get(Execution.class);
     }
 

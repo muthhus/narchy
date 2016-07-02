@@ -36,7 +36,6 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.Texts;
@@ -75,7 +74,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
-				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), true)
+				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -129,7 +128,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				//BagChart.show((Default)nar);
+				BagChart.show((Default)nar);
 			}
 		};
 
@@ -444,18 +443,16 @@ public class PacmanEnvironment extends cpcman implements Environment {
 					e.setMaximum((long) (Math.max(e.getMaximum(),e.weightedSize().getAsLong()) * 1.05f)); //grow
 				}
 			};
-			index.concepts.policy().eviction().ifPresent(evictionConsumer);
-			index.subterms.policy().eviction().ifPresent(evictionConsumer);
-
+			index.data.policy().eviction().ifPresent(evictionConsumer);
 
 			if (ratio > 0.75f) {
 
-				index.concepts.cleanUp();
-				index.subterms.cleanUp();
+				//index.data.cleanUp();
 
-				logger.error("{}", index.concepts.stats());
+				//logger.error("{}", index.data.stats());
 
 			}
+
 			if (ratio > 0.95f) {
 				logger.error("memory alert");
 				//System.gc();

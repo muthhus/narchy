@@ -1,6 +1,5 @@
 package nars.term.variable;
 
-import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 

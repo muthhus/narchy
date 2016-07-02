@@ -1,8 +1,8 @@
 package nars.nal;
 
+import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRuleSet;
-import nars.nal.derive.TrieDeriver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

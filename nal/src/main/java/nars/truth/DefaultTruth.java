@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.util.Util.clampround;
-import static nars.util.Util.round;
 
 
 public class DefaultTruth implements Truth  {

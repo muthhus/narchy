@@ -171,6 +171,14 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
         return processQuestion(task, nar);
     }
 
+    @Override public void delete() {
+        termlinks().clear();
+        tasklinks().clear();
+        beliefs().clear();
+        goals().clear();
+        questions().clear();
+        quests().clear();
+    }
 
 
 

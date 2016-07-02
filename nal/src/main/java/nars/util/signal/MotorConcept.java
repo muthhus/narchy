@@ -180,6 +180,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     }
 
 
+    @Override
     protected boolean beliefModificationRequiresUpdate(@NotNull Task t, NAR nar) {
         //always update (calling .accept(nar) ) after every change
         return true;

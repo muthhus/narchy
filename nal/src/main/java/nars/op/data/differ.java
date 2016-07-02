@@ -1,7 +1,6 @@
 package nars.op.data;
 
 import nars.$;
-import nars.index.TermIndex;
 import nars.nal.op.BinaryTermOperator;
 import nars.term.Compound;
 import nars.term.Term;

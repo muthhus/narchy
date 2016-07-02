@@ -1,6 +1,5 @@
 package nars.concept.table;
 
-import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
@@ -17,7 +16,6 @@ import java.util.Iterator;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.or;
-import static nars.truth.TruthFunctions.c2w;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).

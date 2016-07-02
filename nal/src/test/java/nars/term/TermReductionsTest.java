@@ -10,9 +10,7 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.io.NarseseTest.assertParseException;
-import static nars.term.TermTest.assertInvalidTerm;
-import static nars.term.TermTest.assertValidTerm;
-import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
+import static nars.term.TermTest.*;
 import static org.junit.Assert.*;
 
 /**

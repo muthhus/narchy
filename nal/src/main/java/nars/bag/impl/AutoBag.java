@@ -5,10 +5,7 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.forget.BudgetForget;
 import nars.link.BLink;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
 
 /**
  * Auto-tunes forgetting rate according to inbound demand, which is zero if bag is
@@ -84,12 +81,14 @@ public final class AutoBag<V> implements BudgetForget {
         return ratio;
     }
 
+    @Override
     public final void update(NAR nar) {
 
         this.now = nar.time();
         //forget.update(nar);
     }
 
+    @Override
     @Deprecated public final void cycle(float subCycle) {
 
         //forget.cycle(subCycle);

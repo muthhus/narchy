@@ -2,9 +2,7 @@ package nars.op.in;
 
 import nars.NAR;
 import nars.task.Task;
-import nars.task.flow.Input;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

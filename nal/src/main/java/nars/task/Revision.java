@@ -9,7 +9,6 @@ import nars.nal.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermVector;
 import nars.truth.*;
 import nars.util.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;

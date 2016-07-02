@@ -8,8 +8,8 @@ import nars.budget.Budget;
 import nars.nal.ConceptProcess;
 import nars.nal.TimeFunction;
 import nars.nal.meta.PremiseEval;
-import nars.nal.rule.PremiseRule;
 import nars.nal.meta.ProcTerm;
+import nars.nal.rule.PremiseRule;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Compound;
@@ -19,7 +19,8 @@ import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.*;
+import static nars.Op.ATOM;
+import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 

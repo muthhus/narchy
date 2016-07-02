@@ -1,22 +1,13 @@
 package nars.nal.nal6;
 
-import nars.NAR;
-import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
-import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertTrue;
 

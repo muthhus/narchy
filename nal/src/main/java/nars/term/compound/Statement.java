@@ -20,7 +20,6 @@
  */
 package nars.term.compound;
 
-import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

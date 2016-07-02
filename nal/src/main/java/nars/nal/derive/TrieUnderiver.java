@@ -1,23 +1,16 @@
 package nars.nal.derive;
 
 import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.SetMultimap;
 import nars.Premise;
 import nars.nal.Deriver;
 import nars.nal.Underiver;
-import nars.nal.meta.ProcTerm;
-import nars.nal.op.Derive;
-import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRule.Conclusion;
 import nars.task.Task;
 import nars.term.Term;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
-import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import java.util.function.Consumer;
 
@@ -46,8 +39,8 @@ public class TrieUnderiver implements Underiver {
 
     public TrieUnderiver(TrieDeriver t) {
         this.deriver = t;
-        g = new SimpleDirectedGraph<Term,CauseEdge>((a,b) -> {
-           return new CauseEdge(a,b);
+        g = new SimpleDirectedGraph<>((a, b) -> {
+            return new CauseEdge(a, b);
         });
 
         //traverse the derivation trie to a graph (DAG)

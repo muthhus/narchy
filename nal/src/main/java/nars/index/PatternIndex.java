@@ -1,14 +1,10 @@
 package nars.index;
 
-import nars.$;
 import nars.Op;
-import nars.bag.Bag;
-import nars.concept.AtomConcept;
 import nars.nal.meta.PatternCompound;
-import nars.nal.op.TermTransform;
-import nars.nal.rule.PremiseRule;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisTransform;
+import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

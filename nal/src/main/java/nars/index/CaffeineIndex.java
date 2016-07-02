@@ -1,11 +1,10 @@
 package nars.index;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Weigher;
+import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -15,39 +14,40 @@ import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 
-public class CaffeineIndex extends MaplikeIndex  {
+public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @NotNull
-    public final Cache<Termed, Termed> concepts;
-    @NotNull
-    public final Cache<TermContainer, TermContainer> subterms;
+    public final Cache<Object, Object> data;
 
 
-    private final Weigher<Termed, Termed> conceptWeigher = (k,v) -> {
+    private final Weigher<Object, Object> conceptWeigher = (k,v) -> {
         if (v instanceof Atomic) {
             return 1;
         } else {
-            if (!(v instanceof CompoundConcept)) {
-                //special implementation, dont allow removal
-                return 0;
+            int w;
+            if (v instanceof Concept) {
+                if (!(v instanceof CompoundConcept)) {
+                    //special implementation, dont allow removal
+                    return 0;
+                }
+                w = ((Concept)v).volume();// * weightFactor;
+            } else if (v instanceof TermContainer) {
+                w = ((TermContainer) v).volume();
+            } else {
+                w = 1;
             }
-            int w = v.volume();// * weightFactor;
+
+
             //w/=(1f + maxConfidence((CompoundConcept)v));
 
             return (int)w;
         }
     };
 
-    private float maxConfidence(CompoundConcept v) {
+    private static float maxConfidence(CompoundConcept v) {
         return Math.max(v.beliefs().confMax(), v.goals().confMax());
     }
 
-    private final Weigher<TermContainer, TermContainer> subtermWeigher = new Weigher<TermContainer, TermContainer>() {
-        @Override
-        public int weigh(@Nonnull TermContainer key, @Nonnull TermContainer value) {
-            return (int)value.volume();// * weightFactor);
-        }
-    };
 
     public CaffeineIndex(int maxWeight, Concept.ConceptBuilder builder) {
         this(maxWeight, builder, false);
@@ -56,20 +56,19 @@ public class CaffeineIndex extends MaplikeIndex  {
     public CaffeineIndex(int maxWeight, Concept.ConceptBuilder conceptBuilder, boolean soft) {
         super(conceptBuilder);
 
-        Caffeine<Termed, Termed> builder = prepare(Caffeine.newBuilder(), soft);
+        Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
         builder.weigher(conceptWeigher)
                .maximumWeight(maxWeight)
-               .recordStats();
-
-        concepts = builder.build();
+               .removalListener(this)
 
 
-        Caffeine<TermContainer, TermContainer> subBuilder = prepare(Caffeine.newBuilder(), soft);
-        subBuilder.weigher(subtermWeigher)
-                .maximumWeight(maxWeight);
+               //.recordStats()
+        ;
 
-        subterms = subBuilder.build();
+
+        data = builder.build();
+
     }
 
 
@@ -78,8 +77,8 @@ public class CaffeineIndex extends MaplikeIndex  {
         //builder = builder.initialCapacity(initialSize);
 
         if (soft) {
-            //builder = builder.softValues();
-            builder = builder.weakValues();
+            builder = builder.softValues();
+            //builder = builder.weakValues();
 
 
         }
@@ -100,19 +99,19 @@ public class CaffeineIndex extends MaplikeIndex  {
     public Termed remove(@NotNull Termed entry) {
         Termed t = get(entry);
         if (t!=null) {
-            concepts.invalidate(entry);
+            data.invalidate(entry);
         }
         return t;
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return concepts.getIfPresent(x);
+        return (Termed) data.getIfPresent(x);
     }
 
     @Override
     public @Nullable void set(@NotNull Termed src, @NotNull Termed target) {
-        concepts.put(src, target);
+        data.put(src, target);
         //Termed exist = data.getIfPresent(src);
 
         //data.put(src, target);
@@ -126,39 +125,43 @@ public class CaffeineIndex extends MaplikeIndex  {
 
     @Override
     public void clear() {
-        concepts.invalidateAll();
-        subterms.invalidateAll();
+        data.invalidateAll();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        concepts.asMap().forEach((k, v) -> c.accept(v));
+        data.asMap().forEach((k, v) -> {
+            if (v instanceof Termed)
+                c.accept((Termed)v);
+        });
     }
 
     @Override
     public int size() {
-        return (int) concepts.estimatedSize();
+        return (int) data.estimatedSize();
     }
 
     @Override
     public int subtermsCount() {
-        return (int) subterms.estimatedSize();
+        return 0;
     }
 
     @Override
     protected TermContainer putIfAbsent(@NotNull TermContainer s, TermContainer s1) {
-        return subterms.get(s, t -> s1);
+        return (TermContainer) data.get(s, t -> s1);
     }
 
     @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
-        return subterms.getIfPresent(t);
+
+        return (TermContainer) data.getIfPresent(t);
     }
 
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return concepts.get(x, this::buildConcept);
+        return (Termed) data.get(x, (interned) ->
+                buildConcept((Atomic)interned));
     }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
@@ -177,7 +180,13 @@ public class CaffeineIndex extends MaplikeIndex  {
 
     @Override
     public @NotNull String summary() {
-        return concepts.estimatedSize() + " concepts, " + subterms.estimatedSize() + " subterms";
+        return data.estimatedSize() + " concepts";
     }
 
+    @Override
+    public void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
+        if (value instanceof Concept) {
+            ((Concept)value).delete();
+        }
+    }
 }

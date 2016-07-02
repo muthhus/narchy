@@ -154,6 +154,9 @@ public enum Global {
 
     public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 32;
 
+    /** for large caches this should be false */
+    public static boolean TERMLINKS_LINK_TO_CONCEPTS_IF_POSSIBLE = false;
+
 
     @NotNull
     public static <K,V> Map<K, V> newHashMap() {

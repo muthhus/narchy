@@ -184,7 +184,7 @@ public interface TimeFunction {
             Term d0 = derived.term(0);
 
             if (Terms.equalOrNegationOf(d0,bt) /*|| (derived.size() > 0 && derived.term(1).equals(prem.task().term()))*/ ||
-                    (d0.equalsIgnoringVariables(bt) || Terms.equalOrNegationOf(d0, bt))
+                    (d0.equalsIgnoringVariables(bt) )
 
                     ) //last chance: try by ignoring variables to handle variable introduction cases
                 eventDelta *= -1;

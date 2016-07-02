@@ -199,6 +199,10 @@ public interface AbstractConcept extends Concept, Term {
     }
 
 
+    default void delete() {
+        termlinks().clear();
+        tasklinks().clear();
+    }
 
     @Override
     default void linkTask(@NotNull Task t, float scale) {
@@ -253,5 +257,7 @@ public interface AbstractConcept extends Concept, Term {
 //        }
 //        //TODO clear bags
 //    }
+
+
 
 }

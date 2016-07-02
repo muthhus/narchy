@@ -111,7 +111,7 @@ public class TestLSTMOnline {
 
         LiveSTM l = new LiveSTM(inputs, outputs, cells, 0.1) {
 
-            int t = 0;
+            int t;
 
 
             @Override

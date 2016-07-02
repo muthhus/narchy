@@ -11,7 +11,7 @@ public final class Interaction {
 
     public double[] actual;
     public double[] expected;
-    public double[] predicted = null;
+    public double[] predicted;
 
     /** forget rate, between 0 and 1 */
     public float forget;

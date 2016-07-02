@@ -21,7 +21,6 @@
 package nars.concept;
 
 import com.google.common.collect.Iterators;
-import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
@@ -45,7 +44,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -381,7 +379,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         out.println('\n');
     }
 
-
+    void delete();
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

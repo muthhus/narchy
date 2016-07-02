@@ -3,7 +3,6 @@ package nars.util.condition;
 import nars.$;
 import nars.NAR;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +16,7 @@ public class ExecutionCondition implements NARCondition {
     private final float minExpect, maxExpect;
     private final @NotNull Operator operator;
     private boolean success;
-    private long successTime = Tense.TIMELESS;
+    //private long successTime = Tense.TIMELESS;
 
     public ExecutionCondition(@NotNull NAR n, long start, long end, @NotNull String opTerm, float minExpect, float maxExpect) {
 

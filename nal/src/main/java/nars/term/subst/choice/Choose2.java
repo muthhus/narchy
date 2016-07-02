@@ -10,6 +10,7 @@ import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -35,7 +36,7 @@ public class Choose2 extends Termutator {
     public String toString() {
 
         return "Choose2{" +
-                "yFree=" + yFree +
+                "yFree=" + Arrays.toString(yFree) +
                 ", xEllipsis=" + xEllipsis +
                 ", x=" + x[0] + ',' + x[1] +
                 '}';

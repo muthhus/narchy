@@ -3,12 +3,11 @@ package nars.util.signal;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.Texts;
-import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 7/2/16.

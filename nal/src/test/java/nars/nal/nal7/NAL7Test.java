@@ -1,7 +1,6 @@
 package nars.nal.nal7;
 
 import nars.NAR;
-import nars.concept.Concept;
 import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;

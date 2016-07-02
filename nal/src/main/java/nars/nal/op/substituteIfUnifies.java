@@ -1,11 +1,9 @@
 package nars.nal.op;
 
 import nars.Op;
-import nars.concept.OperationConcept;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.AtomicStringConstant;
 import nars.term.subst.OneMatchFindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

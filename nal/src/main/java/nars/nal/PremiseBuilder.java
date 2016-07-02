@@ -8,15 +8,12 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
-import nars.truth.ProjectedTruth;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

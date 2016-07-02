@@ -6,7 +6,6 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
-import nars.task.flow.TaskQueue;
 import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

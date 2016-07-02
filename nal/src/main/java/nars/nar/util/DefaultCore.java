@@ -37,12 +37,10 @@ public class DefaultCore extends AbstractCore {
     /** called when a concept is displaced from the concept bag */
     protected void deactivate(Concept c) {
 
-
-        //apply forgetting so that shrinking capacity will be applied to concept's components fairly
-        //c.tasklinks().commit(Forget.QualityToPriority);
-        //c.termlinks().commit(Forget.QualityToPriority);
-
         c.capacity(cold);
+
+        c.tasklinks().commit();
+        c.termlinks().commit();
 
         nar.emotion.alert(1f/ concepts.size());
     }

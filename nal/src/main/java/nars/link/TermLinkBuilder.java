@@ -3,7 +3,6 @@ package nars.link;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
-import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -11,8 +10,10 @@ import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public enum TermLinkBuilder {
@@ -87,7 +88,7 @@ public enum TermLinkBuilder {
                 ct = t;
             }
 
-            if (target.add(ct)) { //do not descend on repeats
+            if (target.add(Global.TERMLINKS_LINK_TO_CONCEPTS_IF_POSSIBLE ? ct : ct.term())) { //do not descend on repeats
 
                 if (level > 0 && ct instanceof Compound) {
                     Compound cct = (Compound) ct;

@@ -69,6 +69,11 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
         return alias.compareTo(o);
     }
 
+    @Override
+    public void delete() {
+        //?
+    }
+
     @NotNull
     @Override
     public String toString() {
