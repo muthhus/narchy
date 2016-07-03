@@ -276,7 +276,7 @@ public abstract class TermBuilder {
                 } else if (x.size() == 1) {
                     return x.term(0);
                 } else {
-                    return x.op().temporal ? x.dt(0) : x;
+                    return x.op().temporal ? finish(x.op(), 0, TermSet.the(x.subterms().terms())) : x;
                 }
             } else {
 

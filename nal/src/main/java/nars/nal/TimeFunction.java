@@ -1,5 +1,6 @@
 package nars.nal;
 
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.Premise;
@@ -519,7 +520,7 @@ public interface TimeFunction {
         if (!Global.DEBUG && !derived.op().temporal)
             return derived; //disregard dt if not in debug mode
 
-        return derived.dt(eventDelta * polarity);
+        return dt(derived, eventDelta * polarity);
     }
 
     /**
@@ -839,11 +840,11 @@ public interface TimeFunction {
         //}
         //}
 
-        if (t != DTERNAL) {
+        if ((t != DTERNAL) && (t!=derived.dt())) {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 
-            derived = derived.dt(t);
+            derived = dt(derived, t);
 
 //            int nt = derived.t();
 //            if (occ > TIMELESS) {
@@ -863,4 +864,8 @@ public interface TimeFunction {
         return derived;
 
     };
+
+    static Compound dt(Compound derived, int t) {
+        return (Compound) $.compound(derived.op(), t, derived.subterms().terms());
+    }
 }

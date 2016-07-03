@@ -6,7 +6,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,64 +18,31 @@ import org.jetbrains.annotations.NotNull;
  * This is in case the revision task for some reason does not become processed,
  * then this budget will not be moved.
  */
-public class RevisionTask extends MutableTask  {
+public class RevisionTask extends AnswerTask  {
 
-    Task newBelief, oldBelief;
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
-        super(term, newBelief.punc(), conclusion);
+        super(term, newBelief, oldBelief, conclusion, creationTime, occTime, 0.5f);
 
-//        if (!newBelief.isBeliefOrGoal() || !oldBelief.isBeliefOrGoal() )
-//            throw new UnsupportedOperationException("invalid punctuation");
-
-        evidence(Stamp.zip(newBelief.evidence(), oldBelief.evidence()));
-        time(creationTime, occTime);
-
-        this.newBelief = newBelief;
-        this.oldBelief = oldBelief;
-
-        /*.because("Insertion Revision (%+" +
-                        Texts.n2(conclusion.freq() - newBelief.freq()) +
-                ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
     }
 
     public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
-        super(c, a,
-                now, newOcc,
-                Stamp.zip(a.evidence(), b.evidence(), aMix),
-                newTruth);
-        budget(a, b, aMix);
-        log("Revection Merge");
+        super(c, a, b, newTruth, now, newOcc, aMix);
 
-        this.newBelief = a;
-        this.oldBelief = b;
+        if (!a.isBeliefOrGoal() || !b.isBeliefOrGoal() )
+            throw new UnsupportedOperationException("invalid punctuation");
     }
 
     @Override
     public Task getParentTask() {
-        return newBelief;
+        return aBelief;
     }
 
     @Override
     public Task getParentBelief() {
-        return oldBelief;
+        return bBelief;
     }
 
-    public RevisionTask budget(Task a, Task b) {
-        float acw = a.confWeight();
-        float aMix = acw / (acw + b.confWeight());
-        budget(a, b, aMix);
-        return this;
-    }
-
-    private void budget(Task a, Task b, float aMix) {
-        if (!b.isDeleted() && !a.isDeleted()) {
-            budget(b.budget());
-            BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);
-        } else {
-            delete();
-        }
-    }
 
 //    @Override
 //    public boolean isDeleted() {
@@ -105,7 +71,7 @@ public class RevisionTask extends MutableTask  {
 
     /** rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept */
     private void unlink() {
-        this.newBelief = this.oldBelief = null;
+        this.aBelief = this.bBelief = null;
     }
 
 

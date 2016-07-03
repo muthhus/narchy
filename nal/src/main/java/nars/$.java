@@ -216,7 +216,7 @@ public enum $ {
     }
 
     @NotNull
-    @Deprecated public static Variable varQuery(int i) {
+    public static Variable varQuery(int i) {
         return v(VAR_QUERY, i);
     }
 

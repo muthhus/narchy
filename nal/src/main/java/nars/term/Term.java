@@ -22,6 +22,9 @@ package nars.term;
 
 
 import nars.Op;
+import nars.term.atom.Atomic;
+import nars.term.atom.AtomicString;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;
 import org.jetbrains.annotations.NotNull;
@@ -290,5 +293,34 @@ public interface Term extends Termed, Termlike {
         return null;
     }
 
+    public static int compare(Term x, Term y) {
+        if (x.equals(y)) return 0;
+
+        int d = x.op().compareTo(y.op());
+        if (d!=0)
+            return d;
+
+        if (x instanceof AbstractVariable) {
+            //hashcode serves as the ordering too
+            return Integer.compare(x.hashCode(), y.hashCode());
+        } else if (x instanceof Atomic) {
+            //if the op is the same, it is required to be a subclass of Atomic
+            //which should have an ordering determined by its toString()
+            return x.toString().compareTo((/*(Atomic)*/y).toString());
+        } else if (x instanceof Compound) {
+
+            Compound cx = (Compound)x;
+            Compound cy = (Compound)y;
+
+            int diff3 = Integer.compare(cx.dt(), cy.dt());
+            if (diff3 != 0)
+                return diff3;
+
+            return cx.subterms().compareTo(cy.subterms());
+
+        }
+
+        throw new RuntimeException("ordering exception: " + x + ", " + y);
+    }
 }
 

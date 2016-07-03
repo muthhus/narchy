@@ -34,6 +34,7 @@ public class TermSet<X extends Term> extends TermVector {
 
     @NotNull
     public static TermSet the(@NotNull Collection<? extends Term> x) {
+
         return new TermSet(toSortedSetArray(x));
     }
 

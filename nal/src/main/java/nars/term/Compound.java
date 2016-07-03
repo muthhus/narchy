@@ -228,20 +228,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default int compareTo(@NotNull Termlike o) {
-
-        if (this == o) return 0;
-
-        int diff = Integer.compare(structure(), o.structure());
-        if (diff != 0)
-            return diff;
-
-        Compound c = (Compound)o; //(o.term());
-
-        int diff3 = Integer.compare(this.dt(), c.dt());
-        if (diff3 != 0)
-            return diff3;
-
-        return this.subterms().compareTo(c.subterms());
+        return Term.compare(this, (Term)o);
     }
 
 
@@ -460,16 +447,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //        return false;
 //    }
 
-    /** sets temporal relation value (TEMPORARY). returns new value */
-    @NotNull
-    default Compound dt(int cycles) {
 
-        if (cycles == dt()) return this;
-
-        GenericCompound g = new GenericCompound(op(), cycles, (TermVector)subterms());
-        if (isNormalized()) g.setNormalized();
-        return g;
-    }
 
     /** gets temporal relation value */
     int dt();

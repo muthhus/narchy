@@ -85,24 +85,30 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean equals(@Nullable Object that) {
 
-        if (this == that) return true;
+        if (this == that)
+            return true;
 
-        if (that instanceof Termed) {
+        if (hash != that.hashCode())
+            return false;
+
+        Compound cthat;
+        if (that instanceof Compound) {
+            cthat = (Compound)that;
+        } else if (that instanceof Termed) {
             Term tthat = ((Termed) that).term();
-            if (this == tthat) {
-                return true;
-            }
             if (tthat instanceof Compound) {
-                if (hashCode() == that.hashCode()) {
-                    Compound cthat = (Compound) tthat;
-                    if (op() == cthat.op())
-                        if (dt() == cthat.dt())
-                            if (subterms().equals(cthat.subterms()))
-                                return true;
-                }
+                cthat = (Compound) tthat;
+            } else {
+                return false;
             }
+        } else {
             return false;
         }
+
+        if (op == cthat.op())
+            if (dt == cthat.dt())
+                if (subterms.equals(cthat.subterms()))
+                    return true;
 
         return false;
     }

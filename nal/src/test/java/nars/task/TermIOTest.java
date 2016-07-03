@@ -1,9 +1,14 @@
 package nars.task;
 
+import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
+import nars.term.variable.Variable;
 import nars.util.IO;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -15,7 +20,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static java.lang.System.out;
+import static nars.$.$;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -39,8 +46,13 @@ public class TermIOTest {
             //out.println("\t\t" +((Task)orig).explanation());
             //out.println("\t\t" +((Task)copy).explanation());
         //}
+
+        Terms.printRecursive(System.out, (Term)orig, 10);
+
         //System.out.println("\tbytes: " + Arrays.toString(barray));
         out.println("\tcopy: " + copy);
+
+        Terms.printRecursive(System.out, (Term)copy, 10);
 
         //assertTrue(copy != orig);
         assertEquals(copy, orig);
@@ -63,7 +75,25 @@ public class TermIOTest {
     @Test
     public void testTermSerialization2() {
         assertTermEqualSerialize("<a-->(b==>c)>");
+    }
+    @Test
+    public void testTermSerialization3() {
         assertTermEqualSerialize("(#a --> b)");
+    }
+    @Test
+    public void testTermSerialization3_2() {
+        //multiple variables
+
+        Variable q = $.varQuery(1);
+        Compound twoB = $.inh( $.varDep(2), $.the("b"));
+        assertNotEquals(
+                q.compareTo(twoB),
+                twoB.compareTo(q) );
+
+        assertTermEqualSerialize("((#a --> b) <-> ?c)");
+
+        assertEquals( $("(#2-->b)").compareTo($("?1")), -$("?1").compareTo($("(#2-->b)")) );
+
     }
 
     void assertTermEqualSerialize(@NotNull String s) {
@@ -113,3 +143,4 @@ public class TermIOTest {
     }
 
 }
+

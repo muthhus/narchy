@@ -87,7 +87,7 @@ public class Revision {
             return new RevisionTask(c.getTwo(),
                     a, b, now, newOcc, aMix,
                     newTruth.withConf(newConf)
-                    );
+                    ).budget(a, b, aMix).log("Revection Merge");
 
         } else {
             //just project 'b' to 'a' time
@@ -129,8 +129,8 @@ public class Revision {
 
             if (bb.isDeleted()) return null;
 
-            Task solution = new RevisionTask(b.term() /* question term in case it has different temporality */,
-                    b, a, newTruth, now, newOcc)
+            Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
+                    b, a, newTruth, now, newOcc, 0.5f)
                     .budget(bb)
                     //.state(state())
                     //.setEvidence(evidence())
@@ -289,7 +289,7 @@ public class Revision {
             }
         }
 
-        return a.term().dt( dt );
+        return $.compound(a.op(), dt, a.term().terms());
     }
 }
 

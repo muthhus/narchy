@@ -130,7 +130,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				BagChart.show((Default)nar);
+				//BagChart.show((Default)nar);
 			}
 		};
 

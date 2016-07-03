@@ -506,15 +506,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     static int compareTo(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
-
-//        int diff;
-//        if ((diff = Integer.compare(a.hashCode(), b.hashCode())) != 0)
-//            return diff;
-
-        int diff2;
-        if ((diff2 = Integer.compare(a.structure(), b.structure())) != 0)
-            return diff2;
-
         return compareContent(a, b);
     }
 
@@ -537,7 +528,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
             }
             */
 
-            if (d != 0) return d;
+            if (d != 0)
+                return d;
         }
 
         return 0;
