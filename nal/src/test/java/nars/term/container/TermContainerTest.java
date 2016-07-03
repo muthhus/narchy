@@ -4,6 +4,8 @@ import nars.$;
 import nars.term.Compound;
 import org.junit.Test;
 
+import java.util.HashSet;
+
 import static nars.$.$;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +30,8 @@ public class TermContainerTest {
         assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}")));
         assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}")));
 
-        assertFalse(TermContainer.commonSubterms($("(#x,y)"), $("{a,#x}"), true));
+        assertFalse(TermContainer.commonSubterms($("(#x,y)"), $("{a,#x}"), true, new HashSet()));
+        assertTrue(TermContainer.commonSubterms($("(#x,a)"), $("{a,$y}"), true, new HashSet()));
     }
 
     @Test

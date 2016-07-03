@@ -6,6 +6,8 @@ import nars.term.subst.FindSubst;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+
 import static nars.term.container.TermContainer.commonSubterms;
 import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
 import static nars.term.container.TermContainer.subtermIsCommon;
@@ -19,6 +21,8 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
     public NoCommonSubtermsConstraint(@NotNull Term b) {
         this.b = b;
     }
+
+    final static ThreadLocal<HashSet<Term>> scratch = ThreadLocal.withInitial(()->new HashSet());
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
@@ -37,7 +41,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Compound C = (Compound) y;
 
             return bCompound ?
-                    commonSubterms((Compound) B, C, true)
+                    commonSubterms((Compound) B, C, true, scratch.get())
                     :
                     C.containsTerm(B);
 

@@ -12,9 +12,7 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.experiment.Environment;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -63,8 +61,8 @@ public class PongEnvironment extends Player implements Environment {
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				//new CaffeineIndex(128*1024,new DefaultConceptBuilder(rng) , true )
-				new Cache2kIndex(256000, rng)
+				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
+				//new Cache2kIndex(256000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -93,7 +91,7 @@ public class PongEnvironment extends Player implements Environment {
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
 				beliefChart(this);
-				BagChart.show((Default) nar);
+				//BagChart.show((Default) nar);
 			}
 
 //			@Override

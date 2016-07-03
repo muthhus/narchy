@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Global;
 import nars.budget.RawBLink;
 import nars.budget.merge.BudgetMerge;
 import nars.util.data.list.CircularArrayList;
@@ -41,8 +42,10 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     @Override
     public int size() {
-        if (pending == null) return 0;
-        return pending.size();
+        CircularArrayList<RawBLink<X>> p = this.pending;
+        if (p == null)
+            return 0;
+        return p.size();
     }
 
     @Override
@@ -51,10 +54,15 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         if (p != null) {
             clear();
             for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-                RawBLink<X> w = p.get(i);
+                RawBLink<X> w = p.getAndNullify(i);
+                if (w == null) continue;
+
                 float wp = w.pri();
-                if (wp == wp) //not deleted
+                if (wp == wp) { //not deleted
                     target.commitPending(w.x, wp, w.dur(), w.qua());
+                } else {
+                    throw new RuntimeException(); //shouldnt have happened this way
+                }
             }
         }
     }
@@ -94,7 +102,15 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         float sum = 0;
         for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
             RawBLink<X> w = p.get(i);
-            sum += w.pri() * w.dur();
+            float pp = w.priIfFiniteElseZero();
+            if (pp > 0) {
+                sum += pp * w.dur();
+            } else {
+                p.set(i, null);
+            }
+        }
+        if (sum < Global.BUDGET_EPSILON) {
+            clear();
         }
         return sum;
     }

@@ -1,7 +1,5 @@
 package nars.irc;
 
-import com.google.common.html.HtmlEscapers;
-import edu.cmu.sphinx.util.props.tools.HTMLDumper;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -10,23 +8,16 @@ import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.experiment.Talk;
 import nars.gui.BagChart;
-import nars.gui.ConceptBagInput;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
-import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
-import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
-import nars.util.Util;
 import nars.util.Wiki;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -34,8 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.SpaceGraph;
-import spacegraph.layout.FastOrganicLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -219,7 +208,7 @@ public class NarseseIRCBot extends Talk {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1024, 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), true)
+                new CaffeineIndex(true)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)

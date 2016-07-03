@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
  * Adds an additional condition that deletes the link if the referenced
  * Budgeted is deleted
  */
-public final class WeakBLinkToBudgeted<B extends Budgeted> extends WeakBLink<B> {
+public final class WeakBufferedBLinkToBudgeted<B extends Budgeted> extends WeakBufferedBLink<B> {
 
-    public WeakBLinkToBudgeted(B id, @NotNull Budgeted b, float scal) {
+    public WeakBufferedBLinkToBudgeted(B id, @NotNull Budgeted b, float scal) {
         super(id, b, scal);
     }
 

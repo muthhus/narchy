@@ -9,13 +9,13 @@ import java.lang.ref.WeakReference;
 /**
  * Created by me on 5/29/16.
  */
-public class WeakBLink<X> extends DefaultBLink<X> {
+public class WeakBufferedBLink<X> extends DefaultBLink<X> {
 
     ///** the referred item */
     @NotNull
     public final WeakReference<X> id;
 
-    public WeakBLink(X id, @NotNull Budgeted b, float scal) {
+    public WeakBufferedBLink(X id, @NotNull Budgeted b, float scal) {
         super(id, b, scal);
         this.id = new WeakReference<>(id);
     }

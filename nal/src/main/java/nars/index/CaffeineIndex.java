@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -48,17 +47,18 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
-    public CaffeineIndex(int maxWeight, Concept.ConceptBuilder builder) {
-        this(maxWeight, builder, false);
+    public CaffeineIndex(Concept.ConceptBuilder builder) {
+        this(builder, false);
     }
 
-    public CaffeineIndex(int maxWeight, Concept.ConceptBuilder conceptBuilder, boolean soft) {
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, boolean soft) {
         super(conceptBuilder);
 
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
-        builder.weigher(conceptWeigher)
-               .maximumWeight(maxWeight)
+        builder
+               //.weigher(conceptWeigher)
+               //.maximumWeight(maxWeight)
                .removalListener(this)
 
 
@@ -76,8 +76,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         //builder = builder.initialCapacity(initialSize);
 
         if (soft) {
-            builder = builder.softValues();
-            //builder = builder.weakValues();
+            //builder = builder.softValues();
+            builder = builder.weakValues();
 
 
         }

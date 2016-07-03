@@ -28,15 +28,11 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.experiment.Environment;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
-import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
@@ -76,7 +72,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
-				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)

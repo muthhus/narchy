@@ -1,5 +1,7 @@
 package nars.budget.policy;
 
+import nars.$;
+import nars.Global;
 import nars.Memory;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -47,12 +49,13 @@ public class TaskBudgeting {
                 aveAri(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero())
                     * volRatioScale
         ;
+        if (priority * durability < Global.BUDGET_EPSILON)
+            return null;
 
         final float quality = qual * volRatioScale;
 
 
-
-        return new UnitBudget(priority, durability, quality);
+        return $.b(priority, durability, quality);
 
 
         /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java

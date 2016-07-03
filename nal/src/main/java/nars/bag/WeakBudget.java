@@ -7,18 +7,30 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
-/**
- * Created by me on 7/2/16.
- */
-public class WeakBudget<V> extends WeakReference<V> implements Budget {
+
+public class WeakBudget<X> extends WeakReference<X> implements Budget {
 
     private float p, d, q;
+    private int hash;
 
-    public WeakBudget(V referent, ReferenceQueue<? super V> queue, float p, float d, float q) {
+    public WeakBudget(X referent, ReferenceQueue<? super X> queue, float p, float d, float q) {
         super(referent, queue);
         this.p = p;
         this.d = d;
         this.q = q;
+        hash = referent.hashCode();
+    }
+
+    public final X get() {
+        if (p == p) {
+            X x = super.get();
+            if (x == null) {
+                p = Float.NaN;
+            }
+            return x;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -42,7 +54,12 @@ public class WeakBudget<V> extends WeakReference<V> implements Budget {
     }
 
     @Override
-    public boolean delete() {
+    public final boolean delete() {
+        if (p==p) {
+            p = Float.NaN;
+            clear();
+            return true;
+        }
         return false;
     }
 
@@ -65,4 +82,6 @@ public class WeakBudget<V> extends WeakReference<V> implements Budget {
     public @NotNull Budget clone() {
         return new RawBudget(p, d, q);
     }
+
+
 }

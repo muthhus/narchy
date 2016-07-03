@@ -100,16 +100,14 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
-        return commonSubterms(a, b, false);
+        return commonSubterms(a, b, false, new HashSet());
     }
 
     /**
      * recursively
      */
     @NotNull
-    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
-
-        HashSet<Term> r = new HashSet<Term>();
+    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, HashSet<Term> scratch) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -118,8 +116,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         if (commonStructure == 0)
             return false;
 
-        a.termsToSet(commonStructure, r, true);
-        return b.termsToSet(commonStructure, r, false);
+        scratch.clear();
+        a.termsToSet(commonStructure, scratch, true);
+        return b.termsToSet(commonStructure, scratch, false);
 
     }
 
