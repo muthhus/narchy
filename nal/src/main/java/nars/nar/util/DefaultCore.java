@@ -2,6 +2,7 @@ package nars.nar.util;
 
 import nars.NAR;
 import nars.bag.Bag;
+import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.DefaultConceptPolicy;
@@ -79,6 +80,10 @@ public class DefaultCore extends AbstractCore {
             setCapacity(capacity);
         }
 
+        @Override
+        protected BagPendings<Concept> newPendings() {
+            return new MapBagPendings();
+        }
 
         @Override
         public void clear() {

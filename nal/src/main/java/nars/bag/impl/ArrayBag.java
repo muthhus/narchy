@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -77,7 +78,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         public void apply(ArrayBag<X> target) {
             CircularArrayList<RawBLink<X>> p = this.pending;
             if (p!=null) {
-                this.pending = null;
+                clear();
                 for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
                     RawBLink<X> w = p.get(i);
                     float wp = w.pri();
@@ -133,6 +134,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     public static class MapBagPendings<X> extends BagPendings<X>  {
 
+        static boolean nullify = false;
         private /*Reference*/Map<X,Budget> pending;
         int capacity;
 
@@ -143,17 +145,21 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         @Override
         public void clear() {
-            pending = null;
+            if (nullify)
+                pending = null;
+            else
+                pending.clear();
         }
 
         protected Map<X, Budget> newPendingMap() {
             //int s = 1+capacity/2;
 
-            return new HashMap<>(capacity);
+            //return new HashMap<>(capacity);
             //return new HashMap<>();
             //return new UnifriedMap<>(8); //<-- not safe, grows huge
             //return new WeakHashMap<>(capacity);
             //return new LinkedHashMap<>(s);
+            return new ConcurrentHashMapUnsafe<>(capacity);
         }
 
         float sum;
@@ -191,7 +197,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         public void apply(ArrayBag<X> target) {
             Map<X,Budget> n = this.pending;
             if (n!=null) {
-                this.pending = null;
+                clear();
                 n.forEach((k,b) -> {
                     target.commitPending(k, b.pri(), b.dur(), b.qua());
                 });
@@ -199,9 +205,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
-    final BagPendings<V> pending =
-            new ListBagPendings();
-            //new MapBagPendings();
+    final BagPendings<V> pending;
 
     public ArrayBag(int cap, BudgetMerge mergeFunction) {
         super(BLink[]::new,
@@ -213,9 +217,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         );
 
+        pending = newPendings();
+
         setCapacity(cap);
 
         this.mergeFunction = mergeFunction;
+    }
+
+    protected BagPendings<V> newPendings() {
+        return new ListBagPendings();
     }
 
     public void setCapacity(int newCapacity) {
