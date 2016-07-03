@@ -47,10 +47,13 @@ public class WeakBufferedBLink<X> extends DefaultBLink<X> {
     }
 
     @Override
-    public boolean commit() {
+    public void commit() {
         //check existence
         X val = id.get();
-        return val == null ? delete() : super.commit();
+        if (val == null)
+            delete();
+        else
+            super.commit();
     }
 
     @Nullable

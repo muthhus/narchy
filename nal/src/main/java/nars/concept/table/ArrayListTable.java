@@ -127,10 +127,9 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
             //int excess = size() - newCapacity;
             //while (excess-- > 0)
 
-            while (size() - newCapacity > 0)
-                removeWeakest("Shrink");
-
         }
+        while (size() - newCapacity > 0)
+            removeWeakest("Shrink");
     }
 
     protected abstract void removeWeakest(Object reason);

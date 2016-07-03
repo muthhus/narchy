@@ -29,8 +29,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     abstract public static class BagPendings<V> {
         abstract public void capacity(int c);
+
         abstract public void add(V v, float p, float d, float q);
+
         abstract public int size();
+
         abstract public void apply(ArrayBag<V> target);
 
         abstract public float mass(ArrayBag<V> bag);
@@ -71,13 +74,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     @Override
-    protected void removeWeakest(Object reason) {
+    protected final void removeWeakest(Object reason) {
 
-        if (removeDeletedAtBottom()) {
-            return;
+        System.out.println(reason + " " + map.size() + "=" + items.size());
+        if (!removeDeletedAtBottom()) {
+            remove(weakest()).delete(reason);
         }
-
-        remove(weakest()).delete(reason);
+        System.out.println("\t" + reason + " " + map.size() + "=" + items.size());
     }
 
     @Override
@@ -92,12 +95,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return 0;
     }
 
-    /** true iff o1 > o2 */
+    /**
+     * true iff o1 > o2
+     */
     static final boolean cmpGT(@NotNull BLink o1, @NotNull BLink o2) {
         return (priIfFiniteElseNeg1(o1) < priIfFiniteElseNeg1(o2));
     }
 
-    /** true iff o1 < o2 */
+    /**
+     * true iff o1 < o2
+     */
     static final boolean cmpLT(@NotNull BLink o1, @NotNull BLink o2) {
         return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
     }
@@ -105,11 +112,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     static float priIfFiniteElseNeg1(Budgeted b) {
         if (b == null) return -1;
         float p = b.pri();
-        return p==p ? p : -1;
+        return p == p ? p : -1;
         //return (b!=null) ? b.priIfFiniteElseNeg1() : -1f;
         //return b.priIfFiniteElseNeg1();
     }
-
 
 
     @Override
@@ -256,27 +262,26 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         if (b.isDeleted())
             throw new RuntimeException();
-            //return null;
+        //return null;
 
         BLink<V> existing = get(key);
 
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
         } else if (isFull()) {
-            pending.add(key, b.pri()*scale, b.qua(), b.dur());
+            pending.add(key, b.pri() * scale, b.qua(), b.dur());
             return null;
         } else {
-            return putNew(key, newLink(key, b.pri()*scale, b.qua(), b.dur() ));
+            return putNew(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
         }
     }
-
-
 
 
     /**
      * the applied budget will not become effective until commit()
      */
-    @NotNull private final BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+    @NotNull
+    private final BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
         if (existing != b) {
             float o = mergeFunction.merge(existing, b, scale);
@@ -287,17 +292,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return existing;
     }
 
-    @NotNull protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
+    @NotNull
+    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b) {
         return newLink(i, b, 1f);
     }
 
-    @NotNull protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
+    @NotNull
+    protected final BLink<V> newLink(@NotNull V i, @NotNull Budgeted b, float scale) {
         return newLink(i, scale * b.pri(), b.dur(), b.qua());
     }
 
-    @NotNull protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
+    @NotNull
+    protected BLink<V> newLink(@NotNull V i, float p, float d, float q) {
         if (i instanceof Budgeted)
-            return new StrongBLinkToBudgeted((Budgeted)i, p, d, q);
+            return new StrongBLinkToBudgeted((Budgeted) i, p, d, q);
         else
             return new StrongBLink(i, p, d, q);
     }
@@ -309,18 +317,22 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @NotNull
     @Override
-    @Deprecated public Bag<V> commit() {
+    @Deprecated
+    public Bag<V> commit() {
         return commit(null);
     }
 
-    /** applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted */
+    /**
+     * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
+     */
     @NotNull
-    @Override public Bag<V> commit(@Nullable Consumer<BLink> each) {
+    @Override
+    public Bag<V> commit(@Nullable Consumer<BLink> each) {
         int s = size();
         if (s > 0) {
             int lowestUnsorted = updateExisting(each, s);
 
-            if (lowestUnsorted != -1)  {
+            if (lowestUnsorted != -1) {
                 int[] qsortStack = new int[16];
                 qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
             } // else: perfectly sorted
@@ -329,7 +341,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         BagPendings<V> p = this.pending;
-        if (p!=null) {
+        if (p != null) {
             this.bottomPri = bottomPriIfFull();
             p.apply(this);
         }
@@ -340,7 +352,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     transient private float bottomPri;
 
     public final void commitPending(V key, float p, float d, float q) {
-    //final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
+        //final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
         //            if (key == null)
 //                continue; //link was destroyed before it could be processed
 
@@ -374,12 +386,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return (s == capacity()) ? get(s - 1).pri() : -1f;
     }
 
-    /** returns the index of the lowest unsorted item */
+    /**
+     * returns the index of the lowest unsorted item
+     */
     private int updateExisting(@Nullable Consumer<BLink> each, int s) {
 //        int dirtyStart = -1;
         int lowestUnsorted = -1;
 
-        final boolean eachNotNull = each!=null;
+        final boolean eachNotNull = each != null;
 
         BLink<V>[] l = items.array();
         int t = s - 1;
@@ -387,14 +401,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         for (int i = t; i >= 0; i--) {
             BLink<V> b = l[i];
 
-                if (eachNotNull)
-                    each.accept(b);
+            if (eachNotNull)
+                each.accept(b);
 
-                b.commit();
+            b.commit();
 
 
             if (lowestUnsorted == -1 && cmpGT(b, beneath)) {
-                lowestUnsorted = i+1;
+                lowestUnsorted = i + 1;
             }
 
             beneath = b;
@@ -404,15 +418,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     private boolean removeDeletedAtBottom() {
         //remove deleted items they will collect at the end
-        int i = size()-1;
+        int i = size() - 1;
         BLink<V> ii;
         SortedArray<BLink<V>> items = this.items;
         BLink<V>[] l = items.array();
 
         int removed = 0;
         int toRemoveFromMap = 0;
-        while (i > 0 && ((ii = l[i])==null || (ii.isDeleted()))) {
-            if (ii!=null && removeKeyForValue(ii) == null) {
+        while (i > 0 && ((ii = l[i]) == null || (ii.isDeleted()))) {
+            if (ii != null && removeKeyForValue(ii) == null) {
                 //
                 //throw new RuntimeException("Bag fault while trying to remove key by item value");
 
@@ -460,11 +474,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-
-
-
-
-    /** http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java */
+    /**
+     * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
+     */
 
     public static void qsort(int[] stack, BLink[] c, int start, int size) {
         int left = start, right = size - 1, stack_pointer = -1;
@@ -479,8 +491,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                     i = j - 1;
                     while (i >= left && cmpGT(c[i], swap)) {
                         BLink x = c[i];
-                        c[i] = c[i+1];
-                        c[i+1] = x;
+                        c[i] = c[i + 1];
+                        c[i + 1] = x;
                         i--;
                     }
                     c[i + 1] = swap;
@@ -605,7 +617,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return isEmpty() ? 0 : items.last().pri();
     }
 
-    /** returns mass (index 0) pending mass (index 1) */
+    /**
+     * returns mass (index 0) pending mass (index 1)
+     */
     public float[] preCommit() {
         BLink<V>[] l = items.array();
         int s = size();
@@ -617,7 +631,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             pendingMass += d * b.priDelta();
         }
         pendingMass += pending.mass(this);
-        return new float[] { mass, pendingMass };
+        return new float[]{mass, pendingMass};
     }
 
 

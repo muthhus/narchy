@@ -184,14 +184,13 @@ public class STMClustered extends STM {
         }
 
         @Override
-        public boolean commit() {
+        public void commit() {
             if (get().isDeleted()) {
                 delete();
-                return true;
             }
             priSub(cycleCost(id));
             nearest().transfer(this);
-            return super.commit();
+            super.commit();
         }
 
         private TasksNode nearest() {

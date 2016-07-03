@@ -70,7 +70,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     }
 
     @Override
-    public boolean commit() {
+    public void commit() {
         if (changed) {
             float p = PRI;
             if (p == p) /* not NaN */ {
@@ -79,9 +79,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
                 QUA = clamp(QUA + dQua);   dQua = 0;
             }
             changed = false;
-            return true;
         }
-        return false;
     }
 
     @Override

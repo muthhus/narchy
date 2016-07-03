@@ -48,7 +48,7 @@ public abstract class AbstractNAR extends NAR {
 
 
         conceptWarm = new DefaultConceptPolicy(12, 10, 4, 24, 12);
-        conceptCold = new DefaultConceptPolicy(10, 8, 1, 16, 8);
+        conceptCold = new DefaultConceptPolicy(10, 8, 1, 8, 4);
 
         durMin.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 

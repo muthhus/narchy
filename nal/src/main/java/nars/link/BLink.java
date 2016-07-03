@@ -67,7 +67,7 @@ public abstract class BLink<X> implements Budget, Link<X> {
     }
 
 
-    public abstract boolean commit();
+    public abstract void commit();
 
     /** show additional information */
     public String toString2() {

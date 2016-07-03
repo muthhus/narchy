@@ -220,6 +220,8 @@ public interface Concept extends Termed, Comparable<Termlike> {
     static <T> void linkPeer(Bag<T> bag, T x, Budget b, float q) {
         //@NotNull Bag<Termed> bag = termlinks();
         BLink<T> existing = bag.get(x);
+        if (existing == null)
+            return;
 
         /*
         Hebbian Learning:
