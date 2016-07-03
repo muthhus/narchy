@@ -130,7 +130,7 @@ public class Revision {
             if (bb.isDeleted()) return null;
 
             Task solution = new RevisionTask(b.term() /* question term in case it has different temporality */,
-                    b, a, newTruth, now, newOcc)
+                    a, b, newTruth, now, newOcc)
                     .budget(bb)
                     //.state(state())
                     //.setEvidence(evidence())

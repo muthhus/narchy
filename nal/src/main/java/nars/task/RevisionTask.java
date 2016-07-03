@@ -1,5 +1,7 @@
 package nars.task;
 
+import nars.bag.Bag;
+import nars.budget.BudgetFunctions;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
@@ -19,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RevisionTask extends MutableTask  {
 
+    Task newBelief, oldBelief;
+
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc(), conclusion);
 
@@ -28,9 +32,35 @@ public class RevisionTask extends MutableTask  {
         evidence(Stamp.zip(newBelief.evidence(), oldBelief.evidence()));
         time(creationTime, occTime);
         budget(oldBelief, newBelief);
+
+        this.newBelief = newBelief;
+        this.oldBelief = oldBelief;
+
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
                 ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
+    }
+
+    public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
+        super(c, a,
+                now, newOcc,
+                Stamp.zip(a.evidence(), b.evidence(), aMix),
+                newTruth);
+        budget(a, b, aMix);
+        log("Revection Merge");
+
+        this.newBelief = a;
+        this.oldBelief = b;
+    }
+
+    @Override
+    public Task getParentTask() {
+        return newBelief;
+    }
+
+    @Override
+    public Task getParentBelief() {
+        return oldBelief;
     }
 
     private void budget(Task a, Task b) {
@@ -48,15 +78,6 @@ public class RevisionTask extends MutableTask  {
         }
     }
 
-    public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
-        super(c, a,
-                now, newOcc,
-                Stamp.zip(a.evidence(), b.evidence(), aMix),
-                newTruth);
-        budget(a, b, aMix);
-        log("Revection Merge");
-    }
-
 //    @Override
 //    public boolean isDeleted() {
 //        if (super.isDeleted()) {
@@ -72,43 +93,64 @@ public class RevisionTask extends MutableTask  {
 //    }
 //
 
+
+    @Override
+    public boolean delete() {
+        if (super.delete()) {
+            unlink();
+            return true;
+        }
+        return false;
+    }
+
+    /** rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept */
+    private void unlink() {
+        this.newBelief = this.oldBelief = null;
+    }
+
+
     /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
     @Override public boolean onConcept(@NotNull Concept c) {
         super.onConcept(c);
 
         //TODO reimplement again
 
-        //float resultPri = pri();
-//        Task parentNewBelief = getParentTask();
-//        Task parentOldBelief = getParentBelief();
-//
-//        if (parentNewBelief==null || parentOldBelief==null) {
-//            return true; //HACK
-//        }
-//
-//        float newBeliefContribution;
-//        if (parentNewBelief.isBeliefOrGoal()) {
-//            float newBeliefConf = parentNewBelief.confWeight();
-//            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
-//        } else {
-//            //question/quest
-//            newBeliefContribution = 0.5f;
-//        }
-//
-//        //Balance Tasks
-//        BudgetFunctions.balancePri(
-//                parentNewBelief.budget(), parentOldBelief.budget(),
-//                resultPri,
-//                newBeliefContribution);
-//
-//        //Balance Tasklinks
-//        Bag<Task> tasklinks = c.tasklinks();
-//        BudgetFunctions.balancePri(
-//                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
-//                resultPri,
-//                newBeliefContribution);
-//
-//
+        float resultPri = pri();
+        Task parentNewBelief = getParentTask();
+        if (parentNewBelief==null) {
+            unlink();
+            return true; //HACK
+        }
+
+        Task parentOldBelief = getParentBelief();
+        if (parentOldBelief==null) {
+            unlink();
+            return true; //HACK
+        }
+
+        float newBeliefContribution;
+        if (parentNewBelief.isBeliefOrGoal()) {
+            float newBeliefConf = parentNewBelief.confWeight();
+            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
+        } else {
+            //question/quest
+            newBeliefContribution = 0.5f;
+        }
+
+        //Balance Tasks
+        BudgetFunctions.balancePri(
+                parentNewBelief.budget(), parentOldBelief.budget(),
+                resultPri,
+                newBeliefContribution);
+
+        //Balance Tasklinks
+        Bag<Task> tasklinks = c.tasklinks();
+        BudgetFunctions.balancePri(
+                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+                resultPri,
+                newBeliefContribution);
+
+
 ////        if (parentNewBelief!=null)
 ////            weaken(parentNewBelief);
 ////            //parentNewBelief.onRevision(this);
@@ -117,6 +159,7 @@ public class RevisionTask extends MutableTask  {
 ////            weaken(parentOldBelief);
 ////            //oldBelief.onRevision(this);
 
+        unlink();
         return true;
     }
 

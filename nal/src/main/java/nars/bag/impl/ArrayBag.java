@@ -147,7 +147,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         public void clear() {
             if (nullify)
                 pending = null;
-            else
+            else if (pending!=null)
                 pending.clear();
         }
 
