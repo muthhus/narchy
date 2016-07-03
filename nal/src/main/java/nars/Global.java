@@ -27,6 +27,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
+import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -165,8 +166,8 @@ public enum Global {
 
     @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
-        return new UnifiedMap(capacity);
-        //return new UnifriedMap(capacity /*, loadFactor */);
+        //return new UnifiedMap(capacity);
+        return new UnifriedMap(capacity /*, loadFactor */);
 
         //return new FasterHashMap(capacity);
         //return new FastMap<>(); //javolution http://javolution.org/apidocs/javolution/util/FastMap.html

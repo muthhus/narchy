@@ -11,6 +11,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
+import nars.util.data.list.CircularArrayList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     public static class ListBagPendings<X> extends BagPendings<X>  {
 
-        public List<RawBLink<X>> pending = null;
+        //public List<RawBLink<X>> pending = null;
+        CircularArrayList<RawBLink<X>> pending = null;
         private int capacity;
 
         @Override
@@ -57,10 +59,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         @Override
         public void add(X x, float p, float d, float q, BudgetMerge merge) {
-            if (pending==null) {
-                pending = Global.newArrayList(capacity);
+            CircularArrayList<RawBLink<X>> pend = this.pending;
+            if (pend ==null) {
+                //pending = Global.newArrayList(capacity);
+                this.pending = pend = new CircularArrayList<>(capacity);
+            } else if (pend.size() == capacity) {
+                pend.removeFirst();
             }
-            pending.add(new RawBLink(x, p, d, q));
+
+            pend.add(new RawBLink(x, p, d, q));
         }
 
         @Override
@@ -71,7 +78,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         @Override
         public void apply(ArrayBag<X> target) {
-            List<RawBLink<X>> p = this.pending;
+            CircularArrayList<RawBLink<X>> p = this.pending;
             if (p!=null) {
                 this.pending = null;
                 for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {

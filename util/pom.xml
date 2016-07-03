@@ -177,6 +177,19 @@
       <scope>compile</scope>
     </dependency>
 
+      <dependency>
+        <groupId>org.cache2k</groupId>
+        <artifactId>cache2k-api</artifactId>
+        <version>0.26-BETA</version>
+      </dependency>
+      <dependency>
+        <groupId>org.cache2k</groupId>
+        <artifactId>cache2k-core</artifactId>
+        <version>0.26-BETA</version>
+        <scope>runtime</scope>
+      </dependency>
+
+
     <!-- https://mvnrepository.com/artifact/org.iq80.snappy/snappy -->
     <dependency>
       <groupId>org.iq80.snappy</groupId>

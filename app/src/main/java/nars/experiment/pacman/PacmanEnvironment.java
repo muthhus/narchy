@@ -30,6 +30,7 @@ import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -74,7 +75,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
-				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
+				//new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
+				new Cache2kIndex(128000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -83,7 +85,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.premiser.confMin.setValue(0.03f);
 		nar.conceptActivation.setValue(0.1f);
 
-		new MemoryManager(nar);
+		//new MemoryManager(nar);
 
 		nar.beliefConfidence(0.7f);
 		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides

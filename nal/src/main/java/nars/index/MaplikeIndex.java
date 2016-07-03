@@ -68,9 +68,6 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         if (y == null) {
             y = buildCompound(x.op(), x.dt(), x.subterms()    /* TODO make this sometimes false */);
 
-//            if (y == null)
-//                throw new InvalidTerm(x.op(), x.dt(), x.subterms().terms());
-
             if (canBuildConcept(y)) {
                 set(y = buildConcept(y) );
             }
