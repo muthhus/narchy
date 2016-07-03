@@ -26,12 +26,11 @@ public class RevisionTask extends MutableTask  {
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc(), conclusion);
 
-        if (!newBelief.isBeliefOrGoal() || !oldBelief.isBeliefOrGoal() )
-            throw new UnsupportedOperationException("invalid punctuation");
+//        if (!newBelief.isBeliefOrGoal() || !oldBelief.isBeliefOrGoal() )
+//            throw new UnsupportedOperationException("invalid punctuation");
 
         evidence(Stamp.zip(newBelief.evidence(), oldBelief.evidence()));
         time(creationTime, occTime);
-        budget(oldBelief, newBelief);
 
         this.newBelief = newBelief;
         this.oldBelief = oldBelief;
@@ -63,10 +62,11 @@ public class RevisionTask extends MutableTask  {
         return oldBelief;
     }
 
-    private void budget(Task a, Task b) {
+    public RevisionTask budget(Task a, Task b) {
         float acw = a.confWeight();
         float aMix = acw / (acw + b.confWeight());
         budget(a, b, aMix);
+        return this;
     }
 
     private void budget(Task a, Task b, float aMix) {
