@@ -8,12 +8,13 @@ import nars.Symbols;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static nars.$.t;
 
 /** accepts a numeric signal which has been normalized to 0..1.0 range */
-public class FuzzyConceptSet {
+public class FuzzyConceptSet implements Iterable<SensorConcept> {
 
 
     private final FloatSupplier input;
@@ -116,4 +117,8 @@ public class FuzzyConceptSet {
     }
 
 
+    @Override
+    public Iterator<SensorConcept> iterator() {
+        return sensors.iterator();
+    }
 }

@@ -10,6 +10,7 @@ import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import static nars.experiment.pong.PongEnvironment.beliefChart;
@@ -279,7 +280,7 @@ abstract public class Algorithmic implements Environment {
             @Override
             public void start(int inputs, int actions) {
                 super.start(inputs, actions);
-                beliefChart(this);
+                beliefChart(this, Collections.emptyList());
             }
         };
 

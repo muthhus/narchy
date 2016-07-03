@@ -11,9 +11,11 @@ import nars.truth.TruthWave;
 import spacegraph.render.JoglSpace2D;
 import spacegraph.render.ShapeDrawer;
 
+import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
 
 import static java.lang.Math.PI;
 import static nars.nal.Tense.ETERNAL;
@@ -34,6 +36,8 @@ public class BeliefTableChart extends JoglSpace2D {
     private long now;
 
     float angleSpeed = 0.5f;
+
+    private BiFunction<Long, long[], long[]> rangeControl = (now, range) -> range; //default: no change
 
 
     public BeliefTableChart(NAR n, Concept c) {
@@ -145,6 +149,10 @@ public class BeliefTableChart extends JoglSpace2D {
 
             }
         }
+
+        long[] newRange = rangeControl.apply(now, new long[] { minT, maxT });
+        minT = newRange[0];
+        maxT = newRange[1];
 
         for (int i = num-1; i >=0; i--) {
             float my = 0f;//dy * 0.15f;
@@ -319,6 +327,11 @@ public class BeliefTableChart extends JoglSpace2D {
 
     private static float eternalX(float width, float b, float w, float cc) {
         return b + (width - b - w) * cc;
+    }
+
+    public BeliefTableChart time(BiFunction<Long,long[],long[]> rangeControl) {
+        this.rangeControl = rangeControl;
+        return this;
     }
 
     @FunctionalInterface

@@ -43,6 +43,8 @@ import static nars.Symbols.*;
 public class Narsese extends BaseParser<Object> {
 
 
+    public static final String NARSESE_TASK_TAG = "Narsese";
+
     //These should be set to something like RecoveringParseRunner for performance
     private final ParseRunner inputParser = new ParseRunner(Input());
     private final ParseRunner singleTaskParser = new ParseRunner(Task());
@@ -110,7 +112,7 @@ public class Narsese extends BaseParser<Object> {
                 break;
         }
 
-        return ttt;
+        return ttt.log(NARSESE_TASK_TAG);
     }
 
     public static boolean isPunctuation(char c) {

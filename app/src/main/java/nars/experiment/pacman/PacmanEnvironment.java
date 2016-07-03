@@ -75,8 +75,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				//new CaffeineIndex(new DefaultConceptBuilder(rng), false)
-				new Cache2kIndex(100000, rng)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), false)
+				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -130,7 +130,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				//BagChart.show((Default)nar);
+				BagChart.show((Default)nar);
 			}
 		};
 

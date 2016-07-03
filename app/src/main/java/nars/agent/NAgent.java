@@ -48,7 +48,7 @@ public class NAgent implements Agent {
     private List<SensorConcept> inputs;
     //private SensorConcept reward;
     private int lastAction = -1;
-    private float reward = Float.NaN;
+    public float reward = Float.NaN;
 
     private int ticksBeforeObserve = 1;
     private int ticksBeforeDecide = 1;
@@ -134,10 +134,11 @@ public class NAgent implements Agent {
     private final int motorBeliefCapacity = 16;
     private final int motorGoalCapacity = 16;
 
-    private final int rewardBeliefCapacity = 2 * motorBeliefCapacity;
+    //private final int rewardBeliefCapacity = 2 * motorBeliefCapacity;
 
     public SensorConcept happy;
     public SensorConcept sad;
+    public FuzzyConceptSet rewardConcepts;
 
 
     public NAgent(NAR n) {
@@ -238,10 +239,10 @@ public class NAgent implements Agent {
         }).flatMap(x -> x).collect(toList());
 
 
-        FuzzyConceptSet reward = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
+        rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
 
-        this.sad = reward.sensors.get(0);
-        this.happy = reward.sensors.get(2);
+        this.sad = rewardConcepts.sensors.get(0);
+        this.happy = rewardConcepts.sensors.get(2);
 
 //        float rewardResolution = 0.05f;
 //        this.happy = new SensorConcept($.prop(nar.self, the("happy")), nar,

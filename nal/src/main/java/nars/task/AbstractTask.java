@@ -192,12 +192,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             setTime(now, oc);
         }
 
-        //shift the occurrence time if dt < 0 and non-eternal
-        int termDur = term.term().dt();
-        long exOcc = occurrence();
-        if (exOcc!=ETERNAL && termDur!=DTERNAL && termDur < 0) {
-            setOccurrence(exOcc - termDur);
-        }
 
 
 
@@ -224,6 +218,18 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             if (Global.DEBUG && (log == null))
                 log("Input");
 
+        }
+
+
+        //shift the occurrence time if input and dt < 0 and non-eternal
+        if (log!=null && log().get(0).equals(Narsese.NARSESE_TASK_TAG)) {
+            long exOcc = occurrence();
+            if (exOcc != ETERNAL) {
+                int termDur = term.term().dt();
+                if (termDur != DTERNAL && termDur < 0) {
+                    setOccurrence(exOcc - termDur);
+                }
+            }
         }
 
         onInput(memory);

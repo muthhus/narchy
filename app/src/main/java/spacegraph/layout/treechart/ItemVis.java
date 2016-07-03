@@ -100,8 +100,9 @@ public class ItemVis<X> {
         );
 
         gl.glColor3f(1,1,1);
+        float labelSize = (float) (height / 4f * Math.min(0.005f,percent));
         ShapeDrawer.renderLabel(gl,
-                (float)(height/4f*percent), //label size
+                labelSize, //label size
                 label, (float)(left+width/2f), (float)(top+height/2f), 0.5f);
 
     }

@@ -5,6 +5,8 @@ package nars.experiment.pong;/*
  *  Read the file 'COPYING' for more information
  */
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
@@ -19,6 +21,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -28,6 +31,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.FuzzyConceptSet;
+import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
@@ -63,8 +67,8 @@ public class PongEnvironment extends Player implements Environment {
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				//new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
-				new Cache2kIndex(56000, rng)
+				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
+				//new Cache2kIndex(56000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -72,22 +76,23 @@ public class PongEnvironment extends Player implements Environment {
 				,new FrameClock());
 		nar.beliefConfidence(0.8f);
 		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(48);
-		nar.conceptActivation.setValue(0.1f);
+		nar.conceptActivation.setValue(0.2f);
 		nar.confMin.setValue(0.03f);
 
 
 
+		List<SensorConcept> cheats = new ArrayList();
 
 		NAgent a = new NAgent(nar) {
 			@Override
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
-				beliefChart(this);
+				beliefChart(this, cheats);
 				BagChart.show((Default) nar);
 			}
 
@@ -110,7 +115,7 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		//new MySTMClustered(nar, 16, '.');
+		new MySTMClustered(nar, 16, '.');
 		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();
@@ -120,7 +125,7 @@ public class PongEnvironment extends Player implements Environment {
 		PongEnvironment e = new PongEnvironment();
 
 
-		addCheats(a.nar, e);
+		Iterables.addAll(cheats, addCheats(a.nar, e));
 
 		//nar.logSummaryGT(System.out, 0.25f);
 
@@ -149,27 +154,31 @@ public class PongEnvironment extends Player implements Environment {
 	}
 
 	/** direct inputs from pong for a nars agent */
-	private static void addCheats(NAR n, PongEnvironment e) {
+	private static Iterable<SensorConcept> addCheats(NAR n, PongEnvironment e) {
 		PongModel pong = e.pong;
 
 		float pri = 0.5f;
 
-		numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri);
+		float halfPaddle = pong.PADDLE_HEIGHT / 2f;
 
-		numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri);
-		numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position, pri);
-		numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position, pri);
+		return Iterables.concat(
+			numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri),
 
-		numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () ->
-				//pong.ball_y - pong.player1.position,
-				//(float)Math.pow(
-						pong.ball_y - pong.player1.position //, 2f),
-				,pri);
+			numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri),
+			numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position+halfPaddle, pri),
+			numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position+halfPaddle, pri),
+
+			numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () -> {
+
+						return pong.ball_y - (pong.player1.position + halfPaddle);
+					} , pri)
+		);
+
 	}
 
-	private static void numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+	private static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 
-		new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
+		return new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
 				"(" + term + " --> " + low + ")",
 				"(" + term + " --> " + mid + ")",
 				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
@@ -213,11 +222,21 @@ public class PongEnvironment extends Player implements Environment {
 
 
 
-	public static void beliefChart(NAgent a) {
+	public static void beliefChart(NAgent a, List<? extends Concept> additional) {
 		List<Concept> charted = new ArrayList(a.actions);
-		charted.add(a.happy);
-		charted.add(a.sad);
-		new BeliefTableChart(a.nar, charted).show(400, 100);
+		Iterables.addAll(charted, a.rewardConcepts);
+		charted.addAll(additional);
+		new BeliefTableChart(a.nar, charted)
+				.time((now, range) -> {
+					long low = range[0];
+					long high = range[1];
+					long nowRadius = 250;
+					if (now - low > nowRadius)
+						low  = now-nowRadius;
+					if (high - now > nowRadius)
+						high = now + nowRadius;
+					return new long[]{low,high};
+				}).show(400, 100);
 	}
 
 	@Override
