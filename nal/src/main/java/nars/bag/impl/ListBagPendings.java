@@ -102,11 +102,13 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         float sum = 0;
         for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
             RawBLink<X> w = p.get(i);
-            float pp = w.priIfFiniteElseZero();
-            if (pp > 0) {
-                sum += pp * w.dur();
-            } else {
-                p.set(i, null);
+            if (w!=null) {
+                float pp = w.priIfFiniteElseZero();
+                if (pp > 0) {
+                    sum += pp * w.dur();
+                } else {
+                    p.set(i, null);
+                }
             }
         }
         if (sum < Global.BUDGET_EPSILON) {

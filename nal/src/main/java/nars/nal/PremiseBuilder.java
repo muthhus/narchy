@@ -61,6 +61,8 @@ public enum PremiseBuilder {
                 BLink<? extends Termed> termLink = termsArray.get(i);
 
                 Termed tl = termLink.get();
+                if (tl == null)
+                    continue;
 
                 Term termLinkTerm = tl.term();
 

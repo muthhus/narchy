@@ -140,7 +140,7 @@ public enum Global {
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_EPSILON = 0.0005f;
+    public static final float BUDGET_EPSILON = 0.001f;
 
 
 

@@ -75,12 +75,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     protected final void removeWeakest(Object reason) {
-
-        System.out.println(reason + " " + map.size() + "=" + items.size());
         if (!removeDeletedAtBottom()) {
             remove(weakest()).delete(reason);
         }
-        System.out.println("\t" + reason + " " + map.size() + "=" + items.size());
     }
 
     @Override
