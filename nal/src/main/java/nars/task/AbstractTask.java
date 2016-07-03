@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * Default Task implementation
  * TODO move all mutable methods to MutableTask and call this ImmutableTask
@@ -34,7 +37,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private long[] evidence;
 
     private long creation = Tense.TIMELESS;
-    private long occurrence = Tense.ETERNAL;
+    private long occurrence = ETERNAL;
 
 //    /** Array of tasks from which the Task is derived, or null if input
 //     *
@@ -183,17 +186,18 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (creation() <= Tense.TIMELESS) {
             long now = memory.time();
             long oc = occurrence();
-            if (oc != Tense.ETERNAL)
+            if (oc != ETERNAL)
                 oc += now;
 
             setTime(now, oc);
         }
 
-////        //shift the occurrence time if dt < 0
-//        int termDur = term.term().dt();
-//        if (termDur!=DTERNAL && termDur < 0) {
-//            setOccurrenceTime(occurrence() - termDur);
-//        }
+        //shift the occurrence time if dt < 0 and non-eternal
+        int termDur = term.term().dt();
+        long exOcc = occurrence();
+        if (exOcc!=ETERNAL && termDur!=DTERNAL && termDur < 0) {
+            setOccurrence(exOcc - termDur);
+        }
 
 
 

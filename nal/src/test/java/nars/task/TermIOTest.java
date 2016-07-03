@@ -47,12 +47,12 @@ public class TermIOTest {
             //out.println("\t\t" +((Task)copy).explanation());
         //}
 
-        Terms.printRecursive(System.out, (Term)orig, 10);
+        //Terms.printRecursive(System.out, (Task)orig, 10);
 
         //System.out.println("\tbytes: " + Arrays.toString(barray));
         out.println("\tcopy: " + copy);
 
-        Terms.printRecursive(System.out, (Term)copy, 10);
+        //Terms.printRecursive(System.out, (Term)copy, 10);
 
         //assertTrue(copy != orig);
         assertEquals(copy, orig);
@@ -92,7 +92,7 @@ public class TermIOTest {
 
         assertTermEqualSerialize("((#a --> b) <-> ?c)");
 
-        assertEquals( $("(#2-->b)").compareTo($("?1")), -$("?1").compareTo($("(#2-->b)")) );
+        assertEquals( Math.signum($("(#2-->b)").compareTo($("?1"))), -Math.signum($("?1").compareTo($("(#2-->b)"))) );
 
     }
 

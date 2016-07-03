@@ -68,7 +68,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler_simplerBeliefTemporal()  {
         test()
-                //.log()
+                .log()
                 .input("(open(t1) &&+5 [opened]:t1). :|:")
                 .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "[opened]:t1", 1.0f, 0.81f, 5)

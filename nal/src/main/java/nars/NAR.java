@@ -219,7 +219,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed)  {
         List<Task> result = Global.newArrayList(1);
         Narsese.the().tasks(parse, result, unparsed, this);
-        result.forEach(c->c.normalize(this));
         return result;
     }
 
