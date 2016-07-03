@@ -28,15 +28,12 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Task... parents) {
+    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth) {
         super(term.term(), punct, truth,
-            /* budget: */ 0, Float.NaN, Float.NaN, parents);
+            /* budget: */ 0, Float.NaN, Float.NaN);
     }
 
-    public MutableTask(@NotNull Termed<Compound> term, char punct, @Nullable Truth truth, Reference<Task>[] parents) {
-        super(term, punct, truth,
-            /* budget: */ 0, Float.NaN, Float.NaN, parents);
-    }
+
 
 //    @NotNull
 //    public static MutableTask clone(@NotNull Task t, @NotNull Compound newTerm) {
@@ -64,13 +61,13 @@ public class MutableTask extends AbstractTask {
         super(taskToClone);
         truth(newTruth);
         time(now, occ);
-        parent(taskToClone);
+        evidence(taskToClone.evidence());
     }
 
 
 
-    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth/*, @NotNull BudgetMerge budgetMerge*/) {
-        this(newTerm, taskToClone.punc(), newTruth, taskToClone, otherTask);
+    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, long now, long occ, long[] newEvidence, Truth newTruth) {
+        this(newTerm, taskToClone.punc(), newTruth);
 
         setEvidence(newEvidence);
 
@@ -215,83 +212,11 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public final MutableTask parent(@NotNull Task parentTask, @Nullable Task parentBelief) {
-        /*if (parentTask == null)
-            throw new RuntimeException("parent task being set to null");*/
-
-        ensureParentNonLoop(parentTask, parentBelief);
-
-        return parent(parentRef(parentTask, parentBelief));
-
-    }
-
-    @Nullable
-    public static Reference<Task>[] parentRef(@NotNull Task parentTask, @Nullable Task parentBelief) {
-        return Global.reference(
-                new Task[]{
-                        (parentTask.isCommand()) ? null : parentTask,
-                        (parentBelief == null || parentBelief.isCommand()) ? null : parentBelief
-                }
-        );
-    }
-
-    @NotNull
-    public final MutableTask parent(Reference<Task>[] parents) {
-
-        //ensureParentNonLoop(parentTask, parentBelief);
-
-        this.parents = parents;
-
-        updateEvidence();
-
-        return this;
-    }
-
-
-    private void ensureParentNonLoop(@NotNull Task parentTask, @Nullable Task parentBelief) {
-        if (Global.DEBUG) {
-            if (parentTask!=null && Objects.equals(this,parentTask))
-                throw new RuntimeException("parentTask loop");
-            if (parentBelief!=null && Objects.equals(this,parentBelief))
-                throw new RuntimeException("parentBelief loop");
-        }
-    }
-
-//    @NotNull
-//    public MutableTask parent(Reference<Task> rt, Reference<Task> rb) {
-//
-//        Task pt = dereference(rt);
-//        this.parentTask = ((pt != null) && !pt.isCommand()) ? rt : null ;
-//
-//        Task pb = dereference(rb);
-//        this.parentBelief = ((pb != null) && !pb.isCommand()) ? rb : null;
-//
-//        ensureParentNonLoop(pt, pb);
-//
-//        updateEvidence();
-//
-//        return this;
-//    }
-
-
-    @NotNull
     public final MutableTask occurr(long occurrenceTime) {
         setOccurrence(occurrenceTime);
         return this;
     }
 
-    @NotNull
-    public final MutableTask parent(@NotNull Task task) {
-        return parent(task, null);
-    }
-
-    /**
-     //     * sets an amount of cycles to shift the final applied occurence time
-     //     */
-//    public TaskSeed<T> occurrDelta(long occurenceTime) {
-//        this.occDelta = occurenceTime;
-//        return this;
-//    }
 
     @NotNull
     public MutableTask eternal() {
@@ -299,16 +224,6 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-
-//    /** flag used for anticipatable derivation */
-//    @NotNull
-//    public MutableTask anticipate(boolean a) {
-//        if (state==TaskState.Executed)
-//            throw new RuntimeException("can not anticipate already executed task");
-//
-//        if (a) state = (TaskState.Anticipated);
-//        return this;
-//    }
 
 
     @NotNull

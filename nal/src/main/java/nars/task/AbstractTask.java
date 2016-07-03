@@ -7,13 +7,11 @@ import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -38,19 +36,19 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     private long creation = Tense.TIMELESS;
     private long occurrence = Tense.ETERNAL;
 
-    /** Array of tasks from which the Task is derived, or null if input
-     *
-     * These are not guaranteed to remain because it is
-     * stored as a Soft or Weak reference so that
-     * task ancestry does not grow uncontrollably;
-     *
-     * instead, we rely on the JVM garbage collector
-     * to serve as an enforcer of AIKR
-     *
-     * @return The task from which the task is derived, or
-     * null if it has been forgotten
-     */
-    @Nullable protected transient Reference<Task>[] parents;
+//    /** Array of tasks from which the Task is derived, or null if input
+//     *
+//     * These are not guaranteed to remain because it is
+//     * stored as a Soft or Weak reference so that
+//     * task ancestry does not grow uncontrollably;
+//     *
+//     * instead, we rely on the JVM garbage collector
+//     * to serve as an enforcer of AIKR
+//     *
+//     * @return The task from which the task is derived, or
+//     * null if it has been forgotten
+//     */
+//    @Nullable protected transient Reference<Task>[] parents;
 
 //    /** Belief from which the Task is derived, or null if derived from a theorem     */
 //    @Nullable protected transient Reference<Task> parentBelief;
@@ -87,8 +85,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     /** copy/clone constructor */
     public AbstractTask(@NotNull Task task) {
         this(task, task.punc(), task.truth(),
-                task.pri(), task.dur(), task.qua(),
-                task.getParentsRef());
+                task.pri(), task.dur(), task.qua());
         setEvidence(task.evidence());
         setOccurrence(task.occurrence());
     }
@@ -107,13 +104,8 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
     }
 
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
-                        @Nullable Task... parentTasks) {
-        this(term, punctuation, truth, p, d, q, Global.reference(parentTasks));
-    }
 
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
-                        @Nullable Reference<Task>[] parents) {
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q) {
         super(p, d, q);
 
         this.punc = punctuation;
@@ -133,8 +125,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         this.truth = truth;
         this.term = term;
-        this.parents = parents;
-        updateEvidence();
     }
 
 
@@ -183,7 +173,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
         }
 
-        Termed<Compound> ntt = Task.normalizeTaskTerm(t, punc, memory, isInput());
+        Termed<Compound> ntt = Task.normalizeTaskTerm(t, punc, memory);
         setTerm(ntt);
 
         // if a task has an unperceived creationTime,
@@ -220,11 +210,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         //finally, assign a unique stamp if none specified (input)
         if (evidence == null) {
 
-            //assert(isInput()); //throw new RuntimeException("derived task without evidence: " + this);
-            if (!isInput())
-                throw new RuntimeException("derived task without evidence: " + this);
-
-
             setEvidence(memory.newStampSerial());
 
             //this actually means it arrived from unknown origin.
@@ -251,10 +236,6 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
 
-    @Override
-    public @Nullable Reference<Task>[] getParentsRef() {
-        return parents;
-    }
 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
     private final int rehash() {
@@ -357,10 +338,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         return this;
     }
 
-    @Override
-    public final boolean isDouble() {
-        return getParentBelief() != null;
-    }
+
 
     @Override
     public final char punc() {
@@ -370,14 +348,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Nullable
     @Override
     public final long[] evidence() {
-        long[] e = this.evidence;
-        if (e == null) {
-            updateEvidence();
-            e = this.evidence;
-//            if (e == null)
-//                throw new NullPointerException();
-        }
-        return e;
+        return this.evidence;
     }
 
     @Override
@@ -432,31 +403,11 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
 
-    final void updateEvidence() {
-        //supplying no evidence will be assigned a new serial
-        //but this should only happen for input tasks (with no parent)
 
-        Task pt = getParentTask();
-        if (pt !=null) {
-            Task pb = getParentBelief();
-            if (pb!=null)
-                setEvidence( Stamp.zip(pt, pb ));
-            else
-                setEvidence(pt.evidence());
-        } else {
-            setEvidence((long[])null);
-        }
-
-    }
 
     @Override
     public boolean delete() {
         if (super.delete()) {
-            Reference<Task>[] p = this.parents;
-            if (p !=null) {
-                Global.dereference(p);
-                //NO this.parents = null; //dont remove the array, it is there to indicate it is not an input task
-            }
             if (!Global.DEBUG)
                 this.log = null; //.clear();
             return true;

@@ -21,7 +21,7 @@ import static nars.nal.UtilityFunctions.aveAri;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess p) {
+    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess p, float minDur) {
 
 
         Task parentTask = p.task();
@@ -37,7 +37,6 @@ public class TaskBudgeting {
 
         float linkDur = aveAri( taskLink.dur(), termLink.dur() );
         final float durability = linkDur * volRatioScale;
-        float minDur = p.nar().durMin.floatValue();
         if (durability < minDur)
             return null;
 
@@ -83,8 +82,8 @@ public class TaskBudgeting {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundQuestion(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(1.0f, content, nal);
+    public static Budget compoundQuestion(@NotNull Termed content, @NotNull ConceptProcess premise, float minDur) {
+        return budgetInference(1.0f, content, premise, minDur);
     }
 
     /**
@@ -92,15 +91,15 @@ public class TaskBudgeting {
      *
      * @param truth   The truth value of the conclusion
      * @param content The content of the conclusion
-     * @param nal     Reference to the memory
+     * @param premise     Reference to the memory
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess premise, float minDur) {
         return budgetInference(
                 BudgetFunctions.truthToQuality(truth),
                 content,
-                nal);
+                premise, minDur);
     }
 
     /**

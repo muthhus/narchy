@@ -129,10 +129,8 @@ public class Revision {
 
             if (bb.isDeleted()) return null;
 
-            Task solution = new MutableTask(b.term() /* question term in case it has different temporality */,
-                    b.punc(), newTruth)
-                    .time(now, newOcc)
-                    .parent(b, a)
+            Task solution = new RevisionTask(b.term() /* question term in case it has different temporality */,
+                    b, a, newTruth, now, newOcc)
                     .budget(bb)
                     //.state(state())
                     //.setEvidence(evidence())

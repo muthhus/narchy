@@ -226,7 +226,8 @@ public class Inperience {
         long now = nar.time();
 
         nar.input(new MutableTask(ret, Symbols.BELIEF, 1f, nar)
-                        .parent(task).time(now, now)
+                        //.parent(task)
+                        .time(now, now)
                         //.truth(1.0f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
                         //.budget(pri, dur)
                         .because("Inperience"));
@@ -288,7 +289,7 @@ public class Inperience {
         nar.input(new MutableTask(new_term, Symbols.GOAL, 1f, nar)
                         /*.budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
-                        .parent(parent, belief)
+                        //.parent(parent, belief)
                         .time(now, now + delay)
                         .because("Inner Belief")
         );

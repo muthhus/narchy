@@ -97,20 +97,6 @@ public interface TermIndex {
     @Nullable Concept.@Nullable ConceptBuilder conceptBuilder();
 
 
-    @NotNull
-    static Task spawn(@NotNull Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
-        return spawn(parent, content, punctuation, truth, occ, budget.pri(), budget.dur(), budget.qua());
-    }
-
-    @NotNull
-    static Task spawn(@NotNull Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
-        return new MutableTask(content, punctuation, truth)
-                .budget(p, d, q)
-                .parent(parent)
-                .occurr(occ);
-    }
-
-
     @Nullable
     Term[] theSubterms(TermContainer s);
 

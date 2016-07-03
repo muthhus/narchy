@@ -6,29 +6,45 @@ import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+
+import static nars.Global.dereference;
+import static nars.Global.reference;
 
 
 abstract public class DerivedTask extends MutableTask {
 
-    //if the links are weak then these dont need to be also
-    //@NotNull private final Reference<BLink<? extends Task>> taskLink;
-    //@NotNull private final Reference<BLink<? extends Termed>> termLink;
-    protected final @NotNull BLink<? extends Task> taskLink;
-    protected final @NotNull BLink<? extends Termed> termLink;
+    public final Reference<ConceptProcess> premise;
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise, Reference<Task>[] parents) {
-        super(tc, punct, truth, parents);
-        this.taskLink = (premise.taskLink);
-        this.termLink = (premise.termLink);
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+        super(tc, punct, truth);
+
+        @Nullable long[] pte = premise.task().evidence();
+        evidence(
+            premise.belief != null ?
+                Stamp.zip(pte, premise.belief.evidence()) : //double
+                pte //single
+        );
+
+        this.premise = new SoftReference(premise);
     }
 
+    @Override @Nullable public final Task getParentTask() {
+        ConceptProcess p = this.premise.get();
+        return p!=null ? p.task() : null;
+    }
+    @Override @Nullable public final Task getParentBelief() {
+        ConceptProcess p = this.premise.get();
+        return p!=null ? p.belief : null;
+    }
 
 
     //    /** next = the child which resulted from this and another task being revised */
@@ -53,8 +69,8 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise, Reference<Task>[] parents) {
-            super(tc, punct, truth, premise, parents);
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+            super(tc, punct, truth, premise);
         }
     }
 
@@ -62,16 +78,19 @@ abstract public class DerivedTask extends MutableTask {
 
         private final Concept parentConcept;
 
-        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise, Reference<Task>[] parents) {
-            super(tc, punct, truth, premise, parents);
+        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+            super(tc, punct, truth, premise);
             this.parentConcept = premise.conceptLink.get();
         }
 
         @Override
         public boolean onConcept(@NotNull Concept c) {
             if (super.onConcept(c)) {
-                Concept.linkPeer(parentConcept.termlinks(), termLink.get(), budget(), qua());
-                Concept.linkPeer(parentConcept.tasklinks(), taskLink.get(), budget(), qua());
+                ConceptProcess p = this.premise.get();
+                if (p!=null) {
+                    Concept.linkPeer(parentConcept.termlinks(), p.termLink.get(), budget(), qua());
+                    Concept.linkPeer(parentConcept.tasklinks(), p.taskLink.get(), budget(), qua());
+                }
                 return true;
             }
             return false;
@@ -80,8 +99,12 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                Concept.linkPeer(parentConcept.termlinks(), termLink.get(), UnitBudget.Zero, qua());
-                Concept.linkPeer(parentConcept.tasklinks(), taskLink.get(), UnitBudget.Zero, qua());
+                ConceptProcess p = this.premise.get();
+                if (p!=null) {
+                    Concept.linkPeer(parentConcept.termlinks(), p.termLink.get(), UnitBudget.Zero, qua());
+                    Concept.linkPeer(parentConcept.tasklinks(), p.taskLink.get(), UnitBudget.Zero, qua());
+                    this.premise.clear();
+                }
                 return true;
             }
             return false;

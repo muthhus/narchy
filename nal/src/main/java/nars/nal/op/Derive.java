@@ -115,7 +115,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     final void derive(@NotNull PremiseEval m, @NotNull Compound raw) {
         ConceptProcess premise = m.premise;
-        NAR nar = premise.nar();
+        NAR nar = m.nar;
 
         Truth truth = m.truth.get();
 
@@ -198,7 +198,10 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             occ = ETERNAL;
         }
 
-        premise.derive(content, truth, budget, nar.time(), occ, m, this);
+        nar.process(
+            premise.derive(content, truth, budget, nar.time(), occ, m, this)
+        );
+
     }
 
 

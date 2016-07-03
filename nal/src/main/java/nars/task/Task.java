@@ -57,7 +57,6 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked, Supplier<Task> {
 
-    int CONJUNCTION_WITH_NEGATION = or(Op.CONJ, NEG);
 
     static void explanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
@@ -81,11 +80,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         sb.append("\n  ");
 
         Task pt = task.getParentTask();
-        Task pb = task.getParentBelief();
         if (pt != null) {
             //sb.append("  PARENT ");
             explanation(pt, indent+1, sb);
         }
+
+        Task pb = task.getParentBelief();
         if (pb != null) {
             //sb.append("  BELIEF ");
             explanation(pb, indent+1, sb);
@@ -108,7 +108,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory, boolean input) {
+    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed<Compound> t, char punc, @NotNull Memory memory) {
 
         t = memory.index.normalize(t, true);
 
@@ -173,20 +173,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Override
     @NotNull
     default Task task() { return this; }
-
-    @Nullable Reference<Task>[] getParentsRef();
-
-    /*@Nullable default Task[] getParents() {
-        return dereference(getParentsRef());
-    }*/
-    @Nullable default Task getParentTask() {
-        return dereference(getParentsRef(), 0);
-    }
-    @Nullable default Task getParentBelief() {
-        return dereference(getParentsRef(), 1);
-    }
-
-
 
 
     /**
@@ -495,33 +481,6 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
-    default boolean hasParent(Task t) {
-        if (getParentTask() == null)
-            return false;
-        Task p = getParentTask();
-        do {
-            Task n = p.getParentTask();
-            if (n == null) break;
-            if (n.equals(t))
-                return true;
-            p = n;
-        } while (true);
-        return false;
-    }
-
-    @Nullable
-    default Task getRootTask() {
-        if (getParentTask() == null) {
-            return null;
-        }
-        Task p = getParentTask();
-        do {
-            Task n = p.getParentTask();
-            if (n == null) break;
-            p = n;
-        } while (true);
-        return p;
-    }
 
 
     @NotNull
@@ -557,24 +516,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     List log();
 
 
-    //TODO make a Source.{ INPUT, SINGLE, DOUBLE } enum
-
-    /** is double-premise */
-    boolean isDouble();
-
-
-
     /**
      * Check if a Task is a direct input,
      * or if its origin has been forgotten or never known
      */
     default boolean isInput() {
+        return evidence().length == 1;
         //return evidence().length <= 1;
-        if (getParentsRef() == null) {
-            @Nullable long[] ee = evidence();
-            return !(ee != null && ee.length > 1);
-        }
-        return false;
         //return (getParentTask() == null);
         //return (evidence().length <= 1) && ;
     }
@@ -824,6 +772,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     @Nullable
     default Term term(int i) {
         return term().term(i);
+    }
+
+    default Task getParentTask() {
+        return null;
+    }
+    default Task getParentBelief() {
+        return null;
     }
 
     default boolean cyclic() {

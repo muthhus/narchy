@@ -34,7 +34,6 @@ import static nars.nal.Tense.DTERNAL;
  */
 public class ConceptProcess implements Premise {
 
-    public final NAR nar;
     public final BLink<? extends Task> taskLink;
 
     public final BLink<? extends Termed> termLink;
@@ -55,11 +54,9 @@ public class ConceptProcess implements Premise {
     private transient byte cyclic = -1;
 
 
-    public ConceptProcess(NAR nar,
-                          BLink<? extends Concept> conceptLink,
+    public ConceptProcess(BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
                           BLink<? extends Termed> termLink, @Nullable Task belief) {
-        this.nar = nar;
 
         this.taskLink = taskLink;
 
@@ -133,10 +130,7 @@ public class ConceptProcess implements Premise {
                 .toString();
     }
 
-    @Override
-    public final NAR nar() {
-        return nar;
-    }
+
 
     public int matchesMax() {
         final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
@@ -144,27 +138,15 @@ public class ConceptProcess implements Premise {
     }
 
     /** part 2 */
-    public final void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
+    @NotNull public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
-        char punct = p.punct.get();
 
-        boolean single;
-        switch (punct) {
-            case Symbols.BELIEF: single = d.beliefSingle; break;
-            case Symbols.GOAL: single = d.goalSingle; break;
-            default:
-                single = false;
-        }
-
-        Reference<Task>[] parents = parentRef(single); //shared by eternalized also
-
-        Task derived = newDerivedTask(c, punct, truth, parents)
+        return newDerivedTask(c, p.punct.get(), truth)
                 .time(now, occ)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
-                .log( Global.DEBUG ? d.rule : "Derived");
+                .log(Global.DEBUG ? d.rule : "Derived");
 
-        nar.process(derived);
 
         //ETERNALIZE: (CURRENTLY DISABLED)
 
@@ -190,14 +172,11 @@ public class ConceptProcess implements Premise {
 
     }
 
-    public Reference<Task>[] parentRef(boolean single) {
-        return MutableTask.parentRef(task(), !single ? belief() : null);
-    }
 
     @NotNull
-    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth, Reference<Task>[] parents) {
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth) {
         //return new DerivedTask.DefaultDerivedTask(c, punct, truth, this, parents);
-        return new DerivedTask.CompetingDerivedTask(c, punct, truth, this, parents);
+        return new DerivedTask.CompetingDerivedTask(c, punct, truth, this);
     }
 
 

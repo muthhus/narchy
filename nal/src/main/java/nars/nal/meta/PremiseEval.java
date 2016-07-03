@@ -73,7 +73,7 @@ public class PremiseEval extends FindSubst {
 
 
     /** initializes with the default static term index/builder */
-    public PremiseEval(NAR nar, Random r, Deriver deriver) {
+    public PremiseEval(Random r, Deriver deriver) {
         this($.terms, r, deriver);
     }
 
@@ -244,9 +244,10 @@ public class PremiseEval extends FindSubst {
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
         ConceptProcess p = this.premise;
+        float minDur = nar.durMin.floatValue();
         return (truth != null) ?
-                    TaskBudgeting.compoundForward(truth, derived, p) :
-                    TaskBudgeting.compoundQuestion(derived, p);
+                    TaskBudgeting.compoundForward(truth, derived, p, minDur) :
+                    TaskBudgeting.compoundQuestion(derived, p, minDur);
     }
 
 

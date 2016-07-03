@@ -78,7 +78,7 @@ public abstract class AbstractNAR extends NAR {
 
 
     protected PremiseEval newMatcher() {
-        return new PremiseEval(this, random, newDeriver());
+        return new PremiseEval(random, newDeriver());
     }
 
     /** NAL7 plugins */

@@ -108,7 +108,8 @@ public class EternalTable extends SortedListTable<Task, Task> {
                     ),
                     newBelief, oldBelief,
                     conclusion,
-                    nar.time(), ETERNAL)
+                    nar.time(), ETERNAL).
+                        log("Insertion Revision")
                 :
                 null;
     }

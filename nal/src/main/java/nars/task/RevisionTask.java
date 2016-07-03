@@ -1,7 +1,5 @@
 package nars.task;
 
-import nars.bag.Bag;
-import nars.budget.BudgetFunctions;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
@@ -22,14 +20,14 @@ import org.jetbrains.annotations.NotNull;
 public class RevisionTask extends MutableTask  {
 
     public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
-        super(term, newBelief.punc(), conclusion, newBelief, oldBelief);
+        super(term, newBelief.punc(), conclusion);
 
         if (!newBelief.isBeliefOrGoal() || !oldBelief.isBeliefOrGoal() )
             throw new UnsupportedOperationException("invalid punctuation");
 
+        evidence(Stamp.zip(newBelief.evidence(), oldBelief.evidence()));
         time(creationTime, occTime);
         budget(oldBelief, newBelief);
-        log("Insertion Revision");
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
                 ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
@@ -51,7 +49,7 @@ public class RevisionTask extends MutableTask  {
     }
 
     public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
-        super(c, a, b,
+        super(c, a,
                 now, newOcc,
                 Stamp.zip(a.evidence(), b.evidence(), aMix),
                 newTruth);
@@ -78,47 +76,46 @@ public class RevisionTask extends MutableTask  {
     @Override public boolean onConcept(@NotNull Concept c) {
         super.onConcept(c);
 
-        float resultPri = pri();
-//        if (resultPri!=resultPri)
-//            return false; //deleted already?
+        //TODO reimplement again
 
-        Task parentNewBelief = getParentTask();
-        Task parentOldBelief = getParentBelief();
-
-        if (parentNewBelief==null || parentOldBelief==null) {
-            return true; //HACK
-        }
-
-        float newBeliefContribution;
-        if (parentNewBelief.isBeliefOrGoal()) {
-            float newBeliefConf = parentNewBelief.confWeight();
-            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
-        } else {
-            //question/quest
-            newBeliefContribution = 0.5f;
-        }
-
-        //Balance Tasks
-        BudgetFunctions.balancePri(
-                parentNewBelief.budget(), parentOldBelief.budget(),
-                resultPri,
-                newBeliefContribution);
-
-        //Balance Tasklinks
-        Bag<Task> tasklinks = c.tasklinks();
-        BudgetFunctions.balancePri(
-                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
-                resultPri,
-                newBeliefContribution);
-
-
-//        if (parentNewBelief!=null)
-//            weaken(parentNewBelief);
-//            //parentNewBelief.onRevision(this);
+        //float resultPri = pri();
+//        Task parentNewBelief = getParentTask();
+//        Task parentOldBelief = getParentBelief();
 //
-//        if (parentOldBelief!=null)
-//            weaken(parentOldBelief);
-//            //oldBelief.onRevision(this);
+//        if (parentNewBelief==null || parentOldBelief==null) {
+//            return true; //HACK
+//        }
+//
+//        float newBeliefContribution;
+//        if (parentNewBelief.isBeliefOrGoal()) {
+//            float newBeliefConf = parentNewBelief.confWeight();
+//            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.confWeight());
+//        } else {
+//            //question/quest
+//            newBeliefContribution = 0.5f;
+//        }
+//
+//        //Balance Tasks
+//        BudgetFunctions.balancePri(
+//                parentNewBelief.budget(), parentOldBelief.budget(),
+//                resultPri,
+//                newBeliefContribution);
+//
+//        //Balance Tasklinks
+//        Bag<Task> tasklinks = c.tasklinks();
+//        BudgetFunctions.balancePri(
+//                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+//                resultPri,
+//                newBeliefContribution);
+//
+//
+////        if (parentNewBelief!=null)
+////            weaken(parentNewBelief);
+////            //parentNewBelief.onRevision(this);
+////
+////        if (parentOldBelief!=null)
+////            weaken(parentOldBelief);
+////            //oldBelief.onRevision(this);
 
         return true;
     }

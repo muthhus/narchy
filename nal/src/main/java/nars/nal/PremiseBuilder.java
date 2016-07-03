@@ -83,7 +83,7 @@ public enum PremiseBuilder {
 
     @Nullable
     static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
-        return new ConceptProcess(nar, conceptLink, taskLink, termLink, match(nar, task, tl));
+        return new ConceptProcess(conceptLink, taskLink, termLink, match(nar, task, tl));
     }
 
 

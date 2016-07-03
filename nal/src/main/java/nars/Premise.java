@@ -21,7 +21,6 @@ public interface Premise extends Tasked {
     @Nullable
     Task belief();
 
-    NAR nar();
 
     /** true if both task and (non-null) belief are temporal events */
     default boolean isEvent() {

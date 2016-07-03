@@ -117,7 +117,7 @@ public class TaskTest {
 
         long[] ev = {1, 2};
         d.eventTaskProcess.on(t -> {
-            if (t.isDouble())
+            if (t.getParentBelief()!=null)
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.evidence()), ev, t.evidence());
 
