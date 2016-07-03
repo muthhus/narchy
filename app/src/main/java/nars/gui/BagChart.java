@@ -10,6 +10,7 @@ import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.treechart.ItemVis;
 import spacegraph.layout.treechart.TreemapChart;
+import spacegraph.obj.CrosshairSurface;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -49,6 +50,7 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
 
         s.add(new Facial(tc));
+        s.add(new Facial(new CrosshairSurface(s)));
     }
 
     public void update() {

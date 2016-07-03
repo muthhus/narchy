@@ -236,11 +236,11 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
         float nextSatisfaction = b.motivation(now) - g.motivation(now);
 
         float deltaSatisfaction = nextSatisfaction - satisfaction;
+
         this.satisfaction = nextSatisfaction;
+
         nar.emotion.happy(deltaSatisfaction);
     }
-
-
 
 
 

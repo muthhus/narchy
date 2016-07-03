@@ -93,7 +93,7 @@ public class TreemapChart<X> extends Surface {
 
 		ArrayDeque<ItemVis<X>> newChildren = new ArrayDeque<>(estimatedSize);
 
-		int i = limit == -1 ? Integer.MAX_VALUE : limit;
+		int i = limit < 0 ? Integer.MAX_VALUE : limit;
 
 		for (X item : nextChildren) {
 			if (i-- <= 0)

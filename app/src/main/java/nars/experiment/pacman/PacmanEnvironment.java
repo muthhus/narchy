@@ -20,12 +20,14 @@
 package nars.experiment.pacman;
 
 import com.github.benmanes.caffeine.cache.Policy;
+import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
@@ -36,7 +38,9 @@ import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.time.MySTMClustered;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.Texts;
@@ -49,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+
+import static nars.experiment.pong.PongEnvironment.numericSensor;
 
 /**
  * the java application class of pacman 
@@ -83,7 +89,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.05f);
+		nar.conceptActivation.setValue(0.35f);
 
 		//new MemoryManager(nar);
 
@@ -91,8 +97,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.7f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.7f;
 		nar.cyclesPerFrame.set(64);
 		nar.confMin.setValue(0.02f);
 
@@ -117,17 +123,30 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		});
 
 		//new Abbreviation2(nar, "_");
-		//new MySTMClustered(nar, 16, '.');
+		new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
+
+
 
 		NAgent n = new NAgent(nar) {
 			@Override
 			public void start(int inputs, int actions) {
 				super.start(inputs, actions);
 
-				List<Concept> charted = new ArrayList(super.actions);
-				charted.add(happy);
+				List<Termed> charted = new ArrayList(super.actions);
+
 				charted.add(sad);
+				charted.add(happy);
+
+				charted.add(nar.conceptualize($.$("[pill]"), UnitBudget.Zero));
+				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
+				charted.add(nar.ask($.$("(($1-->HAPPY) <=> ($1-->happy))")).term());
+				charted.add(nar.conceptualize($.$("[ghost]"), UnitBudget.Zero));
+
+				Iterables.addAll(charted,
+					numericSensor(nar.self.toString(),
+						"SAD", "NEUTRAL", "HAPPY", nar, ()->nar.emotion.happy(), 0.5f));
+
 				new BeliefTableChart(nar, charted).show(600, 300);
 
 				BagChart.show((Default)nar);
@@ -139,7 +158,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				15512);
+				16384);
 
 
 

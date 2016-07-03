@@ -74,15 +74,15 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(48);
-		nar.conceptActivation.setValue(0.2f);
-		nar.confMin.setValue(0.03f);
+		nar.cyclesPerFrame.set(64);
+		nar.conceptActivation.setValue(0.05f);
+		nar.confMin.setValue(0.02f);
 
 
 
@@ -93,7 +93,7 @@ public class PongEnvironment extends Player implements Environment {
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
 				beliefChart(this, cheats);
-				BagChart.show((Default) nar);
+				BagChart.show((Default) nar, 512);
 			}
 
 //			@Override
@@ -115,7 +115,7 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.');
+		//new MySTMClustered(nar, 32, '.');
 		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();
@@ -176,12 +176,12 @@ public class PongEnvironment extends Player implements Environment {
 
 	}
 
-	private static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 
 		return new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
 				"(" + term + " --> " + low + ")",
 				"(" + term + " --> " + mid + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
 	}
 
 	public PongEnvironment() {
@@ -230,7 +230,7 @@ public class PongEnvironment extends Player implements Environment {
 				.time((now, range) -> {
 					long low = range[0];
 					long high = range[1];
-					long nowRadius = 250;
+					long nowRadius = 450;
 					if (now - low > nowRadius)
 						low  = now-nowRadius;
 					if (high - now > nowRadius)

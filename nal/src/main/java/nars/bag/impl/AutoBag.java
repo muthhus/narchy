@@ -15,7 +15,6 @@ public final class AutoBag<V> implements BudgetForget {
     private long now;
     private float ratio;
 
-    //private final Forget.AbstractForget forget;
 
 
     public AutoBag() {

@@ -84,12 +84,12 @@ public interface Concept<T extends Term> extends Termed<T> {
 
     @Nullable
     default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(now, when) : Truth.Null;
+        return hasBeliefs() ? beliefs().truth(now, when) : null;
     }
 
     @Nullable
     default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(now, when) : Truth.Null;
+        return hasGoals() ? goals().truth(now, when) : null;
     }
 
     @Nullable

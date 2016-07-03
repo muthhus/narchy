@@ -92,7 +92,7 @@ public interface BeliefTable extends TaskTable {
         @NotNull
         @Override
         public Truth truth(long now, long when) {
-            return Truth.Null;
+            return null;
         }
 
 
@@ -363,11 +363,11 @@ public interface BeliefTable extends TaskTable {
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available */
-    Truth truth(long now, long when);
+    @Nullable Truth truth(long now, long when);
 
 
 
-    @NotNull default Truth truth(long now) {
+    @Nullable default Truth truth(long now) {
         return truth(now, now);
     }
 
@@ -401,12 +401,12 @@ public interface BeliefTable extends TaskTable {
 
     default float expectation(long when) {
         Truth t = truth(when);
-        return t == null ? 0.5f : t.expectation();
+        return t != null ? t.expectation() : 0.5f;
     }
 
     default float motivation(long when) {
         Truth t = truth(when);
-        return t == null ? 0.5f : t.motivation();
+        return t != null ? t.motivation() : 0;
     }
 
 

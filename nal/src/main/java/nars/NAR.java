@@ -934,13 +934,24 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public final Concept<?> concept(@NotNull Termed tt, boolean createIfMissing) {
 
-        //optimization: assume a concept instance is the concept of this NAR
+
+//        //optimization: assume a concept instance is the concept of this NAR
+        //dangerous for CompoundConcept's because it my be a stale concept instance, so always do a lookup
+        //in fact this is how stale instances can be detected
+        Term t = tt.term();
         if (tt instanceof Concept) {
-            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-            return (Concept) tt;
+            if (t instanceof Compound) {
+                assert(t !=tt);
+                Concept next = concept(t, createIfMissing);
+                //if (next!=tt)
+                    //logger.info("warning: callee has a stale concept instance: " + tt + " vs. active " + next);
+                return next;
+            }
+//
+//            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+//            return (Concept) tt;
         }
 
-        Term t = tt.term();
 
         if (t instanceof Variable)
             return null;
@@ -965,11 +976,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * @param link whether to activate termlinks recursively
      * */
     @Nullable
-    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
+    public abstract Concept conceptualize(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
 
     @Deprecated @Nullable
-    final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b) {
+    final public Concept conceptualize(@NotNull Termed<?> termed, @NotNull Budgeted b) {
         return conceptualize(termed, b, 1f, 0f, null);
     }
 

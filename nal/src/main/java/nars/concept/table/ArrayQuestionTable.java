@@ -117,8 +117,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     /** returns true if a quality was modified as a signal whether the list needs sorted */
     public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
-        if (Stamp.overlapping(q.evidence(), a.evidence()))
-            return;
+//        if (Stamp.overlapping(q.evidence(), a.evidence()))
+//            return;
 
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();

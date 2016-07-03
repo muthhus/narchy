@@ -64,12 +64,12 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (tt!=null) {
             if (ee != null) {
-                return (tt == null || ee.conf() > tt.conf()) ? ee : tt;
+                return (ee.conf() > tt.conf()) ? ee : tt;
             } else {
                 return tt;
             }
         } else {
-            return ee!=null ? ee : Truth.Null;
+            return ee!=null ? ee : null;
         }
 
     }

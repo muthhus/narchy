@@ -6,12 +6,12 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
+import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
 import spacegraph.render.JoglSpace2D;
 import spacegraph.render.ShapeDrawer;
 
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +23,7 @@ import static nars.nal.Tense.ETERNAL;
 
 public class BeliefTableChart extends JoglSpace2D {
 
-    final List<? extends Concept> c;
+    final List<? extends Termed> terms;
     final List<TruthWave> beliefs;
     final List<TruthWave> beliefProj;
     final List<TruthWave> goals;
@@ -39,14 +39,18 @@ public class BeliefTableChart extends JoglSpace2D {
 
     private BiFunction<Long, long[], long[]> rangeControl = (now, range) -> range; //default: no change
 
+    /** the last resolved concept for the specified terms being charted */
+    private Concept[] concepts;
 
-    public BeliefTableChart(NAR n, Concept c) {
-        this(n, Collections.singletonList(c));
+
+    public BeliefTableChart(NAR n, Concept terms) {
+        this(n, Collections.singletonList(terms));
     }
 
-    public BeliefTableChart(NAR n, List<? extends Concept> c) {
+    public BeliefTableChart(NAR n, List<? extends Termed> terms) {
         super();
-        this.c =c;
+        this.terms = terms;
+        concepts = new Concept[terms.size()];
         this.nar = n;
 
         redraw = new AtomicBoolean(false);
@@ -55,7 +59,7 @@ public class BeliefTableChart extends JoglSpace2D {
         beliefProj = Global.newArrayList();
         goals = Global.newArrayList();
         goalProj = Global.newArrayList();
-        int numConcepts = c.size();
+        int numConcepts = terms.size();
         for (int i = 0; i < numConcepts; i++) {
             beliefs.add(new TruthWave(0));
             beliefProj.add(new TruthWave(0));
@@ -74,9 +78,27 @@ public class BeliefTableChart extends JoglSpace2D {
         redraw.set(true);
 
     }
+    public void update() {
+
+        this.now = nar.time();
+        for (int i = 0; i < this.terms.size(); i++) {
+            Concept c = nar.concept(terms.get(i).term() /* lookup by term, not the termed which could be a dead instance */);
+            concepts[i] = c;
+            if (c != null) {
+                beliefs.get(i).set(c.beliefs(), now);
+                goals.get(i).set(c.goals(), now);
+            } else {
+                beliefs.get(i).set(BeliefTable.EMPTY, now);
+                goals.get(i).set(BeliefTable.EMPTY, now);
+            }
+        }
+
+        ready();
+
+    }
 
 
-    protected void draw(GL2 gl, int n, float W, float H, long minT, long maxT) {
+    protected void draw(Termed tt, Concept cc, GL2 gl, int n, float W, float H, long minT, long maxT) {
 
         float gew = H;
         float geh = H;
@@ -84,14 +106,19 @@ public class BeliefTableChart extends JoglSpace2D {
         float tew = W-H;
         float teh = H;
 
+        float cp = nar.conceptPriority(cc);
+        gl.glColor4f(1f,1f,1f, 0.25f + 0.75f * cp);
+        float size = (cp > 0 ? (0.003f + 0.0015f * cp) : 0.0015f) * H; //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
+        ShapeDrawer.renderLabel(gl, size, tt.toString(), W/2f, H/2f, 0);
+
         TruthWave beliefs = this.beliefs.get(n);
         if (!beliefs.isEmpty()) {
-            renderTable(n, minT, maxT, now, gl, gew, geh, tew, teh, beliefs, true);
+            renderTable(cc, n, minT, maxT, now, gl, gew, geh, tew, teh, beliefs, true);
         }
 
         TruthWave goals = this.goals.get(n);
         if (!goals.isEmpty()) {
-            renderTable(n, minT, maxT, now, gl, gew, geh, tew, teh, goals, false);
+            renderTable(cc, n, minT, maxT, now, gl, gew, geh, tew, teh, goals, false);
         }
 
 
@@ -120,7 +147,7 @@ public class BeliefTableChart extends JoglSpace2D {
         //clear
         clear(1f /*0.5f*/);
 
-        int num = c.size();
+        int num = terms.size();
         float dy = H / num;
         gl.glPushMatrix();
 
@@ -157,7 +184,7 @@ public class BeliefTableChart extends JoglSpace2D {
         for (int i = num-1; i >=0; i--) {
             float my = 0f;//dy * 0.15f;
             gl.glTranslatef(0,my/2,0);
-            draw(gl, i, W, dy-my, minT, maxT);
+            draw(terms.get(i), concepts[i], gl, i, W, dy-my, minT, maxT);
             gl.glTranslatef(0,dy-my/2,0);
         }
         gl.glPopMatrix();
@@ -223,24 +250,6 @@ public class BeliefTableChart extends JoglSpace2D {
 
     final float padding = 4;
 
-    public void update() {
-
-
-
-        this.now = nar.time();
-        for (int i = 0; i < this.c.size(); i++) {
-            Concept c = c(i);
-            beliefs.get(i).set(c.beliefs(), now);
-            goals.get(i).set(c.goals(), now);
-        }
-
-        ready();
-
-    }
-
-    public Concept c(int i) {
-        return this.c.get(i);
-    }
 
     @Override
     public void reshape(GLAutoDrawable ad, int i, int i1, int i2, int i3) {
@@ -252,7 +261,7 @@ public class BeliefTableChart extends JoglSpace2D {
         redraw.set(true);
     }
 
-    private void renderTable(int n, long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave wave, boolean beliefOrGoal) {
+    private void renderTable(Concept c, int n, long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave wave, boolean beliefOrGoal) {
 
         //Present axis line
         if ((now <= maxT) && (now >= minT)) {
@@ -269,7 +278,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
         //draw projections
         if (minT!=maxT) {
-            Concept c = c(n);
+
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
             int projections = 8;
