@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 /**
  * adapter to a Map for coordinating changes in a Map with another Collection
  */
-public abstract class CollectorMap<K, V>  {
+public abstract class CollectorMap<K, V> {
 
     public final Map<K, V> map;
 
@@ -57,19 +57,16 @@ public abstract class CollectorMap<K, V>  {
 //    }
 
 
-
     @Nullable
     public V put(K key, V value) {
 
-        /*synchronized (nameTable)*/
-        V removed = putKey(key, value);
+        V removed = map.put(key, value);
         if (removed != null) {
 
             if (removed == value) {
                 //rejected input
                 return value;
-            }
-            else {
+            } else {
                 //displaced other
                 V remd = removeItem(removed);
                 if (remd == null)
@@ -88,8 +85,9 @@ public abstract class CollectorMap<K, V>  {
             removed = displaced;
         }
 
-
         return removed;
+
+
     }
 
     @Nullable
@@ -129,7 +127,6 @@ public abstract class CollectorMap<K, V>  {
         @Nullable K key = key(value);
         return key == null ? null : removeKey(key);
     }
-
 
 
 //    public final boolean containsValue(V it) {

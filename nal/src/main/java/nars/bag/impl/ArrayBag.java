@@ -75,8 +75,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     protected final void removeWeakest(Object reason) {
-        if (!removeDeletedAtBottom()) {
-            remove(weakest()).delete(reason);
+        synchronized(map) {
+            if (!removeDeletedAtBottom()) {
+                remove(weakest()).delete(reason);
+            }
         }
     }
 
@@ -259,17 +261,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         if (b.isDeleted())
             throw new RuntimeException();
-        //return null;
 
         BLink<V> existing = get(key);
 
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
-        } else if (isFull()) {
-            pending.add(key, b.pri() * scale, b.qua(), b.dur());
-            return null;
         } else {
-            return putNew(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
+            if (isFull()) {
+                synchronized(map) {
+                    pending.add(key, b.pri() * scale, b.qua(), b.dur());
+                }
+                return null;
+            } else {
+                return putNew(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
+            }
         }
     }
 
@@ -308,7 +313,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
-        return put(i, newBudget);
+        synchronized(map) {
+            return put(i, newBudget);
+        }
     }
 
 
@@ -325,22 +332,26 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     @Override
     public Bag<V> commit(@Nullable Consumer<BLink> each) {
-        int s = size();
-        if (s > 0) {
-            int lowestUnsorted = updateExisting(each, s);
+        synchronized (map) {
+            int s = size();
+            if (s > 0) {
+                int lowestUnsorted = updateExisting(each, s);
 
-            if (lowestUnsorted != -1) {
-                int[] qsortStack = new int[16];
-                qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
-            } // else: perfectly sorted
+                if (lowestUnsorted != -1) {
+                    int[] qsortStack = new int[16];
+                    qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
+                } // else: perfectly sorted
 
-            removeDeletedAtBottom();
+                removeDeletedAtBottom();
+            }
         }
 
-        BagPendings<V> p = this.pending;
-        if (p != null) {
-            this.bottomPri = bottomPriIfFull();
-            p.apply(this);
+        synchronized (map) {
+            BagPendings<V> p = this.pending;
+            if (p != null) {
+                this.bottomPri = bottomPriIfFull();
+                p.apply(this);
+            }
         }
 
         return this;
@@ -442,11 +453,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         if (toRemoveFromMap > 0) {
 //            int sizeBefore = map.size();
-            synchronized (map) {
                 if (map.values().removeIf(BLink::isDeleted)) {
                     return true;
                 }
-            }
 
 
             //EXTRA checks but which dont apply if dealing with weak links becaues they can get removed in the middle of checking them (heisenbug):

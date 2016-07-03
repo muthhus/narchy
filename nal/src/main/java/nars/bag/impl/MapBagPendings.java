@@ -5,6 +5,7 @@ import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -37,8 +38,8 @@ public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
         //return new HashMap<>();
         //return new UnifriedMap<>(8); //<-- not safe, grows huge
         //return new WeakHashMap<>(capacity);
-        //return new LinkedHashMap<>(s);
-        return new ConcurrentHashMapUnsafe<>(capacity);
+        return new LinkedHashMap<>(capacity);
+        //return new ConcurrentHashMapUnsafe<>(capacity);
     }
 
     float sum;

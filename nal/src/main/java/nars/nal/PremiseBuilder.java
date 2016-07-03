@@ -110,12 +110,13 @@ public enum PremiseBuilder {
             return null;
 
         Concept beliefConcept = nar.concept(beliefConceptTerm);
+        if (beliefConcept == null)
+            return null;
 
         @Nullable BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-        if (table.isEmpty()) {
+        if (table.isEmpty())
             return null;
-        }
 
         //Task belief = project(task, table.match(task), nar.time());
         Task belief = table.match(task);

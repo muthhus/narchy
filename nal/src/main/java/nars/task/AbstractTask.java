@@ -274,13 +274,10 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     @NotNull @Override
     public final Compound term() {
-        return term.term();
-    }
-
-    @NotNull @Override
-    public final Termed<Compound> termed() {
         return term;
     }
+
+
 
     @Nullable @Override
     public final Truth truth() {
@@ -484,7 +481,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
 
         if (term) {
-            if (!this.term.equals(that.termed())) return false;
+            if (!this.term.equals(that.term())) return false;
         }
 
         return true;

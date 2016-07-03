@@ -35,12 +35,10 @@ import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
-import static nars.Op.NEG;
 import static nars.Op.or;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
@@ -283,12 +281,10 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     @NotNull
     default Concept concept(@NotNull NAR n) {
-        return n.concept(termed());
+        return n.concept(term());
     }
 
     @NotNull @Override Compound term();
-
-    Termed<Compound> termed();
 
     @Nullable @Override
     Truth truth();

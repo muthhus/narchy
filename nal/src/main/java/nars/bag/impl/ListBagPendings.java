@@ -60,8 +60,6 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
                 float wp = w.pri();
                 if (wp == wp) { //not deleted
                     target.commitPending(w.x, wp, w.dur(), w.qua());
-                } else {
-                    throw new RuntimeException(); //shouldnt have happened this way
                 }
             }
         }

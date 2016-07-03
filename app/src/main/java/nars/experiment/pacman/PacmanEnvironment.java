@@ -33,6 +33,7 @@ import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -70,11 +71,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Multi nar = new Multi(2,
-		Default nar = new Default(
+		Multi nar = new Multi(2,
+		//Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), false)
-				//new Cache2kIndex(100000, rng)
+				//new CaffeineIndex(new DefaultConceptBuilder(rng), false)
+				new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
