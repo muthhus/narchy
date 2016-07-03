@@ -596,7 +596,7 @@ public interface TermIndex {
 
     default void loadBuiltins() {
         for (TransformConcept t : TransformConcept.BuiltIn) {
-            set(t,t);
+            set(t);
         }
     }
 
