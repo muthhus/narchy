@@ -28,6 +28,7 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
 import nars.experiment.Environment;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
@@ -71,8 +72,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		Multi nar = new Multi(2,
-		//Default nar = new Default(
+		//Multi nar = new Multi(2,
+		Default nar = new Default(
 				1024, 4, 2, 2, rng,
 				//new CaffeineIndex(new DefaultConceptBuilder(rng), false)
 				new Cache2kIndex(100000, rng)
@@ -129,7 +130,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				//BagChart.show((Default)nar);
+				BagChart.show((Default)nar);
 			}
 		};
 

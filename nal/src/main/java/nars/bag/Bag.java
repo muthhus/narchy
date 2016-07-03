@@ -52,8 +52,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * insert/merge with an initial / default budget
      */
-    default @Nullable BLink<V> put(@NotNull V x) {
-        return put(x, initialBudget(x), null);
+    default @Nullable void put(@NotNull V x) {
+        put(x, initialBudget(x), null);
     }
 //        @Nullable
 //        @Override public BLink<V> put(@NotNull V v) {
@@ -83,26 +83,27 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 //        return new BLink(v, 0,0,0);
     }
 
-    @Override
-    default @Nullable BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
-        return put(i, b, 1f, null);
+    /** always returns null, which is different semantics than the supermethod it overrides */
+    @Override default @Nullable BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
+        put(i, b, 1f, null);
+        return null;
     }
 
-    default @Nullable BLink<V> put(@NotNull V i, @NotNull Budgeted b) {
-        return put(i, b, 1f, null);
-    }
-
-
-    default @Nullable BLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
-        return put(i, b, 1f, overflowing);
-    }
-
-    default @Nullable BLink<V> put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
-        return put(v, b, 1f, overflowing);
+    default @Nullable void put(@NotNull V i, @NotNull Budgeted b) {
+        put(i, b, 1f, null);
     }
 
 
-    @Nullable BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
+    default @Nullable void put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
+        put(i, b, 1f, overflowing);
+    }
+
+    default @Nullable void put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
+        put(v, b, 1f, overflowing);
+    }
+
+
+    void put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
 
 
 
@@ -466,10 +467,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return null;
         }
 
-        @Nullable
         @Override
-        public BLink put(Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
-            return null;
+        public void put(Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
         }
 
         @Override

@@ -245,6 +245,14 @@ public class STMClustered extends STM {
             protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
                 return new TLink(i, p, d, q);
             }
+
+            @Override
+            protected BLink<Task> putNew(Task i, BLink<Task> newBudget) {
+                BLink<Task> displaced = super.putNew(i, newBudget);
+                if (displaced != null)
+                    drop((TLink)displaced);
+                return displaced;
+            }
         };
 
         this.net = new NeuralGasNet<>(DIMENSIONS, clusters) {
@@ -305,10 +313,7 @@ public class STMClustered extends STM {
 
         if (t.punc() == punc) {
 
-            TLink displaced = (TLink) bag.put(t, t.budget());
-
-            if (displaced != null)
-                drop(displaced);
+            bag.put(t, t.budget());
         }
 
     }

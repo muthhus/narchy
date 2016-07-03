@@ -257,7 +257,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * @return The updated budget
      */
     @Override
-    public final @Nullable BLink<V> put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
+    public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         if (b.isDeleted())
             throw new RuntimeException();
@@ -265,15 +265,15 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         BLink<V> existing = get(key);
 
         if (existing != null) {
-            return putExists(b, scale, existing, overflow);
+            putExists(b, scale, existing, overflow);
         } else {
             if (isFull()) {
                 synchronized(map) {
                     pending.add(key, b.pri() * scale, b.qua(), b.dur());
                 }
-                return null;
+
             } else {
-                return putNew(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
+                putNewAndDeleteDisplaced(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
             }
         }
     }
@@ -283,15 +283,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
      * the applied budget will not become effective until commit()
      */
     @NotNull
-    private final BLink<V> putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+    private final void putExists(@NotNull Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
-        if (existing != b) {
-            float o = mergeFunction.merge(existing, b, scale);
-            if (overflow != null)
-                overflow.add(o);
+        if (existing == b) {
+            throw new RuntimeException("budget self merge");
         }
 
-        return existing;
+        float o = mergeFunction.merge(existing, b, scale);
+        if (overflow != null)
+            overflow.add(o);
+
     }
 
     @NotNull
@@ -312,9 +313,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             return new StrongBLink(i, p, d, q);
     }
 
-    protected @Nullable BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
+    protected BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
         synchronized(map) {
-            return put(i, newBudget);
+            BLink<V> removed = put(i, newBudget);
+            return removed;
         }
     }
 
@@ -373,7 +375,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         float v = bottomPri;
         if (v <= p) {
-            putNew(key, newLink(key, p, d, q));
+            putNewAndDeleteDisplaced(key, newLink(key, p, d, q));
             bottomPri = bottomPriIfFull();
         } else {
             putFail(key);
@@ -383,6 +385,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 }*/
         //}
 
+    }
+
+    /** wraps the putNew call with a suffix that destroys the link at the end */
+    private final void putNewAndDeleteDisplaced(V key, @Nullable BLink<V> value) {
+        BLink<V> displaced = putNew(key, value);
+        if (displaced!=null)
+            displaced.delete();
     }
 
     protected void putFail(V key) {

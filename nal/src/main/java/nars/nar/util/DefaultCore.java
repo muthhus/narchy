@@ -93,7 +93,7 @@ public class DefaultCore extends AbstractCore {
 
 
         @Override
-        protected @Nullable BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
+        protected BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
             if (!activate(i))
                 return b;
             BLink<Concept> displaced = super.putNew(i, b);
