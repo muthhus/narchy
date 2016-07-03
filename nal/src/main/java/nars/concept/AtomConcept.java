@@ -7,6 +7,7 @@ import nars.budget.Budgeted;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -18,14 +19,14 @@ import java.util.Map;
 
 public class AtomConcept extends Atom implements AbstractConcept  {
 
-    private final Bag<Termed> termLinks;
+    private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
 
     private final Op op;
 
     private Map meta;
 
-    public AtomConcept(@NotNull Atom atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public AtomConcept(@NotNull Atom atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
         super(atom.toString());
 
         this.op = atom.op();
@@ -52,7 +53,7 @@ public class AtomConcept extends Atom implements AbstractConcept  {
     }
 
     @Override
-    public @NotNull Bag<Termed> termlinks() {
+    public Bag<Term> termlinks() {
         return termLinks;
     }
 

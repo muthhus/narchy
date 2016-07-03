@@ -4,7 +4,9 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermSet;
 import org.junit.Test;
 
 import java.util.List;
@@ -28,7 +30,7 @@ public class TermTemplateTest {
 
         Concept c = t.concept(n);
 
-        List<Termed> templates = dereference(((CompoundConcept)c).termLinkTemplates);
+        TermSet templates = ((CompoundConcept)c).templates;
         assertEquals(12, templates.size());
 
         String s = Joiner.on('\n').join(templates);

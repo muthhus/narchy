@@ -9,6 +9,7 @@ import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
@@ -434,8 +435,8 @@ public class NAgent implements Agent {
 
             //return true;
         //});
-        for (Term x : new Term[] { happy, sad } ) {
-            nar.ask($.impl($("?w"), x), '?', ETERNAL);
+        for (Termed x : new Termed[] { happy, sad } ) {
+            nar.ask($.impl($("?w"), x.term()), '?', ETERNAL);
             nar.ask(x, '@', ETERNAL);
         }
 

@@ -66,7 +66,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
 
     @NotNull
-    @Override public Bag<Termed> termbag() {
+    @Override public Bag<Term> termbag() {
         return new CurveBag<>(defaultCurveSampler, mergeDefault);
     }
 

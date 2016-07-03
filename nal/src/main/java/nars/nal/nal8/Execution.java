@@ -59,11 +59,12 @@ public interface Execution  {
 
         //final int numArgs = x0.length;
 
-        Compound x = (Compound) operation.term(0);
+        Compound operationTerm = operation.term();
+        Compound x = (Compound) operationTerm.term(0);
         if (x.op() != PROD)
             throw new RuntimeException("invalid operation");
 
-        Term inh = resultTerm((Atomic)operation.term(1), x, y);
+        Term inh = resultTerm((Atomic) operationTerm.term(1), x, y);
         if ((!(inh instanceof Compound))) {
             //TODO wrap a non-Compound result as some kind of statement
             return null;
@@ -172,7 +173,7 @@ public interface Execution  {
 
         //Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
 
-        return $.belief(operation, operation.desire(nar.time())). //equal to input, balanced
+        return $.belief(operation.term(), operation.desire(nar.time())). //equal to input, balanced
                 //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
                         //budget(b).

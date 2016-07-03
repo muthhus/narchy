@@ -32,7 +32,7 @@ public class BooleanConceptTest {
 
         FloatConcept B = new FloatConcept("(b)", n).punc('.');
 
-        BooleanConcept bc = BooleanConcept.And(n, A, B);
+        BooleanConcept bc = BooleanConcept.And(n, A.term(), B.term());
         n.ask(bc);
 
         assertEquals(0.5f, bc.beliefs().truth(n.time()).freq(), 0.01f);

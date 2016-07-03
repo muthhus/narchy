@@ -928,32 +928,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     abstract public void clear();
 
     @Nullable
-    public final Concept concept(@NotNull Termed t) {
+    public final Concept<?> concept(@NotNull Termed t) {
         return concept(t, false);
     }
 
     @Nullable
-    public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
+    public final Concept<?> concept(@NotNull Termed tt, boolean createIfMissing) {
 
-        if (t instanceof Task) {
-            t = ((Task)t).termed();
-
-            if (t instanceof Concept) {
-                //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-                return (Concept) t;
-            }
-
-        } else {
-            if (t instanceof Variable)
-                return null;
-
-            //optimization: assume a concept instance is the concept of this NAR
-            if (t instanceof Concept) {
-                //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
-                return (Concept) t;
-            }
-
+        //optimization: assume a concept instance is the concept of this NAR
+        if (tt instanceof Concept) {
+            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+            return (Concept) tt;
         }
+
+        Term t = tt.term();
+
+        if (t instanceof Variable)
+            return null;
 
         return index.concept(t, createIfMissing);
     }
@@ -962,7 +953,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
 
     @NotNull
-    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
+    public NAR forEachConcept(@NotNull Consumer<Concept<?>> recip) {
         index.forEach(x -> {
             if (x instanceof Concept)
                 recip.accept((Concept)x);

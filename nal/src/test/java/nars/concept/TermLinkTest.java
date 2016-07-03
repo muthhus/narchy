@@ -66,7 +66,7 @@ public class TermLinkTest {
         }
 
         public float pri(int x, int y) {
-            BLink<Termed> tl = concept(x).termlinks().get(vertex(y));
+            BLink<Term> tl = concept(x).termlinks().get(vertex(y));
             if (tl == null)
                 return 0f;
             return tl.pri();
@@ -81,7 +81,7 @@ public class TermLinkTest {
             //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
         }
 
-        public @Nullable Concept concept(int x) {
+        public @Nullable Concept<?> concept(int x) {
             return concept(vertex(x));
         }
 

@@ -76,8 +76,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         //builder = builder.initialCapacity(initialSize);
 
         if (soft) {
-            //builder = builder.softValues();
-            builder = builder.weakValues();
+            builder = builder.softValues();
+            //builder = builder.weakValues();
 
 
         }

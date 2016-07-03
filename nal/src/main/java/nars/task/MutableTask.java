@@ -120,11 +120,6 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @NotNull
-    protected final MutableTask term(@NotNull Termed<Compound> t) {
-        setTerm(t);
-        return this;
-    }
 
     @NotNull
     public final MutableTask truth(float freq, float conf) {

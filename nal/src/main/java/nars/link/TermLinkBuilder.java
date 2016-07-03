@@ -1,33 +1,31 @@
 package nars.link;
 
-import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermSet;
 import nars.term.variable.Variable;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
 public enum TermLinkBuilder {
     ;
 
-    @NotNull public static Set<Termed> components(@NotNull Compound host, @NotNull NAR nar) {
+    @NotNull public static Set<Term> components(@NotNull Compound host) {
 
-        Set<Termed> components = new HashSet<>(//new LinkedHashSet<>(
+        Set<Term> components = new HashSet<>(//new LinkedHashSet<>(
             host.complexity() /* estimate */
         );
 
         for (int i = 0, ii = host.size(); i < ii; i++) {
 
-            components(host.term(i), levels(host), nar, components);
+            components(host.term(i), levels(host), components);
 
         }
         return components;
@@ -43,36 +41,11 @@ public enum TermLinkBuilder {
         //}
     }
 
-    /** termlink templates with equal proportion shared, except variables and anything else which would not have a concept */
-    @NotNull
-    public static List<Termed> buildFlat(@NotNull Compound term, @NotNull NAR nar) {
-        Set<Termed> s = components(term, nar);
-
-        //int active = (int)s.stream().filter(x -> !(x instanceof Variable)).count(); //TODO avoid stream()
-
-        return new FasterList(s);
-
-//        int total = s.size();
-//        List<TermTemplate> ss = Global.newArrayList(total);
-//        //float fraction = 1f / active;
-//        float fraction = 1f / total;
-//        for (Termed x : s) {
-//            ss.add(new TermTemplate(x, fraction));
-//        }
-//        return ss;
-
-
-        //return s.stream().map(x -> new TermTemplate(x, fraction)).collect(Collectors.toList());
-
-    }
-
-
-
 
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static void components(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
+    protected static void components(@NotNull Term t, int level, @NotNull Collection<Term> target) {
 
         if (t instanceof Variable) {
 
@@ -82,18 +55,12 @@ public enum TermLinkBuilder {
 
         } else {
 
-            boolean autocreate = t.complexity() < Global.AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD;
-            Termed ct = nar.concept(t, autocreate);
-            if (ct == null) {
-                ct = t;
-            }
+            if (target.add(t)) { //do not descend on repeats
 
-            if (target.add(Global.TERMLINKS_LINK_TO_CONCEPTS_IF_POSSIBLE ? ct : ct.term())) { //do not descend on repeats
-
-                if (level > 0 && ct instanceof Compound) {
-                    Compound cct = (Compound) ct;
+                if (level > 0 && t instanceof Compound) {
+                    Compound cct = (Compound) t;
                     for (int i = 0, ii = cct.size(); i < ii; i++) {
-                        components(cct.term(i), level - 1, nar, target);
+                        components(cct.term(i), level - 1, target);
                     }
                 }
             }

@@ -59,12 +59,12 @@ public abstract class ConceptMap {
 	 * returns true if the concept was successfully removed (ie. it was already
 	 * present and not permanently included)
 	 */
-	protected abstract boolean onConceptForget(Concept c);
+	protected abstract boolean onConceptForget(Concept<?> c);
 
 	/**
 	 * returns true if the concept was successfully added (ie. it was not
 	 * already present)
 	 */
-	protected abstract boolean onConceptActive(Concept c);
+	protected abstract boolean onConceptActive(Concept<?> c);
 
 }

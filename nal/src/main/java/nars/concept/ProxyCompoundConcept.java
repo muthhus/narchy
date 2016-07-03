@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Term>> {
 
     @NotNull
-    private final CompoundConcept target;
+    private final CompoundConcept<?> target;
 
     @NotNull
     private final Compound alias;
@@ -77,12 +77,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     @NotNull
     @Override
     public String toString() {
-        return TermPrinter.stringify(target).toString();
+        return TermPrinter.stringify(target.term()).toString();
     }
 
     @Override
     public void append(Appendable p) throws IOException {
-        TermPrinter.append(target, p);
+        TermPrinter.append(target.term(), p);
     }
 
     @NotNull
@@ -128,7 +128,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public @NotNull Bag<Termed> termlinks() {
+    public Bag<Term> termlinks() {
         return target.termlinks();
     }
 
@@ -144,9 +144,10 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
     @NotNull
     @Override
-    public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
-        return target.meta(key, value);
+    public Object meta(Object key, BiFunction value) {
+        return target.meta(key,value);
     }
+
 
     /**
      * Judgments directly made about the term Use ArrayList because of access

@@ -145,7 +145,7 @@ public abstract class TermFunction<O> extends AbstractOperator {
 
 
 
-        final Compound ttt = exec;
+        final Compound ttt = exec.term();
         Compound args = Operator.opArgs(ttt);
         //if (!tt.isCommand()) {
 

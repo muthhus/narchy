@@ -362,7 +362,8 @@ public interface TermIndex {
     }
 
 
-    default Termed<Compound> normalize(@NotNull Termed<Compound> t, boolean insert) {
+    default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
+        Compound r;
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
@@ -378,20 +379,21 @@ public interface TermIndex {
                 return null;
             }
 
-            t = t2;
 
-            ((GenericCompound) t).setNormalized();
+            ((GenericCompound)t2).setNormalized();
+            r = (Compound)t2;
 
-        }
-
-        // TODO also eligible for fast concept resolution is if it is temporal but has no temporal relations
-        if (t instanceof Compound && ((Compound)t).hasTemporal()) {
-            return t;
         } else {
-            //fast resolve to concept if not temporal:
-            Termed shared = insert ? the(t) : get(t);
-            return shared != null ? shared : t;
+            r = t.term();
         }
+
+        if (insert) {
+            Term t4 = the(r).term();
+            r = (Compound)t4;
+        }
+
+        return r;
+
     }
 
 
@@ -509,11 +511,12 @@ public interface TermIndex {
             if ((term = atemporalize((Compound)term)) == null)
                 //throw new InvalidTerm(prenormalizetd);
                 return null; //probably unforseeable
+
+            //unwrap negation again if necessary?
+            if (term.op() == NEG)
+                term = ((Compound)term.term()).term(0);
         }
 
-        //unwrap negation
-        if (term.op() == NEG)
-            term = ((Compound)term.term()).term(0);
 
         @Nullable Termed c = get(term, createIfMissing);
         if (c == null)
@@ -615,9 +618,9 @@ public interface TermIndex {
             return (Compound) i.transform(
                     (c.op().temporal && c.dt()!=DTERNAL) ?
                             //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
-                            (Compound)i.the((i.builder().build(c.op(), DTERNAL,
+                            (Compound)(i.the((i.builder().build(c.op(), DTERNAL,
                                     c.subterms().terms()
-                            ))) :
+                            ))).term()) :
                             c,
                     this);
         }

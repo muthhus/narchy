@@ -12,7 +12,7 @@ public class echo extends ImmediateOperator {
 
     @Override
     public void execute(@NotNull OperationConcept t) {
-        nar.eventSpeak.emit( Operator.opArgs(t) );
+        nar.eventSpeak.emit( Operator.opArgs(t.term()) );
     }
 
 }

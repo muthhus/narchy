@@ -153,11 +153,6 @@ public enum Global {
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
-    /** 0 to disable auto-sub-conceptualize */
-    public static int AUTO_CONCEPTUALIZE_DURING_LINKING_COMPLEXITY_THRESHOLD = 0;
-
-    /** for large caches this should be false */
-    public static boolean TERMLINKS_LINK_TO_CONCEPTS_IF_POSSIBLE = false;
 
 
     @NotNull

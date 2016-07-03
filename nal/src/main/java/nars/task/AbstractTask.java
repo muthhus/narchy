@@ -23,7 +23,7 @@ import java.util.Objects;
 public abstract class AbstractTask extends UnitBudget implements Task, Temporal {
 
     /** content term of this task */
-    private Termed<Compound> term;
+    private Compound term;
 
     protected char punc;
 
@@ -98,7 +98,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     protected final void setTerm(@NotNull Termed<Compound> t) {
         Termed existing = term;
-        term = t; //use the provided instance even if equals
+        term = t.term(); //use the provided instance even if equals
         if (!existing.equals(t)) {
             invalidate();
         }
@@ -124,7 +124,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         }
 
         this.truth = truth;
-        this.term = term;
+        this.term = term.term();
     }
 
 
@@ -276,6 +276,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final Compound term() {
         return term.term();
     }
+
     @NotNull @Override
     public final Termed<Compound> termed() {
         return term;

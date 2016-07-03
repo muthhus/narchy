@@ -35,7 +35,6 @@ import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -49,11 +48,11 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface Concept extends Termed, Comparable<Termlike> {
+public interface Concept<T extends Term> extends Termed<T> {
 
     @NotNull Bag<Task> tasklinks();
 
-    @NotNull Bag<Termed> termlinks();
+    @NotNull Bag<Term> termlinks();
 
     @Nullable Map<Object, Object> meta();
 
@@ -135,14 +134,14 @@ public interface Concept extends Termed, Comparable<Termlike> {
         }
     }
 
-    default BeliefTable tableAnswering(char punc) {
-        switch (punc) {
-            case Symbols.QUESTION: return beliefs();
-            case Symbols.QUEST: return goals();
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
+//    default BeliefTable tableAnswering(char punc) {
+//        switch (punc) {
+//            case Symbols.QUESTION: return beliefs();
+//            case Symbols.QUEST: return goals();
+//            default:
+//                throw new UnsupportedOperationException();
+//        }
+//    }
 
 
     default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
@@ -422,7 +421,7 @@ public interface Concept extends Termed, Comparable<Termlike> {
         @NotNull
         Bag<Task> taskbag();
         @NotNull
-        Bag<Termed> termbag();
+        Bag<Term> termbag();
 
     }
 }

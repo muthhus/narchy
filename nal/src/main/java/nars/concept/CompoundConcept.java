@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
@@ -15,30 +14,27 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
 import java.util.List;
 import java.util.Map;
 
 
-public class CompoundConcept extends GenericCompound<Term> implements AbstractConcept , Compound<Term> {
+public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
 
     private final Bag<Task> taskLinks;
-    private final Bag<Termed> termLinks;
-
-
-    /** cached */
-    private transient final int _structure;
+    private final Bag<Term> termLinks;
 
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
-    @Nullable Reference<List<Termed>> termLinkTemplates;
+    final TermSet templates;
+    private final T term;
 
     @Nullable
     private QuestionTable questions;
@@ -60,23 +56,21 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Termed> termLinks, @NotNull Bag<Task> taskLinks) {
-        super(term.op(), term.dt(), term.subterms());
+    public CompoundConcept(@NotNull T term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks) {
+        this.term = term;
 
-//        if (!term.isNormalized())
-//            throw new RuntimeException(term + " unnormalized");
-        setNormalized();
+        this.templates = TermSet.the(TermLinkBuilder.components(term));
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
-
-        this._structure = term.structure();
     }
 
+    @NotNull
     @Override
-    public int structure() {
-        return _structure;
+    public T term() {
+        return term;
     }
+
 
     @Override
     public void setMeta(@NotNull Map newMeta) {
@@ -94,18 +88,18 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     }
 
     @Override
-    public @NotNull Bag<Termed> termlinks() {
+    public Bag<Term> termlinks() {
         return termLinks;
     }
 
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+    public CompoundConcept(@NotNull T term, @NotNull NAR n) {
         this(term, n.index.conceptBuilder());
     }
 
     /** default construction by a NAR on conceptualization */
-    public CompoundConcept(@NotNull Compound term, @NotNull ConceptBuilder b) {
+    public CompoundConcept(@NotNull T term, @NotNull ConceptBuilder b) {
         this(term, b.termbag(), b.taskbag());
     }
 
@@ -309,7 +303,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     /** link to subterms, hierarchical downward */
     public void linkSubs(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
 
-        List<Termed> templates = templates(nar);
+
 
         linkDistribute(b, scale, minScale, nar, templates, conceptOverflow);
 
@@ -363,29 +357,15 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 //                }
     }
 
-    public List<Termed> templates(@NotNull NAR nar) {
-        List<Termed> templates = Global.dereference(this.termLinkTemplates);
-        if (templates == null) {
-            templates = TermLinkBuilder.buildFlat(this, nar);
-//                if (this.termLinkTemplates!=null) {
-//                    System.err.println("GC'd");
-//                }
-            this.termLinkTemplates = Global.reference(templates);
-        } /*else {
-//                if (this.termLinkTemplates!=null) {
-//                    System.err.println("exist");
-//                }
-        }*/
-        return templates;
-    }
 
-    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<Termed> templates, MutableFloat subConceptOverflow) {
+    final void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull TermSet templates, MutableFloat subConceptOverflow) {
 
         int n = templates.size();
         float tStrength = 1f/n;
 
+        Term[] t = templates.terms();
         for (int i = 0; i < n; i++) {
-            Termed tt = templates.get(i);
+            Termed tt = t[i];
             float subScale = scale * tStrength;
 
             //Link the peer termlink bidirectionally
@@ -436,7 +416,23 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
     }
 
+    @Override
+    public final boolean equals(Object obj) {
+        return this == obj || term.equals(obj);
+    }
 
+    @Override
+    public final int hashCode() {
+        return term.hashCode();
+    }
 
+    @Override
+    public final String toString() {
+        return term.toString();
+    }
+
+    public Term term(int i) {
+        return term().term(i);
+    }
 
 }

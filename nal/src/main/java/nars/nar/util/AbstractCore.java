@@ -12,6 +12,7 @@ import nars.link.BLink;
 import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -71,7 +72,7 @@ public abstract class AbstractCore {
     /**
      * temporary re-usable array for batch firing
      */
-    transient private final List<BLink<? extends Termed>> terms = Global.newArrayList();
+    transient private final List<BLink<Term>> terms = Global.newArrayList();
     transient private final List<BLink<Task>> tasks = Global.newArrayList();
 
 
@@ -148,11 +149,11 @@ public abstract class AbstractCore {
      */
     public final int firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
 
-        Concept c = conceptLink.get();
+        Concept<?> c = conceptLink.get();
 
         matcher.init(nar);
 
-        List<BLink<? extends Termed>> termsBuffer = this.terms;
+        List<BLink<Term>> termsBuffer = this.terms;
         c.termlinks().sample(termlinks, termsBuffer::add);
         int count = 0;
         if (!termsBuffer.isEmpty()) {

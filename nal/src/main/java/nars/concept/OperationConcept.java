@@ -7,6 +7,7 @@ import nars.bag.Bag;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.util.event.Topic;
@@ -26,7 +27,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     protected volatile boolean pendingRun;
 
 
-    public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public OperationConcept(@NotNull Compound term, Bag<Term> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
     }
 
@@ -42,7 +43,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
 
     /* subj contains the parameter product */
     public final TermContainer parameters() {
-        return ((Compound)term(0)).subterms();
+        return ((Compound)term().term(0)).subterms();
     }
 
     @Nullable
@@ -91,14 +92,13 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     }
 
     public @Nullable
-    static Topic<OperationConcept> operationExec(Concept c) {
-        return c == null ? null : c.get(Execution.class);
+    static Topic<OperationConcept> operationExec(Concept<?> c) {
+        return c != null ? c.get(Execution.class) : null;
     }
 
-    public @Nullable Concept operationConcept(NAR nar) {
+    public @Nullable final Concept operationConcept(NAR nar) {
         return nar.concept(
-            //Operator.operator(this)
-            term(1) //operator as predicate
+            term().term(1) //operator is the predicate
         );
     }
 

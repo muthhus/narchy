@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public interface AbstractConcept extends Concept, Term {
+public interface AbstractConcept<T extends Term> extends Concept<T> {
 
     //private final Bag<Task> taskLinks;
     //private final Bag<Termed> termLinks;
@@ -43,45 +43,38 @@ public interface AbstractConcept extends Concept, Term {
 
     /** returns the outgoing component only */
     @Nullable
-    static Concept linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
+    static Concept linkSub(@NotNull Concept source, @NotNull Termed target,
                            @NotNull Budgeted b, float subScale, boolean alsoReverse,
                            @Nullable MutableFloat conceptOverflow,
                            @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
 
-        /*
-        if (!(task.isStructual() && (cLink0.getType() == TermLink.TRANSFORM))) {
-
-        }*/
-
-
-
         /* activate concept */
-        Concept target = nar.conceptualize(targetTerm, b, subScale,
-                0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
-                conceptOverflow);
+        Concept targetConcept;
 
-        if (targetTerm instanceof Variable) {
-
+        if (target instanceof Variable) {
+            targetConcept = null;
         } else {
-            if (target == null)
-                throw new RuntimeException("termlink to null concept: " + targetTerm);
+            targetConcept = nar.conceptualize(target, b, subScale,
+                    0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
+                    conceptOverflow);
+            if (targetConcept == null)
+                throw new RuntimeException("termlink to null concept: " + target);
         }
 
         if (target == source)
             throw new RuntimeException("termlink self-loop");
 
 
-
         /* insert termlink target to source */
-        if (target!=null && alsoReverse) {
+        if (targetConcept!=null && alsoReverse) {
             subScale /= 2; //divide among both directions
-            target.termlinks().put(source, b, subScale, termlinkOverflow);
+            targetConcept.termlinks().put(source.term(), b, subScale, termlinkOverflow);
         }
 
         /* insert termlink source to target */
-        source.termlinks().put(target != null ? target : targetTerm, b, subScale, termlinkOverflow);
+        source.termlinks().put(target.term(), b, subScale, termlinkOverflow);
 
-        return target;
+        return targetConcept;
     }
 
 

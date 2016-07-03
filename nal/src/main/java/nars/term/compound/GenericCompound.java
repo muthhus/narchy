@@ -3,10 +3,7 @@ package nars.term.compound;
 import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
-import nars.term.Compound;
-import nars.term.InvalidTerm;
-import nars.term.Term;
-import nars.term.TermPrinter;
+import nars.term.*;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Util;
@@ -47,9 +44,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer _subterms) {
 
-        TermVector subterms = (TermVector)_subterms; //HACK for future support of alternate TermContainer impls
+        TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
 
-        if (Global.DEBUG && dt!=DTERNAL) {
+        if (Global.DEBUG && dt != DTERNAL) {
             if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
                 throw new InvalidTerm(op, dt, subterms.terms());
@@ -90,14 +87,21 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         if (this == that) return true;
 
-        if (that instanceof Compound) {
-            Compound cthat = (Compound) that;
-            return (
-                hashCode() == cthat.hashCode() &&
-                op() == cthat.op() &&
-                dt() == cthat.dt() &&
-                subterms().equals(cthat.subterms())
-            );
+        if (that instanceof Termed) {
+            Term tthat = ((Termed) that).term();
+            if (this == tthat) {
+                return true;
+            }
+            if (tthat instanceof Compound) {
+                if (hashCode() == that.hashCode()) {
+                    Compound cthat = (Compound) tthat;
+                    if (op() == cthat.op())
+                        if (dt() == cthat.dt())
+                            if (subterms().equals(cthat.subterms()))
+                                return true;
+                }
+            }
+            return false;
         }
 
         return false;
