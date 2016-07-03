@@ -169,7 +169,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             if (ac != null) { //??
                 Task ap = ac.merge(q, a, q.occurrence(), nar);
                 if (ap != null && !ap.isDeleted()) {
-                    nar.inputLater(ap);
+                    nar.input(ap);
+                    //nar.inputLater(ap);
                 }
             }
         }

@@ -76,7 +76,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
 				//new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
-				new Cache2kIndex(256000, rng)
+				new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -117,7 +117,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		});
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.');
+		//new MySTMClustered(nar, 16, '.');
 		//new MySTMClustered(nar, 8, '!');
 
 		NAgent n = new NAgent(nar) {

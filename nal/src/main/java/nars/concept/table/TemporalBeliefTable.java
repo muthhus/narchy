@@ -13,7 +13,7 @@ public interface TemporalBeliefTable extends Table<Task,Task> {
 
     @Nullable Task top(long when);
 
-    @Nullable Truth truth(long when);
+    @Nullable Truth truth(long when, EternalTable eternal);
 
-    @Nullable Task ready(Task input, NAR nar);
+    @Nullable Task ready(Task input, EternalTable eternal, NAR nar);
 }

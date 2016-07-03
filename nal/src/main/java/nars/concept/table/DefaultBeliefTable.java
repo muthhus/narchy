@@ -47,7 +47,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new EternalTable(mp, initialEternalCapacity);
-        temporal = new MicrosphereTemporalBeliefTable(mp, eternal, initialTemporalCapacity);
+        temporal = new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
@@ -62,7 +62,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         final Truth tt;
         synchronized (temporal) {
-            tt = temporal.truth(when);
+            tt = temporal.truth(when, eternal);
         }
 
         if (tt!=null) {
@@ -127,6 +127,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public void clear() {
         eternal.clear();
         temporal.clear();
+        map.clear();
     }
 
 
@@ -261,7 +262,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull
     protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
-        input = temporal.ready(input, nar);
+        input = temporal.ready(input, eternal, nar);
         if (input != null) {
             //inserting this task.  should be successful
             boolean ii = insert(input, temporal);

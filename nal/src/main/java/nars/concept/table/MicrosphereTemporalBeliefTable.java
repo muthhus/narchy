@@ -20,20 +20,18 @@ import static nars.nal.Tense.ETERNAL;
 /** stores the items unsorted; revection manages their ranking and removal */
 public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> implements TemporalBeliefTable {
 
-    private final SortedTable<Task, Task> eternal;
-    long min, max;
-
     static final int MAX_TRUTHPOLATION_SIZE = 64;
     static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(()->{
         return new TruthPolation(MAX_TRUTHPOLATION_SIZE);
     });
 
+
+    private long min = Tense.ETERNAL, max = Tense.ETERNAL;
     private long lastUpdate = Tense.TIMELESS;
 
-    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, SortedTable<Task, Task> eternal, int initialCapacity) {
+    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, int initialCapacity) {
         super(mp);
         setCapacity(initialCapacity);
-        this.eternal = eternal;
     }
 
     public static float rank(@NotNull Task t, long when, float ageFactor) {
@@ -43,7 +41,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     @Nullable
     @Override
-    public Task ready(@NotNull Task input, @NotNull NAR nar) {
+    public Task ready(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
         int cap = capacity();
 
         this.lastUpdate = nar.time();
@@ -56,7 +54,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
             if (removeAlreadyDeleted() >= cap) {
 
                 //the result of compression is processed separately
-                Task merged = compress(input, nar.time());
+                Task merged = compress(input, nar.time(), eternal);
                 if (merged == null) {
                     //not compressible with respect to this input, so reject the input
                     return null;
@@ -193,7 +191,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     /** frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task */
     @Nullable
-    protected Task compress(@NotNull Task input, long now) {
+    protected Task compress(@NotNull Task input, long now, EternalTable eternal) {
 
         updateRange();
 
@@ -209,7 +207,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
         Task merged;
         if (b!=null) {
-            merged = merge(a, b, now);
+            merged = merge(a, b, now, eternal);
 
             remove(b);
             TaskTable.removeTask(b, "Revection Revision");
@@ -226,11 +224,11 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     /** t is the target time of the new merged task */
     @Nullable
-    public Task merge(@NotNull Task a, @NotNull Task b, long now) {
+    public Task merge(@NotNull Task a, @NotNull Task b, long now, EternalTable eternal) {
         float ac = a.confWeight();
         float bc = b.confWeight();
         long mid = (long)((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
-        Truth truth = truth(mid);
+        Truth truth = truth(mid, eternal);
         if (truth == null)
             return null;
         return Revision.merge(a, b, now, mid, truth);
@@ -275,7 +273,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task,Task> 
 
     @Nullable
     @Override
-    public final Truth truth(long when) {
+    public final Truth truth(long when, EternalTable eternal) {
         int s = size();
         switch (s) {
             case 0:

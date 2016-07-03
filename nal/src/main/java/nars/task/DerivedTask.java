@@ -76,7 +76,7 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class CompetingDerivedTask extends DerivedTask {
 
-        private final Concept parentConcept;
+        private Concept parentConcept;
 
         public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
             super(tc, punct, truth, premise);
@@ -90,6 +90,8 @@ abstract public class DerivedTask extends MutableTask {
                 if (p!=null) {
                     Concept.linkPeer(parentConcept.termlinks(), p.termLink.get(), budget(), qua());
                     Concept.linkPeer(parentConcept.tasklinks(), p.taskLink.get(), budget(), qua());
+                } else {
+                    parentConcept = null;
                 }
                 return true;
             }
@@ -100,11 +102,15 @@ abstract public class DerivedTask extends MutableTask {
         public boolean delete() {
             if (super.delete()) {
                 ConceptProcess p = this.premise.get();
-                if (p!=null) {
-                    Concept.linkPeer(parentConcept.termlinks(), p.termLink.get(), UnitBudget.Zero, qua());
-                    Concept.linkPeer(parentConcept.tasklinks(), p.taskLink.get(), UnitBudget.Zero, qua());
-                    this.premise.clear();
+                Concept pc = this.parentConcept;
+                if (p!=null && pc !=null) {
+                    Concept.linkPeer(pc.termlinks(), p.termLink.get(), UnitBudget.Zero, qua());
+                    Concept.linkPeer(pc.tasklinks(), p.taskLink.get(), UnitBudget.Zero, qua());
                 }
+
+                this.premise.clear();
+                this.parentConcept = null;
+
                 return true;
             }
             return false;
