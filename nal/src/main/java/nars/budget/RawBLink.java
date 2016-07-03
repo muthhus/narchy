@@ -10,4 +10,8 @@ public class RawBLink<X> extends RawBudget {
         super(p, d, q);
         this.x = x;
     }
+
+    public void deleteFast() {
+        priority = Float.NaN;
+    }
 }

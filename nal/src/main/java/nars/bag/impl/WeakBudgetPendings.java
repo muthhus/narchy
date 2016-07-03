@@ -24,7 +24,7 @@ public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
 
 
     @Override
-    public final float mass() {
+    public final float mass(ArrayBag<X> bag) {
         /*Reference*/
         WeakBudgetMap<X> pending = this.pending;
         if (pending != null) return pending.mass();

@@ -1,8 +1,6 @@
 package nars.bag.impl;
 
-import nars.Global;
 import nars.bag.Bag;
-import nars.bag.WeakBudget;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.RawBLink;
@@ -17,7 +15,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.ReferenceQueue;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -40,13 +37,13 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         abstract public int size();
         abstract public void apply(ArrayBag<V> target);
 
-        abstract public float mass();
+        abstract public float mass(ArrayBag<V> bag);
 
         abstract public void clear();
     }
 
 
-    public static class ListBagPendings<X> extends BagPendings<X>  {
+    public static class ListBagPendings<X extends Comparable<X>> extends BagPendings<X>  {
 
         //public List<RawBLink<X>> pending = null;
         CircularArrayList<RawBLink<X>> pending = null;
@@ -83,16 +80,42 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
                 this.pending = null;
                 for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
                     RawBLink<X> w = p.get(i);
-                    target.commitPending(w.x, w.pri(), w.dur(), w.qua());
+                    float wp = w.pri();
+                    if (wp==wp) //not deleted
+                        target.commitPending(w.x, wp, w.dur(), w.qua());
                 }
             }
         }
 
+        private void compact(CircularArrayList<RawBLink<X>> p, BudgetMerge merge) {
+
+            Collections.sort(p, (RawBLink<X> a, RawBLink<X> b) -> {
+                boolean adel = a.isDeleted();
+                boolean bdel = b.isDeleted();
+//                if (adel && bdel)
+//                    return 0;
+//                if (adel)
+//                    return +1;
+//                if (bdel)
+//                    return +1;
+//
+
+                int cmp = a.x.compareTo(b.x);
+                if (cmp == 0 && !adel && !bdel) {
+                    merge.merge(a, b, 1f);
+                    b.deleteFast();
+                }
+                return cmp;
+            });
+        }
+
         @Override
-        public float mass() {
-            List<RawBLink<X>> p = this.pending;
+        public float mass(ArrayBag<X> bag) {
+            CircularArrayList<RawBLink<X>> p = this.pending;
             if (p == null)
                 return 0;
+
+            compact(p, bag.mergeFunction);
 
             float sum = 0;
             for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
@@ -134,7 +157,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
 
         float sum;
-        public final float mass() {
+        public final float mass(ArrayBag<X> bag) {
             sum = 0;
             if (pending != null)
                 pending.forEach((k,v) -> sum += v.pri() * v.dur());
@@ -748,7 +771,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             mass += d * b.priIfFiniteElseZero();
             pendingMass += d * b.priDelta();
         }
-        pendingMass += pending.mass();
+        pendingMass += pending.mass(this);
         return new float[] { mass, pendingMass };
     }
 
