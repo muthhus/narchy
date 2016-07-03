@@ -367,11 +367,10 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         if (this == obj) return 0;
 
         Task o = (Task)obj;
-        int tt = term().compareTo(o.term());
-        if (tt != 0) return tt;
 
-        int tc = Character.compare(punc(), o.punc());
-        if (tc != 0) return tc;
+        int c = Util.compare(evidence(), o.evidence());
+        if (c != 0)
+            return c;
 
         Truth tr = this.truth();
         if (tr !=null) {
@@ -382,10 +381,16 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             if (tu!=0) return tu;
         }
 
+
         int to = Long.compare( occurrence(), o.occurrence() );
         if (to!=0) return to;
 
-        return Util.compare(evidence(), o.evidence());
+
+        int tc = Character.compare(punc(), o.punc());
+        if (tc != 0) return tc;
+
+        return term().compareTo(o.term());
+
     }
 
     @NotNull
