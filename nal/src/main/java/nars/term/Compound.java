@@ -20,6 +20,7 @@
  */
 package nars.term;
 
+import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
@@ -78,22 +79,52 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return t;
     }
 
-    @NotNull
-    default SetIterable<Term> recurseTermsToSet() {
-        UnifiedSet<Term> t = new UnifiedSet(volume());
-        recurseTerms(t::add);
-        return t;
-        //return t.toImmutable();
+
+    @NotNull default boolean termsToSet(Collection<Term> t, boolean addOrRemoved) {
+        return termsToSet(-1, t, addOrRemoved);
     }
-    @NotNull
-    default SetIterable<Term> recurseTermsToSet(int inStructure) {
-        UnifiedSet<Term> t = new UnifiedSet(0);
-        recurseTerms((s) -> {
-            if ((s.structure() & inStructure) > 0)
-                t.add(s);
-        });
-        return t;//.toImmutable();
+
+    /** returns whether the set operation caused a change or not */
+    @NotNull default boolean termsToSet(int inStructure, Collection<Term> t, boolean addOrRemoved) {
+        boolean r = false;
+//        if (recurse) {
+//
+//            r |= addOrRemoved ? t.add(this) : t.remove(this);
+//            if (addOrRemoved || !r) //on removal we can exit early
+//                r = or(addOrRemoved ? t::add : t::remove);
+
+        //} else {
+            for (int i = 0; i < size(); i++) {
+                @NotNull T s = term(i);
+                if (inStructure==-1 || ((s.structure() & inStructure) > 0)) {
+                    if (addOrRemoved)
+                        r |= t.add(s);
+                    else
+                        r |= t.remove(s);
+
+                    if (!addOrRemoved && r) //on removal we can exit early
+                        return true;
+                }
+            }
+        //}
+        return r;
     }
+
+//    @NotNull
+//    default MutableSet<Term> termsToSet(boolean recurse, int inStructure, MutableSet<Term> t) {
+//        if (recurse) {
+//            recurseTerms((s) -> {
+//                    t.add(s);
+//            });
+//        } else {
+//            for (int i = 0; i < size(); i++) {
+//                @NotNull T s = term(i);
+//                if ((s.structure() & inStructure) > 0)
+//                    t.add(s);
+//            }
+//        }
+//        return t;//.toImmutable();
+//    }
 
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v) {

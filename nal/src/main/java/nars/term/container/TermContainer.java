@@ -6,6 +6,7 @@ import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.factory.Sets;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -14,9 +15,7 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -50,22 +49,29 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-    /** gets subterm at index i */
+    /**
+     * gets subterm at index i
+     */
     @Nullable T term(int i);
 
-    /** returns subterm automatically casted as compound (Use with caution) */
+    /**
+     * returns subterm automatically casted as compound (Use with caution)
+     */
     default public <C extends Compound> C cterm(int i) {
-        return (C)term(i);
+        return (C) term(i);
     }
 
-    /** tests if subterm i is op o */
+    /**
+     * tests if subterm i is op o
+     */
     boolean isTerm(int i, @NotNull Op o);
     /*default boolean isTerm(int i, @NotNull Op o) {
         T ti = term(i);
         return (ti.op() == o);
     }*/
 
-    @Override @Nullable
+    @Override
+    @Nullable
     default Term termOr(int i, @Nullable Term ifOutOfBounds) {
         return size() <= i ? ifOutOfBounds : term(i);
     }
@@ -79,56 +85,42 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
     static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
-        if ((a.structure() & b.structure())==0)
+        if ((a.structure() & b.structure()) == 0)
             return Sets.mutable.empty(); //nothing in common
         else
-            return Sets.intersect(a.toSet(),b.toSet());
+            return Sets.intersect(a.toSet(), b.toSet());
     }
 
-
-
-
-
-    Predicate2<Object,SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {
+    Predicate2<Object, SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {
         return xx.contains(yy);
     };
-    Predicate2<Object,SetIterable> nonVarSubtermIsCommon = (Object yy, SetIterable xx) -> {
+    Predicate2<Object, SetIterable> nonVarSubtermIsCommon = (Object yy, SetIterable xx) -> {
         return yy instanceof Variable ? false : xx.contains(yy);
     };
 
-    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
-        return commonSubterms(a, b, subtermIsCommon);
+    @NotNull
+    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
+        return commonSubterms(a, b, false);
     }
 
-    /** recursively */
-    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, Predicate2<Object,SetIterable> isCommonPredicate) {
+    /**
+     * recursively
+     */
+    @NotNull
+    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
-        SetIterable<Term> x, y;
-        if (isCommonPredicate == nonVarSubtermIsCommon) {
-            int commonStructure = a.structure() & b.structure();
+        HashSet<Term> r = new HashSet<Term>();
+
+        int commonStructure = a.structure() & b.structure();
+        if (excludeVariables)
             commonStructure = commonStructure & ~(Op.VariableBits); //mask by variable bits since we do not want them
 
-            if (commonStructure == 0)
-                return false;
+        if (commonStructure == 0)
+            return false;
 
-            x = a.recurseTermsToSet(commonStructure);
-            y = b.recurseTermsToSet(commonStructure);
+        a.termsToSet(commonStructure, r, true);
+        return b.termsToSet(commonStructure, r, false);
 
-            //the simpler predicate is sufficient to use below now that variables have been eliminated from the beginning
-
-        } else {
-            //All terms, unrestricted
-            x = a.recurseTermsToSet();
-            y = b.recurseTermsToSet();
-        }
-
-        if (x.size() < y.size()) { //swap so that y is smaller
-            SetIterable<Term> tmp = x;
-            x = y;
-            y = tmp;
-        }
-
-        return y.anySatisfyWith(subtermIsCommon, (SetIterable<?>)x);
     }
 
     @Override
@@ -136,18 +128,21 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return false;
     }
 
-    /** recursively */
-    @NotNull static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
+    /**
+     * recursively
+     */
+    @NotNull
+    static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
 
         boolean aCompound = a instanceof Compound;
         boolean bCompound = b instanceof Compound;
         if (aCompound && bCompound) {
-            return commonSubterms((Compound)a, ((Compound)b), subtermIsCommon);
+            return commonSubterms((Compound) a, ((Compound) b));
         } else {
             if (aCompound && !bCompound) {
-                return ((Compound)a).containsTerm(b);
+                return ((Compound) a).containsTerm(b);
             } else if (bCompound && !aCompound) {
-                return ((Compound)b).containsTerm(a);
+                return ((Compound) b).containsTerm(a);
             } else {
                 //neither are compounds
                 return a.equals(b);
@@ -155,7 +150,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         }
 
     }
-
 
 
 //    /**
@@ -166,22 +160,25 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 //    }
 
 
-
 //    static boolean equals(@NotNull TermContainer a, Object b) {
 //        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
 //    }
 
-    /** should be called only from equals() */
+    /**
+     * should be called only from equals()
+     */
     default boolean equalTo(@NotNull TermContainer b) {
         return (hashCode() == b.hashCode()) &&
-               //(structure() == b.structure()) &&
-               //(volume() == b.volume()) &&
-               (size() == b.size()) &&
-               (equalTerms(b));
+                //(structure() == b.structure()) &&
+                //(volume() == b.volume()) &&
+                (size() == b.size()) &&
+                (equalTerms(b));
     }
 
 
-    /** size should already be known equal */
+    /**
+     * size should already be known equal
+     */
     default boolean equalTerms(@NotNull TermContainer c) {
         int cl = size();
         for (int i = 0; i < cl; i++) {
@@ -192,7 +189,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-    /** returns null if empty set */
+    /**
+     * returns null if empty set
+     */
     @Nullable
     static Compound difference(@NotNull Op op, @NotNull Compound a, @NotNull Compound b) {
         return difference($.terms, op, a, b);
@@ -207,7 +206,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     static Compound difference(@NotNull TermBuilder t, @NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 
         //intersect the mask
-        if ((a.structure()&b.structure())==0)
+        if ((a.structure() & b.structure()) == 0)
             return null;
 
         Term[] aa = a.terms();
@@ -237,11 +236,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     void copyInto(Collection<Term> target);
 
 
-
-    /** expected to provide a non-copy reference to an internal array,
-     *  if it exists. otherwise it should create such array.
-     *  if this creates a new array, consider using .term(i) to access
-     *  subterms iteratively.
+    /**
+     * expected to provide a non-copy reference to an internal array,
+     * if it exists. otherwise it should create such array.
+     * if this creates a new array, consider using .term(i) to access
+     * subterms iteratively.
      */
     @NotNull T[] terms();
 
@@ -309,7 +308,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         int s = t.size();
         for (int i = 0; i < s; i++) {
             sb.append(t.term(i));
-            if (i < s-1)
+            if (i < s - 1)
                 sb.append(", ");
         }
         sb.append(")]}");
@@ -317,20 +316,24 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     }
 
-    /** extract a sublist of terms as an array */
+    /**
+     * extract a sublist of terms as an array
+     */
     @NotNull
     default Term[] terms(int start, int end) {
         //TODO for TermVector, create an Array copy directly
         //TODO for TermVector, if (start == 0) && end == just return its array
 
-        Term[] t = new Term[end-start];
+        Term[] t = new Term[end - start];
         int j = 0;
         for (int i = start; i < end; i++)
             t[j++] = term(i);
         return t;
     }
 
-    /** follows normal indexOf() semantics; -1 if not found */
+    /**
+     * follows normal indexOf() semantics; -1 if not found
+     */
     default int indexOf(@NotNull Term t) {
         if (!impossibleSubterm(t)) {
             int s = size();
@@ -341,8 +344,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         }
         return -1;
     }
-
-
 
 
 //    /** writes subterm bytes, including any attached metadata preceding or following it */
@@ -389,7 +390,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     default boolean equivalent(@NotNull List<Term> sub) {
         int s = size();
-        if (s==sub.size()) {
+        if (s == sub.size()) {
             for (int i = 0; i < s; i++) {
                 if (!term(i).equals(sub.get(i)))
                     return false;
@@ -401,7 +402,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     default boolean equivalent(@NotNull Term[] sub) {
         int s = size();
-        if (s==sub.length) {
+        if (s == sub.length) {
             for (int i = 0; i < s; i++) {
                 if (!term(i).equals(sub[i]))
                     return false;
@@ -412,8 +413,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-    /** returns true if evaluates true for any terms
-     * @param p*/
+    /**
+     * returns true if evaluates true for any terms
+     *
+     * @param p
+     */
     @Override
     default boolean or(@NotNull Predicate<Term> p) {
         int s = size();
@@ -426,8 +430,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return false;
     }
 
-    /** returns true if evaluates true for all terms
-     * @param p*/
+    /**
+     * returns true if evaluates true for all terms
+     *
+     * @param p
+     */
     @Override
     default boolean and(@NotNull Predicate<Term> p) {
         int s = size();
@@ -441,16 +448,16 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-
-    /** produces the correct TermContainer for the given Op,
+    /**
+     * produces the correct TermContainer for the given Op,
      * according to the existing type
      */
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull TermContainer tt) {
         return (!requiresTermSet(op, tt.size()) ||
                 tt.isSorted()) ?
-                    tt :
-                    TermSet.the(tt.terms());
+                tt :
+                TermSet.the(tt.terms());
     }
 
 
@@ -470,7 +477,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
-        return  requiresTermSet(op, tt.length) ?
+        return requiresTermSet(op, tt.length) ?
                 TermSet.the(tt) :
                 TermVector.the(tt);
     }
@@ -487,7 +494,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         if (s < 2) return true;
 
         for (int i = 1; i < s; i++) {
-            if (term(i-1).compareTo(term(i))!=-1)
+            if (term(i - 1).compareTo(term(i)) != -1)
                 return false;
         }
         return true;
@@ -519,7 +526,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         if ((diff = Integer.compare(s, c.size())) != 0)
             return diff;
 
-        TermContainer cc = (TermContainer)c;
+        TermContainer cc = (TermContainer) c;
         for (int i = 0; i < s; i++) {
             int d = a.term(i).compareTo(cc.term(i));
 
@@ -538,8 +545,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
     }
 
 
-
-    /** a and b must be instances of input, and output must be of size input.length-2 */
+    /**
+     * a and b must be instances of input, and output must be of size input.length-2
+     */
     static Term[] except(@NotNull TermContainer input, Term a, Term b, Term[] output) {
 //        int targetLen = input.size() - 2;
 //        if (output.length!= targetLen) {
@@ -548,16 +556,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         int j = 0;
         for (int i = 0; i < input.size(); i++) {
             Term x = input.term(i);
-            if ((x!=a) && (x!=b))
+            if ((x != a) && (x != b))
                 output[j++] = x;
         }
 
-        if (j!=output.length)
+        if (j != output.length)
             throw new RuntimeException("permute underflow");
 
         return output;
     }
-    /** a must be in input, and output must be of size input.length-1 */
+
+    /**
+     * a must be in input, and output must be of size input.length-1
+     */
     static Term[] except(@NotNull Term[] input, Term a, Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
@@ -565,17 +576,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 //        }
         int j = 0;
         for (Term x : input) {
-            if (x!=a)
+            if (x != a)
                 output[j++] = x;
         }
 
-        if (j!=output.length)
+        if (j != output.length)
             throw new RuntimeException("permute underflow");
 
         return output;
     }
 
-    /** for use with commutive (TermSet's) */
+    /**
+     * for use with commutive (TermSet's)
+     */
     @NotNull
     static TermContainer except(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
         MutableSet<Term> s = c.toSet();

@@ -52,8 +52,8 @@ public class MapIndex extends SimpleMapIndex {
     }
 
     @Override
-    protected TermContainer putIfAbsent(TermContainer x, TermContainer y) {
-        return subterms.putIfAbsent(x, y);
+    protected TermContainer putIfAbsent(TermContainer x) {
+        return subterms.putIfAbsent(x, x);
     }
 }
 

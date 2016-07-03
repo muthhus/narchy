@@ -135,9 +135,9 @@ public class Cache2kIndex extends MaplikeIndex {
     }
 
     @Override
-    protected TermContainer putIfAbsent(TermContainer src, TermContainer target) {
-        if (data.putIfAbsent(src, target)) {
-            return target;
+    protected TermContainer putIfAbsent(TermContainer src) {
+        if (data.putIfAbsent(src, src)) {
+            return src;
         }
         return (TermContainer) data.get(src); //HACK
     }

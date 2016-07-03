@@ -1,16 +1,12 @@
 package nars.bag.impl;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.budget.RawBLink;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.link.BLink;
 import nars.link.StrongBLink;
 import nars.link.StrongBLinkToBudgeted;
-import nars.util.data.list.CircularArrayList;
 import nars.util.data.sorted.SortedArray;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +24,12 @@ import java.util.function.Predicate;
 public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>, BiFunction<RawBudget, RawBudget, RawBudget> {
 
 
-    private final BudgetMerge mergeFunction;
-    //protected final FasterList<BLink<V>> pending = new FasterList();
+    public final BudgetMerge mergeFunction;
 
 
     abstract public static class BagPendings<V> {
         abstract public void capacity(int c);
-        abstract public void add(V v, float p, float d, float q, BudgetMerge merge);
+        abstract public void add(V v, float p, float d, float q);
         abstract public int size();
         abstract public void apply(ArrayBag<V> target);
 
@@ -43,167 +38,6 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         abstract public void clear();
     }
 
-
-    public static class ListBagPendings<X extends Comparable<X>> extends BagPendings<X>  {
-
-        //public List<RawBLink<X>> pending = null;
-        CircularArrayList<RawBLink<X>> pending = null;
-        private int capacity;
-
-        @Override
-        public void capacity(int c) {
-            this.capacity = c;
-        }
-
-        @Override
-        public void add(X x, float p, float d, float q, BudgetMerge merge) {
-            CircularArrayList<RawBLink<X>> pend = this.pending;
-            if (pend ==null) {
-                //pending = Global.newArrayList(capacity);
-                this.pending = pend = new CircularArrayList<>(capacity);
-            } else if (pend.size() == capacity) {
-                pend.removeFirst();
-            }
-
-            pend.add(new RawBLink(x, p, d, q));
-        }
-
-        @Override
-        public int size() {
-            if (pending == null) return 0;
-            return pending.size();
-        }
-
-        @Override
-        public void apply(ArrayBag<X> target) {
-            CircularArrayList<RawBLink<X>> p = this.pending;
-            if (p!=null) {
-                clear();
-                for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-                    RawBLink<X> w = p.get(i);
-                    float wp = w.pri();
-                    if (wp==wp) //not deleted
-                        target.commitPending(w.x, wp, w.dur(), w.qua());
-                }
-            }
-        }
-
-        private void compact(CircularArrayList<RawBLink<X>> p, BudgetMerge merge) {
-
-            Collections.sort(p, (RawBLink<X> a, RawBLink<X> b) -> {
-                boolean adel = a.isDeleted();
-                boolean bdel = b.isDeleted();
-//                if (adel && bdel)
-//                    return 0;
-//                if (adel)
-//                    return +1;
-//                if (bdel)
-//                    return +1;
-//
-
-                int cmp = a.x.compareTo(b.x);
-                if (cmp == 0 && !adel && !bdel) {
-                    merge.merge(a, b, 1f);
-                    b.deleteFast();
-                }
-                return cmp;
-            });
-        }
-
-        @Override
-        public float mass(ArrayBag<X> bag) {
-            CircularArrayList<RawBLink<X>> p = this.pending;
-            if (p == null)
-                return 0;
-
-            compact(p, bag.mergeFunction);
-
-            float sum = 0;
-            for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
-                RawBLink<X> w = p.get(i);
-                sum += w.pri() * w.dur();
-            }
-            return sum;
-        }
-
-        @Override
-        public void clear() {
-            pending = null;
-        }
-    }
-
-    public static class MapBagPendings<X> extends BagPendings<X>  {
-
-        static boolean nullify = false;
-        private /*Reference*/Map<X,Budget> pending;
-        int capacity;
-
-
-        public MapBagPendings() {
-
-        }
-
-        @Override
-        public void clear() {
-            if (nullify)
-                pending = null;
-            else if (pending!=null)
-                pending.clear();
-        }
-
-        protected Map<X, Budget> newPendingMap() {
-            //int s = 1+capacity/2;
-
-            //return new HashMap<>(capacity);
-            //return new HashMap<>();
-            //return new UnifriedMap<>(8); //<-- not safe, grows huge
-            //return new WeakHashMap<>(capacity);
-            //return new LinkedHashMap<>(s);
-            return new ConcurrentHashMapUnsafe<>(capacity);
-        }
-
-        float sum;
-        public final float mass(ArrayBag<X> bag) {
-            sum = 0;
-            if (pending != null)
-                pending.forEach((k,v) -> sum += v.pri() * v.dur());
-            return sum;
-        }
-
-        @Override
-        public void capacity(int c) {
-            this.capacity = c;
-        }
-
-        @Override
-        public void add(X x, float p, float d, float q, BudgetMerge merge) {
-
-            Map<X,Budget> n = this.pending;
-            if (n == null) {
-                this.pending = n = newPendingMap();
-            }
-            n.merge(x, new RawBudget(p, d, q), merge);
-        }
-
-
-        @Override
-        public int size() {
-            if (pending!=null)
-                return pending.size();
-            return 0;
-        }
-
-        @Override
-        public void apply(ArrayBag<X> target) {
-            Map<X,Budget> n = this.pending;
-            if (n!=null) {
-                clear();
-                n.forEach((k,b) -> {
-                    target.commitPending(k, b.pri(), b.dur(), b.qua());
-                });
-            }
-        }
-    }
 
     final BagPendings<V> pending;
 
@@ -217,21 +51,20 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
         );
 
-        pending = newPendings();
+        this.mergeFunction = mergeFunction;
+        this.pending = newPendings();
 
         setCapacity(cap);
-
-        this.mergeFunction = mergeFunction;
     }
 
     protected BagPendings<V> newPendings() {
-        return new ListBagPendings();
+        return new ListBagPendings(mergeFunction);
     }
 
     public void setCapacity(int newCapacity) {
         int current = capacity();
         if (current != newCapacity) {
-            pending.capacity(Math.max(1, newCapacity/2));
+            pending.capacity(newCapacity);
             super.setCapacity(newCapacity);
         }
 
@@ -241,7 +74,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     protected void removeWeakest(Object reason) {
 
         if (removeDeletedAtBottom()) {
-            return; //
+            return;
         }
 
         remove(weakest()).delete(reason);
@@ -251,6 +84,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = priIfFiniteElseNeg1(o1);
         float f2 = priIfFiniteElseNeg1(o2);
+
         if (f1 < f2)
             return 1;           // Neither val is NaN, thisVal is smaller
         if (f1 > f2)
@@ -429,7 +263,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         if (existing != null) {
             return putExists(b, scale, existing, overflow);
         } else if (isFull()) {
-            pending.add(key, b.pri()*scale, b.qua(), b.dur(), mergeFunction);
+            pending.add(key, b.pri()*scale, b.qua(), b.dur());
             return null;
         } else {
             return putNew(key, newLink(key, b.pri()*scale, b.qua(), b.dur() ));
@@ -487,6 +321,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             int lowestUnsorted = updateExisting(each, s);
 
             if (lowestUnsorted != -1)  {
+                int[] qsortStack = new int[16];
                 qsort(qsortStack, items.array(), 0 /*dirtyStart - 1*/, s);
             } // else: perfectly sorted
 
@@ -625,7 +460,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
-    final private int[] qsortStack = new int[16];
+
 
 
 

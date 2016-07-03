@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 
@@ -18,7 +19,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @NotNull
     public final Cache<Object, Object> data;
-
+    public final WeakHashMap<TermContainer,TermContainer> subs = new WeakHashMap<>();
 
     private final Weigher<Object, Object> conceptWeigher = (k,v) -> {
         if (v instanceof Atomic) {
@@ -31,8 +32,6 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                     return 0;
                 }
                 w = ((Concept)v).volume();// * weightFactor;
-            } else if (v instanceof TermContainer) {
-                w = ((TermContainer) v).volume();
             } else {
                 w = 1;
             }
@@ -143,18 +142,18 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public int subtermsCount() {
-        return 0;
+        return subs.size();
     }
 
     @Override
-    protected TermContainer putIfAbsent(@NotNull TermContainer s, TermContainer s1) {
-        return (TermContainer) data.get(s, t -> s1);
+    protected TermContainer putIfAbsent(@NotNull TermContainer s) {
+        return subs.putIfAbsent(s, s);
     }
 
     @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
 
-        return (TermContainer) data.getIfPresent(t);
+        return subs.get(t);
     }
 
 
@@ -180,7 +179,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return data.estimatedSize() + " concepts";
+        return data.estimatedSize() + " concepts / " + subs.size() + " subterms";
     }
 
     @Override

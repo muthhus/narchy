@@ -1,0 +1,106 @@
+package nars.bag.impl;
+
+import nars.budget.RawBLink;
+import nars.budget.merge.BudgetMerge;
+import nars.util.data.list.CircularArrayList;
+
+import java.util.Collections;
+import java.util.Comparator;
+
+/**
+ * Created by me on 7/3/16.
+ */
+public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendings<X> implements Comparator<RawBLink<X>> {
+
+    private final BudgetMerge merge;
+    //public List<RawBLink<X>> pending = null;
+    CircularArrayList<RawBLink<X>> pending = null;
+    private int capacity;
+
+    public ListBagPendings(BudgetMerge m) {
+        this.merge = m;
+    }
+
+    @Override
+    public void capacity(int c) {
+        this.capacity = c;
+    }
+
+    @Override
+    public void add(X x, float p, float d, float q) {
+        CircularArrayList<RawBLink<X>> pend = this.pending;
+        if (pend == null) {
+            //pending = Global.newArrayList(capacity);
+            this.pending = pend = new CircularArrayList<>(capacity);
+        } else if (pend.size() == capacity) {
+            pend.removeFirst();
+        }
+
+        pend.add(new RawBLink<>(x, p, d, q));
+    }
+
+    @Override
+    public int size() {
+        if (pending == null) return 0;
+        return pending.size();
+    }
+
+    @Override
+    public void apply(ArrayBag<X> target) {
+        CircularArrayList<RawBLink<X>> p = this.pending;
+        if (p != null) {
+            clear();
+            for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
+                RawBLink<X> w = p.get(i);
+                float wp = w.pri();
+                if (wp == wp) //not deleted
+                    target.commitPending(w.x, wp, w.dur(), w.qua());
+            }
+        }
+    }
+
+    @Override
+    public int compare(RawBLink<X> a, RawBLink<X> b) {
+        boolean adel = a.isDeleted();
+        boolean bdel = b.isDeleted();
+//                if (adel && bdel)
+//                    return 0;
+//                if (adel)
+//                    return +1;
+//                if (bdel)
+//                    return +1;
+//
+
+        int cmp = a.x.compareTo(b.x);
+        if (cmp == 0 && !adel && !bdel) {
+            merge.merge(a, b, 1f);
+            b.deleteFast();
+        }
+        return cmp;
+    }
+
+    private void combine(CircularArrayList<RawBLink<X>> p) {
+        Collections.sort(p, this);
+    }
+
+    @Override
+    public float mass(ArrayBag<X> bag) {
+        CircularArrayList<RawBLink<X>> p = this.pending;
+        if (p == null)
+            return 0;
+
+        combine(p);
+
+        float sum = 0;
+        for (int i = 0, pendingSize = p.size(); i < pendingSize; i++) {
+            RawBLink<X> w = p.get(i);
+            sum += w.pri() * w.dur();
+        }
+        return sum;
+    }
+
+    @Override
+    public void clear() {
+        pending = null;
+    }
+}

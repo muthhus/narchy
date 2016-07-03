@@ -7,9 +7,10 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.container.TermContainer.commonSubterms;
+import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
 import static nars.term.container.TermContainer.subtermIsCommon;
 
-
+/** variables excluded */
 public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
     @NotNull
@@ -26,7 +27,6 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
         Term B = f.term(b);
 
-        //variables excluded, along with 'nonVarSubtermIsCommon' predicate in the compound vs compound case
         if (B == null || B instanceof Variable)
             return false;
 
@@ -37,13 +37,15 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Compound C = (Compound) y;
 
             return bCompound ?
-                    commonSubterms((Compound) B, C, subtermIsCommon) :
-                    C.containsTerm(B);  //C.containsTermRecursively(B);
+                    commonSubterms((Compound) B, C, true)
+                    :
+                    C.containsTerm(B);
 
         } else {
 
             return bCompound ?
-                    ((Compound) B).containsTermRecursively(y) :
+                    B.containsTerm(y)
+                    :
                     B.equals(y);
         }
 

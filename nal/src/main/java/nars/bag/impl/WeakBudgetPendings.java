@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
 
+    private final BudgetMerge merge;
     private /*Reference*/ WeakBudgetMap<X> pending;
 
 
@@ -22,6 +23,9 @@ public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
 //            //return new LinkedHashMap<>(s);
 //        }
 
+    public WeakBudgetPendings(BudgetMerge merge) {
+        this.merge = merge;
+    }
 
     @Override
     public final float mass(ArrayBag<X> bag) {
@@ -42,7 +46,7 @@ public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
     }
 
     @Override
-    public void add(X x, float p, float d, float q, BudgetMerge merge) {
+    public void add(X x, float p, float d, float q) {
         //Reference<WeakBudgetMap<X>> m = this.pending;
         WeakBudgetMap<X> n = this.pending;
         if (n == null) {

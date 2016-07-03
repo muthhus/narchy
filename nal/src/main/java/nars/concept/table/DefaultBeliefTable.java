@@ -31,18 +31,15 @@ public class DefaultBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
-    public DefaultBeliefTable() {
-        this(0, 0);
-    }
 
-    DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
+    public DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
 
         Map<Task, Task> mp;
         this.map = mp =
             //Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
             new HashMap<>(
-                //initialEternalCapacity + initialTemporalCapacity
-                8 /* ESTIMATE */
+                initialEternalCapacity + initialTemporalCapacity
+                //    initialEternalCapacity /* ESTIMATE */
             );
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */

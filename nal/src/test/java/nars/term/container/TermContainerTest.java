@@ -25,8 +25,10 @@ public class TermContainerTest {
 
     @Test
     public void testCommonSubtermsRecursion() {
-        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a, [x, b]}")));
-        assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a, [c, b]}")));
+        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}")));
+        assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}")));
+
+        assertFalse(TermContainer.commonSubterms($("(#x,y)"), $("{a,#x}"), true));
     }
 
     @Test

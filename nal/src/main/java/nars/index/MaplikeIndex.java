@@ -128,7 +128,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
         if (changed && !temporal) {
             s = TermVector.the(bb);
-            TermContainer existing2 = putIfAbsent(s, s);
+            TermContainer existing2 = putIfAbsent(s);
             if (existing2 != null)
                 s = existing2;
         }
@@ -138,7 +138,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     /**
      * subterms put
      */
-    abstract protected TermContainer putIfAbsent(TermContainer s, TermContainer s1);
+    abstract protected TermContainer putIfAbsent(TermContainer s);
 
     @Override
     public final TermBuilder builder() {
@@ -151,7 +151,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
         return key instanceof Compound ?
                 theCompound((Compound) key, createIfMissing)
-                : theAtom((Atomic)key.term(), createIfMissing);
+                : theAtom((Atomic)key, createIfMissing);
     }
 
     @NotNull

@@ -192,6 +192,7 @@ public class BooleanConcept extends CompoundConcept {
 //        ((DynamicBeliefTable) goals()).updateTask(now);
 //    }
 
+
     @NotNull
     @Override
     protected BeliefTable newBeliefTable() {

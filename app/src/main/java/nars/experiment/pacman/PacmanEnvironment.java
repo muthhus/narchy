@@ -32,6 +32,7 @@ import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
+import nars.index.Indexes;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -75,8 +76,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 3, rng,
-				//new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
-				new Cache2kIndex(100000, rng)
+				new CaffeineIndex(512*1024, new DefaultConceptBuilder(rng), false)
+				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -93,7 +94,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(48);
+		nar.cyclesPerFrame.set(24);
 		nar.confMin.setValue(0.05f);
 
 
@@ -130,7 +131,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				BagChart.show((Default)nar);
+				//BagChart.show((Default)nar);
 			}
 		};
 

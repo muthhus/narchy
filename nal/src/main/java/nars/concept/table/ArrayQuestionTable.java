@@ -29,12 +29,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     @NotNull
     private final List<Task> list;
 
-
-    public ArrayQuestionTable() {
-        this(0);
-    }
-
-    ArrayQuestionTable(int capacity) {
+    public ArrayQuestionTable(int capacity) {
         super();
 
         this.list = Global.newArrayList(capacity);

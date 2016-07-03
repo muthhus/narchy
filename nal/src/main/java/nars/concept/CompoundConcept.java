@@ -41,16 +41,17 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     @Nullable Reference<List<Termed>> termLinkTemplates;
 
     @Nullable
-    private final QuestionTable questions;
+    private QuestionTable questions;
     @Nullable
-    private final QuestionTable quests;
+    private QuestionTable quests;
     @Nullable
-    private final BeliefTable beliefs;
+    private BeliefTable beliefs;
     @Nullable
-    private final BeliefTable goals;
+    private BeliefTable goals;
 
     private float satisfaction = 0;
     private @NotNull Map meta;
+    private transient ConceptPolicy policy;
 
 
     /**
@@ -68,11 +69,6 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
-
-        beliefs = newBeliefTable();
-        goals = newGoalTable();
-        questions = newQuestionTable();
-        quests = newQuestionTable();
 
         this._structure = term.structure();
     }
@@ -102,15 +98,6 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
         return termLinks;
     }
 
-    /** used for questions and quests */
-    @NotNull protected QuestionTable newQuestionTable() {
-        return new ArrayQuestionTable();
-    }
-
-//    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-//        this((Compound) $.$(compoundTermString), n);
-//    }
-
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
@@ -135,15 +122,47 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     @Nullable
     @Override
     public final QuestionTable quests() {
-        return (quests);
+        return questionTableOrEmpty(quests);
     }
 
     @NotNull
     @Override
     public final QuestionTable questions() {
-        return (questions);
+        return questionTableOrEmpty(questions);
     }
 
+
+    @NotNull
+    static QuestionTable questionTableOrEmpty(QuestionTable q) {
+        return q !=null ? q : QuestionTable.EMPTY;
+    }
+    @NotNull
+    static BeliefTable beliefTableOrEmpty(BeliefTable b) {
+        return b !=null ? b : BeliefTable.EMPTY;
+    }
+
+    final QuestionTable questionsOrNew() {
+        return questions == null ? (questions = new ArrayQuestionTable(policy.questionCap(true))) : questions;
+    }
+    final QuestionTable questsOrNew() {
+        return quests == null ? (quests = new ArrayQuestionTable(policy.questionCap(false))) : quests;
+    }
+    final BeliefTable beliefsOrNew() {
+        return beliefs == null ? (beliefs = newBeliefTable()) : beliefs;
+    }
+
+
+    final BeliefTable goalsOrNew() {
+        return goals == null ? (goals = newGoalTable()) : goals;
+    }
+
+    protected BeliefTable newBeliefTable() {
+        return new DefaultBeliefTable(policy.beliefCap(this, true, true), policy.beliefCap(this, true, false));
+    }
+
+    protected BeliefTable newGoalTable() {
+        return new DefaultBeliefTable(policy.beliefCap(this, false, true), policy.beliefCap(this, false, false));
+    }
 
     /**
      * Judgments directly made about the term Use ArrayList because of access
@@ -152,7 +171,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     @NotNull
     @Override
     public BeliefTable beliefs() {
-        return (beliefs);
+        return beliefTableOrEmpty(beliefs);
     }
 
     /**
@@ -161,7 +180,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     @NotNull
     @Override
     public BeliefTable goals() {
-        return (goals);
+        return beliefTableOrEmpty(goals);
     }
 
 
@@ -188,7 +207,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
      */
     @Nullable
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return processBeliefOrGoal(belief, nar, beliefs, questions);
+        return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions());
     }
 
     /**
@@ -198,7 +217,7 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
      */
     @Nullable
     public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return processBeliefOrGoal(goal, nar, goals, quests);
+        return processBeliefOrGoal(goal, nar, goalsOrNew(), quests());
     }
 
     /**
@@ -228,31 +247,28 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
     }
 
 
-    @NotNull protected BeliefTable newBeliefTable() {
-        return new DefaultBeliefTable();
-    }
-
-    /** return null to request a default table from the system */
-    @NotNull protected BeliefTable newGoalTable() {
-        return new DefaultBeliefTable();
-    }
 
 
 
     @Override public void capacity(@NotNull ConceptPolicy p) {
+        this.policy = p;
         linkCapacity(p);
         beliefCapacity(p);
         questionCapacity(p);
     }
 
     protected void questionCapacity(@NotNull ConceptPolicy p) {
-        questions().capacity(p.questionCap(true));
-        quests().capacity(p.questionCap(false));
+        questions().capacity((byte)p.questionCap(true));
+        quests().capacity((byte)p.questionCap(false));
     }
 
     protected void beliefCapacity(@NotNull ConceptPolicy p) {
-        beliefs().capacity(p.beliefCap(this, true, true), p.beliefCap(this, true, false));
-        goals().capacity(p.beliefCap(this, false, true), p.beliefCap(this, false, false));
+        beliefs().capacity(
+                (byte)p.beliefCap(this, true, true),
+                p.beliefCap(this, true, false));
+        goals().capacity(
+                (byte)p.beliefCap(this, false, true),
+                p.beliefCap(this, false, false));
     }
 
 
@@ -271,11 +287,11 @@ public class CompoundConcept extends GenericCompound<Term> implements AbstractCo
         final BeliefTable answerTable;
         if (q.isQuestion()) {
             //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = questions();
+            questionTable = questionsOrNew();
             answerTable = beliefs();
         } else { // else if (q.isQuest())
             //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = quests();
+            questionTable = questsOrNew();
             answerTable = goals();
         }
 
