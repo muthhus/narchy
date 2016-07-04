@@ -144,16 +144,19 @@ public enum Global {
     public static final float BUDGET_EPSILON = 0.001f;
 
 
-
-
     /** minimum durability and quality necessary for a derivation to form */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
 
-    /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 0.5f;
-
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
+
+    /** relates time and evidence */
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
+
+    /** additional temporal belief space for sensor concepts,
+     *  which will usually have a lot of highly fluctuating activity that should
+     *  be remembered */
+    public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 3;
 
 
     @NotNull

@@ -167,11 +167,11 @@ public interface BeliefTable extends TaskTable {
      */
     static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
         float c = t.conf();
-        //float c = c2w(t.conf());
+        //float c = t.confWeight(); //<- doesnt seem to work, produces values too high
+
         if (c < bestSoFar)
             return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
         else {
-            //long dt = Math.abs(t.occurrence() - when) + Math.abs(now - when);
             long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
             float relevance = relevance(dt, ageFactor);
             float rank = c * relevance;

@@ -3,6 +3,7 @@ package nars.util.signal;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.budget.policy.ConceptPolicy;
@@ -119,7 +120,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     @Override
     protected void beliefCapacity(ConceptPolicy p) {
-        DefaultConceptPolicy.beliefCapacityNonEternal(this, p);
+        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
         DefaultConceptPolicy.goalCapacityOneEternal(this, p);
     }
 

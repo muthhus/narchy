@@ -38,7 +38,7 @@ public class RevisionTest {
         */
 
         //}
-        d.conceptWarm.beliefsMaxEteOrTemp.set(maxBeliefs);
+        d.conceptWarm.beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

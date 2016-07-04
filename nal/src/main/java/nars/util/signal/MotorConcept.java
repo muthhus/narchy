@@ -2,6 +2,7 @@ package nars.util.signal;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
@@ -109,7 +110,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     /** allow no eternal beliefs, and ONE eternal goal */
     @Override protected void beliefCapacity(ConceptPolicy p) {
-        beliefCapacityNonEternal(this, p);
+        beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
         goals().capacity(1, p.beliefCap(this, false, true) + p.beliefCap(this, false, false)  - 1);
     }
 

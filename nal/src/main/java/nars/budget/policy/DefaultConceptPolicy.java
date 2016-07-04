@@ -11,9 +11,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class DefaultConceptPolicy implements ConceptPolicy {
 
-    public final MutableInteger beliefsMaxEteOrTemp, goalsMaxEteOrTemp;
+    public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
     public final MutableInteger termlinksCapacityMax, termlinksCapacityMin, taskLinksCapacity;
+    private final MutableInteger beliefsMaxTemp;
+    private final MutableInteger goalsMaxTemp;
 
     public DefaultConceptPolicy(int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(new MutableInteger(Math.max(1, beliefsCapTotal / 2)),
@@ -24,9 +26,11 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    DefaultConceptPolicy(MutableInteger beliefsMaxEteOrTemp, MutableInteger goalsMaxEteOrTemp, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
-        this.beliefsMaxEteOrTemp = beliefsMaxEteOrTemp;
-        this.goalsMaxEteOrTemp = goalsMaxEteOrTemp;
+    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+        this.beliefsMaxEte = beliefsMaxEte;
+        this.beliefsMaxTemp = beliefsMaxEte;
+        this.goalsMaxEte = goalsMaxEte;
+        this.goalsMaxTemp = goalsMaxEte;
         this.questionsMax = questionsMax;
         this.termlinksCapacityMin = termlinksCapacity;
         this.termlinksCapacityMax = new MutableInteger(termlinksCapacity.intValue()); //HACK
@@ -34,8 +38,10 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     }
 
     /** no eternal; use allocated eternal capacity added to temporals */
-    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
-        c.beliefs().capacity(0, p.beliefCap(c, true, true) + p.beliefCap(c, true, false));
+    public static void beliefCapacityNonEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p, int multiplier) {
+        c.beliefs().capacity(0,
+                Math.max(p.beliefCap(c, true, true),p.beliefCap(c, true, false)) * multiplier
+        );
     }
 
     /** no eternal; use allocated eternal capacity added to temporals */
@@ -50,9 +56,15 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         if (beliefOrGoal) {
-            return beliefsMaxEteOrTemp.intValue();
+            if (eternalOrTemporal)
+                return beliefsMaxEte.intValue();
+            else
+                return beliefsMaxTemp.intValue();
         } else {
-            return goalsMaxEteOrTemp.intValue();
+            if (eternalOrTemporal)
+                return goalsMaxEte.intValue();
+            else
+                return goalsMaxTemp.intValue();
         }
     }
 
