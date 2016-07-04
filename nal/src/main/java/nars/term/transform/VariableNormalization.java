@@ -51,10 +51,6 @@ public class VariableNormalization extends VariableTransform implements Function
         //rename = new HashMap(size); //doesnt work being called recursively
     }
 
-    /** call when finished */
-    public final void clear() {
-        rename.delete();
-    }
 
 //    final static Comparator<Map.Entry<Variable, Variable>> comp = new Comparator<Map.Entry<Variable, Variable>>() {
 //        @Override

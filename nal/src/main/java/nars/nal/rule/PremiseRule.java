@@ -123,7 +123,7 @@ public class PremiseRule extends GenericCompound {
     private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
 
     @Nullable
-    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, false) {
+    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, true) {
         @Override
         public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'X');
@@ -554,11 +554,14 @@ public class PremiseRule extends GenericCompound {
         try {
 
             //HACK
-            PremiseRuleVariableNormalization vn = new PremiseRuleVariableNormalization();
-            Term tt = index.transform(
-                    (Compound) terms.transform(this, UppercaseAtomsToPatternVariables),
-                    vn);
-            vn.clear();
+            Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
+            if (ss == null)
+                throw new RuntimeException("unnormalizable: " + this);
+
+            Term tt = index.transform(ss, new PremiseRuleVariableNormalization());
+
+            if (tt == null)
+                throw new RuntimeException("unnormalizable: " + this);
 
             Compound premiseComponents = (Compound) index.the(tt);
 

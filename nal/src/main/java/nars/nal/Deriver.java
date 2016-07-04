@@ -36,7 +36,7 @@ public abstract class Deriver  {
                 if (defaultDeriver == null) { //double boiler
                     Util.time(logger, "Rule parse", ()-> {
                         try {
-                            defaultRules = new PremiseRuleSet();
+                            defaultRules = PremiseRuleSet.resource("default.meta.nal");
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }

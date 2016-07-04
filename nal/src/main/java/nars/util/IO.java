@@ -1,12 +1,14 @@
 package nars.util;
 
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nal.Tense;
+import nars.nal.meta.match.Ellipsis;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -18,6 +20,7 @@ import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.variable.AbstractVariable;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -34,6 +37,8 @@ import java.io.IOException;
  */
 public class IO {
 
+
+    public static final byte SPECIAL_OP = (byte)(Op.values().length+1);
 
     static boolean hasTruth(char punc) {
         return punc == Symbols.BELIEF || punc == Symbols.GOAL;
@@ -149,18 +154,51 @@ public class IO {
     }
 
 
+    /**
+     * called by readTerm after determining the op type */
+    @Nullable
+    public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
-    static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
+        byte ob = in.readByte();
+
+        if (ob == SPECIAL_OP) {
+            String toParse = in.readUTF();
+            Term x = t.parseRaw(toParse);
+            if (x == null)
+                throw new IOException("Undecoded term: " + toParse);
+            return x;
+        }
+
+        Op o = Op.values()[ob];
+        if (o.var)
+            return readVariable(in, o, t);
+        else if (o.atomic)
+            return readAtomic(in, o, t);
+        else
+            return readCompound(in, o, t);
+    }
+    public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
+
+        if (isSpecial(term)) {
+            out.writeByte(SPECIAL_OP);
+            out.writeUTF(term.toString());
+            return;
+        }
 
         out.writeByte(term.op().ordinal());
 
         if (term instanceof Atomic) {
+
             if (term instanceof Variable)
                 writeVariable(out, (AbstractVariable)term);
             else
                 writeAtomic(out, (Atomic) term);
         } else
             writeCompound(out, (Compound)term);
+    }
+
+    public static boolean isSpecial(@NotNull Term term) {
+        return term instanceof GenericVariable;
     }
 
     static void writeCompound(@NotNull DataOutput out, @NotNull Compound c) throws IOException {
@@ -208,18 +246,7 @@ public class IO {
 //        return (Compound) t.normalize(key, true);
     }
 
-    /**
-     * called by readTerm after determining the op type */
-    @Nullable
-    static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
-        Op o = Op.values()[in.readByte()];
-        if (o.var)
-            return readVariable(in, o, t);
-        else if (o.atomic)
-            return readAtomic(in, o, t);
-        else
-            return readCompound(in, o, t);
-    }
+
 
 
     /** serialization and deserialization of terms, tasks, etc. */

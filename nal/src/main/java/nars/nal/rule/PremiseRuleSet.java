@@ -1,53 +1,140 @@
 package nars.nal.rule;
 
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
 import nars.Global;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
-import nars.term.Termed;
+import nars.util.IO;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static nars.util.IO.readTerm;
 
 
 /**
  * Holds an set of derivation rules and a pattern index of their components
  */
-public class PremiseRuleSet  {
+public class PremiseRuleSet {
 
     public final List<PremiseRule> rules;
 
-    public PremiseRuleSet() throws IOException, URISyntaxException {
-        this(Paths.get(Deriver.class.getClassLoader().getResource("default.meta.nal").toURI()));
-        //this(Deriver.class.getClassLoader().getResourceAsStream("default.meta.nal"));
+
+
+    public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
+
+        PatternIndex p = new PatternIndex();
+        Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
+
+        BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
+            try {
+                IO.writeTerm(o, x.getOne());
+                o.writeUTF(x.getTwo());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
+                try {
+                    return Tuples.pair(
+                            (Compound)readTerm(i, p),
+                            i.readUTF()
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+        };
+
+        Stream<Pair<Compound, String>> parsed =
+                fileCache(path, PremiseRuleSet.class.getSimpleName(),
+                        () -> {
+                            try {
+                                return parse(load(Files.readAllLines(path)), p);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        },
+                        encoder,
+                        decoder
+                );
+
+        return new PremiseRuleSet(parsed, p);
     }
 
-    public PremiseRuleSet(InputStream is) throws IOException {
-        this(Util.inputToStrings(is));
+    public static <X> Stream<X> fileCache(Path p, String baseName, Supplier<Stream<X>> o,
+                                          BiConsumer<X,DataOutput> encoder,
+                                          Function<DataInput,X> decoder
+                                          ) throws IOException {
+
+        File f = p.toFile();
+        long lastModified = f.lastModified();
+        long size = f.length();
+        String suffix = "_" + p.getFileName() + "_" + lastModified + "_" + size;
+
+
+        String tempDir = System.getProperty("java.io.tmpdir");
+
+        File cached = new File(tempDir, baseName + suffix);
+        if (cached.exists()) {
+            //try read
+            try {
+
+                DataInputStream fin = new DataInputStream(new FileInputStream(cached));
+
+                List<X> read = new ArrayList(); //TODO use stream directly
+
+                while (fin.available() > 0) {
+                    read.add(decoder.apply(fin));
+                }
+
+                fin.close();
+
+                return read.stream();
+            } catch (Exception e) {
+                logger.error("{}, regenerating..", e);
+                //continue below
+            }
+        }
+
+        //save
+        Stream<X> instanced = o.get();
+        List<X> copy = new ArrayList(); //HACK
+        DataOutputStream dout = new DataOutputStream( new FileOutputStream(cached.getAbsolutePath()) );
+        instanced.forEach(c -> {
+            copy.add(c);
+            encoder.accept(c, dout);
+        });
+        dout.close();
+        return copy.stream();
+
+
     }
 
-    public PremiseRuleSet(@NotNull Path path) throws IOException {
-        this(Files.readAllLines(path));
-    }
-    public final PatternIndex patterns = new PatternIndex();
+
+    public final PatternIndex patterns;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
@@ -55,7 +142,7 @@ public class PremiseRuleSet  {
 
 
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
-
+        this.patterns = new PatternIndex();
         this.rules = Global.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             this.rules.add(normalize ? p.normalizeRule(patterns) : p);
@@ -66,15 +153,24 @@ public class PremiseRuleSet  {
 
 
     public PremiseRuleSet(@NotNull List<String> ruleStrings) {
+        this(ruleStrings, new PatternIndex());
+    }
 
-        this.rules = parse(load(ruleStrings), patterns).distinct().collect(toList());
+    public PremiseRuleSet(@NotNull List<String> ruleStrings, PatternIndex patterns) {
+        this(parse(load(ruleStrings), patterns), patterns);
+    }
 
+    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, PatternIndex patterns) {
+        this.rules = permute(parsed, patterns).distinct().collect(toList());
+
+        this.patterns = patterns;
 
         logger.info("indexed " + rules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
         if (errors[0] > 0) {
             logger.warn("\trule errors: " + errors[0]);
         }
     }
+
 
 
     @NotNull
@@ -149,28 +245,29 @@ public class PremiseRuleSet  {
     }
 
 
-
     @NotNull
-    static Stream<PremiseRule> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
+    static Stream<Pair<Compound, String>> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
         return rawRules
                 .map(PremiseRuleSet::preprocess)
                 .distinct()
-                .parallel()
+                //.parallel()
                 //.sequential()
-                .map(src-> {
+                .map(src -> Tuples.pair((Compound) index.parseRaw(src), src));
+    }
 
-            Set<PremiseRule> ur = Global.newHashSet(512);
+    @NotNull
+    static Stream<PremiseRule> permute(@NotNull Stream<Pair<Compound, String>> rawRules, @NotNull PatternIndex index) {
+        return rawRules.map(rawAndSrc -> {
+
+            String src = rawAndSrc.getTwo();
+
+            Set<PremiseRule> ur = Global.newHashSet(4);
             try {
-
-                Termed prt = index.parseRaw(src);
-
-                PremiseRule preNorm = new PremiseRule((Compound) prt);
-
+                PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, index, ur);
-
             } catch (Exception ex) {
                 logger.error("Invalid TaskRule: {} {}", src, ex.getMessage());
-                ex.printStackTrace();
+                throw new RuntimeException(ex);
             }
 
             return ur;
@@ -185,32 +282,31 @@ public class PremiseRuleSet  {
     }
 
     public static void permute(PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
-
-        posNegPermute(preNormRule, src, (PremiseRule r) -> {
-
+        posNegPermute(preNormRule, src, ur, index, (PremiseRule r) -> {
             permuteSwap(r, src, index, ur, (PremiseRule s) -> {
-
-                if (Global.BACKWARD_QUESTION_RULES && r.allowBackward) {
-
-                    r.backwardPermutation(index, (q, reason) -> {
-
-                        PremiseRule b = add(q, src + ':' + reason, ur, index);
-
-                        //                    //2nd-order backward
-                        //                    if (forwardPermutes(b)) {
-                        //                        permuteSwap(b, src, index, ur);
-                        //                    }
-                    });
-                }
-
+                permuteBackward(src, index, ur, r);
             });
-
-        }, ur, index);
+        });
     }
 
-    protected static void posNegPermute(PremiseRule preNorm, String src, Consumer<PremiseRule> each, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index) {
+    static void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, PremiseRule r) {
+        if (Global.BACKWARD_QUESTION_RULES && r.allowBackward) {
+
+            r.backwardPermutation(index, (q, reason) -> {
+
+                PremiseRule b = add(q, src + ':' + reason, ur, index);
+
+                //                    //2nd-order backward
+                //                    if (forwardPermutes(b)) {
+                //                        permuteSwap(b, src, index, ur);
+                //                    }
+            });
+        }
+    }
+
+    protected static void posNegPermute(PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index, Consumer<PremiseRule> each) {
         PremiseRule pos = add(preNorm.positive(index), src, ur, index);
-        if (pos!=null)
+        if (pos != null)
             each.accept(pos);
 
         if (Global.NEGATIVE_RULES) {
@@ -221,10 +317,9 @@ public class PremiseRuleSet  {
     }
 
 
-
     public static void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, Consumer<PremiseRule> then) {
 
-        then.accept( r );
+        then.accept(r);
 
         if (Global.SWAP_RULES && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
@@ -234,9 +329,11 @@ public class PremiseRuleSet  {
 
     }
 
-    /** whether a rule will be forward permuted */
+    /**
+     * whether a rule will be forward permuted
+     */
     static boolean permuteSwap(@NotNull PremiseRule r) {
-        boolean[] fwd = new boolean[] { true };
+        boolean[] fwd = new boolean[]{true};
         r.recurseTerms((s) -> {
 
             if (!fwd[0])
@@ -246,15 +343,15 @@ public class PremiseRuleSet  {
             String x = s.toString();
 
             if ((x.contains("task(")) ||
-                (x.contains("belief(")) ||
-                (x.contains("time(")) ||
-                //(x.contains("Punctuation"))  ||
-                //(x.contains("Structural")) ||
-                //(x.contains("Identity")) ||
-                (x.contains("substitute"))  //TESTING THIS
+                    (x.contains("belief(")) ||
+                    (x.contains("time(")) ||
+                    //(x.contains("Punctuation"))  ||
+                    //(x.contains("Structural")) ||
+                    //(x.contains("Identity")) ||
+                    (x.contains("substitute"))  //TESTING THIS
                 //(x.contains("Negation"))
 
-            ) {
+                    ) {
                 fwd[0] = false;
             }
         });

@@ -374,9 +374,7 @@ public interface TermIndex {
             if (numVars == 1 && ct.varPattern() == 0) {
                 t2 = transform(ct, VariableNormalization.singleVariableNormalization);
             } else {
-                VariableNormalization vn = new VariableNormalization(numVars);
-                t2 = transform(ct, vn);
-                vn.clear();
+                t2 = transform(ct, new VariableNormalization(numVars));
             }
 
             /*if (!(t2 instanceof Compound)) { //includes null test

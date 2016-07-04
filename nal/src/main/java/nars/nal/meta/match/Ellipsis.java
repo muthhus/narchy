@@ -76,7 +76,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         public final Term from, to;
 
         public EllipsisTransformPrototype(/*Op type, */Variable name, Term from, Term to) {
-            super(Op.VAR_PATTERN, ".." + from + '=' + to + "..+");
+            super(Op.VAR_PATTERN,
+                    name.toString().substring(1) /* skip '%' */ + ".." + from + '=' + to + "..+");
             //this.name = name;
             this.from = from;
             this.to = to;
