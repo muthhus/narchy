@@ -3,10 +3,14 @@ package nars.nal;
 import nars.nal.derive.TrieDeriver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.rule.PremiseRuleSet;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  *
@@ -30,14 +34,16 @@ public abstract class Deriver  {
         if (defaultRules == null) {
             //synchronized(logger) {
                 if (defaultDeriver == null) { //double boiler
-                    try {
-                        defaultRules = new PremiseRuleSet();
-                        defaultDeriver = new TrieDeriver( defaultRules );
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("getDefaultDeriver: {}",e.getCause());
-                        System.exit(1);  //e.printStackTrace();
-                    }
+                    Util.time(logger, "Rule parse", ()-> {
+                        try {
+                            defaultRules = new PremiseRuleSet();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    Util.time(logger, "Rule compile", ()-> {
+                        defaultDeriver = new TrieDeriver(defaultRules);
+                    });
                 }
             //}
 

@@ -1,5 +1,7 @@
 package nars;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
@@ -9,8 +11,11 @@ import com.github.fge.grappa.rules.Rule;
 import com.github.fge.grappa.run.ParseRunner;
 import com.github.fge.grappa.run.ParsingResult;
 import com.github.fge.grappa.run.context.MatcherContext;
+import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
@@ -31,7 +36,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.Symbols.*;
@@ -44,6 +51,7 @@ public class Narsese extends BaseParser<Object> {
 
 
     public static final String NARSESE_TASK_TAG = "Narsese";
+
 
     //These should be set to something like RecoveringParseRunner for performance
     private final ParseRunner inputParser = new ParseRunner(Input());
@@ -171,36 +179,28 @@ public class Narsese extends BaseParser<Object> {
     public PremiseRule popTaskRule() {
         //(Term)pop(), (Term)pop()
 
-        List<Term> r = Global.newArrayList(1);
-        List<Term> l = Global.newArrayList(1);
+        List<Term> r = Global.newArrayList(16);
+        List<Term> l = Global.newArrayList(16);
 
         Object popped;
         while ((popped = pop()) != PremiseRule.class) { //lets go back till to the start now
-            r.add((Term) popped);
+            r.add(the(popped));
         }
+        if (r.isEmpty()) //empty premise list is invalid
+            return null;
 
         while (!getContext().getValueStack().isEmpty() && (popped = pop()) != PremiseRule.class) {
-            l.add((Term) popped);
+            l.add(the(popped));
         }
+        if (l.isEmpty()) //empty premise list is invalid
+            return null;
+
 
         Collections.reverse(l);
         Collections.reverse(r);
 
-        Compound premise;
-        if (l.size() >= 1) {
-            premise = $.p(l);
-        } else {
-            //empty premise list is invalid
-            return null;
-        }
-
-        Compound conclusion;
-        if (r.size() >= 1) {
-            conclusion = $.p(r);
-        } else {
-            //empty premise list is invalid
-            return null;
-        }
+        Compound premise = $.p(l);
+        Compound conclusion = $.p(r);
 
         return new PremiseRule(premise, conclusion);
     }
@@ -510,14 +510,15 @@ public class Narsese extends BaseParser<Object> {
                         //negation shorthand
                         seq(NEG.str, s(), Term(), push(
                                 //Negation.make(popTerm(null, true)))),
-                                $.neg($.the(pop())))),
+                                $.neg( /*$.$(*/ (Term)pop() ))),
 
                         NumberAtom(),
                         Atom()
 
                 ),
 
-                push(the(pop())),
+                //ATOM
+                push((pop())),
 
                 s()
         );
@@ -688,7 +689,7 @@ public class Narsese extends BaseParser<Object> {
     Rule ColonReverseInheritance() {
         return sequence(
                 Term(false, true), ':', Term(),
-                push($.inh((Term) pop(), (Term) pop()))
+                push($.inh(the(pop()), the(pop())))
         );
     }
 
@@ -884,7 +885,7 @@ public class Narsese extends BaseParser<Object> {
 
                 s(), close,
 
-                push(popTerm(defaultOp, allowInternalOp))
+                push(popTerm(defaultOp))
         );
     }
 
@@ -909,13 +910,12 @@ public class Narsese extends BaseParser<Object> {
 
 
     @Nullable
-    static Object the(@Nullable Object o) {
+    static Term the(@Nullable Object o) {
         if (o == null) return null; //pass through
-        if (o instanceof Term) return o;
+        if (o instanceof Term) return (Term) o;
         if (o instanceof String) {
             String s = (String) o;
-            //return Atom.the(Utf8.toUtf8(name));
-
+            //return s;
             return $.the(s);
 
 //        int olen = name.length();
@@ -941,15 +941,13 @@ public class Narsese extends BaseParser<Object> {
      * produce a term from the terms (& <=1 NALOperator's) on the value stack
      */
     @Deprecated
-    final Term popTerm(Op op /*default */, @Deprecated boolean allowInternalOp) {
-
+    final Term popTerm(Op op /*default */) {
 
         //System.err.println(getContext().getValueStack());
 
-        ValueStack<Object> stack = getContext().getValueStack();
+        ArrayValueStack<Object> stack = (ArrayValueStack)getContext().getValueStack();
 
-
-        List<Term> vectorterms = Global.newArrayList(2); //stack.size() + 1);
+        List vectorterms = Global.newArrayList(2); //stack.size() + 1);
 
         while (!stack.isEmpty()) {
             Object p = pop();
@@ -975,17 +973,16 @@ public class Narsese extends BaseParser<Object> {
 
 
             if (p instanceof String) {
-                throw new RuntimeException("string not expected here");
-//                Term t = Atom.the((String) p);
-//                vectorterms.add(t);
+                //throw new RuntimeException("string not expected here");
+                //Term t = $.the((String) p);
+                vectorterms.add(p);
             } else if (p instanceof Term) {
-                Term t = (Term) p;
-                vectorterms.add(t);
+                vectorterms.add(p);
             } else if (p instanceof Op) {
 
                 if (op != null) {
-                    if ((!allowInternalOp) && (!p.equals(op)))
-                        throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
+                    //if ((!allowInternalOp) && (!p.equals(op)))
+                        //throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
 
                     throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
                 }
@@ -997,10 +994,32 @@ public class Narsese extends BaseParser<Object> {
 
         if (vectorterms.isEmpty()) return null;
 
-        //int v = vectorterms.size();
 
+        return vectorTerms.get(Tuples.pair(op, (List) vectorterms), popTermFunction);
+    }
+
+
+    public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {
+        return _popTerm(x.getOne(), x.getTwo());
+    };
+
+    static final Cache<Pair<Op,List>,Term> vectorTerms = Caffeine.newBuilder()
+            .maximumSize(2048)
+            .initialCapacity(2048)
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .build();
+
+
+    private static Term _popTerm(Op op, List vectorterms) {
         Collections.reverse(vectorterms);
 
+        for (int i = 0, vectortermsSize = vectorterms.size(); i < vectortermsSize; i++) {
+            Object x = vectorterms.get(i);
+            if (x instanceof String) {
+                //string to atom
+                vectorterms.set(i, $.the(x));
+            }
+        }
 //        if ((op == null || op == PRODUCT) && (vectorterms.get(0) instanceof Operator)) {
 //            op = NALOperator.OPERATION;
 //        }

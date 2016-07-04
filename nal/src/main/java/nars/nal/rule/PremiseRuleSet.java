@@ -136,7 +136,7 @@ public class PremiseRuleSet  {
 
     @Deprecated /* soon */ static String preprocess(@NotNull CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
     {
-        String ret = '<' + rule.toString() + '>';
+        String ret = rule.toString();
 
         if (ret.contains("..")) {
             ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
@@ -145,7 +145,7 @@ public class PremiseRuleSet  {
             ret = ret.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
         }
 
-        return ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
+        return '<' + ret + '>'; //ret.replace("\n", "");/*.replace("A_1..n","\"A_1..n\"")*/ //TODO: implement A_1...n notation, needs dynamic term construction before matching
     }
 
 
@@ -153,8 +153,9 @@ public class PremiseRuleSet  {
     @NotNull
     static Stream<PremiseRule> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
         return rawRules
-                .distinct().parallel()
                 .map(PremiseRuleSet::preprocess)
+                .distinct()
+                .parallel()
                 //.sequential()
                 .map(src-> {
 

@@ -22,6 +22,7 @@ import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1020,5 +1021,12 @@ public enum Util {
             return true;
         }
         return false;
+    }
+
+    public static void time(Logger logger, String procName, Runnable procedure) {
+        long start = System.currentTimeMillis();
+        procedure.run();
+        long end = System.currentTimeMillis();
+        logger.info("{} ({} ms)", procName, (end-start));
     }
 }
