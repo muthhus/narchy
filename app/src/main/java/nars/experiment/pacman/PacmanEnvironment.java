@@ -106,7 +106,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_QUESTION_PRIORITY = 0.7f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.7f;
 		nar.cyclesPerFrame.set(64);
-		nar.confMin.setValue(0.02f);
+		nar.confMin.setValue(0.05f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -160,9 +160,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				Iterables.addAll(charted,
 					bipolarNumericSensor(nar.self.toString(),
 						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
-				Iterables.addAll(charted,
-						numericSensor(nar.self.toString(),
-								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
+//				Iterables.addAll(charted,
+//						numericSensor(nar.self.toString(),
+//								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
 
 				new BeliefTableChart(nar, charted).show(600, 300);
 

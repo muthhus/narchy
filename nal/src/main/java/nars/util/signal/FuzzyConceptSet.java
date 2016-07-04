@@ -57,7 +57,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                         y = t(f, conf);
                             //y = t(Util.clamp(1f-(cdist/dd)), conf);
                         //}
-                        System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
+                        //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
                         return y;
                     }
             ));

@@ -170,7 +170,7 @@ public class PremiseRuleTest {
 
     @Test
     public void testBackwardPermutations() {
-        if (Global.BACKWARD_QUESTIONS) {
+        if (Global.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
                     rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)>")
             );

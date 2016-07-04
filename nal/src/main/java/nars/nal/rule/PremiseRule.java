@@ -57,6 +57,7 @@ import static nars.term.Terms.*;
 public class PremiseRule extends GenericCompound {
 
     transient private char taskPunc = 0;
+    public boolean allowBackward;
 
     @NotNull
     @Override
@@ -68,7 +69,6 @@ public class PremiseRule extends GenericCompound {
                 "\t temporalize=" + timeFunction +
                 "\t eternalize=" + eternalize +
                 "\t anticipate=" + anticipate +
-                "\t backward=" + backward +
                 "\t minNAL=" + minNAL +
                 "\t source='" + source + '\'' +
                 '}';
@@ -108,7 +108,6 @@ public class PremiseRule extends GenericCompound {
     //it has certain pre-conditions, all given as predicates after the two input premises
 
 
-    boolean backward;
 
     /**
      * maximum of the minimum NAL levels involved in the postconditions of this rule
@@ -124,14 +123,14 @@ public class PremiseRule extends GenericCompound {
     private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
 
     @Nullable
-    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform() {
+    private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, false) {
         @Override
         public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'X');
         }
     };
     @Nullable
-    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform() {
+    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform(true, true) {
         @Override
         public Term apply(@NotNull Term func) {
             return $.the(func.toString() + 'N');
@@ -224,6 +223,10 @@ public class PremiseRule extends GenericCompound {
         }
 
         return l;
+    }
+
+    public void setAllowBackward() {
+        allowBackward = true;
     }
 
 //    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
@@ -418,11 +421,11 @@ public class PremiseRule extends GenericCompound {
         char puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
-        if ((p.beliefTruth != null) && (belief == null)) {
+        if ((p.beliefTruth != null) && !p.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {
             throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
         }
         TruthOperator desire = DesireFunction.get(p.goalTruth);
-        if ((p.goalTruth != null) && (desire == null)) {
+        if ((p.goalTruth != null) && !p.goalTruth.equals(TruthOperator.NONE) && (desire == null)) {
             throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
         }
 
@@ -1002,9 +1005,6 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    public final void setAllowBackward() {
-        this.backward = true;
-    }
 
 
     /**
@@ -1019,9 +1019,8 @@ public class PremiseRule extends GenericCompound {
      * so each premise gets exchanged with the conclusion in order to form a own rule,
      * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
-    public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w, @NotNull PatternIndex index) {
+    public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
 
-        if (Global.BACKWARD_QUESTIONS) {
             Term T = getTask(); //Task
             Term B = getBelief(); //Belief
             Term C = getConclusionTermPattern(); //Conclusion
@@ -1033,7 +1032,7 @@ public class PremiseRule extends GenericCompound {
             // T, C, [pre], task_is_question() |- B, [post]
             PremiseRule clone2 = clonePermutation(T, C, B, true, index);
             w.accept(clone2, "T,C,question |- B");
-        }
+
 
     }
 
@@ -1059,23 +1058,19 @@ public class PremiseRule extends GenericCompound {
      * after generating, these are then backward permuted
      */
     @NotNull
-    public final PremiseRule forwardPermutation(@NotNull PatternIndex index) {
+    public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
 
         // T, B, [pre] |- C, [post] ||--
-
         Term T = getTask();
         Term B = getBelief();
-        Term C = getConclusionTermPattern();
 
-        ////      B, T, [pre], task_is_question() |- T, [post]
-        //      B, T, [pre], task_is_question() |- C, [post]
-
-        PremiseRule p = clonePermutation(B, T, C, false, index);
-        if (p.getTask().equals(T) && p.getBelief().equals(B)) {
+        if (T.equals(B)) {
             //no change, ignore the permutation
-            p = null;
+            return null;
+        } else {
+            Term C = getConclusionTermPattern();
+            return clonePermutation(B, T, C, false, index);
         }
-        return p;
     }
 
     static final Term TaskQuestionTerm = exec($.operator("task"), $.quote("?"));

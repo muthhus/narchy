@@ -1,6 +1,7 @@
 package nars.nal.rule;
 
 import nars.$;
+import nars.nal.meta.TruthOperator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -18,8 +19,18 @@ import static nars.Op.INH;
  */
 abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term>, Function<Term,Term> {
 
+    public final boolean includeBelief, includeDesire;
+
+
+
     final Atom belief = $.the("Belief");
     final Atom desire = $.the("Desire");
+
+
+    protected PremiseTruthTransform(boolean includeBelief, boolean includeDesire) {
+        this.includeBelief = includeBelief;
+        this.includeDesire = includeDesire;
+    }
 
     @Override
     public @Nullable Termed<?> apply(Compound parent, Term subterm) {
@@ -27,6 +38,12 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
         Compound tf = (Compound) subterm;
         Term func = tf.term(0);
         Term mode = tf.term(1);
+
+        if (func.equals(TruthOperator.NONE))
+            return subterm; //no change
+
+        if ((!includeDesire && mode.equals(desire)) || (!includeBelief && mode.equals(belief)))
+            return $.inh(TruthOperator.NONE, mode);
 
         return $.inh(apply(func), mode);
 
@@ -37,7 +54,7 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
     public boolean test(@NotNull Term o) {
         if (o.op() == INH) {
             Term pred = ((Compound) o).term(1);
-            return pred.equals(belief) || pred.equals(desire);
+            return (pred.equals(belief)) || (pred.equals(desire));
         }
         return false;
     }

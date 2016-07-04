@@ -3,6 +3,7 @@ package nars.nal.meta;
 import nars.$;
 import nars.Memory;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +12,8 @@ import java.util.Map;
 
 
 public interface TruthOperator {
+
+    static final Atom NONE = $.the("None");
 
     static void permuteTruth(TruthOperator[] values, Map<Term, TruthOperator> table) {
         for (TruthOperator tm : values) {

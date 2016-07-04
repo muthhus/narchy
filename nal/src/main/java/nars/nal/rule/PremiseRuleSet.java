@@ -158,7 +158,7 @@ public class PremiseRuleSet  {
                 //.sequential()
                 .map(src-> {
 
-            List<PremiseRule> ur = Global.newArrayList(4);
+            Set<PremiseRule> ur = Global.newHashSet(512);
             try {
 
                 Termed prt = index.parseRaw(src);
@@ -187,54 +187,54 @@ public class PremiseRuleSet  {
 
         posNegPermute(preNormRule, src, (PremiseRule r) -> {
 
-            if (forwardPermutes(r)) {
-                permuteForward(r, src, r.backward, index, ur);
-            }
+            permuteSwap(r, src, index, ur, (PremiseRule s) -> {
 
-            if (r.backward) {
+                if (Global.BACKWARD_QUESTION_RULES && r.allowBackward) {
 
-                //System.err.println("r: " + r);
+                    r.backwardPermutation(index, (q, reason) -> {
 
-                r.backwardPermutation((q, reason) -> {
+                        PremiseRule b = add(q, src + ':' + reason, ur, index);
 
-                    //System.err.println("  q: " + q + " " + reason);
-                    PremiseRule b = add(ur, q, src + ':' + reason, index);
+                        //                    //2nd-order backward
+                        //                    if (forwardPermutes(b)) {
+                        //                        permuteSwap(b, src, index, ur);
+                        //                    }
+                    });
+                }
 
-                    //2nd-order backward
-                    if (forwardPermutes(b)) {
-                        permuteForward(b, src, r.backward, index, ur);
-                    }
-                }, index);
-            }
+            });
+
         }, ur, index);
     }
 
     protected static void posNegPermute(PremiseRule preNorm, String src, Consumer<PremiseRule> each, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index) {
-        PremiseRule pos = add(ur, preNorm.positive(index), src, index);
+        PremiseRule pos = add(preNorm.positive(index), src, ur, index);
         if (pos!=null)
             each.accept(pos);
-        PremiseRule neg = add(ur, preNorm.negative(index), src, index);
-        if (neg!=null)
-            each.accept(neg);
+
+        if (Global.NEGATIVE_RULES) {
+            PremiseRule neg = add(preNorm.negative(index), src + ":Negated", ur, index);
+            if (neg != null)
+                each.accept(neg);
+        }
     }
 
 
 
-    public static void permuteForward(@NotNull PremiseRule r, String src, boolean thenBackward, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
+    public static void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, Consumer<PremiseRule> then) {
 
-        @NotNull PremiseRule bSwap = r.forwardPermutation(index);
-        if (bSwap!=null) {
-            add(ur, bSwap, src + ":forward", index);
-        }
-        //PremiseRule f = b;
+        then.accept( r );
 
-        if (thenBackward) {
-            r.backwardPermutation((s, reasonBF) -> add(ur, s, src + ':' + reasonBF, index), index);
+        if (Global.SWAP_RULES && permuteSwap(r)) {
+            PremiseRule bSwap = r.swapPermutation(index);
+            if (bSwap != null)
+                then.accept(add(bSwap, src + ":forward", ur, index));
         }
+
     }
 
     /** whether a rule will be forward permuted */
-    static boolean forwardPermutes(@NotNull PremiseRule r) {
+    static boolean permuteSwap(@NotNull PremiseRule r) {
         boolean[] fwd = new boolean[] { true };
         r.recurseTerms((s) -> {
 
@@ -261,8 +261,7 @@ public class PremiseRuleSet  {
     }
 
 
-    @Nullable
-    static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
+    static PremiseRule add(@Nullable PremiseRule q, String src, @NotNull Collection<PremiseRule> target, @NotNull PatternIndex index) {
         if (q == null)
             return null;
 //            throw new RuntimeException("null: " + q + ' ' + src);
@@ -270,9 +269,7 @@ public class PremiseRuleSet  {
 
         PremiseRule normalized = normalize(q, index);
         normalized.setSource(src);
-        target.add(normalized);
-
-        return normalized;
+        return target.add(normalized) ? normalized : null;
     }
 
     @NotNull

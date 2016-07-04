@@ -133,8 +133,11 @@ public enum Global {
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
-    public static boolean BACKWARD_QUESTIONS = true;
+    public static boolean BACKWARD_QUESTION_RULES = true;
 
+    public static boolean NEGATIVE_RULES = true;
+
+    public static boolean SWAP_RULES = true;
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */

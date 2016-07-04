@@ -19,6 +19,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -64,7 +65,7 @@ public class PongEnvironment extends Player implements Environment {
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
 		//Multi nar = new Multi(3,
 		Default nar = new Default(
-				1024, 4, 2, 2, rng,
+				1024, 3, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
 				//new Cache2kIndex(56000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
@@ -79,7 +80,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
 		nar.cyclesPerFrame.set(64);
-		nar.conceptActivation.setValue(0.05f);
+		nar.conceptActivation.setValue(0.25f);
 		nar.confMin.setValue(0.02f);
 
 
@@ -113,7 +114,7 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		//new MySTMClustered(nar, 32, '.');
+		new MySTMClustered(nar, 32, '.');
 		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();
@@ -127,7 +128,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		//nar.logSummaryGT(System.out, 0.25f);
 
-		e.run(a, 264*16);
+		e.run(a, 128*16);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
