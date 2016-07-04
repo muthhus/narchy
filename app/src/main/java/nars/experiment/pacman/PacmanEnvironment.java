@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static nars.experiment.pong.PongEnvironment.bipolarNumericSensor;
 import static nars.experiment.pong.PongEnvironment.numericSensor;
 
 /**
@@ -141,11 +142,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(nar.conceptualize($.$("[pill]"), UnitBudget.Zero));
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
 				charted.add(nar.ask($.$("(($1-->HAPPY) <=> ($1-->happy))")).term());
+
+				charted.add(nar.ask($.$("(a:a0 && (I-->happy))")).term());
+				charted.add(nar.ask($.$("(a:a1 && (I-->happy))")).term());
+				charted.add(nar.ask($.$("(a:a2 && (I-->happy))")).term());
+				charted.add(nar.ask($.$("(a:a3 && (I-->happy))")).term());
+
 				charted.add(nar.conceptualize($.$("[ghost]"), UnitBudget.Zero));
 
+				//NAL9 emotion feedback loop
 				Iterables.addAll(charted,
-					numericSensor(nar.self.toString(),
-						"SAD", "NEUTRAL", "HAPPY", nar, ()->nar.emotion.happy(), 0.5f));
+					bipolarNumericSensor(nar.self.toString(),
+						"SAD", "NEUTRAL", "HAPPY", nar, ()->nar.emotion.happy(), 0.5f).resolution(0.15f));
 
 				new BeliefTableChart(nar, charted).show(600, 300);
 

@@ -102,6 +102,11 @@ public class PremiseEval extends FindSubst {
         putXY(t,t);
     }
 
+    public int matchesMax() {
+        final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
+        return (int) Math.ceil(task.pri() * (max - min) + min);
+    }
+
 
     /** only one thread should be in here at a time */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable ProcTerm eachMatch, @Nullable MatchConstraint constraints, int matchFactor) {
@@ -115,7 +120,7 @@ public class PremiseEval extends FindSubst {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.termutes = Math.max(1, premise.matchesMax() / matchFactor);
+            this.termutes = Math.max(1, matchesMax() / matchFactor);
             finish = true;
         } else {
             this.termutes = -1; //will not apply unless eachMatch!=null (final step)
@@ -135,11 +140,6 @@ public class PremiseEval extends FindSubst {
 
 
     }
-
-//    @Override
-//    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
-//        super.matchAll(x, y, finish);
-//    }
 
     @Override
     public boolean onMatch() {

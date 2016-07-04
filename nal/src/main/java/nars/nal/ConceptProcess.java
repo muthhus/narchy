@@ -132,10 +132,6 @@ public class ConceptProcess implements Premise {
 
 
 
-    public int matchesMax() {
-        final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
-        return (int) Math.ceil(task().pri() * (max - min) + min);
-    }
 
     /** part 2 */
     @NotNull public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {

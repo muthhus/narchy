@@ -29,6 +29,7 @@ import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
+import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.SensorConcept;
@@ -162,11 +163,11 @@ public class PongEnvironment extends Player implements Environment {
 		float halfPaddle = pong.PADDLE_HEIGHT / 2f;
 
 		return Iterables.concat(
-			numericSensor("ball", "left", "middle", "right", n, () -> pong.ball_x, pri),
+			numericSensor("ball", "left", "midX", "right", n, () -> pong.ball_x, pri),
 
-			numericSensor("ball", "bottom", "middle","top", n, () -> pong.ball_y, pri),
-			numericSensor("(pad,mine)", "bottom", "middle", "top", n, () -> pong.player1.position+halfPaddle, pri),
-			numericSensor("(pad,theirs)","bottom", "middle", "top", n, () -> pong.player2.position+halfPaddle, pri),
+			numericSensor("ball", "bottom", "midY","top", n, () -> pong.ball_y, pri),
+			numericSensor("(pad,mine)", "bottom", "midY", "top", n, () -> pong.player1.position+halfPaddle, pri),
+			numericSensor("(pad,theirs)","bottom", "midY", "top", n, () -> pong.player2.position+halfPaddle, pri),
 
 			numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () -> {
 
@@ -176,12 +177,22 @@ public class PongEnvironment extends Player implements Environment {
 
 	}
 
-	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+	public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 
-		return new FuzzyConceptSet(new RangeNormalizedFloat(input), n,
+		PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
+		return rawNumericSensor(term, low, mid, high, n, pri, p);
+	}
+
+	public static FuzzyConceptSet rawNumericSensor(String term, String low, String mid, String high, NAR n, float pri, FloatSupplier p) {
+		return new FuzzyConceptSet(p, n,
 				"(" + term + " --> " + low + ")",
 				"(" + term + " --> " + mid + ")",
 				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
+	}
+
+	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+		return rawNumericSensor(term, low, mid, high, n, pri, p);
 	}
 
 	public PongEnvironment() {

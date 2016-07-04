@@ -6,6 +6,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.truth.Truth;
+import nars.util.Util;
 import nars.util.math.FloatSupplier;
 
 import java.util.Iterator;
@@ -36,6 +37,9 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         int i = 0;
         for (String s : states) {
 
+            float dd = (i==0 || i==numStates-1) ?
+                    dr  : //endpoints
+                    dw; //middle points
 
             float fCenter = center;
             sensors.add( new SensorConcept(s, nar,
@@ -43,11 +47,17 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                     (x) -> {
                         float cdist = Math.abs(x - fCenter);
                         Truth y;
-                        if (cdist > dw) {
-                            y = t(0, conf);
-                        } else {
-                            y = t(0.5f + (1f-(cdist/dw))*0.5f, conf);
-                        }
+                        //if (cdist > dd) {
+                            //y = t(0, conf);
+                        //} else {
+                        float f = 0.5f + (1f - (cdist / dd)) * 0.5f;
+
+                        ///sharpen the curve:
+                        float fs = ((float)Math.pow( 2 * (f-0.5f), 3)+1f)/2f;
+
+                        y = t(fs, conf);
+                            //y = t(Util.clamp(1f-(cdist/dd)), conf);
+                        //}
                         //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
                         return y;
                     }
