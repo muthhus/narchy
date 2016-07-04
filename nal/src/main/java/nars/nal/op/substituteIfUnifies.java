@@ -55,14 +55,15 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return null;
         }
 
-        if (!x.equals(y) && hasAnyOp) {
-
+        boolean equals = x.equals(y);
+        if (!equals && hasAnyOp) {
             OneMatchFindSubst m = this.subMatcher;
             term = m.tryMatch(op, parent, term, x, y);
             m.clear();
-
+            return term;
+        } else {
+            return equals ? term : null;
         }
-        return term;
     }
 
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
@@ -106,5 +107,20 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return Op.VAR_INDEP;
         }
     }
+    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
 
+        public substituteOnlyIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
+            super(parent, sub);
+        }
+
+        @Override
+        protected boolean mustSubstitute() {
+            return true;
+        }
+
+        @Override
+        public Op unifying() {
+            return Op.VAR_INDEP;
+        }
+    }
 }

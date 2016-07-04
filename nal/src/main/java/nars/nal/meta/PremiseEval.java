@@ -93,6 +93,7 @@ public class PremiseEval extends FindSubst {
         put(new substituteIfUnifies.substituteIfUnifiesDep(this, subMatcher));
         put(new substituteIfUnifies.substituteOnlyIfUnifiesDep(this, subMatcher));
         put(new substituteIfUnifies.substituteIfUnifiesIndep(this, subMatcher));
+        put(new substituteIfUnifies.substituteOnlyIfUnifiesIndep(this, subMatcher));
 
         this.start = now();
 
