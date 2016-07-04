@@ -21,16 +21,20 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.Texts;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
@@ -1028,5 +1032,59 @@ public enum Util {
         procedure.run();
         long end = System.currentTimeMillis();
         logger.info("{} ({} ms)", procName, (end-start));
+    }
+
+    public static <X> Stream<X> fileCache(Path p, String baseName, Supplier<Stream<X>> o,
+                                          BiConsumer<X,DataOutput> encoder,
+                                          Function<DataInput,X> decoder,
+                                          Logger logger
+                                          ) throws IOException {
+
+        File f = p.toFile();
+        long lastModified = f.lastModified();
+        long size = f.length();
+        String suffix = "_" + p.getFileName() + "_" + lastModified + "_" + size;
+
+        List<X> buffer = new FasterList(1024 /* estimate */);
+
+        String tempDir = System.getProperty("java.io.tmpdir");
+
+        File cached = new File(tempDir, baseName + suffix);
+        if (cached.exists()) {
+            //try read
+            try {
+
+                FileInputStream ff = new FileInputStream(cached);
+                DataInputStream din = new DataInputStream(ff);
+                while (din.available() > 0) {
+                    buffer.add(decoder.apply(din));
+                }
+                din.close();
+
+                logger.warn("cache loaded {}: ({} bytes, from {})", cached.getAbsolutePath(), cached.length(), new Date(cached.lastModified()));
+
+                return buffer.stream();
+            } catch (Exception e) {
+                logger.warn("{}, regenerating..", e);
+                //continue below
+            }
+        }
+
+        //save
+        buffer.clear();
+
+        Stream<X> instanced = o.get();
+
+        DataOutputStream dout = new DataOutputStream( new FileOutputStream(cached.getAbsolutePath()) );
+        instanced.forEach(c -> {
+            buffer.add(c);
+            encoder.accept(c, dout);
+        });
+        dout.close();
+        logger.warn("cached {}: ({} bytes)", cached.getAbsolutePath(), dout.size());
+
+        return buffer.stream();
+
+
     }
 }

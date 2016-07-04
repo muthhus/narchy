@@ -18,14 +18,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -46,7 +44,6 @@ public class PremiseRuleSet {
     public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
 
         PatternIndex p = new PatternIndex();
-        Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
 
         BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
             try {
@@ -68,8 +65,9 @@ public class PremiseRuleSet {
                 }
         };
 
+        Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
         Stream<Pair<Compound, String>> parsed =
-                fileCache(path, PremiseRuleSet.class.getSimpleName(),
+                Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
                         () -> {
                             try {
                                 return parse(load(Files.readAllLines(path)), p);
@@ -78,59 +76,11 @@ public class PremiseRuleSet {
                             }
                         },
                         encoder,
-                        decoder
+                        decoder,
+                        logger
                 );
 
         return new PremiseRuleSet(parsed, p);
-    }
-
-    public static <X> Stream<X> fileCache(Path p, String baseName, Supplier<Stream<X>> o,
-                                          BiConsumer<X,DataOutput> encoder,
-                                          Function<DataInput,X> decoder
-                                          ) throws IOException {
-
-        File f = p.toFile();
-        long lastModified = f.lastModified();
-        long size = f.length();
-        String suffix = "_" + p.getFileName() + "_" + lastModified + "_" + size;
-
-
-        String tempDir = System.getProperty("java.io.tmpdir");
-
-        File cached = new File(tempDir, baseName + suffix);
-        if (cached.exists()) {
-            //try read
-            try {
-
-                DataInputStream fin = new DataInputStream(new FileInputStream(cached));
-
-                List<X> read = new ArrayList(); //TODO use stream directly
-
-                while (fin.available() > 0) {
-                    read.add(decoder.apply(fin));
-                }
-
-                fin.close();
-
-                return read.stream();
-            } catch (Exception e) {
-                logger.error("{}, regenerating..", e);
-                //continue below
-            }
-        }
-
-        //save
-        Stream<X> instanced = o.get();
-        List<X> copy = new ArrayList(); //HACK
-        DataOutputStream dout = new DataOutputStream( new FileOutputStream(cached.getAbsolutePath()) );
-        instanced.forEach(c -> {
-            copy.add(c);
-            encoder.accept(c, dout);
-        });
-        dout.close();
-        return copy.stream();
-
-
     }
 
 

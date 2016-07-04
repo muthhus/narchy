@@ -554,8 +554,8 @@ public class Narsese extends BaseParser<Object> {
                 COMPOUND_TERM_CLOSER,
 
 
-                push(TemporalRelationBuilder((Term) pop() /* pred */,
-                        (Integer) pop() /*cycleDelta*/, (Op) pop() /*relation*/, (Term) pop() /* subj */))
+                push(TemporalRelationBuilder(the(pop()) /* pred */,
+                        (Integer) pop() /*cycleDelta*/, (Op) pop() /*relation*/, the(pop()) /* subj */))
         );
     }
 
