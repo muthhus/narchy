@@ -141,7 +141,7 @@ public class TrieDeriver extends Deriver {
 
     @NotNull
     private static List<ProcTerm> factorSubOpToSwitch(@NotNull List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
-        Map<PatternOp, ProcTerm> cases = Global.newHashMap();
+        Map<PatternOp, ProcTerm> cases = Global.newHashMap(8);
         List<ProcTerm> removed = Global.newArrayList(); //in order to undo
         bb.removeIf(p -> {
             if (p instanceof IfThen) {

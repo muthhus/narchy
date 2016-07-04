@@ -5,11 +5,15 @@ import nars.Global;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
+import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -25,16 +29,31 @@ import java.util.function.Function;
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
     @NotNull
-    final Map<Variable, Variable /*Variable*/> rename;
+    private final UnifriedMap<Variable, Variable /*Variable*/> rename;
 
-    boolean renamed;
+    private boolean renamed;
 
     public VariableNormalization() {
         this(0);
     }
 
-    public VariableNormalization(int size) {
-        rename = Global.newHashMap(size);
+
+
+    public VariableNormalization(int size /* estimate */) {
+        this(new UnifriedMap<>(size));
+    }
+
+    public VariableNormalization(@NotNull UnifriedMap<Variable, Variable> r) {
+        rename = r;
+
+        //NOTE:
+        //rename = new ConcurrentHashMap(size); //doesnt work being called recursively
+        //rename = new HashMap(size); //doesnt work being called recursively
+    }
+
+    /** call when finished */
+    public final void clear() {
+        rename.delete();
     }
 
 //    final static Comparator<Map.Entry<Variable, Variable>> comp = new Comparator<Map.Entry<Variable, Variable>>() {
@@ -82,7 +101,6 @@ public class VariableNormalization extends VariableTransform implements Function
                 //return null;
 
             return $.v(current.op(), 1);
-            //return _newVariable(current, 1);
         }
     };
 
@@ -91,10 +109,10 @@ public class VariableNormalization extends VariableTransform implements Function
     @Override
     public final Variable apply(@NotNull Variable v) {
         Variable rvv = newVariable(v, rename.size()+1);
-        if (!this.renamed) {
-            //track if modification occurred
-            this.renamed = (rvv!=v); //!rvv.equals(v);
-        }
+
+        //track if modification occurred
+        this.renamed |= (rvv!=v); //!rvv.equals(v);
+
         return rvv;
     }
 
@@ -107,10 +125,13 @@ public class VariableNormalization extends VariableTransform implements Function
     protected Variable newVariable(@NotNull Variable v, int serial) {
         if (v instanceof GenericVariable) {
             return ((GenericVariable) v).normalize(serial); //HACK
-        } else if (v instanceof Ellipsis) {
-            return ((Ellipsis)v).clone($.v(v.op(), serial), this);
         } else {
-            return $.v(v.op(), serial); //N/A
+            @NotNull AbstractVariable vn = $.v(v.op(), serial);
+            if (v instanceof Ellipsis) {
+                return ((Ellipsis) v).clone(vn, this);
+            } else {
+                return vn; //N/A
+            }
         }
 
     }

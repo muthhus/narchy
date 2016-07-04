@@ -362,16 +362,21 @@ public interface TermIndex {
     }
 
 
+
     default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
         Compound r;
-        if (/*t instanceof Compound &&*/ !t.isNormalized()) {
+        if (!t.isNormalized()) {
             Compound ct = (Compound) t;
             int numVars = ct.vars();
-            Term t2 = transform(ct,
-                    (numVars == 1 && ct.varPattern() == 0) ?
-                            VariableNormalization.singleVariableNormalization :
-                            new VariableNormalization(numVars)
-            );
+
+            Term t2;
+            if (numVars == 1 && ct.varPattern() == 0) {
+                t2 = transform(ct, VariableNormalization.singleVariableNormalization);
+            } else {
+                VariableNormalization vn = new VariableNormalization(numVars);
+                t2 = transform(ct, vn);
+                vn.clear();
+            }
 
             if (!(t2 instanceof Compound)) { //includes null test
                 if (Global.DEBUG)

@@ -106,9 +106,10 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
 
     protected static final int DEFAULT_INITIAL_CAPACITY = 8;
 
-    private static final long serialVersionUID = 1L;
 
     protected transient Object[] table;
+
+    private final static Object[] ZERO = new Object[0];
 
     protected transient int occupied;
 
@@ -125,6 +126,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     }
 
     public UnifriedMap(int initialCapacity, float loadFactor) {
+
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("initial capacity cannot be less than 0");
         }
@@ -136,7 +138,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }
 
         this.loadFactor = loadFactor;
-        init(fastCeil(initialCapacity / loadFactor));
+        if (initialCapacity > 0)
+            init(fastCeil(initialCapacity / loadFactor));
+        else {
+            maxSize = 0;
+            table = ZERO;
+        }
     }
 
     public UnifriedMap(Map<? extends K, ? extends V> map) {
@@ -282,14 +289,14 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     }
 
     protected final int index(Object key) {
-        return index(key, table.length);
-    }
+        int tl = table.length;
 
-    protected static int index(Object key, int tl) {
         // This function ensures that hashCodes that differ only by
         // constant multiples at each bit position have a bounded
         // number of collisions (approximately 8 at default load factor).
-        int h = key == null ? 0 : key.hashCode();
+        int h = /*key == null ? 0 :*/ //disallow null keys
+            key.hashCode();
+
         h ^= h >>> 20 ^ h >>> 12;
         h ^= h >>> 7 ^ h >>> 4;
         return (h & (tl >> 1) - 1) << 1;
@@ -310,6 +317,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         }*/
     }
 
+    public void delete() {
+        occupied = 0;
+        table = ZERO;
+    }
+
+
     @Override
     public V put(K key, V value) {
         return (V)putFast(key, value);
@@ -320,6 +333,9 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
      * make sure value is of type V
      */
     public final Object putFast(Object key, Object value) {
+        if (table.length == 0)
+            allocate(2);
+
         int index = index(key);
         Object[] t = table;
         Object cur = t[index];
@@ -528,7 +544,7 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     public V getIfAbsentPut(K key, Function0<? extends V> function) {
         Object[] t = table;
 
-        int index = index(key, t.length);
+        int index = index(key);
 
         Object cur = t[index];
 
@@ -791,8 +807,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     @Override
     public final V get(Object key) {
 
+        if (occupied == 0)
+            return null;
+
+        int index = index(key);
         Object[] t = table;
-        int index = index(key, t.length);
+
         Object cur = t[index];
 
         Object v = null;
@@ -829,8 +849,13 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
 
     @Override
     public boolean containsKey(Object key) {
+
         Object[] t = table;
-        int index = index(key, t.length);
+        int length = t.length;
+        if (length == 0)
+            return false;
+
+        int index = index(key);
         Object cur = t[index];
 
         if (cur == null) {
@@ -1110,8 +1135,12 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
 
     @Override
     public V remove(Object key) {
+        if (occupied == 0)
+            return null;
+
         int index = index(key);
         Object[] t = table;
+
         Object cur = t[index];
         if (cur != null) {
             Object val = t[index + 1];
@@ -1314,44 +1343,44 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
         return builder.toString();
     }
 
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        int size = in.readInt();
-        loadFactor = in.readFloat();
-        init(Math.max((int) (size / loadFactor) + 1,
-                DEFAULT_INITIAL_CAPACITY));
-        for (int i = 0; i < size; i++) {
-            put((K) in.readObject(), (V) in.readObject());
-        }
-    }
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt(size());
-        out.writeFloat(loadFactor);
-        for (int i = 0; i < table.length; i += 2) {
-            Object o = table[i];
-            if (o != null) {
-                if (o == CHAINED_KEY) {
-                    writeExternalChain(out, (Object[]) table[i + 1]);
-                } else {
-                    out.writeObject(nonSentinel(o));
-                    out.writeObject(table[i + 1]);
-                }
-            }
-        }
-    }
-
-    private void writeExternalChain(ObjectOutput out, Object[] chain) throws IOException {
-        for (int i = 0; i < chain.length; i += 2) {
-            Object cur = chain[i];
-            if (cur == null) {
-                return;
-            }
-            out.writeObject(nonSentinel(cur));
-            out.writeObject(chain[i + 1]);
-        }
-    }
+//    @Override
+//    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+//        int size = in.readInt();
+//        loadFactor = in.readFloat();
+//        init(Math.max((int) (size / loadFactor) + 1,
+//                DEFAULT_INITIAL_CAPACITY));
+//        for (int i = 0; i < size; i++) {
+//            put((K) in.readObject(), (V) in.readObject());
+//        }
+//    }
+//
+//    @Override
+//    public void writeExternal(ObjectOutput out) throws IOException {
+//        out.writeInt(size());
+//        out.writeFloat(loadFactor);
+//        for (int i = 0; i < table.length; i += 2) {
+//            Object o = table[i];
+//            if (o != null) {
+//                if (o == CHAINED_KEY) {
+//                    writeExternalChain(out, (Object[]) table[i + 1]);
+//                } else {
+//                    out.writeObject(nonSentinel(o));
+//                    out.writeObject(table[i + 1]);
+//                }
+//            }
+//        }
+//    }
+//
+//    private void writeExternalChain(ObjectOutput out, Object[] chain) throws IOException {
+//        for (int i = 0; i < chain.length; i += 2) {
+//            Object cur = chain[i];
+//            if (cur == null) {
+//                return;
+//            }
+//            out.writeObject(nonSentinel(cur));
+//            out.writeObject(chain[i + 1]);
+//        }
+//    }
 
     @Override
     public void forEachWithIndex(ObjectIntProcedure<? super V> objectIntProcedure) {
@@ -1645,6 +1674,16 @@ public class UnifriedMap<K, V> extends AbstractMutableMap<K, V>
     @Override
     public <P> boolean noneSatisfyWith(Predicate2<? super V, ? super P> predicate, P parameter) {
         return shortCircuitWith(predicate, parameter, true, false, true);
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        throw new UnsupportedOperationException();
     }
 
     protected class KeySet implements Set<K>, Serializable, BatchIterable<K> {

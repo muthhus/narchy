@@ -37,6 +37,7 @@ import nars.term.variable.Variable;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
 import nars.util.data.list.FasterList;
+import nars.util.data.map.UnifriedMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -550,9 +551,11 @@ public class PremiseRule extends GenericCompound {
         try {
 
             //HACK
+            PremiseRuleVariableNormalization vn = new PremiseRuleVariableNormalization();
             Term tt = index.transform(
                     (Compound) terms.transform(this, UppercaseAtomsToPatternVariables),
-                    new PremiseRuleVariableNormalization());
+                    vn);
+            vn.clear();
 
             Compound premiseComponents = (Compound) index.the(tt);
 
@@ -1184,6 +1187,10 @@ public class PremiseRule extends GenericCompound {
         public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
 
         int offset;
+
+        public PremiseRuleVariableNormalization() {
+            super(new UnifriedMap<>(8));
+        }
 
         public static AbstractVariable varPattern(int i) {
             return v(VAR_PATTERN, i);

@@ -130,8 +130,6 @@ public enum Global {
     public static int QUERY_ANSWERS_PER_MATCH = 1;
 
 
-    /** smallest non-zero sub-cycle time measurement; # of cycles per frame should not exceed 1 / SUBFRAME_EPSILON */
-    public static float SUBFRAME_EPSILON = 0.0001f;
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
@@ -149,7 +147,7 @@ public enum Global {
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 16f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 0.5f;
 
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
@@ -162,22 +160,28 @@ public enum Global {
 
     @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
+        if (capacity < 4) {
+            return new UnifriedMap<>(capacity);
+        } else {
+            return new HashMap<>(capacity);
+        }
+
         //return new UnifiedMap(capacity);
-        return new UnifriedMap(capacity /*, loadFactor */);
+        //return new UnifriedMap(capacity /*, loadFactor */);
 
         //return new FasterHashMap(capacity);
         //return new FastMap<>(); //javolution http://javolution.org/apidocs/javolution/util/FastMap.html
-        //return new HashMap<>(capacity); //doesn't work here, possiblye due to null value policy
+
         //return new LinkedHashMap(capacity);
     }
 
-    /** copy */
-    @NotNull
-    public static <X,Y> Map<X, Y> newHashMap(Map<X, Y> xy) {
-        //return new UnifriedMap(xy);
-        return new UnifiedMap(xy);
-        //return new HashMap(xy);
-    }
+//    /** copy */
+//    @NotNull
+//    public static <X,Y> Map<X, Y> newHashMap(Map<X, Y> xy) {
+//        //return new UnifriedMap(xy);
+//        return new UnifiedMap(xy);
+//        //return new HashMap(xy);
+//    }
 
     @NotNull
     public static <X> List<X> newArrayList() {
@@ -193,7 +197,7 @@ public enum Global {
 
     @NotNull
     public static <X> Set<X> newHashSet(int capacity) {
-        if (capacity < 2) {
+        if (capacity < 4) {
             return new UnifiedSet(0);
         } else {
             //return new UnifiedSet(capacity);

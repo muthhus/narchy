@@ -263,6 +263,9 @@ public class BeliefTableChart extends JoglSpace2D {
 
     private void renderTable(Concept c, int n, long minT, long maxT, long now, GL2 gl, float gew, float geh, float tew, float teh, TruthWave wave, boolean beliefOrGoal) {
 
+        if (c == null)
+            return;
+
         //Present axis line
         if ((now <= maxT) && (now >= minT)) {
             float nowLineWidth = 3;

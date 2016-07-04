@@ -941,11 +941,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Term t = tt.term();
         if (tt instanceof Concept) {
             if (t instanceof Compound) {
-                assert(t !=tt);
-                Concept next = concept(t, createIfMissing);
-                //if (next!=tt)
+                //assert(t !=tt);
+                if (t!=tt) {
+                    Concept next = concept(t, createIfMissing);
+                    //if (next!=tt)
                     //logger.info("warning: callee has a stale concept instance: " + tt + " vs. active " + next);
-                return next;
+                    return next;
+                }
             }
 //
 //            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
