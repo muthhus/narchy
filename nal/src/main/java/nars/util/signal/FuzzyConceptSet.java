@@ -50,14 +50,14 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                         //if (cdist > dd) {
                             //y = t(0, conf);
                         //} else {
-                        float f = 0.5f + (1f - (cdist / dd)) * 0.5f;
+                        float f = (1f - (cdist / dd));
 
                         ///sharpen the curve:
 
                         y = t(f, conf);
                             //y = t(Util.clamp(1f-(cdist/dd)), conf);
                         //}
-                        //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
+                        System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
                         return y;
                     }
             ));

@@ -363,6 +363,7 @@ public interface TermIndex {
 
 
 
+
     default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
         Compound r;
         if (!t.isNormalized()) {
@@ -378,11 +379,11 @@ public interface TermIndex {
                 vn.clear();
             }
 
-            if (!(t2 instanceof Compound)) { //includes null test
+            /*if (!(t2 instanceof Compound)) { //includes null test
                 if (Global.DEBUG)
                     System.err.println(t + " TermIndex.normalize() produced null");
                 return null;
-            }
+            }*/
 
 
             ((GenericCompound)t2).setNormalized();

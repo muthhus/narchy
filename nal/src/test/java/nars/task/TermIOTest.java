@@ -92,7 +92,11 @@ public class TermIOTest {
 
         assertTermEqualSerialize("((#a --> b) <-> ?c)");
 
-        assertEquals( Math.signum($("(#2-->b)").compareTo($("?1"))), -Math.signum($("?1").compareTo($("(#2-->b)"))) );
+        Term a = $("(#2-->b)");
+        Term b = $("?1");
+        int x = a.compareTo(b);
+        int y = b.compareTo(a);
+        assertNotEquals((int) Math.signum(x), (int) Math.signum(y));
 
     }
 

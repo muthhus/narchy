@@ -3,6 +3,7 @@ package nars.term.variable;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
@@ -43,11 +44,7 @@ public class GenericVariable extends AtomicString implements Variable {
     @Override
     public int compareTo(@NotNull Termlike that) {
         if (this == that) return 0;
-        if (that instanceof Compound)
-            return 1;
-        if (that instanceof AbstractVariable)
-            return -1; //prevent comparison with AbstractVariable
-        return super.compareTo(that);
+        return Term.compare(this, (Term)that);
     }
 
     @Override
