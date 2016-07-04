@@ -19,6 +19,7 @@
 
 package nars.experiment.pacman;
 
+import boofcv.gui.image.ImageZoomPanel;
 import com.github.benmanes.caffeine.cache.Policy;
 import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
@@ -46,10 +47,14 @@ import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.vision.NARCamera;
+import nars.vision.SwingCamera;
+import org.ejml.ops.MatrixVisualization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -128,6 +133,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
+		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */);
 
 		NAgent n = new NAgent(nar) {
 			@Override
@@ -141,7 +147,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 				charted.add(nar.conceptualize($.$("[pill]"), UnitBudget.Zero));
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
-				charted.add(nar.ask($.$("(($1-->HAPPY) <=> ($1-->happy))")).term());
+				charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
 
 				charted.add(nar.ask($.$("(a:a0 && (I-->happy))")).term());
 				charted.add(nar.ask($.$("(a:a1 && (I-->happy))")).term());
@@ -153,20 +159,41 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//NAL9 emotion feedback loop
 				Iterables.addAll(charted,
 					bipolarNumericSensor(nar.self.toString(),
-						"SAD", "NEUTRAL", "HAPPY", nar, ()->nar.emotion.happy(), 0.5f).resolution(0.15f));
+						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
+				Iterables.addAll(charted,
+						numericSensor(nar.self.toString(),
+								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
 
 				new BeliefTableChart(nar, charted).show(600, 300);
 
-				BagChart.show((Default)nar);
+				//BagChart.show((Default)nar);
 			}
 		};
 
-		new PacmanEnvironment(1 /* ghosts  */).run(
+
+		NARCamera camera = new NARCamera(nar, new SwingCamera(pacman, 4, 4), (x, y) -> {
+			return $.p($.the(x), $.the(y));
+		});
+
+//		nar.log();
+//		nar.onFrame(nn -> {
+//
+//			camera.updateMono((x,y,t,w) -> {
+//				nar.believe(t, w, 0.9f);
+//			});
+//
+//		});
+
+
+
+		pacman.run(
 				//new DQN(),
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
 				16384);
+
+
 
 
 

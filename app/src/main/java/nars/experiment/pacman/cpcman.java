@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * the main class of the pacman game
  */
-public class cpcman extends Frame
+public class cpcman extends JFrame
 implements Runnable, KeyListener, ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 3582431359568375379L;
@@ -311,7 +311,8 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	}
 
 
-	void paintUpdate(Graphics g) 	{
+	@Override
+	public void paint(Graphics g) {
 
 		//g.setColor(Color.black);
 
@@ -466,7 +467,7 @@ implements Runnable, KeyListener, ActionListener, WindowListener
 	public void update(Graphics g)
 	{
 
-		paintUpdate(g);	
+		paint(g);
 	}
 
 	///////////////////////////////////////

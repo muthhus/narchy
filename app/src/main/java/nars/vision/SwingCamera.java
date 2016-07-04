@@ -5,24 +5,40 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Captures a swing component to a bitmap and scales it down, returning an image pixel by pixel
+ * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel
  */
 public class SwingCamera implements PixelCamera {
 
-    private final JComponent component;
+    private final Container component;
     private BufferedImage big;
     private BufferedImage small;
-    int width, height;
+    public int width;
+    public int height;
     private Graphics2D smallGfx;
 
-    public SwingCamera(JComponent component, int targetWidth, int targetHeight) {
+    public SwingCamera(Container component, int targetWidth, int targetHeight) {
         this.component = component;
         this.width = targetWidth;
         this.height = targetHeight;
     }
 
+    public void updateMono(PerPixelMono m) {
+        update((x,y,p)-> {
+            int r = (p & 0x00ff0000) >> 16;
+            int g = (p & 0x0000ff00) >> 8;
+            int b = (p & 0x000000ff);
+
+            m.pixel(x, y, ((r+g+b) / 256f)/3f);
+        });
+    }
+    public void updateMono(PerIndexMono m) {
+        updateMono((x,y,p)-> {
+            m.pixel(width * y + x, p);
+        });
+    }
+
     @Override
-    public void update(PerPixel p) {
+    public void update(PerPixelRGB p) {
 
         big = ScreenImage.get(component, big);
 

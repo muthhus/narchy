@@ -53,9 +53,8 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                         float f = 0.5f + (1f - (cdist / dd)) * 0.5f;
 
                         ///sharpen the curve:
-                        float fs = ((float)Math.pow( 2 * (f-0.5f), 3)+1f)/2f;
 
-                        y = t(fs, conf);
+                        y = t(f, conf);
                             //y = t(Util.clamp(1f-(cdist/dd)), conf);
                         //}
                         //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);

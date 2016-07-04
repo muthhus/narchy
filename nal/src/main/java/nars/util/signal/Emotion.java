@@ -30,6 +30,9 @@ public final class Emotion implements Serializable {
     @NotNull
     public final FloatGuage happy;
 
+    @NotNull
+    public final FloatGuage motivation;
+
     private transient final Logger logger;
 
     /** alertness, % active concepts change per cycle */
@@ -47,6 +50,7 @@ public final class Emotion implements Serializable {
         this.stress = new FloatGuage("stress");
         this.frustration = new FloatGuage("frustration");
         this.alert = new FloatGuage("alert");
+        this.motivation = new FloatGuage("motivation");
 
     }
 
@@ -58,6 +62,7 @@ public final class Emotion implements Serializable {
         stress.clear();
         frustration.clear();
         alert.clear();
+        motivation.clear();
     }
 
     /** percentage of business which was not frustration */
@@ -123,6 +128,7 @@ public final class Emotion implements Serializable {
 
     @Deprecated public void happy(float delta) {
         happy.accept( delta );
+        motivation.accept( Math.abs(delta) );
     }
     @Deprecated public void busy(float pri) {
         busy.accept( pri );

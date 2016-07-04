@@ -9,7 +9,7 @@ import nars.term.Termed;
 /**
  * Created by me on 6/5/16.
  */
-public class NARCamera implements PixelCamera.PerPixel {
+public class NARCamera implements PixelCamera.PerPixelRGB {
 
     private final PixelCamera cam;
     private final PixelToTerm pixelTerm;
@@ -37,20 +37,28 @@ public class NARCamera implements PixelCamera.PerPixel {
     public interface PerPixel {
         void pixel(int x, int y, Termed t, int r, int g, int b);
     }
+    public interface PerPixelMono {
+        void pixel(int x, int y, Termed t, float w);
+    }
     public interface PixelToTerm {
         Termed pixel(int x, int y);
     }
 
-    public void update(PerPixel pp) {
-        cam.update(this);
+    public synchronized void update(PerPixel pp) {
         this.perPixel = pp;
+        cam.update(this);
+    }
+    public void updateMono(PerPixelMono pp) {
+        update((x,y,t,r,g,b) -> {
+           pp.pixel(x,y,t,PixelCamera.rgbToMono(r,g,b));
+        });
     }
 
     @Override
-    public void pixel(int x, int y, int rgb) {
-        int r = (rgb & 0x00ff0000) >> 16;
-        int g = (rgb & 0x0000ff00) >> 8;
-        int b = (rgb & 0x000000ff);
+    public void pixel(int x, int y, int aRGB) {
+        int r = (aRGB & 0x00ff0000) >> 16;
+        int g = (aRGB & 0x0000ff00) >> 8;
+        int b = (aRGB & 0x000000ff);
         perPixel.pixel(x, y, p(x,y), r, g, b);
     }
 

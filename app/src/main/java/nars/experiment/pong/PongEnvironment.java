@@ -6,7 +6,6 @@ package nars.experiment.pong;/*
  */
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
@@ -16,12 +15,10 @@ import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
-import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -178,7 +175,6 @@ public class PongEnvironment extends Player implements Environment {
 	}
 
 	public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
-
 		PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
 		return rawNumericSensor(term, low, mid, high, n, pri, p);
 	}
@@ -189,10 +185,18 @@ public class PongEnvironment extends Player implements Environment {
 				"(" + term + " --> " + mid + ")",
 				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
 	}
-
+	public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
+		return new FuzzyConceptSet(p, n,
+				"(" + term + " --> " + low + ")",
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
+	}
 	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
 		return rawNumericSensor(term, low, mid, high, n, pri, p);
+	}
+	public static FuzzyConceptSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
+		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+		return rawNumericSensor(term, low, high, n, pri, p);
 	}
 
 	public PongEnvironment() {
@@ -501,14 +505,9 @@ public class PongEnvironment extends Player implements Environment {
 		for (int i = 0; i < ticksPerFrame; i++)
 			pong.actionPerformed(null);
 
-		swingCamera.update((x,y,p)->{
-			int i = width * y + x;
-			int r = (p & 0x00ff0000) >> 16;
-			ins[i++] = r/255f;
+		swingCamera.updateMono((i, r)->{
+			ins[i] = r;
 		});
-
-
-
 
 		float score = points;
 		float reward = score-lastScore + bias;
