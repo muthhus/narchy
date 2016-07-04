@@ -1,17 +1,24 @@
 package nars.vision;
 
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
+import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.index.TermIndex;
 import nars.term.Termed;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
+import spacegraph.obj.CrosshairSurface;
+import spacegraph.render.ShapeDrawer;
 
 /**
  * Created by me on 6/5/16.
  */
 public class NARCamera implements PixelCamera.PerPixelRGB {
 
-    private final PixelCamera cam;
+    public final PixelCamera cam;
     private final PixelToTerm pixelTerm;
 
     //final WeakHashMap<IntIntPair,Termed> terms = new WeakHashMap();
@@ -33,6 +40,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.cam = c;
         this.pixelTerm = pixelTerm;
     }
+
 
     public interface PerPixel {
         void pixel(int x, int y, Termed t, int r, int g, int b);
@@ -79,4 +87,37 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         return (((long)x) << 32) | ((long)y);
     }
 
+    public static void newWindow(NARCamera camera) {
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
+        s.show(500, 500);
+
+        s.add(new Facial(new CameraViewer(camera)));
+        //s.add(new Facial(new CrosshairSurface(s)));
+    }
+
+    private static class CameraViewer extends Surface {
+        private final NARCamera camera;
+        float tw = 400f;
+
+        public CameraViewer(NARCamera camera) {
+            this.camera = camera;
+        }
+
+        @Override
+        protected void paint(GL2 gl) {
+
+            int w = camera.cam.width();
+            int h = camera.cam.height();
+            float ar = h/w;
+
+            float th = tw/ar;
+
+            float dw = tw/w;
+            float dh = th/h;
+            camera.cam.update((x,y,r,g,b,a)->{
+                gl.glColor4f(r,g,b,a);
+                ShapeDrawer.rect(gl, x*dw, th - y*dh, dw, dh);
+            });
+        }
+    }
 }

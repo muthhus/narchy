@@ -171,18 +171,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		};
 
 
-		NARCamera camera = new NARCamera(nar, new SwingCamera(pacman, 4, 4), (x, y) -> {
+		NARCamera camera = new NARCamera(nar, new SwingCamera(pacman, 128, 128 ), (x, y) -> {
 			return $.p($.the(x), $.the(y));
 		});
+		NARCamera.newWindow(camera);
 
-//		nar.log();
-//		nar.onFrame(nn -> {
-//
+		nar.onFrame(nn -> {
+
 //			camera.updateMono((x,y,t,w) -> {
-//				nar.believe(t, w, 0.9f);
+//				//nar.believe(t, w, 0.9f);
 //			});
-//
-//		});
+
+		});
 
 
 

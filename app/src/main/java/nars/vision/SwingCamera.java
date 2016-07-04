@@ -22,19 +22,15 @@ public class SwingCamera implements PixelCamera {
         this.height = targetHeight;
     }
 
-    public void updateMono(PerPixelMono m) {
-        update((x,y,p)-> {
-            int r = (p & 0x00ff0000) >> 16;
-            int g = (p & 0x0000ff00) >> 8;
-            int b = (p & 0x000000ff);
 
-            m.pixel(x, y, ((r+g+b) / 256f)/3f);
-        });
+    @Override
+    public int width() {
+        return width;
     }
-    public void updateMono(PerIndexMono m) {
-        updateMono((x,y,p)-> {
-            m.pixel(width * y + x, p);
-        });
+
+    @Override
+    public int height() {
+        return height;
     }
 
     @Override
@@ -48,7 +44,9 @@ public class SwingCamera implements PixelCamera {
         if (small == null || small.getWidth()!=width || small.getHeight()!=height) {
             small = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             smallGfx = small.createGraphics(); //create a graphics object to paint to
-            smallGfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            smallGfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            smallGfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            smallGfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
 
         final BufferedImage small = this.small;
