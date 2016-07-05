@@ -13,7 +13,7 @@ public class Maze1DTest extends RunAgentTest {
 
 
     @Override public Environment environment() {
-        return new Maze1DEnv(9);
+        return new Maze1DEnv(3);
     }
 
     @Override

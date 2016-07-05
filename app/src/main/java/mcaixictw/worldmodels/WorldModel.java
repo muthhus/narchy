@@ -1,6 +1,8 @@
 package mcaixictw.worldmodels;
 
-import java.util.List;
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+
 
 /**
  * The agents model of the the environment. The goal of the agent is to maximize
@@ -33,26 +35,30 @@ public abstract class WorldModel {
 
 	// public abstract void clear();
 
-	public abstract void update(List<Boolean> symlist);
 
-	public abstract void updateHistory(List<Boolean> symlist);
+
+	public abstract void update(BooleanList symlist);
+
+	public abstract void updateHistory(BooleanArrayList symlist);
 
 	public abstract void revert(int numSymbols);
 
 	public abstract void revertHistory(int newsize);
 
-	public abstract List<Boolean> genRandomSymbols(int bits);
+	public abstract BooleanArrayList genRandomSymbols(int bits);
 
-	public abstract List<Boolean> genRandomSymbolsAndUpdate(int bits);
+	public abstract BooleanArrayList genRandomSymbolsAndUpdate(int bits);
 
-	public abstract double predict(List<Boolean> symbols);
+
+
+	public abstract double predict(BooleanList symbols);
 
 	public abstract boolean nthHistorySymbol(int n);
 
 	public abstract int historySize();
 
-	public static WorldModel getInstance(String name,
-                                         WorldModelSettings settings) {
+	public static WorldModel build(String name,
+								   WorldModelSettings settings) {
 
 		if (settings.isFacContextTree()) {
 			return new FactorialContextTree(name, settings.getDepth());

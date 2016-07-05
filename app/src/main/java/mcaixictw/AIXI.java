@@ -1,9 +1,13 @@
 package mcaixictw;
 
 import java.io.PrintWriter;
+import java.util.function.IntConsumer;
 import java.util.logging.Logger;
 
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
+
+import static mcaixictw.Util.asInt;
 
 
 /**
@@ -15,6 +19,12 @@ public class AIXI extends AIXIModel {
 	
 	private static final Logger log = Logger.getLogger(AIXI.class.getName());
 
+	public AIXI(Environment env, ControllerSettings agentSettings,UCTSettings uctSettings, WorldModel model) {
+		this(env.numActions(), env.observationBits(),
+			 env.rewardBits(), agentSettings, uctSettings, model);
+
+	}
+
 	/**
 	 * use the given instance of WorldModel
 	 * 
@@ -23,51 +33,51 @@ public class AIXI extends AIXIModel {
 	 * @param uctSettings
 	 * @param model
 	 */
-	public AIXI(Environment env, ControllerSettings agentSettings,
+	public AIXI(int actions, int observationBits, int rewardBits, ControllerSettings agentSettings,
                 UCTSettings uctSettings, WorldModel model) {
-		super(env.numActions(), env.observationBits(),
-				env.rewardBits(), model);
+		super(actions, observationBits, rewardBits, model);
 		this.uctSettings = uctSettings;
 		this.agentSettings = agentSettings;
-		this.environment = env;
 		search = new UCTSearch();
 	}
 
 	public String toString() {
-		String limiter = "=====================\n";
-		String result = limiter;
-		result += agentSettings;
-		result += uctSettings;
-		result += this.getModel();
-		result += "cycle: " + cycle + '\n';
-		result += "avgRew: " + this.averageReward() + '\n';
-		result += limiter;
+
+		String result = "";
+		result += "cycle: " + cycle + ' ';
+		result += agentSettings.toString() + ' ';
+		result += uctSettings.toString() + ' ';
+		result += "avgRew: " + this.averageReward();
+
 		return result;
 	}
 
-	private final Environment environment;
 	private UCTSettings uctSettings;
 	private ControllerSettings agentSettings;
 	private UCTSearch search;
 	private PrintWriter csv;
 	private int cycle = 1;
 
-	/**
-	 * interact with the environment. if the random flag is true the agent will
-	 * choose a random action on every cycle. Otherwise the agent will either
-	 * use the UCT algorithm to estimate the optimal action or it will choose a
-	 * random action with the probability given by the agentSettings
-	 * (exploration).
-	 * 
-	 * @param cycles
-	 * @param random
-	 */
-	public void play(int cycles, boolean random) {
-		System.out.println("play " + cycles + " cycles");
-		System.out.println(this);
-		for (int k = 0; k < cycles; k++) {
-			play(random);
-		}
+//	/**
+//	 * interact with the environment. if the random flag is true the agent will
+//	 * choose a random action on every cycle. Otherwise the agent will either
+//	 * use the UCT algorithm to estimate the optimal action or it will choose a
+//	 * random action with the probability given by the agentSettings
+//	 * (exploration).
+//	 *
+//	 * @param cycles
+//	 * @param random
+//	 */
+//	public void play(int obs, int rew, int cycles, boolean random) {
+//		System.out.println("play " + cycles + " cycles");
+//		System.out.println(this);
+//		for (int k = 0; k < cycles; k++) {
+//			play(obs, rew, random);
+//		}
+//	}
+
+	public void run(Environment e, boolean random) {
+		run(e.getObservation(), e.getReward(), random, e::performAction);
 	}
 
 	/**
@@ -75,28 +85,41 @@ public class AIXI extends AIXIModel {
 	 * 
 	 * @param random
 	 */
-	public void play(boolean random) {
-		int obs = environment.getObservation();
-		int rew = environment.getReward();
+	public void run(int obs, int rew, boolean random, IntConsumer onAction) {
 		this.modelUpdate(obs, rew);
-		boolean explore = (Math.random() < agentSettings.getExploration())
-				|| random;
-		int action;
+		decide(random, onAction);
+	}
+
+	public void run(float[] obs, int bitsPerInput, int rew, boolean random, IntConsumer onAction) {
+		this.modelUpdate(obs, bitsPerInput, rew);
+		decide(random, onAction);
+	}
+
+
+	void decide(boolean random, IntConsumer onAction) {
+		boolean explore = random || (Math.random() < agentSettings.getExploration());
+
+		BooleanArrayList action;
 		if (explore) {
 			action = this.genRandomActionAndUpdate();
 		} else {
 			action = search.search(this, uctSettings);
 			this.modelUpdate(action);
 		}
-		environment.performAction(action);
-		
-		log.fine(cycle + "," + obs + ',' + rew + "," + action + ","
+
+		if (action.size() != getActionBits())
+			throw new RuntimeException();
+
+		onAction.accept(asInt(action));
+
+		/*log.fine(cycle + "," + obs + ',' + rew + "," + action + ","
 				+ explore + ',' + agentSettings.getExploration() + ","
-				+ this.reward() + ',' + this.averageReward());
-		
-		if ((cycle & (cycle - 1)) == 0) {
+				+ this.reward() + ',' + this.averageReward());*/
+
+		/*if ((cycle & (cycle - 1)) == 0) {
 			System.out.println(this);
-		}
+		}*/
+
 		agentSettings.setExploration(agentSettings.getExploration()
 				* agentSettings.getExploreDecay());
 		cycle++;
@@ -112,16 +135,11 @@ public class AIXI extends AIXIModel {
 	 */
 	public void dictate(int obs, int rew, int action) {
 		this.modelUpdate(obs, rew);
-		this.modelUpdate(action);
+		this.modelUpdate(Util.encode(action, getActionBits()));
 	}
 
-	public WorldModel getModel() {
-		return this.getModel();
-	}
 
-	public Environment getEnvironment() {
-		return environment;
-	}
+
 
 	public AIXIModel getAgent() {
 		return this;

@@ -1,5 +1,9 @@
 package mcaixictw.worldmodels;
 
+
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,7 @@ public class FactorialContextTree extends ContextTree {
 	// }
 
 	protected void update(boolean sym) {
+		ensureTree(1);
 		int m_currentlyActiveTree = addedSymbolCount % ctwTrees.size();
 		assert (historySize() != 0 || m_currentlyActiveTree == 0);
 
@@ -48,10 +53,8 @@ public class FactorialContextTree extends ContextTree {
 	}
 
 	@Override
-	public void update(List<Boolean> symlist) {
-		if (ctwTrees == null || ctwTrees.size() == 0) {
-			ctwTrees = allocateTrees(symlist.size());
-		}
+	public void update(BooleanList symlist) {
+		ensureTree(symlist.size());
 		// assume the perception has always the same size (this actually makes
 		// sense, the advantage of making this assumption is that we can don't
 		// have to know the size of a perception when we crate the
@@ -68,12 +71,18 @@ public class FactorialContextTree extends ContextTree {
 		}
 	}
 
+	public void ensureTree(int size) {
+		if (ctwTrees == null || ctwTrees.size() == 0) {
+			ctwTrees = allocateTrees(size);
+		}
+	}
+
 	public void revert() {
 		assert (addedSymbolCount > 0);
 		assert (historySize() > 0);
 		// we need to access the history otherwise we cannot tell which the
 		// last inserted symbol was.
-		boolean sym = history.remove(history.size()-1);
+		boolean sym = history.removeAtIndex(history.size()-1);
 		int m_currentlyActiveTree = (addedSymbolCount - 1) % ctwTrees.size();
 		ctwTrees.get(m_currentlyActiveTree).remove(sym, history);
 		addedSymbolCount--;

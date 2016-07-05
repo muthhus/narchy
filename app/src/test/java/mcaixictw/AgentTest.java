@@ -1,9 +1,11 @@
 package mcaixictw;
 
+import static mcaixictw.Util.asInt;
 import static org.junit.Assert.*;
 
 import java.util.List;
 
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,7 +34,7 @@ abstract public class AgentTest {
 		modelSettings = new WorldModelSettings();
 		modelSettings.setDepth(5);
 
-		WorldModel model = WorldModel.getInstance("AgentTestModel",
+		WorldModel model = WorldModel.build("AgentTestModel",
 				modelSettings);
 
 		agent = new AIXIModel(actions, obsBits, rewBits, model);
@@ -55,8 +57,7 @@ abstract public class AgentTest {
 		int observation = 165;
 		int reward = 4;
 
-		List<Boolean> result = Util.encode(observation, obsBits);
-		result.addAll(Util.encode(reward, rewBits));
+		BooleanArrayList result = Util.encode(observation, obsBits);
 
 		// 10100101101
 		assertTrue(result.get(0) == true);
@@ -67,9 +68,11 @@ abstract public class AgentTest {
 		assertTrue(result.get(5) == true);
 		assertTrue(result.get(6) == false);
 		assertTrue(result.get(7) == true);
-		assertTrue(result.get(8) == true);
-		assertTrue(result.get(9) == false);
-		assertTrue(result.get(10) == false);
+
+		BooleanArrayList rb = Util.encode(reward, rewBits);
+		assertTrue(rb.get(0) == true);
+		assertTrue(rb.get(1) == false);
+		assertTrue(rb.get(2) == false);
 
 		result = agent.encodePercept(observation, reward);
 		// 10100101101
@@ -91,7 +94,7 @@ abstract public class AgentTest {
 		System.out.println(modelSettings);
 		System.out.println("history size: " + agent.getModel().historySize());
 		agent.modelUpdate(0,0);
-		agent.modelUpdate(0);
+		act(0);
 		agent.genPerceptAndUpdate();
 	}
 
@@ -101,22 +104,22 @@ abstract public class AgentTest {
 		int rew = 2;
 		int perception = (obs << rewBits) | rew;
 		agent.modelUpdate(obs, rew);
-		int lastPercept = agent.getLastPercept();
+		int lastPercept = asInt(agent.getLastPercept());
 		assertTrue(perception == lastPercept);
 		agent.genRandomActionAndUpdate();
-		lastPercept = agent.getLastPercept();
+		lastPercept = asInt(agent.getLastPercept());
 		assertTrue(perception == lastPercept);
 	}
 
 	@Test
 	public final void testGetLastAction() {
 		agent.modelUpdate(0,0);
-		agent.modelUpdate(0);
+		act(0);
 		agent.genPerceptAndUpdate();
-		int a = agent.genRandomActionAndUpdate();
-		assertTrue(a == agent.getLastAction());
+		int a = asInt(agent.genRandomActionAndUpdate());
+		assertTrue(a == asInt(agent.getLastAction()));
 		agent.genPerceptAndUpdate();
-		assertTrue(a == agent.getLastAction());
+		assertTrue(a == asInt(agent.getLastAction()));
 	}
 
 	@Test
@@ -124,7 +127,7 @@ abstract public class AgentTest {
 		agent.modelUpdate(0,0);
 		int obs = 1;
 		int rew = 1;
-		agent.modelUpdate(0);
+		act(0);
 		double p = agent.perceptProbability(obs, rew);
 		ModelUndo mu = new ModelUndo(agent);
 
@@ -143,7 +146,7 @@ abstract public class AgentTest {
 	@Test
 	public final void testHistoryRevert() {
 		agent.modelUpdate(0,0);
-		agent.modelUpdate(0);
+		act(0);
 		int obs = 1;
 		int rew = 1;
 		double p = agent.perceptProbability(obs, rew);
@@ -154,5 +157,9 @@ abstract public class AgentTest {
 		}
 		agent.historyRevert(mu);
 		assertTrue(agent.perceptProbability(obs, rew) - p < eps);
+	}
+
+	public void act(int a) {
+		agent.modelUpdate(Util.encode(a, agent.getActionBits()));
 	}
 }

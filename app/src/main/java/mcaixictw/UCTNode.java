@@ -1,5 +1,9 @@
 package mcaixictw;
 
+
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import nars.util.data.map.UnifriedMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +19,10 @@ public class UCTNode {
 		this.isChanceNode = isChanceNode;
 		visits = 0;
 		mean = 0;
-		children = new TreeMap<>();
+		children = new UnifriedMap();
 	}
 
-	private Map<Integer, UCTNode> children; // stores the children
+	private final Map<BooleanArrayList, UCTNode> children; // stores the children
 	private boolean isChanceNode; // true if this node is a chance node
 	private double mean; // the expected reward of this node
 	private int visits; // number of times the search node has been visited
@@ -30,11 +34,11 @@ public class UCTNode {
 	 * 
 	 * @return
 	 */
-	public int bestAction() {
-		int bestAction = 0;
+	public BooleanArrayList bestAction() {
+		BooleanArrayList bestAction = null;
 		double maxReward = Double.MIN_VALUE;
 
-		for (Entry<Integer, UCTNode> curr : children.entrySet()) {
+		for (Entry<BooleanArrayList, UCTNode> curr : children.entrySet()) {
 			double expectedReward = curr.getValue().mean;
 			if (expectedReward > maxReward) {
 				maxReward = expectedReward;
@@ -51,19 +55,20 @@ public class UCTNode {
 	 * @param dfr
 	 * @return
 	 */
-	private int actionSelect(AIXIModel agent, int dfr) {
+	private BooleanArrayList actionSelect(AIXIModel agent, int dfr) {
 		assert (agent.numActions() >= children.size());
 
 		double maxValue = Double.MIN_VALUE;
-		int selectedAction = 0;
+		BooleanArrayList selectedAction = null;
 
 		// If we haven't explored all possible actions, choose one uniformly
 		// at random
 		if (children.size() < agent.numActions()) {
-			List<Integer> unexplored = new ArrayList<>();
+			List<BooleanArrayList> unexplored = new ArrayList<>();
 			for (int a = 0; a < agent.numActions(); a++) {
-				if (!children.containsKey(a)) {
-					unexplored.add(a);
+				BooleanArrayList aa = Util.encode(a, agent.getActionBits());
+				if (!children.containsKey(aa)) {
+					unexplored.add(aa);
 				}
 			}
 			selectedAction = unexplored.get(Util.randRange(unexplored.size()));
@@ -72,7 +77,7 @@ public class UCTNode {
 			// highest expected reward) actions. But also
 			// explore other actions not to get stuck with wrong decisions.
 
-			for (Entry<Integer, UCTNode> curr : children.entrySet()) {
+			for (Entry<BooleanArrayList, UCTNode> curr : children.entrySet()) {
 
 				UCTNode currNode = curr.getValue();
 
@@ -124,7 +129,7 @@ public class UCTNode {
 			// we have reached the horizon of the agent
 			return agent.reward();
 		} else if (isChanceNode) {
-			int p = agent.genPerceptAndUpdate();
+			BooleanArrayList p = agent.genPerceptAndUpdate();
 			if (!children.containsKey(p)) {
 				children.put(p, new UCTNode(false));
 			}
@@ -132,10 +137,8 @@ public class UCTNode {
 		} else if (visits == 0) {
 			futureTotalReward = rollout(agent, m);
 		} else {
-			int a = actionSelect(agent, m);
-			if (!children.containsKey(a)) {
-				children.put(a, new UCTNode(true));
-			}
+			BooleanArrayList a = actionSelect(agent, m);
+			children.computeIfAbsent(a, (k) -> new UCTNode(true));
 			agent.modelUpdate(a);
 			futureTotalReward = children.get(a).sample(agent, m);
 		}
@@ -197,17 +200,14 @@ public class UCTNode {
 	 * @param percept
 	 * @return
 	 */
-	public UCTNode getSubtree(int action, int percept) {
+	public UCTNode getSubtree(BooleanArrayList action, BooleanArrayList percept) {
 		assert (!isChanceNode);
-		assert (children.containsKey(action));
+		//assert (children.containsKey(action));
 
 		UCTNode chanceNode = children.get(action);
 
-		if (chanceNode.children.containsKey(percept)) {
-			return chanceNode.children.get(percept);
-		} else {
-			return new UCTNode(false);
-		}
+		return chanceNode.children.computeIfAbsent(percept, (k)->new UCTNode(false));
+
 		/*
 		 * 
 		 * NodeSearch afterAction, afterPercept; boolean found = false;

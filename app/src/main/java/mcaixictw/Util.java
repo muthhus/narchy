@@ -1,6 +1,8 @@
 package mcaixictw;
 
-import java.util.ArrayList;
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+
 import java.util.List;
 
 public class Util {
@@ -38,14 +40,18 @@ public class Util {
 	 * @param symlist
 	 * @return
 	 */
-	public static int decode(List<Boolean> symlist) {
-		int value = 0;
-		for (int i = 0; i < symlist.size(); i++) {
-			int k = symlist.get(i) ? 1 : 0;
-			value = 2 * value + k;
+	@Deprecated public static BooleanArrayList asBitSet(List<Boolean> symlist) {
+		int l = symlist.size();
+
+		BooleanArrayList fb = new BooleanArrayList(l);
+
+		for (int i = 0; i < l; i++) {
+			fb.add(symlist.get(i));
 		}
-		return value;
+
+		return fb;
 	}
+
 
 	/**
 	 * Encodes a value onto the end of a symbol list using "bits" symbols. the
@@ -55,13 +61,45 @@ public class Util {
 	 * @param bits
 	 * @return
 	 */
-	public static List<Boolean> encode(int value, int bits) {
-		List<Boolean> symlist = new ArrayList<>();
-		for (int i = 0; i < bits; i++, value /= 2) {
-			boolean sym = (value & 1) == 1;
-			symlist.add(0, sym);
+	public static void encode(int value, int bits, BooleanArrayList target) {
+		for (int i = 0; i < bits; i++) {
+			boolean sym = (value & (1 << i)) > 0;
+			//System.out.println(value + " bit " + i + " = " + sym + "(" + (1 << i) + ":" + (value & (i << i)) + ")");
+			target.add(sym);
 		}
-		return symlist;
+	}
+	public static BooleanArrayList encode(int value, int bits) {
+		BooleanArrayList f = new BooleanArrayList(bits);
+		encode(value, bits, f);
+		return f;
+	}
+
+	/** input array normalized to 0..+1.0, applies simple threshold at 0.5 */
+	public static void encode(float[] f, int bitsPerInput, BooleanArrayList target) {
+		if (bitsPerInput!=1)
+			throw new UnsupportedOperationException();
+
+		for (int i = 0; i < f.length; i++) {
+			boolean sym = f[i] > 0.5f;
+			target.add(sym);
+		}
+
+	}
+
+
+	public static int asInt(BooleanList b) {
+		if (b.size() > 31)
+			throw new UnsupportedOperationException();
+
+		int m = 1;
+		int total = 0;
+		for (int i = 0; i < b.size(); i++) { //HACK avoid iterating this far
+			if (b.get(i))
+				total += m;
+			m*=2;
+		}
+
+		return total;
 	}
 
 	/**

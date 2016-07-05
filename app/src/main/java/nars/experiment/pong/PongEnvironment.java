@@ -45,8 +45,8 @@ public class PongEnvironment extends Player implements Environment {
 	public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
 	int actions = 3;
 
-	final int width = 2;
-	final int height = 2;
+	final int width = 8;
+	final int height = 8;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -523,8 +523,8 @@ public class PongEnvironment extends Player implements Environment {
 		actRelativeVelocity(action); //numActions = 3
 		//actAbsolute(action);
 
-		long now = nagent.nar.time();
-		int dt = 16;
+//		long now = nagent.nar.time();
+//		int dt = 16;
 
 //		priMatrix.set(width,height*2,(x,y)->{
 //

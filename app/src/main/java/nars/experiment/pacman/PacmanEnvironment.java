@@ -58,16 +58,18 @@ import static nars.experiment.pong.PongEnvironment.numericSensor;
  */
 public class PacmanEnvironment extends cpcman implements Environment {
 
-	final int visionRadius = 5;
+	final int visionRadius;
 	final int itemTypes = 3;
 
-	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
+	final int inputs;
 	private final int pacmanCyclesPerFrame = 6;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.05f;
 
-	public PacmanEnvironment(int ghosts) {
+	public PacmanEnvironment(int ghosts, int visionRadius) {
 		super(ghosts);
+		this.visionRadius = visionRadius;
+		this.inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
 	}
 
 
@@ -125,7 +127,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
-		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */);
+		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 5 /* visionRadius */);
 
 		NAgent n = new NAgent(nar) {
 			@Override

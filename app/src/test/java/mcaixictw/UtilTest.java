@@ -1,11 +1,12 @@
 package mcaixictw;
 
+import static mcaixictw.Util.asInt;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mcaixictw.Util;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,22 +43,37 @@ public class UtilTest {
 	}
 
 	@Test
+	public final void testDecode2() {
+		List<Boolean> list = new ArrayList<>();
+		list.add(true);
+		list.add(true);
+		list.add(false);
+		list.add(true);
+		list.add(true);
+		list.add(false);
+		BooleanArrayList bs = Util.asBitSet(list);
+		assertEquals(list.toString() + " " + bs.toString(),27, asInt(bs));
+	}
+
+	@Test
 	public final void testDecode() {
 		List<Boolean> list = new ArrayList<>();
 		list.add(true);
 		list.add(true);
 		list.add(false);
 		list.add(true);
-		assertTrue(Util.decode(list) == 13);
+		BooleanArrayList bs = Util.asBitSet(list);
+		assertEquals(list.toString() + " " + bs.toString(), 11, asInt(bs));
 	}
 
 	@Test
 	public final void testEncode() {
-		List<Boolean> list = Util.encode(13, 4);
-		assertTrue(list.get(0) == true);
-		assertTrue(list.get(1) == true);
-		assertTrue(list.get(2) == false);
-		assertTrue(list.get(3) == true);
+		BooleanArrayList list = Util.encode(11, 4);
+		//System.out.println(list.toString());
+		assertTrue(list.get(0));
+		assertTrue(list.get(1));
+		assertFalse(list.get(2));
+		assertTrue(list.get(3));
 	}
 
 }

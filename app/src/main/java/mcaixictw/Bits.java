@@ -1,41 +1,28 @@
 package mcaixictw;
 
+
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+
 import java.util.ArrayList;
 
-/**
- * representation of a bit string
- */
-public class Bits extends ArrayList<Boolean> {
+public enum Bits {
+	;
 
-	public Bits() {
-		super();
+
+	//TODO make these immutable/read-only
+	public final static BooleanList one = new BooleanArrayList(1).with(true);
+	public final static BooleanList zero = new BooleanArrayList(1).with(false);
+
+
+	public static BooleanArrayList rand() {
+		return rand(1);
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8828268179061588441L;
-
-	public Bits one() {
-		add(true);
-		return this;
+	public static BooleanArrayList rand(int length) {
+		BooleanArrayList f = new BooleanArrayList(length);
+		for (int i = 0; i < length; i++)
+			f.add(Util.randSym());
+		return f;
 	}
-
-	public Bits zero() {
-		add(false);
-		return this;
-	}
-
-	public Bits rand() {
-		add(Util.randSym());
-		return this;
-	}
-
-	public Bits rand(int length) {
-		for (int i = 0; i < length; i++) {
-			add(Util.randSym());
-		}
-		return this;
-	}
-
 }

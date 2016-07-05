@@ -14,9 +14,9 @@ public class UCTSettings extends Settings {
 
 	public String toString() {
 		String result = "";
-		result += "horizon: " + horizon + '\n';
-		result += "recycleUCT: " + recycleUCT + '\n';
-		result += "mcSimulations: " + mcSimulations + '\n';
+		result += "horizon: " + horizon + ' ';
+		result += "recycleUCT: " + recycleUCT + ' ';
+		result += "mcSimulations: " + mcSimulations;
 		return result;
 	}
 

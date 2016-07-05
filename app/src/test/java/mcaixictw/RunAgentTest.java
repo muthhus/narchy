@@ -11,10 +11,13 @@ import org.junit.Test;
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.WorldModel;
 
+import static junit.framework.TestCase.assertTrue;
+
 abstract public class RunAgentTest {
 
 	private static Logger log = Logger.getLogger(RunAgentTest.class
 			.getName());
+	private Environment env;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -29,16 +32,14 @@ abstract public class RunAgentTest {
 
 		// set up the biased coin environment. The coin lands on one side with a
 		// probability of 0.7.
-		Environment env = environment();
+		env = environment();
 
 		WorldModelSettings modelSettings = new WorldModelSettings();
 		modelSettings.setFacContextTree(true);
 		modelSettings.setDepth(3);
-		log.info("depth: " + modelSettings.getDepth());
-		log.info("create new model");
-		WorldModel model = WorldModel.getInstance(name(), modelSettings);
-		controller = new AIXI(env, controllerSettings, uctSettings,
-				model);
+
+		WorldModel model = WorldModel.build(name(), modelSettings);
+		controller = new AIXI(env, controllerSettings, uctSettings, model);
 
 	}
 
@@ -59,12 +60,15 @@ abstract public class RunAgentTest {
 	@Test
 	public final void test() {
 
-		int n = 10000;
+		int n = 1000;
 		log.info("Play " + n + " rounds against the biased coin environment");
 
 		// A smart agent should learn to always choose the biased side and
 		// should come close to an average reward of 0.7
-		controller.play(n, false);
+		for (int i = 0; i < n; i++)
+			controller.run(env, false);
+		double r = controller.averageReward();
+		assertTrue(r + " avg reward", r > 0.6f);
 		
 	}
 

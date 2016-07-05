@@ -2,6 +2,8 @@ package mcaixictw.worldmodels;
 
 import java.util.*;
 
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.Bits;
 import mcaixictw.Util;
 
@@ -16,12 +18,12 @@ public class ContextTree extends WorldModel {
 	// create a context tree of specified maximum depth
 	protected ContextTree(String name, int depth) {
 		super(name);
-		history = new ArrayList();
+		history = new BooleanArrayList();
 		root = new CTNode();
 		this.depth = depth;
 	}
 
-	protected List<Boolean> history; // the agents history
+	protected BooleanArrayList history; // the agents history
 	protected CTNode root; // the root node of the context tree
 	protected int depth; // the maximum depth of the context tree
 
@@ -49,7 +51,7 @@ public class ContextTree extends WorldModel {
 				symbols.add(b1);
 				symbols.add(b2);
 
-				result += "P(" + b2 + b1 + "|h) = " + predict(symbols) + '\n';
+				result += "P(" + b2 + b1 + "|h) = " + predict(Util.asBitSet(symbols)) + '\n';
 			}
 		}
 		if (root != null) {
@@ -81,7 +83,7 @@ public class ContextTree extends WorldModel {
 		return result;
 	}
 
-	protected void add(boolean sym, List<Boolean> underlyingHistory) {
+	protected void add(boolean sym, BooleanArrayList underlyingHistory) {
 		CTNode currNode = root;
 
 		// Update the root
@@ -112,7 +114,7 @@ public class ContextTree extends WorldModel {
 		updateProbabilities(currNode);
 	}
 
-	protected void remove(boolean sym, List<Boolean> underlyingHistory) {
+	protected void remove(boolean sym, BooleanArrayList underlyingHistory) {
 
 		CTNode currNode = root;
 
@@ -360,9 +362,10 @@ public class ContextTree extends WorldModel {
 	 * 
 	 * @param symlist
 	 */
-	public void update(List<Boolean> symlist) {
+	public void update(BooleanList symlist) {
 		// Update the symbol list
-		for (int i = 0; i < symlist.size(); i++) {
+		int len = symlist.size();
+		for (int i = 0; i < len; i++) {
 			update(symlist.get(i));
 		}
 	}
@@ -373,10 +376,13 @@ public class ContextTree extends WorldModel {
 	 * most recent symbol has the highest index.
 	 * 
 	 * @param symlist
-	 */
-	public void updateHistory(List<Boolean> symlist) {
+	*/
+	public void updateHistory(BooleanArrayList b) {
 		// System.out.println("update history: " + Util.toString(symlist));
-		history.addAll(symlist);
+
+		for (int i = 0 ; i < b.size(); i++)
+			history.add(b.get(i));
+
 	}
 
 	/**
@@ -385,16 +391,19 @@ public class ContextTree extends WorldModel {
 	public void revert() {
 		// We can only revert if there is at least one symbol in the history.
 		int size = history.size();
-		assert (size > 0);
+		if (size == 0)
+			throw new RuntimeException();
 
 		// we need to access the history otherwise we can not tell which the
 		// last inserted symbol was.
-		Boolean sym = history.remove(history.size()-1);
+		boolean sym = history.removeAtIndex(history.size()-1);
 		remove(sym, history);
 	}
 
 	public void revert(int numSymbols) {
-		assert (history.size() >= numSymbols);
+		if (history.size() < numSymbols)
+			throw new RuntimeException("history underflow");
+
 		for (int i = 0; i < numSymbols; i++) {
 			revert();
 		}
@@ -412,7 +421,7 @@ public class ContextTree extends WorldModel {
 
 		int toRemove = history.size() - newsize;
 		for (; toRemove > 0; toRemove--) {
-			history.remove(toRemove-1);
+			history.removeAtIndex(toRemove-1);
 		}
 	}
 
@@ -423,8 +432,8 @@ public class ContextTree extends WorldModel {
 	 * @param bits
 	 * @return
 	 */
-	public List<Boolean> genRandomSymbols(int bits) {
-		List<Boolean> result = genRandomSymbolsAndUpdate(bits);
+	public BooleanArrayList genRandomSymbols(int bits) {
+		BooleanArrayList result = genRandomSymbolsAndUpdate(bits);
 		// restore the context tree to it's original state
 		for (int i = 0; i < bits; i++) {
 			revert();
@@ -439,17 +448,17 @@ public class ContextTree extends WorldModel {
 	 * the context tree statistics and update the context tree with the newly
 	 * generated bits. last predicted symbol has the highest index.
 	 */
-	public List<Boolean> genRandomSymbolsAndUpdate(int bits) {
+	public BooleanArrayList genRandomSymbolsAndUpdate(int bits) {
 		List<Boolean> result = new ArrayList<>(bits);
 		for (int i = 0; i < bits; i++) {
 			boolean sampledSymbol = false;
-			if (Math.random() <= predict(new Bits().one())) {
+			if (Math.random() <= predict(Bits.one)) {
 				sampledSymbol = true;
 			}
 			result.add(sampledSymbol);
 			update(sampledSymbol);
 		}
-		return result;
+		return Util.asBitSet(result);
 	}
 
 	/**
@@ -458,7 +467,7 @@ public class ContextTree extends WorldModel {
 	 * @param symbols
 	 * @return
 	 */
-	public double predict(List<Boolean> symbols) {
+	public double predict(BooleanList symbols) {
 
 		double logProbBefore = logBlockProbability();
 
@@ -469,7 +478,8 @@ public class ContextTree extends WorldModel {
 		// the symbol '1'
 
 		// add all the symbols to the tree
-		symbols.forEach(this::update);
+		for (int i = 0 ; i < symbols.size(); i++)
+			update(symbols.get(i));
 
 		double logProbAfter = logBlockProbability();
 		assert (logProbAfter <= logProbBefore);
@@ -553,7 +563,7 @@ public class ContextTree extends WorldModel {
 	 * @param symbols
 	 * @return
 	 */
-	public CTNode getNode(List<Boolean> symbols) {
+	public CTNode getNode(BooleanArrayList symbols) {
 		CTNode currNode = root;
 		for (int i = 0; i < symbols.size(); i++) {
 			boolean currSym = symbols.get(i);

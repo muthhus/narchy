@@ -2,9 +2,7 @@ package mcaixictw;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,8 +30,8 @@ public class ContextTreeTest {
 		WorldModelSettings settings = new WorldModelSettings();
 		settings.setFacContextTree(false);
 		settings.setDepth(2);
-		ct = WorldModel.getInstance("ContextTreeTestModel", settings);
-		// List<Boolean> list = new ArrayList<Boolean>();
+		ct = WorldModel.build("ContextTreeTestModel", settings);
+		// BooleanArrayList list = new ArrayBooleanArrayList();
 		// for (int i = 0; i < 1000; i++) {
 		// list.add(Util.randSym());
 		// }
@@ -53,10 +51,11 @@ public class ContextTreeTest {
 	 * @param model
 	 */
 	private void sumUpTo1(ContextTree model) {
-		double p_1 = model.predict(new Bits().one());
-		double p_0 = model.predict(new Bits().zero());
+		double p_1 = model.predict(Bits.one);
+		double p_0 = model.predict(Bits.zero);
 		System.out.println("p_1: " + p_1 + " p_0: " + p_0);
-		assertTrue(Math.abs(1.0 - (p_1 + p_0)) < eps);
+		double e = Math.abs(1.0 - (p_1 + p_0));
+		assertTrue(e + " should be less than " + eps, e < eps);
 	}
 
 	@Test
@@ -67,14 +66,14 @@ public class ContextTreeTest {
 		WorldModelSettings settings = new WorldModelSettings();
 		settings.setFacContextTree(false);
 		settings.setDepth(3);
-		ContextTree ct = (ContextTree) WorldModel.getInstance(
+		ContextTree ct = (ContextTree) WorldModel.build(
 				"ContextTreeTestModel", settings);
 		sumUpTo1(ct);
 
-		List<Boolean> past, context;
+		BooleanArrayList past, context;
 
 		// 110
-		past = new ArrayList<>();
+		past = new BooleanArrayList();
 		past.add(true);
 		past.add(true);
 		past.add(false);
@@ -83,19 +82,19 @@ public class ContextTreeTest {
 		sumUpTo1(ct);
 
 		// 0100110
-		ct.update(new Bits().zero());
+		ct.update(Bits.zero);
 		sumUpTo1(ct);
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		sumUpTo1(ct);
-		ct.update(new Bits().zero());
+		ct.update(Bits.zero);
 		sumUpTo1(ct);
-		ct.update(new Bits().zero());
+		ct.update(Bits.zero);
 		sumUpTo1(ct);
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		sumUpTo1(ct);
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		sumUpTo1(ct);
-		ct.update(new Bits().zero());
+		ct.update(Bits.zero);
 		sumUpTo1(ct);
 
 		System.out.println(ct);
@@ -105,71 +104,71 @@ public class ContextTreeTest {
 				7.0 / 2048.0));
 
 		// first level
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(true);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 16.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				9.0 / 128.0));
 
 		// second level
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(true);
 		context.add(true);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 2.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(true);
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 8.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		context.add(true);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				5.0 / 16.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				3.0 / 8.0));
 
 		// third level
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(true);
 		context.add(true);
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 2.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(true);
 		context.add(false);
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 8.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		context.add(true);
 		context.add(true);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 2.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		context.add(true);
 		context.add(false);
 		assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
 				1.0 / 2.0));
 
-		context = new ArrayList<>();
+		context = new BooleanArrayList();
 		context.add(false);
 		context.add(false);
 		context.add(true);
@@ -192,9 +191,11 @@ public class ContextTreeTest {
 	@Test
 	public final void test0() {
 
-		List<Boolean> symbols, sym1, sym0;
+		BooleanArrayList symbols;
+		BooleanArrayList sym1;
+		BooleanArrayList sym0;
 
-		symbols = new ArrayList<>();
+		symbols = new BooleanArrayList();;
 		boolean b = true;
 		symbols.add(b);
 		symbols.add(!b);
@@ -208,8 +209,8 @@ public class ContextTreeTest {
 		ct.update(symbols);
 		System.out.println("updated");
 
-		sym1 = new ArrayList<>();
-		sym0 = new ArrayList<>();
+		sym1 = new BooleanArrayList();;
+		sym0 = new BooleanArrayList();;
 		sym1.add(true);
 		sym0.add(false);
 		double p1, p0;
@@ -237,7 +238,8 @@ public class ContextTreeTest {
 	@Test
 	public final void test1() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();
+		;
 		list.add(false);
 		for (int i = 0; i < 25; i++) {
 			ct.update(list);
@@ -263,29 +265,29 @@ public class ContextTreeTest {
 		int depth = 2;
 		settings.setDepth(depth);
 
-		ContextTree ct = (ContextTree) WorldModel.getInstance(
+		ContextTree ct = (ContextTree) WorldModel.build(
 				"ContextTreeTestModel", settings);
 
 		// if there isn't a history of length = depth, the predictions of the
 		// context tree won't sum up to 1.
 		
 		
-		ct.updateHistory(new Bits().rand(depth));
+		ct.updateHistory(Bits.rand(depth));
 		System.out.println("empty");
 		System.out.println(ct);
 
 		this.sumUpTo1(ct);
 
 		System.out.println("update with 1: ");
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		this.sumUpTo1(ct);
 
-		ct.update(new Bits().zero());
+		ct.update(Bits.zero);
 
 		System.out.println(ct);
 
 		System.out.println("update with 0: ");
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		this.sumUpTo1(ct);
 
 		System.out.println(ct);
@@ -297,7 +299,7 @@ public class ContextTreeTest {
 		System.out.println(ct);
 
 		System.out.println("update with 1");
-		ct.update(new Bits().one());
+		ct.update(Bits.one);
 		this.sumUpTo1(ct);
 
 		System.out.println(ct);
@@ -322,16 +324,13 @@ public class ContextTreeTest {
 		int depth = 10;
 		settings.setDepth(depth);
 
-		ContextTree ct = (ContextTree) WorldModel.getInstance(
+		ContextTree ct = (ContextTree) WorldModel.build(
 				"ContextTreeTestModel", settings);
-		Bits history = new Bits();
-		for (int i = 0; i < depth; i++) {
-			history.rand();
-		}
+		BooleanArrayList history = Bits.rand(depth);
 		ct.updateHistory(history);
 		int testLength = 1000;
 		for (int i = 0; i < testLength; i++) {
-			ct.update(new Bits().rand());
+			ct.update(Bits.rand());
 			sumUpTo1(ct);
 		}
 	}
@@ -351,12 +350,12 @@ public class ContextTreeTest {
 
 		boolean toPredict = false;
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		list.add(toPredict);
 
 		double p1 = ct.predict(list);
 
-		List<Boolean> list2 = new ArrayList<>();
+		BooleanArrayList list2 = new BooleanArrayList();;
 
 		int symbols = 100;
 		for (int i = 0; i < symbols; i++) {
@@ -373,13 +372,13 @@ public class ContextTreeTest {
 	@Test
 	public final void testUpdateListOfBoolean() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 
 		list.add(true);
 		list.add(false);
 		list.add(true);
 
-		List<Boolean> listTrue = new ArrayList<>();
+		BooleanArrayList listTrue = new BooleanArrayList();;
 		listTrue.add(true);
 
 		double p1 = ct.predict(listTrue);
@@ -393,13 +392,13 @@ public class ContextTreeTest {
 	@Test
 	public final void testUpdateHistory() {
 
-		List<Boolean> listTrue = new ArrayList<>();
+		BooleanArrayList listTrue = new BooleanArrayList();;
 		listTrue.add(true);
 		double p1 = ct.predict(listTrue);
 
 		int s1 = ct.historySize();
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		list.add(true);
 		list.add(false);
 		list.add(true);
@@ -417,17 +416,17 @@ public class ContextTreeTest {
 	@Test
 	public final void testRevert() {
 
-		List<Boolean> listTrue = new ArrayList<>();
+		BooleanArrayList listTrue = new BooleanArrayList();;
 		listTrue.add(true);
 
-		List<Boolean> listFalse = new ArrayList<>();
+		BooleanArrayList listFalse = new BooleanArrayList();;
 		listFalse.add(false);
 
 		double pTrue = ct.predict(listTrue);
 		double pFalse = ct.predict(listFalse);
 
 		int numSymbols = 100;
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		for (int i = 0; i < numSymbols; i++) {
 			list.add(Util.randSym());
 		}
@@ -442,7 +441,7 @@ public class ContextTreeTest {
 	@Test
 	public final void testRevertHistory() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		int s1 = ct.historySize();
 		int numSymbols = 100;
 		for (int i = 0; i < numSymbols; i++) {
@@ -457,7 +456,7 @@ public class ContextTreeTest {
 	@Test
 	public final void testGenRandomSymbols() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		list.add(true);
 		double p1 = ct.predict(list);
 
@@ -481,7 +480,7 @@ public class ContextTreeTest {
 	@Test
 	public final void testPredictBoolean() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		list.add(true);
 
 		double p = ct.predict(list);
@@ -502,7 +501,7 @@ public class ContextTreeTest {
 	@Test
 	public final void testPredictListOfBoolean() {
 
-		List<Boolean> list = new ArrayList<>();
+		BooleanArrayList list = new BooleanArrayList();;
 		list.add(true);
 		list.add(false);
 		list.add(true);
@@ -510,7 +509,7 @@ public class ContextTreeTest {
 
 		double p1 = ct.predict(list);
 
-		List<Boolean> updateList = new ArrayList<>();
+		BooleanArrayList updateList = new BooleanArrayList();;
 
 		int numSymbols = 100;
 		for (int i = 0; i < numSymbols; i++) {
@@ -528,7 +527,7 @@ public class ContextTreeTest {
 	@Test
 	public final void testNthHistorySymbol() {
 
-		List<Boolean> updateList = new ArrayList<>();
+		BooleanArrayList updateList = new BooleanArrayList();;
 		updateList.add(false);
 		updateList.add(false);
 		updateList.add(true);

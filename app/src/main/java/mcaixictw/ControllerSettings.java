@@ -1,5 +1,7 @@
 package mcaixictw;
 
+import nars.util.Texts;
+
 import java.io.File;
 
 /**
@@ -17,8 +19,8 @@ public class ControllerSettings extends Settings {
 
 	public String toString() {
 		String result = "";
-		result += "exploration: " + exploration + '\n';
-		result += "exploreDecay: " + exploreDecay + '\n';
+		result += "exploration: " + Texts.n4(exploration) + ' ';
+		result += "exploreDecay: " + exploreDecay;
 		return result;
 	}
 

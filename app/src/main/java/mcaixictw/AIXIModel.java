@@ -3,7 +3,12 @@ package mcaixictw;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gs.collections.api.list.primitive.BooleanList;
+import com.gs.collections.api.list.primitive.MutableBooleanList;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
+
+import static mcaixictw.Util.asInt;
 
 /**
  * Representation of a smart agent.
@@ -100,10 +105,11 @@ public class AIXIModel {
 	 * 
 	 * @return
 	 */
-	public int genRandomActionAndUpdate() {
+	public BooleanArrayList genRandomActionAndUpdate() {
 		int a = Util.randRange(actions);
-		modelUpdate(a);
-		return a;
+		BooleanArrayList aa = Util.encode(a, actionBits);
+		modelUpdate(aa);
+		return aa;
 	}
 
 	/**
@@ -111,8 +117,8 @@ public class AIXIModel {
 	 * 
 	 * @return
 	 */
-	public int genPercept() {
-		return Util.decode(model.genRandomSymbols(obsBits + rewBits));
+	public BooleanArrayList genPercept() {
+		return model.genRandomSymbols(obsBits + rewBits);
 	}
 
 	/**
@@ -121,16 +127,16 @@ public class AIXIModel {
 	 * 
 	 * @return
 	 */
-	public int genPerceptAndUpdateHistory() {
+	public BooleanArrayList genPerceptAndUpdateHistory() {
 		assert (!lastUpdatePercept);
-		List<Boolean> list = model.genRandomSymbols(obsBits + rewBits);
-		model.updateHistory(list);
-		int reward = decodeReward(list);
+		BooleanArrayList r = model.genRandomSymbols(obsBits + rewBits);
+		model.updateHistory(r);
+		int reward = decodeReward(r);
 		assert (isRewardOk(reward));
-		assert (isObservationOk(decodeObservation(list)));
+		assert (isObservationOk(r));
 		totalReward += reward;
 		lastUpdatePercept = true;
-		return Util.decode(list);
+		return r;
 	}
 
 	/**
@@ -140,19 +146,19 @@ public class AIXIModel {
 	 * 
 	 * @return
 	 */
-	public int genPerceptAndUpdate() {
+	public BooleanArrayList genPerceptAndUpdate() {
 		
 		// TODO problem if there was no update
 		
 		assert (!lastUpdatePercept);
 		int numBits = obsBits + rewBits;
-		List<Boolean> list = model.genRandomSymbolsAndUpdate(numBits);
+		BooleanArrayList list = model.genRandomSymbolsAndUpdate(numBits);
 		int reward = decodeReward(list);
-		assert (isObservationOk(decodeObservation(list)));
+		assert (isObservationOk(list));
 		assert (isRewardOk(reward));
 		totalReward += reward;
 		lastUpdatePercept = true;
-		return Util.decode(list);
+		return list;
 	}
 
 	/**
@@ -168,18 +174,25 @@ public class AIXIModel {
 		totalReward += reward;
 		lastUpdatePercept = true;
 	}
+	public void modelUpdate(float[] observation, int bitsPerInput, int reward) {
+		assert (!lastUpdatePercept);
+		model.update(encodePercept(observation, bitsPerInput, reward));
+		// Update other properties
+		totalReward += reward;
+		lastUpdatePercept = true;
+	}
 
 	/**
 	 * Update the agent's internal model of the world after performing an action
 	 * 
 	 * @param action
 	 */
-	public void modelUpdate(int action) {
-		assert (action < actions);
+	public void modelUpdate(BooleanArrayList action) {
+		assert (asInt(action) < actions);
 		assert (lastUpdatePercept);
 
 		// Update internal model
-		model.updateHistory(encodeAction(action));
+		model.updateHistory(action);
 
 		timeCycle++;
 		lastUpdatePercept = false;
@@ -246,7 +259,6 @@ public class AIXIModel {
 	 * @return
 	 */
 	public double perceptProbability(int observation, int reward) {
-
 		return model.predict(encodePercept(observation, reward));
 	}
 
@@ -263,30 +275,33 @@ public class AIXIModel {
 	 * @param obs
 	 * @return
 	 */
-	private boolean isObservationOk(int obs) {
-		return obs <= ((1 << obsBits) - 1);
+	private boolean isObservationOk(BooleanArrayList obs) {
+		return obs.size() <= ((1 << obsBits) - 1);
 	}
 
-	/**
-	 * Encodes an action as a list of symbols
-	 * 
-	 * @param action
-	 * @return
-	 */
-	public List<Boolean> encodeAction(int action) {
-		return Util.encode(action, actionBits);
-	}
+
 
 	/**
 	 * Encodes a percept (observation, reward) as a list of symbols
-	 * 
+	 *
 	 * @param observation
 	 * @param reward
 	 * @return
 	 */
-	public List<Boolean> encodePercept(int observation, int reward) {
-		List<Boolean> result = Util.encode(observation, obsBits);
-		result.addAll(Util.encode(reward, rewBits));
+	public BooleanArrayList encodePercept(int observation, int reward) {
+		BooleanArrayList result = new BooleanArrayList(obsBits + rewBits);
+		Util.encode(observation, obsBits, result);
+		Util.encode(reward, rewBits, result);
+		return result;
+	}
+
+	public BooleanArrayList encodePercept(float[] observation, int bitsPerInput, int reward) {
+		if (observation.length*bitsPerInput!=obsBits)
+			throw new UnsupportedOperationException();
+
+		BooleanArrayList result = new BooleanArrayList(obsBits + rewBits);
+		Util.encode(observation, bitsPerInput, result);
+		Util.encode(reward, rewBits, result);
 		return result;
 	}
 
@@ -296,11 +311,17 @@ public class AIXIModel {
 	 * @param perception
 	 * @return
 	 */
-	public int decodeReward(List<Boolean> perception) {
+	public int decodeReward(BooleanArrayList perception) {
 		int s = perception.size();
-		int decodedReward = Util.decode(perception.subList(s - rewBits, s));
-		assert (isRewardOk(decodedReward));
-		return decodedReward;
+		//BooleanList decodedReward = perception.subList(s - rewBits, s);
+		BooleanArrayList decodedReward = new BooleanArrayList(rewBits);
+		for (int i = s - rewBits; i < s; i++)
+			decodedReward.add(perception.get(i));
+
+		int total = asInt(decodedReward);
+
+		assert (isRewardOk(total));
+		return total;
 	}
 
 	/**
@@ -310,12 +331,12 @@ public class AIXIModel {
 	 * @param symlist
 	 * @return
 	 */
-	public int decodeObservation(List<Boolean> symlist) {
-		return Util.decode(symlist.subList(0, obsBits));
+	public BooleanArrayList decodeObservation(List<Boolean> symlist) {
+		return Util.asBitSet(symlist.subList(0, obsBits));
 	}
 
 	// Returns the most recent perception
-	public int getLastPercept() {
+	public BooleanArrayList getLastPercept() {
 		int percept_bits = obsBits + rewBits;
 		int i, end;
 		if (lastUpdatePercept) {
@@ -329,11 +350,11 @@ public class AIXIModel {
 		for (; i >= end; i--) {
 			list.add(model.nthHistorySymbol(i));
 		}
-		return Util.decode(list);
+		return Util.asBitSet(list);
 	}
 
 	// Returns the most recent action
-	public int getLastAction() {
+	public BooleanArrayList getLastAction() {
 		int percept_bits = obsBits + rewBits;
 		int i, end;
 		if (lastUpdatePercept) {
@@ -347,7 +368,7 @@ public class AIXIModel {
 		for (; i >= end; i--) {
 			list.add(model.nthHistorySymbol(i));
 		}
-		return Util.decode(list);
+		return Util.asBitSet(list);
 	}
 
 	public boolean lastUpdatePercept() {

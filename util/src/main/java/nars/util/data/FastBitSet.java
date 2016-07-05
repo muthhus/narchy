@@ -148,7 +148,7 @@ public class FastBitSet {
      * @throws IndexOutOfBoundsException if 
      *          {@code (fromIndex < 0) | (toIndex < fromIndex)}
      */
-    public void clear(int fromIndex, int toIndex) {
+    public void clearAll(int fromIndex, int toIndex) {
         if ((fromIndex < 0) || (toIndex < fromIndex)) 
             throw new IndexOutOfBoundsException();
         int i = fromIndex >>> 6;
@@ -178,6 +178,21 @@ public class FastBitSet {
         int i = bitIndex >> 6;
         setLength(i + 1);
         bits[i] ^= 1L << bitIndex;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(length());
+        for (long x : bits) {
+            String ss = Long.toString(x, 2);
+
+            for (int i = ss.length(); i < 64; i++) //prepend with zeros
+                s.append('0');
+
+            s.append(ss);
+
+        }
+        return s.toString();
     }
 
     /**
@@ -234,8 +249,8 @@ public class FastBitSet {
         int length = MathLib.min(_length, (toIndex >>> 6) + 1);
         bitSet.setLength(length);
         System.arraycopy(bits, 0, bitSet.bits, 0, length);
-        bitSet.clear(0, fromIndex);
-        bitSet.clear(toIndex, length << 6);
+        bitSet.clearAll(0, fromIndex);
+        bitSet.clearAll(toIndex, length << 6);
         return bitSet;
     }
 
@@ -420,7 +435,7 @@ public class FastBitSet {
      * @throws IndexOutOfBoundsException if 
      *          {@code (fromIndex < 0) | (toIndex < fromIndex)}
      */
-    public void set(int fromIndex, int toIndex) {
+    public void setAll(int fromIndex, int toIndex) {
         if ((fromIndex < 0) || (toIndex < fromIndex)) 
             throw new IndexOutOfBoundsException();
         int i = fromIndex >>> 6;
@@ -448,9 +463,9 @@ public class FastBitSet {
      */
     public void set(int fromIndex, int toIndex, boolean value) {
         if (value) {
-            set(fromIndex, toIndex);
+            setAll(fromIndex, toIndex);
         } else {
-            clear(fromIndex, toIndex);
+            clearAll(fromIndex, toIndex);
         }
     }
 
@@ -509,7 +524,10 @@ public class FastBitSet {
     // Optimization.
     public int hashCode() {
         int h = 0;
+        int lastI = 0;
          for (int i=nextSetBit(0); i >= 0; i = nextSetBit(i)) {
+             if (i == lastI)
+                 break;
              h += i;
         }
         return h;
@@ -540,6 +558,27 @@ public class FastBitSet {
             bits[i] = 0;
         }
         _length = newLength;
+    }
+
+    public int asInt() {
+        if (length() > 31)
+            throw new UnsupportedOperationException();
+
+        int m = 1;
+        int total = 0;
+        for (int i = 0; i < 32; i++) { //HACK avoid iterating this far
+            if (get(i))
+                total += m;
+            m*=2;
+        }
+
+        return total;
+    }
+
+    public FastBitSet subList(int offset, int size) {
+        FastBitSet f = new FastBitSet(size);
+        System.arraycopy(bits, offset, f.bits, 0, size);
+        return f;
     }
 
     public enum MathLib {
