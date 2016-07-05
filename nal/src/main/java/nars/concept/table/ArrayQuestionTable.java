@@ -123,6 +123,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
+        float qBudget = q.pri();
+
         boolean aEtern = a.isEternal();
         boolean qEtern = q.isEternal();
         float factor = 1f;
@@ -135,6 +137,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                 factor = 1f-a.conf();
             }
         }
+
+
         q.budget().priMult(factor);
         if (!qEtern) {
             //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
@@ -169,9 +173,12 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
                 if (ap != null && !ap.isDeleted()) {
                     nar.input(ap);
                     //nar.inputLater(ap);
+                    return;
                 }
             }
         }
+
+        nar.activate(a, qBudget);
     }
 
     @Nullable

@@ -43,7 +43,7 @@ public class TemporalTest {
     }
 
     @Test public void testCoNegatedSubtermConcept() {
-        assertEquals("((x)&&(--,(x)))", n.conceptualize(
+        assertEquals("((x)&&(--,(x)))", n.activate(
                 n.term("((x) &&+10 (--,(x)))"), UnitBudget.One).toString());
     }
 
@@ -67,7 +67,7 @@ public class TemporalTest {
     }
 
     @Test public void testAtemporalization() {
-        assertEquals("((x)==>(y))", n.conceptualize(
+        assertEquals("((x)==>(y))", n.activate(
                 n.term("((x) ==>+10 (y))"), UnitBudget.One).toString());
     }
 
@@ -91,7 +91,7 @@ public class TemporalTest {
         assertEquals("(do(that) &&+0 ((a)&&(b)))", nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("(do(that)&&((a)&&(b)))", n.conceptualize(nt, UnitBudget.One).toString());
+        assertEquals("(do(that)&&((a)&&(b)))", n.activate(nt, UnitBudget.One).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 
@@ -102,7 +102,7 @@ public class TemporalTest {
         assertEquals("(do(that) &&+1 ((a) ==>+2 (b)))", nn.toString());
 
 
-        assertEquals("(do(that)&&((a)==>(b)))", n.conceptualize(nn, UnitBudget.One).toString());
+        assertEquals("(do(that)&&((a)==>(b)))", n.activate(nn, UnitBudget.One).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ??
 

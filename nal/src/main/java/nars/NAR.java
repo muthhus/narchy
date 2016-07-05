@@ -978,12 +978,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * @param link whether to activate termlinks recursively
      * */
     @Nullable
-    public abstract Concept conceptualize(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
+    public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
 
     @Deprecated @Nullable
-    final public Concept conceptualize(@NotNull Termed<?> termed, @NotNull Budgeted b) {
-        return conceptualize(termed, b, 1f, 0f, null);
+    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
+        return activate(termed, b, 1f, 0f, null);
     }
 
     @NotNull
@@ -1201,6 +1201,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         logger.info("Loaded {} tasks from {}", count, tasks);
 
         return this;
+    }
+
+    /** activates a concept via a task. the task may already be present in the system,
+     *  but it will be reinforced via peer tasklinks activation.
+     *  (a normal duplicate task going through process() will not have this behavior.)
+     */
+    public final void activate(Task t, float scale) {
+        activate(t.concept(this), t, scale, scale, null);
+    }
+
+    public final void activate(Task t) {
+        activate(t, 1f);
     }
 
     @Nullable

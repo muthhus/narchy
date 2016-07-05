@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.function.IntConsumer;
 
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import mcaixictw.worldmodels.ContextTree;
 import mcaixictw.worldmodels.WorldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,13 @@ public class AIXI extends AIXIModel {
 
 		String result = "";
 		result += "cycle: " + cycle + ' ';
-        result += "history: " + historySize() + ' ';
+		int hs = historySize();
+		result += "history: " + hs + ' ';
+
+//		result +=  "(" + (((ContextTree)getAgent().getModel()).minH-hs) + ".." +
+//				(((ContextTree)getAgent().getModel()).maxH-hs) + ") ";
+//		((ContextTree)getAgent().getModel()).resetHistoryCounter();
+
 		result += agentSettings.toString() + ' ';
 		result += uctSettings.toString() + ' ';
 		result += "avgRew: " + this.averageReward();
@@ -107,6 +114,12 @@ public class AIXI extends AIXIModel {
 		} else {
 			action = search.search(this, uctSettings);
 			this.modelUpdate(action);
+		}
+
+		//update memory
+		int perceptSize = getAgent().getRewBits() + getAgent().getObsBits() + getAgent().getActionBits();
+		if (getModel().historySize() > getModel().depth() * perceptSize) {
+			getModel().forget(perceptSize);
 		}
 
 		if (action.size() != getActionBits())

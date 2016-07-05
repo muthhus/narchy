@@ -2,11 +2,13 @@ package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.*;
-import nars.budget.Budgeted;
+import nars.budget.Budget;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nal.Tense;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -123,7 +125,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final Budgeted RewardAttentionPerFrame =
+    private final Budget RewardAttentionPerFrame =
             b(0.9f,0.9f,0.9f);
             //null;
 
@@ -142,6 +144,7 @@ public class NAgent implements Agent {
     public SensorConcept happy;
     public SensorConcept sad;
     public FuzzyConceptSet rewardConcepts;
+    private Task beHappy, dontBeSad;
 
 
     public NAgent(NAR n) {
@@ -387,10 +390,10 @@ public class NAgent implements Agent {
 
         //TODO specify goal via a method in the sensor/digitizers
         float eternalGoalSeekConf = 1f /* gamma */;
-        nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
+        this.beHappy = nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 
-        nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
+        this.dontBeSad = nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
         //nar.goal(sad, Tense.Present, 0f, gamma);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
@@ -460,8 +463,11 @@ public class NAgent implements Agent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         if (RewardAttentionPerFrame!=null) {
 
-            boost(happy);
-            boost(sad);
+            //boost(happy);
+            boost(beHappy);
+            //boost(sad);
+            boost(dontBeSad);
+
             for (MotorConcept c : actions)
                 boost(c);
 
@@ -476,10 +482,14 @@ public class NAgent implements Agent {
 
     }
 
+    private void boost(Task t) {
+        BudgetMerge.max.apply(t.budget(), RewardAttentionPerFrame);
+        nar.activate(t);
+    }
 
 
     public @Nullable Concept boost(Concept c) {
-        return nar.conceptualize(c, RewardAttentionPerFrame, 1f, 1f, null);
+        return nar.activate(c, RewardAttentionPerFrame, 1f, 1f, null);
     }
 
     public void observe(float[] nextObservation) {
@@ -624,7 +634,7 @@ public class NAgent implements Agent {
             motivation[i] = motivation(actions.get(i));
         }
 
-        return decideAction.decideAction(motivation, lastAction, nar.random);
+        return decideAction.decideAction(motivation.clone(), lastAction, nar.random);
     }
 
     /** maps a concept's belief/goal state to a number */

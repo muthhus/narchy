@@ -35,7 +35,7 @@ abstract public class AgentTest {
 		modelSettings.setDepth(5);
 
 		WorldModel model = WorldModel.build("AgentTestModel",
-				modelSettings);
+				modelSettings, 16384);
 
 		agent = new AIXIModel(actions, obsBits, rewBits, model);
 	}

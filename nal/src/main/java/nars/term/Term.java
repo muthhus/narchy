@@ -39,14 +39,14 @@ import static nars.nal.Tense.DTERNAL;
 public interface Term extends Termed, Termlike, Comparable<Term> {
 
 
-    public static boolean equalAtemporally(@NotNull Termed term, @NotNull Termed<Compound> beliefConcept) {
+    public static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
 
-        Term t = $.unNeg(term.term());
-        Term b = $.unNeg(beliefConcept.term());
+        //Term t = $.unNeg(term.term());
+        //Term b = $.unNeg(beliefConcept.term());
 
-        if (t.op() == b.op()) {
-            if (t.structure() == b.structure() && t.volume() == b.volume()) {
-                return b.equals($.terms.atemporalize((Compound) t));
+        if (a.op() == b.op()) {
+            if (a.structure() == b.structure() && a.volume() == b.volume()) {
+                return b.equals($.terms.atemporalize((Compound) a));
             }
         }
         return false;

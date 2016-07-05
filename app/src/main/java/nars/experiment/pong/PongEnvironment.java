@@ -15,6 +15,7 @@ import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -45,8 +46,8 @@ public class PongEnvironment extends Player implements Environment {
 	public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
 	int actions = 3;
 
-	final int width = 8;
-	final int height = 8;
+	final int width = 4;
+	final int height = 4;
 	final int pixels = width * height;
 	final int scaleX = (int)(24f*20/width);
 	final int scaleY = (int)(24f*16/width);
@@ -67,20 +68,20 @@ public class PongEnvironment extends Player implements Environment {
 		Default nar = new Default(
 				1024, 3, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
-				//new Cache2kIndex(56000, rng)
+				//new Cache2kIndex(250000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.85f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(64);
-		nar.conceptActivation.setValue(0.1f);
+		nar.conceptActivation.setValue(0.07f);
 		nar.confMin.setValue(0.01f);
 
 

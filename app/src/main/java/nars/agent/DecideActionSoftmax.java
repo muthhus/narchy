@@ -14,6 +14,10 @@ public class DecideActionSoftmax implements DecideAction {
      */
     private float[] motNorm, motProb;
 
+
+    /** whether to exclude negative values */
+    boolean onlyPositive = false;
+
     float temperature;
 
     public DecideActionSoftmax(float temperature) {
@@ -27,6 +31,12 @@ public class DecideActionSoftmax implements DecideAction {
             motNorm = new float[actions];
             motProb = new float[actions];
         }
+
+        if (onlyPositive) {
+            for (int i = 0; i < motivation.length; i++)
+                motivation[i] = Math.max(0, motivation[i]);
+        }
+
         float[] minmax = Util.minmax(motivation);
         float min = minmax[0];
         float max = minmax[1];

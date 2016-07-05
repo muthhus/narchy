@@ -21,6 +21,7 @@ public class FactorialContextTree extends ContextTree {
 	protected List<ContextTree> ctwTrees;
 	protected int addedSymbolCount;
 
+
 	private List<ContextTree> allocateTrees(int numTrees) {
 		System.out.println("allocate trees: " + numTrees);
 		if (ctwTrees == null) {

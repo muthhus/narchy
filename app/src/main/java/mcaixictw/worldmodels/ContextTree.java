@@ -17,12 +17,27 @@ import mcaixictw.Util;
 public class ContextTree extends WorldModel {
 
 	public static final double LOG_OF_HALF = Math.log(0.5);
-	private final int maxHistoryLength = 16384;
+	private final int maxHistoryLength = 256*1024;
+
+	//public int minH = Integer.MAX_VALUE;
+	//public int maxH = Integer.MIN_VALUE;
+//	public void resetHistoryCounter() {
+//		minH = Integer.MAX_VALUE;
+//		maxH = Integer.MIN_VALUE;
+//	}
 
 	// create a context tree of specified maximum depth
 	protected ContextTree(String name, int depth) {
 		super(name);
 		history = new BitSet(maxHistoryLength);
+		/* {
+			@Override
+			public boolean get(int bitIndex) {
+				if (bitIndex > maxH) maxH = bitIndex;
+				if (bitIndex < minH) minH = bitIndex;
+				return super.get(bitIndex);
+			}
+		};*/
 
 		root = new CTNode();
 		this.depth = depth;
@@ -186,7 +201,7 @@ public class ContextTree extends WorldModel {
 		// using the weighted probabilities from section 5.7
 
 		// TODO make sure this is correct.
-		if (currNode.child(false) == null && currNode.child(true) == null) {
+		if (currNode.isEmpty()) {
 			currNode.logPweight = currNode.logPest;
 			currNode = currNode.parent;
 		}
@@ -439,6 +454,43 @@ public class ContextTree extends WorldModel {
 
 		int toRemove = historyPtr - newsize;
 		pop(toRemove);
+	}
+
+	@Override
+	public void forget(int b) {
+		//HACK shift down
+		while (b > 0) {
+			int c = Math.min(63, b);
+			history = shiftRight(history, c);
+			historyPtr -= c;
+			b -= c;
+		}
+	}
+
+	/** http://stackoverflow.com/a/29834792 */
+	public static BitSet shiftRight(BitSet bits, int n) {
+		if (n < 0)
+			throw new IllegalArgumentException("'n' must be >= 0");
+		if (n >= 64)
+			throw new IllegalArgumentException("'n' must be < 64");
+
+		long[] words = bits.toLongArray();
+
+//		// Expand array if there will be carry bits
+//		if (words[words.length - 1] >>> n > 0) {
+//			long[] tmp = new long[words.length + 1];
+//			System.arraycopy(words, 0, tmp, 0, words.length);
+//			words = tmp;
+//		}
+
+		// Do the shift
+		for (int i = words.length - 1; i > 0; i--) {
+			words[i] <<= n; // Shift current word
+			words[i] |= words[i - 1] >>> (64 - n); // Do the carry
+		}
+		words[0] <<= n; // shift [0] separately, since no carry
+
+		return BitSet.valueOf(words);
 	}
 
 	/**

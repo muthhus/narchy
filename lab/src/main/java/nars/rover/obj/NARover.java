@@ -423,7 +423,7 @@ public class NARover extends AbstractRover {
         for (int i = 0; i < pixels; i++) {
             final float angle = (startAngle + (aStep * i));
 
-            Termed visionTerm = nar.conceptualize($.the(id + i), UnitBudget.Zero);
+            Termed visionTerm = nar.activate($.the(id + i), UnitBudget.Zero);
 
             VisionRay v = new VisionRay(center, angle, aStep, base, distance, resolution, (dist, c) -> {
                 float p = nar.conceptPriority(visionTerm);

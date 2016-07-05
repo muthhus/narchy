@@ -41,8 +41,6 @@ import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.vision.NARCamera;
-import nars.vision.SwingCamera;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,12 +86,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.35f);
+		nar.conceptActivation.setValue(0.15f);
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.7f);
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
@@ -127,7 +125,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
-		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 5 /* visionRadius */);
+		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 4 /* visionRadius */);
 
 		NAgent n = new NAgent(nar) {
 			@Override
@@ -139,8 +137,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(sad);
 				charted.add(happy);
 
-				charted.add(nar.conceptualize($.$("[pill]"), UnitBudget.Zero));
-				charted.add(nar.conceptualize($.$("[ghost]"), UnitBudget.Zero));
+				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
+				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
 
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
 				//charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());

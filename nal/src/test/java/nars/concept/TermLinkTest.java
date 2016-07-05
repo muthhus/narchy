@@ -75,7 +75,7 @@ public class TermLinkTest {
         public void activate(int x, float a) {
 
             //Concept c = concept(x);
-            Concept c = nar.conceptualize(vertex(x), b(a, 0.5f, 0.5f),
+            Concept c = nar.activate(vertex(x), b(a, 0.5f, 0.5f),
                     /* concept factor */ 1f,  /* link factor */ 1f, null);
 
             //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
@@ -89,7 +89,7 @@ public class TermLinkTest {
             //nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f));
             //Concept c = nar.conceptualize(edge(x, y), b(a, 0.5f, 0.5f), 1f, 1f, null);
             Budget b = b(a, 0.5f, 0.5f);
-            Concept c = nar.conceptualize(vertex(x), b, a, 0f, null);
+            Concept c = nar.activate(vertex(x), b, a, 0f, null);
             Concept.linkPeer(c.termlinks(), vertex(y), b, a);
 
         }

@@ -248,7 +248,7 @@ public class Multi extends AbstractNAR {
 
     @Nullable
     @Override
-    public final Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
+    public final Concept activate(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
         Concept c = concept(termed, true);
         if (c != null) {
 //            {

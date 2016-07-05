@@ -419,7 +419,7 @@ public class TermTest {
         assertEquals(0, b.compareTo(a));
 
         if (normalize) {
-            Concept n2a = n2.conceptualize(a, UnitBudget.One);
+            Concept n2a = n2.activate(a, UnitBudget.One);
             assertNotNull(a + " should conceptualize", n2a);
             assertNotNull(b);
             assertEquals(n2a.toString(), b.toString());

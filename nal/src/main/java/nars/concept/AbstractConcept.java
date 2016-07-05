@@ -54,7 +54,7 @@ public interface AbstractConcept<T extends Term> extends Concept<T> {
         if (target instanceof Variable) {
             targetConcept = null;
         } else {
-            targetConcept = nar.conceptualize(target, b, subScale,
+            targetConcept = nar.activate(target, b, subScale,
                     0f /* zero prevents direct recursive linking, it should go through the target concept though and happen through there */,
                     conceptOverflow);
             if (targetConcept == null)

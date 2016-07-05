@@ -3,8 +3,6 @@ package mcaixictw;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gs.collections.api.list.primitive.BooleanList;
-import com.gs.collections.api.list.primitive.MutableBooleanList;
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
 
@@ -202,11 +200,11 @@ public class AIXIModel {
 	 * revert the history of the agent without touching the CTW model.
 	 */
 	public void historyRevert(ModelUndo mu) {
-		model.revertHistory(mu.getHistorySize());
-		assert (model.historySize() == mu.getHistorySize());
-		timeCycle = mu.getAge();
-		totalReward = mu.getReward();
-		lastUpdatePercept = mu.isLastUpdatePercept();
+		model.revertHistory(mu.historySize);
+		assert (model.historySize() == mu.historySize);
+		timeCycle = mu.age;
+		totalReward = mu.reward;
+		lastUpdatePercept = mu.lastUpdatePercept;
 	}
 
 	/**
@@ -218,8 +216,8 @@ public class AIXIModel {
 	 */
 	public boolean modelRevert(ModelUndo mu) {
 		// Revert as long we are not in the state defined by 'mu'
-		while (mu.getAge() != timeCycle
-				|| mu.isLastUpdatePercept() != lastUpdatePercept) {
+		while (mu.age != timeCycle
+				|| mu.lastUpdatePercept != lastUpdatePercept) {
 			// Undo a percept-update
 			if (lastUpdatePercept) {
 				model.revert(obsBits + rewBits);
@@ -233,11 +231,11 @@ public class AIXIModel {
 		}
 
 		// Make sure we correctly reverted the agent.
-		assert (mu.getHistorySize() == historySize());
-		assert (lastUpdatePercept == mu.isLastUpdatePercept());
+		assert (mu.historySize == historySize());
+		assert (lastUpdatePercept == mu.lastUpdatePercept);
 
-		timeCycle = mu.getAge();
-		totalReward = mu.getReward();
+		timeCycle = mu.age;
+		totalReward = mu.reward;
 
 		return true;
 	}
@@ -324,16 +322,6 @@ public class AIXIModel {
 		return total;
 	}
 
-	/**
-	 * Decodes the observation from a list of symbols, assuming the perception
-	 * is at the beginning of the list.
-	 * 
-	 * @param symlist
-	 * @return
-	 */
-	public BooleanArrayList decodeObservation(List<Boolean> symlist) {
-		return Util.asBitSet(symlist.subList(0, obsBits));
-	}
 
 	// Returns the most recent perception
 	public BooleanArrayList getLastPercept() {
@@ -346,11 +334,11 @@ public class AIXIModel {
 			i = percept_bits + actionBits - 1;
 			end = actionBits;
 		}
-		List<Boolean> list = new ArrayList<>(end);
+		BooleanArrayList list = new BooleanArrayList(end);
 		for (; i >= end; i--) {
 			list.add(model.nthHistorySymbol(i));
 		}
-		return Util.asBitSet(list);
+		return list;
 	}
 
 	// Returns the most recent action
@@ -364,11 +352,11 @@ public class AIXIModel {
 			i = actionBits - 1;
 			end = 0;
 		}
-		List<Boolean> list = new ArrayList<>(end);
+		BooleanArrayList list = new BooleanArrayList(end);
 		for (; i >= end; i--) {
 			list.add(model.nthHistorySymbol(i));
 		}
-		return Util.asBitSet(list);
+		return list;
 	}
 
 	public boolean lastUpdatePercept() {

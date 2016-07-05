@@ -45,6 +45,8 @@ public abstract class WorldModel {
 
 	public abstract void revertHistory(int newsize);
 
+	public abstract int depth();
+
 	public abstract BooleanArrayList genRandomSymbols(int bits);
 
 	public abstract BooleanArrayList genRandomSymbolsAndUpdate(int bits);
@@ -58,6 +60,10 @@ public abstract class WorldModel {
 	public abstract int historySize();
 
 	public static WorldModel build(String name,
+								   WorldModelSettings settings, int historySize /* TODO */) {
+		return build(name, settings);
+	}
+	public static WorldModel build(String name,
 								   WorldModelSettings settings) {
 
 		if (settings.isFacContextTree()) {
@@ -66,4 +72,6 @@ public abstract class WorldModel {
 			return new ContextTree(name, settings.getDepth());
 		}
 	}
+
+	public abstract void forget(int b);
 }

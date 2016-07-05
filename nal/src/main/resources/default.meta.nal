@@ -346,7 +346,7 @@
 
     A, B, task("."), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B,            time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Strong)
+    A, B,            time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Weak)
 
 
 

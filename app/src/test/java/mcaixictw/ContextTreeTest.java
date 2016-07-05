@@ -30,7 +30,7 @@ public class ContextTreeTest {
 		WorldModelSettings settings = new WorldModelSettings();
 		settings.setFacContextTree(false);
 		settings.setDepth(2);
-		ct = WorldModel.build("ContextTreeTestModel", settings);
+		ct = WorldModel.build("ContextTreeTestModel", settings, 16384);
 		// BooleanArrayList list = new ArrayBooleanArrayList();
 		// for (int i = 0; i < 1000; i++) {
 		// list.add(Util.randSym());
@@ -67,7 +67,7 @@ public class ContextTreeTest {
 		settings.setFacContextTree(false);
 		settings.setDepth(3);
 		ContextTree ct = (ContextTree) WorldModel.build(
-				"ContextTreeTestModel", settings);
+				"ContextTreeTestModel", settings, 16834);
 		sumUpTo1(ct);
 
 		BooleanArrayList past, context;
@@ -266,7 +266,7 @@ public class ContextTreeTest {
 		settings.setDepth(depth);
 
 		ContextTree ct = (ContextTree) WorldModel.build(
-				"ContextTreeTestModel", settings);
+				"ContextTreeTestModel", settings, 16384);
 
 		// if there isn't a history of length = depth, the predictions of the
 		// context tree won't sum up to 1.
@@ -325,7 +325,7 @@ public class ContextTreeTest {
 		settings.setDepth(depth);
 
 		ContextTree ct = (ContextTree) WorldModel.build(
-				"ContextTreeTestModel", settings);
+				"ContextTreeTestModel", settings, 16384);
 		BooleanArrayList history = Bits.rand(depth);
 		ct.updateHistory(history);
 		int testLength = 1000;
@@ -451,6 +451,7 @@ public class ContextTreeTest {
 		ct.updateHistory(list);
 		ct.revertHistory(s1);
 		assertTrue(p - ct.predict(list) < eps);
+		assertEquals(s1, ct.historySize());
 	}
 
 	@Test

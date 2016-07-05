@@ -36,9 +36,10 @@ abstract public class RunAgentTest {
 
 		WorldModelSettings modelSettings = new WorldModelSettings();
 		modelSettings.setFacContextTree(true);
-		modelSettings.setDepth(3);
+		modelSettings.setDepth(9);
+		uctSettings.setMcSimulations(200);
 
-		WorldModel model = WorldModel.build(name(), modelSettings);
+		WorldModel model = WorldModel.build(name(), modelSettings, 16384);
 		controller = new AIXI(env, controllerSettings, uctSettings, model);
 
 	}
@@ -65,8 +66,10 @@ abstract public class RunAgentTest {
 
 		// A smart agent should learn to always choose the biased side and
 		// should come close to an average reward of 0.7
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) {
+			System.out.println(controller);
 			controller.run(env, false);
+		}
 		double r = controller.averageReward();
 		assertTrue(r + " avg reward", r > 0.6f);
 		

@@ -5,10 +5,10 @@ import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import nars.util.data.map.UnifriedMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 /**
  * one node of the upper confidence bound applied to trees algorithm.
@@ -19,7 +19,8 @@ public class UCTNode {
 		this.isChanceNode = isChanceNode;
 		visits = 0;
 		mean = 0;
-		children = new UnifriedMap();
+		//children = new UnifriedMap();
+		children = new HashMap();
 	}
 
 	private final Map<BooleanArrayList, UCTNode> children; // stores the children
@@ -130,21 +131,19 @@ public class UCTNode {
 			return agent.reward();
 		} else if (isChanceNode) {
 			BooleanArrayList p = agent.genPerceptAndUpdate();
-			if (!children.containsKey(p)) {
-				children.put(p, new UCTNode(false));
-			}
-			futureTotalReward = children.get(p).sample(agent, m - 1);
+			UCTNode cp = children.computeIfAbsent(p, (x) -> new UCTNode(false));
+			futureTotalReward = cp.sample(agent, m - 1);
 		} else if (visits == 0) {
 			futureTotalReward = rollout(agent, m);
 		} else {
 			BooleanArrayList a = actionSelect(agent, m);
-			children.computeIfAbsent(a, (k) -> new UCTNode(true));
+			UCTNode cp = children.computeIfAbsent(a, (k) -> new UCTNode(true));
 			agent.modelUpdate(a);
-			futureTotalReward = children.get(a).sample(agent, m);
+			futureTotalReward = cp.sample(agent, m);
 		}
 
 		// Calculate the expected average reward
-		double reward = futureTotalReward - undo.getReward();
+		double reward = futureTotalReward - undo.reward;
 
 		// update the mean reward
 		mean = 1.0 / (double) (visits + 1) * (reward + (double) visits * mean);
@@ -158,10 +157,13 @@ public class UCTNode {
 
 		agent.modelRevert(undo);
 
-		assert (undo.getAge() == agent.age());
-		assert (undo.getHistorySize() == agent.historySize());
-		assert (undo.getReward() == agent.reward());
-		assert (undo.isLastUpdatePercept() == agent.lastUpdatePercept());
+		if (undo.age != agent.age())
+			throw new RuntimeException("Undo history age mismatch");
+		if (undo.historySize != agent.historySize())
+			throw new RuntimeException("Undo history size mismatch");
+
+		assert (undo.reward == agent.reward());
+		assert (undo.lastUpdatePercept == agent.lastUpdatePercept());
 
 		return futureTotalReward;
 	}

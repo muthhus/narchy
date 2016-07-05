@@ -24,9 +24,13 @@ public class AIXIAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
         WorldModelSettings modelSettings = new WorldModelSettings();
-        modelSettings.setFacContextTree(false);
-        modelSettings.setDepth(4);
+        modelSettings.setFacContextTree(true);
+        modelSettings.setDepth(3);
 
+        uctSettings.setHorizon(3);
+        uctSettings.setMcSimulations(100);
+        uctSettings.setRecycleUCT(true);
+        //final int historySize = 16384;
         //uctSettings.setHorizon(4);
 
         world = WorldModel.build("agent", modelSettings);
@@ -60,8 +64,8 @@ public class AIXIAgent implements Agent {
     }
 
     public static void main(String[] args) {
-        new PacmanEnvironment(1, 1)
+        new PacmanEnvironment(1, 2)
         //new PongEnvironment()
-                .run(new AIXIAgent(), 5000);
+                .run(new AIXIAgent(), 256*64);
     }
 }

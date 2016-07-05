@@ -55,7 +55,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return null;
         }
 
-        boolean equals = Term.equalAtemporally(x, y);
+        //boolean equals = Term.equalAtemporally(x, y);
+        boolean equals = x.equals(y);
         if (!equals && hasAnyOp) {
             OneMatchFindSubst m = this.subMatcher;
             term = m.tryMatch(op, parent, term, x, y);

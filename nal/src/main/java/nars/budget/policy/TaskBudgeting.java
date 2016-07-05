@@ -31,8 +31,8 @@ public class TaskBudgeting {
             return null;
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
-        int parentVol = parentTask.volume() + p.beliefTerm().volume();
-        float volRatioScale = Math.min(1f, parentVol / ((float) (parentVol + derived.volume())));
+        float parentVol = aveAri(parentTask.volume(), p.beliefTerm().volume());
+        float volRatioScale = parentVol / ((float) (parentVol + derived.volume()));
 
         BLink<? extends Task> taskLink = p.taskLink;
         BLink<? extends Termed> termLink = p.termLink;
