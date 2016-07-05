@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.$.$;
 import static nars.budget.policy.DefaultConceptPolicy.beliefCapacityNonEternal;
+import static nars.budget.policy.DefaultConceptPolicy.goalCapacityOneEternal;
 
 
 public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
@@ -124,7 +125,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     /** allow no eternal beliefs, and ONE eternal goal */
     @Override protected void beliefCapacity(ConceptPolicy p) {
         beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
-        goals().capacity(1, p.beliefCap(this, false, true) + p.beliefCap(this, false, false)  - 1);
+        goalCapacityOneEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
     }
 
 

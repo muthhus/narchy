@@ -76,12 +76,12 @@ public class PongEnvironment extends Player implements Environment {
 		nar.beliefConfidence(0.8f);
 		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(32);
-		nar.conceptActivation.setValue(0.25f);
-		nar.confMin.setValue(0.02f);
+		nar.DEFAULT_GOAL_PRIORITY = 0.85f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
+		nar.cyclesPerFrame.set(64);
+		nar.conceptActivation.setValue(0.1f);
+		nar.confMin.setValue(0.01f);
 
 
 
@@ -137,7 +137,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		nar.output(new File(KNOWLEDGEFILE), false,
 				t -> {
-					if (!t.isInput() && t.conf() > 0.5f) {
+					if (!t.isInput() && t.conf() > 0.75f) {
 						//System.out.println(t + "\t" + Arrays.toString(t.evidence()));
 						return true;
 					}

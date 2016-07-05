@@ -78,6 +78,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         return super.processBelief(belief, nar);
     }
 
+
+
     /** called when a conflicting belief has attempted to be processed */
     protected void onConflict(@NotNull Task belief) {
 
@@ -121,7 +123,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     @Override
     protected void beliefCapacity(ConceptPolicy p) {
         DefaultConceptPolicy.beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
-        DefaultConceptPolicy.goalCapacityOneEternal(this, p);
+        DefaultConceptPolicy.goalCapacityOneEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
     }
 
 

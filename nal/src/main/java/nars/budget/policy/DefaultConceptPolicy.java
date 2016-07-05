@@ -52,6 +52,10 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     public static void goalCapacityOneEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p) {
         c.goals().capacity(1, p.beliefCap(c, false, true) + p.beliefCap(c, false, false));
     }
+    /** no eternal; use allocated eternal capacity added to temporals */
+    public static void goalCapacityOneEternal(@NotNull CompoundConcept c, @NotNull ConceptPolicy p, int multiplier) {
+        c.goals().capacity(1, Math.max(p.beliefCap(c, false, true), p.beliefCap(c, false, false)) * multiplier);
+    }
 
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {

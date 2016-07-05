@@ -62,7 +62,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	final int itemTypes = 3;
 
 	final int inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
-	private final int pacmanCyclesPerFrame = 12;
+	private final int pacmanCyclesPerFrame = 6;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.05f;
 
@@ -91,13 +91,13 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MemoryManager(nar);
 
 		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.7f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.7f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
 		nar.cyclesPerFrame.set(64);
-		nar.confMin.setValue(0.05f);
+		nar.confMin.setValue(0.01f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");

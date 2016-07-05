@@ -107,7 +107,10 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         for (int i = 0; i < listSize; i++) {
             Task q = list.get(i);
-            answer(q, a, nar);
+            if (q.isDeleted())
+                remove(i, "Discovered Deleted");
+            else
+                answer(q, a, nar);
         }
     }
 

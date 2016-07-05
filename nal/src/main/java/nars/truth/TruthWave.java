@@ -81,6 +81,8 @@ public class TruthWave {
     }
 
     public static void load(float[] t, Truthed x, int j, long occ, float q) {
+        if (x == null)
+            return;
         t[j++] = x.freq();
         t[j++] = x.conf();
         t[j++] = occ== Tense.ETERNAL ? Float.NaN : occ;

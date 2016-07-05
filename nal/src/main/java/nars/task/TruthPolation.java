@@ -7,6 +7,7 @@ import nars.$;
 import nars.Global;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[][] times;
     @NotNull final float[] freq;
     @NotNull final float[] conf;
+    private static final Truth EterNull = $.t(0.5f, Global.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1D */, null);
@@ -43,9 +45,12 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         return truth(when, Lists.newArrayList(tasks), null);
     }
 
-    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal) {
+    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal) {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
+
+        if (topEternal == null)
+            topEternal = EterNull;
 
         float eternalization = topEternal!=null ? 1f/(1+tasks.size()) : 0f; //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
 
@@ -55,7 +60,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     }
 
 
-    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Task topEternal, /* background */float maxDarkFraction, float darkThresold) {
+    public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal, /* background */float maxDarkFraction, float darkThresold) {
         assert(times.length <= tasks.size());
 
         int n = tasks.size();
@@ -90,7 +95,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         }
 
         if (topEternal!=null) {
-            this.setBackground(topEternal.freq(), topEternal.conf());
+            this.setBackground(topEternal.freq(), topEternal.confWeight());
         } else {
             this.setBackground(Float.NaN, 0);
         }

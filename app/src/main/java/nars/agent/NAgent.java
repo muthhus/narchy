@@ -4,6 +4,7 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.*;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
+import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -18,6 +19,7 @@ import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.IntFunction;
@@ -145,7 +147,7 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.5f)
+            new DecideActionSoftmax(0.4f)
             //new DecideActionEpsilonGreedy()
         );
     }
@@ -325,11 +327,11 @@ public class NAgent implements Agent {
 
 
         return                    Texts.n2(motivation) + "\t + "
-                 + "rwrd=[" +
-                     n4( sad.beliefs().truth(now).motivation() )
-                             + "," +
-                     n4( happy.beliefs().truth(now).motivation() )
-                 + "] "
+//                 + "rwrd=[" +
+//                     n4( sad.beliefs().truth(now).motivation() )
+//                             + "," +
+//                     n4( happy.beliefs().truth(now).motivation() )
+//                 + "] "
                  + "hapy=" + n4(emotion.happy()) + " "
                  + "busy=" + n4(emotion.busy.getSum()) + " "
                  + "lern=" + n4(emotion.learning()) + " "
@@ -354,13 +356,13 @@ public class NAgent implements Agent {
                     return input[i];
                 }, sensorTruth) {
 
-                    @Override
-                    public float pri() {
-                        //input priority modulated by concept priority
-                        float min = 0.5f;
-                        return sensorPriority * (min /* min */ + (1f-min) * nar.conceptPriority(this));
-                    }
-                }.resolution(0.01f).timing(-1, -1).pri(sensorPriority)
+//                    @Override
+//                    public float pri() {
+//                        //input priority modulated by concept priority
+//                        float min = 0.5f;
+//                        return sensorPriority * (min /* min */ + (1f-min) * nar.conceptPriority(this));
+//                    }
+                }.resolution(0.02f).timing(-1, -1).pri(sensorPriority)
         );
 
 
@@ -458,11 +460,13 @@ public class NAgent implements Agent {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         if (RewardAttentionPerFrame!=null) {
 
-            long now = nar.time();
-            nar.conceptualize(happy, RewardAttentionPerFrame, 1f, 1f, null);
-            //nar.goal(RewardAttentionPerFrame.pri(), happy, now+1, 1f, gamma);
-            nar.conceptualize(sad, RewardAttentionPerFrame, 1f, 1f, null);
+            boost(happy);
+            boost(sad);
+            for (MotorConcept c : actions)
+                boost(c);
+
             //nar.goal(RewardAttentionPerFrame.pri(), sad, now+1, 0f, gamma);
+            //nar.goal(RewardAttentionPerFrame.pri(), happy, now+1, 1f, gamma);
         }
 //        for (Concept a : actions) {
 //            nar.conceptualize(a, ActionAttentionPerFrame);
@@ -470,6 +474,12 @@ public class NAgent implements Agent {
 
         return lastAction;
 
+    }
+
+
+
+    public @Nullable Concept boost(Concept c) {
+        return nar.conceptualize(c, RewardAttentionPerFrame, 1f, 1f, null);
     }
 
     public void observe(float[] nextObservation) {

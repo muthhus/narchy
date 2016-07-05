@@ -151,12 +151,12 @@ public enum Global {
 
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1f;
 
     /** additional temporal belief space for sensor concepts,
      *  which will usually have a lot of highly fluctuating activity that should
      *  be remembered */
-    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 2; //HACK
+    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 4; //HACK
 
 
     @NotNull
