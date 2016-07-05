@@ -6,7 +6,6 @@ import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.factory.Sets;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -28,7 +27,7 @@ import static com.gs.collections.impl.factory.Sets.mutable;
  * Methods common to both Term and Subterms
  * T = subterm type
  */
-public interface TermContainer<T extends Term> extends Termlike, Comparable<Termlike>, Iterable<T> {
+public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
 
     @NotNull
     static TermContainer union(@NotNull TermContainer a, @NotNull TermContainer b) {
@@ -499,24 +498,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
         return true;
     }
 
-    @Override
+
     default int compareTo(@NotNull Termlike o) {
         return compareTo(this, o);
     }
 
     static int compareTo(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
-        return compareContent(a, b);
-    }
-
-
-    static int compareContent(@NotNull TermContainer a, @NotNull Termlike c) {
 
         int s = a.size(), diff;
-        if ((diff = Integer.compare(s, c.size())) != 0)
+        if ((diff = Integer.compare(s, b.size())) != 0)
             return diff;
 
-        TermContainer cc = (TermContainer) c;
+        TermContainer cc = (TermContainer) b;
         for (int i = 0; i < s; i++) {
             int d = a.term(i).compareTo(cc.term(i));
 
@@ -534,6 +528,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable<Term
 
         return 0;
     }
+
 
 
     /**

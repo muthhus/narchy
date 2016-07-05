@@ -10,7 +10,7 @@ import java.util.function.Predicate;
  * Features exhibited by, and which can classify terms
  * and termlike productions
  */
-public interface Termlike extends Comparable<Termlike> {
+public interface Termlike {
 
     /**
      * volume = total number of terms = complexity + # total variables

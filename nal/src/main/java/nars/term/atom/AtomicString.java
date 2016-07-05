@@ -33,11 +33,5 @@ public abstract class AtomicString implements Atomic {
         return toString().hashCode();
     }
 
-    /**
-     * @param that The Term to be compared with the current Term
-     */
-    @Override public int compareTo(@NotNull Termlike that) {
-        return Term.compare(this, (Term) that);
-    }
 
 }

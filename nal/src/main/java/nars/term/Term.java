@@ -35,7 +35,7 @@ import java.io.IOException;
 import static nars.nal.Tense.DTERNAL;
 
 
-public interface Term extends Termed, Termlike {
+public interface Term extends Termed, Termlike, Comparable<Term> {
 
 
     @NotNull
@@ -293,34 +293,36 @@ public interface Term extends Termed, Termlike {
         return null;
     }
 
-    public static int compare(Term x, Term y) {
-        if (x.equals(y)) return 0;
 
-        int d = x.op().compareTo(y.op());
+    /** GLOBAL TERM COMPARATOR FUNCTION */
+    @Override public default int compareTo(Term y) {
+        if (this.equals(y)) return 0;
+
+        int d = this.op().compareTo(y.op());
         if (d!=0)
             return d;
 
-        if (x instanceof AbstractVariable) {
-            //hashcode serves as the ordering too
-            return Integer.compare(x.hashCode(), y.hashCode());
-        } else if (x instanceof Atomic) {
-            //if the op is the same, it is required to be a subclass of Atomic
-            //which should have an ordering determined by its toString()
-            return x.toString().compareTo((/*(Atomic)*/y).toString());
-        } else if (x instanceof Compound) {
+        if (this instanceof Compound) {
 
-            Compound cx = (Compound)x;
+            Compound cthis = (Compound)this;
             Compound cy = (Compound)y;
 
-            int diff3 = Integer.compare(cx.dt(), cy.dt());
+            int diff3 = Integer.compare(cthis.dt(), cy.dt());
             if (diff3 != 0)
                 return diff3;
 
-            return cx.subterms().compareTo(cy.subterms());
+            return cthis.subterms().compareTo(cy.subterms());
 
+        } else if (this instanceof AbstractVariable) {
+            //hashcode serves as the ordering too
+            return Integer.compare(this.hashCode(), y.hashCode());
+        } else if (this instanceof Atomic) {
+            //if the op is the same, it is required to be a subclass of Atomic
+            //which should have an ordering determined by its toString()
+            return this.toString().compareTo((/*(Atomic)*/y).toString());
         }
 
-        throw new RuntimeException("ordering exception: " + x + ", " + y);
+        throw new RuntimeException("ordering ethisception: " + this + ", " + y);
     }
 }
 

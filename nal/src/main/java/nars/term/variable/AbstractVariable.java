@@ -61,11 +61,6 @@ public abstract class AbstractVariable implements Variable {
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
-    @Override
-    public final int compareTo(@NotNull Termlike o) {
-        return Term.compare(this, (Term)o);
-    }
-
 
     @Override
     public final int hashCode() {

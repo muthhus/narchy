@@ -226,12 +226,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-    @Override
-    default int compareTo(@NotNull Termlike o) {
-        return Term.compare(this, (Term)o);
-    }
-
-
     /**
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist

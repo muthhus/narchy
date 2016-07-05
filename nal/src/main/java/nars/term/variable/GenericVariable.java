@@ -41,11 +41,6 @@ public class GenericVariable extends AtomicString implements Variable {
         return false;
     }
 
-    @Override
-    public int compareTo(@NotNull Termlike that) {
-        if (this == that) return 0;
-        return Term.compare(this, (Term)that);
-    }
 
     @Override
     public final int complexity() {
