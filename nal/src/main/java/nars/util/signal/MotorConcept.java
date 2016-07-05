@@ -2,6 +2,7 @@ package nars.util.signal;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.procedure.primitive.FloatFloatProcedure;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
@@ -47,6 +48,8 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     //private final Logger logger;
 
     @FunctionalInterface  public interface MotorFunction {
+        final static MotorFunction NoFeedback = (b,d) -> Float.NaN;
+
         float motor(float believed, float desired);
     }
 
@@ -60,6 +63,16 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
      * belief feedback expectation
      */
     float nextFeedback;
+
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
+        this($(compoundTermString), n, MotorFunction.NoFeedback);
+    }
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatFloatProcedure update) throws Narsese.NarseseException {
+        this($(compoundTermString), n, (b,d) -> {
+            update.value(b, d);
+            return Float.NaN;
+        });
+    }
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         this($(compoundTermString), n, motor);

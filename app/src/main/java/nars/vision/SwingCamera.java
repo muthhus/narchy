@@ -1,6 +1,5 @@
 package nars.vision;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -11,17 +10,38 @@ public class SwingCamera implements PixelCamera {
 
     private final Container component;
     private BufferedImage big;
-    private BufferedImage small;
+    private BufferedImage out;
     public int width;
     public int height;
-    private Graphics2D smallGfx;
+    private Graphics2D outgfx;
+    public Rectangle input;
+
+    public SwingCamera(Container component) {
+        this(component, 0, 0);
+    }
 
     public SwingCamera(Container component, int targetWidth, int targetHeight) {
         this.component = component;
+        input(0, 0, component.getWidth(), component.getHeight());
+        output(targetWidth, targetHeight);
+    }
+
+    public void output(int targetWidth, int targetHeight) {
         this.width = targetWidth;
         this.height = targetHeight;
     }
 
+    public void input(int x, int y, int w, int h) {
+        this.input = new Rectangle(x, y, w, h);
+    }
+
+
+    public int inWidth() {
+        return component.getWidth();
+    }
+    public int inHeight() {
+        return component.getHeight();
+    }
 
     @Override
     public int width() {
@@ -36,22 +56,29 @@ public class SwingCamera implements PixelCamera {
     @Override
     public void update(PerPixelRGB p) {
 
-        big = ScreenImage.get(component, big);
-
         final int width = this.width;
+        if (width == 0)
+            return;
         final int height = this.height;
+        if (height == 0)
+            return;
 
-        if (small == null || small.getWidth()!=width || small.getHeight()!=height) {
-            small = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            smallGfx = small.createGraphics(); //create a graphics object to paint to
-            smallGfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            smallGfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-            smallGfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        big = ScreenImage.get(component, big, input);
+
+
+
+
+        if (out == null || out.getWidth()!=width || out.getHeight()!=height) {
+            out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            outgfx = out.createGraphics(); //create a graphics object to paint to
+            outgfx.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            outgfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+            outgfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
 
-        final BufferedImage small = this.small;
-        smallGfx.fillRect(0, 0, width, height); //TODO add fade option
-        smallGfx.drawImage(big, 0, 0, width, height, null); //draw the image scaled
+        final BufferedImage small = this.out;
+        outgfx.fillRect(0, 0, width, height); //TODO add fade option
+        outgfx.drawImage(big, 0, 0, width, height, null); //draw the image scaled
 
 
         for (int y = 0; y < height; y++) {

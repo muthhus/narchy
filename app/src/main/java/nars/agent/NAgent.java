@@ -6,11 +6,9 @@ import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.learn.Agent;
 import nars.nal.Tense;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
@@ -160,48 +158,9 @@ public class NAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
 
+        List<MotorConcept> outputConcepts = IntStream.range(0, actions).mapToObj(i -> {
 
-        sensorPriority = nar.priorityDefault(Symbols.BELIEF);
-        rewardPriority = goalFeedbackPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
-
-        alpha = nar.confidenceDefault(Symbols.BELIEF);
-        gamma = nar.confidenceDefault(Symbols.GOAL);
-
-        motivation = new float[actions];
-        lastMotivation = new float[actions];
-
-
-        input = new float[inputs];
-
-        this.actions = IntStream.range(0, actions).mapToObj(i -> {
-
-            MotorConcept.MotorFunction motorFunc = (b, d) -> {
-
-                motivation[i] =
-
-                        //(d > 0.5 && d > b ? d - b : 0);
-                        //(d > 0.5 ? d : 0) / (d+b);
-                        //d / (d+b);
-                        //(d > 0.1f ? d - b : -1f);
-                        //d - b;
-                        d;
-
-                        //(d*d) - (b*b);
-                        //Math.max(0, d-b);
-                        //(1+d)/(1+b);
-                        //d;
-                        //d / (1 + b);
-
-                //d  / (1f + b);
-
-                /*if (d < 0.5) return 0; //Float.NaN;
-                if (d < b) return 0; //Float.NaN;
-                return d-b;*/
-
-                return Float.NaN;
-            };
-
-            MotorConcept mc = new MotorConcept(actionConceptName(i), nar, motorFunc) {
+            MotorConcept mc = new MotorConcept(actionConceptName(i), nar) {
 
                 @Override protected void beliefCapacity(ConceptPolicy p) {
                     beliefs().capacity(0, motorBeliefCapacity);
@@ -237,15 +196,12 @@ public class NAgent implements Agent {
         }).collect(toList());
 
 
-        this.inputs = IntStream.range(0, inputs).mapToObj(i -> {
+        List<SensorConcept> inputContepts = IntStream.range(0, inputs).mapToObj(i -> {
             return getSensorConcepts(sensorFreq, i);
         }).flatMap(x -> x).collect(toList());
 
+        start(inputContepts, outputConcepts);
 
-        rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
-
-        this.sad = rewardConcepts.sensors.get(0);
-        this.happy = rewardConcepts.sensors.get(2);
 
 //        float rewardResolution = 0.05f;
 //        this.happy = new SensorConcept($.prop(nar.self, the("happy")), nar,
@@ -319,6 +275,26 @@ public class NAgent implements Agent {
 //                .pri(rewardPriority)
 //                .resolution(0.01f);
         init();
+    }
+
+    public void start(List<SensorConcept> inputContepts, List<MotorConcept> outputConcepts) {
+        this.inputs = inputContepts;
+        this.actions = outputConcepts;
+
+        input = new float[this.inputs.size()];
+        motivation = new float[this.actions.size()];
+        lastMotivation = new float[this.actions.size()];
+
+        sensorPriority = nar.priorityDefault(Symbols.BELIEF);
+        rewardPriority = goalFeedbackPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
+
+        alpha = nar.confidenceDefault(Symbols.BELIEF);
+        gamma = nar.confidenceDefault(Symbols.GOAL);
+
+
+        rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
+        this.sad = rewardConcepts.sensors.get(0);
+        this.happy = rewardConcepts.sensors.get(2);
     }
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
@@ -520,11 +496,13 @@ public class NAgent implements Agent {
 
     float lastOnConf = 0;
 
-    private void decide(int lastAction) {
+    public int decide(int _lastAction) {
 
         nar.clock.tick(ticksBeforeDecide);
 
         this.nextAction = -1;
+
+
         float nextMotivation;
 
         nextAction = decideMotivation();
@@ -589,6 +567,8 @@ public class NAgent implements Agent {
         this.lastAction = nextAction;
         System.arraycopy(motivation, 0, lastMotivation, 0, motivation.length);
         this.lastOnConf = onConf;
+
+        return nextAction;
     }
 
     /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
@@ -627,7 +607,35 @@ public class NAgent implements Agent {
     }
 
     private final int decideMotivation() {
+
+        float[] motivation = this.motivation;
+
+        for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
+            motivation[i] = motivation(actions.get(i));
+        }
+
         return decideAction.decideAction(motivation, lastAction, nar.random);
+    }
+
+    /** maps a concept's belief/goal state to a number */
+    protected float motivation(MotorConcept m) {
+        return m.goals().motivation(nar.time());
+
+        //                    //(d > 0.5 && d > b ? d - b : 0);
+//                    //(d > 0.5 ? d : 0) / (d+b);
+//                    //d / (d+b);
+//                    //(d > 0.1f ? d - b : -1f);
+//                    //d - b;
+//                    d;
+//            //(d*d) - (b*b);
+//            //Math.max(0, d-b);
+//            //(1+d)/(1+b);
+//            //d;
+//            //d / (1 + b);/
+//            //d  / (1f + b);
+//            return Float.NaN;
+//        };
+
     }
 
 

@@ -87,7 +87,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), true)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -99,9 +99,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.7f);
+		nar.beliefConfidence(0.8f);
 		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.7f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.7f;
@@ -118,7 +118,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.inputAt(100,"$1.0;0.8;1.0$ samePlace:(#x,#y,#a,#b)?");
 
 		//nar.log();
-		//nar.logSummaryGT(System.out, 0.1f);
+		nar.logSummaryGT(System.out, 0.1f);
+
 //		nar.log(System.err, v -> {
 //			if (v instanceof Task) {
 //				Task t = (Task)v;
@@ -171,9 +172,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		};
 
 
-		NARCamera camera = new NARCamera(nar, new SwingCamera(pacman, 128, 128 ), (x, y) -> {
+		SwingCamera swingCam = new SwingCamera(pacman);
+		NARCamera camera = new NARCamera("pacmap", nar, swingCam, (x, y) -> {
 			return $.p($.the(x), $.the(y));
 		});
+
+		swingCam.input(200,200, 128, 128);
+		swingCam.output(64,64);
+
 		NARCamera.newWindow(camera);
 
 		nar.onFrame(nn -> {

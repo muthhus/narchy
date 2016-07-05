@@ -156,7 +156,7 @@ public enum Global {
     /** additional temporal belief space for sensor concepts,
      *  which will usually have a lot of highly fluctuating activity that should
      *  be remembered */
-    public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 3;
+    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 2; //HACK
 
 
     @NotNull
@@ -166,11 +166,7 @@ public enum Global {
 
     @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
-        if (capacity < 4) {
-            return new UnifriedMap<>(capacity);
-        } else {
-            return new HashMap<>(capacity);
-        }
+        return new HashMap<>(capacity);
 
         //return new UnifiedMap(capacity);
         //return new UnifriedMap(capacity /*, loadFactor */);

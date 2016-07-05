@@ -1,5 +1,6 @@
 package nars.vision;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -43,6 +44,11 @@ public class ScreenImage
 {
 //private static List<String> types = Arrays.asList( ImageIO.getWriterFileSuffixes() );
 
+	public static BufferedImage get(Container component, @Nullable BufferedImage image) {
+		return get(component, image, null);
+	}
+
+
 	/*
 	 *  Create a BufferedImage for Swing components.
 	 *  The entire component will be captured to an image.
@@ -50,7 +56,7 @@ public class ScreenImage
 	 *  @param  component Swing component to create image from
 	 *  @return	image the image for the given region
 	*/
-	public static BufferedImage get(Container component, BufferedImage image)
+	public static BufferedImage get(Container component, @Nullable BufferedImage image, @Nullable Rectangle region)
 	{
 		Dimension d = component.getSize();
 
@@ -60,7 +66,9 @@ public class ScreenImage
 			component.setSize( d );
 		}
 
-		Rectangle region = new Rectangle(0, 0, d.width, d.height);
+		if (region == null)
+			 region = new Rectangle(0, 0, d.width, d.height);
+
 		return ScreenImage.get(component, region, image);
 	}
 

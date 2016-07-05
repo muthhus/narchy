@@ -184,12 +184,12 @@ public class PongEnvironment extends Player implements Environment {
 		return new FuzzyConceptSet(p, n,
 				"(" + term + " --> " + low + ")",
 				"(" + term + " --> " + mid + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.07f);
 	}
 	public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
 		return new FuzzyConceptSet(p, n,
 				"(" + term + " --> " + low + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
 	}
 	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
