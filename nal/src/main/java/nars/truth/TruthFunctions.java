@@ -110,11 +110,6 @@ public final class TruthFunctions extends UtilityFunctions {
     public static Truth deduction1(@NotNull Truth a, float bC, float minConf) {
         return deductionB(a, 1f, bC, minConf);
     }
-    /** assumes belief freq=0f */
-    @Nullable
-    public static Truth deduction0(@NotNull Truth a, float bC, float minConf) {
-        return deductionB(a, 0f, bC, minConf);
-    }
 
     @Nullable
     public static Truth deduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
@@ -123,10 +118,8 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @Nullable
     public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
-        float aF = a.freq();
-        float f = and(aF, bF);
-        //float c = and(f, a.conf(), bC);
-        float c = and( Math.max(f, (1- aF) * bF), a.conf(), bC);
+        float f = and(a.freq(), bF);
+        float c = and(f, a.conf(), bC);
         return c >= minConf ? t(f, c) : null;
     }
 
@@ -138,10 +131,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth analogy(@NotNull Truth a, float bf, float bc, float minConf) {
-        //float c = and(a.conf(), bc, bf);
-        float c = and(a.conf(), bc, Math.max(bf, 1-bf));
-        float aF = a.freq();
-        return c < minConf ? null : t(and(aF, bf), c);
+        float c = and(a.conf(), bc, bf);
+        return c < minConf ? null : t(and(a.freq(), bf), c);
     }
     @Nullable
     public static Truth analogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
