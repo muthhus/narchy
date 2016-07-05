@@ -23,6 +23,7 @@ public interface Environment {
         Arrays.fill(ins, 0.5f);
 
         preStart(a);
+
         a.start(inputs, x.getTwo());
 
         float rewardSum = 0;

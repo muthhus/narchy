@@ -769,6 +769,17 @@ public enum $ {
     }
 
 
+    /** unwraps a negation term if negated */
+    public static Term unNeg(Term possiblyNegative) {
+        if (possiblyNegative.op() == NEG) {
+            // (--,(--,P)) = P
+            return ((TermContainer) possiblyNegative).term(0);
+        } else {
+            return possiblyNegative;
+        }
+    }
+
+
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 
         @Override

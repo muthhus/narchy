@@ -42,6 +42,7 @@ public class Obstacle {
 		double dist = (xd * xd + yd * yd);
 		return dist;
 	}
+
 	private double getDistance(double x2, double y2) {
 		return Math.sqrt(getDistanceSq(x2, y2));
 	}

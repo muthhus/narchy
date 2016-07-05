@@ -136,7 +136,7 @@ public enum PremiseBuilder {
                 //attempt to Unify any Query variables; answer if unifies
                 if (task.term().hasVarQuery()) {
                     matchQueryQuestion(nar, task, belief);
-                } else if (beliefConcept instanceof Compound && Compound.atemporallyEqual(task, beliefConcept)) {
+                } else if (beliefConcept instanceof Compound && Term.equalAtemporally(task, beliefConcept)) {
                     matchAnswer(nar, task, belief);
                 }
 

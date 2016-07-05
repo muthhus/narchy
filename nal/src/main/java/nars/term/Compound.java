@@ -54,18 +54,6 @@ import static nars.nal.Tense.DTERNAL;
 public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
 
 
-    static boolean atemporallyEqual(@NotNull Termed term, @NotNull Termed<Compound> beliefConcept) {
-        //TODO can be accelerated
-        Term t = term.term();
-        if (t.op() == beliefConcept.op()) {
-            Term b = beliefConcept.term();
-            if (t.structure() == b.structure() && t.volume() == b.volume()) {
-                return b.equals($.terms.atemporalize((Compound) t));
-            }
-        }
-        return false;
-    }
-
     /** gets the set of unique recursively contained terms of a specific type
      * TODO generalize to a provided lambda predicate selector
      * */

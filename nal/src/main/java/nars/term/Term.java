@@ -21,6 +21,7 @@
 package nars.term;
 
 
+import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
@@ -37,6 +38,19 @@ import static nars.nal.Tense.DTERNAL;
 
 public interface Term extends Termed, Termlike, Comparable<Term> {
 
+
+    public static boolean equalAtemporally(@NotNull Termed term, @NotNull Termed<Compound> beliefConcept) {
+
+        Term t = $.unNeg(term.term());
+        Term b = $.unNeg(beliefConcept.term());
+
+        if (t.op() == b.op()) {
+            if (t.structure() == b.structure() && t.volume() == b.volume()) {
+                return b.equals($.terms.atemporalize((Compound) t));
+            }
+        }
+        return false;
+    }
 
     @NotNull
     @Override
