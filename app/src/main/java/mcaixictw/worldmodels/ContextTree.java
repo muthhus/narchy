@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.gs.collections.api.list.primitive.BooleanList;
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import com.gs.collections.impl.stack.mutable.primitive.BooleanArrayStack;
 import mcaixictw.Bits;
 import mcaixictw.Util;
 
@@ -15,17 +16,41 @@ import mcaixictw.Util;
  */
 public class ContextTree extends WorldModel {
 
+	public static final double LOG_OF_HALF = Math.log(0.5);
+	private final int maxHistoryLength = 16384;
+
 	// create a context tree of specified maximum depth
 	protected ContextTree(String name, int depth) {
 		super(name);
-		history = new BooleanArrayList();
+		history = new BitSet(maxHistoryLength);
+
 		root = new CTNode();
 		this.depth = depth;
 	}
 
-	protected BooleanArrayList history; // the agents history
+	protected BitSet history; // the agents history
+	int historyPtr = 0;
+
 	protected CTNode root; // the root node of the context tree
 	protected int depth; // the maximum depth of the context tree
+
+	protected void push(boolean b) {
+		if (historyPtr == maxHistoryLength)
+			throw new RuntimeException("history overflow");
+		history.set(historyPtr++, b);
+	}
+
+	protected boolean pop() {
+		if (historyPtr == 0)
+			throw new RuntimeException("history underflow");
+		return history.get(--historyPtr);
+	}
+	protected void pop(int n) {
+		historyPtr -= n;
+		if (historyPtr < 0)
+			throw new RuntimeException("history underflow");
+	}
+
 
 	/**
 	 * recursively traverses the tree and returns a string in human readable
@@ -36,7 +61,7 @@ public class ContextTree extends WorldModel {
 		result += "ContextTree" + '\n';
 		result += "name: " + name + '\n';
 		result += "depth: " + depth + '\n';
-		result += "history size: " + history.size() + '\n';
+		result += "history size: " + historySize() + '\n';
 		return result;
 	}
 
@@ -83,7 +108,7 @@ public class ContextTree extends WorldModel {
 		return result;
 	}
 
-	protected void add(boolean sym, BooleanArrayList underlyingHistory) {
+	protected void add(boolean sym, BitSet history, int historyPtr) {
 		CTNode currNode = root;
 
 		// Update the root
@@ -94,11 +119,11 @@ public class ContextTree extends WorldModel {
 		currNode.incrCount(sym);
 
 		// Update all nodes with that context
-		int d = Math.max(underlyingHistory.size() - depth, 0);
+		int d = Math.max(historyPtr - depth, 0);
 
-		for (int i = underlyingHistory.size() - 1; i >= d; i--) {
+		for (int i = historyPtr - 1; i >= d; i--) {
 
-			boolean currSymbol = underlyingHistory.get(i);
+			boolean currSymbol = history.get(i);
 			// may have to create a new node.
 			if (currNode.child(currSymbol) == null) {
 				currNode.setChild(currSymbol, new CTNode());
@@ -114,7 +139,7 @@ public class ContextTree extends WorldModel {
 		updateProbabilities(currNode);
 	}
 
-	protected void remove(boolean sym, BooleanArrayList underlyingHistory) {
+	protected void remove(boolean sym, BitSet history, int historyPtr) {
 
 		CTNode currNode = root;
 
@@ -127,14 +152,16 @@ public class ContextTree extends WorldModel {
 
 		// Update all nodes with that context
 
-		int d = Math.max(underlyingHistory.size() - depth, 0);
+		int d = Math.max(historyPtr - depth, 0);
 
-		for (int i = underlyingHistory.size() - 1; i >= d; i--) {
+		for (int i = historyPtr - 1; i >= d; i--) {
 
-			boolean currSymbol = underlyingHistory.get(i);
+			boolean currSymbol = history.get(i);
 
 			currNode = currNode.child(currSymbol);
-			assert (currNode != null);
+			if (currNode == null)
+				throw new NullPointerException(currSymbol + " does not exist for " + currNode + " (history=" + historyPtr + ")");
+
 
 			// Update the node
 			assert (currNode.count(sym) > 0);
@@ -168,10 +195,10 @@ public class ContextTree extends WorldModel {
 
 		while (currNode != null) {
 
-			pChildW[0] = currNode.child(false) != null ? currNode.child(false).logPweight
-					: 0.0;
-			pChildW[1] = currNode.child(true) != null ? currNode.child(true).logPweight
-					: 0.0;
+			CTNode falseNode = currNode.child(false);
+			pChildW[0] = falseNode != null ? falseNode.logPweight : 0.0;
+			CTNode trueNode = currNode.child(true);
+			pChildW[1] = trueNode != null ? trueNode.logPweight : 0.0;
 
 			// We want to calculate
 			// log(Pw) = log(0.5(P_est + P0*P1))
@@ -199,8 +226,7 @@ public class ContextTree extends WorldModel {
 				log_one_plus_exp = Math.log(1.0 + Math.exp(log_one_plus_exp));
 			}
 
-			currNode.logPweight = Math.log(0.5) + currNode.logPest
-					+ log_one_plus_exp;
+			currNode.logPweight = LOG_OF_HALF + currNode.logPest + log_one_plus_exp;
 
 			// inefficient
 			// double p_est = Math.exp(currNode.logPest);
@@ -261,18 +287,20 @@ public class ContextTree extends WorldModel {
 
 		// Update all nodes with that context
 
-		int d = Math.max(underlyingHistory.size() - depth, 0);
+		int d = Math.max(historyPtr - depth, 0);
 
-		for (int i = underlyingHistory.size() - 1; i >= d; i--) {
+		for (int i = historyPtr - 1; i >= d; i--) {
 
 			boolean currSymbol = underlyingHistory.get(i);
 			// may have to create a new node.
-			if (currNode.child(currSymbol) == null) {
-				assert (addSymbol == true);
-				currNode.setChild(currSymbol, new CTNode());
+			assert (addSymbol == true);
+
+			CTNode symbolChild = currNode.child(currSymbol);
+			if (symbolChild == null) {
+				currNode.setChild(currSymbol, symbolChild = new CTNode());
 				// currNode.child(currSymbol).parent = currNode;
 			}
-			currNode = currNode.child(currSymbol);
+			currNode = symbolChild;
 
 			// Update the node
 			if (addSymbol) {
@@ -297,7 +325,7 @@ public class ContextTree extends WorldModel {
 
 		// Update the probabilities
 		// using the weighted probabilities from section 5.7
-		if (currNode.child(false) == null && currNode.child(true) == null) {
+		if (currNode.isEmpty()) {
 			currNode.logPweight = currNode.logPest;
 			currNode = currNode.parent;
 		}
@@ -329,7 +357,7 @@ public class ContextTree extends WorldModel {
 			// p_x = 1;
 			// }
 
-			double p_w = p_x + Math.log(0.5) + currNode.logPweight;
+			double p_w = p_x + LOG_OF_HALF + currNode.logPweight;
 
 			if (Util.DebugOutput) {
 				System.out
@@ -353,8 +381,8 @@ public class ContextTree extends WorldModel {
 	 * @param sym
 	 */
 	protected void update(boolean sym) {
-		add(sym, history);
-		history.add(sym); // The symbol is now history...
+		add(sym, history, historyPtr);
+		push(sym); // The symbol is now history...
 	}
 
 	/**
@@ -379,34 +407,25 @@ public class ContextTree extends WorldModel {
 	*/
 	public void updateHistory(BooleanArrayList b) {
 		// System.out.println("update history: " + Util.toString(symlist));
-
-		for (int i = 0 ; i < b.size(); i++)
-			history.add(b.get(i));
-
+		int bs = b.size();
+		for (int i = 0; i < bs; i++)
+			push(b.get(i));
 	}
 
 	/**
 	 * removes the most recently observed symbol from the context tree
 	 */
 	public void revert() {
-		// We can only revert if there is at least one symbol in the history.
-		int size = history.size();
-		if (size == 0)
-			throw new RuntimeException();
 
 		// we need to access the history otherwise we can not tell which the
 		// last inserted symbol was.
-		boolean sym = history.removeAtIndex(history.size()-1);
-		remove(sym, history);
+		boolean sym = pop();
+		remove(sym, history, historyPtr);
 	}
 
 	public void revert(int numSymbols) {
-		if (history.size() < numSymbols)
-			throw new RuntimeException("history underflow");
-
-		for (int i = 0; i < numSymbols; i++) {
+		for (int i = 0; i < numSymbols; i++)
 			revert();
-		}
 	}
 
 	/**
@@ -416,13 +435,10 @@ public class ContextTree extends WorldModel {
 	 */
 	public void revertHistory(int newsize) {
 
-		assert (newsize <= history.size());
+		assert (newsize <= historyPtr);
 
-
-		int toRemove = history.size() - newsize;
-		for (; toRemove > 0; toRemove--) {
-			history.removeAtIndex(toRemove-1);
-		}
+		int toRemove = historyPtr - newsize;
+		pop(toRemove);
 	}
 
 	/**
@@ -449,7 +465,7 @@ public class ContextTree extends WorldModel {
 	 * generated bits. last predicted symbol has the highest index.
 	 */
 	public BooleanArrayList genRandomSymbolsAndUpdate(int bits) {
-		List<Boolean> result = new ArrayList<>(bits);
+		BooleanArrayList result = new BooleanArrayList(bits);
 		for (int i = 0; i < bits; i++) {
 			boolean sampledSymbol = false;
 			if (Math.random() <= predict(Bits.one)) {
@@ -458,7 +474,7 @@ public class ContextTree extends WorldModel {
 			result.add(sampledSymbol);
 			update(sampledSymbol);
 		}
-		return Util.asBitSet(result);
+		return result;
 	}
 
 	/**
@@ -523,12 +539,13 @@ public class ContextTree extends WorldModel {
 	 */
 	public boolean nthHistorySymbol(int n) {
 		assert (n >= 0);
-		assert (n < history.size());
-		return history.get(history.size() - (n + 1));
+		int h = historySize();
+		assert (n < h);
+		return history.get(h - (n + 1));
 	}
 
-	public int historySize() {
-		return history.size();
+	public final int historySize() {
+		return historyPtr;
 	}
 
 	public int size() {
@@ -563,11 +580,11 @@ public class ContextTree extends WorldModel {
 	 * @param symbols
 	 * @return
 	 */
-	public CTNode getNode(BooleanArrayList symbols) {
+	public final CTNode getNode(BooleanArrayList symbols) {
 		CTNode currNode = root;
-		for (int i = 0; i < symbols.size(); i++) {
-			boolean currSym = symbols.get(i);
-			currNode = currSym ? currNode.getChild1() : currNode.getChild0();
+		int s = symbols.size();
+		for (int i = 0; i < s; i++) {
+			currNode = currNode.child(symbols.get(i));
 			if (currNode == null) {
 				return null;
 			}

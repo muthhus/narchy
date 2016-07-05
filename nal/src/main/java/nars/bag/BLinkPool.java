@@ -4,8 +4,9 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.link.Link;
-import nars.util.data.FastBitSet;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.BitSet;
 
 import static nars.util.Util.clamp;
 
@@ -14,8 +15,7 @@ import static nars.util.Util.clamp;
  */
 public class BLinkPool<X> {
 
-    @NotNull
-    final FastBitSet changed;
+    final @NotNull BitSet changed;
     @NotNull
     final float[] b;
     private final int cap;
@@ -23,7 +23,7 @@ public class BLinkPool<X> {
     public BLinkPool(int capacity) {
         this.cap = capacity;
         this.b = new float[6 * capacity];
-        this.changed = new FastBitSet(capacity);
+        this.changed = new BitSet(capacity);
     }
 
     @NotNull

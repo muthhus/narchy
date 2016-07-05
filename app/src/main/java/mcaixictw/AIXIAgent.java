@@ -24,8 +24,8 @@ public class AIXIAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
         WorldModelSettings modelSettings = new WorldModelSettings();
-        modelSettings.setFacContextTree(true);
-        modelSettings.setDepth(3);
+        modelSettings.setFacContextTree(false);
+        modelSettings.setDepth(4);
 
         //uctSettings.setHorizon(4);
 

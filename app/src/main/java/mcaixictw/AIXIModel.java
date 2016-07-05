@@ -130,7 +130,7 @@ public class AIXIModel {
 	public BooleanArrayList genPerceptAndUpdateHistory() {
 		assert (!lastUpdatePercept);
 		BooleanArrayList r = model.genRandomSymbols(obsBits + rewBits);
-		model.updateHistory(r);
+		model.update(r);
 		int reward = decodeReward(r);
 		assert (isRewardOk(reward));
 		assert (isObservationOk(r));

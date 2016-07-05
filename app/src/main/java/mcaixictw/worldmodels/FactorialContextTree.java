@@ -45,10 +45,10 @@ public class FactorialContextTree extends ContextTree {
 		assert (historySize() != 0 || m_currentlyActiveTree == 0);
 
 		// add to correct tree
-		ctwTrees.get(m_currentlyActiveTree).add(sym, history);
+		ctwTrees.get(m_currentlyActiveTree).add(sym, history, historyPtr);
 
 		// The symbol is now history...
-		history.add(sym);
+		push(sym);
 		addedSymbolCount++;
 	}
 
@@ -82,9 +82,9 @@ public class FactorialContextTree extends ContextTree {
 		assert (historySize() > 0);
 		// we need to access the history otherwise we cannot tell which the
 		// last inserted symbol was.
-		boolean sym = history.removeAtIndex(history.size()-1);
+		boolean sym = pop();
 		int m_currentlyActiveTree = (addedSymbolCount - 1) % ctwTrees.size();
-		ctwTrees.get(m_currentlyActiveTree).remove(sym, history);
+		ctwTrees.get(m_currentlyActiveTree).remove(sym, history, historyPtr);
 		addedSymbolCount--;
 	}
 
@@ -120,7 +120,7 @@ public class FactorialContextTree extends ContextTree {
 		} else {
 			result += "no context trees initialized\n";
 		}
-		result += "history size: " + history.size() + '\n';
+		result += "history size: " + historySize() + '\n';
 		return result;
 	}
 

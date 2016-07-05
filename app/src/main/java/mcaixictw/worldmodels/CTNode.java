@@ -153,4 +153,8 @@ public class CTNode {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+	public boolean isEmpty() {
+		return child0 == null && child1 == null;
+	}
 }

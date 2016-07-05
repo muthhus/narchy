@@ -2,10 +2,11 @@ package mcaixictw;
 
 import java.io.PrintWriter;
 import java.util.function.IntConsumer;
-import java.util.logging.Logger;
 
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static mcaixictw.Util.asInt;
 
@@ -17,7 +18,7 @@ import static mcaixictw.Util.asInt;
  */
 public class AIXI extends AIXIModel {
 	
-	private static final Logger log = Logger.getLogger(AIXI.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(AIXI.class.getName());
 
 	public AIXI(Environment env, ControllerSettings agentSettings,UCTSettings uctSettings, WorldModel model) {
 		this(env.numActions(), env.observationBits(),
@@ -45,6 +46,7 @@ public class AIXI extends AIXIModel {
 
 		String result = "";
 		result += "cycle: " + cycle + ' ';
+        result += "history: " + historySize() + ' ';
 		result += agentSettings.toString() + ' ';
 		result += uctSettings.toString() + ' ';
 		result += "avgRew: " + this.averageReward();
