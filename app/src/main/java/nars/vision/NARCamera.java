@@ -7,19 +7,15 @@ import com.jogamp.opengl.GL2;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
-import nars.index.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.obj.CrosshairSurface;
 import spacegraph.render.ShapeDrawer;
 
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by me on 6/5/16.
@@ -35,6 +31,11 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
     private final NAR nar;
     private final Term id;
+
+    private int cx;
+    private int cy;
+    private int dx = 0, dy = 0;
+
     private PerPixel perPixel;
 
 
@@ -44,20 +45,25 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.cam = c;
         this.pixelTerm = pixelTerm;
         this.controller = new NAgent(nar);
+        this.cx = 0;
+        this.cy = 0;
         controller.start(
                 Collections.emptyList(),
                 Lists.mutable.of(
+                        new MotorConcept("(" + id + ", center)", nar, (b, d) -> {
+                            look(0, 0);
+                        }),
                         new MotorConcept("(" + id + ", up)", nar, (b, d) -> {
-                            move(0, -0.5f);
+                            look(0, -0.5f);
                         }),
                         new MotorConcept("(" + id + ", down)", nar, (b, d) -> {
-                            move(0, +0.5f);
+                            look(0, +0.5f);
                         }),
                         new MotorConcept("(" + id + ", left)", nar, (b, d) -> {
-                            move(-0.5f, 0);
+                            look(-0.5f, 0);
                         }),
                         new MotorConcept("(" + id + ", right)", nar, (b, d) -> {
-                            move(-0.5f, 0);
+                            look(-0.5f, 0);
                         })
                 ));
         nar.onFrame(nn -> {
@@ -65,18 +71,33 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         });
     }
 
-    public void move(float dx, float dy) {
-        int w = cam.width();
-        int h = cam.height();
-        int px = Math.round(w * dx);
-        int py = Math.round(h * dy);
-        int x = ((SwingCamera) cam).input.x + px;
-        int y = ((SwingCamera) cam).input.y + py;
+    public void look(float dx, float dy) {
+        SwingCamera scam = (SwingCamera) this.cam;
+        int w = scam.inWidth();
+        int h = scam.inHeight();
+        this.dx = Math.round(w * dx);
+        this.dy = Math.round(h * dy);
+//
+//        int x = cx + px;
+//        int y = cy + py;
+//
+//        if (x < 0) x = 0;
+//        if (y < 0) y = 0;
+//
+//        input(x, y, w, h);
+    }
 
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-
-        ((SwingCamera) cam).input(x, y, w, h);
+    public void center(int x, int y) {
+        SwingCamera scam = (SwingCamera) this.cam;
+        int w = scam.inWidth();
+        int h = scam.inHeight();
+        this.cx = x;
+        this.cy = y;
+        input(x-w/2 + dx, y-h/2 + dy, w, h);
+    }
+    public void input(int x, int y, int w, int h) {
+        SwingCamera scam = (SwingCamera) this.cam;
+        scam.input(x, y, w, h);
     }
 
     public interface PerPixel {

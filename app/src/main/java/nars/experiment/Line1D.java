@@ -169,7 +169,7 @@ public class Line1D implements Environment {
 
         //nar.log();
 
-        new MySTMClustered(nar, 4, '.');
+        new MySTMClustered(nar, 4, '.', 4);
         int cycles = 3000;
 
         NAgent nagent = new NAgent(nar);

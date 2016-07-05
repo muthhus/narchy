@@ -28,19 +28,25 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return beliefBeforeOrDuringTask(m.premise);
+            return beliefBeforeOrDuringTask(m.task, m.belief);
         }
 
     };
 
-    public static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
-        Task b = p.belief();
-        if (b == null) return false;
-        long tOcc = p.task().occurrence();
-        long bOcc = b.occurrence();
-        return !Tense.isEternal(bOcc) &&
-                !Tense.isEternal(tOcc) &&
-                ((bOcc - tOcc) >= 0);
+    public static boolean beliefBeforeOrDuringTask(Task task, Task belief) {
+
+        if (belief == null)
+            return false;
+
+        long tOcc = task.occurrence();
+        if (tOcc == ETERNAL)
+            return false;
+
+        long bOcc = belief.occurrence();
+        if (bOcc == ETERNAL)
+            return false;
+
+        return ((bOcc - tOcc) >= 0);
     }
 
 
@@ -56,13 +62,12 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            ConceptProcess p = m.premise;
 
             /* true if belief is present and both task and belief are eternal */
-            Task b = p.belief();
+            Task b = m.belief;
             if (b == null) return false;
 
-            long tOcc = p.task().occurrence();
+            long tOcc = m.task.occurrence();
             long bOcc = b.occurrence();
             boolean tEternal = (tOcc == ETERNAL);
             boolean bEternal = (bOcc == ETERNAL);
@@ -107,11 +112,11 @@ abstract public class events extends AtomicBoolCondition {
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
 
-            Task belief = m.premise.belief();
+            Task belief = m.belief;
             if (belief == null && requireBelief())
                 return false;
 
-            Task task = m.premise.task();
+            Task task = m.task;
             Compound tt = task.term();
             int ttdt = tt.dt();
 

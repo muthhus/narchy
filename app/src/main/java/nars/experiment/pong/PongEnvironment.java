@@ -73,13 +73,13 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+		nar.beliefConfidence(0.8f);
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+		nar.DEFAULT_GOAL_PRIORITY = 0.7f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(32);
 		nar.conceptActivation.setValue(0.25f);
 		nar.confMin.setValue(0.02f);
 
@@ -114,7 +114,7 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 32, '.');
+		new MySTMClustered(nar, 8, '.', 2);
 		//new HappySad(nar, 4);
 
 		//DQN a = new DQN();

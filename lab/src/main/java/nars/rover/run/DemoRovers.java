@@ -176,7 +176,7 @@ public class DemoRovers {
 
         Default nar = newNAR();
 
-        new MySTMClustered(nar, 128, '.');
+        new MySTMClustered(nar, 128, '.', 4);
 
         Entity e = sim.game.createEntity().edit()
                 .add(new Physical(

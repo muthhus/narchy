@@ -229,7 +229,7 @@ public class NarseseIRCBot extends Talk {
 
         nar.logSummaryGT(System.out, 0.4f);
 
-        new MySTMClustered(nar, 4, '.');
+        new MySTMClustered(nar, 4, '.', 4);
 
         NarseseIRCBot bot = new NarseseIRCBot(nar);
 

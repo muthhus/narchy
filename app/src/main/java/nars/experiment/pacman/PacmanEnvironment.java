@@ -19,9 +19,7 @@
 
 package nars.experiment.pacman;
 
-import boofcv.gui.image.ImageZoomPanel;
 import com.github.benmanes.caffeine.cache.Policy;
-import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
@@ -29,15 +27,11 @@ import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.budget.UnitBudget;
-import nars.concept.Concept;
 import nars.experiment.Environment;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
@@ -49,17 +43,14 @@ import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
-import org.ejml.ops.MatrixVisualization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static nars.experiment.pong.PongEnvironment.bipolarNumericSensor;
 import static nars.experiment.pong.PongEnvironment.numericSensor;
 
 /**
@@ -118,7 +109,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//nar.inputAt(100,"$1.0;0.8;1.0$ samePlace:(#x,#y,#a,#b)?");
 
 		//nar.log();
-		nar.logSummaryGT(System.out, 0.1f);
+		//nar.logSummaryGT(System.out, 0.1f);
 
 //		nar.log(System.err, v -> {
 //			if (v instanceof Task) {
@@ -130,7 +121,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		});
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.');
+		new MySTMClustered(nar, 8, '.', 2);
 		//new MySTMClustered(nar, 8, '!');
 
 
@@ -147,25 +138,31 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				charted.add(happy);
 
 				charted.add(nar.conceptualize($.$("[pill]"), UnitBudget.Zero));
-				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
-				charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
-
-				charted.add(nar.ask($.$("(a:a0 && (I-->happy))")).term());
-				charted.add(nar.ask($.$("(a:a1 && (I-->happy))")).term());
-				charted.add(nar.ask($.$("(a:a2 && (I-->happy))")).term());
-				charted.add(nar.ask($.$("(a:a3 && (I-->happy))")).term());
-
 				charted.add(nar.conceptualize($.$("[ghost]"), UnitBudget.Zero));
 
+				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
+				//charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
+
+				charted.add(nar.ask($.$("((a0) &&+2 (I-->happy))")).term());
+				charted.add(nar.ask($.$("((a1) &&+2 (I-->happy))")).term());
+				charted.add(nar.ask($.$("((a2) &&+2 (I-->happy))")).term());
+				charted.add(nar.ask($.$("((a3) &&+2 (I-->happy))")).term());
+				charted.add(nar.ask($.$("((a0) &&+2 (I-->sad))")).term());
+				charted.add(nar.ask($.$("((a1) &&+2 (I-->sad))")).term());
+				charted.add(nar.ask($.$("((a2) &&+2 (I-->sad))")).term());
+				charted.add(nar.ask($.$("((a3) &&+2 (I-->sad))")).term());
+
+
 				//NAL9 emotion feedback loop
-				Iterables.addAll(charted,
-					bipolarNumericSensor(nar.self.toString(),
-						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
+//				Iterables.addAll(charted,
+//					bipolarNumericSensor(nar.self.toString(),
+//						"be_sad", "be_neutral", "be_happy", nar, ()->(float)(Util.sigmoid(nar.emotion.happy())-0.5f)*2f, 0.5f).resolution(0.1f));
+
 //				Iterables.addAll(charted,
 //						numericSensor(nar.self.toString(),
 //								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
 
-				new BeliefTableChart(nar, charted).show(600, 300);
+				new BeliefTableChart(nar, charted).show(600, 900);
 
 				//BagChart.show((Default)nar);
 			}
@@ -177,12 +174,15 @@ public class PacmanEnvironment extends cpcman implements Environment {
 			return $.p($.the(x), $.the(y));
 		});
 
-		swingCam.input(200,200, 128, 128);
+		swingCam.input(200,200, 32, 32);
 		swingCam.output(64,64);
 
 		NARCamera.newWindow(camera);
 
 		nar.onFrame(nn -> {
+
+			camera.center(pacman.pac.iX, pacman.pac.iY); //center on nars
+
 
 //			camera.updateMono((x,y,t,w) -> {
 //				//nar.believe(t, w, 0.9f);

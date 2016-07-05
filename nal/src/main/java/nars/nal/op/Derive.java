@@ -129,6 +129,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 truth = truth.negated();
         }
 
+
+
         //pre-filter invalid statements: insufficient NAL level, etc
         if (!Task.preNormalize(raw, nar))
             return;
@@ -201,6 +203,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         nar.process(
             premise.derive(content, truth, budget, nar.time(), occ, m, this)
         );
+
+
 
     }
 

@@ -23,8 +23,11 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
-    public MySTMClustered(@NotNull NAR nar, int size, char punc) {
+	private final int maxConjunctionSize;
+
+	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxConjunctionSize) {
         super(nar, new MutableInteger(size), punc);
+		this.maxConjunctionSize = maxConjunctionSize;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class MySTMClustered extends STMClustered {
 				}
 
 				float finalFreq = freq;
-				node.termSet(4).forEach(tt -> {
+				node.termSet(maxConjunctionSize).forEach(tt -> {
 
 					Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
 

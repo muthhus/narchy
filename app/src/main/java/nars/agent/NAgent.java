@@ -640,7 +640,8 @@ public class NAgent implements Agent {
 
 
     private String actionConceptName(int i) {
-        return "a:a" + i;
+        return "(a" + i + ")";
+        //return "a:a" + i;
         //return "A:a" + i;
         //return "A:{a" + i + "}";
         //return "(a,a" + i + ")";

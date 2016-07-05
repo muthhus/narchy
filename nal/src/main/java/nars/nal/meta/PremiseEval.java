@@ -68,7 +68,7 @@ public class PremiseEval extends FindSubst {
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;
-    public Task task;
+    public Task task, belief;
     public char taskPunct;
 
 
@@ -193,6 +193,7 @@ public class PremiseEval extends FindSubst {
         this.punct.set(task.punc());
 
         Task belief = p.belief();
+        this.belief = belief;
 
         Compound tt = task.term();
 
