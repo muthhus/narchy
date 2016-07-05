@@ -17,7 +17,7 @@ http://brian.tannerpages.com
  limitations under the License.
 */
 
-package jurls.reinforcementlearning.domains.tetris;
+package nars.experiment.tetris;
 
 import java.util.Arrays;
 import java.util.Random;

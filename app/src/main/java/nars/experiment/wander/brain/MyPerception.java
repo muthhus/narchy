@@ -1,6 +1,6 @@
-package jurls.reinforcementlearning.domains.wander.brain;
+package nars.experiment.wander.brain;
 
-import jurls.reinforcementlearning.domains.wander.Player;
+import nars.experiment.wander.Player;
 import org.apache.commons.math3.util.MathUtils;
 
 public class MyPerception {

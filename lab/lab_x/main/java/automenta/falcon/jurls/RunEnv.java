@@ -4,7 +4,7 @@ import automenta.falcon.AGENT;
 import automenta.falcon.FALCON;
 import automenta.vivisect.swing.NWindow;
 import jurls.reinforcementlearning.domains.RLEnvironment;
-import jurls.reinforcementlearning.domains.wander.Curiousbot;
+import nars.experiment.wander.Curiousbot;
 
 /**
  * Created by me on 8/5/15.

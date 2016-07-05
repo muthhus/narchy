@@ -1,6 +1,5 @@
-package jurls.reinforcementlearning.domains.wander;
+package nars.experiment.wander;
 
-import nars.Video;
 
 import java.awt.*;
 
@@ -23,9 +22,9 @@ public class Obstacle {
 		x = d(-World.SIZE, World.SIZE);
 		y = d(-World.SIZE, World.SIZE);
 		r = d(MIN_SIZE, MAX_SIZE);
-		c = new Color(Video.colorHSB(
+		c = new Color(//Video.colorHSB(
 				0.7f + 0.1f * (float) ((r - MIN_SIZE) / (MAX_SIZE - MIN_SIZE)),
-				0.65f, 0.85f));
+				0.65f, 0.85f);
 	}
 
 	public boolean circleCollides(double x2, double y2, double r2) {

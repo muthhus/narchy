@@ -1,4 +1,4 @@
-package jurls.reinforcementlearning.domains.wander.brain;
+package nars.experiment.wander.brain;
 
 import java.io.Serializable;
 

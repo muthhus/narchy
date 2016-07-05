@@ -1,10 +1,10 @@
-package jurls.reinforcementlearning.domains.wander;
+package nars.experiment.wander;
 
-import jurls.reinforcementlearning.domains.wander.brain.Action;
-import jurls.reinforcementlearning.domains.wander.brain.MyPerception;
-import jurls.reinforcementlearning.domains.wander.brain.actions.*;
+import nars.experiment.wander.brain.Action;
+import nars.experiment.wander.brain.MyPerception;
+import nars.experiment.wander.brain.actions.*;
 
-import static jurls.reinforcementlearning.domains.wander.Obstacle.d;
+import static nars.experiment.wander.Obstacle.d;
 
 public class Player {
 

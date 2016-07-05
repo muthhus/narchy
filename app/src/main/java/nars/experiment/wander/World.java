@@ -1,4 +1,4 @@
-package jurls.reinforcementlearning.domains.wander;
+package nars.experiment.wander;
 
 import java.awt.*;
 

@@ -17,7 +17,7 @@ http://brian.tannerpages.com
  limitations under the License.
  */
 
-package jurls.reinforcementlearning.domains.tetris.visualizer;
+package nars.experiment.tetris.visualizer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

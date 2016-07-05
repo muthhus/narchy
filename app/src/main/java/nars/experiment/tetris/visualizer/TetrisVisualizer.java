@@ -16,14 +16,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package jurls.reinforcementlearning.domains.tetris.visualizer;
+package nars.experiment.tetris.visualizer;
 
-import jurls.reinforcementlearning.domains.tetris.Tetris;
-import nars.gui.output.ImagePanel;
+import nars.experiment.tetris.Tetris;
 
 import javax.swing.*;
 
-public class TetrisVisualizer extends ImagePanel {
+public class TetrisVisualizer  {
 
 	private final int blockSize;
 	private final int lastUpdateTimeStep = -1;
@@ -39,7 +38,7 @@ public class TetrisVisualizer extends ImagePanel {
 	}
 
 	public TetrisVisualizer(Tetris t, int blockSize) {
-		super(t.getWidth() * blockSize, t.getHeight() * blockSize);
+		//super(t.getWidth() * blockSize, t.getHeight() * blockSize);
 
 		tetris = t;
 		this.blockSize = blockSize;
@@ -60,12 +59,12 @@ public class TetrisVisualizer extends ImagePanel {
 		//
 		// addDesiredExtras();
 
-		render();
+		//render();
 	}
 
-	public void render() {
+	/*public void render() {
 		blocks.render(g(), blockSize);
-	}
+	}*/
 
 	// @Override
 	// public void paint(Graphics g) {

@@ -16,22 +16,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package jurls.reinforcementlearning.domains.tetris;
+package nars.experiment.tetris;
 
-import jurls.reinforcementlearning.domains.RLEnvironment;
-import jurls.reinforcementlearning.domains.tetris.visualizer.TetrisVisualizer;
+import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.impl.tuple.Tuples;
+import nars.experiment.Environment;
+import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.learn.Agent;
 
 import java.awt.*;
 import java.net.URL;
 
 
-public class Tetris implements RLEnvironment {
+public class Tetris implements Environment {
 
     private double currentScore;
     public TetrisState gameState;
     
     private int nextAction;
-    private TetrisVisualizer vis;
+
     private double previousScore;
 
     public Tetris(int width, int height) {
@@ -39,37 +42,29 @@ public class Tetris implements RLEnvironment {
         restart();
     }
 
-    @Override
-    public Component component() {
-        if (vis == null)
-            vis = new TetrisVisualizer(this, 40);
-        return vis;
-    }
 
-    @Override
+
+
     public int numActions() {
         return 6;
     }
 
 
-    @Override
+
     public double getReward() {
         return Math.max(-30, Math.min(30, currentScore - previousScore))/30.0;
     }
 
-    @Override
-    public void frame() {
-        step(nextAction);
-        vis.render();
-    }
+//    public void frame() {
+//        step(nextAction);
+//        vis.render();
+//    }
 
-    @Override
     public boolean takeAction(int action) {
         nextAction = action;
         return true;
     }
 
-    @Override
     public double[] observe() {
         return gameState.asVector(false);
     }
@@ -158,6 +153,22 @@ public class Tetris implements RLEnvironment {
 
     public int getHeight() {
         return gameState.worldHeight;
+    }
+
+    @Override
+    public Twin<Integer> start() {
+        return Tuples.twin(getWidth()*getHeight(),numActions());
+    }
+
+    @Override
+    public float pre(int t, float[] ins) {
+        //TODO
+        return 0;
+    }
+
+    @Override
+    public void post(int t, int action, float[] ins, Agent a) {
+//TODO
     }
 }
 //

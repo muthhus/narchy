@@ -16,7 +16,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-package jurls.reinforcementlearning.domains.tetris.visualizer;
+package nars.experiment.tetris.visualizer;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

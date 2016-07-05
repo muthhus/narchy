@@ -1,7 +1,7 @@
-package jurls.reinforcementlearning.domains.wander.brain.actions;
+package nars.experiment.wander.brain.actions;
 
-import jurls.reinforcementlearning.domains.wander.Player;
-import jurls.reinforcementlearning.domains.wander.brain.Action;
+import nars.experiment.wander.Player;
+import nars.experiment.wander.brain.Action;
 
 public class MoveForward extends Action {
 	private static final long serialVersionUID = 1L;
