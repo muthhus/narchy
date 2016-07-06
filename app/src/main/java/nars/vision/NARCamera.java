@@ -35,12 +35,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     private final NAR nar;
     private final Term id;
 
-    private int cx;
-    private int cy;
-    private int x = 0, y = 0;
 
     private PerPixel perPixel;
     private float z;
+    int x, y, ox, oy;
 
 
     public NARCamera(String id, NAR nar, PixelCamera c, PixelToTerm pixelTerm) {
@@ -49,8 +47,6 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.cam = c;
         this.pixelTerm = pixelTerm;
         this.controller = new NAgent(nar);
-        this.cx = 0;
-        this.cy = 0;
         this.z = 0.25f;
         controller.start(
                 Collections.emptyList(),
@@ -96,13 +92,15 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         int h = scam.inHeight();
 
         this.x += Math.round(w * dx);
+        this.x = Math.max(0, Math.min(w, x));
 
         this.y += Math.round(h * dy);
+        this.y = Math.max(0, Math.min(h, y));
 
         this.z += dz;
         this.z = Math.max(minZoom,Math.min(z,maxZoom));
 
-        center(0,0,z);
+        center(x,y,z);
 //
 //        int x = cx + px;
 //        int y = cy + py;
@@ -116,15 +114,14 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     public void center(int x, int y, float zoom) {
         SwingCamera scam = (SwingCamera) this.cam;
 
-        this.cx = x;
-        this.cy = y;
         int iw = Math.round(scam.inWidth() * zoom);
         int ih = Math.round(scam.inHeight() * zoom);
-        input(x - iw /2 + this.x, y- ih /2 + this.y, iw, ih);
+        input(x - iw /2 + this.ox, y- ih /2 + this.oy, iw, ih);
     }
     public void input(int x, int y, int w, int h) {
         SwingCamera scam = (SwingCamera) this.cam;
         scam.input(x, y, w, h);
+        scam.update();
     }
 
     public interface PerPixel {
@@ -202,7 +199,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             float dw = tw / w;
             float dh = th / h;
-            camera.cam.update((x, y, r, g, b, a) -> {
+            ((SwingCamera)camera.cam).updateBuffered((x, y, r, g, b, a) -> {
                 gl.glColor4f(r, g, b, a);
                 ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
             });

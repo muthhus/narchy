@@ -27,13 +27,17 @@ public interface PixelCamera {
 
     default void update(PerPixelRGBf m) {
         update((x,y,p)-> {
-            //int a = (p & 0xff000000) >> 24;
-            int a = 255;
-            int r = (p & 0x00ff0000) >> 16;
-            int g = (p & 0x0000ff00) >> 8;
-            int b = (p & 0x000000ff);
-            m.pixel(x, y, r/255f, g/255f, b/255f, a/255f);
+            intToFloat(m, x, y, p);
         });
+    }
+
+    default void intToFloat(PerPixelRGBf m, int x, int y, int p) {
+        //int a = (p & 0xff000000) >> 24;
+        int a = 255;
+        int r = (p & 0x00ff0000) >> 16;
+        int g = (p & 0x0000ff00) >> 8;
+        int b = (p & 0x000000ff);
+        m.pixel(x, y, r/255f, g/255f, b/255f, a/255f);
     }
 
     default void updateMono(PerPixelMono m) {

@@ -3,13 +3,19 @@ package nars.experiment;
 import com.gs.collections.api.tuple.Twin;
 import nars.$;
 import nars.NAR;
+import nars.budget.UnitBudget;
+import nars.gui.BagChart;
+import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
+import nars.nal.Tense;
 import nars.nar.Default;
+import nars.term.Termed;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 
 /**
  * Created by me on 7/5/16.
@@ -28,9 +34,14 @@ public class CameraTrack implements Environment {
                 g.fillRect(0, 0, sw, sh);
                 g.setColor(Color.WHITE);
                 circle(g, sw / 2, sh / 2, sw/3);
+                g.setColor(Color.RED);
                 circle(g, sw / 6, sh / 6, sw/6);
+                g.setColor(Color.GREEN);
                 circle(g, getWidth() - sw / 6, sh / 6, sw/6);
+                g.setColor(Color.BLUE);
                 circle(g, sw / 6, getHeight() - sh / 6, sw/6);
+                g.setColor(Color.YELLOW);
+                circle(g, getWidth() - sw / 6, getHeight() - sh / 6, sw/6);
             }
 
             public void circle(Graphics g, int x, int y, int r) {
@@ -52,10 +63,36 @@ public class CameraTrack implements Environment {
 			return $.p($.the(x), $.the(y));
 		});
         cam.input(0,0,256,256);
-        swingCam.output(32,32);
+        swingCam.output(12,12);
         NARCamera.newWindow(cam);
 
 
+        //nar.log();
+        nar.onFrame(nn->{
+            cam.update((x,y,t,r,g,b) -> {
+                nar.believe($.inh(t.term(), $.the("r")), Tense.Present, r/256f, 0.9f);
+                nar.believe($.inh(t.term(), $.the("g")), Tense.Present, g/256f, 0.9f);
+                nar.believe($.inh(t.term(), $.the("b")), Tense.Present, b/256f, 0.9f);
+            });
+        });
+
+        {
+            BagChart.show((Default) nar);
+        }
+
+        {
+            java.util.List<Termed> charted = new ArrayList();
+
+            charted.add($.$("(#x<->r)"));
+            charted.add($.$("(#x<->g)"));
+            charted.add($.$("(#x<->b)"));
+            charted.add($.$("((2,2)-->g)"));
+//            charted.add(nar.ask($.$("(?x<->r)").term()));
+//            charted.add(nar.ask($.$("(?x<->g)").term()));
+//            charted.add(nar.ask($.$("(?x<->b)").term()));
+
+            new BeliefTableChart(nar, charted).show(600, 900);
+        }
     }
 
     @Override
@@ -75,8 +112,11 @@ public class CameraTrack implements Environment {
 
     public static void main(String[] args) {
         Default nar = new Default();
+        nar.cyclesPerFrame.set(32);
+        nar.conceptActivation.setValue(0.02f);
 
         new CameraTrack(400, 400, 32, 32, nar);
-        nar.loop(15f);
+        nar.loop(25f);
+
     }
 }
