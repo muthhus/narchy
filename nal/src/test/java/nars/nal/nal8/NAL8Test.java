@@ -484,13 +484,15 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL, 7)
         ;
     }
+
     @Test
     public void temporal_goal_detachment_2()  {
         test()
-                //.log()
+                .log()
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
-                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', 5, ETERNAL, 15)
+                .mustDesire(cycles, "((at) &&+5 (open))", 1f, 0.81f, 5)
+                .mustNotOutput(cycles, "((at) &&+5 (open))", '!', ETERNAL, 15)
         ;
     }
     @Test
@@ -683,12 +685,33 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void testInhibition()  {
+        //by deduction
         test()
             .goal("(reward)")
             .believe("((good) ==> (reward))", 1, 0.9f)
             .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
             .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
 
+    }
+    @Test
+    public void testInhibition1()  {
+        test()
+                .log()
+                .goal("(reward)")
+                .believe("((good) ==> (reward))", 1, 0.9f)
+                .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
+                .mustDesire(cycles, "(good)", 1.0f, 0.81f)
+                .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+    }
+    @Test
+    public void testInhibition2()  {
+        test()
+                .log()
+                .goal("(reward)", Tense.Present, 1f, 0.9f)
+                .believe("((good) &&+0 (reward))", 1, 0.9f) //TODO without +0
+                .believe("((bad) &&+0 (--,(reward)))", 1, 0.9f)
+                .mustDesire(cycles, "(good)", 1.0f, 0.81f, 0)
+                .mustDesire(cycles, "(bad)", 0.0f, 0.81f, 0);
     }
 
     @Test public void testNegatedImplicationTerm1() {

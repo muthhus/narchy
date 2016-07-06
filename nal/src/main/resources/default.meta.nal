@@ -237,7 +237,11 @@
 
     B, (A ==> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
+        B, (C ==> (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Abduction, Desire:Deduction)
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
+
+    B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:Deduction)
+        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Desire:Deduction)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)
@@ -283,7 +287,7 @@
     (&&,X,A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- X, (Desire:StructuralStrong)
         (&&,(--,%X),A), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%X), (Desire:StructuralStrong)
     (&&,X,A), X, time(decomposeTaskIfBeliefBefore), task("!") |- A, (Desire:StructuralStrong)
-        (&&,X,(--,%A)), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%A), (Desire:StructuralStrong)
+        //(&&,X,(--,%A)), X, time(decomposeTaskIfTermLinkBefore), task("!") |- (--,%A), (Desire:StructuralStrong)
     (&&,X,A), B, time(decomposeTask), task("!")            |- substituteOnlyIfUnifiesDep(A,X,B), (Desire:Deduction)
         //TODO as above
 
@@ -346,7 +350,7 @@
 
     A, B, task("."), time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B,            time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Weak)
+    A, B, task("."), time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection)
 
 
 
@@ -397,8 +401,8 @@
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction)
-    (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
+    (Y --> L), ((Y --> S) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction)
+    (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S), time(dtBeliefExact) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 
 

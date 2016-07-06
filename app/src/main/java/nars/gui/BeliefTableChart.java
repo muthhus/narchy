@@ -225,7 +225,7 @@ public class BeliefTableChart extends JoglSpace2D {
     float[] beliefTheta, goalTheta;
 
     public void drawCrossHair(GL2 gl, float gew, float geh, Truth truth, double theta) {
-        float w = 4;
+        float w = 2;
         gl.glLineWidth(w);
 
         float conf = truth.conf();
@@ -236,7 +236,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
-        double r = gew * (0.1 + (0.15 * conf));
+        double r = gew * (0.25 + (0.25 * conf));
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
@@ -295,10 +295,10 @@ public class BeliefTableChart extends JoglSpace2D {
             float[] theta;
             if (beliefOrGoal) {
                 theta = beliefTheta;
-                gl.glColor4f(1f,0f,0,0.85f);
+                gl.glColor4f(1f,0f,0,0.2f + 0.8f * bc.conf());
             } else {
                 theta = goalTheta;
-                gl.glColor4f(0f,1f,0,0.85f);
+                gl.glColor4f(0f,1f,0,0.2f + 0.8f * bc.conf());
             }
             theta[n] += bc.motivation() * angleSpeed;
             drawCrossHair(gl, gew, geh, bc, theta[n]);
