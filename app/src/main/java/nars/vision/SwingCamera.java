@@ -114,4 +114,20 @@ public class SwingCamera implements PixelCamera {
         );
     }
 
+    public float red(int x, int y) {
+        return outsideBuffer(x, y) ? Float.NaN : decodeRed(out.getRGB(x, y));
+    }
+    public float green(int x, int y) {
+        return outsideBuffer(x, y) ? Float.NaN : decodeGreen(out.getRGB(x,y));
+    }
+    public float blue(int x, int y) {
+        return outsideBuffer(x, y) ? Float.NaN : decodeBlue(out.getRGB(x,y));
+    }
+
+    public boolean outsideBuffer(int x, int y) {
+        return out == null || (x < 0) || (y < 0) || (x >= out.getWidth()) || (y >= out.getHeight());
+    }
+
+
+
 }

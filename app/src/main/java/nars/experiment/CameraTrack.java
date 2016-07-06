@@ -2,19 +2,23 @@ package nars.experiment;
 
 import com.gs.collections.api.tuple.Twin;
 import nars.$;
+import nars.Global;
 import nars.NAR;
-import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
-import nars.nal.Tense;
 import nars.nar.Default;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.util.math.FloatSupplier;
+import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by me on 7/5/16.
@@ -25,6 +29,7 @@ public class CameraTrack implements Environment {
     private final int h;
     private final JPanel scene;
     private final NARCamera cam;
+    Map<Term, SensorConcept> sensors;
 
     public CameraTrack(int sw, int sh, int w, int h, NAR nar) {
         this.scene = new JPanel() {
@@ -58,40 +63,66 @@ public class CameraTrack implements Environment {
         this.h = h;
 
         SwingCamera swingCam = new SwingCamera(scene);
-        this.cam = new NARCamera(getClass().getSimpleName(), nar, swingCam, (x, y) -> {
-			return $.p($.the(x), $.the(y));
-		});
+        int width = 12;
+        int height = 12;
+        sensors = Global.newHashMap(width*height*3);
+
+        this.cam = new NARCamera(getClass().getSimpleName(), nar, swingCam,
+//                (x, y) -> $.p($.the(x), $.the(y))
+                (x, y) -> NARCamera.quadp(0, x, y, width, height)
+        );
         cam.input(0,0,256,256);
-        swingCam.output(12,12);
+        swingCam.output(width,height);
         NARCamera.newWindow(cam);
 
 
-        //nar.log();
-        nar.onFrame(nn->{
-            cam.update((x,y,t,r,g,b) -> {
-                nar.believe($.inh(t.term(), $.the("r")), Tense.Present, r/256f, 0.9f);
-                nar.believe($.inh(t.term(), $.the("g")), Tense.Present, g/256f, 0.9f);
-                nar.believe($.inh(t.term(), $.the("b")), Tense.Present, b/256f, 0.9f);
-            });
+        //nar.logSummaryGT(System.out, 0.5f);
+        Global.DEBUG = true;
+        nar.onTask(tt -> {
+            if (tt.isEternal())
+                System.err.println(tt.proof());
         });
 
-        {
-            BagChart.show((Default) nar);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final int xx = x;
+                final int yy = y;
+                Compound t = (Compound) cam.p(x,y).term();
+
+                addSensor(nar, sensors, t, $.the("red"), () -> cam.red(xx, yy));
+                addSensor(nar, sensors, t, $.the("gre"), () -> cam.green(xx, yy));
+                addSensor(nar, sensors, t, $.the("blu"), () -> cam.blue(xx, yy));
+            }
         }
 
-        {
-            java.util.List<Termed> charted = new ArrayList();
 
-            charted.add($.$("(#x<->r)"));
-            charted.add($.$("(#x<->g)"));
-            charted.add($.$("(#x<->b)"));
-            charted.add($.$("((2,2)-->g)"));
+
+//        {
+//            BagChart.show((Default) nar);
+//        }
+
+        java.util.List<Termed> charted = new ArrayList();
+
+        charted.add($.$("red"));
+        charted.add($.$("gre"));
+        charted.add($.$("blu"));
+        charted.add($.$("(#x-->red)"));
+        charted.add($.$("(#x-->gre)"));
+        charted.add($.$("(#x-->blu)"));
+        charted.add(nar.ask($.$("(?x && (#x-->blu))")));
+
 //            charted.add(nar.ask($.$("(?x<->r)").term()));
 //            charted.add(nar.ask($.$("(?x<->g)").term()));
 //            charted.add(nar.ask($.$("(?x<->b)").term()));
 
-            new BeliefTableChart(nar, charted).show(600, 900);
-        }
+        new BeliefTableChart(nar, charted).show(600, 900);
+    }
+
+    public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
+        Compound tr = $.inh(t.term(), componentTerm);
+        sensors.put(tr, new SensorConcept( tr, nar,
+                component,
+                f -> $.t(f, 0.9f)).resolution(0.1f).pri(0.1f));
     }
 
     @Override
@@ -112,7 +143,7 @@ public class CameraTrack implements Environment {
     public static void main(String[] args) {
         Default nar = new Default();
         nar.cyclesPerFrame.set(32);
-        nar.conceptActivation.setValue(0.02f);
+        nar.conceptActivation.setValue(0.05f);
 
         new CameraTrack(400, 400, 32, 32, nar);
         nar.loop(25f);

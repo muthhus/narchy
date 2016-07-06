@@ -34,10 +34,20 @@ public interface PixelCamera {
     default void intToFloat(PerPixelRGBf m, int x, int y, int p) {
         //int a = (p & 0xff000000) >> 24;
         int a = 255;
-        int r = (p & 0x00ff0000) >> 16;
-        int g = (p & 0x0000ff00) >> 8;
-        int b = (p & 0x000000ff);
-        m.pixel(x, y, r/255f, g/255f, b/255f, a/255f);
+        float r = decodeRed(p);
+        float g = decodeGreen(p);
+        float b = decodeBlue(p);
+        m.pixel(x, y, r, g, b, a/255f);
+    }
+
+    default float decodeRed(int p) {
+        return ((p & 0x00ff0000) >> 16)/255f;
+    }
+    default float decodeGreen(int p) {
+        return ((p & 0x0000ff00) >> 8)/255f;
+    }
+    default float decodeBlue(int p) {
+        return ((p & 0x000000ff))/255f;
     }
 
     default void updateMono(PerPixelMono m) {

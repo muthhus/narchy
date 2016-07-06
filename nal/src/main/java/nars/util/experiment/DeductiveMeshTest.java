@@ -69,7 +69,7 @@ public class DeductiveMeshTest {
 
 
         n.nar.ask( q = (Compound) link(0,0, dims[0]-1, dims[1]-1), ETERNAL, a -> {
-            System.out.println(a.explanation());
+            System.out.println(a.proof());
             return true;
         });
 

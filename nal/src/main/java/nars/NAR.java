@@ -1113,7 +1113,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         @NotNull
         @Override
         public String getMessage() {
-            return super.getMessage() + ": " + task.explanation();
+            return super.getMessage() + ": " + task.proof();
         }
 
     }

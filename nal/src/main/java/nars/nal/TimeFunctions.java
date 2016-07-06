@@ -20,7 +20,7 @@ import static nars.nal.Tense.*;
  * Strategies for solving temporal components of a derivation
  */
 @FunctionalInterface
-public interface TimeFunction {
+public interface TimeFunctions {
 
     /**
      * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
@@ -56,24 +56,24 @@ public interface TimeFunction {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
+    TimeFunctions dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
+    TimeFunctions dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
+    TimeFunctions dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
 
     /**
      * early-aligned, difference in dt
      */
-    TimeFunction dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, 2);
     };
-    TimeFunction dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> {
         //TODO
         return dtDiff(derived, p, occReturn, -2);
     };
@@ -82,7 +82,7 @@ public interface TimeFunction {
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
         ConceptProcess prem = p.premise;
 
-        Compound taskTerm = p.taskTerm;
+        Compound taskTerm = (Compound) $.pos(p.taskTerm);
         Termed<Compound> beliefTerm = p.beliefTerm;
 
         int dt;
@@ -133,8 +133,8 @@ public interface TimeFunction {
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    TimeFunction occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1);
-    TimeFunction occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1);
+    TimeFunctions occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1);
+    TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1);
 
 
 //    /**
@@ -198,8 +198,8 @@ public interface TimeFunction {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunction dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
-    TimeFunction dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
+    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, p, false);
     };
@@ -208,8 +208,8 @@ public interface TimeFunction {
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable TimeFunction decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
-    @Nullable TimeFunction decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
+    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
+    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
 
     @NotNull
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
@@ -217,13 +217,13 @@ public interface TimeFunction {
 
         Task premBelief = prem.belief();
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm).term();
+        Compound decomposedTerm = (Compound) (decomposeTask ? $.pos(p.taskTerm) : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
         long occDecomposed = decomposeTask ? prem.task().occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
         Task otherTask = decomposeTask ? premBelief : prem.task();
-        Term otherTerm = decomposeTask ? p.beliefTerm.term() : p.taskTerm;
+        Term otherTerm = decomposeTask ? p.beliefTerm.term() : $.pos(p.taskTerm);
         long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : ETERNAL;
 
 
@@ -397,7 +397,7 @@ public interface TimeFunction {
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull PremiseEval p, boolean taskOrBelief) {
         ConceptProcess prem = p.premise;
-        Term dtTerm = taskOrBelief ? p.taskTerm : p.beliefTerm;
+        Term dtTerm = taskOrBelief ? $.pos(p.taskTerm) : p.beliefTerm;
 
         Task t = prem.task();
         Task b = prem.belief();
@@ -434,18 +434,18 @@ public interface TimeFunction {
     /**
      * dt is supplied by Task
      */
-    TimeFunction dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
 
-    TimeFunction dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
 
     /**
      * dt is supplied by Belief
      */
-    TimeFunction dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, false);
-    TimeFunction dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
@@ -471,7 +471,7 @@ public interface TimeFunction {
         if (o != ETERNAL) {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-                long ddt = p.taskTerm.dt();
+                long ddt = ((Compound)$.pos(p.taskTerm)).dt();
                 if (ddt != DTERNAL)
                     o += ddt;
             } else if (taskOrBelief && !end) {
@@ -520,11 +520,11 @@ public interface TimeFunction {
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @Nullable TimeFunction dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
+    @Nullable TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess premise = p.premise;
 
         Task task = premise.task();
-        int taskDT = p.taskTerm.dt();
+        int taskDT = ((Compound)$.pos(p.taskTerm)).dt();
         Term bt = p.beliefTerm;
 
         int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
@@ -580,7 +580,7 @@ public interface TimeFunction {
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
-    @Nullable TimeFunction Auto = (derived, p, d, occReturn, confScale) -> {
+    @Nullable TimeFunctions Auto = (derived, p, d, occReturn, confScale) -> {
 
 
         Term tp = d.rule.getTask();
@@ -593,7 +593,7 @@ public interface TimeFunction {
 
         long occ = premise.occurrenceTarget((t, b) -> t); //reset
 
-        Compound tt = p.taskTerm;
+        Compound tt = (Compound) $.pos(p.taskTerm);
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 
         int td = tt.dt();

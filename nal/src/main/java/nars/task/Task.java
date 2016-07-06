@@ -54,7 +54,7 @@ import static nars.truth.TruthFunctions.eternalize;
 public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked, Supplier<Task> {
 
 
-    static void explanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
+    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 
         for (int i = 0; i < indent; i++)
@@ -78,13 +78,13 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         Task pt = task.getParentTask();
         if (pt != null) {
             //sb.append("  PARENT ");
-            explanation(pt, indent+1, sb);
+            proof(pt, indent+1, sb);
         }
 
         Task pb = task.getParentBelief();
         if (pb != null) {
             //sb.append("  BELIEF ");
-            explanation(pb, indent+1, sb);
+            proof(pb, indent+1, sb);
         }
     }
 
@@ -478,15 +478,15 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
     @NotNull
-    default String explanation() {
+    default String proof() {
         StringBuilder sb = new StringBuilder();
-        return explanation(sb).toString();
+        return proof(sb).toString();
     }
 
     @NotNull
-    default StringBuilder explanation(@NotNull StringBuilder temporary) {
+    default StringBuilder proof(@NotNull StringBuilder temporary) {
         temporary.setLength(0);
-        explanation(this, 0, temporary);
+        proof(this, 0, temporary);
         return temporary;
     }
 

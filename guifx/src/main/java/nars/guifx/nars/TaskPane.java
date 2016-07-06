@@ -19,7 +19,7 @@ public class TaskPane extends BorderPane {
 
     public TaskPane(NAR nar, Task c) {
 
-        TextArea ta = new TextArea(c.explanation());
+        TextArea ta = new TextArea(c.proof());
         ta.setEditable(false);
 
         setCenter(scrolled(ta, true, false));

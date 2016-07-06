@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
 import nars.nal.ConceptProcess;
-import nars.nal.TimeFunction;
+import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.rule.PremiseRule;
@@ -37,8 +37,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final PremiseRule rule;
-    @NotNull
-    private final TimeFunction temporalizer;
+    private final @NotNull TimeFunctions temporalizer;
 
     /**
      * result pattern
@@ -56,7 +55,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  boolean beliefSingle, boolean goalSingle, boolean eternalize, @NotNull TimeFunction temporalizer) {
+                  boolean beliefSingle, boolean goalSingle, boolean eternalize, @NotNull TimeFunctions temporalizer) {
         this.rule = rule;
 
 

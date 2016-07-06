@@ -45,7 +45,7 @@ public class NAgentDebug extends NAgent  {
     protected void onConflict(SensorConceptDebug c, Task belief) {
         if (printConflict) {
             log.println("CONFLICT");
-            log.println(belief.explanation());
+            log.println(belief.proof());
             c.beliefs().print(log);
             @Nullable Truth projected = c.belief(belief.occurrence());
             log.println("@" + belief.occurrence() + ": incoming=" +

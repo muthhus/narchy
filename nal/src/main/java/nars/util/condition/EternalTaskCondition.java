@@ -434,7 +434,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (similar != null && !similar.isEmpty()) {
                 similar.values().forEach(s -> {
                     String pattern = "SIM\n{}";
-                    logger.info(pattern, s.explanation());
+                    logger.info(pattern, s.proof());
                     //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                 });
             }

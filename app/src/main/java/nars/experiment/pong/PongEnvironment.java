@@ -31,6 +31,7 @@ import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.SensorConcept;
+import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
@@ -364,133 +365,17 @@ public class PongEnvironment extends Player implements Environment {
 //		return n;
 
 		//int d = log2(Math.max(width, height));
-		Compound q = (Compound) quadp(0, x, y, width, height);
+		Compound q = (Compound) NARCamera.quadp(0, x, y, width, height);
 		//Compound n = $.inh(q, $.the("w"));
-		Compound n = q;
 
-		System.out.println(" (" + x + "," + y + ") " + n);
-		return n;
+        System.out.println(" (" + x + "," + y + ") " + q);
+		return q;
 
 
 		//return inh(c, the("w"));
 		//return inst(c, the("w"));
 	}
 
-	private Term quadp(int level, int x, int y, int width, int height) {
-
-		if (width <= 1 || height <= 1) {
-			return null; //dir; //$.p(dir);
-		}
-
-		int cx = width/2;
-		int cy = height/2;
-
-		boolean left = x < cx;
-		boolean up = y < cy;
-
-
-		char c1 = (left ? 'l' : 'r');
-		char c2 = (up ? 'u' : 'd');
-		if (!left)
-			x -= cx;
-		if (!up)
-			y -= cy;
-		int area = width * height;
-
-		//Term d = $.the(c1 + "" + c2);
-		//Term d = $.secti($.the(c1), $.the(c2));
-		//Term d = $.seti($.the(c1), $.the(c2));
-//		Term d = level > 0  ?
-//					$.seti($.the(c1), $.the(c2), $.the(area)) :
-//					$.seti($.the(c1), $.the(c2) );
-		Term d = level > 0  ?
-				$.secte($.the(c1), $.the(c2), $.the(area)) :
-				$.secte($.the(c1), $.the(c2) );
-
-		//Term dir = $.p(d,$.the(area));
-		//Term dir = level == 0 ? d : $.p(d,$.the(area));
-		//Term dir = level == 0 ? d : $.p(d,$.the(area));
-		//Term dir = level == 0 ? d : $.inh(d,$.the(area));
-		//Term dir = $.inh(d,$.the(area));
-
-		//Term dir = $.inh(d,$.the(area));
-		//Term dir = level == 0 ? d : $.inh(d,$.the(area));
-
-		Term q = quadp(level+1, x, y, width / 2, height / 2);
-		if (q!=null) {
-			//return $.p(dir, q);
-			//return $.image(0, false, dir, $.sete(q));
-
-			//return $.inh(q, dir);
-			//return $.inst(q, (level== 0 ? d : $.seti(d, $.the(area))));
-			return $.inst(q, d);
-			//return $.diffe(dir, q);
-
-			//return $.sete(q, dir);
-			//return $.inst(q, dir);
-			//return $.instprop(q, dir);
-			//return $.p(q, dir);
-			//return $.image(0, false, dir, q);
-		}
-		else {
-			return d;
-			//return $.p(dir);
-			//return $.inst($.varDep(0), dir);
-		}
-	}
-
-	private Compound quadpFlat(int x, int y, int width, int height) {
-		int cx = width/2;
-		int cy = height/2;
-
-		boolean left = x < cx;
-		boolean up = y < cy;
-
-
-		char c1 = (left ? 'l' : 'r');
-		char c2 = (up ? 'u' : 'd');
-		if (!left)
-			x -= cx;
-		if (!up)
-			y -= cy;
-
-		Atom dir = $.the(c1 + "" + c2);
-
-		if (width>1 || height > 1) {
-			Compound q = quadpFlat(x, y, width / 2, height / 2);
-			if (q!=null)
-				return $.p(Terms.concat(new Term[] { dir }, q.terms()));
-			else
-				return $.p(dir);
-		} else {
-			return null; //dir; //$.p(dir);
-		}
-	}
-
-	public static int log2(int width) {
-		return (int)Math.ceil(Math.log(width)/Math.log(2));
-	}
-
-	public Term binaryp(int x, int depth) {
-		String s = Integer.toBinaryString(x);
-		int i = s.length()-1;
-		Term n = null;
-		for (int d = 0; d < depth; d++, i--) {
-			Atom next = $.the(i < 0 || s.charAt(i) == '0' ? 0 : 1);
-
-			//next = $.the( ((char)(d+'a')) + "" + next.toString());
-
-			if (n == null) {
-				//n = next;
-				n = $.p(next);
-				//n = $.p(next, $.varDep(0));
-			} else {
-				n = $.p(next, n);
-				//n = $.inh(n, next);
-			}
-		}
-		return n;
-	}
 
 	@Override
 	public Twin<Integer> start() {

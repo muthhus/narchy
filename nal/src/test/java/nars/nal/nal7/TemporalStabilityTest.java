@@ -38,7 +38,7 @@ abstract public class TemporalStabilityTest {
                 long o = tt.occurrence();
                 if (!validOccurrence(o)) {
                     if (irregular.add(tt)) { //already detected?
-                        System.err.println("  instability: " + tt + "\n" + tt.explanation() + "\n");
+                        System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");
                         irregular.add(tt);
                     }
                 }

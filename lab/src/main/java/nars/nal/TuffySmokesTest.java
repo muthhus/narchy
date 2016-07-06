@@ -40,7 +40,7 @@ public class TuffySmokesTest {
         }
 
         n.ask("<?x --> [Cancer]>", ETERNAL, c -> {
-			System.out.println(c.explanation());
+			System.out.println(c.proof());
 			return true;
 		});
     }

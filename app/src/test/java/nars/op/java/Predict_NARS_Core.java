@@ -127,10 +127,10 @@ public class Predict_NARS_Core {
                 pi.add(Math.round((f / discretization) * cols));
                 if (Math.abs(f-val) > 1) {
                     System.err.println(f + " vs actual " + val );
-                    System.err.println(tf.explanation());
+                    System.err.println(tf.proof());
                 } else {
                     System.out.println("OK: " + tf);
-                    System.out.println(tf.explanation());
+                    System.out.println(tf.proof());
                 }
             }
 

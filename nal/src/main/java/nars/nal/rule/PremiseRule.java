@@ -9,7 +9,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
-import nars.nal.TimeFunction;
+import nars.nal.TimeFunctions;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
@@ -120,7 +120,7 @@ public class PremiseRule extends GenericCompound {
     @Nullable
     MatchTaskBelief match;
 
-    private @Nullable TimeFunction timeFunction = TimeFunction.Auto;
+    private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
 
     @Nullable
     private static final CompoundTransform<Compound, Term> truthSwap = new PremiseTruthTransform(true, true) {
@@ -415,7 +415,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                              @NotNull TimeFunction temporalizer) {
+                              @NotNull TimeFunctions temporalizer) {
 
 
         char puncOverride = p.puncOverride;
@@ -709,89 +709,89 @@ public class PremiseRule extends GenericCompound {
                             pres.add( events.taskPredicate;
                             break;*/
                         case "dt":
-                            timeFunction = TimeFunction.occForward;
+                            timeFunction = TimeFunctions.occForward;
                             break;
 
 
                         case "dtBelief":
-                            timeFunction = TimeFunction.dtBelief;
+                            timeFunction = TimeFunctions.dtBelief;
                             break;
                         case "dtBeliefEnd":
-                            timeFunction = TimeFunction.dtBeliefEnd;
+                            timeFunction = TimeFunctions.dtBeliefEnd;
                             break;
                         case "dtBeliefExact":
-                            timeFunction = TimeFunction.dtBeliefExact;
+                            timeFunction = TimeFunctions.dtBeliefExact;
                             break;
 
                         case "dtTask":
-                            timeFunction = TimeFunction.dtTask;
+                            timeFunction = TimeFunctions.dtTask;
                             break;
                         case "dtTaskEnd":
-                            timeFunction = TimeFunction.dtTaskEnd;
+                            timeFunction = TimeFunctions.dtTaskEnd;
                             break;
                         case "dtTaskExact":
-                            timeFunction = TimeFunction.dtTaskExact;
+                            timeFunction = TimeFunctions.dtTaskExact;
                             break;
 
                         case "decomposeTask":
-                            timeFunction = TimeFunction.decomposeTask;
+                            timeFunction = TimeFunctions.decomposeTask;
                             break;
 
                         case "decomposeTaskIfTermLinkBefore":
-                            timeFunction = TimeFunction.decomposeTask;
+                            timeFunction = TimeFunctions.decomposeTask;
                             pres.add( events.ifTermLinkBefore );
                             break;
 
                         case "decomposeTaskIfBeliefBefore":
-                            timeFunction = TimeFunction.decomposeTask;
+                            timeFunction = TimeFunctions.decomposeTask;
                             pres.add( events.ifBeliefBefore );
                             break;
 
                         case "decomposeBelief":
-                            timeFunction = TimeFunction.decomposeBelief;
+                            timeFunction = TimeFunctions.decomposeBelief;
                             break;
 
                         case "dtCombine":
-                            timeFunction = TimeFunction.dtCombine;
+                            timeFunction = TimeFunctions.dtCombine;
                             break;
                         case "dtReverse":
-                            timeFunction = TimeFunction.occReverse;
+                            timeFunction = TimeFunctions.occReverse;
                             break;
 //                        case "dtIfEvent":
 //                            temporalize = Temporalize.dtIfEvent;
 //                            break;
                         case "dtAfter":
-                            timeFunction = TimeFunction.occForward;
+                            timeFunction = TimeFunctions.occForward;
                             pres.add( events.after );
                             break;
                         case "dtAfterReverse":
-                            timeFunction = TimeFunction.occReverse;
+                            timeFunction = TimeFunctions.occReverse;
                             pres.add( events.after );
                             break;
 
                         case "dtAfterOrEternal":
-                            timeFunction = TimeFunction.occForward;
+                            timeFunction = TimeFunctions.occForward;
                             pres.add( events.afterOrEternal );
                             break;
                         case "dtAfterOrEternalReverse":
-                            timeFunction = TimeFunction.occReverse;
+                            timeFunction = TimeFunctions.occReverse;
                             pres.add( events.afterOrEternal );
                             break;
 
                         case "dtTminB":
-                            timeFunction = TimeFunction.dtTminB;
+                            timeFunction = TimeFunctions.dtTminB;
                             break;
                         case "dtBminT":
-                            timeFunction = TimeFunction.dtBminT;
+                            timeFunction = TimeFunctions.dtBminT;
                             break;
                         case "dtIntersect":
-                            timeFunction = TimeFunction.dtIntersect;
+                            timeFunction = TimeFunctions.dtIntersect;
                             break;
                         case "dtUnion":
-                            timeFunction = TimeFunction.dtUnion;
+                            timeFunction = TimeFunctions.dtUnion;
                             break;
                         case "dtUnionReverse":
-                            timeFunction = TimeFunction.dtUnionReverse;
+                            timeFunction = TimeFunctions.dtUnionReverse;
                             break;
 
                         default:
