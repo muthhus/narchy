@@ -444,6 +444,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
 
+
     /* calculates the "cost" of an execution according to certain evaluated condtions
      //     *  this is the soonest time at which all output conditions were successful.
      //     *  if any conditions were not successful, the cost is infinity

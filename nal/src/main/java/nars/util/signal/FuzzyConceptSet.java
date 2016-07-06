@@ -41,22 +41,32 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                     dw; //middle points
 
             float fCenter = center;
+
             sensors.add( new SensorConcept(s, nar,
                     this.input,
                     (x) -> {
-                        float cdist = Math.abs(x - fCenter);
+
                         Truth y;
                         //if (cdist > dd) {
                             //y = t(0, conf);
                         //} else {
-                        float f = (1f - (cdist / dd));
 
-                        ///sharpen the curve:
+                        float f, c;
+                        float cdist = Math.abs(x - fCenter);
+                        if (cdist < dd) {
+                            f = 0.5f + 0.5f * (1f - (cdist / (dd)));
+                            c = conf * (0.5f + 0.5f * f);
+                        } else {
+                            f = 0.5f - 0.5f * (cdist / (dd));
+                            c = conf * (0.5f + 0.5f * (cdist - dd));
+                        }
 
-                        y = t(f, conf);
-                            //y = t(Util.clamp(1f-(cdist/dd)), conf);
-                        //}
-                        //System.out.println(x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
+
+
+
+                        y = t(f, c);
+
+                        //System.out.println(s + " " + x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
                         return y;
                     }
             ));

@@ -28,4 +28,6 @@ public interface NARCondition extends Serializable {
         else
             logger.warn(s);
     }
+
+
 }

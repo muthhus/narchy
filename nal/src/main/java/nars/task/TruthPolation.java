@@ -49,14 +49,14 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        if (topEternal == null)
-            topEternal = EterNull;
+        float maxDarkFraction = 1 - (0.5f / (1f + tasks.size()));
 
-        float eternalization = topEternal!=null ? 1f/(1+tasks.size()) : 0f; //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
-
-        return truth(when, tasks, topEternal,
-                1f-eternalization,
-                topEternal!= null ? Global.TRUTH_EPSILON : 0);
+        if (topEternal == null) {
+            return truth(when, tasks, EterNull, maxDarkFraction, Global.TRUTH_EPSILON);
+        } else {
+            //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
+            return truth(when, tasks, topEternal, maxDarkFraction,  Global.TRUTH_EPSILON);
+        }
     }
 
 

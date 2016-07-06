@@ -236,11 +236,10 @@ public interface TimeFunctions {
 
             long shift = ETERNAL;
 
-            /*if (occDecomposed != ETERNAL && occOther != ETERNAL) {*/
-            //if both offer an occurrence time, by default, use occOther
             if (decomposedTerm.size() != 2) {
+                //probably a (&&+0, ...)
                 shift = 0;
-                occ = ETERNAL;
+                occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
             } else if (occOther != ETERNAL) {
 
 

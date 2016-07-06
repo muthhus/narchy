@@ -4,6 +4,7 @@ import com.gs.collections.api.tuple.Twin;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -79,7 +80,10 @@ public class CameraTrack implements Environment {
         //nar.logSummaryGT(System.out, 0.5f);
         Global.DEBUG = true;
         nar.onTask(tt -> {
-            if (tt.isEternal())
+            //detect eternal derivations
+            if (!tt.isInput() && tt.isEternal())
+                System.err.println(tt.proof());
+            if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
                 System.err.println(tt.proof());
         });
 
@@ -142,11 +146,11 @@ public class CameraTrack implements Environment {
 
     public static void main(String[] args) {
         Default nar = new Default();
-        nar.cyclesPerFrame.set(32);
-        nar.conceptActivation.setValue(0.05f);
+        nar.cyclesPerFrame.set(128);
+        nar.conceptActivation.setValue(0.15f);
 
         new CameraTrack(400, 400, 32, 32, nar);
-        nar.loop(25f);
+        nar.loop(15f);
 
     }
 }

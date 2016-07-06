@@ -12,6 +12,7 @@
 
 //desire spreading by similarity
      S, (S <-> P), task("!") |- P, (Desire:Intersection)
+        (--,%S), (S <-> P), task("!") |- (--,%P), (Desire:Intersection)
 
 
 
@@ -239,9 +240,10 @@
     B, (C ==> A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Abduction, Desire:Deduction)
         B, (C ==> (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Abduction, Desire:Deduction)
     B, (A <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Belief:Analogy, Desire:Strong)
+        B, ((--,%A) <=> C), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Belief:Analogy, Desire:Strong)
 
-    B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:Deduction)
-        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Desire:Deduction)
+    B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndep(C,A,B), (Desire:Strong)
+        B, (C && (--,%A)), time(decomposeBelief) |- substituteIfUnifiesIndep((--,%C),A,B), (Desire:Strong)
 
 //    M, (M ==> P), shift_occurrence_forward(unused,"==>") |- P, (Truth:Deduction, Desire:Induction, Order:ForAllSame)
 //    B, (A ==> C), substitute_if_unifies("$",A,B), shift_occurrence_forward(unused,"==>") |- C, (Truth:Deduction, Order:ForAllSame)

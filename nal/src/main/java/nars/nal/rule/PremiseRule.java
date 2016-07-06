@@ -3,6 +3,7 @@ package nars.nal.rule;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
+import com.gs.collections.impl.factory.Maps;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -279,7 +280,7 @@ public class PremiseRule extends GenericCompound {
         private final String id;
 
 
-        public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
+        @Deprecated public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
 
             Term pattern = post.pattern;
 
@@ -297,16 +298,16 @@ public class PremiseRule extends GenericCompound {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval p) {
-            char punc = p.punct.get();
-            switch (punc) {
-                case Symbols.BELIEF:
-                case Symbols.GOAL:
-                    float conf = p.truth.get().conf();
-                    if (conf < p.confidenceMin(pattern, punc)) {
-                        return false;
-                    }
-                    break;
-            }
+//            char punc = p.punct.get();
+//            switch (punc) {
+//                case Symbols.BELIEF:
+//                case Symbols.GOAL:
+//                    float conf = p.truth.get().conf();
+//                    if (conf < p.confidenceMin(pattern, punc)) {
+//                        return false;
+//                    }
+//                    break;
+//            }
 
             return true;
         }
@@ -430,13 +431,12 @@ public class PremiseRule extends GenericCompound {
         }
 
         Derive der = new Derive(rule, p.pattern,
-                belief != null && belief.single(),
-                desire != null && desire.single(),
+                belief, desire,
                 /*anticipate,*/
                 eternalize, temporalizer);
 
-        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
-        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
+        String beliefLabel = belief != null ? "belief" : "_";
+        String desireLabel = desire != null ? "desire" : "_";
 
         String sn = "Truth(";
         String i =
@@ -1095,29 +1095,44 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public PremiseRule negative(PatternIndex index) {
-
-        @NotNull Term tt = getTask();
-//        if (tt.op() == Op.ATOM) {
-//            //raw pattern var, no need to invert the rule
-//            //System.err.println("--- " + tt);
-//            //return null;
-//        } else {
-//            //System.err.println("NEG " + neg(tt));
-//        }
-
-        Compound newTask = (Compound) neg(tt);
-        Term[] pp = getPremise().terms().clone();
-        pp[0] = newTask;
-        Compound newPremise = (Compound) $.compound(getPremise().op(), pp);
-        Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
-
-        @NotNull PremiseRule neg = PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
-
-        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
-
-        return neg;
-    }
+//    public PremiseRule negative(PatternIndex index) {
+//
+//        @NotNull Term tt = getTask();
+////        if (tt.op() == Op.ATOM) {
+////            //raw pattern var, no need to invert the rule
+////            //System.err.println("--- " + tt);
+////            //return null;
+////        } else {
+////            //System.err.println("NEG " + neg(tt));
+////        }
+//
+//        Compound newTask = (Compound) neg(tt);
+//        Term[] pp = getPremise().terms().clone();
+//        pp[0] = newTask;
+//
+//
+//        Map<Term,Term> negMap = Maps.mutable.of(tt, newTask);
+//        Term prevTask = pp[1];
+//        pp[1] = $.terms.remap(prevTask, negMap);
+//
+//
+//        Compound newPremise = (Compound) $.compound(getPremise().op(), pp);
+//
+//        @NotNull Compound prevConclusion = getConclusion();
+//        Compound newConclusion = (Compound) $.terms.remap(prevConclusion, negMap);
+//
+//        //only the task was affected
+//        if (newConclusion.equals(prevConclusion) && newTask.equals(prevTask))
+//            return null;
+//
+//        //Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
+//
+//        @NotNull PremiseRule neg = PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
+//
+//        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
+//
+//        return neg;
+//    }
 
     /**
      * safe negation

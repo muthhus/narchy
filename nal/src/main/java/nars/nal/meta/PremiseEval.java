@@ -71,6 +71,8 @@ public class PremiseEval extends FindSubst {
     public Task task, belief;
     public char taskPunct;
 
+    public boolean taskInverted, beliefInverted;
+
 
     /** initializes with the default static term index/builder */
     public PremiseEval(Random r, Deriver deriver) {
@@ -200,22 +202,23 @@ public class PremiseEval extends FindSubst {
         this.taskTruth = task.truth();
         this.beliefTruth = belief != null ? belief.truth() : null;
 
-        if (taskTruth == null || !taskTruth.isNegative()) {
-            this.taskTerm = tt;
-        } else {
+        //normalize to positive truth
+        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
+            this.taskInverted = true;
             this.taskTruth = this.taskTruth.negated();
-            this.taskTerm = $.neg(tt);
+        } else {
+            this.taskInverted = false;
         }
 
-        //Termed bb = p.beliefTerm(); //includes when belief==null, the termlink
-
-        //if (beliefTruth == null || !beliefTruth.isNegative()) {
-            this.beliefTerm = p.beliefTerm().term();
-//        } else {
-//            this.beliefTruth = this.beliefTruth.negated();
-//            this.beliefTerm = $.neg(bb);
-//        }
-
+        //normalize to positive truth
+        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
+            this.beliefInverted = true;
+            this.beliefTruth = this.beliefTruth.negated();
+        } else {
+            this.beliefInverted = false;
+        }
+        this.beliefTerm = p.beliefTerm().term();
+        this.taskTerm = tt;
 
         this.cyclic = p.cyclic();
         this.overlap = p.overlap();

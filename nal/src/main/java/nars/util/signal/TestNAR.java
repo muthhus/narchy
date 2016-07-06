@@ -551,8 +551,11 @@ public class TestNAR  {
         }
         for (NARCondition t : disqualifies) {
             if (t.isTrue()) {
-                logger.error("mustNot: {}", t);
+
+                logger.error("mustNot: {}\n{}", t);
                 t.log(logger);
+                ((EternalTaskCondition)t).matched.forEach(shouldntHave -> logger.error("Must not:\n{}", shouldntHave.proof()));
+
 
                 success = false;
             }

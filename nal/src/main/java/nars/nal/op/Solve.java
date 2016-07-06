@@ -141,38 +141,38 @@ abstract public class Solve extends AtomicBoolCondition {
 
 
 
-        float minConf = m.confMin;
+//        float minConf = m.confMin;
 
 
-        Truth truth = tf.apply(
-                m.taskTruth,
-                m.beliefTruth,
-                m.nar,
-                minConf
-        );
-
-
-        //pre-filter insufficient confidence level
-
-        if (truth != null) {
-
-//            if (Global.DEBUG) {
-//                if (!tf.single() && belief == null) {
-//                    throw new RuntimeException("null belief but non-single truth function");
-//                }
+//        Truth truth = tf.apply(
+//                m.taskTruth,
+//                m.beliefTruth,
+//                m.nar,
+//                minConf
+//        );
+//
+//
+//        //pre-filter insufficient confidence level
+//
+//        if (truth != null) {
+//
+////            if (Global.DEBUG) {
+////                if (!tf.single() && belief == null) {
+////                    throw new RuntimeException("null belief but non-single truth function");
+////                }
+////            }
+//
+//            if ( truth.conf() > minConf) {
+//                m.truth.set(truth);
+//                return true;
 //            }
+//            //use this to find truth functions which do not utilize minConf before allocating a result Truth instance
+//            /*else {
+//                throw new RuntimeException(this + " did not filter minConf");
+//            }*/
+//        }
 
-            if ( truth.conf() > minConf) {
-                m.truth.set(truth);
-                return true;
-            }
-            //use this to find truth functions which do not utilize minConf before allocating a result Truth instance
-            /*else {
-                throw new RuntimeException(this + " did not filter minConf");
-            }*/
-        }
-
-        return false;
+        return true;
     }
 
 

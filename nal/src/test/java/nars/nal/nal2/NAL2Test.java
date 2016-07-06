@@ -99,6 +99,7 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void inheritanceToSimilarity2() throws Narsese.NarseseException {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
         tester.believe("<bird <-> swan>",0.1f,0.9f);//Bird is different from swan.");
         tester.mustBelieve(cycles,"<bird --> swan>",0.1f,0.73f);//Bird is probably not a type of swan.");

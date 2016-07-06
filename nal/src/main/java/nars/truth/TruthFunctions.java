@@ -222,6 +222,8 @@ public final class TruthFunctions extends UtilityFunctions {
         if (invertA) f1 = 1 - f1;
 
         float f2 = b.freq();
+
+
         float f0 = or(f1, f2);
         float c = w2c(and(f0, a.conf(), b.conf()));
         if (c < minConf)

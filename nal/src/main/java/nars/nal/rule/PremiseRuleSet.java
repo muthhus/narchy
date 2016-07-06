@@ -261,11 +261,11 @@ public class PremiseRuleSet {
         if (pos != null)
             each.accept(pos);
 
-        if (Global.NEGATIVE_RULES) {
-            PremiseRule neg = add(preNorm.negative(index), src + ":Negated", ur, index);
-            if (neg != null)
-                each.accept(neg);
-        }
+//        if (Global.NEGATIVE_RULES) {
+//            PremiseRule neg = add(preNorm.negative(index), src + ":Negated", ur, index);
+//            if (neg != null)
+//                each.accept(neg);
+//        }
     }
 
 

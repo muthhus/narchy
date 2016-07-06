@@ -95,7 +95,7 @@ public enum Global {
 
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
 
-    
+
     /* ---------- avoiding repeated reasoning ---------- */
         /** Maximum length of the evidental base of the Stamp, a power of 2 */
     public static final int STAMP_MAX_EVIDENCE = 10;
@@ -131,11 +131,13 @@ public enum Global {
 
 
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
-    public static boolean BACKWARD_QUESTION_RULES = true;
+    public static final boolean BACKWARD_QUESTION_RULES = true;
 
-    public static boolean NEGATIVE_RULES = true;
+    public static final boolean INVERT_NEGATIVE_PREMISE_TASK = true;
 
-    public static boolean SWAP_RULES = true;
+    //public static boolean NEGATIVE_RULES = true;
+
+    public static final boolean SWAP_RULES = true;
 
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */

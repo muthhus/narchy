@@ -1,14 +1,13 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.Global;
-import nars.NAR;
-import nars.Op;
+import nars.*;
 import nars.budget.Budget;
 import nars.nal.ConceptProcess;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
+import nars.nal.meta.TruthOperator;
 import nars.nal.rule.PremiseRule;
 import nars.task.Revision;
 import nars.task.Task;
@@ -18,6 +17,9 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
@@ -50,28 +52,31 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * whether this a single or double premise derivation; necessary in case premise
      * does have a belief but it was not involved in determining Truth
      */
-    public final boolean beliefSingle, goalSingle;
+    private final TruthOperator belief;
+    private final TruthOperator desire;
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  boolean beliefSingle, boolean goalSingle, boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                  TruthOperator belief, TruthOperator desire, boolean eternalize, @NotNull TimeFunctions temporalizer) {
         this.rule = rule;
+
+        this.belief = belief;
+        this.desire = desire;
 
 
         this.conclusionPattern = term;
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.temporalizer = temporalizer;
-        this.beliefSingle = beliefSingle;
-        this.goalSingle = goalSingle;
+
         this.eternalize = eternalize;
 
         this.id = "Derive(" +
                 Joiner.on(',').join(
                     term,
                     "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
-                    beliefSingle ? "Bs" : "Bd",
-                    goalSingle ? "Gs" : "Gd",
+                    belief!=null ? belief : "_",
+                    desire!=null ? desire : "_",
                     eternalize ? "Et" : "_") +
                 ')';
 
@@ -101,22 +106,54 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @Override
     public final void accept(@NotNull PremiseEval m) {
 
-//        if (!uniquePatternVar.allSatisfy(m.xy::containsKey))
-//            return;
+        Term cp = this.conclusionPattern;
+        boolean tInverted = m.taskInverted, bInverted = m.beliefInverted;
 
-        Term r = m.index.resolve(conclusionPattern, m);
+        if (m.taskInverted || m.beliefInverted) {
+
+            boolean atomicConclusion = cp.op().atomic;
+            if (!atomicConclusion && m.taskInverted) {
+                Map<Term,Term> cc = new HashMap();
+                cc.put(this.rule.getTask(), $.neg(this.rule.getTask()));
+                Term ccp = $.terms.remap(cp, cc);
+                if (!ccp.equals(cp)) {
+                    tInverted = false; //inversion applied as the subterm
+                    cp = ccp;
+                }
+            }
+            if (!atomicConclusion && m.beliefInverted) {
+                Map<Term,Term> cc = new HashMap();
+                cc.put(this.rule.getBelief(), $.neg(this.rule.getBelief()));
+                Term ccp = $.terms.remap(cp, cc);
+                if (!ccp.equals(cp)) {
+                    bInverted = false; //inversion applied as the subterm
+                    cp = ccp;
+                }
+
+            }
+        }
+
+        Term r = m.index.resolve(cp, m);
         if (r instanceof Compound) { //includes null test
 
-            derive(m, (Compound)r);
+            TruthOperator f = (m.punct.get() == Symbols.BELIEF) ? belief : desire;
+            Truth t = (f == null) ?
+                null :
+                f.apply(
+                     !tInverted ? m.taskTruth : m.taskTruth.negated(), //uninvert the truths if necessary
+                     !bInverted ? m.beliefTruth : m.beliefTruth.negated(), //uninvert the truths if necessary
+                     m.nar,
+                     m.confMin
+                    );
+            if (t!=null)
+                derive(m, (Compound)r, t);
         }
 
     }
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound raw) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, Truth truth) {
         ConceptProcess premise = m.premise;
         NAR nar = m.nar;
-
-        Truth truth = m.truth.get();
 
         if (raw.op() == NEG) {
             //negations cant term concepts or tasks, so we unwrap and invert the truth (fi

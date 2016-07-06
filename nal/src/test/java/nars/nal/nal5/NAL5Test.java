@@ -109,6 +109,22 @@ public class NAL5Test extends AbstractNALTest {
         tester.mustBelieve(cycles,"<<robin --> bird> <=> <robin --> [flying]>>",0.70f,0.45f); //.en("I guess robin is a type of bird if and only if robin can fly.");
     }
 
+    @Test
+    public void comparisonOpposite(){
+        TestNAR tester = test();
+        tester.believe("<(x) ==> (z)>", 0.1f, 0.9f);
+        tester.believe("<(y) ==> (z)>", 1.0f, 0.9f);
+        tester.mustBelieve(cycles,"<(x) <=> (y)>",0.10f,0.45f);
+    }
+
+//    @Test
+//    public void comparisonNegNeg(){
+//        TestNAR tester = test();
+//        tester.log();
+//        tester.believe("<(x) ==> (z)>", 0.0f, 0.9f);
+//        tester.believe("<(y) ==> (z)>", 0.0f, 0.9f);
+//        tester.mustBelieve(cycles,"<(x) <=> (y)>", ????
+//    }
 
 
     @Test

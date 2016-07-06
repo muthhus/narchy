@@ -648,6 +648,44 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void testWTFDontDecomposeConjunction() {
+        //$.07;.23;.24$ ((I-->happy) &&+0 (I-->neutral)). 3-2 %.06;.81%
+        //$.50;.50;.90$ (I-->sad). 1+0 %0.0;.90%
+        //dont derive: (I-->sad). %.94;.04%  via rule: <(&&,(--,%X),%A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)>:Negated
+
+        test()
+                .log()
+                .inputAt(0, "((I-->happy) &&+0 (I-->neutral)). :|: %0.06;0.90%")
+                .inputAt(0, "(I-->sad). :|: %0.0;0.90%")
+
+                //must be true, not false:
+                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", '.', 0.5f, 1f, 0, 1f, 0)
+                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", '.', 0.5f, 1f, 0, 1f, ETERNAL)
+                    //<A, B, task("."), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)>
+
+                .mustNotOutput(cycles, "(I-->sad)", '.', 0.5f, 1f, 0, 1f, 0)
+                .mustNotOutput(cycles, "(I-->sad)", '.', 0.5f, 1f, 0, 1f, ETERNAL)
+                    // '<(&&,X,%A..+), X, time(decomposeTask) |- (&&,%A..+), (Belief:StructuralDeduction)>:Negated'}
+
+
+        ;
+    }
+
+    @Test public void testWTFDontDecomposeConjunction2() {
+        /*((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral))). 1-1 %.06;.45%
+                ((I-->happy) &&+0 (I-->neutral)). 0+0 %.06;.90% {0+0: 1} Narsese
+                NOT: (I-->sad). 5-5 %.94;.02%*/
+
+        test()
+                .log()
+                .inputAt(0, "((--,(I-->sad)) <=>+0 (x)). :|: %0.06;0.90%")
+                .inputAt(0, "(x). :|: %0.06;0.90%")
+
+                //must be true, not false:
+                .mustNotOutput(cycles, "(I-->sad)", '.', 0.5f, 1f, 0, 1f, 0);
+
+    }
+
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }
