@@ -119,7 +119,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //		});
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 8, '.', 2);
+		new MySTMClustered(nar, 8, '.', 3);
 		//new MySTMClustered(nar, 8, '!');
 
 
@@ -141,14 +141,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
 				//charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
 
-				charted.add(nar.ask($.$("((a0) &&+2 (I-->happy))")).term());
-				charted.add(nar.ask($.$("((a1) &&+2 (I-->happy))")).term());
-				charted.add(nar.ask($.$("((a2) &&+2 (I-->happy))")).term());
-				charted.add(nar.ask($.$("((a3) &&+2 (I-->happy))")).term());
-				charted.add(nar.ask($.$("((a0) &&+2 (I-->sad))")).term());
-				charted.add(nar.ask($.$("((a1) &&+2 (I-->sad))")).term());
-				charted.add(nar.ask($.$("((a2) &&+2 (I-->sad))")).term());
-				charted.add(nar.ask($.$("((a3) &&+2 (I-->sad))")).term());
+				charted.add(nar.ask($.$("((a0) &&+2 (happy))")).term());
+				charted.add(nar.ask($.$("((a1) &&+2 (happy))")).term());
+				charted.add(nar.ask($.$("((a2) &&+2 (happy))")).term());
+				charted.add(nar.ask($.$("((a3) &&+2 (happy))")).term());
+				charted.add(nar.ask($.$("((a0) &&+2 (sad))")).term());
+				charted.add(nar.ask($.$("((a1) &&+2 (sad))")).term());
+				charted.add(nar.ask($.$("((a2) &&+2 (sad))")).term());
+				charted.add(nar.ask($.$("((a3) &&+2 (sad))")).term());
 
 
 				//NAL9 emotion feedback loop

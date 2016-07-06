@@ -5,7 +5,6 @@ import com.google.common.collect.SetMultimap;
 import nars.Premise;
 import nars.nal.Deriver;
 import nars.nal.Underiver;
-import nars.nal.rule.PremiseRule.Conclusion;
 import nars.task.Task;
 import nars.term.Term;
 import org.jgrapht.Graph;
@@ -47,8 +46,6 @@ public class TrieUnderiver implements Underiver {
         t.recurse((a, b) -> {
             g.addVertex(b);
 
-            if (b instanceof Conclusion)
-                conclusion.put(((Conclusion) b).pattern, a);
 
             if (a!=null) {
                 g.addVertex(a);

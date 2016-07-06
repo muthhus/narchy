@@ -183,7 +183,7 @@ public class NAL7Test extends AbstractNALTest {
         int time = cycles * 2;
         test()
             .log()
-            .input("X:x.")
+            //.input("X:x.") //shouldnt be necessary
             .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
             .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
             .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2)

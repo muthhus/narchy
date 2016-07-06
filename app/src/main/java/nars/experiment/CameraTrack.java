@@ -83,8 +83,8 @@ public class CameraTrack implements Environment {
             //detect eternal derivations
             if (!tt.isInput() && tt.isEternal())
                 System.err.println(tt.proof());
-            if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
-                System.err.println(tt.proof());
+            /*if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
+                System.err.println(tt.proof());*/
         });
 
         for (int x = 0; x < width; x++) {

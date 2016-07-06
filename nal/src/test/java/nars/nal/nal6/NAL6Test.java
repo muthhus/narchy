@@ -266,8 +266,21 @@ public class NAL6Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "<<swan --> $1> ==> <gull --> $1>>", 1.00f, 0.39f); //en("I guess what can be said about swan can also be said about gull.");
         tester.mustBelieve(cycles, "<<gull --> $1> <=> <swan --> $1>>", 0.80f, 0.45f); //en("I guess gull and swan share most properties.");
         tester.mustBelieve(cycles, "(&&,<gull --> #1>,<swan --> #1>)", 0.80f, 0.81f); //en("Gull and swan have some common property.");
-
     }
+    @Test
+    public void variable_introduction3()  {
+        TestNAR tester = test();
+        tester.log();
+        tester.believe("<gull --> swimmer>", 1f, 0.9f); //en("A gull is a swimmer.");
+        tester.believe("<swan --> swimmer>", 0f, 0.9f); //en("A swan is never a swimmer.");
+        tester.mustBelieve(cycles, "(&&,<gull --> #1>,<swan --> #1>)", 0.0f, 0.81f); //en("Gull and swan have no common property.");
+        tester.mustBelieve(cycles, "(&&,<gull --> #1>,(--,<swan --> #1>))", 1.0f, 0.81f); //en("Gull and non-swans have some common property.");
+
+//        tester.mustBelieve(cycles, "<<gull --> $1> ==> <swan --> $1>>", 0.80f, 0.45f); //en("I guess what can be said about gull usually can also be said about swan.");
+//        tester.mustBelieve(cycles, "<<swan --> $1> ==> <gull --> $1>>", 1.00f, 0.39f); //en("I guess what can be said about swan can also be said about gull.");
+//        tester.mustBelieve(cycles, "<<gull --> $1> <=> <swan --> $1>>", 0.80f, 0.45f); //en("I guess gull and swan share most properties.");
+    }
+
     @Test
     public void variable_introduction_with_existing_vars2()  {
         //test that an introduced variable doesn't interfere with an existing variable of same name ($1)

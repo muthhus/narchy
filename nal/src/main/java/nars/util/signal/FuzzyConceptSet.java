@@ -52,15 +52,11 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
                         //} else {
 
                         float f, c;
-                        float cdist = Math.abs(x - fCenter);
-                        if (cdist < dd) {
-                            f = 0.5f + 0.5f * (1f - (cdist / (dd)));
-                            c = conf * (0.5f + 0.5f * f);
-                        } else {
-                            f = 0.5f - 0.5f * (cdist / (dd));
-                            c = conf * (0.5f + 0.5f * (cdist - dd));
-                        }
 
+                        float cdist = Math.abs(x - fCenter);
+
+                        f = Math.max(0, (1f - (cdist / (dd))));
+                        c = conf;
 
 
 

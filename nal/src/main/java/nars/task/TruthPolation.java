@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -51,11 +52,12 @@ public final class TruthPolation extends InterpolatingMicrosphere {
 
         float maxDarkFraction = 1 - (0.5f / (1f + tasks.size()));
 
+        float thresh = Global.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
         if (topEternal == null) {
-            return truth(when, tasks, EterNull, maxDarkFraction, Global.TRUTH_EPSILON);
+            return truth(when, tasks, EterNull, maxDarkFraction, thresh);
         } else {
             //TODO maybe weight by relative confidence and the sum of conf in the list of tasks
-            return truth(when, tasks, topEternal, maxDarkFraction,  Global.TRUTH_EPSILON);
+            return truth(when, tasks, topEternal, maxDarkFraction, thresh);
         }
     }
 

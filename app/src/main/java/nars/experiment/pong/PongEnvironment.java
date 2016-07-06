@@ -129,7 +129,7 @@ public class PongEnvironment extends Player implements Environment {
 
 		//nar.logSummaryGT(System.out, 0.25f);
 
-		e.run(a, 128*16);
+		e.run(a, 256*16);
 
 		NAR.printTasks(nar, true);
 		NAR.printTasks(nar, false);
@@ -165,10 +165,10 @@ public class PongEnvironment extends Player implements Environment {
 			numericSensor("ball", "left", "midX", "right", n, () -> pong.ball_x, pri),
 
 			numericSensor("ball", "bottom", "midY","top", n, () -> pong.ball_y, pri),
-			numericSensor("(pad,mine)", "bottom", "midY", "top", n, () -> pong.player1.position+halfPaddle, pri),
-			numericSensor("(pad,theirs)","bottom", "midY", "top", n, () -> pong.player2.position+halfPaddle, pri),
+			numericSensor("padMine", "bottom", "midY", "top", n, () -> pong.player1.position+halfPaddle, pri),
+			numericSensor("padTheirs","bottom", "midY", "top", n, () -> pong.player2.position+halfPaddle, pri),
 
-			numericSensor("(ball,(pad,mine))", "below", "same", "above", n, () -> {
+			numericSensor("(ball,padMine)", "below", "same", "above", n, () -> {
 
 						return pong.ball_y - (pong.player1.position + halfPaddle);
 					} , pri)
@@ -185,7 +185,11 @@ public class PongEnvironment extends Player implements Environment {
 		return new FuzzyConceptSet(p, n,
 				"(" + term + " --> " + low + ")",
 				"(" + term + " --> " + mid + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.07f);
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
+//				"(" + term + " , " + low + ")",
+//				"(" + term + " , " + mid + ")",
+//				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
+
 	}
 	public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
 		return new FuzzyConceptSet(p, n,

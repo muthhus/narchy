@@ -53,16 +53,16 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * does have a belief but it was not involved in determining Truth
      */
     private final TruthOperator belief;
-    private final TruthOperator desire;
+    private final TruthOperator goal;
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  TruthOperator belief, TruthOperator desire, boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                  TruthOperator belief, TruthOperator goal, boolean eternalize, @NotNull TimeFunctions temporalizer) {
         this.rule = rule;
 
         this.belief = belief;
-        this.desire = desire;
+        this.goal = goal;
 
 
         this.conclusionPattern = term;
@@ -76,7 +76,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     term,
                     "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
                     belief!=null ? belief : "_",
-                    desire!=null ? desire : "_",
+                    goal !=null ? goal : "_",
                     eternalize ? "Et" : "_") +
                 ')';
 
@@ -136,7 +136,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         Term r = m.index.resolve(cp, m);
         if (r instanceof Compound) { //includes null test
 
-            TruthOperator f = (m.punct.get() == Symbols.BELIEF) ? belief : desire;
+            char c = m.punct.get();
+            TruthOperator f;
+            if (c == Symbols.BELIEF)
+                f = belief;
+            else if (c == Symbols.GOAL)
+                f = goal;
+            else
+                f = null;
+
             Truth t = (f == null) ?
                 null :
                 f.apply(
@@ -145,7 +153,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                      m.nar,
                      m.confMin
                     );
-            if (t!=null)
+
+            if (f==null || t!=null)
                 derive(m, (Compound)r, t);
         }
 

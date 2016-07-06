@@ -302,12 +302,13 @@ public class NAgent implements Agent {
 
         rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
         this.sad = rewardConcepts.sensors.get(0);
-        this.happy = rewardConcepts.sensors.get(2);
+        this.happy = rewardConcepts.sensors.get(rewardConcepts.sensors.size()-1);
     }
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
         return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar,
-                "(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.1f);
+                //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.1f);
+                "(sad)", "(happy)").resolution(0.05f);
     }
 
     public void setSensorNamer(IntFunction<Compound> sensorNamer) {

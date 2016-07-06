@@ -216,7 +216,6 @@ public class PremiseRule extends GenericCompound {
 
         //SUFFIX (order already determined for matching)
         {
-            l.add(new Conclusion(this, post));
 
             addAll(l, match.code);
 
@@ -263,55 +262,6 @@ public class PremiseRule extends GenericCompound {
 //    }
 
 
-    /**
-     * pre-match filtering based on conclusion op type and other premise context
-     */
-    public static final class Conclusion extends AtomicBoolCondition {
-
-        /**
-         * pattern which determines the concluson term.
-         * this is applied prior to the actual match.
-         * VAR_PATTERN acts as a sort of wildcard / unknown
-         */
-        @NotNull
-        public final Term pattern;
-
-        @NotNull
-        private final String id;
-
-
-        @Deprecated public Conclusion(@NotNull PremiseRule premiseRule, @NotNull PostCondition post) {
-
-            Term pattern = post.pattern;
-
-            this.pattern = pattern;
-
-            char puncOverride = post.puncOverride;
-            char puncSrc = puncOverride != 0 ? puncOverride : '_';
-            this.id = "Conclusion(" + puncSrc + ')';
-        }
-
-        @Override
-        public @NotNull String toString() {
-            return id;
-        }
-
-        @Override
-        public boolean booleanValueOf(@NotNull PremiseEval p) {
-//            char punc = p.punct.get();
-//            switch (punc) {
-//                case Symbols.BELIEF:
-//                case Symbols.GOAL:
-//                    float conf = p.truth.get().conf();
-//                    if (conf < p.confidenceMin(pattern, punc)) {
-//                        return false;
-//                    }
-//                    break;
-//            }
-
-            return true;
-        }
-    }
 
     /**
      * higher is earlier
@@ -863,12 +813,12 @@ public class PremiseRule extends GenericCompound {
 
                 case "task":
                     switch (arg1.toString()) {
-//                        case "negative":
-//                            pres.add( TaskNegative.the;
-//                            break;
-//                        case "positive":
-//                            pres.add( TaskPositive.the;
-//                            break;
+                        case "negative":
+                            pres.add( TaskNegative.the );
+                            break;
+                        case "positive":
+                            pres.add( TaskPositive.the );
+                            break;
                         case "\"?\"":
                             pres.add( TaskPunctuation.Question );
                             taskPunc = '?';
