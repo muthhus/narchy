@@ -1,5 +1,8 @@
 package nars.vision;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -7,6 +10,8 @@ import java.awt.image.BufferedImage;
  * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel
  */
 public class SwingCamera implements PixelCamera {
+
+    static final Logger logger = LoggerFactory.getLogger(SwingCamera.class);
 
     private final Container component;
     private BufferedImage big;
@@ -62,6 +67,8 @@ public class SwingCamera implements PixelCamera {
         final int height = this.height;
         if (height == 0)
             return;
+
+        logger.info("{} capturing {} scaled to {},{}", component.getClass().getSimpleName(), input, width,height);
 
         big = ScreenImage.get(component, big, input);
 

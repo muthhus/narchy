@@ -22,6 +22,9 @@ import java.util.Collections;
  */
 public class NARCamera implements PixelCamera.PerPixelRGB {
 
+    public static final float minZoom = 0.5f;
+    public static final float maxZoom = 5f;
+
     public final NAgent controller;
     public final PixelCamera cam;
     private final PixelToTerm pixelTerm;
@@ -34,9 +37,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
     private int cx;
     private int cy;
-    private int dx = 0, dy = 0;
+    private int x = 0, y = 0;
 
     private PerPixel perPixel;
+    private float z;
 
 
     public NARCamera(String id, NAR nar, PixelCamera c, PixelToTerm pixelTerm) {
@@ -47,36 +51,58 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.controller = new NAgent(nar);
         this.cx = 0;
         this.cy = 0;
+        this.z = 0.25f;
         controller.start(
                 Collections.emptyList(),
                 Lists.mutable.of(
                         new MotorConcept("(" + id + ", center)", nar, (b, d) -> {
-                            look(0, 0);
+                            look(0, 0, 0);
                         }),
                         new MotorConcept("(" + id + ", up)", nar, (b, d) -> {
-                            look(0, -0.5f);
+                            look(0, -0.1f, 0);
                         }),
                         new MotorConcept("(" + id + ", down)", nar, (b, d) -> {
-                            look(0, +0.5f);
+                            look(0, +0.1f, 0);
                         }),
                         new MotorConcept("(" + id + ", left)", nar, (b, d) -> {
-                            look(-0.5f, 0);
+                            look(-0.1f, 0, 0);
                         }),
                         new MotorConcept("(" + id + ", right)", nar, (b, d) -> {
-                            look(-0.5f, 0);
+                            look(+0.1f, 0, 0);
+                        }),
+                        new MotorConcept("(" + id + ", in)", nar, (b, d) -> {
+                            look(0, 0, 0.1f);
+                        }),
+                        new MotorConcept("(" + id + ", out)", nar, (b, d) -> {
+                            look(0, 0, -0.1f);
                         })
+
                 ));
+
+        SwingCamera scam = (SwingCamera) this.cam;
+
         nar.onFrame(nn -> {
+            System.out.println("update camera: @(" + x + "," + y + ")x(" + scam.width + "," + scam.height + ")");
             controller.decide(-1);
         });
+
+        x = scam.inWidth()/2;
+        y = scam.inHeight()/2;
     }
 
-    public void look(float dx, float dy) {
+    public void look(float dx, float dy, float dz) {
         SwingCamera scam = (SwingCamera) this.cam;
         int w = scam.inWidth();
         int h = scam.inHeight();
-        this.dx = Math.round(w * dx);
-        this.dy = Math.round(h * dy);
+
+        this.x += Math.round(w * dx);
+
+        this.y += Math.round(h * dy);
+
+        this.z += dz;
+        this.z = Math.max(minZoom,Math.min(z,maxZoom));
+
+        center(0,0,z);
 //
 //        int x = cx + px;
 //        int y = cy + py;
@@ -87,13 +113,14 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //        input(x, y, w, h);
     }
 
-    public void center(int x, int y) {
+    public void center(int x, int y, float zoom) {
         SwingCamera scam = (SwingCamera) this.cam;
-        int w = scam.inWidth();
-        int h = scam.inHeight();
+
         this.cx = x;
         this.cy = y;
-        input(x-w/2 + dx, y-h/2 + dy, w, h);
+        int iw = Math.round(scam.inWidth() * zoom);
+        int ih = Math.round(scam.inHeight() * zoom);
+        input(x - iw /2 + this.x, y- ih /2 + this.y, iw, ih);
     }
     public void input(int x, int y, int w, int h) {
         SwingCamera scam = (SwingCamera) this.cam;
@@ -179,6 +206,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
                 gl.glColor4f(r, g, b, a);
                 ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
             });
+
+            //border
+            gl.glColor4f(1f,1f,1f,1f);
+            ShapeDrawer.strokeRect(gl, 0, 0, tw, th);
         }
     }
 }
