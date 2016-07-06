@@ -1,8 +1,6 @@
 package nars.guifx.util;
 
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
 
 /**
  * Created by me on 8/13/15.

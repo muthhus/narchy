@@ -27,7 +27,6 @@ package spacegraph.render;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
-import spacegraph.Spatial;
 import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
 import spacegraph.phys.collision.shapes.*;
 import spacegraph.phys.dynamics.RigidBody;

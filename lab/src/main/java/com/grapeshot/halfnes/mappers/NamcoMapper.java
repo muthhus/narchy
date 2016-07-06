@@ -4,8 +4,10 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.audio.*;
+import com.grapeshot.halfnes.audio.ExpansionSoundChip;
+import com.grapeshot.halfnes.audio.Namco163SoundChip;
 import com.grapeshot.halfnes.utils;
+
 import java.util.Arrays;
 
 /**

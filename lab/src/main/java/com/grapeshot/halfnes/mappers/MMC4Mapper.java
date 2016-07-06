@@ -1,6 +1,6 @@
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
+import com.grapeshot.halfnes.utils;
 
 public class MMC4Mapper extends Mapper {
 

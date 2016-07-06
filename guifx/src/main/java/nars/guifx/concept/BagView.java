@@ -1,20 +1,17 @@
 package nars.guifx.concept;
 
-import impl.org.controlsfx.table.MappedList;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import nars.Global;
 import nars.bag.Bag;
 import nars.link.BLink;
 
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.toCollection;
 import static javafx.application.Platform.runLater;
 
 /**

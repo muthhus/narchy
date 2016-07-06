@@ -4,8 +4,12 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
+import com.grapeshot.halfnes.CPU;
+import com.grapeshot.halfnes.CPURAM;
+import com.grapeshot.halfnes.PPU;
 import com.grapeshot.halfnes.audio.*;
+import com.grapeshot.halfnes.utils;
+
 import java.util.Arrays;
 
 /**

@@ -14,8 +14,6 @@ import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
-import static javafx.application.Application.launch;
-
 // drag the mouse over the rectangle to rotate it.
 public class MeshRectangleDemo extends Application {
 

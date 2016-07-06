@@ -6,7 +6,6 @@ import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.truth.Truth;
-import nars.util.Util;
 import nars.util.math.FloatSupplier;
 
 import java.util.Iterator;

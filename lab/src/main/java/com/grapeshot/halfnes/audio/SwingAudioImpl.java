@@ -6,9 +6,12 @@ package com.grapeshot.halfnes.audio;
 
 import com.grapeshot.halfnes.NES;
 import com.grapeshot.halfnes.PrefsSingleton;
-import com.grapeshot.halfnes.audio.AudioOutInterface;
 import com.grapeshot.halfnes.mappers.Mapper;
-import javax.sound.sampled.*;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 
 /**
  *

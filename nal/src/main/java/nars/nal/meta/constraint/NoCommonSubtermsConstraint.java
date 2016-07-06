@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 import static nars.term.container.TermContainer.commonSubterms;
-import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
-import static nars.term.container.TermContainer.subtermIsCommon;
 
 /** variables excluded */
 public final class NoCommonSubtermsConstraint implements MatchConstraint {

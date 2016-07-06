@@ -4,8 +4,6 @@
  */
 package com.grapeshot.halfnes.video;
 
-import com.grapeshot.halfnes.video.NesColors;
-import com.grapeshot.halfnes.video.Renderer;
 import java.awt.image.BufferedImage;
 
 /**

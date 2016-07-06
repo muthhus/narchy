@@ -5,8 +5,8 @@
 package com.grapeshot.halfnes.ui;
 
 import com.grapeshot.halfnes.audio.AudioOutInterface;
-import java.awt.Color;
-import java.awt.Graphics2D;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**

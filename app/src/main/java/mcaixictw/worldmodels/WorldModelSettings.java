@@ -1,8 +1,8 @@
 package mcaixictw.worldmodels;
 
-import java.io.File;
-
 import mcaixictw.Settings;
+
+import java.io.File;
 
 /**
  * Provides some parameters of how to build the model of the world.

@@ -1,6 +1,5 @@
 package nars.cfg.bytecode;
 
-import org.objectweb.asm.*;
 import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
 

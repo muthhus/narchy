@@ -11,9 +11,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Reference;
-import java.util.Objects;
-
 /**
  * Mutable task with additional fluent api utility methods
  */

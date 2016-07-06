@@ -38,8 +38,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static nars.Global.dereference;
-import static nars.Op.or;
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.task.Revision.truthProjection;

@@ -3,7 +3,6 @@ package nars.experiment;
 import com.gs.collections.api.tuple.Twin;
 import nars.$;
 import nars.NAR;
-import nars.budget.UnitBudget;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
@@ -15,7 +14,7 @@ import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * Created by me on 7/5/16.

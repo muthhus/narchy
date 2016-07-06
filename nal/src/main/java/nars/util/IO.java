@@ -1,14 +1,12 @@
 package nars.util;
 
 import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.index.TermIndex;
 import nars.nal.Tense;
-import nars.nal.meta.match.Ellipsis;
 import nars.task.AbstractTask;
 import nars.task.MutableTask;
 import nars.task.Task;

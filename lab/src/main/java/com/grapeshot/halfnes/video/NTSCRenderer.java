@@ -6,9 +6,10 @@ package com.grapeshot.halfnes.video;
 
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 
-import java.awt.image.*;
-import java.util.*;
-
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
 /**

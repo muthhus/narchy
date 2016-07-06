@@ -5,7 +5,9 @@
 package com.grapeshot.halfnes.ui;
 
 import com.grapeshot.halfnes.PrefsSingleton;
-import static com.grapeshot.halfnes.utils.*;
+import javafx.scene.Scene;
+import net.java.games.input.*;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -14,13 +16,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.prefs.Preferences;
-import javafx.scene.Scene;
 
-import net.java.games.input.Component;
-import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
-import net.java.games.input.Event;
-import net.java.games.input.EventQueue;
+import static com.grapeshot.halfnes.utils.*;
 
 /**
  *

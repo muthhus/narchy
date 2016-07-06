@@ -14,8 +14,6 @@ import spacegraph.render.ShapeDrawer;
 import javax.vecmath.Vector3f;
 import java.util.function.BiConsumer;
 
-import static spacegraph.test.Lesson14.renderString;
-
 /**
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter

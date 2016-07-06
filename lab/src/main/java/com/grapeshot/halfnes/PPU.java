@@ -4,14 +4,16 @@
  */
 package com.grapeshot.halfnes;
 
-import static com.grapeshot.halfnes.PrefsSingleton.get;
 import com.grapeshot.halfnes.mappers.Mapper;
 import com.grapeshot.halfnes.ui.DebugUI;
 import com.grapeshot.halfnes.ui.GUIInterface;
-import static com.grapeshot.halfnes.utils.reverseByte;
+
 import java.awt.image.BufferedImage;
-import static java.awt.image.BufferedImage.TYPE_INT_BGR;
 import java.util.Arrays;
+
+import static com.grapeshot.halfnes.PrefsSingleton.get;
+import static com.grapeshot.halfnes.utils.reverseByte;
+import static java.awt.image.BufferedImage.TYPE_INT_BGR;
 import static java.util.Arrays.fill;
 
 public class PPU {

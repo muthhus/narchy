@@ -20,17 +20,11 @@
  */
 package nars.term;
 
-import com.gs.collections.api.set.MutableSet;
-import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.subst.FindSubst;
 import nars.util.Util;
 import nars.util.data.array.IntArrays;

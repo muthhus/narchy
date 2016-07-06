@@ -1,7 +1,5 @@
 package nars.util.math;
 
-import org.apache.commons.math3.exception.MathArithmeticException;
-
 /** balances at zero, balanced normalization of positive and negative ranges (radius)
  *  output is normalized to range 0..1.0
  * */

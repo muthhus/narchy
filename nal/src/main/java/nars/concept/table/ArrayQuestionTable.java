@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Task;
-import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

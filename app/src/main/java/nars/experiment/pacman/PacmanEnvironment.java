@@ -49,8 +49,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static nars.experiment.pong.PongEnvironment.numericSensor;
-
 /**
  * the java application class of pacman 
  */

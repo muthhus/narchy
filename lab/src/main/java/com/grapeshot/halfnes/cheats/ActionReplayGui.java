@@ -4,14 +4,14 @@
  */
 package com.grapeshot.halfnes.cheats;
 
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
-import static com.grapeshot.halfnes.utils.*;
+import static com.grapeshot.halfnes.utils.BIT15;
 
 /**
  * Dialog box to configure and apply Pro Action Replay cheat codes.

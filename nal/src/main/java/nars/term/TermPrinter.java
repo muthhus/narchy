@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.Op;
 import nars.Symbols;
-import nars.concept.Concept;
 import nars.term.atom.Atomic;
 import nars.term.compound.Statement;
 import org.jetbrains.annotations.NotNull;

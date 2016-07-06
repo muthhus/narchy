@@ -4,8 +4,8 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
+import com.grapeshot.halfnes.audio.VRC6SoundChip;
+import com.grapeshot.halfnes.utils;
 
 public class VRC6Mapper extends Mapper {
 

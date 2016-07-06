@@ -2,7 +2,6 @@ package nars.concept.table;
 
 import nars.Global;
 import nars.NAR;
-import nars.bag.impl.SortedTable;
 import nars.nal.Tense;
 import nars.task.Revision;
 import nars.task.Task;

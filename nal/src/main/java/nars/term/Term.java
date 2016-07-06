@@ -24,7 +24,6 @@ package nars.term;
 import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicString;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;

@@ -3,7 +3,6 @@ package mcaixictw.env;
 import mcaixictw.Environment;
 import mcaixictw.RunAgentTest;
 import mcaixictw.environments.CoinFlipEnv;
-import org.junit.Test;
 
 /**
  * Created by me on 7/4/16.

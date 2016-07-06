@@ -1,13 +1,10 @@
 package nars.guifx.nars;
 
-import nars.Global;
 import nars.NAR;
 import nars.task.Task;
 import nars.truth.Stamp;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

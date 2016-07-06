@@ -4,8 +4,6 @@ import com.grapeshot.halfnes.ui.ControllerImpl;
 import com.grapeshot.halfnes.ui.GUIInterface;
 import com.grapeshot.halfnes.ui.OnScreenMenu;
 import com.grapeshot.halfnes.video.NesColors;
-import java.nio.ByteBuffer;
-import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -20,6 +18,9 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+
+import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * @author Stephen Chin - steveonjava@gmail.com

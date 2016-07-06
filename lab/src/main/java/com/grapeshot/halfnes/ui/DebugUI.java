@@ -5,9 +5,10 @@
 package com.grapeshot.halfnes.ui;
 
 import com.grapeshot.halfnes.NES;
-import java.awt.*;
-import java.awt.image.*;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class DebugUI extends JFrame {
     // StrokeInformer aStrokeInformer = new StrokeInformer();

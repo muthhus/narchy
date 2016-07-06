@@ -7,10 +7,6 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.swing.GraphicalTerminalImplementation;
-import com.googlecode.lanterna.terminal.swing.TerminalEmulatorColorConfiguration;
-import com.googlecode.lanterna.terminal.swing.TerminalEmulatorDeviceConfiguration;
-import com.googlecode.lanterna.terminal.swing.TerminalScrollController;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -21,6 +17,8 @@ import nars.rover.physics.j2d.LayerDraw;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
+
+import com.artemis.Component;
 
 /**
  * Created by me on 4/1/16.

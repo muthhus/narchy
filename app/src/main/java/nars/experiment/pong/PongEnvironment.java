@@ -15,7 +15,6 @@ import nars.concept.Concept;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
-import nars.index.Cache2kIndex;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -35,11 +34,11 @@ import nars.util.signal.SensorConcept;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static nars.$.t;
 
 public class PongEnvironment extends Player implements Environment {
 

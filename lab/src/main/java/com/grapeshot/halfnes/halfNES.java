@@ -6,7 +6,6 @@ package com.grapeshot.halfnes;
 
 import com.grapeshot.halfnes.ui.SwingUI;
 
-import java.io.*;
 import javax.swing.*;
 
 public class halfNES {

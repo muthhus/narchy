@@ -1,7 +1,7 @@
 package nars.web;
 
-import nars.util.data.MutableInteger;
 import nars.util.Util;
+import nars.util.data.MutableInteger;
 
 /**
  * Created by me on 4/24/16.

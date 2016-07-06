@@ -1,7 +1,10 @@
 package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.*;
+import nars.$;
+import nars.Global;
+import nars.NAR;
+import nars.Symbols;
 import nars.budget.Budget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;

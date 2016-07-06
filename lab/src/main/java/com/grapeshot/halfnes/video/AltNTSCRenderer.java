@@ -4,9 +4,9 @@
  */
 package com.grapeshot.halfnes.video;
 
-import java.awt.image.BufferedImage;
-
 import com.grapeshot.halfnes.utils;
+
+import java.awt.image.BufferedImage;
 
 /**
  *

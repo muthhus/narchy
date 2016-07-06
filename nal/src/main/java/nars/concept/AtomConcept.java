@@ -8,7 +8,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

@@ -7,7 +7,6 @@ import com.artemis.utils.Bag;
 import com.gs.collections.api.block.procedure.Procedure;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
 import nars.rover.Sim;
 import nars.rover.obj.DrawAbove;
 import nars.rover.physics.gl.Box2DJoglSpace;

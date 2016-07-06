@@ -4,14 +4,9 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.term.Term;
-import nars.term.Termed;
 import nars.term.container.TermSet;
 import org.junit.Test;
 
-import java.util.List;
-
-import static nars.Global.dereference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

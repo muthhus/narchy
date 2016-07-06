@@ -2,7 +2,6 @@ package asanf.FOM;
 
 
 import asanf.FOM.Util.DTMatrix;
-import com.gs.collections.api.block.predicate.primitive.ObjectIntPredicate;
 
 import java.util.ArrayList;
 import java.util.Collection;

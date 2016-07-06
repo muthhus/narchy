@@ -1,7 +1,6 @@
 package nars.guifx.graph2.source;
 
 
-
 import javafx.beans.property.SimpleObjectProperty;
 import nars.NAR;
 import nars.guifx.Spacegraph;
@@ -15,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 

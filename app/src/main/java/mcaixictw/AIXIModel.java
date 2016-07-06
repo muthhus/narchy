@@ -1,8 +1,5 @@
 package mcaixictw;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
 import mcaixictw.worldmodels.WorldModel;
 

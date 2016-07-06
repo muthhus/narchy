@@ -1,17 +1,13 @@
 package mcaixictw;
 
-import static org.junit.Assert.*;
-
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import mcaixictw.worldmodels.ContextTree;
-import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.WorldModel;
+import mcaixictw.worldmodels.WorldModelSettings;
+import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class ContextTreeTest {

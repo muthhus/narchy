@@ -23,8 +23,6 @@ package nars.term.variable;
 
 import nars.Global;
 import nars.Op;
-import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 

@@ -9,11 +9,9 @@ import javafx.scene.chart.PieChart;
 import javafx.stage.Stage;
 import nars.guifx.NARfx;
 import nars.guifx.Spacegraph;
-import nars.guifx.graph2.layout.HyperOrganicLayout;
 import nars.guifx.terminal.Console;
 import nars.guifx.util.CodeInput;
 import nars.guifx.util.Windget;
-import nars.util.FX;
 
 
 public class RunSpacegraph extends Application {

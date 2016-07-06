@@ -4,8 +4,9 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.utils;
 import com.grapeshot.halfnes.audio.MMC5SoundChip;
+import com.grapeshot.halfnes.utils;
+
 import java.util.Arrays;
 
 /**

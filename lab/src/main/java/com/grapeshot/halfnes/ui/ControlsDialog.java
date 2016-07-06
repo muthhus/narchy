@@ -11,6 +11,7 @@
 package com.grapeshot.halfnes.ui;
 
 import com.grapeshot.halfnes.PrefsSingleton;
+
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;

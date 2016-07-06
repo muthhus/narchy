@@ -4,9 +4,10 @@
  */
 package com.grapeshot.halfnes;
 
-import com.grapeshot.halfnes.ui.Oscilloscope;
 import com.grapeshot.halfnes.audio.*;
 import com.grapeshot.halfnes.mappers.Mapper;
+import com.grapeshot.halfnes.ui.Oscilloscope;
+
 import java.util.ArrayList;
 
 public class APU {

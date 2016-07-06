@@ -1,7 +1,6 @@
 package nars.term.transform;
 
 import nars.$;
-import nars.Global;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -11,9 +10,6 @@ import nars.term.variable.Variable;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**

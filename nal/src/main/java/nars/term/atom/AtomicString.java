@@ -1,9 +1,5 @@
 package nars.term.atom;
 
-import nars.term.Term;
-import nars.term.Termlike;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by me on 1/1/16.
  */

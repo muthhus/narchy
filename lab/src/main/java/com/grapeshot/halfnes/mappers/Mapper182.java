@@ -1,6 +1,6 @@
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
+import com.grapeshot.halfnes.utils;
 
 public class Mapper182 extends Mapper {
     //Pirate MMC3 clone with scrambled registers

@@ -5,7 +5,6 @@ import asanf.FOM.Util.CorrelationFunction;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
-import edu.stanford.nlp.tagger.common.Tagger;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import nars.$;
 import nars.term.Term;
@@ -15,8 +14,6 @@ import org.semanticweb.owlapi.model.*;
 
 import java.io.*;
 import java.util.*;
-
-import static edu.stanford.nlp.tagger.maxent.MaxentTagger.DEFAULT_NLP_GROUP_MODEL_PATH;
 
 
 public class FuzzyOntologyMiner {

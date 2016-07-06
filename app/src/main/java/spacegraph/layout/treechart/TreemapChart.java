@@ -3,13 +3,15 @@ package spacegraph.layout.treechart;
 import com.google.common.collect.Lists;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import nars.Global;
 import nars.util.data.list.FasterList;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 

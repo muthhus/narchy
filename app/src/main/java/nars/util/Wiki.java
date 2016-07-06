@@ -20,16 +20,17 @@
 
 package nars.util;
 
+import javax.security.auth.login.*;
 import java.io.*;
 import java.net.*;
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.text.Normalizer;
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
-
-import javax.security.auth.login.*;
 
 /**
  *  This is a somewhat sketchy bot framework for editing MediaWiki wikis.

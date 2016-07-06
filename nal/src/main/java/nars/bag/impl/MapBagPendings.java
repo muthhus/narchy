@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;

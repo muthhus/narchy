@@ -4,8 +4,9 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
+import com.grapeshot.halfnes.audio.ExpansionSoundChip;
+import com.grapeshot.halfnes.audio.Sunsoft5BSoundChip;
+import com.grapeshot.halfnes.utils;
 
 /**
  *

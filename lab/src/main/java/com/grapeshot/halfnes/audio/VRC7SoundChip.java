@@ -5,9 +5,12 @@
 package com.grapeshot.halfnes.audio;
 
 //import com.grapeshot.halfnes.ui.DebugUI;
-import static com.grapeshot.halfnes.utils.*;
-//import java.awt.image.BufferedImage;
+
 import java.util.Arrays;
+
+import static com.grapeshot.halfnes.utils.*;
+
+//import java.awt.image.BufferedImage;
 
 /**
  *

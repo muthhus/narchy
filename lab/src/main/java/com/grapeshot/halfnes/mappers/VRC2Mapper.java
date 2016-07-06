@@ -4,7 +4,7 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.*;
+import com.grapeshot.halfnes.utils;
 
 public class VRC2Mapper extends Mapper {
     //vrc2a mapper(INES #22); vrc2b is mapped to 23 along with the one form of vrc4

@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.bag.Bag;
 import nars.budget.BudgetFunctions;
-import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;

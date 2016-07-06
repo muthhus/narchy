@@ -18,7 +18,6 @@ import nars.util.FX;
 import za.co.knonchalant.builder.POJONode;
 
 import static javafx.application.Platform.runLater;
-import static nars.util.FX.scrolled;
 
 
 public class DemoNARNotes {

@@ -78,12 +78,14 @@
     </dependency>
 
 
-    <!--<dependency>-->
-      <!--<groupId>org.ow2.asm</groupId>-->
-      <!--<artifactId>asm-debug-all</artifactId>-->
-      <!--<version>5.1</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
+    <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>6.0_ALPHA</version>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>me.qmx.jitescript</groupId>
       <artifactId>jitescript</artifactId>
@@ -99,7 +101,7 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.4.6</version>
+      <version>1.4.7</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

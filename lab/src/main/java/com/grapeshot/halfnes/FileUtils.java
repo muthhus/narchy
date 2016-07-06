@@ -4,8 +4,11 @@
  */
 package com.grapeshot.halfnes;
 
-import java.awt.EventQueue;
-import java.io.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  *

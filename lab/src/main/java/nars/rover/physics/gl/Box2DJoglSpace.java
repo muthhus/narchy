@@ -1,13 +1,15 @@
 package nars.rover.physics.gl;
 
 import com.jogamp.newt.event.*;
-import com.jogamp.opengl.*;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import nars.rover.Sim;
 import nars.rover.physics.Display;
-import spacegraph.render.JoglSpace;
 import org.jbox2d.dynamics.World2D;
+import spacegraph.render.JoglSpace;
 
 import java.awt.*;
 import java.nio.FloatBuffer;

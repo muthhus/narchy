@@ -3,7 +3,7 @@
  */
 package com.grapeshot.halfnes.video;
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 
 /**
  *

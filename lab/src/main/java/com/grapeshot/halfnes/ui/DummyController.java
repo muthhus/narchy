@@ -6,14 +6,7 @@ package com.grapeshot.halfnes.ui;
 
 import java.util.HashMap;
 
-import static com.grapeshot.halfnes.utils.BIT0;
-import static com.grapeshot.halfnes.utils.BIT1;
-import static com.grapeshot.halfnes.utils.BIT2;
-import static com.grapeshot.halfnes.utils.BIT3;
-import static com.grapeshot.halfnes.utils.BIT4;
-import static com.grapeshot.halfnes.utils.BIT5;
-import static com.grapeshot.halfnes.utils.BIT6;
-import static com.grapeshot.halfnes.utils.BIT7;
+import static com.grapeshot.halfnes.utils.*;
 
 /**
  * @author Andrew

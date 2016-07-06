@@ -2,7 +2,6 @@ package mcaixictw.env;
 
 import mcaixictw.Environment;
 import mcaixictw.RunAgentTest;
-import mcaixictw.environments.CoinFlipEnv;
 import mcaixictw.environments.Maze1DEnv;
 
 /**

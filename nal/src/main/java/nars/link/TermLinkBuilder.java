@@ -1,11 +1,8 @@
 package nars.link;
 
-import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.container.TermSet;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 

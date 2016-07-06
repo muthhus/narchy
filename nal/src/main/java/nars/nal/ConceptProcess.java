@@ -5,16 +5,13 @@
 package nars.nal;
 
 import nars.Global;
-import nars.NAR;
 import nars.Premise;
-import nars.Symbols;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -22,8 +19,6 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.ref.Reference;
 
 import static nars.nal.Tense.DTERNAL;
 

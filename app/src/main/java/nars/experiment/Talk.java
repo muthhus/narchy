@@ -7,29 +7,20 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.LineProcessor;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.concept.OperationConcept;
-import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.nar.Default;
-import nars.nar.util.DefaultConceptBuilder;
 import nars.op.in.Twenglish;
-import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.variable.Variable;
-import nars.time.RealtimeMSClock;
 import nars.util.Util;
 import nars.util.data.MultiOutputStream;
 import nars.util.data.map.CapacityLinkedHashMap;
-import nars.util.data.map.RUCache;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -37,10 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Predicate;
-
-import static nars.$.$;
 
 /**
  * Created by me on 6/27/16.

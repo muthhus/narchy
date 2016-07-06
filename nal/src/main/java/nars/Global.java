@@ -21,13 +21,11 @@
 package nars;
 
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.Util;
 import nars.util.data.list.FasterList;
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

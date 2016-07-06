@@ -14,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
-import static nars.Global.dereference;
-import static nars.Global.reference;
-
 
 abstract public class DerivedTask extends MutableTask {
 

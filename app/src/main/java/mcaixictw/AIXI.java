@@ -1,13 +1,12 @@
 package mcaixictw;
 
-import java.io.PrintWriter;
-import java.util.function.IntConsumer;
-
 import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
-import mcaixictw.worldmodels.ContextTree;
 import mcaixictw.worldmodels.WorldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.PrintWriter;
+import java.util.function.IntConsumer;
 
 import static mcaixictw.Util.asInt;
 

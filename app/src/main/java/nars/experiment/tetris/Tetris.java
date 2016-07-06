@@ -24,7 +24,6 @@ import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.learn.Agent;
 
-import java.awt.*;
 import java.net.URL;
 
 

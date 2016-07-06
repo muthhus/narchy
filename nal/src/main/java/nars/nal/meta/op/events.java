@@ -1,7 +1,5 @@
 package nars.nal.meta.op;
 
-import nars.nal.ConceptProcess;
-import nars.nal.Tense;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;

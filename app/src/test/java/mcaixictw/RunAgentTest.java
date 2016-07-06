@@ -1,15 +1,10 @@
 package mcaixictw;
 
-import java.util.logging.Logger;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.WorldModel;
+import mcaixictw.worldmodels.WorldModelSettings;
+import org.junit.*;
+
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertTrue;
 

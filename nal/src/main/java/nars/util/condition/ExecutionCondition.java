@@ -2,7 +2,6 @@ package nars.util.condition;
 
 import nars.$;
 import nars.NAR;
-import nars.nal.Tense;
 import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 

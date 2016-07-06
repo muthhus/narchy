@@ -3,7 +3,6 @@ package mcaixictw;
 import mcaixictw.worldmodels.WorldModel;
 import mcaixictw.worldmodels.WorldModelSettings;
 import nars.experiment.pacman.PacmanEnvironment;
-import nars.experiment.pong.PongEnvironment;
 import nars.learn.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

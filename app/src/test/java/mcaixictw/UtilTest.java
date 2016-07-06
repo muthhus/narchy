@@ -1,17 +1,13 @@
 package mcaixictw;
 
-import static mcaixictw.Util.asInt;
-import static org.junit.Assert.*;
+import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
+import org.junit.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gs.collections.impl.list.mutable.primitive.BooleanArrayList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static mcaixictw.Util.asInt;
+import static org.junit.Assert.*;
 
 
 public class UtilTest {

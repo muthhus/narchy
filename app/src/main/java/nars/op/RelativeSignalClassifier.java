@@ -1,16 +1,10 @@
 package nars.op;
 
-import nars.$;
-import nars.NAR;
-import nars.nal.Tense;
 import nars.term.Compound;
 import nars.util.math.FloatSupplier;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-
-import static nars.$.logger;
 
 /**
  * Created by me on 6/27/16.

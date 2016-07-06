@@ -7,11 +7,13 @@ package com.grapeshot.halfnes.ui;
 import com.grapeshot.halfnes.FileUtils;
 import com.grapeshot.halfnes.NES;
 import com.grapeshot.halfnes.PrefsSingleton;
-import com.grapeshot.halfnes.video.RGBRenderer;
 import com.grapeshot.halfnes.cheats.ActionReplay;
 import com.grapeshot.halfnes.cheats.ActionReplayGui;
 import com.grapeshot.halfnes.video.NTSCRenderer;
+import com.grapeshot.halfnes.video.RGBRenderer;
 import com.grapeshot.halfnes.video.Renderer;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -29,7 +31,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import javax.swing.*;
 
 public class SwingUI extends JFrame implements GUIInterface {
 

@@ -32,8 +32,6 @@ package nars.cfg.bytecode;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
-import org.objectweb.asm.tree.analysis.*;
 
 import java.util.Arrays;
 import java.util.HashSet;

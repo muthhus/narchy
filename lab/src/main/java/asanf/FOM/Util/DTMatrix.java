@@ -1,7 +1,6 @@
 package asanf.FOM.Util;
-import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
-import java.util.ArrayList;
+import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 
 /**
  * Classe che modella una matrice triangolare espandibile dinamicamente

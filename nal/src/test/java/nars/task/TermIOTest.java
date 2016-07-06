@@ -7,7 +7,6 @@ import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.variable.Variable;
 import nars.util.IO;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +20,7 @@ import java.util.TreeSet;
 
 import static java.lang.System.out;
 import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Term serialization
