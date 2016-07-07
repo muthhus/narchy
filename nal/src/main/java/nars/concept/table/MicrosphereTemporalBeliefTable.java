@@ -35,9 +35,9 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         setCapacity(initialCapacity);
     }
 
-    public static float rank(@NotNull Task t, long when, float ageFactor) {
+    public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
         //return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
-        return rankTemporalByConfidence(t, when, when, ageFactor, -1);
+        return rankTemporalByConfidence(t, when, now, ageFactor, -1);
     }
 
     @Nullable
@@ -140,7 +140,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, now, ageFactor);
+            float r = rank(ii, now,  now, ageFactor);
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;
@@ -197,7 +197,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         }
 
 
-        float inputRank = input != null ? rank(input, now, ageFactor()) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rank(input, now, now, ageFactor()) : Float.POSITIVE_INFINITY;
 
         Task a = weakest(now, null, inputRank);
         if (a == null)
@@ -246,7 +246,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     @Nullable
     @Override
-    public Task top(long when) {
+    public Task top(long when, long now, Task against) {
 
         //removeDeleted();
 
@@ -264,7 +264,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         for (int i = 0; i < ls; i++) {
             Task x = get(i);
             if (x == null) continue;
-            float r = rank(x, when, ageFactor);
+
+            float r = rank(x, when, now, ageFactor);
+
+            if (against!=null && Stamp.overlapping(x.evidence(), against.evidence())) {
+                r *= Global.MATCH_OVERLAP_MULTIPLIER;
+            }
+
             if (r > bestRank) {
                 best = x;
                 bestRank = r;

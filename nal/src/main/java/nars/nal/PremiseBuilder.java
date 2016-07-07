@@ -46,6 +46,7 @@ public enum PremiseBuilder {
     public static int run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<Term>> termsArray, @NotNull BLink<Task> taskLink, PremiseEval matcher) {
 
         int count = 0;
+        long now = nar.time();
 
         Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
         if (task != null) {
@@ -69,7 +70,7 @@ public enum PremiseBuilder {
                 if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
                 //if (!taskTerm.equals( termLinkTerm )) {
                     if (matcher.run(
-                        newPremise(nar, conceptLink, termLink, taskLink, task, tl)
+                        newPremise(nar, now, conceptLink, termLink, taskLink, task, tl)
                     )) {
                         count++;
                     }
@@ -84,8 +85,8 @@ public enum PremiseBuilder {
     }
 
     @Nullable
-    static ConceptProcess newPremise(@NotNull NAR nar, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
-        return new ConceptProcess(conceptLink, taskLink, termLink, match(nar, task, tl));
+    static ConceptProcess newPremise(@NotNull NAR nar, long now, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
+        return new ConceptProcess(conceptLink, taskLink, termLink, match(nar, now, task, tl));
     }
 
 
@@ -103,7 +104,7 @@ public enum PremiseBuilder {
          patham9 its using the result of higher confidence
      */
     @Nullable
-    static Task match(@NotNull NAR nar, @NotNull Task task, @NotNull Termed beliefConceptTerm) {
+    static Task match(@NotNull NAR nar, long now, @NotNull Task task, @NotNull Termed beliefConceptTerm) {
 
         //atomic concepts will have no beliefs to match
         if (!(beliefConceptTerm instanceof Compound))
@@ -115,11 +116,7 @@ public enum PremiseBuilder {
 
         @Nullable BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-        if (table.isEmpty())
-            return null;
-
-        //Task belief = project(task, table.match(task), nar.time());
-        Task belief = table.match(task);
+        Task belief = table.match(task, now);
 
         if (belief!=null && task.isQuestOrQuestion()) {
 

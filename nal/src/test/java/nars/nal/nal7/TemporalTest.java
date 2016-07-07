@@ -321,7 +321,7 @@ public class TemporalTest {
         assertEquals("((\\,(a==>b),_)-->[pill])", cc.toString());
         cc.print();
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().topTemporal(2,d.time()).term().toString());
+        assertEquals("((\\,(a ==>+4 b),_)-->[pill])", cc.beliefs().topTemporal(2,d.time(), null).term().toString());
     }
 
     @Test public void testSubtermTimeRecursive() {

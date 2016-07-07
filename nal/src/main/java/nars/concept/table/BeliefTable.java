@@ -82,9 +82,8 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
-        @Nullable
         @Override
-        public Task topTemporal(long when, long now) {
+        public Task topTemporal(long when, long now, Task against) {
             return null;
         }
 
@@ -200,12 +199,17 @@ public interface BeliefTable extends TaskTable {
         return top(now, now);
     }
 
+    @Nullable
+    default Task top(long when, long now) {
+        return top(when, now, null);
+    }
+
     /** get the most relevant belief/goal with respect to a specific time. */
     @Nullable
-    default Task top(long t, long now) {
+    default Task top(long when, long now, @Nullable Task against) {
 
         final Task ete = topEternal();
-        if (t == Tense.ETERNAL) {
+        if (when == Tense.ETERNAL) {
             if (ete != null) {
                 return ete;
             } /*else {
@@ -213,7 +217,7 @@ public interface BeliefTable extends TaskTable {
             } */
         }
 
-        Task tmp = topTemporal(t, now);
+        Task tmp = topTemporal(when, now, against);
 
         if (tmp == null) {
             return ete;
@@ -232,7 +236,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable Task topEternal();
 
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
-    @Nullable Task topTemporal(long when, long now);
+    Task topTemporal(long when, long now, @Nullable Task against);
 
 
 
@@ -375,28 +379,30 @@ public interface BeliefTable extends TaskTable {
      *
      *  TODO consider similarity of any of term's recursive 'dt' temporality in ranking
      * */
-    @Nullable
-    default Task match(Task target) {
+    default Task match(Task target, long now) {
 
         int size = size();
+        if (size == 0)
+            return null;
+
 
         long occ = target.occurrence();
+        return top(occ, now, target);
 
-        do {
-
-            Task belief = top( occ );
-
-            if (belief == null) {
-                return null;
-            } else if (belief.isDeleted()) {
-                remove(belief);
-            } else {
-                return belief;
-            }
-
-        } while (size-- > 0);
-
-        return null;
+//        do {
+//
+//            Task belief = top( occ );
+//
+//            if (belief == null) {
+//                return null;
+//            } else if (belief.isDeleted()) {
+//                remove(belief);
+//            } else {
+//                return belief;
+//            }
+//
+//        } while (size-- > 0);
+//        return null;
     }
 
     default float expectation(long when) {

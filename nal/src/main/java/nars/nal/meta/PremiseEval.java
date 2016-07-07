@@ -256,38 +256,37 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    /** specific minimum confidence function for advanced filtering heuristics TODO */
-    public final float confidenceMin(Term pattern, char punc) {
-
-//        //EXAMPLE TEMPORARY HACK
-//        Op o = pattern.op();
-//        if (o!=VAR_PATTERN) {
-//            int str = pattern.structure();
+//    /** specific minimum confidence function for advanced filtering heuristics TODO */
+//    public final float confidenceMin(Term pattern, char punc) {
 //
-//            if ((Op.hasAny(str, Op.EQUIV) || (o == Op.INHERIT)))
-//                return minConfidence * 3;
-//        }
-
-        return confMin;
-    }
+////        //EXAMPLE TEMPORARY HACK
+////        Op o = pattern.op();
+////        if (o!=VAR_PATTERN) {
+////            int str = pattern.structure();
+////
+////            if ((Op.hasAny(str, Op.EQUIV) || (o == Op.INHERIT)))
+////                return minConfidence * 3;
+////        }
+//
+//        return confMin;
+//    }
 
     /** gets the op of the (top-level) pattern being compared
      * @param subterm 0 or 1, indicating task or belief
      * */
-    public final boolean subTermIs(int subterm, int op) {
+    /*public final boolean subTermIs(int subterm, int op) {
         return (subterm==0 ? termSub0op : termSub1op) == op;
-    }
+    }*/
     public final int subOp(int i /* 0 or 1 */) {
         return (i == 0 ? termSub0op : termSub1op);
     }
 
     /** @param subterm 0 or 1, indicating task or belief */
     public final boolean subTermMatch(int subterm, int bits) {
-        int existingStructure = (subterm == 0 ? termSub0Struct : termSub1Struct);
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Op.hasAll(existingStructure, bits);
+        return Op.hasAll((subterm == 0 ? termSub0Struct : termSub1Struct), bits);
     }
 
     /** both */

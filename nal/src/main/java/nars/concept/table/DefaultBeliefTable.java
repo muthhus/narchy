@@ -141,13 +141,12 @@ public class DefaultBeliefTable implements BeliefTable {
         return null;
     }
 
-    @Nullable
     @Override
-    public final Task topTemporal(long when, long now) {
+    public final Task topTemporal(long when, long now, Task against) {
         TemporalBeliefTable tt = temporal;
         if (!tt.isEmpty()) {
             synchronized (temporal) {
-                return tt.top(when);
+                return tt.top(when, now, against);
             }
         }
         return null;

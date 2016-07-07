@@ -108,6 +108,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             Task q = list.get(i);
             if (q.isDeleted())
                 remove(i, "Discovered Deleted");
+            else if (a.isDeleted())
+                break;
             else
                 answer(q, a, nar);
         }
@@ -147,6 +149,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         if (!q.onAnswered(a)) {
             //the qustion requested for it to be deleted
             remove(q);
+            return;
         } else {
 
             //if there is a reduction in variables, link the (distinct) concepts

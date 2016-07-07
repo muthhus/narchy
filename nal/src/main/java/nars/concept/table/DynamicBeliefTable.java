@@ -38,9 +38,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         return null;
     }
 
-    @Nullable
     @Override
-    public Task topTemporal(long when, long now) {
+    public Task topTemporal(long when, long now, Task against) {
         updateTask(now);
         return current;
     }
@@ -76,7 +75,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Truth truth(long now, long when) {
-        @Nullable Task x = topTemporal(when, now);
+        @Nullable Task x = topTemporal(when, now, null);
         return x != null ? x.projectTruth(when, now, false) : null;
     }
 

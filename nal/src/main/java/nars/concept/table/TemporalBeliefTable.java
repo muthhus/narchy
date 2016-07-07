@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface TemporalBeliefTable extends Table<Task,Task> {
 
-    @Nullable Task top(long when);
+    @Nullable Task top(long when, long now, Task against);
 
     @Nullable Truth truth(long when, EternalTable eternal);
 
