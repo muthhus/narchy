@@ -195,7 +195,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				16384);
+				256*64);
 
 
 

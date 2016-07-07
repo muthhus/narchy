@@ -156,7 +156,10 @@ public enum Global {
     /** additional temporal belief space for sensor concepts,
      *  which will usually have a lot of highly fluctuating activity that should
      *  be remembered */
-    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 4; //HACK
+    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 2; //HACK
+
+    /** exponent by which confidence (modeled as luminance) decays through the time axis (>=1) */
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1.5f;
 
 
     @NotNull

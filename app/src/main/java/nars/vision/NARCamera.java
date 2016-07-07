@@ -25,8 +25,8 @@ import java.util.Collections;
  */
 public class NARCamera implements PixelCamera.PerPixelRGB {
 
-    public static final float minZoom = 0.5f;
-    public static final float maxZoom = 5f;
+    public static final float minZoom = 0.15f;
+    public static final float maxZoom = 1f;
 
     public final NAgent controller;
     public final PixelCamera cam;
@@ -43,6 +43,9 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     private float z;
     int x, y, ox, oy;
 
+    float xySpeed = 0.02f;
+    float zoomSpeed = 0.01f;
+
 
     public NARCamera(String id, NAR nar, PixelCamera c, PixelToTerm pixelTerm) {
         this.id = $.$(id);
@@ -54,35 +57,47 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         controller.start(
                 Collections.emptyList(),
                 Lists.mutable.of(
-                        new MotorConcept("(" + id + ", center)", nar, (b, d) -> {
-                            look(0, 0, 0);
+                        new MotorConcept("(" + id + ", (center))", nar, (b, d) -> {
+                            //look(0, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", up)", nar, (b, d) -> {
-                            look(0, -0.1f, 0);
+                        new MotorConcept("(" + id + ", (up))", nar, (b, d) -> {
+                            //look(0, -1, 0);
                         }),
-                        new MotorConcept("(" + id + ", down)", nar, (b, d) -> {
-                            look(0, +0.1f, 0);
+                        new MotorConcept("(" + id + ", (--,(up)))", nar, (b, d) -> {
+                            //look(0, +1f, 0);
                         }),
-                        new MotorConcept("(" + id + ", left)", nar, (b, d) -> {
-                            look(-0.1f, 0, 0);
+                        new MotorConcept("(" + id + ", (left))", nar, (b, d) -> {
+                            //look(-1f, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", right)", nar, (b, d) -> {
-                            look(+0.1f, 0, 0);
+                        new MotorConcept("(" + id + ", (--,(left)))", nar, (b, d) -> {
+                            //look(+1f, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", in)", nar, (b, d) -> {
-                            look(0, 0, 0.1f);
+                        new MotorConcept("(" + id + ", (in))", nar, (b, d) -> {
+                            //look(0, 0, +1f);
                         }),
-                        new MotorConcept("(" + id + ", out)", nar, (b, d) -> {
-                            look(0, 0, -0.1f);
+                        new MotorConcept("(" + id + ", (--,(in)))", nar, (b, d) -> {
+                            //look(0, 0, -1f);
                         })
 
                 ));
 
         SwingCamera scam = (SwingCamera) this.cam;
 
-        nar.onFrame(nn -> {
-            System.out.println("update camera: @(" + x + "," + y + ")x(" + scam.width + "," + scam.height + ")");
-            controller.decide(-1);
+//        nar.onFrame(nn -> {
+//            System.out.println("update camera: @(" + x + "," + y + ")x(" + scam.width + "," + scam.height + ")");
+//            controller.decide(-1);
+//        });
+
+        nar.onFrame(f -> {
+            switch (controller.lastAction) {
+                case 0: look(0, 0, 0); break;
+                case 1: look(1, 0, 0); break;
+                case 2: look(-1, 0, 0); break;
+                case 3: look(0, 1, 0); break;
+                case 4: look(0, -1, 0); break;
+                case 5: look(0, 0, 1); break;
+                case 6: look(0, 0, -1); break;
+            }
         });
 
         x = scam.inWidth()/2;
@@ -100,18 +115,24 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     }
 
     public void look(float dx, float dy, float dz) {
+
+        dx *= xySpeed;
+        dy *= xySpeed;
+        dz *= zoomSpeed;
+
         SwingCamera scam = (SwingCamera) this.cam;
         int w = scam.inWidth();
         int h = scam.inHeight();
 
-        this.x += Math.round(w * dx);
-        this.x = Math.max(0, Math.min(w, x));
-
-        this.y += Math.round(h * dy);
-        this.y = Math.max(0, Math.min(h, y));
-
         this.z += dz;
         this.z = Math.max(minZoom,Math.min(z,maxZoom));
+
+        this.x += Math.round(w * z * dx);
+        this.x = Math.max(0, Math.min(w, x));
+
+        this.y += Math.round(h * z * dy);
+        this.y = Math.max(0, Math.min(h, y));
+
 
         center(x,y,z);
 //
@@ -123,6 +144,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //
 //        input(x, y, w, h);
     }
+
 
     public void center(int x, int y, float zoom) {
         SwingCamera scam = (SwingCamera) this.cam;
@@ -220,7 +242,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //border
             gl.glColor4f(1f,1f,1f,1f);
-            ShapeDrawer.strokeRect(gl, 0, 0, tw, th);
+            ShapeDrawer.strokeRect(gl, 0, 0, tw+dw, th+dh);
         }
     }
 
@@ -342,3 +364,4 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     }
 
 }
+

@@ -52,7 +52,7 @@ public class NAgent implements Agent {
     public List<MotorConcept> actions;
     private List<SensorConcept> inputs;
     //private SensorConcept reward;
-    private int lastAction = -1;
+    public int lastAction = -1;
     public float reward = Float.NaN;
 
     private int ticksBeforeObserve = 1;
@@ -282,10 +282,11 @@ public class NAgent implements Agent {
 //        this.dRewardSensorNeg = new SensorConcept("(dRn)", nar, differentialNeg, sensorFreq)
 //                .pri(rewardPriority)
 //                .resolution(0.01f);
-        init();
     }
 
     public void start(List<SensorConcept> inputContepts, List<MotorConcept> outputConcepts) {
+
+
         this.inputs = inputContepts;
         this.actions = outputConcepts;
 
@@ -303,6 +304,9 @@ public class NAgent implements Agent {
         rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
         this.sad = rewardConcepts.sensors.get(0);
         this.happy = rewardConcepts.sensors.get(rewardConcepts.sensors.size()-1);
+
+        init();
+
     }
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
@@ -452,13 +456,14 @@ public class NAgent implements Agent {
     }
 
     @Override
-    public int act(float rewardValue, float[] nextObservation) {
+    public int act(float rewardValue, @Nullable float[] nextObservation) {
 
         if (lastAction != -1) {
             learn(input, lastAction, rewardValue);
         }
 
-        observe(nextObservation);
+        if (nextObservation!=null)
+            observe(nextObservation);
 
         decide(this.lastAction);
 
@@ -506,7 +511,7 @@ public class NAgent implements Agent {
 
     }
 
-    private void learn(float[] input, int action, float reward) {
+    public void learn(float[] input, int action, float reward) {
 
         float prevReward = this.reward;
         if (Float.isFinite(prevReward))
@@ -538,6 +543,7 @@ public class NAgent implements Agent {
         nextMotivation = motivation[nextAction];
 
         long now = nar.time();
+        //System.out.println("decisiveness=" + decisiveness(nextAction));
 
 //        float onConf = 0.5f + 0.5f * Math.max(
 //                //w2c(d *motivation.length) * gamma,

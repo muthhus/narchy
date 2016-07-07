@@ -40,8 +40,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
         this.sensor = new Sensor(n, this, this, truth) {
             @Override
-            public float pri() {
-                return SensorConcept.this.pri();
+            public float pri(float v, long now, float prevV, long lastV) {
+                return SensorConcept.this.pri(v, now, prevV, lastV);
             }
         };
         n.on(this);
@@ -50,15 +50,21 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     }
 
-    public float pri() {
+    public float pri(float v, long now, float prevV, long lastV) {
+//        float m;
+//        if (prevV != prevV) //NaN
+//            m = 1f; //first input
+//        else
+//            m = (Math.abs(v-prevV)); //decrease by sameness
+//        return sensor.pri * m;
         return sensor.pri;
     }
 
-    @NotNull
-    public SensorConcept sensorDT(int newDT) {
-        sensor.dt(newDT);
-        return this;
-    }
+//    @NotNull
+//    public SensorConcept sensorDT(int newDT) {
+//        sensor.dt(newDT);
+//        return this;
+//    }
 
     @Override
     public @Nullable

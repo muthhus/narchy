@@ -150,7 +150,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     @NotNull
-    protected void commit(float v) {
+    protected final void commit(float v) {
 //        float f, c;
 //        if (v < 0.5f) {
 //            f = 0f;
@@ -182,14 +182,14 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         if (t!=null) {
             return new MutableTask(term(), punc, t)
                     .time(now, now + dt())
-                    .budget(pri(), dur)
+                    .budget(pri(v, now, prevF, lastInput), dur)
                     .log(this);
         } else {
             return null;
         }
     }
 
-    public float pri() {
+    public float pri(float v, long now, float prevV, long lastV) {
         return pri;
     }
 

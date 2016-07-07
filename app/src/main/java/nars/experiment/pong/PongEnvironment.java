@@ -170,7 +170,9 @@ public class PongEnvironment extends Player implements Environment {
 
 			numericSensor("(ball,padMine)", "below", "same", "above", n, () -> {
 
-						return pong.ball_y - (pong.player1.position + halfPaddle);
+				float delta = pong.ball_y - (pong.player1.position + halfPaddle);
+				return delta*delta*delta;
+				//return delta;
 					} , pri)
 		);
 
@@ -183,9 +185,9 @@ public class PongEnvironment extends Player implements Environment {
 
 	public static FuzzyConceptSet rawNumericSensor(String term, String low, String mid, String high, NAR n, float pri, FloatSupplier p) {
 		return new FuzzyConceptSet(p, n,
-				"(" + term + " --> " + low + ")",
-				"(" + term + " --> " + mid + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
+				"(" + term + " {-] " + low + ")",
+				"(" + term + " {-] " + mid + ")",
+				"(" + term + " {-] " + high +")").pri(pri).resolution(0.05f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);

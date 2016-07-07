@@ -102,7 +102,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             this.setBackground(Float.NaN, 0);
         }
 
-        float exp = 2f;
+        float exp = Global.TEMPORAL_MICROSPHERE_EXPONENT;
         float[] v = this.value(
                 ZERO, times,
                 freq, conf,
