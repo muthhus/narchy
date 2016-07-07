@@ -9,6 +9,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
+import nars.concept.table.BeliefTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -72,9 +72,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         return current.equals(t) ? current : null;
     }
 
-    @Nullable
     @Override
-    public Truth truth(long now, long when) {
+    public Truth truth(long when, long now) {
         @Nullable Task x = topTemporal(when, now, null);
         return x != null ? x.projectTruth(when, now, false) : null;
     }

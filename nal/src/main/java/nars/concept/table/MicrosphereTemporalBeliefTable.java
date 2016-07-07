@@ -11,9 +11,12 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
+import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -36,13 +39,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
     public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
-        //return rankTemporalByConfidenceAndOriginality(t, when, when, ageFactor, -1);
+        //return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
         return rankTemporalByConfidence(t, when, now, ageFactor, -1);
     }
 
     @Nullable
     @Override
-    public Task ready(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
 
         this.lastUpdate = nar.time();
 
@@ -99,6 +102,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         }
         return null;
     }
+
 
 
     private void invalidateRange() {
@@ -232,7 +236,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         float ac = a.confWeight();
         float bc = b.confWeight();
         long mid = (long) ((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
-        Truth truth = truth(mid, eternal);
+        Truth truth = truth(mid, now, eternal);
         if (truth == null)
             return null;
         return Revision.merge(a, b, now, mid, truth);
@@ -246,7 +250,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     @Nullable
     @Override
-    public Task top(long when, long now, Task against) {
+    public Task strongest(long when, long now, Task against) {
 
         //removeDeleted();
 
@@ -283,13 +287,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     @Nullable
     @Override
-    public final Truth truth(long when, @Nullable EternalTable eternal) {
+    public final Truth truth(long when, long now, @Nullable EternalTable eternal) {
         int s = size();
         switch (s) {
             case 0:
                 return null;
             case 1:
-                return get(0).truth();
+                return get(0).projectTruth(when, now, false);
             default:
                 return truthpolations.get().truth(when, list, eternal!=null ? eternal.top() : null);
         }
@@ -310,7 +314,21 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         return s;
     }
 
-//    public Task weakest(Task input, NAR nar) {
+    @Override
+    public final void removeIf(Predicate<Task> o) {
+        //TODO optimize, these iterators suck
+        List<Task> toRemove = Global.newArrayList(0);
+        for (Task x : this) {
+            if (o.test(x)) {
+                toRemove.add(x);
+            }
+        }
+        for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
+            remove(toRemove.get(i));
+        }
+    }
+
+    //    public Task weakest(Task input, NAR nar) {
 //
 //        //if (polation == null) {
 //            //force update for current time

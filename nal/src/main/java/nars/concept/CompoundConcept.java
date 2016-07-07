@@ -149,11 +149,23 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
     }
 
     protected BeliefTable newBeliefTable() {
-        return new DefaultBeliefTable(policy.beliefCap(this, true, true), policy.beliefCap(this, true, false));
+        int eCap = policy.beliefCap(this, true, true);
+        int tCap = policy.beliefCap(this, true, false);
+        return newBeliefTable(eCap, tCap);
+    }
+
+    protected BeliefTable newBeliefTable(int eCap, int tCap) {
+        return new DefaultBeliefTable(eCap, tCap);
     }
 
     protected BeliefTable newGoalTable() {
-        return new DefaultBeliefTable(policy.beliefCap(this, false, true), policy.beliefCap(this, false, false));
+        int eCap = policy.beliefCap(this, false, true);
+        int tCap = policy.beliefCap(this, false, false);
+        return newGoalTable(eCap, tCap);
+    }
+
+    protected BeliefTable newGoalTable(int eCap, int tCap) {
+        return new DefaultBeliefTable(eCap, tCap);
     }
 
     /**

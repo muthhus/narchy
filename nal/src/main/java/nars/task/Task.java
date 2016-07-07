@@ -695,8 +695,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    @NotNull
+    @Nullable
     default ProjectedTruth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
+
 
         Truth currentTruth = truth();
 
@@ -705,6 +706,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             return isEternal() ? new ProjectedTruth(currentTruth, ETERNAL) : eternalize(currentTruth);
 
         } else {
+
 
             long occ = occurrence();
             if (occ == targetTime)
@@ -728,8 +730,12 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 }
             }
 
+            if (nextConf < Global.TRUTH_EPSILON)
+                return null;
+
             return new ProjectedTruth(currentTruth.freq(), nextConf, nextOcc);
         }
+
     }
 
 //    final class ExpectationComparator implements Comparator<Task>, Serializable {

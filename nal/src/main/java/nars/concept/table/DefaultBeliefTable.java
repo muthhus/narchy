@@ -44,13 +44,16 @@ public class DefaultBeliefTable implements BeliefTable {
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new EternalTable(mp, initialEternalCapacity);
-        temporal = new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
+        temporal = newTemporalBeliefTable(mp, initialTemporalCapacity);
+    }
+
+    protected TemporalBeliefTable newTemporalBeliefTable(Map<Task, Task> mp, int initialTemporalCapacity) {
+        return new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
-    @Nullable
     @Override
-    public final Truth truth(long now, long when) {
+    public final Truth truth(long when, long now) {
 
         final Truth ee;
         synchronized (eternal) {
@@ -59,7 +62,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         final Truth tt;
         synchronized (temporal) {
-            tt = temporal.truth(when, eternal);
+            tt = temporal.truth(when, now, eternal);
         }
 
         if (tt!=null) {
@@ -146,7 +149,7 @@ public class DefaultBeliefTable implements BeliefTable {
         TemporalBeliefTable tt = temporal;
         if (!tt.isEmpty()) {
             synchronized (temporal) {
-                return tt.top(when, now, against);
+                return tt.strongest(when, now, against);
             }
         }
         return null;
@@ -258,11 +261,11 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull
     protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
-        input = temporal.ready(input, eternal, nar);
+        input = temporal.add(input, eternal, nar);
         if (input != null) {
-            //inserting this task.  should be successful
-            boolean ii = insert(input, temporal);
-            assert (ii);
+            boolean ii = insert(input, temporal); //inserting this task.  should be successful
+            if (!ii)
+                throw new RuntimeException("tasktable insert");
         }
 
         return input;

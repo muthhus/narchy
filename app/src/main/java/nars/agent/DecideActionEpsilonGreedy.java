@@ -10,13 +10,17 @@ import java.util.Random;
  */
 public class DecideActionEpsilonGreedy implements DecideAction {
 
-    float epsilonRandom = 0.01f; //0.01f;
+    float epsilonRandom; //0.01f;
 
     /*
     TODO - decaying epsilon:
             epsilonRandom *= epsilonRandomDecay;
             epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
      */
+
+    public DecideActionEpsilonGreedy(float epsilonRandom) {
+        this.epsilonRandom = epsilonRandom;
+    }
 
     int motivationOrder[];
 

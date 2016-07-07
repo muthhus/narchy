@@ -43,8 +43,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     private float z;
     int x, y, ox, oy;
 
-    float xySpeed = 0.02f;
-    float zoomSpeed = 0.01f;
+    float xySpeed = 0.03f;
+    float zoomSpeed = 0.005f;
 
 
     public NARCamera(String id, NAR nar, PixelCamera c, PixelToTerm pixelTerm) {
@@ -57,25 +57,25 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         controller.start(
                 Collections.emptyList(),
                 Lists.mutable.of(
-                        new MotorConcept("(" + id + ", (center))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_center)", nar, (b, d) -> {
                             //look(0, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", (up))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_up)", nar, (b, d) -> {
                             //look(0, -1, 0);
                         }),
-                        new MotorConcept("(" + id + ", (--,(up)))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_down)", nar, (b, d) -> {
                             //look(0, +1f, 0);
                         }),
-                        new MotorConcept("(" + id + ", (left))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_left)", nar, (b, d) -> {
                             //look(-1f, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", (--,(left)))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_right)", nar, (b, d) -> {
                             //look(+1f, 0, 0);
                         }),
-                        new MotorConcept("(" + id + ", (in))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_in)", nar, (b, d) -> {
                             //look(0, 0, +1f);
                         }),
-                        new MotorConcept("(" + id + ", (--,(in)))", nar, (b, d) -> {
+                        new MotorConcept("(" + id + "_out)", nar, (b, d) -> {
                             //look(0, 0, -1f);
                         })
 
@@ -116,8 +116,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
     public void look(float dx, float dy, float dz) {
 
-        dx *= xySpeed;
-        dy *= xySpeed;
+        dx *= xySpeed;// * z;
+        dy *= xySpeed;// * z;
         dz *= zoomSpeed;
 
         SwingCamera scam = (SwingCamera) this.cam;
@@ -127,10 +127,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         this.z += dz;
         this.z = Math.max(minZoom,Math.min(z,maxZoom));
 
-        this.x += Math.round(w * z * dx);
+        this.x += Math.round(w * dx);
         this.x = Math.max(0, Math.min(w, x));
 
-        this.y += Math.round(h * z * dy);
+        this.y += Math.round(h * dy);
         this.y = Math.max(0, Math.min(h, y));
 
 

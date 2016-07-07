@@ -112,7 +112,7 @@ public class BeliefTableTest  {
         }
         System.out.println();
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + b.concept().beliefs().truth(0, i  /* relative to zero */));
+            System.out.println(i + "\t" + b.concept().beliefs().truth(i, 0   /* relative to zero */));
         }
 
         /* first */ assertEquals(0, b.concept().beliefs().truth(0).freq(), 0.05f);

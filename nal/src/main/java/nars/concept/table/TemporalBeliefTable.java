@@ -6,14 +6,18 @@ import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
 /**
  * Created by me on 5/7/16.
  */
 public interface TemporalBeliefTable extends Table<Task,Task> {
 
-    @Nullable Task top(long when, long now, Task against);
+    @Nullable Task strongest(long when, long now, Task against);
 
-    @Nullable Truth truth(long when, EternalTable eternal);
+    @Nullable Truth truth(long when, long now, EternalTable eternal);
 
-    @Nullable Task ready(Task input, EternalTable eternal, NAR nar);
+    @Nullable Task add(Task input, EternalTable eternal, NAR nar);
+
+    void removeIf(Predicate<Task> o);
 }

@@ -13,6 +13,7 @@ import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -42,7 +43,7 @@ public class CameraTrack implements Environment {
     public CameraTrack(int sw, int sh, int width, int height, NAR nar) {
         this.scene = new JPanel() {
 
-            float rotationspeed = 0; //1f/250;
+            float rotationspeed = 1f/250;
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(Color.BLACK);
@@ -53,10 +54,11 @@ public class CameraTrack implements Environment {
                 float theta = nar.time() * rotationspeed;
                 float r = sw/3f;
 
-                g.setColor(Color.GREEN);    circle(g, r, theta, (int)r);
-                g.setColor(Color.GREEN);  circle(g, r, theta + 1 * Math.PI/2f, (int)r);
-                g.setColor(Color.BLUE);   circle(g, r, theta + 2 * Math.PI/2f, (int)r);
-                g.setColor(Color.GREEN); circle(g, r, theta + 3 * Math.PI/2f, (int)r);
+
+                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));    circle(g, r, theta, (int)r);
+                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));  circle(g, r, theta + 1 * Math.PI/2f, (int)r);
+                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));   circle(g, r, theta + 2 * Math.PI/2f, (int)r);
+                g.setColor(new Color(0, 0, 255+nar.random.nextInt(1))); circle(g, r, theta + 3 * Math.PI/2f, (int)r);
             }
 
             public void circle(Graphics g, int x, int y, int r) {
@@ -101,8 +103,8 @@ public class CameraTrack implements Environment {
         sensors = Global.newHashMap(width*height*3);
 
         this.cam = new NARCamera(getClass().getSimpleName(), nar, swingCam,
-                //(x, y) -> $.p($.the(x), $.the(y))
-                (x, y) -> NARCamera.quadp(0, x, y, width, height)
+                (x, y) -> $.p($.the(x), $.the(y))
+                //(x, y) -> NARCamera.quadp(0, x, y, width, height)
         );
         cam.input(0,0,sw,sh);
         swingCam.output(width,height);
@@ -150,13 +152,13 @@ public class CameraTrack implements Environment {
 
         Iterables.addAll( charted, Iterables.concat(
             PongEnvironment.numericSensor("reddish", "low", "high", nar,
-                    () -> (float)Math.sqrt(rt.floatValue()),
+                    () -> (float)/*Math.sqrt*/(rt.floatValue()),
                     0.9f).resolution(0.05f),
             PongEnvironment.numericSensor("greenness", "low", "high", nar,
-                    () -> (float)Math.sqrt(gt.floatValue()),
+                    () -> (float)/*Math.sqrt*/(gt.floatValue()),
                     0.9f).resolution(0.05f),
             PongEnvironment.numericSensor("blueness", "low", "high", nar,
-                    () -> (float)Math.sqrt(bt.floatValue()),
+                    () -> (float)/*Math.sqrt*/(bt.floatValue()),
                     0.9f).resolution(0.05f)
         ));
 
@@ -173,7 +175,7 @@ public class CameraTrack implements Environment {
                 bt.add(b);
             });
 
-            cam.controller.act(bt.floatValue() - rt.floatValue() - gt.floatValue(), (float[])null);
+            cam.controller.act(bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f), (float[])null);
         });
 
 
@@ -220,14 +222,16 @@ public class CameraTrack implements Environment {
     }
 
     public static void main(String[] args) {
-        Default nar = new Default();
+        Default nar = new Default(1024, 8, 2, 2);
         nar.cyclesPerFrame.set(32);
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.65f);
-        nar.confMin.setValue(0.3f);
-        nar.conceptActivation.setValue(0.1f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
+        nar.confMin.setValue(0.02f);
+        nar.conceptActivation.setValue(0.02f);
 
-        new CameraTrack(256, 256, 16,16, nar);
+        new MySTMClustered(nar, 8, '.', 2);
+
+        new CameraTrack(256, 256, 6,6, nar);
 
         BagChart.show((Default) nar, 32);
 

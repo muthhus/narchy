@@ -9,6 +9,7 @@ import nars.Narsese;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.CompoundConcept;
+import nars.concept.table.BeliefTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -85,6 +86,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     }
 
 
+
+//    @Override
+//    protected BeliefTable newGoalTable(int eCap, int tCap) {
+//        return new SensorBeliefTable(eCap, tCap);
+//    }
 
     /** called when a conflicting belief has attempted to be processed */
     protected void onConflict(@NotNull Task belief) {

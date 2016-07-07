@@ -88,8 +88,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.7f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;

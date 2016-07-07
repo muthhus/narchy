@@ -113,6 +113,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final Collection<Object> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
+
     public NAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, rng, index);
 
@@ -1233,4 +1234,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 process(t, activation);
         }
     }
+
+    public final Predicate<@NotNull Task> taskPast = (Task t) -> {
+        long o = t.occurrence();
+        return o !=Tense.ETERNAL && o < time();
+    };
+    public final Predicate<@NotNull Task> taskFuture = (Task t) -> {
+        long o = t.occurrence();
+        return o !=Tense.ETERNAL && o > time();
+    };
 }

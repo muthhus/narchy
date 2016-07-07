@@ -30,14 +30,10 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(float f, float c) {
-        this(f, c, Global.TRUTH_EPSILON, hashDiscreteness);
+        this(f, c, Global.TRUTH_EPSILON);
     }
 
     public DefaultTruth(float f, float c, float epsilon) {
-        this(f, c, Global.TRUTH_EPSILON, (int)(1f/epsilon));
-    }
-
-    public DefaultTruth(float f, float c, float epsilon, int discreteness) {
 
         //assert(Float.isFinite(f) && Float.isFinite(c));
 

@@ -153,8 +153,8 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.4f)
-            //new DecideActionEpsilonGreedy()
+            new DecideActionSoftmax(0.2f)
+            //new DecideActionEpsilonGreedy(0.05f)
         );
     }
 
@@ -311,8 +311,8 @@ public class NAgent implements Agent {
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
         return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar,
-                //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.1f);
-                "(sad)", "(happy)").resolution(0.05f);
+                "(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
+                //"(sad)", "(happy)").resolution(0.02f);
     }
 
     public void setSensorNamer(IntFunction<Compound> sensorNamer) {

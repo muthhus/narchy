@@ -34,6 +34,8 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         return new ArrayIterator(items.array(), 0, items.size());
     }
 
+
+
     static class ArrayIterator<E> implements ListIterator<E> {
         private final E[] array;
         private final int size;

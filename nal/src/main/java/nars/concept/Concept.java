@@ -84,12 +84,12 @@ public interface Concept<T extends Term> extends Termed<T> {
 
     @Nullable
     default Truth belief(long when, long now) {
-        return hasBeliefs() ? beliefs().truth(now, when) : null;
+        return hasBeliefs() ? beliefs().truth(when, now) : null;
     }
 
     @Nullable
     default Truth desire(long when, long now) {
-        return hasGoals() ? goals().truth(now, when) : null;
+        return hasGoals() ? goals().truth(when, now) : null;
     }
 
     @Nullable
@@ -147,7 +147,7 @@ public interface Concept<T extends Term> extends Termed<T> {
     default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
         long now = nar.time();
         return Revision.merge(x, y, now, when,
-                ((BeliefTable)tableFor(y.punc())).truth(now, when)
+                ((BeliefTable)tableFor(y.punc())).truth(when, now)
         );
     }
 
