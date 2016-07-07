@@ -71,7 +71,6 @@ public class PremiseEval extends FindSubst {
     public Task task, belief;
     public char taskPunct;
 
-    public boolean taskInverted, beliefInverted;
 
 
     /** initializes with the default static term index/builder */
@@ -202,21 +201,22 @@ public class PremiseEval extends FindSubst {
         this.taskTruth = task.truth();
         this.beliefTruth = belief != null ? belief.truth() : null;
 
-        //normalize to positive truth
-        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
-            this.taskInverted = true;
-            this.taskTruth = this.taskTruth.negated();
-        } else {
-            this.taskInverted = false;
-        }
+//        //normalize to positive truth
+//        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
+//            this.taskInverted = true;
+//            this.taskTruth = this.taskTruth.negated();
+//        } else {
+//            this.taskInverted = false;
+//        }
+//
+//        //normalize to positive truth
+//        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
+//            this.beliefInverted = true;
+//            this.beliefTruth = this.beliefTruth.negated();
+//        } else {
+//            this.beliefInverted = false;
+//        }
 
-        //normalize to positive truth
-        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
-            this.beliefInverted = true;
-            this.beliefTruth = this.beliefTruth.negated();
-        } else {
-            this.beliefInverted = false;
-        }
         this.beliefTerm = p.beliefTerm().term();
         this.taskTerm = tt;
 

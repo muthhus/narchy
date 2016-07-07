@@ -17,8 +17,8 @@ public class PongModel extends JPanel implements ActionListener, MouseListener, 
 
 	// Proprietà dei carrelli
 	public static final int SPEED = 15; // Velocità dei carrelli
-	public static final int PADDLE_HEIGHT = 40; // SEMI-altezza del carrello
-	public static final int WIDTH = 20;
+	public static final int PADDLE_HEIGHT = 60; // SEMI-altezza del carrello
+	public static final int WIDTH = 15;
 	private static final int TOLERANCE = 5;
 	private static final int PADDING = 0;
 

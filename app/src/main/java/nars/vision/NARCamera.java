@@ -1,6 +1,7 @@
 package nars.vision;
 
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
+import com.gs.collections.api.block.predicate.primitive.IntIntPredicate;
 import com.gs.collections.impl.factory.Lists;
 import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import com.jogamp.opengl.GL2;
@@ -22,6 +23,8 @@ import spacegraph.Surface;
 import spacegraph.render.ShapeDrawer;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static nars.nal.UtilityFunctions.w2c;
 
@@ -30,7 +33,7 @@ import static nars.nal.UtilityFunctions.w2c;
  */
 public class NARCamera implements PixelCamera.PerPixelRGB {
 
-    public static final float minZoom = 0.25f;
+    public static final float minZoom = 0.35f;
     public static final float maxZoom = 0.8f;
 
     public final NAgent controller;
@@ -143,7 +146,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //float reward = 0.5f * (controller.happy.get() - controller.sad.get());
             float sadness = 1f - controller.happy.get();
-            float alpha = 0.5f;
+            float alpha = 0.8f;
             int mm = 0;
             for (MotorConcept m : controller.actions) {
                 if (Math.random() < sadness) {
@@ -155,7 +158,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
                                     m, nar.time()+1,
                                     (float)Math.random(),
                                     //Util.clamp(desire(mm, nar.time()) + dx * (float) Math.random()), //offset current value by something
-                            0.02f + alpha*sadness*0.55f);
+                            0.15f + alpha*sadness*0.55f);
                     //0.1f + sadness * (float)Math.random() * 0.8f);
 
                 }
@@ -203,6 +206,18 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     public float blue(int x, int y) {
         return ((SwingCamera) cam).blue(x, y);
     }
+    public float blue(IntIntPredicate select) {
+        final float[] blueTotal = {0};
+        final int[] num = {0};
+        SwingCamera c = ((SwingCamera) cam);
+        c.updateBuffered((x,y,r,g,b,a)-> {
+            if (select.accept(x, y)) {
+                blueTotal[0] += b;
+                num[0]++;
+            }
+        });
+        return blueTotal[0] / num[0];
+    }
 
     public void look(float dx, float dy, float dz) {
 
@@ -247,6 +262,14 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         SwingCamera scam = (SwingCamera) this.cam;
         scam.input(x, y, w, h);
         scam.update();
+    }
+
+    public Term snapshot() {
+        Set<Term> s = new HashSet();
+        ((SwingCamera)cam).updateBuffered((x, y, r, g, b, a)->{
+            s.add( $.p(p(x,y).term(), (b > 0.5f ? $.the("b") : $.the("x")) ) ); //HACK this only does blue plane
+        });
+        return $.sete(s);
     }
 
     public interface PerPixel {

@@ -49,7 +49,7 @@ public class CameraTrack implements Environment {
         this.nar = nar;
         this.scene = new JPanel() {
 
-            float rotationspeed = 0; // 1f/150;
+            float rotationspeed = 1f/150;
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(Color.BLACK);
@@ -144,17 +144,35 @@ public class CameraTrack implements Environment {
         });
         //nar.logSummaryGT(System.out, 0.2f);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                final int xx = x;
-                final int yy = y;
-                Compound t = (Compound) cam.p(x,y).term();
+//        for (int x = 0; x < width; x++) {
+//            for (int y = 0; y < height; y++) {
+//                final int xx = x;
+//                final int yy = y;
+//                Compound t = (Compound) cam.p(x,y).term();
+//
+//                //addSensor(nar, sensors, t, $.the("red"), () -> thresh(cam.red(xx, yy)));
+//                //addSensor(nar, sensors, t, $.the("gre"), () -> thresh(cam.green(xx, yy)));
+//                addSensor(nar, sensors, t, $.the("blu"), () -> thresh(cam.blue(xx, yy)));
+//            }
+//        }
 
-                //addSensor(nar, sensors, t, $.the("red"), () -> thresh(cam.red(xx, yy)));
-                //addSensor(nar, sensors, t, $.the("gre"), () -> thresh(cam.green(xx, yy)));
-                addSensor(nar, sensors, t, $.the("blu"), () -> thresh(cam.blue(xx, yy)));
-            }
-        }
+//        nar.onFrame(nn-> {
+//            nar.believe((Compound)$.sim($.p($.the("frame"), $.the(""+nar.time())), cam.snapshot()), Tense.Present, 1f, 0.99f);
+//        });
+
+        nar.onFrame(nn-> {
+
+
+
+            nar.believe($.prop($.the("topHalf"), $.the("blu")), Tense.Present,
+                    0.5f + 0.5f * cam.blue((x,y)->y<cam.cam.height()), 0.95f);
+            nar.believe($.prop($.the("botHalf"), $.the("blu")), Tense.Present,
+                    0.5f + 0.5f * cam.blue((x,y)->y>cam.cam.height()), 0.95f);
+            nar.believe($.prop($.the("leftHalf"), $.the("blu")), Tense.Present,
+                    0.5f + 0.5f * cam.blue((x,y)->x<cam.cam.width()), 0.95f);
+            nar.believe($.prop($.the("rightHalf"), $.the("blu")), Tense.Present,
+                    0.5f + 0.5f * cam.blue((x,y)->x>cam.cam.width()), 0.95f);
+        });
 
         MutableFloat rt = new MutableFloat(), gt = new MutableFloat(), bt = new MutableFloat();
 
@@ -218,11 +236,11 @@ public class CameraTrack implements Environment {
         charted.addAll(cam.controller.actions);
 
         Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.x, nar,0.5f,
-                "(camx --> low)", "(camx --> mid)", "(camx --> high)").resolution(0.2f));
+                "(camx --> [low])", "(camx --> [mid])", "(camx --> [high])").resolution(0.05f));
         Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.y, nar,0.5f,
-                "(camy --> low)", "(camy --> mid)", "(camy --> high)").resolution(0.2f));
-        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.59f,
-                "(camz --> low)", "(camz --> mid)", "(camz --> high)").resolution(0.2f));
+                "(camy --> [low])", "(camy --> [mid])", "(camy --> [high])").resolution(0.05f));
+        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.5f,
+                "(camz --> [low])", "(camz --> [mid])", "(camz --> [high])").resolution(0.05f));
 
 //            charted.add(nar.ask($.$("(?x-->red)").term()));
 //            charted.add(nar.ask($.$("(?x<->g)").term()));
@@ -249,7 +267,7 @@ public class CameraTrack implements Environment {
     }
 
     public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
-        Compound tr = $.inh(t.term(), componentTerm);
+        Compound tr = $.instprop(t.term(), componentTerm);
         sensors.put(tr, new SensorConcept( tr, nar,
                 component,
                 f -> {
@@ -274,18 +292,20 @@ public class CameraTrack implements Environment {
 
     public static void main(String[] args) {
         Default nar = new Default(1024, 4, 2, 2);
-        nar.cyclesPerFrame.set(16);
+        nar.cyclesPerFrame.set(64);
         nar.beliefConfidence(0.7f);
         nar.goalConfidence(0.7f);
-        nar.confMin.setValue(0.01f);
-        nar.conceptActivation.setValue(0.01f);
+        nar.confMin.setValue(0.3f);
+        nar.conceptActivation.setValue(0.1f);
 
-        new MySTMClustered(nar, 16, '.', 4);
+        //new MySTMClustered(nar, 16, '.', 4);
 
-        new CameraTrack(256, 256, 7, 7, nar);
+        new CameraTrack(256, 256, 8, 8, nar);
 
+        Global.DEBUG = true;
+        //nar.log();
 
-        nar.run(1500);
+        nar.run(16512);
 
         NAR.printTasks(nar,false);
         //nar.loop(50f);

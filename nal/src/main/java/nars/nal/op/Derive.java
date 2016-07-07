@@ -17,6 +17,7 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -107,36 +108,45 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     public final void accept(@NotNull PremiseEval m) {
 
         Term cp = this.conclusionPattern;
-        boolean tInverted = m.taskInverted, bInverted = m.beliefInverted;
 
-        if (m.taskInverted || m.beliefInverted) {
+        Truth taskTruth = m.taskTruth, beliefTruth = m.beliefTruth;
 
-            boolean atomicConclusion = cp.op().atomic;
-            if (!atomicConclusion && m.taskInverted) {
-                Map<Term,Term> cc = new HashMap();
-                cc.put(this.rule.getTask(), $.neg(this.rule.getTask()));
+        char punct = m.punct.get();
+
+
+        if (!cp.op().atomic && (punct!=Symbols.QUEST && punct!=Symbols.QUESTION)) {
+
+            if (taskTruth != null && taskTruth.isNegative()) {
+                Map<Term, Term> cc = new HashMap();
+                Term taskPattern = this.rule.getTask();
+                cc.put(taskPattern, $.neg(taskPattern));
                 Term ccp = $.terms.remap(cp, cc);
                 if (!ccp.equals(cp)) {
-                    tInverted = false; //inversion applied as the subterm
+                    taskTruth = taskTruth.negated();
                     cp = ccp;
                 }
             }
-            if (!atomicConclusion && m.beliefInverted) {
-                Map<Term,Term> cc = new HashMap();
-                cc.put(this.rule.getBelief(), $.neg(this.rule.getBelief()));
+
+            if (beliefTruth != null && beliefTruth.isNegative()) {
+
+                Map<Term, Term> cc = new HashMap();
+                @NotNull Term beliefPattern = this.rule.getBelief();
+                cc.put(beliefPattern, $.neg(beliefPattern));
                 Term ccp = $.terms.remap(cp, cc);
                 if (!ccp.equals(cp)) {
-                    bInverted = false; //inversion applied as the subterm
+                    beliefTruth = beliefTruth.negated();
                     cp = ccp;
                 }
 
             }
+
+
         }
 
         Term r = m.index.resolve(cp, m);
         if (r instanceof Compound) { //includes null test
 
-            char c = m.punct.get();
+            char c = punct;
             TruthOperator f;
             if (c == Symbols.BELIEF)
                 f = belief;
@@ -148,11 +158,12 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             Truth t = (f == null) ?
                 null :
                 f.apply(
-                     !tInverted ? m.taskTruth : m.taskTruth.negated(), //uninvert the truths if necessary
-                     !bInverted ? m.beliefTruth : m.beliefTruth.negated(), //uninvert the truths if necessary
+                     taskTruth,
+                     beliefTruth,
                      m.nar,
                      m.confMin
                     );
+
 
             if (f==null || t!=null)
                 derive(m, (Compound)r, t);
