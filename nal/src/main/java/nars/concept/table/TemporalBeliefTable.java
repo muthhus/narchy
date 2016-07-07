@@ -20,4 +20,10 @@ public interface TemporalBeliefTable extends Table<Task,Task> {
     @Nullable Task add(Task input, EternalTable eternal, NAR nar);
 
     void removeIf(Predicate<Task> o);
+
+    public long min();
+    public long max();
+
+    void min(long minT);
+    void max(long maxT);
 }

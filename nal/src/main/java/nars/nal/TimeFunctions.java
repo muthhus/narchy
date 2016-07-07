@@ -590,7 +590,11 @@ public interface TimeFunctions {
         Task task = premise.task();
         Task belief = premise.belief();
 
-        long occ = premise.occurrenceTarget((t, b) -> t); //reset
+        long occ = premise.occurrenceTarget((t, b) -> {
+            if ((belief!=null) && (!belief.isEternal()))
+                return b;
+            return t;
+        }); //reset
 
         Compound tt = (Compound) $.pos(p.taskTerm);
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;

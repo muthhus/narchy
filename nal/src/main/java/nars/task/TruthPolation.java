@@ -50,7 +50,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float maxDarkFraction = 1 - (0.5f / (1f + tasks.size()));
+        float maxDarkFraction = 1 - Global.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
 
         float thresh = Global.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
         if (topEternal == null) {

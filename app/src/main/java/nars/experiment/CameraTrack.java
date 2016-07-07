@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
+import static nars.Op.INH;
+
 /**
  * Created by me on 7/5/16.
  */
@@ -43,11 +45,21 @@ public class CameraTrack implements Environment {
     public CameraTrack(int sw, int sh, int width, int height, NAR nar) {
         this.scene = new JPanel() {
 
-            float rotationspeed = 1f/250;
+            float rotationspeed = 1f/150;
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(Color.BLACK);
                 g.fillRect(0, 0, sw, sh);
+
+                //background pattern
+                g.setColor(new Color(20,20,20));
+                int gr = 16;
+                for (int i = 0; i < sw; i+=gr) {
+                    for (int j = 0; j < sh; j+=gr) {
+                        g.fillRect(i, j, gr/2, gr/2);
+                    }
+                }
+
 //                g.setColor(Color.DARK_GRAY);
 //                circle(g, sw / 2, sh / 2, sw / 4);
 
@@ -55,9 +67,9 @@ public class CameraTrack implements Environment {
                 float r = sw/3f;
 
 
-                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));    circle(g, r, theta, (int)r);
-                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));  circle(g, r, theta + 1 * Math.PI/2f, (int)r);
-                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));   circle(g, r, theta + 2 * Math.PI/2f, (int)r);
+//                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));    circle(g, r, theta, (int)r);
+//                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));  circle(g, r, theta + 1 * Math.PI/2f, (int)r);
+//                g.setColor(new Color(0, 255+nar.random.nextInt(1),0));   circle(g, r, theta + 2 * Math.PI/2f, (int)r);
                 g.setColor(new Color(0, 0, 255+nar.random.nextInt(1))); circle(g, r, theta + 3 * Math.PI/2f, (int)r);
             }
 
@@ -76,13 +88,14 @@ public class CameraTrack implements Environment {
         JPanel overlay = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-                g.setColor(Color.WHITE);
 
 
                 if (null!=cam)
                     if (null!=((SwingCamera)cam.cam)) {
+                        float reward = cam.controller.reward;
+                        g.setColor(Color.getHSBColor(cam.controller.happy.beliefs().expectation(nar.time()), 0.5f, 0.5f));
                         Rectangle r = ((SwingCamera) cam.cam).input;
-                        g.drawRect(r.x, r.y, r.width, r.height);
+                        g.drawRect(r.x-1, r.y-1, r.width+1, r.height+1);
                     }
             }
 
@@ -95,7 +108,7 @@ public class CameraTrack implements Environment {
         win.setContentPane(scene);
         win.setSize(sw, sh);
         win.setVisible(true);
-
+        win.setResizable(false);
 
 
         SwingCamera swingCam = new SwingCamera(scene);
@@ -111,15 +124,20 @@ public class CameraTrack implements Environment {
         NARCamera.newWindow(cam);
 
 
-        //nar.logSummaryGT(System.out, 0.5f);
+        nar.logSummaryGT(System.out, 0.75f);
+
         Global.DEBUG = true;
-//        nar.onTask(tt -> {
-//            //detect eternal derivations
+        nar.onTask(tt -> {
+            //detect eternal derivations
 //            if (!tt.isInput() && tt.isEternal() && tt.isBelief())
 //                System.err.println(tt.proof());
-//            /*if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
-//                System.err.println(tt.proof());*/
-//        });
+            if (!tt.isInput() && tt.isGoal()) {
+                if (tt.term().op()==INH && tt.term().term(1).op()==Op.OPER)
+                    System.err.println(tt.proof());
+            }
+            /*if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
+                System.err.println(tt.proof());*/
+        });
         //nar.logSummaryGT(System.out, 0.2f);
 
         for (int x = 0; x < width; x++) {
@@ -139,7 +157,7 @@ public class CameraTrack implements Environment {
 
 
 //        {
-//            BagChart.show((Default) nar);
+            BagChart.show((Default) nar);
 //        }
 
         java.util.List<Termed> charted = new ArrayList();
@@ -151,16 +169,18 @@ public class CameraTrack implements Environment {
 //        charted.add($.$("(#x-->[gre])"));
 
         Iterables.addAll( charted, Iterables.concat(
-            PongEnvironment.numericSensor("reddish", "low", "high", nar,
-                    () -> (float)/*Math.sqrt*/(rt.floatValue()),
-                    0.9f).resolution(0.05f),
-            PongEnvironment.numericSensor("greenness", "low", "high", nar,
-                    () -> (float)/*Math.sqrt*/(gt.floatValue()),
-                    0.9f).resolution(0.05f),
+//            PongEnvironment.numericSensor("reddish", "low", "high", nar,
+//                    () -> (float)/*Math.sqrt*/(rt.floatValue()),
+//                    0.9f).resolution(0.05f),
+//            PongEnvironment.numericSensor("greenness", "low", "high", nar,
+//                    () -> (float)/*Math.sqrt*/(gt.floatValue()),
+//                    0.9f).resolution(0.05f),
             PongEnvironment.numericSensor("blueness", "low", "high", nar,
                     () -> (float)/*Math.sqrt*/(bt.floatValue()),
                     0.9f).resolution(0.05f)
         ));
+        nar.goal("(blueness-->low)", Tense.Eternal, 0f, 1f);
+        nar.goal("(blueness-->high)", Tense.Eternal, 1f, 1f);
 
         nar.onFrame(nn-> {
             scene.repaint();
@@ -175,7 +195,9 @@ public class CameraTrack implements Environment {
                 bt.add(b);
             });
 
-            cam.controller.act(bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f), (float[])null);
+            cam.controller.reward = bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f);
+
+            //cam.controller.act(bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f), (float[])null);
         });
 
 
@@ -187,23 +209,30 @@ public class CameraTrack implements Environment {
         //charted.add(nar.goal($.$("(#x-->[green])"), Tense.Eternal, 0f, 0.95f).term());
 //        charted.add(nar.ask($.$("(#x-->blu)")));
 
-        Iterables.addAll(charted, cam.controller.rewardConcepts);
+        //Iterables.addAll(charted, cam.controller.rewardConcepts);
         charted.addAll(cam.controller.actions);
+
+        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.x, nar,0.9f, "(camx --> low)", "(camx --> mid)", "(camx --> high)"));
+        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.y, nar,0.9f, "(camy --> low)", "(camy --> mid)", "(camy --> high)"));
+        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.9f, "(camz --> low)", "(camz --> mid)", "(camz --> high)"));
 
 //            charted.add(nar.ask($.$("(?x-->red)").term()));
 //            charted.add(nar.ask($.$("(?x<->g)").term()));
 //            charted.add(nar.ask($.$("(?x<->b)").term()));
 
-        new BeliefTableChart(nar, charted).show(600, 900);
+        new BeliefTableChart(nar, charted)
+                .timeRadius(400)
+                .show(600, 900)
+        ;
     }
 
     public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
-        Compound tr = $.instprop(t.term(), componentTerm);
+        Compound tr = $.inh(t.term(), componentTerm);
         sensors.put(tr, new SensorConcept( tr, nar,
                 component,
                 f -> {
-                    return $.t((float)Math.sqrt(f), 0.95f);
-                }).resolution(0.2f).pri(0.04f));
+                    return $.t(f, 0.95f);
+                }).resolution(0.2f).pri(0.05f));
     }
 
     @Override
@@ -222,18 +251,17 @@ public class CameraTrack implements Environment {
     }
 
     public static void main(String[] args) {
-        Default nar = new Default(1024, 8, 2, 2);
-        nar.cyclesPerFrame.set(32);
+        Default nar = new Default(1024, 4, 2, 2);
+        nar.cyclesPerFrame.set(16);
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
-        nar.confMin.setValue(0.02f);
-        nar.conceptActivation.setValue(0.02f);
+        nar.confMin.setValue(0.05f);
+        nar.conceptActivation.setValue(0.05f);
 
-        new MySTMClustered(nar, 8, '.', 2);
+        new MySTMClustered(nar, 16, '.', 3);
 
-        new CameraTrack(256, 256, 6,6, nar);
+        new CameraTrack(256, 256, 5, 5, nar);
 
-        BagChart.show((Default) nar, 32);
 
         nar.run(15000);
         //nar.loop(50f);

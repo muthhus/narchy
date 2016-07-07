@@ -3,10 +3,7 @@ package nars.util.signal;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.procedure.primitive.FloatFloatProcedure;
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -87,7 +84,10 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         //this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
-        feedback = new Sensor(n, this, this) {
+        feedback = new Sensor(n, this, this,
+                //(v) -> $.t(1f, v * n.confidenceDefault(Symbols.BELIEF)
+                (v) -> $.t(v, n.confidenceDefault(Symbols.BELIEF)
+                )) {
 
             @Override
             protected int dt() {
@@ -182,9 +182,9 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+motorDT);
-        float desired = d!=null ? d.motivation() : 0f;
+        float desired = d!=null ? d.expectation() : 0f;
         @Nullable Truth b = this.belief(now+motorDT);
-        float believed = b!=null ? b.motivation() : 0f;
+        float believed = b!=null ? b.expectation() : 0f;
 
         float response = motor.motor(believed, desired);
 

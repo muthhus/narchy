@@ -78,6 +78,15 @@ public enum DesireFunction implements TruthOperator {
         }
     },
 
+    @SinglePremise
+    @AllowOverlap
+    StructuralDeduction() {
+        @NotNull
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+            return T != null ? TruthFunctions.deduction1(T, defaultTruth(m).conf(), minConf) : null;
+        }
+    },
+
 //    @AllowOverlap @SinglePremise
 //    StructuralStrongNeg() {
 //        @Nullable

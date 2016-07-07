@@ -78,6 +78,26 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         return input;
     }
 
+    @Override
+    public void min(long minT) {
+        this.min = minT;
+    }
+
+    @Override
+    public void max(long maxT) {
+        this.max = maxT;
+    }
+
+    @Override
+    public long min() {
+        if (min == Tense.ETERNAL) ageFactor();
+        return min;
+    }
+    @Override
+    public long max() {
+        if (max == Tense.ETERNAL) ageFactor();
+        return max;
+    }
 
     @Nullable
     @Override

@@ -8,7 +8,6 @@ package nars.experiment.pong;/*
 import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.concept.Concept;
@@ -21,9 +20,6 @@ import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Terms;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.math.FloatSupplier;
@@ -164,7 +160,14 @@ public class PongEnvironment extends Player implements Environment {
 		return Iterables.concat(
 			numericSensor("ball", "left", "midX", "right", n, () -> pong.ball_x, pri),
 
-			numericSensor("ball", "bottom", "midY","top", n, () -> pong.ball_y, pri),
+			numericSensor(() -> pong.ball_y, n, pri,
+				"(y --> bottom)",
+				"(y --> bottommid)",
+				"(y --> midy)",
+				"(y --> topmid)",
+				"(y --> top)"
+			),
+
 			numericSensor("padMine", "bottom", "midY", "top", n, () -> pong.player1.position+halfPaddle, pri),
 			numericSensor("padTheirs","bottom", "midY", "top", n, () -> pong.player2.position+halfPaddle, pri),
 
@@ -180,14 +183,30 @@ public class PongEnvironment extends Player implements Environment {
 
 	public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 		PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
-		return rawNumericSensor(term, low, mid, high, n, pri, p);
+		return rawNumericSensor(term, p, n, pri, low, mid, high);
 	}
 
-	public static FuzzyConceptSet rawNumericSensor(String term, String low, String mid, String high, NAR n, float pri, FloatSupplier p) {
+	public static FuzzyConceptSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
+		return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+//				"(" + term + " , " + low + ")",
+//				"(" + term + " , " + mid + ")",
+//				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
+
+	}
+	public static FuzzyConceptSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
+		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+		return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+//				"(" + term + " , " + low + ")",
+//				"(" + term + " , " + mid + ")",
+//				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
+
+	}
+
+	public static FuzzyConceptSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
 		return new FuzzyConceptSet(p, n,
-				"(" + term + " {-] " + low + ")",
-				"(" + term + " {-] " + mid + ")",
-				"(" + term + " {-] " + high +")").pri(pri).resolution(0.05f);
+				"(" + term + " --> " + low + ")",
+				"(" + term + " --> " + mid + ")",
+				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
@@ -200,7 +219,7 @@ public class PongEnvironment extends Player implements Environment {
 	}
 	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
 		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-		return rawNumericSensor(term, low, mid, high, n, pri, p);
+		return rawNumericSensor(term, p, n, pri, low, mid, high);
 	}
 	public static FuzzyConceptSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
 		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
@@ -249,17 +268,7 @@ public class PongEnvironment extends Player implements Environment {
 		List<Concept> charted = new ArrayList(a.actions);
 		Iterables.addAll(charted, a.rewardConcepts);
 		charted.addAll(additional);
-		new BeliefTableChart(a.nar, charted)
-				.time((now, range) -> {
-					long low = range[0];
-					long high = range[1];
-					long nowRadius = 450;
-					if (now - low > nowRadius)
-						low  = now-nowRadius;
-					if (high - now > nowRadius)
-						high = now + nowRadius;
-					return new long[]{low,high};
-				}).show(400, 100);
+		new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 100);
 	}
 
 	@Override

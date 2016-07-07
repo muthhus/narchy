@@ -799,4 +799,9 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return delete();
     }
 
+    default boolean temporal() {
+        return occurrence()!=ETERNAL;
+    }
+
+
 }

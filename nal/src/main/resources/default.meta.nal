@@ -70,7 +70,7 @@
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Desire:Strong, Derive:AllowBackward)
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
@@ -80,27 +80,27 @@
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward)
-    (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward)
+    (P --> M), (S --> M), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
+    (M --> P), (M --> S), neq(S,P) |- (S <-> P), (Belief:Comparison, Desire:Weak, Derive:AllowBackward, Derive:NoSwap)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
     (M --> P), (S <-> M), neq(S,P) |- (S --> P), (Belief:Analogy, Desire:Strong, Derive:AllowBackward)
     (P --> M), (S <-> M), neq(S,P) |- (P --> S), (Belief:Analogy, Desire:Strong, Derive:AllowBackward)
-    (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Desire:Strong, Derive:AllowBackward)
+    (M <-> P), (S <-> M), neq(S,P) |- (S <-> P), (Belief:Resemblance, Desire:Strong, Derive:AllowBackward, Derive:NoSwap)
 
-//// inheritance-based composition ////////////////////////////////////////////////////////////////////////////////////
+//// inheritance composition ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are in the intension/extension of M, then union/difference and intersection can be built:
 
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Desire:Intersection)
-    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Desire:Intersection, Derive:NoSwap)
+    (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S & P) --> M), (Belief:Union, Derive:NoSwap)
     (P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Desire:Intersection)
-    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P & S)), (Belief:Intersection, Desire:Intersection, Derive:NoSwap)
+    (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P | S)), (Belief:Union, Derive:NoSwap)
     (M --> P), (M --> S), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- (M --> (P - S)), (Belief:Difference)
 
-//// inheritance-based decomposition ////////////////////////////////////////////////////////////////////////////////////
+//// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
          (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
@@ -125,27 +125,27 @@
 
 //(C --> A), (C --> B), set_ext(A), union(A,B,R) |- (C --> R), (Truth:Union)
 //(C --> A), (C --> B), set_ext(A), intersection(A,B,R) |- (C --> R), (Truth:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union, Derive:NoSwap)
+    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection, Derive:NoSwap)
+    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference, Derive:NoSwap)
 
 //(C --> A), (C --> B), set_int(A), union(A,B,R) |- (C --> R), (Truth:Intersection)
 //(C --> A), (C --> B), set_int(A), intersection(A,B,R) |- (C --> R), (Truth:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection, Derive:NoSwap)
+    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union, Derive:NoSwap)
+    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference, Derive:NoSwap)
 
 //(A --> C), (B --> C), set_ext(A), union(A,B,R) |- (R --> C), (Truth:Intersection)
 //(A --> C), (B --> C), set_ext(A), intersection(A,B,R) |- (R --> C), (Truth:Union)
-    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union, Derive:NoSwap)
+    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection, Derive:NoSwap)
+    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference, Derive:NoSwap)
 
 //(A --> C), (B --> C), set_int(A), union(A,B,R) |- (R --> C), (Truth:Union)
 //(A --> C), (B --> C), set_int(A), intersection(A,B,R) |- (R --> C), (Truth:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union, Derive:NoSwap)
+    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection, Derive:NoSwap)
+    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference, Derive:NoSwap)
 
 //Set element takeout:
 
@@ -153,18 +153,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction, Desire:Deduction)
-    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction, Desire:Deduction)
-    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction, Desire:Deduction)
-    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction, Desire:Deduction)
+    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
-//NAL3 single premise inference: (switched the belief term to the compound one so that less useful termlinks to atoms arent relied upon)
+//NAL3 single premise inference
 
-    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction, Desire:Deduction)
-    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction, Desire:Deduction)
+    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
-    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction, Desire:Deduction)
-    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction, Desire:Deduction)
+    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -486,11 +486,11 @@
 
     (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity)
 
-    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
+    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
 //Recursion Force - TODO use varargs
 

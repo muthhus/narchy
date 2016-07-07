@@ -23,6 +23,7 @@ import static nars.nal.Tense.ETERNAL;
 
 public class BeliefTableChart extends JoglSpace2D {
 
+    public static final float baseTaskSize = 3f;
     final List<? extends Termed> terms;
     final List<TruthWave> beliefs;
     final List<TruthWave> beliefProj;
@@ -41,6 +42,9 @@ public class BeliefTableChart extends JoglSpace2D {
 
     /** the last resolved concept for the specified terms being charted */
     private Concept[] concepts;
+
+    /** draw additional projection wave to show truthpolation values for a set of evenly spaced points on the visible range */
+    private boolean drawProjections = false;
 
 
     public BeliefTableChart(NAR n, Concept terms) {
@@ -107,7 +111,7 @@ public class BeliefTableChart extends JoglSpace2D {
         float teh = H;
 
         float cp = nar.conceptPriority(cc);
-        gl.glColor4f(1f,1f,1f, 0.25f + 0.75f * cp);
+        gl.glColor4f(0.5f,0.5f,0.5f, 0.2f + 0.25f * cp);
         float size = (cp > 0 ? (0.003f + 0.0015f * cp) : 0.0015f) * H; //if not active then show in small, otherwise if active show larger and grow in proportion to the activity
         ShapeDrawer.renderLabel(gl, size, tt.toString(), W/2f, H/2f, 0);
 
@@ -280,7 +284,7 @@ public class BeliefTableChart extends JoglSpace2D {
         renderWave(minT, maxT, gl, gew, geh, tew, teh, wave, beliefOrGoal ? beliefRenderer : goalRenderer);
 
         //draw projections
-        if (minT!=maxT) {
+        if (drawProjections && minT!=maxT) {
 
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
@@ -312,8 +316,8 @@ public class BeliefTableChart extends JoglSpace2D {
             boolean eternal = (o!=o);
             float eh, x;
             float padding = this.padding;
-            float pw = 1f + gew/(1f/conf)/4f;//10 + 10 * conf;
-            float ph = 1f + geh/(1f/conf)/4f;//10 + 10 * conf;
+            float pw = baseTaskSize + gew/(1f/conf)/4f;//10 + 10 * conf;
+            float ph = baseTaskSize + geh/(1f/conf)/4f;//10 + 10 * conf;
 
             if (eternal) {
                 eh = geh;
@@ -343,6 +347,20 @@ public class BeliefTableChart extends JoglSpace2D {
 
     public BeliefTableChart time(BiFunction<Long,long[],long[]> rangeControl) {
         this.rangeControl = rangeControl;
+        return this;
+    }
+
+    public BeliefTableChart timeRadius(long nowRadius) {
+        this.time((now, range) -> {
+            long low = range[0];
+            long high = range[1];
+
+            if (now - low > nowRadius)
+                low  = now-nowRadius;
+            if (high - now > nowRadius)
+                high = now + nowRadius;
+            return new long[]{low,high};
+        });
         return this;
     }
 

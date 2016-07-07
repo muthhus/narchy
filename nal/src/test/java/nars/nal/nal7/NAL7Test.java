@@ -686,6 +686,7 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
+
 //    @Test public void testTruthDecayOverTime0() {
 //        testTruthDecayOverTime(0, 0.81f, 0.005f);
 //    }

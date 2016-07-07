@@ -753,4 +753,49 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(G)", 0.0f, 0.81f);
     }
 
+    @Test public void testInheritanceCompositionTemporal() {
+        /*
+        WRONG OCCURRENCE TIME:
+        $.38;.39;.78$ (((in)|(left))-->^cam)! 474-424 %.12;.99% {474-424: 67;7k;ab;kv;lx} PremiseRule{	 prePreconditions=[TermNotEquals(1:(0),0:(0)), task:".!"]	 match=MatchTaskBelief[((%1-->%2),(%3-->%2))]	 postconditions=[PostCondition{term=((%1|%3)-->%2), beliefTruth=Intersection, goalTruth=Intersection, puncOverride= }]	 temporalize=nars.nal.TimeFunctions$$Lambda$122/684230144@3fbfa96	 eternalize=false	 anticipate=false	 minNAL=1	 source='<(P --> M), (S --> M), notSet(S), notSet(P), neq(S,P), no_common_subterm(S,P) |- ((S | P) --> M), (Belief:Intersection, Desire:Intersection, Derive:NoSwap)>'}
+              $1.0;.50;.51$ cam(left)! 464-414 %.78;1.0% {464-414: 67;7k;ab} Revection Merge
+              $.96;.46;.43$ (((in)|(left))-->^cam). 442-399 %.16;.99% {442-399: kv;lx} Revection Merge
+        */
+
+        //uses AUTO TimeFunction
+
+        test()
+                .log()
+                .inputAt(0, "cam(left)! :|:")
+                .inputAt(4, "(((in)|(left))-->^cam). :|:")
+
+                //must interpolate
+                .mustDesire(cycles, "(((in)|(left))-->^cam)", 1f,0.81f, 4)
+                .mustNotOutput(cycles, "(((in)|(left))-->^cam)", '!', 0, ETERNAL);
+    }
+
+    @Test public void testInheritanceDecompositionTemporalGoal() {
+        //(((in)|(left))-->^cam)!
+        //   cam(in)!
+        //   cam(out)!
+
+        test()
+                .log()
+                .inputAt(0, "(((in)|(left))-->^cam)! :|:")
+                .mustDesire(cycles, "cam(in)", 1f,0.81f, 0)
+                .mustDesire(cycles, "cam(left)", 1f,0.81f, 0);
+
+    }
+    @Test public void testInheritanceDecompositionTemporalBelief() {
+        //(((in)|(left))-->^cam)!
+        //   cam(in)!
+        //   cam(out)!
+
+        test()
+                .log()
+                .inputAt(0, "(((in)|(left))-->^cam). :|:")
+                .mustBelieve(cycles, "cam(in)", 1f,0.81f, 0)
+                .mustBelieve(cycles, "cam(left)", 1f,0.81f, 0);
+
+    }
+
 }

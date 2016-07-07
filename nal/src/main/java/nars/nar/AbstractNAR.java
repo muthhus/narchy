@@ -169,7 +169,7 @@ public abstract class AbstractNAR extends NAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            activate(c, t, activation, activation, overflow);
+            activate(c, t, activation, 1f, overflow);
 
             emotion.stress(overflow);
 

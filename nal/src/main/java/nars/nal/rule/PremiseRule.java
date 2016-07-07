@@ -59,6 +59,7 @@ public class PremiseRule extends GenericCompound {
 
     transient private char taskPunc = 0;
     public boolean allowBackward;
+    public boolean allowForward = true;
 
     @NotNull
     @Override

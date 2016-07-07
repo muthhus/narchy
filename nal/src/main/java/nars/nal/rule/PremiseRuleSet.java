@@ -273,7 +273,7 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (Global.SWAP_RULES && permuteSwap(r)) {
+        if (Global.SWAP_RULES && r.allowForward && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));
@@ -300,6 +300,7 @@ public class PremiseRuleSet {
                     //(x.contains("Punctuation"))  ||
                     //(x.contains("Structural")) ||
                     //(x.contains("Identity")) ||
+                    (x.contains("structural")) ||
                     (x.contains("substitute"))  //TESTING THIS
                 //(x.contains("Negation"))
 

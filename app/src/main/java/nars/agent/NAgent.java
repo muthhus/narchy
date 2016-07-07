@@ -19,6 +19,7 @@ import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
+import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
@@ -153,7 +154,7 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.2f)
+            new DecideActionSoftmax(0.3f)
             //new DecideActionEpsilonGreedy(0.05f)
         );
     }
@@ -310,9 +311,12 @@ public class NAgent implements Agent {
     }
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
-        return new FuzzyConceptSet(new PolarRangeNormalizedFloat(input), nar,
-                "(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
-                //"(sad)", "(happy)").resolution(0.02f);
+        return new FuzzyConceptSet(
+                //new PolarRangeNormalizedFloat(input),
+                new RangeNormalizedFloat(input),
+                nar,
+                //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
+                "(sad)", "(happy)").resolution(0.1f);
     }
 
     public void setSensorNamer(IntFunction<Compound> sensorNamer) {
@@ -466,9 +470,18 @@ public class NAgent implements Agent {
             observe(nextObservation);
 
         decide(this.lastAction);
+        reinforce();
 
 
+//        for (Concept a : actions) {
+//            nar.conceptualize(a, ActionAttentionPerFrame);
+//        }
 
+        return lastAction;
+
+    }
+
+    public void reinforce() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
         if (RewardAttentionPerFrame!=null) {
 
@@ -483,12 +496,6 @@ public class NAgent implements Agent {
             //nar.goal(RewardAttentionPerFrame.pri(), sad, now+1, 0f, gamma);
             //nar.goal(RewardAttentionPerFrame.pri(), happy, now+1, 1f, gamma);
         }
-//        for (Concept a : actions) {
-//            nar.conceptualize(a, ActionAttentionPerFrame);
-//        }
-
-        return lastAction;
-
     }
 
     private void boost(Task t) {

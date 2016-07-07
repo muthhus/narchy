@@ -7,6 +7,7 @@ import nars.bag.impl.SortedListTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.EternalTable;
 import nars.concept.table.TemporalBeliefTable;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -149,6 +150,28 @@ public class SensorBeliefTable extends DefaultBeliefTable {
 
         @Override
         public void removeIf(Predicate<Task> o) {
+
+        }
+
+        @Override
+        public long min() {
+            //TODO
+            return Tense.ETERNAL;
+        }
+
+        @Override
+        public long max() {
+            //TODO
+            return Tense.ETERNAL;
+        }
+
+        @Override
+        public void min(long minT) {
+
+        }
+
+        @Override
+        public void max(long maxT) {
 
         }
 
