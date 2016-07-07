@@ -49,7 +49,7 @@ public class CameraTrack implements Environment {
         this.nar = nar;
         this.scene = new JPanel() {
 
-            float rotationspeed = 1f/150;
+            float rotationspeed = 0; // 1f/150;
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(Color.BLACK);
@@ -150,9 +150,8 @@ public class CameraTrack implements Environment {
                 final int yy = y;
                 Compound t = (Compound) cam.p(x,y).term();
 
-                addSensor(nar, sensors, t, $.the("red"),
-                        () -> thresh(cam.red(xx, yy)));
-                addSensor(nar, sensors, t, $.the("gre"), () -> thresh(cam.green(xx, yy)));
+                //addSensor(nar, sensors, t, $.the("red"), () -> thresh(cam.red(xx, yy)));
+                //addSensor(nar, sensors, t, $.the("gre"), () -> thresh(cam.green(xx, yy)));
                 addSensor(nar, sensors, t, $.the("blu"), () -> thresh(cam.blue(xx, yy)));
             }
         }
@@ -254,8 +253,8 @@ public class CameraTrack implements Environment {
         sensors.put(tr, new SensorConcept( tr, nar,
                 component,
                 f -> {
-                    return $.t(f, 0.95f);
-                }).resolution(0.2f).pri(0.05f));
+                    return $.t(f, 0.75f);
+                }).resolution(0.1f).pri(0.1f));
     }
 
     @Override
@@ -275,18 +274,20 @@ public class CameraTrack implements Environment {
 
     public static void main(String[] args) {
         Default nar = new Default(1024, 4, 2, 2);
-        nar.cyclesPerFrame.set(64);
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.cyclesPerFrame.set(16);
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f);
         nar.confMin.setValue(0.01f);
         nar.conceptActivation.setValue(0.01f);
 
-        //new MySTMClustered(nar, 16, '.', 4);
+        new MySTMClustered(nar, 16, '.', 4);
 
-        new CameraTrack(256, 256, 3, 3, nar);
+        new CameraTrack(256, 256, 7, 7, nar);
 
 
-        nar.run(15000);
+        nar.run(1500);
+
+        NAR.printTasks(nar,false);
         //nar.loop(50f);
 
     }

@@ -144,10 +144,9 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             //float reward = 0.5f * (controller.happy.get() - controller.sad.get());
             float sadness = 1f - controller.happy.get();
             float alpha = 0.5f;
-            float dx = 0.15f;
             int mm = 0;
             for (MotorConcept m : controller.actions) {
-                if (Math.random() < alpha * sadness) {
+                if (Math.random() < sadness) {
                     //System.out.println("random train " + m);
                     nar.
                             goal
@@ -156,7 +155,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
                                     m, nar.time()+1,
                                     (float)Math.random(),
                                     //Util.clamp(desire(mm, nar.time()) + dx * (float) Math.random()), //offset current value by something
-                            0.55f);
+                            0.02f + alpha*sadness*0.55f);
                     //0.1f + sadness * (float)Math.random() * 0.8f);
 
                 }
