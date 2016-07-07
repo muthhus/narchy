@@ -125,8 +125,8 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
     /** allow no eternal beliefs, and ONE eternal goal */
     @Override protected void beliefCapacity(ConceptPolicy p) {
-        beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
-        goalCapacityOneEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
+        beliefCapacityNonEternal(this, p, 1);
+        goalCapacityOneEternal(this, p, 1);
     }
 
 

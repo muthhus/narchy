@@ -46,7 +46,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * result pattern
      */
     @NotNull
-    public final Term conclusionPattern;
+    public final Term conclusionPattern, conclusionPatternNP, conclusionPatternPN, conclusionPatternNN;
 
 
     /**
@@ -67,6 +67,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         this.conclusionPattern = term;
+        this.conclusionPatternNP = negateConclusion(true, false);
+        this.conclusionPatternPN = negateConclusion(false, true);
+        this.conclusionPatternNN = negateConclusion(true, true);
+
+
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.temporalizer = temporalizer;
 
@@ -82,6 +87,36 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 ')';
 
 
+    }
+
+    private Term negateConclusion(boolean task, boolean belief) {
+
+        @NotNull Term cp = this.conclusionPattern;
+
+        if (cp.op().atomic)
+            return null;
+
+        if (task) {
+            Map<Term, Term> cc = new HashMap();
+            Term taskPattern = this.rule.getTask();
+            cc.put(taskPattern, $.neg(taskPattern));
+            Term ccp = $.terms.remap(cp, cc);
+            if (ccp.equals(cp)) {
+                return null; //unaffects the conclusion, so the negation can't be captured by a negated subterm
+            }
+            cp = ccp;
+        }
+        if (belief) {
+            Map<Term, Term> cc = new HashMap();
+            @NotNull Term beliefPattern = this.rule.getBelief();
+            cc.put(beliefPattern, $.neg(beliefPattern));
+            Term ccp = $.terms.remap(cp, cc);
+            if (ccp.equals(cp)) {
+                return null; //unaffects the conclusion, so the negation can't be captured by a negated subterm
+            }
+            cp = ccp;
+        }
+        return cp;
     }
 
 
@@ -107,41 +142,36 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     @Override
     public final void accept(@NotNull PremiseEval m) {
 
-        Term cp = this.conclusionPattern;
 
         Truth taskTruth = m.taskTruth, beliefTruth = m.beliefTruth;
 
         char punct = m.punct.get();
 
+        Term cp = this.conclusionPattern;
 
         if (!cp.op().atomic && (punct!=Symbols.QUEST && punct!=Symbols.QUESTION)) {
 
-            if (taskTruth != null && taskTruth.isNegative()) {
-                Map<Term, Term> cc = new HashMap();
-                Term taskPattern = this.rule.getTask();
-                cc.put(taskPattern, $.neg(taskPattern));
-                Term ccp = $.terms.remap(cp, cc);
-                if (!ccp.equals(cp)) {
+            boolean tn = taskTruth != null && taskTruth.isNegative();
+            boolean bn = beliefTruth != null && beliefTruth.isNegative();
+            if (bn && tn) {
+                if (conclusionPatternNN!=null) {
+                    cp = conclusionPatternNN;
                     taskTruth = taskTruth.negated();
-                    cp = ccp;
-                }
-            }
-
-            if (beliefTruth != null && beliefTruth.isNegative()) {
-
-                Map<Term, Term> cc = new HashMap();
-                @NotNull Term beliefPattern = this.rule.getBelief();
-                cc.put(beliefPattern, $.neg(beliefPattern));
-                Term ccp = $.terms.remap(cp, cc);
-                if (!ccp.equals(cp)) {
                     beliefTruth = beliefTruth.negated();
-                    cp = ccp;
                 }
-
+            } else if (bn) {
+                if (conclusionPatternPN!=null) {
+                    cp = conclusionPatternPN;
+                    beliefTruth = beliefTruth.negated();
+                }
+            } else if (tn) {
+                if (conclusionPatternNP!=null) {
+                    cp = conclusionPatternNP;
+                    taskTruth = taskTruth.negated();
+                }
             }
-
-
         }
+
 
         Term r = m.index.resolve(cp, m);
         if (r instanceof Compound) { //includes null test

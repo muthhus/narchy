@@ -94,7 +94,7 @@ public enum Global {
 
 
 
-    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 12;
 
 
     /* ---------- avoiding repeated reasoning ---------- */
@@ -117,7 +117,7 @@ public enum Global {
     /**
      * max # of chained termutes which can be active
      */
-    public final static int UnificationTermutesMax = 16;
+    public final static int UnificationTermutesMax = 8;
 
 
     /** lower limit for # of termutations derived, determined by premise's priority */
@@ -134,10 +134,7 @@ public enum Global {
     /** permute certain rules backward to questions (experimental, generates a lot of questions) */
     public static final boolean BACKWARD_QUESTION_RULES = true;
 
-    public static final boolean INVERT_NEGATIVE_PREMISE_TASK = true;
-
-    //public static boolean NEGATIVE_RULES = true;
-
+    /** swap task and belief in eligible rules ("forward" permutation) */
     public static final boolean SWAP_RULES = true;
 
 
@@ -154,10 +151,7 @@ public enum Global {
     /** relates time and evidence */
     public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.1f;
 
-    /** additional temporal belief space for sensor concepts,
-     *  which will usually have a lot of highly fluctuating activity that should
-     *  be remembered */
-    @Deprecated public static final int SENSOR_TEMPORAL_BELIEF_MULTIPLIER = 2; //HACK
+
 
     /** exponent by which confidence (modeled as luminance) decays through the time axis (>=1) */
     public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
@@ -229,9 +223,9 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                new SoftReference<>(s);
+                //new SoftReference<>(s);
                 //new WeakReference<>(s);
-                //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
+                Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 
 

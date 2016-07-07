@@ -134,8 +134,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     @Override
     protected void beliefCapacity(ConceptPolicy p) {
-        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
-        DefaultConceptPolicy.goalCapacityOneEternal(this, p, Global.SENSOR_TEMPORAL_BELIEF_MULTIPLIER);
+        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, 1);
+        DefaultConceptPolicy.goalCapacityOneEternal(this, p, 1);
     }
 
 
