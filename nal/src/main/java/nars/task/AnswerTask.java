@@ -26,6 +26,16 @@ public class AnswerTask extends MutableTask {
         time(creationTime, occTime);
     }
 
+    @Override
+    public Task getParentTask() {
+        return aBelief;
+    }
+
+    @Override
+    public Task getParentBelief() {
+        return bBelief;
+    }
+
     public AnswerTask budget(Task a, Task b) {
         float acw = a.confWeight();
         float aMix = acw / (acw + b.confWeight());

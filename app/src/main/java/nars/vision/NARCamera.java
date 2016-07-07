@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.signal.MotorConcept;
 import spacegraph.Facial;
@@ -87,8 +88,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //                           //return d;
 //                        }),
                         new MotorConcept("cam(in)", nar, (b, d) -> {
-                           //look(0, 0, +1f*(d));
-                           return d;
+                            //look(0, 0, +1f*(d));
+                            return d;
                         })
 //                        new MotorConcept("(" + id + "_out)", nar, (b, d) -> {
 //                           //look(0, 0, -1f*(d));
@@ -100,10 +101,11 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         SwingCamera scam = (SwingCamera) this.cam;
 
         for (MotorConcept m : controller.actions) {
-            nar.goal(m, Tense.Eternal, 1f, 0.02f);
+            //nar.goal(m, Tense.Eternal, 1f, 0.02f);
+            nar.believe(m, Tense.Present, 0.5f, 0.1f); //center
         }
         for (MotorConcept m : controller.actions) {
-            nar.goal(m, Tense.Eternal, 0f, 0.02f);
+            //nar.goal(m, Tense.Eternal, 0f, 0.02f);
         }
 
         nar.onFrame(nn -> {
@@ -114,23 +116,23 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             //float up = desire(1, now);
             //float down = desire(0, now);
-            float upDown = desire(0, now)-0.5f;
+            float upDown = desire(0, now) - 0.5f;
             //float upDown =   up - down;
             //float left = desire(3, now);
             //float right = desire(2, now);
             //float leftRight = left - right;
-            float leftRight = desire(1, now)-0.5f;
+            float leftRight = desire(1, now) - 0.5f;
 //            float in = desire(5, now);
 //            float out = desire(4, now);
 //            float inOut = in - out;
-            float inOut = desire(2, now)-0.5f;
+            float inOut = desire(2, now) - 0.5f;
 
 
             int ww = ((SwingCamera) this.cam).inWidth();
             int hh = ((SwingCamera) this.cam).inHeight();
-            int x = (int)(2 * leftRight * ww/2f + ww/2f);
-            int y = (int)(2 * upDown * hh/2f + hh/2f);
-            float z = 0.5f * Util.clampBi(inOut) * (maxZoom-minZoom) + minZoom;
+            int x = (int) (2 * leftRight * ww / 2f + ww / 2f);
+            int y = (int) (2 * upDown * hh / 2f + hh / 2f);
+            float z = 0.5f * Util.clampBi(inOut) * (maxZoom - minZoom) + minZoom;
 
             //System.out.println(leftRight + ".." + x + " "+ upDown + ".." + y);
 
@@ -140,28 +142,50 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             controller.reinforce();
 
             //float reward = 0.5f * (controller.happy.get() - controller.sad.get());
-            float sadness = 1f -controller.happy.get();
-            float alpha = 0.2f;
-            System.out.println("sad=" + sadness);
-                for (MotorConcept m : controller.actions) {
-                    if (Math.random() < alpha * sadness) {
-                        System.out.println("random train " + m);
-                        nar.goal(m, Tense.Present, (float) Math.random(),
-                                0.1f + sadness * (float)Math.random() * 0.8f);
+            float sadness = 1f - controller.happy.get();
+            float alpha = 0.5f;
+            float dx = 0.15f;
+            int mm = 0;
+            for (MotorConcept m : controller.actions) {
+                if (Math.random() < alpha * sadness) {
+                    //System.out.println("random train " + m);
+                    nar.
+                            goal
+                            //believe
+                                (nar.DEFAULT_GOAL_PRIORITY,
+                                    m, nar.time()+1,
+                                    (float)Math.random(),
+                                    //Util.clamp(desire(mm, nar.time()) + dx * (float) Math.random()), //offset current value by something
+                            0.55f);
+                    //0.1f + sadness * (float)Math.random() * 0.8f);
 
-                    }
                 }
+                mm++;
+            }
 
 
         });
 
 
-        x = scam.inWidth()/2;
-        y = scam.inHeight()/2;
+        x = scam.inWidth() / 2;
+        y = scam.inHeight() / 2;
     }
 
     public float desire(int m, long now) {
-        float d = controller.actions.get(m).desire(now).expectation();
+
+        MotorConcept cc = controller.actions.get(m);
+        if (!cc.hasBeliefs())
+            return 0.5f;
+
+        Truth x = cc
+                //.desire(now).expectation();
+                .belief(now);
+
+        if (x==null)
+            return 0.5f;
+
+        float d = x.freq();
+
         return d;
 //        float b = controller.actions.get(m).belief(now).expectation();
 //        if (d + b == 0) return 0;
@@ -170,13 +194,15 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     }
 
     public float red(int x, int y) {
-        return ((SwingCamera)cam).red(x, y);
+        return ((SwingCamera) cam).red(x, y);
     }
+
     public float green(int x, int y) {
-        return ((SwingCamera)cam).green(x, y);
+        return ((SwingCamera) cam).green(x, y);
     }
+
     public float blue(int x, int y) {
-        return ((SwingCamera)cam).blue(x, y);
+        return ((SwingCamera) cam).blue(x, y);
     }
 
     public void look(float dx, float dy, float dz) {
@@ -204,7 +230,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
 
     public void center(int x, int y, float z) {
-        this.z = Math.max(minZoom,Math.min(z,maxZoom));
+        this.z = Math.max(minZoom, Math.min(z, maxZoom));
 
         SwingCamera scam = (SwingCamera) this.cam;
         int w = scam.inWidth();
@@ -215,8 +241,9 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
         int iw = Math.round(scam.inWidth() * z);
         int ih = Math.round(scam.inHeight() * z);
-        input(x - iw /2 + this.ox, y- ih /2 + this.oy, iw, ih);
+        input(x - iw / 2 + this.ox, y - ih / 2 + this.oy, iw, ih);
     }
+
     public void input(int x, int y, int w, int h) {
         SwingCamera scam = (SwingCamera) this.cam;
         scam.input(x, y, w, h);
@@ -299,14 +326,14 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
             float dw = tw / w;
             float dh = th / h;
-            ((SwingCamera)camera.cam).updateBuffered((x, y, r, g, b, a) -> {
+            ((SwingCamera) camera.cam).updateBuffered((x, y, r, g, b, a) -> {
                 gl.glColor4f(r, g, b, a);
                 ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
             });
 
             //border
-            gl.glColor4f(1f,1f,1f,1f);
-            ShapeDrawer.strokeRect(gl, 0, 0, tw+dw, th+dh);
+            gl.glColor4f(1f, 1f, 1f, 1f);
+            ShapeDrawer.strokeRect(gl, 0, 0, tw + dw, th + dh);
         }
     }
 
@@ -317,8 +344,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             return null; //dir; //$.p(dir);
         }
 
-        int cx = width/2;
-        int cy = height/2;
+        int cx = width / 2;
+        int cy = height / 2;
 
         boolean left = x < cx;
         boolean up = y < cy;
@@ -338,9 +365,9 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //		Term d = level > 0  ?
 //					$.seti($.the(c1), $.the(c2), $.the(area)) :
 //					$.seti($.the(c1), $.the(c2) );
-        Term d = level > 0  ?
+        Term d = level > 0 ?
                 $.secte($.the(c1), $.the(c2), $.the(area)) :
-                $.secte($.the(c1), $.the(c2) );
+                $.secte($.the(c1), $.the(c2));
 
         //Term dir = $.p(d,$.the(area));
         //Term dir = level == 0 ? d : $.p(d,$.the(area));
@@ -351,8 +378,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         //Term dir = $.inh(d,$.the(area));
         //Term dir = level == 0 ? d : $.inh(d,$.the(area));
 
-        Term q = quadp(level+1, x, y, width / 2, height / 2);
-        if (q!=null) {
+        Term q = quadp(level + 1, x, y, width / 2, height / 2);
+        if (q != null) {
             //return $.p(dir, q);
             //return $.image(0, false, dir, $.sete(q));
 
@@ -366,8 +393,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
             //return $.instprop(q, dir);
             //return $.p(q, dir);
             //return $.image(0, false, dir, q);
-        }
-        else {
+        } else {
             return d;
             //return $.p(dir);
             //return $.inst($.varDep(0), dir);
@@ -375,8 +401,8 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     }
 
     private Compound quadpFlat(int x, int y, int width, int height) {
-        int cx = width/2;
-        int cy = height/2;
+        int cx = width / 2;
+        int cy = height / 2;
 
         boolean left = x < cx;
         boolean up = y < cy;
@@ -391,10 +417,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 
         Atom dir = $.the(c1 + "" + c2);
 
-        if (width>1 || height > 1) {
+        if (width > 1 || height > 1) {
             Compound q = quadpFlat(x, y, width / 2, height / 2);
-            if (q!=null)
-                return $.p(Terms.concat(new Term[] { dir }, q.terms()));
+            if (q != null)
+                return $.p(Terms.concat(new Term[]{dir}, q.terms()));
             else
                 return $.p(dir);
         } else {
@@ -403,12 +429,12 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     }
 
     public static int log2(int width) {
-        return (int)Math.ceil(Math.log(width)/Math.log(2));
+        return (int) Math.ceil(Math.log(width) / Math.log(2));
     }
 
     public Term binaryp(int x, int depth) {
         String s = Integer.toBinaryString(x);
-        int i = s.length()-1;
+        int i = s.length() - 1;
         Term n = null;
         for (int d = 0; d < depth; d++, i--) {
             Atom next = $.the(i < 0 || s.charAt(i) == '0' ? 0 : 1);

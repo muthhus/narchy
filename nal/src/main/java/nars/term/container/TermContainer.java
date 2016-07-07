@@ -93,12 +93,12 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
             return Sets.intersect(a.toSet(), b.toSet());
     }
 
-    Predicate2<Object, SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {
-        return xx.contains(yy);
-    };
-    Predicate2<Object, SetIterable> nonVarSubtermIsCommon = (Object yy, SetIterable xx) -> {
-        return yy instanceof Variable ? false : xx.contains(yy);
-    };
+//    Predicate2<Object, SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {
+//        return xx.contains(yy);
+//    };
+//    Predicate2<Object, SetIterable> nonVarSubtermIsCommon = (Object yy, SetIterable xx) -> {
+//        return yy instanceof Variable ? false : xx.contains(yy);
+//    };
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
@@ -108,6 +108,21 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * recursively
      */
+    @NotNull
+    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, HashSet<Term> scratch) {
+
+        int commonStructure = a.structure() & b.structure();
+        if (excludeVariables)
+            commonStructure = commonStructure & ~(Op.VariableBits); //mask by variable bits since we do not want them
+
+        if (commonStructure == 0)
+            return false;
+
+        scratch.clear();
+        a.termsToSetRecurse(commonStructure, scratch, true);
+        return b.termsToSetRecurse(commonStructure, scratch, false);
+    }
+
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, HashSet<Term> scratch) {
 

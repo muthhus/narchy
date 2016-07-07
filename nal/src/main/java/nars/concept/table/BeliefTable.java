@@ -414,6 +414,11 @@ public interface BeliefTable extends TaskTable {
         return t != null ? t.motivation() : 0;
     }
 
+    /** returns 0.5 if no truth can be determined */
+    default float freq(long when) {
+        Truth t = truth(when);
+        return t != null ? t.freq() : 0.5f;
+    }
 
 
     //void remove(Task belief, @NotNull NAR nar);

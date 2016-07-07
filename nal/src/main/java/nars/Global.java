@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -151,7 +152,7 @@ public enum Global {
 
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.1f;
 
     /** additional temporal belief space for sensor concepts,
      *  which will usually have a lot of highly fluctuating activity that should
@@ -228,8 +229,8 @@ public enum Global {
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
         return s == null ? null :
-                //new SoftReference<>(s);
-                new WeakReference<>(s);
+                new SoftReference<>(s);
+                //new WeakReference<>(s);
                 //Global.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
     }
 

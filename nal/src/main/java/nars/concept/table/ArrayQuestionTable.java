@@ -4,7 +4,9 @@ import nars.Global;
 import nars.NAR;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.task.AnswerTask;
 import nars.task.Task;
+import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,6 +102,10 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
     @Override
     public void answer(@NotNull Task a, @NotNull NAR nar) {
+
+        if (a instanceof AnswerTask)
+            return; //already an answer
+
         int listSize = list.size();
         if (listSize == 0)
             return;
@@ -123,6 +129,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
+
 
         float qBudget = q.pri();
 
@@ -173,8 +180,11 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             if (ac != null) { //??
                 Task ap = ac.merge(q, a, q.occurrence(), nar);
                 if (ap != null && !ap.isDeleted()) {
-                    nar.input(ap);
-                    //nar.inputLater(ap);
+                    if (Stamp.overlapping(q.evidence(), a.evidence()))
+                        nar.inputLater(ap); //avoid infinite loop
+                    else
+                        nar.input(ap);
+
                     return;
                 }
             }

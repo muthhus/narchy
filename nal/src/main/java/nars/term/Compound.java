@@ -48,9 +48,10 @@ import static nars.nal.Tense.DTERNAL;
 public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
 
 
-    /** gets the set of unique recursively contained terms of a specific type
+    /**
+     * gets the set of unique recursively contained terms of a specific type
      * TODO generalize to a provided lambda predicate selector
-     * */
+     */
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
         Set<Term> t = Global.newHashSet(volume());
@@ -62,34 +63,54 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-    @NotNull default boolean termsToSet(Collection<Term> t, boolean addOrRemoved) {
+    @NotNull
+    default boolean termsToSet(Collection<Term> t, boolean addOrRemoved) {
         return termsToSet(-1, t, addOrRemoved);
     }
 
-    /** returns whether the set operation caused a change or not */
-    @NotNull default boolean termsToSet(int inStructure, Collection<Term> t, boolean addOrRemoved) {
+    /**
+     * returns whether the set operation caused a change or not
+     */
+    @NotNull
+    default boolean termsToSet(int inStructure, Collection<Term> t, boolean addOrRemoved) {
         boolean r = false;
-//        if (recurse) {
-//
-//            r |= addOrRemoved ? t.add(this) : t.remove(this);
-//            if (addOrRemoved || !r) //on removal we can exit early
-//                r = or(addOrRemoved ? t::add : t::remove);
+        for (int i = 0; i < size(); i++) {
+            @NotNull T s = term(i);
+            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
+                if (addOrRemoved)
+                    r |= t.add(s);
+                else
+                    r |= t.remove(s);
 
-        //} else {
-            for (int i = 0; i < size(); i++) {
-                @NotNull T s = term(i);
-                if (inStructure==-1 || ((s.structure() & inStructure) > 0)) {
-                    if (addOrRemoved)
-                        r |= t.add(s);
-                    else
-                        r |= t.remove(s);
-
-                    if (!addOrRemoved && r) //on removal we can exit early
-                        return true;
-                }
+                if (!addOrRemoved && r) //on removal we can exit early
+                    return true;
             }
-        //}
+        }
         return r;
+    }
+
+    @NotNull
+    default boolean termsToSetRecurse(int inStructure, Collection<Term> t, boolean addOrRemoved) {
+        final boolean[] r = {false};
+        recurseTerms((SubtermVisitor)(s) -> {
+
+            if (!addOrRemoved && r[0]) { //on removal we can exit early
+                return; //HACK todo make a visitor with a predicate termination condition rather than have to continue traversing
+            }
+
+            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
+                if (addOrRemoved)
+                    r[0] |= t.add(s);
+                else
+                    r[0] |= t.remove(s);
+
+//                if (!addOrRemoved && r[0]) { //on removal we can exit early
+//                    return true;
+//                }
+            }
+        });
+
+        return r[0];
     }
 
 //    @NotNull
@@ -135,7 +156,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return hashCode();
     }
 
-    @Nullable default int[] pathTo(Term subterm) {
+    @Nullable
+    default int[] pathTo(Term subterm) {
         if (subterm.equals(this)) return IntArrays.EMPTY_ARRAY;
         if (!containsTermRecursively(subterm)) return null;
         return pathTo(new IntArrayList(0), this, subterm);
@@ -143,7 +165,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     static int[] pathTo(IntArrayList p, Term superTerm, Term target) {
         if (superTerm instanceof Compound) {
-            Compound cc = (Compound)superTerm;
+            Compound cc = (Compound) superTerm;
             for (int i = 0; i < cc.size(); i++) {
                 Term s = cc.term(i);
                 if (s.equals(target)) {
@@ -163,23 +185,22 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-
     /**
      * unification matching entry point (default implementation)
      *
-     * @param y compound to match against (the instance executing this method is considered 'x')
+     * @param y     compound to match against (the instance executing this method is considered 'x')
      * @param subst the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
-     *
+     * <p>
      * implementations may assume that y's .op() already matches this, and that
      * equality has already determined to be false.
-     * */
+     */
     default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
         TermContainer xsubs = subterms();
         int xs = xsubs.size();
         TermContainer ysubs = y.subterms();
-        if (xs == ysubs.size())  {
+        if (xs == ysubs.size()) {
 
             if (vars() + y.vars() == 0)
                 return false; //no variables that could produce any matches
@@ -216,7 +237,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     default Term subterm(@NotNull int... path) {
         Term ptr = this;
         for (int i : path) {
-            if ((ptr = ptr.termOr(i, null))==null)
+            if ((ptr = ptr.termOr(i, null)) == null)
                 return null;
         }
         return ptr;
@@ -309,7 +330,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-
     @NotNull
     @Override
     default T term(int i) {
@@ -321,10 +341,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     default T[] terms() {
         return subterms().terms();
     }
-
-
-
-
 
 
     @Override
@@ -390,8 +406,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-
-
 //    @Nullable
 //    @Override
 //    default Ellipsis firstEllipsis() {
@@ -400,13 +414,11 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
     @Nullable
     default Term last() {
         int s = size();
         return s == 0 ? null : term(s - 1);
     }
-
 
 
     @Override
@@ -424,17 +436,18 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
-    /** gets temporal relation value */
+    /**
+     * gets temporal relation value
+     */
     int dt();
 
     default boolean temporal() {
-        return dt()!= Tense.DTERNAL;
+        return dt() != Tense.DTERNAL;
     }
 
 
-
-    /** similar to a indexOf() call, this will search for a int[]
+    /**
+     * similar to a indexOf() call, this will search for a int[]
      * path to the first subterm occurrence of the supplied term,
      * or null if none was found
      */
@@ -457,7 +470,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         int s = x.length;
         for (int i = 0; i < s; i++) {
             Term xx = x[i];
-            if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound)xx, t, l))) {
+            if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
                 l.add(i);
                 return true;
             } //else, try next subterm and its subtree
@@ -477,10 +490,9 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         for (int i = 0; i < s; i++) {
             Term x = term(i);
             if (x instanceof Compound) {
-                if (((Compound)x).containsTermRecursively(b))
+                if (((Compound) x).containsTermRecursively(b))
                     return true;
-            }
-            else {
+            } else {
                 if (x.equals(b))
                     return true;
             }
@@ -496,8 +508,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
         int s = size();
 
-        if ((((Compound)other).dt() == dt()) && (other.size() == s)) {
-            Compound o = (Compound)other;
+        if ((((Compound) other).dt() == dt()) && (other.size() == s)) {
+            Compound o = (Compound) other;
             for (int i = 0; i < s; i++) {
                 if (!term(i).equalsIgnoringVariables(o.term(i)))
                     return false;
@@ -703,7 +715,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
 //    @Override
 //    public int compareTo(final Object that) {
 //        if (that == this) return 0;
@@ -847,8 +858,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     } */
 
 
-
-
 //    /**
 //     * true if equal operate and all terms contained
 //     */
@@ -881,7 +890,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //        }
 //        return Memory.make(t1, terms, memory);
 //    }
-
 
 
 //    /**
@@ -934,7 +942,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
 //    /**
 //     * Gives a set of all (unique) contained term, recursively
 //     */
@@ -947,10 +954,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //        }
 //        return s;
 //    }
-
-
-
-
 
 
 //    /**
@@ -1067,7 +1070,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
 //    @Override
 //    public boolean equals(final Object that) {
 //        if (!(that instanceof CompoundTerm))
@@ -1096,11 +1098,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
-
-
-
 //boolean transform(CompoundTransform<Compound<T>, T> trans, int depth);
-
 
 
 //    /**

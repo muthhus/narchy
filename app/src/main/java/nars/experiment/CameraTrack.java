@@ -22,6 +22,7 @@ import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,10 +40,13 @@ public class CameraTrack implements Environment {
 
     private final JPanel scene;
     private final NARCamera cam;
+    private final NAR nar
+            ;
     Map<Term, SensorConcept> sensors;
 
 
     public CameraTrack(int sw, int sh, int width, int height, NAR nar) {
+        this.nar = nar;
         this.scene = new JPanel() {
 
             float rotationspeed = 1f/150;
@@ -124,17 +128,17 @@ public class CameraTrack implements Environment {
         NARCamera.newWindow(cam);
 
 
-        nar.logSummaryGT(System.out, 0.75f);
+        //nar.logSummaryGT(System.out, 0.75f);
 
-        Global.DEBUG = true;
+        //Global.DEBUG = true;
         nar.onTask(tt -> {
             //detect eternal derivations
 //            if (!tt.isInput() && tt.isEternal() && tt.isBelief())
 //                System.err.println(tt.proof());
-            if (!tt.isInput() && tt.isGoal()) {
-                if (tt.term().op()==INH && tt.term().term(1).op()==Op.OPER)
-                    System.err.println(tt.proof());
-            }
+//            if (!tt.isInput() && tt.isGoal()) {
+//                if (tt.term().op()==INH && tt.term().term(1).op()==Op.OPER)
+//                    System.err.println(tt.proof());
+//            }
             /*if (!tt.isInput() && tt.term().hasAny(Op.VAR_DEP))
                 System.err.println(tt.proof());*/
         });
@@ -146,9 +150,10 @@ public class CameraTrack implements Environment {
                 final int yy = y;
                 Compound t = (Compound) cam.p(x,y).term();
 
-                addSensor(nar, sensors, t, $.the("red"), () -> cam.red(xx, yy));
-                addSensor(nar, sensors, t, $.the("gre"), () -> cam.green(xx, yy));
-                addSensor(nar, sensors, t, $.the("blu"), () -> cam.blue(xx, yy));
+                addSensor(nar, sensors, t, $.the("red"),
+                        () -> thresh(cam.red(xx, yy)));
+                addSensor(nar, sensors, t, $.the("gre"), () -> thresh(cam.green(xx, yy)));
+                addSensor(nar, sensors, t, $.the("blu"), () -> thresh(cam.blue(xx, yy)));
             }
         }
 
@@ -195,7 +200,8 @@ public class CameraTrack implements Environment {
                 bt.add(b);
             });
 
-            cam.controller.reward = bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f);
+            float r = bt.floatValue() - (rt.floatValue() + gt.floatValue() / 2f);
+            reward(r);
 
             //cam.controller.act(bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f), (float[])null);
         });
@@ -212,9 +218,12 @@ public class CameraTrack implements Environment {
         //Iterables.addAll(charted, cam.controller.rewardConcepts);
         charted.addAll(cam.controller.actions);
 
-        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.x, nar,0.9f, "(camx --> low)", "(camx --> mid)", "(camx --> high)"));
-        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.y, nar,0.9f, "(camy --> low)", "(camy --> mid)", "(camy --> high)"));
-        //Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.9f, "(camz --> low)", "(camz --> mid)", "(camz --> high)"));
+        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.x, nar,0.5f,
+                "(camx --> low)", "(camx --> mid)", "(camx --> high)").resolution(0.2f));
+        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.y, nar,0.5f,
+                "(camy --> low)", "(camy --> mid)", "(camy --> high)").resolution(0.2f));
+        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.59f,
+                "(camz --> low)", "(camz --> mid)", "(camz --> high)").resolution(0.2f));
 
 //            charted.add(nar.ask($.$("(?x-->red)").term()));
 //            charted.add(nar.ask($.$("(?x<->g)").term()));
@@ -224,6 +233,20 @@ public class CameraTrack implements Environment {
                 .timeRadius(400)
                 .show(600, 900)
         ;
+    }
+
+    private float thresh(float v) {
+        return v > 0.5f ? 1f : 0f;
+    }
+
+    final DescriptiveStatistics rewardStat = new DescriptiveStatistics(128);
+
+    public void reward(float r) {
+        cam.controller.reward = r;
+        rewardStat.addValue(r);
+        if (nar.time() % 100 == 0) {
+            System.out.println("reward~= " + rewardStat.getMean());
+        }
     }
 
     public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
@@ -252,15 +275,15 @@ public class CameraTrack implements Environment {
 
     public static void main(String[] args) {
         Default nar = new Default(1024, 4, 2, 2);
-        nar.cyclesPerFrame.set(16);
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
-        nar.confMin.setValue(0.05f);
-        nar.conceptActivation.setValue(0.05f);
+        nar.cyclesPerFrame.set(64);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
+        nar.confMin.setValue(0.01f);
+        nar.conceptActivation.setValue(0.01f);
 
-        new MySTMClustered(nar, 16, '.', 3);
+        //new MySTMClustered(nar, 16, '.', 4);
 
-        new CameraTrack(256, 256, 5, 5, nar);
+        new CameraTrack(256, 256, 3, 3, nar);
 
 
         nar.run(15000);

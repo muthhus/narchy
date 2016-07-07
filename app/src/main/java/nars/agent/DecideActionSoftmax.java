@@ -19,6 +19,7 @@ public class DecideActionSoftmax implements DecideAction {
     boolean onlyPositive = false;
 
     float temperature;
+    private float decisiveness;
 
     public DecideActionSoftmax(float temperature) {
         this.temperature = temperature;
@@ -40,8 +41,10 @@ public class DecideActionSoftmax implements DecideAction {
         float[] minmax = Util.minmax(motivation);
         float min = minmax[0];
         float max = minmax[1];
+        float sumNorm = 0;
         for (int i = 0; i < actions; i++) {
-            motNorm[i] = Util.normalize(motivation[i], min, max);
+            float u = Util.normalize(motivation[i], min, max);
+            sumNorm += (motNorm[i] = u);
         }
 
         /* http://www.cse.unsw.edu.au/~cs9417ml/RL1/source/RLearner.java */
@@ -55,13 +58,18 @@ public class DecideActionSoftmax implements DecideAction {
 
         float r = random.nextFloat() * sumProb;
 
-        for (int i = actions - 1; i >= 1; i--) {
+        int i;
+        for (i = actions - 1; i >= 1; i--) {
             float m = motProb[i];
             r -= m;
-            if (r <= 0)
-                return i;
+            if (r <= 0) {
+                break;
+            }
         }
 
-        return 0;
+        decisiveness = motNorm[i] / sumNorm;
+        System.out.println("decisiveness: " + decisiveness );
+
+        return i;
     }
 }

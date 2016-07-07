@@ -32,15 +32,6 @@ public class RevisionTask extends AnswerTask  {
             throw new UnsupportedOperationException("invalid punctuation");
     }
 
-    @Override
-    public Task getParentTask() {
-        return aBelief;
-    }
-
-    @Override
-    public Task getParentBelief() {
-        return bBelief;
-    }
 
 
 //    @Override

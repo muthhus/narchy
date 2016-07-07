@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 import static nars.term.container.TermContainer.commonSubterms;
+import static nars.term.container.TermContainer.commonSubtermsRecurse;
 
 /** variables excluded */
 public final class NoCommonSubtermsConstraint implements MatchConstraint {
@@ -39,7 +40,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Compound C = (Compound) y;
 
             return bCompound ?
-                    commonSubterms((Compound) B, C, true, scratch.get())
+                    commonSubtermsRecurse((Compound) B, C, true, scratch.get())
                     :
                     C.containsTerm(B);
 

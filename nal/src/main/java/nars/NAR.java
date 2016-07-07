@@ -151,7 +151,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
-        TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
+        TreeSet<Task> bt = new TreeSet<>( (a, b) ->
+            //sort by name
+                //{ return a.term().toString().compareTo(b.term().toString()); }
+            //sort by confidence (descending)
+                { return Float.compare(b.conf(), a.conf()); }
+        );
         n.forEachActiveConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
 
@@ -161,7 +166,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             }
         });
         bt.forEach(xt -> {
-            System.out.println(xt);
+            System.out.println(xt.proof());
         });
     }
 

@@ -84,12 +84,12 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.15f);
+		nar.conceptActivation.setValue(0.1f);
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.9f);
-		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.8f);
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
@@ -117,6 +117,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //			}
 //			return false;
 //		});
+
+		Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 8, '.', 3);
@@ -195,7 +197,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				256*64);
+				1*64);
 
 
 
