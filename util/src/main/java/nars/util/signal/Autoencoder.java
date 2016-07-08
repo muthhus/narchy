@@ -196,8 +196,9 @@ public class Autoencoder {
 		return y;
 	}
 
-	public float train(float[] x, float learningRate, float noiseLevel,
-			float corruptionRate, boolean sigmoid) {
+	public float train(float[] x, float learningRate,
+					   float noiseLevel, float corruptionRate,
+					   boolean sigmoid) {
 		if ((tilde_x == null) || (tilde_x.length != n_visible)) {
 			tilde_x = new float[n_visible];
 			z = new float[n_visible];

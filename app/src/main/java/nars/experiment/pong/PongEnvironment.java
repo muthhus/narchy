@@ -174,8 +174,8 @@ public class PongEnvironment extends Player implements Environment {
 			numericSensor("(ball,padMine)", "below", "same", "above", n, () -> {
 
 				float delta = pong.ball_y - (pong.player1.position + halfPaddle);
-				return delta*delta*delta;
-				//return delta;
+				return delta;
+
 					} , pri)
 		);
 

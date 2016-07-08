@@ -95,6 +95,8 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         if (cp.op().atomic)
             return null;
+        if (cp.vars() > 0) //exclude vars for now, but this may be allowed if unification on the variable-containing superterm matches the task/belief pattern being negated, etc.
+            return null;
 
         if (task) {
             Map<Term, Term> cc = new HashMap();

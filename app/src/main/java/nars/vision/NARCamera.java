@@ -54,7 +54,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     int ox;
     int oy;
 
-    float xySpeed = 0.15f;
+    float xySpeed = 1f;
     float zoomSpeed = 0.05f;
 
 
@@ -242,6 +242,10 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
 //        input(x, y, w, h);
     }
 
+
+    public void move(float dx, float dy, float dz) {
+        center(Math.round(x + dx * xySpeed), Math.round(y + dy * xySpeed), z + dz * zoomSpeed);
+    }
 
     public void center(int x, int y, float z) {
         this.z = Math.max(minZoom, Math.min(z, maxZoom));

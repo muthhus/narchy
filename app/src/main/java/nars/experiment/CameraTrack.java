@@ -3,6 +3,7 @@ package nars.experiment;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -11,6 +12,8 @@ import nars.experiment.pong.PongEnvironment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
+import nars.learn.ql.DQN;
+import nars.learn.ql.HaiQAgent;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.op.time.MySTMClustered;
@@ -18,6 +21,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.math.FloatSupplier;
+import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
@@ -40,8 +44,11 @@ public class CameraTrack implements Environment {
 
     private final JPanel scene;
     private final NARCamera cam;
-    private final NAR nar
-            ;
+    private final NAR nar;
+    private final JPanel overlay;
+
+    MutableFloat rt = new MutableFloat(), gt = new MutableFloat(), bt = new MutableFloat();
+    ;
     Map<Term, SensorConcept> sensors;
 
 
@@ -49,7 +56,10 @@ public class CameraTrack implements Environment {
         this.nar = nar;
         this.scene = new JPanel() {
 
-            float rotationspeed = 1f/150;
+            int cycle = 0;
+
+            float rotationspeed = 1f/1350;
+
             @Override
             protected void paintComponent(Graphics g) {
                 g.setColor(Color.BLACK);
@@ -67,7 +77,7 @@ public class CameraTrack implements Environment {
 //                g.setColor(Color.DARK_GRAY);
 //                circle(g, sw / 2, sh / 2, sw / 4);
 
-                float theta = nar.time() * rotationspeed;
+                float theta = cycle++ * rotationspeed;
                 float r = sw/3f;
 
 
@@ -89,7 +99,7 @@ public class CameraTrack implements Environment {
             }
 
         };
-        JPanel overlay = new JPanel() {
+        overlay = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
 
@@ -174,12 +184,8 @@ public class CameraTrack implements Environment {
                     0.5f + 0.5f * cam.blue((x,y)->x>cam.cam.width()), 0.95f);
         });
 
-        MutableFloat rt = new MutableFloat(), gt = new MutableFloat(), bt = new MutableFloat();
-
-
-
 //        {
-            BagChart.show((Default) nar);
+//            BagChart.show((Default) nar);
 //        }
 
         java.util.List<Termed> charted = new ArrayList();
@@ -205,20 +211,8 @@ public class CameraTrack implements Environment {
         nar.goal("(blueness-->high)", Tense.Eternal, 1f, 1f);
 
         nar.onFrame(nn-> {
-            scene.repaint();
-            overlay.repaint();
+            update();
 
-            rt.setValue(0);
-            gt.setValue(0);
-            bt.setValue(0);
-            cam.update((x,y,t,r,g,b)->{
-                rt.add(r);
-                gt.add(g);
-                bt.add(b);
-            });
-
-            float r = bt.floatValue() - (rt.floatValue() + gt.floatValue() / 2f);
-            reward(r);
 
             //cam.controller.act(bt.floatValue() - (rt.floatValue() + gt.floatValue()/2f), (float[])null);
         });
@@ -246,10 +240,28 @@ public class CameraTrack implements Environment {
 //            charted.add(nar.ask($.$("(?x<->g)").term()));
 //            charted.add(nar.ask($.$("(?x<->b)").term()));
 
-        new BeliefTableChart(nar, charted)
-                .timeRadius(400)
-                .show(600, 900)
-        ;
+//        new BeliefTableChart(nar, charted)
+//                .timeRadius(400)
+//                .show(600, 900)
+//        ;
+    }
+
+    public void update() {
+        scene.repaint();
+        overlay.repaint();
+
+        rt.setValue(0);
+        gt.setValue(0);
+        bt.setValue(0);
+        cam.update((x,y,t,r,g,b)->{
+            rt.add(r);
+            gt.add(g);
+            bt.add(b);
+        });
+
+        float r = bt.floatValue() - (rt.floatValue() + gt.floatValue() / 2f);
+        reward(r);
+
     }
 
     private float thresh(float v) {
@@ -261,9 +273,9 @@ public class CameraTrack implements Environment {
     public void reward(float r) {
         cam.controller.reward = r;
         rewardStat.addValue(r);
-        if (nar.time() % 100 == 0) {
+        /*if (nar.time() % 100 == 0) {
             System.out.println("reward~= " + rewardStat.getMean());
-        }
+        }*/
     }
 
     public void addSensor(NAR nar, Map<Term, SensorConcept> sensors, Compound t, Term componentTerm, FloatSupplier component) {
@@ -300,15 +312,66 @@ public class CameraTrack implements Environment {
 
         //new MySTMClustered(nar, 16, '.', 4);
 
-        new CameraTrack(256, 256, 8, 8, nar);
+        CameraTrack cam = new CameraTrack(256, 256, 16, 16, nar);
 
         Global.DEBUG = true;
         //nar.log();
 
-        nar.run(16512);
+//        nar.run(16512);
+//
+//        NAR.printTasks(nar,false);
+//        //nar.loop(50f);
 
-        NAR.printTasks(nar,false);
-        //nar.loop(50f);
+        new Environment() {
 
+            @Override
+            public Twin<Integer> start() {
+                return Tuples.twin(4+1+2,7);
+            }
+
+            final FloatSupplier rn = new RangeNormalizedFloat(()->
+                cam.bt.floatValue()
+            );
+
+
+            @Override
+            public float pre(int t, float[] ins) {
+                int w = cam.cam.cam.width();
+                int h = cam.cam.cam.height();
+                ins[0] = cam.cam.blue((x,y)->x<w);
+                ins[1] = cam.cam.blue((x,y)->x>w);
+                ins[2] = cam.cam.blue((x,y)->y<h);
+                ins[3] = cam.cam.blue((x,y)->y>h);
+
+                ins[4] = cam.cam.blue((x,y)-> (x >= w/4 && x<=3*w/4 && y >= h/4 && y <=3*h/4));
+
+                ins[5] = ((float)cam.cam.x) / cam.cam.cam.width();
+                ins[6] = ((float)cam.cam.y) / cam.cam.cam.height();
+
+                float r = rn.asFloat()-0.5f;
+                System.out.println(r);
+                return r;
+            }
+
+            @Override
+            public void post(int t, int action, float[] ins, Agent a) {
+                System.out.println(t + " action=" + action);
+                float s = 16;
+                switch (action) {
+                    case 0: break; //nothing
+                    case 1:  cam.cam.move(s, 0, 0); break;
+                    case 2:  cam.cam.move(-s, 0, 0); break;
+                    case 3:  cam.cam.move(0, s, 0); break;
+                    case 4:  cam.cam.move(0, -s, 0); break;
+                    case 5:  cam.cam.move(0, 0, 1); break;
+                    case 6:  cam.cam.move(0, 0, -1); break;
+                }
+                cam.update();
+            }
+
+        }.run(
+            new HaiQAgent()
+            //new DQN()
+        , 55500);
     }
 }

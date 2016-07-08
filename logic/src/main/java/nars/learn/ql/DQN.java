@@ -7,7 +7,7 @@ import static java.lang.System.out;
  */
 public class DQN extends ReinforceJSAgent {
 
-    @Deprecated private final float alpha = 0.03f;
+    @Deprecated private final float alpha = 0.005f;
 
     public DQN() {
 
@@ -19,7 +19,7 @@ public class DQN extends ReinforceJSAgent {
 
     @Override
     String getAgentInitCode(int inputs, int actions) {
-        int hiddens = 3 * inputs * actions; //heuristic
+        int hiddens = 4 * inputs * actions; //heuristic
         return "var spec =  { alpha: + " + alpha + ", num_hidden_units: " + hiddens + " }; " +
                "var agent = new RL.DQNAgent(env, spec); ";
     }
