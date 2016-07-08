@@ -9,6 +9,7 @@ public enum GnutellaConstants {
     ;
 
     /* Constantes de solicitud conexion */
+    public static final String CONNECTION_REQUEST_PRE = "GNUTELLA CONNECT";
     public static final String CONNECTION_REQUEST = "GNUTELLA CONNECT/<0.4>\n\n ";
     public static final String CONNECTION_ACCEPTED = "GNUTELLA OK\n\n";
 
@@ -32,13 +33,12 @@ public enum GnutellaConstants {
     public static final int HEADER_LENGTH = 23;
     public static final byte PING_PLL = 0;
     public static final byte PONG_PLL = 14;
-    public static final int QUERYHIT_PART_L = 19;
+    //public static final int QUERYHIT_PART_L = 19;
     public static final int SERVER_ID_L = 16;
 
     /* Constantes de implementacion */
     public static final byte DEFAULT_TTL = 7;
     public static final int MY_MESSAGE = -1;
-    public static final int MAX_DOWNLOADS = 10;
     public static final int MINSPEEDL = 2;
     public static final byte INITIAL_HOP = -1;
     public static final byte EOS = 0x0000;

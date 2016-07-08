@@ -7,9 +7,11 @@ import nars.concept.Concept;
 import nars.inter.gnutella.*;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.util.IO;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class InterNAR extends Peer implements ClientModel {
         b.believe("(X --> y)");
 
         String question = "(?x --> y)?";
-        ai.query(question);
+        ai.query(IO.asBytes(a.task(question)));
         //TODO a.ask(question);
 
         Thread.sleep(2000);
@@ -80,7 +82,12 @@ public class InterNAR extends Peer implements ClientModel {
 
     @Override
     public void onQueryHit(Client client, QueryHitMessage q) {
-        logger.info("{} told \"{}\" by {}", nar.self, Arrays.toString(q.getFileName()), q.responder);
+        try {
+            Task t = IO.readTask(new DataInputStream(new ByteArrayInputStream(q.result)), nar.index);
+            logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -91,16 +98,19 @@ public class InterNAR extends Peer implements ClientModel {
 
     @Override
     public void search(Client client, QueryMessage message, Consumer<QueryHitMessage> eachResult) {
-        String queryString = message.query;
-        logger.info("{} asked \"{}\" by {}", nar.self, queryString, message.recipient);
+        byte[] queryString = message.query;
 
-        final int[] count = { 3 };
-        nar.ask($(queryString), Tense.ETERNAL, a -> {
-            eachResult.accept(client.createQueryHit(message.idBytes(), 1, Lists.newArrayList(
-                    Triple.of(a.toString(), 0, 0)
-            )) );
-            return (count[0]--) > 0;
-        });
+        Task t = IO.taskFromBytes(message.query, nar.index);
+        logger.info("{} asked \"{}\" by {}", nar.self, t, message.recipient);
+
+        if (t.isQuestion()) {
+            final int[] count = {3};
+            nar.ask(t.term(), Tense.ETERNAL, a -> {
+                eachResult.accept(client.createQueryHit(message.idBytes(), 1, IO.asBytes(t)));
+                return (count[0]--) > 0;
+            });
+        }
+
     }
 
     @Override

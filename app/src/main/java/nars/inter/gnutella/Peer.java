@@ -127,6 +127,9 @@ public class Peer {
     public void query(String searchCriteria) {
         client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
     }
+    public void query(byte[] searchCriteria) {
+        client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
+    }
 
     /**
      * Establishes a connection to download the specified file from a specified

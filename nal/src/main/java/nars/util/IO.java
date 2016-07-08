@@ -26,9 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by me on 5/29/16.
@@ -244,7 +242,26 @@ public class IO {
 //        return (Compound) t.normalize(key, true);
     }
 
+    public static byte[] asBytes(Task t) {
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        try {
+            IO.writeTask(new DataOutputStream(bs), t);
+            byte[] tb = bs.toByteArray();
+            return tb;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+    }
+
+    public static Task taskFromBytes(byte[] b, TermIndex index) {
+        try {
+            return IO.readTask(new DataInputStream(new ByteArrayInputStream(b)), index);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 
     /** serialization and deserialization of terms, tasks, etc. */

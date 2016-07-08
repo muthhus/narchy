@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 
-    private final short localPort;
+    private final short port;
     private final boolean running;
     private final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
 
@@ -37,7 +37,7 @@ public class Client {
      * Creates a Client who manage sending/receiving Messages of the Gnutella
      * protocol
      *
-     * @param localPort   * @param localPort Port in which the servent owner of this
+     * @param port   * @param localPort Port in which the servent owner of this
      *                    client works
      * @param neighbors   HashMap that contains the connections to its neighbors nodes.
      *                    Keys are in format InetSocketAddress, those InetSocketAddress
@@ -49,7 +49,7 @@ public class Client {
      * @param peerID   The 16-byte string uniquely identifying the servent on the
      *                    network who is being requested to push
      */
-    public Client(Peer peer, short localPort,
+    public Client(Peer peer, short port,
                   ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors,
                   InetAddress ipAddress,
                   byte[] peerID,
@@ -57,7 +57,7 @@ public class Client {
     ) {
         this.peer = peer;
         this.model = b;
-        this.localPort = localPort;
+        this.port = port;
         running = true;
         this.neighbors = neighbors;
 
@@ -65,7 +65,7 @@ public class Client {
 
         numberFileShared = 0;
         numberKbShared = 0;
-        myInetSocketAddress = new InetSocketAddress(ipAddress, localPort);
+        myInetSocketAddress = new InetSocketAddress(ipAddress, port);
         firstPongsFromNeighbors = new ConcurrentHashMap<>();
         this.peerID = peerID;
         maxNodes = 10;
@@ -120,20 +120,31 @@ public class Client {
                 myInetSocketAddress, minSpeed, searchCriteria);
         return query;
     }
+    private Message createQuery(short minSpeed, byte[] searchCriteria) {
+        QueryMessage query = new QueryMessage(GnutellaConstants.DEFAULT_TTL,
+                GnutellaConstants.INITIAL_HOP, 2 + searchCriteria.length,
+                myInetSocketAddress, minSpeed, searchCriteria);
+        return query;
+    }
 
-    public QueryHitMessage createQueryHit(byte[] idMessage, int pL,
-                                           List<Triple<String, Integer, Integer>> files) {
-        return createQueryHit(idMessage, pL, localPort, files, peerID);
+//    public QueryHitMessage createQueryHit(byte[] idMessage, int pL,
+//                                           List<Triple<String, Integer, Integer>> files) {
+//        return createQueryHit(idMessage, pL, localPort, files, peerID);
+//    }
+//
+
+    public QueryHitMessage createQueryHit(byte[] idMessage, int pL, byte[] result) {
+        return createQueryHit(idMessage, pL, port, result, peerID );
     }
 
     public QueryHitMessage createQueryHit(byte[] idMessage, int pL,
                                            short port,
-                                           List<Triple<String, Integer, Integer>> files, byte[] idServent) {
+                                           byte[] result, byte[] idServent) {
 
         QueryHitMessage queryHit = new QueryHitMessage(idMessage,
-                GnutellaConstants.DEFAULT_TTL, (byte) 0, pL,
+                GnutellaConstants.DEFAULT_TTL, (byte) 0, (byte) pL,
                 myInetSocketAddress, port, ipAddress,
-                GnutellaConstants.DFLT_SPEED, files,
+                GnutellaConstants.DFLT_SPEED, result,
                 idServent);
         return queryHit;
     }
@@ -160,6 +171,9 @@ public class Client {
      *                       descriptor header.
      */
     public void addQuery(short minSpeed, String searchCriteria) {
+        pending(createQuery(minSpeed, searchCriteria));
+    }
+    public void addQuery(short minSpeed, byte[] searchCriteria) {
         pending(createQuery(minSpeed, searchCriteria));
     }
 
@@ -310,33 +324,39 @@ public class Client {
 
     }
 
-    public QueryHitMessage searchFiles(QueryMessage message, String directory) {
-        File myFiles[] = new File(directory).listFiles();
-        sortFilesDesc(myFiles);
-
-        List<Triple<String, Integer, Integer>> ll = Global.newArrayList(0);
-
-        int payloadL = GnutellaConstants.QUERYHIT_PART_L + GnutellaConstants.SERVER_ID_L;
-
-        for (int i = 0; i < myFiles.length; i++) {
-
-            File ff = myFiles[i];
-            if (ff.isDirectory())
-                continue;
-
-            String fn = ff.getName();
-            if (fn.contains(message.query)) {
-                long len = ff.length();
-                ll.add(
-                    Triple.of(fn.trim(), (int) len, i)
-                );
-                payloadL += len;
-
-            }
-        }
-
-        return !ll.isEmpty() ? createQueryHit(message.idBytes(), payloadL, ll) : null;
-    }
+//    public QueryHitMessage searchFiles(QueryMessage message, String directory) {
+//        File myFiles[] = new File(directory).listFiles();
+//        sortFilesDesc(myFiles);
+//
+//        List<Triple<String, Integer, Integer>> ll = Global.newArrayList(0);
+//
+//        int payloadL = GnutellaConstants.QUERYHIT_PART_L + GnutellaConstants.SERVER_ID_L;
+//
+//        CharSequence qs = message.queryString();
+//
+//        for (int i = 0; i < myFiles.length; i++) {
+//
+//            File ff = myFiles[i];
+//            if (ff.isDirectory())
+//                continue;
+//
+//            String fn = ff.getName();
+//
+//            if (fn.contains(qs)) {
+//                long len = ff.length();
+//                ll.add(
+//                    Triple.of(fn.trim(), (int) len, i)
+//                );
+//                payloadL += len;
+//
+//            }
+//        }
+//
+//        return !ll.isEmpty() ? createQueryHit(message.idBytes(), payloadL, port,
+//                null, //TODO encode 'll' as bytes,
+//                peerID
+//        ) : null;
+//    }
 
 
     public void broadcast(Message message, InetSocketAddress except) {
@@ -355,8 +375,8 @@ public class Client {
      *
      * @return the local port number
      */
-    public short getLocalPort() {
-        return localPort;
+    public short getPort() {
+        return port;
     }
 
     /**

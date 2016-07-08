@@ -12,7 +12,8 @@ import java.net.InetSocketAddress;
  */
 public class QueryMessage extends Message {
     private final BigInteger minSpeed;
-    public final String query;
+    public final byte[] query;
+
 
     /**
      * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
@@ -38,7 +39,7 @@ public class QueryMessage extends Message {
         super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
                 receptorNode);
         this.minSpeed = BigInteger.valueOf(minSpeed);
-        this.query = query;
+        this.query = query.getBytes();
     }
 
     /**
@@ -62,6 +63,14 @@ public class QueryMessage extends Message {
     public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
                         InetSocketAddress receptorNode, byte[] minSpeed,
                         String query) {
+        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
+                receptorNode);
+        this.minSpeed = new BigInteger(minSpeed);
+        this.query = query.getBytes();
+    }
+    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
+                        InetSocketAddress receptorNode, byte[] minSpeed,
+                        byte[] query) {
         super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
                 receptorNode);
         this.minSpeed = new BigInteger(minSpeed);
@@ -90,6 +99,12 @@ public class QueryMessage extends Message {
     public QueryMessage(byte ttl, byte hop, int paytloadL,
                         InetSocketAddress receptorNode, short minSpeed,
                         String query) {
+        this(ttl, hop, paytloadL, receptorNode, minSpeed, query.getBytes());
+    }
+
+    public QueryMessage(byte ttl, byte hop, int paytloadL,
+                        InetSocketAddress receptorNode, short minSpeed,
+                        byte[] query) {
         super(GnutellaConstants.QUERY, ttl, hop, paytloadL, receptorNode);
         this.minSpeed = BigInteger.valueOf(minSpeed);
         this.query = query;
@@ -114,7 +129,7 @@ public class QueryMessage extends Message {
     public byte[] toByteArray() {
 
         byte[] query = new byte[GnutellaConstants.HEADER_LENGTH
-                + this.query.length() + 2 + GnutellaConstants.EOS_L];
+                + this.query.length + 2 + GnutellaConstants.EOS_L];
         byte[] temp = super.toByteArray();
         int i = 0;
         for (byte b : temp) {
@@ -127,12 +142,16 @@ public class QueryMessage extends Message {
             query[i++] = a;
 
         }
-        for (char c : this.query.toCharArray()) {
-            query[i++] = (byte) c;
+        //TODO arraycopy
+        for (byte c : this.query) {
+            query[i++] = c;
         }
         query[i] = GnutellaConstants.EOS;
         return query;
     }
 
 
+    public CharSequence queryString() {
+        return new String(query);
+    }
 }

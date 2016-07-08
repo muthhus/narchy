@@ -1,6 +1,8 @@
 package nars.inter.gnutella;
 
 import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -21,6 +23,8 @@ public class MessageHandler {
      */
     private final InetSocketAddress receptorNode;
 
+    static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+
     public MessageHandler(InetSocketAddress receptorNode) {
         this.receptorNode = receptorNode;
     }
@@ -37,8 +41,8 @@ public class MessageHandler {
         int idx = 0;
 
         try {
-            while (/*inStream.available() > 0 && */idx < GnutellaConstants.HEADER_LENGTH) {
-                message.add(inStream.readByte());
+            while (idx < GnutellaConstants.HEADER_LENGTH) {
+                message.add(inStream.readByte()); //blocks for input here
                 idx++;
 
             }
@@ -114,9 +118,7 @@ public class MessageHandler {
                     ByteArrayList partQuery = new ByteArrayList();
 
                     while (inStream.available() > 0) {
-                        byte b = inStream.readByte();
-                        partQuery.add(b);
-
+                        partQuery.add(inStream.readByte());
                         idx++;
                     }
 
@@ -156,18 +158,21 @@ public class MessageHandler {
                     // Declaracion de donde almacenaremos los atributos del mensaje
                     // pong
                     j = 0;
-                    byte nHits = stream[j++];
+                    //byte nHits = stream[j++];
 
                     byte[] portQ = new byte[GnutellaConstants.PORT_LENGTH];
                     byte[] ipQ = new byte[GnutellaConstants.IP_LENGTH];
                     byte[] speedQ = new byte[4];
-                    byte[][] fIQ = new byte[nHits][4];
-                    byte[][] fSQ = new byte[nHits][4];
+                    //byte[][] fIQ = new byte[nHits][4];
+                    //byte[][] fSQ = new byte[nHits][4];
 
-                    int nameL = partQueryH.size() - nHits
-                            * GnutellaConstants.QUERYHIT_PART_L
-                            - GnutellaConstants.SERVER_ID_L;
-                    byte[][] name = new byte[nHits][nameL];
+                    //int payloadSize = partQueryH.size();
+                    /*int resultL = payloadSize - //nHits
+                            //* GnutellaConstants.QUERYHIT_PART_L
+                            - GnutellaConstants.SERVER_ID_L;*/
+
+                    //byte[][] name = new byte[nHits][nameL];
+
                     byte[] idServent = new byte[GnutellaConstants.SERVER_ID_L];
 
                     // Llenamos cada campo con lo que habia en el stream
@@ -181,23 +186,30 @@ public class MessageHandler {
                     for (int i = 0; i < 4; i++) {
                         speedQ[i] = stream[j++];
                     }
-                    for (int k = 0; k < nHits; k++) {
+//                    for (int k = 0; k < nHits; k++) {
+//
+//                        for (int i = 0; i < 4; i++) {
+//                            fIQ[k][i] = stream[j++];
+//                        }
+//                        for (int i = 0; i < 4; i++) {
+//                            fSQ[k][i] = stream[j++];
+//                        }
+//
+//                        for (int i = 0; i < nameL; i++) {
+//                            if (stream[j] == GnutellaConstants.END) {
+//                                j++;
+//                                break;
+//                            }
+//                            name[k][i] = stream[j++];
+//                        }
+//
+//                    }
+                    int payload = stream.length - j - GnutellaConstants.SERVER_ID_L;
 
-                        for (int i = 0; i < 4; i++) {
-                            fIQ[k][i] = stream[j++];
-                        }
-                        for (int i = 0; i < 4; i++) {
-                            fSQ[k][i] = stream[j++];
-                        }
 
-                        for (int i = 0; i < nameL; i++) {
-                            if (stream[j] == GnutellaConstants.END) {
-                                j++;
-                                break;
-                            }
-                            name[k][i] = stream[j++];
-                        }
-
+                    byte[] result = new byte[payload];
+                    for (int i = 0; i < payload; i++) {
+                        result[i] = stream[j++];
                     }
                     for (int i = 0; i < GnutellaConstants.SERVER_ID_L; i++) {
                         idServent[i] = stream[j++];
@@ -205,16 +217,17 @@ public class MessageHandler {
 
 
                     QueryHitMessage m = new QueryHitMessage(idMessage, ttl, hop,
-                            stream.length, receptorNode, nHits, portQ,
-                            InetAddress.getByAddress(ipQ), speedQ, fIQ, fSQ, name,
+                            stream.length, receptorNode, (byte)result.length, portQ,
+                            InetAddress.getByAddress(ipQ), speedQ, result,
                             idServent);
 
                     return m;
 
                 case GnutellaConstants.PUSH:
+                    return null;
 
                 default:
-                    return null;
+                    logger.warn("unknown message type {} ", payloadD);
 
             }
 

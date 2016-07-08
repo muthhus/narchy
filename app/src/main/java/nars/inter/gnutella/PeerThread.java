@@ -240,12 +240,18 @@ public class PeerThread implements Runnable {
         try {
             in = mySocket.getInputStream();
             inStream = new DataInputStream(in);
+
+            byte[] b = new byte[256];
+            int bl = inStream.read(b);
+            String request = (b[0] == 0 ? new String(b, 2, bl) : new String(b)); //DECODE a seeming -string or plain UTF if HTTP request
+
+
             // A servent
             // may reject an incoming connection request for a variety of
             // reasons - a servent’s pool of incoming
             // connection slots may be exhausted
-            String request = inStream.readUTF();
-            if (request.equals(GnutellaConstants.CONNECTION_REQUEST)) {
+            //String request = inStream.readUTF();
+            if (request.startsWith(GnutellaConstants.CONNECTION_REQUEST_PRE)) {
                 out = mySocket.getOutputStream();
                 outStream = new DataOutputStream(out);
                 outStream.writeUTF(GnutellaConstants.CONNECTION_ACCEPTED);
@@ -310,7 +316,7 @@ public class PeerThread implements Runnable {
                     return GnutellaConstants.FAILURE_NODE;
 
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                     return GnutellaConstants.FAILURE_NODE;
                 }
 
@@ -414,6 +420,9 @@ public class PeerThread implements Runnable {
             do {
 
                 Message m = messageHandler.nextMessage(inStream);
+                if (m == null)
+                    continue;
+
                 logger.info("recv {}", m);
 
                 flag = true;
