@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -28,26 +27,24 @@ public class PeerThread implements Runnable {
     private DataInputStream inStream;
     private OutputStream out;
     private DataOutputStream outStream;
-    private Socket mySocket;
+    private final Socket mySocket;
     private boolean downloadThread;
 
 
-    private Executor messagesToSend = Executors.newSingleThreadExecutor();
-    private MessageHandler messageHandler;
-    private InetSocketAddress inSktA;
+    private final Executor messagesToSend = Executors.newSingleThreadExecutor();
+    private final MessageHandler messageHandler;
+    private final InetSocketAddress inSktA;
     private boolean working;
     private boolean connected;
     private boolean flag;
 
-    final Map<String,Message> messageCache;
+    final Map<String, Message> messageCache;
 
 	/* Atributos del nodo cuando es para descarga */
 
     private BigInteger fileLength;
     private String fileName;
-    private String typeConnection;
     private BigInteger rangeByte;
-    private boolean downloadFinished;
     private boolean server;
     private static final Logger logger = LoggerFactory.getLogger(PeerThread.class);
 
@@ -64,7 +61,7 @@ public class PeerThread implements Runnable {
      * @param pathName        Name directoryPath or file which, the Servent that owns this
      *                        Server, shares with the network
      */
-    public PeerThread(Map<String,Message> messageCache, Socket mySocket, Client client,InetSocketAddress inSkA) {
+    public PeerThread(Map<String, Message> messageCache, Socket mySocket, Client client, InetSocketAddress inSkA) {
 
         this.messageCache = messageCache;
         this.client = client;
@@ -77,7 +74,6 @@ public class PeerThread implements Runnable {
 
         working = true;
         downloadThread = false;
-        downloadFinished = false;
         connected = true;
 
     }
@@ -94,14 +90,6 @@ public class PeerThread implements Runnable {
         return fileLength.intValue();
     }
 
-    /**
-     * Returns boolean that determines if the download has finished
-     *
-     * @return true if is finished, false otherwise
-     */
-    public boolean getDownloadFinished() {
-        return downloadFinished;
-    }
 
     /**
      * Returns the number of bytes that before this connection started had been
@@ -145,9 +133,7 @@ public class PeerThread implements Runnable {
      */
     public void send(Message m) {
         logger.info("send {}", m);
-        messagesToSend.execute(() -> {
-            _send(m);
-        });
+        messagesToSend.execute(() -> _send(m));
     }
 
     public boolean connected() {
@@ -163,7 +149,6 @@ public class PeerThread implements Runnable {
     public void close() {
         connected = false;
         working = false;
-        downloadFinished = true;
     }
 
     /**
@@ -222,7 +207,7 @@ public class PeerThread implements Runnable {
             outStream = new DataOutputStream(out);
             in = mySocket.getInputStream();
             inStream = new DataInputStream(in);
-            String request = GnutellaConstants.HTTP_GETPART + size + "/" + file
+            String request = GnutellaConstants.HTTP_GETPART + size + '/' + file
                     + GnutellaConstants.HTTP_REST + range + "\r\n\r\n";
             outStream.writeUTF(request);
             String answer = inStream.readUTF();
@@ -295,8 +280,8 @@ public class PeerThread implements Runnable {
 
                     this.fileLength = new BigInteger(get[2]);
                     this.fileName = get[3].trim();
-                    this.typeConnection = connection[1];
-                    ;
+                    //String typeConnection = connection[1];
+
                     this.rangeByte = new BigInteger(bytes[1].substring(0,
                             bytes.length - 1));
                     if (getRangeByte() > getFileLength()) {
@@ -307,10 +292,9 @@ public class PeerThread implements Runnable {
                     outStream = new DataOutputStream(out);
 
 
-                    boolean b = false;
 
                     File a = new File(fileName);
-                    if (a != null && !a.isDirectory()) {
+                    if (!a.isDirectory()) {
 
                         outStream.writeUTF(GnutellaConstants.HTTP_OK
                                 + getFileLength() + "\r\n\r\n");
@@ -345,6 +329,7 @@ public class PeerThread implements Runnable {
      *
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
         flag = true;
 
@@ -360,51 +345,64 @@ public class PeerThread implements Runnable {
         String file = getFileName();
 
         if (server) {
-
-            try {
-
-                RandomAccessFile f = new RandomAccessFile(file, "r");
-
-                byte[] b = new byte[(int) f.length() - getRangeByte()];
-
-                f.seek(getRangeByte());
-                int actual = f.read(b);
-
-                logger.info("sent {}/{} bytes from {}", actual, b.length, file);
-                outStream.write(b);
-                outStream.close();
-
-                downloadFinished = true;
-
-            } catch (FileNotFoundException e) {
-                logger.warn("File not found: {}", e);
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            sendData(file);
         } else {
-            try {
-
-                int remaining = getFileLength() - getRangeByte();
-                ByteBuffer b = ByteBuffer.allocate(remaining);
-
-                int pos = 0;
-                while (remaining > 0 && inStream.available() > 0) {
-                    int r = inStream.read(b.array(), pos, remaining);
-                    remaining -= r;
-                    pos += r;
-                }
-                b.rewind();
-                client.model.onDownload(client, file, b, getRangeByte());
-
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            downloadFinished = true;
+            recvData(file);
         }
+    }
+
+    public void recvData(String file) {
+        try {
+
+            int remaining = getFileLength() - getRangeByte();
+            ByteBuffer b = ByteBuffer.allocate(remaining);
+
+            int pos = 0;
+            while (remaining > 0 && inStream.available() > 0) {
+                int r = inStream.read(b.array(), pos, remaining);
+                remaining -= r;
+                pos += r;
+            }
+            b.rewind();
+            client.model.onDownload(client, file, b, getRangeByte());
+
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void sendData(String file) {
+        try {
+
+            byte[] b = client.model.data(client, file, getRangeByte());
+            if (b != null) {
+                outStream.write(b);
+            }
+
+            outStream.close();
+
+
+        } catch (FileNotFoundException e) {
+            logger.warn("File not found: {}", e);
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static byte[] sendFile(String file, int rangePosition) throws IOException {
+        RandomAccessFile f = new RandomAccessFile(file, "r");
+
+        byte[] b = new byte[(int) f.length() - rangePosition];
+
+        f.seek(rangePosition);
+        int actual = f.read(b);
+
+        logger.info("sent {}/{} bytes from {}", actual, b.length, file);
+        return b;
     }
 
     public void runServer() {
@@ -418,9 +416,6 @@ public class PeerThread implements Runnable {
                 Message m = messageHandler.nextMessage(inStream);
                 logger.info("recv {}", m);
 
-                String messageID = m.idString();
-                InetSocketAddress inetSckAd = new InetSocketAddress(
-                        mySocket.getInetAddress(), getPort());
                 flag = true;
                 switch (m.getPayloadD()) {
 
@@ -432,7 +427,9 @@ public class PeerThread implements Runnable {
                         break;
 
                     case GnutellaConstants.PONG:
-                        pending(m);
+                        if (unseen(m)) {
+                            pending(m);
+                        }
                         break;
 
                     case GnutellaConstants.PUSH:
@@ -472,7 +469,7 @@ public class PeerThread implements Runnable {
     }
 
     public boolean unseen(Message m) {
-        return messageCache.putIfAbsent(m.idString(), m)==null;
+        return messageCache.putIfAbsent(m.idString(), m) == null;
     }
 
     public void _send(Message m) {

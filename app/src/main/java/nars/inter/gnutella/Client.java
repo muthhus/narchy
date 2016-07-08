@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -21,7 +20,6 @@ public class Client {
     private final short localPort;
     private final boolean working;
     private final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
-    public final ConcurrentHashMap<InetSocketAddress, PeerThread> downloads;
 
     private final ConcurrentHashMap<String, ArrayList<InetSocketAddress>> firstPongsFromNeighbors;
     private final Executor pendingMessages = Executors.newSingleThreadExecutor();
@@ -51,17 +49,11 @@ public class Client {
      * @param ipAddress   the ip address bound to this client
      * @param idServent   The 16-byte string uniquely identifying the servent on the
      *                    network who is being requested to push
-     * @param downloads   HashMap that contains the connections to nodes which the
-     *                    Servent owner of this Server has request for downloads and
-     *                    connections to nodes that request for a download . Keys are in
-     *                    format InetSocketAddress, those InetSocketAddress are bound
-     *                    with each connection(ServentThread). Values are ServentThread.
      */
     public Client(Peer peer, short localPort,
                   ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors,
                   InetAddress ipAddress,
                   byte[] idServent,
-                  ConcurrentHashMap<InetSocketAddress, PeerThread> downloads,
                   ClientModel b
     ) {
         this.peer = peer;
@@ -69,14 +61,13 @@ public class Client {
         this.localPort = localPort;
         working = true;
         this.neighbors = neighbors;
-        this.downloads = downloads;
 
         this.ipAddress = ipAddress;
 
         numberFileShared = 0;
         numberKbShared = 0;
         myInetSocketAddress = new InetSocketAddress(ipAddress, localPort);
-        firstPongsFromNeighbors = new ConcurrentHashMap<String, ArrayList<InetSocketAddress>>();
+        firstPongsFromNeighbors = new ConcurrentHashMap<>();
         this.idServent = idServent;
         maxNodes = 10;
     }
@@ -95,7 +86,7 @@ public class Client {
         maxNodes++;
     }
 
-    public synchronized int getMaxNodes() {
+    public int getMaxNodes() {
         return maxNodes;
     }
 
@@ -132,8 +123,8 @@ public class Client {
     }
 
     private QueryHitMessage createQueryHit(byte[] idMessage, int pL,
-                                                  InetSocketAddress receptorNode, short port,
-                                                  InetAddress myIpAddress, List<Triple<String, Integer, Integer>> files, byte[] idServent) {
+                                           short port,
+                                           List<Triple<String, Integer, Integer>> files, byte[] idServent) {
 
         QueryHitMessage queryHit = new QueryHitMessage(idMessage,
                 GnutellaConstants.DEFAULT_TTL, (byte) 0, pL,
@@ -151,9 +142,7 @@ public class Client {
     }
 
     public final void pending(Message m) {
-        pendingMessages.execute(() -> {
-            handle(m);
-        });
+        pendingMessages.execute(() -> handle(m));
     }
 
 
@@ -220,7 +209,7 @@ public class Client {
             if (myInetSocketAddress.equals(message.receptorNode)) {
                 broadcast(message);
             } else {
-                if (n!=null) {
+                if (n != null) {
                     // contesto al que lo envio
                     n.send(
                             newPong(message)
@@ -231,7 +220,7 @@ public class Client {
 
         } else {
             // no tiene vida solo contesto
-            if (n!=null)
+            if (n != null)
                 n.send(newPong(message));
         }
     }
@@ -275,14 +264,16 @@ public class Client {
     }
 
     public void onHit(QueryHitMessage m) {
-        if (peer.seen(m))
-            return;
+
 
         InetSocketAddress owner = m.receptorNode;
-        if (myInetSocketAddress.equals(owner)) {
-            model.onQueryHit(this, m);
-        } else {
-            neighbors.get(owner).send(m);
+        //if (!myInetSocketAddress.equals(owner)) {
+        model.onQueryHit(this, m);
+        //} else {
+
+        if (!myInetSocketAddress.equals(owner)) {
+            if (!peer.seen(m))
+                neighbors.get(owner).send(m);
         }
     }
 
@@ -344,9 +335,9 @@ public class Client {
             return null;
 
         return createQueryHit(message.id.toByteArray(),
-                payloadL, myInetSocketAddress,
+                payloadL,
                 (short) myInetSocketAddress.getPort(),
-                ipAddress, ll,
+                ll,
                 idServent);
     }
 
@@ -359,9 +350,7 @@ public class Client {
     }
 
     public void broadcast(Message message) {
-        neighbors.forEach((k, v) -> {
-            v.send(message);
-        });
+        neighbors.forEach((k, v) -> v.send(message));
     }
 
     /**
@@ -414,32 +403,25 @@ public class Client {
      *              uniquely identify the file matching the corresponding query.
      */
     public synchronized void download(InetAddress i, short port, String file, int size, int range) {
-        if (downloads.size() <= GnutellaConstants.MAX_DOWNLOADS) {
-            Socket sktTmp;
 
-            try {
-                sktTmp = new Socket(i, port);
+        Socket sktTmp;
 
-                InetSocketAddress inetSocketA = new InetSocketAddress(
-                        sktTmp.getInetAddress(), sktTmp.getLocalPort());
-                PeerThread thread = new PeerThread(peer.messageCache, sktTmp, this, inetSocketA);
-                if (thread.start(file, size, range)) {
-                    downloads.putIfAbsent(inetSocketA, thread);
-                    new Thread(thread).start();
-                } else {
-                    System.out.println("DENIED  DOWNLOAD CONNECTION");
-                }
-            } catch (UnknownHostException e) {
+        try {
+            sktTmp = new Socket(i, port);
 
-                e.printStackTrace();
-            } catch (IOException e) {
-
-                e.printStackTrace();
+            InetSocketAddress inetSocketA = new InetSocketAddress(sktTmp.getInetAddress(), sktTmp.getLocalPort());
+            PeerThread thread = new PeerThread(peer.messageCache, sktTmp, this, inetSocketA);
+            if (thread.start(file, size, range)) {
+                new Thread(thread).start();
+            } else {
+                System.out.println("DENIED  DOWNLOAD CONNECTION");
             }
+        } catch (IOException e) {
 
-        } else {
-            System.out.println("MAX DOWNLOADS EXCEEDED");
+            e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -468,9 +450,6 @@ public class Client {
 
                     return true;
                 }
-            } catch (UnknownHostException e) {
-
-                e.printStackTrace();
             } catch (IOException e) {
 
                 e.printStackTrace();
@@ -484,14 +463,8 @@ public class Client {
     }
 
     private static void sortFilesDesc(File[] files) {
-        Comparator<File> comparator = new Comparator<File>() {
-
-            @Override
-            public int compare(File o1, File o2) {
-                return Long.valueOf(o1.lastModified()).compareTo(
-                        o2.lastModified());
-            }
-        };
+        Comparator<File> comparator = (o1, o2) -> Long.valueOf(o1.lastModified()).compareTo(
+                o2.lastModified());
         Arrays.sort(files, comparator);
 
     }

@@ -11,5 +11,5 @@ public interface ClientModel {
 
     QueryHitMessage search(Client client, QueryMessage message);
 
-
+    byte[] data(Client client, String file, int rangePosition);
 }
