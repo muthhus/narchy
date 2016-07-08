@@ -1,27 +1,73 @@
 package nars.inter;
 
-import com.addthis.meshy.MeshyServer;
-import nars.NAR;
 
-import java.io.IOException;
+import nars.$;
+import nars.NAR;
+import nars.nar.Default;
+import nars.task.Task;
+import nars.util.IO;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * Peer interface for an InterNARS mesh
  * https://github.com/addthis/meshy/blob/master/src/test/java/com/addthis/
  */
-public class InterNAR {
+public class InterNAR  {
+
+
+    final Logger logger;
 
     final NAR nar;
-    final MeshyServer server;
+
 
     public InterNAR(NAR n, int port) throws IOException {
+
+        logger = LoggerFactory.getLogger(n.self + "," + getClass().getSimpleName());
+
         this.nar = n;
-        this.server = new MeshyServer(port);
+
+
+
     }
 
-    public void connect(String host, int port) {
-        //server1.connectToPeer(server2.getUUID(), server2.getLocalAddress());
+
+
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        //test
+
+        NAR a = new Default();
+        InterNAR ai = new InterNAR(a, 10001);
+
+        NAR b = new Default();
+        InterNAR bi = new InterNAR(a, 10001);
+        //bi.connectPeer(ai);
+
+
+
+        ai.send(a.task("(a-->b)."));
+
     }
 
+    public void send(Task t) {
+
+
+        DataOutput d = new DataOutputStream(null);
+        try {
+            IO.writeTask(d, t);
+            //o.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+    }
 
 }
