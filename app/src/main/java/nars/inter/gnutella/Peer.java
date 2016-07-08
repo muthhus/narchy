@@ -4,7 +4,6 @@ import nars.util.data.map.CapacityLinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -40,11 +39,20 @@ public class Peer {
     public final Client client;
     final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
     private final IdGenerator myIdGenerator;
-    private final File myDirectory;
 
     final int maxConnections = 5;
 
     final Map<String, Message> messageCache = new CapacityLinkedHashMap(4096);
+
+
+    /** this instance must implement ClientModel */
+    protected Peer() throws IOException {
+        this(null);
+    }
+
+    public Peer(ClientModel model) throws IOException {
+        this(newRandomPort(), model);
+    }
 
     /**
      * Constructs a Servent that listens for upcoming connections in the
@@ -54,9 +62,11 @@ public class Peer {
      * @throws IOException IO error when opening the socket in which this Servent
      *                     listens for upcoming connections
      */
-    public Peer(String pathName, ClientModel model) throws IOException {
+    public Peer(short port, ClientModel model) throws IOException {
 
-        this.myPort = newRandomPort();
+        this.myPort = port;
+        if (model == null)
+            model = (ClientModel)this;
 
         neighbors = new ConcurrentHashMap<>(maxConnections);
 
@@ -64,7 +74,6 @@ public class Peer {
 
         myIdGenerator = new IdGenerator();
 
-        myDirectory = new File(pathName);
 
         this.client = new Client(this, myPort, neighbors,
                 ipAddress,
@@ -73,14 +82,18 @@ public class Peer {
 
         client.start();
 
-        this.server = new Server(this, myPort, neighbors,
-                myIdGenerator,
-                myDirectory, client);
+        this.server = new Server(this, myPort, neighbors, client);
 
 
         new Thread(server).start();
 
         logger.info("started {}", server.socket);
+    }
+
+    public void connect(Peer p) {
+        if (p == this)
+            throw new RuntimeException("self connect");
+        connect(p.host(), p.port());
     }
 
 

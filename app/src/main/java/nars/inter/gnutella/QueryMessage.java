@@ -133,4 +133,6 @@ public class QueryMessage extends Message {
         query[i] = GnutellaConstants.EOS;
         return query;
     }
+
+
 }

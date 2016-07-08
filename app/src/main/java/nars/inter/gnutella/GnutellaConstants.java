@@ -68,4 +68,7 @@ public enum GnutellaConstants {
     public static final String HTTP_REST = "/ HTTP/1.0\r\nConnection: Keep-Alive\r\nRange: bytes=";
     public static final String HTTP_DENY = " HTTP 400 Bad Request\r\n\r\n";
 
+
+    public static final int AUTO_PING_PER_N_MESSAGES = 10;
+    static final long DEAD_CONNECTION_REMOVAL_INTERVAL_MS = 10000;
 }

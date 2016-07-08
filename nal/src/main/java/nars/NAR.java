@@ -98,7 +98,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * TODO
      */
     @NotNull
-    public final Atom self;
+    public Atom self;
     /**
      * Flag for running continuously
      */
@@ -168,6 +168,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         bt.forEach(xt -> {
             System.out.println(xt.proof());
         });
+    }
+
+    /** change the identity of this NAR */
+    public NAR setSelf(Atom nextSelf) {
+        this.self = nextSelf;
+        return this;
+    }
+    public NAR setSelf(String nextSelf) {
+        return setSelf($.$(nextSelf));
     }
 
     /**
@@ -1092,6 +1101,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             });
         }
     }
+
+
 
 
 //    @Nullable

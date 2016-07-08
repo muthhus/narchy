@@ -364,7 +364,7 @@ public class PeerThread implements Runnable {
                 pos += r;
             }
             b.rewind();
-            client.model.onDownload(client, file, b, getRangeByte());
+            client.model.data(client, file, b, getRangeByte());
 
 
         } catch (IOException e) {

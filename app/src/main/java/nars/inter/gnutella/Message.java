@@ -19,7 +19,7 @@ public class Message {
     byte ttl;
     byte hop;
     public final int payloadL;
-    public final InetSocketAddress receptorNode;
+    public final InetSocketAddress recipient;
 
     /**
      * Creates a header used on Gnutella Protocol v0.4
@@ -33,16 +33,16 @@ public class Message {
      *                     network
      * @param hop          The number of times the descriptor has been forwarded
      * @param payloadL     The length of the descriptor immediately following this header
-     * @param receptorNode Id of the thread that received the message
+     * @param recipient Id of the thread that received the message
      */
     protected Message(byte[] id, byte payloadD, byte ttl, byte hop,
-                      int payloadL, InetSocketAddress receptorNode) {
+                      int payloadL, InetSocketAddress recipient) {
         this.id = new BigInteger(id);
         this.payloadD = payloadD;
         this.ttl = ttl;
         this.hop = hop;
         this.payloadL = payloadL;
-        this.receptorNode = receptorNode;
+        this.recipient = recipient;
 
     }
 
@@ -56,16 +56,16 @@ public class Message {
      *                     network
      * @param hop          The number of times the descriptor has been forwarded
      * @param payloadL     The length of the descriptor immediately following this header
-     * @param receptorNode thread that received the message
+     * @param recipient thread that received the message
      */
     protected Message(byte payloadD, byte ttl, byte hop, int payloadL,
-                      InetSocketAddress receptorNode) {
+                      InetSocketAddress recipient) {
         this.id = new BigInteger(IdGenerator.getIdMessage());
         this.payloadD = payloadD;
         this.ttl = ttl;
         this.hop = hop;
         this.payloadL = payloadL;
-        this.receptorNode = receptorNode;
+        this.recipient = recipient;
 
     }
 
@@ -163,6 +163,10 @@ public class Message {
 
         return getClass().getSimpleName() + '|' + id.toString(36) + '|' + getPayloadD() + '|' + getTtl()
                 + '|' + getHop() + '|' + getPayloadL();
+    }
+
+    public final byte[] idBytes() {
+        return id.toByteArray();
     }
 
 }

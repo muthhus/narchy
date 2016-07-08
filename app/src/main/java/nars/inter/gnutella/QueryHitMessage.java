@@ -17,14 +17,14 @@ import java.util.List;
  */
 public class QueryHitMessage extends Message {
 
-    private final byte numberOfHits;
-    private final BigInteger port;
-    private final InetAddress myIpAddress;
-    private final BigInteger speed;
-    private final BigInteger[] fileIndex;
-    private final BigInteger[] fileSize;
-    private final String[] fileName;
-    private final byte[] idServent;
+    public final byte numberOfHits;
+    public final BigInteger port;
+    public final InetAddress responder;
+    public final BigInteger speed;
+    public final BigInteger[] fileIndex;
+    public final BigInteger[] fileSize;
+    public final String[] fileName;
+    public final byte[] idServent;
 
     /**
      * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
@@ -57,13 +57,13 @@ public class QueryHitMessage extends Message {
 
     public QueryHitMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
                            InetSocketAddress receptorNode, short port,
-                           InetAddress myIpAddress, int speed, List<Triple<String, Integer, Integer>> files, byte[] idServent) {
+                           InetAddress responder, int speed, List<Triple<String, Integer, Integer>> files, byte[] idServent) {
         super(idMessage, GnutellaConstants.QUERY_HIT, ttl, hop, paytloadL,
                 receptorNode);
 
         this.numberOfHits = (byte) files.size();
         this.port = BigInteger.valueOf(port);
-        this.myIpAddress = myIpAddress;
+        this.responder = responder;
         this.speed = BigInteger.valueOf(speed);
 
         this.idServent = idServent;
@@ -112,14 +112,14 @@ public class QueryHitMessage extends Message {
      */
     public QueryHitMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
                            InetSocketAddress receptorNode, byte numberOfHits, byte[] port,
-                           InetAddress myIpAddress, byte[] speed, byte[][] fileIndex,
+                           InetAddress responder, byte[] speed, byte[][] fileIndex,
                            byte[][] fileSize, byte[][] fileName, byte[] idServent) {
         super(idMessage, GnutellaConstants.QUERY_HIT, ttl, hop, paytloadL,
                 receptorNode);
 
         this.numberOfHits = numberOfHits;
         this.port = new BigInteger(port);
-        this.myIpAddress = myIpAddress;
+        this.responder = responder;
         this.speed = new BigInteger(speed);
         this.fileIndex = new BigInteger[numberOfHits];
         this.fileSize = new BigInteger[numberOfHits];
@@ -171,7 +171,7 @@ public class QueryHitMessage extends Message {
             queryHit[i++] = a;
 
         }
-        for (byte a : myIpAddress.getAddress()) {
+        for (byte a : responder.getAddress()) {
             queryHit[i++] = a;
         }
 
@@ -246,15 +246,6 @@ public class QueryHitMessage extends Message {
      */
     public short getPort() {
         return port.shortValue();
-    }
-
-    /**
-     * Returns the ip address
-     *
-     * @return the ip address
-     */
-    public InetAddress getMyIpAddress() {
-        return myIpAddress;
     }
 
     /**
