@@ -1,29 +1,23 @@
 package nars.inter;
 
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
-import nars.concept.Concept;
+import nars.bag.impl.ArrayBag;
+import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.*;
+import nars.link.BLink;
 import nars.nal.Tense;
-import nars.nar.Default;
 import nars.op.mental.Inperience;
-import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Term;
 import nars.util.IO;
-import org.apache.commons.lang3.tuple.Triple;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import static nars.$.$;
 
 /**
  * Peer interface for an InterNARS mesh
@@ -34,17 +28,38 @@ public class InterNAR extends Peer implements ClientModel {
     final Logger logger;
     final NAR nar;
 
+    float broadcastPriorityThreshold = 0.75f;
+    float broadcastConfidenceThreshold = 0.95f;
+
+    final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
+
     public InterNAR(NAR n) throws IOException {
         super();
 
         logger = LoggerFactory.getLogger(n.self + "," + getClass().getSimpleName());
 
         this.nar = n;
+
+        nar.onTask(t -> {
+            if (t.isQuestion()) {
+                BLink<Term> existingBudget = asked.get(t.term());
+                if (existingBudget == null /* || or below a decayed threshold */ ) {
+                    nar.runLater(()->{
+                        //broadcast question as internar query
+                        asked.put(t.term(), t.budget());
+
+                        logger.info("{} asks \"{}\"", address, t);
+                        query(IO.asBytes(t));
+
+                    });
+                }
+            } else if (t.isBelief()) {
+//                if (t.pri() > broadcastPriorityThreshold && t.conf() > broadcastConfidenceThreshold) {
+//                    query(IO.asBytes(t));
+//                }
+            }
+        });
     }
-
-
-
-
 
 
 
@@ -58,11 +73,15 @@ public class InterNAR extends Peer implements ClientModel {
         //if (q.id.equals(id)) //TODO dont reify if it's a message originating from this peer
         //TODO dont reify an already reified belief?
 
+        consider(q, t);
+
+
+    }
+
+    public void consider(Message q, Task t) {
         nar.believe(
             Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present
         );
-
-
     }
 
     @Override
@@ -71,17 +90,20 @@ public class InterNAR extends Peer implements ClientModel {
     }
 
     @Override
-    public void search(Client client, QueryMessage message, Consumer<QueryHitMessage> eachResult) {
+    public void search(Client client, QueryMessage q, Consumer<QueryHitMessage> eachResult) {
 
-        Task t = IO.taskFromBytes(message.query, nar.index);
-        logger.info("{} asked \"{}\" by {}", nar.self, t, message.recipient);
+        Task t = IO.taskFromBytes(q.query, nar.index);
+        logger.info("{} asked \"{}\" from {}", address, t, q.recipient);
 
         if (t.isQuestion()) {
             final int[] count = {3};
             nar.ask(t.term(), Tense.ETERNAL, a -> {
-                eachResult.accept(client.createQueryHit(message.idBytes(), 1, IO.asBytes(a)));
+                logger.info("{} answering \"{}\" to {}", address, a, q.recipient);
+                eachResult.accept(client.createQueryHit(q.recipient, q.idBytes(), 1, IO.asBytes(a)));
                 return (count[0]--) > 0;
             });
+        } else if (t.isBelief()) {
+            //consider(q, t);
         }
 
     }

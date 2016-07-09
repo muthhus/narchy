@@ -97,8 +97,8 @@ public class QueryHitMessage extends Message {
     }
 
         public QueryHitMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-                           InetSocketAddress receptorNode, byte numberOfHits, byte[] port,
-                           InetAddress responder, byte[] speed, byte[] result, byte[] idServent) {
+                               InetSocketAddress receptorNode, byte[] port,
+                               InetAddress responder, byte[] speed, byte[] result, byte[] idServent) {
         super(idMessage, GnutellaConstants.QUERY_HIT, ttl, hop, paytloadL,
                 receptorNode);
 

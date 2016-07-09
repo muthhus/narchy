@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -219,7 +218,7 @@ public class MessageHandler {
 
 
                 QueryHitMessage m = new QueryHitMessage(idMessage, ttl, hop,
-                        stream.length, receptorNode, (byte) result.length, portQ,
+                        stream.length, receptorNode, portQ,
                         InetAddress.getByAddress(ipQ), speedQ, result,
                         idServent);
 

@@ -19,9 +19,8 @@ public class Client {
     private final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
 
     private final ConcurrentHashMap<String, Collection<InetSocketAddress>> firstPongsFromNeighbors;
-    private final Executor pendingMessages = Executors.newSingleThreadExecutor();
+    private final ExecutorService pendingMessages = Executors.newSingleThreadExecutor();
 
-    private final InetSocketAddress myInetSocketAddress;
     private final InetAddress ipAddress;
     @Deprecated private final int numberFileShared;
     private final int numberKbShared;
@@ -64,7 +63,7 @@ public class Client {
 
         numberFileShared = 0;
         numberKbShared = 0;
-        myInetSocketAddress = new InetSocketAddress(ipAddress, port);
+
         firstPongsFromNeighbors = new ConcurrentHashMap<>();
         this.peerID = peerID;
         maxNodes = 10;
@@ -97,7 +96,7 @@ public class Client {
      */
     public PingMessage createPing() {
         PingMessage m = new PingMessage(GnutellaConstants.DEFAULT_TTL,
-                GnutellaConstants.INITIAL_HOP, myInetSocketAddress);
+                GnutellaConstants.INITIAL_HOP, peer.address);
         return m;
     }
 
@@ -107,8 +106,8 @@ public class Client {
 
     private PongMessage newPong(byte[] messageId) {
         PongMessage pong = new PongMessage(messageId,
-                GnutellaConstants.DEFAULT_TTL, (byte) 0, myInetSocketAddress,
-                (short) myInetSocketAddress.getPort(), getIpAddress(),
+                GnutellaConstants.DEFAULT_TTL, (byte) 0, peer.address,
+                (short) peer.address.getPort(), getIpAddress(),
                 getNumberFileShared(), getNumberKbShared());
         return pong;
     }
@@ -116,13 +115,13 @@ public class Client {
     private Message createQuery(short minSpeed, String searchCriteria) {
         QueryMessage query = new QueryMessage(GnutellaConstants.DEFAULT_TTL,
                 GnutellaConstants.INITIAL_HOP, 2 + searchCriteria.length(),
-                myInetSocketAddress, minSpeed, searchCriteria);
+                peer.address, minSpeed, searchCriteria);
         return query;
     }
     private Message createQuery(short minSpeed, byte[] searchCriteria) {
         QueryMessage query = new QueryMessage(GnutellaConstants.DEFAULT_TTL,
                 GnutellaConstants.INITIAL_HOP, 2 + searchCriteria.length,
-                myInetSocketAddress, minSpeed, searchCriteria);
+                peer.address, minSpeed, searchCriteria);
         return query;
     }
 
@@ -132,17 +131,17 @@ public class Client {
 //    }
 //
 
-    public QueryHitMessage createQueryHit(byte[] idMessage, int pL, byte[] result) {
-        return createQueryHit(idMessage, pL, port, result, peerID );
+    public QueryHitMessage createQueryHit(InetSocketAddress recipient, byte[] idMessage, int pL, byte[] result) {
+        return createQueryHit(recipient, idMessage, pL, port, result, peerID );
     }
 
-    public QueryHitMessage createQueryHit(byte[] idMessage, int pL,
+    public QueryHitMessage createQueryHit(InetSocketAddress recipient, byte[] idMessage, int pL,
                                            short port,
                                            byte[] result, byte[] idServent) {
 
         QueryHitMessage queryHit = new QueryHitMessage(idMessage,
                 GnutellaConstants.DEFAULT_TTL, (byte) 0, (byte) pL,
-                myInetSocketAddress, port, ipAddress,
+                recipient, port, ipAddress,
                 GnutellaConstants.DFLT_SPEED, result,
                 idServent);
         return queryHit;
@@ -160,6 +159,7 @@ public class Client {
     }
 
 
+
     /**
      * Adds a QuerMessage to the pending Message queue
      *
@@ -169,11 +169,11 @@ public class Client {
      *                       of this string is bounded by the Payload_Length field of the
      *                       descriptor header.
      */
-    public void addQuery(short minSpeed, String searchCriteria) {
-        pending(createQuery(minSpeed, searchCriteria));
+    public void query(short minSpeed, String searchCriteria) {
+        broadcast(createQuery(minSpeed, searchCriteria));
     }
-    public void addQuery(short minSpeed, byte[] searchCriteria) {
-        pending(createQuery(minSpeed, searchCriteria));
+    public void query(short minSpeed, byte[] searchCriteria) {
+        broadcast(createQuery(minSpeed, searchCriteria));
     }
 
     final AtomicInteger messageCount = new AtomicInteger();
@@ -214,7 +214,7 @@ public class Client {
 
         if (forward) {
             // Si yo lo cree
-            if (myInetSocketAddress.equals(message.recipient)) {
+            if (peer.address.equals(message.recipient)) {
                 broadcast(message);
             } else {
                 if (n != null) {
@@ -242,7 +242,7 @@ public class Client {
             // // Primer caso es nuestro
 
             InetSocketAddress ownerPing = messageP.recipient;
-            if (myInetSocketAddress.equals(ownerPing)) {
+            if (peer.address.equals(ownerPing)) {
                 //for this node
 
                 Collection<InetSocketAddress> firstPing = firstPongsFromNeighbors.get(messageP.idString());
@@ -274,24 +274,27 @@ public class Client {
 
 
         InetSocketAddress owner = m.recipient;
-        //if (!myInetSocketAddress.equals(owner)) {
+        //if (!peer.address.equals(owner)) {
         model.onQueryHit(this, m);
         //} else {
 
-        if (!myInetSocketAddress.equals(owner)) {
+        if (!peer.address.equals(owner)) {
             if (!peer.seen(m))
                 neighbors.get(owner).send(m);
         }
     }
 
 
-    public void onQuery(QueryMessage message) {
-        if (myInetSocketAddress.equals(message.recipient)) {
-            broadcast(message, message.recipient);
+    public void onQuery(QueryMessage q) {
+
+
+        if (peer.address.equals(q.recipient)) {
+
         } else {
-            model.search(this, message, (mQueryH) -> {
-                neighbors.get(message.recipient).send(mQueryH);
+            model.search(this, q, (mQueryH) -> {
+                neighbors.get(q.recipient).send(mQueryH);
             });
+            broadcast(q, q.recipient);
         }
 
         //TODO decide to propagate query
@@ -350,13 +353,18 @@ public class Client {
 
 
     public void broadcast(Message message, InetSocketAddress except) {
+        //peer.logger.trace("{} broadcast: {} exceptTo {}", peer.server.socket, message, except);
+        peer.seen(message);
         neighbors.forEach((k, v) -> {
+
             if (!k.equals(except))
                 v.send(message);
         });
     }
 
     public void broadcast(Message message) {
+        //peer.logger.trace("broadcast: {}", message);
+        peer.seen(message);
         neighbors.forEach((k, v) -> v.send(message));
     }
 
@@ -469,14 +477,16 @@ public class Client {
         return false;
     }
 
-    private static void sortFilesDesc(File[] files) {
-        Comparator<File> comparator = (o1, o2) -> Long.valueOf(o1.lastModified()).compareTo(
-                o2.lastModified());
-        Arrays.sort(files, comparator);
-
-    }
+//    private static void sortFilesDesc(File[] files) {
+//        Comparator<File> comparator = (o1, o2) -> Long.valueOf(o1.lastModified()).compareTo(
+//                o2.lastModified());
+//        Arrays.sort(files, comparator);
+//
+//    }
 
     public void stop() {
+
+        pendingMessages.shutdownNow();
         running = false;
 
     }

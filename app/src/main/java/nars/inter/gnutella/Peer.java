@@ -1,5 +1,6 @@
 package nars.inter.gnutella;
 
+import nars.util.Util;
 import nars.util.data.map.CapacityLinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class Peer {
     final static Logger logger = LoggerFactory.getLogger(Peer.class);
 
 
-    private final InetAddress ipAddress;
+    public final InetAddress host;
     private final short myPort;
     public final Server server;
     public final Client client;
@@ -51,6 +52,7 @@ public class Peer {
 
     final Map<String, Message> messageCache = new CapacityLinkedHashMap(4096);
     private final byte[] id;
+    public final InetSocketAddress address;
 
 
     /**
@@ -80,18 +82,19 @@ public class Peer {
 
         neighbors = new ConcurrentHashMap<>(maxConnections);
 
-        ipAddress = InetAddress.getLocalHost();
+        host = InetAddress.getLocalHost();
+        address = new InetSocketAddress(host, port);
 
 
         this.client = new Client(this, myPort, neighbors,
-                ipAddress,
+                host,
                 id = IdGenerator.getIdServent(), model
         );
 
         exe.execute(() -> {
             while (client.running) {
 
-                nars.util.Util.pause(GnutellaConstants.DEAD_CONNECTION_REMOVAL_INTERVAL_MS);
+                Util.pause(GnutellaConstants.DEAD_CONNECTION_REMOVAL_INTERVAL_MS);
 
                 client.removeDeadConnections();
 
@@ -140,11 +143,12 @@ public class Peer {
      * @param searchCriteria the name of file for the search
      */
     public void query(String searchCriteria) {
-        client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
+        client.query(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
     }
 
     public void query(byte[] searchCriteria) {
-        client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
+        client.query(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
+
     }
 
     /**
@@ -230,7 +234,7 @@ public class Peer {
     }
 
     public String host() {
-        return ipAddress.getHostName();
+        return host.getHostName();
     }
 
     public boolean seen(Message messageP) {

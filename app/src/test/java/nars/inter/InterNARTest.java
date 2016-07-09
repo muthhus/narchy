@@ -3,10 +3,12 @@ package nars.inter;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.IO;
+import nars.util.Util;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.*;
 
@@ -15,44 +17,63 @@ import static org.junit.Assert.*;
  */
 public class InterNARTest {
 
+    static void testAB(BiConsumer<InterNAR, InterNAR> ab) {
+
+        try {
+            NAR a = new Default().setSelf("a");
+            InterNAR ai = new InterNAR(a);
+
+            NAR b = new Default().setSelf("b");
+            InterNAR bi = new InterNAR(b);
+
+            bi.connect(ai);
+
+            ab.accept(ai, bi);
+
+            ai.stop();
+            bi.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(e.toString(), false);
+        }
+    }
+
     @Test
-    public void testInterNAR1() throws IOException, InterruptedException {
+    public void testInterNAR1() {
 
-        NAR a = new Default().setSelf("a");
-        InterNAR ai = new InterNAR(a);
+        testAB((ai, bi) -> {
 
-        NAR b = new Default().setSelf("b");
-        InterNAR bi = new InterNAR(b);
+            NAR a = ai.nar;
+            NAR b = bi.nar;
 
-        bi.connect(ai);
+            b.believe("(X --> y)");
 
-        b.believe("(X --> y)");
+            String question = "(?x --> y)?";
+            a.ask(question);
+            //ai.query(IO.asBytes(a.task(question)));
+            //TODO a.ask(question);
 
-        String question = "(?x --> y)?";
-        ai.query(IO.asBytes(a.task(question)));
-        //TODO a.ask(question);
+            Util.pause(100);
 
-        Thread.sleep(300);
+            //a.log();
+            AtomicBoolean recv = new AtomicBoolean();
+            a.onTask(tt -> {
+                //System.out.println(b + ": " + tt);
+                if (tt.toString().contains("(X-->y)"))
+                    recv.set(true);
+            });
 
-        //a.log();
-        AtomicBoolean recv = new AtomicBoolean();
-        a.onTask(tt -> {
-            //System.out.println(b + ": " + tt);
-            if (tt.toString().contains("(X-->y)"))
-                recv.set(true);
+            a.run(4);
+            b.run(4);
+
+            Util.pause(200);
+
+            assertTrue(recv.get());
+
         });
 
-        a.run(4);
-        b.run(4);
-
-        Thread.sleep(300);
-
-
-        ai.stop();
-        bi.stop();
-
-        ai = bi = null;
-        a = b = null;
 
     }
+
+
 }
