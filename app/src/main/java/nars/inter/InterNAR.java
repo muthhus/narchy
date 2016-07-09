@@ -6,6 +6,9 @@ import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.*;
+import nars.inter.gnutella.message.Message;
+import nars.inter.gnutella.message.QueryHitMessage;
+import nars.inter.gnutella.message.QueryMessage;
 import nars.link.BLink;
 import nars.nal.Tense;
 import nars.op.mental.Inperience;
@@ -23,13 +26,13 @@ import java.util.function.Consumer;
  * Peer interface for an InterNARS mesh
  * https://github.com/addthis/meshy/blob/master/src/test/java/com/addthis/
  */
-public class InterNAR extends Peer implements ClientModel {
+public class InterNAR extends Peer implements PeerModel {
 
     final Logger logger;
     final NAR nar;
 
     float broadcastPriorityThreshold = 0.75f;
-    float broadcastConfidenceThreshold = 0.95f;
+    float broadcastConfidenceThreshold = 0.9f;
 
     final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
 
@@ -54,9 +57,9 @@ public class InterNAR extends Peer implements ClientModel {
                     });
                 }
             } else if (t.isBelief()) {
-//                if (t.pri() > broadcastPriorityThreshold && t.conf() > broadcastConfidenceThreshold) {
-//                    query(IO.asBytes(t));
-//                }
+                if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
+                    query(IO.asBytes(t));
+                }
             }
         });
     }
@@ -64,7 +67,7 @@ public class InterNAR extends Peer implements ClientModel {
 
 
     @Override
-    public void onQueryHit(Client client, QueryHitMessage q) {
+    public void onQueryHit(Peer client, QueryHitMessage q) {
 
         Task t = IO.taskFromBytes(q.result, nar.index);
         logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
@@ -85,12 +88,12 @@ public class InterNAR extends Peer implements ClientModel {
     }
 
     @Override
-    public void data(Client client, String file, ByteBuffer b, int rangeByte) {
+    public void data(Peer client, String file, ByteBuffer b, int rangeByte) {
 
     }
 
     @Override
-    public void search(Client client, QueryMessage q, Consumer<QueryHitMessage> eachResult) {
+    public void search(Peer client, QueryMessage q, Consumer<QueryHitMessage> eachResult) {
 
         Task t = IO.taskFromBytes(q.query, nar.index);
         logger.info("{} asked \"{}\" from {}", address, t, q.recipient);
@@ -103,13 +106,13 @@ public class InterNAR extends Peer implements ClientModel {
                 return (count[0]--) > 0;
             });
         } else if (t.isBelief()) {
-            //consider(q, t);
+            consider(q, t);
         }
 
     }
 
     @Override
-    public byte[] data(Client client, String file, int rangePosition) {
+    public byte[] data(Peer client, String file, int rangePosition) {
         return null;
     }
 

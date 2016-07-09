@@ -1,4 +1,6 @@
-package nars.inter.gnutella;
+package nars.inter.gnutella.message;
+
+import nars.inter.gnutella.GnutellaConstants;
 
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
@@ -15,32 +17,32 @@ public class QueryMessage extends Message {
     public final byte[] query;
 
 
-    /**
-     * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
-     * length, receptor node, min speed, search criteria
-     *
-     * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
-     *                     network
-     * @param ttl          Time to live. The number of times the descriptor will be
-     *                     forwarded by Gnutella servents before it is removed from the
-     *                     network
-     * @param hop          The number of times the descriptor has been forwarded
-     * @param paytloadL    The length of the descriptor immediately following this
-     *                     header.
-     * @param receptorNode Id of the thread that received the message
-     * @param minSpeed     The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     * @param query        The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     */
-    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-                        InetSocketAddress receptorNode, short minSpeed,
-                        String query) {
-        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
-                receptorNode);
-        this.minSpeed = BigInteger.valueOf(minSpeed);
-        this.query = query.getBytes();
-    }
+//    /**
+//     * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
+//     * length, receptor node, min speed, search criteria
+//     *
+//     * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
+//     *                     network
+//     * @param ttl          Time to live. The number of times the descriptor will be
+//     *                     forwarded by Gnutella servents before it is removed from the
+//     *                     network
+//     * @param hop          The number of times the descriptor has been forwarded
+//     * @param paytloadL    The length of the descriptor immediately following this
+//     *                     header.
+//     * @param receptorNode Id of the thread that received the message
+//     * @param minSpeed     The minimum speed (in kB/second) of servents that should
+//     *                     respond to this message.
+//     * @param query        The minimum speed (in kB/second) of servents that should
+//     *                     respond to this message.
+//     */
+//    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
+//                        InetSocketAddress receptorNode, short minSpeed,
+//                        String query) {
+//        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
+//                receptorNode);
+//        this.minSpeed = BigInteger.valueOf(minSpeed);
+//        this.query = query.getBytes();
+//    }
 
     /**
      * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
@@ -68,14 +70,15 @@ public class QueryMessage extends Message {
         this.minSpeed = new BigInteger(minSpeed);
         this.query = query.getBytes();
     }
-    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-                        InetSocketAddress receptorNode, byte[] minSpeed,
-                        byte[] query) {
-        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
-                receptorNode);
-        this.minSpeed = new BigInteger(minSpeed);
-        this.query = query;
-    }
+
+//    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
+//                        InetSocketAddress receptorNode, byte[] minSpeed,
+//                        byte[] query) {
+//        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
+//                receptorNode);
+//        this.minSpeed = new BigInteger(minSpeed);
+//        this.query = query;
+//    }
 
     /**
      * * Creates a QueryHitMessage with the specified idMessage, ttl, hop,

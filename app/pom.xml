@@ -125,6 +125,16 @@
       <version>0.24.1</version>
       <scope>compile</scope>
     </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/com.turn/ttorrent -->
+    <dependency>
+      <groupId>com.turn</groupId>
+      <artifactId>ttorrent</artifactId>
+      <version>1.5</version>
+    </dependency>
+
+
   </dependencies>
 
 </project>

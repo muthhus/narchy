@@ -1,11 +1,10 @@
-package nars.inter.gnutella;
+package nars.inter.gnutella.message;
 
-import org.apache.commons.lang3.tuple.Triple;
+import nars.inter.gnutella.GnutellaConstants;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.List;
 
 /**
  * Class that defines a QueryHitMessage defined in Gnutella Protocol v0.4. The

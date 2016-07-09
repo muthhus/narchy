@@ -1,4 +1,6 @@
-package nars.inter.gnutella;
+package nars.inter.gnutella.message;
+
+import nars.inter.gnutella.GnutellaConstants;
 
 import java.net.InetSocketAddress;
 

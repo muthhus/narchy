@@ -1,6 +1,7 @@
 package nars.inter;
 
 import nars.NAR;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.util.IO;
 import nars.util.Util;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
+import static nars.$.$;
 import static org.junit.Assert.*;
 
 /**
@@ -50,10 +52,8 @@ public class InterNARTest {
 
             String question = "(?x --> y)?";
             a.ask(question);
-            //ai.query(IO.asBytes(a.task(question)));
-            //TODO a.ask(question);
 
-            Util.pause(100);
+            Util.pause(500);
 
             //a.log();
             AtomicBoolean recv = new AtomicBoolean();
@@ -75,5 +75,41 @@ public class InterNARTest {
 
     }
 
+    /** cooperative solving */
+    @Test public void testInterNAR2() {
+
+        testAB((ai, bi) -> {
+
+            NAR a = ai.nar;
+            NAR b = bi.nar;
+            b.log();
+
+
+            b.believe("(a --> b)");
+            b.believe("(c --> d)");
+
+            a.believe(0.9f, $("(b --> c)"), Tense.Eternal,1f,0.9f);
+
+            Util.pause(500);
+
+            AtomicBoolean recv = new AtomicBoolean();
+            b.onTask(tt -> {
+                //System.out.println(b + ": " + tt);
+                if (tt.isBelief() && (!tt.isInput()) && tt.toString().contains("(a-->d)"))
+                    recv.set(true);
+            });
+            b.ask("(a --> d)");
+
+            a.run(16);
+            b.run(16);
+
+            Util.pause(200);
+
+            assertTrue(recv.get());
+
+        });
+
+
+    }
 
 }
