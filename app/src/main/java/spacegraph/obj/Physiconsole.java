@@ -1,9 +1,11 @@
 package spacegraph.obj;
 
 import com.jogamp.opengl.GL2;
+import infinispan.com.google.common.io.NullOutputStream;
 import nars.$;
 import nars.gui.ConceptMaterializer;
 import nars.gui.ConceptWidget;
+import nars.nar.Default;
 import nars.term.Termed;
 import nars.util.Util;
 import nars.util.data.list.CircularArrayList;
@@ -14,6 +16,9 @@ import spacegraph.phys.collision.shapes.ConvexInternalShape;
 import spacegraph.phys.dynamics.RigidBody;
 
 import javax.vecmath.Vector3f;
+import java.io.PrintStream;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -26,12 +31,14 @@ import static javax.vecmath.Vector3f.v;
 public class Physiconsole extends ListInput<Object, Spatial<Object>> implements Function<Object, Spatial<Object>> {
 
 
-    CircularArrayList<Object> buffer = new CircularArrayList(256);
+    private final int capacity;
+    ArrayDeque<Object> buffer;
 
     public boolean needsLayout;
 
-    public Physiconsole() {
-
+    public Physiconsole(int capacity) {
+        buffer = new ArrayDeque(capacity);
+        this.capacity = capacity;
     }
 
 //    public static class LineBlock extends Spatial {
@@ -45,8 +52,15 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
     }
 
     public void append(Object s) {
+        if (buffer.contains(s)) {
+            buffer.remove(s);
+        } else if (capacity == buffer.size()) {
+            Object popped = buffer.removeFirst();
+            space.getOrAdd(popped).inactivate();
+        }
         buffer.add(s);
-        commit(buffer.toArray(new Object[buffer.size()])); //HACK todo optimize
+        Object[] bb = buffer.toArray(new Object[buffer.size()]);
+        commit(bb); //HACK todo optimize
     }
 
     @Override
@@ -76,14 +90,12 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
 
         float marginY = 0.5f;
 
-        System.out.println("layout " + visible.size());
         for (Spatial v : visible) {
             RigidBody body = v.body;
             if (body == null)
                 continue;
 
             Vector3f vs = ((ConvexInternalShape) body.shape()).implicitShapeDimensions;
-            System.out.println(x + " " + y);
             float r = 2f;
             float width = vs.x * r;
             float height = vs.y * r;
@@ -93,15 +105,26 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
     }
 
     public static void main(String[] args) {
-        Physiconsole p = new Physiconsole();
+        Physiconsole p = new Physiconsole(9);
         SpaceGraph<?> s = new SpaceGraph(p, p);
 
-        p.println("1");
-        p.println("XY");
-        p.println("abc");
-        p.println("abcd");
-        p.println("abcdGv");
-        p.println("abcdefz");
+
+        Default n = new Default();
+        n.input("<a --> b>.");
+        n.input("<b --> c>. :|:");
+        n.input("<c --> d>. :|:");
+        n.input("<?x <=> (b|d)>?");
+        n.onTask(t -> {
+            p.append(t.toString());
+        });
+        n.loop(10f);
+
+//        p.println("1");
+//        p.println("XY");
+//        p.println("abc");
+//        p.println("abcd");
+//        p.println("abcdGv");
+//        p.println("abcdefz");
 
 
 //                (List<Surface> vt) -> new SurfaceMount<>(null,
@@ -162,3 +185,4 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         return w;
     }
 }
+

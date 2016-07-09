@@ -355,4 +355,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         return get(i % size());
     }
 
+    public boolean isFull() {
+        return size() == capacity();
+    }
 }

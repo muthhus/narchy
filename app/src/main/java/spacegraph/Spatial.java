@@ -254,7 +254,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
               //  ty = sx/sy;
             //}
 
-            gl.glTranslatef(-1/4f, -1/4f, 0f); //align
+            gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
 
             gl.glScalef(tx, ty, 1f);
 
