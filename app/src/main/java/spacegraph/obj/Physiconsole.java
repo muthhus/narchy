@@ -1,5 +1,10 @@
 package spacegraph.obj;
 
+import com.googlecode.lanterna.TerminalTextUtils;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;
 import infinispan.com.google.common.io.NullOutputStream;
 import nars.$;
@@ -16,6 +21,7 @@ import spacegraph.phys.collision.shapes.ConvexInternalShape;
 import spacegraph.phys.dynamics.RigidBody;
 
 import javax.vecmath.Vector3f;
+import java.awt.event.InputEvent;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -99,14 +105,125 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
             float r = 2f;
             float width = vs.x * r;
             float height = vs.y * r;
-            v.move(width/2f, y, z);
+            v.move(width / 2f, y, z);
             y += height + marginY;
         }
     }
 
+
     public static void main(String[] args) {
+
+        ConsoleSurface.EditTerminal edit = new ConsoleSurface.EditTerminal(40, 16);
+
         Physiconsole p = new Physiconsole(9);
-        SpaceGraph<?> s = new SpaceGraph(p, p);
+        SpaceGraph<?> s = new SpaceGraph(p, p) {
+            @Override
+            public void init(GL2 gl) {
+                super.init(gl);
+
+                addKeyListener(new KeyListener() {
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        if (!e.isPrintableKey() || e.isActionKey() || e.isModifierKey())
+                            return;
+
+                        char cc = e.getKeyChar();
+                        if (!TerminalTextUtils.isControlCharacter(cc)) {
+                            boolean altDown = (e.getModifiers() & KeyEvent.ALT_MASK) != 0;
+                            boolean ctrlDown = (e.getModifiers() & InputEvent.CTRL_MASK) != 0;
+
+                            KeyStroke next = new KeyStroke(cc,ctrlDown, altDown);
+                            if (next != null) {
+                                edit.gui.handleInput(next);
+                                edit.refresh();
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+
+
+                        //see: GraphicalTerminalImplementation.java
+
+                        KeyStroke next = null;
+                        boolean altDown = (e.getModifiers() & KeyEvent.ALT_MASK) != 0;
+                        boolean ctrlDown = (e.getModifiers() & InputEvent.CTRL_MASK) != 0;
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            next = (new KeyStroke(KeyType.Enter, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                            next = (new KeyStroke(KeyType.Escape, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                            next = (new KeyStroke(KeyType.Backspace, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            next = (new KeyStroke(KeyType.ArrowLeft, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            next = (new KeyStroke(KeyType.ArrowRight, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            next = (new KeyStroke(KeyType.ArrowUp, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            next = (new KeyStroke(KeyType.ArrowDown, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_INSERT) {
+                            next = (new KeyStroke(KeyType.Insert, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                            next = (new KeyStroke(KeyType.Delete, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_HOME) {
+                            next = (new KeyStroke(KeyType.Home, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_END) {
+                            next = (new KeyStroke(KeyType.End, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+                            next = (new KeyStroke(KeyType.PageUp, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
+                            next = (new KeyStroke(KeyType.PageDown, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F1) {
+                            next = (new KeyStroke(KeyType.F1, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F2) {
+                            next = (new KeyStroke(KeyType.F2, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F3) {
+                            next = (new KeyStroke(KeyType.F3, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F4) {
+                            next = (new KeyStroke(KeyType.F4, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F5) {
+                            next = (new KeyStroke(KeyType.F5, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F6) {
+                            next = (new KeyStroke(KeyType.F6, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F7) {
+                            next = (new KeyStroke(KeyType.F7, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F8) {
+                            next = (new KeyStroke(KeyType.F8, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F9) {
+                            next = (new KeyStroke(KeyType.F9, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F10) {
+                            next = (new KeyStroke(KeyType.F10, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F11) {
+                            next = (new KeyStroke(KeyType.F11, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_F12) {
+                            next = (new KeyStroke(KeyType.F12, ctrlDown, altDown));
+                        } else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                            if (e.isShiftDown()) {
+                                next = (new KeyStroke(KeyType.ReverseTab, ctrlDown, altDown));
+                            } else {
+                                next = (new KeyStroke(KeyType.Tab, ctrlDown, altDown));
+                            }
+                        } else {
+                            //keyTyped doesn't catch this scenario (for whatever reason...) so we have to do it here
+                            if (altDown && ctrlDown && e.getKeyCode() >= 'A' && e.getKeyCode() <= 'Z') {
+                                char asLowerCase = Character.toLowerCase((char) e.getKeyCode());
+                                next = (new KeyStroke(asLowerCase, true, true));
+                            }
+                        }
+
+                        if (next!=null) {
+                            //edit.input(next);
+                            edit.gui.handleInput(next);
+                            edit.refresh();
+                        }
+                    }
+                });
+            }
+        };
 
 
         Default n = new Default();
@@ -117,37 +234,16 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         n.onTask(t -> {
             p.append(t.toString());
         });
-        n.loop(10f);
-
-//        p.println("1");
-//        p.println("XY");
-//        p.println("abc");
-//        p.println("abcd");
-//        p.println("abcdGv");
-//        p.println("abcdefz");
+        n.loop(20f);
 
 
-//                (List<Surface> vt) -> new SurfaceMount<>(null,
-//                        new GridSurface(vt, GridSurface.VERTICAL)),
-//
-//                newArrayList(
-//                        new GridSurface(newArrayList(
-//                                new XYPadSurface(),
-//                                new XYPadSurface()
-//                        ), GridSurface.HORIZONTAL),
-//                        new GridSurface(newArrayList(
-//                                new SliderSurface(0.75f,  0, 1),
-//                                new SliderSurface(0.25f,  0, 1),
-//                                new SliderSurface(0.5f,  0, 1)
-//                        ), GridSurface.VERTICAL)
-//                )
-//        );
-//
-//        s.add(new Facial(new ConsoleSurface(new ConsoleSurface.DummyTerminal(80, 25))).scale(500f, 400f));
-//        s.add(new Facial(new CrosshairSurface(s)));
+        s.add(new Facial(new ConsoleSurface(edit)).scale(500f, 400f));
+        s.add(new Facial(new CrosshairSurface(s)));
 
 
-        s.show(800, 800);
+        s.show(1200, 800);
+
+
     }
 
 
@@ -166,7 +262,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         String s = x.toString();
 
         float cAspect = 2f;
-        float sx = s.length()/cAspect;
+        float sx = s.length() / cAspect;
         float sy = 1f;
 
         ConceptWidget w = new ConceptWidget($.the(s), 0) {
@@ -177,7 +273,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
 
             @Override
             protected void colorshape(GL2 gl) {
-                gl.glColor3f(0.1f,0.1f,0.1f);
+                gl.glColor3f(0.1f, 0.1f, 0.1f);
             }
         };
 

@@ -98,4 +98,6 @@ public class CrosshairSurface extends Surface implements MouseListener {
     public void mouseWheelMoved(MouseEvent e) {
         update(e);
     }
+
+
 }

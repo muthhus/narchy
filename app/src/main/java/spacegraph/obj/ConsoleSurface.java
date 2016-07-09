@@ -107,6 +107,11 @@ public class ConsoleSurface extends Surface {
 
         gl.glLineWidth(2f);
 
+        int cury = term.cursor().row;
+        int curx = term.cursor().column;
+
+        long t = System.currentTimeMillis(); //HACK
+
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
 
@@ -123,7 +128,7 @@ public class ConsoleSurface extends Surface {
                 TextColor backColor = c.back;
                 if (!transparent || !backColor.equals(TextColor.ANSI.DEFAULT)) {
 
-                    float bgAlpha = 0.9f;
+                    float bgAlpha = 0.5f;
 
 
                     gl.glColor4f(
@@ -135,7 +140,6 @@ public class ConsoleSurface extends Surface {
                             ,-dz
                     );
                 }
-
 
                 char cc = displayChar(c);
                 if ((cc != 0) && (cc != ' ')) {
@@ -150,6 +154,17 @@ public class ConsoleSurface extends Surface {
                     glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
                     gl.glPopMatrix();
 
+                }
+
+                if ((i == curx) && (r == cury)) {
+                    float p = (1f + (float)Math.sin(t/100.0)) * 0.5f;
+                    gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
+                    float m = -(0.1f + 0.3f * p);
+                    ShapeDrawer.rect(gl,
+                            0+m, 0+m,
+                            cw-m, ch-m
+                            ,-dz-m
+                    );
                 }
 
                 gl.glPopMatrix();
@@ -181,6 +196,63 @@ public class ConsoleSurface extends Surface {
     }
 
 
+    public static class EditTerminal extends DefaultVirtualTerminal {
+        public MultiWindowTextGUI gui;
+
+        public EditTerminal(int c, int r) {
+            super(c, r);
+
+
+            //term.clearScreen();
+            new Thread(() -> {
+
+                try {
+                    TerminalScreen screen = new TerminalScreen(this);
+                    screen.startScreen();
+                    gui = new MultiWindowTextGUI(
+                            new SeparateTextGUIThread.Factory(),
+                            screen);
+
+
+                    setCursorVisible(true);
+
+                    gui.setBlockingIO(false);
+                    gui.setEOFWhenNoWindows(false);
+
+
+                    final BasicWindow window = new BasicWindow();
+                    window.setPosition(new TerminalPosition(0,0));
+                    window.setSize(new TerminalPosition(c-2,r-2));
+
+
+                    TextBox t = new TextBox("", TextBox.Style.MULTI_LINE);
+                    t.setPreferredSize(new TerminalPosition(c-3,r-3));
+
+                    t.takeFocus();
+                    window.setComponent(t);
+
+
+                    gui.addWindow(window);
+                    gui.setActiveWindow(window);
+
+                    refresh();
+                    gui.waitForWindowToClose(window);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+        }
+
+        public void refresh() {
+            try {
+                gui.updateScreen();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static class DummyTerminal extends DefaultVirtualTerminal {
         public DummyTerminal(int c, int r) {
