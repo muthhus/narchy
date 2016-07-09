@@ -9,9 +9,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 
 /**
@@ -38,14 +39,23 @@ public class Peer {
     public final Server server;
     public final Client client;
     final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
-    private final IdGenerator myIdGenerator;
+    final ExecutorService exe =
+            //Executors.newFixedThreadPool(8);
+//            new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+//                                      1L, TimeUnit.SECONDS,
+//                                      new SynchronousQueue<Runnable>());
+            //Executors.newFixedThreadPool(4);
+            Executors.newCachedThreadPool();
 
     final int maxConnections = 5;
 
     final Map<String, Message> messageCache = new CapacityLinkedHashMap(4096);
+    private final byte[] id;
 
 
-    /** this instance must implement ClientModel */
+    /**
+     * this instance must implement ClientModel
+     */
     protected Peer() throws IOException {
         this(null);
     }
@@ -66,26 +76,31 @@ public class Peer {
 
         this.myPort = port;
         if (model == null)
-            model = (ClientModel)this;
+            model = (ClientModel) this;
 
         neighbors = new ConcurrentHashMap<>(maxConnections);
 
         ipAddress = InetAddress.getLocalHost();
 
-        myIdGenerator = new IdGenerator();
-
 
         this.client = new Client(this, myPort, neighbors,
                 ipAddress,
-                IdGenerator.getIdServent(), model
+                id = IdGenerator.getIdServent(), model
         );
 
-        client.start();
+        exe.execute(() -> {
+            while (client.running) {
+
+                nars.util.Util.pause(GnutellaConstants.DEAD_CONNECTION_REMOVAL_INTERVAL_MS);
+
+                client.removeDeadConnections();
+
+            }
+        });
 
         this.server = new Server(this, myPort, neighbors, client);
 
-
-        new Thread(server).start();
+        exe.execute(server);
 
         logger.info("started {}", server.socket);
     }
@@ -127,6 +142,7 @@ public class Peer {
     public void query(String searchCriteria) {
         client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
     }
+
     public void query(byte[] searchCriteria) {
         client.addQuery(GnutellaConstants.DFLTMIN_SPEED, searchCriteria);
     }
@@ -167,11 +183,32 @@ public class Peer {
      */
     public void stop() {
 
+        client.stop();
+
+        logger.info("stop");
+
         Enumeration<InetSocketAddress> n = neighbors.keys();
         while (n.hasMoreElements()) {
             InetSocketAddress idN = n.nextElement();
-            neighbors.remove(idN).close();
+            neighbors.remove(idN).stop();
         }
+
+        try {
+            server.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+//        try {
+//            exe.awaitTermination(100, TimeUnit.MILLISECONDS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
+        List<Runnable> r = exe.shutdownNow();
 
 
     }

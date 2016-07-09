@@ -122,10 +122,9 @@ public class Inperience {
     }
 
 
-    @Nullable
-    public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
+    public static Atomic reify(char punc) {
         Atomic opTerm;
-        switch (s.punc()) {
+        switch (punc) {
             case Symbols.BELIEF:
                 opTerm = believe;
                 break;
@@ -139,8 +138,13 @@ public class Inperience {
                 opTerm = evaluate;
                 break;
             default:
-                return null;
+                opTerm = null;
         }
+        return opTerm;
+    }
+
+    @Nullable
+    public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
@@ -149,15 +153,15 @@ public class Inperience {
         boolean negated = tt.op() == Op.NEG;
         int k = 0;
 
+        arg[k++] = !negated ? tt : $.neg(tt) /* unwrap negation */;
+
         if (tr != null) {
             arg[k++] = tr.toWordTerm(conceptCreationExpectation, negated);
         }
 
-        arg[k++] = !negated ? tt : $.neg(tt) /* unwrap negation */;
-
         arg[k] = self;
 
-        Compound operation = $.exec(opTerm, arg);
+        Compound operation = $.exec(reify(s.punc()), arg);
 //        if (operation == null) {
 //            throw new RuntimeException("Unable to create Inheritance: " + opTerm + ", " + Arrays.toString(arg));
 //        }

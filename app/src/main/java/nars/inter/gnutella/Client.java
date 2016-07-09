@@ -1,8 +1,5 @@
 package nars.inter.gnutella;
 
-import nars.Global;
-import org.apache.commons.lang3.tuple.Triple;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,13 +8,14 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Client {
 
     private final short port;
-    private final boolean running;
+    boolean running;
     private final ConcurrentHashMap<InetSocketAddress, PeerThread> neighbors;
 
     private final ConcurrentHashMap<String, Collection<InetSocketAddress>> firstPongsFromNeighbors;
@@ -28,9 +26,10 @@ public class Client {
     @Deprecated private final int numberFileShared;
     private final int numberKbShared;
 
+
     private final byte[] peerID;
     public final ClientModel model;
-    private final Peer peer;
+    public final Peer peer;
     private int maxNodes;
 
     /**
@@ -71,7 +70,7 @@ public class Client {
         maxNodes = 10;
     }
 
-    private synchronized void removeDeadConnections() {
+    synchronized void removeDeadConnections() {
         Iterator<Map.Entry<InetSocketAddress, PeerThread>> ii = neighbors.entrySet().iterator();
         while (ii.hasNext()) {
             if (!ii.next().getValue().connected()) {
@@ -179,15 +178,6 @@ public class Client {
 
     final AtomicInteger messageCount = new AtomicInteger();
 
-    public void start() {
-        new Thread(() -> {
-            while (running) {
-                nars.util.Util.pause(GnutellaConstants.DEAD_CONNECTION_REMOVAL_INTERVAL_MS);
-
-                removeDeadConnections();
-            }
-        }).start();
-    }
 
     public final void handle(Message message) {
         boolean fordward = message.refreshMessage();
@@ -429,7 +419,7 @@ public class Client {
             InetSocketAddress inetSocketA = new InetSocketAddress(sktTmp.getInetAddress(), sktTmp.getLocalPort());
             PeerThread thread = new PeerThread(peer.messageCache, sktTmp, this, inetSocketA);
             if (thread.start(file, size, range)) {
-                new Thread(thread).start();
+                peer.exe.execute(thread);
             } else {
                 System.out.println("DENIED  DOWNLOAD CONNECTION");
             }
@@ -461,7 +451,7 @@ public class Client {
                 if (node.connexionRequest() == GnutellaConstants.ACCEPTED) {
 
                     neighbors.computeIfAbsent(inetSocketA, (i) -> {
-                        new Thread(node).start();
+                        peer.exe.execute(node);
                         return node;
                     });
 
@@ -483,6 +473,11 @@ public class Client {
         Comparator<File> comparator = (o1, o2) -> Long.valueOf(o1.lastModified()).compareTo(
                 o2.lastModified());
         Arrays.sort(files, comparator);
+
+    }
+
+    public void stop() {
+        running = false;
 
     }
 }

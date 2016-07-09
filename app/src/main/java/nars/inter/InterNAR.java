@@ -2,11 +2,13 @@ package nars.inter;
 
 
 import com.google.common.collect.Lists;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.inter.gnutella.*;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.op.mental.Inperience;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.util.IO;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static nars.$.$;
@@ -40,54 +43,25 @@ public class InterNAR extends Peer implements ClientModel {
     }
 
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-        NAR a = new Default().setSelf("a");
-        InterNAR ai = new InterNAR(a);
-
-        NAR b = new Default().setSelf("b");
-        InterNAR bi = new InterNAR(b);
-
-        bi.connect(ai);
-
-        b.believe("(X --> y)");
-
-        String question = "(?x --> y)?";
-        ai.query(IO.asBytes(a.task(question)));
-        //TODO a.ask(question);
-
-        Thread.sleep(2000);
-
-        a.onTask(tt -> {
-           System.out.println(b + ": " + tt);
-        });
 
 
-        a.run(16);
-        b.run(16);
-
-    }
 
 
-    public void send(Task t) {
-
-        DataOutput d = new DataOutputStream(null);
-        try {
-            IO.writeTask(d, t);
-            //o.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void onQueryHit(Client client, QueryHitMessage q) {
-        try {
-            Task t = IO.readTask(new DataInputStream(new ByteArrayInputStream(q.result)), nar.index);
-            logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        Task t = IO.taskFromBytes(q.result, nar.index);
+        logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
+
+
+        //if (q.id.equals(id)) //TODO dont reify if it's a message originating from this peer
+        //TODO dont reify an already reified belief?
+
+        nar.believe(
+            Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present
+        );
+
 
     }
 
@@ -98,7 +72,6 @@ public class InterNAR extends Peer implements ClientModel {
 
     @Override
     public void search(Client client, QueryMessage message, Consumer<QueryHitMessage> eachResult) {
-        byte[] queryString = message.query;
 
         Task t = IO.taskFromBytes(message.query, nar.index);
         logger.info("{} asked \"{}\" by {}", nar.self, t, message.recipient);
@@ -106,7 +79,7 @@ public class InterNAR extends Peer implements ClientModel {
         if (t.isQuestion()) {
             final int[] count = {3};
             nar.ask(t.term(), Tense.ETERNAL, a -> {
-                eachResult.accept(client.createQueryHit(message.idBytes(), 1, IO.asBytes(t)));
+                eachResult.accept(client.createQueryHit(message.idBytes(), 1, IO.asBytes(a)));
                 return (count[0]--) > 0;
             });
         }

@@ -151,7 +151,7 @@ public class Message {
      * @return the id in a string format
      */
     public String idString() {
-        return id.toString();
+        return id.toString(36);
     }
 
     /*

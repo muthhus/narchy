@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -31,14 +32,15 @@ public class PeerThread implements Runnable {
     private boolean downloadThread;
 
 
-    private final Executor messagesToSend = Executors.newSingleThreadExecutor();
+    //private final ExecutorService messagesToSend = Executors.newSingleThreadExecutor();
     private final MessageHandler messageHandler;
     private final InetSocketAddress inSktA;
     private boolean working;
     private boolean connected;
     private boolean flag;
 
-    final Map<String, Message> messageCache;
+    @Deprecated
+    final Map<String, Message> messageCache; //link through peer
 
 	/* Atributos del nodo cuando es para descarga */
 
@@ -133,7 +135,9 @@ public class PeerThread implements Runnable {
      */
     public void send(Message m) {
         logger.info("send {}", m);
-        messagesToSend.execute(() -> _send(m));
+        client.peer.exe
+        //messagesToSend
+                .execute(() -> _send(m));
     }
 
     public boolean connected() {
@@ -146,7 +150,26 @@ public class PeerThread implements Runnable {
     /**
      * Close this connection
      */
-    public void close() {
+    public void stop() {
+        try {
+            mySocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            inStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //messagesToSend.shutdownNow();
         connected = false;
         working = false;
     }
@@ -166,6 +189,7 @@ public class PeerThread implements Runnable {
 
 
             inStream = new DataInputStream(in);
+
             outStream.writeUTF(GnutellaConstants.CONNECTION_REQUEST);
             if (inStream.readUTF()
                     .equals(GnutellaConstants.CONNECTION_ACCEPTED)) {
@@ -298,7 +322,6 @@ public class PeerThread implements Runnable {
                     outStream = new DataOutputStream(out);
 
 
-
                     File a = new File(fileName);
                     if (!a.isDirectory()) {
 
@@ -414,51 +437,55 @@ public class PeerThread implements Runnable {
     public void runServer() {
         while (working) {
 
-            //try {
+            Message m;
+            try {
 
 
-            do {
-
-                Message m = messageHandler.nextMessage(inStream);
+                m = messageHandler.nextMessage(inStream);
                 if (m == null)
                     continue;
+            } catch (IOException e) {
+                working = false;
+                break;
+            }
 
-                logger.info("recv {}", m);
 
-                flag = true;
-                switch (m.getPayloadD()) {
+            logger.info("recv {}", m);
 
-                    case GnutellaConstants.PING:
-                        if (unseen(m)) {
-                            pending(m);
-                        }
+            flag = true;
+            switch (m.getPayloadD()) {
 
-                        break;
+                case GnutellaConstants.PING:
+                    if (unseen(m)) {
+                        pending(m);
+                    }
 
-                    case GnutellaConstants.PONG:
-                        if (unseen(m)) {
-                            pending(m);
-                        }
-                        break;
+                    break;
 
-                    case GnutellaConstants.PUSH:
-                        break;
+                case GnutellaConstants.PONG:
+                    if (unseen(m)) {
+                        pending(m);
+                    }
+                    break;
 
-                    case GnutellaConstants.QUERY:
-                        if (unseen(m)) {
-                            pending(m);
-                        }
-                        break;
+                case GnutellaConstants.PUSH:
+                    break;
 
-                    case GnutellaConstants.QUERY_HIT:
-                        if (unseen(m)) {
-                            pending(m);
-                        }
-                        break;
+                case GnutellaConstants.QUERY:
+                    if (unseen(m)) {
+                        pending(m);
+                    }
+                    break;
 
-                }
+                case GnutellaConstants.QUERY_HIT:
+                    if (unseen(m)) {
+                        pending(m);
+                    }
+                    break;
 
-            } while (true);
+            }
+
+
             /*} catch (IOException e) {
                 System.err.println(getClass() + "run(): " + e.getClass()
                         + e.getMessage());
@@ -490,7 +517,7 @@ public class PeerThread implements Runnable {
                         @Override
                         public void run() {
                             if (!flag) {
-                                close();
+                                stop();
                             }
                         }
                     }, PONG_TIMEOUT_MS);
