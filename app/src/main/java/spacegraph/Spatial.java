@@ -6,6 +6,7 @@ import com.jogamp.opengl.math.Quaternion;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.phys.collision.shapes.BoxShape;
 import spacegraph.phys.collision.shapes.CollisionShape;
+import spacegraph.phys.collision.shapes.ConvexInternalShape;
 import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.phys.linearmath.Transform;
 import spacegraph.phys.util.Motion;
@@ -236,6 +237,32 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         gl.glPushMatrix();
         ShapeDrawer.transform(gl, body.transform());
         renderRelative(gl, body);
+
+        gl.glPushMatrix();
+        {
+            Vector3f v = ((ConvexInternalShape) body.shape()).implicitShapeDimensions; //HACK
+            //adjust aspect ratio
+            float r = 2f;
+            float sx = v.x * r;
+            float sy = v.y * r;
+            float tx, ty;
+            //if (sx > sy) {
+                ty = sy;
+                tx = sy/sx;
+            //} else {
+              //  tx = sx;
+              //  ty = sx/sy;
+            //}
+
+            gl.glTranslatef(-1/4f, -1/4f, 0f); //align
+
+            gl.glScalef(tx, ty, 1f);
+
+
+            renderRelativeAspect(gl);
+        }
+        gl.glPopMatrix();
+
         gl.glPopMatrix();
     }
 
@@ -244,22 +271,31 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         renderShape(gl, body);
 
     }
+    protected void renderRelativeAspect(GL2 gl) {
+
+
+
+    }
 
     protected void renderLabel(GL2 gl) {
         //float p = v.pri * 0.75f + 0.25f;
         gl.glColor4f(1f, 1f, 1f, pri);
 
-        ShapeDrawer.renderLabel(gl, 0.003f, label, 0, 0, 0.5f);
+        ShapeDrawer.renderLabel(gl, 0.003f,0.003f, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {
+        colorshape(gl);
+        ShapeDrawer.draw(gl, body);
+    }
+
+    protected void colorshape(GL2 gl) {
         float p = SpaceGraph.h(pri)/2f;
         gl.glColor4f(p,
                 //pri * Math.min(1f),
                 p, //1f / (1f + (v.lag / (activationPeriods * dt)))),
                 p,
                 1f);
-        ShapeDrawer.draw(gl, body);
     }
 
     protected void renderAbsolute(GL2 gl) {

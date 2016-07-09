@@ -39,7 +39,7 @@ public abstract class ConvexInternalShape extends ConvexShape {
 
 	// local scaling. collisionMargin is not scaled !
 	protected final Vector3f localScaling = new Vector3f(1f, 1f, 1f);
-	protected final Vector3f implicitShapeDimensions = new Vector3f();
+	public final Vector3f implicitShapeDimensions = new Vector3f();
 	protected float collisionMargin = BulletGlobals.CONVEX_DISTANCE_MARGIN;
 
 	/**

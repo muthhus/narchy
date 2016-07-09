@@ -8,7 +8,7 @@ import spacegraph.phys.dynamics.RigidBody;
 /**
  * Created by me on 6/26/16.
  */
-class ConceptWidget extends Spatial<Termed> {
+public class ConceptWidget extends Spatial<Termed> {
 
     /**
      * measure of inactivity, in time units
@@ -20,9 +20,7 @@ class ConceptWidget extends Spatial<Termed> {
     }
 
     @Override
-    protected void renderRelative(GL2 gl, RigidBody body) {
-        super.renderRelative(gl, body);
-
+    protected void renderRelativeAspect(GL2 gl) {
         renderLabel(gl);
     }
 

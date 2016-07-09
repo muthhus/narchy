@@ -27,17 +27,17 @@ public class Lesson14 extends JoglSpace {
     }
 
     public static void renderString(GL2 gl, int font, String string) {
-        renderString(gl, font, string, 1f, 0, 0, 0);
+        renderString(gl, font, string, 1f, 1f, 0, 0, 0);
     }
 
-    public static void renderString(GL2 gl, int font, String string, float fontScale, float dx, float dy, float dz) {
+    public static void renderString(GL2 gl, int font, String string, float fontScaleX, float fontScaleY, float dx, float dy, float dz) {
         // Center Our Text On The Screen
         float width =
                 glut.glutStrokeLength(font, string);
                 //glut.glutBitmapLength(font, string);
 
         gl.glPushMatrix();
-        gl.glScalef(fontScale, fontScale, fontScale);
+        gl.glScalef(fontScaleX, fontScaleY, Math.max(fontScaleX, fontScaleY));
 
         gl.glTranslatef(-width / 2f + dx, dy, dz);
 

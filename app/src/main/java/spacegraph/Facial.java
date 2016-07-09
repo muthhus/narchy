@@ -10,7 +10,6 @@ public class Facial {
 
     public static void main(String[] args) {
         SpaceGraph s = new SpaceGraph();
-
         s.add(new Facial(new ConsoleSurface(80, 25)).scale(0.5f));
         s.show(800, 600);
     }

@@ -37,7 +37,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
         new SpaceGraph<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
-        ).withTransform(
+        ).with(
             //new Spiral()
             new FastOrganicLayout()
         ).show(900, 900);
@@ -46,7 +46,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     }
 
-    public SpaceGraph withTransform(SpaceTransform<O>... t) {
+    public SpaceGraph with(SpaceTransform<O>... t) {
         for (SpaceTransform g : t)
             this.transforms.add(g);
         return this;

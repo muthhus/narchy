@@ -7,25 +7,28 @@ import nars.Global;
  */
 public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
 
-    private final X[] items;
+    private X[] items;
 
     public ListInput(X... xx) {
         super();
         this.items = xx;
+    }
 
+    public void commit(X[] xx) {
+        this.items = xx;
+        if (space!=null)
+            refresh();
     }
 
     @Override
     public void start(SpaceGraph space) {
         super.start(space);
-        refresh();
+        commit(items);
     }
 
     @Override
     protected void updateImpl() {
-//        if (items.length!=visible.size()) {
-//            refresh();
-//        }
+
     }
 
     private void refresh() {

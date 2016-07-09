@@ -425,18 +425,18 @@ public enum ShapeDrawer {
         gl.glEnd();
     }
 
-    static public void renderLabel(GL2 gl, float scale, String label, float dx, float dy, float dz) {
+    static public void renderLabel(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
         gl.glPushMatrix();
         gl.glNormal3f(0,0,1f);
         gl.glTranslatef(dx, dy, dz);
 
-        float fontThick = 2f;
+        float fontThick = 5f;
         gl.glLineWidth(fontThick);
 
         //float r = v.radius;
         renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
-                scale,
-                0, 0, (1/1.9f)/scale); // Print GL Text To The Screen
+                scaleX, scaleY,
+                0, 0, (1/1.9f)/(Math.max(scaleX,scaleY))); // Print GL Text To The Screen
         gl.glPopMatrix();
     }
 
