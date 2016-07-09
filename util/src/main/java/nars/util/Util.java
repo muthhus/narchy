@@ -21,6 +21,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.data.list.FasterList;
+import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -583,30 +584,30 @@ public enum Util {
         }
     }
 
-    /**
-     * Generic utility method for running a list of tasks in current thread (concurrency == 1) or in multiple threads (> 1, in which case it will block until they finish)
-     */
-    public static void run(Deque<Runnable> tasks, int maxTasksToRun, int threads) {
-
-        //int concurrency = Math.min(threads, maxTasksToRun);
-        //if (concurrency == 1) {
-            tasks.forEach(Runnable::run);
-//            return;
-  //      }
+//    /**
+//     * Generic utility method for running a list of tasks in current thread (concurrency == 1) or in multiple threads (> 1, in which case it will block until they finish)
+//     */
+//    public static void run(Deque<Runnable> tasks, int maxTasksToRun, int threads) {
 //
-//        ConcurrentContext ctx = ConcurrentContext.enter();
-//        ctx.setConcurrency(concurrency);
+//        //int concurrency = Math.min(threads, maxTasksToRun);
+//        //if (concurrency == 1) {
+//            tasks.forEach(Runnable::run);
+////            return;
+//  //      }
+////
+////        ConcurrentContext ctx = ConcurrentContext.enter();
+////        ctx.setConcurrency(concurrency);
+////
+////        try {
+////            run(tasks, maxTasksToRun, ctx::execute);
+////        } finally {
+////            // Waits for all concurrent executions to complete.
+////            // Re-exports any exception raised during concurrent executions.
+////            if (ctx != null)
+////                ctx.exit();
+////        }
 //
-//        try {
-//            run(tasks, maxTasksToRun, ctx::execute);
-//        } finally {
-//            // Waits for all concurrent executions to complete.
-//            // Re-exports any exception raised during concurrent executions.
-//            if (ctx != null)
-//                ctx.exit();
-//        }
-
-    }
+//    }
 
     /**
      * clamps a value to 0..1 range
@@ -634,11 +635,13 @@ public enum Util {
      * discretizes values to nearest finite resolution real number determined by epsilon spacing
      */
     public static float round(float value, float epsilon) {
+
         return Math.round(value / epsilon) * epsilon;
+
     }
 
     public static float clampround(float value, float epsilon) {
-        return clamp( round(value, epsilon ));
+        return round(clamp(value), epsilon );
     }
 
     public static int hash(float f, int discretness) {

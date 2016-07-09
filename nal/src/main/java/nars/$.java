@@ -808,8 +808,8 @@ public enum $ {
         @Override
         public
         @Nullable
-        Term[] theSubterms(TermContainer s) {
-            return s.terms();
+        TermContainer theSubterms(TermContainer s) {
+            return s;
         }
 
         @Override

@@ -75,10 +75,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		Multi nar = new Multi(2,
+		Multi nar = new Multi(3,
 		//Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), 200000, false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), 600000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -86,7 +86,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.4f);
+		nar.conceptActivation.setValue(0.3f);
 
 		//new MemoryManager(nar);
 
@@ -96,8 +96,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(4);
-		nar.confMin.setValue(0.05f);
+		nar.cyclesPerFrame.set(8);
+		nar.confMin.setValue(0.03f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -120,7 +120,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //			return false;
 //		});
 
-		Global.DEBUG = true;
+		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 8, '.', 2);
@@ -145,14 +145,14 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
 				//charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());
 
-				charted.add(nar.ask($.$("((a0) &&+2 (happy))")).term());
-				charted.add(nar.ask($.$("((a1) &&+2 (happy))")).term());
-				charted.add(nar.ask($.$("((a2) &&+2 (happy))")).term());
-				charted.add(nar.ask($.$("((a3) &&+2 (happy))")).term());
-				charted.add(nar.ask($.$("((a0) &&+2 (sad))")).term());
-				charted.add(nar.ask($.$("((a1) &&+2 (sad))")).term());
-				charted.add(nar.ask($.$("((a2) &&+2 (sad))")).term());
-				charted.add(nar.ask($.$("((a3) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a0) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a1) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a2) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a3) &&+2 (happy))")).term());
+//				charted.add(nar.ask($.$("((a0) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a1) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a2) &&+2 (sad))")).term());
+//				charted.add(nar.ask($.$("((a3) &&+2 (sad))")).term());
 
 
 				//NAL9 emotion feedback loop
@@ -201,7 +201,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				256*64);
+				512*64);
 
 
 

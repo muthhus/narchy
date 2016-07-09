@@ -259,7 +259,8 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
-        if (b.isDeleted()) {
+        float bp = b.pri();
+        if (bp!=bp) { //deleted
             //throw new RuntimeException();
             return;
         }
@@ -271,12 +272,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             putExists(b, scale, existing, overflow);
         } else {
             if (isFull()) {
-                synchronized(map) {
-                    pending.add(key, b.pri() * scale, b.qua(), b.dur());
-                }
+
+                pending.add(key, bp * scale, b.qua(), b.dur());
 
             } else {
-                putNewAndDeleteDisplaced(key, newLink(key, b.pri() * scale, b.qua(), b.dur()));
+                putNewAndDeleteDisplaced(key, newLink(key, bp * scale, b.qua(), b.dur()));
             }
         }
     }

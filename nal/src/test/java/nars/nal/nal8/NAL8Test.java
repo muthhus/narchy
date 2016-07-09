@@ -769,7 +769,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(4, "(((in)|(left))-->^cam). :|:")
 
                 //must interpolate
-                .mustDesire(cycles, "(((in)|(left))-->^cam)", 1f,0.81f, 4)
+                .mustDesire(cycles, "(((in)|(left))-->^cam)", 1f,0.73f, 4)
                 .mustNotOutput(cycles, "(((in)|(left))-->^cam)", '!', 0, ETERNAL);
     }
 

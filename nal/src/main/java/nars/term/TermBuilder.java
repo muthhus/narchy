@@ -173,7 +173,7 @@ public abstract class TermBuilder {
      * step before calling Make, do not call manually from outside
      */
     @NotNull
-    final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
+    protected final Term finish(@NotNull Op op, int dt, @NotNull TermContainer args) {
 
         int s = args.size();
 
@@ -497,9 +497,9 @@ public abstract class TermBuilder {
                 //HACK use more efficient way
                 Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
                 if (a == null) return null;
-                return newIntersection2(
-                        a,
-                        newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection),
+                Term b = newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
+                if (b == null) return null;
+                return newIntersection2(a, b,
                         intersection, setUnion, setIntersection
                 );
         }

@@ -47,6 +47,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
         }
+
         return TermSet.the(t);
     }
 

@@ -94,7 +94,7 @@ public interface TermIndex {
 
 
     @Nullable
-    Term[] theSubterms(TermContainer s);
+    TermContainer theSubterms(TermContainer s);
 
     @Nullable
     default TermContainer normalize(TermContainer s) {
@@ -388,8 +388,7 @@ public interface TermIndex {
         }
 
         if (insert) {
-            Term t4 = the(r).term();
-            r = (Compound)t4;
+            r = (Compound) termOrNull(the(r));
         }
 
         return r;

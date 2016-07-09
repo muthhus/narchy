@@ -64,7 +64,7 @@ public class PongEnvironment extends Player implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 3, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng) , 200000, true )
+				new CaffeineIndex(new DefaultConceptBuilder(rng) , 500000, true )
 				//new Cache2kIndex(250000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -77,7 +77,7 @@ public class PongEnvironment extends Player implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.85f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(32);
 		nar.conceptActivation.setValue(0.05f);
 		nar.confMin.setValue(0.1f);
 

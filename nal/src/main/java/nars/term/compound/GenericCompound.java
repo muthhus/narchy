@@ -88,8 +88,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (this == that)
             return true;
 
-        if (hash != that.hashCode())
-            return false;
 
         Compound cthat;
         if (that instanceof Compound) {
@@ -104,6 +102,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         } else {
             return false;
         }
+
+        if (hash != that.hashCode())
+            return false;
 
         if (op == cthat.op())
             if (dt == cthat.dt())

@@ -46,8 +46,8 @@ public class PatternIndex extends RawTermIndex {
     @NotNull
     public PatternCompound make(@NotNull Compound seed) {
 
-        Term[] v = theSubterms(seed.subterms());
-        TermContainer vv = TermVector.the(v);
+        TermContainer v = theSubterms(seed.subterms());
+        TermContainer vv = v; //TermVector.the(v);
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
