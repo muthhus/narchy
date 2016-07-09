@@ -17,9 +17,13 @@ public class CrosshairSurface extends Surface implements MouseListener {
     int mx, my;
     boolean mouseEnabled;
     private float smx, smy;
+    private short[] pressed;
+
 
     public CrosshairSurface(SpaceGraph s) {
+
         this.space = s;
+
     }
 
 
@@ -40,7 +44,23 @@ public class CrosshairSurface extends Surface implements MouseListener {
         float ch = 175f; //TODO proportional to ortho height (pixels)
 
         //gl.glTranslatef(mx, my, 0);
-        gl.glColor4f(0.2f, 0.8f, 0f, 0.6f);
+        float r, g, b;
+        r = g = b = 0.75f;
+        if (pressed!=null && pressed.length > 0) {
+            switch (pressed[0]) {
+                case 1:
+                    r = 1f; g = 0.5f; b = 0f;
+                    break;
+                case 2:
+                    r = 0.5f; g = 1f; b = 0f;
+                    break;
+                case 3:
+                    r = 0f; g = 0.5f; b = 1f;
+                    break;
+            }
+        }
+        gl.glColor4f(r, g, b, 0.6f);
+
         gl.glLineWidth(4f);
         ShapeDrawer.strokeRect(gl, smx-cw/2f, smy-ch/2f, cw, ch);
 
@@ -92,6 +112,8 @@ public class CrosshairSurface extends Surface implements MouseListener {
         smx = ((float)mx) ;
         my = e.getY();
         smy = (win.getHeight() - ((float)my)) ;
+
+        pressed = e.getButtonsDown();
     }
 
     @Override

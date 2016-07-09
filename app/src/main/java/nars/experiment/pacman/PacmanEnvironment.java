@@ -28,6 +28,7 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.budget.UnitBudget;
 import nars.experiment.Environment;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -84,18 +85,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.1f);
+		nar.conceptActivation.setValue(0.4f);
 
 		//new MemoryManager(nar);
 
 		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(64);
-		nar.confMin.setValue(0.01f);
+		nar.cyclesPerFrame.set(4);
+		nar.confMin.setValue(0.05f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -121,7 +122,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 8, '.', 3);
+		new MySTMClustered(nar, 8, '.', 2);
 		//new MySTMClustered(nar, 8, '!');
 
 
@@ -164,7 +165,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 				new BeliefTableChart(nar, charted).show(600, 900);
 
-				//BagChart.show((Default)nar);
+				BagChart.show((Default)nar);
 			}
 		};
 

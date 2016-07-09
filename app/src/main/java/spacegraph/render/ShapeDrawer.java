@@ -430,7 +430,7 @@ public enum ShapeDrawer {
         gl.glNormal3f(0,0,1f);
         gl.glTranslatef(dx, dy, dz);
 
-        float fontThick = 5f;
+        float fontThick = 2f;
         gl.glLineWidth(fontThick);
 
         //float r = v.radius;

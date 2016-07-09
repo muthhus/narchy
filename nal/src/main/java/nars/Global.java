@@ -149,17 +149,20 @@ public enum Global {
 
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1.1f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 0.5f;
 
 
 
     /** exponent by which confidence (modeled as luminance) decays through the time axis (>=1) */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
 
     /** how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
      *  used to discourage premise's choice of belief tasks which overlap with the task.
      * */
-    public static float MATCH_OVERLAP_MULTIPLIER = 0.2f;
+    public static float PREMISE_MATCH_OVERLAP_MULTIPLIER = 0.1f;
+
+    /** if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression */
+    public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
 
 
     @NotNull

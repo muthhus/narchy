@@ -230,11 +230,12 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         n.input("<a --> b>.");
         n.input("<b --> c>. :|:");
         n.input("<c --> d>. :|:");
+        n.input("<c --> b>. :|:");
         n.input("<?x <=> (b|d)>?");
         n.onTask(t -> {
             p.append(t.toString());
         });
-        n.loop(20f);
+        n.loop(5f);
 
 
         s.add(new Facial(new ConsoleSurface(edit)).scale(500f, 400f));

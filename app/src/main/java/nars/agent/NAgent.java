@@ -6,6 +6,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.budget.Budget;
+import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
@@ -129,9 +130,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final Budget RewardAttentionPerFrame =
-            b(0.9f,0.9f,0.9f);
-            //null;
+    private final float reinforcementAttention = 0; //0.5f;
 
     //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 
@@ -485,7 +484,7 @@ public class NAgent implements Agent {
 
     public void reinforce() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-        if (RewardAttentionPerFrame!=null) {
+        if (reinforcementAttention > 0) {
 
             //boost(happy);
             boost(beHappy);
@@ -501,13 +500,14 @@ public class NAgent implements Agent {
     }
 
     private void boost(Task t) {
-        BudgetMerge.max.apply(t.budget(), RewardAttentionPerFrame);
+        BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
         nar.activate(t);
     }
 
 
     public @Nullable Concept boost(Concept c) {
-        return nar.activate(c, RewardAttentionPerFrame, 1f, 1f, null);
+
+        return nar.activate(c, UnitBudget.One, reinforcementAttention, reinforcementAttention, null);
     }
 
     public void observe(float[] nextObservation) {

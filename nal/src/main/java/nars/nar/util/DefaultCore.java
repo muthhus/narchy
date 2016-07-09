@@ -65,7 +65,7 @@ public class DefaultCore extends AbstractCore {
     @Override
     protected Bag<Concept> newConceptBag() {
 
-        return new MonitoredCurveBag(nar, 1, nar.random);
+        return new MonitoredCurveBag(nar, 1, ((DefaultConceptBuilder)nar.index.conceptBuilder()).defaultCurveSampler);
 
     }
 
@@ -74,8 +74,8 @@ public class DefaultCore extends AbstractCore {
 
         final NAR nar;
 
-        public MonitoredCurveBag(NAR nar, int capacity, @NotNull Random rng) {
-            super(capacity, rng, BudgetMerge.plusDQBlend);
+        public MonitoredCurveBag(NAR nar, int capacity, CurveSampler sampler) {
+            super(capacity, sampler, BudgetMerge.plusDQBlend);
             this.nar = nar;
             setCapacity(capacity);
         }

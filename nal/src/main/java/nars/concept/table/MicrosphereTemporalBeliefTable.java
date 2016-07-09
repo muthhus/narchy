@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
-import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -160,7 +159,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
             Task ii = get(i);
             if (excluding != null &&
-                    ((ii == excluding) || (Stamp.overlapping(excludingEvidence, ii.evidence()))))
+                    ((ii == excluding) || (!Global.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE && Stamp.overlapping(excludingEvidence, ii.evidence()))))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
@@ -292,7 +291,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
             float r = rank(x, when, now, ageFactor);
 
             if (against!=null && Stamp.overlapping(x.evidence(), against.evidence())) {
-                r *= Global.MATCH_OVERLAP_MULTIPLIER;
+                r *= Global.PREMISE_MATCH_OVERLAP_MULTIPLIER;
             }
 
             if (r > bestRank) {

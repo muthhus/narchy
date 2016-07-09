@@ -86,7 +86,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
-        this.defaultCurveSampler = new CurveBag.DirectSampler(CurveBag.power2BagCurve, rng);
+        this.defaultCurveSampler =
+                new CurveBag.NormalizedSampler(
+                //new CurveBag.DirectSampler(
+                    //CurveBag.linearBagCurve,
+                    CurveBag.power2BagCurve,
+                    //CurveBag.power6BagCurve,
+                    rng);
     }
 
 

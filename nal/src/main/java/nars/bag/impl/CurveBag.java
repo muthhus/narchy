@@ -32,14 +32,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
 
-    public CurveBag(int capacity, @NotNull Random rng, BudgetMerge mergeFunction) {
-        this(capacity,
-            //new NormalizedSampler(
-            new DirectSampler(
-                 power2BagCurve, rng
-        ), mergeFunction);
-    }
-
     public CurveBag(@NotNull CurveSampler c, BudgetMerge mergeFunction) {
         this(1, c, mergeFunction);
     }
@@ -402,6 +394,22 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 //    }
 
 
+    /** flat, gives equal attention to items in the bag */
+    public static final BagCurve linearBagCurve = new BagCurve() {
+
+        @Override
+        public final float valueOf(float x) {
+            return x;
+        }
+
+        @NotNull
+        @Override
+        public String toString() {
+            return "LinearBagCurve";
+        }
+
+    };
+
     public static final BagCurve power2BagCurve = new Power2BagCurve();
     public static final BagCurve power4BagCurve = new Power4BagCurve();
     public static final BagCurve power6BagCurve = new Power6BagCurve();
@@ -467,24 +475,24 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         abstract float sample(int size);
     }
 
-    public static class CubicBagCurve implements CurveBag.BagCurve {
-
-        @Override
-        public final float valueOf(float x) {
-            //1.0 - ((1.0-x)^2)
-            // a function which has domain and range between 0..1.0 but
-            //   will result in values above 0.5 more often than not.  see the curve:
-            //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLjAtKCgxLjAteCleMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMS4wLSgoMS4wLXgpXjMpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTEuMDYyODU2NzAzOTk5OTk5MiIsIjIuMzQ1MDE1Mjk2IiwiLTAuNDM2NTc0NDYzOTk5OTk5OSIsIjEuNjYwNTc3NTM2MDAwMDAwNCJdfV0-
-            float nx = 1.0f - x;
-            return 1.0f - (nx * nx * nx);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "CubicBagCurve";
-        }
-    }
+//    public static class CubicBagCurve implements CurveBag.BagCurve {
+//
+//        @Override
+//        public final float valueOf(float x) {
+//            //1.0 - ((1.0-x)^2)
+//            // a function which has domain and range between 0..1.0 but
+//            //   will result in values above 0.5 more often than not.  see the curve:
+//            //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLjAtKCgxLjAteCleMikiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjAsImVxIjoiMS4wLSgoMS4wLXgpXjMpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTEuMDYyODU2NzAzOTk5OTk5MiIsIjIuMzQ1MDE1Mjk2IiwiLTAuNDM2NTc0NDYzOTk5OTk5OSIsIjEuNjYwNTc3NTM2MDAwMDAwNCJdfV0-
+//            float nx = 1.0f - x;
+//            return 1.0f - (nx * nx * nx);
+//        }
+//
+//        @NotNull
+//        @Override
+//        public String toString() {
+//            return "CubicBagCurve";
+//        }
+//    }
 
     public static class Power4BagCurve implements BagCurve {
 

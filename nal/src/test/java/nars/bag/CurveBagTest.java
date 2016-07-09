@@ -38,7 +38,7 @@ public class CurveBagTest  {
         int cap = 1;
 
         testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant));
-        testBasicInsertionRemoval(new CurveBag(cap, rng, plusDQDominant));
+        testBasicInsertionRemoval(new CurveBag(cap, defaultSampler, plusDQDominant));
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
@@ -261,7 +261,7 @@ public class CurveBagTest  {
     private CurveBag<String> populated(int n , @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = newNormalizedSamplingBag(rng, n, plusDQDominant);
+        CurveBag<String> a = newNormalizedSamplingBag(n, plusDQDominant);
 
 
         //fill with uniform randomness
@@ -282,7 +282,7 @@ public class CurveBagTest  {
 
         float level = 0.04f;
 
-        CurveBag<String> a = newNormalizedSamplingBag(rng, n, plusDQDominant);
+        CurveBag<String> a = newNormalizedSamplingBag(n, plusDQDominant);
 
         for (int i = 0; i < n; i++) {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
@@ -302,9 +302,11 @@ public class CurveBagTest  {
         }
     }
 
+    static final CurveBag.CurveSampler defaultSampler = new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng);
+
     @NotNull
-    public CurveBag<String> newNormalizedSamplingBag(Random rng, int n, BudgetMerge mergeFunction) {
-        return new CurveBag(n, new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng), mergeFunction);
+    public CurveBag<String> newNormalizedSamplingBag(int n, BudgetMerge mergeFunction) {
+        return new CurveBag(n, defaultSampler, mergeFunction);
     }
 
 //    /** maybe should be in ArrayBagTest */

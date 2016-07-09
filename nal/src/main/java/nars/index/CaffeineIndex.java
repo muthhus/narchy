@@ -22,7 +22,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     private final Weigher<Object, Object> conceptWeigher = (k,v) -> {
         if (v instanceof Atomic) {
-            return 1;
+            return 0; //dont allow removal of atomic
         } else {
             int w;
             if (v instanceof Concept) {
@@ -30,11 +30,9 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                     //special implementation, dont allow removal
                     return 0;
                 }
-                w = ((Concept)v).volume();// * weightFactor;
-            } else {
-                w = 1;
             }
 
+            w = ((Termed)v).complexity();// * weightFactor;
 
             //w/=(1f + maxConfidence((CompoundConcept)v));
 
@@ -56,9 +54,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
+        final int maxWeight = 50000 * 4;
         builder
-               //.weigher(conceptWeigher)
-               //.maximumWeight(maxWeight)
+               .weigher(conceptWeigher)
+               .maximumWeight(maxWeight)
                .removalListener(this)
 
 
@@ -76,8 +75,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         //builder = builder.initialCapacity(initialSize);
 
         if (soft) {
-            builder = builder.softValues();
-            //builder = builder.weakValues();
+            //builder = builder.softValues();
+            builder = builder.weakValues();
 
 
         }

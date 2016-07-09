@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.term.atom.Atomic;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.treechart.ItemVis;
@@ -21,6 +22,7 @@ import java.util.function.BiConsumer;
 public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BLink<X>, ItemVis<BLink<X>>> {
 
 
+    private static long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
 
     public static void main(String[] args) {
@@ -36,10 +38,35 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
     public static void show(Default d) {
         show(d, -1);
     }
+
     public static void show(Default d, int count) {
-        BagChart<Concept> tc = new BagChart(d.core.concepts, count, 1400, 800);
+        BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count, 1400, 800) {
+            @Override
+            public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
+                float p = x.pri();
+                float ph = 0.25f + 0.75f * p;
+
+
+                Concept c = x.get();
+                float r, g, b;
+                if (c instanceof Atomic) {
+                    r = g = b = ph * 0.5f;
+                } else {
+                    float belief = c.hasBeliefs() ? c.beliefs().top(now).conf() : 0f;
+                    float goal = c.hasGoals() ? c.goals().top(now).conf() : 0f;
+                    r = 0;
+                    g = belief;
+                    b = goal;
+                }
+
+                y.update(p, r, g, b);
+
+
+            }
+        };
 
         d.onFrame(xx -> {
+            now = xx.time();
             if (tc.busy.compareAndSet(false, true)) {
                 tc.update();
             }
@@ -88,7 +115,6 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
     public void accept(BLink<X> x, ItemVis<BLink<X>> y) {
         float p = x.pri();
         float ph = 0.25f + 0.75f * p;
-        y.update(p,
-                ph, ph * x.dur(), ph * x.qua());
+        y.update(p, ph, ph * x.dur(), ph * x.qua());
     }
 }
