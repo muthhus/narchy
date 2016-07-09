@@ -76,9 +76,9 @@ public class ServerThread extends PeerThread {
                     break;
 
                 case GnutellaConstants.QUERY_HIT:
-                    if (mine(m) || unseen(m)) {
+                    //if (/*mine(m) || */unseen(m)) {
                         pending(m);
-                    }
+                    //}
                     break;
 
             }

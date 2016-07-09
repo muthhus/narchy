@@ -219,7 +219,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                     return false;
                 default:
                     //Compound
-                    if (y instanceof Compound)
+                    if ((y instanceof Compound) && (xOp == y.op()))
                         return ((Compound) x).match((Compound) y, this);
                     else
                         break;
