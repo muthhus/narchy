@@ -3,6 +3,7 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
@@ -17,8 +18,8 @@ import java.util.function.Consumer;
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @NotNull
-    public final Cache<Object, Object> data;
-    public final WeakHashMap<TermContainer,TermContainer> subs = new WeakHashMap<>();
+    public final Cache<Termed, Termed> data;
+    public final Cache<TermContainer, TermContainer> subs;
 
     private final Weigher<Object, Object> conceptWeigher = (k,v) -> {
         if (v instanceof Atomic) {
@@ -45,16 +46,16 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
-    public CaffeineIndex(Concept.ConceptBuilder builder) {
-        this(builder, false);
+    public CaffeineIndex(Concept.ConceptBuilder builder, int maxWeight) {
+        this(builder, maxWeight, false);
     }
 
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, boolean soft) {
+
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, int maxWeight, boolean soft) {
         super(conceptBuilder);
 
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
-        final int maxWeight = 50000 * 4;
         builder
                .weigher(conceptWeigher)
                .maximumWeight(maxWeight)
@@ -63,9 +64,11 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
                //.recordStats()
         ;
-
-
         data = builder.build();
+
+        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), true);
+        subs = builderSubs.build();
+
 
     }
 
@@ -104,7 +107,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return (Termed) data.getIfPresent(x);
+        return data.getIfPresent(x);
     }
 
     @Override
@@ -130,7 +133,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public void forEach(@NotNull Consumer<? super Termed> c) {
         data.asMap().forEach((k, v) -> {
             if (v instanceof Termed)
-                c.accept((Termed)v);
+                c.accept(v);
         });
     }
 
@@ -141,25 +144,23 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public int subtermsCount() {
-        return subs.size();
+        return (int) subs.estimatedSize();
     }
 
     @Override
     protected TermContainer putIfAbsent(@NotNull TermContainer s) {
-        return subs.putIfAbsent(s, s);
+        return subs.get(s, (ss) -> s); //HACK
     }
 
     @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
-
-        return subs.get(t);
+        return subs.getIfPresent(t);
     }
 
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return (Termed) data.get(x, (interned) ->
-                buildConcept((Atomic)interned));
+        return data.get(x, (interned) -> buildConcept(interned));
     }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
@@ -178,7 +179,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return data.estimatedSize() + " concepts / " + subs.size() + " subterms";
+        return data.estimatedSize() + " concepts / " + subs.estimatedSize() + " subterms";
     }
 
     @Override

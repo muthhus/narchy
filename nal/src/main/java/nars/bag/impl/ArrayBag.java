@@ -259,8 +259,11 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Override
     public final void put(@NotNull V key, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
-        if (b.isDeleted())
-            throw new RuntimeException();
+        if (b.isDeleted()) {
+            //throw new RuntimeException();
+            return;
+        }
+
 
         BLink<V> existing = get(key);
 

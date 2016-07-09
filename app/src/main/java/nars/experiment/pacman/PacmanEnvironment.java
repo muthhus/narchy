@@ -33,6 +33,7 @@ import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
@@ -74,10 +75,10 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		//Multi nar = new Multi(2,
-		Default nar = new Default(
+		Multi nar = new Multi(2,
+		//Default nar = new Default(
 				1024, 4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), true)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), 200000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -163,9 +164,11 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //						numericSensor(nar.self.toString(),
 //								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
 
-				new BeliefTableChart(nar, charted).show(600, 900);
+				if (nar instanceof Default) {
+					new BeliefTableChart(nar, charted).show(600, 900);
 
-				BagChart.show((Default)nar);
+					BagChart.show((Default) nar);
+				}
 			}
 		};
 

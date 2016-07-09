@@ -17,6 +17,7 @@ import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
@@ -60,10 +61,10 @@ public class PongEnvironment extends Player implements Environment {
 		//Global.TRUTH_EPSILON = 0.2f;
 
 		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
-		//Multi nar = new Multi(3,
+		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 3, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng) , true )
+				new CaffeineIndex(new DefaultConceptBuilder(rng) , 200000, true )
 				//new Cache2kIndex(250000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -88,8 +89,11 @@ public class PongEnvironment extends Player implements Environment {
 			@Override
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
-				beliefChart(this, cheats);
-				BagChart.show((Default) nar, 512);
+
+				if (nar instanceof Default) {
+					BagChart.show((Default) nar, 512);
+					beliefChart(this, cheats);
+				}
 			}
 
 //			@Override
