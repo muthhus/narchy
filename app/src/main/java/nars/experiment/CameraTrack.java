@@ -45,10 +45,9 @@ public class CameraTrack implements Environment {
     private final JPanel scene;
     private final NARCamera cam;
     private final NAR nar;
-    private final JPanel overlay;
+    private final CameraDebugPane overlay;
 
     MutableFloat rt = new MutableFloat(), gt = new MutableFloat(), bt = new MutableFloat();
-    ;
     Map<Term, SensorConcept> sensors;
 
 
@@ -56,7 +55,7 @@ public class CameraTrack implements Environment {
         this.nar = nar;
         this.scene = new JPanel() {
 
-            int cycle = 0;
+            int cycle;
 
             float rotationspeed = 1f/1350;
 
@@ -99,33 +98,23 @@ public class CameraTrack implements Environment {
             }
 
         };
-        overlay = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
 
-
-                if (null!=cam)
-                    if (null!=((SwingCamera)cam.cam)) {
-                        float reward = cam.controller.reward;
-                        g.setColor(Color.getHSBColor(cam.controller.happy.beliefs().expectation(nar.time()), 0.5f, 0.5f));
-                        Rectangle r = ((SwingCamera) cam.cam).input;
-                        g.drawRect(r.x-1, r.y-1, r.width+1, r.height+1);
-                    }
-            }
-
-        };
-        overlay.setOpaque(false);
         scene.setSize(sw, sh);
+
         JFrame win = new JFrame();
-        win.setGlassPane(overlay);
-        overlay.setVisible(true);
-        win.setContentPane(scene);
         win.setSize(sw, sh);
+        win.setContentPane(scene);
+
+        SwingCamera swingCam = new SwingCamera(scene);
+        overlay = new CameraDebugPane(swingCam);
+
+
         win.setVisible(true);
         win.setResizable(false);
 
 
-        SwingCamera swingCam = new SwingCamera(scene);
+
+
 
         sensors = Global.newHashMap(width*height*3);
 
@@ -135,7 +124,7 @@ public class CameraTrack implements Environment {
         );
         cam.input(0,0,sw,sh);
         swingCam.output(width,height);
-        NARCamera.newWindow(cam);
+        NARCamera.newWindow(swingCam);
 
 
         //nar.logSummaryGT(System.out, 0.75f);
@@ -204,7 +193,7 @@ public class CameraTrack implements Environment {
 //                    () -> (float)/*Math.sqrt*/(gt.floatValue()),
 //                    0.9f).resolution(0.05f),
             PongEnvironment.numericSensor("blueness", "low", "high", nar,
-                    () -> (float)/*Math.sqrt*/(bt.floatValue()),
+                    () -> bt.floatValue(),
                     0.9f).resolution(0.05f)
         ));
         nar.goal("(blueness-->low)", Tense.Eternal, 0f, 1f);
@@ -370,8 +359,48 @@ public class CameraTrack implements Environment {
             }
 
         }.run(
-            new HaiQAgent()
-            //new DQN()
+            //new HaiQAgent()
+            new DQN()
         , 55500);
+    }
+
+    public static final class CameraDebugPane extends JPanel {
+
+
+        private final SwingCamera cam;
+
+        public CameraDebugPane(SwingCamera cam) {
+            super();
+
+            setSize(cam.inWidth(), cam.inHeight());
+
+            this.cam = cam;
+
+            //setOpaque(false);
+
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+        }
+
+        @Override
+        public void update(Graphics g) {
+            super.update(g);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+                //float reward = cam.controller.reward;
+                //g.setColor(Color.getHSBColor(cam.controller.happy.beliefs().expectation(nar.time()), 0.5f, 0.5f));
+
+                g.setColor(Color.WHITE);
+                Rectangle r = cam.input;
+                g.drawRect(r.x - 1, r.y - 1, r.width + 1, r.height + 1);
+
+        }
+
     }
 }

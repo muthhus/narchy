@@ -20,24 +20,35 @@ package nars.experiment.tetris;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
+import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
+import nars.experiment.CameraTrack;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.term.Compound;
+import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.vision.NARCamera;
+import nars.vision.SwingCamera;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
 public class Tetris implements Environment {
 
+    private static int GAME_DIVISOR = 4;
     private final TetrisVisualizer vis;
+    private final JFrame window;
     private double currentScore;
     public TetrisState game;
     
@@ -49,12 +60,15 @@ public class Tetris implements Environment {
     public Tetris(int width, int height) {
         game = new TetrisState(width, height);
         vis = new TetrisVisualizer(this, 32);
-        JFrame win = new JFrame();
-        win.setContentPane(vis);
-        win.setSize(vis.size());
-        win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        win.setVisible(true);
+        window = new JFrame();
 
+        window.setSize(vis.getWidth(), vis.getHeight()+32);
+
+        SwingUtilities.invokeLater(()->{
+            window.setContentPane(vis);
+            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            window.setVisible(true);
+        });
 
         restart();
     }
@@ -66,8 +80,50 @@ public class Tetris implements Environment {
 
         this.seenState = ins;
 
-        return (float)getReward();
+        float r = (float)getReward();
+        //System.out.println("rew=" + r);
+        return r;
     }
+
+    @Override
+    public void preStart(Agent a) {
+        if (a instanceof NAgent) {
+            //provide custom sensor input names for the nars agent
+
+            NAgent ag = (NAgent) a;
+
+            ag.setSensorNamer((i) -> {
+                int x = game.x(i);
+                int y = game.y(i);
+
+                Compound squareTerm = $.inh($.p($.the(x), $.the(y)), $.the("t"));
+                return squareTerm;
+
+//                int dx = (visionRadius  ) - ax;
+//                int dy = (visionRadius  ) - ay;
+//                Atom dirX, dirY;
+//                if (dx == 0) dirX = $.the("v"); //vertical
+//                else if (dx > 0) dirX = $.the("r"); //right
+//                else /*if (dx < 0)*/ dirX = $.the("l"); //left
+//                if (dy == 0) dirY = $.the("h"); //horizontal
+//                else if (dy > 0) dirY = $.the("u"); //up
+//                else /*if (dy < 0)*/ dirY = $.the("d"); //down
+//                Term squareTerm = $.p(
+//                        //$.p(dirX, $.the(Math.abs(dx))),
+//                        $.inh($.the(Math.abs(dx)), dirX),
+//                        //$.p(dirY, $.the(Math.abs(dy)))
+//                        $.inh($.the(Math.abs(dy)), dirY)
+//                );
+//                //System.out.println(dx + " " + dy + " " + squareTerm);
+//
+//                //return $.p(squareTerm, typeTerm);
+//                return $.prop(squareTerm, typeTerm);
+//                //return (Compound)$.inh($.the(square), typeTerm);
+            });
+        }
+    }
+
+
 
     @Override
     public void post(int t, int action, float[] ins, Agent a) {
@@ -94,7 +150,8 @@ public class Tetris implements Environment {
         game.reset();
         game.spawn_block();
         game.running = true;
-        previousScore = currentScore = 0;
+        previousScore = 0;
+        currentScore = -50;
     }
 
     public double step(int nextAction) {
@@ -119,6 +176,7 @@ public class Tetris implements Environment {
             currentScore = game.get_score();
             return currentScore - previousScore;
         } else {
+            //System.out.println("restart");
             restart();
             return 0;
         }
@@ -157,7 +215,7 @@ public class Tetris implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-        nar.cyclesPerFrame.set(16);
+        nar.cyclesPerFrame.set(64);
         nar.confMin.setValue(0.02f);
 
 
@@ -176,19 +234,55 @@ public class Tetris implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        //new MySTMClustered(nar, 8, '.', 2);
+        //new MySTMClustered(nar, 32, '.', 2);
         //new MySTMClustered(nar, 8, '!');
 
 
-        NAgent n = new NAgent(nar);
+        NAgent n = new NAgent(nar) {
+            @Override
+            public void start(int inputs, int actions) {
+                super.start(inputs, actions);
 
-        new Tetris(8, 16).run(n, 5000);
+                List<Termed> charted = new ArrayList(super.actions);
 
-        //nar.index.print(System.out);
+                charted.add(sad);
+                charted.add(happy);
+
+                if (nar instanceof Default) {
+                    new BeliefTableChart(nar, charted).show(600, 900);
+                    //BagChart.show((Default) nar);
+                }
+            }
+        };
+        n.framesBeforeDecision = GAME_DIVISOR;
+
+
+        Tetris t = new Tetris(12, 24);
+
+        addCamera(t, nar, 8, 8);
+
+        t.run(n, 5100);
+
+        nar.index.print(System.out);
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         n.printActions();
         nar.forEachActiveConcept(System.out::println);
+    }
+
+    static void addCamera(Tetris t, NAR n, int w, int h) {
+        SwingCamera s = new SwingCamera(t.vis);
+
+        NARCamera nc = new NARCamera("t", n, s, (x, y) -> $.p($.the(x), $.the(y)));
+
+        NARCamera.newWindow(s);
+
+        s.input(0, 0, t.vis.getWidth(),t.vis.getHeight());
+        s.output(w, h);
+
+        n.onFrame(nn -> {
+            s.update();
+        });
     }
 
 }

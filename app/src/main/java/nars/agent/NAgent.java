@@ -62,8 +62,8 @@ public class NAgent implements Agent {
     public float reward = Float.NaN;
     float dReward;
 
-    private int ticksBeforeObserve = 1;
-    private int ticksBeforeDecide = 1;
+    public int ticksBeforeObserve = 1;
+    public int ticksBeforeDecide = 1;
 
 
 
@@ -155,6 +155,9 @@ public class NAgent implements Agent {
     public SensorConcept sad;
     public FuzzyConceptSet rewardConcepts;
     private Task beHappy, dontBeSad;
+
+    /** normally 1, but can be increased to give NARS more frames of processing between environment frames */
+    public int framesBeforeDecision = 1;
 
 
     public NAgent(NAR n) {
@@ -522,7 +525,8 @@ public class NAgent implements Agent {
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
         nar.clock.tick(ticksBeforeObserve-1);
-        nar.step();
+
+        nar.run(framesBeforeDecision);
 
 
     }

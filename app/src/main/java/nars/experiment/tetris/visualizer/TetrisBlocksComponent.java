@@ -36,6 +36,9 @@ public class TetrisBlocksComponent {
 
 	public void render(Graphics2D g, int DABS, float[] state) {
 
+		if (state == null)
+			return;
+
 //		Rectangle2D agentRect;
 		int numCols = tetVis.getWorldWidth();
 		int numRows = tetVis.getWorldHeight();

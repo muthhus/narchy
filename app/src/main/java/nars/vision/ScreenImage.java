@@ -98,6 +98,9 @@ public class ScreenImage
 			layoutComponent( component );
 		}
 
+		if ((region.width <= 0 || region.height <= 0))
+			return null;
+
 		if (image==null || image.getWidth()!=region.width || image.getHeight()!=region.height) {
 			image = new BufferedImage(region.width, region.height, BufferedImage.TYPE_INT_RGB);
 		}

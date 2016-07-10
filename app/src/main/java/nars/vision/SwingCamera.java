@@ -6,6 +6,10 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static nars.vision.PixelCamera.decodeBlue;
+import static nars.vision.PixelCamera.decodeGreen;
+import static nars.vision.PixelCamera.decodeRed;
+
 /**
  * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel
  */
@@ -14,8 +18,8 @@ public class SwingCamera implements PixelCamera {
     static final Logger logger = LoggerFactory.getLogger(SwingCamera.class);
 
     private final Container component;
-    private BufferedImage big;
-    private BufferedImage out;
+    public BufferedImage in;
+    public BufferedImage out;
     public int width;
     public int height;
     private Graphics2D outgfx;
@@ -79,7 +83,7 @@ public class SwingCamera implements PixelCamera {
 
         //logger.info("{} capturing {} scaled to {},{}", component.getClass().getSimpleName(), input, width, height);
 
-        big = ScreenImage.get(component, big, input);
+        in = ScreenImage.get(component, in, input);
 
         if (out == null || out.getWidth() != width || out.getHeight() != height) {
             out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -91,17 +95,17 @@ public class SwingCamera implements PixelCamera {
 
 
         outgfx.fillRect(0, 0, width, height); //TODO add fade option
-        outgfx.drawImage(big, 0, 0, width, height, null); //draw the image scaled
+        outgfx.drawImage(in, 0, 0, width, height, null); //draw the image scaled
         return true;
     }
 
     public void updateBuffered(PerPixelRGB p) {
-        final BufferedImage small = this.out;
-        if (small == null)
+        final BufferedImage b = this.out;
+        if (b == null)
             return;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                p.pixel(x, y, small.getRGB(x, y));
+                p.pixel(x, y, b.getRGB(x, y));
             }
         }
     }
@@ -118,7 +122,7 @@ public class SwingCamera implements PixelCamera {
         return outsideBuffer(x, y) ? Float.NaN : decodeRed(out.getRGB(x, y));
     }
     public float green(int x, int y) {
-        return outsideBuffer(x, y) ? Float.NaN : decodeGreen(out.getRGB(x,y));
+        return outsideBuffer(x, y) ? Float.NaN : decodeGreen(out.getRGB(x, y));
     }
     public float blue(int x, int y) {
         return outsideBuffer(x, y) ? Float.NaN : decodeBlue(out.getRGB(x,y));

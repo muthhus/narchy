@@ -120,7 +120,7 @@ public class TetrisState {
                 if (thisPiece[x][y] != 0) {
                     //Writing currentBlockId +1 because blocks are 0 indexed, and we want spots to be
                     //0 if they are clear, and >0 if they are not.
-                    int linearIndex = p(currentX + x, currentY + y);
+                    int linearIndex = i(currentX + x, currentY + y);
                     /*if(linearIndex<0){
                         System.err.printf("Bogus linear index %d for %d + %d, %d + %d\n",linearIndex,currentX,x,currentY,y);
                         Thread.dumpStack();
@@ -205,10 +205,16 @@ public class TetrisState {
      * @param y
      * @return
      */
-    int p(int x, int y) {
+    int i(int x, int y) {
         return y * width + x;
         //assert returnValue >= 0 : " "+y+" * "+worldWidth+" + "+x+" was less than 0.";
         //return returnValue;
+    }
+    int x(int i) {
+        return i % width;
+    }
+    int y(int i) {
+        return i / width;
     }
 
     /**
@@ -240,7 +246,7 @@ public class TetrisState {
                         }
 
                         //Otherwise check if it hits another piece
-                        int linearArrayIndex = p(checkX + x, checkY + y);
+                        int linearArrayIndex = i(checkX + x, checkY + y);
                         if (worldState[linearArrayIndex] != 0) {
                             return true;
                         }
@@ -272,7 +278,7 @@ public class TetrisState {
                         if ((checkX + x >= 0 && checkX + x < width && checkY + y >= 0 && checkY + y < height)) {
                             //This array location is in bounds  
                             //Check if it hits another piece
-                            int linearArrayIndex = p(checkX + x, checkY + y);
+                            int linearArrayIndex = i(checkX + x, checkY + y);
                             if (worldState[linearArrayIndex] != 0) {
                                 return true;
                             }
@@ -424,7 +430,7 @@ public class TetrisState {
      */
     boolean isRow(int y) {
         for (int x = 0; x < width; ++x) {
-            int linearIndex = p(x, y);
+            int linearIndex = i(x, y);
             if (worldState[linearIndex] == 0) {
                 return false;
             }
@@ -433,7 +439,7 @@ public class TetrisState {
     }
     boolean isEmpty(int y) {
         for (int x = 0; x < width; ++x) {
-            int linearIndex = p(x, y);
+            int linearIndex = i(x, y);
             if (worldState[linearIndex] != 0) {
                 return false;
             }
@@ -454,22 +460,22 @@ public class TetrisState {
         }
 
         for (int x = 0; x < width; ++x) {
-            int linearIndex = p(x, y);
+            int linearIndex = i(x, y);
             worldState[linearIndex] = 0;
         }
 
         //Copy each row down one (except the top)
         for (int ty = y; ty > 0; --ty) {
             for (int x = 0; x < width; ++x) {
-                int linearIndexTarget = p(x, ty);
-                int linearIndexSource = p(x, ty - 1);
+                int linearIndexTarget = i(x, ty);
+                int linearIndexSource = i(x, ty - 1);
                 worldState[linearIndexTarget] = worldState[linearIndexSource];
             }
         }
 
         //Clear the top row
         for (int x = 0; x < width; ++x) {
-            int linearIndex = p(x, 0);
+            int linearIndex = i(x, 0);
             worldState[linearIndex] = 0;
         }
 

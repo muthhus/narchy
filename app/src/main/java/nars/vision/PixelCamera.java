@@ -40,13 +40,13 @@ public interface PixelCamera {
         m.pixel(x, y, r, g, b, a/255f);
     }
 
-    default float decodeRed(int p) {
+    public static float decodeRed(int p) {
         return ((p & 0x00ff0000) >> 16)/255f;
     }
-    default float decodeGreen(int p) {
+    public static float decodeGreen(int p) {
         return ((p & 0x0000ff00) >> 8)/255f;
     }
-    default float decodeBlue(int p) {
+    public static float decodeBlue(int p) {
         return ((p & 0x000000ff))/255f;
     }
 

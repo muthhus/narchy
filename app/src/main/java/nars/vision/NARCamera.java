@@ -22,19 +22,23 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.ShapeDrawer;
 
+import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import static nars.nal.UtilityFunctions.w2c;
+import static nars.vision.PixelCamera.decodeBlue;
+import static nars.vision.PixelCamera.decodeGreen;
+import static nars.vision.PixelCamera.decodeRed;
 
 /**
  * Created by me on 6/5/16.
  */
 public class NARCamera implements PixelCamera.PerPixelRGB {
 
-    public static final float minZoom = 0.35f;
-    public static final float maxZoom = 0.8f;
+    public static final float minZoom = 0.25f;
+    public static final float maxZoom = 1f;
 
     public final NAgent controller;
     public final PixelCamera cam;
@@ -271,7 +275,7 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
     public Term snapshot() {
         Set<Term> s = new HashSet();
         ((SwingCamera)cam).updateBuffered((x, y, r, g, b, a)->{
-            s.add( $.p(p(x,y).term(), (b > 0.5f ? $.the("b") : $.the("x")) ) ); //HACK this only does blue plane
+            s.add( $.p(p(x,y).term(), ($.the(b > 0.5f ? "b" : "x")) ) ); //HACK this only does blue plane
         });
         return $.sete(s);
     }
@@ -325,42 +329,90 @@ public class NARCamera implements PixelCamera.PerPixelRGB {
         return (((long) x) << 32) | ((long) y);
     }
 
-    public static void newWindow(NARCamera camera) {
+    public static void newWindow(SwingCamera camera) {
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-        s.show(500, 500);
+        s.show(700, 800);
 
         s.add(new Facial(new CameraViewer(camera)));
         //s.add(new Facial(new CrosshairSurface(s)));
     }
 
     private static class CameraViewer extends Surface {
-        private final NARCamera camera;
-        float tw = 400f;
+        private final SwingCamera camera;
+        float tw = 300f;
 
-        public CameraViewer(NARCamera camera) {
+        public CameraViewer(SwingCamera camera) {
             this.camera = camera;
         }
 
         @Override
         protected void paint(GL2 gl) {
 
-            int w = camera.cam.width();
-            int h = camera.cam.height();
-            float ar = h / w;
+            //gl.glScalef(0.25f,0.25f,0.25f);
+            //draw(gl, this.camera.out);
+            draw(gl,this.camera.in);
+            drawLegend(gl);
+
+        }
+
+        public void drawLegend(GL2 gl) {
+
+            gl.glPushMatrix();
+
+            gl.glTranslatef(tw*1.1f, 0, 0);
+            gl.glScalef(0.5f,0.5f,0.5f);
+
+            gl.glColor3f(0.5f,0.5f,0.5f);
+            int hh = camera.inHeight();
+            int ww = camera.inWidth();
+            ShapeDrawer.strokeRect(gl,0,0, ww, hh);
+
+            if (camera.out!=null)
+                ShapeDrawer.strokeRect(gl,camera.input.x,camera.input.y, camera.input.width, camera.input.height);
+
+            gl.glPopMatrix();
+
+        }
+
+        private void draw(GL2 gl, BufferedImage b) {
+            if (b == null)
+                return;
+
+            int w = b.getWidth();
+            int h = b.getHeight();
+            if ((w == 0) || (h == 0))
+                return;
+
+            //float ar = h / w;
+            float ar = 1f;
+
 
             float th = tw / ar;
 
             float dw = tw / w;
             float dh = th / h;
-            ((SwingCamera) camera.cam).updateBuffered((x, y, r, g, b, a) -> {
-                gl.glColor4f(r, g, b, a);
-                ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
-            });
+
+            //float a = 1f;
+            for (int y = 0; y < b.getHeight(); y++) {
+                for (int x = 0; x < b.getWidth(); x++) {
+                    int p = b.getRGB(x, y);
+                    float r = decodeRed(p);
+                    float g = decodeGreen(p);
+                    float bl = decodeBlue(p);
+
+                    gl.glColor3f(r, g, bl);
+                    ShapeDrawer.rect(gl, x * dw, th - y * dh, dw, dh);
+
+                }
+            }
+
 
             //border
             gl.glColor4f(1f, 1f, 1f, 1f);
             ShapeDrawer.strokeRect(gl, 0, 0, tw + dw, th + dh);
         }
+
+
     }
 
 
