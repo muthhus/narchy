@@ -89,7 +89,7 @@ public class Memory extends Param {
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
     int level;
 
-    private final AtomicLong currentStampSerial = new AtomicLong(1);
+
 
 
     /**
@@ -161,23 +161,6 @@ public class Memory extends Param {
     }
 
 
-    /**
-     * produces a new stamp serial #, used to uniquely identify inputs
-     */
-    public final long newStampSerial() {
-        return currentStampSerial.getAndIncrement();
-    }
-
-    /** used to ensure that the next system stamp serial is beyond the range of any input */
-    protected final void ensureStampSerialGreater(long s) {
-        long nextStamp = currentStampSerial.longValue();
-        if (nextStamp < s)
-            currentStampSerial.set(s+1);
-    }
-    protected final void ensureStampSerialGreater(@NotNull long[] s) {
-        //assume that the evidence is sorted, and that the max value is in the last position
-        ensureStampSerialGreater(s[s.length-1]);
-    }
 
     public final long time() {
         return clock.time();

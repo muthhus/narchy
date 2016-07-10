@@ -208,7 +208,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
         //finally, assign a unique stamp if none specified (input)
         if (evidence == null) {
 
-            setEvidence(memory.newStampSerial());
+            setEvidence(memory.clock.newStampSerial());
 
             //this actually means it arrived from unknown origin.
             //we'll clarify what null evidence means later.

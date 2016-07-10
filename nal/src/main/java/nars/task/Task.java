@@ -32,6 +32,7 @@ import nars.truth.ProjectedTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import nars.util.data.LongString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -663,9 +664,14 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
             buffer.append(creation());
         }
         buffer.append(Symbols.STAMP_STARTER).append(' ');
+
+        int base = LongString.maxBase();
         for (int i = 0; i < len; i++) {
 
-            buffer.append(Long.toString(ev[i], 36));
+            buffer.append(
+                //Long.toString(ev[i], 36)
+                LongString.toString(ev[i], base)
+            );
             if (i < (len - 1)) {
                 buffer.append(Symbols.STAMP_SEPARATOR);
             }

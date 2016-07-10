@@ -34,6 +34,7 @@ public class InterNAR extends Peer implements PeerModel {
     public float broadcastConfidenceThreshold = 0.9f;
 
     final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
+    private boolean paranoid = false;
 
     public InterNAR(NAR n) throws IOException {
         this(n, (short)-1);
@@ -59,7 +60,7 @@ public class InterNAR extends Peer implements PeerModel {
 
                     });
                 }
-            } else if (t.isBelief()) {
+            } else if (t.isBeliefOrGoal()) {
                 if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
                     query(t);
                 }
@@ -104,9 +105,13 @@ public class InterNAR extends Peer implements PeerModel {
 //    }
 
     public void consider(Message q, Task t) {
-        nar.believe(
-            Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present
-        );
+        if (paranoid) {
+            nar.believe(
+                    Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present
+            );
+        } else {
+            nar.input(t);
+        }
     }
 
     @Override

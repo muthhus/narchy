@@ -19,6 +19,7 @@ import nars.op.time.STMTemporalLinkage;
 import nars.task.Task;
 import nars.term.atom.Atom;
 import nars.time.Clock;
+import nars.time.FrameClock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -160,7 +161,11 @@ public abstract class AbstractNAR extends NAR {
 
         Task t = c.process(input, this);
         if (t != null && !t.isDeleted()) {
-            ensureStampSerialGreater(t.evidence());
+
+            if (clock instanceof FrameClock) {
+                //HACK for unique serial number w/ frameclock
+                ((FrameClock)clock).ensureStampSerialGreater(t.evidence());
+            }
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 

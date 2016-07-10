@@ -13,7 +13,10 @@ public interface Clock extends Serializable {
 	/** returns the current time, as measured in units determined by this clock */
 	long time();
 
-	/** called each cycle */
+	/** returns a new stamp evidence id */
+	long newStampSerial();
+
+		/** called each cycle */
 	void tick();
 
 	default void tick(int ticks) {

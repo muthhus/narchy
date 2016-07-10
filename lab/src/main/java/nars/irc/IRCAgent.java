@@ -1,15 +1,18 @@
 package nars.irc;
 
+import nars.index.TermIndex;
 import nars.inter.InterNAR;
 import nars.nal.Tense;
 import nars.nar.Terminal;
+import nars.term.Compound;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 7/10/16.
  */
-public class DummyIRCBot extends IRCBot {
+public class IRCAgent extends IRCBot {
 
     final Terminal terminal = new Terminal(16, new XorShift128PlusRandom(1), new RealtimeMSClock());
 
@@ -17,10 +20,17 @@ public class DummyIRCBot extends IRCBot {
 
     private final InterNAR inter;
 
-    public DummyIRCBot(String server, String nick, String channel, int udpPort) throws Exception {
+    public IRCAgent(String server, String nick, String channel, int udpPort) throws Exception {
         super(server, nick, channel);
 
         terminal.log();
+
+        terminal.onExec(new TermProcedure("say") {
+            @Override public @Nullable Object function(Compound arguments, TermIndex i) {
+                send(channel, arguments.toString());
+                return null;
+            }
+        });
 
         inter = new InterNAR(terminal, (short)udpPort );
         inter.broadcastPriorityThreshold = 0.5f; //lower threshold
@@ -41,7 +51,7 @@ public class DummyIRCBot extends IRCBot {
     public static void main(String[] args) throws Exception {
         //while (running) {
             try {
-                new DummyIRCBot(
+                new IRCAgent(
                         "irc.freenode.net",
                         //"localhost",
                         "NARchy", "#netention", 11001);

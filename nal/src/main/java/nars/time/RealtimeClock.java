@@ -3,6 +3,8 @@ package nars.time;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by me on 7/2/15.
@@ -12,6 +14,13 @@ public abstract class RealtimeClock implements Clock {
     long t, t0 = -1;
     private long start;
 
+    long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000;
+    final AtomicInteger nextStamp = new AtomicInteger(1);
+
+    @Override
+    public long newStampSerial() {
+        return seed | nextStamp.getAndIncrement();
+    }
 
     @Override
     public void clear() {

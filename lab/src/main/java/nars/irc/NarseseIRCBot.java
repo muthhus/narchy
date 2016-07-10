@@ -67,6 +67,7 @@ public class NarseseIRCBot extends Talk {
 
         inter = new InterNAR(nar);
         inter.connect("localhost", 11001);
+        inter.broadcastPriorityThreshold = 0.5f;
 
 //        irc = new IRCBot(
 //                "irc.freenode.net",
@@ -164,23 +165,17 @@ public class NarseseIRCBot extends Talk {
         });
     }
 
-    abstract class IRCBotOperator extends TermFunction {
+    abstract class IRCBotOperator extends TermProcedure {
 
 
         public IRCBotOperator(String id) {
             super(id);
         }
 
-        @Override
-        public boolean autoReturnVariable() {
-            return true;
-        }
-
-
 
         @Nullable
         @Override
-        public Object function(Compound arguments, TermIndex i) {
+        public final Object function(Compound arguments, TermIndex i) {
             Object y = function(arguments);
 
             send("//" + y.toString());

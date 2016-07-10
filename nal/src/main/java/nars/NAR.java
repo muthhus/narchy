@@ -479,7 +479,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     b = (Budgeted) ((Twin) v).getOne();
                 }
             }
-            return b != null && b.summary() > summaryThreshold;
+            return b != null && b.pri() > summaryThreshold;
         });
     }
 
