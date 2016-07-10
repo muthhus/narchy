@@ -21,13 +21,14 @@ package nars.experiment.tetris.visualizer;
 import nars.experiment.tetris.Tetris;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class TetrisVisualizer  {
+public class TetrisVisualizer extends JPanel  {
 
 	private final int blockSize;
 	private final int lastUpdateTimeStep = -1;
 	JCheckBox printGridCheckBox;
-	private final Tetris tetris;
+	public final Tetris tetris;
 	private final TetrisBlocksComponent blocks;
 
 	public boolean printGrid() {
@@ -38,7 +39,8 @@ public class TetrisVisualizer  {
 	}
 
 	public TetrisVisualizer(Tetris t, int blockSize) {
-		//super(t.getWidth() * blockSize, t.getHeight() * blockSize);
+		super();
+		setSize(t.getWidth() * blockSize, t.getHeight() * blockSize);
 
 		tetris = t;
 		this.blockSize = blockSize;
@@ -66,14 +68,14 @@ public class TetrisVisualizer  {
 		blocks.render(g(), blockSize);
 	}*/
 
-	// @Override
-	// public void paint(Graphics g) {
-	// //g.setPaintMode();
-	// blocks.render((Graphics2D) g);
-	// //g.setColor(Color.BLUE);
-	// //g.setXORMode(Color.GREEN);
-	// //g.drawString("Score: " + Texts.n4(tetris.reward()), 0, 400);
-	// }
+	 @Override
+	 public void paint(Graphics g) {
+	 //g.setPaintMode();
+	 blocks.render((Graphics2D) g, blockSize, tetris.seenState);
+	 //g.setColor(Color.BLUE);
+	 //g.setXORMode(Color.GREEN);
+	 //g.drawString("Score: " + Texts.n4(tetris.reward()), 0, 400);
+	 }
 
 	// //Override this if you don't want some extras (like check boxes)
 	// protected void addDesiredExtras() {
@@ -135,10 +137,7 @@ public class TetrisVisualizer  {
 	// return theGlueState.getReturnThisEpisode();
 	// }
 	//
-	public double[] getWorld() {
-		// checkCoreData();
-		return tetris.gameState.asVector(false);
-	}
+
 	//
 	// public int getEpisodeNumber() {
 	// return theGlueState.getEpisodeNumber();

@@ -22,7 +22,6 @@ package nars.experiment.tetris;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 
 public class TetrisState {
@@ -34,11 +33,11 @@ public class TetrisState {
     static final int NONE = 4; /*The no-action Action*/
     static final int FALL = 5; /* fall down */
 
-    float fallingBLockColor = 0.5f;
+    float fallingBLockColor = 1f;
 
     private final Random randomGenerator = new Random();
     
-    public boolean blockMobile = true;
+    public boolean running = true;
     public int currentBlockId;/*which block we're using in the block table*/
 
     public int currentRotation;
@@ -49,22 +48,22 @@ public class TetrisState {
 
     public boolean is_game_over;/*have we reached the end state yet*/
 
-    public int worldWidth=10;/*how wide our board is*/
-    public int worldHeight=20;/*how tall our board is*/
+    public int width =10;/*how wide our board is*/
+    public int height =20;/*how tall our board is*/
     
     
 
-    public double[] worldState;/*what the world looks like without the current block*/
+    public float[] worldState;/*what the world looks like without the current block*/
 
     //	/*Hold all the possible bricks that can fall*/
     Vector<TetrisPiece> possibleBlocks = new Vector<>();
-    private double[] worldObservation;
+    //private double[] worldObservation;
 
 
 
     public TetrisState(int width, int height) {
-        worldWidth = width;
-        worldHeight = height;
+        this.width = width;
+        this.height = height;
         possibleBlocks.add(TetrisPiece.makeLine());
         possibleBlocks.add(TetrisPiece.makeSquare());
         possibleBlocks.add(TetrisPiece.makeTri());
@@ -73,12 +72,12 @@ public class TetrisState {
         possibleBlocks.add(TetrisPiece.makeLShape());
         possibleBlocks.add(TetrisPiece.makeJShape());
 
-        worldState=new double[worldHeight*worldWidth];
+        worldState=new float[this.height * this.width];
         reset();
     }
 
     public void reset() {
-        currentX = worldWidth / 2 - 1;
+        currentX = width / 2 - 1;
         currentY = 0;
         score = 0;
         for (int i = 0; i < worldState.length; i++) {
@@ -88,34 +87,30 @@ public class TetrisState {
         is_game_over = false;
     }
 
-    public double[] asVector(boolean monochrome) {
+    public void toVector(boolean monochrome, float[] target) {
         //eget observation with only the state space
-            
-        if (worldObservation == null) 
-            worldObservation = new double[worldState.length + possibleBlocks.size() + 2];
-        else
-            Arrays.fill(worldObservation, 0);
+
+        Arrays.fill(target, -1);
             
             int x = 0;
             for (double i : worldState) {
                 if (monochrome)
-                    worldObservation[x] = i > 0 ? 1.0 : -1.0;
+                    target[x] = i > 0 ? 1.0f : -1.0f;
                 else
-                    worldObservation[x] = i > 0 ? i : - 1.0;
+                    target[x] = i > 0 ? (float)i : - 1.0f;
                 x++;
             }
-            
-            
-            writeCurrentBlock(worldObservation, fallingBLockColor);
-                        
-            //Set the bit vector value for which block is currently following
-            worldObservation[worldState.length + currentBlockId] = 1;
-            return worldObservation;
+
+        writeCurrentBlock(target, 0.5f);
+
+
+//            //Set the bit vector value for which block is currently following
+//            target[worldState.length + currentBlockId] = 1;
 
     }
 
 
-    private void writeCurrentBlock(double[] game_world, double color) {
+    private void writeCurrentBlock(float[] f, float color) {
         int[][] thisPiece = possibleBlocks.get(currentBlockId).getShape(currentRotation);
 
         if (color == -1)
@@ -131,7 +126,7 @@ public class TetrisState {
                         Thread.dumpStack();
                         System.exit(1);
                     }*/
-                    game_world[linearIndex] = color;
+                    f[linearIndex] = color;
                 }
             }
         }
@@ -211,7 +206,7 @@ public class TetrisState {
      * @return
      */
     int p(int x, int y) {
-        return y * worldWidth + x;
+        return y * width + x;
         //assert returnValue >= 0 : " "+y+" * "+worldWidth+" + "+x+" was less than 0.";
         //return returnValue;
     }
@@ -240,7 +235,7 @@ public class TetrisState {
 
                         //if the height of this square is more than the board size or the X of 
                         //this square is more than the board size, then we're "colliding" with the wall
-                        if (checkY + y >= worldHeight || checkX + x >= worldWidth) {
+                        if (checkY + y >= height || checkX + x >= width) {
                             return true;
                         }
 
@@ -274,7 +269,7 @@ public class TetrisState {
                     if (thePiece[x][y] != 0) {
 
                         //This checks to see if x and y are in bounds
-                        if ((checkX + x >= 0 && checkX + x < worldWidth && checkY + y >= 0 && checkY + y < worldHeight)) {
+                        if ((checkX + x >= 0 && checkX + x < width && checkY + y >= 0 && checkY + y < height)) {
                             //This array location is in bounds  
                             //Check if it hits another piece
                             int linearArrayIndex = p(checkX + x, checkY + y);
@@ -319,7 +314,7 @@ public class TetrisState {
                         //Through demorgan's law is
                         //if thisX is negative OR thisX is too big or 
                         //thisY is negative OR this Y is too big
-                        if (!(checkX + x >= 0 && checkX + x < worldWidth && checkY + y >= 0 && checkY + y < worldHeight)) {
+                        if (!(checkX + x >= 0 && checkX + x < width && checkY + y >= 0 && checkY + y < height)) {
                             return false;
                         }
                     }
@@ -368,7 +363,7 @@ public class TetrisState {
         }
 
         if (onSomething) {
-            blockMobile = false;
+            running = false;
             writeCurrentBlock(worldState, -1);
             checkIfRowAndScore();
         } else {
@@ -378,12 +373,12 @@ public class TetrisState {
     }
 
     public void spawn_block() {
-        blockMobile = true;
+        running = true;
 
         currentBlockId = randomGenerator.nextInt(possibleBlocks.size());
 
         currentRotation = 0;
-        currentX = (worldWidth / 2) - 2;
+        currentX = (width / 2) - 2;
         currentY = -4;
         
         score += getWidth() / 2;
@@ -398,7 +393,7 @@ public class TetrisState {
         }
         is_game_over = colliding(currentX, currentY, currentRotation) || hitOnWayIn;
         if (is_game_over) {
-            blockMobile = false;
+            running = false;
         }
     }
 
@@ -406,7 +401,7 @@ public class TetrisState {
         int numRowsCleared = 0;
 
         //Start at the bottom, work way up
-        for (int y = worldHeight - 1; y >= 0; --y) {
+        for (int y = height - 1; y >= 0; --y) {
             if (isRow(y)) {
                 removeRow(y);
                 numRowsCleared += 1;
@@ -428,7 +423,7 @@ public class TetrisState {
      * @return
      */
     boolean isRow(int y) {
-        for (int x = 0; x < worldWidth; ++x) {
+        for (int x = 0; x < width; ++x) {
             int linearIndex = p(x, y);
             if (worldState[linearIndex] == 0) {
                 return false;
@@ -437,7 +432,7 @@ public class TetrisState {
         return true;
     }
     boolean isEmpty(int y) {
-        for (int x = 0; x < worldWidth; ++x) {
+        for (int x = 0; x < width; ++x) {
             int linearIndex = p(x, y);
             if (worldState[linearIndex] != 0) {
                 return false;
@@ -458,14 +453,14 @@ public class TetrisState {
             return;
         }
 
-        for (int x = 0; x < worldWidth; ++x) {
+        for (int x = 0; x < width; ++x) {
             int linearIndex = p(x, y);
             worldState[linearIndex] = 0;
         }
 
         //Copy each row down one (except the top)
         for (int ty = y; ty > 0; --ty) {
-            for (int x = 0; x < worldWidth; ++x) {
+            for (int x = 0; x < width; ++x) {
                 int linearIndexTarget = p(x, ty);
                 int linearIndexSource = p(x, ty - 1);
                 worldState[linearIndexTarget] = worldState[linearIndexSource];
@@ -473,7 +468,7 @@ public class TetrisState {
         }
 
         //Clear the top row
-        for (int x = 0; x < worldWidth; ++x) {
+        for (int x = 0; x < width; ++x) {
             int linearIndex = p(x, 0);
             worldState[linearIndex] = 0;
         }
@@ -493,11 +488,11 @@ public class TetrisState {
     }
 
     public int getWidth() {
-        return worldWidth;
+        return width;
     }
 
     public int getHeight() {
-        return worldHeight;
+        return height;
     }
 
 //    public int[] getNumberedStateSnapShot() {
@@ -520,9 +515,9 @@ public class TetrisState {
      */
     public void printState() {
         int index = 0;
-        for (int i = 0; i < worldHeight - 1; i++) {
-            for (int j = 0; j < worldWidth; j++) {
-                System.out.print(worldState[i * worldWidth + j]);
+        for (int i = 0; i < height - 1; i++) {
+            for (int j = 0; j < width; j++) {
+                System.out.print(worldState[i * width + j]);
             }
             System.out.print("\n");
         }
@@ -536,26 +531,26 @@ public class TetrisState {
     }
 
     
-    /*End of Tetris Helper Functions*/
-
-    public TetrisState(TetrisState stateToCopy) {
-        blockMobile = stateToCopy.blockMobile;
-        currentBlockId = stateToCopy.currentBlockId;
-        currentRotation = stateToCopy.currentRotation;
-        currentX = stateToCopy.currentX;
-        currentY = stateToCopy.currentY;
-        score = stateToCopy.score;
-        is_game_over = stateToCopy.is_game_over;
-        worldWidth = stateToCopy.worldWidth;
-        worldHeight = stateToCopy.worldHeight;
-
-        worldState = new double[stateToCopy.worldState.length];
-        System.arraycopy(stateToCopy.worldState, 0, worldState, 0, worldState.length);
-
-        possibleBlocks = new Vector<>();
-        //hopefully nobody modifies the pieces as they go
-        possibleBlocks.addAll(stateToCopy.possibleBlocks.stream().collect(Collectors.toList()));
-
-    }
+//    /*End of Tetris Helper Functions*/
+//
+//    public TetrisState(TetrisState stateToCopy) {
+//        blockMobile = stateToCopy.blockMobile;
+//        currentBlockId = stateToCopy.currentBlockId;
+//        currentRotation = stateToCopy.currentRotation;
+//        currentX = stateToCopy.currentX;
+//        currentY = stateToCopy.currentY;
+//        score = stateToCopy.score;
+//        is_game_over = stateToCopy.is_game_over;
+//        width = stateToCopy.width;
+//        height = stateToCopy.height;
+//
+//        worldState = new float[stateToCopy.worldState.length];
+//        System.arraycopy(stateToCopy.worldState, 0, worldState, 0, worldState.length);
+//
+//        possibleBlocks = new Vector<>();
+//        //hopefully nobody modifies the pieces as they go
+//        possibleBlocks.addAll(stateToCopy.possibleBlocks.stream().collect(Collectors.toList()));
+//
+//    }
 }
 

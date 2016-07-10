@@ -77,7 +77,6 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 
 	public static void main (String[] args) 	{
-		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
 		//Multi nar = new Multi(4,512,

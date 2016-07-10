@@ -20,58 +20,80 @@ package nars.experiment.tetris;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
+import nars.NAR;
+import nars.agent.NAgent;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.index.CaffeineIndex;
 import nars.learn.Agent;
+import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
+import nars.time.FrameClock;
+import nars.util.data.random.XorShift128PlusRandom;
 
-import java.net.URL;
+import javax.swing.*;
+import java.util.Random;
 
 
 public class Tetris implements Environment {
 
+    private final TetrisVisualizer vis;
     private double currentScore;
-    public TetrisState gameState;
+    public TetrisState game;
     
     private int nextAction;
 
     private double previousScore;
+    public float[] seenState;
 
     public Tetris(int width, int height) {
-        gameState = new TetrisState(width, height);
+        game = new TetrisState(width, height);
+        vis = new TetrisVisualizer(this, 32);
+        JFrame win = new JFrame();
+        win.setContentPane(vis);
+        win.setSize(vis.size());
+        win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        win.setVisible(true);
+
+
         restart();
     }
 
 
 
+    @Override
+    public float pre(int t, float[] ins) {
+
+        this.seenState = ins;
+
+        return (float)getReward();
+    }
+
+    @Override
+    public void post(int t, int action, float[] ins, Agent a) {
+        step(action);
+    }
 
     public int numActions() {
         return 6;
     }
 
-
-
     public double getReward() {
         return Math.max(-30, Math.min(30, currentScore - previousScore))/30.0;
     }
 
-//    public void frame() {
-//        step(nextAction);
-//        vis.render();
-//    }
 
     public boolean takeAction(int action) {
         nextAction = action;
         return true;
     }
 
-    public double[] observe() {
-        return gameState.asVector(false);
-    }
+
 
     public void restart() {
-        gameState.reset();
-        gameState.spawn_block();
-        gameState.blockMobile = true;
+        game.reset();
+        game.spawn_block();
+        game.running = true;
         previousScore = currentScore = 0;
     }
 
@@ -81,77 +103,35 @@ public class Tetris implements Environment {
             throw new RuntimeException("Invalid action selected in Tetrlais: " + nextAction);            
         }
 
-        if (gameState.blockMobile) {
-            gameState.take_action(nextAction);
-            gameState.update();
+        if (game.running) {
+            game.take_action(nextAction);
+            game.update();
         } else {
-            gameState.spawn_block();
+            game.spawn_block();
         }
 
-        
+        game.toVector(false, seenState);
+        vis.repaint();
 
-        if (!gameState.gameOver()) {
+
+        if (!game.gameOver()) {
             previousScore = currentScore;
-            currentScore = gameState.get_score();
+            currentScore = game.get_score();
             return currentScore - previousScore;
         } else {
             restart();
             return 0;
         }
+
     }
 
-    public void env_cleanup() {
-    }
-
-
-
-    public String getVisualizerClassName() {
-        return TetrisVisualizer.class.getName();
-    }
-
-    @SuppressWarnings("HardcodedFileSeparator")
-    public URL getImageURL() {
-        URL imageURL = Tetris.class.getResource("/images/tetris.png");
-        return imageURL;
-    }
-
-//    private String makeTaskSpec() {
-//        int boardSize = gameState.getHeight() * gameState.getWidth();
-//        int numPieces = gameState.possibleBlocks.size();
-//
-//        TaskSpecVRLGLUE3 theTaskSpecObject = new TaskSpecVRLGLUE3();
-//        theTaskSpecObject.setEpisodic();
-//        theTaskSpecObject.setDiscountFactor(1.0d);
-//        //First add the binary variables for the board
-//        theTaskSpecObject.addDiscreteObservation(new IntRange(0, 1, boardSize));
-//        //Now the binary features to tell what piece is falling
-//        theTaskSpecObject.addDiscreteObservation(new IntRange(0, 1, numPieces));
-//        //Now the actual board size in the observation. The reason this was here is/was because
-//        //there was no way to add meta-data to the task spec before.
-//        //First height
-//        theTaskSpecObject.addDiscreteObservation(new IntRange(gameState.getHeight(), gameState.getHeight()));
-//        //Then width
-//        theTaskSpecObject.addDiscreteObservation(new IntRange(gameState.getWidth(), gameState.getWidth()));
-//
-//        theTaskSpecObject.addDiscreteAction(new IntRange(0, 5));
-//        //This is actually a lie... the rewards aren't in that range.
-//        theTaskSpecObject.setRewardRange(new DoubleRange(0, 8.0d));
-//
-//        //This is a better way to tell the rows and cols
-//        theTaskSpecObject.setExtra("EnvName:Tetris HEIGHT:" + gameState.getHeight() + " WIDTH:" + gameState.getWidth() + " Revision: " + this.getClass().getPackage().getImplementationVersion());
-//
-//        String taskSpecString = theTaskSpecObject.toTaskSpec();
-//
-//        TaskSpec.checkTaskSpec(taskSpecString);
-//        return taskSpecString;
-//    }
 
     public int getWidth() {
-        return gameState.worldWidth;
+        return game.width;
     }
 
     public int getHeight() {
-        return gameState.worldHeight;
+        return game.height;
     }
 
     @Override
@@ -159,37 +139,56 @@ public class Tetris implements Environment {
         return Tuples.twin(getWidth()*getHeight(),numActions());
     }
 
-    @Override
-    public float pre(int t, float[] ins) {
-        //TODO
-        return 0;
+    public static void main(String[] args) {
+        Random rng = new XorShift128PlusRandom(1);
+
+        //Multi nar = new Multi(4,512,
+        Default nar = new Default(1024,
+                4, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
+
+                ,new FrameClock());
+        nar.conceptActivation.setValue(0.3f);
+
+
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
+        nar.cyclesPerFrame.set(16);
+        nar.confMin.setValue(0.02f);
+
+
+        //nar.log();
+        //nar.logSummaryGT(System.out, 0.1f);
+
+//		nar.log(System.err, v -> {
+//			if (v instanceof Task) {
+//				Task t = (Task)v;
+//				if (t instanceof DerivedTask && t.punc() == '!')
+//					return true;
+//			}
+//			return false;
+//		});
+
+        //Global.DEBUG = true;
+
+        //new Abbreviation2(nar, "_");
+        //new MySTMClustered(nar, 8, '.', 2);
+        //new MySTMClustered(nar, 8, '!');
+
+
+        NAgent n = new NAgent(nar);
+
+        new Tetris(8, 16).run(n, 5000);
+
+        //nar.index.print(System.out);
+        NAR.printTasks(nar, true);
+        NAR.printTasks(nar, false);
+        n.printActions();
+        nar.forEachActiveConcept(System.out::println);
     }
 
-    @Override
-    public void post(int t, int action, float[] ins, Agent a) {
-//TODO
-    }
 }
-//
-//class DetailsProvider implements hasVersionDetails {
-//
-//    public String getName() {
-//        return "Tetris 1.1";
-//    }
-//
-//    public String getShortName() {
-//        return "Tetris";
-//    }
-//
-//    public String getAuthors() {
-//        return "Brian Tanner, Leah Hackman, Matt Radkie, Andrew Butcher";
-//    }
-//
-//    public String getInfoUrl() {
-//        return "http://library.rl-community.org/tetris";
-//    }
-//
-//    public String getDescription() {
-//        return "Tetris problem from the reinforcement learning library.";
-//    }
-//}

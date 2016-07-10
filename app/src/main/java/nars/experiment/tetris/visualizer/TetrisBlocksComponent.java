@@ -31,25 +31,26 @@ public class TetrisBlocksComponent {
 		tetVis = ev;
 	}
 
-	float motionBlur = 0.6f;
-	final Color alphaBlack = new Color(0, 0, 0, 1.0f - motionBlur);
-	final Color alphaWhite = new Color(1.0f, 1.0f, 1.0f, 1.0f - motionBlur);
+	final Color alphaBlack = new Color(0, 0, 0);
+	final Color alphaWhite = new Color(1.0f, 1.0f, 1.0f);
 
-	public void render(Graphics2D g, int DABS) {
+	public void render(Graphics2D g, int DABS, float[] state) {
 
-		Rectangle2D agentRect;
+//		Rectangle2D agentRect;
 		int numCols = tetVis.getWorldWidth();
 		int numRows = tetVis.getWorldHeight();
-		double[] tempWorld = tetVis.getWorld();
+		//double[] tempWorld = tetVis.getWorld();
 
 		// Desired abstract block size
-		int scaleFactorX = numCols * DABS;
-		int scaleFactorY = numRows * DABS;
+//		int scaleFactorX = numCols * DABS;
+//		int scaleFactorY = numRows * DABS;
 
 		int w = DABS;
 		int h = DABS;
 		int x = 0;
 		int y = 0;
+
+
 
 		g.setColor(alphaBlack);
 		g.fillRect(0, 0, w * numCols, h * numRows);
@@ -63,7 +64,7 @@ public class TetrisBlocksComponent {
 
 				int in = i * numCols + j;
 
-				double bc = tempWorld[in];
+				float bc = state[in];
 
 				Color c = null;
 				if ((bc < 1.0) && (bc > 0)) {
