@@ -68,7 +68,7 @@ public class DecideActionSoftmax implements DecideAction {
         }
 
         decisiveness = motNorm[i] / sumNorm;
-        System.out.println("decisiveness: " + decisiveness );
+        //System.out.println("decisiveness: " + decisiveness );
 
         return i;
     }

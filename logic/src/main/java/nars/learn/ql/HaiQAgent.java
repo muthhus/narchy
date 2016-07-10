@@ -22,7 +22,7 @@ public class HaiQAgent extends HaiQ {
 
     public HaiQAgent() {
         this((inputs, outputs) -> {
-            return (int) (Math.ceil(Math.sqrt(1+inputs*outputs)));
+            return (int) (Math.ceil(/*Math.sqrt*/(1+inputs*outputs)));
         });
     }
 
