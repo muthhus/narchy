@@ -14,15 +14,18 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.container.TermSet;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 
-public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
+public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,Termlike {
 
     private final Bag<Task> taskLinks;
     private final Bag<Term> termLinks;
@@ -73,6 +76,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
     @Override
     public void setMeta(@NotNull Map newMeta) {
         this.meta = newMeta;
+    }
+
+    @NotNull
+    @Override
+    public <C> C meta(Object key, BiFunction value) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -457,7 +466,76 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T> {
     }
 
     public Term term(int i) {
-        return term().term(i);
+        return term.term(i);
     }
 
+    @Override
+    public int size() {
+        return term.size();
+    }
+
+    @Deprecated @Override
+    public boolean containsTerm(Termlike t) {
+        return term.containsTerm(t);
+    }
+
+    @Deprecated @Override
+    public boolean hasTemporal() {
+        return term.hasTemporal();
+    }
+
+    @Deprecated @Override
+    public Term termOr(int i, @Nullable Term ifOutOfBounds) {
+        return term.termOr(i, ifOutOfBounds);
+    }
+
+    @Deprecated @Override
+    public boolean and(Predicate<Term> v) {
+        return term.and(v);
+    }
+
+    @Deprecated @Override
+    public boolean or(Predicate<Term> v) {
+        return term.or(v);
+    }
+
+    @Deprecated @Override
+    public int vars() {
+        return term.vars();
+    }
+
+    @Deprecated @Override
+    public int varIndep() {
+        return term.varIndep();
+    }
+
+    @Deprecated @Override
+    public int varDep() {
+        return term.varDep();
+    }
+
+    @Deprecated @Override
+    public int varQuery() {
+        return term.varQuery();
+    }
+
+    @Deprecated @Override
+    public int varPattern() {
+        return term.varPattern();
+    }
+
+    @Deprecated @Override
+    public int complexity() {
+        return term.complexity();
+    }
+
+    @Deprecated @Override
+    public int structure() {
+        return term.structure();
+    }
+
+    @Override
+    public int volume() {
+        return term.volume();
+    }
 }

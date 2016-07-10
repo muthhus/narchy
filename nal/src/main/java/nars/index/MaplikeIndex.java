@@ -2,8 +2,6 @@ package nars.index;
 
 import nars.Op;
 import nars.concept.Concept;
-import nars.nal.nal8.operator.ImmediateOperator;
-import nars.nal.op.TermTransform;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
@@ -114,8 +112,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
 
-    @Override
-    public final @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
+    @Override public @Nullable TermContainer theSubterms(@NotNull TermContainer s) {
 
         TermContainer r = s;
 
@@ -126,12 +123,10 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
         s = internSubs(s);
 
-        if (r == s) {
+        if ((r == s) || (s == null)) {
             return s;
-        } else if (s == null) {
-            return null;
         } else {
-            TermContainer existing2 = putIfAbsent(s);
+            TermContainer existing2 = put(s);
             if (existing2 != null)
                 s = existing2;
 
@@ -172,7 +167,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     /**
      * subterms put
      */
-    abstract protected TermContainer putIfAbsent(TermContainer s);
+    abstract protected TermContainer put(TermContainer s);
 
     @Override
     public final TermBuilder builder() {

@@ -3,15 +3,14 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 
@@ -21,7 +20,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public final Cache<Termed, Termed> data;
     public final Cache<TermContainer, TermContainer> subs;
 
-    private final Weigher<Object, Object> conceptWeigher = (k,v) -> {
+    private final Weigher<Termlike, Termlike> complexityWeigher = (k, v) -> {
         if (v instanceof Atomic) {
             return 0; //dont allow removal of atomic
         } else {
@@ -33,7 +32,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                 }
             }
 
-            w = ((Termed)v).complexity();// * weightFactor;
+            w = v.complexity();// * weightFactor;
 
             //w/=(1f + maxConfidence((CompoundConcept)v));
 
@@ -57,7 +56,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
         builder
-               .weigher(conceptWeigher)
+               .weigher(complexityWeigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
 
@@ -66,8 +65,11 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         ;
         data = builder.build();
 
-        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), true);
-        subs = builderSubs.build();
+        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
+        subs = builderSubs
+                .weigher(complexityWeigher)
+                .maximumWeight(maxWeight)
+                .build();
 
 
     }
@@ -147,14 +149,19 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return (int) subs.estimatedSize();
     }
 
-    @Override
-    protected TermContainer putIfAbsent(@NotNull TermContainer s) {
-        return subs.get(s, (ss) -> s); //HACK
-    }
 
     @Override
     protected TermContainer getSubterms(@NotNull TermContainer t) {
         return subs.getIfPresent(t);
+    }
+
+
+
+    @Override
+    protected TermContainer put(@NotNull TermContainer s) {
+        subs.put(s, s);
+        return s;
+        //return subs.get(s, (ss) -> s); //HACK
     }
 
 

@@ -156,7 +156,7 @@ strictlyLocal.put("local_3", "only");
     }
 
     @Override
-    protected TermContainer putIfAbsent(TermContainer x) {
+    protected TermContainer put(TermContainer x) {
         return subtermsLocal.putIfAbsent(key(x), x);
     }
 

@@ -127,7 +127,7 @@ public class Cache2kIndex extends MaplikeIndex {
     }
 
     @Override
-    protected TermContainer putIfAbsent(TermContainer src) {
+    protected TermContainer put(TermContainer src) {
         if (data.putIfAbsent(src, src)) {
             return src;
         }
