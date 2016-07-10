@@ -101,8 +101,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(8);
-		nar.confMin.setValue(0.03f);
+		nar.cyclesPerFrame.set(16);
+		nar.confMin.setValue(0.02f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -132,7 +132,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
-		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 2 /* visionRadius */);
+		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 5 /* visionRadius */);
 
 		NAgent n = new NAgent(nar) {
 			@Override

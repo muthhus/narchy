@@ -1089,4 +1089,12 @@ public enum Util {
 
 
     }
+
+    public static float sum(float[] x) {
+        float y = 0;
+        for (float f : x) {
+            y += f;
+        }
+        return y;
+    }
 }
