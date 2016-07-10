@@ -61,7 +61,8 @@ public class Peer {
     private final ExecutorService pendingMessages = Executors.newSingleThreadExecutor();
 
 
-    @Deprecated private int numberFileShared;
+    @Deprecated
+    private int numberFileShared;
     private int numberKbShared;
 
     private int maxNodes;
@@ -74,7 +75,7 @@ public class Peer {
     }
 
     public Peer(short port) throws IOException {
-        this(port!=-1 ? port : newRandomPort(), null);
+        this(port != -1 ? port : newRandomPort(), null);
     }
 
     public Peer(PeerModel model) throws IOException {
@@ -108,8 +109,6 @@ public class Peer {
         firstPongsFromNeighbors = new ConcurrentHashMap<>();
 
 
-
-
         running = true;
 
         numberFileShared = 0;
@@ -127,6 +126,8 @@ public class Peer {
                 Util.pause(GnutellaConstants.DEAD_CONNECTION_REMOVAL_INTERVAL_MS);
 
                 removeDeadConnections();
+
+                ping();
 
             }
         });
@@ -284,7 +285,6 @@ public class Peer {
     }
 
 
-
     public boolean seen(Message messageP) {
         return messageCache.putIfAbsent(messageP.idString(), messageP) != null;
     }
@@ -371,8 +371,6 @@ public class Peer {
     }
 
 
-
-
     final AtomicInteger messageCount = new AtomicInteger();
 
 
@@ -404,29 +402,31 @@ public class Peer {
     }
 
     public void onPing(Message message, boolean forward) {
-        if (seen(message))
-            return;
+        if (!seen(message)) {
 
-        PeerThread n = neighbors.get(message.origin);
+            PeerThread n = neighbors.get(message.origin);
 
-        if (forward) {
-            // Si yo lo cree
-            if (address.equals(message.origin)) {
-                broadcast(message);
-            } else {
-                if (n != null) {
-                    // contesto al que lo envio
-                    n.send(
-                            newPong(message)
-                    );
-                    broadcast(message, message.origin);
+            if (forward) {
+                // Si yo lo cree
+                if (address.equals(message.origin)) {
+                    broadcast(message);
+                } else {
+                    if (n != null) {
+                        // contesto al que lo envio
+                        n.send(
+                                newPong(message)
+                        );
+                        broadcast(message, message.origin);
+                    }
                 }
-            }
 
+            } else {
+                // no tiene vida solo contesto
+                if (n != null)
+                    n.send(newPong(message));
+            }
         } else {
-            // no tiene vida solo contesto
-            if (n != null)
-                n.send(newPong(message));
+            return;
         }
     }
 
@@ -482,17 +482,23 @@ public class Peer {
 //    }
 
 
-    public void onQuery(QueryMessage q) {
+    public boolean onQuery(QueryMessage q) {
 
 
         if (address.equals(q.origin)) {
 
+            //shouldnt happen
         } else {
-//            model.search(this, q, (mQueryH) -> {
-//                neighbors.get(q.origin).send(mQueryH);
-//            });
+            //            model.search(this, q, (mQueryH) -> {
+            //                neighbors.get(q.origin).send(mQueryH);
+            //            });
+
+            //TODO also exclude broadcasting to the author, which can be included in the query message
             broadcast(q, q.origin);
         }
+        return true;
+
+
 
         //TODO decide to propagate query
 

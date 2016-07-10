@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +31,7 @@ public class InterNAR extends Peer implements PeerModel {
     final Logger logger;
     final NAR nar;
 
-    public float broadcastPriorityThreshold = 0.75f;
+    public float broadcastPriorityThreshold = 0.5f;
     public float broadcastConfidenceThreshold = 0.9f;
 
     final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
@@ -48,43 +49,50 @@ public class InterNAR extends Peer implements PeerModel {
         this.nar = n;
 
         nar.onTask(t -> {
-            if (t.isQuestion()) {
-                BLink<Term> existingBudget = asked.get(t.term());
-                if (existingBudget == null /* || or below a decayed threshold */ ) {
-                    nar.runLater(()->{
-                        //broadcast question as internar query
-                        asked.put(t.term(), t.budget());
+            if (!wasReceived(t)) {
+                if (t.isQuestion()) {
+                    BLink<Term> existingBudget = asked.get(t.term());
+                    if (existingBudget == null /* || or below a decayed threshold */) {
+                        nar.runLater(() -> {
+                            //broadcast question as internar query
+                            asked.put(t.term(), t.budget());
 
-                        logger.info("{} asks \"{}\"", address, t);
+                            logger.info("{} asks \"{}\"", address, t);
+                            query(t);
+
+                        });
+                    }
+                } else if (t.isBeliefOrGoal()) {
+                    if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
                         query(t);
-
-                    });
-                }
-            } else if (t.isBeliefOrGoal()) {
-                if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
-                    query(t);
+                    }
                 }
             }
         });
     }
 
     @Override
-    public void onQuery(QueryMessage q) {
-        super.onQuery(q);
+    public boolean onQuery(QueryMessage q) {
+        if (super.onQuery(q)) {
 
-        try {
-            Task t = IO.taskFromBytes(q.query, nar.index);
-            //logger.info("recv query {} \t {}", q, t);
-            consider(q, t);
-        } catch (Exception e) {
-            logger.error("Malformed task: bytes={}", q.queryString());
-            e.printStackTrace();
+            try {
+                Task t = IO.taskFromBytes(q.query, nar.index);
+                //logger.info("recv query {} \t {}", q, t);
+                consider(q, t);
+            } catch (Exception e) {
+                logger.error("Malformed task: bytes={}", q.queryString());
+                e.printStackTrace();
+            }
+
+            return true;
         }
 
+        return false;
 
     }
 
     public void query(Task t) {
+
         query(IO.asBytes(t));
     }
 
@@ -104,7 +112,21 @@ public class InterNAR extends Peer implements PeerModel {
 //
 //    }
 
+    public boolean wasReceived(Task x) {
+        List l = x.log();
+        if (l == null)
+            return false;
+        for (Object o : l) {
+            if (o instanceof Message)
+                return true;
+        }
+        return false;
+    }
+
     public void consider(Message q, Task t) {
+
+        t.log(q);
+
         if (paranoid) {
             nar.believe(
                     Inperience.reify(t, $.quote(q.idString()), 0.75f), Tense.Present

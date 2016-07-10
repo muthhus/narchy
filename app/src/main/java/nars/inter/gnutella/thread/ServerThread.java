@@ -36,50 +36,51 @@ public class ServerThread extends PeerThread {
             try {
 
                 m = Message.nextMessage(inStream, remote);
-                logger.info("{} recv {}", peer, m);
+                //logger.info("{} recv {}", peer, m);
                 if (m == null)
                     continue;
 
+                //logger.trace("recv {}", m);
+
+                flag = true;
+                switch (m.type) {
+
+                    case GnutellaConstants.PING:
+                        if (!peer.seen(m)) {
+                            pending(m);
+                        }
+
+                        break;
+
+                    case GnutellaConstants.PONG:
+                        if (!peer.seen(m)) {
+                            pending(m);
+                        }
+                        break;
+
+                    case GnutellaConstants.PUSH:
+                        break;
+
+                    case GnutellaConstants.QUERY:
+                        if (!peer.seen(m)) {
+                            pending(m);
+                        }
+                        break;
+
+                    case GnutellaConstants.QUERY_HIT:
+                        //if (/*mine(m) || */unseen(m)) {
+                        pending(m);
+                        //}
+                        break;
+
+                }
+
             } catch (IOException e) {
-                working = false;
+                logger.error("{} recv {}", remote, e);
                 break;
             }
 
 
-            //logger.trace("recv {}", m);
-
-            flag = true;
-            switch (m.type) {
-
-                case GnutellaConstants.PING:
-                    if (unseen(m)) {
-                        pending(m);
-                    }
-
-                    break;
-
-                case GnutellaConstants.PONG:
-                    if (unseen(m)) {
-                        pending(m);
-                    }
-                    break;
-
-                case GnutellaConstants.PUSH:
-                    break;
-
-                case GnutellaConstants.QUERY:
-                    if (unseen(m)) {
-                        pending(m);
-                    }
-                    break;
-
-                case GnutellaConstants.QUERY_HIT:
-                    //if (/*mine(m) || */unseen(m)) {
-                        pending(m);
-                    //}
-                    break;
-
-            }
 
 
         /*} catch (IOException e) {
@@ -88,18 +89,9 @@ public class ServerThread extends PeerThread {
         }*/
         }
 
-        peer.neighbors.remove(remote);
-
-        try {
-            inStream.close();
-            in.close();
-            outStream.close();
-            out.close();
-            socket.close();
-        } catch (IOException e) {
-            System.err.println(getClass() + "run(): " + e.getClass()
-                    + e.getMessage());
-        }
+        stop();
 
     }
+
+
 }

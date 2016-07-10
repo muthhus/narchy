@@ -1,53 +1,102 @@
 package nars.irc;
 
+import nars.experiment.Talk;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;
 import nars.nal.Tense;
 import nars.nar.Terminal;
+import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static nars.experiment.Talk.context;
 
 /**
  * Created by me on 7/10/16.
  */
 public class IRCAgent extends IRCBot {
+    private static final Logger logger = LoggerFactory.getLogger(IRCAgent.class);
 
-    final Terminal terminal = new Terminal(16, new XorShift128PlusRandom(1), new RealtimeMSClock());
+    final Terminal nar = new Terminal(16, new XorShift128PlusRandom(1), new RealtimeMSClock());
 
     static boolean running = true;
 
     private final InterNAR inter;
+    private final Talk talk;
+    private float ircMessagePri = 0.9f;
 
     public IRCAgent(String server, String nick, String channel, int udpPort) throws Exception {
         super(server, nick, channel);
 
-        terminal.log();
+        talk = new Talk(nar);
 
-        terminal.onExec(new TermProcedure("say") {
+        nar.log();
+
+        nar.onExec(new TermProcedure("say") {
             @Override public @Nullable Object function(Compound arguments, TermIndex i) {
-                send(channel, arguments.toString());
+                Term content = arguments.term(0);
+                send(channel, content.toString());
                 return null;
             }
         });
 
-        inter = new InterNAR(terminal, (short)udpPort );
-        inter.broadcastPriorityThreshold = 0.5f; //lower threshold
+        inter = new InterNAR(nar, (short)udpPort );
+        inter.broadcastPriorityThreshold = 0.25f; //lower threshold
 
-        terminal.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
+        nar.believe("connect(\"" + server + "\").", Tense.Present, 1f, 0.9f);
     }
 
 
     @Override
     protected void onMessage(String channel, String nick, String msg) {
 
-        terminal.believe(
-                "irc(\"" + channel + "\",\"" + nick + "\",\"" + msg + "\")",
-                Tense.Present, 1f, 0.9f );
+//        nar.goal(
+//                "say(\"" + msg + "\",(\"" + channel+ "\",\"" + nick + "\"))",
+//                Tense.Present, 1f, 0.9f );
+//
+//    }
+//
+//    protected void onMessage(String channel, String nick, String msg) {
+        if (channel.equals("unknown")) return;
+        if (msg.startsWith("//")) return; //comment or previous output
+
+//        if (msg.equals("RESET")) {
+//            restart();
+//        }
+//        else if (msg.equals("WTF")) {
+//            flush();
+//        }
+//        else {
+
+        try {
+            @NotNull List<Task> parsed = nar.tasks(msg.replace("http://","") /* HACK */, o -> {
+                //logger.error("unparsed narsese {} in: {}", o, msg);
+            });
+
+
+            int narsese = parsed.size();
+            if (narsese > 0) {
+                for (Task t : parsed) {
+                    logger.info("narsese({},{}): {}", channel, nick, t);
+                }
+                parsed.forEach(nar::input);
+                return;
+            }
+        } catch (Exception e) { }
+
+        logger.info("hear({},{}): {}", channel, nick, msg);
+        talk.hear(msg, context(channel, nick), ircMessagePri);
+
 
     }
-
     public static void main(String[] args) throws Exception {
         //while (running) {
             try {

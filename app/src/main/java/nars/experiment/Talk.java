@@ -40,31 +40,6 @@ public class Talk {
     long wordDelay = 100; //in milisec
 
 
-    public void goals() {
-
-        //ECHO
-        //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
-        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
-        //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
-        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.85f);
-
-        nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Eternal, 1f, 0.95f);
-
-        nar.goal("(#something-->(/,hear,I,_))", Tense.Eternal, 1f, 0.95f); //hear self say something
-
-        //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
-        //nar.ask($("hear(#y, (I,#c))"), '@', nar.time()+wordDelay*10); //what would i like to hear myself saying to someone
-
-
-        //WORD ANALYSIS
-        //nar.goal($("(hear(#x,#c1) &&+1 wordInfo(#x,#z))"), Tense.Eternal, 1f, 0.75f);
-        //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
-
-        //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
-        //nar.ask($("(&&, hear(#x,#c1), hear(#y,#c2), wordCompare({#x,#y},#z))"), '?', nar.time());
-        //nar.believe($("((hear(#x,#c1) &&+0 hear(#y,#c1)) ==>+0 wordCompare({#x,#y},#z)))"));
-
-    }
 
     private final NAR nar;
 
@@ -87,7 +62,7 @@ public class Talk {
                 }
             }
         };
-        ((ch.qos.logback.classic.Logger) nar.logger).addAppender(hearAppender);
+        ((ch.qos.logback.classic.Logger) NAR.logger).addAppender(hearAppender);
         hearAppender.start();
 
 
@@ -112,13 +87,11 @@ public class Talk {
         nar.onExec(new WordInfo());
 
 
-        new Thread(() -> {
-            while (true) {
-                goals();
-                Util.pause(15000);
-            }
-        }).start();
 
+    }
+    public static Term context(String channel, String nick) {
+        return $.quote(nick);
+        //return $.p($.quote(nick), nar.self); //ignore channel for now
     }
 
     public static void inputLoopback(Predicate<String> eachLine) {
@@ -139,7 +112,7 @@ public class Talk {
                         new LineProcessor<>() {
 
                             @Override
-                            public boolean processLine(String line) throws IOException {
+                            public boolean processLine(String line) {
                                 return eachLine.test(line);
                             }
 
@@ -186,11 +159,11 @@ public class Talk {
 
         Task t = nar.believe(pri * nar.priorityDefault('.'),
                 term,
-                (long) (tt),
+                tt,
                 1f, 0.95f);
                 //0.5f + 0.5f * nar.confidenceDefault('.') * pri);
 
-        System.out.println("hear: " + x + " (" + context + " )\t" + t.occurrence());
+        //System.out.println("hear: " + x + " (" + context + " )\t" + t.occurrence());
         return t;
     }
 

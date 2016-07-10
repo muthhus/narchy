@@ -12,6 +12,7 @@ import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
 import nars.inter.InterNAR;
+import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
@@ -19,8 +20,10 @@ import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
+import nars.util.Util;
 import nars.util.Wiki;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -59,7 +62,6 @@ public class NarseseIRCBot extends Talk {
 
     final NAR nar;
     final InterNAR inter;
-    float ircMessagePri = 0.85f;
 
     public NarseseIRCBot(NAR nar) throws Exception {
         super(nar);
@@ -93,7 +95,7 @@ public class NarseseIRCBot extends Talk {
 //                //new Spiral()
 //                new FastOrganicLayout()
 //        ).show(900, 900);
-        BagChart.show((Default) nar);
+        //BagChart.show((Default) nar);
 
         addOperators();
     }
@@ -129,6 +131,15 @@ public class NarseseIRCBot extends Talk {
                 return b.toString();
             }
         });
+//        nar.onExec(new IRCBotOperator("hear") {
+//            @Override
+//            protected Object function(Compound arguments) {
+//                try {
+//                    hear(((Atom) (arguments.term(1))).toStringUnquoted(), arguments.term(0), 0.9f);
+//                } catch (Exception e) { }
+//                return null;
+//            }
+//        });
         nar.onExec(new IRCBotOperator("readWiki") {
 
             float pri = 0.5f;
@@ -178,7 +189,7 @@ public class NarseseIRCBot extends Talk {
         public final Object function(Compound arguments, TermIndex i) {
             Object y = function(arguments);
 
-            send("//" + y.toString());
+            send("//" + y.toString().replace("\n"," ").replace("\"","'"));
 
             //loop back as hearing
             //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
@@ -214,7 +225,7 @@ public class NarseseIRCBot extends Talk {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1024, 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 500000, true)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 500000, false)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -223,19 +234,19 @@ public class NarseseIRCBot extends Talk {
                 ,new RealtimeMSClock()
         );
 
-        nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-        nar.conceptActivation.setValue(0.15f);
-        nar.cyclesPerFrame.set(32);
+        nar.conceptActivation.setValue(0.05f);
+        nar.cyclesPerFrame.set(16);
 
-        nar.logSummaryGT(System.out, 0.4f);
+        nar.logSummaryGT(System.out, 0.45f);
 
-        new MySTMClustered(nar, 4, '.', 4);
+        new MySTMClustered(nar, 16, '.', 2);
 
         NarseseIRCBot bot = new NarseseIRCBot(nar);
 
@@ -244,6 +255,47 @@ public class NarseseIRCBot extends Talk {
 
         //nar.inputNarsese(new File("/home/me/quietwars.nal"));
 
+
+        new Thread(()->{
+           while (true) {
+               bot.goals();
+               Util.pause(10000);
+           }
+        }).start();
+
+        //addInitialCorpus(bot);
+
+    }
+
+    public void goals() {
+
+        //ECHO
+        //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
+        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
+        //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
+        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.85f);
+
+        nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Eternal, 1f, 0.95f);
+        nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Present, 1f, 0.95f);
+        nar.believe("((#x --> (/,hear,#c,_)) ==> say(#x,#c))", Tense.Eternal, 1f, 0.95f);
+
+        nar.goal("(#something-->(/,hear,I,_))", Tense.Eternal, 1f, 0.95f); //hear self say something
+
+        //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
+        //nar.ask($("hear(#y, (I,#c))"), '@', nar.time()+wordDelay*10); //what would i like to hear myself saying to someone
+
+
+        //WORD ANALYSIS
+        //nar.goal($("(hear(#x,#c1) &&+1 wordInfo(#x,#z))"), Tense.Eternal, 1f, 0.75f);
+        //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
+
+        //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
+        //nar.ask($("(&&, hear(#x,#c1), hear(#y,#c2), wordCompare({#x,#y},#z))"), '?', nar.time());
+        //nar.believe($("((hear(#x,#c1) &&+0 hear(#y,#c1)) ==>+0 wordCompare({#x,#y},#z)))"));
+
+    }
+
+    public static void addInitialCorpus(NarseseIRCBot bot) {
         logger.info("Reading corpus..");
 
         Term sehToMe = $.the("seh");
@@ -297,7 +349,6 @@ public class NarseseIRCBot extends Talk {
         };
 
         bot.hear(corpus, sehToMe, 0.9f);
-
     }
 
 //    public void loop(File corpus, int lineDelay) {
@@ -416,39 +467,8 @@ public class NarseseIRCBot extends Talk {
 
 
 
-    protected void onMessage(String channel, String nick, String msg) {
-        if (channel.equals("unknown")) return;
-        if (msg.startsWith("//")) return; //comment or previous output
 
-//        if (msg.equals("RESET")) {
-//            restart();
-//        }
-//        else if (msg.equals("WTF")) {
-//            flush();
-//        }
-//        else {
 
-        @NotNull List<Task> parsed = nar.tasks(msg.replace("http://","") /* HACK */, o -> {
-            //logger.error("unparsed narsese {} in: {}", o, msg);
-        });
-
-        int narsese = parsed.size();
-        if (narsese > 0) {
-            for (Task t : parsed) {
-                logger.info("narsese({},{}): {}", channel, nick, t);
-            }
-            parsed.forEach(nar::input);
-        } else {
-            logger.info("hear({},{}): {}", channel, nick, msg);
-            hear(msg, context(channel, nick), ircMessagePri);
-        }
-
-    }
-
-    private Term context(String channel, String nick) {
-        return $.quote(nick);
-        //return $.p($.quote(nick), nar.self); //ignore channel for now
-    }
 
 //    protected void hear(String msg, String context) {
 //        try {

@@ -95,23 +95,45 @@ abstract public class PeerThread implements Runnable {
      * Close this connection
      */
     public void stop() {
+
+        peer.neighbors.remove(socket.getRemoteSocketAddress());
+
+        try {
+            socket.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
+        try {
+            in.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
+        try {
+            inStream.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
+        try {
+            out.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
+        try {
+            outStream.close();
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        try {
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            inStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         messagesToSend.shutdownNow();
         connected = false;
@@ -153,9 +175,6 @@ abstract public class PeerThread implements Runnable {
     }
 
 
-    public boolean unseen(Message m) {
-        return !peer.seen(m);
-    }
 
     public void _send(Message m) {
 
@@ -172,7 +191,13 @@ abstract public class PeerThread implements Runnable {
                     }, PONG_TIMEOUT_MS);
         }
 
-        m.out(outStream);
+        try {
+            m.out(outStream);
+        } catch (Exception e) {
+            logger.error("send: {}\n{}", m, e );
+            stop();
+        }
+
     }
 
     public final void pending(Message m) {
