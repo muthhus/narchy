@@ -552,6 +552,15 @@ public enum Texts {
         }
         return sb.toString();
     }
+    public static String n4(float[] v) {
+        StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
+        int s = v.length;
+        for (int i = 0; i < s; i++) {
+            sb.append(n4(v[i]));
+            if (i!= s -1) sb.append(' ');
+        }
+        return sb.toString();
+    }
 
 //    /** fast append to CharBuffer */
 //    public final static CharBuffer append(final CharBuffer c, final CharSequence s) {

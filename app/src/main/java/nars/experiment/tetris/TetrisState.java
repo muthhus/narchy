@@ -57,13 +57,18 @@ public class TetrisState {
 
     //	/*Hold all the possible bricks that can fall*/
     Vector<TetrisPiece> possibleBlocks = new Vector<>();
+    private int time = 0;
+
+    private int timePerFall;
+
     //private double[] worldObservation;
 
 
 
-    public TetrisState(int width, int height) {
+    public TetrisState(int width, int height, int timePerFall) {
         this.width = width;
         this.height = height;
+        this.timePerFall = timePerFall;
         possibleBlocks.add(TetrisPiece.makeLine());
         possibleBlocks.add(TetrisPiece.makeSquare());
         possibleBlocks.add(TetrisPiece.makeTri());
@@ -350,6 +355,8 @@ public class TetrisState {
 
     /*Ok, at this point, they've just taken their action.  We now need to make them fall 1 spot, and check if the game is over, etc */
     public void update() {
+        time++;
+
         // Sanity check.  The game piece should always be in bounds.
         if (!inBounds(currentX, currentY, currentRotation)) {
             System.err.println("In GameState.Java the Current Position of the board is Out Of Bounds... Consistency Check Failed");
@@ -374,7 +381,8 @@ public class TetrisState {
             checkIfRowAndScore();
         } else {
             //fall
-            currentY += 1;
+            if (time % timePerFall == 0)
+                currentY += 1;
         }
     }
 

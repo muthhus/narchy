@@ -35,19 +35,6 @@ public class ConceptProcess implements Premise {
     @Nullable public final Task belief;
     public final BLink<? extends Concept> conceptLink;
 
-    /** lazily cached value :=
-     *      -1: unknown
-     *      0: parents have no evidential overlap
-     *      1: parents have overlapping evidence
-     */
-    private transient byte overlap = -1;
-    /** lazily cached value :=
-     *      -1: unknown
-     *      0: not cyclic
-     *      1: cyclic
-     */
-    private transient byte cyclic = -1;
-
 
     public ConceptProcess(BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
@@ -63,33 +50,6 @@ public class ConceptProcess implements Premise {
     }
 
 
-
-    @Override public final boolean overlap() {
-        int cc = this.overlap;
-        if (cc != -1) {
-            return cc > 0; //cached value
-        } else {
-            Task b = this.belief;
-            boolean o = (b != null) && Stamp.overlapping(task(), b);
-            this.overlap = (byte)(o ? 1 : 0);
-            return o;
-        }
-    }
-
-    @Override public boolean cyclic() {
-        int cc = this.cyclic;
-        if (cc != -1) {
-            return cc > 0; //cached value
-        } else {
-            //Task b = this.belief;
-            boolean o = task().cyclic();
-            this.cyclic = (byte)(o ? 1 : 0);
-            return o;
-        }
-    }
-
-
-    //@NotNull
     @Nullable
     @Override
     public final Task task() {

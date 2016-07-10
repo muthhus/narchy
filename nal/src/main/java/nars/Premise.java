@@ -29,12 +29,6 @@ public interface Premise extends Tasked {
         return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
-    /** whether overlap exists between the "task" and "belief" tasks. if belief==null, returns false */
-    boolean overlap();
-
-    /** whether parent task overlaps with its parent */
-    boolean cyclic();
-
     @FunctionalInterface
     interface OccurrenceSolver {
         long compute(long taskOcc, long beliefOcc);

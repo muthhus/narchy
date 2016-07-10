@@ -18,6 +18,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
 import nars.term.subst.OneMatchFindSubst;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -220,8 +221,8 @@ public class PremiseEval extends FindSubst {
         this.beliefTerm = p.beliefTerm().term();
         this.taskTerm = tt;
 
-        this.cyclic = p.cyclic();
-        this.overlap = p.overlap();
+        this.cyclic = task.cyclic();
+        this.overlap = belief!=null ? Stamp.overlapping(task, belief) : false;
 
         this.termSub0Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();
