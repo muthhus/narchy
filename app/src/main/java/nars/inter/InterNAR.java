@@ -7,7 +7,6 @@ import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.*;
 import nars.inter.gnutella.message.Message;
-import nars.inter.gnutella.message.QueryHitMessage;
 import nars.inter.gnutella.message.QueryMessage;
 import nars.link.BLink;
 import nars.nal.Tense;
@@ -31,13 +30,17 @@ public class InterNAR extends Peer implements PeerModel {
     final Logger logger;
     final NAR nar;
 
-    float broadcastPriorityThreshold = 0.75f;
-    float broadcastConfidenceThreshold = 0.9f;
+    public float broadcastPriorityThreshold = 0.75f;
+    public float broadcastConfidenceThreshold = 0.9f;
 
     final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
 
     public InterNAR(NAR n) throws IOException {
-        super();
+        this(n, (short)-1);
+    }
+
+    public InterNAR(NAR n, short port) throws IOException {
+        super(port);
 
         logger = LoggerFactory.getLogger(n.self + "," + getClass().getSimpleName());
 
@@ -52,34 +55,53 @@ public class InterNAR extends Peer implements PeerModel {
                         asked.put(t.term(), t.budget());
 
                         logger.info("{} asks \"{}\"", address, t);
-                        query(IO.asBytes(t));
+                        query(t);
 
                     });
                 }
             } else if (t.isBelief()) {
                 if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
-                    query(IO.asBytes(t));
+                    query(t);
                 }
             }
         });
     }
 
-
-
     @Override
-    public void onQueryHit(Peer client, QueryHitMessage q) {
+    public void onQuery(QueryMessage q) {
+        super.onQuery(q);
 
-        Task t = IO.taskFromBytes(q.result, nar.index);
-        logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
-
-
-        //if (q.id.equals(id)) //TODO dont reify if it's a message originating from this peer
-        //TODO dont reify an already reified belief?
-
-        consider(q, t);
+        try {
+            Task t = IO.taskFromBytes(q.query, nar.index);
+            //logger.info("recv query {} \t {}", q, t);
+            consider(q, t);
+        } catch (Exception e) {
+            logger.error("Malformed task: bytes={}", q.queryString());
+            e.printStackTrace();
+        }
 
 
     }
+
+    public void query(Task t) {
+        query(IO.asBytes(t));
+    }
+
+
+//    @Override
+//    public void onQueryHit(Peer client, QueryHitMessage q) {
+//
+//        Task t = IO.taskFromBytes(q.result, nar.index);
+//        logger.info("{} told \"{}\" by {}", nar.self, t, q.responder);
+//
+//
+//        //if (q.id.equals(id)) //TODO dont reify if it's a message originating from this peer
+//        //TODO dont reify an already reified belief?
+//
+//        consider(q, t);
+//
+//
+//    }
 
     public void consider(Message q, Task t) {
         nar.believe(
@@ -92,24 +114,24 @@ public class InterNAR extends Peer implements PeerModel {
 
     }
 
-    @Override
-    public void search(Peer client, QueryMessage q, Consumer<QueryHitMessage> eachResult) {
-
-        Task t = IO.taskFromBytes(q.query, nar.index);
-        logger.info("{} asked \"{}\" from {}", address, t, q.recipient);
-
-        if (t.isQuestion()) {
-            final int[] count = {3};
-            nar.ask(t.term(), Tense.ETERNAL, a -> {
-                logger.info("{} answering \"{}\" to {}", address, a, q.recipient);
-                eachResult.accept(client.createQueryHit(q.recipient, q.idBytes(), 1, IO.asBytes(a)));
-                return (count[0]--) > 0;
-            });
-        } else if (t.isBelief()) {
-            consider(q, t);
-        }
-
-    }
+//    @Override
+//    public void search(Peer client, QueryMessage q, Consumer<QueryHitMessage> eachResult) {
+//
+//        Task t = IO.taskFromBytes(q.query, nar.index);
+//        logger.info("{} asked \"{}\" from {}", address, t, q.origin);
+//
+//        if (t.isQuestion()) {
+//            final int[] count = {3};
+//            nar.ask(t.term(), Tense.ETERNAL, a -> {
+//                logger.info("{} answering \"{}\" to {}", address, a, q.origin);
+//                eachResult.accept(client.createQueryHit(q.origin, q.idBytes(), 1, IO.asBytes(a)));
+//                return (count[0]--) > 0;
+//            });
+//        } else if (t.isBelief()) {
+//            consider(q, t);
+//        }
+//
+//    }
 
     @Override
     public byte[] data(Peer client, String file, int rangePosition) {

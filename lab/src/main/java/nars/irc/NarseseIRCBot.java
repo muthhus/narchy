@@ -1,5 +1,6 @@
 package nars.irc;
 
+
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -10,8 +11,10 @@ import nars.experiment.Talk;
 import nars.gui.BagChart;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;
+import nars.inter.InterNAR;
 import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
@@ -55,20 +58,28 @@ public class NarseseIRCBot extends Talk {
     }
 
     final NAR nar;
-    final IRCBot irc;
+    final InterNAR inter;
     float ircMessagePri = 0.85f;
 
     public NarseseIRCBot(NAR nar) throws Exception {
         super(nar);
-        irc = new IRCBot(
-                "irc.freenode.net",
-                //"localhost",
-                "NARchy", "#netention") {
-            @Override
-            protected void onMessage(String channel, String nick, String msg) {
-                NarseseIRCBot.this.onMessage(channel, nick, msg);
-            }
-        };
+
+
+        inter = new InterNAR(nar);
+        inter.connect("localhost", 11001);
+
+//        irc = new IRCBot(
+//                "irc.freenode.net",
+//                //"localhost",
+//                "NARchy", "#netention") {
+//            @Override
+//            protected void onMessage(String channel, String nick, String msg) {
+//                NarseseIRCBot.this.onMessage(channel, nick, msg);
+//            }
+//        };
+
+
+
 
         this.nar = nar;
 
@@ -208,7 +219,7 @@ public class NarseseIRCBot extends Talk {
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(
                 1024, 4, 2, 2, rng,
-                new CaffeineIndex(true)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 500000, true)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
@@ -236,7 +247,7 @@ public class NarseseIRCBot extends Talk {
         nar.loop(25f);
 
 
-        nar.input(new File("/home/me/quietwars.nal"));
+        //nar.inputNarsese(new File("/home/me/quietwars.nal"));
 
         logger.info("Reading corpus..");
 
@@ -370,11 +381,13 @@ public class NarseseIRCBot extends Talk {
     }
 
     protected void send(String buffer) {
-        if ((irc.writer!=null) && (irc.outputting)) {
-            irc.send(irc.channel, buffer);
-        } else {
-            System.out.println("(not connected)\t" + buffer);
-        }
+        //if ((irc.writer!=null) && (irc.outputting)) {
+        nar.input("say(\"" + buffer + "\")! :|:");
+
+            //irc.send(irc.channel, buffer);
+//        } else {
+//            System.out.println("(not connected)\t" + buffer);
+//        }
     }
 
 

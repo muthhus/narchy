@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
+import static nars.nal.Tense.DTERNAL;
 
 
 /**
@@ -72,6 +73,8 @@ public class PremiseEval extends FindSubst {
     public Task task, belief;
     public char taskPunct;
 
+    /** whether the premise involves temporality that must be calculated upon derivation */
+    public boolean temporal;
 
 
     /** initializes with the default static term index/builder */
@@ -229,6 +232,9 @@ public class PremiseEval extends FindSubst {
         this.termSub1Struct = beliefTerm.structure();
         this.termSub1op = beliefTerm.op().ordinal();
 
+        this.temporal = temporal(task, belief);
+
+
         deriver.run(this);
 
         revert(start);
@@ -236,14 +242,13 @@ public class PremiseEval extends FindSubst {
         return true;
     }
 
-//    public final void occurrenceAdd(long durationsDelta) {
-//        //TODO move to post
-//        int oc = occurrenceShift.getIfAbsent(Tense.TIMELESS);
-//        if (oc == Tense.TIMELESS)
-//            oc = 0;
-//        oc += durationsDelta * premise.getTask().duration();
-//        occurrenceShift.set((int)oc);
-//    }
+    private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
+        if (!task.isEternal() || task.dt()!= DTERNAL)
+            return true;
+
+        return belief != null && (!belief.isEternal() || belief.dt() != DTERNAL);
+    }
+
 
     /** calculates Budget used in a derived task,
      *  returns null if invalid / insufficient */

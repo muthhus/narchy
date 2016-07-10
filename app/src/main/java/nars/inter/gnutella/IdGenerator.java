@@ -50,7 +50,7 @@ public class IdGenerator {
      *
      * @return el id
      */
-    public static byte[] getIdMessage() {
+    public static byte[] next() {
         byte id[] = new byte[GnutellaConstants.ID_LENGTH];
         r.nextBytes(id);
         return id;

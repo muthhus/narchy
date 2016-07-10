@@ -1,17 +1,14 @@
 package nars.inter.gnutella.thread;
 
 import nars.inter.gnutella.GnutellaConstants;
-import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Map;
 
 /**
  * Created by me on 7/9/16.
@@ -83,6 +80,7 @@ public class DownloadThread extends PeerThread {
         }
     }
 
+    @Override
     public void run() {
 
         String file = fileName;
@@ -136,7 +134,7 @@ public class DownloadThread extends PeerThread {
         }
     }
 
-    public static byte[] sendFile(String file, int rangePosition) throws IOException {
+    public static byte[] sendFile(String file, int rangePosition) throws IOException, FileNotFoundException {
         RandomAccessFile f = new RandomAccessFile(file, "r");
 
         byte[] b = new byte[(int) f.length() - rangePosition];

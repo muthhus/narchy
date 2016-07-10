@@ -804,4 +804,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     }
 
 
+    default int dt() {
+        return term().dt();
+    }
+
 }

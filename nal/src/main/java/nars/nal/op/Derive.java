@@ -239,7 +239,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
         long occ;
 
-        if ((nar.nal() >= 7) && (premise.hasTemporality())) {
+        if ((nar.nal() >= 7) && (m.temporal)) {
 
             long[] occReturn = new long[]{ETERNAL};
             float[] confScale = new float[] { 1f };

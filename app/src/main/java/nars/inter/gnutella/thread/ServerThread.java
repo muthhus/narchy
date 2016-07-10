@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.util.Map;
 
 /**
  * Created by me on 7/9/16.
@@ -51,7 +49,7 @@ public class ServerThread extends PeerThread {
             //logger.trace("recv {}", m);
 
             flag = true;
-            switch (m.getPayloadD()) {
+            switch (m.type) {
 
                 case GnutellaConstants.PING:
                     if (unseen(m)) {

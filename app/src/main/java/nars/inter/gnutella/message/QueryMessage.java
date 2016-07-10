@@ -2,7 +2,10 @@ package nars.inter.gnutella.message;
 
 import nars.inter.gnutella.GnutellaConstants;
 
-import java.math.BigInteger;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 /**
@@ -13,144 +16,38 @@ import java.net.InetSocketAddress;
  * @version 2.0
  */
 public class QueryMessage extends Message {
-    private final BigInteger minSpeed;
-    public final byte[] query;
 
+    public byte[] query;
 
-//    /**
-//     * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
-//     * length, receptor node, min speed, search criteria
-//     *
-//     * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
-//     *                     network
-//     * @param ttl          Time to live. The number of times the descriptor will be
-//     *                     forwarded by Gnutella servents before it is removed from the
-//     *                     network
-//     * @param hop          The number of times the descriptor has been forwarded
-//     * @param paytloadL    The length of the descriptor immediately following this
-//     *                     header.
-//     * @param receptorNode Id of the thread that received the message
-//     * @param minSpeed     The minimum speed (in kB/second) of servents that should
-//     *                     respond to this message.
-//     * @param query        The minimum speed (in kB/second) of servents that should
-//     *                     respond to this message.
-//     */
-//    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-//                        InetSocketAddress receptorNode, short minSpeed,
-//                        String query) {
-//        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
-//                receptorNode);
-//        this.minSpeed = BigInteger.valueOf(minSpeed);
-//        this.query = query.getBytes();
-//    }
-
-    /**
-     * Creates a QueryHitMessage with the specified idMessage, ttl, hop, payload
-     * length, receptor node, min speed, search criteria
-     *
-     * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
-     *                     network
-     * @param ttl          Time to live. The number of times the descriptor will be
-     *                     forwarded by Gnutella servents before it is removed from the
-     *                     network
-     * @param hop          The number of times the descriptor has been forwarded
-     * @param paytloadL    The length of the descriptor immediately following this
-     *                     header.
-     * @param receptorNode Id of the thread that received the message
-     * @param minSpeed     The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     * @param query        The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     */
-    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-                        InetSocketAddress receptorNode, byte[] minSpeed,
-                        String query) {
-        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
-                receptorNode);
-        this.minSpeed = new BigInteger(minSpeed);
-        this.query = query.getBytes();
+    public QueryMessage(DataInputStream in, InetSocketAddress origin) {
+        super(GnutellaConstants.QUERY, in, origin);
     }
 
-//    public QueryMessage(byte[] idMessage, byte ttl, byte hop, int paytloadL,
-//                        InetSocketAddress receptorNode, byte[] minSpeed,
-//                        byte[] query) {
-//        super(idMessage, GnutellaConstants.QUERY, ttl, hop, paytloadL,
-//                receptorNode);
-//        this.minSpeed = new BigInteger(minSpeed);
-//        this.query = query;
-//    }
-
-    /**
-     * * Creates a QueryHitMessage with the specified idMessage, ttl, hop,
-     * payload length, receptor node, min speed, search criteria. The
-     * idMessage is generated random.
-     *
-     * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
-     *                     network
-     * @param ttl          Time to live. The number of times the descriptor will be
-     *                     forwarded by Gnutella servents before it is removed from the
-     *                     network
-     * @param hop          The number of times the descriptor has been forwarded
-     * @param paytloadL    The length of the descriptor immediately following this
-     *                     header.
-     * @param receptorNode Id of the thread that received the message
-     * @param minSpeed     The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     * @param query        The minimum speed (in kB/second) of servents that should
-     *                     respond to this message.
-     */
-    public QueryMessage(byte ttl, byte hop, int paytloadL,
-                        InetSocketAddress receptorNode, short minSpeed,
-                        String query) {
-        this(ttl, hop, paytloadL, receptorNode, minSpeed, query.getBytes());
-    }
-
-    public QueryMessage(byte ttl, byte hop, int paytloadL,
-                        InetSocketAddress receptorNode, short minSpeed,
-                        byte[] query) {
-        super(GnutellaConstants.QUERY, ttl, hop, paytloadL, receptorNode);
-        this.minSpeed = BigInteger.valueOf(minSpeed);
-        this.query = query;
-    }
-
-    /**
-     * Returns the minimum speed (in kB/second) of servents that should respond
-     * to this message
-     *
-     * @return the minimun speed
-     */
-    public short getMinSpeed() {
-        return minSpeed.shortValue();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see Message#toByteArray()
-     */
     @Override
-    public byte[] toByteArray() {
+    protected void inData(DataInput in) throws IOException {
+        int len = in.readUnsignedShort();
+        query = new byte[len];
+        in.readFully(query);
+    }
 
-        byte[] query = new byte[GnutellaConstants.HEADER_LENGTH
-                + this.query.length + 2 + GnutellaConstants.EOS_L];
-        byte[] temp = super.toByteArray();
-        int i = 0;
-        for (byte b : temp) {
-            query[i++] = b;
-        }
-        if (minSpeed.toByteArray().length < 2) {
-            query[i++] = 0;
-        }
-        for (byte a : minSpeed.toByteArray()) {
-            query[i++] = a;
+    @Override
+    protected void outData(DataOutput out) throws IOException {
+        out.writeShort(query.length);
+        out.write(query);
+    }
 
-        }
-        //TODO arraycopy
-        for (byte c : this.query) {
-            query[i++] = c;
-        }
-        query[i] = GnutellaConstants.EOS;
-        return query;
+
+    public QueryMessage(byte ttl, byte hop,
+                        InetSocketAddress receptorNode,
+                        String query) {
+        this(ttl, hop, receptorNode, query.getBytes());
+    }
+
+    public QueryMessage(byte ttl, byte hop,
+                        InetSocketAddress receptorNode,
+                        byte[] query) {
+        super(GnutellaConstants.QUERY, ttl, hop, receptorNode);
+        this.query = query;
     }
 
 

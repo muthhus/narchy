@@ -1,15 +1,12 @@
 package nars.inter.gnutella.message;
 
-import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 /**
@@ -22,63 +19,61 @@ import java.net.InetSocketAddress;
  * @see
  */
 
-public class Message {
+public abstract class Message  {
 
     public static final Logger logger = LoggerFactory.getLogger(Message.class);
 
-    public final BigInteger id;
-    public final byte payloadD;
-    byte ttl;
-    byte hop;
-    public final int payloadL;
-    public final InetSocketAddress recipient;
+    public final byte[] id;
+    public byte type;
+    public byte ttl;
+    @Deprecated public byte hop;
+    public final InetSocketAddress origin;
 
     /**
      * Creates a header used on Gnutella Protocol v0.4
      *
      * @param id           A 16-byte string uniquely identifying the descriptor on the
      *                     network
-     * @param payloadD     0x00 = Ping, 0x01 = Pong, 0x40 = Push, 0x80 = Query, 0x81 =
+     * @param type     0x00 = Ping, 0x01 = Pong, 0x40 = Push, 0x80 = Query, 0x81 =
      *                     QueryHit PayLoader Descriptor
      * @param ttl          Time to live. The number of times the descriptor will be
      *                     forwarded by Gnutella servents before it is removed from the
      *                     network
      * @param hop          The number of times the descriptor has been forwarded
-     * @param payloadL     The length of the descriptor immediately following this header
-     * @param recipient Id of the thread that received the message
+     * @param origin Id of the thread that received the message
      */
-    protected Message(byte[] id, byte payloadD, byte ttl, byte hop,
-                      int payloadL, InetSocketAddress recipient) {
-        this.id = new BigInteger(id);
-        this.payloadD = payloadD;
+    protected Message(byte[] id, byte type, byte ttl, byte hop,
+                      InetSocketAddress origin) {
+        this.id = id!=null ? id  : IdGenerator.next();
+        this.type = type;
         this.ttl = ttl;
         this.hop = hop;
-        this.payloadL = payloadL;
-        this.recipient = recipient;
+        this.origin = origin;
 
     }
 
     /**
      * @param idMessage    A 16-byte string uniquely identifying the descriptor on the
      *                     network
-     * @param payloadD     0x00 = Ping, 0x01 = Pong, 0x40 = Push, 0x80 = Query, 0x81 =
+     * @param type     0x00 = Ping, 0x01 = Pong, 0x40 = Push, 0x80 = Query, 0x81 =
      *                     QueryHit PayLoader Descriptor
      * @param ttl          Time to live. The number of times the descriptor will be
      *                     forwarded by Gnutella servents before it is removed from the
      *                     network
      * @param hop          The number of times the descriptor has been forwarded
      * @param payloadL     The length of the descriptor immediately following this header
-     * @param recipient thread that received the message
+     * @param origin thread that received the message
      */
-    protected Message(byte payloadD, byte ttl, byte hop, int payloadL,
-                      InetSocketAddress recipient) {
-        this.id = new BigInteger(IdGenerator.getIdMessage());
-        this.payloadD = payloadD;
-        this.ttl = ttl;
-        this.hop = hop;
-        this.payloadL = payloadL;
-        this.recipient = recipient;
+    protected Message(byte type, byte ttl, byte hop,
+                      InetSocketAddress origin) {
+        this(null, type, ttl, hop, origin);
+    }
 
+    public Message(byte type, DataInputStream in, InetSocketAddress origin) {
+        this.type = type;
+        this.origin = origin;
+        this.id = new byte[GnutellaConstants.ID_LENGTH];
+        in(in);
     }
 
     /**
@@ -88,202 +83,209 @@ public class Message {
      * @param inStream DataInputStream in which the Message is read in bytes
      * @return Message of the Gnutella Protocol v0.4
      */
-    public static Message nextMessage(DataInputStream inStream, InetSocketAddress origin) throws IOException {
-        ByteArrayList message = new ByteArrayList();
-        int idx = 0;
+    public static Message nextMessage(DataInputStream in, InetSocketAddress origin) throws IOException, java.net.UnknownHostException {
 
-
-        while (idx < GnutellaConstants.HEADER_LENGTH) {
-
-            message.add(inStream.readByte()); //blocks for input here
-            idx++;
-
-        }
-            /* Declaracion de lo que almacenara el header del message */
-        byte[] idMessage = new byte[GnutellaConstants.ID_LENGTH];
-        byte payloadD;
-        byte ttl;
-        byte hop;
-        byte[] payloadL = new byte[GnutellaConstants.PLL_LENGTH];
-        int j = 0;
-
-        byte stream[] = message.toArray();
-
-        // Leemos el id
-        for (int i = 0; i < GnutellaConstants.ID_LENGTH; i++) {
-            idMessage[i] = stream[j++];
-        }
-        // Leemos el payload descriptor
-
-        payloadD = stream[j++];
-
-        // Leemos el ttl
-        ttl = stream[j++];
-
-        // Leemos el hop
-        hop = stream[j++];
-
-        // Leemos el payload length
-        for (int i = 0; i < GnutellaConstants.PLL_LENGTH; i++) {
-            payloadL[i] = stream[j++];
-        }
-        switch (payloadD) {
+        byte type = in.readByte();
+        switch (type) {
             case GnutellaConstants.PING:
-                return new PingMessage(idMessage, ttl, hop, origin);
-
+                return new PingMessage(in, origin);
             case GnutellaConstants.PONG:
-                ByteArrayList partPong = new ByteArrayList();
-                while (inStream.available() > 0
-                        && idx < GnutellaConstants.HEADER_LENGTH
-                        + GnutellaConstants.PONG_PLL) {
-                    partPong.add(inStream.readByte());
-                    idx++;
-                }
-
-                stream = partPong.toArray();
-                // Declaracion de donde almacenaremos los atributos del mensaje
-                // pong
-                byte[] port = new byte[GnutellaConstants.PORT_LENGTH];
-                byte[] ip = new byte[GnutellaConstants.IP_LENGTH];
-                byte[] nfilesh = new byte[GnutellaConstants.NF_LENGTH];
-                byte[] nkbsh = new byte[GnutellaConstants.NK_LENGTH];
-                j = 0;
-                // Llenamos cada campo con lo que habia en el stream
-                for (int i = 0; i < GnutellaConstants.PORT_LENGTH; i++) {
-                    port[i] = stream[j++];
-                }
-                for (int i = 0; i < GnutellaConstants.IP_LENGTH; i++) {
-                    ip[i] = stream[j++];
-                }
-                for (int i = 0; i < GnutellaConstants.NF_LENGTH; i++) {
-                    nfilesh[i] = stream[j++];
-                }
-
-                for (int i = 0; i < GnutellaConstants.NK_LENGTH; i++) {
-                    nkbsh[i] = stream[j++];
-                }
-                /* Convertimos el arreglo de byte del puerto a short */
-
-                return new PongMessage(idMessage, ttl, hop, origin, port,
-                        ip, nfilesh, nkbsh);
+                return new PongMessage(in, origin);
             case GnutellaConstants.QUERY:
-
-                ByteArrayList partQuery = new ByteArrayList();
-
-                while (inStream.available() > 0) {
-                    partQuery.add(inStream.readByte());
-                    idx++;
-                }
-
-                stream = partQuery.toArray();
-                // Declaracion de donde almacenaremos los atributos del mensaje
-                // pong
-                byte[] minSpeed = new byte[GnutellaConstants.MINSPEEDL];
-
-                int searchCriteriaL = partQuery.size()
-                        - GnutellaConstants.MINSPEEDL - GnutellaConstants.EOS_L;
-
-                byte[] searchCriteria = new byte[searchCriteriaL];
-
-                j = 0;
-                // Llenamos cada campo con lo que habia en el stream
-                for (int i = 0; i < GnutellaConstants.MINSPEEDL; i++) {
-                    minSpeed[i] = stream[j++];
-                }
-                for (int i = 0; i < searchCriteriaL; i++) {
-                    searchCriteria[i] = stream[j++];
-                }
-                return new QueryMessage(idMessage, ttl, hop, searchCriteriaL,
-                        origin, minSpeed, new String(searchCriteria));
-
-            case GnutellaConstants.QUERY_HIT:
-                ByteArrayList partQueryH = new ByteArrayList();
-
-                while (inStream.available() > 0) {
-                    byte b = inStream.readByte();
-                    partQueryH.add(b);
-
-                    idx++;
-                }
-
-                stream = partQueryH.toArray();
-
-                // Declaracion de donde almacenaremos los atributos del mensaje
-                // pong
-                j = 0;
-                //byte nHits = stream[j++];
-
-                byte[] portQ = new byte[GnutellaConstants.PORT_LENGTH];
-                byte[] ipQ = new byte[GnutellaConstants.IP_LENGTH];
-                byte[] speedQ = new byte[4];
-                //byte[][] fIQ = new byte[nHits][4];
-                //byte[][] fSQ = new byte[nHits][4];
-
-                //int payloadSize = partQueryH.size();
-                    /*int resultL = payloadSize - //nHits
-                            //* GnutellaConstants.QUERYHIT_PART_L
-                            - GnutellaConstants.SERVER_ID_L;*/
-
-                //byte[][] name = new byte[nHits][nameL];
-
-                byte[] idServent = new byte[GnutellaConstants.SERVER_ID_L];
-
-                // Llenamos cada campo con lo que habia en el stream
-                for (int i = 0; i < GnutellaConstants.PORT_LENGTH; i++) {
-                    portQ[i] = stream[j++];
-                }
-                for (int i = 0; i < GnutellaConstants.IP_LENGTH; i++) {
-                    ipQ[i] = stream[j++];
-                }
-
-                for (int i = 0; i < 4; i++) {
-                    speedQ[i] = stream[j++];
-                }
-//                    for (int k = 0; k < nHits; k++) {
-//
-//                        for (int i = 0; i < 4; i++) {
-//                            fIQ[k][i] = stream[j++];
-//                        }
-//                        for (int i = 0; i < 4; i++) {
-//                            fSQ[k][i] = stream[j++];
-//                        }
-//
-//                        for (int i = 0; i < nameL; i++) {
-//                            if (stream[j] == GnutellaConstants.END) {
-//                                j++;
-//                                break;
-//                            }
-//                            name[k][i] = stream[j++];
-//                        }
-//
-//                    }
-                int payload = stream.length - j - GnutellaConstants.SERVER_ID_L;
-
-
-                byte[] result = new byte[payload];
-                for (int i = 0; i < payload; i++) {
-                    result[i] = stream[j++];
-                }
-                for (int i = 0; i < GnutellaConstants.SERVER_ID_L; i++) {
-                    idServent[i] = stream[j++];
-                }
-
-
-                QueryHitMessage m = new QueryHitMessage(idMessage, ttl, hop,
-                        stream.length, origin, portQ,
-                        InetAddress.getByAddress(ipQ), speedQ, result,
-                        idServent);
-
-                return m;
-
-            case GnutellaConstants.PUSH:
-                return null;
-
+                return new QueryMessage(in, origin);
             default:
-                Message.logger.warn("unknown message type {} ", payloadD);
-
+                //TODO remaining types
+                return null;
         }
-        return null;
+
+//        ByteArrayList message = new ByteArrayList();
+//        int idx = 0;
+//
+//
+//        while (idx < GnutellaConstants.HEADER_LENGTH) {
+//
+//            message.add(inStream.readByte()); //blocks for input here
+//            idx++;
+//
+//        }
+//            /* Declaracion de lo que almacenara el header del message */
+//        byte[] idMessage = new byte[GnutellaConstants.ID_LENGTH];
+//        int j = 0;
+//
+//        byte stream[] = message.toArray();
+//
+//        // Leemos el id
+//        for (int i = 0; i < GnutellaConstants.ID_LENGTH; i++) {
+//            idMessage[i] = stream[j++];
+//        }
+//        // Leemos el payload descriptor
+//
+//        byte payloadD = stream[j++];
+//
+//        // Leemos el ttl
+//        byte ttl = stream[j++];
+//
+//        // Leemos el hop
+//        byte hop = stream[j++];
+//
+//        // Leemos el payload length
+//        byte[] payloadL = new byte[GnutellaConstants.PLL_LENGTH];
+//        for (int i = 0; i < GnutellaConstants.PLL_LENGTH; i++) {
+//            payloadL[i] = stream[j++];
+//        }
+//        switch (payloadD) {
+//            case GnutellaConstants.PING:
+//                return new PingMessage(idMessage, ttl, hop, origin);
+//
+//            case GnutellaConstants.PONG:
+//                ByteArrayList partPong = new ByteArrayList();
+//                while (inStream.available() > 0
+//                        && idx < GnutellaConstants.HEADER_LENGTH
+//                        + GnutellaConstants.PONG_PLL) {
+//                    partPong.add(inStream.readByte());
+//                    idx++;
+//                }
+//
+//                stream = partPong.toArray();
+//                // Declaracion de donde almacenaremos los atributos del mensaje
+//                // pong
+//                j = 0;
+//                // Llenamos cada campo con lo que habia en el stream
+//                byte[] port = new byte[GnutellaConstants.PORT_LENGTH];
+//                for (int i = 0; i < GnutellaConstants.PORT_LENGTH; i++) {
+//                    port[i] = stream[j++];
+//                }
+//                byte[] ip = new byte[GnutellaConstants.IP_LENGTH];
+//                for (int i = 0; i < GnutellaConstants.IP_LENGTH; i++) {
+//                    ip[i] = stream[j++];
+//                }
+//                byte[] nfilesh = new byte[GnutellaConstants.NF_LENGTH];
+//                for (int i = 0; i < GnutellaConstants.NF_LENGTH; i++) {
+//                    nfilesh[i] = stream[j++];
+//                }
+//
+//                byte[] nkbsh = new byte[GnutellaConstants.NK_LENGTH];
+//                for (int i = 0; i < GnutellaConstants.NK_LENGTH; i++) {
+//                    nkbsh[i] = stream[j++];
+//                }
+//                /* Convertimos el arreglo de byte del puerto a short */
+//
+//                return new PongMessage(idMessage, ttl, hop, origin, port,
+//                        ip, nfilesh, nkbsh);
+//            case GnutellaConstants.QUERY:
+//
+//                ByteArrayList partQuery = new ByteArrayList();
+//
+//                while (inStream.available() > 0) {
+//                    partQuery.add(inStream.readByte());
+//                    idx++;
+//                }
+//
+//                stream = partQuery.toArray();
+//                // Declaracion de donde almacenaremos los atributos del mensaje
+//                // pong
+//
+//                int searchCriteriaL = partQuery.size()
+//                        - GnutellaConstants.MINSPEEDL - GnutellaConstants.EOS_L;
+//
+//                j = 0;
+//                // Llenamos cada campo con lo que habia en el stream
+//                byte[] minSpeed = new byte[GnutellaConstants.MINSPEEDL];
+//                for (int i = 0; i < GnutellaConstants.MINSPEEDL; i++) {
+//                    minSpeed[i] = stream[j++];
+//                }
+//                byte[] searchCriteria = new byte[searchCriteriaL];
+//                for (int i = 0; i < searchCriteriaL; i++) {
+//                    searchCriteria[i] = stream[j++];
+//                }
+//                return new QueryMessage(idMessage, ttl, hop, searchCriteriaL,
+//                        origin, minSpeed, new String(searchCriteria));
+//
+//            case GnutellaConstants.QUERY_HIT:
+//                ByteArrayList partQueryH = new ByteArrayList();
+//
+//                while (inStream.available() > 0) {
+//                    byte b = inStream.readByte();
+//                    partQueryH.add(b);
+//
+//                    idx++;
+//                }
+//
+//                stream = partQueryH.toArray();
+//
+//                // Declaracion de donde almacenaremos los atributos del mensaje
+//                // pong
+//                j = 0;
+//                //byte nHits = stream[j++];
+//
+//                byte[] portQ = new byte[GnutellaConstants.PORT_LENGTH];
+//                //byte[][] fIQ = new byte[nHits][4];
+//                //byte[][] fSQ = new byte[nHits][4];
+//
+//                //int payloadSize = partQueryH.size();
+//                    /*int resultL = payloadSize - //nHits
+//                            //* GnutellaConstants.QUERYHIT_PART_L
+//                            - GnutellaConstants.SERVER_ID_L;*/
+//
+//                //byte[][] name = new byte[nHits][nameL];
+//
+//                // Llenamos cada campo con lo que habia en el stream
+//                for (int i = 0; i < GnutellaConstants.PORT_LENGTH; i++) {
+//                    portQ[i] = stream[j++];
+//                }
+//                byte[] ipQ = new byte[GnutellaConstants.IP_LENGTH];
+//                for (int i = 0; i < GnutellaConstants.IP_LENGTH; i++) {
+//                    ipQ[i] = stream[j++];
+//                }
+//
+//                byte[] speedQ = new byte[4];
+//                for (int i = 0; i < 4; i++) {
+//                    speedQ[i] = stream[j++];
+//                }
+////                    for (int k = 0; k < nHits; k++) {
+////
+////                        for (int i = 0; i < 4; i++) {
+////                            fIQ[k][i] = stream[j++];
+////                        }
+////                        for (int i = 0; i < 4; i++) {
+////                            fSQ[k][i] = stream[j++];
+////                        }
+////
+////                        for (int i = 0; i < nameL; i++) {
+////                            if (stream[j] == GnutellaConstants.END) {
+////                                j++;
+////                                break;
+////                            }
+////                            name[k][i] = stream[j++];
+////                        }
+////
+////                    }
+//                int payload = stream.length - j - GnutellaConstants.SERVER_ID_L;
+//
+//
+//                byte[] result = new byte[payload];
+//                for (int i = 0; i < payload; i++) {
+//                    result[i] = stream[j++];
+//                }
+//                byte[] idServent = new byte[GnutellaConstants.SERVER_ID_L];
+//                for (int i = 0; i < GnutellaConstants.SERVER_ID_L; i++) {
+//                    idServent[i] = stream[j++];
+//                }
+//
+//
+//                return new QueryHitMessage(idMessage, ttl, hop,
+//                        stream.length, origin, portQ,
+//                        InetAddress.getByAddress(ipQ), speedQ, result,
+//                        idServent);
+//
+//            case GnutellaConstants.PUSH:
+//                return null;
+//
+//            default:
+//                Message.logger.warn("unknown message type {} ", payloadD);
+//
+//        }
+//        return null;
 
     }
 
@@ -301,67 +303,34 @@ public class Message {
         return false;
     }
 
-    /**
-     * Returns the payloader descriptor of this Message
-     *
-     * @return the payloader descriptor in a byte representation
-     */
-    public byte getPayloadD() {
-        return payloadD;
-    }
 
-    /**
-     * Returns the ttl of this Message
-     *
-     * @return the ttl in a byte representation
-     */
-    public byte getTtl() {
-        return ttl;
-    }
-
-    /**
-     * Returns the hop of this Message
-     *
-     * @return the hop in a byte representation
-     */
-    public byte getHop() {
-        return hop;
-    }
-
-    /**
-     * Returns the payloader length of this Message
-     *
-     * @return the payloader length in a BigInteger representation
-     */
-    public int getPayloadL() {
-        return payloadL;
-    }
-
-    /**
-     * Returns the representation of this Message in bytes
-     *
-     * @return the representation in bytes
-     */
-    public byte[] toByteArray() {
-        byte header[] = new byte[GnutellaConstants.HEADER_LENGTH];
-        byte id[] = this.id.toByteArray();
-        int i = 0;
-        for (; i < GnutellaConstants.ID_LENGTH; i++) {
-            header[i] = id[i];
+    public final void in(DataInput in) {
+        try {
+            //the type byte should already have been read and known
+            in.readFully(id);
+            ttl = in.readByte();
+            hop = in.readByte();
+            inData(in);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        header[i++] = getPayloadD();
-        header[i++] = getTtl();
-        header[i++] = getHop();
-        byte pl[] = BigInteger.valueOf(getPayloadL()).toByteArray();
-
-        i += GnutellaConstants.PLL_LENGTH - pl.length;
-        for (int j = 0; j < pl.length; j++) {
-            header[i++] = pl[j];
-
-        }
-        return header;
-
     }
+
+    public final void out(DataOutput out) {
+        try {
+            out.writeByte(type);
+            out.write(id);
+            out.writeByte(ttl);
+            out.writeByte(hop);
+            outData(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    abstract protected void inData(DataInput in) throws IOException;
+    abstract protected void outData(DataOutput out) throws IOException;
+
 
     /**
      * Returns the id of this Message in textual presentation
@@ -369,7 +338,7 @@ public class Message {
      * @return the id in a string format
      */
     public String idString() {
-        return id.toString(36);
+        return new BigInteger(id).toString(36);
     }
 
     /*
@@ -379,12 +348,15 @@ public class Message {
      */
     public String toString() {
 
-        return getClass().getSimpleName() + '|' + id.toString(36) + '|' + getPayloadD() + '|' + getTtl()
-                + '|' + getHop() + '|' + getPayloadL();
+        return getClass().getSimpleName() + '|' + idString() + '|' + type + '|' + ttl
+                + '|' + hop;
     }
 
-    public final byte[] idBytes() {
-        return id.toByteArray();
+
+    public byte[] asBytes() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        out(new DataOutputStream(baos));
+        return baos.toByteArray();
     }
 
 }

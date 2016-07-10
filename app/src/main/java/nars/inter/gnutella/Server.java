@@ -72,14 +72,10 @@ public class Server implements Runnable {
      */
     @Nullable
     public PeerThread connect(Socket socket) {
-        InputStream in;
-        OutputStream out;
-        DataInputStream inStream;
-        DataOutputStream outStream;
 
         try {
-            in = socket.getInputStream();
-            inStream = new DataInputStream(in);
+            InputStream in = socket.getInputStream();
+            DataInputStream inStream = new DataInputStream(in);
 
             byte[] b = new byte[256];
             int bl = inStream.read(b);
@@ -91,6 +87,8 @@ public class Server implements Runnable {
             // reasons - a servent’s pool of incoming
             // connection slots may be exhausted
             //String request = inStream.readUTF();
+            DataOutputStream outStream;
+            OutputStream out;
             if (request.startsWith(GnutellaConstants.CONNECTION_REQUEST_PRE)) {
                 out = socket.getOutputStream();
                 outStream = new DataOutputStream(out);
@@ -155,6 +153,8 @@ public class Server implements Runnable {
 
                     return null;
 
+                } catch (IOException e) {
+                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;

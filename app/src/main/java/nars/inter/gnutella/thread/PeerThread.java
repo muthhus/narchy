@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -73,14 +70,6 @@ abstract public class PeerThread implements Runnable {
 
     }
 
-    /**
-     * Returns the port of the connection
-     *
-     * @return the port
-     */
-    public int getPort() {
-        return socket.getPort();
-    }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* METHODS USED IF NOT DOWNLOADTHREAD */
@@ -163,9 +152,6 @@ abstract public class PeerThread implements Runnable {
 
     }
 
-    public boolean mine(Message m) {
-        return m.recipient.equals(peer.address);
-    }
 
     public boolean unseen(Message m) {
         return !peer.seen(m);
@@ -173,7 +159,7 @@ abstract public class PeerThread implements Runnable {
 
     public void _send(Message m) {
 
-        if (m.getPayloadD() == GnutellaConstants.PING) {
+        if (m.type == GnutellaConstants.PING) {
             flag = false;
             new java.util.Timer().schedule(
                     new java.util.TimerTask() {
@@ -186,12 +172,7 @@ abstract public class PeerThread implements Runnable {
                     }, PONG_TIMEOUT_MS);
         }
 
-
-        try {
-            outStream.write(m.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        m.out(outStream);
     }
 
     public final void pending(Message m) {

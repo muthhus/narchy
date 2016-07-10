@@ -32,7 +32,9 @@ public class ConceptProcess implements Premise {
     public final BLink<? extends Task> taskLink;
 
     public final BLink<? extends Termed> termLink;
+
     @Nullable public final Task belief;
+
     public final BLink<? extends Concept> conceptLink;
 
 
@@ -132,16 +134,6 @@ public class ConceptProcess implements Premise {
 
 
 
-    public final boolean hasTemporality() {
-
-        Task task = this.task();
-        if (!task.isEternal() || task.term().dt()!= DTERNAL)
-            return true;
-
-        Task belief = this.belief;
-        return belief != null && (!belief.isEternal() || belief.term().dt() != DTERNAL);
-
-    }
 
 
 }
