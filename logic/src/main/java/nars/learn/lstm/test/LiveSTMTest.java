@@ -23,7 +23,7 @@ public class LiveSTMTest {
         i.zero();
 
 
-        LiveSTM l = new LiveSTM(inputs, outputs, cells, 0.1) {
+        LiveSTM l = new LiveSTM(inputs, outputs, cells) {
 
             int t;
 

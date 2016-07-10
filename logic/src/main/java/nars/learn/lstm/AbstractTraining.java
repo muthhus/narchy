@@ -14,12 +14,13 @@ public abstract class AbstractTraining {
         this.outputs = outputs;
     }
 
-    public SimpleLSTM lstm(int cell_blocks, double initialLearningRate) {
-        return new SimpleLSTM(random, inputs, outputs, cell_blocks, initialLearningRate);
+    public SimpleLSTM lstm(int cell_blocks) {
+        return new SimpleLSTM(random, inputs, outputs, cell_blocks);
     }
 
     @Deprecated public double scoreSupervised(SimpleLSTM agent)  {
 
+        float learningRate = 0.1f;
         final double[] fit = {0};
         final double[] max_fit = {0};
 
@@ -28,15 +29,15 @@ public abstract class AbstractTraining {
                 agent.forget(inter.forget);
 
             if (inter.expected == null) {
-                agent.predict(inter.actual, false);
+                agent.predict(inter.actual);
             }
             else {
                 double[] actual_output = null;
 
                 if (validation_mode)
-                    actual_output = agent.predict(inter.actual, true);
+                    actual_output = agent.predict(inter.actual);
                 else
-                    actual_output = agent.learn(inter.actual, inter.expected, true);
+                    actual_output = agent.learn(inter.actual, inter.expected, learningRate);
 
                 if (util.argmax(actual_output) == util.argmax(inter.expected))
                     fit[0]++;

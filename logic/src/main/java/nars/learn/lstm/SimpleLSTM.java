@@ -1,5 +1,7 @@
 package nars.learn.lstm;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -9,8 +11,6 @@ import static org.apache.commons.math3.util.MathArrays.scaleInPlace;
 public class SimpleLSTM extends AgentSupervised {
 	
 	private final double init_weight_range = 0.1;
-	public double learningRate;//0.07
-	//forgettingRate?
 
 	private final int full_input_dimension;
 	private final int output_dimension;
@@ -45,9 +45,8 @@ public class SimpleLSTM extends AgentSupervised {
 	private double[] deltaH;
 	private double[] full_input;
 
-	public SimpleLSTM(Random r, int input_dimension, int output_dimension, int cell_blocks, final double initLearningRate)
+	public SimpleLSTM(Random r, int input_dimension, int output_dimension, int cell_blocks)
 	{
-		this.learningRate = initLearningRate;
 		this.output_dimension = output_dimension;
 		this.cell_blocks = cell_blocks;
 		
@@ -115,9 +114,9 @@ public class SimpleLSTM extends AgentSupervised {
 	}
 	
 	@Override
-	public double[] predict(double[] input, final boolean requireOutput)
+	public double[] predict(double[] input)
 	{
-		return learn(input, null, requireOutput);
+		return learn(input, null, -1);
 	}
 	
 	public static void Display()
@@ -127,11 +126,10 @@ public class SimpleLSTM extends AgentSupervised {
 		System.out.println("\n==============================");
 	}
 
-	// requireOutput is unused
-	@Override
-	public double[] learn(double[] input, double[] target_output, final boolean requireOutput) {
 
-		final double learningRate = this.learningRate;
+	@Override
+	public double[] learn(double[] input, @Nullable double[] target_output, float learningRate) {
+
 		final int cell_blocks = this.cell_blocks;
 		final int full_input_dimension = this.full_input_dimension;
 
@@ -301,9 +299,6 @@ public class SimpleLSTM extends AgentSupervised {
 		throw new RuntimeException("TODO");
 	}
 
-	public void setLearningRate(double learningRate) {
-		this.learningRate = learningRate;
-	}
 
 
 }

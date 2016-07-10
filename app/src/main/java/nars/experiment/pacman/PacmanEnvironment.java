@@ -36,6 +36,7 @@ import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
+import nars.predict.LSTMPredictor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -43,6 +44,8 @@ import nars.time.FrameClock;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.FloatSupplier;
+import nars.util.math.RangeNormalizedFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +61,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
+
+	boolean trace = false;
 
 	final int inputs;
 	private final int pacmanCyclesPerFrame = 6;
@@ -75,9 +80,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//Global.TRUTH_EPSILON = 0.1f;
 		Random rng = new XorShift128PlusRandom(1);
 
-		Multi nar = new Multi(4,
-		//Default nar = new Default(
-				1024, 4, 2, 2, rng,
+		//Multi nar = new Multi(4,512,
+		Default nar = new Default(1024,
+				4, 2, 2, rng,
 				new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
@@ -127,7 +132,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
-		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 4 /* visionRadius */);
+		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 2 /* visionRadius */);
 
 		NAgent n = new NAgent(nar) {
 			@Override
@@ -163,6 +168,31 @@ public class PacmanEnvironment extends cpcman implements Environment {
 //				Iterables.addAll(charted,
 //						numericSensor(nar.self.toString(),
 //								"unmotivationed", "motivated", nar, ()->(float)nar.emotion.motivation.getSum(), 0.5f).resolution(0.1f));
+
+//				{
+//					List<FloatSupplier> li = new ArrayList();
+//					for (int i = 0; i < this.inputs.size(); i++) {
+//						li.add( this.inputs.get(i).getInput() );
+//					}
+////					for (int i = 0; i < cheats.size(); i++) {
+////						FloatSupplier ci = cheats.get(i).getInput();
+////						//li.add( new DelayedFloat(ci, 2) );
+////						//li.add( new DelayedFloat(new RangeNormalizedFloat(()->reward), 1) );
+////						li.add( ci );
+////					}
+//					List<FloatSupplier> lo = new ArrayList();
+//					RangeNormalizedFloat normReward = new RangeNormalizedFloat(() -> reward);
+//					lo.add(normReward);
+//
+//
+//					LSTMPredictor lp = new LSTMPredictor(li, lo);
+//
+//					nar.onFrame(nn->{
+//						double[] p = lp.next();
+//						System.out.println(Texts.n4(p) + " , " + normReward.asFloat() );
+//					});
+//				}
+
 
 				if (nar instanceof Default) {
 					new BeliefTableChart(nar, charted).show(600, 900);
@@ -413,7 +443,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		cycle(pacmanCyclesPerFrame);
 
 
-		System.out.println( a.summary());
+		if (trace)
+			System.out.println( a.summary());
 
 		/*static final int BLANK=0;
 		static final int WALL=1;
@@ -423,7 +454,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 	}
 
-	float deathPain;
+	float deathPain = -1; //start dead
+
 	@Override
 	public void killedByGhost() {
 		super.killedByGhost();

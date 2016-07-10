@@ -18,7 +18,7 @@ public class TestLSTM1 {
 
 		int cell_blocks = 4;
 		double learningRate = 0.05;
-		SimpleLSTM slstm = task.lstm(cell_blocks, learningRate);
+		SimpleLSTM slstm = task.lstm(cell_blocks);
 
 		int epochs = 5000;
 		for (int epoch = 0; epoch < epochs; epoch++) {

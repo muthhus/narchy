@@ -50,17 +50,18 @@ public class NAgent implements Agent {
     float motivation[];
 
     float input[];
+    public List<SensorConcept> inputs;
 
     public List<MotorConcept> actions;
-    private List<SensorConcept> inputs;
-    //private SensorConcept reward;
     public int lastAction = -1;
+
     public float reward = Float.NaN;
+    float dReward;
 
     private int ticksBeforeObserve = 1;
     private int ticksBeforeDecide = 1;
 
-    float dReward;
+
 
     /**
      * learning rate
@@ -135,7 +136,9 @@ public class NAgent implements Agent {
     //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 
     private SensorConcept dRewardSensorNeg;
+
     private final DecideAction decideAction;
+
     private final boolean synchronousGoalInput = false;
 
 
@@ -311,8 +314,8 @@ public class NAgent implements Agent {
 
     public static FuzzyConceptSet rewardConcepts(FloatSupplier input, NAR nar) {
         return new FuzzyConceptSet(
-                //new PolarRangeNormalizedFloat(input),
-                new RangeNormalizedFloat(input),
+                new PolarRangeNormalizedFloat(input),
+                //new RangeNormalizedFloat(input),
                 nar,
                 //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
                 //"(" + nar.self + " --> [sad])", "(" + nar.self + " --> [happy])").resolution(0.05f);

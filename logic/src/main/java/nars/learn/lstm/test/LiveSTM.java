@@ -15,22 +15,23 @@ import java.util.function.Consumer;
  */
 abstract public class LiveSTM extends AbstractTraining {
 
-    private final SimpleLSTM agent;
+    public final SimpleLSTM agent;
 
     @Deprecated
     private final int ERROR_WINDOW_SIZE = 8;
 
     public boolean train = true;
     DescriptiveStatistics errorHistory = new DescriptiveStatistics();
+    private float learningRate = 0.1f;
 
-    public LiveSTM(int inputs, int outputs, int cellBlocks, double initialLearningRate) {
-        this(new XorShift128PlusRandom(1), inputs, outputs, cellBlocks, initialLearningRate);
+    public LiveSTM(int inputs, int outputs, int cellBlocks) {
+        this(new XorShift128PlusRandom(1), inputs, outputs, cellBlocks);
     }
 
-    public LiveSTM(Random random, int inputs, int outputs, int cellBlocks, double initialLearningRate) {
+    public LiveSTM(Random random, int inputs, int outputs, int cellBlocks) {
         super(random, inputs, outputs);
 
-        this.agent = lstm(cellBlocks, initialLearningRate);
+        this.agent = lstm(cellBlocks);
 
         errorHistory.setWindowSize(ERROR_WINDOW_SIZE);
     }
@@ -46,16 +47,16 @@ abstract public class LiveSTM extends AbstractTraining {
         double dist;
         if (inter.expected == null) {
 
-            inter.predicted = agent.predict(inter.actual, true);
+            inter.predicted = agent.predict(inter.actual);
 
             dist = Float.NaN;
 
         } else {
 
             if (validation_mode)
-                predicted = agent.predict(inter.actual, true);
+                predicted = agent.predict(inter.actual);
             else
-                predicted = agent.learn(inter.actual, inter.expected, true);
+                predicted = agent.learn(inter.actual, inter.expected, learningRate);
 
 //                max_fit++;
 //

@@ -16,13 +16,16 @@ import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
+import nars.learn.lstm.test.LiveSTM;
 import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
+import nars.predict.LSTMPredictor;
 import nars.term.Compound;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.math.DelayedFloat;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.math.RangeNormalizedFloat;
@@ -42,6 +45,8 @@ public class PongEnvironment extends Player implements Environment {
 
 	public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
 	int actions = 3;
+
+	boolean trace = false;
 
 	final int width = 4;
 	final int height = 4;
@@ -90,6 +95,8 @@ public class PongEnvironment extends Player implements Environment {
 			public void start(int inputs, int ac) {
 				super.start(inputs, ac);
 
+
+
 				if (nar instanceof Default) {
 					BagChart.show((Default) nar, 512);
 					beliefChart(this, cheats);
@@ -115,14 +122,14 @@ public class PongEnvironment extends Player implements Environment {
 		//a.gamma /= 4f;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 8, '.', 2);
-		//new HappySad(nar, 4);
-
-		//DQN a = new DQN();
-		//HaiQAgent a = new HaiQAgent();
+		{
+			new MySTMClustered(nar, 8, '.', 2);
+		}
 
 
 		PongEnvironment e = new PongEnvironment();
+
+
 
 
 		Iterables.addAll(cheats, addCheats(a.nar, e));
@@ -455,7 +462,8 @@ public class PongEnvironment extends Player implements Environment {
 //
 //		});
 
-		System.out.println( a.summary());
+		if (trace)
+			System.out.println( a.summary());
 
 	}
 
