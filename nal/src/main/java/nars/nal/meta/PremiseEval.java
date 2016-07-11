@@ -265,6 +265,25 @@ public class PremiseEval extends FindSubst {
     }
 
 
+    public final long occurrenceTarget(@NotNull OccurrenceSolver s) {
+        long tOcc = task.occurrence();
+        Task b = belief;
+        if (b == null) return tOcc;
+        else {
+            long bOcc = b.occurrence();
+            return s.compute(tOcc, bOcc);
+
+//            //if (bOcc == ETERNAL) {
+//            return (tOcc != ETERNAL) ?
+//                        whenBothNonEternal.compute(tOcc, bOcc) :
+//                        ((bOcc != ETERNAL) ?
+//                            bOcc :
+//                            ETERNAL
+//            );
+        }
+    }
+
+
 //    /** specific minimum confidence function for advanced filtering heuristics TODO */
 //    public final float confidenceMin(Term pattern, char punc) {
 //

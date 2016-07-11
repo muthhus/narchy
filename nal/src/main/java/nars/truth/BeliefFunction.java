@@ -132,7 +132,7 @@ public enum BeliefFunction implements TruthOperator {
 
     @SinglePremise
     Negation() {
-        @NotNull
+        @Nullable
         @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
             return TruthFunctions.negation(T, minConf);
         }
@@ -274,8 +274,8 @@ public enum BeliefFunction implements TruthOperator {
 
     @SinglePremise
     Identity() {
-        @NotNull
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return TruthOperator.identity(T, minConf);
         }
     },

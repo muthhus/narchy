@@ -29,27 +29,5 @@ public interface Premise extends Tasked {
         return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
-    @FunctionalInterface
-    interface OccurrenceSolver {
-        long compute(long taskOcc, long beliefOcc);
-    }
-
-    default long occurrenceTarget(@NotNull OccurrenceSolver s) {
-        long tOcc = task().occurrence();
-        Task b = belief();
-        if (b == null) return tOcc;
-        else {
-            long bOcc = b.occurrence();
-            return s.compute(tOcc, bOcc);
-
-//            //if (bOcc == ETERNAL) {
-//            return (tOcc != ETERNAL) ?
-//                        whenBothNonEternal.compute(tOcc, bOcc) :
-//                        ((bOcc != ETERNAL) ?
-//                            bOcc :
-//                            ETERNAL
-//            );
-        }
-    }
 
 }

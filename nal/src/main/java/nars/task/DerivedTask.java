@@ -4,6 +4,7 @@ import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.ConceptProcess;
+import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Stamp;
@@ -22,17 +23,19 @@ abstract public class DerivedTask extends MutableTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, PremiseEval p) {
         super(tc, punct, truth);
 
-        @Nullable long[] pte = premise.task().evidence();
+        @Nullable long[] pte = p.task.evidence();
+
+        @Nullable Task b = p.belief;
         evidence(
-            premise.belief != null ?
-                Stamp.zip(pte, premise.belief.evidence()) : //double
+            b != null ?
+                Stamp.zip(pte, b.evidence()) : //double
                 pte //single
         );
 
-        this.premise = new SoftReference(premise);
+        this.premise = new SoftReference(p.premise);
     }
 
     @Override @Nullable public final Task getParentTask() {
@@ -67,7 +70,7 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
             super(tc, punct, truth, premise);
         }
     }
@@ -75,7 +78,7 @@ abstract public class DerivedTask extends MutableTask {
     public static class CompetingDerivedTask extends DerivedTask {
 
 
-        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
+        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
             super(tc, punct, truth, premise);
         }
 

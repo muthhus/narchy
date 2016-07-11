@@ -3,7 +3,7 @@ package nars.nal;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.Premise;
+import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.Task;
@@ -50,7 +50,7 @@ public interface TimeFunctions {
     }
 
     //nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> earlyOrLate(t, b, false);
-    nars.Premise.OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
+    OccurrenceSolver earliestOccurrence = (t, b) -> earlyOrLate(t, b, true);
 
 
     /**
@@ -115,13 +115,13 @@ public interface TimeFunctions {
         }
 
         if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
-            occReturn[0] = prem.occurrenceTarget(earliestOccurrence); //TODO CALCULATE
+            occReturn[0] = p.occurrenceTarget(earliestOccurrence); //TODO CALCULATE
 
             //restore forward polarity for function call at the end
             polarity = 1;
         } else {
             //diff
-            occReturn[0] = prem.occurrenceTarget(earliestOccurrence);
+            occReturn[0] = p.occurrenceTarget(earliestOccurrence);
         }
 
         return deriveDT(derived, polarity, prem, dt);
@@ -160,13 +160,13 @@ public interface TimeFunctions {
 //    };
 
     @NotNull
-    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, int polarity) {
+    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
         ConceptProcess prem = p.premise;
 
         int eventDelta = DTERNAL;
 
         if (!prem.belief().isEternal() && !p.task.isEternal()) {
-            long earliest = prem.occurrenceTarget(earliestOccurrence);
+            long earliest = p.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
             eventDelta = (int) (prem.belief().occurrence() -
@@ -448,10 +448,10 @@ public interface TimeFunctions {
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
-    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, @NotNull Premise.OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
+    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, @NotNull OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
         ConceptProcess premise = p.premise;
 
-        long o = premise.occurrenceTarget(s);
+        long o = p.occurrenceTarget(s);
 //        if (o != ETERNAL) {
 //            long taskDT;
 //            if (taskOrBelief) {
@@ -559,7 +559,7 @@ public interface TimeFunctions {
             eventDelta = taskDT;
         }
 
-        occReturn[0] = premise.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
+        occReturn[0] = p.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
 
         return deriveDT(derived, 1, premise, eventDelta);
     };
@@ -590,7 +590,7 @@ public interface TimeFunctions {
         Task task = p.task;
         Task belief = p.belief;
 
-        long occ = premise.occurrenceTarget((t, b) -> {
+        long occ = p.occurrenceTarget((t, b) -> {
             if ((belief!=null) && (!belief.isEternal()))
                 return b;
             return t;

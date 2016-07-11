@@ -9,6 +9,7 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.meta.TruthOperator;
 import nars.nal.rule.PremiseRule;
+import nars.task.DerivedTask;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Compound;
@@ -295,12 +296,54 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
         nar.process(
-            premise.derive(content, truth, budget, nar.time(), occ, m, this)
+            derive(content, truth, budget, nar.time(), occ, m, this)
         );
 
 
+    }
+
+    /** part 2 */
+    @NotNull public final Task derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
+
+
+        return newDerivedTask(c, p.punct.get(), truth, p)
+                .time(now, occ)
+                .budget(budget) // copied in, not shared
+                //.anticipate(derivedTemporal && d.anticipate)
+                .log(Global.DEBUG ? d.rule : "Derived");
+
+
+        //ETERNALIZE: (CURRENTLY DISABLED)
+
+//        if ((occ != ETERNAL) && (truth != null) && d.eternalize  ) {
+
+
+//            if (!derived.isDeleted()) {
+//
+//
+//                nar.process(newDerivedTask(c, punct, new DefaultTruth(truth.freq(), eternalize(truth.conf())), parents)
+//                        .time(now, ETERNAL)
+//                        .budgetCompoundForward(budget, this)
+//                        /*
+//                TaskBudgeting.compoundForward(
+//                        budget, truth(),
+//                        term(), premise);*/
+//                        .log("Immediaternalized") //Immediate Eternalization
+//
+//                );
+//            }
+
+//        }
 
     }
+
+
+    public @NotNull DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, @Nullable Truth truth, PremiseEval p) {
+        return new DerivedTask.DefaultDerivedTask(c, punct, truth, p);
+        //return new DerivedTask.CompetingDerivedTask(c, punct, truth, p);
+    }
+
+
 
 
 }
