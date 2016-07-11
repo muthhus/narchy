@@ -312,7 +312,7 @@ public abstract class TermBuilder {
             return junctionFlat(op, dt, u);
         } else {
             if (op == DISJ) {
-                throw new RuntimeException("invalid temporal disjunction");
+                throw new RuntimeException("temporal disjunction is invalid");
             }
 
             if (dt == 0) {
@@ -360,21 +360,33 @@ public abstract class TermBuilder {
 
 
         TreeSet<Term> s = new TreeSet();
-        UnifiedSet<Term> unwrappedNegs = flatten(op, u, dt, s, null);
+        int negations = /*UnifiedSet<Term> unwrappedNegs = */flatten(op, u, dt, s, null);
 
         //boolean negate = false;
         int n = s.size();
         if (n == 1) {
             return s.iterator().next();
+        } else if (n == negations) {
+            //DEMORGAN's LAWS when all negated https://en.wikipedia.org/wiki/De_Morgan%27s_laws
+            if (op == DISJ) {
+                Term[] y = new Term[n];
+                int i = 0;
+                for (Term xi : s) {
+                    y[i++] = negation(xi);
+                }
+                return negation(build(CONJ, dt, y));
+
+            } /* else if (op = CONJ... */
         }
 
+
+
+
         //Co-Negated Subterms - any commutive terms with both a subterm and its negative are invalid
-        if (unwrappedNegs!=null) {
+        //if (unwrappedNegs!=null) {
 //            if (op == DISJ && unwrappedNegs.anySatisfy(s::contains))
 //                return null; //throw new InvalidTerm(op, u);
 //            //for conjunction, this is handled by the Task normalization process to allow the co-negations for naming concepts
-
-
 //            if (s.removeAll(unwrappedNegs)) {
 //                //remove their negative counterparts
 //                s.removeIf(x -> {
@@ -394,7 +406,7 @@ public abstract class TermBuilder {
 //                    negate = true;
 //                }
 //            }
-        }
+        //}
 
 //        if (negate) {
 //            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
@@ -403,13 +415,17 @@ public abstract class TermBuilder {
         //}
     }
 
-    static UnifiedSet<Term> flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
+    /** returns # of terms negated */
+    static /*UnifiedSet<Term>*/int flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
+        int negations = 0;
         for (Term x : u) {
-            if ((x.op() == op) && (((Compound) x).dt()==dt)) {
-                unwrappedNegations = flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
+            if ((x.op() == op) && (((Compound) x).dt()==dt) /* 0 or DTERNAL */) {
+                negations += /*unwrappedNegations = */flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
             } else {
                 if (s.add(x)) { //ordinary term, add
-//                    if (x.op() == NEG) {
+                    if (x.op() == NEG) {
+                        negations++;
+                    }
 //                        if (unwrappedNegations == null)
 //                            unwrappedNegations = new UnifiedSet<>(1);
 //                        unwrappedNegations.add(((Compound) x).term(0));
@@ -417,7 +433,7 @@ public abstract class TermBuilder {
                 }
             }
         }
-        return unwrappedNegations;
+        return negations; //return unwrappedNegations;
     }
 
 

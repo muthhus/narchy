@@ -246,10 +246,10 @@ public class Tetris implements Environment {
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-        nar.cyclesPerFrame.set(128);
-        nar.confMin.setValue(0.01f);
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+        nar.cyclesPerFrame.set(64);
+        nar.confMin.setValue(0.05f);
 
 
         //nar.log();
@@ -267,7 +267,7 @@ public class Tetris implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 32, '.', 3);
+        new MySTMClustered(nar, 32, '.', 4);
         //new MySTMClustered(nar, 8, '!');
 
 
@@ -290,7 +290,7 @@ public class Tetris implements Environment {
 
 
 
-        Tetris t = new Tetris(8, 8, 4);
+        Tetris t = new Tetris(8, 16, 4);
 
         //addCamera(t, nar, 8, 8);
 

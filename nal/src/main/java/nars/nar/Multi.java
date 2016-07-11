@@ -53,7 +53,7 @@ public class Multi extends AbstractNAR {
 
     public Multi(int cores, int conceptsPerCore, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(cores, conceptsPerCore, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random,
-                new CaffeineIndex(new DefaultConceptBuilder(random), 500000, true),
+                new CaffeineIndex(new DefaultConceptBuilder(random), 500000, false),
                 new FrameClock());
     }
 

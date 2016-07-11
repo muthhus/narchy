@@ -50,6 +50,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
+    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, int maxWeight, boolean soft) {
         super(conceptBuilder);
 

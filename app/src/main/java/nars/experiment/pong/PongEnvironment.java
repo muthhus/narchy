@@ -1,4 +1,5 @@
-package nars.experiment.pong;/*
+package nars.experiment.pong;
+/*
  *  Copyright (C) 2010  Luca Wehrstedt
  *
  *  This file is released under the GPLv2
@@ -69,7 +70,7 @@ public class PongEnvironment extends Player implements Environment {
 		//Multi nar = new Multi(2,
 		Default nar = new Default(
 				1024, 3, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng) , 500000, true )
+				new CaffeineIndex(new DefaultConceptBuilder(rng) , 500000, false )
 				//new Cache2kIndex(250000, rng)
 				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(256 * 1024, rng)
