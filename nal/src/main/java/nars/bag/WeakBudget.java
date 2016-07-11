@@ -11,16 +11,15 @@ import java.lang.ref.WeakReference;
 public class WeakBudget<X> extends WeakReference<X> implements Budget {
 
     private float p, d, q;
-    private int hash;
 
     public WeakBudget(X referent, ReferenceQueue<? super X> queue, float p, float d, float q) {
         super(referent, queue);
         this.p = p;
         this.d = d;
         this.q = q;
-        hash = referent.hashCode();
     }
 
+    @Override
     public final X get() {
         if (p == p) {
             X x = super.get();

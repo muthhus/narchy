@@ -1,7 +1,10 @@
 package nars.inter.gnutella;
 
 import nars.budget.Budget;
-import nars.inter.gnutella.message.*;
+import nars.inter.gnutella.message.Message;
+import nars.inter.gnutella.message.PingMessage;
+import nars.inter.gnutella.message.PongMessage;
+import nars.inter.gnutella.message.QueryMessage;
 import nars.inter.gnutella.thread.DownloadThread;
 import nars.inter.gnutella.thread.ServerThread;
 import nars.util.Util;
@@ -12,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 

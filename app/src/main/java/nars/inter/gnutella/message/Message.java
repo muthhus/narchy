@@ -8,7 +8,6 @@ import nars.inter.gnutella.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 

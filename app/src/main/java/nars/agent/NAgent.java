@@ -1,13 +1,10 @@
 package nars.agent;
 
-import com.google.common.primitives.Floats;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import com.sun.deploy.util.ArrayUtil;
 import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
@@ -22,13 +19,10 @@ import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
-import nars.util.math.RangeNormalizedFloat;
 import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +32,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static nars.$.*;
+import static nars.$.$;
+import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
 import static nars.util.Texts.n4;
 
@@ -135,7 +130,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final float reinforcementAttention = 0.5f; //0.5f;
+    private final float reinforcementAttention = 0.95f; //0.5f;
 
     //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
 

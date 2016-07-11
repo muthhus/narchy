@@ -3,16 +3,14 @@ package nars.inter;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.util.IO;
 import nars.util.Util;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 7/8/16.

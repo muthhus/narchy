@@ -12,8 +12,6 @@ import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 /**
  * groups each derivation's tasks as a group before inputting into
  * the main perception buffer, allowing post-processing such as budget normalization.

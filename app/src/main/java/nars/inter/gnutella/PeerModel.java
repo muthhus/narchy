@@ -1,9 +1,6 @@
 package nars.inter.gnutella;
 
-import nars.inter.gnutella.message.QueryMessage;
-
 import java.nio.ByteBuffer;
-import java.util.function.Consumer;
 
 
 public interface PeerModel {

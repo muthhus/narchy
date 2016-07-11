@@ -7,7 +7,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Class that represents the Server part of Gnutella Servent

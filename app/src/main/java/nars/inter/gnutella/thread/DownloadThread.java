@@ -5,7 +5,10 @@ import nars.inter.gnutella.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.ByteBuffer;

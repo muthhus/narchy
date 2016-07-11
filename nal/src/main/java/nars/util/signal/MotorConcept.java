@@ -6,7 +6,6 @@ import com.gs.collections.api.block.procedure.primitive.FloatFloatProcedure;
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
-import nars.concept.table.BeliefTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -47,7 +46,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     //private final Logger logger;
 
     @FunctionalInterface  public interface MotorFunction {
-        final static MotorFunction NoFeedback = (b,d) -> Float.NaN;
+        MotorFunction NoFeedback = (b,d) -> Float.NaN;
 
         float motor(float believed, float desired);
     }

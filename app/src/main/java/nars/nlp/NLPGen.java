@@ -1,23 +1,17 @@
 package nars.nlp;
 
-import nars.$;
 import nars.Narsese;
-import nars.Op;
 import nars.index.PatternIndex;
 import nars.nal.Tense;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.subst.FindSubst;
-import nars.term.subst.UnifySubst;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static nars.Op.VAR_PATTERN;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 7/9/16.

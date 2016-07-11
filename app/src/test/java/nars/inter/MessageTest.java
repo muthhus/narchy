@@ -1,14 +1,11 @@
 package nars.inter;
 
-import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.message.QueryMessage;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.util.IO;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertTrue;

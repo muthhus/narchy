@@ -20,11 +20,10 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public final Cache<Termed, Termed> data;
     public final Cache<TermContainer, TermContainer> subs;
 
-    private final Weigher<Termlike, Termlike> complexityWeigher = (k, v) -> {
+    private static final Weigher<Termlike, Termlike> complexityWeigher = (k, v) -> {
         if (v instanceof Atomic) {
             return 0; //dont allow removal of atomic
         } else {
-            int w;
             if (v instanceof Concept) {
                 if (!(v instanceof CompoundConcept)) {
                     //special implementation, dont allow removal
@@ -32,7 +31,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                 }
             }
 
-            w = v.complexity();// * weightFactor;
+            int w = v.complexity();// * weightFactor;
 
             //w/=(1f + maxConfidence((CompoundConcept)v));
 
@@ -168,7 +167,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return data.get(x, (interned) -> buildConcept(interned));
+        return data.get(x, this::buildConcept);
     }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //

@@ -32,10 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Comparator;
 
 import static java.lang.Math.max;
-import static nars.nal.Tense.ETERNAL;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.w2c;
-import static nars.task.Revision.truthProjection;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.eternalize;
 

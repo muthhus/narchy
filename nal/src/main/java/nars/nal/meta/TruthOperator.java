@@ -13,7 +13,7 @@ import java.util.Map;
 
 public interface TruthOperator {
 
-    static final Atom NONE = $.the("None");
+    Atom NONE = $.the("None");
 
     static void permuteTruth(TruthOperator[] values, Map<Term, TruthOperator> table) {
         for (TruthOperator tm : values) {

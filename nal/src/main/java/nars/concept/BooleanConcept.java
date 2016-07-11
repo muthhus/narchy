@@ -129,7 +129,7 @@ public class BooleanConcept extends CompoundConcept {
         if (args.length > Global.STAMP_MAX_EVIDENCE)
             throw new RuntimeException("too many args");
 
-        this.params = (Compound) term().subterm(0,0);; // (({...}) --> ^...)
+        this.params = (Compound) term().subterm(0,0);// (({...}) --> ^...)
 
         this.model = model;
         this.nar = nar;

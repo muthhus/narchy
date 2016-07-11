@@ -4,8 +4,6 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.agent.NAgent;
 import nars.learn.Agent;
-import nars.learn.ql.DQN;
-import nars.learn.ql.HaiQAgent;
 import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 

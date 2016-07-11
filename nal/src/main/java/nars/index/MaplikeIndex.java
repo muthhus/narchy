@@ -15,9 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static nars.Op.INH;
-import static nars.Op.OPER;
-import static nars.Op.PROD;
+import static nars.Op.*;
 import static nars.term.Termed.termOrNull;
 
 /**
@@ -194,7 +192,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         if (s == null)
             return null;
         if ((subs.size() == 2) && op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
-            return build(op, dt, s.terms()).term(); //HACK send through the full build process in case it is an immediate transform
+            return build(INH, dt, s.terms()).term(); //HACK send through the full build process in case it is an immediate transform
         else
             return finish(op, dt, s);
     }

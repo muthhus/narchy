@@ -1,22 +1,16 @@
 package nars.experiment;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Op;
 import nars.experiment.pong.PongEnvironment;
-import nars.gui.BagChart;
-import nars.gui.BeliefTableChart;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
-import nars.learn.ql.HaiQAgent;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -31,10 +25,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
-
-import static nars.Op.INH;
 
 /**
  * Created by me on 7/5/16.

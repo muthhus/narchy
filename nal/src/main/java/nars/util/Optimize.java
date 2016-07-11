@@ -113,7 +113,7 @@ public class Optimize<X> {
             return score;
         });
 
-        int dim = mid.length;
+        //int dim = mid.length;
 
 //        CMAESOptimizer optim = new CMAESOptimizer(cmaesIter, stopValue, true, 0,
 //                0, new MersenneTwister(3), true, null);

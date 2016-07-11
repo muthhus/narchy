@@ -1057,7 +1057,7 @@ public enum Util {
             try {
 
                 FileInputStream ff = new FileInputStream(cached);
-                DataInputStream din = new DataInputStream(ff);
+                DataInputStream din = new DataInputStream(new BufferedInputStream(ff));
                 while (din.available() > 0) {
                     buffer.add(decoder.apply(din));
                 }
@@ -1077,7 +1077,7 @@ public enum Util {
 
         Stream<X> instanced = o.get();
 
-        DataOutputStream dout = new DataOutputStream( new FileOutputStream(cached.getAbsolutePath()) );
+        DataOutputStream dout = new DataOutputStream( new BufferedOutputStream( new FileOutputStream(cached.getAbsolutePath()) ) );
         instanced.forEach(c -> {
             buffer.add(c);
             encoder.accept(c, dout);

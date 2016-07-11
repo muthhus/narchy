@@ -6,14 +6,9 @@ import com.googlecode.lanterna.input.KeyType;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL2;
-import infinispan.com.google.common.io.NullOutputStream;
 import nars.$;
-import nars.gui.ConceptMaterializer;
 import nars.gui.ConceptWidget;
 import nars.nar.Default;
-import nars.term.Termed;
-import nars.util.Util;
-import nars.util.data.list.CircularArrayList;
 import spacegraph.*;
 import spacegraph.phys.collision.shapes.BoxShape;
 import spacegraph.phys.collision.shapes.CollisionShape;
@@ -22,13 +17,10 @@ import spacegraph.phys.dynamics.RigidBody;
 
 import javax.vecmath.Vector3f;
 import java.awt.event.InputEvent;
-import java.io.PrintStream;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static javax.vecmath.Vector3f.v;
 
 /**

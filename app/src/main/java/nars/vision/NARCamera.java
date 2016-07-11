@@ -27,10 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static nars.nal.UtilityFunctions.w2c;
-import static nars.vision.PixelCamera.decodeBlue;
-import static nars.vision.PixelCamera.decodeGreen;
-import static nars.vision.PixelCamera.decodeRed;
+import static nars.vision.PixelCamera.*;
 
 /**
  * Created by me on 6/5/16.

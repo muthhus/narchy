@@ -9,7 +9,6 @@ import nars.$;
 import nars.NAR;
 import nars.concept.OperationConcept;
 import nars.index.TermIndex;
-import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.Twenglish;

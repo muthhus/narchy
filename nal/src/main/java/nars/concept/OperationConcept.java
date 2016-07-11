@@ -58,7 +58,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     }
 
     @Nullable
-    private final Task executeLater(@Nullable Task t, @NotNull NAR nar) {
+    private Task executeLater(@Nullable Task t, @NotNull NAR nar) {
         if (t != null) {
 
             if (!pendingRun && beliefModificationRequiresUpdate(t, nar)) {

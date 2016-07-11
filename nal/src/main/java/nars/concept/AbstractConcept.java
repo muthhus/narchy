@@ -192,6 +192,7 @@ public interface AbstractConcept<T extends Term> extends Concept<T> {
     }
 
 
+    @Override
     default void delete() {
         termlinks().clear();
         tasklinks().clear();

@@ -17,13 +17,11 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static nars.Op.ATOM;
-import static nars.Op.Imdex;
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;

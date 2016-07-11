@@ -1,16 +1,13 @@
 package nars.term.container;
 
-import com.gs.collections.api.block.predicate.Predicate2;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
-import com.gs.collections.api.set.SetIterable;
 import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.term.*;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

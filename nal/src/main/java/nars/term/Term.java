@@ -40,7 +40,7 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
 
 
 
-    public static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
+    static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
 
         //Term t = $.unNeg(term.term());
         //Term b = $.unNeg(beliefConcept.term());
@@ -310,7 +310,8 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
 
 
     /** GLOBAL TERM COMPARATOR FUNCTION */
-    @Override public default int compareTo(Term y) {
+    @Override
+    default int compareTo(Term y) {
         if (this.equals(y)) return 0;
 
         int d = this.op().compareTo(y.op());

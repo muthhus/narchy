@@ -60,18 +60,14 @@ public class Cache2kIndex extends MaplikeIndex {
             }
 
             //trying to copy ClockProPlus64
+            @Override
             protected void recordHit(Entry e) {
                 super.recordHit(e); //HACK
             }
         };
         h.setCacheManager((CacheManagerImpl) CacheManager.getInstance());
         h.setCacheConfig(cfg);
-        h.setLoader(new CacheLoader() {
-            @Override
-            public Object load(Object o) throws Exception {
-                return null;
-            }
-        });
+        h.setLoader(new NullLoader());
         h.init();
         data = h;
 
@@ -138,6 +134,13 @@ public class Cache2kIndex extends MaplikeIndex {
     public void forEach(Consumer<? super Termed> cc) {
         StreamSupport.stream(data.spliterator(), false).filter(x -> x instanceof Termed).
                 forEach(x -> cc.accept((Termed) x));
+    }
+
+    private static class NullLoader extends CacheLoader {
+        @Override
+        public Object load(Object o) throws Exception {
+            return null;
+        }
     }
 
 //    @Override

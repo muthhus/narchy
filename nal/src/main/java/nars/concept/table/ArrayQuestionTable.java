@@ -86,9 +86,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
      */
     @Nullable
     @Override
-    public Task get(Task t) {
-        if (isEmpty()) return null;
-
+    public final Task get(Task t) {
         List<Task> ll = this.list;
         int s = ll.size();
         for (int i = 0; i < s; i++) {

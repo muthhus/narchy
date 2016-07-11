@@ -110,7 +110,7 @@ public class PremiseEval extends FindSubst {
 
     public int matchesMax() {
         final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
-        return (int) Math.ceil(task.pri() * (max - min) + min);
+        return (int) Math.ceil(task.summary() * (max - min) + min);
     }
 
 
@@ -119,9 +119,8 @@ public class PremiseEval extends FindSubst {
 
         int t = now();
 
-        boolean finish;
-
         this.forEachMatch = eachMatch; //to notify of matches
+        boolean finish;
         if (eachMatch!=null) {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
@@ -225,7 +224,7 @@ public class PremiseEval extends FindSubst {
         this.taskTerm = tt;
 
         this.cyclic = task.cyclic();
-        this.overlap = belief!=null ? Stamp.overlapping(task, belief) : false;
+        this.overlap = belief != null && Stamp.overlapping(task, belief);
 
         this.termSub0Struct = taskTerm.structure();
         this.termSub0op = taskTerm.op().ordinal();

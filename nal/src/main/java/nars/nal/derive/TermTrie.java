@@ -116,7 +116,7 @@ abstract public class TermTrie<K extends Term, V> {
         return termCost;
     }
 
-    private String s(@NotNull SummaryStatistics s) {
+    private static String s(@NotNull SummaryStatistics s) {
         return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
     }
 

@@ -234,8 +234,11 @@ public class TrieDeriver extends Deriver {
             ProcTerm[] proc = sw.proc;
             for (int i = 0; i < proc.length; i++) {
                 ProcTerm b = proc[i];
-                if (b != null) proc[i] = build(b);
-                else continue;
+                if (b != null)
+                    proc[i] = build(b);
+                //else {
+                    //continue
+                //}
             }
         } else {
 

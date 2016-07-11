@@ -389,23 +389,23 @@ public class STMClustered extends STM {
         abstract Task task(int u);
     }
 
-    public static void main(String[] args) {
-        Default n = new Default();
-        STMClustered stm = new STMClustered(n, new MutableInteger(16), '.');
-
-        new EventGenerator(n, 2f, 8) {
-
-            Compound term(int u) {
-                return $.sete($.the(u));
-            }
-
-            @NotNull
-            @Override
-            Task task(int u) {
-                return new MutableTask(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
-            }
-        };
-
-        n.run(24);
-    }
+//    public static void main(String[] args) {
+//        Default n = new Default();
+//        STMClustered stm = new STMClustered(n, new MutableInteger(16), '.');
+//
+//        new EventGenerator(n, 2f, 8) {
+//
+//            Compound term(int u) {
+//                return $.sete($.the(u));
+//            }
+//
+//            @NotNull
+//            @Override
+//            Task task(int u) {
+//                return new MutableTask(term(u), /*(Math.random() < 0.5f) ?*/ '.' /*: '!'*/, new DefaultTruth((float) Math.random(), 0.5f)).time(now, now);
+//            }
+//        };
+//
+//        n.run(24);
+//    }
 }

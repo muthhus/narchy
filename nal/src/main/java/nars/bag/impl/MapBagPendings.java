@@ -6,9 +6,7 @@ import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by me on 7/3/16.
@@ -42,6 +40,7 @@ public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
 
     float sum;
 
+    @Override
     public final float mass(ArrayBag<X> bag) {
         sum = 0;
         if (pending != null)

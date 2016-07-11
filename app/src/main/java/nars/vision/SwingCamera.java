@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static nars.vision.PixelCamera.decodeBlue;
-import static nars.vision.PixelCamera.decodeGreen;
-import static nars.vision.PixelCamera.decodeRed;
+import static nars.vision.PixelCamera.*;
 
 /**
  * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel

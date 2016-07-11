@@ -319,7 +319,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
 
-    private final int removeAlreadyDeleted() {
+    private int removeAlreadyDeleted() {
         int s = size();
         for (int i = 0; i < s; ) {
             Task x = get(i);

@@ -1,21 +1,16 @@
 package nars.inter.gnutella.thread;
 
-import nars.bag.impl.ArrayBag;
-import nars.budget.Budget;
-import nars.budget.UnitBudget;
-import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.GnutellaConstants;
-import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.Peer;
-import nars.link.BLink;
-import nars.util.Util;
+import nars.inter.gnutella.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Class for managing the connections created by a Servent

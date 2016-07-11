@@ -38,7 +38,7 @@ public final class STMTemporalLinkage extends STM {
     }
 
     @Override
-    public synchronized final void accept(@NotNull Task t) {
+    public final void accept(@NotNull Task t) {
 
         if (t.punc() != Symbols.BELIEF) {
             return;
@@ -62,43 +62,45 @@ public final class STMTemporalLinkage extends STM {
 
 
 
-        int numExtra = Math.max(0, stm.size() - stmSize);
+        synchronized (stm) {
+            int numExtra = Math.max(0, stm.size() - stmSize);
 
 
-        Iterator<Task> ss = stm.iterator();
+            Iterator<Task> ss = stm.iterator();
 
-        while (ss.hasNext()) {
+            while (ss.hasNext()) {
 
-            Task previousTask = ss.next();
+                Task previousTask = ss.next();
 
-            if ((numExtra > 0) || (previousTask.isDeleted())) {
-                numExtra--;
-                ss.remove();
-            } else {
+                if ((numExtra > 0) || (previousTask.isDeleted())) {
+                    numExtra--;
+                    ss.remove();
+                } else {
 
-                //is this valid ?
-//                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
-//                    //the premise would be invalid anyway
-//                    continue;
-//                }
+                    //is this valid ?
+                    //                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
+                    //                    //the premise would be invalid anyway
+                    //                    continue;
+                    //                }
 
-                if (previousTask.term().equals(t.term()))
-                    continue;
+                    if (previousTask.term().equals(t.term()))
+                        continue;
 
-                float strength =
-                        1f;
-                        //t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
+                    float strength =
+                            1f;
+                    //t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
 
-                if (strength > 0)
-                    concept.crossLink(t, previousTask, strength, nar);
+                    if (strength > 0)
+                        concept.crossLink(t, previousTask, strength, nar);
+
+                }
+
 
             }
 
+            stm.add(t);
 
         }
-
-        stm.add(t);
-
     }
 
 

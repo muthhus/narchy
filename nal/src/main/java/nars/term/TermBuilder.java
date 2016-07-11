@@ -96,7 +96,7 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private Term[] filterTrueFalseImplicits(Op o, Term[] u) {
+    private static Term[] filterTrueFalseImplicits(Op o, Term[] u) {
         int imdices = 0;
         for (Term x : u) {
             if (x == True) {
@@ -309,7 +309,7 @@ public abstract class TermBuilder {
         }
 
         if (dt == DTERNAL) {
-            return junctionFlat(op, dt, u);
+            return junctionFlat(op, DTERNAL, u);
         } else {
             if (op == DISJ) {
                 throw new RuntimeException("temporal disjunction is invalid");
@@ -437,85 +437,86 @@ public abstract class TermBuilder {
     }
 
 
-
     @Nullable
     public Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+        while (true) {
 
 
+            //special statement filters
+            switch (op) {
 
-        //special statement filters
-        switch (op) {
-
-            case INH:
-                if (predicate instanceof TermTransform && transform() && subject.op() == PROD) {
-                    return ((TermTransform) predicate).function( (Compound) subject );
-                }
-                break;
+                case INH:
+                    if (predicate instanceof TermTransform && transform() && subject.op() == PROD) {
+                        return ((TermTransform) predicate).function((Compound) subject);
+                    }
+                    break;
 
 
-            case EQUI:
-                if (!validEquivalenceTerm(subject) || !validEquivalenceTerm(predicate))
-                    return null;
-                break;
-
-            case IMPL:
-                if (subject.isAny(TermIndex.InvalidEquivalenceTerm) ||
-                    predicate.isAny(TermIndex.InvalidImplicationPredicate))
-                    return null;
-
-                if (predicate.op() == IMPL) {
-                    Term oldCondition = subj(predicate);
-                    if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
+                case EQUI:
+                    if (!validEquivalenceTerm(subject) || !validEquivalenceTerm(predicate))
                         return null;
-                    else
-                        return impl2Conj(dt, subject, predicate, oldCondition);
-                }
+                    break;
+
+                case IMPL:
+                    if (subject.isAny(TermIndex.InvalidEquivalenceTerm) ||
+                            predicate.isAny(TermIndex.InvalidImplicationPredicate))
+                        return null;
+
+                    if (predicate.op() == IMPL) {
+                        Term oldCondition = subj(predicate);
+                        if ((oldCondition.op() == CONJ && oldCondition.containsTerm(subject)))
+                            return null;
+                        else
+                            return impl2Conj(dt, subject, predicate, oldCondition);
+                    }
 
 
+                    //filter (factor out) any common subterms iff equal 'dt'
+                    if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
+                        Compound csub = (Compound) subject;
+                        Compound cpred = (Compound) predicate;
+                        if (csub.dt() == cpred.dt()) {
 
-                //filter (factor out) any common subterms iff equal 'dt'
-                if ((subject.op() == CONJ) && (predicate.op() == CONJ)) {
-                    Compound csub = (Compound) subject;
-                    Compound cpred = (Compound) predicate;
-                    if(csub.dt() == cpred.dt()) {
+                            TermContainer subjs = csub.subterms();
+                            TermContainer preds = cpred.subterms();
 
-                        TermContainer subjs = csub.subterms();
-                        TermContainer preds = cpred.subterms();
+                            MutableSet<Term> common = TermContainer.intersect(subjs, preds);
+                            if (!common.isEmpty()) {
+                                Term newSubject = build(csub, TermContainer.except(subjs, common));
+                                if (newSubject == null)
+                                    return null;
+                                Term newPredicate = build(cpred, TermContainer.except(preds, common));
+                                if (newPredicate == null)
+                                    return null;
 
-                        MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                        if (!common.isEmpty()) {
-                            Term newSubject = build(csub, TermContainer.except(subjs, common));
-                            if (newSubject == null)
-                                return null;
-                            Term newPredicate = build(cpred, TermContainer.except(preds, common));
-                            if (newPredicate == null)
-                                return null;
-
-                            return statement(op, dt, newSubject, newPredicate);
+                                subject = newSubject;
+                                predicate = newPredicate;
+                                continue;
+                            }
                         }
                     }
-                }
 
-                break;
+                    break;
 
-        }
+            }
 
-        int validity = Statement.validStatement(subject, predicate);
-        switch (validity) {
+            int validity = Statement.validStatement(subject, predicate);
+            switch (validity) {
 
-            case -1:
-                return null;
+                case -1:
+                    return null;
 
-            case 0:
-                return True;
+                case 0:
+                    return True;
 
-            case 1:
-                if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
-                    dt = -dt;
-                return finish(op, dt, subject, predicate);
+                case 1:
+                    if (op.commutative && (dt != DTERNAL && dt != 0) && subject.compareTo(predicate) > 0) //equivalence
+                        dt = -dt;
+                    return finish(op, dt, subject, predicate);
 
-            default:
-                throw new UnsupportedOperationException();
+                default:
+                    throw new UnsupportedOperationException();
+            }
         }
     }
 

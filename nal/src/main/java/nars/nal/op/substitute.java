@@ -62,7 +62,7 @@ public class substitute extends TermTransformOperator /*implements PremiseAware*
 //    }
 
     @Nullable
-    public static final Term resolve(@NotNull PremiseEval r, Term x) {
+    public static Term resolve(@NotNull PremiseEval r, Term x) {
         //TODO make a half resolve that only does xy?
         Term ret = r.yx.get(x);
         return ret != null ? ret : x;

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
-import static nars.term.container.TermContainer.commonSubterms;
 import static nars.term.container.TermContainer.commonSubtermsRecurse;
 
 /** variables excluded */
@@ -21,7 +20,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         this.b = b;
     }
 
-    final static ThreadLocal<HashSet<Term>> scratch = ThreadLocal.withInitial(()->new HashSet());
+    final static ThreadLocal<HashSet<Term>> scratch = ThreadLocal.withInitial(HashSet::new);
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {

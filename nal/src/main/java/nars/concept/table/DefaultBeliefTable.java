@@ -47,7 +47,7 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal = newTemporalBeliefTable(mp, initialTemporalCapacity);
     }
 
-    protected TemporalBeliefTable newTemporalBeliefTable(Map<Task, Task> mp, int initialTemporalCapacity) {
+    protected static TemporalBeliefTable newTemporalBeliefTable(Map<Task, Task> mp, int initialTemporalCapacity) {
         return new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
     }
 

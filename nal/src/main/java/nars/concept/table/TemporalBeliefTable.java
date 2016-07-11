@@ -21,8 +21,8 @@ public interface TemporalBeliefTable extends Table<Task,Task> {
 
     void removeIf(Predicate<Task> o);
 
-    public long min();
-    public long max();
+    long min();
+    long max();
 
     void min(long minT);
     void max(long maxT);

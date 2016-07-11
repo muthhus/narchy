@@ -3,7 +3,6 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import nars.term.Termed;
 import spacegraph.Spatial;
-import spacegraph.phys.dynamics.RigidBody;
 
 /**
  * Created by me on 6/26/16.

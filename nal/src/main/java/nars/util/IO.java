@@ -78,11 +78,9 @@ public class IO {
 
     @NotNull
     public static Truth readTruth(@NotNull DataInput in) throws IOException {
-        Truth truth;
         float f = in.readFloat();
         float c = in.readFloat();
-        truth = new DefaultTruth(f, c);
-        return truth;
+        return $.t(f, c);
     }
 
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
@@ -243,8 +241,8 @@ public class IO {
     }
 
     public static byte[] asBytes(Task t) {
-        ByteArrayOutputStream bs = new ByteArrayOutputStream();
         try {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTask(new DataOutputStream(bs), t);
             byte[] tb = bs.toByteArray();
             return tb;
@@ -304,7 +302,7 @@ public class IO {
 
                 @NotNull
                 @Override
-                public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException, ClassNotFoundException {
+                public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
                     return readTask(in, index);
                 }
 

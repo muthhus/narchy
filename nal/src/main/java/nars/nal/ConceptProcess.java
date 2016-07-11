@@ -15,12 +15,9 @@ import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.nal.Tense.DTERNAL;
 
 /**
  * Firing a concept (reasoning event).  Derives new Tasks via reasoning rules.

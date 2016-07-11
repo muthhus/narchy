@@ -58,8 +58,7 @@ public class DeductiveMeshTest {
                         edges.add(link(x, y, x, y + 1));
                 }
 
-                for (Term e : edges)
-                    n.nar.believe(e);
+                edges.forEach(n.nar::believe);
 //                if (!edges.isEmpty())
 //                    n.nar.believe( $.conj(edges.toArray(new Term[edges.size()])) );// $.sete(c)));
 

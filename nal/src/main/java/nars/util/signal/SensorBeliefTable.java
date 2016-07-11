@@ -1,9 +1,7 @@
 package nars.util.signal;
 
 import com.google.common.collect.TreeMultimap;
-import com.google.common.collect.TreeRangeMap;
 import nars.NAR;
-import nars.bag.impl.SortedListTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.EternalTable;
 import nars.concept.table.TemporalBeliefTable;
@@ -13,10 +11,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

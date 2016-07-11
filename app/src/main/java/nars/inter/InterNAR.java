@@ -5,7 +5,8 @@ import nars.$;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
-import nars.inter.gnutella.*;
+import nars.inter.gnutella.Peer;
+import nars.inter.gnutella.PeerModel;
 import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.message.QueryMessage;
 import nars.link.BLink;
@@ -17,10 +18,9 @@ import nars.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Peer interface for an InterNARS mesh
