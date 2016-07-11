@@ -57,11 +57,17 @@ public class ServerThread extends PeerThread {
             try {
 
                 byte type = inStream.readByte();
-                byte len1 = inStream.readByte(); //lower 8 bits
-                byte len2 = inStream.readByte(); //upper 8 bits
+                int len1 = inStream.readUnsignedByte(); //lower 8 bits
+                int len2 = inStream.readUnsignedByte(); //upper 8 bits
                 int len = (len2 << 8 ) | len1;
-                byte[] buffer = new byte[len - 3];
-                int s = in.read(buffer);
+                if (len < 1 || len > GnutellaConstants.MAX_MESSAGE_SIZE) {
+                    logger.warn("socket overflow");
+                    continue;
+                }
+
+                byte[] buffer = new byte[len];
+                int s = in.readNBytes(buffer, 0, len);
+
                 if (s != buffer.length) {
                     logger.warn("socket underflow");
                     continue;
@@ -125,18 +131,25 @@ public class ServerThread extends PeerThread {
 
     }
 
-    protected void send() {
+    protected synchronized void send() {
 
         while (working) {
+
             try {
-                if (!outgoing.isEmpty()) {
-                    Message top;
-                    outgoing.commit();
-                    synchronized (outgoing) {
+
+                Message top = null;
+
+                synchronized (outgoing) {
+                    if (!outgoing.isEmpty()) {
+                        outgoing.commit();
+
                         top = outgoing.removeItem(0).get();
                     }
-                    _send(top);
                 }
+
+                if (top!=null)
+                    _send(top);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -151,6 +164,8 @@ public class ServerThread extends PeerThread {
         synchronized (outgoing) {
             outgoing.put(m, b);
         }
+
+        //System.out.println("output buffer: " + outgoing.size() + "/" + outgoing.capacity());
 //        if (outgoing.isFull()) {
 //            logger.warn("output ")
 //        }

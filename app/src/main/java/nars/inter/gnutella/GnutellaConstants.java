@@ -74,4 +74,6 @@ public enum GnutellaConstants {
 
     public static final int AUTO_PING_PER_N_MESSAGES = 10;
     static final long DEAD_CONNECTION_REMOVAL_INTERVAL_MS = 30000;
+
+    public static int MAX_MESSAGE_SIZE = 4096; //maybe up to 64k, max UDP message length
 }

@@ -357,9 +357,9 @@ public abstract class Message  {
         ByteArrayDataOutput oo = ByteStreams.newDataOutput(ESTIMATED_MESSAGE_SIZE);
         out(oo);
         byte[] x = oo.toByteArray();
-        short size = (short)(x.length);
+        short size = (short)(x.length - 3);
         //add the size information in bytes 1 and 2
-        x[1] = (byte)(size & 0xff);   //lower 8 bits of the size
+        x[1] = (byte)(size & 0x00ff);   //lower 8 bits of the size
         x[2] = (byte)((size & 0xff00) >> 8); //upper 8 bits of the size
         return x;
     }

@@ -168,7 +168,7 @@ abstract public class PeerThread implements Runnable  {
 
 
 
-    public void _send(Message m) {
+    public synchronized void _send(Message m) {
 
 //        if (m.type == GnutellaConstants.PING) {
 //            flag = false;
@@ -185,9 +185,8 @@ abstract public class PeerThread implements Runnable  {
 
         try {
             byte[] mb = m.asBytes();
-            logger.info("send message: {}", mb.length);
+            //logger.info("send message: {}", mb.length);
             out.write(mb);
-            out.flush();
         } catch (Exception e) {
             logger.error("send: {}\n{}", m, e );
         }
