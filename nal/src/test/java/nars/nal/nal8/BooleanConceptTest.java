@@ -39,26 +39,26 @@ public class BooleanConceptTest {
 
         A.set(0f);
         B.set(0f);
-        n.step();
+        n.next();
         assertEquals(0f, bc.beliefs().truth(n.time()).freq(), 0.01f);
 
         A.set(0f);
         B.set(1f);
-        n.step();
+        n.next();
         assertEquals(0f, bc.beliefs().truth(n.time()).freq(), 0.01f);
 
         A.set(1f);
         B.set(1f);
-        n.step();
+        n.next();
         assertEquals(1f, bc.beliefs().truth(n.time()).freq(), 0.3f); //big tolerance here
 
-        n.step();
+        n.next();
 
         B.set(1f);
-        n.step();
-        n.step();
-        n.step();
-        n.step();
+        n.next();
+        n.next();
+        n.next();
+        n.next();
 
 
 

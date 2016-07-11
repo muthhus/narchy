@@ -1,11 +1,13 @@
 package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
+import nars.term.atom.Atom;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
@@ -29,6 +31,10 @@ import static nars.term.compound.Statement.subj;
 public abstract class TermBuilder {
 
 
+    /** implicit truth subterms */
+    private static final Atom False = $.the("ø");
+    private static final Atom True = $.the("¿");
+    private static final Term[] TrueArray = new Term[] { True };
 
     @Nullable
     public final Term build(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTerm {
@@ -185,7 +191,7 @@ public abstract class TermBuilder {
 
 
 
-    @NotNull
+    @Nullable
     public final Term finish(@NotNull Op op, @NotNull Term... args) {
         return finish(op, DTERNAL, args);
     }
@@ -195,8 +201,14 @@ public abstract class TermBuilder {
         return finish(op, DTERNAL, args);
     }
 
-    @NotNull
+    @Nullable
     public final Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
+        for (Term x : args) {
+            if ((x == True) || (x == False)) {
+                return null;
+                //throw new RuntimeException(op + " term with imdex in subterms: " + args);
+            }
+        }
         return finish(op, dt, TermContainer.the(op, args));
     }
 
@@ -222,8 +234,10 @@ public abstract class TermBuilder {
         if (Global.DEBUG ) {
             //check for any imdex terms that may have not been removed
             for (Term x : args.terms()) {
-                if (x == True)
+                if ((x == True) || (x == False)) {
+                    //return null;
                     throw new RuntimeException(op + " term with imdex in subterms: " + args);
+                }
             }
         }
 
@@ -308,6 +322,19 @@ public abstract class TermBuilder {
 
         }
 
+        //simple equality and negequal test
+        if (ul == 2) {
+            Term a = u[0];
+            Term b = u[1];
+            if (a.equals(b))
+                return a;
+            if (((dt == DTERNAL) || (dt == 0)) &&
+                    (((a.op() == NEG) && (negation(a).equals(b))) ||
+                    ((b.op() == NEG) && (negation(b).equals(a))))) {
+                return True;
+            }
+        }
+
         if (dt == DTERNAL) {
             return junctionFlat(op, DTERNAL, u);
         } else {
@@ -334,9 +361,6 @@ public abstract class TermBuilder {
                     //else
                     return null;
                 }
-
-                if (u[0].equals(u[1]))
-                    return u[0];
 
                 if (u[0].compareTo(u[1]) > 0) {
                     //it will be reversed in commutative sorting, so invert dt
@@ -419,6 +443,7 @@ public abstract class TermBuilder {
     static /*UnifiedSet<Term>*/int flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
         int negations = 0;
         for (Term x : u) {
+
             if ((x.op() == op) && (((Compound) x).dt()==dt) /* 0 or DTERNAL */) {
                 negations += /*unwrappedNegations = */flatten(op, ((Compound) x).terms(), dt, s); //recurse
             } else {
@@ -461,6 +486,14 @@ public abstract class TermBuilder {
                     if (subject.isAny(TermIndex.InvalidEquivalenceTerm) ||
                             predicate.isAny(TermIndex.InvalidImplicationPredicate))
                         return null;
+
+                    if (subject == True) {
+                        return predicate;
+                    } else if (subject == False) {
+                        //probably should return null
+                        return null;
+                        //return negation(predicate);
+                    }
 
                     if (predicate.op() == IMPL) {
                         Term oldCondition = subj(predicate);

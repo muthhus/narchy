@@ -4,7 +4,6 @@ import nars.concept.Concept;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -26,8 +25,8 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     }
 
     @Override
-    public Termed remove(Termed entry) {
-        return concepts.remove(entry);
+    public void remove(Termed entry) {
+        concepts.remove(entry);
     }
 
 

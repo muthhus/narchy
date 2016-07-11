@@ -241,7 +241,7 @@ public class ControlFlowTest {
 
         for (float B : conditionSequence ) {
             System.out.println("Execute Forward branch w/ condition=" + B);
-            n.believe(condition, Tense.Present, B).step();
+            n.believe(condition, Tense.Present, B).next();
 
             n.goal(start, Tense.Present, 1f);
 

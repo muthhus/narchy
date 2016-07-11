@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -116,13 +117,14 @@ public class NarseseIRCBot extends Talk {
                 return "Conscious cleared";
             }
         });
-        nar.onExec(new IRCBotOperator("say") {
-
-            @Override protected Object function(Compound arguments) {
-                //cancel feedback
-                return null;
-            }
-        });
+//        nar.onExec(new IRCBotOperator("say") {
+//
+//            @Override protected Object function(Compound arguments) {
+//                return arguments.toString();
+//                //cancel feedback
+//                //return null;
+//            }
+//        });
 
         nar.onExec(new IRCBotOperator("memstat") {
             @Nullable @Override public Object function(Compound arguments) {
@@ -179,7 +181,7 @@ public class NarseseIRCBot extends Talk {
 //        });
         nar.onExec(new IRCBotOperator("readWiki") {
 
-            float pri = 0.5f;
+            float pri = 0.25f;
 
             @Override
             protected Object function(Compound arguments) {
@@ -203,7 +205,7 @@ public class NarseseIRCBot extends Talk {
 
                     List<Term> tokens = hear(strippedText, $.the("wiki_" + page), pri);
 
-                    return "Reading " + base + ":\"" + page + "\": " + strippedText.length() + " characters, " + tokens.size() + " tokens";
+                    return "Reading " + base + ":" + page + ": " + strippedText.length() + " characters, " + tokens.size() + " tokens";
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -227,7 +229,7 @@ public class NarseseIRCBot extends Talk {
             Object y = function(arguments);
 
             if (y!=null)
-                send( y.toString().replace("\n"," ").replace("\"","'"));
+                send( y.toString().replace("\n"," ") );
 
             //loop back as hearing
             //say($.quote(y.toString()), $.p(nar.self, $.the("controller")));
@@ -272,66 +274,80 @@ public class NarseseIRCBot extends Talk {
                 ,new RealtimeMSClock()
         );
 
-        nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.9f;
 
         nar.DEFAULT_QUEST_PRIORITY = 0.5f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-        nar.conceptActivation.setValue(0.2f);
-        nar.cyclesPerFrame.set(48);
+        nar.conceptActivation.setValue(0.1f);
+        nar.cyclesPerFrame.set(16);
 
-        nar.logSummaryGT(System.out, 0.45f);
+        nar.logSummaryGT(System.out, 0.5f);
 
-        new MySTMClustered(nar, 32, '.', 3);
+        new MySTMClustered(nar, 32, '.', 2);
 
         NarseseIRCBot bot = new NarseseIRCBot(nar);
 
-        nar.loop(15f);
+        nar.loop(30f);
 
 
         //nar.inputNarsese(new File("/home/me/quietwars.nal"));
 
 
-        //new Thread(()->{
-           //while (true) {
-               bot.goals();
-               //Util.pause(10000);
-           //}
-        //}).start();
+        List<Task> goals = new ArrayList() {{
+            nar.task("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))! %1.0;1.0%");
+            nar.task("((#x --> (/,hear,#c,_)) ==>+0 say(#x,#c)). %1.0;1.0%");
+            nar.task("(#something-->(/,hear,I,_))! %1.0;1.0%");
+        }};
+
+        for (Task t : goals) {
+            nar.input(t);
+        }
+
+        new Thread(()->{
+           while (true) {
+               for (Task t : goals) {
+                   nar.activate(t, 1f);
+               }
+               Util.pause(10000);
+           }
+        }).start();
 
         //addInitialCorpus(bot);
 
     }
 
-    public void goals() {
-
-        //ECHO
-        //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
-        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
-        //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
-        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.85f);
-
-        nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Eternal, 1f, 1f);
-        //nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Present, 1f, 0.95f);
-        nar.believe("((#x --> (/,hear,#c,_)) ==>+0 say(#x,#c))", Tense.Eternal, 1f, 1f);
-
-        nar.goal("(#something-->(/,hear,I,_))", Tense.Eternal, 1f, 0.95f); //hear self say something
-
-        //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
-        //nar.ask($("hear(#y, (I,#c))"), '@', nar.time()+wordDelay*10); //what would i like to hear myself saying to someone
 
 
-        //WORD ANALYSIS
-        //nar.goal($("(hear(#x,#c1) &&+1 wordInfo(#x,#z))"), Tense.Eternal, 1f, 0.75f);
-        //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
-
-        //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
-        //nar.ask($("(&&, hear(#x,#c1), hear(#y,#c2), wordCompare({#x,#y},#z))"), '?', nar.time());
-        //nar.believe($("((hear(#x,#c1) &&+0 hear(#y,#c1)) ==>+0 wordCompare({#x,#y},#z)))"));
-
-    }
+//    public void goals() {
+//
+//        //ECHO
+//        //nar.goal("(hear(#x,#c) &&+0 hear(#x,union(#c,[I])))", Tense.Present, 1f, 0.9f);
+//        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.5f);
+//        //nar.believe("((hear(#x,(#c,I)) &&+1 hear(#y,(#c,I))) ==>+0 (hear(#x,(I,#d)) &&+1 hear(#y,(I,#d))))", Tense.Present, 1f, 0.75f);
+//        //nar.goal("(hear(#x,(#c,I)) &&+1 hear(#x,(I,#c)))", Tense.Present, 1f, 0.85f);
+//
+//        nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Eternal, 1f, 1f);
+//        //nar.goal("((#x --> (/,hear,#c,_)) &&+0 say(#x,#c))", Tense.Present, 1f, 0.95f);
+//        nar.believe("((#x --> (/,hear,#c,_)) ==>+0 say(#x,#c))", Tense.Eternal, 1f, 1f);
+//
+//        nar.goal("(#something-->(/,hear,I,_))", Tense.Eternal, 1f, 0.95f); //hear self say something
+//
+//        //nar.ask($("(hear(?x,?c) ==> hear(?y, ?c))"), '?', nar.time());
+//        //nar.ask($("hear(#y, (I,#c))"), '@', nar.time()+wordDelay*10); //what would i like to hear myself saying to someone
+//
+//
+//        //WORD ANALYSIS
+//        //nar.goal($("(hear(#x,#c1) &&+1 wordInfo(#x,#z))"), Tense.Eternal, 1f, 0.75f);
+//        //nar.believe($("(hear(#x,#c1) &&+1 wordCompare({#x,#y},#z)))"));
+//
+//        //nar.goal("((hear(#x,?c1) ==> hear(#y,?c2)) &&+0 wordCompare({#x,#y},#z))", Tense.Present, 1f, 0.9f);
+//        //nar.ask($("(&&, hear(#x,#c1), hear(#y,#c2), wordCompare({#x,#y},#z))"), '?', nar.time());
+//        //nar.believe($("((hear(#x,#c1) &&+0 hear(#y,#c1)) ==>+0 wordCompare({#x,#y},#z)))"));
+//
+//    }
 
     public static void addInitialCorpus(NarseseIRCBot bot) {
         logger.info("Reading corpus..");

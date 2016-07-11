@@ -50,23 +50,23 @@ public class InterNAR extends Peer implements PeerModel {
 
         nar.onTask(t -> {
             if (!wasReceived(t)) {
-                if (t.isQuestion()) {
-                    BLink<Term> existingBudget = asked.get(t.term());
-                    if (existingBudget == null /* || or below a decayed threshold */) {
-                        nar.runLater(() -> {
-                            //broadcast question as internar query
-                            asked.put(t.term(), t.budget());
-
-                            logger.info("{} asks \"{}\"", address, t);
-                            query(t);
-
-                        });
-                    }
-                } else if (t.isBeliefOrGoal()) {
-                    if (t.pri() >= broadcastPriorityThreshold && t.conf() >= broadcastConfidenceThreshold) {
+//                if (t.isQuestion()) {
+//                    BLink<Term> existingBudget = asked.get(t.term());
+//                    if (existingBudget == null /* || or below a decayed threshold */) {
+//                        nar.runLater(() -> {
+//                            //broadcast question as internar query
+//                            asked.put(t.term(), t.budget());
+//
+//                            logger.info("{} asks \"{}\"", address, t);
+//                            query(t);
+//
+//                        });
+//                    }
+//                } else if (t.isBeliefOrGoal()) {
+                    if (t.pri() >= broadcastPriorityThreshold && (t.isBeliefOrGoal() && t.conf() >= broadcastConfidenceThreshold) || (t.isQuestOrQuestion())) {
                         query(t);
                     }
-                }
+//                }
             }
         });
     }
@@ -92,7 +92,9 @@ public class InterNAR extends Peer implements PeerModel {
     }
 
     public void query(Task t) {
-        query(IO.asBytes(t), t.budget());
+        nar.runLater(()->{
+            query(IO.asBytes(t), t.budget());
+        });
     }
 
 

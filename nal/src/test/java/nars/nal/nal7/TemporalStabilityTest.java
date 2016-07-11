@@ -25,7 +25,7 @@ abstract public class TemporalStabilityTest {
         TimeMap m = null;
         for (int i = 0; i < cycles; i++) {
 
-            n.step();
+            n.next();
             m = new TimeMap(n);
             //Set<Between<Long>> times = m.keySetSorted();
         /*if (times.size() < 3)

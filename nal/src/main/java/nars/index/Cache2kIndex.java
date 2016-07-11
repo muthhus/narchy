@@ -95,10 +95,9 @@ public class Cache2kIndex extends MaplikeIndex {
         return 0;
     }
 
-    @NotNull
     @Override
-    public Termed remove(Termed entry) {
-        return (Termed) data.peekAndRemove(entry);
+    public void remove(Termed entry) {
+        data.remove(entry);
     }
 
     @Override

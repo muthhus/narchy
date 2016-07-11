@@ -18,6 +18,7 @@ limitations under the License.
  */
 package nars.experiment.tetris;
 
+import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
@@ -36,13 +37,17 @@ import nars.term.Compound;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static nars.experiment.pong.PongEnvironment.numericSensor;
 
 
 public class Tetris implements Environment {
@@ -231,8 +236,8 @@ public class Tetris implements Environment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        Multi nar = new Multi(2,512,
-        //Default nar = new Default(1024,
+        //Multi nar = new Multi(2,512,
+        Default nar = new Default(1024,
                 4, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
 
@@ -241,7 +246,7 @@ public class Tetris implements Environment {
 
 
         nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
@@ -269,6 +274,13 @@ public class Tetris implements Environment {
         //new MySTMClustered(nar, 8, '!');
 
 
+        Tetris t = new Tetris(8, 16, 4);
+
+        Iterable<Termed> cheats = Iterables.concat(
+                numericSensor(() -> t.game.currentX, nar, 0.9f, "active:left", "active:middle", "active:right"),
+                numericSensor(() -> t.game.currentY, nar, 0.9f, "active:top", "active:bottom")
+        );
+
         NAgent n = new NAgent(nar) {
             @Override
             public void start(int inputs, int actions) {
@@ -278,6 +290,7 @@ public class Tetris implements Environment {
 
                 charted.add(sad);
                 charted.add(happy);
+                Iterables.addAll(charted, cheats);
 
                 if (nar instanceof Default) {
                     new BeliefTableChart(nar, charted).show(600, 900);
@@ -288,7 +301,8 @@ public class Tetris implements Environment {
 
 
 
-        Tetris t = new Tetris(8, 16, 4);
+
+
 
         //addCamera(t, nar, 8, 8);
 

@@ -13,7 +13,7 @@ public class MathTest {
         Terminal t = new Terminal();
         t.log();
         t.input("(add(1,2,?x)<->result).");
-        t.step();
+        t.next();
     }
     @Test
     public void testImplVarAdd1() {

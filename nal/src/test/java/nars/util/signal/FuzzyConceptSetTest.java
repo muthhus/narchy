@@ -1,10 +1,7 @@
 package nars.util.signal;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import nars.NAR;
-import nars.concept.CompoundConcept;
-import nars.concept.Concept;
 import nars.nar.Default;
 import nars.truth.Truth;
 import nars.util.Texts;
@@ -14,8 +11,6 @@ import org.junit.Test;
 
 import java.util.stream.StreamSupport;
 
-import static nars.truth.Truthed.confSum;
-import static nars.truth.Truthed.confWeightSum;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -60,7 +55,7 @@ public class FuzzyConceptSetTest {
 
         for (int i = 0; i < 32; i++) {
             m.setValue(Math.sin(i/2f));
-            d.step();
+            d.next();
             Iterable<Truth> beliefs = Iterables.transform(f, x -> x.belief(d.time()));
 
             double freqSum = StreamSupport.stream(beliefs.spliterator(), false).mapToDouble(x -> x.freq()).sum();

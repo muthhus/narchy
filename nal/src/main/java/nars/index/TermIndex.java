@@ -405,7 +405,7 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
+    default Term transform(@Nullable Compound src, @NotNull CompoundTransform t) {
         return src==null || !t.testSuperTerm(src) ? src : _transform(src, t);
     }
 
@@ -539,8 +539,7 @@ public interface TermIndex {
         return termOrNull(resolve(src, new MapSubst(m)));
     }
 
-    @Nullable
-    default Termed remove(Termed entry) {
+    default void remove(Termed entry) {
         throw new UnsupportedOperationException();
     }
 
@@ -634,7 +633,7 @@ public interface TermIndex {
         }
 
         @Override
-        public @NotNull Termed apply(Compound parent, @NotNull Term subterm) {
+        public @Nullable Termed apply(Compound parent, @NotNull Term subterm) {
             return _atemporalize((Compound)subterm);
         }
     }

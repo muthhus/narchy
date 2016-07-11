@@ -33,13 +33,13 @@ public class OperationConceptTest {
 
 
         n.goal(op, 1f, 0.9f);
-        n.step().step();
+        n.next().next();
         assertMotive(n, op, 0.5f, 0.95f);
 
-        n.believe(op, 0f, 0.5f).step();
+        n.believe(op, 0f, 0.5f).next();
         assertMotive(n, op, 0.25f, 0.95f);
 
-        n.believe(op, 1f, 0.6f).step().step(); //cause revision
+        n.believe(op, 1f, 0.6f).next().next(); //cause revision
         assertMotive(n, op, 0.571f, 0.95f);
 
         //n.concept(op).print();

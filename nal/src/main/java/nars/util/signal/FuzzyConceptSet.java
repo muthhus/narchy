@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -42,6 +43,10 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
             s += nn;
         }
         return nearness[index] /= s;
+    }
+
+    public FuzzyConceptSet(MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
+        this(()->input.floatValue(), nar, states);
     }
 
     public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {

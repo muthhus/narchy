@@ -49,7 +49,7 @@ public class QuestionTest {
 
         nar
                 .believe(belief, 1.0f, 0.9f)
-                .step()
+                .next()
                 .ask(question, ETERNAL, b -> {
                     if (b.punc() == '.' && b.term().equals(expectedSolutionTerm))
                         ok.set(true);

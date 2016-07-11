@@ -151,6 +151,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
+        printTasks(n, beliefsOrGoals, (t) -> {
+            System.out.println(t.proof());
+        });
+    }
+
+    @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, Consumer<Task> e) {
         TreeSet<Task> bt = new TreeSet<>( (a, b) ->
             //sort by name
                 //{ return a.term().toString().compareTo(b.term().toString()); }
@@ -165,9 +171,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //System.out.println("\t" + c.beliefs().top(n.time()));
             }
         });
-        bt.forEach(xt -> {
-            System.out.println(xt.proof());
-        });
+        bt.forEach(e);
     }
 
     /** change the identity of this NAR */
@@ -554,7 +558,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
     @NotNull
-    public final NAR step() {
+    public final NAR next() {
         return run(1);
     }
 

@@ -109,7 +109,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @NotNull @Override
-    public final Termed apply(Compound ct, Variable v) {
+    public final Termed apply(Compound ct, @NotNull Variable v) {
         return rename.computeIfAbsent(v, this);
     }
 

@@ -93,9 +93,8 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
 
-    @Nullable
     @Override
-    abstract public Termed remove(Termed entry);
+    abstract public void remove(Termed entry);
 
     @Nullable
     @Override

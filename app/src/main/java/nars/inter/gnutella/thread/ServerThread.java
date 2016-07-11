@@ -28,7 +28,7 @@ public class ServerThread extends PeerThread {
 
     /** messages per second (hz) */
     float maxSendFrequency = 24;
-    float maxRecvFrequency = 32;
+    float maxRecvFrequency = 48;
     final int messageBagSize = 128;
 
     final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.max);

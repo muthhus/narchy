@@ -20,7 +20,7 @@ public class ProxyCompoundConceptTest {
         String cString = "(c)";
 
         n.input(abString + ".");
-        n.step();
+        n.next();
 
         CompoundConcept ab = (CompoundConcept) n.concept(abString);
 

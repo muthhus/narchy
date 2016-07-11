@@ -90,11 +90,11 @@ public class TaskTest {
 
         Task x = n.inputTask("<a --> b>.");
         assertArrayEquals(new long[]{1}, x.evidence());
-        n.step();
+        n.next();
 
         Task y = n.inputTask("<b --> c>.");
         assertArrayEquals(new long[]{2}, y.evidence());
-        n.step();
+        n.next();
 
         n.reset();
 

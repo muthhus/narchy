@@ -68,7 +68,7 @@ public class LoopPane extends FlowPane {
 
             NAR n = loop.nar;
             if (!n.running.get()) {
-                n.step();
+                n.next();
                 say("stepped to time " + n.time());
             } else {
                 say("already running");

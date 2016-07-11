@@ -66,7 +66,7 @@ public class BeliefTableTest  {
         n.input("a:b. %0.8|0.8%");
 
 
-        n.step();
+        n.next();
         b.print();
 
         assertEquals(0.86f, b.beliefs().top(n.time()).expectation(true), 0.1f);
@@ -75,7 +75,7 @@ public class BeliefTableTest  {
         n.input("a:b. %0.2|0.7%");
         n.input("a:b. %0.1|0.8%"); //highest negative
 
-        n.step();
+        n.next();
         b.print();
 
         //assertEquals(0.24f, b.beliefs().top(n).expectation(false), 0.01f);
@@ -131,7 +131,7 @@ public class BeliefTableTest  {
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 
-        b.believe(1.0f, 0.5f); n.step();
+        b.believe(1.0f, 0.5f); n.next();
         b.print();
 
         BeliefTable beliefs = b.concept().beliefs();
@@ -140,19 +140,19 @@ public class BeliefTableTest  {
         assertEquals(0.5, beliefs.top(n.time()).conf(), 0.001);
         assertEquals(1, beliefs.size());
 
-        b.believe(1.0f, 0.5f); n.step();
+        b.believe(1.0f, 0.5f); n.next();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
         assertEquals(0.669, beliefs.topEternal().conf(), 0.001);
 
-        b.believe(1.0f, 0.5f); n.step();
+        b.believe(1.0f, 0.5f); n.next();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
         assertEquals(0.75, bb.topEternal().conf(), 0.001);
         assertEquals(0.75, bb.top(n.time()).conf(), 0.001);
 
-        b.believe(1.0f, 0.5f); n.step();
+        b.believe(1.0f, 0.5f); n.next();
         b.print();
         assertEquals(0.79, beliefs.topEternal().conf(), 0.01);
         assertEquals(7, beliefs.size());

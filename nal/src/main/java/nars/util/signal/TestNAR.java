@@ -617,7 +617,7 @@ public class TestNAR  {
         //try {
         int frames = (int) (finalCycle - time());
         while (frames-- > 0 && !finished)
-            nar.step();
+            nar.next();
 
         /*}
         catch (Exception e) {

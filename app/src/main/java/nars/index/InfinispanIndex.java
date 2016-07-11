@@ -69,8 +69,8 @@ public class InfinispanIndex extends MaplikeIndex {
     }
 
     @Override
-    public Termed remove(Termed x) {
-        return conceptsLocal.remove(key(x.term()));
+    public void remove(Termed x) {
+        conceptsLocal.remove(key(x.term()));
     }
 
     @Override

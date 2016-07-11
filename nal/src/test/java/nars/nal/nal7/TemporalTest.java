@@ -171,7 +171,7 @@ public class TemporalTest {
         //n.input("(((SELF,#1)-->at) &&+0 goto(#1)).");
 
 
-        n.step();
+        n.next();
 
         Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
@@ -257,7 +257,7 @@ public class TemporalTest {
         //d.index().print(System.out);
         //d.concept("(x==>y)").print();
 
-        d.step();
+        d.next();
 
         int indexSize = d.index.size();
 
@@ -267,7 +267,7 @@ public class TemporalTest {
         assertEquals(3 , d.concept("(x==>y)").beliefs().size() );
 
         d.input("(x ==>+1 y). :|:"); //present
-        d.step();
+        d.next();
 
         //d.concept("(x==>y)").print();
 
@@ -376,7 +376,7 @@ public class TemporalTest {
         NAR n = new Default();
         n.input("(x ==>+5 y).");
         n.input("(y ==>-5 x).");
-        n.step();
+        n.next();
 
         StringBuilder cc = new StringBuilder();
         TreeSet d = new TreeSet((x,y)-> x.toString().compareTo(y.toString()));

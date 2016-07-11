@@ -557,7 +557,7 @@ public class Terms   {
     }
 
     @Nullable
-    public static Compound compoundOrNull(Term t) {
+    public static Compound compoundOrNull(@Nullable Term t) {
         if (t instanceof Compound)
             return ((Compound) t);
         else

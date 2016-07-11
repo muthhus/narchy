@@ -9,7 +9,6 @@ import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
@@ -28,9 +27,9 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public final Cache<TermContainer, TermContainer> subs;
 
     private static final Weigher<Termlike, Termlike> complexityWeigher = (k, v) -> {
-        if (v instanceof Atomic) {
-            return 0; //dont allow removal of atomic
-        } else {
+//        if (v instanceof Atomic) {
+//            return 0; //dont allow removal of atomic
+//        } else {
             if (v instanceof Concept) {
                 if (!(v instanceof CompoundConcept)) {
                     //special implementation, dont allow removal
@@ -43,7 +42,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
             //w/=(1f + maxConfidence((CompoundConcept)v));
 
             return (int)w;
-        }
+        //}
     };
 
     private static float maxConfidence(@NotNull CompoundConcept v) {
@@ -79,7 +78,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
         Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
         subs = builderSubs
-                .softValues()
+                //.softValues()
                 .weigher(complexityWeigher)
                 .maximumWeight(maxWeight)
                 .build();
@@ -114,15 +113,9 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return builder;
     }
 
-    @Nullable
     @Override
-    public Termed remove(@NotNull Termed x) {
-        Cache<Termed, Termed> cc = cacheFor(x);
-        Termed t = cc.getIfPresent(x);
-        if (t!=null) {
-            cc.invalidate(x);
-        }
-        return t;
+    public void remove(@NotNull Termed x) {
+        cacheFor(x).invalidate(x);
     }
 
     @Override
@@ -130,7 +123,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         return cacheFor(x).getIfPresent(x);
     }
 
-    private Cache<Termed,Termed> cacheFor(Termed x) {
+    private final Cache<Termed,Termed> cacheFor(Termed x) {
         if (x.term() instanceof Compound)
             return compounds;
         else

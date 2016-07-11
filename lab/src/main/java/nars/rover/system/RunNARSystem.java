@@ -22,7 +22,7 @@ public class RunNARSystem extends EntityProcessingSystem {
     @Override
     protected void process(Entity e) {
 
-        e.getComponent(RunNAR.class).nar.step();
+        e.getComponent(RunNAR.class).nar.next();
 
     }
 }

@@ -22,7 +22,7 @@ public class PrologCoreTest {
         PrologCore p = new PrologCore(n);
         n.input("a:b.");
         n.input("(--, c:d).");
-        n.step();
+        n.next();
 
         assertTrue(p.isTrue("'-->'(b,a)."));
         assertFalse(p.isTrue("'-->'(a,b)."));
@@ -38,19 +38,19 @@ public class PrologCoreTest {
         n.input("a:b.");
         n.input("a:c.");
         n.input("(--, c:d).");
-        n.step();
+        n.next();
 
         n.input("a:b?");
         //expect true
-        n.step();
+        n.next();
 
         n.input("c:d?");
         //expect false
-        n.step();
+        n.next();
 
         n.input("a:?x?");
         //expect true with 2 answers
-        n.step();
+        n.next();
 
     }
 
@@ -60,15 +60,15 @@ public class PrologCoreTest {
         PrologCore p = new PrologCore(n);
         n.input("a:b.");
         n.input("b:c.");
-        n.step();
+        n.next();
 
         n.input("a:c?");
         //expect true
-        n.step();
+        n.next();
 
         n.input("a:d?");
         //expect false
-        n.step();
+        n.next();
     }
 
     @Test
@@ -76,7 +76,7 @@ public class PrologCoreTest {
         NAR n = new Default();
         PrologCore p = new PrologCore(n);
         n.input("(&&,a,b,c).");
-        n.step();
+        n.next();
 
         assertTrue(p.isTrue("'&&'(a,b,c)."));
         //assertTrue(p.isTrue("','(a,','(b,c))."));
@@ -88,7 +88,7 @@ public class PrologCoreTest {
         n.believe("x:a");
         n.believe("y:b");
         n.believe("z:c", false);
-        n.step();
+        n.next();
 
         assertTrue(p.isTrue("'&&'('-->'(a,x), '-->'(b,y), not('-->'(c,z)))."));
         assertFalse(p.isTrue("'&&'('-->'(a,x), '-->'(b,y), '-->'(c,z))."));
@@ -105,15 +105,15 @@ public class PrologCoreTest {
         n.input("c:d.");
         n.input("d:e.");
         n.input("e:f.");
-        n.step();
+        n.next();
 
         n.input("a:f?");
         //expect true
-        n.step();
+        n.next();
 
         n.input("a:?x?");
         //expect true
-        n.step();
+        n.next();
 
     }
 

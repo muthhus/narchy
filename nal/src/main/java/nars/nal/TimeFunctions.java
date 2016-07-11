@@ -124,7 +124,7 @@ public interface TimeFunctions {
             occReturn[0] = p.occurrenceTarget(earliestOccurrence);
         }
 
-        return deriveDT(derived, polarity, prem, dt);
+        return deriveDT(derived, polarity, p, dt, occReturn);
     }
 
     /**
@@ -191,7 +191,7 @@ public interface TimeFunctions {
         }
 
 
-        return deriveDT(derived, polarity, prem, eventDelta);
+        return deriveDT(derived, polarity, p, eventDelta, occReturn);
     }
 
 
@@ -424,7 +424,7 @@ public interface TimeFunctions {
 
         if (dtTerm instanceof Compound && Op.isTemporal(derived, ((Compound) dtTerm).dt())) {
             int dtdt = dtTerm instanceof Compound ? ((Compound) dtTerm).dt() : DTERNAL;
-            return deriveDT(derived, +1, prem, dtdt);
+            return deriveDT(derived, +1, p, dtdt, occReturn);
         } else
             return derived;
     }
@@ -501,8 +501,7 @@ public interface TimeFunctions {
         return derived;
     }
 
-    @NotNull
-    static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull ConceptProcess premise, int eventDelta) {
+    static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull PremiseEval p, int eventDelta, @NotNull long[] occReturn) {
         if (eventDelta == DTERNAL)
             return derived; //no change
 
@@ -513,7 +512,7 @@ public interface TimeFunctions {
         if (!Global.DEBUG && !derived.op().temporal)
             return derived; //disregard dt if not in debug mode
 
-        return dt(derived, eventDelta * polarity);
+        return dt(derived, eventDelta * polarity, p, occReturn);
     }
 
     /**
@@ -561,7 +560,7 @@ public interface TimeFunctions {
 
         occReturn[0] = p.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
 
-        return deriveDT(derived, 1, premise, eventDelta);
+        return deriveDT(derived, 1, p, eventDelta, occReturn);
     };
 
 //    Temporalize AutoSimple = (derived, p, d, occReturn) -> {
@@ -841,7 +840,7 @@ public interface TimeFunctions {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 
-            derived = dt(derived, t);
+            derived = dt(derived, t, p, occReturn);
 
 //            int nt = derived.t();
 //            if (occ > TIMELESS) {
@@ -862,8 +861,14 @@ public interface TimeFunctions {
 
     };
 
-    @Nullable
-    static Compound dt(@NotNull Compound derived, int t) {
-        return (Compound) $.compound(derived.op(), t, derived.subterms().terms());
+    static Compound dt(@NotNull Compound derived, int dt, @NotNull PremiseEval p, long[] occReturn) {
+        if (!derived.op().temporal && dt!=DTERNAL && dt!=0 && occReturn[0]!=ETERNAL) {
+            //something got reduced to a non-temporal, so shift it to the midpoint of what the actual term would have been:
+            occReturn[0] += dt/2;
+            dt = DTERNAL;
+        }
+        if (derived.dt()!=dt)
+            return (Compound) p.index.builder().build(derived.op(), dt, derived.subterms().terms());
+        return derived;
     }
 }

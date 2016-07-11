@@ -33,7 +33,7 @@ public class TermLinkTest {
 
         for (int i = 0; i < 55; i++) {
             System.out.println(n.time());
-            n.step();
+            n.next();
         }
 
     }
@@ -156,7 +156,7 @@ public class TermLinkTest {
 
 
         };
-        n.step(); //build network
+        n.next(); //build network
         n.core.concepts.print();
 
 //        //activate neurons 1 and 3
