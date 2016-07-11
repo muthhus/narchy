@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nars.Op.ATOM;
+import static nars.Op.Imdex;
 import static nars.Op.NEG;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
@@ -176,6 +177,9 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
 
         Term r = m.index.resolve(cp, m);
+        /*if (r == Imdex)
+            System.err.println(r + " " + this.rule.source);*/ //<- finds rules which may help to add a neq(x,y) constraint
+
         if (r instanceof Compound) { //includes null test
 
             char c = punct;

@@ -286,7 +286,7 @@ public class TemporalTest {
         d.believe("((\\,((#1-->[happy])&&(#1-->[sad])),((0-->v),(0-->h)),_)-->[pill])");
         d.run(1);
         d.core.concepts.print();
-        assertEquals(21, d.core.concepts.size());
+        assertEquals(10, d.core.concepts.size());
     }
 
     @Test public void testConceptualizationIntermpolationEternal() {

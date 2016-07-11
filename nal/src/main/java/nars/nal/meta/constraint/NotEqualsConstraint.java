@@ -4,6 +4,8 @@ import nars.term.Term;
 import nars.term.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.term.Terms.equalsAnonymous;
+
 
 public final class NotEqualsConstraint implements MatchConstraint {
 
@@ -16,7 +18,9 @@ public final class NotEqualsConstraint implements MatchConstraint {
     @Override
     public boolean invalid(Term x, @NotNull Term y, @NotNull FindSubst f) {
         Term canNotEqual = f.xy.get(b);
-        return canNotEqual!=null && y.equals(canNotEqual);
+        return canNotEqual!=null &&
+                equalsAnonymous(y, canNotEqual);
+                //y.equals(canNotEqual);
     }
 
     @NotNull

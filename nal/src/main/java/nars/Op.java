@@ -100,6 +100,11 @@ public enum Op {
     /** Image index ("imdex") symbol */
     public static final Atom Imdex = $.the("_");
 
+    /** implicit truth subterm */
+    public static final Atom True = $.the("¿");
+    public static final Atom False = $.the("ø");
+    public static final Term[] TrueArray = new Term[] { True };
+
     /**
      * symbol representation of this getOperator
      */

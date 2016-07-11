@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
+import static nars.term.Terms.compoundOrNull;
 
 /**
  *
@@ -614,14 +615,14 @@ public interface TermIndex {
         @Nullable
         Compound _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
-            return (Compound) i.transform(
+            return compoundOrNull(i.transform(
                     (c.op().temporal && c.dt()!=DTERNAL) ?
                             //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
-                            (Compound)(i.the((i.builder().build(c.op(), DTERNAL,
+                            compoundOrNull(i.the((i.builder().build(c.op(), DTERNAL,
                                     c.subterms().terms()
                             ))).term()) :
                             c,
-                    this);
+                    this));
         }
 
         @Override

@@ -2,7 +2,6 @@ package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.index.TermIndex;
@@ -55,7 +54,7 @@ public abstract class TermBuilder {
 
             case CONJ:
             case DISJ:
-                return junction(op, dt, filterImdex(u));
+                return junction(op, dt, filterTrueFalseImplicits(op, u));
 
             case IMGi:
             case IMGe:
@@ -97,23 +96,31 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private Term[] filterImdex(Term[] u) {
+    private Term[] filterTrueFalseImplicits(Op o, Term[] u) {
         int imdices = 0;
         for (Term x : u) {
-            if (x == Imdex) {
+            if (x == True) {
                 imdices++;
+            } else if (x == False)  {
+                if (o != DISJ) {
+                    return null; //false subterm in conjunction makes the entire condition false
+                } else { //DISJ
+                    imdices++; //false subterm in disjunction (or) has no effect
+                }
             }
         }
+
         if (imdices == 0)
             return u;
+
         int ul = u.length;
         if (ul == imdices)
-            return new Term[] { Imdex }; //reduces to an Imdex itself
+            return TrueArray; //reduces to an Imdex itself
 
         Term[] y = new Term[ul - imdices];
         for (int i = 0, j = 0; i < ul; i++) {
             Term uu = u[i];
-            if (uu!=Imdex)
+            if ((uu!=True) && (uu!=False))
                 y[j++] = uu;
         }
 
@@ -212,10 +219,10 @@ public abstract class TermBuilder {
             }
         }
 
-        if (Global.DEBUG && op!=PROD /* imdices are normal in prototypical products */) {
+        if (Global.DEBUG ) {
             //check for any imdex terms that may have not been removed
             for (Term x : args.terms()) {
-                if (x == Imdex)
+                if (x == True)
                     throw new RuntimeException(op + " term with imdex in subterms: " + args);
             }
         }
@@ -241,6 +248,11 @@ public abstract class TermBuilder {
 
     @Nullable
     public final Term negation(@NotNull Term t) {
+        if (t == True)
+            return False;
+        else if (t == False)
+            return True;
+
         if (t.op() == NEG) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
@@ -477,7 +489,7 @@ public abstract class TermBuilder {
                 return null;
 
             case 0:
-                return Imdex;
+                return True;
 
             case 1:
                 if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence

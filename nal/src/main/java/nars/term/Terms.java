@@ -556,4 +556,10 @@ public class Terms   {
         return u.toImmutable();
     }
 
+    public static Compound compoundOrNull(Term t) {
+        if (t instanceof Compound)
+            return ((Compound) t);
+        else
+            return null;
+    }
 }
