@@ -2,6 +2,8 @@ package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import nars.$;
+import nars.Global;
 import nars.Op;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
@@ -53,7 +55,7 @@ public abstract class TermBuilder {
 
             case CONJ:
             case DISJ:
-                return junction(op, dt, u);
+                return junction(op, dt, filterImdex(u));
 
             case IMGi:
             case IMGe:
@@ -93,6 +95,29 @@ public abstract class TermBuilder {
         }
 
         return finish(op, dt, u);
+    }
+
+    private Term[] filterImdex(Term[] u) {
+        int imdices = 0;
+        for (Term x : u) {
+            if (x == Imdex) {
+                imdices++;
+            }
+        }
+        if (imdices == 0)
+            return u;
+        int ul = u.length;
+        if (ul == imdices)
+            return new Term[] { Imdex }; //reduces to an Imdex itself
+
+        Term[] y = new Term[ul - imdices];
+        for (int i = 0, j = 0; i < ul; i++) {
+            Term uu = u[i];
+            if (uu!=Imdex)
+                y[j++] = uu;
+        }
+
+        return y;
     }
 
 
@@ -184,6 +209,14 @@ public abstract class TermBuilder {
                 //return null;
                 //throw new RuntimeException("invalid size " + s + " for " + op);
                 return a0; //reduction
+            }
+        }
+
+        if (Global.DEBUG && op!=PROD /* imdices are normal in prototypical products */) {
+            //check for any imdex terms that may have not been removed
+            for (Term x : args.terms()) {
+                if (x == Imdex)
+                    throw new RuntimeException(op + " term with imdex in subterms: " + args);
             }
         }
 
@@ -437,13 +470,23 @@ public abstract class TermBuilder {
 
         }
 
-        if (Statement.validStatement(subject, predicate)) {
-            if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
-                dt = -dt;
-            return finish(op, dt, subject, predicate);
-        }
+        int validity = Statement.validStatement(subject, predicate);
+        switch (validity) {
 
-        return null;
+            case -1:
+                return null;
+
+            case 0:
+                return Imdex;
+
+            case 1:
+                if (op.commutative && (dt!=DTERNAL && dt!=0) && subject.compareTo(predicate) > 0) //equivalence
+                    dt = -dt;
+                return finish(op, dt, subject, predicate);
+
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     /** whether this builder applies immediate transforms */

@@ -434,4 +434,21 @@ public class TermReductionsTest {
         //..
     }
 
+    /** conjunction and disjunction subterms which can occurr as a result
+     * of variable substitution, etc which don't necessarily affect
+     * the resulting truth of the compound although if the statements
+     * were alone they would not form valid tasks themselves
+     */
+    @Test public void testSingularStatementsInConjunctionsAndDisjunctions() {
+        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<->a),c:d,e:f)"));
+        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
+        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
+        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
+
+        assertEquals($("(||,c:d,e:f)"), $("(||,(a<->a),c:d,e:f)"));
+        assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
+        assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));
+        assertEquals($("(||,c:d,e:f)"), $("(||,(a==>a),c:d,e:f)"));
+    }
+
 }

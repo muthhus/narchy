@@ -50,8 +50,13 @@ public interface Statement {
 //        return subject.op() == Op.NEG && ((Compound) subject).term(0).equals(predicate);
 //    }
 
-    /** skips the null and equality test */
-    static boolean validStatement(@NotNull Term subject, @NotNull Term predicate) {
+    /** @return
+     *       -1 invalid for statement
+     *       0 equivalent
+     *      +1 valid for statement
+     *
+     */
+    static int validStatement(@NotNull Term subject, @NotNull Term predicate) {
 
 
         Compound sc = subject instanceof Compound ? (Compound)subject : null;
@@ -59,10 +64,10 @@ public interface Statement {
 
         if (sc!=null && pc!=null) {
             if (Terms.equalsAnonymous(sc, pc))
-                return false;
+                return 0;
         } else {
             if (subject.equals(predicate))
-                return false;
+                return 0;
         }
 
         //TODO its possible to disqualify invalid statement if there is no structural overlap here
@@ -71,7 +76,7 @@ public interface Statement {
                 sc.containsTermRecursively(predicate)
                 //sc.containsTerm(predicate)
             ) {
-            return false;
+            return -1;
         }
 
         if (pc!=null) {
@@ -79,14 +84,14 @@ public interface Statement {
                     pc.containsTermRecursively(subject)
                     //pc.containsTerm(subject)
                )
-                return false;
+                return -1;
 
             if (sc!=null && subject.op().statement && predicate.op().statement) {
-                return !sc.term(0).equals(pc.term(1)) && !sc.term(1).equals(pc.term(0));
+                return (!sc.term(0).equals(pc.term(1)) && !sc.term(1).equals(pc.term(0))) ? +1 : -1;
             }
         }
 
-        return true;
+        return +1;
     }
 
 

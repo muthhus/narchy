@@ -494,7 +494,7 @@ public class TermTest {
     @Test
     public void validStatement() {
         Compound t = $("<({tom},{vienna}) --> livingIn>");
-        assertTrue(Statement.validStatement(t.term(0), t.term(1)));
+        assertEquals(+1, Statement.validStatement(t.term(0), t.term(1)));
 
     }
 
