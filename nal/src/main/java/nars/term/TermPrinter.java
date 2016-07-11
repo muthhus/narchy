@@ -44,7 +44,7 @@ public interface TermPrinter {
     }
 
 
-    static void appendArgs(Compound c, @NotNull Appendable p) throws IOException {
+    static void appendArgs(@NotNull Compound c, @NotNull Appendable p) throws IOException {
         int nterms = c.size();
 
         boolean bb = nterms > 1;

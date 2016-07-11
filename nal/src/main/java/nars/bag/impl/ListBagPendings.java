@@ -4,6 +4,8 @@ import nars.Global;
 import nars.budget.RawBLink;
 import nars.budget.merge.BudgetMerge;
 import nars.util.data.list.CircularArrayList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,7 +17,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     private final BudgetMerge merge;
     //public List<RawBLink<X>> pending = null;
-    CircularArrayList<RawBLink<X>> pending = null;
+    @Nullable CircularArrayList<RawBLink<X>> pending = null;
     private int capacity;
 
     public ListBagPendings(BudgetMerge m) {
@@ -28,7 +30,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     @Override
-    public void add(X x, float p, float d, float q) {
+    public void add(@NotNull X x, float p, float d, float q) {
         CircularArrayList<RawBLink<X>> pend = this.pending;
         if (pend == null) {
             //pending = Global.newArrayList(capacity);
@@ -49,7 +51,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     @Override
-    public void apply(ArrayBag<X> target) {
+    public void apply(@NotNull ArrayBag<X> target) {
         CircularArrayList<RawBLink<X>> p = this.pending;
         if (p != null) {
             clear();
@@ -66,7 +68,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     @Override
-    public int compare(RawBLink<X> a, RawBLink<X> b) {
+    public int compare(@NotNull RawBLink<X> a, @NotNull RawBLink<X> b) {
         boolean adel = a.isDeleted();
         boolean bdel = b.isDeleted();
 //                if (adel && bdel)
@@ -85,7 +87,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
         return cmp;
     }
 
-    private void combine(CircularArrayList<RawBLink<X>> p) {
+    private void combine(@NotNull CircularArrayList<RawBLink<X>> p) {
         Collections.sort(p, this);
     }
 

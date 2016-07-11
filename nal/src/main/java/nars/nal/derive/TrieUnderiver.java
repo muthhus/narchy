@@ -7,6 +7,8 @@ import nars.nal.Deriver;
 import nars.nal.Underiver;
 import nars.task.Task;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -16,6 +18,7 @@ import java.util.function.Consumer;
 
 public class TrieUnderiver implements Underiver {
 
+    @NotNull
     private final TrieDeriver deriver;
 
     static class CauseEdge extends Pair<Term,Term> {
@@ -24,6 +27,7 @@ public class TrieUnderiver implements Underiver {
             super(from, to);
         }
 
+        @NotNull
         @Override
         public String toString() {
             //return '(' + this.first.toString() + ',' + this.second.toString() + ')';
@@ -31,12 +35,13 @@ public class TrieUnderiver implements Underiver {
         }
     }
 
+    @NotNull
     final SimpleDirectedGraph<Term,CauseEdge> g;
 
     final SetMultimap<Term /*Pattern*/, Term /*Incmoing Condition*/> conclusion =
             MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
 
-    public TrieUnderiver(TrieDeriver t) {
+    public TrieUnderiver(@NotNull TrieDeriver t) {
         this.deriver = t;
         g = new SimpleDirectedGraph<>((a, b) -> {
             return new CauseEdge(a, b);
@@ -62,6 +67,7 @@ public class TrieUnderiver implements Underiver {
 
     }
 
+    @Nullable
     public Graph<Term,Term> causesOf(Term derivedPattern) {
         //entire incoming subgraph to a target
         return null;
@@ -75,6 +81,7 @@ public class TrieUnderiver implements Underiver {
 
     }
 
+    @NotNull
     @Override
     public Deriver deriver() {
         return deriver;

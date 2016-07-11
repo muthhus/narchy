@@ -250,7 +250,7 @@ public class TrieDeriver extends Deriver {
         return p;
     }
 
-    public void recurse(CauseEffect each) {
+    public void recurse(@NotNull CauseEffect each) {
         for (ProcTerm p : roots) {
             recurse(null, p, each);
         }
@@ -260,7 +260,7 @@ public class TrieDeriver extends Deriver {
 
     }
 
-    public static Term recurse(Term pred, Term curr, CauseEffect each) {
+    public static Term recurse(Term pred, Term curr, @NotNull CauseEffect each) {
 
         each.accept(pred, curr);
 

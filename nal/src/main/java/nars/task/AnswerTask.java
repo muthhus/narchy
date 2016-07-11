@@ -6,15 +6,17 @@ import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 7/3/16.
  */
 public class AnswerTask extends MutableTask {
 
+    @Nullable
     protected Task aBelief, bBelief;
 
-    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, Task bBelief, Truth conclusion, long creationTime, long occTime, float aMix) {
+    public AnswerTask(@NotNull Termed<Compound> term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long occTime, float aMix) {
         super(term, aBelief.punc(), conclusion);
 
         this.aBelief = aBelief;
@@ -26,24 +28,28 @@ public class AnswerTask extends MutableTask {
         time(creationTime, occTime);
     }
 
+    @Nullable
     @Override
     public Task getParentTask() {
         return aBelief;
     }
 
+    @Nullable
     @Override
     public Task getParentBelief() {
         return bBelief;
     }
 
-    public AnswerTask budget(Task a, Task b) {
+    @NotNull
+    public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
         float acw = a.confWeight();
         float aMix = acw / (acw + b.confWeight());
         budget(a, b, aMix);
         return this;
     }
 
-    public AnswerTask budget(Task a, Task b, float aMix) {
+    @NotNull
+    public AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
         if (!b.isDeleted() && !a.isDeleted()) {
             budget(b.budget());
             BudgetMerge.plusDQBlend.merge(budget(), a.budget(), aMix);

@@ -117,6 +117,7 @@ abstract public class DefaultBLink<X> extends BLink<X> {
 
 
 
+    @NotNull
     @Override public String toString2() {
         return toString() + "+/-:" + dPri + ';' + dDur + ';' + dQua;
     }

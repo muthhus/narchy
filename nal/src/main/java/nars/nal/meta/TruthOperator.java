@@ -15,7 +15,7 @@ public interface TruthOperator {
 
     Atom NONE = $.the("None");
 
-    static void permuteTruth(TruthOperator[] values, Map<Term, TruthOperator> table) {
+    static void permuteTruth(@NotNull TruthOperator[] values, @NotNull Map<Term, TruthOperator> table) {
         for (TruthOperator tm : values) {
             table.put($.the(tm.toString()), tm);
             table.put($.the(tm.toString() + 'X'), TruthOperator.swapped(tm));
@@ -45,7 +45,7 @@ public interface TruthOperator {
         return new SwappedTruth(o);
     }
     @NotNull
-    static TruthOperator negated(TruthOperator o) {
+    static TruthOperator negated(@NotNull TruthOperator o) {
         return new NegatedTruth(o);
     }
 
@@ -77,10 +77,11 @@ public interface TruthOperator {
 
     final class NegatedTruth implements TruthOperator {
 
+        @NotNull
         private final TruthOperator o;
         private final transient boolean overlapCached;
 
-        public NegatedTruth(TruthOperator o) {
+        public NegatedTruth(@NotNull TruthOperator o) {
             this.o = o;
             overlapCached = o.allowOverlap();
         }

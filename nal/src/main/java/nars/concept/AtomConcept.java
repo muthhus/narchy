@@ -21,6 +21,7 @@ public class AtomConcept extends Atom implements AbstractConcept  {
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
 
+    @NotNull
     private final Op op;
 
     private Map meta;
@@ -51,6 +52,7 @@ public class AtomConcept extends Atom implements AbstractConcept  {
         return taskLinks;
     }
 
+    @NotNull
     @Override
     public Bag<Term> termlinks() {
         return termLinks;

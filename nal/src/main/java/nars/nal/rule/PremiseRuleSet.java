@@ -43,6 +43,7 @@ public class PremiseRuleSet {
 
 
 
+    @NotNull
     public static PremiseRuleSet resource(String name) throws IOException, URISyntaxException {
 
         PatternIndex p = new PatternIndex();
@@ -86,6 +87,7 @@ public class PremiseRuleSet {
     }
 
 
+    @NotNull
     public final PatternIndex patterns;
 
 
@@ -108,11 +110,11 @@ public class PremiseRuleSet {
         this(ruleStrings, new PatternIndex());
     }
 
-    public PremiseRuleSet(@NotNull List<String> ruleStrings, PatternIndex patterns) {
+    public PremiseRuleSet(@NotNull List<String> ruleStrings, @NotNull PatternIndex patterns) {
         this(parse(load(ruleStrings), patterns), patterns);
     }
 
-    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, PatternIndex patterns) {
+    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternIndex patterns) {
         this.rules = permute(parsed, patterns).distinct().collect(toList());
 
         this.patterns = patterns;
@@ -182,6 +184,7 @@ public class PremiseRuleSet {
                 .stream();
     }
 
+    @NotNull
     @Deprecated /* soon */ static String preprocess(@NotNull CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
     {
         String ret = rule.toString();
@@ -227,13 +230,13 @@ public class PremiseRuleSet {
     }
 
     @NotNull
-    public static Set<PremiseRule> permute(PremiseRule preNorm) {
+    public static Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
         Set<PremiseRule> ur;
         permute(preNorm, "", new PatternIndex(), ur = Global.newHashSet(1));
         return ur;
     }
 
-    public static void permute(PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
+    public static void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
         posNegPermute(preNormRule, src, ur, index, (PremiseRule r) -> {
             permuteSwap(r, src, index, ur, (PremiseRule s) -> {
                 permuteBackward(src, index, ur, r);
@@ -241,7 +244,7 @@ public class PremiseRuleSet {
         });
     }
 
-    static void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, PremiseRule r) {
+    static void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
         if (Global.BACKWARD_QUESTION_RULES && r.allowBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
@@ -256,7 +259,7 @@ public class PremiseRuleSet {
         }
     }
 
-    protected static void posNegPermute(PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index, Consumer<PremiseRule> each) {
+    protected static void posNegPermute(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index, @NotNull Consumer<PremiseRule> each) {
         PremiseRule pos = add(preNorm.positive(index), src, ur, index);
         if (pos != null)
             each.accept(pos);
@@ -269,7 +272,7 @@ public class PremiseRuleSet {
     }
 
 
-    public static void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, Consumer<PremiseRule> then) {
+    public static void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull Consumer<PremiseRule> then) {
 
         then.accept(r);
 
@@ -312,6 +315,7 @@ public class PremiseRuleSet {
     }
 
 
+    @Nullable
     static PremiseRule add(@Nullable PremiseRule q, String src, @NotNull Collection<PremiseRule> target, @NotNull PatternIndex index) {
         if (q == null)
             return null;

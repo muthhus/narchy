@@ -13,6 +13,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
 
     public final MutableInteger beliefsMaxEte, goalsMaxEte;
     public final MutableInteger questionsMax;
+    @NotNull
     public final MutableInteger termlinksCapacityMax, termlinksCapacityMin, taskLinksCapacity;
     private final MutableInteger beliefsMaxTemp;
     private final MutableInteger goalsMaxTemp;
@@ -26,7 +27,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
         this.beliefsMaxEte = beliefsMaxEte;
         this.beliefsMaxTemp = beliefsMaxEte;
         this.goalsMaxEte = goalsMaxEte;
@@ -73,7 +74,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
     }
 
     @Override
-    public int linkCap(AbstractConcept c, boolean termOrTask) {
+    public int linkCap(@NotNull AbstractConcept c, boolean termOrTask) {
         if (termOrTask) {
             int min = termlinksCapacityMin.intValue();
             int max = termlinksCapacityMax.intValue();

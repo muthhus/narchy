@@ -38,6 +38,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         return null;
     }
 
+    @Nullable
     @Override
     public Task topTemporal(long when, long now, Task against) {
         updateTask(now);
@@ -72,6 +73,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         return current.equals(t) ? current : null;
     }
 
+    @Nullable
     @Override
     public Truth truth(long when, long now) {
         @Nullable Task x = topTemporal(when, now, null);

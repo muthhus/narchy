@@ -76,7 +76,7 @@ public class Default extends AbstractNAR {
     }
 
 
-    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
+    protected @NotNull DefaultCore newCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, @NotNull PremiseEval matcher) {
 
         DefaultCore c = new DefaultCore(this, matcher, conceptWarm, conceptCold);
         c.concepts.setCapacity(activeConcepts);
@@ -98,6 +98,8 @@ public class Default extends AbstractNAR {
 
     @Override
     public final float conceptPriority(@NotNull Termed termed) {
+        if (termed == null)
+            throw new NullPointerException();
         //if (termed!=null) {
             //Concept cc = concept(termed);
             //if (cc != null) {

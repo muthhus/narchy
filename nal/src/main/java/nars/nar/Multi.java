@@ -36,10 +36,12 @@ public class Multi extends AbstractNAR {
 
     @NotNull
     final WorkerCore[] cores;
+    @NotNull
     final Map<Concept, DefaultCore> active;
     //new ConcurrentHashMap();
 
     //final CyclicBarrier barrier;
+    @NotNull
     final Semaphore demand, supply;
 
     @Deprecated
@@ -132,7 +134,7 @@ public class Multi extends AbstractNAR {
         private boolean stopped;
 
 
-        public WorkerCore(int n, PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+        public WorkerCore(int n, @NotNull PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
             super(Multi.this, matcher, warm, cold);
             this.thread = new Thread(this);
             thread.setName(nar.toString() + ".Worker" + n);
@@ -218,7 +220,7 @@ public class Multi extends AbstractNAR {
     }
 
 
-    protected @NotNull WorkerCore newCore(int id, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseEval matcher) {
+    protected @NotNull WorkerCore newCore(int id, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, @NotNull PremiseEval matcher) {
 
         WorkerCore c = new WorkerCore(id, matcher, conceptWarm, conceptCold);
         c.concepts.setCapacity(activeConcepts);

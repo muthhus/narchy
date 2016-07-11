@@ -3,6 +3,8 @@ package nars.bag.impl;
 import nars.bag.WeakBudget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractMap;
@@ -18,6 +20,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     /**
      * Returns a set of the mappings contained in this hash table.
      */
+    @NotNull
     @Override
     public Set entrySet() {
         processQueue();
@@ -25,9 +28,11 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     }
 
     /* Hash table mapping WeakKeys to values */
+    @Nullable
     private Map<X, WeakBudget<X>> hash;
 
     /* Reference queue for cleared WeakKeys */
+    @Nullable
     private ReferenceQueue queue = new ReferenceQueue();
 
     /*
@@ -60,7 +65,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      * @throws IllegalArgumentException If the initial capacity is less than zero, or if the load
      *                                  factor is nonpositive
      */
-    public WeakBudgetMap(Map<X, WeakBudget<X>> internal) {
+    public WeakBudgetMap(@NotNull Map<X, WeakBudget<X>> internal) {
         this.hash = internal;
         if (!internal.isEmpty())
             putAll(internal);
@@ -80,7 +85,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
     }
 
 
-    public final void forEachBudget(Consumer<WeakBudget<X>> action) {
+    public final void forEachBudget(@NotNull Consumer<WeakBudget<X>> action) {
         hash.forEach((k, v) -> action.accept(v));
     }
 
@@ -114,6 +119,7 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      *
      * @param key The key whose associated value, if any, is to be returned.
      */
+    @Nullable
     @Override
     public X get(Object key) {
         processQueue();
@@ -135,7 +141,8 @@ public class WeakBudgetMap<X> extends AbstractMap implements Map {
      * @return The previous value to which this key was mapped, or
      * <code>null</code> if if there was no mapping for the key
      */
-    public Object put(X key, float p, float d, float q, BudgetMerge mergeFunction) {
+    @Nullable
+    public Object put(X key, float p, float d, float q, @NotNull BudgetMerge mergeFunction) {
         processQueue();
 
         WeakBudget<X> rtn = hash.get(key);

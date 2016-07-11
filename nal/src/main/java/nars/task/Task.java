@@ -780,9 +780,11 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return term().term(i);
     }
 
+    @Nullable
     default Task getParentTask() {
         return null;
     }
+    @Nullable
     default Task getParentBelief() {
         return null;
     }

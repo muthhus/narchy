@@ -217,7 +217,7 @@ public interface Concept<T extends Term> extends Termed<T> {
     }
 
     /** link to a specific peer */
-    static <T> void linkPeer(Bag<T> bag, T x, Budget b, float q) {
+    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
         //@NotNull Bag<Termed> bag = termlinks();
         BLink<T> existing = bag.get(x);
         if (existing == null)

@@ -31,7 +31,7 @@ public final class AndCondition extends GenericCompound<BoolCondition> implement
 
 
     /** just attempts to evaluate the condition, causing any desired side effects as a result */
-    @Override public final void accept(PremiseEval m) {
+    @Override public final void accept(@NotNull PremiseEval m) {
         BoolCondition.run(this, m);
     }
 

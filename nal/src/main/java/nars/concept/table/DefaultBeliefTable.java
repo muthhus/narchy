@@ -47,6 +47,7 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal = newTemporalBeliefTable(mp, initialTemporalCapacity);
     }
 
+    @NotNull
     protected static TemporalBeliefTable newTemporalBeliefTable(Map<Task, Task> mp, int initialTemporalCapacity) {
         return new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
     }
@@ -239,7 +240,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
-    private void addEternalAxiom(@NotNull Task input, SortedTable<Task, Task> et) {
+    private void addEternalAxiom(@NotNull Task input, @NotNull SortedTable<Task, Task> et) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden");
@@ -258,7 +259,7 @@ public class DefaultBeliefTable implements BeliefTable {
         et.put(input, input);
     }
 
-    @NotNull
+    @Nullable
     protected Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
         input = temporal.add(input, eternal, nar);

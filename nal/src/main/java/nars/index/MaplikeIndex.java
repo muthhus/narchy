@@ -30,8 +30,9 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         this.conceptBuilder = conceptBuilder;
     }
 
+    @NotNull
     @Override
-    public Term newCompound(Op op, int dt, TermContainer subterms) {
+    public Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
 
@@ -92,6 +93,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
 
+    @Nullable
     @Override
     abstract public Termed remove(Termed entry);
 
@@ -167,6 +169,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
      */
     abstract protected TermContainer put(TermContainer s);
 
+    @NotNull
     @Override
     public final TermBuilder builder() {
         return this;

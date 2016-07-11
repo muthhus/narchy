@@ -31,6 +31,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
         return false;
     }
 
+    @NotNull
     abstract protected Op unifying();
 
     @Nullable
@@ -74,6 +75,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             super(parent, sub);
         }
 
+        @NotNull
         @Override
         public Op unifying() {
             return Op.VAR_DEP;
@@ -91,6 +93,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return true;
         }
 
+        @NotNull
         @Override
         public Op unifying() {
             return Op.VAR_DEP;
@@ -103,6 +106,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             super(parent, sub);
         }
 
+        @NotNull
         @Override
         public Op unifying() {
             return Op.VAR_INDEP;
@@ -119,6 +123,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
             return true;
         }
 
+        @NotNull
         @Override
         public Op unifying() {
             return Op.VAR_INDEP;

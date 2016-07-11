@@ -16,7 +16,7 @@ public final class TaskPositive extends AtomicBoolCondition {
     final static int negateOrd = Op.NEG.ordinal();
 
     @Override
-    public boolean booleanValueOf(PremiseEval e) {
+    public boolean booleanValueOf(@NotNull PremiseEval e) {
         return e.termSub0op != negateOrd;// e.taskTerm.op()!= Op.NEGATE;
     }
 

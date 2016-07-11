@@ -78,6 +78,7 @@ public abstract class AbstractNAR extends NAR {
     }
 
 
+    @NotNull
     protected PremiseEval newMatcher() {
         return new PremiseEval(random, newDeriver());
     }
@@ -189,7 +190,7 @@ public abstract class AbstractNAR extends NAR {
     }
 
     /** initialize a new concept: set initial capacity policy, etc */
-    final protected void init(Concept c) {
+    final protected void init(@NotNull Concept c) {
         c.capacity(conceptCold);
     }
 

@@ -53,6 +53,7 @@ public class PatternIndex extends RawTermIndex {
                 new PatternCompound.PatternCompoundSimple(seed, vv);
     }
 
+    @NotNull
     private static PatternCompound makeEllipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
 
 

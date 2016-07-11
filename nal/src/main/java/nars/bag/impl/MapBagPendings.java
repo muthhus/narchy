@@ -4,6 +4,7 @@ import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.budget.merge.BudgetMerge;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
 
     private final BudgetMerge merge;
+    @NotNull
     private final Map<X, Budget> pending;
     int capacity;
 
@@ -65,7 +67,7 @@ public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
     }
 
     @Override
-    public void apply(ArrayBag<X> target) {
+    public void apply(@NotNull ArrayBag<X> target) {
         Iterator<Map.Entry<X, Budget>> ii = pending.entrySet().iterator();
         while (ii.hasNext()) {
             Map.Entry<X, Budget> kb = ii.next();

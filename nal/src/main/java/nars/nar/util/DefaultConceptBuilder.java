@@ -37,7 +37,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 //            (Variable v) -> new VariableConcept(v);
 
     @Nullable
-    final Termed newConcept(Compound t){
+    final Termed newConcept(@NotNull Compound t){
 
         switch (t.op()) {
             case INH:
@@ -81,6 +81,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     public final Random rng; //shared
+    @NotNull
     public final CurveBag.CurveSampler defaultCurveSampler; //shared
 
 

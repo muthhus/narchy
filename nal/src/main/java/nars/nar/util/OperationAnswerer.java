@@ -6,6 +6,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -14,10 +15,11 @@ import java.util.Map;
  */
 abstract public class OperationAnswerer extends Answerer {
 
+    @NotNull
     private final ObjectIntHashMap argIndex;
     private final int numArgs;
 
-    public OperationAnswerer(Compound pattern, NAR n) {
+    public OperationAnswerer(@NotNull Compound pattern, @NotNull NAR n) {
         super(pattern, n);
         if (!Op.isOperation(pattern))
             throw new RuntimeException(pattern + " is not an operation compound pattern");
@@ -34,7 +36,7 @@ abstract public class OperationAnswerer extends Answerer {
     }
 
     @Override
-    protected final void onMatch(Map<Term, Term> xy) {
+    protected final void onMatch(@NotNull Map<Term, Term> xy) {
         Term[] args = new Term[numArgs];
         xy.forEach((k, v) -> {
             int i = argIndex.getIfAbsent(k, -1);

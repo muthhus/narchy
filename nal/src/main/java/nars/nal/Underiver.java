@@ -2,6 +2,7 @@ package nars.nal;
 
 import nars.Premise;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -16,6 +17,6 @@ public interface Underiver {
     /**
      * a forward deriver implementation which it will use to check its results
      */
-    Deriver deriver();
+    @NotNull Deriver deriver();
 
 }

@@ -82,12 +82,14 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Nullable
         @Override
         public Task topTemporal(long when, long now, Task against) {
             return null;
         }
 
 
+        @Nullable
         @Override
         public Truth truth(long when, long now) {
             return null;
@@ -185,7 +187,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
-    Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar);
+    @Nullable Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar);
 
 
 //    @Nullable
@@ -235,7 +237,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable Task topEternal();
 
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
-    Task topTemporal(long when, long now, @Nullable Task against);
+    @Nullable Task topTemporal(long when, long now, @Nullable Task against);
 
 
 
@@ -366,7 +368,7 @@ public interface BeliefTable extends TaskTable {
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available */
-    Truth truth(long when, long now);
+    @Nullable Truth truth(long when, long now);
 
 
 
@@ -378,7 +380,8 @@ public interface BeliefTable extends TaskTable {
      *
      *  TODO consider similarity of any of term's recursive 'dt' temporality in ranking
      * */
-    default Task match(Task target, long now) {
+    @Nullable
+    default Task match(@NotNull Task target, long now) {
 
         int size = size();
         if (size == 0)

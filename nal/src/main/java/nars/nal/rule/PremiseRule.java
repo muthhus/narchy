@@ -900,7 +900,7 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void notOp(Term task, Term belief, Set<BoolCondition> pres, ListMultimap<Term, MatchConstraint> constraints, Term t, int structure) {
+    public static void notOp(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
         constraints.put(t, new NotOpConstraint(structure));
         if (t.equals(task)) {
             pres.add(new PatternOpNot(0, structure));
@@ -910,7 +910,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    public void neq(Collection<BoolCondition> pres, Term task, Term belief, ListMultimap<Term, MatchConstraint> constraints, Term arg1, Term arg2) {
+    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, Term arg1, Term arg2) {
         //find if the two compared terms are recursively contained as subterms of either the task or belief
         //and if so, create a precondition constraint rather than a matcher constraint
 
@@ -945,7 +945,7 @@ public class PremiseRule extends GenericCompound {
 
     }
 
-    static @Nullable int[] nonCommutivePathTo(Term term, Term arg1) {
+    static @Nullable int[] nonCommutivePathTo(@NotNull Term term, Term arg1) {
         int[] p = term.pathTo(arg1);
         if (p == null) return null;
         if (p.length == 0) return p;
@@ -1033,6 +1033,7 @@ public class PremiseRule extends GenericCompound {
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");
 
+    @NotNull
     public PremiseRule positive(PatternIndex index) {
 
 //        Term[] pp = getPremise().terms().clone();
@@ -1089,7 +1090,8 @@ public class PremiseRule extends GenericCompound {
     /**
      * safe negation
      */
-    private static Term neg(Term x) {
+    @NotNull
+    private static Term neg(@NotNull Term x) {
         if (x.op() == Op.NEG) {
             return ((Compound) x).term(0); //unwrap
         } else {

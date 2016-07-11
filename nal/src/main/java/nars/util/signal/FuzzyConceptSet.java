@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +19,13 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
 
 
     private final FloatSupplier input;
+    @NotNull
     public final List<SensorConcept> sensors;
+    @NotNull
     private final NAR nar;
     float conf;
 
-    public FuzzyConceptSet(FloatSupplier input, NAR nar, String... states) {
+    public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
 
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
         this.input = input;
@@ -102,12 +105,14 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
 //			return t(f, c * conf);
 //		}
 
+    @NotNull
     public FuzzyConceptSet pri(float p) {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
             sensors.get(i).pri(p);
         }
         return this;
     }
+    @NotNull
     public FuzzyConceptSet resolution(float r) {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
             sensors.get(i).resolution(r);
@@ -115,12 +120,14 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         return this;
     }
 
+    @NotNull
     public FuzzyConceptSet conf(float c) {
         this.conf = c;
         return this;
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return Joiner.on("\t").join(Iterators.transform(
@@ -136,6 +143,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     }
 
 
+    @NotNull
     @Override
     public Iterator<SensorConcept> iterator() {
         return sensors.iterator();

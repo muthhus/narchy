@@ -55,6 +55,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
 
 
         private int capacity;
+        @NotNull
         private final TreeMultimap<Long, Task> map;
 
         public SensorTemporalBeliefTable(@Deprecated Map<Task, Task> outerMap, int capacity) {
@@ -124,7 +125,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        public int compare(Task o1, Task o2) {
+        public int compare(@NotNull Task o1, @NotNull Task o2) {
             return Long.compare(o1.occurrence(), o2.occurrence());
         }
 
@@ -171,6 +172,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
 
         }
 
+        @Nullable
         @Override
         public Iterator<Task> iterator() {
             return null;

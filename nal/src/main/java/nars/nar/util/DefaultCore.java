@@ -26,7 +26,7 @@ public class DefaultCore extends AbstractCore {
     private final DefaultConceptPolicy warm;
 
 
-    public DefaultCore(@NotNull NAR nar, PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
         super(nar, matcher);
         this.warm = warm;
         this.cold = cold;
@@ -34,7 +34,7 @@ public class DefaultCore extends AbstractCore {
 
 
     /** called when a concept is displaced from the concept bag */
-    protected void deactivate(Concept c) {
+    protected void deactivate(@NotNull Concept c) {
 
         c.capacity(cold);
 
@@ -72,12 +72,13 @@ public class DefaultCore extends AbstractCore {
 
         final NAR nar;
 
-        public MonitoredCurveBag(NAR nar, int capacity, CurveSampler sampler) {
+        public MonitoredCurveBag(NAR nar, int capacity, @NotNull CurveSampler sampler) {
             super(capacity, sampler, BudgetMerge.plusDQBlend);
             this.nar = nar;
             setCapacity(capacity);
         }
 
+        @NotNull
         @Override
         protected BagPendings<Concept> newPendings() {
             return new MapBagPendings(mergeFunction);
@@ -90,6 +91,7 @@ public class DefaultCore extends AbstractCore {
         }
 
 
+        @Nullable
         @Override
         protected BLink<Concept> putNew(@NotNull Concept i, @NotNull BLink<Concept> b) {
             if (!activate(i))
@@ -102,7 +104,7 @@ public class DefaultCore extends AbstractCore {
         }
 
         @Override
-        protected void putFail(Concept c) {
+        protected void putFail(@NotNull Concept c) {
             deactivate(c);
         }
 

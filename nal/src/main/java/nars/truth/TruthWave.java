@@ -80,7 +80,7 @@ public class TruthWave {
         this.current = b.truth(now);
     }
 
-    public static void load(float[] t, Truthed x, int j, long occ, float q) {
+    public static void load(float[] t, @Nullable Truthed x, int j, long occ, float q) {
         if (x == null)
             return;
         t[j++] = x.freq();
@@ -103,7 +103,7 @@ public class TruthWave {
 
 
     /** fills the wave with evenly sampled points in a time range */
-    public void setProjected(BeliefTable table, float minT, float maxT, int points) {
+    public void setProjected(@NotNull BeliefTable table, float minT, float maxT, int points) {
         if (minT == maxT) {
             clear();
             return;

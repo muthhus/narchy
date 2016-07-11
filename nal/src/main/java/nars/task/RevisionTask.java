@@ -20,12 +20,12 @@ import org.jetbrains.annotations.NotNull;
 public class RevisionTask extends AnswerTask  {
 
 
-    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
+    public RevisionTask(@NotNull Termed<Compound> term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief, oldBelief, conclusion, creationTime, occTime, 0.5f);
 
     }
 
-    public RevisionTask(Compound c, Task a, Task b, long now, long newOcc, float aMix, Truth newTruth) {
+    public RevisionTask(@NotNull Compound c, @NotNull Task a, @NotNull Task b, long now, long newOcc, float aMix, Truth newTruth) {
         super(c, a, b, newTruth, now, newOcc, aMix);
 
         if (!a.isBeliefOrGoal() || !b.isBeliefOrGoal() )

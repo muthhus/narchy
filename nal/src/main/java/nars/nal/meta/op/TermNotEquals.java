@@ -18,6 +18,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
 
     //0=task, 1=belief term pattern
     private final int a, b;
+    @NotNull
     private final String id;
 
     /** TODO the shorter path should be set for 'a' if possible, because it will be compared first */
@@ -56,7 +57,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
         return !ta.equals(tb);
     }
 
-    public static Term resolve(Term ca, int[] aPath) {
+    public static Term resolve(Term ca, @NotNull int[] aPath) {
         if (aPath.length == 0)
             return ca;
         else {

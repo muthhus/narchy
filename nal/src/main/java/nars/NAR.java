@@ -114,7 +114,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     private final Collection<Object> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
 
-    public NAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
+    public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, rng, index);
 
         the(NAR.class, this);
@@ -171,11 +171,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     /** change the identity of this NAR */
-    public NAR setSelf(Atom nextSelf) {
+    @NotNull
+    public NAR setSelf(@NotNull Atom nextSelf) {
         this.self = nextSelf;
         return this;
     }
-    public NAR setSelf(String nextSelf) {
+    @NotNull
+    public NAR setSelf(@NotNull String nextSelf) {
         return setSelf($.$(nextSelf));
     }
 
@@ -822,7 +824,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
     }
 
-    public Future runAsync(Runnable t, int maxRunsPerFrame) {
+    @Nullable
+    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
         final Semaphore s = new Semaphore(0);
         onFrame(nn->{
             int a = s.availablePermits();
@@ -976,7 +979,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return index.concept(t, createIfMissing);
     }
 
-    @NotNull
+    @Nullable
     public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
 
     @NotNull
@@ -1046,14 +1049,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * gets a measure of the current priority of the concept
      */
-    abstract public float conceptPriority(Termed termed);
+    abstract public float conceptPriority(@NotNull Termed termed);
 
     public Termed[] terms(String... terms) {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
     /** text output */
-    public void outputTasks(Predicate<Task> filter, PrintStream out) {
+    public void outputTasks(@NotNull Predicate<Task> filter, @NotNull PrintStream out) {
         forEachConceptTask(c-> {
             if (filter.test(c))
                 out.println(c.term().toString() + c.punc() + " " + c.truth()); //TODO occurence time
@@ -1075,24 +1078,25 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //        pw.close();
 //    }
 
-    public On onTask(Consumer<Task> o) {
+    @NotNull
+    public On onTask(@NotNull Consumer<Task> o) {
         return eventTaskProcess.on(o);
     }
 
-    public @NotNull NAR believe(Termed<Compound> c, Tense tense) {
+    public @NotNull NAR believe(@NotNull Termed<Compound> c, @NotNull Tense tense) {
         return believe(c, tense, 1f);
     }
 
     /** installs a concept in the index and activates it, used for setup of custom concept implementations
      *  implementations should apply active concept capacity policy
      * */
-    public final void on(Concept c) {
+    public final void on(@NotNull Concept c) {
         index.set(c);
         on.add(c);
     }
 
     /** processes the input before the next frame has run */
-    public final void inputLater(Task ap) {
+    public final void inputLater(@NotNull Task ap) {
         if (!running.get()) {
             input(ap);
         } else {
@@ -1155,7 +1159,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public NAR output(File f, boolean append, @NotNull Predicate<Task> each) throws IOException {
+    public NAR output(@NotNull File f, boolean append, @NotNull Predicate<Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         output(ff, each);
         ff.close();
@@ -1224,11 +1228,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      *  but it will be reinforced via peer tasklinks activation.
      *  (a normal duplicate task going through process() will not have this behavior.)
      */
-    public final void activate(Task t, float scale) {
+    public final void activate(@NotNull Task t, float scale) {
         activate(t.concept(this), t, scale, scale, null);
     }
 
-    public final void activate(Task t) {
+    public final void activate(@NotNull Task t) {
         activate(t, 1f);
     }
 

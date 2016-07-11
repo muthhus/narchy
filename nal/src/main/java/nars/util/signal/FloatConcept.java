@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class FloatConcept extends SensorConcept {
 
 
+    @NotNull
     private final MutableFloat value;
 
     public FloatConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {

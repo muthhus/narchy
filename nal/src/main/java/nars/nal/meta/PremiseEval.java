@@ -70,6 +70,7 @@ public class PremiseEval extends FindSubst {
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;
+    @Nullable
     public Task task, belief;
     public char taskPunct;
 
@@ -104,7 +105,7 @@ public class PremiseEval extends FindSubst {
 
     }
 
-    protected void put(Term t) {
+    protected void put(@NotNull Term t) {
         putXY(t,t);
     }
 
@@ -174,7 +175,7 @@ public class PremiseEval extends FindSubst {
     }
 
 
-    public void init(NAR nar) {
+    public void init(@NotNull NAR nar) {
         this.nar = nar;
         this.confMin = nar.confMin.floatValue();
     }

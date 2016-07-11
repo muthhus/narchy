@@ -17,7 +17,7 @@ public enum DesireFunction implements TruthOperator {
 
     @SinglePremise
     Negation() {
-        @NotNull
+        @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return TruthFunctions.negation(T, minConf);
         }
@@ -64,7 +64,7 @@ public enum DesireFunction implements TruthOperator {
 
     @SinglePremise
     Identity() {
-        @NotNull
+        @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return TruthOperator.identity(T, minConf);
         }
@@ -81,7 +81,7 @@ public enum DesireFunction implements TruthOperator {
     @SinglePremise
     @AllowOverlap
     StructuralDeduction() {
-        @NotNull
+        @Nullable
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
             return T != null ? TruthFunctions.deduction1(T, defaultTruth(m).conf(), minConf) : null;
         }

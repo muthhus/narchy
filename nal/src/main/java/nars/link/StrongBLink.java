@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 public class StrongBLink<X> extends DefaultBLink<X> {
 
     ///** the referred item */
+    @Nullable
     public X id;
 
     public StrongBLink(X id, float p, float d, float q) {

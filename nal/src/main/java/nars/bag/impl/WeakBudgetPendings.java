@@ -3,6 +3,8 @@ package nars.bag.impl;
 import nars.bag.WeakBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.util.data.map.UnifriedMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import java.util.Map;
 public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
 
     private final BudgetMerge merge;
+    @Nullable
     private /*Reference*/ WeakBudgetMap<X> pending;
 
 
@@ -62,6 +65,7 @@ public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
 //
 //        }
 
+    @NotNull
     public Map<X, WeakBudget<X>> newInternalMap() {
         //return new HashMap();
         return new UnifriedMap<>(8);
@@ -75,7 +79,7 @@ public class WeakBudgetPendings<X> extends ArrayBag.BagPendings<X> {
     }
 
     @Override
-    public void apply(ArrayBag<X> target) {
+    public void apply(@NotNull ArrayBag<X> target) {
         WeakBudgetMap<X> n = this.pending;
         if (n != null) {
             this.pending = null;

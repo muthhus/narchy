@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Premise extends Tasked {
 
-    @NotNull
+    @Nullable
     @Override
     Task task();
 

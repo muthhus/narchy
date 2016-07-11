@@ -18,6 +18,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @NotNull
     public final Cache<Termed, Termed> data;
+    @NotNull
     public final Cache<TermContainer, TermContainer> subs;
 
     private static final Weigher<Termlike, Termlike> complexityWeigher = (k, v) -> {
@@ -39,7 +40,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         }
     };
 
-    private static float maxConfidence(CompoundConcept v) {
+    private static float maxConfidence(@NotNull CompoundConcept v) {
         return Math.max(v.beliefs().confMax(), v.goals().confMax());
     }
 
@@ -157,6 +158,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 
 
+    @NotNull
     @Override
     protected TermContainer put(@NotNull TermContainer s) {
         subs.put(s, s);
@@ -165,6 +167,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
 
+    @NotNull
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
         return data.get(x, this::buildConcept);

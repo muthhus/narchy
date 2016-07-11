@@ -31,7 +31,7 @@ abstract public class events extends AtomicBoolCondition {
 
     };
 
-    public static boolean beliefBeforeOrDuringTask(Task task, Task belief) {
+    public static boolean beliefBeforeOrDuringTask(@NotNull Task task, @Nullable Task belief) {
 
         if (belief == null)
             return false;
@@ -98,6 +98,7 @@ abstract public class events extends AtomicBoolCondition {
     };
 
     private static class IfTermLinkBefore extends events {
+        @NotNull
         @Override
         public String toString() {
             return "ifTermLinkBefore";

@@ -96,7 +96,7 @@ public final class AutoBag<V> implements BudgetForget {
     }
 
     @Override
-    public void accept(BLink bLink) {
+    public void accept(@NotNull BLink bLink) {
 
         float eDur = bLink.dur() * maxEffectiveDurability;
         bLink.priMult( 1f - (ratio * (1f - eDur) ));

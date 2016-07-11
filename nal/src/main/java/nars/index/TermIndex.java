@@ -135,7 +135,7 @@ public interface TermIndex {
 //    }
 
     @Nullable
-    default Term build(@NotNull Compound csrc, Term[] newSubs) {
+    default Term build(@NotNull Compound csrc, @NotNull Term[] newSubs) {
         return builder().build(csrc.op(), csrc.dt(), newSubs);
     }
 
@@ -361,6 +361,7 @@ public interface TermIndex {
 
 
 
+    @Nullable
     default Compound normalize(@NotNull Termed<Compound> t, boolean insert) {
         Compound r;
         if (!t.isNormalized()) {
@@ -535,10 +536,12 @@ public interface TermIndex {
         return "";
     }
 
+    @Nullable
     default Term remap(@NotNull Term src, Map<Term, Term> m) {
         return termOrNull(resolve(src, new MapSubst(m)));
     }
 
+    @Nullable
     default Termed remove(Termed entry) {
         throw new UnsupportedOperationException();
     }
@@ -593,6 +596,7 @@ public interface TermIndex {
         return (x instanceof Compound) && (!(x instanceof Concept)) && (x.hasTemporal());
     }
 
+    @Nullable
     default Compound atemporalize(@NotNull Compound c) {
         if (!possiblyTemporal(c))
             return c;
@@ -605,9 +609,10 @@ public interface TermIndex {
     final class CompoundAtemporalizer implements CompoundTransform<Compound,Term> {
 
         private final TermIndex index;
+        @Nullable
         private final Compound result;
 
-        public CompoundAtemporalizer(TermIndex index, Compound c) {
+        public CompoundAtemporalizer(TermIndex index, @NotNull Compound c) {
             this.index = index;
             result = _atemporalize(c);
         }

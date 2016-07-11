@@ -118,7 +118,8 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return this;
 	}
 
-	public Bag<Task> tasklinks() {
+	@NotNull
+    public Bag<Task> tasklinks() {
 		return concept().tasklinks();
 	}
 

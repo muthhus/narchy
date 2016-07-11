@@ -66,7 +66,7 @@ public interface Termlike {
         return otherTermsVolume > volume();
     }
 
-    Term termOr(int i, @Nullable Term ifOutOfBounds);
+    @Nullable Term termOr(int i, @Nullable Term ifOutOfBounds);
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >

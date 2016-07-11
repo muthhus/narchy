@@ -1,7 +1,6 @@
 package nars.term;
 
 import com.gs.collections.api.set.MutableSet;
-import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
 import nars.Op;
 import nars.index.TermIndex;
@@ -96,7 +95,7 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private static Term[] filterTrueFalseImplicits(Op o, Term[] u) {
+    private static Term[] filterTrueFalseImplicits(Op o, @NotNull Term[] u) {
         int imdices = 0;
         for (Term x : u) {
             if (x == True) {
@@ -360,7 +359,7 @@ public abstract class TermBuilder {
 
 
         TreeSet<Term> s = new TreeSet();
-        int negations = /*UnifiedSet<Term> unwrappedNegs = */flatten(op, u, dt, s, null);
+        int negations = /*UnifiedSet<Term> unwrappedNegs = */flatten(op, u, dt, s);
 
         //boolean negate = false;
         int n = s.size();
@@ -416,11 +415,11 @@ public abstract class TermBuilder {
     }
 
     /** returns # of terms negated */
-    static /*UnifiedSet<Term>*/int flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s, @NotNull UnifiedSet<Term> unwrappedNegations) {
+    static /*UnifiedSet<Term>*/int flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
         int negations = 0;
         for (Term x : u) {
             if ((x.op() == op) && (((Compound) x).dt()==dt) /* 0 or DTERNAL */) {
-                negations += /*unwrappedNegations = */flatten(op, ((Compound) x).terms(), dt, s, unwrappedNegations); //recurse
+                negations += /*unwrappedNegations = */flatten(op, ((Compound) x).terms(), dt, s); //recurse
             } else {
                 if (s.add(x)) { //ordinary term, add
                     if (x.op() == NEG) {
@@ -651,7 +650,8 @@ public abstract class TermBuilder {
         return build(csrc.op(), csrc.dt(), newSubs);
     }
 
-    public final Term build(@NotNull Compound csrc, TermContainer newSubs) {
+    @Nullable
+    public final Term build(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
         if (csrc.subterms().equals(newSubs))
             return csrc;
         else

@@ -64,6 +64,7 @@ public enum $ {
 
 
 
+    @NotNull
     public static <T extends Term> T $(@NotNull String term) {
         return (T)Narsese.the().term(term, terms, true);
     }
@@ -132,14 +133,14 @@ public enum $ {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Atomic opTerm, Term... arg) {
+    public static Compound exec(@NotNull Atomic opTerm, @Nullable Term... arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
-    @NotNull public static Compound exec(@NotNull Atomic opTerm, Collection<Term> arg) {
+    @NotNull public static Compound exec(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
@@ -365,6 +366,7 @@ public enum $ {
 
 
     /** parallel conjunction &| aka &&+0 */
+    @Nullable
     public static Term parallel(Term... s) {
         return compound(CONJ, 0, s);
     }
@@ -511,7 +513,7 @@ public enum $ {
     }
 
     @Nullable
-    public static Term compound(@NotNull Op op, int dt, Term... subterms) {
+    public static Term compound(@NotNull Op op, int dt, @NotNull Term... subterms) {
         return terms.build(op, dt, subterms);
     }
 
@@ -689,6 +691,7 @@ public enum $ {
         return ext ? $.inh(related, img) : $.inh(img, related);
     }
 
+    @Nullable
     public static Term imageMask(int relation, boolean ext, @NotNull Term[] elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         return compound(ext ? IMGe : IMGi, relation, elementsMasked);
@@ -705,16 +708,17 @@ public enum $ {
         return image(relation, false, product.terms());
     }
 
-    @NotNull
+    @Nullable
     public static Truth t(float f, float c) {
         return t(f, c, Global.TRUTH_EPSILON);
     }
 
-    @NotNull
+    @Nullable
     public static Truth t(float f, float c, float minConf) {
         return c < minConf ? null : new DefaultTruth(f, c);
     }
 
+    @NotNull
     public static Budget b(float p, float d, float q) {
         return new UnitBudget(p, d, q);
     }
@@ -770,7 +774,8 @@ public enum $ {
 
 
     /** positivize: unwraps a negation term if negated */
-    public static Term pos(Term possiblyNegative) {
+    @Nullable
+    public static Term pos(@NotNull Term possiblyNegative) {
         if (possiblyNegative.op() == NEG) {
             // (--,(--,P)) = P
             return ((TermContainer) possiblyNegative).term(0);
@@ -782,6 +787,7 @@ public enum $ {
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 
+        @NotNull
         @Override
         public Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
             return new GenericCompound(op, dt, subterms);

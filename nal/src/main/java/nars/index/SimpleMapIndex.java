@@ -19,6 +19,7 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
         this.concepts = compounds;
     }
 
+    @NotNull
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
         return concepts.computeIfAbsent(x, this::buildConcept);

@@ -43,7 +43,7 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<Term>> termsArray, @NotNull BLink<Task> taskLink, PremiseEval matcher) {
+    public static int run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<Term>> termsArray, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher) {
 
         int count = 0;
         long now = nar.time();

@@ -27,14 +27,18 @@ import java.util.function.Predicate;
 
 public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,Termlike {
 
+    @NotNull
     private final Bag<Task> taskLinks;
+    @NotNull
     private final Bag<Term> termLinks;
 
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
+    @NotNull
     final TermSet templates;
+    @NotNull
     private final T term;
 
     @Nullable
@@ -94,6 +98,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return taskLinks;
     }
 
+    @NotNull
     @Override
     public Bag<Term> termlinks() {
         return termLinks;
@@ -134,45 +139,53 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
 
     @NotNull
-    static QuestionTable questionTableOrEmpty(QuestionTable q) {
+    static QuestionTable questionTableOrEmpty(@Nullable QuestionTable q) {
         return q !=null ? q : QuestionTable.EMPTY;
     }
     @NotNull
-    static BeliefTable beliefTableOrEmpty(BeliefTable b) {
+    static BeliefTable beliefTableOrEmpty(@Nullable BeliefTable b) {
         return b !=null ? b : BeliefTable.EMPTY;
     }
 
+    @NotNull
     final QuestionTable questionsOrNew() {
         return questions == null ? (questions = new ArrayQuestionTable(policy.questionCap(true))) : questions;
     }
+    @NotNull
     final QuestionTable questsOrNew() {
         return quests == null ? (quests = new ArrayQuestionTable(policy.questionCap(false))) : quests;
     }
+    @NotNull
     final BeliefTable beliefsOrNew() {
         return beliefs == null ? (beliefs = newBeliefTable()) : beliefs;
     }
 
 
+    @NotNull
     final BeliefTable goalsOrNew() {
         return goals == null ? (goals = newGoalTable()) : goals;
     }
 
+    @NotNull
     protected BeliefTable newBeliefTable() {
         int eCap = policy.beliefCap(this, true, true);
         int tCap = policy.beliefCap(this, true, false);
         return newBeliefTable(eCap, tCap);
     }
 
+    @NotNull
     protected BeliefTable newBeliefTable(int eCap, int tCap) {
         return new DefaultBeliefTable(eCap, tCap);
     }
 
+    @NotNull
     protected BeliefTable newGoalTable() {
         int eCap = policy.beliefCap(this, false, true);
         int tCap = policy.beliefCap(this, false, false);
         return newGoalTable(eCap, tCap);
     }
 
+    @NotNull
     protected BeliefTable newGoalTable(int eCap, int tCap) {
         return new DefaultBeliefTable(eCap, tCap);
     }
@@ -237,6 +250,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
+    @Nullable
     synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
 
         if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
@@ -328,7 +342,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
     @Override
-    public void linkAny(Budgeted b, float scale, float minScale, NAR nar, @Nullable MutableFloat conceptOverflow) {
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, NAR nar, @Nullable MutableFloat conceptOverflow) {
         linkSubs(b, scale, minScale, nar, conceptOverflow);
         //linkPeers(b, scale, nar, false);
     }
@@ -465,6 +479,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return term.toString();
     }
 
+    @NotNull
     public Term term(int i) {
         return term.term(i);
     }
@@ -475,7 +490,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
     @Deprecated @Override
-    public boolean containsTerm(Termlike t) {
+    public boolean containsTerm(@NotNull Termlike t) {
         return term.containsTerm(t);
     }
 
@@ -484,18 +499,19 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return term.hasTemporal();
     }
 
+    @Nullable
     @Deprecated @Override
     public Term termOr(int i, @Nullable Term ifOutOfBounds) {
         return term.termOr(i, ifOutOfBounds);
     }
 
     @Deprecated @Override
-    public boolean and(Predicate<Term> v) {
+    public boolean and(@NotNull Predicate<Term> v) {
         return term.and(v);
     }
 
     @Deprecated @Override
-    public boolean or(Predicate<Term> v) {
+    public boolean or(@NotNull Predicate<Term> v) {
         return term.or(v);
     }
 

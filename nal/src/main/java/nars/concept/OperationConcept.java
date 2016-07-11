@@ -26,7 +26,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     protected volatile boolean pendingRun;
 
 
-    public OperationConcept(@NotNull Compound term, Bag<Term> termLinks, Bag<Task> taskLinks) {
+    public OperationConcept(@NotNull Compound term, @NotNull Bag<Term> termLinks, @NotNull Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
     }
 
@@ -70,7 +70,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
         return t;
     }
 
-    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, NAR nar) {
+    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, @NotNull NAR nar) {
         return hasGoals() && operationExec(operationConcept(nar))!=null;
     }
 
@@ -86,16 +86,16 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
 
     }
 
-    public @Nullable Topic<OperationConcept> operationExec(NAR nar) {
+    public @Nullable Topic<OperationConcept> operationExec(@NotNull NAR nar) {
         return operationExec(operationConcept(nar));
     }
 
     public @Nullable
-    static Topic<OperationConcept> operationExec(Concept<?> c) {
+    static Topic<OperationConcept> operationExec(@Nullable Concept<?> c) {
         return c != null ? c.get(Execution.class) : null;
     }
 
-    public @Nullable final Concept operationConcept(NAR nar) {
+    public @Nullable final Concept operationConcept(@NotNull NAR nar) {
         return nar.concept(
             term().term(1) //operator is the predicate
         );

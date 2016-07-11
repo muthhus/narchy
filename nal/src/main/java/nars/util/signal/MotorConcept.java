@@ -65,7 +65,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         this($(compoundTermString), n, MotorFunction.NoFeedback);
     }
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatFloatProcedure update) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull FloatFloatProcedure update) throws Narsese.NarseseException {
         this($(compoundTermString), n, (b,d) -> {
             update.value(b, d);
             return Float.NaN;

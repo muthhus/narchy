@@ -25,9 +25,10 @@ import java.util.stream.StreamSupport;
  */
 public class Cache2kIndex extends MaplikeIndex {
 
+    @NotNull
     final ClockProPlusCache data;
 
-    public Cache2kIndex(long cap, Random rng) {
+    public Cache2kIndex(long cap, @NotNull Random rng) {
         super(new DefaultConceptBuilder(rng));
 
         CacheConfiguration cfg = Cache2kBuilder.forUnknownTypes().
@@ -94,6 +95,7 @@ public class Cache2kIndex extends MaplikeIndex {
         return 0;
     }
 
+    @NotNull
     @Override
     public Termed remove(Termed entry) {
         return (Termed) data.peekAndRemove(entry);
@@ -131,12 +133,13 @@ public class Cache2kIndex extends MaplikeIndex {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> cc) {
+    public void forEach(@NotNull Consumer<? super Termed> cc) {
         StreamSupport.stream(data.spliterator(), false).filter(x -> x instanceof Termed).
                 forEach(x -> cc.accept((Termed) x));
     }
 
     private static class NullLoader extends CacheLoader {
+        @Nullable
         @Override
         public Object load(Object o) throws Exception {
             return null;

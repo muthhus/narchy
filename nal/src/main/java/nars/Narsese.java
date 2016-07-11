@@ -1010,7 +1010,8 @@ public class Narsese extends BaseParser<Object> {
             .build();
 
 
-    private static Term _popTerm(Op op, List vectorterms) {
+    @Nullable
+    private static Term _popTerm(@NotNull Op op, @NotNull List vectorterms) {
         Collections.reverse(vectorterms);
 
         for (int i = 0, vectortermsSize = vectorterms.size(); i < vectortermsSize; i++) {
@@ -1333,7 +1334,7 @@ public class Narsese extends BaseParser<Object> {
         public NarseseException(String input, Throwable cause) {
             this(input, null, cause);
         }
-        public NarseseException(String input, @NotNull ParsingResult result, Throwable cause) {
+        public NarseseException(String input, ParsingResult result, Throwable cause) {
             super(input + "\n" + result, cause);
             this.result = result;
         }

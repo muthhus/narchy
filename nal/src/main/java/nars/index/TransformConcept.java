@@ -9,6 +9,8 @@ import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * static-level instant term transform operations
@@ -21,13 +23,15 @@ public final class TransformConcept extends AtomConcept implements TermTransform
             new TransformConcept(new union())
     };
 
+    @NotNull
     private final TermTransform function;
 
-    public TransformConcept(TermTransform o) {
+    public TransformConcept(@NotNull TermTransform o) {
         super($.operator(o.getClass().getSimpleName()), Bag.EMPTY, Bag.EMPTY);
         this.function = o;
     }
 
+    @Nullable
     @Override
     public Term function(Compound args) {
 //            if (args.varPattern() > 0) {

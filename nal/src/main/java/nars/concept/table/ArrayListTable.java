@@ -32,6 +32,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
         forEach(t -> each.accept(key(t)));
     }
 
+    @NotNull
     @Override
     abstract public Iterator<L> iterator();
 
@@ -134,6 +135,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
 
     protected abstract void removeWeakest(Object reason);
 
+    @Nullable
     abstract public V weakest();
 
 //    @Override

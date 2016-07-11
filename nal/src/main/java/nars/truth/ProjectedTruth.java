@@ -7,7 +7,7 @@ public final class ProjectedTruth extends DefaultTruth {
 
 	public final long when;
 
-	public ProjectedTruth(Truth t, long when) {
+	public ProjectedTruth(@NotNull Truth t, long when) {
 		this(t.freq(), t.conf(), when);
 	}
 

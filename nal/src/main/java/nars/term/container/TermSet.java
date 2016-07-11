@@ -14,7 +14,7 @@ public class TermSet<X extends Term> extends TermVector {
         return new TermSet(Terms.toSortedSetArray(x));
     }
 
-    @NotNull public static TermSet concat(@NotNull Term[] a, Term... b) {
+    @NotNull public static TermSet concat(@NotNull Term[] a, @NotNull Term... b) {
         if ((a.length + b.length) == 2) {
             //simple case
             return TermSet.the(a[0], b[0]);
@@ -26,7 +26,7 @@ public class TermSet<X extends Term> extends TermVector {
 
     public
     @NotNull
-    static TermSet concat(TreeSet<Term> t, Term[] b) {
+    static TermSet concat(@NotNull TreeSet<Term> t, Term[] b) {
         Collections.addAll(t, b);
         return TermSet.the(t);
     }

@@ -4,6 +4,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
@@ -26,12 +27,14 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
     float merge(Budget existing, Budgeted incoming, float incomingScale);
 
 
+    @Nullable
     @Override
     default Budget apply(Budget existing, Budget incoming) {
         return apply(existing, incoming, 1f);
     }
 
-    default Budget apply(Budget existing, Budget incoming, float scale) {
+    @Nullable
+    default Budget apply(@Nullable Budget existing, Budget incoming, float scale) {
         if (existing == null)
             return incoming;
         else {

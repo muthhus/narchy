@@ -107,7 +107,7 @@ public interface Execution  {
      * which will be replaced with the result term (y)
      */
     @Nullable
-    static Term resultTerm(Atomic oper, @NotNull Compound x, @Nullable Term y) {
+    static Term resultTerm(@NotNull Atomic oper, @NotNull Compound x, @Nullable Term y) {
 
         //add var dep as last term if missing
         Term xLast = x.last();

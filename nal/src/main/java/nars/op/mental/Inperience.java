@@ -122,6 +122,7 @@ public class Inperience {
     }
 
 
+    @Nullable
     public static Atomic reify(char punc) {
         Atomic opTerm;
         switch (punc) {

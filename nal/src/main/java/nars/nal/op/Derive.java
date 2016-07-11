@@ -17,6 +17,7 @@ import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,13 +53,15 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
      * whether this a single or double premise derivation; necessary in case premise
      * does have a belief but it was not involved in determining Truth
      */
+    @Nullable
     private final TruthOperator belief;
+    @Nullable
     private final TruthOperator goal;
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
-                  TruthOperator belief, TruthOperator goal, boolean eternalize, @NotNull TimeFunctions temporalizer) {
+                  @Nullable TruthOperator belief, @Nullable TruthOperator goal, boolean eternalize, @NotNull TimeFunctions temporalizer) {
         this.rule = rule;
 
         this.belief = belief;
@@ -205,7 +208,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     }
 
-    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, Truth truth) {
+    final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth) {
         ConceptProcess premise = m.premise;
         NAR nar = m.nar;
 

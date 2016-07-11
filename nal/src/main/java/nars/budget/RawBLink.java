@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RawBLink<X> extends RawBudget {
 
+    @NotNull
     public final X x;
 
     public RawBLink(@NotNull X x, float p, float d, float q) {

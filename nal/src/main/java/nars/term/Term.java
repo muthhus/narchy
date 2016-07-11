@@ -59,7 +59,7 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
         return this;
     }
 
-    @NotNull
+    @Nullable
     @Override
     Op op();
 
@@ -302,7 +302,7 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
     /** returns an int[] path to the first occurrence of the specified subterm
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
      */
-    @Nullable default int[] pathTo(Term subterm) {
+    @Nullable default int[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this))
             return IntArrays.EMPTY_ARRAY;
         return null;

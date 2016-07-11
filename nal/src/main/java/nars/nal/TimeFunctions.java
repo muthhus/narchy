@@ -211,7 +211,7 @@ public interface TimeFunctions {
     @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, true);
     @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn, float[] confScale) -> decompose(derived, p, occReturn, false);
 
-    @NotNull
+    @Nullable
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
         ConceptProcess prem = p.premise;
 
@@ -862,7 +862,8 @@ public interface TimeFunctions {
 
     };
 
-    static Compound dt(Compound derived, int t) {
+    @Nullable
+    static Compound dt(@NotNull Compound derived, int t) {
         return (Compound) $.compound(derived.op(), t, derived.subterms().terms());
     }
 }

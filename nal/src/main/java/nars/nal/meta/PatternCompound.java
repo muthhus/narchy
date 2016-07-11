@@ -219,6 +219,7 @@ abstract public class PatternCompound extends GenericCompound {
      */
     public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
 
+        @Nullable
         private final EllipsisTransform ellipsisTransform;
 
         public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable EllipsisTransform ellipsis, @NotNull TermContainer subterms) {

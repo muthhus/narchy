@@ -10,7 +10,8 @@ public interface Termed<T extends Term>  {
 
     @NotNull T term();
 
-    @NotNull default Op op() { return term().op(); }
+    @Nullable
+    default Op op() { return term().op(); }
 
 
     default boolean levelValid(int nal) {

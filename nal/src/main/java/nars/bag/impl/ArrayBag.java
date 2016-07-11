@@ -108,7 +108,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         return (priIfFiniteElseNeg1(o1) > priIfFiniteElseNeg1(o2));
     }
 
-    static float priIfFiniteElseNeg1(Budgeted b) {
+    static float priIfFiniteElseNeg1(@Nullable Budgeted b) {
         if (b == null) return -1;
         float p = b.pri();
         return p == p ? p : -1;
@@ -316,6 +316,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
             return new StrongBLink(i, p, d, q);
     }
 
+    @Nullable
     protected BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
         synchronized(map) {
             BLink<V> removed = put(i, newBudget);
@@ -364,7 +365,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     transient private float bottomPri;
 
-    public final void commitPending(V key, float p, float d, float q) {
+    public final void commitPending(@NotNull V key, float p, float d, float q) {
         //final BiConsumer<V,RawBudget> eachPending = (key, inc) -> {
         //            if (key == null)
 //                continue; //link was destroyed before it could be processed
@@ -391,7 +392,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
     /** wraps the putNew call with a suffix that destroys the link at the end */
-    private final void putNewAndDeleteDisplaced(V key, @Nullable BLink<V> value) {
+    private final void putNewAndDeleteDisplaced(@NotNull V key, @Nullable BLink<V> value) {
         BLink<V> displaced = putNew(key, value);
         if (displaced!=null)
             displaced.delete();
@@ -481,8 +482,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
+    @Nullable
     @Override
-    public RawBudget apply(RawBudget bExisting, RawBudget bNext) {
+    public RawBudget apply(@Nullable RawBudget bExisting, RawBudget bNext) {
         if (bExisting != null) {
             mergeFunction.merge(bExisting, bNext, 1f);
             return bExisting;
@@ -638,6 +640,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     /**
      * returns mass (index 0) pending mass (index 1)
      */
+    @NotNull
     public float[] preCommit() {
         BLink<V>[] l = items.array();
         int s = size();

@@ -17,6 +17,7 @@ import java.lang.ref.SoftReference;
 
 abstract public class DerivedTask extends MutableTask {
 
+    @NotNull
     public final Reference<ConceptProcess> premise;
 
     //TODO should this also affect the Belief task?

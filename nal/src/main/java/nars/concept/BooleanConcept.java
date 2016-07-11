@@ -27,6 +27,7 @@ public class BooleanConcept extends CompoundConcept {
 
     public static final Operator AND_OP = $.operator("and");
     public static final Operator OR_OP = $.operator("or");
+    @Nullable
     private final Compound params;
 
 
@@ -213,6 +214,7 @@ public class BooleanConcept extends CompoundConcept {
             this.beliefOrGoal = beliefOrGoal;
         }
 
+        @NotNull
         @Override
         public NAR nar() {
             return nar;

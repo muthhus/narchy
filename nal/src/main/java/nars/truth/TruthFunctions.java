@@ -145,13 +145,12 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth resemblance(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
         float c = and(a.conf(), b.conf(), or(f1, f2));
         return (c < minConf) ? null : t(and(f1, f2), c);
-
     }
 
     /**
@@ -198,7 +197,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
         return c < minConf ? null : t(1, c);
@@ -365,7 +364,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         float c = and(v1.conf(), v2.conf());
         return c < minConf ? null : t(and(v1.freq(), v2.freq()), c);
@@ -377,7 +376,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
         return c < minConf ? null : t(v1.freq(), c);
@@ -441,7 +440,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth reduceDisjunction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         Truth nn = negation(b, minConf);
         if (nn == null) return null;
@@ -455,7 +454,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * {(--, (&&, A, B)), B} |- (--, A)
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth reduceConjunction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
 
         Truth n1 = negation(v1, minConf);
@@ -486,7 +485,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b,float minConf) {
         return reduceConjunction(a, negation(b, minConf), minConf);
     }
@@ -497,7 +496,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c1 = a.conf();
         float v0c = w2c(c1);
@@ -506,6 +505,7 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     /** decompose positive / negative */
+    @Nullable
     public static Truth decompose(@NotNull Truth a, @NotNull Truth b, boolean x, boolean y, boolean z, float minConf) {
         float f1 = a.freq(), c1 = a.conf(), f2 = b.freq(), c2 = b.conf();
         float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
@@ -513,7 +513,7 @@ public final class TruthFunctions extends UtilityFunctions {
         return c < minConf ? null : t(z ? f : 1 - f, c);
     }
 
-    @NotNull
+    @Nullable
     public static Truth difference(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = and(a.conf(), b.conf());
         return (c < minConf) ? null : t(and(a.freq(), (1 - b.freq())), c);
@@ -548,7 +548,7 @@ public final class TruthFunctions extends UtilityFunctions {
         return Global.HORIZON * c / (1 - Math.min(c, 1.0f - Global.TRUTH_EPSILON));
     }
 
-    public static float and(Truthed... tt) {
+    public static float and(@NotNull Truthed... tt) {
         float c = 1f;
         for (Truthed x : tt) {
             c *= x.conf();

@@ -25,6 +25,7 @@ import java.util.function.Function;
  */
 public class LibraryInput {
 
+    @NotNull
     private final List<Task> tasks;
     private String input;
 

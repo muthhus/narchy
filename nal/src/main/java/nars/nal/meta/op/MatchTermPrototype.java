@@ -122,6 +122,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
         return build(this.eachMatch);
     }
 
+    @Nullable
     abstract protected ProcTerm build(ProcTerm eachMatch);
 
     @Override

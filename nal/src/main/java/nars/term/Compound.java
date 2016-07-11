@@ -64,7 +64,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @NotNull
-    default boolean termsToSet(Collection<Term> t, boolean addOrRemoved) {
+    default boolean termsToSet(@NotNull Collection<Term> t, boolean addOrRemoved) {
         return termsToSet(-1, t, addOrRemoved);
     }
 
@@ -72,7 +72,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * returns whether the set operation caused a change or not
      */
     @NotNull
-    default boolean termsToSet(int inStructure, Collection<Term> t, boolean addOrRemoved) {
+    default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         boolean r = false;
         for (int i = 0; i < size(); i++) {
             @NotNull T s = term(i);
@@ -90,7 +90,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @NotNull
-    default boolean termsToSetRecurse(int inStructure, Collection<Term> t, boolean addOrRemoved) {
+    default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
         recurseTerms((SubtermVisitor)(s) -> {
 
@@ -157,13 +157,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @Nullable
-    default int[] pathTo(Term subterm) {
+    default int[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this)) return IntArrays.EMPTY_ARRAY;
         if (!containsTermRecursively(subterm)) return null;
         return pathTo(new IntArrayList(0), this, subterm);
     }
 
-    static int[] pathTo(IntArrayList p, Term superTerm, Term target) {
+    @Nullable
+    static int[] pathTo(@NotNull IntArrayList p, Term superTerm, @NotNull Term target) {
         if (superTerm instanceof Compound) {
             Compound cc = (Compound) superTerm;
             for (int i = 0; i < cc.size(); i++) {
@@ -381,7 +382,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return commutative(op(), size());
     }
 
-    public static boolean commutative(Op op, int size) {
+    public static boolean commutative(@NotNull Op op, int size) {
         return op.commutative && size > 1;
     }
 

@@ -187,9 +187,12 @@ public class BeliefTableChart extends JoglSpace2D {
 
         for (int i = num-1; i >=0; i--) {
             float my = 0f;//dy * 0.15f;
-            gl.glTranslatef(0,my/2,0);
-            draw(terms.get(i), concepts[i], gl, i, W, dy-my, minT, maxT);
-            gl.glTranslatef(0,dy-my/2,0);
+            Concept cc = concepts[i];
+            if (cc!=null) {
+                gl.glTranslatef(0,my/2,0);
+                draw(terms.get(i), cc, gl, i, W, dy-my, minT, maxT);
+                gl.glTranslatef(0,dy-my/2,0);
+            }
         }
         gl.glPopMatrix();
 

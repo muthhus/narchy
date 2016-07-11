@@ -269,7 +269,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     @Nullable
     @Override
-    public Task strongest(long when, long now, Task against) {
+    public Task strongest(long when, long now, @Nullable Task against) {
 
         //removeDeleted();
 
@@ -334,7 +334,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
     @Override
-    public final void removeIf(Predicate<Task> o) {
+    public final void removeIf(@NotNull Predicate<Task> o) {
         //TODO optimize, these iterators suck
         List<Task> toRemove = Global.newArrayList(0);
         for (Task x : this) {

@@ -42,7 +42,7 @@ public class IO {
 
 
     @NotNull
-    public static MutableTask readTask(@NotNull DataInput in, TermIndex t) throws IOException {
+    public static MutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
         Term term = readTerm(in, t);
 
@@ -120,17 +120,17 @@ public class IO {
     }
 
     @Nullable
-    public static Atomic readVariable(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         int x = in.readByte();
         return $.v(o, x);
     }
     @Nullable
-    public static void writeVariable(@NotNull DataOutput out, AbstractVariable v) throws IOException {
+    public static void writeVariable(@NotNull DataOutput out, @NotNull AbstractVariable v) throws IOException {
         out.writeByte(v.id);
     }
 
     @Nullable
-    public static Atomic readAtomic(@NotNull DataInput in, Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
         String s = in.readUTF();
         Term key;
         switch (o) {
@@ -240,7 +240,7 @@ public class IO {
 //        return (Compound) t.normalize(key, true);
     }
 
-    public static byte[] asBytes(Task t) {
+    public static byte[] asBytes(@NotNull Task t) {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTask(new DataOutputStream(bs), t);
@@ -252,7 +252,7 @@ public class IO {
 
     }
 
-    public static Task taskFromBytes(byte[] b, TermIndex index) {
+    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTask(new DataInputStream(new ByteArrayInputStream(b)), index);
         } catch (IOException e) {

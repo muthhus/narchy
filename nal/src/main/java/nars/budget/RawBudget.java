@@ -30,7 +30,7 @@ public class RawBudget implements Budget {
 
     }
 
-    public RawBudget(Budgeted b, float scale) {
+    public RawBudget(@NotNull Budgeted b, float scale) {
         this(b.pri()*scale, b.dur(), b.qua());
     }
 

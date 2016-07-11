@@ -7,8 +7,7 @@ import org.jetbrains.annotations.Nullable;
 @FunctionalInterface
 public interface Tasked  {
 
-    @NotNull
-    Task task();
+    @Nullable Task task();
 
     @Nullable
     static Task the(Object possiblyTask) {

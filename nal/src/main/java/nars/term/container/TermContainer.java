@@ -57,6 +57,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * returns subterm automatically casted as compound (Use with caution)
      */
+    @Nullable
     default public <C extends Compound> C cterm(int i) {
         return (C) term(i);
     }
@@ -107,7 +108,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
      * recursively
      */
     @NotNull
-    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, HashSet<Term> scratch) {
+    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -122,7 +123,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
     @NotNull
-    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, HashSet<Term> scratch) {
+    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables, @NotNull HashSet<Term> scratch) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -550,7 +551,8 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * a and b must be instances of input, and output must be of size input.length-2
      */
-    static Term[] except(@NotNull TermContainer input, Term a, Term b, Term[] output) {
+    @NotNull
+    static Term[] except(@NotNull TermContainer input, Term a, Term b, @NotNull Term[] output) {
 //        int targetLen = input.size() - 2;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
@@ -571,7 +573,8 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * a must be in input, and output must be of size input.length-1
      */
-    static Term[] except(@NotNull Term[] input, Term a, Term[] output) {
+    @NotNull
+    static Term[] except(@NotNull Term[] input, Term a, @NotNull Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");

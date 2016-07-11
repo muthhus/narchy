@@ -315,7 +315,7 @@ public class Terms   {
         }
     }
 
-    public static void printRecursive(PrintStream out, @NotNull Term x, int level) {
+    public static void printRecursive(@NotNull PrintStream out, @NotNull Term x, int level) {
         //indent
         for (int i = 0; i < level; i++)
             out.print("  ");
@@ -546,7 +546,7 @@ public class Terms   {
 
 
 
-    public static ImmutableSet<Term> unique(Term c, Predicate<Term> p) {
+    public static ImmutableSet<Term> unique(@NotNull Term c, @NotNull Predicate<Term> p) {
         UnifiedSet<Term> u = new UnifiedSet();
         c.recurseTerms(x -> {
             if (p.test(x)) {
@@ -556,6 +556,7 @@ public class Terms   {
         return u.toImmutable();
     }
 
+    @Nullable
     public static Compound compoundOrNull(Term t) {
         if (t instanceof Compound)
             return ((Compound) t);
