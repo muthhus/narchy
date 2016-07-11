@@ -1,8 +1,8 @@
 package nars.inter.gnutella;
 
+import nars.budget.Budget;
 import nars.inter.gnutella.message.*;
 import nars.inter.gnutella.thread.DownloadThread;
-import nars.inter.gnutella.thread.PeerThread;
 import nars.inter.gnutella.thread.ServerThread;
 import nars.util.Util;
 import nars.util.data.map.CapacityLinkedHashMap;
@@ -55,7 +55,7 @@ public class Peer {
 
 
     boolean running;
-    public final ConcurrentHashMap<SocketAddress, PeerThread> neighbors;
+    public final ConcurrentHashMap<SocketAddress, ServerThread> neighbors;
 
 
     private final ExecutorService pendingMessages = Executors.newSingleThreadExecutor();
@@ -127,7 +127,9 @@ public class Peer {
 
                 removeDeadConnections();
 
-                ping();
+                //if (GnutellaConstants.AUTO_PING_PER_N_MESSAGES == 0) {
+                    addPing();
+                //}
 
             }
         });
@@ -154,11 +156,12 @@ public class Peer {
             setMaxNodes();
         }
         if (neighbors.size() <= maxNodes) {
-            PeerThread node;
+            ServerThread node;
             try {
                 Socket sktTmp = new Socket(InetAddress.getByName(ip), port);
                 InetSocketAddress inetSocketA = new InetSocketAddress(
                         sktTmp.getInetAddress(), sktTmp.getLocalPort());
+
                 node = new ServerThread(sktTmp, this);
 
                 if (node.connexionRequest() == GnutellaConstants.ACCEPTED) {
@@ -171,22 +174,13 @@ public class Peer {
                     return true;
                 }
             } catch (IOException e) {
-
-                e.printStackTrace();
+                logger.warn("Connection fail: {}:{} ({})", ip, port, e.toString());
             }
-            System.err.println("DENIED CONNECCTION");
 
-            return false;
+
         }
 
         return false;
-    }
-
-    /**
-     * Used to actively discover hosts on the network
-     */
-    public void ping() {
-        addPing();
     }
 
     /**
@@ -200,6 +194,9 @@ public class Peer {
 
     public void query(byte[] searchCriteria) {
         broadcast(createQuery(searchCriteria));
+    }
+    public void query(byte[] searchCriteria, Budget b) {
+        broadcast(createQuery(searchCriteria), b);
     }
 
     /**
@@ -291,7 +288,7 @@ public class Peer {
 
 
     synchronized void removeDeadConnections() {
-        Iterator<Map.Entry<SocketAddress, PeerThread>> ii = neighbors.entrySet().iterator();
+        Iterator<Map.Entry<SocketAddress, ServerThread>> ii = neighbors.entrySet().iterator();
         while (ii.hasNext()) {
             if (!ii.next().getValue().connected()) {
                 ii.remove();
@@ -377,6 +374,8 @@ public class Peer {
     public final void handle(Message message) {
         boolean fordward = message.refreshMessage();
 
+        messageCount.incrementAndGet();
+
         switch (message.type) {
             case GnutellaConstants.PING:
                 onPing(message, fordward);
@@ -396,15 +395,13 @@ public class Peer {
 
         }
 
-        if (messageCount.incrementAndGet() % GnutellaConstants.AUTO_PING_PER_N_MESSAGES == 0) {
-            addPing();
-        }
+
     }
 
     public void onPing(Message message, boolean forward) {
         if (!seen(message)) {
 
-            PeerThread n = neighbors.get(message.origin);
+            ServerThread n = (ServerThread)neighbors.get(message.origin);
 
             if (forward) {
                 // Si yo lo cree
@@ -455,7 +452,7 @@ public class Peer {
             } else {
                 //forward
 
-                neighbors.get(ownerPing).send(messageP);
+                ((ServerThread)neighbors.get(ownerPing)).send(messageP);
             }
 
         } else {
@@ -567,8 +564,15 @@ public class Peer {
 
     public void broadcast(Message message) {
         //logger.trace("broadcast: {}", message);
-        seen(message);
-        neighbors.forEach((k, v) -> v.send(message));
+        if (!seen(message)) {
+            neighbors.forEach((k, v) -> v.send(message));
+        }
+    }
+    public void broadcast(Message message, Budget b) {
+        //logger.trace("broadcast: {}", message);
+        if (!seen(message)) {
+            neighbors.forEach((k, v) -> v.send(message, b));
+        }
     }
 
     /**

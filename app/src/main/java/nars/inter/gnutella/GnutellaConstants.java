@@ -10,7 +10,10 @@ public enum GnutellaConstants {
 
     /* Constantes de solicitud conexion */
     public static final String CONNECTION_REQUEST_PRE = "GNUTELLA CONNECT";
+
     public static final String CONNECTION_REQUEST = "GNUTELLA CONNECT/<0.4>\n\n ";
+    public static final byte[] CONNECTION_REQUESTbytes = CONNECTION_REQUEST.getBytes();
+
     public static final String CONNECTION_ACCEPTED = "GNUTELLA OK\n\n";
 
     /* Constantes de tipos de mensaje */
@@ -70,5 +73,5 @@ public enum GnutellaConstants {
 
 
     public static final int AUTO_PING_PER_N_MESSAGES = 10;
-    static final long DEAD_CONNECTION_REMOVAL_INTERVAL_MS = 10000;
+    static final long DEAD_CONNECTION_REMOVAL_INTERVAL_MS = 30000;
 }

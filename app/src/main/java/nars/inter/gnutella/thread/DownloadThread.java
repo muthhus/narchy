@@ -56,19 +56,19 @@ public class DownloadThread extends PeerThread {
             this.fileLength = BigInteger.valueOf(size);
             this.fileName = file;
             out = socket.getOutputStream();
-            outStream = new DataOutputStream(out);
+            //outStream = new DataOutputStream(out);
             in = socket.getInputStream();
             inStream = new DataInputStream(in);
             String request = GnutellaConstants.HTTP_GETPART + size + '/' + file
                     + GnutellaConstants.HTTP_REST + range + "\r\n\r\n";
-            outStream.writeUTF(request);
+            //outStream.writeUTF(request);
             String answer = inStream.readUTF();
             if (answer.equals(GnutellaConstants.HTTP_OK + size + "\r\n\r\n")) {
                 return true;
             }
             inStream.close();
             in.close();
-            outStream.close();
+            //outStream.close();
             out.close();
             socket.close();
             return false;
@@ -119,10 +119,10 @@ public class DownloadThread extends PeerThread {
 
             byte[] b = peer.model.data(peer, file, (int) rangeByte.longValue());
             if (b != null) {
-                outStream.write(b);
+                out.write(b);
             }
 
-            outStream.close();
+            out.close();
 
 
         } catch (FileNotFoundException e) {

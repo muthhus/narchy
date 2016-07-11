@@ -1,10 +1,10 @@
 package nars.inter.gnutella.message;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import nars.inter.gnutella.GnutellaConstants;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -18,17 +18,17 @@ import java.net.InetSocketAddress;
 public class PingMessage extends Message {
 
 
-    public PingMessage(DataInputStream in, InetSocketAddress origin) {
+    public PingMessage(ByteArrayDataInput in, InetSocketAddress origin) {
         super(GnutellaConstants.PING, in, origin);
     }
 
     @Override
-    protected void inData(DataInput in) throws IOException {
+    protected void inData(ByteArrayDataInput in)  {
 
     }
 
     @Override
-    protected void outData(DataOutput out) throws IOException {
+    protected void outData(ByteArrayDataOutput out)  {
 
     }
 

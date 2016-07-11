@@ -1,10 +1,10 @@
 package nars.inter.gnutella.message;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import nars.inter.gnutella.GnutellaConstants;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -19,19 +19,19 @@ public class QueryMessage extends Message {
 
     public byte[] query;
 
-    public QueryMessage(DataInputStream in, InetSocketAddress origin) {
+    public QueryMessage(ByteArrayDataInput in, InetSocketAddress origin) {
         super(GnutellaConstants.QUERY, in, origin);
     }
 
     @Override
-    protected void inData(DataInput in) throws IOException {
+    protected void inData(ByteArrayDataInput in)  {
         int len = in.readUnsignedShort();
         query = new byte[len];
         in.readFully(query);
     }
 
     @Override
-    protected void outData(DataOutput out) throws IOException {
+    protected void outData(ByteArrayDataOutput out) {
         out.writeShort(query.length);
         out.write(query);
     }

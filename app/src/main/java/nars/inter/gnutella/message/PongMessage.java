@@ -1,13 +1,14 @@
 package nars.inter.gnutella.message;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
 import nars.inter.gnutella.GnutellaConstants;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 /**
  * Class that defines a PongMessage defined in Gnutella Protocol v0.4
@@ -31,21 +32,26 @@ public class PongMessage extends Message {
 
     }
 
-    public PongMessage(DataInputStream in, InetSocketAddress origin) {
+    public PongMessage(ByteArrayDataInput in, InetSocketAddress origin) {
         super(GnutellaConstants.PONG, in, origin);
     }
 
     @Override
-    protected void inData(DataInput in) throws IOException {
+    protected void inData(ByteArrayDataInput in)  {
         //assumes IPv4 for now
         byte[] addr = new byte[4];
         in.readFully(addr);
-        this.ip = InetAddress.getByAddress(addr);
+        try {
+            this.ip = InetAddress.getByAddress(addr);
+        } catch (UnknownHostException e) {
+            logger.error("Unknown host ({}): {}", e, addr);
+            this.ip = null;
+        }
         this.port = (short)in.readUnsignedShort();
     }
 
     @Override
-    protected void outData(DataOutput out) throws IOException {
+    protected void outData(ByteArrayDataOutput out) {
         out.write(ip.getAddress());
         out.writeShort(port);
     }

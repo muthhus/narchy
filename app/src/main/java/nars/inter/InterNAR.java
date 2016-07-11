@@ -92,8 +92,7 @@ public class InterNAR extends Peer implements PeerModel {
     }
 
     public void query(Task t) {
-
-        query(IO.asBytes(t));
+        query(IO.asBytes(t), t.budget());
     }
 
 

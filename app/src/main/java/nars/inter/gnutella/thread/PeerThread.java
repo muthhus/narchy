@@ -1,8 +1,14 @@
 package nars.inter.gnutella.thread;
 
+import nars.bag.impl.ArrayBag;
+import nars.budget.Budget;
+import nars.budget.UnitBudget;
+import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.Peer;
+import nars.link.BLink;
+import nars.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,22 +24,22 @@ import java.util.concurrent.Executors;
  * @author Miguel Vilchis
  */
 
-abstract public class PeerThread implements Runnable {
-    public static final int PONG_TIMEOUT_MS = 10000;
+abstract public class PeerThread implements Runnable  {
 
     public final Peer peer;
+
+
     /* Atributos siempre usados */
     protected InputStream in;
     protected DataInputStream inStream;
     protected OutputStream out;
-    protected DataOutputStream outStream;
+    //protected DataOutputStream outStream;
     public final Socket socket;
 
 
-    private final ExecutorService messagesToSend = Executors.newSingleThreadExecutor();
+
     protected boolean working;
     protected boolean connected;
-    protected boolean flag;
 
 
 	/* Atributos del nodo cuando es para descarga */
@@ -60,29 +66,19 @@ abstract public class PeerThread implements Runnable {
         this.socket = socket;
 
         working = true;
-        flag = true;
         connected = true;
 
         out = socket.getOutputStream();
-        outStream = new DataOutputStream(out);
+        //outStream = new DataOutputStream(out);
         in = socket.getInputStream();
         inStream = new DataInputStream(in);
 
+
     }
 
 
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* METHODS USED IF NOT DOWNLOADTHREAD */
 
-    /**
-     * Adds the Message to the queue of pending messages to send
-     *
-     * @param m the Message
-     */
-    public void send(Message m) {
-        //logger.trace("send {}", m);
-        messagesToSend.execute(() -> _send(m));
-    }
+
 
     public boolean connected() {
         return connected;
@@ -95,6 +91,8 @@ abstract public class PeerThread implements Runnable {
      * Close this connection
      */
     public void stop() {
+
+        //recvThread.interrupt();
 
         peer.neighbors.remove(socket.getRemoteSocketAddress());
 
@@ -122,11 +120,6 @@ abstract public class PeerThread implements Runnable {
             //e.printStackTrace();
         }
 
-        try {
-            outStream.close();
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
 
         try {
             socket.close();
@@ -135,7 +128,6 @@ abstract public class PeerThread implements Runnable {
         }
 
 
-        messagesToSend.shutdownNow();
         connected = false;
         working = false;
     }
@@ -151,14 +143,14 @@ abstract public class PeerThread implements Runnable {
         try {
 
 
-            outStream.writeUTF(GnutellaConstants.CONNECTION_REQUEST);
+            out.write(GnutellaConstants.CONNECTION_REQUESTbytes);
+            //outStream.writeUTF(GnutellaConstants.CONNECTION_REQUESTbytes);
             if (inStream.readUTF()
                     .equals(GnutellaConstants.CONNECTION_ACCEPTED)) {
                 return true;
             }
             inStream.close();
             in.close();
-            outStream.close();
             out.close();
             socket.close();
 
@@ -178,24 +170,26 @@ abstract public class PeerThread implements Runnable {
 
     public void _send(Message m) {
 
-        if (m.type == GnutellaConstants.PING) {
-            flag = false;
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            if (!flag) {
-                                stop();
-                            }
-                        }
-                    }, PONG_TIMEOUT_MS);
-        }
+//        if (m.type == GnutellaConstants.PING) {
+//            flag = false;
+//            new java.util.Timer().schedule(
+//                    new java.util.TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            if (!flag) {
+//                                stop();
+//                            }
+//                        }
+//                    }, PONG_TIMEOUT_MS);
+//        }
 
         try {
-            m.out(outStream);
+            byte[] mb = m.asBytes();
+            logger.info("send message: {}", mb.length);
+            out.write(mb);
+            out.flush();
         } catch (Exception e) {
             logger.error("send: {}\n{}", m, e );
-            stop();
         }
 
     }

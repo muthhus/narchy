@@ -1,5 +1,8 @@
 package nars.inter.gnutella.message;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.IdGenerator;
 import org.slf4j.Logger;
@@ -69,7 +72,7 @@ public abstract class Message  {
         this(null, type, ttl, hop, origin);
     }
 
-    public Message(byte type, DataInputStream in, InetSocketAddress origin) {
+    public Message(byte type, ByteArrayDataInput in, InetSocketAddress origin) {
         this.type = type;
         this.origin = origin;
         this.id = new byte[GnutellaConstants.ID_LENGTH];
@@ -83,9 +86,8 @@ public abstract class Message  {
      * @param inStream DataInputStream in which the Message is read in bytes
      * @return Message of the Gnutella Protocol v0.4
      */
-    public static Message nextMessage(DataInputStream in, InetSocketAddress origin) throws IOException, java.net.UnknownHostException {
+    public static Message nextMessage(byte type, ByteArrayDataInput in, InetSocketAddress origin)  {
 
-        byte type = in.readByte();
         switch (type) {
             case GnutellaConstants.PING:
                 return new PingMessage(in, origin);
@@ -304,32 +306,28 @@ public abstract class Message  {
     }
 
 
-    public final void in(DataInput in) {
-        try {
-            //the type byte should already have been read and known
-            in.readFully(id);
-            ttl = in.readByte();
-            hop = in.readByte();
-            inData(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public final void in(ByteArrayDataInput in) {
+        //NOTE: the initial type byte should already have been read and known
+        //NOTE: the size short (16 bits) should have already been read and known
+        in.readFully(id);
+        ttl = in.readByte();
+        hop = in.readByte();
+        inData(in);
     }
 
-    public final void out(DataOutput out) {
-        try {
-            out.writeByte(type);
-            out.write(id);
-            out.writeByte(ttl);
-            out.writeByte(hop);
-            outData(out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected final void out(ByteArrayDataOutput out) {
+
+        out.writeByte(type);
+        out.writeShort(0); //size, will be filled in after the message has been construced
+        out.write(id);
+        out.writeByte(ttl);
+        out.writeByte(hop);
+        outData(out);
+
     }
 
-    abstract protected void inData(DataInput in) throws IOException;
-    abstract protected void outData(DataOutput out) throws IOException;
+    abstract protected void inData(ByteArrayDataInput in);
+    abstract protected void outData(ByteArrayDataOutput out);
 
 
     /**
@@ -353,10 +351,17 @@ public abstract class Message  {
     }
 
 
+    final static int ESTIMATED_MESSAGE_SIZE = 512; //in bytes
+
     public byte[] asBytes() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        out(new DataOutputStream(baos));
-        return baos.toByteArray();
+        ByteArrayDataOutput oo = ByteStreams.newDataOutput(ESTIMATED_MESSAGE_SIZE);
+        out(oo);
+        byte[] x = oo.toByteArray();
+        short size = (short)(x.length);
+        //add the size information in bytes 1 and 2
+        x[1] = (byte)(size & 0xff);   //lower 8 bits of the size
+        x[2] = (byte)((size & 0xff00) >> 8); //upper 8 bits of the size
+        return x;
     }
 
 }
