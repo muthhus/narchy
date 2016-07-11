@@ -24,6 +24,7 @@ package nars.term;
 import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;
@@ -35,7 +36,7 @@ import java.io.IOException;
 import static nars.nal.Tense.DTERNAL;
 
 
-public interface Term extends Termed, Termlike, Comparable<Term> {
+public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
 
@@ -311,10 +312,10 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
 
     /** GLOBAL TERM COMPARATOR FUNCTION */
     @Override
-    default int compareTo(Term y) {
+    default int compareTo(Termlike y) {
         if (this.equals(y)) return 0;
 
-        int d = this.op().compareTo(y.op());
+        int d = this.op().compareTo(((Term)y).op()); //HACK
         if (d!=0)
             return d;
 
@@ -327,7 +328,7 @@ public interface Term extends Termed, Termlike, Comparable<Term> {
             if (diff3 != 0)
                 return diff3;
 
-            return cthis.subterms().compareTo(cy.subterms());
+            return TermContainer.compare(cthis.subterms(),cy.subterms());
 
         } else if (this instanceof AbstractVariable) {
             //hashcode serves as the ordering too

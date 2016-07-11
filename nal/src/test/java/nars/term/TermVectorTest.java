@@ -59,8 +59,8 @@ public class TermVectorTest {
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
 
-        assertEquals(0, a.subterms().compareTo(b.subterms()));
-        assertEquals(0, b.subterms().compareTo(a.subterms()));
+        assertEquals(0, TermContainer.compare(a.subterms(), b.subterms()));
+        assertEquals(0, TermContainer.compare(b.subterms(), a.subterms()));
 
         assertNotEquals(0, a.compareTo(b));
         assertNotEquals(0, b.compareTo(a));

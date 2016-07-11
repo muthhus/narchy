@@ -66,6 +66,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 //        return alias.equals(ref);
     }
 
+
     @Override
     public int compareTo(Termlike o) {
         if (equals(o)) return 0;

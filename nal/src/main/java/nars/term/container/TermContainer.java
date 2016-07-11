@@ -516,11 +516,11 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     }
 
 
-    default int compareTo(@NotNull Termlike o) {
-        return compareTo(this, o);
-    }
+//    default int compareTo(@NotNull Termlike o) {
+//        return compareTo(this, o);
+//    }
 
-    static int compareTo(@NotNull TermContainer a, @NotNull Termlike b) {
+    static int compare(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
 
         int s = a.size(), diff;

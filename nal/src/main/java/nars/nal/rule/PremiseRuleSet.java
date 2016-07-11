@@ -53,7 +53,7 @@ public class PremiseRuleSet {
                 IO.writeTerm(o, x.getOne());
                 o.writeUTF(x.getTwo());
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e); //e.printStackTrace();
             }
         };
         Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
@@ -63,8 +63,8 @@ public class PremiseRuleSet {
                             i.readUTF()
                     );
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
+                    throw new RuntimeException(e); //e.printStackTrace();
+                    //return null;
                 }
         };
 
