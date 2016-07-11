@@ -1,6 +1,7 @@
 package nars.util.data.sorted;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -580,9 +581,10 @@ public final class SortedArray<E> {
     /**
      * Returns the first (lowest) element currently in this list.
      */
-    public E first() {
+    @Nullable public final E first() {
         if (this.isEmpty()) {
-            throw new NoSuchElementException();
+            //throw new NoSuchElementException();
+            return null;
         } else {
             return list[0];
         }
@@ -591,10 +593,11 @@ public final class SortedArray<E> {
     /**
      * Returns the last (highest) element currently in this list.
      */
-    public E last() {
+    @Nullable
+    public final E last() {
         int size = this.size;
         if (size == 0) {
-            throw new NoSuchElementException();
+            return null;
         } else {
             return this.list[size - 1];
         }

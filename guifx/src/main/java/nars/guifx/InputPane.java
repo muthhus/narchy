@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.guifx.space.WebMap;
 import nars.guifx.util.TabXLazy;
 import nars.guifx.wikipedia.NARWikiBrowser;
-import nars.op.in.LibraryInput;
 
 import java.util.Map;
 
@@ -75,7 +74,7 @@ public class InputPane extends TabPane {
         final ListView<String> index = new ListView<>();
         final TextArea source = new TextArea();
 
-        final Map<String, String> absPath;
+        //final Map<String, String> absPath;
 
         public LibraryInputPane() {
 
@@ -93,37 +92,37 @@ public class InputPane extends TabPane {
             bp.setRight(buttons);
 
             getItems().setAll(scrolled(index), bp);
-
-            absPath = getAllExamples();
-
-            index.getItems().addAll(absPath.keySet());
-
-            index.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-            index.getSelectionModel().selectedItemProperty().addListener((e) -> runLater(LibraryInputPane.this));
+//
+//            absPath = getAllExamples();
+//
+//            index.getItems().addAll(absPath.keySet());
+//
+//            index.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+//
+//            index.getSelectionModel().selectedItemProperty().addListener((e) -> runLater(LibraryInputPane.this));
 
         }
-
-        public Map<String, String> getAllExamples() {
-            return LibraryInput.getUnitTests(LibraryInput.directories);
-        }
+//
+//        public Map<String, String> getAllExamples() {
+//            return LibraryInput.getUnitTests(LibraryInput.directories);
+//        }
 
         @Override
         public void run() {
 
-            StringBuilder sb = new StringBuilder();
-            for (String file : index.getSelectionModel().getSelectedItems()) {
-
-                try {
-                    LibraryInput x = LibraryInput.get(nar, absPath.get(file));
-                    if (x != null)
-                        sb.append(x.getSource()).append("\n\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-            source.setText(sb.toString());
+//            StringBuilder sb = new StringBuilder();
+//            for (String file : index.getSelectionModel().getSelectedItems()) {
+//
+//                try {
+//                    LibraryInput x = LibraryInput.get(nar, absPath.get(file));
+//                    if (x != null)
+//                        sb.append(x.getSource()).append("\n\n");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//            source.setText(sb.toString());
 
         }
     }

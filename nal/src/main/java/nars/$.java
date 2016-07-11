@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.term.Terms.compoundOrNull;
 
 /***
  *     oooo       oo       .o.       ooooooooo.
@@ -114,7 +115,7 @@ public enum $ {
 //        if ((predicate instanceof Operator) && if (subject instanceof Product))
 //            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
 //        else
-        return (Compound) compound(INH, subj, pred);
+        return compoundOrNull(compound(INH, subj, pred));
     }
 
 

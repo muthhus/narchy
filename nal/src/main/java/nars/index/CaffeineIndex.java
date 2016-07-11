@@ -66,11 +66,19 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         ;
         data = builder.build();
 
-        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
+
+        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
         subs = builderSubs
+                .softValues()
                 .weigher(complexityWeigher)
                 .maximumWeight(maxWeight)
                 .build();
+
+//        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
+//        subs = builderSubs
+//                .weigher(complexityWeigher)
+//                .maximumWeight(maxWeight)
+//                .build();
 
 
     }

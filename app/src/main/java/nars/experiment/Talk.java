@@ -166,7 +166,7 @@ public class Talk {
         return t;
     }
 
-    public @NotNull Compound hearEvent(Term context, Term word) {
+    public Compound hearEvent(Term context, Term word) {
         //return $.prop(word, context);
         return $.image(2, true, hear, context, word);
         //return $.prop(word, context);

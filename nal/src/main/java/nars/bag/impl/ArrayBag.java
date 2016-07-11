@@ -84,6 +84,16 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         }
     }
 
+    @Nullable
+    @Override
+    public BLink<V> remove(V x) {
+        synchronized(map) {
+            return super.remove(x);
+        }
+    }
+
+
+
     @Override
     public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
         float f1 = priIfFiniteElseNeg1(o1);
@@ -321,8 +331,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @Nullable
     protected BLink<V> putNew(@NotNull V i, @NotNull BLink<V> newBudget) {
         synchronized(map) {
-            BLink<V> removed = put(i, newBudget);
-            return removed;
+            return put(i, newBudget);
         }
     }
 
@@ -357,7 +366,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         synchronized (map) {
             BagPendings<V> p = this.pending;
             if (p != null) {
-                this.bottomPri = bottomPriIfFull();
+                this.bottomPri = minPriIfFull();
                 p.apply(this);
             }
         }
@@ -382,7 +391,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         float v = bottomPri;
         if (v <= p) {
             putNewAndDeleteDisplaced(key, newLink(key, p, d, q));
-            bottomPri = bottomPriIfFull();
+            bottomPri = minPriIfFull();
         } else {
             putFail(key);
         }
@@ -404,9 +413,9 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
-    private final float bottomPriIfFull() {
+    private final float minPriIfFull() {
         int s = size();
-        return (s == capacity()) ? get(s - 1).pri() : -1f;
+        return (s == capacity()) ? priMin() : -1f;
     }
 
     /**
@@ -631,12 +640,14 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Override
     public float priMax() {
-        return isEmpty() ? 0 : items.first().pri();
+        BLink<V> x = items.first();
+        return x!=null ? x.pri() : 0f;
     }
 
     @Override
     public float priMin() {
-        return isEmpty() ? 0 : items.last().pri();
+        BLink<V> x = items.last();
+        return x!=null ? x.pri() : 0f;
     }
 
     /**

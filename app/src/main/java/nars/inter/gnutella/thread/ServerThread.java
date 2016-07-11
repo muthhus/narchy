@@ -2,6 +2,7 @@ package nars.inter.gnutella.thread;
 
 import com.google.common.io.ByteStreams;
 import nars.bag.impl.ArrayBag;
+import nars.bag.impl.AutoBag;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
@@ -26,9 +27,9 @@ public class ServerThread extends PeerThread {
 
 
     /** messages per second (hz) */
-    float maxSendFrequency = 16;
-    float maxRecvFrequency = 24;
-    final int messageBagSize = 64;
+    float maxSendFrequency = 24;
+    float maxRecvFrequency = 32;
+    final int messageBagSize = 128;
 
     final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.max);
 
@@ -131,6 +132,8 @@ public class ServerThread extends PeerThread {
 
     }
 
+    final AutoBag a = new AutoBag();
+
     protected synchronized void send() {
 
         while (working) {
@@ -141,7 +144,7 @@ public class ServerThread extends PeerThread {
 
                 synchronized (outgoing) {
                     if (!outgoing.isEmpty()) {
-                        outgoing.commit();
+                        a.commit(outgoing);
 
                         top = outgoing.removeItem(0).get();
                     }

@@ -160,12 +160,19 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     @Nullable
     @Override
     protected L addItem(L i) {
+        int cap = capacity();
+        if (cap < 1) {
+            //bounce
+            return i;
+        }
 
         int size = size();
 
         L displaced = null;
-        if (size > 0 && size == capacity()) {
-            if (compare(items.last(), i) < 0) {
+
+        if (size == cap) {
+            L last = items.last();
+            if (compare(last, i) < 0) {
                 //insufficient rank, bounce
                 return i;
             }
