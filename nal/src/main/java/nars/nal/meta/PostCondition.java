@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static nars.$.the;
@@ -44,7 +45,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     }
 
 
-    public static final Set<Atom> reservedMetaInfoCategories = new HashSet<>() {{
+    public static final Set<Atom> reservedMetaInfoCategories = new LinkedHashSet() {{
         add(the("Belief"));
         add(the("Stamp"));
         add(the("Desire"));
@@ -75,7 +76,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * if puncOverride == 0 (unspecified), then the default punctuation rule determines the
      * derived task's punctuation.  otherwise, its punctuation will be set to puncOverride's value
      */
-    public transient char puncOverride;
+    public final transient char puncOverride;
 
 
     /**
@@ -85,7 +86,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @throws RuntimeException
      */
     @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
-                                     @NotNull Term... modifiers) throws RuntimeException {
+                                     @NotNull Term... modifiers) throws RuntimeException, UnsupportedOperationException {
 
 
         Term beliefTruth = null, goalTruth = null;

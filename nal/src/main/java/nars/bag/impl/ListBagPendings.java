@@ -17,7 +17,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
 
     private final BudgetMerge merge;
     //public List<RawBLink<X>> pending = null;
-    @Nullable CircularArrayList<RawBLink<X>> pending = null;
+    @Nullable CircularArrayList<RawBLink<X>> pending;
     private int capacity;
 
     public ListBagPendings(BudgetMerge m) {

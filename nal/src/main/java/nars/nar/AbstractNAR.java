@@ -40,11 +40,11 @@ public abstract class AbstractNAR extends NAR {
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
-    public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random random) {
+    public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random random) {
         this(clock, index, random, Global.DEFAULT_SELF);
     }
 
-    public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
+    public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
 

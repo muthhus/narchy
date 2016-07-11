@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class AutoBag<V> implements BudgetForget {
     private long now;
-    private float ratio;
+    volatile private float ratio;
 
     /** prevents durabilty=1.0 from avoiding forgetting, a value ~1.0 */
-    final float maxEffectiveDurability = 1f;
+    final static float maxEffectiveDurability = 1f;
 
 
     public AutoBag() {

@@ -11,6 +11,7 @@ import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[][] times;
     @NotNull final float[] freq;
     @NotNull final float[] conf;
+    @Nullable
     private static final Truth EterNull = $.t(0.5f, Global.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
@@ -45,6 +47,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         return truth(when, Lists.newArrayList(tasks), null);
     }
 
+    @Nullable
     public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal) {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
@@ -61,6 +64,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     }
 
 
+    @Nullable
     public Truth truth(long when, @NotNull List<Task> tasks, @Nullable Truthed topEternal, /* background */float maxDarkFraction, float darkThresold) {
         assert(times.length <= tasks.size());
 
@@ -138,8 +142,8 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         return times.length;
     }
 
-    public void print() {
-        System.out.println(Joiner.on("\n").join(this.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
+    public void print(PrintStream out) {
+        out.println(Joiner.on("\n").join(this.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
     }
 
 //    /** returns a metric of the usefulness of a given task according to its influence in determining past measurements */

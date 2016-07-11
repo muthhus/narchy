@@ -24,8 +24,9 @@ public class NarseseExtendedTest {
 
 
 
-    void eternal(@NotNull Task t) {
-        tensed(t, true, null);
+    void eternal(Task t) {
+        assertNotNull(t);
+        tensed(t, true, Tense.Eternal);
     }
     void tensed(@NotNull Task t, @NotNull Tense w) {
         tensed(t, false, w);
@@ -37,6 +38,7 @@ public class NarseseExtendedTest {
                 case Past: assertTrue(t.occurrence() < 0); break;
                 case Future: assertTrue(t.occurrence() > 0); break;
                 case Present: assertEquals(0, t.occurrence()); break;
+                case Eternal: assertEquals(ETERNAL, t.occurrence()); break;
             }
         }
     }

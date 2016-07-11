@@ -70,6 +70,7 @@ public abstract class BLink<X> implements Budget, Link<X> {
     public abstract void commit();
 
     /** show additional information */
+    @NotNull
     public String toString2() {
         return toString();
     }

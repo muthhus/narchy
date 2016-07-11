@@ -19,6 +19,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     protected @Nullable Task current;
     //boolean changed = true;
 
+    @NotNull
     abstract public NAR nar();
 
     @Override

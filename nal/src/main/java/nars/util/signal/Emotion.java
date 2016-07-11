@@ -85,28 +85,28 @@ public final class Emotion implements Serializable {
         return (float) happy.getSum();
     }
 
-    public void print(@NotNull OutputStream output) {
-        final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
-        try {
-            conf.encodeToStream(output, this);
-        } catch (IOException e) {
-            try {
-                output.write(e.toString().getBytes());
-            } catch (IOException e1) {            }
-        }
-    }
+//    public void print(@NotNull OutputStream output) {
+//        final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
+//        try {
+//            conf.encodeToStream(output, this);
+//        } catch (IOException e) {
+//            try {
+//                output.write(e.toString().getBytes());
+//            } catch (IOException e1) {            }
+//        }
+//    }
 
-    @Override
-    public String toString() {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(os);
-        print(ps);
-        try {
-            return os.toString("UTF8");
-        } catch (UnsupportedEncodingException e) {
-            return e.toString();
-        }
-    }
+//    @Override
+//    public String toString() {
+//        ByteArrayOutputStream os = new ByteArrayOutputStream();
+//        PrintStream ps = new PrintStream(os);
+//        print(ps);
+//        try {
+//            return os.toString("UTF8");
+//        } catch (UnsupportedEncodingException e) {
+//            return e.toString();
+//        }
+//    }
 
     //    @Override
 //    public final void onFrame() {

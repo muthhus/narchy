@@ -45,7 +45,7 @@ public class TermSet<X extends Term> extends TermVector {
 
 
     private TermSet(X[] x) {
-        super(x);
+        super((Term[]) x);
     }
 
     @NotNull

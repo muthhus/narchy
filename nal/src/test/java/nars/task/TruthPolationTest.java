@@ -29,7 +29,7 @@ public class TruthPolationTest {
         //System.out.println( polation.truth(0, a, b) );
         assertEquals(Revision.revision(a, b), polation.truth(0, a, b));
 
-        polation.print();
+        polation.print(System.out);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.Op;
+import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ public final class Fork extends GenericCompound<ProcTerm> implements ProcTerm {
 
 
     protected Fork(@NotNull ProcTerm[] actions) {
-        super(Op.CONJ, TermSet.the(actions));
+        super(Op.CONJ, TermSet.the((Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.termCache = actions;

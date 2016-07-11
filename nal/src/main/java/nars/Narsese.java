@@ -999,6 +999,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
+    @Nullable
     public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {
         return _popTerm(x.getOne(), x.getTwo());
     };

@@ -494,7 +494,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void input(@NotNull Task t) {
         if (t.isCommand()) {
-            t.onConcept(null); //direct execution
+            //t.onConcept(null); //direct execution
         } else {
             process(t.normalize(this)); //accept into input buffer for eventual processing
         }

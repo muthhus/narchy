@@ -42,6 +42,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     }
 
 
+    @NotNull
     final BagPendings<V> pending;
 
     public ArrayBag(int cap, BudgetMerge mergeFunction) {
@@ -60,6 +61,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         setCapacity(cap);
     }
 
+    @NotNull
     protected BagPendings<V> newPendings() {
         return new ListBagPendings(mergeFunction);
     }

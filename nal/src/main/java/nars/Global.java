@@ -234,7 +234,7 @@ public enum Global {
 
     @Nullable
     public static <C> Reference<C>[] reference(@Nullable C[] s) {
-        int l = Util.lastNonNull(s);
+        int l = Util.lastNonNull((Object[]) s);
         if (l > -1) {
             l++;
             Reference<C>[] rr = new Reference[l];

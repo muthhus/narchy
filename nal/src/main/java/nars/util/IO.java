@@ -20,7 +20,6 @@ import nars.term.container.TermContainer;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,10 +182,11 @@ public class IO {
 
         if (term instanceof Atomic) {
 
-            if (term instanceof Variable)
-                writeVariable(out, (AbstractVariable)term);
-            else
+            if (term instanceof AbstractVariable) {
+                writeVariable(out, (AbstractVariable) term);
+            } else {
                 writeAtomic(out, (Atomic) term);
+            }
         } else
             writeCompound(out, (Compound)term);
     }

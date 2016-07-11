@@ -1,6 +1,5 @@
 package nars.op.time;
 
-import nars.$;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.budget.Budgeted;
@@ -10,11 +9,7 @@ import nars.learn.gng.Node;
 import nars.link.BLink;
 import nars.link.DefaultBLink;
 import nars.link.StrongBLink;
-import nars.nar.Default;
-import nars.task.MutableTask;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.truth.DefaultTruth;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +46,7 @@ public class STMClustered extends STM {
 
     private static final double[] EmptyCoherence = new double[] { Double.NaN, Double.NaN };
 
-    private int compactPeriod = 8;
+    private static int compactPeriod = 8;
 
     public final class TasksNode extends Node {
 

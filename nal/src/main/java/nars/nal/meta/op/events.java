@@ -4,11 +4,9 @@ import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
-import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -84,65 +82,7 @@ abstract public class events extends AtomicBoolCondition {
 //        }
 //    };
 
-    public static final @Nullable BoolCondition ifTermLinkBefore = new IfTermLinkBefore();
-    public static final @Nullable BoolCondition ifBeliefBefore = new IfTermLinkBefore() {
-        @Override
-        public String toString() {
-            return "ifBeliefIsBefore";
-        }
-        @Override
-        public boolean requireBelief() {
-            return true;
-        }
-
-    };
-
-    private static class IfTermLinkBefore extends events {
-        @NotNull
-        @Override
-        public String toString() {
-            return "ifTermLinkBefore";
-        }
-
-        public boolean requireBelief() {
-            return false;
-        }
-
-        @Override
-        public boolean booleanValueOf(@NotNull PremiseEval m) {
-
-            Task belief = m.belief;
-            if (belief == null && requireBelief())
-                return false;
-
-            Task task = m.task;
-            Compound tt = task.term();
-            int ttdt = tt.dt();
-
-
-            if ((belief!=null) && (belief.occurrence()!=ETERNAL) && (task.occurrence()!=ETERNAL)) {
-                //only allow a belief if it occurred before or during the task's specified occurrence
-                if (belief.occurrence() > task.occurrence())
-                    return false;
-            }
-
-            if ((ttdt == DTERNAL) || (ttdt == 0)) {
-                return true;
-            } else {
-
-                final int targetMatch;  //must match term
-                if (ttdt < 0) { //time reversed
-                    targetMatch = 1;
-                } else /*if (ttdt > 0) */{ //time forward
-                    targetMatch = 0;
-                }
-                return tt.term(targetMatch).equals(m.beliefTerm);
-            }
-        }
-
-    }
-
-//    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */
+    //    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */
 //    public static final events dtBeliefSimultaneous = new events() {
 //        @Override
 //        public boolean booleanValueOf(PremiseEval m) {

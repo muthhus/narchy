@@ -27,7 +27,7 @@ public final class DefaultConceptPolicy implements ConceptPolicy {
         );
     }
 
-    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, MutableInteger taskLinksCapacity) {
+    DefaultConceptPolicy(MutableInteger beliefsMaxEte, MutableInteger goalsMaxEte, MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
         this.beliefsMaxEte = beliefsMaxEte;
         this.beliefsMaxTemp = beliefsMaxEte;
         this.goalsMaxEte = goalsMaxEte;

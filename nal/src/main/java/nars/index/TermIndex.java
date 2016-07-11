@@ -89,7 +89,7 @@ public interface TermIndex {
     int InvalidImplicationPredicate = or(EQUI);
 
 
-    TermBuilder builder();
+    @NotNull TermBuilder builder();
 
     @Nullable Concept.@Nullable ConceptBuilder conceptBuilder();
 
@@ -97,35 +97,35 @@ public interface TermIndex {
     @Nullable
     TermContainer theSubterms(TermContainer s);
 
-    @Nullable
-    default TermContainer normalize(TermContainer s) {
-        if (s instanceof TermVector)
-            return normalize((TermVector) s);
+//    @Nullable
+//    default TermContainer normalize(TermContainer s) {
+//        if (s instanceof TermVector)
+//            return normalize((TermVector) s);
+//
+//
+//        //TODO implement normalization for any non-container types
+//        throw new UnsupportedOperationException();
+//    }
 
-
-        //TODO implement normalization for any non-container types
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * should be called after a new entry needed to be created for the novel termcontainer
-     */
-    @Nullable
-    default TermContainer normalize(@NotNull TermVector s) {
-        Term[] x = s.terms();
-        int l = x.length;
-        for (int i = 0; i < l; i++) {
-            Term a = x[i];
-            Termed b = the(a);
-            if (b == null)
-                return null;
-            if (a != b) {
-                //different instance but still equal so replace it in the origin array, otherwise leave as-is
-                x[i] = b.term();
-            }
-        }
-        return s;
-    }
+//    /**
+//     * should be called after a new entry needed to be created for the novel termcontainer
+//     */
+//    @Nullable
+//    default TermContainer normalize(@NotNull TermVector s) {
+//        Term[] x = s.terms();
+//        int l = x.length;
+//        for (int i = 0; i < l; i++) {
+//            Term a = x[i];
+//            Termed b = the(a);
+//            if (b == null)
+//                return null;
+//            if (a != b) {
+//                //different instance but still equal so replace it in the origin array, otherwise leave as-is
+//                x[i] = b.term();
+//            }
+//        }
+//        return s;
+//    }
 
 
     int subtermsCount();

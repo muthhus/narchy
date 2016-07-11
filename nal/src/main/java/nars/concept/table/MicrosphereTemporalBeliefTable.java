@@ -111,15 +111,20 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
 
     @Override
-    protected Task removeItem(@NotNull Task removed) {
-        if (super.removeItem(removed) == removed) {
-            long occ = removed.occurrence();
-            if ((occ == min) || (occ == max)) {
-                invalidateRange();
-            }
-            return removed;
+    protected final Task removeItem(@NotNull Task removed) {
+        @Nullable Task actuallyRemoved = super.removeItem(removed);
+
+        if (actuallyRemoved!=removed) {
+            actuallyRemoved.delete();
         }
-        return null;
+
+        removed.delete();
+
+        long occ = removed.occurrence();
+        if ((occ == min) || (occ == max)) {
+            invalidateRange();
+        }
+        return removed;
     }
 
 

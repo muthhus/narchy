@@ -20,7 +20,7 @@ public class substitute extends TermTransformOperator /*implements PremiseAware*
     }
 
 
-    @NotNull
+    @Nullable
     @Override
     public Term function(@NotNull Compound p) {
 

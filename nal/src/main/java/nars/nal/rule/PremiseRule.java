@@ -318,8 +318,8 @@ public class PremiseRule extends GenericCompound {
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
-        if (b == events.ifTermLinkBefore) return events.class;
-        if (b == events.ifBeliefBefore) return events.class;
+        if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
+        if (b == IfTermLinkBefore.ifBeliefBefore) return events.class;
 
         if (b instanceof Solve) return Solve.class;
 
@@ -691,12 +691,12 @@ public class PremiseRule extends GenericCompound {
 
                         case "decomposeTaskIfTermLinkBefore":
                             timeFunction = TimeFunctions.decomposeTask;
-                            pres.add( events.ifTermLinkBefore );
+                            pres.add( IfTermLinkBefore.ifTermLinkBefore );
                             break;
 
                         case "decomposeTaskIfBeliefBefore":
                             timeFunction = TimeFunctions.decomposeTask;
-                            pres.add( events.ifBeliefBefore );
+                            pres.add( IfTermLinkBefore.ifBeliefBefore );
                             break;
 
                         case "decomposeBelief":
@@ -910,7 +910,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, Term arg1, Term arg2) {
+    public void neq(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term arg1, @NotNull Term arg2) {
         //find if the two compared terms are recursively contained as subterms of either the task or belief
         //and if so, create a precondition constraint rather than a matcher constraint
 
@@ -945,7 +945,7 @@ public class PremiseRule extends GenericCompound {
 
     }
 
-    static @Nullable int[] nonCommutivePathTo(@NotNull Term term, Term arg1) {
+    static @Nullable int[] nonCommutivePathTo(@NotNull Term term, @NotNull Term arg1) {
         int[] p = term.pathTo(arg1);
         if (p == null) return null;
         if (p.length == 0) return p;

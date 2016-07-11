@@ -147,6 +147,7 @@ public abstract class TermBuilder {
     }
 
 
+    @NotNull
     public abstract Term newCompound(Op op, int dt, TermContainer subterms);
 
 
