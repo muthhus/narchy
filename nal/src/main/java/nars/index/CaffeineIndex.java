@@ -3,6 +3,7 @@ package nars.index;
 import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
@@ -11,13 +12,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
 public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @NotNull
-    public final Cache<Termed, Termed> data;
+    public final Cache<Termed, Termed> atomics;
+
+    @NotNull
+    public final Cache<Termed, Termed> compounds;
+
     @NotNull
     public final Cache<TermContainer, TermContainer> subs;
 
@@ -60,11 +66,15 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                .weigher(complexityWeigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
-
-
                //.recordStats()
         ;
-        data = builder.build();
+        compounds = builder.build();
+
+
+        Caffeine<Object, Object> buildera = prepare(Caffeine.newBuilder(), false);
+        buildera
+                .removalListener(this);
+        atomics = buildera.build();
 
 
         Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
@@ -91,8 +101,6 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
         if (soft) {
             //builder = builder.softValues();
             builder = builder.weakValues();
-
-
         }
 
         //.softValues()
@@ -108,22 +116,34 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Nullable
     @Override
-    public Termed remove(@NotNull Termed entry) {
-        Termed t = get(entry);
+    public Termed remove(@NotNull Termed x) {
+        Cache<Termed, Termed> cc = cacheFor(x);
+        Termed t = cc.getIfPresent(x);
         if (t!=null) {
-            data.invalidate(entry);
+            cc.invalidate(x);
         }
         return t;
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return data.getIfPresent(x);
+        return cacheFor(x).getIfPresent(x);
+    }
+
+    private Cache<Termed,Termed> cacheFor(Termed x) {
+        if (x.term() instanceof Compound)
+            return compounds;
+        else
+            return atomics;
     }
 
     @Override
     public void set(@NotNull Termed src, @NotNull Termed target) {
-        data.put(src, target);
+
+        cacheFor(src).
+                //.get(src, s -> target);
+                put(src, target);
+
         //Termed exist = data.getIfPresent(src);
 
         //data.put(src, target);
@@ -137,20 +157,24 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public void clear() {
-        data.invalidateAll();
+        compounds.invalidateAll();
+        atomics.invalidateAll();
+        subs.invalidateAll();
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        data.asMap().forEach((k, v) -> {
+        BiConsumer<Termed, Termed> e = (k, v) -> {
             if (v instanceof Termed)
                 c.accept(v);
-        });
+        };
+        atomics.asMap().forEach(e);
+        compounds.asMap().forEach(e);
     }
 
     @Override
     public int size() {
-        return (int) data.estimatedSize();
+        return (int) (compounds.estimatedSize() + atomics.estimatedSize());
     }
 
     @Override
@@ -178,7 +202,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     @NotNull
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
-        return data.get(x, this::buildConcept);
+        return atomics.get(x, this::buildConcept);
     }
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //
@@ -197,7 +221,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public @NotNull String summary() {
-        return data.estimatedSize() + " concepts / " + subs.estimatedSize() + " subterms";
+        return size() + " concepts / " + subtermsCount() + " subterms";
     }
 
     @Override

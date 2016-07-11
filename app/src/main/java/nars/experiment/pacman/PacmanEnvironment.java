@@ -536,7 +536,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 					e.setMaximum((long) (Math.max(e.getMaximum(),e.weightedSize().getAsLong()) * 1.05f)); //grow
 				}
 			};
-			index.data.policy().eviction().ifPresent(evictionConsumer);
+			index.compounds.policy().eviction().ifPresent(evictionConsumer);
 
 			if (ratio > 0.75f) {
 

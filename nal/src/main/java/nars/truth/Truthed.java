@@ -51,6 +51,12 @@ public interface Truthed  {
             t += s.truth().conf();
         return t;
     }
+    static float confWeightSum(@NotNull Iterable<? extends Truthed> beliefs) {
+        float t = 0;
+        for (Truthed s : beliefs)
+            t += s.truth().confWeight();
+        return t;
+    }
 
     static float freqMean(@NotNull Iterable<? extends Truthed> beliefs) {
 

@@ -25,6 +25,25 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     private final NAR nar;
     float conf;
 
+
+    @NotNull float[] centerPoints;
+
+    public float calculate(int index) {
+        float v = input.asFloat();
+
+        int n = centerPoints.length;
+        float nearness[] = new float[n];
+        float s = 0;
+        float dr = 1f / (n-1);
+        for (int i = 0; i < n; i++) {
+            float nn;
+            float dist = Math.abs(centerPoints[i] - v);
+            nearness[i] = nn = Math.max(0, dr-dist);
+            s += nn;
+        }
+        return nearness[index] /= s;
+    }
+
     public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
 
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
@@ -32,47 +51,20 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
         this.nar = nar;
 
         int numStates = states.length;
+
+        centerPoints = new float[numStates];
+
         this.sensors = Global.newArrayList(numStates);
-        float dw = 1f / numStates;
         float dr = 1f / (numStates-1);
         float center = 0;
         int i = 0;
         for (String s : states) {
 
-            float dd = (i==0 || i==numStates-1) ?
-                    dr  : //endpoints
-                    dw; //middle points
+            centerPoints[i] = center;
+            int ii = i;
 
-            float fCenter = center;
-
-            sensors.add( new SensorConcept(s, nar,
-                    this.input,
-                    (x) -> {
-
-                        Truth y;
-                        //if (cdist > dd) {
-                            //y = t(0, conf);
-                        //} else {
-
-                        float f, c;
-
-                        float cdist = Math.abs(x - fCenter);
-
-                        if (cdist < dd) {
-                            f = Math.max(0.5f, 0.5f + 0.5f * (1f - (cdist / (dd))));
-                        } else {
-                            f = 0;
-                        }
-
-                        c = conf;
-
-
-
-                        y = t(f, c);
-
-                        //System.out.println(s + " " + x + " ==(" + fCenter + "|" + cdist + ")==> " + y);
-                        return y;
-                    }
+            sensors.add( new SensorConcept(s, nar, this.input,
+                (x) -> t(calculate(ii), conf)
             ));
             center += dr;
             i++;

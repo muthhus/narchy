@@ -342,9 +342,6 @@ public interface BeliefTable extends TaskTable {
 //        return null;
 //    }
 
-    default float confSum() {
-        return Truthed.confSum(this);
-    }
 
     default float confMax() {
         return confMax(0f, 1f);
