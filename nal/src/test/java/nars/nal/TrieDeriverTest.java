@@ -55,7 +55,7 @@ public class TrieDeriverTest {
 
 
 
-    final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Judgment)";
+    final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)";
 
     final String r1 = "((|,X,A..+) --> M), M, task(\".\") |- (X --> M), (Belief:StructuralDeduction)";
     final String r1Case = "<(|, puppy, kitten) --> animal>.";

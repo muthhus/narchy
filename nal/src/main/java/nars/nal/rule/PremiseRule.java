@@ -1216,7 +1216,7 @@ public class PremiseRule extends GenericCompound {
             return true;
         }
 
-        @Nullable
+        @NotNull
         public Termed applyAfter(Variable secondary) {
             offset++;
             return apply(null, secondary);

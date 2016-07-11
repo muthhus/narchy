@@ -71,7 +71,7 @@ public interface BeliefTable extends TaskTable {
 
         @NotNull
         @Override
-        public Task add(@NotNull Task input, QuestionTable questions, NAR nar) {
+        public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
             return input;
         }
 

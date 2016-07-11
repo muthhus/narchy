@@ -144,7 +144,6 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
-    @NotNull
     protected final void commit(float v) {
 //        float f, c;
 //        if (v < 0.5f) {

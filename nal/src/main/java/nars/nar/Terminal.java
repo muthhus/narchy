@@ -38,7 +38,7 @@ public class Terminal extends AbstractNAR {
 
 
     @Override
-    public Concept activate(@NotNull Termed termed, Budgeted activation, float conceptActivation, float linkActivation, MutableFloat overflow) {
+    public Concept activate(@NotNull Termed termed, @NotNull Budgeted activation, float conceptActivation, float linkActivation, MutableFloat overflow) {
         return concept(termed, true); //ignore activation
     }
 
@@ -48,7 +48,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public float conceptPriority(Termed termed) {
+    public float conceptPriority(@NotNull Termed termed) {
         return 0;
     }
 
@@ -72,7 +72,7 @@ public class Terminal extends AbstractNAR {
 
     @Nullable
     @Override
-    public NAR forEachActiveConcept(Consumer<Concept> recip) {
+    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
         return null;
     }
 

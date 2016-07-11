@@ -19,8 +19,6 @@ public class UnifySubst extends FindSubst  {
 
     final Collection<Termed> target;
     final int maxMatches;
-
-    @NotNull
     private Term a;
 
     int matches;

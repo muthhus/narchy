@@ -35,7 +35,7 @@ import static nars.nal.Tense.DTERNAL;
  */
 public class PremiseEval extends FindSubst {
 
-    private final Deriver deriver;
+    @NotNull private final Deriver deriver;
     private final int start;
 
 
@@ -49,14 +49,14 @@ public class PremiseEval extends FindSubst {
 
 
     /** current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee */
-    @NotNull
+    @Nullable
     @Deprecated public ProcTerm forEachMatch;
 
 
 
     /** run parameters */
     int termutes;
-
+    private int termutesMax;
 
 
     /** cached value */
@@ -64,26 +64,29 @@ public class PremiseEval extends FindSubst {
     public int termSub0op, termSub1op;
     public int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
-    @Nullable
-    public Truth taskTruth, beliefTruth;
-    @Nullable
+
+    @Nullable public Truth taskTruth, beliefTruth;
+
     public Compound taskTerm;
     public Term beliefTerm;
     public NAR nar;
-    @Nullable
-    public Task task, belief;
+
+    public Task task;
+    @Nullable public Task belief;
     public char taskPunct;
 
     /** whether the premise involves temporality that must be calculated upon derivation */
     public boolean temporal;
 
 
+
+
     /** initializes with the default static term index/builder */
-    public PremiseEval(Random r, Deriver deriver) {
+    public PremiseEval(Random r, @NotNull Deriver deriver) {
         this($.terms, r, deriver);
     }
 
-    public PremiseEval(TermIndex index, Random r, Deriver deriver) {
+    public PremiseEval(TermIndex index, Random r, @NotNull Deriver deriver) {
         super(index, VAR_PATTERN, r );
 
 
@@ -109,9 +112,9 @@ public class PremiseEval extends FindSubst {
         putXY(t,t);
     }
 
-    public int matchesMax() {
+    public int matchesMax(float p) {
         final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
-        return (int) Math.ceil(task.summary() * (max - min) + min);
+        return (int) Math.ceil(p * (max - min) + min);
     }
 
 
@@ -126,7 +129,7 @@ public class PremiseEval extends FindSubst {
             //set the # of matches according to the # of conclusions in this branch
             //each matched termutation will be used to derive F=matchFactor conclusions,
             //so divide the premiseMatches value by it to equalize the derivation quantity
-            this.termutes = Math.max(1, matchesMax() / matchFactor);
+            this.termutes = Math.max(1, termutesMax / matchFactor);
             finish = true;
         } else {
             this.termutes = -1; //will not apply unless eachMatch!=null (final step)
@@ -204,6 +207,7 @@ public class PremiseEval extends FindSubst {
 
         this.taskTruth = task.truth();
         this.beliefTruth = belief != null ? belief.truth() : null;
+        this.termutesMax = matchesMax(task.summary());
 
 //        //normalize to positive truth
 //        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
@@ -254,11 +258,10 @@ public class PremiseEval extends FindSubst {
      *  returns null if invalid / insufficient */
     @Nullable
     public final Budget budget(@Nullable Truth truth, @NotNull Termed derived) {
-        ConceptProcess p = this.premise;
         float minDur = nar.durMin.floatValue();
         return (truth != null) ?
-                    TaskBudgeting.compoundForward(truth, derived, p, minDur) :
-                    TaskBudgeting.compoundQuestion(derived, p, minDur);
+                    TaskBudgeting.compoundForward(truth, derived, this, minDur) :
+                    TaskBudgeting.compoundQuestion(derived, this, minDur);
     }
 
 

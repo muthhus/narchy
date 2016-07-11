@@ -801,7 +801,7 @@ public enum $ {
         @Override
         public
         @Nullable
-        Termed get(Termed t, boolean createIfMissing) {
+        Termed get(@NotNull Termed t, boolean createIfMissing) {
             return createIfMissing ? t : null;
         }
 

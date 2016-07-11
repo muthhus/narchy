@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class WeakBufferedBLinkToBudgeted<B extends Budgeted> extends WeakBufferedBLink<B> {
 
-    public WeakBufferedBLinkToBudgeted(B id, @NotNull Budgeted b, float scal) {
+    public WeakBufferedBLinkToBudgeted(@NotNull B id, @NotNull Budgeted b, float scal) {
         super(id, b, scal);
     }
 

@@ -66,7 +66,7 @@ abstract public class ArrayListTable<V, L> extends CollectorMap<V, L> implements
      * @param k An item
      * @return Whether the Item is in the Bag
      */
-    public final boolean contains(V k) {
+    public final boolean contains(@NotNull V k) {
         return this.containsKey(k);
     }
 

@@ -79,6 +79,7 @@ public class InfinispanIndex extends MaplikeIndex {
     }
 
 
+    @NotNull
     @Override
     protected Termed getNewAtom(@NotNull Atomic x) {
         return conceptsLocal.computeIfAbsent(key(x.term()), xx -> buildConcept(x));

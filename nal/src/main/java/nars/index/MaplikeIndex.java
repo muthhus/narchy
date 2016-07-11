@@ -102,7 +102,6 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     public abstract Termed get(@NotNull Termed x);
 
     @Override
-    @Nullable
     abstract public void set(@NotNull Termed src, Termed target);
 
     /* default */

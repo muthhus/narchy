@@ -33,15 +33,15 @@ abstract public class DefaultBLink<X> extends BLink<X> {
     private float dQua;
 
 
-    public DefaultBLink(X id, float p, float d, float q) {
+    public DefaultBLink(@NotNull X id, float p, float d, float q) {
         init(p, d, q);
     }
 
-    public DefaultBLink(X id, @NotNull Budgeted b) {
+    public DefaultBLink(@NotNull X id, @NotNull Budgeted b) {
         this(id, b, 1f);
     }
 
-    public DefaultBLink(X id, @NotNull Budgeted b, float scale) {
+    public DefaultBLink(@NotNull X id, @NotNull Budgeted b, float scale) {
         init(b, scale);
     }
 

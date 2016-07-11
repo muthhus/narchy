@@ -181,6 +181,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         /*if (r == Imdex)
             System.err.println(r + " " + this.rule.source);*/ //<- finds rules which may help to add a neq(x,y) constraint
 
+
         if (r instanceof Compound) { //includes null test
 
             char c = punct;
@@ -272,7 +273,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             if (truth!=null) {
                 float projection;
                 if (Global.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
-                    projection = Revision.truthProjection(premise.task().occurrence(), premise.belief().occurrence(), nar.time());
+                    projection = Revision.truthProjection(m.task.occurrence(), m.belief.occurrence(), nar.time());
                 } else {
                     projection = 1f;
                 }

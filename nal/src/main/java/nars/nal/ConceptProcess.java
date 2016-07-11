@@ -124,7 +124,7 @@ public class ConceptProcess implements Premise {
 
 
     @NotNull
-    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, Truth truth) {
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct, @Nullable Truth truth) {
         return new DerivedTask.DefaultDerivedTask(c, punct, truth, this);
         //return new DerivedTask.CompetingDerivedTask(c, punct, truth, this);
     }

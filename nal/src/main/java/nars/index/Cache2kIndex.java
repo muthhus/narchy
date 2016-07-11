@@ -108,7 +108,7 @@ public class Cache2kIndex extends MaplikeIndex {
 
 
     @Override
-    public @Nullable void set(@NotNull Termed src, Termed target) {
+    public void set(@NotNull Termed src, Termed target) {
 
         data.put(src, target);
         if (isSpecial(src)) {

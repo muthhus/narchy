@@ -60,10 +60,8 @@ public interface TermIndex {
     /**
      * set whether absent or not
      */
-    @Nullable
     void set(@NotNull Termed src, Termed target);
 
-    @Nullable
     default void set(@NotNull Termed t) {
         set(t, t);
     }

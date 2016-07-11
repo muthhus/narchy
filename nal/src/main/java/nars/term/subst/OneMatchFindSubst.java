@@ -52,7 +52,6 @@ public final class OneMatchFindSubst extends FindSubst {
         return false;
     }
 
-    @Nullable
     public boolean tryMatch(@NotNull Op op, @NotNull Term x, @NotNull Term y) {
         tryMatch(op, null, null, x, y);
         return !xy.isEmpty();

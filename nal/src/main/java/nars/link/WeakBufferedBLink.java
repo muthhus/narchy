@@ -15,7 +15,7 @@ public class WeakBufferedBLink<X> extends DefaultBLink<X> {
     @NotNull
     public final WeakReference<X> id;
 
-    public WeakBufferedBLink(X id, @NotNull Budgeted b, float scal) {
+    public WeakBufferedBLink(@NotNull X id, @NotNull Budgeted b, float scal) {
         super(id, b, scal);
         this.id = new WeakReference<>(id);
     }

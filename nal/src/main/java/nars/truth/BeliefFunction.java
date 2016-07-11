@@ -321,7 +321,6 @@ public enum BeliefFunction implements TruthOperator {
         return m.truthDefault(Symbols.BELIEF);
     }
 
-    @NotNull
     private static float defaultConfidence(@NotNull Memory m) {
         return m.confidenceDefault(Symbols.BELIEF);
     }

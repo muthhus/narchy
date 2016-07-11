@@ -142,7 +142,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         return times.length;
     }
 
-    public void print(PrintStream out) {
+    public void print(@NotNull PrintStream out) {
         out.println(Joiner.on("\n").join(this.microsphereData.stream().map(FloatArrayList::new).collect(Collectors.toList())));
     }
 

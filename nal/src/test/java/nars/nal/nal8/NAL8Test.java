@@ -68,7 +68,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler_simplerBeliefTemporal()  {
         test()
-                .log()
+                //.log()
                 .input("(open(t1) &&+5 [opened]:t1). :|:")
                 .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "[opened]:t1", 1.0f, 0.81f, 5)
@@ -231,7 +231,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void further_detachment()  {
         test()
-            .log()
+            //.log()
             .input("reachable:(SELF,{t002}). :|:")
             .inputAt(10, "(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
             .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5);
@@ -378,7 +378,7 @@ public class NAL8Test extends AbstractNALTest {
         assertEquals(2, t.size());
 
         test()
-                .log()
+                //.log()
                 .input("(hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))). :|:")
                 .mustBelieve(cycles, "hold:(SELF,{t002})", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "(at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5)
@@ -398,7 +398,7 @@ public class NAL8Test extends AbstractNALTest {
     public void subbelief_2medium()  {
         //requires StructuralDeduction to AllowOverlap
         test()
-                .log()
+                //.log()
                 .input("(a:b &&+5 (c:d &&+5 x:y)). :|:")
                 .mustBelieve(cycles, "a:b", 1.0f, 0.81f, 0)
                 .mustBelieve(cycles, "c:d", 1.0f, 0.73f, 5)
@@ -488,7 +488,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void temporal_goal_detachment_2()  {
         test()
-                .log()
+                //.log()
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 ((at) &&+5 (open)) ).") //should not decomposed by the goal task
                 .mustDesire(cycles, "((at) &&+5 (open))", 1f, 0.81f, 5)
@@ -599,7 +599,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testGoalConjunctionDecompose() {
         test()
-                .log()
+                //.log()
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
                 .mustNotOutput(cycles, "(y)", '!', 3)
@@ -696,7 +696,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void testInhibition1()  {
         test()
-                .log()
+                //.log()
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
@@ -706,7 +706,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void testInhibition2()  {
         test()
-                .log()
+                //.log()
                 .goal("(reward)", Tense.Present, 1f, 0.9f)
                 .believe("((good) &&+0 (reward))", 1, 0.9f) //TODO without +0
                 .believe("((bad) &&+0 (--,(reward)))", 1, 0.9f)
@@ -764,7 +764,7 @@ public class NAL8Test extends AbstractNALTest {
         //uses AUTO TimeFunction
 
         test()
-                .log()
+                //.log()
                 .inputAt(0, "cam(left)! :|:")
                 .inputAt(4, "(((in)|(left))-->^cam). :|:")
 
@@ -779,7 +779,7 @@ public class NAL8Test extends AbstractNALTest {
         //   cam(out)!
 
         test()
-                .log()
+                //.log()
                 .inputAt(0, "(((in)|(left))-->^cam)! :|:")
                 .mustDesire(cycles, "cam(in)", 1f,0.81f, 0)
                 .mustDesire(cycles, "cam(left)", 1f,0.81f, 0);
@@ -791,7 +791,7 @@ public class NAL8Test extends AbstractNALTest {
         //   cam(out)!
 
         test()
-                .log()
+                //.log()
                 .inputAt(0, "(((in)|(left))-->^cam). :|:")
                 .mustBelieve(cycles, "cam(in)", 1f,0.81f, 0)
                 .mustBelieve(cycles, "cam(left)", 1f,0.81f, 0);

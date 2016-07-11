@@ -36,7 +36,6 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
     }
 
 
-    @Nullable
     @Override
     public final void set(@NotNull Termed src, Termed target) {
         concepts.put(src, target);

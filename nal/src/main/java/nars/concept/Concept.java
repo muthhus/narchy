@@ -180,7 +180,7 @@ public interface Concept<T extends Term> extends Termed<T> {
         return true;
     }
 
-    void linkAny(Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow);
+    void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow);
 
 
     void linkTask(@NotNull Task t, float scale);

@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 /** TODO is this better named "substituteAny" */
 public class substitute extends TermTransformOperator /*implements PremiseAware*/ {
 
-    private final PremiseEval parent;
+    @NotNull private final PremiseEval parent;
 
-    public substitute(PremiseEval parent) {
+    public substitute(@NotNull PremiseEval parent) {
         this.parent = parent;
     }
 
@@ -39,8 +39,12 @@ public class substitute extends TermTransformOperator /*implements PremiseAware*
         final Term y = xx[2];
 
         Term x1 = resolve(parent, x);
-        Term y1 = resolve(parent, y);
+        if (x1 == null)
+            return null;
 
+        Term y1 = resolve(parent, y);
+        if (y1 == null)
+            return null;
 
         return resolve(parent, new MapSubst.MapSubstWithOverride(parent.yx, x1, y1), term);
     }

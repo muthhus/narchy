@@ -106,7 +106,7 @@ public class AtomConcept extends Atom implements AbstractConcept  {
     }
 
     @Override
-    public void linkAny(Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
         //nothing
     }
 }

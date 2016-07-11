@@ -109,7 +109,7 @@ public class DefaultCore extends AbstractCore {
         }
 
         @Override
-        public @Nullable BLink<Concept> remove(Concept x) {
+        public @Nullable BLink<Concept> remove(@NotNull Concept x) {
             BLink<Concept> r = super.remove(x);
             if (r!=null) {
                 deactivate(x);

@@ -12,7 +12,7 @@ import static nars.term.atom.Atom.toUnquoted;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
-    @Nullable
+    @NotNull
     @Override
     String toString();
 

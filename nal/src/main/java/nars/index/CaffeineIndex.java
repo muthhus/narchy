@@ -114,7 +114,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
     @Override
-    public @Nullable void set(@NotNull Termed src, @NotNull Termed target) {
+    public void set(@NotNull Termed src, @NotNull Termed target) {
         data.put(src, target);
         //Termed exist = data.getIfPresent(src);
 

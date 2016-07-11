@@ -73,19 +73,19 @@ public class SensorBeliefTable extends DefaultBeliefTable {
 
         @Nullable
         @Override
-        public Task get(Object key) {
+        public Task get(@NotNull Object key) {
             throw new UnsupportedOperationException();
         }
 
         @Nullable
         @Override
-        public Object remove(Task key) {
+        public Object remove(@NotNull Task key) {
             return map.remove(key.occurrence(), key);
         }
 
         @Nullable
         @Override
-        public Task put(Task task, Task task2) {
+        public Task put(@NotNull Task task, @NotNull Task task2) {
             throw new UnsupportedOperationException();
         }
 
@@ -95,7 +95,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
         }
 
         @Override
-        public void forEachKey(Consumer<? super Task> each) {
+        public void forEachKey(@NotNull Consumer<? super Task> each) {
             map.values().forEach(each);
         }
 
@@ -110,7 +110,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
         }
 
         @Override
-        public void topWhile(Predicate<? super Task> each, int n) {
+        public void topWhile(@NotNull Predicate<? super Task> each, int n) {
             //TODO choose a radius of n around the current nar.time()
 
 
@@ -141,12 +141,12 @@ public class SensorBeliefTable extends DefaultBeliefTable {
         }
 
         @Override
-        public @Nullable Task add(Task input, EternalTable eternal, NAR nar) {
+        public @Nullable Task add(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
             return null;
         }
 
         @Override
-        public void removeIf(Predicate<Task> o) {
+        public void removeIf(@NotNull Predicate<Task> o) {
 
         }
 

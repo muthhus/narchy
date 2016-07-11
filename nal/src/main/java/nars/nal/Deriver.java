@@ -57,11 +57,7 @@ public abstract class Deriver  {
     public final PremiseRuleSet rules;
 
 
-    public Deriver() {
-        this.rules = null;
-    }
-
-    public Deriver(PremiseRuleSet rules) {
+    public Deriver(@Nullable PremiseRuleSet rules) {
         this.rules = rules;
     }
 
@@ -92,7 +88,7 @@ public abstract class Deriver  {
 //    }
 
     /** run an initialized rule matcher */
-    public abstract void run(PremiseEval matcher);
+    public abstract void run(@NotNull PremiseEval matcher);
 
 
 

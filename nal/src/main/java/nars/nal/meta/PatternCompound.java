@@ -49,10 +49,10 @@ abstract public class PatternCompound extends GenericCompound {
 
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
-        @Nullable
+        @NotNull
         protected final Ellipsis ellipsis;
 
-        PatternCompoundWithEllipsis(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        PatternCompoundWithEllipsis(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, subterms);
 
             this.ellipsis = ellipsis;
@@ -80,7 +80,7 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
 
-        public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
         }
 
@@ -186,7 +186,7 @@ abstract public class PatternCompound extends GenericCompound {
 
         private final int ellipseIndex;
 
-        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
             this.ellipseIndex = indexOf(ellipsis);
         }
@@ -219,7 +219,7 @@ abstract public class PatternCompound extends GenericCompound {
      */
     public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
 
-        @Nullable
+        @NotNull
         private final EllipsisTransform ellipsisTransform;
 
         public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @Nullable EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
@@ -273,7 +273,7 @@ abstract public class PatternCompound extends GenericCompound {
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
-        public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
         }
 

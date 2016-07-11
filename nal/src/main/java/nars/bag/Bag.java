@@ -52,7 +52,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
     /**
      * insert/merge with an initial / default budget
      */
-    default @Nullable void put(@NotNull V x) {
+    default void put(@NotNull V x) {
         put(x, initialBudget(x), null);
     }
 //        @Nullable
@@ -89,16 +89,16 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         return null;
     }
 
-    default @Nullable void put(@NotNull V i, @NotNull Budgeted b) {
+    default void put(@NotNull V i, @NotNull Budgeted b) {
         put(i, b, 1f, null);
     }
 
 
-    default @Nullable void put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
+    default void put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
         put(i, b, 1f, overflowing);
     }
 
-    default @Nullable void put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
+    default void put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
         put(v, b, 1f, overflowing);
     }
 
@@ -464,12 +464,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
         @Nullable
         @Override
-        public BLink remove(Object x) {
+        public BLink remove(@NotNull Object x) {
             return null;
         }
 
         @Override
-        public void put(Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+        public void put(@NotNull Object i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
         }
 
         @Override
@@ -484,7 +484,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         }
 
         @Override
-        public boolean contains(Object it) {
+        public boolean contains(@NotNull Object it) {
             return false;
         }
 
@@ -501,7 +501,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
         @NotNull
         @Override
-        public Bag commit(@NotNull Consumer each) {
+        public Bag commit(@Nullable Consumer each) {
             return this;
         }
 
@@ -519,7 +519,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
 
         @Nullable
         @Override
-        public Object put(Object o, Object o2) {
+        public Object put(@NotNull Object o, @NotNull Object o2) {
             return null;
         }
 

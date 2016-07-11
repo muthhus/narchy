@@ -175,7 +175,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
     }
 
     @Override
-    public void accept(NAR nar) {
+    public void accept(@NotNull NAR nar) {
         //super.accept(nar);
         pendingRun = false; //HACK
 
@@ -196,7 +196,7 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
 
 
     @Override
-    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, NAR nar) {
+    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, @NotNull NAR nar) {
         //always update (calling .accept(nar) ) after every change
         return true;
     }

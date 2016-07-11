@@ -123,7 +123,6 @@ public class IO {
         int x = in.readByte();
         return $.v(o, x);
     }
-    @Nullable
     public static void writeVariable(@NotNull DataOutput out, @NotNull AbstractVariable v) throws IOException {
         out.writeByte(v.id);
     }

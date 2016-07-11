@@ -68,7 +68,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 
 
     @Override
-    public int compareTo(Termlike o) {
+    public int compareTo(@NotNull Termlike o) {
         if (equals(o)) return 0;
         return alias.compareTo(o);
     }
@@ -85,7 +85,7 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void append(Appendable p) throws IOException {
+    public void append(@NotNull Appendable p) throws IOException {
         TermPrinter.append(target.term(), p);
     }
 

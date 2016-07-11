@@ -523,7 +523,21 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     static int compare(@NotNull TermContainer a, @NotNull Termlike b) {
         if (a == b) return 0;
 
-        int s = a.size(), diff;
+
+
+        //why doesnt this work:
+//        int hashDiff = Integer.compare(a.hashCode(), b.hashCode());
+//        if (hashDiff!=0) {
+//            return hashDiff;
+//        }
+
+        int diff;
+
+//        int v = a.structure();
+//        if ((diff = Integer.compare(v, b.structure())) != 0)
+//            return diff;
+
+        int s = a.size();
         if ((diff = Integer.compare(s, b.size())) != 0)
             return diff;
 
@@ -531,17 +545,19 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         for (int i = 0; i < s; i++) {
             int d = a.term(i).compareTo(cc.term(i));
 
-            /*
-            if (Global.DEBUG) {
-                int d2 = b.compareTo(a);
+
+            /*if (Global.DEBUG) {
+                int d2 = cc.term(i).compareTo(a.term(i));
                 if (d2!=-d)
                     throw new RuntimeException("ordering inconsistency: " + a + ", " + b );
-            }
-            */
+            }*/
 
-            if (d != 0)
+
+            if (d != 0) {
                 return d;
+            }
         }
+
 
         return 0;
     }

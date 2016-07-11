@@ -84,7 +84,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     @NotNull
     @Override
-    public <C> C meta(Object key, BiFunction value) {
+    public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         throw new UnsupportedOperationException();
     }
 
@@ -342,7 +342,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
     @Override
-    public void linkAny(@NotNull Budgeted b, float scale, float minScale, NAR nar, @Nullable MutableFloat conceptOverflow) {
+    public void linkAny(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
         linkSubs(b, scale, minScale, nar, conceptOverflow);
         //linkPeers(b, scale, nar, false);
     }

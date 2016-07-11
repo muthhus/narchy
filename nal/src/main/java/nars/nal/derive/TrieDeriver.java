@@ -101,7 +101,7 @@ public class TrieDeriver extends Deriver {
     }
 
     @Override
-    public final void run(PremiseEval m) {
+    public final void run(@NotNull PremiseEval m) {
         for (ProcTerm r : roots)
             r.accept(m);
     }

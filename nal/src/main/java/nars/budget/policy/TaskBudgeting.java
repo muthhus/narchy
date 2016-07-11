@@ -10,6 +10,7 @@ import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -23,21 +24,22 @@ import static nars.nal.UtilityFunctions.aveAri;
  */
 public class TaskBudgeting {
 
-    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull ConceptProcess p, float minDur) {
+    public static @Nullable Budget budgetInference(float qual, @NotNull Termed derived, @NotNull PremiseEval p, float minDur) {
 
 
-        Task parentTask = p.task();
-        if (parentTask == null)
-            return null;
+        Task parentTask = p.task;
 
         //Penalize by complexity: RELATIVE SIZE INCREASE METHOD
-        float parentVol = aveAri(parentTask.complexity(), p.beliefTerm().complexity());
+        float parentVol = aveAri(parentTask.complexity(), p.beliefTerm.complexity());
         //float volRatioScale = parentVol / ((float) (parentVol + derived.complexity()));
         float volRatioScale = Math.min(1, parentVol / derived.complexity() );
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
 
-        BLink<? extends Task> taskLink = p.taskLink;
-        BLink<? extends Termed> termLink = p.termLink;
+
+        ConceptProcess pp = p.premise;
+
+        BLink<? extends Task> taskLink = pp.taskLink;
+        BLink<? extends Termed> termLink = pp.termLink;
 
         float linkDur = aveAri( taskLink.dur(), termLink.dur() );
         final float durability = linkDur * volRatioScale;
@@ -87,7 +89,7 @@ public class TaskBudgeting {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundQuestion(@NotNull Termed content, @NotNull ConceptProcess premise, float minDur) {
+    public static Budget compoundQuestion(@NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
         return budgetInference(1.0f, content, premise, minDur);
     }
 
@@ -100,7 +102,7 @@ public class TaskBudgeting {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess premise, float minDur) {
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull PremiseEval premise, float minDur) {
         return budgetInference(
                 BudgetFunctions.truthToQuality(truth),
                 content,

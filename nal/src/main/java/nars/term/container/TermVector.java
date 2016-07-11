@@ -110,7 +110,7 @@ public class TermVector implements TermContainer<Term> {
 
 
     @Override
-    public final boolean isTerm(int i, Op o) {
+    public final boolean isTerm(int i, @NotNull Op o) {
         return term[i].op() == o;
     }
 

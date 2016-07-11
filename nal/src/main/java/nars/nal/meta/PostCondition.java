@@ -86,7 +86,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @throws RuntimeException
      */
     @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
-                                     @NotNull Term... modifiers) throws RuntimeException, UnsupportedOperationException {
+                                     @NotNull Term... modifiers) throws RuntimeException {
 
 
         Term beliefTruth = null, goalTruth = null;
@@ -119,7 +119,7 @@ public class PostCondition implements Serializable, Level //since there can be m
                         case "Goal":
                             puncOverride = Symbols.GOAL;
                             break;
-                        case "Judgment":
+                        case "Belief":
                             puncOverride = Symbols.BELIEF;
                             break;
                         case "Quest":

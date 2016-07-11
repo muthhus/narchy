@@ -14,14 +14,14 @@ import java.util.function.BiConsumer;
  */
 public abstract class CollectorMap<K, V> {
 
-    public final Map<K, V> map;
+    @NotNull public final Map<K, V> map;
 
-    protected CollectorMap(Map<K, V> map) {
+    protected CollectorMap(@NotNull Map<K, V> map) {
         this.map = map;
     }
 
     @Nullable
-    abstract public K key(V v);
+    abstract public K key(@NotNull V v);
 
     @Override
     public String toString() {
@@ -33,13 +33,13 @@ public abstract class CollectorMap<K, V> {
      * returns null if successful, non-null if an item was displaced it will be that item
      */
     @Nullable
-    protected abstract V addItem(V e);
+    protected abstract V addItem(@NotNull V e);
 
     /**
      * implementation for removing the value to another collecton (called internally)
      */
     @Nullable
-    protected abstract V removeItem(V e);
+    protected abstract V removeItem(@NotNull V e);
 
     public final void forEach(@NotNull BiConsumer<K, V> each) {
         map.forEach(each);
@@ -58,7 +58,7 @@ public abstract class CollectorMap<K, V> {
 
 
     @Nullable
-    public V put(K key, V value) {
+    public V put(@NotNull K key, @NotNull V value) {
 
         V removed = map.put(key, value);
         if (removed != null) {
@@ -91,7 +91,7 @@ public abstract class CollectorMap<K, V> {
     }
 
     @Nullable
-    public V remove(K x) {
+    public V remove(@NotNull K x) {
 
         V e = removeKey(x);
         if (e != null) {
@@ -112,7 +112,7 @@ public abstract class CollectorMap<K, V> {
     }
 
 
-    protected final V removeKey(K key) {
+    protected final @Nullable V removeKey(@NotNull K key) {
         return map.remove(key);
     }
 
@@ -123,7 +123,7 @@ public abstract class CollectorMap<K, V> {
 //            throw new RuntimeException("Bag fault while trying to remove key by item value");
 //    }
 
-    protected final V removeKeyForValue(V value) {
+    protected final @Nullable V removeKeyForValue(@NotNull V value) {
         @Nullable K key = key(value);
         return key == null ? null : removeKey(key);
     }
@@ -137,11 +137,11 @@ public abstract class CollectorMap<K, V> {
         map.clear();
     }
 
-    public final V get(@NotNull Object key) {
+    @Nullable public final V get(@NotNull Object key) {
         return map.get(key);
     }
 
-    public boolean containsKey(K name) {
+    public boolean containsKey(@NotNull K name) {
         return map.containsKey(name);
     }
 
@@ -156,12 +156,12 @@ public abstract class CollectorMap<K, V> {
     }
 
 
-    /**
-     * put key in index, do not add value
-     */
-    protected final V putKey(K key, V value) {
-        return map.put(key, value);
-    }
+//    /**
+//     * put key in index, do not add value
+//     */
+//    protected final V putKey(K key, V value) {
+//        return map.put(key, value);
+//    }
 //    public final V putKeyIfAbsent(K key, V value) {
 //        return map.putIfAbsent(key, value);
 //    }

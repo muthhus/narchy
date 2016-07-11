@@ -60,7 +60,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return this;
     }
 
-    @Nullable
+    @NotNull
     @Override
     Op op();
 
@@ -192,7 +192,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return true;
     }
 
-    default int subtermTime(Term x) {
+    default int subtermTime(@NotNull Term x) {
         return subtermTime(x, this instanceof Compound ? ((Compound) this).dt() : DTERNAL);
     }
 //    default long subtermTimeOrZero(Term x, long offset) {
@@ -203,7 +203,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     /**
      * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
      */
-    default int subtermTime(Term x, int dt) {
+    default int subtermTime(@NotNull Term x, int dt) {
 
         if (this.equals(x))
             return 0;
@@ -312,7 +312,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     /** GLOBAL TERM COMPARATOR FUNCTION */
     @Override
-    default int compareTo(Termlike y) {
+    default int compareTo(@NotNull Termlike y) {
         if (this.equals(y)) return 0;
 
         int d = this.op().compareTo(((Term)y).op()); //HACK

@@ -2,6 +2,7 @@ package nars.op.java;
 
 import nars.Op;
 import nars.term.atom.AtomicStringConstant;
+import org.jetbrains.annotations.NotNull;
 
 /** refers to a java object instance TODO */
 public final class ObjRef<O> extends AtomicStringConstant {
@@ -22,6 +23,7 @@ public final class ObjRef<O> extends AtomicStringConstant {
         return null;
     }
 
+    @NotNull
     @Override
     public    Op op() {
         return null;

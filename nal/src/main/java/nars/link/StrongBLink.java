@@ -1,5 +1,6 @@
 package nars.link;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -9,7 +10,7 @@ public class StrongBLink<X> extends DefaultBLink<X> {
     @Nullable
     public X id;
 
-    public StrongBLink(X id, float p, float d, float q) {
+    public StrongBLink(@NotNull X id, float p, float d, float q) {
         super(id, p, d, q);
         this.id = id;
     }

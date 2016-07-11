@@ -57,7 +57,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
         return !ta.equals(tb);
     }
 
-    public static Term resolve(Term ca, @NotNull int[] aPath) {
+    public static Term resolve(@NotNull Term ca, @NotNull int[] aPath) {
         if (aPath.length == 0)
             return ca;
         else {

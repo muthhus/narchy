@@ -165,12 +165,12 @@ public interface TimeFunctions {
 
         int eventDelta = DTERNAL;
 
-        if (!prem.belief().isEternal() && !prem.task().isEternal()) {
+        if (!prem.belief().isEternal() && !p.task.isEternal()) {
             long earliest = prem.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
             eventDelta = (int) (prem.belief().occurrence() -
-                    prem.task().occurrence());
+                    p.task.occurrence());
 
 
             occReturn[0] = earliest;
@@ -219,10 +219,10 @@ public interface TimeFunctions {
 
         Compound decomposedTerm = (Compound) (decomposeTask ? $.pos(p.taskTerm) : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
-        long occDecomposed = decomposeTask ? prem.task().occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
+        long occDecomposed = decomposeTask ? p.task.occurrence() : (premBelief != null ? premBelief.occurrence() : ETERNAL);
 
         //the non-decomposed counterpart of the premise
-        Task otherTask = decomposeTask ? premBelief : prem.task();
+        Task otherTask = decomposeTask ? premBelief : p.task;
         Term otherTerm = decomposeTask ? p.beliefTerm.term() : $.pos(p.taskTerm);
         long occOther = (otherTask != null && !otherTask.isEternal()) ? otherTask.occurrence() : ETERNAL;
 
@@ -398,8 +398,8 @@ public interface TimeFunctions {
         ConceptProcess prem = p.premise;
         Term dtTerm = taskOrBelief ? $.pos(p.taskTerm) : p.beliefTerm;
 
-        Task t = prem.task();
-        Task b = prem.belief();
+        Task t = p.task;
+        Task b = p.belief;
         if (!taskOrBelief && b != null) {
             //if (b.occurrence()!=ETERNAL) {
             int derivedInT = dtTerm.subtermTime(derived);
@@ -522,7 +522,7 @@ public interface TimeFunctions {
     @Nullable TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
         ConceptProcess premise = p.premise;
 
-        Task task = premise.task();
+        Task task = p.task;
         int taskDT = ((Compound)$.pos(p.taskTerm)).dt();
         Term bt = p.beliefTerm;
 
@@ -587,8 +587,8 @@ public interface TimeFunctions {
 
         ConceptProcess premise = p.premise;
 
-        Task task = premise.task();
-        Task belief = premise.belief();
+        Task task = p.task;
+        Task belief = p.belief;
 
         long occ = premise.occurrenceTarget((t, b) -> {
             if ((belief!=null) && (!belief.isEternal()))

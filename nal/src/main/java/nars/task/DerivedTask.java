@@ -22,7 +22,7 @@ abstract public class DerivedTask extends MutableTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
         super(tc, punct, truth);
 
         @Nullable long[] pte = premise.task().evidence();
@@ -67,7 +67,7 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+        public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
             super(tc, punct, truth, premise);
         }
     }
@@ -75,7 +75,7 @@ abstract public class DerivedTask extends MutableTask {
     public static class CompetingDerivedTask extends DerivedTask {
 
 
-        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, Truth truth, @NotNull ConceptProcess premise) {
+        public CompetingDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull ConceptProcess premise) {
             super(tc, punct, truth, premise);
         }
 

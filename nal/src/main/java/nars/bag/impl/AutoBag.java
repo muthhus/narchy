@@ -83,7 +83,7 @@ public final class AutoBag<V> implements BudgetForget {
     }
 
     @Override
-    public final void update(NAR nar) {
+    public final void update(@NotNull NAR nar) {
 
         this.now = nar.time();
         //forget.update(nar);
