@@ -290,8 +290,10 @@ public abstract class TermBuilder {
     @Nullable
     public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
 
-        int ul = u.length;
+        if (u == null)
+            return null;
 
+        int ul = u.length;
         if (ul == 0) {
             return null;
         }

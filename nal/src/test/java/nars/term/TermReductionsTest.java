@@ -444,11 +444,14 @@ public class TermReductionsTest {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
+        assertInvalidTerm(          ()->$("(&&,(--,(a==>a)),c:d,e:f)")); //INVALID
 
         assertEquals($("(||,c:d,e:f)"), $("(||,(a<->a),c:d,e:f)"));
         assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
         assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));
         assertEquals($("(||,c:d,e:f)"), $("(||,(a==>a),c:d,e:f)"));
+        assertEquals($("(||,c:d,e:f)"), $("(||,(--,(a==>a)),c:d,e:f)")); //VALID
+
     }
 
 }
