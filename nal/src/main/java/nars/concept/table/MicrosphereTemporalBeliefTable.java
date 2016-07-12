@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
@@ -204,7 +203,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
            higher means it is easier to hold beliefs further away from current time at the expense of accuracy
            lower means more accuracy at the expense of shorter memory span
      */
-        float historyFactor = Global.DEFAULT_TEMPORAL_HISTORY_FACTOR;
+        float historyFactor = Global.TEMPORAL_DURATION;
         return (range == 0) ? 1 :
                 ((1f) / (range * historyFactor));
     }

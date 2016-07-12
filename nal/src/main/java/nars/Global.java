@@ -148,8 +148,9 @@ public enum Global {
     public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
 
 
-    /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1f;
+    /** relates time and evidence (confidence); how past and future beliefs decay in rank
+     * across time; width of the temporal focus */
+    public static final float TEMPORAL_DURATION = 4f;
 
 
 

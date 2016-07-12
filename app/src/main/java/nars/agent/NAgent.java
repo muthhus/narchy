@@ -32,10 +32,12 @@ import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.lang.Math.max;
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
 import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
+import static nars.nal.UtilityFunctions.or;
 import static nars.util.Texts.n4;
 
 /**
@@ -89,53 +91,11 @@ public class NAgent implements Agent {
         //0.5f + alpha /2f /* learning rate */);
     };
 
-    /** values only on the positive half of the freq spectrum */
-    final FloatToObjectFunction sensorFreqPos = (v) -> {
-        float f;
-
-        if (Math.abs(v/2f) <= Global.TRUTH_EPSILON*2f) {
-            //f = 0f;
-            f = 0.5f;
-            //return null;
-        } else if (v > 0) { //if (v > 0f) {
-            f = 0.5f + v / 2f;
-        } else {
-            f = 0f;
-        }
-        return t(f, alpha);
-    };
-
-    final FloatToObjectFunction sensorFreqPosNeg = (v) -> {
-        float f;
-        if (Math.abs(v/2f) < Global.TRUTH_EPSILON) {
-            f = 0.5f;
-        } else if (v > 0f) {
-            f = 0.5f + v / 2f;
-        } else { //if (v < 0) {
-            f = 0.5f - (-v) / 2f;
-        }
-        return t(f, alpha);
-    };
-
-    final FloatToObjectFunction sensorConf = (v) -> {
-        /*return new DefaultTruth(
-                v < 0.5f ? 0 : 1f, alpha * 0.99f * Math.abs(v - 0.5f));*/
-
-        return t(1f, alpha * v);
-        //return new DefaultTruth(1f, v);
-        //0.5f + alpha /2f /* learning rate */);
-    };
-
-
-
     private float[] lastMotivation;
     private int nextAction = -1;
 
     private final float reinforcementAttention = 0.95f; //0.5f;
 
-    //private Budgeted ActionAttentionPerFrame = null; //b(0.9f,0.9f,0.9f);
-
-    private SensorConcept dRewardSensorNeg;
 
     private final DecideAction decideAction;
 
@@ -272,14 +232,30 @@ public class NAgent implements Agent {
             Truth f;
             boolean change = (lastAction!=nextAction);
             if (change && nextAction == i) {
-                f = t(1, gamma);
+                //f = t(1, gamma);
+                f = d;
             } else if (change && lastAction == i) {
-                f = t(0, gamma);
+                //f = t(0, gamma);
+                f = d;
             } else {
-                f = null;
+                return null;
             }
-            if (b!=null && f!=null && b.equals(f))
-                f = null; //no change from current belief state
+            if (b!=null) {
+                if (b.equals(f))
+                    f = null; //no change from current belief state
+                else {
+                    //reduce feedback by similarity to existing belief state
+                    float freqDiff = Math.abs(b.freq() - d.freq());
+                    float confDiff = Math.abs(b.conf() - d.conf());
+                    //HACK an approximation:
+                    float c = f.conf() * or( (1-freqDiff), (1-confDiff) );
+                    if (c < Global.TRUTH_EPSILON)
+                        return null; //change infinitisemal
+                    else
+                        return $.t(f.freq(), c);
+                }
+            }
+
             return f;
         };
     }
@@ -533,7 +509,7 @@ public class NAgent implements Agent {
 
     }
 
-    float lastOnConf = 0;
+
 
     public int decide(int _lastAction) {
 
@@ -542,15 +518,12 @@ public class NAgent implements Agent {
         this.nextAction = -1;
 
 
-        float nextMotivation;
 
         nextAction = decideMotivation();
 
         if (nextAction == -1) {
             nextAction = randomMotivation();
         }
-
-        nextMotivation = motivation[nextAction];
 
         long now = nar.time();
         //System.out.println("decisiveness=" + decisiveness(nextAction));
@@ -569,49 +542,48 @@ public class NAgent implements Agent {
                 //TODO find an accurate way to do this
                 //lastOnConf*(motivation[lastAction]-lastMotivation[lastAction]);
 
-        float onConf = gamma, offConf = gamma;
 
 
         if (synchronousGoalInput || lastAction != nextAction) {
 
 
 
-            //belief/goal feedback levels
-            float off =
-                    0 + (_lastAction==-1 ? 0 :
-                        (0.5f - 0.5f *
-                                decisiveness(_lastAction)));
-                                //motivation[_lastAction] / motivation[nextAction])); //preserve residual motivation of previous action
-                    //0.5f - (n-1)/n;
-                    //0f; //0.25f; //0.49f;
+//            //belief/goal feedback levels
+//            float off =
+//                    0 + (_lastAction==-1 ? 0 :
+//                        (0.5f - 0.5f * decisiveness(_lastAction)));
+//                                //motivation[_lastAction] / motivation[nextAction])); //preserve residual motivation of previous action
+//                    //0.5f - (n-1)/n;
+//                    //0f; //0.25f; //0.49f;
+//
+//            //float on = 1f; //0.75f;
+//            float on =
+//                    (0.5f + 0.5f * decisiveness(nextAction));
 
-            float on = 1f; //0.75f;
-            float preOff = (off+on*2f)/3f; //0.75f;
-            float preOn = (on+off*2f)/3f; // 0.75f;
+//            float preOff = (off+on*2f)/3f; //0.75f;
+//            float preOn = (on+off*2f)/3f; // 0.75f;
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
-                //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
-                //nar.believe(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
 
-                nar.goal(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
-                //nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
+                //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
+
+                nar.goal(goalPriority, lastActionMotor, now-1,
+                        0, max(Global.TRUTH_EPSILON, (1f-decisiveness(lastAction)) * gamma)); //downward step function bottom
             }
 
-            MotorConcept nextAction = actions.get(this.nextAction);
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
-            //nar.believe(goalPriority, nextAction, now, preOn, conf); //upward step function bottom
 
 
-            nar.goal(goalPriority, nextAction, now, on, onConf); //upward step function top
-            //nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
+            nar.goal(goalPriority, actions.get(this.nextAction), now,
+                    1, max(Global.TRUTH_EPSILON, (decisiveness(this.nextAction)) * gamma)); //upward step function top
         }
 
         //updateMotors();
 
         this.lastAction = nextAction;
         System.arraycopy(motivation, 0, lastMotivation, 0, motivation.length);
-        this.lastOnConf = onConf;
+
 
         return nextAction;
     }
