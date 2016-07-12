@@ -254,7 +254,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
 
         if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
-            //HACK share the minT and maxT of both tables
+
+            //finds the temporal intersection of the two temporal belief tables:
+            //this affects the temporal belief compression's focus in time
+
             long minT = Long.MAX_VALUE;
             long maxT = Long.MIN_VALUE;
 
@@ -296,8 +299,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     }
 
 
+    @Override
+    public final ConceptPolicy policy() {
+        return policy;
+    }
 
-    @Override public void capacity(@NotNull ConceptPolicy p) {
+    @Override public final void policy(@NotNull ConceptPolicy p) {
         this.policy = p;
         linkCapacity(p);
         beliefCapacity(p);

@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
@@ -20,6 +21,7 @@ public class AtomConcept extends Atom implements AbstractConcept  {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
+    private ConceptPolicy policy;
 
     @NotNull
     private final Op op;
@@ -45,6 +47,15 @@ public class AtomConcept extends Atom implements AbstractConcept  {
     }
 
 
+    @Override
+    public ConceptPolicy policy() {
+        return policy;
+    }
+    @Override
+    public void policy(@NotNull ConceptPolicy p) {
+        this.policy = p;
+        linkCapacity(p);
+    }
 
 
     @Override

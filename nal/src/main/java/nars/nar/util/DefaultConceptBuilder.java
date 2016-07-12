@@ -4,6 +4,8 @@ import nars.Op;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.merge.BudgetMerge;
+import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -30,6 +32,8 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     final Function<Atom, AtomConcept> atomBuilder =
             (Atom a) -> new AtomConcept(a, termbag(), taskbag());
 
+    private final ConceptPolicy conceptInitialize, conceptActivate;
+
 
     //private static volatile int serial = 0;
 
@@ -37,7 +41,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 //            (Variable v) -> new VariableConcept(v);
 
     @Nullable
-    final Termed newConcept(@NotNull Compound t){
+    final Concept newConcept(@NotNull Compound t){
 
         switch (t.op()) {
             case INH:
@@ -87,6 +91,10 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     public DefaultConceptBuilder(@NotNull Random r) {
         this.rng = r;
+
+        this.conceptInitialize = new DefaultConceptPolicy(10, 8, 1, 8, 4);
+        this.conceptActivate = new DefaultConceptPolicy(12, 10, 4, 24, 12);
+
         this.defaultCurveSampler =
                 new CurveBag.NormalizedSampler(
                 //new CurveBag.DirectSampler(
@@ -106,7 +114,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
             return term;
         }
 
-        Termed result = null;
+        Concept result = null;
         if (term instanceof Compound) {
             result = newConcept(  (Compound) term );
         } else {
@@ -126,9 +134,20 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
             throw new UnsupportedOperationException();
         }
 
+
         //logger.trace("{} conceptualized to {}", term, result);
 
         return result;
 
     }
+
+    @Override
+    public ConceptPolicy initialized() {
+        return conceptInitialize;
+    }
+    @Override
+    public ConceptPolicy activated() {
+        return conceptActivate;
+    }
+
 }

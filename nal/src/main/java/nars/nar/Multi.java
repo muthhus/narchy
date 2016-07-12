@@ -4,6 +4,7 @@ import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.Global;
 import nars.NAR;
 import nars.budget.Budgeted;
+import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.index.CaffeineIndex;
@@ -134,7 +135,7 @@ public class Multi extends AbstractNAR {
         private boolean stopped;
 
 
-        public WorkerCore(int n, @NotNull PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+        public WorkerCore(int n, @NotNull PremiseEval matcher, ConceptPolicy warm, ConceptPolicy cold) {
             super(Multi.this, matcher, warm, cold);
             this.thread = new Thread(this);
             thread.setName(nar.toString() + ".Worker" + n);

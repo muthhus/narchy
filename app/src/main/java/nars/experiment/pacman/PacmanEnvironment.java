@@ -498,18 +498,18 @@ public class PacmanEnvironment extends cpcman implements Environment {
 
 			logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
 
-			nar.conceptCold.termlinksCapacityMin.set(
-					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)/2
-			);
-			nar.conceptCold.termlinksCapacityMax.set(
-					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)/2
-			);
-			nar.conceptWarm.termlinksCapacityMin.set(
-					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)
-			);
-			nar.conceptWarm.termlinksCapacityMax.set(
-					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)
-			);
+//			nar.conceptCold.termlinksCapacityMin.set(
+//					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)/2
+//			);
+//			nar.conceptCold.termlinksCapacityMax.set(
+//					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)/2
+//			);
+//			nar.conceptWarm.termlinksCapacityMin.set(
+//					(int)Util.lerp(linkMinLow, linkMinHigh, ratio)
+//			);
+//			nar.conceptWarm.termlinksCapacityMax.set(
+//					(int)Util.lerp(linkMaxLow, linkMaxHigh, ratio)
+//			);
 			nar.confMin.setValue(
 					Util.lerp(confMinMin, confMinMax, ratio)
 			);

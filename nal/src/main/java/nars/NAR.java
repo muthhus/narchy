@@ -23,6 +23,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.variable.Variable;
 import nars.time.Clock;
+import nars.time.FrameClock;
 import nars.util.IO;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
@@ -497,11 +498,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * if the task was a command, it will return false even if executed
      */
     public final void input(@NotNull Task t) {
-        if (t.isCommand()) {
-            //t.onConcept(null); //direct execution
-        } else {
-            process(t.normalize(this)); //accept into input buffer for eventual processing
-        }
+
+        process(t.normalize(this)); //accept into input buffer for eventual processing
+
     }
 
     @Override
@@ -785,7 +784,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         if (running.get()) {
             return nextTasks.add(t);
         } else {
+            running.set(true); //prevents recursive invocation
             t.accept(this);
+            running.set(false);
             return true;
         }
     }
@@ -1240,8 +1241,65 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         activate(t, 1f);
     }
 
+    /** called for new concepts */
+    abstract protected void init(@NotNull Concept c);
+
+    /**
+     * process a Task through its Concept
+     */
     @Nullable
-    abstract public Concept process(@NotNull Task input, float activation);
+    public final Concept process(@NotNull Task input, float activation) {
+
+        if (input.isDeleted()) {
+            throw new RuntimeException(input + " deleted");
+        }
+
+        Concept c = concept(input, true);
+        if (c == null) {
+            if (Global.DEBUG) {
+                //throw new InvalidTaskException(input, "Inconceivable");
+                logger.error("Inconceivable: {}", input);
+            }
+            input.delete("Inconceivable");
+            return null;
+        }
+
+        float business = input.pri();
+        emotion.busy(business);
+
+
+        if (c.policy()==null) {
+            c.policy(index.conceptBuilder().initialized());
+        }
+
+        Task t = c.process(input, this);
+        if (t != null && !t.isDeleted()) {
+
+            if (clock instanceof FrameClock) {
+                //HACK for unique serial number w/ frameclock
+                ((FrameClock)clock).ensureStampSerialGreater(t.evidence());
+            }
+
+            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
+
+            t.onConcept(c);
+
+            //propagate budget
+            MutableFloat overflow = new MutableFloat();
+
+            activate(c, t, activation, activation, overflow);
+
+            emotion.stress(overflow);
+
+
+            eventTaskProcess.emit(t); //signal any additional processes
+
+        } else {
+            emotion.frustration(business);
+        }
+
+        return c;
+    }
 
     @Nullable
     public final Concept process(@NotNull Task input) {

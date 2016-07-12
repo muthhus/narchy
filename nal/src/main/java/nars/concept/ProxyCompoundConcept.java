@@ -66,6 +66,10 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
 //        return alias.equals(ref);
     }
 
+    @Override
+    public final ConceptPolicy policy() {
+        return target.policy();
+    }
 
     @Override
     public int compareTo(@NotNull Termlike o) {
@@ -184,8 +188,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public void capacity(@NotNull ConceptPolicy c) {
-        target.capacity(c);
+    public void policy(@NotNull ConceptPolicy c) {
+        target.policy(c);
     }
 
 

@@ -2,7 +2,7 @@ package nars.nar;
 
 import nars.Global;
 import nars.NAR;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
 import nars.nal.Deriver;
@@ -16,13 +16,9 @@ import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.reset;
 import nars.op.time.STMTemporalLinkage;
-import nars.task.Task;
 import nars.term.atom.Atom;
 import nars.time.Clock;
-import nars.time.FrameClock;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -36,7 +32,7 @@ import java.util.Random;
  */
 public abstract class AbstractNAR extends NAR {
 
-    public final @NotNull DefaultConceptPolicy conceptWarm, conceptCold;
+    public final @NotNull ConceptPolicy conceptWarm, conceptCold;
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
@@ -47,9 +43,8 @@ public abstract class AbstractNAR extends NAR {
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
-
-        conceptWarm = new DefaultConceptPolicy(12, 10, 4, 24, 12);
-        conceptCold = new DefaultConceptPolicy(10, 8, 1, 8, 4);
+        conceptWarm = index.conceptBuilder().activated();
+        conceptCold = index.conceptBuilder().initialized();
 
         durMin.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
@@ -132,66 +127,10 @@ public abstract class AbstractNAR extends NAR {
     }
 
 
-    /**
-     * process a Task through its Concept
-     */
-    @Nullable @Override
-    public final Concept process(@NotNull Task input, float activation) {
-
-        if (input.isDeleted()) {
-            throw new RuntimeException(input + " deleted");
-        }
-
-        Concept c = concept(input, true);
-        if (c == null) {
-            if (Global.DEBUG) {
-                //throw new InvalidTaskException(input, "Inconceivable");
-                logger.error("Inconceivable: {}", input);
-            }
-            input.delete("Inconceivable");
-            return null;
-        }
-
-        float business = input.pri();
-        emotion.busy(business);
-
-        if (c.beliefs().capacity() == 0) {
-            //concept is new, apply inactive policy by default
-            init(c);
-        }
-
-        Task t = c.process(input, this);
-        if (t != null && !t.isDeleted()) {
-
-            if (clock instanceof FrameClock) {
-                //HACK for unique serial number w/ frameclock
-                ((FrameClock)clock).ensureStampSerialGreater(t.evidence());
-            }
-
-            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-
-            t.onConcept(c);
-
-            //propagate budget
-            MutableFloat overflow = new MutableFloat();
-
-            activate(c, t, activation, activation, overflow);
-
-            emotion.stress(overflow);
-
-
-            eventTaskProcess.emit(t); //signal any additional processes
-
-        } else {
-            emotion.frustration(business);
-        }
-
-        return c;
-    }
 
     /** initialize a new concept: set initial capacity policy, etc */
-    final protected void init(@NotNull Concept c) {
-        c.capacity(conceptCold);
+    @Override final protected void init(@NotNull Concept c) {
+        c.policy(conceptCold);
     }
 
 //    public static final AbstractOperator[] exampleOperators = {

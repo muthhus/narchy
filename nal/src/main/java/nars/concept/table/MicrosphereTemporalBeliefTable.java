@@ -71,8 +71,8 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         if (isFull()) {
             //WHY DOES THIS HAPPEN, IS IT DANGEROUS
             //if (Global.DEBUG)
-                throw new RuntimeException(this + " compression failed");
-            //return null;
+                //throw new RuntimeException(this + " compression failed");
+            return null;
         }
 
         return input;

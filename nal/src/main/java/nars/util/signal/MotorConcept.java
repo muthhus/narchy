@@ -6,6 +6,7 @@ import com.gs.collections.api.block.procedure.primitive.FloatFloatProcedure;
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -20,105 +21,61 @@ import static nars.budget.policy.DefaultConceptPolicy.beliefCapacityNonEternal;
 import static nars.budget.policy.DefaultConceptPolicy.goalCapacityOneEternal;
 
 
-public class MotorConcept extends OperationConcept implements FloatFunction<Term> {
+public class MotorConcept extends OperationConcept  {
 
-    /**
-     * all effected motor actuation relative to the differential of current desire and current belief
-     */
-    public static final MotorFunction relative = (d,b) -> d;
 
-    /**
-     * motor feedback attenuated by half of motor input
-     */
-    public static final FloatToFloatFunction leaky = m -> m / 2;
-
-    /**
-     * motor actuation directly controlled by desire value d
-     */
-    public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
 
     /** relative temporal lookahead for desire/belief prediction */
     final int motorDT = 1;
 
-    @NotNull
-    public final Sensor feedback;
-    //private final Logger logger;
+    private final float feedbackPriority;
+    private final float feedbackDurability;
 
+
+    /** determines the feedback belief when desire or belief has changed in a MotorConcept
+     *  implementations may be used to trigger procedures based on these changes.
+     *  normally the result of the feedback will be equal to the input desired value
+     *  although this may be reduced to indicate that the motion has hit a limit or
+     *  experienced resistence
+     * */
     @FunctionalInterface  public interface MotorFunction {
-        MotorFunction NoFeedback = (b,d) -> Float.NaN;
 
-        float motor(float believed, float desired);
+        /**
+         * @param desired current desire
+         * @param believed current belief
+         * @return truth of a new feedback belief, or null to disable the creation of any feedback this iteration
+         */
+        @Nullable Truth motor(@Nullable Truth believed, @Nullable Truth desired);
+
+        /** all desire passes through to affect belief */
+        MotorFunction Direct = (believed, desired) -> desired;
+
+        /** absorbs all desire and doesnt affect belief */
+        MotorFunction Null = (believed, desired) -> null;
     }
 
-    /**
-     * input: 0..+1 (expectation)   output feedback: 0..+1 or NaN
-     */
+
     @NotNull
     private MotorFunction motor;
 
-    /**
-     * belief feedback expectation
-     */
-    float nextFeedback;
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this($(compoundTermString), n, MotorFunction.NoFeedback);
-    }
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull FloatFloatProcedure update) throws Narsese.NarseseException {
-        this($(compoundTermString), n, (b,d) -> {
-            update.value(b, d);
-            return Float.NaN;
-        });
+        this($(compoundTermString), n, MotorFunction.Direct);
     }
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         this($(compoundTermString), n, motor);
     }
+
     public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
         super(term, n);
 
         assert (Op.isOperation(this));
 
-        //this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
-
-
-        feedback = new Sensor(n, this, this,
-                //(v) -> $.t(1f, v * n.confidenceDefault(Symbols.BELIEF)
-                (v) -> $.t(v, n.confidenceDefault(Symbols.BELIEF)
-                )) {
-
-            @Override
-            protected int dt() {
-                return 0; //0=now/immediate, +=future tense
-            }
-
-            @NotNull
-            @Override
-            protected Task newInputTask(float v, long now) {
-                Task t = super.newInputTask(v, now);
-                if (t!=null) {
-                    t.log("Motor Feedback");
-                }
-                return t;
-            }
-
-            @Override
-            protected void init() {
-                //Nothing, dont auto-start
-            }
-
-            @NotNull
-            @Override
-            public Termed<Compound> term() {
-                return MotorConcept.this; //allow access to this concept directly
-            }
-        };
-
-
+        this.feedbackPriority = n.priorityDefault(Symbols.GOAL /* though these will be used for beliefs */);
+        this.feedbackDurability = n.durabilityDefault(Symbols.GOAL /* though these will be used for beliefs */);
         this.motor = motor;
-
-        //n.onFrame(this);
 
     }
 
@@ -144,56 +101,38 @@ public class MotorConcept extends OperationConcept implements FloatFunction<Term
         return motor;
     }
 
-    @NotNull
-    public final Sensor getFeedback() {
-        return feedback;
-    }
 
-    /**
-     * adjust min/max temporal resolution of feedback input
-     */
-    @NotNull
-    public MotorConcept setFeedbackTiming(int minCycles, int maxCycles) {
-        feedback.minTimeBetweenUpdates(minCycles);
-        feedback.maxTimeBetweenUpdates(maxCycles);
-        return this;
-    }
+
 
     /**
      * change the motor function
      */
-    public void setMotor(@NotNull MotorFunction motor) {
+    public final void setMotor(@NotNull MotorFunction motor) {
         this.motor = motor;
     }
 
-    /**
-     * returns the last recorded feedback value
-     */
-    @Override
-    public float floatValueOf(Term anObject /* ignored */) {
-        return nextFeedback;
-    }
+
 
     @Override
-    public void accept(@NotNull NAR nar) {
+    public final void accept(@NotNull NAR nar) {
         //super.accept(nar);
         pendingRun = false; //HACK
 
         long now = nar.time();
         @Nullable Truth d = this.desire(now+motorDT);
-        float desired = d!=null ? d.expectation() : 0f;
         @Nullable Truth b = this.belief(now+motorDT);
-        float believed = b!=null ? b.expectation() : 0f;
 
-        float response = motor.motor(believed, desired);
-
-        if (Float.isFinite(response)) {
-            nextFeedback = response;
-            feedback.accept(nar);
-        }
-
+        Truth feedback = motor.motor(b, d);
+        if (feedback!=null)
+            nar.input(feedback(feedback, now));
     }
 
+    protected final Task feedback(Truth t, long when) {
+        return new MutableTask(term(), Symbols.BELIEF, t)
+                .time(when, when)
+                .budget(feedbackPriority, feedbackDurability)
+                .log("Motor Feedback");
+    }
 
     @Override
     protected boolean beliefModificationRequiresUpdate(@NotNull Task t, @NotNull NAR nar) {

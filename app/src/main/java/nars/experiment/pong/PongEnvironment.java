@@ -73,15 +73,15 @@ public class PongEnvironment extends Player implements Environment {
 				//new Indexes.SoftTermIndex(128 * 1024, rng)
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
-		nar.beliefConfidence(0.9f);
+		nar.beliefConfidence(0.8f);
 		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.85f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
 		nar.cyclesPerFrame.set(32);
 		nar.conceptActivation.setValue(0.25f);
-		nar.confMin.setValue(0.05f);
+		nar.confMin.setValue(0.01f);
 
 
 
@@ -166,20 +166,20 @@ public class PongEnvironment extends Player implements Environment {
 		float halfPaddle = pong.PADDLE_HEIGHT / 2f;
 
 		return Iterables.concat(
-			numericSensor("ball", "left", "midX", "right", n, () -> pong.ball_x, pri),
+			numericSensor("ball", "left", /*"midX",*/ "right", n, () -> pong.ball_x, pri),
 
 			numericSensor(() -> pong.ball_y, n, pri,
 				"(y --> bottom)",
-				"(y --> bottommid)",
-				"(y --> midy)",
-				"(y --> topmid)",
+//				"(y --> bottommid)",
+//				"(y --> midy)",
+//				"(y --> topmid)",
 				"(y --> top)"
 			),
 
-			numericSensor("padMine", "bottom", "midY", "top", n, () -> pong.player1.position+halfPaddle, pri),
-			numericSensor("padTheirs","bottom", "midY", "top", n, () -> pong.player2.position+halfPaddle, pri),
+			numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position+halfPaddle, pri),
+			numericSensor("padTheirs","bottom", /*"midY",*/ "top", n, () -> pong.player2.position+halfPaddle, pri),
 
-			numericSensor("(ball,padMine)", "below", "same", "above", n, () -> {
+			numericSensor("(ball,padMine)", "below" , "same", "above", n, () -> {
 
 				float delta = pong.ball_y - (pong.player1.position + halfPaddle);
 				return delta;

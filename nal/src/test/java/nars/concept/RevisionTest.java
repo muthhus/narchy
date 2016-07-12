@@ -5,6 +5,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
@@ -38,7 +39,7 @@ public class RevisionTest {
         */
 
         //}
-        d.conceptWarm.beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptPolicy)d.conceptWarm).beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

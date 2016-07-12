@@ -5,7 +5,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.bag.impl.MapBagPendings;
 import nars.budget.merge.BudgetMerge;
-import nars.budget.policy.DefaultConceptPolicy;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
@@ -22,11 +22,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DefaultCore extends AbstractCore {
 
-    private final DefaultConceptPolicy cold;
-    private final DefaultConceptPolicy warm;
+    private final ConceptPolicy cold;
+    private final ConceptPolicy warm;
 
 
-    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher, DefaultConceptPolicy warm, DefaultConceptPolicy cold) {
+    public DefaultCore(@NotNull NAR nar, @NotNull PremiseEval matcher, ConceptPolicy warm, ConceptPolicy cold) {
         super(nar, matcher);
         this.warm = warm;
         this.cold = cold;
@@ -36,7 +36,7 @@ public class DefaultCore extends AbstractCore {
     /** called when a concept is displaced from the concept bag */
     protected void deactivate(@NotNull Concept c) {
 
-        c.capacity(cold);
+        c.policy(cold);
 
         c.tasklinks().commit();
         c.termlinks().commit();
@@ -50,7 +50,7 @@ public class DefaultCore extends AbstractCore {
     protected boolean activate(@NotNull Concept c) {
 
         //set capacity first in case there are any queued items, they may join during the commit */
-        c.capacity(warm);
+        c.policy(warm);
 
 //        //clean out any deleted links since having been deactivated
         c.tasklinks().commit();//Forget.QualityToPriority);

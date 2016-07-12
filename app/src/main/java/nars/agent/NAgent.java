@@ -15,6 +15,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
@@ -75,7 +76,7 @@ public class NAgent implements Agent {
 
     float sensorPriority;
     float rewardPriority;
-    float goalFeedbackPriority;
+
     float goalPriority;
 
 
@@ -171,42 +172,19 @@ public class NAgent implements Agent {
     @Override
     public void start(int inputs, int actions) {
 
-        List<MotorConcept> outputConcepts = IntStream.range(0, actions).mapToObj(i -> {
+        List<MotorConcept> outputConcepts = IntStream.range(0, actions).mapToObj(i ->
 
-            MotorConcept mc = new MotorConcept(actionConceptName(i), nar) {
 
-                @Override protected void beliefCapacity(ConceptPolicy p) {
+            new MotorConcept(actionConceptName(i), nar, motorFunction(i)) {
+
+                @Override
+                protected void beliefCapacity(ConceptPolicy p) {
                     beliefs().capacity(0, motorBeliefCapacity);
                     goals().capacity(1, motorGoalCapacity);
                 }
+            }
 
-                @Override
-                public float floatValueOf(Term anObject) {
-//                    //shouldnt get called
-//                    throw new UnsupportedOperationException();
-//////                    //feedback (belief)
-//                    float m = motivation[i];
-//                    if (i == nextAction) {
-//                        m = 0.5f + m / 2f;
-//                    } else {
-//                        m = 0f;
-//                    }
-//                    return m;
-//                        //return 0.5f + 0.5f * (m);
-//                        //return 0.9f;
-//                    }
-//                    return 0f;
-//                    //return 0.5f; //this motor was not 'executed'
-//                    //return 0.5f;
-                    return Float.NaN;
-                }
-            };
-
-            mc.feedback.pri(goalFeedbackPriority);
-            //mc.feedback.maxTimeBetweenUpdates(8);
-
-            return mc;
-        }).collect(toList());
+        ).collect(toList());
 
 
         List<SensorConcept> inputContepts = IntStream.range(0, inputs).mapToObj(i -> {
@@ -289,6 +267,23 @@ public class NAgent implements Agent {
 //                .resolution(0.01f);
     }
 
+    protected MotorConcept.MotorFunction motorFunction(int i) {
+        return (b,d) -> {
+            Truth f;
+            boolean change = (lastAction!=nextAction);
+            if (change && nextAction == i) {
+                f = t(1, gamma);
+            } else if (change && lastAction == i) {
+                f = t(0, gamma);
+            } else {
+                f = null;
+            }
+            if (b!=null && f!=null && b.equals(f))
+                f = null; //no change from current belief state
+            return f;
+        };
+    }
+
     public void start(List<SensorConcept> inputContepts, List<MotorConcept> outputConcepts) {
 
 
@@ -300,7 +295,7 @@ public class NAgent implements Agent {
         lastMotivation = new float[this.actions.size()];
 
         sensorPriority = nar.priorityDefault(Symbols.BELIEF);
-        rewardPriority = goalFeedbackPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
+        rewardPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
 
         alpha = nar.confidenceDefault(Symbols.BELIEF);
         gamma = nar.confidenceDefault(Symbols.GOAL);
@@ -600,7 +595,7 @@ public class NAgent implements Agent {
                 //nar.believe(goalPriority, lastActionMotor, now, preOff, conf); //downward step function top
 
                 nar.goal(goalPriority, lastActionMotor, now-1, off, offConf); //downward step function bottom
-                nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
+                //nar.believe(goalPriority, lastActionMotor, now, off, offConf); //downward step function bottom
             }
 
             MotorConcept nextAction = actions.get(this.nextAction);
@@ -609,7 +604,7 @@ public class NAgent implements Agent {
 
 
             nar.goal(goalPriority, nextAction, now, on, onConf); //upward step function top
-            nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
+            //nar.believe(goalPriority, nextAction, now+1, on, onConf); //upward step function top
         }
 
         //updateMotors();

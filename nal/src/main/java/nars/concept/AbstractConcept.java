@@ -78,7 +78,8 @@ public interface AbstractConcept<T extends Term> extends Concept<T> {
     }
 
 
-//    @Override @NotNull
+
+    //    @Override @NotNull
 //    public Term term() {
 //        return term;
 //    }
@@ -181,10 +182,8 @@ public interface AbstractConcept<T extends Term> extends Concept<T> {
 //        //t.equalsAnonymously(term());
 //    }
 
-    @Override
-    default void capacity(@NotNull ConceptPolicy p) {
-        linkCapacity(p);
-    }
+    void policy(@NotNull ConceptPolicy p);
+
 
     default void linkCapacity(@NotNull ConceptPolicy p) {
         termlinks().setCapacity( p.linkCap(this, true) );

@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static nars.nal.Tense.ETERNAL;
+
 /** primarily a collector for believing time-changing input signals */
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
 
@@ -68,10 +70,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     @Override
     public @Nullable
     Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        //if (belief.evidence().length > 1) {
 
-        //Filter feedback that contradicts the sensor's provided beliefs
-        if (belief!=sensor.next()) {
+        //Filter past or present or eternal feedback (ie. contradicts the sensor's recorded beliefs)
+        //but allow future predictions
+        long bocc = belief.occurrence();
+        if (belief!=sensor.next() && (bocc==ETERNAL || bocc < nar.time())) {
             //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
 
             //TODO delete its non-input parent tasks?

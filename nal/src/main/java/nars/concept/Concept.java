@@ -27,6 +27,7 @@ import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
+import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
@@ -102,7 +103,7 @@ public interface Concept<T extends Term> extends Termed<T> {
         return desire(now, now);
     }
 
-    void capacity(ConceptPolicy c);
+    void policy(ConceptPolicy c);
 
     boolean contains(Task t);
 
@@ -383,6 +384,8 @@ public interface Concept<T extends Term> extends Termed<T> {
 
     void delete();
 
+    ConceptPolicy policy();
+
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
 //        if (termLinks && taskLinks) {
@@ -423,6 +426,10 @@ public interface Concept<T extends Term> extends Termed<T> {
         Bag<Task> taskbag();
         @NotNull
         Bag<Term> termbag();
+
+        ConceptPolicy initialized();
+
+        ConceptPolicy activated();
 
     }
 }
