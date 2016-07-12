@@ -119,7 +119,7 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.35f)
+            new DecideActionSoftmax(0.25f)
             //new DecideActionEpsilonGreedy(0.05f)
         );
     }
@@ -241,19 +241,20 @@ public class NAgent implements Agent {
                 return null;
             }
             if (b!=null) {
-                if (b.equals(f))
+                if (b.equals(f)) {
                     f = null; //no change from current belief state
-                else {
-                    //reduce feedback by similarity to existing belief state
-                    float freqDiff = Math.abs(b.freq() - d.freq());
-                    float confDiff = Math.abs(b.conf() - d.conf());
-                    //HACK an approximation:
-                    float c = f.conf() * or( (1-freqDiff), (1-confDiff) );
-                    if (c < Global.TRUTH_EPSILON)
-                        return null; //change infinitisemal
-                    else
-                        return $.t(f.freq(), c);
                 }
+//                else {
+//                    //reduce feedback by similarity to existing belief state
+//                    float freqDiff = Math.abs(b.freq() - d.freq());
+//                    float confDiff = Math.abs(b.conf() - d.conf());
+//                    //HACK an approximation:
+//                    float c = f.conf() * or( (1-freqDiff), (1-confDiff) );
+//                    if (c < Global.TRUTH_EPSILON)
+//                        return null; //change infinitisemal
+//                    else
+//                        return $.t(f.freq(), c);
+//                }
             }
 
             return f;
@@ -569,8 +570,8 @@ public class NAgent implements Agent {
 
                 //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
 
-                //float offness = 1f - decisiveness(lastAction);
-                float offness = 1f;
+                float offness = 1f - decisiveness(lastAction);
+                //float offness = 1f;
                 nar.goal(goalPriority, lastActionMotor, now-1,
                         0, max(Global.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
             }
@@ -578,8 +579,8 @@ public class NAgent implements Agent {
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
 
 
-            //float onness = decisiveness(this.nextAction);
-            float onness = 1f;
+            float onness = decisiveness(this.nextAction);
+            //float onness = 1f;
             nar.goal(goalPriority, actions.get(this.nextAction), now,
                     1, max(Global.TRUTH_EPSILON, onness * gamma)); //upward step function top
         }
@@ -593,28 +594,28 @@ public class NAgent implements Agent {
         return nextAction;
     }
 
-//    /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
-//     * @return value in (0..1.0]
-//     */
-//    private float decisiveness(int nextAction) {
-//
-//        float[] minmax = Util.minmax(motivation);
-//        int actions = motivation.length;
-//        float[] motNorm = new float[actions];
-//        float min = minmax[0];
-//        float max = minmax[1];
-//        if ( min == max) return 1f;
-//        float s = 0;
-//        for (int i = 0; i < actions; i++) {
-//            float m;
-//            motNorm[i] = m = Util.normalize(motivation[i], min, max);
-//            s += m;
-//        }
-//        if (s == 0) return 1f;
-//        float p = motNorm[nextAction] / s;
-//        return p;
-//
-//    }
+    /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
+     * @return value in (0..1.0]
+     */
+    private float decisiveness(int nextAction) {
+
+        float[] minmax = Util.minmax(motivation);
+        int actions = motivation.length;
+        float[] motNorm = new float[actions];
+        float min = minmax[0];
+        float max = minmax[1];
+        if ( min == max) return 1f;
+        float s = 0;
+        for (int i = 0; i < actions; i++) {
+            float m;
+            motNorm[i] = m = Util.normalize(motivation[i], min, max);
+            s += m;
+        }
+        if (s == 0) return 1f;
+        float p = motNorm[nextAction] / s;
+        return p;
+
+    }
 
 //    private void updateMotors() {
 //        //update all motors and their feedback

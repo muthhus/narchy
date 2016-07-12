@@ -1,18 +1,12 @@
 package nars.util.signal;
 
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import com.gs.collections.api.block.procedure.primitive.FloatFloatProcedure;
 import nars.*;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.Truth;
-import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +20,13 @@ public class MotorConcept extends OperationConcept  {
 
 
 
-    /** relative temporal lookahead for desire/belief prediction */
-    final int motorDT = 1;
+    /** relative temporal delta time for desire/belief prediction */
+    final int decisionDT = 0;
+
+    /** relative temporal delta time for feedback occurrence */
+    final int feedbackDT = 1;
+
+
 
     private final float feedbackPriority;
     private final float feedbackDurability;
@@ -119,8 +118,8 @@ public class MotorConcept extends OperationConcept  {
         pendingRun = false; //HACK
 
         long now = nar.time();
-        @Nullable Truth d = this.desire(now+motorDT);
-        @Nullable Truth b = this.belief(now+motorDT);
+        @Nullable Truth d = this.desire(now+ decisionDT);
+        @Nullable Truth b = this.belief(now+ decisionDT);
 
         Truth feedback = motor.motor(b, d);
         if (feedback!=null)
@@ -129,7 +128,7 @@ public class MotorConcept extends OperationConcept  {
 
     protected final Task feedback(Truth t, long when) {
         return new MutableTask(term(), Symbols.BELIEF, t)
-                .time(when, when)
+                .time(when, when+ feedbackDT)
                 .budget(feedbackPriority, feedbackDurability)
                 .log("Motor Feedback");
     }
