@@ -257,13 +257,11 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
      */
     @Nullable
     public Task merge(@NotNull Task a, @NotNull Task b, long now, @Nullable EternalTable eternal) {
-        float ac = a.confWeight();
-        float bc = b.confWeight();
+        double ac = a.confWeight();
+        double bc = b.confWeight();
         long mid = (long) ((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
         Truth truth = truth(mid, now, eternal);
-        if (truth == null)
-            return null;
-        return Revision.merge(a, b, now, mid, truth);
+        return truth != null ? Revision.merge(a, b, now, mid, truth) : null;
     }
 
 

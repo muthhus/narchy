@@ -94,7 +94,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final float reinforcementAttention = 0.95f; //0.5f;
+    private final float reinforcementAttention = 0.5f; //0.5f;
 
 
     private final DecideAction decideAction;
@@ -563,20 +563,25 @@ public class NAgent implements Agent {
 //            float preOff = (off+on*2f)/3f; //0.75f;
 //            float preOn = (on+off*2f)/3f; // 0.75f;
 
+
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
 
                 //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
 
+                //float offness = 1f - decisiveness(lastAction);
+                float offness = 1f;
                 nar.goal(goalPriority, lastActionMotor, now-1,
-                        0, max(Global.TRUTH_EPSILON, (1f-decisiveness(lastAction)) * gamma)); //downward step function bottom
+                        0, max(Global.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
             }
 
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
 
 
+            //float onness = decisiveness(this.nextAction);
+            float onness = 1f;
             nar.goal(goalPriority, actions.get(this.nextAction), now,
-                    1, max(Global.TRUTH_EPSILON, (decisiveness(this.nextAction)) * gamma)); //upward step function top
+                    1, max(Global.TRUTH_EPSILON, onness * gamma)); //upward step function top
         }
 
         //updateMotors();
@@ -588,28 +593,28 @@ public class NAgent implements Agent {
         return nextAction;
     }
 
-    /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
-     * @return value in (0..1.0]
-     */
-    private float decisiveness(int nextAction) {
-
-        float[] minmax = Util.minmax(motivation);
-        int actions = motivation.length;
-        float[] motNorm = new float[actions];
-        float min = minmax[0];
-        float max = minmax[1];
-        if ( min == max) return 1f;
-        float s = 0;
-        for (int i = 0; i < actions; i++) {
-            float m;
-            motNorm[i] = m = Util.normalize(motivation[i], min, max);
-            s += m;
-        }
-        if (s == 0) return 1f;
-        float p = motNorm[nextAction] / s;
-        return p;
-
-    }
+//    /** measure of the motivation decisiveness (inverse of confusion) of the next selected action relative to the other actions
+//     * @return value in (0..1.0]
+//     */
+//    private float decisiveness(int nextAction) {
+//
+//        float[] minmax = Util.minmax(motivation);
+//        int actions = motivation.length;
+//        float[] motNorm = new float[actions];
+//        float min = minmax[0];
+//        float max = minmax[1];
+//        if ( min == max) return 1f;
+//        float s = 0;
+//        for (int i = 0; i < actions; i++) {
+//            float m;
+//            motNorm[i] = m = Util.normalize(motivation[i], min, max);
+//            s += m;
+//        }
+//        if (s == 0) return 1f;
+//        float p = motNorm[nextAction] / s;
+//        return p;
+//
+//    }
 
 //    private void updateMotors() {
 //        //update all motors and their feedback
@@ -637,7 +642,7 @@ public class NAgent implements Agent {
     /** maps a concept's belief/goal state to a number */
     protected float motivation(MotorConcept m) {
         return m.goals().
-                expectation(nar.time()) - 0.5f;
+                expectation(nar.time());
                 //motivation(nar.time());
 
         //                    //(d > 0.5 && d > b ? d - b : 0);

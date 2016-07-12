@@ -150,7 +150,7 @@ public enum Global {
 
     /** relates time and evidence (confidence); how past and future beliefs decay in rank
      * across time; width of the temporal focus */
-    public static final float TEMPORAL_DURATION = 4f;
+    public static final float TEMPORAL_DURATION = 2f;
 
 
 

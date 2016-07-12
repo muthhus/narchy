@@ -31,8 +31,8 @@ public class Revision {
      */
     @Nullable
     public static Truth revisionEternal(@NotNull Truthed a, @NotNull Truthed b, float match, float minConf) {
-        float w1 = TruthFunctions.c2w(a.conf());
-        float w2 = TruthFunctions.c2w(b.conf());
+        float w1 = a.confWeight();
+        float w2 = b.confWeight();
         float w = (w1 + w2);
         float newConf = UtilityFunctions.w2c(w) * match;
         if (newConf < minConf)
@@ -57,8 +57,8 @@ public class Revision {
     public static Task merge(@NotNull Task a, @NotNull Task b, long now, long newOcc, @NotNull Truth newTruth) {
 
         if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
-            float aw = a.isQuestOrQuestion() ? 0 : c2w(a.conf()); //question
-            float bw = c2w(b.conf());
+            float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
+            float bw = b.confWeight();
 
             float aMix = aw / (aw + bw);
 

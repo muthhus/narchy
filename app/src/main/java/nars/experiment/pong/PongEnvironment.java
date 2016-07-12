@@ -40,222 +40,220 @@ import java.util.List;
 
 public class PongEnvironment extends Player implements Environment {
 
-	public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
-	int actions = 3;
+    public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
+    int actions = 3;
 
-	boolean trace = true;
+    boolean trace = true;
 
-	final int width = 2;
-	final int height = 2;
-	final int pixels = width * height;
-	final int scaleX = (int)(24f*20/width);
-	final int scaleY = (int)(24f*16/width);
-	final int ticksPerFrame = 1; //framerate divisor
-	private final PongModel pong;
+    final int width = 2;
+    final int height = 2;
+    final int pixels = width * height;
+    final int scaleX = (int) (24f * 20 / width);
+    final int scaleY = (int) (24f * 16 / width);
+    final int ticksPerFrame = 1; //framerate divisor
+    private final PongModel pong;
 
-	float bias; //pain of boredom
-	private NAgent nagent;
-	final SwingCamera swingCamera;
-
-
-
-	public static void main (String[] args) throws IOException {
-		//Global.TRUTH_EPSILON = 0.2f;
-
-		XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
-		//Multi nar = new Multi(2,
-		Default nar = new Default(
-				1024, 3, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng) , 500000, false )
-				//new Cache2kIndex(250000, rng)
-				//new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
-				//new Indexes.WeakTermIndex(256 * 1024, rng)
-				//new Indexes.SoftTermIndex(128 * 1024, rng)
-				//new Indexes.DefaultTermIndex(128 *1024, rng)
-				,new FrameClock());
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.4f;
-		nar.DEFAULT_GOAL_PRIORITY = 0.85f;
-		nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
-		nar.DEFAULT_QUEST_PRIORITY = 0.6f;
-		nar.cyclesPerFrame.set(32);
-		nar.conceptActivation.setValue(0.25f);
-		nar.confMin.setValue(0.01f);
+    float bias; //pain of boredom
+    private NAgent nagent;
+    final SwingCamera swingCamera;
 
 
+    public static void main(String[] args) throws IOException {
+        //Global.TRUTH_EPSILON = 0.2f;
 
-		List<SensorConcept> cheats = new ArrayList();
+        XorShift128PlusRandom rng = new XorShift128PlusRandom(1);
+        //Multi nar = new Multi(2,
+        Default nar = new Default(
+                1024, 3, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 500000, false)
+                //new Cache2kIndex(250000, rng)
+                //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
+                //new Indexes.WeakTermIndex(256 * 1024, rng)
+                //new Indexes.SoftTermIndex(128 * 1024, rng)
+                //new Indexes.DefaultTermIndex(128 *1024, rng)
+                , new FrameClock());
+        nar.beliefConfidence(0.7f);
+        nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.4f;
+        nar.cyclesPerFrame.set(32);
+        nar.conceptActivation.setValue(0.15f);
+        nar.confMin.setValue(0.02f);
 
-		NAgent a = new NAgent(nar) {
-			@Override
-			public void start(int inputs, int ac) {
-				super.start(inputs, ac);
+
+        List<SensorConcept> cheats = new ArrayList();
+
+        NAgent a = new NAgent(nar) {
+            @Override
+            public void start(int inputs, int ac) {
+                super.start(inputs, ac);
 
 
-
-				if (nar instanceof Default) {
-					BagChart.show((Default) nar, 512);
-					beliefChart(this, cheats);
-				}
-			}
+                if (nar instanceof Default) {
+                    BagChart.show((Default) nar, 512);
+                    beliefChart(this, cheats);
+                }
+            }
 
 //			@Override
 //			public int act(float rewardValue, float[] nextObservation) {
 //				nar.clear();
 //				return super.act(rewardValue, nextObservation);
 //			}
-		};
+        };
 
-		try {
-			nar.input(new File(KNOWLEDGEFILE));
-		} catch (FileNotFoundException e) {
+        try {
+            nar.input(new File(KNOWLEDGEFILE));
+        } catch (FileNotFoundException e) {
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		//a.epsilon = 0.6f;
-		//a.gamma /= 4f;
+        //a.epsilon = 0.6f;
+        //a.gamma /= 4f;
 
-		//new Abbreviation2(nar, "_");
-		{
-			new MySTMClustered(nar, 8, '.', 2);
-		}
-
-
-		PongEnvironment e = new PongEnvironment();
+        //new Abbreviation2(nar, "_");
+        {
+            new MySTMClustered(nar, 8, '.', 2);
+        }
 
 
+        PongEnvironment e = new PongEnvironment();
 
 
-		Iterables.addAll(cheats, addCheats(a.nar, e));
+        Iterables.addAll(cheats, addCheats(a.nar, e));
 
-		//nar.logSummaryGT(System.out, 0.25f);
+        //nar.logSummaryGT(System.out, 0.25f);
 
-		e.run(a, 256*16);
+        e.run(a, 256 * 16);
 
-		NAR.printTasks(nar, true);
-		NAR.printTasks(nar, false);
+        NAR.printTasks(nar, true);
+        NAR.printTasks(nar, false);
 
-		a.printActions();
+        a.printActions();
 
-		nar.output(new File(KNOWLEDGEFILE), false,
-				t -> {
-					if (!t.isInput() && t.conf() > 0.75f) {
-						//System.out.println(t + "\t" + Arrays.toString(t.evidence()));
-						return true;
-					}
-					return false;
-		});
+        nar.output(new File(KNOWLEDGEFILE), false,
+                t -> {
+                    if (!t.isInput() && t.conf() > 0.75f) {
+                        //System.out.println(t + "\t" + Arrays.toString(t.evidence()));
+                        return true;
+                    }
+                    return false;
+                });
 
 //		nar.forEachConcept(c -> {
 //			System.out.println(c);
 //		});
 
 
-		//nar.forEachConcept(System.out::println);
-	}
+        //nar.forEachConcept(System.out::println);
+    }
 
-	/** direct inputs from pong for a nars agent */
-	private static Iterable<SensorConcept> addCheats(NAR n, PongEnvironment e) {
-		PongModel pong = e.pong;
+    /**
+     * direct inputs from pong for a nars agent
+     */
+    private static Iterable<SensorConcept> addCheats(NAR n, PongEnvironment e) {
+        PongModel pong = e.pong;
 
-		float pri = 0.5f;
+        float pri = 0.5f;
 
-		float halfPaddle = pong.PADDLE_HEIGHT / 2f;
+        float halfPaddle = pong.PADDLE_HEIGHT / 2f;
 
-		return Iterables.concat(
-			numericSensor("ball", "left", /*"midX",*/ "right", n, () -> pong.ball_x, pri),
+        return Iterables.concat(
+                numericSensor("ball", "left", /*"midX",*/ "right", n, () -> pong.ball_x, pri),
 
-			numericSensor(() -> pong.ball_y, n, pri,
-				"(y --> bottom)",
+                numericSensor(() -> pong.ball_y, n, pri,
+                        "(y --> bottom)",
 //				"(y --> bottommid)",
-//				"(y --> midy)",
+                        "(y --> midy)",
 //				"(y --> topmid)",
-				"(y --> top)"
-			),
+                        "(y --> top)"
+                ),
 
-			numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position+halfPaddle, pri),
-			numericSensor("padTheirs","bottom", /*"midY",*/ "top", n, () -> pong.player2.position+halfPaddle, pri),
+                numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position + halfPaddle, pri),
+                numericSensor("padTheirs", "bottom", /*"midY",*/ "top", n, () -> pong.player2.position + halfPaddle, pri),
 
-			numericSensor("(ball,padMine)", "below" , "same", "above", n, () -> {
+                rawNumericSensor("(ball,padMine)", new PolarRangeNormalizedFloat(() ->
+                    pong.ball_y - (pong.player1.position + halfPaddle)
+                ), n, pri, "below", "same", "above")
+        );
 
-				float delta = pong.ball_y - (pong.player1.position + halfPaddle);
-				return delta;
+    }
 
-					} , pri)
-		);
+    public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+        PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
+        return rawNumericSensor(term, p, n, pri, low, mid, high);
+    }
 
-	}
-
-	public static FuzzyConceptSet bipolarNumericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
-		PolarRangeNormalizedFloat p = new PolarRangeNormalizedFloat(input);
-		return rawNumericSensor(term, p, n, pri, low, mid, high);
-	}
-
-	public static FuzzyConceptSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
-		return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+    public static FuzzyConceptSet rawNumericSensor(FloatSupplier p, NAR n, float pri, String... states) {
+        return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
-	}
-	public static FuzzyConceptSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
-		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-		return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
+    }
+
+    public static FuzzyConceptSet numericSensor(FloatSupplier input, NAR n, float pri, String... states) {
+        RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+        return new FuzzyConceptSet(p, n, states).pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
-	}
+    }
 
-	public static FuzzyConceptSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
-		return new FuzzyConceptSet(p, n,
-				"(" + term + " --> " + low + ")",
-				"(" + term + " --> " + mid + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.1f);
+    public static FuzzyConceptSet rawNumericSensor(String term, FloatSupplier p, NAR n, float pri, String low, String mid, String high) {
+        return new FuzzyConceptSet(p, n,
+                "(" + term + " --> " + low + ")",
+                "(" + term + " --> " + mid + ")",
+                "(" + term + " --> " + high + ")").pri(pri).resolution(0.1f);
 //				"(" + term + " , " + low + ")",
 //				"(" + term + " , " + mid + ")",
 //				"(" + term + " , " + high +")").pri(pri).resolution(0.07f);
 
-	}
-	public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
-		return new FuzzyConceptSet(p, n,
-				"(" + term + " --> " + low + ")",
-				"(" + term + " --> " + high +")").pri(pri).resolution(0.05f);
-	}
-	public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
-		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-		return rawNumericSensor(term, p, n, pri, low, mid, high);
-	}
-	public static FuzzyConceptSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
-		RangeNormalizedFloat p = new RangeNormalizedFloat(input);
-		return rawNumericSensor(term, low, high, n, pri, p);
-	}
+    }
 
-	public PongEnvironment() {
-		super();
+    public static FuzzyConceptSet rawNumericSensor(String term, String low, String high, NAR n, float pri, FloatSupplier p) {
+        return new FuzzyConceptSet(p, n,
+                "(" + term + " --> " + low + ")",
+                "(" + term + " --> " + high + ")").pri(pri).resolution(0.05f);
+    }
 
-		JFrame j = new JFrame();
-		j.setTitle ("Pong");
-		j.setSize (width * scaleX, height * scaleY);
-		j.setResizable(false);
+    public static FuzzyConceptSet numericSensor(String term, String low, String mid, String high, NAR n, FloatSupplier input, float pri) {
+        RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+        return rawNumericSensor(term, p, n, pri, low, mid, high);
+    }
 
+    public static FuzzyConceptSet numericSensor(String term, String low, String high, NAR n, FloatSupplier input, float pri) {
+        RangeNormalizedFloat p = new RangeNormalizedFloat(input);
+        return rawNumericSensor(term, low, high, n, pri, p);
+    }
 
-		pong = new PongModel(this, new Player.CPU_EASY());
-		this.position = (height*scaleY)/2;
-		pong.acceleration = false;
-		j.getContentPane ().add (pong);
+    public PongEnvironment() {
+        super();
 
-		j.addMouseListener (pong);
-		j.addKeyListener (pong);
-
-		j.setVisible(true);
-		j.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+        JFrame j = new JFrame();
+        j.setTitle("Pong");
+        j.setSize(width * scaleX, height * scaleY);
+        j.setResizable(false);
 
 
-		this.swingCamera = new SwingCamera(pong,width,height);
+        pong = new PongModel(this, new Player.CPU_EASY());
+        this.position = (height * scaleY) / 2;
+        pong.acceleration = false;
+        j.getContentPane().add(pong);
+
+        j.addMouseListener(pong);
+        j.addKeyListener(pong);
+
+        j.setVisible(true);
+        j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+        this.swingCamera = new SwingCamera(pong, width, height);
 
 
 //		FX.run(()->{
@@ -267,24 +265,22 @@ public class PongEnvironment extends Player implements Environment {
 //		});
 
 
-	}
+    }
 
 
+    public static void beliefChart(NAgent a, List<? extends Concept> additional) {
+        List<Concept> charted = new ArrayList(a.actions);
+        Iterables.addAll(charted, a.rewardConcepts);
+        charted.addAll(additional);
+        new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 100);
+    }
 
+    @Override
+    public void preStart(Agent a) {
+        if (a instanceof NAgent) {
+            //provide custom sensor input names for the nars agent
 
-	public static void beliefChart(NAgent a, List<? extends Concept> additional) {
-		List<Concept> charted = new ArrayList(a.actions);
-		Iterables.addAll(charted, a.rewardConcepts);
-		charted.addAll(additional);
-		new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 100);
-	}
-
-	@Override
-	public void preStart(Agent a) {
-		if (a instanceof NAgent) {
-			//provide custom sensor input names for the nars agent
-
-			nagent = (NAgent) a;
+            nagent = (NAgent) a;
 
 //			for (int i = 1; i < Math.max(width,height); i++) {
 //				nar.believe("(" + (i-1) + " <-> " + i + ")", 0.85f, 1f);
@@ -311,7 +307,7 @@ public class PongEnvironment extends Player implements Environment {
 //				}
 //			});
 
-			nagent.setSensorNamer((i) -> {
+            nagent.setSensorNamer((i) -> {
 //				int cell = i;
 //				int type = i % 3;
 //				Atom typeTerm;
@@ -323,10 +319,10 @@ public class PongEnvironment extends Player implements Environment {
 //						throw new RuntimeException();
 //				}
 
-				int ax = i % width;
-				int ay = i / width;
+                int ax = i % width;
+                int ay = i / width;
 
-				//Term squareTerm = $.p($.the(ax), $.the(ay));
+                //Term squareTerm = $.p($.the(ax), $.the(ay));
 
 //				int dx = (visionRadius  ) - ax;
 //				int dy = (visionRadius  ) - ay;
@@ -345,11 +341,11 @@ public class PongEnvironment extends Player implements Environment {
 //				);
 //				System.out.println(dx + " " + dy + " " + squareTerm);
 
-				return p(ax, ay);
-			});
-			//nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUESTION);
-			//nar.ask($("( ((#1,#2)-->w) ==> (R) )"), Symbols.QUESTION);
-			//nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUEST);
+                return p(ax, ay);
+            });
+            //nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUESTION);
+            //nar.ask($("( ((#1,#2)-->w) ==> (R) )"), Symbols.QUESTION);
+            //nar.ask($("( ((#1,#2)-->w) && (R) )"), Symbols.QUEST);
 //			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUESTION);
 //			nar.ask($("( ((0,?y)-->w) && (R) )"), Symbols.QUEST);
 
@@ -365,71 +361,71 @@ public class PongEnvironment extends Player implements Environment {
 //			//nar.log();
 //			nar.input("((&&, ((#1,#2)-->w), ((#3,#4)-->w)) &&+0 dist((#1,#2),(#3,#4),#x)).");
 
-		}
-	}
+        }
+    }
 
 
-	final Compound[][] pCache = new Compound[width][height];
+    final Compound[][] pCache = new Compound[width][height];
 
-	public final Compound p(int x, int y) {
-		Compound e = pCache[x][y];
-		if (e == null) {
-			pCache[x][y] = e = _p(x, y);
-		}
-		return e;
-	}
+    public final Compound p(int x, int y) {
+        Compound e = pCache[x][y];
+        if (e == null) {
+            pCache[x][y] = e = _p(x, y);
+        }
+        return e;
+    }
 
-	public Compound _p(int x, int y) {
-		//return $.p(the(x), the(y));
+    public Compound _p(int x, int y) {
+        //return $.p(the(x), the(y));
 
 //		int d = log2(Math.max(width, height));
 //		Compound n = $.inh($.p(binaryp(x, d), binaryp(y, d)), $.the("w"));
 //		System.out.println(" (" + x + "," + y + ") " + n);
 //		return n;
 
-		//int d = log2(Math.max(width, height));
-		Compound q = (Compound) NARCamera.quadp(0, x, y, width, height);
-		//Compound n = $.inh(q, $.the("w"));
+        //int d = log2(Math.max(width, height));
+        Compound q = (Compound) NARCamera.quadp(0, x, y, width, height);
+        //Compound n = $.inh(q, $.the("w"));
 
         System.out.println(" (" + x + "," + y + ") " + q);
-		return q;
+        return q;
 
 
-		//return inh(c, the("w"));
-		//return inst(c, the("w"));
-	}
+        //return inh(c, the("w"));
+        //return inst(c, the("w"));
+    }
 
 
-	@Override
-	public Twin<Integer> start() {
-		return Tuples.twin(pixels, actions);
-	}
+    @Override
+    public Twin<Integer> start() {
+        return Tuples.twin(pixels, actions);
+    }
 
-	float lastScore;
+    float lastScore;
 
 
-	@Override
-	public float pre(int t, float[] ins) {
+    @Override
+    public float pre(int t, float[] ins) {
 
-		for (int i = 0; i < ticksPerFrame; i++)
-			pong.actionPerformed(null);
+        for (int i = 0; i < ticksPerFrame; i++)
+            pong.actionPerformed(null);
 
-		swingCamera.updateMono((i, r)->{
-			ins[i] = r;
-		});
+        swingCamera.updateMono((i, r) -> {
+            ins[i] = r;
+        });
 
-		float score = points;
-		float reward = score-lastScore + bias;
+        float score = points;
+        float reward = score - lastScore + bias;
 
-		lastScore = score;
-		return reward;
-	}
+        lastScore = score;
+        return reward;
+    }
 
-	@Override
-	public void post(int t, int action, float[] ins, Agent a) {
-		//actRelative(action); //numActions = 3
-		actRelativeVelocity(action); //numActions = 3
-		//actAbsolute(action);
+    @Override
+    public void post(int t, int action, float[] ins, Agent a) {
+        //actRelative(action); //numActions = 3
+        actRelativeVelocity(action); //numActions = 3
+        //actAbsolute(action);
 
 //		long now = nagent.nar.time();
 //		int dt = 16;
@@ -459,52 +455,52 @@ public class PongEnvironment extends Player implements Environment {
 //
 //		});
 
-		if (trace)
-			System.out.println( a.summary());
+        if (trace)
+            System.out.println(a.summary());
 
-	}
+    }
 
-	private void actAbsolute(int action) {
+    private void actAbsolute(int action) {
 
-		moveTo( (int)(((float)action) / (actions-1) * height * scaleY), pong );
-	}
+        moveTo((int) (((float) action) / (actions - 1) * height * scaleY), pong);
+    }
 
-	public void actRelative(int action) {
-		switch (action) {
-			case 0:
-				move(-PongModel.SPEED*ticksPerFrame, pong);
-				break;
-			case 1: /* nothing */
-				break;
-			case 2:
-				move(+PongModel.SPEED*ticksPerFrame, pong);
-				break;
+    public void actRelative(int action) {
+        switch (action) {
+            case 0:
+                move(-PongModel.SPEED * ticksPerFrame, pong);
+                break;
+            case 1: /* nothing */
+                break;
+            case 2:
+                move(+PongModel.SPEED * ticksPerFrame, pong);
+                break;
 
-		}
-	}
+        }
+    }
 
-	int vel;
+    int vel;
 
-	public void actRelativeVelocity(int action) {
-		switch (action) {
-			case 0:
-				vel = -PongModel.SPEED;
-				break;
-			case 1:
-				vel = 0;
-				break;
-			case 2:
-				vel = +PongModel.SPEED;
-				break;
-		}
-		move(vel, pong);
-	}
+    public void actRelativeVelocity(int action) {
+        switch (action) {
+            case 0:
+                vel = -PongModel.SPEED;
+                break;
+            case 1:
+                vel = 0;
+                break;
+            case 2:
+                vel = +PongModel.SPEED;
+                break;
+        }
+        move(vel, pong);
+    }
 
 
-	@Override
-	public void computePosition(PongModel pong) {
+    @Override
+    public void computePosition(PongModel pong) {
 
-	}
+    }
 
 //	private static class HappySad extends RelativeSignalClassifier implements Consumer<NAR> {
 //
