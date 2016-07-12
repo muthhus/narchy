@@ -65,11 +65,12 @@ public class RangeNormalizedFloat implements FloatSupplier {
             return (raw - min) / (max - min);
     }
 
-    void updateRange(float raw) {
+    public RangeNormalizedFloat updateRange(float raw) {
         if (min > raw)
             min = raw;
         if (max < raw)
             max = raw;
+        return this;
     }
 
 

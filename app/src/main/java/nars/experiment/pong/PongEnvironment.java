@@ -45,8 +45,8 @@ public class PongEnvironment extends Player implements Environment {
 
     boolean trace = true;
 
-    final int width = 2;
-    final int height = 2;
+    final int width = 7;
+    final int height = 7;
     final int pixels = width * height;
     final int scaleX = (int) (24f * 20 / width);
     final int scaleY = (int) (24f * 16 / width);
@@ -65,7 +65,7 @@ public class PongEnvironment extends Player implements Environment {
         //Multi nar = new Multi(2,
         Default nar = new Default(
                 1024, 3, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 500000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
                 //new Cache2kIndex(250000, rng)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -74,13 +74,13 @@ public class PongEnvironment extends Player implements Environment {
                 , new FrameClock());
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.2f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(48);
-        nar.conceptActivation.setValue(0.15f);
-        nar.confMin.setValue(0.03f);
+        nar.cyclesPerFrame.set(128);
+        nar.conceptActivation.setValue(0.1f);
+        nar.confMin.setValue(0.02f);
 
 
         List<SensorConcept> cheats = new ArrayList();

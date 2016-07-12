@@ -68,7 +68,6 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
-        static final float deleteDecayRate = 0.75f;
         static final float feedbackRate = 0.1f;
 
         public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
@@ -84,15 +83,15 @@ abstract public class DerivedTask extends MutableTask {
             return false;
         }
 
-        public void feedback(float score) {
+        void feedback(float score) {
             ConceptProcess p = this.premise.get();
             if (p != null) {
                 BLink<? extends Term> termlink = p.termLink;
                 BLink<? extends Task> tasklink = p.taskLink;
                 //BLink<? extends Concept> pc = p.conceptLink;
-                if (termlink != null && !termlink.isDeleted())
+                if (!termlink.isDeleted())
                     termlink.priLerpMult(score, feedbackRate);
-                if (tasklink != null && !tasklink.isDeleted())
+                if (!tasklink.isDeleted())
                     tasklink.priLerpMult(score, feedbackRate);
 
             }
@@ -101,7 +100,7 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                feedback(deleteDecayRate);
+                feedback(0);
                 this.premise.clear();
                 return true;
             }

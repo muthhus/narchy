@@ -94,7 +94,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final float reinforcementAttention = 0.5f; //0.5f;
+    private final float reinforcementAttention = 0.9f; //0.5f;
 
 
     private final DecideAction decideAction;
@@ -293,7 +293,9 @@ public class NAgent implements Agent {
                 nar,
                 //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
                 //"(" + nar.self + " --> [sad])", "(" + nar.self + " --> [happy])").resolution(0.05f);
-                nar.self + "(sad)", nar.self + "(happy)").resolution(0.05f);
+                //nar.self + "(sad)", nar.self + "(happy)"
+                nar.self + "(happy)"
+            ).resolution(0.02f);
                 //"(sad)", "(happy)").resolution(0.05f);
     }
 
@@ -306,7 +308,8 @@ public class NAgent implements Agent {
             a.print();
         }
         happy.print();
-        sad.print();
+        if (happy!=sad)
+            sad.print();
     }
 
 
@@ -383,7 +386,11 @@ public class NAgent implements Agent {
         this.beHappy = nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 
-        this.dontBeSad = nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
+        if (sad!=happy)
+            this.dontBeSad = nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
+        else
+            this.dontBeSad = null;
+
         //nar.goal(sad, Tense.Present, 0f, gamma);
 
         /*nar.goal("(dR)", Tense.Eternal, 1f, 1f); //prefer increase usually
@@ -477,8 +484,10 @@ public class NAgent implements Agent {
     }
 
     private void boost(Task t) {
-        BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
-        nar.activate(t);
+        if (t!=null) {
+            BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
+            nar.activate(t);
+        }
     }
 
 

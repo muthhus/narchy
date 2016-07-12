@@ -18,9 +18,10 @@ public class PolarRangeNormalizedFloat extends RangeNormalizedFloat {
         return n/2f + 0.5f;
     }
 
-    public void set(float radius) {
+    public PolarRangeNormalizedFloat radius(float radius) {
         this.min = 0;
         this.max = radius;
+        return this;
     }
 
     //    final RangeNormalizedFloat positive;

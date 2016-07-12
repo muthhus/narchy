@@ -1299,7 +1299,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
             //heuristic
-            float dynamicRange = 4f;
+            float dynamicRange = 2f;
             float score = 1 +
                     Math.max(0, displacedPri-t.pri()) +  //economic bonus
                     displacedConf; //knowledge bonus

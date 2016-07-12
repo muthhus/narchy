@@ -23,7 +23,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     @NotNull
     public final List<SensorConcept> sensors;
     @NotNull
-    private final NAR nar;
+    public final NAR nar;
     float conf;
 
 
@@ -51,29 +51,38 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
 
     public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {
 
+
         this.conf = nar.confidenceDefault(Symbols.BELIEF);
         this.input = input;
         this.nar = nar;
 
         int numStates = states.length;
-
         centerPoints = new float[numStates];
-
         this.sensors = Global.newArrayList(numStates);
-        float dr = 1f / (numStates-1);
-        float center = 0;
-        int i = 0;
-        for (String s : states) {
 
-            centerPoints[i] = center;
-            int ii = i;
+        if (states.length > 1) {
+            float dr = 1f / (numStates-1);
+            float center = 0;
+            int i = 0;
+            for (String s : states) {
 
-            sensors.add( new SensorConcept(s, nar, this.input,
-                (x) -> t(calculate(ii), conf)
+                centerPoints[i] = center;
+                int ii = i;
+
+                sensors.add( new SensorConcept(s, nar, this.input,
+                        (x) -> t(calculate(ii), conf)
+                ));
+                center += dr;
+                i++;
+            }
+        } else {
+            sensors.add( new SensorConcept(states[0], nar, this.input,
+                    (x) -> t(x, conf)
             ));
-            center += dr;
-            i++;
         }
+
+
+
     }
 
 //		private Truth biangular(float v) {

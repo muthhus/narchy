@@ -27,13 +27,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ConceptProcess implements Premise {
 
-    public final BLink<? extends Task> taskLink;
+    @NotNull public final BLink<? extends Task> taskLink;
 
-    public final BLink<? extends Term> termLink;
+    @NotNull public final BLink<? extends Term> termLink;
 
     @Nullable public final Task belief;
 
-    public final BLink<? extends Concept> conceptLink;
+    @NotNull public final BLink<? extends Concept> conceptLink;
 
 
     public ConceptProcess(BLink<? extends Concept> conceptLink,

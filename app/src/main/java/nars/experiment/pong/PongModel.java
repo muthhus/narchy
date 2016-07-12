@@ -12,12 +12,12 @@ import java.awt.event.*;
 public class PongModel extends JPanel implements ActionListener, MouseListener, KeyListener {
 	// Proprietà della palla
 	private static final int RADIUS = 15; // Raggio
-	private static final int START_SPEED = 6; // Velocità iniziale
+	private static final int START_SPEED = 3; // Velocità iniziale
 	private static final int ACCELERATION = 110; // Ogni quanti frame aumenta di 1 pixel la velocità
 
 	// Proprietà dei carrelli
 	public static final int SPEED = 15; // Velocità dei carrelli
-	public static final int PADDLE_HEIGHT = 60; // SEMI-altezza del carrello
+	public static final int PADDLE_HEIGHT = 40; // SEMI-altezza del carrello
 	public static final int WIDTH = 15;
 	private static final int TOLERANCE = 5;
 	private static final int PADDING = 0;
