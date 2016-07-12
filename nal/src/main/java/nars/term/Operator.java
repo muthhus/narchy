@@ -35,6 +35,12 @@ public class Operator<T extends Term> extends Atom {
     public static Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
+    @Nullable
+    public static Compound opArgs(@NotNull Term x) {
+        if (x instanceof Compound)
+            return opArgs((Compound)x);
+        return null;
+    }
 
 
     /** returns the terms array of the arguments of an operation. does not check if the input is actually an operation */

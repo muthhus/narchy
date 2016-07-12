@@ -136,6 +136,10 @@ public class MarkovChain<T> {
      * @return data element at the current node tuple index
      */
     public T next(boolean loop, int maxLength) {
+
+        if (nodes.isEmpty())
+            return null;
+
         // In case mCurrent hasn't been initialized yet.
         if (mCurrent == null || mCurrent == header) mCurrent = header.next(rng);
 

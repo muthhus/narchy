@@ -162,42 +162,42 @@ public class NARover extends AbstractRover {
         int minMotorFeedbackCycles = -1; ////nar.duration() / 2;
         int maxMotorFeedbackCycles = -1; //nar.duration() * 3;
 
-        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return 0;
-            return motor.left(l-b);
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
-        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return 0;
-            return motor.right(l-b);
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
-        MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return 0;
-            return motor.forward(l-b);
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
-        MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return 0;
-            return motor.backward(l-b);
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
-        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,l) -> {
-            if ((b > l) || (l < 0.5f)) return 0;
-            return motor.stop(l-b);
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
-        MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (b,s) -> {
-
-//            if (s > motorThresh) {
-//                if (gun.fire(torso, s)) {
-//                    return s;
-//                }
-//            }
-            return Float.NaN; //unfired;
-
-        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
-
+//        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
+//            if ((b > l) || (l < 0.5f)) return 0;
+//            return motor.left(l-b);
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
+//        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
+//            if ((b > l) || (l < 0.5f)) return 0;
+//            return motor.right(l-b);
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
+//        MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
+//            if ((b > l) || (l < 0.5f)) return 0;
+//            return motor.forward(l-b);
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
+//        MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
+//            if ((b > l) || (l < 0.5f)) return 0;
+//            return motor.backward(l-b);
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
+//        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,l) -> {
+//            if ((b > l) || (l < 0.5f)) return 0;
+//            return motor.stop(l-b);
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
+//        MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (b,s) -> {
+//
+////            if (s > motorThresh) {
+////                if (gun.fire(torso, s)) {
+////                    return s;
+////                }
+////            }
+//            return Float.NaN; //unfired;
+//
+//        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+//
 
     }
 

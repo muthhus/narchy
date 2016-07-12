@@ -77,7 +77,7 @@ public class InterNAR extends Peer implements PeerModel {
 
             try {
                 Task t = IO.taskFromBytes(q.query, nar.index);
-                //logger.info("recv query {} \t {}", q, t);
+                logger.info("recv: {} \t {}", t, q);
                 consider(q, t);
             } catch (Exception e) {
                 logger.error("Malformed task: bytes={}", q.queryString());

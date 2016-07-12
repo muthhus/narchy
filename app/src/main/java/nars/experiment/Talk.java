@@ -14,6 +14,7 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.variable.Variable;
@@ -34,7 +35,7 @@ import java.util.function.Predicate;
  */
 public class Talk {
 
-    final static Atom hear = $.the("hear");
+    public final static Operator hear = $.operator("hear");
 
     long wordDelay = 100; //in milisec
 
@@ -65,7 +66,7 @@ public class Talk {
         hearAppender.start();
 
 
-        nar.onExec(new AbstractOperator("say") {
+        nar.onExec(new AbstractOperator("think") {
             @Override
             public void execute(OperationConcept x) {
                 //@Nullable Operator say = operator();
@@ -77,7 +78,7 @@ public class Talk {
                         return; //maybe randomly select a word
                     }
 
-                    say(x, content, context);
+                    think(x, content, context);
 
                 }
 
@@ -142,7 +143,7 @@ public class Talk {
         Thread t = new Thread(() -> {
 
             for (Term x : tokens) {
-                hear(context, System.currentTimeMillis(), x, pri);
+                hear(x, context, System.currentTimeMillis(), pri);
                 Util.pause(wordDelay);
 
             }
@@ -151,16 +152,16 @@ public class Talk {
         return t;
     }
 
-    public @Nullable Task hear(Term context, long tt, Term x, float pri) {
+    public Task hear(Term x, Term context, long when, float pri) {
         @NotNull Compound term = hearEvent(context, x);
         if (term == null)
             return null;
 
         Task t = nar.believe(pri * nar.priorityDefault('.'),
                 term,
-                tt,
-                1f, 0.95f);
-                //0.5f + 0.5f * nar.confidenceDefault('.') * pri);
+                when,
+                1f,
+                0.5f + 0.5f * nar.confidenceDefault('.') * pri);
 
         //System.out.println("hear: " + x + " (" + context + " )\t" + t.occurrence());
         return t;
@@ -168,17 +169,18 @@ public class Talk {
 
     public Compound hearEvent(Term context, Term word) {
         //return $.prop(word, context);
-        return $.image(2, true, hear, context, word);
+        //return $.image(2, true, hear, context, word);
         //return $.prop(word, context);
-        //return $.exec(hear, word, context );
+        return $.exec(hear, word, context );
     }
 
-    public void say(OperationConcept o, Term content, Term context) {
+    public void think(OperationConcept o, Term content, Term context) {
         long now = System.currentTimeMillis();
         float exp = o.goals().expectation(now);
-        System.err.println("SAY: " + content + " (" + context + ")  " + exp);
+        System.err.println("think: " + content + " (" + context + ")  " + exp);
 
-        Task belief = hear(nar.self, now, content, exp);
+        if (!context.toString().equals("I"))
+            hear(content, nar.self, now, exp);
 
         //apply negative-feedback for that output
         //nar.goal(goal.pri(), belief.term(), belief.occurrence(), 1f-belief.freq(), belief.conf());

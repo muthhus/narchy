@@ -1,8 +1,11 @@
 package nars.inter.gnutella.message;
 
+import ch.qos.logback.core.encoder.ByteArrayUtil;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Bytes;
+import infinispan.com.mchange.util.ByteArrayComparator;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.IdGenerator;
 import org.slf4j.Logger;
@@ -10,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * Class that represents the structure of the header of a Message specified in
@@ -21,7 +25,7 @@ import java.net.InetSocketAddress;
  * @see
  */
 
-public abstract class Message  {
+public abstract class Message implements Comparable<Message> {
 
     public static final Logger logger = LoggerFactory.getLogger(Message.class);
 
@@ -30,6 +34,11 @@ public abstract class Message  {
     public byte ttl;
     @Deprecated public byte hop;
     public final InetSocketAddress origin;
+
+    @Override
+    public int compareTo(Message o) {
+        return Arrays.compare(id, o.id); //TODO may not be enough if message id's are re-used for replies etc
+    }
 
     /**
      * Creates a header used on Gnutella Protocol v0.4

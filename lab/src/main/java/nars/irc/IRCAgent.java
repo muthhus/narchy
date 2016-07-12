@@ -43,7 +43,10 @@ public class IRCAgent extends IRCBot {
         nar.onExec(new TermProcedure("say") {
             @Override public @Nullable Object function(Compound arguments, TermIndex i) {
                 Term content = arguments.term(0);
-                send(channel, content.toString());
+                String context = arguments.size() > 1 ? arguments.term(1).toString() : "";
+                if (context.equals("I"))
+                    send(channel, content.toString());
+
                 return null;
             }
         });
