@@ -77,8 +77,7 @@ public class PremiseEval extends FindSubst {
 
     /** whether the premise involves temporality that must be calculated upon derivation */
     public boolean temporal;
-
-
+    private long[] evidence;
 
 
     /** initializes with the default static term index/builder */
@@ -242,6 +241,8 @@ public class PremiseEval extends FindSubst {
         deriver.run(this);
 
         revert(start);
+        this.evidence = null;
+        this.premise = null;
 
         return true;
     }
@@ -355,7 +356,21 @@ public class PremiseEval extends FindSubst {
     }
 
 
+    public long[] evidence() {
 
+        if (evidence == null) {
+            long[] pte = task.evidence();
+
+            Task b = belief;
+            evidence =
+                    b != null ?
+                            Stamp.zip(pte, b.evidence()) : //double
+                            pte //single
+            ;
+        }
+
+        return evidence;
+    }
 }
 
 

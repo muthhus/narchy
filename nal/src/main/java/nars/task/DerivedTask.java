@@ -26,14 +26,7 @@ abstract public class DerivedTask extends MutableTask {
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, PremiseEval p) {
         super(tc, punct, truth);
 
-        @Nullable long[] pte = p.task.evidence();
-
-        @Nullable Task b = p.belief;
-        evidence(
-            b != null ?
-                Stamp.zip(pte, b.evidence()) : //double
-                pte //single
-        );
+        evidence(p.evidence());
 
         this.premise = new SoftReference(p.premise);
     }

@@ -8,6 +8,8 @@ import nars.Narsese;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.CompoundConcept;
+import nars.concept.table.DefaultBeliefTable;
+import nars.concept.table.TemporalBeliefTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -31,6 +33,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
+    int beliefMultiplier = 3;
+    int goalMultiplier = 3;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, input, truth);
@@ -71,10 +75,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     public @Nullable
     Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 
+
         //Filter past or present or eternal feedback (ie. contradicts the sensor's recorded beliefs)
         //but allow future predictions
-        long bocc = belief.occurrence();
-        if (belief!=sensor.next() && (bocc==ETERNAL || bocc < nar.time())) {
+
+        if (!validBelief(belief, nar)) {
             //logger.error("Sensor concept rejected derivation:\n {}\npredicted={} derived={}", belief.explanation(), belief(belief.occurrence()), belief.truth());
 
             //TODO delete its non-input parent tasks?
@@ -83,9 +88,23 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
             return null;
         }
 
+        if (hasBeliefs() && ((DefaultBeliefTable)beliefs()).temporal.isFull()) {
+            //try to remove at least one past belief which did not originate from this sensor
+            //this should clear space for future predictions
+            TemporalBeliefTable tb = ((DefaultBeliefTable) beliefs()).temporal;
+            tb.removeIf(t -> !validBelief(t, nar));
+        }
+
         return super.processBelief(belief, nar);
     }
 
+    /** originating from this sensor, or a future prediction */
+    public boolean validBelief(@NotNull Task belief, @NotNull NAR nar) {
+        if (belief.log(0) == sensor)
+            return true;
+        long bocc = belief.occurrence();
+        return (bocc!=ETERNAL && bocc > nar.time());
+    }
 
 
 //    @Override
@@ -135,8 +154,8 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     @Override
     protected void beliefCapacity(ConceptPolicy p) {
-        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, 1);
-        DefaultConceptPolicy.goalCapacityOneEternal(this, p, 1);
+        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, beliefMultiplier);
+        DefaultConceptPolicy.goalCapacityOneEternal(this, p, goalMultiplier);
     }
 
 
