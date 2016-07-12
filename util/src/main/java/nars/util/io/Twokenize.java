@@ -399,7 +399,7 @@ public enum Twokenize {
     public static List<Span> tokenize(String text) {
         List<Span> l = simpleTokenize(squeezeWhitespace(text));
 
-        Set<Span> hidden = new HashSet();
+        Set<Span> hidden = new HashSet(l.size());
 
         for (Span a : l) {
             if (hidden.contains(a)) continue;
