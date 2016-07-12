@@ -253,19 +253,24 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     @Nullable
     synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
 
-//        if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
-//            //HACK share the minT and maxT of both tables
-//            long minT = Long.MAX_VALUE;
-//            long maxT = Long.MIN_VALUE;
-//                minT = Math.min( minT,  (((DefaultBeliefTable)beliefs()).temporal.min() ));
-//                maxT = Math.max( maxT,  (((DefaultBeliefTable)beliefs()).temporal.max() ));
-//                minT = Math.min( minT,  (((DefaultBeliefTable)goals()).temporal.min() ));
-//                maxT = Math.max( maxT,  (((DefaultBeliefTable)goals()).temporal.max() ));
-//            ((DefaultBeliefTable)beliefs()).temporal.min(minT);
-//            ((DefaultBeliefTable)beliefs()).temporal.max(maxT);
-//            ((DefaultBeliefTable)goals()).temporal.min(minT);
-//            ((DefaultBeliefTable)goals()).temporal.max(maxT);
-//        }
+        if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
+            //HACK share the minT and maxT of both tables
+            long minT = Long.MAX_VALUE;
+            long maxT = Long.MIN_VALUE;
+
+                //max of the min
+                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.min() ));
+                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.min() ));
+
+                //..and min of the max
+                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.max() ));
+                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.max() ));
+
+            ((DefaultBeliefTable)beliefs()).temporal.min(minT);
+            ((DefaultBeliefTable)beliefs()).temporal.max(maxT);
+            ((DefaultBeliefTable)goals()).temporal.min(minT);
+            ((DefaultBeliefTable)goals()).temporal.max(maxT);
+        }
 
         //synchronized (target) {
             Task b = target.add(belief, questions, nar);

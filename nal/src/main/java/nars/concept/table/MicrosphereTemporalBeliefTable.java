@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
+import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -38,8 +39,8 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
     public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
-        return rankTemporalByConfidence(t, when, now, ageFactor, -1);
+        return rankTemporalByConfidenceAndOriginality(t, when, now, ageFactor, -1);
+        //return rankTemporalByConfidence(t, when, now, ageFactor, -1);
     }
 
     @Nullable
@@ -69,9 +70,9 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
         if (isFull()) {
             //WHY DOES THIS HAPPEN, IS IT DANGEROUS
-            if (Global.DEBUG)
+            //if (Global.DEBUG)
                 throw new RuntimeException(this + " compression failed");
-            return null;
+            //return null;
         }
 
         return input;

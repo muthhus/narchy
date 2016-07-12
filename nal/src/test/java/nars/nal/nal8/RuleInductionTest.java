@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import com.google.common.base.Joiner;
 import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
@@ -9,6 +10,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.junit.Test;
 
 import java.util.TreeSet;
+
+import static nars.util.Texts.n2;
 
 /**
  * Created by me on 7/11/16.
@@ -23,7 +26,7 @@ public class RuleInductionTest {
         Default d = new Default(1024, 6, 2, 2);
 
 
-        int loops = 100;
+        int loops = 32;
         float hz = 1f/16f;
 
         MutableFloat m = new MutableFloat(0);
@@ -43,6 +46,14 @@ public class RuleInductionTest {
             m.setValue( (float)(Math.sin(i*hz*(Math.PI*2)) * 0.5f + 0.5f) );
             //System.out.println(m.floatValue());
             d.next();
+            System.out.println( Joiner.on("\t").join(
+                    d.concept("(f_lo)").belief(d.time()),
+                    d.concept("(f_hi)").belief(d.time()),
+                    n2(m.floatValue()),
+                    d.concept("(g_lo)").belief(d.time()),
+                    d.concept("(g_hi)").belief(d.time())
+            ));
+
         }
 
         TreeSet<Task> nameSorted = new TreeSet<Task>((x,y)->x.toString().compareTo(y.toString()));
@@ -54,7 +65,7 @@ public class RuleInductionTest {
             }
         });
         nameSorted.forEach(x -> {
-            System.out.println(x);
+            System.out.println(x.proof());
         });
 
     }

@@ -149,7 +149,7 @@ public enum Global {
 
 
     /** relates time and evidence */
-    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 2f;
+    public static final float DEFAULT_TEMPORAL_HISTORY_FACTOR = 1f;
 
 
 
