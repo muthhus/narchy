@@ -183,7 +183,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** called when a Concept processes this Task; return false to cancel pocessing
      *  @param c null for command tasks, otherwise it is the concept which has has been changed by this task after its processing
      * */
-    boolean onConcept(@Nullable Concept c);
+    boolean onConcept(@Nullable Concept c, float score);
 
 
 //

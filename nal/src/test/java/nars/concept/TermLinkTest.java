@@ -81,7 +81,7 @@ public class TermLinkTest {
             //((CompoundConcept)c).linkPeers(b(a, 0.5f, 0.5f), 1f, nar, true);
         }
 
-        public @Nullable Concept<?> concept(int x) {
+        public @Nullable Concept concept(int x) {
             return concept(vertex(x));
         }
 
@@ -106,7 +106,7 @@ public class TermLinkTest {
 
         public void commit() {
             vertices().forEach(v -> {
-                @NotNull Bag<Termed> tl = concept(v).termlinks();
+                @NotNull Bag<Term> tl = concept(v).termlinks();
                 tl.commit();
                 System.out.println("commit: " + v + " " + tl);
             });

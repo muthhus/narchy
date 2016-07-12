@@ -278,7 +278,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     }
 
     @Override
-    public boolean onConcept(@NotNull Concept c) {
+    public boolean onConcept(@NotNull Concept c, float score) {
         return true;
     }
 

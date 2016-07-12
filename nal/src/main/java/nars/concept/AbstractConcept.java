@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public interface AbstractConcept<T extends Term> extends Concept<T> {
+public interface AbstractConcept<T extends Term> extends Concept {
 
     //private final Bag<Task> taskLinks;
     //private final Bag<Termed> termLinks;

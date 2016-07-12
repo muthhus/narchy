@@ -13,6 +13,7 @@ import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
  * and negations of Operations
 
  */
-public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
+public class OperationConcept extends CompoundConcept<Compound> implements Consumer<NAR> {
 
     protected volatile boolean pendingRun;
 
@@ -36,7 +37,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     }
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this($.$(compoundTermString), n);
+        this((Compound)$.$(compoundTermString), n);
     }
 
 
@@ -45,16 +46,14 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
         return ((Compound)term().term(0)).subterms();
     }
 
-    @Nullable
     @Override
-    public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return executeLater(super.processGoal(goal, nar), nar);
+    public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+        return executeLater(super.processGoal(goal, nar, displaced), nar);
     }
 
-    @Nullable
     @Override
-    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return executeLater(super.processBelief(belief, nar), nar);
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+        return executeLater(super.processBelief(belief, nar, displaced), nar);
     }
 
     @Nullable
@@ -91,7 +90,7 @@ public class OperationConcept extends CompoundConcept implements Consumer<NAR> {
     }
 
     public @Nullable
-    static Topic<OperationConcept> operationExec(@Nullable Concept<?> c) {
+    static Topic<OperationConcept> operationExec(@Nullable Concept c) {
         return c != null ? c.get(Execution.class) : null;
     }
 

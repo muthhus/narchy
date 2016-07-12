@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.subst.UnifySubst;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +60,7 @@ public enum PremiseBuilder {
                 if (task.isDeleted())
                     break;
 
-                BLink<? extends Termed> termLink = termsArray.get(i);
+                BLink<? extends Term> termLink = termsArray.get(i);
 
                 Termed tl = termLink.get();
                 if (tl == null)
@@ -85,7 +86,7 @@ public enum PremiseBuilder {
     }
 
     @Nullable
-    static ConceptProcess newPremise(@NotNull NAR nar, long now, BLink<? extends Concept> conceptLink, BLink<? extends Termed> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
+    static ConceptProcess newPremise(@NotNull NAR nar, long now, BLink<? extends Concept> conceptLink, BLink<? extends Term> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
         return new ConceptProcess(conceptLink, taskLink, termLink, match(nar, now, task, tl));
     }
 
@@ -175,7 +176,9 @@ public enum PremiseBuilder {
     static void matchAnswer(@NotNull NAR nar, @NotNull Task q, Task a) {
         @Nullable Concept c = nar.concept(q);
         if (c != null)
-            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar);
+            ((QuestionTable)c.tableFor(q.punc())).answer(a, nar,
+                    /*@Deprecated HACK*/ new FasterList(0)
+        );
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {

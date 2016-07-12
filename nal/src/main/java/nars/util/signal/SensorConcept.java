@@ -17,14 +17,15 @@ import nars.truth.Truth;
 import nars.util.data.Sensor;
 import nars.util.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static nars.nal.Tense.ETERNAL;
 
 /** primarily a collector for believing time-changing input signals */
-public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
+public class SensorConcept extends CompoundConcept<Compound> implements FloatFunction<Term> {
 
     @NotNull
     protected final Sensor sensor;
@@ -37,7 +38,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     int goalMultiplier = 3;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
-        this($.$(term), n, input, truth);
+        this((Compound)$.$(term), n, input, truth);
     }
 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
@@ -72,8 +73,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 //    }
 
     @Override
-    public @Nullable
-    Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
 
 
         //Filter past or present or eternal feedback (ie. contradicts the sensor's recorded beliefs)
@@ -95,7 +95,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
             tb.removeIf(t -> !validBelief(t, nar));
         }
 
-        return super.processBelief(belief, nar);
+        return super.processBelief(belief, nar, displaced);
     }
 
     /** originating from this sensor, or a future prediction */

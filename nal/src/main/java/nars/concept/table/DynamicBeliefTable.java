@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by me on 4/4/16.
@@ -27,9 +28,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         //ignored
     }
 
-    @Nullable
     @Override
-    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
         return input == current ? input : null;
     }
 

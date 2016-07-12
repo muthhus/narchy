@@ -121,7 +121,7 @@ public enum $ {
 
     @Nullable
     public static Compound inh(@NotNull String subj, @NotNull String pred) {
-        return inh($(subj), $(pred));
+        return inh((Term)$(subj), (Term)$(pred));
     }
 
 
@@ -274,7 +274,7 @@ public enum $ {
 
     @NotNull
     public static MutableTask task(@NotNull String term, char punct, float freq, float conf) throws Narsese.NarseseException {
-        return task($.$(term), punct, freq, conf);
+        return task((Compound)$.$(term), punct, freq, conf);
     }
 
     @NotNull

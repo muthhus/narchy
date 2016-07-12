@@ -39,8 +39,6 @@ import static nars.nal.Tense.DTERNAL;
 public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
-
-
     static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed<Compound> b) {
 
         //Term t = $.unNeg(term.term());

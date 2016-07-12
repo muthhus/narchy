@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
@@ -19,8 +20,7 @@ public interface QuestionTable extends TaskTable {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    @Nullable
-    Task add(Task t, BeliefTable answers, NAR n);
+    Task add(Task t, BeliefTable answers, List<Task> displ, NAR n);
 
     void capacity(int newCapacity);
 
@@ -32,7 +32,7 @@ public interface QuestionTable extends TaskTable {
     Task get(Task t);
 
     /** called when a new answer appears */
-    void answer(Task result, NAR nar);
+    void answer(Task result, NAR nar, List<Task> displ);
 
 //    {
 //        for (Task a : this) {
@@ -50,7 +50,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public @Nullable Task add(Task t, BeliefTable answers, NAR n) {
+        public Task add(Task t, BeliefTable answers, List<Task> displ, NAR n) {
             return null;
         }
 
@@ -80,7 +80,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void remove(@NotNull Task belief) {
+        public void remove(@NotNull Task belief, List<Task> displ) {
 
         }
 
@@ -90,7 +90,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void answer(Task result, NAR nar) {
+        public void answer(Task result, NAR nar, List<Task> displ) {
 
         }
     };

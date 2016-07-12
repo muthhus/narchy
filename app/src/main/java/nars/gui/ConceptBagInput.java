@@ -6,6 +6,7 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.EDraw;
@@ -96,7 +97,7 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
 //            if (lastConceptForget != lastConceptForget)
 //                lastConceptForget = now;
 
-        @NotNull Bag<Termed> termlinks = cc.termlinks();
+        @NotNull Bag<Term> termlinks = cc.termlinks();
         @NotNull Bag<Task> tasklinks = cc.tasklinks();
 //
 //        if (!termlinks.isEmpty()) {
@@ -146,7 +147,7 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
         float width = minLineWidth + (maxLineWidth - minLineWidth) * (pri + (dur) * (qua));
 
         float r, g, b;
-        float hp = 0.4f + 0.6f * pri;
+        float hp = 0.25f + 0.75f * pri;
         //float qh = 0.5f + 0.5f * qua;
         if (task) {
             r = hp;
@@ -157,7 +158,7 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
             g = dur / 3f;
             r = 0;
         }
-        float a = 0.25f + 0.75f * (pri);
+        float a = 0.75f;
 
         int n;
         ee[n = (v.numEdges++)].set(target, width,

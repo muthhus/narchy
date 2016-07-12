@@ -6,8 +6,8 @@ import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,13 +31,18 @@ abstract public class DerivedTask extends MutableTask {
         this.premise = new SoftReference(p.premise);
     }
 
-    @Override @Nullable public final Task getParentTask() {
+    @Override
+    @Nullable
+    public final Task getParentTask() {
         ConceptProcess p = this.premise.get();
-        return p!=null ? p.task() : null;
+        return p != null ? p.task() : null;
     }
-    @Override @Nullable public final Task getParentBelief() {
+
+    @Override
+    @Nullable
+    public final Task getParentBelief() {
         ConceptProcess p = this.premise.get();
-        return p!=null ? p.belief : null;
+        return p != null ? p.belief : null;
     }
 
 
@@ -54,7 +59,7 @@ abstract public class DerivedTask extends MutableTask {
 //    }
 
     static void multiply(float factor, @Nullable BLink link, boolean alsoDurability) {
-        if (link !=null && !link.isDeleted()) {
+        if (link != null && !link.isDeleted()) {
             link.andPriority(factor);
             if (alsoDurability)
                 link.andDurability(factor);
@@ -63,8 +68,44 @@ abstract public class DerivedTask extends MutableTask {
 
     public static class DefaultDerivedTask extends DerivedTask {
 
+        static final float deleteDecayRate = 0.75f;
+        static final float feedbackRate = 0.1f;
+
         public DefaultDerivedTask(@NotNull Termed<Compound> tc, char punct, @Nullable Truth truth, @NotNull PremiseEval premise) {
             super(tc, punct, truth, premise);
+        }
+
+        @Override
+        public boolean onConcept(@NotNull Concept c, float score) {
+            if (super.onConcept(c, score)) {
+                feedback(score);
+                return true;
+            }
+            return false;
+        }
+
+        public void feedback(float score) {
+            ConceptProcess p = this.premise.get();
+            if (p != null) {
+                BLink<? extends Term> termlink = p.termLink;
+                BLink<? extends Task> tasklink = p.taskLink;
+                //BLink<? extends Concept> pc = p.conceptLink;
+                if (termlink != null && !termlink.isDeleted())
+                    termlink.priLerpMult(score, feedbackRate);
+                if (tasklink != null && !tasklink.isDeleted())
+                    tasklink.priLerpMult(score, feedbackRate);
+
+            }
+        }
+
+        @Override
+        public boolean delete() {
+            if (super.delete()) {
+                feedback(deleteDecayRate);
+                this.premise.clear();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -76,10 +117,10 @@ abstract public class DerivedTask extends MutableTask {
         }
 
         @Override
-        public boolean onConcept(@NotNull Concept c) {
-            if (super.onConcept(c)) {
+        public boolean onConcept(@NotNull Concept c, float score) {
+            if (super.onConcept(c, score)) {
                 ConceptProcess p = this.premise.get();
-                if (p!=null) {
+                if (p != null) {
                     Concept pc = p.conceptLink.get();
                     Concept.linkPeer(pc.termlinks(), p.termLink.get(), budget(), qua());
                     Concept.linkPeer(pc.tasklinks(), p.taskLink.get(), budget(), qua());
@@ -93,7 +134,7 @@ abstract public class DerivedTask extends MutableTask {
         public boolean delete() {
             if (super.delete()) {
                 ConceptProcess p = this.premise.get();
-                if (p!=null) {
+                if (p != null) {
                     Concept pc = p.conceptLink.get();
                     Concept.linkPeer(pc.termlinks(), p.termLink.get(), UnitBudget.Zero, qua());
                     Concept.linkPeer(pc.tasklinks(), p.taskLink.get(), UnitBudget.Zero, qua());

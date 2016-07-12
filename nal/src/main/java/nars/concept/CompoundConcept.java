@@ -20,6 +20,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -212,8 +213,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     public
     @Nullable
-    Task processQuest(@NotNull Task task, @NotNull NAR nar) {
-        return processQuestion(task, nar);
+    Task processQuest(@NotNull Task task, @NotNull NAR nar, List<Task> displaced) {
+        return processQuestion(task, nar, displaced);
     }
 
     @Override public void delete() {
@@ -231,9 +232,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    @Nullable
-    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions());
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar, List<Task> displaced) {
+        return processBeliefOrGoal(belief, nar, beliefsOrNew(), questions(), displaced);
     }
 
     /**
@@ -241,17 +241,15 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    @Nullable
-    public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return processBeliefOrGoal(goal, nar, goalsOrNew(), quests());
+    public Task processGoal(@NotNull Task goal, @NotNull NAR nar, List<Task> displaced) {
+        return processBeliefOrGoal(goal, nar, goalsOrNew(), quests(), displaced);
     }
 
     /**
      * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      * TODO remove synchronized by lock-free technique
      */
-    @Nullable
-    synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions) {
+    synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
 
         if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
 
@@ -276,7 +274,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         }
 
         //synchronized (target) {
-            Task b = target.add(belief, questions, nar);
+            Task b = target.add(belief, questions, displaced, nar);
             if (b != null)
                 updateSatisfaction(nar);
             return b;
@@ -332,10 +330,10 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      *
      * @param q   The task to be processed
      * @param nar
+     * @param displaced
      * @return the relevant task
      */
-    @Nullable
-    public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
+    public Task processQuestion(@NotNull Task q, @NotNull NAR nar, List<Task> displaced) {
 
         final QuestionTable questionTable;
         final BeliefTable answerTable;
@@ -350,7 +348,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         }
 
 
-        return questionTable.add(q, answerTable, nar);
+        return questionTable.add(q, answerTable, displaced, nar);
     }
 
     @Override
@@ -454,21 +452,20 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    @Nullable
-    public final Task process(@NotNull final Task task, @NotNull NAR nar) {
+    public final Task process(@NotNull final Task task, @NotNull NAR nar, List<Task> displaced) {
 
         switch (task.punc()) {
             case Symbols.BELIEF:
-                return processBelief(task, nar);
+                return processBelief(task, nar, displaced);
 
             case Symbols.GOAL:
-                return processGoal(task, nar);
+                return processGoal(task, nar, displaced);
 
             case Symbols.QUESTION:
-                return processQuestion(task, nar);
+                return processQuestion(task, nar, displaced);
 
             case Symbols.QUEST:
-                return processQuest(task, nar);
+                return processQuest(task, nar, displaced);
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + task);

@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,9 +43,8 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         //return rankTemporalByConfidence(t, when, now, ageFactor, -1);
     }
 
-    @Nullable
     @Override
-    public Task add(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar) {
 
         this.lastUpdate = nar.time();
 
@@ -53,7 +53,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
             return null;
 
         //the result of compression is processed separately
-        Task next = compress(input, nar.time(), eternal);
+        Task next = compress(input, nar.time(), eternal, displ);
         if (next == null) {
             //not compressible with respect to this input, so reject the input
             return null;
@@ -210,14 +210,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     @Nullable
     protected Task compress() {
-        return compress(null, lastUpdate, null);
+        return compress(null, lastUpdate, null, new FasterList() /* HACK unnecessary */);
     }
 
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
-    @Nullable
-    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal) {
+    protected Task compress(@Nullable Task input, long now, @Nullable EternalTable eternal, List<Task> displ) {
 
         int cap = capacity();
         if (size() < cap || removeAlreadyDeleted() < cap) {
@@ -240,13 +239,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
             merged = merge(a, b, now, eternal);
 
             remove(b);
-            TaskTable.removeTask(b, "Revection Revision");
+            TaskTable.removeTask(b, "Revection Revision", displ);
         } else {
             merged = null;
         }
 
         remove(a);
-        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision");
+        TaskTable.removeTask(a, (b == null) ? "Revection Forget" : "Revection Revision", displ);
 
 
         return merged != null ? merged : input;

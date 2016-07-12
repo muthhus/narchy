@@ -14,6 +14,7 @@ import nars.nal.op.Derive;
 import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public class ConceptProcess implements Premise {
 
     public final BLink<? extends Task> taskLink;
 
-    public final BLink<? extends Termed> termLink;
+    public final BLink<? extends Term> termLink;
 
     @Nullable public final Task belief;
 
@@ -37,7 +38,7 @@ public class ConceptProcess implements Premise {
 
     public ConceptProcess(BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
-                          BLink<? extends Termed> termLink, @Nullable Task belief) {
+                          BLink<? extends Term> termLink, @Nullable Task belief) {
 
         this.taskLink = taskLink;
 

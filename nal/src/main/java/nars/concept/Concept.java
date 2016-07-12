@@ -44,12 +44,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface Concept<T extends Term> extends Termed<T> {
+public interface Concept extends Termed {
 
     @NotNull Bag<Task> tasklinks();
 
@@ -156,10 +157,10 @@ public interface Concept<T extends Term> extends Termed<T> {
     /**
      * process a task in this concept
      *
+     * @param displaced collects tasks which have been displaced by the potential insertion of this task
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    @Nullable
-    Task process(@NotNull Task task, @NotNull NAR nar);
+    Task process(@NotNull Task task, @NotNull NAR nar, List<Task> displaced);
 
     /**
      * attempt insert a tasklink into this concept's tasklink bag
@@ -220,7 +221,7 @@ public interface Concept<T extends Term> extends Termed<T> {
     /** link to a specific peer */
     static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
         //@NotNull Bag<Termed> bag = termlinks();
-        BLink<T> existing = bag.get(x);
+        BLink<? extends T> existing = bag.get(x);
         if (existing == null)
             return;
 

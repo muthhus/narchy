@@ -25,6 +25,7 @@ import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.nal.nal8.AbstractOperator;
 import nars.task.Task;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -77,7 +78,7 @@ public class doubt extends AbstractOperator {
         table.clear();
         tt.forEach(t-> {
             t.setTruth(t.truth().confMult(confMultiplied));
-            table.add(t, null, nar);
+            table.add(t, null, new FasterList() /* HACK */, nar);
         });
 
     }

@@ -7,6 +7,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -18,7 +19,7 @@ public interface TemporalBeliefTable extends Table<Task,Task> {
 
     @Nullable Truth truth(long when, long now, EternalTable eternal);
 
-    @Nullable Task add(@NotNull Task input, EternalTable eternal, @NotNull NAR nar);
+    Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar);
 
     void removeIf(@NotNull Predicate<Task> o);
 

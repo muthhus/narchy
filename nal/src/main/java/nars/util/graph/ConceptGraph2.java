@@ -18,7 +18,7 @@ import java.util.Set;
  * Uses a concept meta to hold adjacency data
  * TODO incomplete
  */
-public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGraph<Concept<?>,E>, EdgeFactory<Concept<?>,E> {
+public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGraph<Concept,E>, EdgeFactory<Concept,E> {
 
     @Override
     public int inDegreeOf(Concept vertex) {
@@ -123,13 +123,13 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
 
     @Nullable
     @Override
-    public EdgeFactory<Concept<?>, E> getEdgeFactory() {
+    public EdgeFactory<Concept, E> getEdgeFactory() {
         return null;
     }
 
     @NotNull
     @Override
-    public E addEdge(@NotNull Concept<?> source, @NotNull Concept<?> target) {
+    public E addEdge(@NotNull Concept source, @NotNull Concept target) {
         E e = createEdge(source, target);
         Vertex sv = source.get(this);
         Vertex tv = target.get(this);
@@ -139,7 +139,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
     }
 
     @Override
-    public boolean addEdge(Concept<?> sourceVertex, Concept<?> targetVertex, E e) {
+    public boolean addEdge(Concept sourceVertex, Concept targetVertex, E e) {
         return false;
     }
 
@@ -187,13 +187,13 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
     }
 
     @Override
-    public boolean removeAllVertices(Collection<? extends Concept<?>> vertices) {
+    public boolean removeAllVertices(Collection<? extends Concept> vertices) {
         return false;
     }
 
     @Nullable
     @Override
-    public E removeEdge(@NotNull Concept<?> source, @NotNull Concept<?> target) {
+    public E removeEdge(@NotNull Concept source, @NotNull Concept target) {
         Vertex<E> sv = source.get(this);
         Vertex<E> tv = target.get(this);
         E x1 = sv.removeEdge(target, Vertex.EdgeSet.Outgoing);
@@ -215,7 +215,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
 
     @Nullable
     @Override
-    public Set<Concept<?>> vertexSet() {
+    public Set<Concept> vertexSet() {
         return null;
     }
 

@@ -12,6 +12,7 @@ import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.layout.FastOrganicLayout;
+import spacegraph.layout.Spiral;
 import spacegraph.phys.collision.dispatch.CollisionObject;
 import spacegraph.render.JoglPhysics;
 
@@ -27,19 +28,20 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     public static void main(String[] args) {
 
         Default n = new Default(1024, 8, 6, 8);
+        n.conceptActivation.setValue(0.25f);
         //n.nal(4);
 
 
         new DeductiveMeshTest(n, new int[]{5,5}, 16384);
 
-        final int maxNodes = 64;
-        final int maxEdges = 8;
+        final int maxNodes = 128;
+        final int maxEdges = 10;
 
         new SpaceGraph<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
-            //new Spiral()
-            new FastOrganicLayout()
+            new Spiral()
+            //new FastOrganicLayout()
         ).show(900, 900);
 
         n.loop(35f);

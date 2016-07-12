@@ -277,8 +277,10 @@ public class Tetris implements Environment {
         Tetris t = new Tetris(8, 16, 4);
 
         Iterable<Termed> cheats = Iterables.concat(
-                numericSensor(() -> t.game.currentX, nar, 0.9f, "active:left", "active:middle", "active:right"),
-                numericSensor(() -> t.game.currentY, nar, 0.9f, "active:top", "active:bottom")
+                numericSensor(() -> t.game.currentX, nar, 0.9f,
+                        "active:left", "active:middle", "active:right").resolution(0.1f),
+                numericSensor(() -> t.game.currentY, nar, 0.9f,
+                        "active:top", "active:bottom").resolution(0.1f)
         );
 
         NAgent n = new NAgent(nar) {

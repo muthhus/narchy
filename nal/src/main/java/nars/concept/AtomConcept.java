@@ -9,15 +9,18 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 
-public class AtomConcept extends Atom implements AbstractConcept  {
+public class AtomConcept extends Atom implements AbstractConcept<Atomic>  {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
@@ -103,13 +106,10 @@ public class AtomConcept extends Atom implements AbstractConcept  {
     }
 
 
-    @Nullable
     @Override
-    public Task process(@NotNull Task task, @NotNull NAR nar) {
+    public Task process(@NotNull Task task, @NotNull NAR nar, List displaced) {
         throw new UnsupportedOperationException();
     }
-
-
 
     @Override
     public final boolean contains(Task t) {

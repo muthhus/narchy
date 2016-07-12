@@ -60,11 +60,11 @@ public class MotorConcept extends OperationConcept  {
 
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this($(compoundTermString), n, MotorFunction.Direct);
+        this((Compound)$(compoundTermString), n, MotorFunction.Direct);
     }
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
-        this($(compoundTermString), n, motor);
+        this((Compound)$(compoundTermString), n, motor);
     }
 
     public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {

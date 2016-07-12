@@ -240,7 +240,7 @@ public class NAgent implements Agent {
             } else {
                 return null;
             }
-            if (b!=null) {
+            if (b!=null && f!=null) {
                 if (b.equals(f)) {
                     f = null; //no change from current belief state
                 }

@@ -74,9 +74,9 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     @Override
-    public void remove(@NotNull Task belief) {
+    public void remove(@NotNull Task belief, List<Task> displ) {
         if (list.remove(belief)) {
-            TaskTable.removeTask(belief, null);
+            TaskTable.removeTask(belief, null, displ);
         }
     }
 
@@ -99,7 +99,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
 
     @Override
-    public void answer(@NotNull Task a, @NotNull NAR nar) {
+    public void answer(@NotNull Task a, @NotNull NAR nar, List<Task> displ) {
 
         if (a instanceof AnswerTask)
             return; //already an answer
@@ -115,7 +115,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             else if (a.isDeleted())
                 break;
             else
-                answer(q, a, nar);
+                answer(q, a, nar, displ);
         }
     }
 
@@ -124,7 +124,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     }
 
     /** returns true if a quality was modified as a signal whether the list needs sorted */
-    public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar) {
+    public void answer(@NotNull Task q, @NotNull Task a, @NotNull NAR nar, List<Task> displ) {
 //        if (Stamp.overlapping(q.evidence(), a.evidence()))
 //            return;
 
@@ -153,7 +153,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         if (!q.onAnswered(a)) {
             //the qustion requested for it to be deleted
-            remove(q);
+            remove(q, displ);
             return;
         } else {
 
@@ -191,9 +191,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         nar.activate(a, qBudget);
     }
 
-    @Nullable
     @Override
-    public Task add(@NotNull Task q, @NotNull BeliefTable answers, @NotNull NAR n) {
+    public Task add(@NotNull Task q, @NotNull BeliefTable answers, List<Task> displ, @NotNull NAR n) {
         Task existing = get(q);
         if (existing != null) {
             if (existing != q) {
@@ -208,7 +207,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
             if (!answers.isEmpty()) {
                 Task a = answers.top(q.occurrence());
                 if (a!=null) {
-                    answer(q, a, n);
+                    answer(q, a, n, displ);
                 }
             }
         }

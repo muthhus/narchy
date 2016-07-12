@@ -281,7 +281,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         //float p = v.pri * 0.75f + 0.25f;
         gl.glColor4f(1f, 1f, 1f, pri);
 
-        ShapeDrawer.renderLabel(gl, 0.003f,0.003f, label, 0, 0, 0.5f);
+        ShapeDrawer.renderLabel(gl, 0.0015f,0.0015f, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {

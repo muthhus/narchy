@@ -37,7 +37,7 @@ public abstract class AbstractCore {
 
     public final @NotNull AutoBag<Task> tasklinkUpdate;
 
-    public final @NotNull AutoBag<Termed> termlinkUpdate;
+    public final @NotNull AutoBag<Term> termlinkUpdate;
 
 
     //public final MutableFloat activationFactor = new MutableFloat(1.0f);
@@ -149,7 +149,7 @@ public abstract class AbstractCore {
      */
     public final int firePremiseSquared(@NotNull BLink<? extends Concept> conceptLink, int tasklinks, int termlinks) {
 
-        Concept<?> c = conceptLink.get();
+        Concept c = conceptLink.get();
 
         matcher.init(nar);
 

@@ -183,7 +183,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
     @NotNull
     public NAR setSelf(@NotNull String nextSelf) {
-        return setSelf($.$(nextSelf));
+        return setSelf((Atom)$.$(nextSelf));
     }
 
     /**
@@ -950,12 +950,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     abstract public void clear();
 
     @Nullable
-    public final Concept<?> concept(@NotNull Termed t) {
+    public final Concept concept(@NotNull Termed t) {
         return concept(t, false);
     }
 
     @Nullable
-    public final Concept<?> concept(@NotNull Termed tt, boolean createIfMissing) {
+    public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
 
 //
 ////        //optimization: assume a concept instance is the concept of this NAR
@@ -988,7 +988,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract NAR forEachActiveConcept(@NotNull Consumer<Concept> recip);
 
     @NotNull
-    public NAR forEachConcept(@NotNull Consumer<Concept<?>> recip) {
+    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
         index.forEach(x -> {
             if (x instanceof Concept)
                 recip.accept((Concept)x);
@@ -1272,7 +1272,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             c.policy(index.conceptBuilder().initialized());
         }
 
-        Task t = c.process(input, this);
+        List<Task> displaced = Global.newArrayList();
+
+        Task t = c.process(input, this, displaced);
+
+        //measure and delete the displaced tasks
+        float displacedPri = 0, displacedConf = 0;
+        for (int i = 0, displacedSize = displaced.size(); i < displacedSize; i++) {
+            Task d = displaced.get(i);
+            displacedPri += d.priIfFiniteElseZero();
+            if (d.isBeliefOrGoal())
+                displacedConf += d.conf();
+            else
+                displacedConf += 1f; //for questions, lack of confidence will not be applied
+            d.delete();
+        }
+
         if (t != null && !t.isDeleted()) {
 
             if (clock instanceof FrameClock) {
@@ -1282,21 +1297,30 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
-            t.onConcept(c);
 
-            //propagate budget
-            MutableFloat overflow = new MutableFloat();
+            //heuristic
+            float dynamicRange = 4f;
+            float score = 1 +
+                    Math.max(0, displacedPri-t.pri()) +  //economic bonus
+                    displacedConf; //knowledge bonus
 
-            activate(c, t, activation, activation, overflow);
+            score = Math.max(0f, Math.min(dynamicRange, score));
+            t.budget().priMult(score);
+            if (t.pri() > Global.BUDGET_EPSILON) {
+                //propagate budget
+                MutableFloat overflow = new MutableFloat();
+                activate(c, t, activation, activation, overflow);
+                emotion.stress(overflow);
+            }
 
-            emotion.stress(overflow);
-
+            t.onConcept(c, score);
 
             eventTaskProcess.emit(t); //signal any additional processes
 
         } else {
             emotion.frustration(business);
         }
+
 
         return c;
     }

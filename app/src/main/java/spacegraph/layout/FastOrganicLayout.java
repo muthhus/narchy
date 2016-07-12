@@ -113,7 +113,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
 
         setInitialTemp(0.2f);
         setMinDistanceLimit(3f);
-        setMaxDistanceLimit(100f);
+        setMaxDistanceLimit(200f);
 
     }
 

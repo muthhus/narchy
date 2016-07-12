@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -120,8 +121,8 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     }
 
     @Override
-    public @Nullable Task process(@NotNull Task task, @NotNull NAR nar) {
-        return target.process(task, nar);
+    public Task process(@NotNull Task task, @NotNull NAR nar, List displaced) {
+        return target.process(task, nar, displaced);
     }
 
     @NotNull

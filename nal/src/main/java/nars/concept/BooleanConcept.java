@@ -18,6 +18,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Dynamically updates a truth value based on truth aggregation of the concepts referred by parameters
  */
@@ -230,7 +232,7 @@ public class BooleanConcept extends CompoundConcept {
         }
 
         @Override
-        public void remove(@NotNull Task belief) {
+        public void remove(@NotNull Task belief, List<Task> displ) {
             //nothing, maybe force update
             if (belief == this.current) {
                 current = null;

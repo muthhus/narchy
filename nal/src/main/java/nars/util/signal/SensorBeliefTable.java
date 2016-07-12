@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -26,7 +27,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    protected @NotNull Task addTemporal(@NotNull Task goal, @NotNull NAR nar) {
+    protected Task addTemporal(@NotNull Task goal, List<Task> displaced, @NotNull NAR nar) {
 
         if (!goal.isInput() && nar.taskPast.test(goal)) {
             //this is a goal for a past time, reject
@@ -41,7 +42,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        return super.addTemporal(goal, nar);
+        return super.addTemporal(goal, displaced, nar);
     }
 
 //    @Override
@@ -141,7 +142,7 @@ public class SensorBeliefTable extends DefaultBeliefTable {
         }
 
         @Override
-        public @Nullable Task add(@NotNull Task input, EternalTable eternal, @NotNull NAR nar) {
+        public Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar) {
             return null;
         }
 

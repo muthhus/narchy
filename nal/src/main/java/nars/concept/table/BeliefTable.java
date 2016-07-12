@@ -5,7 +5,6 @@ import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
-import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +12,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.or;
@@ -59,7 +59,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public void remove(@NotNull Task belief) {
+        public void remove(@NotNull Task belief, List<Task> displ) {
             throw new UnsupportedOperationException();
         }
 
@@ -69,9 +69,8 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
-        @NotNull
         @Override
-        public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar) {
+        public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
             return input;
         }
 
@@ -187,7 +186,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
-    @Nullable Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull NAR nar);
+    Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar);
 
 
 //    @Nullable

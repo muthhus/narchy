@@ -4,6 +4,7 @@ import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -12,8 +13,9 @@ import java.util.function.Consumer;
  */
 public interface TaskTable extends Iterable<Task> {
 
-    static void removeTask(@NotNull Task t, @Nullable String reason) {
-        t.delete(reason);
+    static void removeTask(@NotNull Task t, @Nullable String reason, List<Task> queueForRemoval) {
+        t.log(reason);
+        queueForRemoval.add(t);
     }
 
     int capacity();
@@ -117,7 +119,7 @@ public interface TaskTable extends Iterable<Task> {
 //    };
 
     /** forcibly remove a held Task */
-    void remove(@NotNull Task belief);
+    void remove(@NotNull Task belief, List<Task> displ);
 
 
     @Nullable Task get(Task t);

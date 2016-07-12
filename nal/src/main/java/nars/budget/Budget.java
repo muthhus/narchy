@@ -1,5 +1,6 @@
 package nars.budget;
 
+import nars.Global;
 import nars.Symbols;
 import nars.task.Task;
 import nars.util.Texts;
@@ -136,6 +137,20 @@ public interface Budget extends Budgeted {
         float pri = pri();
         if (pri==pri) //if not deleted
             setPriority(pri * factor);
+    }
+    default void priLerp(float target, float speed) {
+        float p = pri();
+        setPriority(Util.lerp(target, p, speed));
+    }
+
+    default void priLerpMult(float factor, float speed) {
+
+        if (Util.equals(factor, 1f, Global.BUDGET_EPSILON))
+            return; //no change
+
+        float p = pri();
+        float target = p * factor;
+        setPriority(Util.lerp(target, p, speed));
     }
 
     default void durMult(float factor) {
