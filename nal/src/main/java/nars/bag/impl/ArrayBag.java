@@ -75,6 +75,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     }
 
+
+    @Override
+    public final boolean isEmpty() {
+        return size() == 0;
+    }
+
     @Override
     protected final void removeWeakest(Object reason) {
         synchronized(map) {

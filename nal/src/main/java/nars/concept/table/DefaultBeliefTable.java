@@ -3,19 +3,14 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.NAR;
-import nars.bag.Table;
-import nars.bag.impl.SortedTable;
-import nars.budget.merge.BudgetMerge;
 import nars.task.AnswerTask;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 
@@ -24,33 +19,23 @@ import java.util.function.Consumer;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
-
     @NotNull public final EternalTable eternal;
     @NotNull public final TemporalBeliefTable temporal;
-    @NotNull final Map<Task,Task> map;
 
-    public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
 
     public DefaultBeliefTable(int initialEternalCapacity, int initialTemporalCapacity) {
 
-        Map<Task, Task> mp;
-        this.map = mp =
-            //Global.newHashMap(initialEternalCapacity + initialTemporalCapacity);
-            new HashMap<>(
-                initialEternalCapacity + initialTemporalCapacity
-                //    initialEternalCapacity /* ESTIMATE */
-            );
+
 
         /* Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new EternalTable(mp, initialEternalCapacity);
-        temporal = newTemporalBeliefTable(mp, initialTemporalCapacity);
+        eternal = new EternalTable(initialEternalCapacity);
+        temporal = newTemporalBeliefTable(initialTemporalCapacity);
     }
 
     @NotNull
-    protected static TemporalBeliefTable newTemporalBeliefTable(Map<Task, Task> mp, int initialTemporalCapacity) {
-        return new MicrosphereTemporalBeliefTable(mp, initialTemporalCapacity);
+    protected static TemporalBeliefTable newTemporalBeliefTable(int initialTemporalCapacity) {
+        return new MicrosphereTemporalBeliefTable(initialTemporalCapacity);
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
@@ -100,11 +85,11 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public int size() {
-        return map.size(); //eternal.size() + temporal.size();
+        return eternal.size() + temporal.size();
     }
 
     @Override public boolean isEmpty() {
-        return map.isEmpty(); // size()==0;
+        return size()==0;
     }
 
     @Override
@@ -114,22 +99,19 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public void capacity(int eternals, int temporals) {
-        eternal.setCapacity(eternals);
-        temporal.setCapacity(temporals);
+        eternal.capacity(eternals);
+        temporal.capacity(temporals);
     }
 
     @Override
     public void remove(@NotNull Task belief, List<Task> displ) {
-        Object removed = ((belief.isEternal()) ? eternal : temporal).remove(belief);
-        assert(removed == belief);
-        TaskTable.removeTask(belief, null, displ);
+        ((belief.isEternal()) ? eternal : temporal).remove(belief, displ);
     }
 
     @Override
     public void clear() {
         eternal.clear();
         temporal.clear();
-        map.clear();
     }
 
 
@@ -140,7 +122,7 @@ public class DefaultBeliefTable implements BeliefTable {
         EternalTable ee = eternal;
         if (!ee.isEmpty()) {
             synchronized (eternal) {
-                return ee.top();
+                return ee.highest();
             }
         }
         return null;
@@ -157,23 +139,9 @@ public class DefaultBeliefTable implements BeliefTable {
         return null;
     }
 
-    @Override
-    public final Task get(Task t) {
-        return map.get(t);
-    }
 
     @Override public Task add(@NotNull Task input, @NotNull QuestionTable questions, List<Task> displaced, @NotNull NAR nar) {
 
-        /* if a duplicate exists, it will merge the incoming task and return true.
-          otherwise false */
-        Task existing = get(input);
-        if (existing!=null) {
-            if (existing!=input) {
-                DuplicateMerge.merge(existing.budget(), input, 1f);
-                input.delete(DUPLICATE_BELIEF_GOAL);
-            }
-            return null;
-        }
 
         //Filter duplicates; return null if duplicate
         // (no link activation will propagate and TaskProcess event will not be triggered)
@@ -208,7 +176,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 throw new RuntimeException("input task rejected (0 capacity): " + input);
             return null;
         }
-        else if ((input.conf() >= 1f) && (cap != 1) && (et.isEmpty() || (et.top().conf() < 1f))) {
+        else if ((input.conf() >= 1f) && (cap != 1) && (et.isEmpty() || (et.first().conf() < 1f))) {
             //AXIOMATIC/CONSTANT BELIEF/GOAL
             addEternalAxiom(input, et, displaced);
             return input;
@@ -241,33 +209,33 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
-    private void addEternalAxiom(@NotNull Task input, @NotNull SortedTable<Task, Task> et, List<Task> displ) {
+    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, List<Task> displ) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
         Consumer<Task> overridden = t -> TaskTable.removeTask(t, "Overridden", displ);
         et.forEach(overridden);
         et.clear();
-        et.setCapacity(1);
+        et.capacity(1);
 
         //2. clear the other table, set capcity to zero preventing temporal tasks
-        Table<Task, Task> otherTable = temporal;
+        TemporalBeliefTable otherTable = temporal;
         otherTable.forEach(overridden);
         otherTable.clear();
-        otherTable.setCapacity(0);
+        otherTable.capacity(0);
 
         //NAR.logger.info("axiom: {}", input);
 
-        et.put(input, input);
+        et.put(input);
     }
 
     protected Task addTemporal(@NotNull Task input, List<Task> displaced, @NotNull NAR nar) {
 
         input = temporal.add(input, eternal, displaced, nar);
-        if (input != null) {
-            boolean ii = insert(input, temporal, displaced); //inserting this task.  should be successful
-            if (!ii)
-                throw new RuntimeException("tasktable insert");
-        }
+//        if (input != null) {
+//            boolean ii = insert(input, temporal, displaced); //inserting this task.  should be successful
+//            if (!ii)
+//                throw new RuntimeException("tasktable insert");
+//        }
 
         return input;
 
@@ -277,13 +245,15 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
 
+//
+
 
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private static boolean insert(@NotNull Task incoming, @NotNull Table<Task, Task> table, List<Task> displ) {
+    private static boolean insert(@NotNull Task incoming, @NotNull EternalTable table, List<Task> displ) {
 
-        Task displaced = table.put(incoming, incoming);
+        Task displaced = table.put(incoming);
 
         if (displaced!=null && !displaced.isDeleted()) {
             TaskTable.removeTask(displaced,

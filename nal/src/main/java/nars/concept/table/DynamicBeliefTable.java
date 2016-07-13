@@ -69,7 +69,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     abstract protected Task update(long now);
 
     @Nullable
-    @Override public Task get(Task t) {
+    public Task get(Task t) {
         return current.equals(t) ? current : null;
     }
 

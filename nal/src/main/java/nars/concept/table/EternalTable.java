@@ -6,9 +6,12 @@ import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
 import nars.truth.Truth;
+import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import static nars.nal.Tense.ETERNAL;
@@ -16,23 +19,47 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * Created by me on 5/7/16.
  */
-public class EternalTable extends SortedListTable<Task, Task> {
+public class EternalTable extends SortedArray<Task> implements TaskTable, Comparator<Task> {
 
-    public EternalTable(Map<Task, Task> index, int initialCapacity) {
-        super(Task[]::new, index);
-        setCapacity(initialCapacity);
+    int capacity;
+
+    public EternalTable(int initialCapacity) {
+        super(Task[]::new, initialCapacity);
+        capacity(initialCapacity);
     }
 
-    @Override
-    protected final void removeWeakest(Object reason) {
-        remove(weakest()).delete(reason);
+    public void capacity(int c) {
+        int s = size();
+        if (this.capacity != c) {
+
+            this.capacity = c;
+
+            //TODO can be accelerated by batch remove operation
+            while (c < s--) {
+                removeLast();
+            }
+        }
     }
 
-    @Nullable
-    @Override
-    public final Task key(Task task) {
-        return task;
+
+
+//    protected final Task removeWeakest(Object reason) {
+//        if (!isEmpty()) {
+//            Task x = remove(size() - 1);
+//            x.delete(reason);
+//        }
+//    }
+
+    public final Task highest() {
+        if (isEmpty()) return null;
+        return list[0];
     }
+
+    public final Task lowest() {
+        if (isEmpty()) return null;
+        return list[size()-1];
+    }
+
 
     @Override
     public final int compare(@NotNull Task o1, @NotNull Task o2) {
@@ -60,7 +87,7 @@ public class EternalTable extends SortedListTable<Task, Task> {
         Truth newBeliefTruth = newBelief.truth();
 
         for (int i = 0; i < bsize; i++) {
-            Task x = get(i);
+            Task x = list[i];
 
             if (!Revision.isRevisible(newBelief, x))
                 continue;
@@ -115,8 +142,33 @@ public class EternalTable extends SortedListTable<Task, Task> {
                 null;
     }
 
+    public final Task put(final Task t) {
+        Task displaced = null;
+
+        if (size() == capacity()) {
+            Task l = lowest();
+            if (l.conf() <= t.conf()) {
+                removeLast();
+            }
+        }
+
+        add(t, this);
+
+        return displaced;
+    }
+
     public final Truth truth() {
-        Task s = top();
+        Task s = highest();
         return s!=null ? s.truth() : null;
+    }
+
+    public int capacity() {
+        return capacity;
+    }
+
+    @Override
+    public void remove(@NotNull Task belief, List<Task> displ) {
+        /*Task removed = */remove(indexOf(belief, this));
+        TaskTable.removeTask(belief, null, displ);
     }
 }

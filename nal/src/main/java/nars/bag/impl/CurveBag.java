@@ -84,7 +84,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
 
 
 
-
     /** optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
      * */
@@ -95,8 +94,6 @@ public class CurveBag<V> extends ArrayBag<V> implements Bag<V> {
         int ss = size();
         if (ss == 0)
             return this;
-
-        assert(n > 0);
 
         final int begin, end;
         if (ss <= n) {

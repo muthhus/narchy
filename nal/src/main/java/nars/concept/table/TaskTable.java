@@ -118,10 +118,12 @@ public interface TaskTable extends Iterable<Task> {
 //
 //    };
 
-    /** forcibly remove a held Task */
+    /** forcibly remove a held Task
+     *  should eventually invoke TaskTable.removeTask() */
     void remove(@NotNull Task belief, List<Task> displ);
 
 
-    @Nullable Task get(Task t);
+    //void add(Task incoming, List<Task> displaced);
 
+    //Task put(Task incoming);
 }

@@ -43,12 +43,14 @@ import java.util.function.IntFunction;
  * @param <E>
  * @author Andreas Hollmann
  */
-public final class SortedArray<E> {
+public class SortedArray<E> implements Iterable<E> {
 
+
+    final static Object[] zeroList = new Object[0];
 
     protected static final int binarySearchThreshold = 8;
     private final IntFunction<E[]> builder;
-    private E[] list;
+    protected E[] list = (E[]) zeroList;
     private int size;
 
     public E[] array() {
@@ -132,11 +134,11 @@ public final class SortedArray<E> {
         //this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
 
         this.builder = builder;
-        setCapacity(initialCapacity);
+        capacity(initialCapacity);
     }
 
-    public void setCapacity(int cap) {
-        if (this.list == null || this.list.length != cap) {
+    public void capacity(int cap) {
+        if (this.list.length != cap) {
             this.list = builder.apply(cap);
         }
     }
@@ -242,6 +244,88 @@ public final class SortedArray<E> {
             return this.list[--size];
         //else
             //return null;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<E> iterator() {
+        //throw new UnsupportedOperationException();
+        return new ArrayIterator(list, 0, size());
+    }
+
+
+
+    static class ArrayIterator<E> implements ListIterator<E> {
+        private final E[] array;
+        private final int size;
+        private int next;
+        private int lastReturned;
+
+        protected ArrayIterator( E[] array, int index, int size ) {
+            this.array = array;
+            next = index;
+            lastReturned = -1;
+            this.size = size;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != size;
+        }
+
+        @Override
+        public E next() {
+            if( !hasNext() )
+                throw new NoSuchElementException();
+            lastReturned = next++;
+            return array[lastReturned];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return next != 0;
+        }
+
+        @Override
+        public E previous() {
+            if( !hasPrevious() )
+                throw new NoSuchElementException();
+            lastReturned = --next;
+            return array[lastReturned];
+        }
+
+        @Override
+        public int nextIndex() {
+            return next;
+        }
+
+        @Override
+        public int previousIndex() {
+            return next - 1;
+        }
+
+        @Override
+        public void remove() {
+            // This operation is not so easy to do but we will fake it.
+            // The issue is that the backing list could be completely
+            // different than the one this iterator is a snapshot of.
+            // We'll just remove(element) which in most cases will be
+            // correct.  If the list had earlier .equals() equivalent
+            // elements then we'll remove one of those instead.  Either
+            // way, none of those changes are reflected in this iterator.
+            //DirectCopyOnWriteArrayList.this.remove(array[lastReturned]);
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(E e) {
+            throw new UnsupportedOperationException();
+        }
     }
 
 

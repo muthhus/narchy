@@ -204,6 +204,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      */
     boolean contains(@NotNull V it);
 
+    boolean isEmpty();
 
     //    /**
 //     * if the next item is true via the predicate, then it is TAKEn out of the bag; otherwise the item remains unaffected
@@ -486,6 +487,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
         @Override
         public boolean contains(@NotNull Object it) {
             return false;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
         }
 
         @NotNull

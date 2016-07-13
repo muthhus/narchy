@@ -27,86 +27,11 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         this.items = new SortedArray<>(builder, 1);
     }
 
+
     @NotNull
     @Override
-    public Iterator<L> iterator() {
-        //throw new UnsupportedOperationException();
-        return new ArrayIterator(items.array(), 0, items.size());
-    }
-
-
-
-    static class ArrayIterator<E> implements ListIterator<E> {
-        private final E[] array;
-        private final int size;
-        private int next;
-        private int lastReturned;
-
-        protected ArrayIterator( E[] array, int index, int size ) {
-            this.array = array;
-            next = index;
-            lastReturned = -1;
-            this.size = size;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != size;
-        }
-
-        @Override
-        public E next() {
-            if( !hasNext() )
-                throw new NoSuchElementException();
-            lastReturned = next++;
-            return array[lastReturned];
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return next != 0;
-        }
-
-        @Override
-        public E previous() {
-            if( !hasPrevious() )
-                throw new NoSuchElementException();
-            lastReturned = --next;
-            return array[lastReturned];
-        }
-
-        @Override
-        public int nextIndex() {
-            return next;
-        }
-
-        @Override
-        public int previousIndex() {
-            return next - 1;
-        }
-
-        @Override
-        public void remove() {
-            // This operation is not so easy to do but we will fake it.
-            // The issue is that the backing list could be completely
-            // different than the one this iterator is a snapshot of.
-            // We'll just remove(element) which in most cases will be
-            // correct.  If the list had earlier .equals() equivalent
-            // elements then we'll remove one of those instead.  Either
-            // way, none of those changes are reflected in this iterator.
-            //DirectCopyOnWriteArrayList.this.remove(array[lastReturned]);
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void set(E e) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void add(E e) {
-            throw new UnsupportedOperationException();
-        }
+    public final Iterator<L> iterator() {
+        return items.iterator();
     }
 
     @Override
@@ -134,9 +59,10 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
         items.clear();
     }
 
+
     @Override @Nullable
     public L top() {
-        return isEmpty() ? null : get(0);
+        return (size()==0) ? null : get(0);
     }
 
     @Override @Nullable

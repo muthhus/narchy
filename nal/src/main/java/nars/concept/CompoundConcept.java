@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
+import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.table.ArrayQuestionTable;
 import nars.concept.table.BeliefTable;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -55,6 +57,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
     private @NotNull Map meta;
     private transient ConceptPolicy policy;
 
+
+    final Map<Task,Task> tasks = new HashMap<>();
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -119,7 +123,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     @Override
     public boolean contains(@NotNull Task t) {
-        return tableFor(t.punc()).get(t)!=null;
+        return tasks.containsKey(t);
     }
 
 
@@ -260,17 +264,17 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
             long maxT = Long.MIN_VALUE;
 
                 //max of the min
-                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.min() ));
-                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.min() ));
+                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.minTime() ));
+                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.minTime() ));
 
                 //..and min of the max
-                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.max() ));
-                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.max() ));
+                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.maxTime() ));
+                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.maxTime() ));
 
-            ((DefaultBeliefTable)beliefs()).temporal.min(minT);
-            ((DefaultBeliefTable)beliefs()).temporal.max(maxT);
-            ((DefaultBeliefTable)goals()).temporal.min(minT);
-            ((DefaultBeliefTable)goals()).temporal.max(maxT);
+            ((DefaultBeliefTable)beliefs()).temporal.minTime(minT);
+            ((DefaultBeliefTable)beliefs()).temporal.maxTime(maxT);
+            ((DefaultBeliefTable)goals()).temporal.minTime(minT);
+            ((DefaultBeliefTable)goals()).temporal.maxTime(maxT);
         }
 
         //synchronized (target) {
@@ -438,6 +442,8 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         }
     }
 
+    public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.max; //this should probably always be max otherwise incoming duplicates may decrease the existing priority
 
     /**
      * Directly process a new task. Called exactly once on each task. Using
@@ -452,23 +458,35 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      * --a revised/projected task which may or may not remain in the belief table
      */
     @Override
-    public final Task process(@NotNull final Task task, @NotNull NAR nar, List<Task> displaced) {
+    public final Task process(@NotNull final Task input, @NotNull NAR nar, List<Task> displaced) {
 
-        switch (task.punc()) {
+        /* if a duplicate exists, it will merge the incoming task and return true.
+          otherwise false */
+        Task existing = tasks.get(input);
+        if (existing!=null) {
+            if (existing!=input) {
+                DuplicateMerge.merge(existing.budget(), input, 1f);
+                input.delete(DUPLICATE_BELIEF_GOAL);
+            }
+            return null;
+        }
+
+
+        switch (input.punc()) {
             case Symbols.BELIEF:
-                return processBelief(task, nar, displaced);
+                return processBelief(input, nar, displaced);
 
             case Symbols.GOAL:
-                return processGoal(task, nar, displaced);
+                return processGoal(input, nar, displaced);
 
             case Symbols.QUESTION:
-                return processQuestion(task, nar, displaced);
+                return processQuestion(input, nar, displaced);
 
             case Symbols.QUEST:
-                return processQuest(task, nar, displaced);
+                return processQuest(input, nar, displaced);
 
             default:
-                throw new RuntimeException("Invalid sentence type: " + task);
+                throw new RuntimeException("Invalid sentence type: " + input);
         }
 
     }

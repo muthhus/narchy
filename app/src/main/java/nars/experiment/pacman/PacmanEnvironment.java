@@ -61,9 +61,9 @@ public class PacmanEnvironment extends cpcman implements Environment {
 	boolean trace = false;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 6;
+	private final int pacmanCyclesPerFrame = 4;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
-	public float scoretoReward = 0.05f;
+	public float scoretoReward = 0.1f;
 
 	public PacmanEnvironment(int ghosts, int visionRadius) {
 		super(ghosts);

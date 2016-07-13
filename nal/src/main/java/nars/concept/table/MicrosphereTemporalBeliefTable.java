@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
@@ -22,7 +21,7 @@ import static nars.nal.Tense.ETERNAL;
 /**
  * stores the items unsorted; revection manages their ranking and removal
  */
-public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task> implements TemporalBeliefTable {
+public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements TemporalBeliefTable {
 
     static final int MAX_TRUTHPOLATION_SIZE = 64;
     static final ThreadLocal<TruthPolation> truthpolations = ThreadLocal.withInitial(() -> {
@@ -32,10 +31,20 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
     private long min = Tense.ETERNAL, max = Tense.ETERNAL;
     private long lastUpdate = Tense.TIMELESS;
+    private int capacity;
 
-    public MicrosphereTemporalBeliefTable(Map<Task, Task> mp, int initialCapacity) {
-        super(mp);
-        setCapacity(initialCapacity);
+    public MicrosphereTemporalBeliefTable(int initialCapacity) {
+        super();
+        capacity(initialCapacity);
+    }
+
+    public void capacity(int initialCapacity) {
+        this.capacity = initialCapacity;
+    }
+
+    @Override
+    public final int capacity() {
+        return capacity;
     }
 
     public static float rank(@NotNull Task t, long when, long now, float ageFactor) {
@@ -70,38 +79,42 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         if (isFull()) {
             //WHY DOES THIS HAPPEN, IS IT DANGEROUS
             //if (Global.DEBUG)
-                //throw new RuntimeException(this + " compression failed");
+            //throw new RuntimeException(this + " compression failed");
             return null;
         }
 
         return input;
     }
 
+    @Override public final boolean isFull() {
+        return size() == capacity();
+    }
+
     @Override
-    public void min(long minT) {
+    public void minTime(long minT) {
         this.min = minT;
     }
 
     @Override
-    public void max(long maxT) {
+    public void maxTime(long maxT) {
         this.max = maxT;
     }
 
     @Override
-    public long min() {
+    public long minTime() {
         if (min == Tense.ETERNAL) ageFactor();
         return min;
     }
+
     @Override
-    public long max() {
+    public long maxTime() {
         if (max == Tense.ETERNAL) ageFactor();
         return max;
     }
 
     @Nullable
-    @Override
-    protected Task addItem(@NotNull Task i) {
-        super.addItem(i);
+    public Task put(@NotNull Task i) {
+        super.add(i);
         long occ = i.occurrence();
         if ((occ < min) || (occ > max)) {
             invalidateRange();
@@ -109,24 +122,22 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         return null;
     }
 
-
     @Override
-    protected final Task removeItem(@NotNull Task removed) {
-        @Nullable Task actuallyRemoved = super.removeItem(removed);
+    public void remove(@NotNull Task removed, List<Task> displ) {
+        @Nullable Task actuallyRemoved = super.removed(removed);
 
-        if (actuallyRemoved!=removed) {
-            actuallyRemoved.delete();
+        if (actuallyRemoved != removed) {
+            removed.delete(); //ensure this extra copy is deleted
         }
 
-        removed.delete();
+        displ.add(actuallyRemoved);
 
         long occ = removed.occurrence();
         if ((occ == min) || (occ == max)) {
             invalidateRange();
         }
-        return removed;
-    }
 
+    }
 
 
     private void invalidateRange() {
@@ -134,14 +145,13 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
     @Nullable
-    @Override
     public Task weakest() {
         if (lastUpdate == Tense.TIMELESS)
             throw new RuntimeException("unable to measure weakest without knowing current time");
         return weakest(lastUpdate, null, Float.POSITIVE_INFINITY);
     }
 
-    @Override
+
     protected final void removeWeakest(@Nullable Object reason) {
 
         int sizeBefore = size();
@@ -149,7 +159,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         if (size() < sizeBefore)
             return; //compression successful
 
-        remove(weakest()).delete(reason);
+        removed(weakest()).delete(reason);
     }
 
     @Nullable
@@ -168,7 +178,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
                 continue;
 
             //consider ii for being the weakest ranked task to remove
-            float r = rank(ii, now,  now, ageFactor);
+            float r = rank(ii, now, now, ageFactor);
             if (r < weakestRank) {
                 weakestRank = r;
                 weakest = ii;
@@ -264,11 +274,6 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
     }
 
 
-    @Override
-    public final Task key(Task task) {
-        return task;
-    }
-
     @Nullable
     @Override
     public Task strongest(long when, long now, @Nullable Task against) {
@@ -292,7 +297,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
 
             float r = rank(x, when, now, ageFactor);
 
-            if (against!=null && Stamp.overlapping(x.evidence(), against.evidence())) {
+            if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
                 r *= Global.PREMISE_MATCH_OVERLAP_MULTIPLIER;
             }
 
@@ -316,7 +321,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
             case 1:
                 return get(0).projectTruth(when, now, false);
             default:
-                return truthpolations.get().truth(when, list, eternal!=null ? eternal.top() : null);
+                return truthpolations.get().truth(when, this, eternal != null ? eternal.first() : null);
         }
     }
 
@@ -326,7 +331,7 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         for (int i = 0; i < s; ) {
             Task x = get(i);
             if (x == null || x.isDeleted()) {
-                removeItem(i);
+                remove(i);
                 s--;
             } else {
                 i++;
@@ -335,8 +340,9 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
         return s;
     }
 
-    @Override
-    public final void removeIf(@NotNull Predicate<Task> o) {
+
+    public final boolean removeIf(@NotNull Predicate<? super Task> o) {
+
         //TODO optimize, these iterators suck
         List<Task> toRemove = Global.newArrayList(0);
         for (Task x : this) {
@@ -344,9 +350,12 @@ public class MicrosphereTemporalBeliefTable extends DefaultListTable<Task, Task>
                 toRemove.add(x);
             }
         }
+        if (toRemove.isEmpty())
+            return false;
         for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
             remove(toRemove.get(i));
         }
+        return true;
     }
 
     //    public Task weakest(Task input, NAR nar) {

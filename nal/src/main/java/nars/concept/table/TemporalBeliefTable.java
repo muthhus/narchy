@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 5/7/16.
  */
-public interface TemporalBeliefTable extends Table<Task,Task> {
+public interface TemporalBeliefTable extends TaskTable {
 
     @Nullable Task strongest(long when, long now, @Nullable Task against);
 
@@ -21,11 +21,15 @@ public interface TemporalBeliefTable extends Table<Task,Task> {
 
     Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar);
 
-    void removeIf(@NotNull Predicate<Task> o);
+    boolean removeIf(@NotNull Predicate<? super Task> o);
 
-    long min();
-    long max();
+    long minTime();
+    long maxTime();
 
-    void min(long minT);
-    void max(long maxT);
+    void minTime(long minT);
+    void maxTime(long maxT);
+
+    void capacity(int c);
+
+    boolean isFull();
 }

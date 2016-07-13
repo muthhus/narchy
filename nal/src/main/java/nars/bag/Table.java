@@ -9,8 +9,6 @@ import java.util.function.Predicate;
 /** nearly a Map */
 public interface Table<K,V> extends Iterable<V> {
 
-
-
     void clear();
 
     @Nullable
@@ -40,9 +38,7 @@ public interface Table<K,V> extends Iterable<V> {
 
     void setCapacity(int i);
 
-    default boolean isEmpty() {
-        return size() == 0;
-    }
+
 
     default boolean isFull() {
         return size() >= capacity();

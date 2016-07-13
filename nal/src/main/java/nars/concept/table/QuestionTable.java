@@ -27,7 +27,6 @@ public interface QuestionTable extends TaskTable {
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
-    @Override
     @Nullable
     Task get(Task t);
 

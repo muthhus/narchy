@@ -1,6 +1,7 @@
 package nars.util.data.list;
 
 import com.gs.collections.impl.list.mutable.FastList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
@@ -11,7 +12,7 @@ import java.util.function.IntFunction;
 
 /**
  * Less-safe faster FastList with direct array access
- *
+ * <p>
  * TODO override the array creation to create an array
  * of the actual type necessary, so that .array()
  * can provide the right array when casted
@@ -33,7 +34,9 @@ public class FasterList<X> extends FastList<X> {
         super(x);
     }
 
-    /** uses array directly */
+    /**
+     * uses array directly
+     */
     public FasterList(int size, X[] x) {
         super(size, x);
     }
@@ -48,11 +51,11 @@ public class FasterList<X> extends FastList<X> {
      * this directly manipulates the 'size' value that the list uses to add new items at. use with caution
      * if index==-1, then size will be zero, similar to calling clear(),
      * except the array items will not be null
-     *
+     * <p>
      * returns the next value
-     * */
+     */
     public final void popTo(int index) {
-        this.size = index+1;
+        this.size = index + 1;
     }
 
 
@@ -85,13 +88,14 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    /** use with caution.
-     *    --this could become invalidated so use it as a snapshot
-     *    --dont modify it
-     *    --when iterating, expect to encounter a null
-     *      at any time, and if this happens, break your loop
-     *      early
-     **
+    /**
+     * use with caution.
+     * --this could become invalidated so use it as a snapshot
+     * --dont modify it
+     * --when iterating, expect to encounter a null
+     * at any time, and if this happens, break your loop
+     * early
+     * *
      */
     public final X[] array() {
         return items;
@@ -130,19 +134,20 @@ public class FasterList<X> extends FastList<X> {
     public final X[] fillArrayNullPadded(X[] array) {
         int s = size;
         int l = array.length;
-        if (array == null || array.length < (s+1)) {
-            array = (X[]) Array.newInstance(array.getClass().getComponentType(), s+1);
+        if (array == null || array.length < (s + 1)) {
+            array = (X[]) Array.newInstance(array.getClass().getComponentType(), s + 1);
         }
         System.arraycopy(items, 0, array, 0, s);
-        if (s<l)
+        if (s < l)
             Arrays.fill(array, s, l, null); //pad remainder
         return array;
     }
+
     public final X[] fillArray(X[] array) {
         int s = size;
         int l = array.length;
         System.arraycopy(items, 0, array, 0, s);
-        if (s<l)
+        if (s < l)
             Arrays.fill(array, s, l, null); //pad remainder
         return array;
     }
@@ -176,5 +181,16 @@ public class FasterList<X> extends FastList<X> {
     public final void clear0() {
         this.items = (X[]) ZERO_SIZED_ARRAY;
         this.size = 0;
+    }
+
+    /** remove, but with Map.remove semantics */
+    public X removed(@NotNull X object) {
+        int index = this.indexOf(object);
+        if (index >= 0) {
+            X r = get(index);
+            this.remove(index);
+            return r;
+        }
+        return null;
     }
 }
