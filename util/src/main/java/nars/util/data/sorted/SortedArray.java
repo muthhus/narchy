@@ -145,8 +145,13 @@ public class SortedArray<E> implements Iterable<E> {
 
 
     public void forEach(Consumer<? super E> action) {
-        for (E x : list)
-            action.accept(x);
+        for (E x : list) {
+            if (x!=null) {
+                action.accept(x);
+            } else {
+                break; //first null element at the end of the array indicates the end
+            }
+        }
     }
 
 

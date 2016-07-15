@@ -55,11 +55,13 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     @Override
     public Task add(@NotNull Task input, EternalTable eternal, List<Task> displ, @NotNull NAR nar) {
 
-        this.lastUpdate = nar.time();
 
         int cap = capacity();
         if (cap == 0)
             return null;
+
+        this.lastUpdate = nar.time();
+
 
         //the result of compression is processed separately
         Task next = compress(input, nar.time(), eternal, displ);

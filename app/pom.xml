@@ -65,7 +65,7 @@
     <dependency>
       <groupId>com.googlecode.concurrent-trees</groupId>
       <artifactId>concurrent-trees</artifactId>
-      <version>2.5.0</version>
+      <version>2.6.0</version>
       <scope>compile</scope>
     </dependency>
 
@@ -125,15 +125,6 @@
       <version>0.24.1</version>
       <scope>compile</scope>
     </dependency>
-
-
-    <!-- https://mvnrepository.com/artifact/com.turn/ttorrent -->
-    <dependency>
-      <groupId>com.turn</groupId>
-      <artifactId>ttorrent</artifactId>
-      <version>1.5</version>
-    </dependency>
-
 
   </dependencies>
 

@@ -462,7 +462,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
         /* if a duplicate exists, it will merge the incoming task and return true.
           otherwise false */
-        Task existing = tasks.get(input);
+        Task existing = tasks.putIfAbsent(input,input);
         if (existing!=null) {
             if (existing!=input) {
                 DuplicateMerge.merge(existing.budget(), input, 1f);
@@ -472,23 +472,33 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         }
 
 
+        Task r;
         switch (input.punc()) {
             case Symbols.BELIEF:
-                return processBelief(input, nar, displaced);
+                r = processBelief(input, nar, displaced);
+                break;
 
             case Symbols.GOAL:
-                return processGoal(input, nar, displaced);
+                r = processGoal(input, nar, displaced);
+                break;
 
             case Symbols.QUESTION:
-                return processQuestion(input, nar, displaced);
+                r = processQuestion(input, nar, displaced);
+                break;
 
             case Symbols.QUEST:
-                return processQuest(input, nar, displaced);
+                r = processQuest(input, nar, displaced);
+                break;
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
+        for (int j = 0, displacedSize = displaced.size(); j < displacedSize; j++) {
+            tasks.remove(displaced.get(j));
+        }
+
+        return r;
     }
 
     @Override
