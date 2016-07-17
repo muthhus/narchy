@@ -85,6 +85,8 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             return null;
         }
 
+        add(input);
+
         return input;
     }
 

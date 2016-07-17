@@ -73,6 +73,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
+
     }
 
     @NotNull
@@ -308,6 +309,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     @Override public final void policy(@NotNull ConceptPolicy p) {
         this.policy = p;
+
         linkCapacity(p);
         beliefCapacity(p);
         questionCapacity(p);

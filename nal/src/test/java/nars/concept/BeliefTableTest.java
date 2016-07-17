@@ -100,6 +100,7 @@ public class BeliefTableTest  {
         //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
         for (int i = 0; i < maxBeliefs; i++) {
             b.believe(0.5f, i/(float)maxBeliefs, 0.85f, i * spacing).run(spacing);
+            assertEquals(i+1, b.size());
         }
 
         b.print();

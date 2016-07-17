@@ -153,7 +153,7 @@ public class DefaultBeliefTable implements BeliefTable {
         }
         else {
             synchronized (temporal) {
-                result = addTemporal(input, displaced, nar);
+                result = temporal.add(input, eternal, displaced, nar);
             }
         }
 
@@ -227,22 +227,6 @@ public class DefaultBeliefTable implements BeliefTable {
 
         et.put(input);
     }
-
-    protected Task addTemporal(@NotNull Task input, List<Task> displaced, @NotNull NAR nar) {
-
-        input = temporal.add(input, eternal, displaced, nar);
-//        if (input != null) {
-//            boolean ii = insert(input, temporal, displaced); //inserting this task.  should be successful
-//            if (!ii)
-//                throw new RuntimeException("tasktable insert");
-//        }
-
-        return input;
-
-    }
-
-
-
 
 
 //
