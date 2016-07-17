@@ -13,6 +13,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +38,7 @@ public class CurveBagTest  {
     @Test public void testBasicInsertionRemoval() {
         int cap = 1;
 
-        testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant));
+        testBasicInsertionRemoval(new ArrayBag(cap, plusDQDominant, new HashMap<>(cap)));
         testBasicInsertionRemoval(new CurveBag(cap, defaultSampler, plusDQDominant));
     }
 
@@ -62,7 +63,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testBudgetMerge() {
-        ArrayBag<String> a = new ArrayBag(4, plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -77,7 +78,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testSort() {
-        ArrayBag<String> a = new ArrayBag(4, plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(4, plusDQDominant, new HashMap<>(4));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -104,7 +105,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testCapacity() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -122,7 +123,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testRemoveByKey() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.commit();
@@ -137,7 +138,7 @@ public class CurveBagTest  {
     }
 
     @Test public void testScalePut() {
-        ArrayBag<String> a = new ArrayBag(2, plusDQDominant);
+        ArrayBag<String> a = new ArrayBag(2, plusDQDominant, new HashMap<>(2));
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);

@@ -30,29 +30,25 @@ import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.signal.SensorConcept;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static nars.experiment.pong.PongEnvironment.numericSensor;
+import static nars.experiment.pong.Pong.numericSensor;
 
 
 public class Tetris implements Environment {
 
-    private static int GAME_DIVISOR = 4;
     private final TetrisVisualizer vis;
     private final JFrame window;
     private double currentScore;

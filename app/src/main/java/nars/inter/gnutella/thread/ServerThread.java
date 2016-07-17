@@ -9,6 +9,7 @@ import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.Peer;
 import nars.inter.gnutella.message.Message;
+import nars.link.BLink;
 import nars.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.HashMap;
 
 /**
  * Created by me on 7/9/16.
@@ -31,7 +33,7 @@ public class ServerThread extends PeerThread {
     float maxRecvFrequency = 48;
     final int messageBagSize = 128;
 
-    final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.max);
+    final ArrayBag<Message> outgoing = new ArrayBag(messageBagSize, BudgetMerge.max, new HashMap<>(messageBagSize));
 
 
 

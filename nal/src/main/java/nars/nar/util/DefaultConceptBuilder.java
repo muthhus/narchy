@@ -10,6 +10,7 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
+import nars.link.BLink;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -21,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -30,7 +33,10 @@ import java.util.function.Function;
 public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     final Function<Atom, AtomConcept> atomBuilder =
-            (Atom a) -> new AtomConcept(a, termbag(), taskbag());
+            (Atom a) -> {
+                Map map = new HashMap();
+                return new AtomConcept(a, termbag(map), taskbag(map));
+            };
 
     private final ConceptPolicy conceptInitialize, conceptActivate;
 
@@ -43,10 +49,14 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     @Nullable
     final Concept newConcept(@NotNull Compound t){
 
+        Map map = new HashMap();
+        @NotNull Bag<Term> termbag = termbag(map);
+        @NotNull Bag<Task> taskbag = taskbag(map);
+
         switch (t.op()) {
             case INH:
                 if (Op.isOperation(t))
-                    return new OperationConcept(t, termbag(), taskbag());
+                    return new OperationConcept(t, termbag, taskbag);
                 break;
 
             case NEG:
@@ -55,7 +65,7 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
         }
 
-        return new CompoundConcept(t, termbag(), taskbag());
+        return new CompoundConcept(t, termbag, taskbag);
     }
 
 
@@ -64,14 +74,14 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
     //new SpaceConcept((Space) t, taskLinks, termLinks);
 
     @NotNull
-    @Override public Bag<Task> taskbag() {
-        return new CurveBag<>(defaultCurveSampler, mergeDefault);
+    public Bag<Task> taskbag(Map map) {
+        return new CurveBag<Task>(1, defaultCurveSampler, mergeDefault, map);
     }
 
 
     @NotNull
-    @Override public Bag<Term> termbag() {
-        return new CurveBag<>(defaultCurveSampler, mergeDefault);
+    public Bag<Term> termbag(Map map) {
+        return new CurveBag<Term>(1, defaultCurveSampler, mergeDefault, map);
     }
 
 

@@ -6,7 +6,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.experiment.pong.PongEnvironment;
+import nars.experiment.pong.Pong;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
 import nars.nal.Tense;
@@ -183,7 +183,7 @@ public class CameraTrack implements Environment {
 //            PongEnvironment.numericSensor("greenness", "low", "high", nar,
 //                    () -> (float)/*Math.sqrt*/(gt.floatValue()),
 //                    0.9f).resolution(0.05f),
-            PongEnvironment.numericSensor("blueness", "low", "high", nar,
+            Pong.numericSensor("blueness", "low", "high", nar,
                     () -> bt.floatValue(),
                     0.9f).resolution(0.05f)
         ));
@@ -209,11 +209,11 @@ public class CameraTrack implements Environment {
         //Iterables.addAll(charted, cam.controller.rewardConcepts);
         charted.addAll(cam.controller.actions);
 
-        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.x, nar,0.5f,
+        Iterables.addAll(charted, Pong.numericSensor(()->cam.x, nar,0.5f,
                 "(camx --> [low])", "(camx --> [mid])", "(camx --> [high])").resolution(0.05f));
-        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.y, nar,0.5f,
+        Iterables.addAll(charted, Pong.numericSensor(()->cam.y, nar,0.5f,
                 "(camy --> [low])", "(camy --> [mid])", "(camy --> [high])").resolution(0.05f));
-        Iterables.addAll(charted, PongEnvironment.numericSensor(()->cam.z, nar,0.5f,
+        Iterables.addAll(charted, Pong.numericSensor(()->cam.z, nar,0.5f,
                 "(camz --> [low])", "(camz --> [mid])", "(camz --> [high])").resolution(0.05f));
 
 //            charted.add(nar.ask($.$("(?x-->red)").term()));

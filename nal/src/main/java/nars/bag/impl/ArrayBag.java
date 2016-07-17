@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -45,12 +46,12 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
     @NotNull
     final BagPendings<V> pending;
 
-    public ArrayBag(int cap, BudgetMerge mergeFunction) {
+    public ArrayBag(int cap, BudgetMerge mergeFunction, Map<V, BLink<V>> map) {
         super(BLink[]::new,
 
                 //new ConcurrentHashMapUnsafe<V, BLink<V>>(),
                 //new LinkedHashMap<>(cap),
-                new HashMap<>(cap)
+                map
                 //Global.newHashMap(cap),
 
         );

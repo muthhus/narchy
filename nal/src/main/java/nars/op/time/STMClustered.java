@@ -234,7 +234,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.bag = new ArrayBag<>(1, BudgetMerge.avgDQBlend) {
+        this.bag = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(1)) {
             @NotNull
             @Override
             protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {

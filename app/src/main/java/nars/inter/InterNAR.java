@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class InterNAR extends Peer implements PeerModel {
     public float broadcastPriorityThreshold = 0.5f;
     public float broadcastConfidenceThreshold = 0.9f;
 
-    final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend);
+    final ArrayBag<Term> asked = new ArrayBag(64, BudgetMerge.plusDQBlend, new HashMap<>(64));
     private boolean paranoid = false;
 
     public InterNAR(NAR n) throws IOException {

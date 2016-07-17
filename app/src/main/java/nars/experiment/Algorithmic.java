@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
-import static nars.experiment.pong.PongEnvironment.beliefChart;
+import static nars.experiment.pong.Pong.beliefChart;
 
 /**
  * http://arxiv.org/pdf/1511.07275v2.pdf

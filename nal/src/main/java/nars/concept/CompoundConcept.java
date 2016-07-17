@@ -11,6 +11,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.link.TermLinkBuilder;
+import nars.nar.util.DefaultConceptBuilder;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -113,12 +114,12 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, n.index.conceptBuilder());
+        this(term, (DefaultConceptBuilder)n.index.conceptBuilder(), new HashMap());
     }
 
     /** default construction by a NAR on conceptualization */
-    public CompoundConcept(@NotNull T term, @NotNull ConceptBuilder b) {
-        this(term, b.termbag(), b.taskbag());
+    CompoundConcept(@NotNull T term, @NotNull DefaultConceptBuilder b, Map bagMap) {
+        this(term, b.termbag(bagMap), b.taskbag(bagMap));
     }
 
 

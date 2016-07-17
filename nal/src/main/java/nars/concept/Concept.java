@@ -423,10 +423,9 @@ public interface Concept extends Termed {
      */
     interface ConceptBuilder extends Function<Term, Termed> {
 
-        @NotNull
-        Bag<Task> taskbag();
-        @NotNull
-        Bag<Term> termbag();
+//        @NotNull
+//        Bag<Task> taskbag();
+//        Bag<Term> termbag(Map<Term, Term> map);
 
         ConceptPolicy initialized();
 
