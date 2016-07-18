@@ -15,10 +15,10 @@ public class TermSet<X extends Term> extends TermVector {
     }
 
     @NotNull public static TermSet concat(@NotNull Term[] a, @NotNull Term... b) {
-        if ((a.length + b.length) == 2) {
-            //simple case
-            return TermSet.the(a[0], b[0]);
-        }
+//        if ((a.length + b.length) == 2) {
+//            //simple case
+//            return TermSet.the(a[0], b[0]);
+//        }
         TreeSet<Term> t = new TreeSet<>();
         Collections.addAll(t, a);
         return concat(t, b);
@@ -33,7 +33,7 @@ public class TermSet<X extends Term> extends TermVector {
 
 
     @NotNull
-    public static TermSet the(@NotNull Collection<? extends Term> x) {
+    public static TermSet the(@NotNull Set<? extends Term> x) {
 
         return new TermSet(toSortedSetArray(x));
     }
@@ -49,7 +49,7 @@ public class TermSet<X extends Term> extends TermVector {
     }
 
     @NotNull
-    public static Term[] toSortedSetArray(@NotNull Collection<? extends Term> c) {
+    public static Term[] toSortedSetArray(@NotNull Set<? extends Term> c) {
 
         int n = c.size();
 
@@ -58,7 +58,7 @@ public class TermSet<X extends Term> extends TermVector {
 
         Term[] a = c.toArray(new Term[n]);
 
-        if (c instanceof Set) {
+        //if (c instanceof Set) {
 
             if (c instanceof TreeSet) {
                 //already sorted
@@ -72,11 +72,11 @@ public class TermSet<X extends Term> extends TermVector {
                 return a;
             }
 
-        } else {
-
-            //potentially is unsorted and has duplicates
-            return n > 1 ? Terms.toSortedSetArray(a) : a;
-        }
+//        } else {
+//
+//            //potentially is unsorted and has duplicates
+//            return n > 1 ? Terms.toSortedSetArray(a) : a;
+//        }
     }
 
     @Override public final boolean isSorted() {

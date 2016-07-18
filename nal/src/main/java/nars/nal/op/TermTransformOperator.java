@@ -14,6 +14,7 @@ public abstract class TermTransformOperator extends AtomicStringConstant impleme
         this.id = "^" + getClass().getSimpleName();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return id;

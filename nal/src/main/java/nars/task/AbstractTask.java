@@ -463,7 +463,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     public final boolean equals(@NotNull Object that) {
 
         return this == that ||
-                (that!=null && hashCode() == that.hashCode() && equivalentTo((Task) that, true, true, true, true, false));
+                (that!=null && hashCode() == that.hashCode() && that instanceof Task && equivalentTo((Task) that, true, true, true, true, false));
 
     }
 

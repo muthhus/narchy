@@ -238,20 +238,20 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.3f);
+        nar.conceptActivation.setValue(0.15f);
 
 
         nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(128);
-        nar.confMin.setValue(0.02f);
+        nar.cyclesPerFrame.set(32);
+        nar.confMin.setValue(0.01f);
 
 
         //nar.log();
@@ -273,20 +273,20 @@ public class Tetris extends TetrisState implements Environment {
         //new MySTMClustered(nar, 8, '!');
 
 
-        Tetris t = new Tetris(8, 8, 4) {
+        Tetris t = new Tetris(8, 12, 4) {
             @Override
             protected int nextBlock() {
                 //return super.nextBlock();
-                return 1; //long blocks
+                return 1; //square blocks
                 //return 0; //long blocks
             }
         };
 
         Iterable<Termed> cheats = Iterables.concat(
                 numericSensor(() -> t.currentX, nar, 0.7f,
-                        "active:left", "active:middle", "active:right").resolution(0.1f),
+                        "active:(x,l)", "active:(x,c)", "active:(x,r)").resolution(0.1f),
                 numericSensor(() -> t.currentY, nar, 0.7f,
-                        "active:top", "active:bottom").resolution(0.1f)
+                        "active:(y,t)", "active:(y,b)").resolution(0.1f)
         );
 
         NAgent n = new NAgent(nar) {

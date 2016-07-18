@@ -182,8 +182,7 @@ public interface AbstractConcept<T extends Term> extends Concept {
 //        //t.equalsAnonymously(term());
 //    }
 
-    @Override
-    void policy(@NotNull ConceptPolicy p);
+
 
 
     default void linkCapacity(@NotNull ConceptPolicy p) {

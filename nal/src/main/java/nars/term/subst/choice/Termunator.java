@@ -41,14 +41,16 @@ public final class Termunator extends Termutator {
     private Termutator[] next() {
         List<Termutator> t = termutes;
         int n = t.size();
-        if (n == 0) {
-            return onlyThis; //TERMINATE TERMUTATION
-        } else {
+        //n>1:
+
+//        if (n == 0) {
+//            return onlyThis; //TERMINATE TERMUTATION
+//        } else {
             t.add(this);
             Termutator[] tt = t.toArray(new Termutator[n]);
             t.clear();
             return tt;
-        }
+        //}
     }
 
     @Override

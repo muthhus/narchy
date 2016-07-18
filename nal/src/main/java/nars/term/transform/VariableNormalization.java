@@ -27,11 +27,11 @@ public class VariableNormalization extends VariableTransform implements Function
     @NotNull
     private final UnifriedMap<Variable, Variable /*Variable*/> rename;
 
-    private boolean renamed;
+    //private boolean renamed;
 
-    public VariableNormalization() {
+    /*public VariableNormalization() {
         this(0);
-    }
+    }*/
 
 
 
@@ -103,7 +103,7 @@ public class VariableNormalization extends VariableTransform implements Function
         Variable rvv = newVariable(v, rename.size()+1);
 
         //track if modification occurred
-        this.renamed |= (rvv!=v); //!rvv.equals(v);
+        //this.renamed |= (rvv!=v); //!rvv.equals(v);
 
         return rvv;
     }
@@ -119,11 +119,11 @@ public class VariableNormalization extends VariableTransform implements Function
             return ((GenericVariable) v).normalize(serial); //HACK
         } else {
             @NotNull AbstractVariable vn = $.v(v.op(), serial);
-            if (v instanceof Ellipsis) {
+            /*if (v instanceof Ellipsis) {
                 return ((Ellipsis) v).clone(vn, this);
-            } else {
+            } else {*/
                 return vn; //N/A
-            }
+            //}
         }
 
     }

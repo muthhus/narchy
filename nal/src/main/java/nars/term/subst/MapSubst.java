@@ -51,10 +51,10 @@ public class MapSubst implements Subst {
         return xy.get(t);
     }
 
-    public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-        if (xy.isEmpty()) return;
-        xy.forEach(each);
-    }
+//    public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
+//        if (xy.isEmpty()) return;
+//        xy.forEach(each);
+//    }
 
 
     @NotNull
@@ -80,11 +80,11 @@ public class MapSubst implements Subst {
         public Term term(@NotNull Term t) {
             return t.equals(ox) ? oy : super.term(t);
         }
-
-        @Override
-        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
-            throw new UnsupportedOperationException();
-        }
+//
+//        @Override
+//        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
+//            throw new UnsupportedOperationException();
+//        }
 
         @Override
         public boolean isEmpty() {

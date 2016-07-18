@@ -103,7 +103,7 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
     @Nullable
     Term normalize(Term x) {
         if (x instanceof Compound)
-            return $.terms.transform((Compound)x, new VariableNormalization());
+            return $.terms.transform((Compound)x, new VariableNormalization(0));
         else if (x instanceof Variable)
             return $.v(x.op(), 1);
         else

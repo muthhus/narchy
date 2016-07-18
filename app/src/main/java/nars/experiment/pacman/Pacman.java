@@ -20,6 +20,7 @@
 package nars.experiment.pacman;
 
 import com.github.benmanes.caffeine.cache.Policy;
+import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static nars.experiment.pong.Pong.numericSensor;
+
 /**
  * the java application class of pacman 
  */
@@ -62,7 +65,7 @@ public class Pacman extends cpcman implements Environment {
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 4;
+	private final int pacmanCyclesPerFrame = 16;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -92,7 +95,7 @@ public class Pacman extends cpcman implements Environment {
 		//new MemoryManager(nar);
 
 		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
@@ -121,14 +124,24 @@ public class Pacman extends cpcman implements Environment {
 //			return false;
 //		});
 
+
+
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 8, '.', 2);
-		//new MySTMClustered(nar, 8, '!');
+		new MySTMClustered(nar, 16, '.', 3);
+		new MySTMClustered(nar, 16, '!', 2);
+
+		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 
 
-		Pacman pacman = new Pacman(1 /* ghosts  */, 5 /* visionRadius */);
+		//PAC GPS global positioining
+		Iterable<Termed> cheats = Iterables.concat(
+				numericSensor(() -> pacman.pac.iX, nar, 0.7f,
+						"I:(x,n)", "I:(x,p)").resolution(0.1f),
+				numericSensor(() -> pacman.pac.iY, nar, 0.7f,
+						"I:(y,n)", "I:(y,p)").resolution(0.1f)
+		);
 
 		NAgent n = new NAgent(nar) {
 			@Override
@@ -142,6 +155,8 @@ public class Pacman extends cpcman implements Environment {
 
 				charted.add(nar.activate($.$("[pill]"), UnitBudget.Zero));
 				charted.add(nar.activate($.$("[ghost]"), UnitBudget.Zero));
+
+				Iterables.addAll(charted, cheats);
 
 				//charted.add(nar.ask($.$("(a:?1 ==> (I-->happy))")).term());
 				//charted.add(nar.ask($.$("((I-->be_happy) <=> (I-->happy))")).term());

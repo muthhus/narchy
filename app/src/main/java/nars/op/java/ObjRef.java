@@ -18,6 +18,7 @@ public final class ObjRef<O> extends AtomicStringConstant {
         return value;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return null;

@@ -478,7 +478,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
             return 0;
         }
 
-        @Nullable
+        @NotNull
         @Override
         public Iterator<BLink> iterator() {
             return Collections.emptyIterator();

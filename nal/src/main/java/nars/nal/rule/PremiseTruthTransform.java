@@ -33,7 +33,7 @@ abstract class PremiseTruthTransform implements CompoundTransform<Compound, Term
     }
 
     @Override
-    public @Nullable Termed<?> apply(Compound parent, Term subterm) {
+    public @Nullable Termed<?> apply(@NotNull Compound parent, @NotNull Term subterm) {
 
         Compound tf = (Compound) subterm;
         Term func = tf.term(0);
