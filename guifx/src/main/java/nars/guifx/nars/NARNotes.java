@@ -71,7 +71,7 @@ public class NARNotes extends BorderPane {
         //private final Button inputButton;
         private final BagView<Task> responseBox;
         private Task task = null;
-        Bag<Task> responses = new ArrayBag<Task>(16, BudgetMerge.max, new HashMap<V, BLink<V>>(16));
+        Bag<Task> responses = new ArrayBag<Task>(16, BudgetMerge.max, new HashMap<>(16));
 
         public Note(Task t) {
             getStyleClass().add("note");

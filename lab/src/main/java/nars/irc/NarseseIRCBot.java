@@ -93,7 +93,7 @@ public class NarseseIRCBot extends Talk {
     final Map<Term,MarkovContext> markovs = new ConcurrentHashMap();
 
 
-    float innerPri = 0.05f;
+    float innerPri = 0.03f;
     float wikiPri = 0.05f;
 
     public NarseseIRCBot(NAR nar) throws Exception {

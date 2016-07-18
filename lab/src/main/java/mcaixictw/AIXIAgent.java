@@ -2,7 +2,7 @@ package mcaixictw;
 
 import mcaixictw.worldmodels.WorldModel;
 import mcaixictw.worldmodels.WorldModelSettings;
-import nars.experiment.pacman.PacmanEnvironment;
+import nars.experiment.pacman.Pacman;
 import nars.learn.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class AIXIAgent implements Agent {
     }
 
     public static void main(String[] args) {
-        new PacmanEnvironment(1, 2)
+        new Pacman(1, 2)
         //new PongEnvironment()
                 .run(new AIXIAgent(), 256*64);
     }

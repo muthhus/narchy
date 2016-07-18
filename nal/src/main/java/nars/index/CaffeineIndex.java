@@ -31,10 +31,15 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //            return 0; //dont allow removal of atomic
 //        } else {
             if (v instanceof Concept) {
+
                 if (!(v instanceof CompoundConcept)) {
                     //special implementation, dont allow removal
                     return 0;
                 }
+
+                Concept c = (Concept)v;
+                if (c.active())
+                    return 0; //disallow removal of active concepts
             }
 
             int w = v.complexity();// * weightFactor;

@@ -3,6 +3,7 @@ package nars.index;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
+import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -12,7 +13,6 @@ import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
@@ -541,6 +541,26 @@ public interface TermIndex {
 
     default void remove(Termed entry) {
         throw new UnsupportedOperationException();
+    }
+
+    default void deactivate(@NotNull Concept c, @NotNull ConceptPolicy cold) {
+
+        c.policy(cold);
+
+        c.tasklinks().commit();
+        c.termlinks().commit();
+
+        c.policy(null);
+        set(c); //update in the cache (weight, etc.)
+    }
+
+    default void activate(@NotNull Concept c, @NotNull ConceptPolicy warm) {
+        c.policy(warm);
+        set(c); //update in the cache (weight, etc.)
+
+        //clean out any deleted links since having been deactivated
+        c.tasklinks().commit();
+        c.termlinks().commit();
     }
 
 

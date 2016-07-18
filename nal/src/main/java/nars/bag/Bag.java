@@ -192,7 +192,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Iterable<BLink<
      * iterates all items in (approximately) descending priority
      * forEach may be used to avoid allocation of iterator instances
      */
-    @Nullable
+    @NotNull
     @Override
     Iterator<BLink<V>> iterator();
 

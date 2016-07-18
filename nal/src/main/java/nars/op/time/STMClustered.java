@@ -46,7 +46,7 @@ public class STMClustered extends STM {
 
     private static final double[] EmptyCoherence = new double[] { Double.NaN, Double.NaN };
 
-    private static int compactPeriod = 8;
+    private static final int compactPeriod = 8;
 
     public final class TasksNode extends Node {
 

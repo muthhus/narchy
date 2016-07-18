@@ -5,7 +5,6 @@ import nars.Global;
 import nars.NAR;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.Concept;
 import nars.index.CaffeineIndex;
 import nars.index.TermIndex;

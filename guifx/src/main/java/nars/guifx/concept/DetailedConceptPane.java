@@ -43,7 +43,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
 
         int maxDisplayedBagItems = 16;
         
-        termlinkView = new BagView<>(
+        termlinkView = new BagView(
                 () -> currentConcept != null ? currentConcept.termlinks() : null,
                 //(t) -> SubButton.make(nar, t.term())
                 (t) -> new TaskButton(t, nar),

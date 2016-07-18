@@ -38,7 +38,7 @@ public class SensorConcept extends CompoundConcept<Compound> implements FloatFun
     int goalMultiplier = 3;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
-        this((Compound)$.$(term), n, input, truth);
+        this($.$(term), n, input, truth);
     }
 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {

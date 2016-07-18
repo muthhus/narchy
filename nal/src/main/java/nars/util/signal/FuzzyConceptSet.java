@@ -5,7 +5,6 @@ import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
-import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

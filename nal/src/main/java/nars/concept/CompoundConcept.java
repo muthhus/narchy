@@ -124,7 +124,7 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
 
 
     @Override
-    public boolean contains(@NotNull Task t) {
+    public final boolean contains(@NotNull Task t) {
         return tasks.containsKey(t);
     }
 
@@ -308,12 +308,13 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
         return policy;
     }
 
-    @Override public final void policy(@NotNull ConceptPolicy p) {
+    @Override public final void policy(@Nullable ConceptPolicy p) {
         this.policy = p;
-
-        linkCapacity(p);
-        beliefCapacity(p);
-        questionCapacity(p);
+        if (p!=null) {
+            linkCapacity(p);
+            beliefCapacity(p);
+            questionCapacity(p);
+        }
     }
 
     protected void questionCapacity(@NotNull ConceptPolicy p) {

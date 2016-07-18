@@ -13,7 +13,6 @@ import nars.nal.PremiseBuilder;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

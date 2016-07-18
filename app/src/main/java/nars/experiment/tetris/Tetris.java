@@ -26,10 +26,12 @@ import nars.NAR;
 import nars.agent.NAgent;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
+import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
@@ -47,12 +49,11 @@ import java.util.Random;
 import static nars.experiment.pong.Pong.numericSensor;
 
 
-public class Tetris implements Environment {
+public class Tetris extends TetrisState implements Environment {
 
     private final TetrisVisualizer vis;
     private final JFrame window;
     private double currentScore;
-    public TetrisState game;
 
     private double previousScore;
     public float[] seenState;
@@ -65,7 +66,7 @@ public class Tetris implements Environment {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(int width, int height, int timePerFall) {
-        game = new TetrisState(width, height, timePerFall);
+        super(width, height, timePerFall);
         vis = new TetrisVisualizer(this, 32);
         window = new JFrame();
 
@@ -113,26 +114,27 @@ public class Tetris implements Environment {
             NAgent ag = (NAgent) a;
             NAR nar = ag.nar;
 
-            //number relations
-            for (int i = 0; i < Math.max(getWidth(),getHeight()); i++) {
-                if (i > 0) {
-                    nar.believe($.inh($.p($.the(i-1),$.the(i)), $.the("next")), 1f, 1f);
-                    nar.believe($.inh($.p($.the(i),$.the(i-1)), $.the("prev")), 1f, 1f);
-                    nar.believe($.inst($.secte($.the(i-1),$.the(i)), $.the("tang")), 1f, 1f);
-                    //nar.believe($.inh($.sete($.the(i-1),$.the(i)), $.the("seq")), 1f, 1f);
-                }
-            }
-            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#a & #c)})");
-            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#b & #d)})");
+//            //number relations
+//            for (int i = 0; i < Math.max(getWidth(),getHeight()); i++) {
+//                if (i > 0) {
+//                    nar.believe($.inh($.p($.the(i-1),$.the(i)), $.the("next")), 1f, 1f);
+//                    nar.believe($.inh($.p($.the(i),$.the(i-1)), $.the("prev")), 1f, 1f);
+//                    nar.believe($.inst($.secte($.the(i-1),$.the(i)), $.the("tang")), 1f, 1f);
+//                    //nar.believe($.inh($.sete($.the(i-1),$.the(i)), $.the("seq")), 1f, 1f);
+//                }
+//            }
+//            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#a & #c)})");
+//            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#b & #d)})");
             //nar.ask("(&&,t:(#a,#b),t:(#c,#d),(prev|next):(#b,#d))");
             //nar.ask("(&&,t:(#a,#b),t:(#c,#d),seq:{#a,#c})");
             //nar.ask("(&&,t:(#a,#b),t:(#c,#d),seq:{#b,#d})");
 
             ag.setSensorNamer((i) -> {
-                int x = game.x(i);
-                int y = game.y(i);
+                int x = x(i);
+                int y = y(i);
 
-                Compound squareTerm = $.inh($.p($.the(x), $.the(y)), $.the("t"));
+                //Compound squareTerm = $.inh($.p($.the(x), $.the(y)), $.the("t"));
+                Compound squareTerm = $.p($.the(x), $.the(y));
                 return squareTerm;
 
 //                int dx = (visionRadius  ) - ax;
@@ -164,7 +166,7 @@ public class Tetris implements Environment {
     @Override
     public void post(int t, int action, float[] ins, Agent a) {
         step(action);
-
+        System.out.println(a.summary());
     }
 
     public int numActions() {
@@ -179,33 +181,34 @@ public class Tetris implements Environment {
 
 
     public void restart() {
-        game.reset();
-        game.spawn_block();
-        game.running = true;
+        reset();
+        spawn_block();
+        running = true;
         previousScore = 0;
         currentScore = -50;
     }
 
     public double step(int nextAction) {
 
+
         if (nextAction > 5 || nextAction < 0) {
             throw new RuntimeException("Invalid action selected in Tetrlais: " + nextAction);            
         }
 
-        if (game.running) {
-            game.take_action(nextAction);
-            game.update();
+        if (running) {
+            take_action(nextAction);
+            update();
         } else {
-            game.spawn_block();
+            spawn_block();
         }
 
-        game.toVector(false, seenState);
+        toVector(false, seenState);
         vis.repaint();
 
 
-        if (!game.gameOver()) {
+        if (!gameOver()) {
             previousScore = currentScore;
-            currentScore = game.get_score();
+            currentScore = get_score();
             return currentScore - previousScore;
         } else {
             //System.out.println("restart");
@@ -217,11 +220,11 @@ public class Tetris implements Environment {
 
 
     public int getWidth() {
-        return game.width;
+        return width;
     }
 
     public int getHeight() {
-        return game.height;
+        return height;
     }
 
     @Override
@@ -232,7 +235,7 @@ public class Tetris implements Environment {
     public static void main(String[] args) {
         Random rng = new XorShift128PlusRandom(1);
 
-        //Multi nar = new Multi(2,512,
+        //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
@@ -247,8 +250,8 @@ public class Tetris implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(64);
-        nar.confMin.setValue(0.05f);
+        nar.cyclesPerFrame.set(128);
+        nar.confMin.setValue(0.02f);
 
 
         //nar.log();
@@ -266,16 +269,23 @@ public class Tetris implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 32, '.', 4);
+        new MySTMClustered(nar, 48, '.', 3);
         //new MySTMClustered(nar, 8, '!');
 
 
-        Tetris t = new Tetris(8, 16, 4);
+        Tetris t = new Tetris(8, 8, 4) {
+            @Override
+            protected int nextBlock() {
+                //return super.nextBlock();
+                return 1; //long blocks
+                //return 0; //long blocks
+            }
+        };
 
         Iterable<Termed> cheats = Iterables.concat(
-                numericSensor(() -> t.game.currentX, nar, 0.9f,
+                numericSensor(() -> t.currentX, nar, 0.7f,
                         "active:left", "active:middle", "active:right").resolution(0.1f),
-                numericSensor(() -> t.game.currentY, nar, 0.9f,
+                numericSensor(() -> t.currentY, nar, 0.7f,
                         "active:top", "active:bottom").resolution(0.1f)
         );
 
@@ -292,7 +302,7 @@ public class Tetris implements Environment {
 
                 if (nar instanceof Default) {
                     new BeliefTableChart(nar, charted).show(600, 900);
-                    //BagChart.show((Default) nar);
+                    BagChart.show((Default) nar, 128);
                 }
             }
         };

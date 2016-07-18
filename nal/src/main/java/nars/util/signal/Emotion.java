@@ -3,11 +3,10 @@ package nars.util.signal;
 import nars.util.meter.event.FloatGuage;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import org.nustaq.serialization.FSTConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values

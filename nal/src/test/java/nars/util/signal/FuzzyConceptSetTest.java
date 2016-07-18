@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import java.util.stream.StreamSupport;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -52,21 +51,21 @@ public class FuzzyConceptSetTest {
 
 //        {
 //            f.clear();
-//            m.setValue(0); d.step();
+//            m.setValue(0); d.next();
 //            System.out.println(Texts.n4(m.floatValue()) + "\t" + f.toString());
 //            assertEquals("(I-->[sad]) %0.25;.90%\t(I-->[neutral]) %1.0;.90%\t(I-->[happy]) %0.0;.90%", f.toString());
 //        }
 //
 //        {
 //            f.clear();
-//            m.setValue(-1); d.step();
+//            m.setValue(-1); d.next();
 //            System.out.println(Texts.n4(m.floatValue()) + "\t" + f.toString());
 //            assertEquals("(I-->[sad]) %1.0;.90%\t(I-->[neutral]) %0.0;.90%\t(I-->[happy]) %0.0;.90%", f.toString());
 //        }
 //
 //        {
 //            f.clear();
-//            m.setValue(+1); d.step();
+//            m.setValue(+1); d.next();
 //            System.out.println(Texts.n4(m.floatValue()) + "\t" + f.toString());
 //            assertEquals("(I-->[sad]) %0.0;.90%\t(I-->[neutral]) %0.0;.90%\t(I-->[happy]) %1.0;.90%", f.toString());
 //        }

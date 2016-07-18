@@ -27,7 +27,6 @@ import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
-import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.concept.table.TaskTable;
@@ -104,7 +103,6 @@ public interface Concept extends Termed {
         return desire(now, now);
     }
 
-    void policy(ConceptPolicy c);
 
     boolean contains(Task t);
 
@@ -161,6 +159,7 @@ public interface Concept extends Termed {
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
     Task process(@NotNull Task task, @NotNull NAR nar, List<Task> displaced);
+
 
     /**
      * attempt insert a tasklink into this concept's tasklink bag
@@ -385,7 +384,13 @@ public interface Concept extends Termed {
 
     void delete();
 
-    ConceptPolicy policy();
+    @Nullable ConceptPolicy policy();
+
+    void policy(@Nullable ConceptPolicy c);
+
+    default boolean active() {
+        return policy()!=null;
+    }
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

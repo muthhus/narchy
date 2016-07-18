@@ -11,7 +11,6 @@ import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

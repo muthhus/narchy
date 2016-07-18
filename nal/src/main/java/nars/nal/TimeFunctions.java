@@ -247,11 +247,8 @@ public interface TimeFunctions {
                 boolean derivedIsDecomposedZero = Terms.equalOrNegationOf(d0, derived);
 
                 if (Terms.equalOrNegationOf(otherTerm, decomposedTerm)) {
-                    if (derivedIsDecomposedZero) {
-                        shift = 0; //beginning, assume its relative to the occurrenc
-                    } else {
-                        shift = dtDecomposed;
-                    }
+                    //beginning, assume its relative to the occurrenc
+                    shift = derivedIsDecomposedZero ? 0 : dtDecomposed;
                 } else {
                     Term d1 = p.resolveNormalized(decomposedTerm.term(1));
 

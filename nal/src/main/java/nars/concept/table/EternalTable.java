@@ -1,7 +1,6 @@
 package nars.concept.table;
 
 import nars.NAR;
-import nars.bag.impl.SortedListTable;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -28,6 +26,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         capacity(initialCapacity);
     }
 
+    @Override
     public void capacity(int c) {
         int s = size();
         if (this.capacity != c) {
@@ -162,6 +161,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         return s!=null ? s.truth() : null;
     }
 
+    @Override
     public int capacity() {
         return capacity;
     }

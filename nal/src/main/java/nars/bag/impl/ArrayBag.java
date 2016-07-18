@@ -12,7 +12,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -93,7 +92,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
     @Nullable
     @Override
-    public BLink<V> remove(V x) {
+    public BLink<V> remove(@NotNull V x) {
         synchronized(map) {
             return super.remove(x);
         }

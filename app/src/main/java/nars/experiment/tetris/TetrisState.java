@@ -145,11 +145,6 @@ public class TetrisState {
     /* This code applies the action, but doesn't do the default fall of 1 square */
     public void take_action(int theAction) {
 
-        if (theAction > 5 || theAction < 0) {
-            System.err.println("Invalid action selected in Tetrlais: " + theAction);
-            //Random >=0 < 6
-            theAction = randomGenerator.nextInt(6);
-        }
 
         int nextRotation = currentRotation;
         int nextX = currentX;
@@ -187,8 +182,10 @@ public class TetrisState {
                 }
                 nextY--;
                 break;
-            default:
+            case NONE:
                 break;
+            default:
+                throw new RuntimeException("unknown action");
         }
         //Check if the resulting position is legal. If so, accept it.
         //Otherwise, don't change anything
@@ -210,15 +207,15 @@ public class TetrisState {
      * @param y
      * @return
      */
-    int i(int x, int y) {
+    final int i(int x, int y) {
         return y * width + x;
         //assert returnValue >= 0 : " "+y+" * "+worldWidth+" + "+x+" was less than 0.";
         //return returnValue;
     }
-    int x(int i) {
+    final int x(int i) {
         return i % width;
     }
-    int y(int i) {
+    final int y(int i) {
         return i / width;
     }
 
@@ -232,10 +229,11 @@ public class TetrisState {
      */
     private boolean colliding(int checkX, int checkY, int checkOrientation) {
         int[][] thePiece = possibleBlocks.get(currentBlockId).getShape(checkOrientation);
+        int ll = thePiece.length;
         try {
 
             for (int y = 0; y < thePiece[0].length; ++y) {
-                for (int x = 0; x < thePiece.length; ++x) {
+                for (int x = 0; x < ll; ++x) {
                     if (thePiece[x][y] != 0) {
                         //First check if a filled in piece of the block is out of bounds!
                         //if the height of this square is negative or the X of 
@@ -273,10 +271,11 @@ public class TetrisState {
 
     private boolean collidingCheckOnlySpotsInBounds(int checkX, int checkY, int checkOrientation) {
         int[][] thePiece = possibleBlocks.get(currentBlockId).getShape(checkOrientation);
+        int ll = thePiece.length;
         try {
 
             for (int y = 0; y < thePiece[0].length; ++y) {
-                for (int x = 0; x < thePiece.length; ++x) {
+                for (int x = 0; x < ll; ++x) {
                     if (thePiece[x][y] != 0) {
 
                         //This checks to see if x and y are in bounds
@@ -389,7 +388,7 @@ public class TetrisState {
     public void spawn_block() {
         running = true;
 
-        currentBlockId = randomGenerator.nextInt(possibleBlocks.size());
+        currentBlockId = nextBlock();
 
         currentRotation = 0;
         currentX = (width / 2) - 2;
@@ -409,6 +408,10 @@ public class TetrisState {
         if (is_game_over) {
             running = false;
         }
+    }
+
+    protected int nextBlock() {
+        return randomGenerator.nextInt(possibleBlocks.size());
     }
 
     void checkIfRowAndScore() {

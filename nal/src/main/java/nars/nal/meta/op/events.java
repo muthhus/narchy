@@ -1,7 +1,6 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
-import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -67,11 +66,7 @@ abstract public class events extends AtomicBoolCondition {
             long bOcc = b.occurrence();
             boolean tEternal = (tOcc == ETERNAL);
             boolean bEternal = (bOcc == ETERNAL);
-            if (tEternal) {
-                return bEternal;
-            } else {
-                return (!bEternal && bOcc <= tOcc);
-            }
+            return tEternal ? bEternal : (!bEternal && (bOcc <= tOcc));
         }
     };
 //    public static final @Nullable BoolCondition ifTermLinkBefore = new events() {

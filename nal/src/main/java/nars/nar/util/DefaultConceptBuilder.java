@@ -10,7 +10,6 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
-import nars.link.BLink;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -9,7 +9,6 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -55,9 +54,11 @@ public class AtomConcept extends Atom implements AbstractConcept<Atomic>  {
         return policy;
     }
     @Override
-    public void policy(@NotNull ConceptPolicy p) {
+    public void policy(@Nullable ConceptPolicy p) {
         this.policy = p;
-        linkCapacity(p);
+        if (p!=null) {
+            linkCapacity(p);
+        }
     }
 
 

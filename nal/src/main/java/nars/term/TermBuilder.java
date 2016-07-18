@@ -101,7 +101,7 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-    private static Term[] filterTrueFalseImplicits(Op o, @NotNull Term[] u) {
+    private static Term[] filterTrueFalseImplicits(@NotNull Op o, @NotNull Term[] u) {
         int imdices = 0;
         for (Term x : u) {
             if (x == True) {
@@ -154,7 +154,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public abstract Term newCompound(Op op, int dt, TermContainer subterms);
+    public abstract Term newCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms);
 
 
     @Nullable
@@ -271,10 +271,9 @@ public abstract class TermBuilder {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         } else {
-            if ((t instanceof Compound) || (t.op()==VAR_PATTERN))
-                return finish(NEG, t);
-            else
-                return null;
+            return ((t instanceof Compound) || (t.op() == VAR_PATTERN)) ?
+                    finish(NEG, t) :
+                    null;
         }
     }
 
@@ -304,9 +303,6 @@ public abstract class TermBuilder {
     @Nullable
     public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
 
-        if (u == null)
-            return null;
-
         int ul = u.length;
         if (ul == 0) {
             return null;
@@ -315,10 +311,9 @@ public abstract class TermBuilder {
         if (ul == 1) {
             Term only = u[0];
             //preserve unitary ellipsis for patterns etc
-            if (only instanceof Ellipsislike)
-                return finish(op, dt, only);
-            else
-                return only;
+            return (only instanceof Ellipsislike) ?
+                    finish(op, dt, only) :
+                    only;
 
         }
 
@@ -329,8 +324,8 @@ public abstract class TermBuilder {
             if (a.equals(b))
                 return a;
             if (((dt == DTERNAL) || (dt == 0)) &&
-                    (((a.op() == NEG) && (negation(a).equals(b))) ||
-                    ((b.op() == NEG) && (negation(b).equals(a))))) {
+                    (((a.op() == NEG)   && (negation(a).equals(b))) ||
+                    ((b.op() == NEG)    && (negation(b).equals(a))))) {
                 return True;
             }
         }
@@ -354,20 +349,17 @@ public abstract class TermBuilder {
                 }
             } else {
 
-
                 if (ul != 2) {
                     //if (Global.DEBUG)
                     //throw new InvalidTerm(op, DTERNAL, t, u);
                     //else
                     return null;
-                }
+                } else {
 
-                if (u[0].compareTo(u[1]) > 0) {
-                    //it will be reversed in commutative sorting, so invert dt
-                    dt = -dt;
+                    return finish(op,
+                            (u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
+                            u);
                 }
-
-                return finish(op, dt, u);
             }
         }
     }

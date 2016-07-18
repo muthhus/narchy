@@ -33,6 +33,7 @@ import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
+import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
@@ -53,19 +54,19 @@ import java.util.function.Consumer;
 /**
  * the java application class of pacman 
  */
-public class PacmanEnvironment extends cpcman implements Environment {
+public class Pacman extends cpcman implements Environment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
 
-	boolean trace = false;
+	boolean trace = true;
 
 	final int inputs;
 	private final int pacmanCyclesPerFrame = 4;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
-	public PacmanEnvironment(int ghosts, int visionRadius) {
+	public Pacman(int ghosts, int visionRadius) {
 		super(ghosts);
 		this.visionRadius = visionRadius;
 		this.inputs = (int)Math.pow(visionRadius * 2 +1, 2) * itemTypes;
@@ -96,8 +97,8 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(24);
-		nar.confMin.setValue(0.03f);
+		nar.cyclesPerFrame.set(64);
+		nar.confMin.setValue(0.01f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -127,7 +128,7 @@ public class PacmanEnvironment extends cpcman implements Environment {
 		//new MySTMClustered(nar, 8, '!');
 
 
-		PacmanEnvironment pacman = new PacmanEnvironment(1 /* ghosts  */, 5 /* visionRadius */);
+		Pacman pacman = new Pacman(1 /* ghosts  */, 5 /* visionRadius */);
 
 		NAgent n = new NAgent(nar) {
 			@Override

@@ -11,6 +11,7 @@ import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.learn.Agent;
 import nars.nal.Tense;
+import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,9 +25,12 @@ import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -319,7 +323,7 @@ public class NAgent implements Agent {
 
         @NotNull Emotion emotion = nar.emotion;
 
-        long now = nar.time();
+        //long now = nar.time();
 
 
         return                    Texts.n2(motivation) + "\t + "
@@ -333,12 +337,25 @@ public class NAgent implements Agent {
                  + "lern=" + n4(emotion.learning()) + " "
                  + "strs=" + n4(emotion.stress.getSum()) + " "
                  + "alrt=" + n4(emotion.alert.getSum()) + " "
+                + " var=" + n4( varPct(nar) ) + " "
                  + "\t" + nar.index.summary()
 
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
                 ;
 
+    }
+
+    private static float varPct(NAR nar) {
+        if (nar instanceof Default) {
+            DoubleSummaryStatistics is = new DoubleSummaryStatistics();
+            ((Default)nar).core.concepts.forEach(c -> {
+                Term tt = c.get().term();
+                is.accept(((float)tt.vars())/tt.volume());
+            });
+            return (float) is.getAverage();
+        }
+        return Float.NaN;
     }
 
 
@@ -502,6 +519,7 @@ public class NAgent implements Agent {
 
         nar.clock.tick(ticksBeforeObserve-1);
 
+        //if (!nar.running.get())
         nar.run(framesBeforeDecision);
 
 

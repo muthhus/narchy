@@ -145,7 +145,7 @@ public enum Global {
     /** minimum durability and quality necessary for a derivation to form */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON*2f;
 
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
+    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
 
 
     /** relates time and evidence (confidence); how past and future beliefs decay in rank

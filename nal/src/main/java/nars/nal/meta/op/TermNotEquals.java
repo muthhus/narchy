@@ -61,11 +61,8 @@ public final class TermNotEquals extends AtomicBoolCondition {
         if (aPath.length == 0)
             return ca;
         else {
-            if ((ca instanceof Compound)) {
-                return ((Compound)ca).subterm(aPath);
-            } else {
-                return null;
-            }
+            return (ca instanceof Compound) ?
+                    ((Compound) ca).subterm(aPath) : null;
         }
     }
 

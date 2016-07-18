@@ -37,7 +37,7 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     }
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((Compound)$.$(compoundTermString), n);
+        this($.$(compoundTermString), n);
     }
 
 

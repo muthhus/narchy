@@ -201,13 +201,9 @@ abstract public class PatternCompound extends GenericCompound {
 
             int xdt = dt();
 
-            if (ellipseIndex >= xdt) {
-                //compare relation from beginning as in non-ellipsis case
-                return (xdt == y.dt());
-            } else {
-                //compare relation from end
-                return ((sizeCached - xdt) == (y.size() - y.dt()));
-            }
+            //compare relation from beginning as in non-ellipsis case
+            //OR compare relation from end
+            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
 
         }
 
@@ -364,14 +360,11 @@ abstract public class PatternCompound extends GenericCompound {
                 yFree.removeAll(alreadyInY);
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
-                if (ellipsis.validSize(numRemainingForEllipsis)) {
 
-                    return matchEllipsisCommutive(subst, xFree, yFree);
+                //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
+                return ellipsis.validSize(numRemainingForEllipsis) &&
+                        matchEllipsisCommutive(subst, xFree, yFree);
 
-                } else {
-                    //wouldnt be enough remaining matches to satisfy ellipsis cardinality
-                    return false;
-                }
 
             }
 

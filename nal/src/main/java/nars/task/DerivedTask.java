@@ -1,19 +1,18 @@
 package nars.task;
 
+import nars.Global;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nal.ConceptProcess;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 
 
 abstract public class DerivedTask extends MutableTask {
@@ -28,7 +27,7 @@ abstract public class DerivedTask extends MutableTask {
 
         evidence(p.evidence());
 
-        this.premise = new SoftReference(p.premise);
+        this.premise = Global.reference(p.premise);
     }
 
     @Override
@@ -84,17 +83,17 @@ abstract public class DerivedTask extends MutableTask {
         }
 
         void feedback(float score) {
-            ConceptProcess p = this.premise.get();
-            if (p != null) {
-                BLink<? extends Term> termlink = p.termLink;
-                BLink<? extends Task> tasklink = p.taskLink;
-                //BLink<? extends Concept> pc = p.conceptLink;
-                if (!termlink.isDeleted())
-                    termlink.priLerpMult(score, feedbackRate);
-                if (!tasklink.isDeleted())
-                    tasklink.priLerpMult(score, feedbackRate);
-
-            }
+//            ConceptProcess p = this.premise.get();
+//            if (p != null) {
+//                BLink<? extends Term> termlink = p.termLink;
+//                BLink<? extends Task> tasklink = p.taskLink;
+//                //BLink<? extends Concept> pc = p.conceptLink;
+//                if (!termlink.isDeleted())
+//                    termlink.priLerpMult(score, feedbackRate);
+//                if (!tasklink.isDeleted())
+//                    tasklink.priLerpMult(score, feedbackRate);
+//
+//            }
         }
 
         @Override

@@ -36,12 +36,11 @@ public class DefaultCore extends AbstractCore {
     /** called when a concept is displaced from the concept bag */
     protected void deactivate(@NotNull Concept c) {
 
-        c.policy(cold);
+        NAR n = this.nar;
 
-        c.tasklinks().commit();
-        c.termlinks().commit();
+        n.index.deactivate(c, cold);
 
-        nar.emotion.alert(1f/ concepts.size());
+        n.emotion.alert(1f / concepts.size());
     }
 
     /** called when a concept enters the concept bag
@@ -50,11 +49,7 @@ public class DefaultCore extends AbstractCore {
     protected boolean activate(@NotNull Concept c) {
 
         //set capacity first in case there are any queued items, they may join during the commit */
-        c.policy(warm);
-
-//        //clean out any deleted links since having been deactivated
-        c.tasklinks().commit();//Forget.QualityToPriority);
-        c.termlinks().commit();//Forget.QualityToPriority);
+        nar.index.activate(c, warm);
 
         return true;
     }

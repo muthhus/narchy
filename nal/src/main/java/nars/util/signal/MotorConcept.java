@@ -1,6 +1,9 @@
 package nars.util.signal;
 
-import nars.*;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
+import nars.Symbols;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.OperationConcept;
 import nars.task.MutableTask;
@@ -60,11 +63,11 @@ public class MotorConcept extends OperationConcept  {
 
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((Compound)$(compoundTermString), n, MotorFunction.Direct);
+        this($(compoundTermString), n, MotorFunction.Direct);
     }
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
-        this((Compound)$(compoundTermString), n, motor);
+        this($(compoundTermString), n, motor);
     }
 
     public MotorConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) throws Narsese.NarseseException {
