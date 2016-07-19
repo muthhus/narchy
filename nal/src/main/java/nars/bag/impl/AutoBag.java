@@ -31,6 +31,8 @@ public final class AutoBag<V> implements BudgetForget {
      */
     public Bag<V> commit(@NotNull Bag<V> bag) {
 
+        if (!(bag instanceof ArrayBag))
+            return bag;
         ArrayBag<V> abag = (ArrayBag<V>) bag; //HACK
 
         synchronized (abag.map) {

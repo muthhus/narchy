@@ -74,13 +74,13 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
     @NotNull
     public Bag<Task> taskbag(Map map) {
-        return new CurveBag<Task>(1, defaultCurveSampler, mergeDefault, map);
+        return new CurveBag<>(1, defaultCurveSampler, mergeDefault, map);
     }
 
 
     @NotNull
     public Bag<Term> termbag(Map map) {
-        return new CurveBag<Term>(1, defaultCurveSampler, mergeDefault, map);
+        return new CurveBag<>(1, defaultCurveSampler, mergeDefault, map);
     }
 
 

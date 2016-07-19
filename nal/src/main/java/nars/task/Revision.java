@@ -221,7 +221,7 @@ public class Revision {
         int adt = a.dt();
         if (a.size() != 2) {
             if (b.size() != a.size())
-                throw new RuntimeException("err");
+                throw new RuntimeException(a + " and " + b + " can not be intermpolated");
             return a;
         }
 

@@ -31,62 +31,8 @@ public class MutableTask extends AbstractTask {
     }
 
 
-
-//    @NotNull
-//    public static MutableTask clone(@NotNull Task t, @NotNull Compound newTerm) {
-//        return new MutableTask(t, newTerm);
-//    }
-
-
-//    public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
-//        this(taskToClone);
-//        term(newTerm);
-//        punc(taskToClone.punc());
-//
-//    }
-
-
-//    @NotNull
-//    public static /* TODO ProjectedTask */ Task project(@NotNull Task t, long now, long occ) {
-//        Truth newTruth = t.projectTruth(now, occ, false);
-//        if (t.truth().equals(newTruth) && t.occurrence()==occ)
-//            return t;
-//        return new MutableTask(t, newTruth, now, occ);
-//    }
-
-    public MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
-        super(taskToClone);
-        truth(newTruth);
-        time(now, occ);
-        evidence(taskToClone.evidence());
-    }
-
-
-
-    public MutableTask(@NotNull Termed<Compound> newTerm, @NotNull Task taskToClone, long now, long occ, long[] newEvidence, Truth newTruth) {
-        this(newTerm, taskToClone.punc(), newTruth);
-
-        setEvidence(newEvidence);
-
-        time(now, occ);
-        budget(0, Float.NaN, Float.NaN);
-
-        //budget(taskToClone.budget());
-        //budgetMerge.merge(budget(), otherTask.budget(), 1f);
-    }
-
-//    public MutableTask(@NotNull Termed<Compound> content, char punc) {
-//        this(content);
-//        punctuation(punc);
-//    }
-
-
     @NotNull
     public MutableTask truth(@Nullable Truth tv) {
-//        if (tv == null)
-//            setTruth(null);
-//        else
-//            setTruth(new DefaultTruth(tv));
         setTruth(tv);
         return this;
     }

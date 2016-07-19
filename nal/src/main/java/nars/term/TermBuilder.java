@@ -427,7 +427,7 @@ public abstract class TermBuilder {
 //        if (negate) {
 //            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
 //        } else {
-            return finish(op, dt, TermSet.the(s));
+        return finish(op, dt, TermSet.the(s));
         //}
     }
 

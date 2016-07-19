@@ -147,7 +147,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         if (size() == capacity()) {
             Task l = lowest();
             if (l.conf() <= t.conf()) {
-                removeLast();
+                displaced = removeLast();
             }
         }
 

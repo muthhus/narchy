@@ -78,9 +78,8 @@ public interface TimeFunctions {
         return dtDiff(derived, p, occReturn, -2);
     };
 
-    @NotNull
+    @Nullable
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
-        ConceptProcess prem = p.premise;
 
         Compound taskTerm = (Compound) $.pos(p.taskTerm);
         Termed<Compound> beliefTerm = p.beliefTerm;
@@ -392,7 +391,6 @@ public interface TimeFunctions {
 
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull PremiseEval p, boolean taskOrBelief) {
-        ConceptProcess prem = p.premise;
         Term dtTerm = taskOrBelief ? $.pos(p.taskTerm) : p.beliefTerm;
 
         Task t = p.task;
@@ -446,7 +444,6 @@ public interface TimeFunctions {
 
     @NotNull
     static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, @NotNull OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
-        ConceptProcess premise = p.premise;
 
         long o = p.occurrenceTarget(s);
 //        if (o != ETERNAL) {

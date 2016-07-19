@@ -58,7 +58,7 @@ public abstract class AbstractOperator implements Consumer<OperationConcept> {
         if (operatorName == null) {
             operatorName = getClass().getSimpleName();
         }
-        this.atomicTerm = $.operator(operatorName);
+        this.atomicTerm = $.oper(operatorName);
     }
 
 

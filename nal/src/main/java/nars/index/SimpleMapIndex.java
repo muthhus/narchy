@@ -63,14 +63,10 @@ abstract public class SimpleMapIndex extends MaplikeIndex {
 
 
 
-    @Override
-    public int subtermsCount() {
-        return -1; //unsupported
-    }
 
-    @NotNull
-    @Override
-    public String summary() {
-        return concepts.size() + " concepts ";
-    }
+//    @NotNull
+//    @Override
+//    public String summary() {
+//        return concepts.size() + " concepts ";
+//    }
 }

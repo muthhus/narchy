@@ -45,7 +45,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
     }
 
     public FuzzyConceptSet(MutableFloat input, @NotNull NAR nar, @NotNull String... states) {
-        this(()->input.floatValue(), nar, states);
+        this(input::floatValue, nar, states);
     }
 
     public FuzzyConceptSet(FloatSupplier input, @NotNull NAR nar, @NotNull String... states) {

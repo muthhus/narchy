@@ -23,18 +23,21 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.agent.NAgent;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
+import nars.index.TransformConcept;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -46,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static nars.experiment.ArithmeticTest.intOrNull;
 import static nars.experiment.pong.Pong.numericSensor;
 
 
@@ -114,14 +118,15 @@ public class Tetris extends TetrisState implements Environment {
             NAgent ag = (NAgent) a;
             NAR nar = ag.nar;
 
-//            //number relations
+////            //number relations
 //            for (int i = 0; i < Math.max(getWidth(),getHeight()); i++) {
 //                if (i > 0) {
-//                    nar.believe($.inh($.p($.the(i-1),$.the(i)), $.the("next")), 1f, 1f);
-//                    nar.believe($.inh($.p($.the(i),$.the(i-1)), $.the("prev")), 1f, 1f);
-//                    nar.believe($.inst($.secte($.the(i-1),$.the(i)), $.the("tang")), 1f, 1f);
-//                    //nar.believe($.inh($.sete($.the(i-1),$.the(i)), $.the("seq")), 1f, 1f);
+//                    nar.believe($.inh($.p($.the(i - 1), $.the(i)), $.the("next")), 1f, 1f);
 //                }
+////                    nar.believe($.inh($.p($.the(i),$.the(i-1)), $.the("prev")), 1f, 1f);
+////                    nar.believe($.inst($.secte($.the(i-1),$.the(i)), $.the("tang")), 1f, 1f);
+////                    //nar.believe($.inh($.sete($.the(i-1),$.the(i)), $.the("seq")), 1f, 1f);
+////                }
 //            }
 //            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#a & #c)})");
 //            nar.ask("(&&,t:(#a,#b),t:(#c,#d),tang:{(#b & #d)})");
@@ -237,11 +242,11 @@ public class Tetris extends TetrisState implements Environment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                4, 2, 2, rng,
+                8, 2, 2, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.15f);
+        nar.conceptActivation.setValue(0.05f);
 
 
         nar.beliefConfidence(0.8f);
@@ -250,9 +255,24 @@ public class Tetris extends TetrisState implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(32);
+        nar.cyclesPerFrame.set(24);
         nar.confMin.setValue(0.01f);
 
+//        nar.on(new TransformConcept("seq", (c) -> {
+//            if (c.size() != 3)
+//                return null;
+//            Term X = c.term(0);
+//            Term Y = c.term(1);
+//
+//            Integer x = intOrNull(X);
+//            Integer y = intOrNull(Y);
+//            Term Z = (x!=null && y!=null)? ((Math.abs(x-y) <= 1) ? $.the("TRUE") : $.the("FALSE")) : c.term(2);
+//
+//
+//            return $.inh($.p(X, Y, Z), $.oper("seq"));
+//        }));
+//        nar.believe("seq(#1,#2,TRUE)");
+//        nar.believe("seq(#1,#2,FALSE)");
 
         //nar.log();
         //nar.logSummaryGT(System.out, 0.1f);
@@ -269,14 +289,14 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 48, '.', 3);
+        new MySTMClustered(nar, 16, '.', 2);
         //new MySTMClustered(nar, 8, '!');
 
 
         Tetris t = new Tetris(8, 12, 4) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock();
+                //return super.nextBlock(); //all blocks
                 return 1; //square blocks
                 //return 0; //long blocks
             }
@@ -284,9 +304,16 @@ public class Tetris extends TetrisState implements Environment {
 
         Iterable<Termed> cheats = Iterables.concat(
                 numericSensor(() -> t.currentX, nar, 0.7f,
-                        "active:(x,l)", "active:(x,c)", "active:(x,r)").resolution(0.1f),
+                        "I(x)")
+                        //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
+                        //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
+                        //"(active,x)")
+                        .resolution(0.25f),
                 numericSensor(() -> t.currentY, nar, 0.7f,
-                        "active:(y,t)", "active:(y,b)").resolution(0.1f)
+                        "I(y)")
+                        //"active:(y,t)", "active:(y,b)")
+                        //"(active,y)")
+                        .resolution(0.1f)
         );
 
         NAgent n = new NAgent(nar) {
@@ -314,7 +341,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, 5100);
+        t.run(n, 25100);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

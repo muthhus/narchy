@@ -41,7 +41,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth conversion(@NotNull Truth t, float minConf) {
         float w = and(t.freq(), t.conf());
         float c = w2c(w);

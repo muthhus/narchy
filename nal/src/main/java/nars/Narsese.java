@@ -460,7 +460,7 @@ public class Narsese extends BaseParser<Object> {
                         seq(oper,
 
                                 //Term(false, false), //<-- allows non-atom terms for operator names
-                                Atom(), push(nonNull($.operator((String)pop()))), // <-- allows only atoms for operator names, normal
+                                Atom(), push(nonNull($.oper((String)pop()))), // <-- allows only atoms for operator names, normal
 
                                 COMPOUND_TERM_OPENER, s(),
                                 firstOf(
@@ -581,7 +581,7 @@ public class Narsese extends BaseParser<Object> {
 
     public Rule Operator() {
         return sequence(OPER.ch,
-                Atom(), push($.operator((String)pop())));
+                Atom(), push($.oper((String)pop())));
                 //Term(false, false),
                 //push($.operator(pop().toString())));
     }
@@ -1028,7 +1028,7 @@ public class Narsese extends BaseParser<Object> {
 
 
         return (op == OPER) ?
-                $.exec($.operator(vectorterms.get(0).toString()),
+                $.exec($.oper(vectorterms.get(0).toString()),
                         vectorterms.subList(1, vectorterms.size())
                 ) :
                 $.compound(op, vectorterms);

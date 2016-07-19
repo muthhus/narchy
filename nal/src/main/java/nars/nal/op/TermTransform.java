@@ -5,7 +5,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.Nullable;
 
 
-public interface TermTransform {
+@FunctionalInterface  public interface TermTransform {
 
     @Nullable Term function(Compound args);
 

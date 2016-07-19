@@ -59,7 +59,7 @@ public abstract class ImmediateOperator extends NullOperator  {
 //    }
     public static Compound operation(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
         return $.exec(
-                $.operator(opClass.getSimpleName()),
+                $.oper(opClass.getSimpleName()),
                 args);
     }
 

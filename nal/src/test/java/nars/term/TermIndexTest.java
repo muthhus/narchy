@@ -234,8 +234,8 @@ public class TermIndexTest {
 
     public static void testCommonPrefix(boolean direction) {
         MaplikeIndex i = (MaplikeIndex)(new Default().index);
-        Atomic sui = operator("substituteIfUnifies");
-        Atomic su = operator("substitute");
+        Atomic sui = oper("substituteIfUnifies");
+        Atomic su = oper("substitute");
 
         if (direction) {
             i.the(sui);

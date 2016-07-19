@@ -87,19 +87,17 @@ public class TermVector implements TermContainer<Term> {
         this.hash = Terms.hashSubterms(term, meta);
 
 
+         final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
+
         final int vD = meta[0];  this.varDeps = (byte)vD;   int varTot = vD;
         final int vI = meta[1];  this.varIndeps = (byte)vI;     varTot+=vI;
         final int vQ = meta[2];  this.varQuerys = (byte)vQ;     varTot+=vQ;
-        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
         this.vars = (byte)(varTot);
-
 
         final int vol = meta[4] + 1;
         this.volume = (short)( vol );
 
-        int cmp = vol - varTot - vP;
-        //if (cmp < 0)
-            //throw new RuntimeException("negative complexity");//cmp = 0;
+        final int cmp = vol - varTot - vP;
         this.complexity = (short)(cmp);
 
 
@@ -133,9 +131,9 @@ public class TermVector implements TermContainer<Term> {
         return term[i];
     }
 
-    public final boolean equals(Term[] t) {
-        return Arrays.equals(term, t);
-    }
+//    public final boolean equals(Term[] t) {
+//        return Arrays.equals(term, t);
+//    }
 
     @Override
     public final int volume() {

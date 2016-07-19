@@ -1,5 +1,6 @@
 package nars.concept.table;
 
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
@@ -347,18 +348,15 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
     public final boolean removeIf(@NotNull Predicate<? super Task> o) {
 
-        //TODO optimize, these iterators suck
-        List<Task> toRemove = Global.newArrayList(0);
-        for (Task x : this) {
-            if (o.test(x)) {
-                toRemove.add(x);
-            }
+        IntArrayList toRemove = new IntArrayList();
+        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
+            Task x = this.get(i);
+            if ((x == null) || (o.test(x)))
+                toRemove.add(i);
         }
         if (toRemove.isEmpty())
             return false;
-        for (int i = 0, toRemoveSize = toRemove.size(); i < toRemoveSize; i++) {
-            remove(toRemove.get(i));
-        }
+        toRemove.forEach(this::remove);
         return true;
     }
 

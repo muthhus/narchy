@@ -24,7 +24,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void revision() throws Narsese.NarseseException {
+    public void revision()  {
         TestNAR tester = test();
         tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
         tester.believe("<robin <-> swan>") ;//;//Robin is similar to swan.");
@@ -32,7 +32,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void comparison() throws Narsese.NarseseException {
+    public void comparison()  {
         TestNAR tester = test();
         tester.believe("<swan --> swimmer>",0.9f,0.9f);//Swan is a type of swimmer.");
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
@@ -40,7 +40,7 @@ public class NAL2Test extends AbstractNALTest {
 
     }
 
-    @Test public void comparison2() throws Narsese.NarseseException {
+    @Test public void comparison2()  {
         TestNAR tester = test();
         tester.believe("<sport --> competition>"); //Sport is a type of competition.");
         tester.believe("<chess --> competition>", 0.9f, 0.9f);//Chess is a type of competition.");
@@ -60,7 +60,7 @@ public class NAL2Test extends AbstractNALTest {
 //    }
 
     @Test
-    public void analogy() throws Narsese.NarseseException {
+    public void analogy()  {
         TestNAR tester = test();
         tester.believe("<swan --> swimmer>");//Swan is a type of swimmer.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
@@ -69,7 +69,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void analogy2() throws Narsese.NarseseException {
+    public void analogy2()  {
         TestNAR tester = test();
         tester.believe("<gull --> swimmer>");//Gull is a type of swimmer.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
@@ -78,9 +78,9 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void resemblance() throws Narsese.NarseseException {
+    public void resemblance()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<robin <-> swan>");//Robin is similar to swan.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
         tester.mustBelieve(cycles, "<gull <-> robin>", 1.0f, 0.81f);//Gull is similar to robin.");
@@ -88,7 +88,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void inheritanceToSimilarity() throws Narsese.NarseseException {
+    public void inheritanceToSimilarity()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>");//Swan is a type of bird. ");
         tester.believe("<bird --> swan>",0.1f,0.9f);//Bird is not a type of swan.");
@@ -97,16 +97,16 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void inheritanceToSimilarity2() throws Narsese.NarseseException {
+    public void inheritanceToSimilarity2()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
         tester.believe("<bird <-> swan>",0.1f,0.9f);//Bird is different from swan.");
         tester.mustBelieve(cycles,"<bird --> swan>",0.1f,0.73f);//Bird is probably not a type of swan.");
     }
 
     @Test
-    public void inheritanceToSimilarity3() throws Narsese.NarseseException {
+    public void inheritanceToSimilarity3()  {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f);//Swan is a type of bird.");
         tester.ask("<bird <-> swan>");//Is bird similar to swan?");
@@ -115,7 +115,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void inheritanceToSimilarity4() throws Narsese.NarseseException {
+    public void inheritanceToSimilarity4()  {
         TestNAR tester = test();
         tester.believe("<bird <-> swan>",0.9f,0.9f);//a bird is similar to a swan.");
         tester.ask("<swan --> bird>");//Is swan a type of bird?");
@@ -150,7 +150,7 @@ public class NAL2Test extends AbstractNALTest {
 */
 
     @Test
-    public void setDefinition() throws Narsese.NarseseException {
+    public void setDefinition()  {
         TestNAR tester = test();
 
         tester.believe("<{Tweety} --> {Birdie}>");//Tweety is Birdie.");
@@ -160,7 +160,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void setDefinition2() throws Narsese.NarseseException {
+    public void setDefinition2()  {
         TestNAR tester = test();
         tester.believe("<[smart] --> [bright]>");//Smart thing is a type of bright thing.");
         tester.mustBelieve(cycles,"<[bright] <-> [smart]>",1.0f,0.9f);//Bright thing is similar to smart thing.");
@@ -168,7 +168,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void setDefinition3() throws Narsese.NarseseException {
+    public void setDefinition3()  {
         TestNAR tester = test();
         tester.believe("<{Birdie} <-> {Tweety}>");//Birdie is similar to Tweety.");
         tester.mustBelieve(cycles,"<Birdie <-> Tweety>",1.0f,0.9f);//Birdie is similar to Tweety.");
@@ -177,7 +177,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void setDefinition4() throws Narsese.NarseseException {
+    public void setDefinition4()  {
         TestNAR tester = test();
         tester.believe("<[bright] <-> [smart]>");//Bright thing is similar to smart thing.");
         tester.mustBelieve(cycles, "<bright <-> smart>", 1.0f, 0.9f);//Bright is similar to smart.");
@@ -186,7 +186,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation() throws Narsese.NarseseException {
+    public void structureTransformation()  {
         TestNAR tester = test();
         tester.believe("<Birdie <-> Tweety>", 0.9f, 0.9f);//Birdie is similar to Tweety.");
         tester.ask("<{Birdie} <-> {Tweety}>");//Is Birdie similar to Tweety?");
@@ -195,7 +195,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation2() throws Narsese.NarseseException {
+    public void structureTransformation2()  {
         TestNAR tester = test();
         tester.believe("<bright <-> smart>", 0.9f, 0.9f);//Bright is similar to smart.");
         tester.ask("<[bright] --> [smart]>");//Is bright thing a type of smart thing?");
@@ -204,7 +204,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation3() throws Narsese.NarseseException {
+    public void structureTransformation3()  {
         /*
         <bright <-> smart>. %0.9;0.9%
         <{bright} --> {smart}>?
@@ -217,7 +217,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void backwardInference() throws Narsese.NarseseException {
+    public void backwardInference()  {
         TestNAR tester = test();
 
         //<bird --> swimmer>. <{?x} --> swimmer>?
@@ -241,6 +241,16 @@ public class NAL2Test extends AbstractNALTest {
         tester.mustBelieve(100, "<p1 --> p3>",
                 1.0f, 1.0f, 0.81f, 1.0f);
         tester.debug();
+    }
+
+    @Test
+    public void setConstruction1()  {
+        TestNAR tester = test();
+        //tester.log();
+        tester.believe("a:{x}.");
+        tester.believe("a:{y}.");
+        tester.mustBelieve(cycles, "a:{x,y}", 1.0f, 0.81f);
+
     }
 
 }

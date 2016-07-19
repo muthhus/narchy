@@ -153,18 +153,18 @@
 //    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
 //    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
 //    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
-    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+}, no_common_subterm(X,C) |- (C --> {X}), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+], no_common_subterm(X,C) |- (C --> [X]), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+}, no_common_subterm(X,C) |- ({X} --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+], no_common_subterm(X,C) |- ([X] --> C), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
 //NAL3 single premise inference
 
-    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+), no_common_subterm(X,M) |- (X --> M), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+), no_common_subterm(X,M) |- (M --> X), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
-    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((B ~ G) --> S), S, no_common_subterm(S,B) |- (B --> S), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    (R --> (B - S)), R, no_common_subterm(S,B) |- (R --> B), (Belief:StructuralDeduction, Desire:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -372,7 +372,6 @@
     (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction)
     (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
-//TODO test that this not_equal with a compound parameter works correctly
     (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction)
     (A ==> (P --> M)), (S --> M), neq(S,P), neq(A, (S --> M)), time(dtTaskExact) |- (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
@@ -522,8 +521,17 @@
 
 
 //Relation introduction (wastepaper experimental)
-//    (A --> C), (B --> D) |- ((A,B) --> (C,D)), (Belief:Intersection)
+//   (A --> C), (B --> D) |- ((A,B) --> (C,D)), (Belief:Intersection)
+   (A --> C), (A --> D) |- ((A,A) --> {C,D}), (Belief:Intersection)
+   (C --> A), (D --> A) |- ({C,D} --> (A,A)), (Belief:Intersection)
 
+//          #_#R[(A --> C) (B --> D) |- ((* A B) --> (* C D)) :post (:t/intersection)] //            ;this one cant be allowed due to control reasons:
+//          #R[(A --> C) (A --> D) |- ((* A A) --> (* C D)) :post (:t/intersection)]
+//         #R[(A --> C) (B --> C) |- ((* A B) --> (* C C)) :post (:t/intersection)]
+//         #R[({A} --> C) (A --> D) |- ((* {A} A) --> (* C D)) :post (:t/intersection)]
+//          #R[(A --> C) ({A} --> D) |- ((* A {A}) --> (* C D)) :post (:t/intersection)]
+//         #R[(A --> [C]) (B --> C) |- ((* A B) --> (* [C] C)) :post (:t/intersection)]
+//         #R[(A --> C) (B --> [C]) |- ((* A B) --> (* C [C])) :post (:t/intersection)]
 
 
 //compound composition one premise

@@ -1028,7 +1028,7 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-    static final Term TaskQuestionTerm = exec($.operator("task"), $.quote("?"));
+    static final Term TaskQuestionTerm = exec($.oper("task"), $.quote("?"));
 
 //    static final Term BELIEF = $.the("Belief");
 //    static final Term DESIRE = $.the("Desire");

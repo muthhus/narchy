@@ -45,7 +45,7 @@ public class GoalPrecisionTest {
     protected void run(@NotNull NAR n, int end) {
 
         Global.DEBUG = true;
-        n.onExecution($.operator("x"), (OperationConcept c) -> {
+        n.onExecution($.oper("x"), (OperationConcept c) -> {
 
             for (Task a : c.goals()) {
 

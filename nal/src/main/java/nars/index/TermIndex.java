@@ -544,17 +544,20 @@ public interface TermIndex {
     }
 
     default void deactivate(@NotNull Concept c, @NotNull ConceptPolicy cold) {
+        if (c.policy() != cold) {
+            c.policy(cold);
 
-        c.policy(cold);
-
-        c.tasklinks().commit();
-        c.termlinks().commit();
+            c.tasklinks().commit();
+            c.termlinks().commit();
+        }
 
         c.policy(null);
         set(c); //update in the cache (weight, etc.)
     }
 
     default void activate(@NotNull Concept c, @NotNull ConceptPolicy warm) {
+        if (c.policy() == warm)
+            return;
         c.policy(warm);
         set(c); //update in the cache (weight, etc.)
 
@@ -582,10 +585,6 @@ public interface TermIndex {
     final class InvalidTaskTerm extends RuntimeException {
 
         public final Termed term;
-
-        public InvalidTaskTerm(Termed term) {
-            this(term, "InvalidTaskTerm");
-        }
 
         public InvalidTaskTerm(Termed term, String message) {
             super(message);

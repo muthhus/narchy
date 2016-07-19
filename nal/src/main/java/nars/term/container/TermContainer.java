@@ -52,7 +52,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
     /**
      * gets subterm at index i
      */
-    @Nullable T term(int i);
+    @NotNull T term(int i);
 
     /**
      * returns subterm automatically casted as compound (Use with caution)

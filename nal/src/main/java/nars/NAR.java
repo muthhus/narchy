@@ -6,6 +6,7 @@ import com.gs.collections.api.tuple.Twin;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
@@ -781,14 +782,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public final boolean runLater(@NotNull Consumer<NAR> t) {
-        if (running.get()) {
+        //if (running.get()) {
             return nextTasks.add(t);
-        } else {
-            running.set(true); //prevents recursive invocation
-            t.accept(this);
-            running.set(false);
-            return true;
-        }
+        //} else {
+            //running.set(true); //prevents recursive invocation
+//            t.accept(this);
+            //running.set(false);
+          //  return true;
+        //}
     }
 
 
@@ -1004,9 +1005,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
 
-    @Deprecated @Nullable
+    @Nullable
     final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
         return activate(termed, b, 1f, 0f, null);
+    }
+    @Nullable
+    final public Concept activate(@NotNull Termed<?> termed, float amount) {
+        return activate(termed, UnitBudget.One.cloneMult(amount,amount,amount));
     }
 
     @NotNull

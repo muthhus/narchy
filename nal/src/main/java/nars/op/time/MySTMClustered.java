@@ -43,7 +43,7 @@ public class MySTMClustered extends STMClustered {
 				double[] tc = n.coherence(0);
 
 				float timeCoherenceThresh = 0.98f;
-				float freqCoherenceThresh = 0.9f;
+				float freqCoherenceThresh = 0.75f;
 
 				if (tc[1] >= timeCoherenceThresh) {
 					double[] fc = n.coherence(1);

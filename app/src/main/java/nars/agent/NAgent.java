@@ -98,7 +98,7 @@ public class NAgent implements Agent {
     private float[] lastMotivation;
     private int nextAction = -1;
 
-    private final float reinforcementAttention = 0.9f; //0.5f;
+    private final float reinforcementAttention = 0.99f; //0.5f;
 
 
     private final DecideAction decideAction;
@@ -479,7 +479,7 @@ public class NAgent implements Agent {
 //            nar.conceptualize(a, ActionAttentionPerFrame);
 //        }
 
-        return lastAction;
+        return nextAction;
 
     }
 
@@ -517,11 +517,14 @@ public class NAgent implements Agent {
 
         System.arraycopy(nextObservation, 0, input, 0, nextObservation.length);
 
-        nar.clock.tick(ticksBeforeObserve-1);
+        synchronized (nar) {
 
-        //if (!nar.running.get())
-        nar.run(framesBeforeDecision);
+            nar.clock.tick(ticksBeforeObserve - 1);
 
+            //if (!nar.running.get())
+            nar.run(framesBeforeDecision);
+
+        }
 
     }
 
@@ -543,9 +546,10 @@ public class NAgent implements Agent {
 
         nar.clock.tick(ticksBeforeDecide);
 
+
+        this.lastAction = nextAction;
+
         this.nextAction = -1;
-
-
 
         nextAction = decideMotivation();
 
@@ -614,7 +618,6 @@ public class NAgent implements Agent {
 
         //updateMotors();
 
-        this.lastAction = nextAction;
         System.arraycopy(motivation, 0, lastMotivation, 0, motivation.length);
 
 

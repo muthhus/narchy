@@ -121,7 +121,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
 
         s = internSubs(s);
 
-        if ((r == s) || (s == null)) {
+        if (r == s) {
             return s;
         } else {
             TermContainer existing2 = put(s);
@@ -193,7 +193,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
         if (s == null)
             return null;
         if ((subs.size() == 2) && op == INH && (subs.term(1).op() == OPER) && subs.term(0).op() == PROD)
-            return build(INH, dt, s.terms()).term(); //HACK send through the full build process in case it is an immediate transform
+            return termOrNull(build(INH, dt, s.terms())); //HACK send through the full build process in case it is an immediate transform
         else
             return finish(op, dt, s);
     }

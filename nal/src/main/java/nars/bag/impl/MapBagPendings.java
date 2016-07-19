@@ -45,8 +45,7 @@ public class MapBagPendings<X> extends ArrayBag.BagPendings<X> {
     @Override
     public final float mass(ArrayBag<X> bag) {
         sum = 0;
-        if (pending != null)
-            pending.forEach((k, v) -> sum += v.pri() * v.dur());
+        pending.forEach((k, v) -> sum += v.pri() * v.dur());
         return sum;
     }
 

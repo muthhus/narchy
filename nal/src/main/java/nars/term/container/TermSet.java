@@ -5,7 +5,10 @@ import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TermSet<X extends Term> extends TermVector {
 

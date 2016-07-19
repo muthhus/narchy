@@ -27,8 +27,8 @@ public class BooleanConcept extends CompoundConcept {
     @NotNull
     public final NAR nar;
 
-    public static final Operator AND_OP = $.operator("and");
-    public static final Operator OR_OP = $.operator("or");
+    public static final Operator AND_OP = $.oper("and");
+    public static final Operator OR_OP = $.oper("or");
     @Nullable
     private final Compound params;
 

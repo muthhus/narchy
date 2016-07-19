@@ -603,7 +603,7 @@ public class NarseseIRCBot extends Talk {
 
     protected void send(String buffer) {
         //if ((irc.writer!=null) && (irc.outputting)) {
-        nar.goal(0.85f, $.exec($.operator("say"), $.quote( buffer ), $.the("I")), Tense.Present, 1f, 0.9f);
+        nar.goal(0.85f, $.exec($.oper("say"), $.quote( buffer ), $.the("I")), Tense.Present, 1f, 0.9f);
 
 
             //irc.send(irc.channel, buffer);

@@ -25,7 +25,7 @@ public class ExecutionCondition implements NARCondition {
         this.minExpect = minExpect;
         this.maxExpect = maxExpect;
 
-        operator = $.operator(opTerm);
+        operator = $.oper(opTerm);
         n.onExecution(operator, tt -> {
             if (!success) {
                 this.success = (tt.goals().motivation(n.time()) > 0);

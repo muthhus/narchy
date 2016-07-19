@@ -74,18 +74,18 @@ public class Inperience {
 //    }
 
 
-    public static final Atomic believe = $.operator("believe");
-    public static final Atomic want = $.operator("want");
-    public static final Atomic wonder = $.operator("wonder");
-    public static final Atomic evaluate = $.operator("evaluate");
-    public static final Atomic anticipate = $.operator("anticipate");
+    public static final Atomic believe = $.oper("believe");
+    public static final Atomic want = $.oper("want");
+    public static final Atomic wonder = $.oper("wonder");
+    public static final Atomic evaluate = $.oper("evaluate");
+    public static final Atomic anticipate = $.oper("anticipate");
 
     static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
-            $.operator("remind"),
-            $.operator("doubt"),
-            $.operator("consider"),
+            $.oper("remind"),
+            $.oper("doubt"),
+            $.oper("consider"),
             evaluate,
-            $.operator("hestitate"),
+            $.oper("hestitate"),
             wonder,
             believe,
             want

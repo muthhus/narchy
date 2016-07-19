@@ -251,8 +251,8 @@ public interface Concept extends Termed {
             //System.out.println(this + " activating " + x);
             bag.forEach(tl -> {
                 boolean active = tl == existing;
-                if (active && init)
-                    return; //dont modify the newly inserted link
+//                if (active && init)
+//                    return; //dont modify the newly inserted link
 
                 float p = tl.pri();
                 if (p!=p) //the link is currently deleted

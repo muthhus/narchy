@@ -17,10 +17,10 @@ public class OperatorTest {
 
 
     @Test public void testOperatorEquality() {
-        assertNotNull( $.operator("echo") );
-        assertEquals( $.operator("echo"), $.operator("echo"));
-        assertNotEquals( $.operator("echo"), $.the("echo")); //echo vs. ^echo
-        assertNotEquals( $.operator("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
+        assertNotNull( $.oper("echo") );
+        assertEquals( $.oper("echo"), $.oper("echo"));
+        assertNotEquals( $.oper("echo"), $.the("echo")); //echo vs. ^echo
+        assertNotEquals( $.oper("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
     }
 
     @Test public void testMustExecuteSuccess() {
@@ -71,7 +71,7 @@ public class OperatorTest {
 //    }
 
     @Test public void testOperationIsInheritance() {
-        Compound o = $.exec($.operator("x"), $.p("x"));
+        Compound o = $.exec($.oper("x"), $.p("x"));
         assertEquals(Op.INH, o.op());
     }
 

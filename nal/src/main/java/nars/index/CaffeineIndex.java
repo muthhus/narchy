@@ -162,10 +162,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
-        BiConsumer<Termed, Termed> e = (k, v) -> {
-            if (v instanceof Termed)
-                c.accept(v);
-        };
+        BiConsumer<Termed, Termed> e = (k, v) -> c.accept(v);
         atomics.asMap().forEach(e);
         compounds.asMap().forEach(e);
     }

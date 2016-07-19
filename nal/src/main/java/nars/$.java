@@ -502,7 +502,7 @@ public enum $ {
     public static Term secti(Term... x) { return compound(SECTi, x); }
 
 
-    public static @NotNull Operator operator(@NotNull String name) {
+    public static @NotNull Operator oper(@NotNull String name) {
         return new Operator(name);
     }
 

@@ -35,7 +35,7 @@ import java.util.function.Predicate;
  */
 public class Talk {
 
-    public final static Operator hear = $.operator("hear");
+    public final static Operator hear = $.oper("hear");
 
     long wordDelay = 100; //in milisec
 

@@ -40,8 +40,8 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         new SpaceGraph<Termed>(
             new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
-            new Spiral()
-            //new FastOrganicLayout()
+            //new Spiral()
+            new FastOrganicLayout()
         ).show(900, 900);
 
         n.loop(35f);
