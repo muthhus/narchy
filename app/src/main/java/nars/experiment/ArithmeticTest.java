@@ -186,7 +186,9 @@ public class ArithmeticTest {
                 Set<Term> preds = bt.unique(x -> ((Compound) x).term(1));
 
                 //use a generic variable so that it wont interfere with any existing
-                @NotNull Term vv = $.$("#related");
+                //@NotNull Term vv = $.$("#related");
+                Term vv = $.varDep(1000);
+
                 if (preds.size() == 1) {
                     Term pp = preds.iterator().next();
                     if (pp.op()!=VAR_DEP && subjs.size() == 2) {
@@ -220,7 +222,7 @@ public class ArithmeticTest {
 
         public @NotNull Term l1Dist(Term relatingVariable, Integer x, Integer y) {
             //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
-            return $.$("((l1Dist," + relatingVariable + "), " + (Math.abs(x - y)) + ")");
+            return $.p($.p($.the("l1Dist"), relatingVariable), $.the(Math.abs(x - y)));
         }
 
         public void add(Task b, Op type, Term newSubj, Term newPred, Term... rules) {

@@ -343,7 +343,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, 300);
+        t.run(n, 2000);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);
