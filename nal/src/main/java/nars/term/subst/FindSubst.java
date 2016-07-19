@@ -195,9 +195,9 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
      */
     public final boolean match(@NotNull Term x, @NotNull Term y) {
 
-        if (x.equals(y)) {
+        /*if (x.equals(y)) {
             return true;
-        } else {
+        } else*/ {
 
             final Op xOp = x.op();
 
@@ -216,11 +216,14 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
                 case OPER:
                 case ATOM:
                     //Atomic
-                    return false;
+                    return x.equals(y);
                 default:
                     //Compound
-                    if ((y instanceof Compound) && (xOp == y.op()))
+                    if ((y instanceof Compound) && (xOp == y.op())) {
+                        if (x.equals(y))
+                            return true;
                         return ((Compound) x).match((Compound) y, this);
+                    }
                     else
                         break;
             }

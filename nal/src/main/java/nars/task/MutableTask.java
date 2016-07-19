@@ -48,8 +48,8 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     @Override
-    public final MutableTask budget(@Nullable Budgeted source) {
-        super.budget(source);
+    public final MutableTask budget(@Nullable Budgeted srcCopy) {
+        super.budget(srcCopy);
         return this;
     }
 

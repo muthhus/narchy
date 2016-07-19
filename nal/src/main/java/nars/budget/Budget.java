@@ -276,11 +276,11 @@ public interface Budget extends Budgeted {
      * copies a budget into this; if source is null, it deletes the budget
      */
     @NotNull
-    default Budget budget(@Nullable Budgeted source) {
-        if (source == null) {
+    default Budget budget(@Nullable Budgeted srcCopy) {
+        if (srcCopy == null) {
             zero();
         } else {
-            budget(source.pri(), source.dur(), source.qua());
+            budget(srcCopy.pri(), srcCopy.dur(), srcCopy.qua());
         }
 
         return this;

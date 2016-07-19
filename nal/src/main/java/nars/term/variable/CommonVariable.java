@@ -26,8 +26,9 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
         int a = v1.id();
         int b = v2.id();
-        if (a == b)
-            throw new RuntimeException("variables equal");
+        if (a == b) {
+            //throw new RuntimeException("variables equal");
+        }
 
         //lexical ordering: swap
         if (b > a) {

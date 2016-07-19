@@ -180,7 +180,7 @@ public class Tetris extends TetrisState implements Environment {
     }
 
     public double getReward() {
-        return Math.max(-30, Math.min(30, currentScore - previousScore))/30.0;
+        return Math.max(-30, Math.min(30, currentScore - previousScore))/10.0;
     }
 
 
@@ -243,21 +243,21 @@ public class Tetris extends TetrisState implements Environment {
 
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
-                8, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 2000000, false)
+                4, 2, 2, rng,
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 100000, false)
 
                 ,new FrameClock());
-        nar.conceptActivation.setValue(0.05f);
+        nar.conceptActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(24);
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.03f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -291,10 +291,12 @@ public class Tetris extends TetrisState implements Environment {
 
         //new Abbreviation2(nar, "_");
         new MySTMClustered(nar, 16, '.', 2);
+        new MySTMClustered(nar, 16, '!', 2);
+        new ArithmeticTest.NumericDifferenceRule(nar);
         //new MySTMClustered(nar, 8, '!');
 
 
-        Tetris t = new Tetris(8, 12, 4) {
+        Tetris t = new Tetris(6, 12, 4) {
             @Override
             protected int nextBlock() {
                 //return super.nextBlock(); //all blocks
@@ -309,12 +311,12 @@ public class Tetris extends TetrisState implements Environment {
                         //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
                         //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
                         //"(active,x)")
-                        .resolution(0.05f),
+                        .resolution(1f/t.width),
                 numericSensor(() -> t.currentY, nar, 0.7f,
                         "I(y)")
                         //"active:(y,t)", "active:(y,b)")
                         //"(active,y)")
-                        .resolution(0.05f)
+                        .resolution(1f/t.height)
         );
 
         NAgent n = new NAgent(nar) {
@@ -336,7 +338,6 @@ public class Tetris extends TetrisState implements Environment {
         };
 
 
-        new ArithmeticTest.NumericDifferenceRule(nar);
 
 
 

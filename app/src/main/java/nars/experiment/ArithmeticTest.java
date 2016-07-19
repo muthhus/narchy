@@ -4,15 +4,15 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
-import nars.index.TransformConcept;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.Op.VAR_DEP;
-import static nars.nal.Tense.DTERNAL;
 
 /**
  * Created by me on 7/18/16.
@@ -100,8 +99,8 @@ public class ArithmeticTest {
 
         Global.DEBUG = true;
         n.log();
-        n.input("(x:1 && x:2).");
-        n.input("(x:2 && x:3).");
+        n.input("((x,1) && (x,2)).");
+        n.input("((x,2) && (x,3)).");
 
 //        n.input("numbers:{1,2,3,4}.");
 //        n.input("numbers:{1,2,3,4}.");
@@ -122,7 +121,7 @@ public class ArithmeticTest {
 
     @Nullable
     public static Integer intOrNull(Term term) {
-        if (term instanceof Atom) {
+        if (term instanceof Atomic) {
             int i = Texts.i(term.toString(), Integer.MIN_VALUE);
             if (i == Integer.MIN_VALUE)
                 return null;
@@ -157,89 +156,120 @@ public class ArithmeticTest {
         @Override
         public void accept(Task b) {
 
-            if (b.isBelief() && b.op() == Op.CONJ) {
+            if (b.isBeliefOrGoal() && b.op() == Op.CONJ) {
 
                 Compound<?> bt = b.term();
-                int negs = bt.subterms().count(x -> x.op() == Op.NEG);
+                TermContainer<?> subs = bt.subterms();
+                int negs = subs.count(x -> x.op() == Op.NEG);
 
-                if (negs != 0/* && negs!= bt.size()*/) {
+                boolean negate = (negs == bt.size());
+                if (negs != 0 && !negate) {
                     //only if none or all of the subterms are negated
                     return;
                 }
 
-                //only handle all inhs
-                //int ins = bt.subterms().count(x -> x.op() == Op.INH);
-                Op type = null;
-
-                if (type == null) {
-                    int ins = bt.subterms().count(x -> x.op() == INH);
-                    if (ins == bt.size())
-                        type = INH;
-                }
-                if (type == null) {
-                    int ins = bt.subterms().count(x -> x.op() == PROD);
-                    if (ins == bt.size())
-                        type = PROD;
+                if (negate) {
+                    subs = $.neg((TermVector)subs);
                 }
 
-                Set<Term> subjs = bt.unique(x -> ((Compound) x).term(0));
-                Set<Term> preds = bt.unique(x -> ((Compound) x).term(1));
+                //type of subterms, must all be the same
+                Op subType = null;
+
+                if (subType == null) {
+                    int ins = subs.count(x -> x.op() == INH);
+                    if (ins == bt.size())
+                        subType = INH;
+                }
+                if (subType == null) {
+                    int ins = subs.count(x -> x.op() == PROD);
+                    if (ins == bt.size())
+                        subType = PROD;
+                }
+
+                if (subType == null)
+                    return;
+
+                Set<Term> subjs = subs.unique(x -> ((Compound) x).term(0));
+                Set<Term> preds = subs.unique(x -> ((Compound) x).term(1));
 
                 //use a generic variable so that it wont interfere with any existing
-                //@NotNull Term vv = $.$("#related");
-                Term vv = $.varDep(1000);
+                Term vv =
+                        $.$("#relating");
+                        //$.$("$relating");
+                        //$.varDep(1000);
+                        //$.varIndep(1000);
 
                 if (preds.size() == 1) {
                     Term pp = preds.iterator().next();
-                    if (pp.op()!=VAR_DEP && subjs.size() == 2) {
+                    if (pp.op()!=vv.op() && subjs.size() == 2) {
                         Term[] ss = subjs.toArray(new Term[subjs.size()]);
                         Integer x = intOrNull(ss[0]);
                         Integer y = intOrNull(ss[1]);
                         if (x != null && y != null) {
-                            add(b, type,
-                                    vv,  pp,
-                                    l1Dist(vv, x, y));
+                            add(b, subType,
+                                    vv, pp, negate,
+                                    integerRelations(vv, x, y));
                         }
                     }
 
                 } else if (subjs.size() == 1) {
                     Term ss = subjs.iterator().next();
-                    if (ss.op()!=VAR_DEP && preds.size() == 2) {
+                    if (ss.op()!=vv.op() && preds.size() == 2) {
                         Term[] pp = preds.toArray(new Term[preds.size()]);
                         Integer x = intOrNull(pp[0]);
                         Integer y = intOrNull(pp[1]);
                         if (x != null && y != null) {
-                            add(b, type,
-                                    ss, vv,
-                                    l1Dist(vv, x, y));
+                            add(b, subType,
+                                    ss, vv, negate,
+                                    integerRelations(vv, x, y));
                         }
                     }
 
                 }
 
             }
+        }
+
+        public @NotNull Term[] integerRelations(Term vv, Integer x, Integer y) {
+            return new Term[] {
+                //l1Dist(vv, x, y),
+                iDelta(vv, x, y)
+            };
         }
 
         public @NotNull Term l1Dist(Term relatingVariable, Integer x, Integer y) {
             //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
             return $.p($.p($.the("l1Dist"), relatingVariable), $.the(Math.abs(x - y)));
         }
+        public @NotNull Term iDelta(Term relatingVariable, Integer x, Integer y) {
+            int min = Math.min(x, y);
+            //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
+            return $.p($.p($.the("iDelta"), relatingVariable), $.the(min), $.the(Math.abs(x - y)));
+        }
 
-        public void add(Task b, Op type, Term newSubj, Term newPred, Term... rules) {
+        public void add(Task b, Op type,  Term newSubj, Term newPred, boolean negate, Term... rules) {
             Term pattern = $.compound(type, newSubj, newPred);
 
             for (Term rule : rules) {
-                n.inputLater(new MutableTask(
+                n.inputLater(
+                    task(b,
                         $.conj(
-                                pattern,
-                                b.dt(),
-                                rule
-                        ),
-                        '.', b.expectation(), n)
-                        .time(n.time(), b.occurrence())
-                        .evidence(b.evidence())
-                        .log("l1Dist"));
+                            $.negIf(pattern, negate),
+                            b.dt(),
+                            rule
+                        )
+                    ).log("l1Dist")
+                );
             }
+        }
+
+        @NotNull MutableTask task(Task b, Term tt) {
+            return new MutableTask(
+                    tt,
+                    b.punc(), b.truth())
+                    .time(n.time(), b.occurrence())
+                    .budget(b)
+                    .evidence(b.evidence());
         }
     }
 }

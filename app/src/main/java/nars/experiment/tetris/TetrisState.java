@@ -48,8 +48,8 @@ public class TetrisState {
 
     public boolean is_game_over;/*have we reached the end state yet*/
 
-    public int width =10;/*how wide our board is*/
-    public int height =20;/*how tall our board is*/
+    public int width;/*how wide our board is*/
+    public int height;/*how tall our board is*/
     
     
 

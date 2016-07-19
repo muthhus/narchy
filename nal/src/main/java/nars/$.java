@@ -164,6 +164,11 @@ public enum $ {
         return terms.negation(x);
     }
 
+    @Nullable public static Term negIf(@NotNull Term x, boolean negate) {
+        if (negate) return neg(x);
+        return x;
+    }
+
     @NotNull
     public static Compound p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
@@ -730,6 +735,16 @@ public enum $ {
         for (int i = 0; i < l; i++) {
             s[i] = $.neg(s[i]);
         }
+    }
+
+    /** negates each entry in the array */
+    public static TermVector neg(@NotNull TermVector s) {
+        int l = s.size();
+        Term[] r = new Term[l];
+        for (int i = 0; i < l; i++) {
+            r[i] = $.neg(s.term(i));
+        }
+        return TermVector.the(r);
     }
 
     /** static storeless term builder */

@@ -28,6 +28,7 @@ import nars.Global;
 import nars.NAR;
 import nars.agent.NAgent;
 import nars.budget.UnitBudget;
+import nars.experiment.ArithmeticTest;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
@@ -129,8 +130,9 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.', 3);
+		new MySTMClustered(nar, 16, '.', 2);
 		new MySTMClustered(nar, 16, '!', 2);
+		new ArithmeticTest.NumericDifferenceRule(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 

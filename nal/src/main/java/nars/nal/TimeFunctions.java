@@ -6,6 +6,7 @@ import nars.Op;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
+import nars.nal.rule.PremiseRule;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -158,17 +159,17 @@ public interface TimeFunctions {
 //        return derived;
 //    };
 
-    @NotNull
+    @Nullable
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
         ConceptProcess prem = p.premise;
 
         int eventDelta = DTERNAL;
 
-        if (!prem.belief().isEternal() && !p.task.isEternal()) {
+        if (!p.belief.isEternal() && !p.task.isEternal()) {
             long earliest = p.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
-            eventDelta = (int) (prem.belief().occurrence() -
+            eventDelta = (int) (p.belief.occurrence() -
                     p.task.occurrence());
 
 
@@ -214,7 +215,7 @@ public interface TimeFunctions {
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
         ConceptProcess prem = p.premise;
 
-        Task premBelief = prem.belief();
+        Task premBelief = p.belief;
 
         Compound decomposedTerm = (Compound) (decomposeTask ? $.pos(p.taskTerm) : p.beliefTerm).term();
         int dtDecomposed = decomposedTerm.dt();
@@ -522,7 +523,7 @@ public interface TimeFunctions {
             eventDelta = DTERNAL;
         } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
-            Task belief = premise.belief();
+            Task belief = p.belief;
 
             if (belief != null && task.isBeliefOrGoal() && belief.isBeliefOrGoal()) {
 //                //blend task and belief's DT's weighted by their relative confidence
@@ -571,10 +572,11 @@ public interface TimeFunctions {
     @Nullable TimeFunctions Auto = (derived, p, d, occReturn, confScale) -> {
 
 
-        Term tp = d.rule.getTask();
-        Term bp = d.rule.getBelief();
+        @NotNull PremiseRule rule = d.rule;
+        Term tp = rule.getTask();
+        Term bp = rule.getBelief();
 
-        ConceptProcess premise = p.premise;
+        //ConceptProcess premise = p.premise;
 
         Task task = p.task;
         Task belief = p.belief;
