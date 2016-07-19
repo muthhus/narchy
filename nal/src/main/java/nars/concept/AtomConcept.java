@@ -11,6 +11,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicStringConstant;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AtomConcept extends Atom implements AbstractConcept<Atomic>  {
+public class AtomConcept extends AtomicStringConstant implements AbstractConcept<Atomic>  {
 
     private final Bag<Term> termLinks;
     private final Bag<Task> taskLinks;
@@ -30,7 +31,7 @@ public class AtomConcept extends Atom implements AbstractConcept<Atomic>  {
 
     private Map meta;
 
-    public AtomConcept(@NotNull Atom atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
+    public AtomConcept(@NotNull Atomic atom, Bag<Term> termLinks, Bag<Task> taskLinks) {
         super(atom.toString());
 
         this.op = atom.op();

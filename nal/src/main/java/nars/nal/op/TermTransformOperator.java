@@ -7,17 +7,10 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class TermTransformOperator extends AtomicStringConstant implements TermTransform {
 
-    @NotNull
-    private final String id;
 
-    public TermTransformOperator() {
-        this.id = "^" + getClass().getSimpleName();
-    }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return id;
+    public TermTransformOperator(String name) {
+        super("^" + name);
     }
 
     @NotNull

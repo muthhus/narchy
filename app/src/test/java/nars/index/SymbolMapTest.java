@@ -4,6 +4,7 @@ import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.junit.Test;
 
 import java.util.function.Function;
@@ -23,7 +24,7 @@ public class SymbolMapTest {
 
         //int start = SymbolMap.getLastSerial();
 
-        Function<Term, Concept> cb = (t)->new AtomConcept((Atom)t, null, null);
+        Function<Term, Concept> cb = (t)->new AtomConcept((Atomic)t, null, null);
 
         tree.resolveOrAdd("concept", cb);
         tree.resolveOrAdd("term", cb);

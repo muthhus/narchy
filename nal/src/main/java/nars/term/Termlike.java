@@ -100,7 +100,9 @@ public interface Termlike {
     boolean or(Predicate<Term> v);
 
     /** total # of variables, excluding pattern variables */
-    int vars();
+    default int vars() {
+        return varDep() + varIndep() + varQuery();
+    }
 
     /** # of contained independent variables */
     int varIndep();

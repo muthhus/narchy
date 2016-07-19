@@ -16,6 +16,7 @@ public class substitute extends TermTransformOperator /*implements PremiseAware*
     @NotNull private final PremiseEval parent;
 
     public substitute(@NotNull PremiseEval parent) {
+        super("substitute");
         this.parent = parent;
     }
 

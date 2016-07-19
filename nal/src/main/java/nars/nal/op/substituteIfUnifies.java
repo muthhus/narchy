@@ -17,11 +17,15 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     private final OneMatchFindSubst subMatcher;
     private final PremiseEval parent; //parent matcher context
 
-    public substituteIfUnifies(PremiseEval parent, OneMatchFindSubst sub) {
-        super();
+    protected substituteIfUnifies(String id, PremiseEval parent, OneMatchFindSubst sub) {
+        super(id);
         this.parent = parent;
         this.subMatcher = sub;
     }
+
+//    public substituteIfUnifies(PremiseEval parent, OneMatchFindSubst sub) {
+//        this("substituteIfUnifies", parent, sub);
+//    }
 
 
     /**
@@ -72,7 +76,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
 
 
         public substituteIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
-            super(parent, sub);
+            super("substituteIfUnifiesDep", parent, sub);
         }
 
         @NotNull
@@ -85,7 +89,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 
         public substituteOnlyIfUnifiesDep(PremiseEval parent, OneMatchFindSubst sub) {
-            super(parent, sub);
+            super("substituteOnlyIfUnifiesDep", parent, sub);
         }
 
         @Override
@@ -103,7 +107,7 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 
         public substituteIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
-            super(parent, sub);
+            super("substituteIfUnifiesIndep",parent, sub);
         }
 
         @NotNull
@@ -115,7 +119,8 @@ abstract public class substituteIfUnifies extends TermTransformOperator  {
     public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
 
         public substituteOnlyIfUnifiesIndep(PremiseEval parent, OneMatchFindSubst sub) {
-            super(parent, sub);
+
+            super("substituteOnlyIfUnifiesIndep", parent, sub);
         }
 
         @Override

@@ -15,6 +15,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,8 +32,8 @@ import java.util.function.Function;
  */
 public class DefaultConceptBuilder implements Concept.ConceptBuilder {
 
-    final Function<Atom, AtomConcept> atomBuilder =
-            (Atom a) -> {
+    final Function<Atomic, AtomConcept> atomBuilder =
+            (Atomic a) -> {
                 Map map = new HashMap();
                 return new AtomConcept(a, termbag(map), taskbag(map));
             };
@@ -133,14 +134,16 @@ public class DefaultConceptBuilder implements Concept.ConceptBuilder {
                 //serial++;
                 //result = varBuilder.apply((Variable) term);
                 return term;
-            } else if (term instanceof Atom) {
-                result = atomBuilder.apply((Atom) term);
+            } else if (term instanceof Atomic) {
+                result = atomBuilder.apply((Atomic) term);
             }
 
         }
         if (result == null) {
-            logger.error("unknown conceptualization method for term: {} of class {} ", term, term.getClass());
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(
+                    "unknown conceptualization method for term \"" +
+                            term + "\" of class: "  + term.getClass()
+            );
         }
 
 

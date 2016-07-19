@@ -1,8 +1,8 @@
 package nars.term;
 
 import nars.Op;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * as shown above, but is not an "Operator").
  *
  */
-public class Operator<T extends Term> extends Atom {
+public class Operator<T extends Term> extends AtomicStringConstant {
 
 
     public Operator(@NotNull T the) {

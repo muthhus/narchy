@@ -252,7 +252,7 @@ public class Tetris extends TetrisState implements Environment {
 
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.15f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
@@ -343,7 +343,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, 25100);
+        t.run(n, 300);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

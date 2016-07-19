@@ -34,8 +34,6 @@ import static nars.nal.Tense.ETERNAL;
  */
 public final class Derive extends AtomicStringConstant implements ProcTerm {
 
-    @NotNull
-    public final String id;
 
     public final boolean eternalize;
 
@@ -63,6 +61,14 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term,
                   @Nullable TruthOperator belief, @Nullable TruthOperator goal, boolean eternalize, @NotNull TimeFunctions temporalizer) {
+        super("Derive(" +
+                Joiner.on(',').join(
+                        term,
+                        "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
+                        belief!=null ? belief : "_",
+                        goal !=null ? goal : "_",
+                        eternalize ? "Et" : "_") +
+                ')');
         this.rule = rule;
 
         this.belief = belief;
@@ -79,16 +85,6 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         this.temporalizer = temporalizer;
 
         this.eternalize = eternalize;
-
-        this.id = "Derive(" +
-                Joiner.on(',').join(
-                    term,
-                    "temporal" + Integer.toHexString(temporalizer.hashCode()), //HACK todo until names are given to unique classes
-                    belief!=null ? belief : "_",
-                    goal !=null ? goal : "_",
-                    eternalize ? "Et" : "_") +
-                ')';
-
 
     }
 
@@ -131,11 +127,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         return ATOM; //product?
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return id;
-    }
+
 
 
     /**

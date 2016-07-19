@@ -471,11 +471,15 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         }
         return count;
     }
+
+    /** note: if the function returns null, null will not be added to the result set */
     default Set<Term> unique(Function<Term,Term> each) {
         Set<Term> r = new HashSet(size());
         int s = size();
         for (int i = 0; i < s; i++) {
-            r.add( each.apply(term(i) ));
+            Term e = each.apply(term(i));
+            if (e!=null)
+                r.add(e);
         }
         return r;
     }
