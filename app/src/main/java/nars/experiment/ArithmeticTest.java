@@ -11,6 +11,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -197,6 +198,13 @@ public class ArithmeticTest {
 
                 //analyze remaining subterms
                 for (int i = 1; i < subs.size(); i++) {
+
+                    //if a subterm is not an integer, check for equality of atoms
+                    if (!subs.term(i).pathsTo(
+                            (e) -> (e instanceof Atom && intOrNull(e)==null) ? e : null,
+                            (p, x) -> (x == null || first.subterm(p).equals(x))))
+                        return;
+
                     subs.term(i).pathsTo(ArithmeticTest::intOrNull, collect);
                     if (numbers.size() != paths)
                         return;  //inconsistent with the first term

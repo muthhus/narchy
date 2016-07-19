@@ -24,6 +24,7 @@ import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.impl.factory.primitive.ByteLists;
 import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import javassist.bytecode.ByteArray;
 import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
@@ -295,6 +296,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         }
         return ptr;
     }
+
+    @Nullable
+    default Term subterm(@NotNull ByteList path) {
+        return subterm(path.toArray()); //HACK avoid creation of new array
+    }
+
     @Nullable
     default Term subterm(@NotNull byte... path) {
         Term ptr = this;
