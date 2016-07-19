@@ -3,6 +3,7 @@ package nars.term;
 import nars.$;
 import nars.Op;
 import nars.term.container.TermContainer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -139,7 +140,8 @@ public class TermReductionsTest {
          */
 
     @Test public void testDisjunctEqual() {
-        assertEquals(p, disj(p, p));
+        @NotNull Compound pp = $.p(this.p);
+        assertEquals(pp, disj(pp, pp));
     }
     @Test public void testConjunctionEqual() {
         assertEquals(p, $.conj(p, p));
@@ -259,10 +261,11 @@ public class TermReductionsTest {
 
     @Test
     public void testDisjunctionReduction() {
-        assertEquals("(||,a,b,c,d)",
-                $("(||,(||,a,b),(||,c,d))").toString());
-        assertEquals("(||,b,c,d)",
-                $("(||,b,(||,c,d))").toString());
+
+        assertEquals("(||,(a-->x),(b-->x),(c-->x),(d-->x))",
+                $("(||,(||,x:a,x:b),(||,x:c,x:d))").toString());
+        assertEquals("(||,(b-->x),(c-->x),(d-->x))",
+                $("(||,x:b,(||,x:c,x:d))").toString());
     }
 
     @Test
@@ -357,12 +360,12 @@ public class TermReductionsTest {
 
     @Test public void testDisjunctionMultipleAndEmbedded() {
 
-        assertEquals("(||,a,b,c,d)",
-                $("(||,(||,a,b),(||,c,d))").toString());
-        assertEquals("(||,a,b,c,d,e,f)",
-                $("(||,(||,a,b),(||,c,d), (||, e, f))").toString());
-        assertEquals("(||,a,b,c,d,e,f,g,h)",
-                $("(||,(||,a,b, (||, g, h)),(||,c,d), (||, e, f))").toString());
+        assertEquals("(||,(a),(b),(c),(d))",
+                $("(||,(||,(a),(b)),(||,(c),(d)))").toString());
+        assertEquals("(||,(a),(b),(c),(d),(e),(f))",
+                $("(||,(||,(a),(b)),(||,(c),(d)), (||,(e),(f)))").toString());
+        assertEquals("(||,(a),(b),(c),(d),(e),(f),(g),(h))",
+                $("(||,(||,(a),(b), (||,(g),(h))),(||,(c),(d)), (||,(e),(f)))").toString());
 
     }
 
@@ -439,18 +442,25 @@ public class TermReductionsTest {
      * the resulting truth of the compound although if the statements
      * were alone they would not form valid tasks themselves
      */
-    @Test public void testSingularStatementsInConjunctionsAndDisjunctions() {
+    @Test public void testSingularStatementsInConjunction() {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
-        assertInvalidTerm(          ()->$("(&&,(--,(a==>a)),c:d,e:f)")); //INVALID
+        assertInvalidTerm(() -> $("(&&,(--,(a==>a)),c:d,e:f)")); //INVALID
 
-        assertEquals($("(||,c:d,e:f)"), $("(||,(a<->a),c:d,e:f)"));
-        assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
-        assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));
-        assertEquals($("(||,c:d,e:f)"), $("(||,(a==>a),c:d,e:f)"));
-        assertEquals($("(||,c:d,e:f)"), $("(||,(--,(a==>a)),c:d,e:f)")); //VALID
+    }
+
+    @Test public void testSingularStatementsInDisjunction() {
+
+        assertInvalidTerm( () -> $("(||,(a<->a),c:d,e:f)")); //null, singular true
+
+        assertEquals($("x:y"), $("(&&,(--,(||,(a<->a),c:d,e:f)),x:y)")); //double fall-thru
+
+//        assertEquals($("(||,c:d,e:f)"), $("(||,(a<=>a),c:d,e:f)"));
+//        assertEquals($("(||,c:d,e:f)"), $("(||,(a-->a),c:d,e:f)"));
+//        assertEquals($("(||,c:d,e:f)"), $("(||,(a==>a),c:d,e:f)"));
+//        assertEquals($("(||,c:d,e:f)"), $("(||,(--,(a==>a)),c:d,e:f)")); //VALID
 
     }
 

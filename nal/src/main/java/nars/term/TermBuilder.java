@@ -57,8 +57,12 @@ public abstract class TermBuilder {
                 if (u.length != 2 || dt != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
                 return instprop(u[0], u[1]);
 
-            case CONJ:
+
             case DISJ:
+                if (dt!=DTERNAL)
+                    throw new InvalidTerm(op,dt,u);
+                return disjunction(u);
+            case CONJ:
                 return junction(op, dt, filterTrueFalseImplicits(op, u));
 
             case IMGi:
@@ -261,6 +265,16 @@ public abstract class TermBuilder {
     }
 
     @Nullable
+    public final Term[] negation(@NotNull Term[] t) {
+        int l = t.length;
+        Term[] u = new Term[l];
+        for (int i = 0; i < l; i++) {
+            u[i] = negation(t[i]);
+        }
+        return u;
+    }
+
+    @Nullable
     public final Term negation(@NotNull Term t) {
         if (t == True)
             return False;
@@ -301,12 +315,17 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term junction(@NotNull Op op, int dt, final @NotNull Term... u) {
+    public Term junction(@NotNull Op op, int dt, final @Nullable Term... u) {
+
+        if (u == null)
+            return null;
+            //return False;
+
 
         int ul = u.length;
-        if (ul == 0) {
+        if (ul == 0)
             return null;
-        }
+            //return True;
 
         if (ul == 1) {
             Term only = u[0];
@@ -333,9 +352,6 @@ public abstract class TermBuilder {
         if (dt == DTERNAL) {
             return junctionFlat(op, DTERNAL, u);
         } else {
-            if (op == DISJ) {
-                throw new RuntimeException("temporal disjunction is invalid");
-            }
 
             if (dt == 0) {
                 //special case: 0
@@ -383,16 +399,16 @@ public abstract class TermBuilder {
         if (n == 1) {
             return s.iterator().next();
         } else if (n == negations) {
-            //DEMORGAN's LAWS when all negated https://en.wikipedia.org/wiki/De_Morgan%27s_laws
-            if (op == DISJ) {
-                Term[] y = new Term[n];
-                int i = 0;
-                for (Term xi : s) {
-                    y[i++] = negation(xi);
-                }
-                return negation(build(CONJ, dt, y));
-
-            } /* else if (op = CONJ... */
+//            //DEMORGAN's LAWS when all negated https://en.wikipedia.org/wiki/De_Morgan%27s_laws
+//            if (op == DISJ) {
+//                Term[] y = new Term[n];
+//                int i = 0;
+//                for (Term xi : s) {
+//                    y[i++] = negation(xi);
+//                }
+//                return negation(build(CONJ, dt, y));
+//
+//            } /* else if (op = CONJ... */
         }
 
 
@@ -682,6 +698,10 @@ public abstract class TermBuilder {
             return csrc;
         else
             return build(csrc.op(), csrc.dt(), newSubs.terms());
+    }
+
+    public final Term disjunction(Term[] u) {
+        return negation(build(CONJ, DTERNAL, negation(u)));
     }
 
 }

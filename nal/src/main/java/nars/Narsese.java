@@ -820,9 +820,7 @@ public class Narsese extends BaseParser<Object> {
 
                         SIM.str,
 
-                        PROPERTY.str,
-                        INSTANCE.str,
-                        INSTANCE_PROPERTY.str,
+
 
                         NEG.str,
 
@@ -830,9 +828,15 @@ public class Narsese extends BaseParser<Object> {
 
                         EQUI.str,
 
+                        CONJ.str,
+
+                        //TODO make these special case macros
                         DISJ.str,
-                        CONJ.str
-                ),
+                        PROPERTY.str,
+                        INSTANCE.str,
+                        INSTANCE_PROPERTY.str
+
+                        ),
 
                 push(getOperator(match()))
         );

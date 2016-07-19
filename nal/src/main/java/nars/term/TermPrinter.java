@@ -1,13 +1,17 @@
 package nars.term;
 
+import nars.$;
 import nars.Op;
 import nars.Symbols;
 import nars.term.atom.Atomic;
 import nars.term.compound.Statement;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.function.Function;
 
+import static nars.Op.DISJ;
 import static nars.Symbols.*;
 
 /**
@@ -42,6 +46,20 @@ public interface TermPrinter {
         appendCloser(p);
 
     }
+    static void compoundAppend(String o, @NotNull TermContainer c, Function<Term,Term> filter, @NotNull Appendable p) throws IOException {
+
+        p.append(COMPOUND_TERM_OPENER);
+
+        p.append(o);
+
+        if (c.size() == 1)
+            p.append(ARGUMENT_SEPARATOR);
+
+        appendArgs(c, filter, p);
+
+        appendCloser(p);
+
+    }
 
 
     static void appendArgs(@NotNull Compound c, @NotNull Appendable p) throws IOException {
@@ -56,6 +74,17 @@ public interface TermPrinter {
         }
     }
 
+    static void appendArgs(@NotNull TermContainer c, Function<Term,Term> filter, @NotNull Appendable p) throws IOException {
+        int nterms = c.size();
+
+        boolean bb = nterms > 1;
+        for (int i = 0; i < nterms; i++) {
+            if ((i != 0) || bb) {
+                p.append(Symbols.ARGUMENT_SEPARATOR);
+            }
+            filter.apply(c.term(i)).append(p);
+        }
+    }
 
     static void appendCloser(@NotNull Appendable p) throws IOException {
         p.append(COMPOUND_TERM_CLOSER);
@@ -68,27 +97,33 @@ public interface TermPrinter {
             case SETi:
             case SETe:
                 setAppend(c, p);
-                break;
+                return;
             case PROD:
                 productAppend(c, p);
-                break;
+                return;
             case IMGi:
             case IMGe:
                 imageAppend(c, p);
-                break;
-            //case INHERIT: inheritAppend(c, p, pretty); break;
-            //case SIMILAR: similarAppend(c, p, pretty); break;
-            default:
-                if (op.isStatement() || c.size()==2) {
-                    if (Op.isOperation(c)) {
-                        operationAppend((Compound) c.term(0), (Atomic)c.term(1), p); //TODO Appender
-                    } else {
-                        statementAppend(c, p, op);
-                    }
-                } else {
-                    compoundAppend(c, p);
+                return;
+            //case INHERIT: inheritAppend(c, p, pretty); return;
+            //case SIMILAR: similarAppend(c, p, pretty); return;
+
+            case NEG:
+                //special case disjunction: (--,(&&,.....))
+                if (Terms.isDisjunction(c)) {
+                    compoundAppend(Op.DISJ.toString(), ((Compound)c.term(0)).subterms(), (x) -> $.neg(x), p);
+                    return;
                 }
-                break;
+        }
+
+        if (op.isStatement() || c.size()==2) {
+            if (Op.isOperation(c)) {
+                operationAppend((Compound) c.term(0), (Atomic)c.term(1), p); //TODO Appender
+            } else {
+                statementAppend(c, p, op);
+            }
+        } else {
+            compoundAppend(c, p);
         }
     }
 

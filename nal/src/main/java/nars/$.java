@@ -160,8 +160,8 @@ public enum $ {
     }
 
     @Nullable
-    public static Compound neg(@NotNull Term x) {
-        return (Compound) terms.negation(x);
+    public static Term neg(@NotNull Term x) {
+        return terms.negation(x);
     }
 
     @NotNull
@@ -374,7 +374,7 @@ public enum $ {
 
     @Nullable
     public static Term disj(Term... a) {
-        return compound(DISJ, a);
+        return terms.disjunction(a);
     }
 
     //static {

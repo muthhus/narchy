@@ -59,8 +59,6 @@ public enum Op {
     /** intensional image */
     IMGi("\\", 4, Args.GTEOne),
 
-    /** disjunction */
-    DISJ("||", true, 5, Args.GTETwo),
 
     /** conjunction */
     CONJ("&&", true, 5, Args.GTETwo),
@@ -89,10 +87,14 @@ public enum Op {
 
     VAR_PATTERN(Symbols.VAR_PATTERN, Op.ANY, OpType.Variable),
 
-    INSTANCE("-{-", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
-    PROPERTY("-]-", 2, OpType.Relation), //should not be given a compact representation because this will not exist internally after parsing
-    INSTANCE_PROPERTY("{-]", 2, OpType.Relation); //should not be given a compact representation because this will not exist internally after parsing
 
+    //VIRTUAL TERMS
+    @Deprecated INSTANCE("-{-", 2, OpType.Relation),
+    @Deprecated PROPERTY("-]-", 2, OpType.Relation),
+    @Deprecated INSTANCE_PROPERTY("{-]", 2, OpType.Relation),
+    @Deprecated DISJ("||", true, 5, Args.GTETwo)
+
+    ;
 
     //-----------------------------------------------------
 
@@ -356,6 +358,22 @@ public enum Op {
         Op.or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);
 //    public static final int WildVariableBits =
 //            Op.or(Op.VAR_PATTERN,Op.VAR_QUERY);
+
+
+
+    //MACRO OPS as Strings only
+//    /** Macro: DISJ("||", true, 5, Args.GTETwo) */
+//    public static final String DISJ = "||";
+//
+//    /** Macro: INSTANCE("-{-", 2, OpType.Relation) */
+//    public static final String INSTANCE = "-{-";
+//
+//    /** Macro: PROPERTY("-]-", 2, OpType.Relation) */
+//    public static final String PROPERTY = "-]-";
+//
+//    /** Macro: INSTANCE_PROPERTY("{-]", 2, OpType.Relation) */
+//    public static final String INSTANCE_PROPERTY = "{-]";
+
 
 
 

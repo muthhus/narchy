@@ -95,9 +95,9 @@ public class TermTest {
     public void testCommutativeCompoundTerm() throws Exception {
 
         assertEquivalentTerm("(&&,a,b)", "(&&,b,a)");
-        assertEquivalentTerm("(&&,(||,b,c),a)", "(&&,a,(||,b,c))");
-        assertEquivalentTerm("(&&,(||,c,b),a)", "(&&,a,(||,b,c))");
-        assertEquivalentTerm("(&&,(||,c,b),a)", "(&&,a,(||,c,b))");
+        assertEquivalentTerm("(&&,(||,(b),(c)),(a))", "(&&,(a),(||,(b),(c)))");
+        assertEquivalentTerm("(&&,(||,(c),(b)),(a))", "(&&,(a),(||,(b),(c)))");
+        assertEquivalentTerm("(&&,(||,(c),(b)),(a))", "(&&,(a),(||,(c),(b)))");
 
         assertEquivalentTerm("(&,a,b)", "(&,b,a)");
         assertEquivalentTerm("{a,c,b}", "{b,a,c}");
@@ -874,8 +874,8 @@ public class TermTest {
 
     public static void assertInvalidTerm(@NotNull Supplier<Term> o) {
         try {
-            o.get();
-            assertTrue(false);
+            Term recv = o.get();
+            assertTrue(recv.toString() + " was not null", false);
         } catch (InvalidTerm e) {
             //correct if happens here
         } catch (Narsese.NarseseException e) {

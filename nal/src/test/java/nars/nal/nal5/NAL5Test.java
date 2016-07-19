@@ -222,6 +222,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void compound_composition_one_premises(){
         TestNAR tester = test();
+        tester.log();
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
         tester.mustBelieve(cycles," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");

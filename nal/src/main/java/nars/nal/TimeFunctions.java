@@ -499,10 +499,6 @@ public interface TimeFunctions {
         if (eventDelta == DTERNAL)
             return derived; //no change
 
-        //exception: if reduction results in || which is non-temporal
-        if (derived.op() == Op.DISJ)
-            return derived;
-
         if (!Global.DEBUG && !derived.op().temporal)
             return derived; //disregard dt if not in debug mode
 

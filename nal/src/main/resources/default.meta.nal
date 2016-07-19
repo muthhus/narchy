@@ -208,11 +208,12 @@
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P || S) ==> M), (Belief:Intersection)
+
     (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P && S) ==> M), (Belief:Union)
+    (%P ==> %M), (%S ==> %M), neq(%S,%P), time(dtCombine) |- ((%P || %S) ==> %M), (Belief:Intersection)
 
     (M ==> P), (M ==> S), neq(S,P), time(dtCombine) |- (M ==> (P && S)), (Belief:Intersection)
-    (M ==> P), (M ==> S), neq(S,P), time(dtCombine) |- (M ==> (P || S)), (Belief:Union)
+    (%M ==> %P), (%M ==> %S), neq(%S,%P), time(dtCombine) |- (%M ==> (%P || %S)), (Belief:Union)
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
 //                                      (R =\> K), (Belief:Induction),
@@ -223,10 +224,11 @@
 
     //TODO versions with negated S subterms
 
-    (S ==> M), ((||,S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative)
     (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive)
+        //(%S ==> %M), ((||,%S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==> %M), (Belief:DecomposePositiveNegativeNegative)
+
     (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-    (M ==> S), (M ==> (||,S,A..+)), time(dtCombine) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive)
+        //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //      + Indep variable elimination
@@ -271,7 +273,7 @@
 //   P, S, no_common_subterm(S,P) |- (S ==> P), (Belief:Induction)
 //   P, S, no_common_subterm(S,P) |- (S <=> P), (Belief:Comparison)
 //   P, S, no_common_subterm(S,P) |- (P && S), (Belief:Intersection)
-//   P, S, no_common_subterm(S,P) |- (P || S), (Belief:Union)
+//   %P, %S, no_common_subterm(S,P) |- (%P || %S), (Belief:Union)
 
 
 
@@ -301,12 +303,12 @@
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
     S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
-    S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+        //%S, (||,%S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
     S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
-    S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
+        //%S, (||,(--,%S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
@@ -536,7 +538,9 @@
 
 //compound composition one premise
 
-    (||,B,A..+), B, task("?") |- (||,B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (||,%B,A..+), %B, task("?") |- (||,%B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+
 //TODO for desire
 
 //query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
