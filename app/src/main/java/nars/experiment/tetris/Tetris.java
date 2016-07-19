@@ -239,7 +239,7 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 100000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 100000, false)
 
                 ,new FrameClock());
         nar.conceptActivation.setValue(0.1f);
@@ -285,8 +285,8 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 16, '.', 2);
-        new MySTMClustered(nar, 16, '!', 2);
+        new MySTMClustered(nar, 16, '.', 3);
+        new MySTMClustered(nar, 16, '!', 3);
         new ArithmeticTest.ArtithmeticInduction1(nar);
         //new MySTMClustered(nar, 8, '!');
 

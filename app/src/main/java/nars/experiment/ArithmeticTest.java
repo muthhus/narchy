@@ -199,7 +199,7 @@ public class ArithmeticTest {
                 //analyze remaining subterms
                 for (int i = 1; i < subs.size(); i++) {
 
-                    //if a subterm is not an integer, check for equality of atoms
+                    //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
                     if (!subs.term(i).pathsTo(
                             (e) -> (e instanceof Atom && intOrNull(e)==null) ? e : null,
                             (p, x) -> (x == null || first.subterm(p).equals(x))))
