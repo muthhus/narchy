@@ -1,5 +1,6 @@
 package nars.index;
 
+import com.gs.collections.api.list.primitive.ByteList;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
@@ -227,6 +228,7 @@ public interface TermIndex {
 //    }
 
 
+
     @Nullable
     default Term transform(Subst f, @NotNull Compound result, TermTransform tf) {
 
@@ -410,6 +412,42 @@ public interface TermIndex {
     }
 
 
+    @Nullable
+    default Term transform(@NotNull Compound src, ByteList path, Term replacement) {
+        return transform(src, path, 0, replacement);
+    }
+
+    @Nullable
+    default Term transform(@NotNull Term src, ByteList path, int depth, Term replacement) {
+        int ps = path.size();
+        if (ps == depth)
+            return replacement;
+        if (ps < depth)
+            throw new RuntimeException("path overflow");
+
+        if (!(src instanceof Compound))
+            return src; //path wont continue inside an atom
+
+        int n = src.size();
+        Compound csrc = (Compound)src;
+
+        Term[] target = new Term[n];
+
+        for (int i = 0; i < n; i++) {
+            Term x = csrc.term(i);
+            if (path.get(depth)!=i)
+                //unchanged subtree
+                target[i] = x;
+            else {
+                //replacement is in this subtree
+                target[i] = transform(x, path, depth+1, replacement);
+            }
+
+        }
+
+        return builder().build(csrc.op(), csrc.dt(), target);
+    }
+
     /**
      * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
      */
@@ -438,8 +476,6 @@ public interface TermIndex {
                 return null;
 
             if (x != y) { //must be refernce equality test for some variable normalization cases
-
-
                 modifications++;
                 x = y;
             }

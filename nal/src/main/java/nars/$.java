@@ -525,7 +525,11 @@ public enum $ {
 
     @Nullable
     public static Term compound(@NotNull Op op, @NotNull Collection<Term> subterms) {
-        return compound(op, subterms.toArray(new Term[subterms.size()]));
+        return compound(op, DTERNAL, subterms);
+    }
+    @Nullable
+    public static Term compound(@NotNull Op op, int dt, @NotNull Collection<Term> subterms) {
+        return compound(op, dt, subterms.toArray(new Term[subterms.size()]));
     }
 
 
@@ -810,7 +814,7 @@ public enum $ {
         }
 
         @Override
-        protected boolean transform() {
+        protected boolean transformImmediates() {
             return true;
         }
 

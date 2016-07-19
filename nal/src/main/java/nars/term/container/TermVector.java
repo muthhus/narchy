@@ -2,6 +2,7 @@ package nars.term.container;
 
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import nars.Global;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.SubtermVisitorX;
@@ -74,6 +75,9 @@ public class TermVector implements TermContainer<Term> {
      @SafeVarargs
      public TermVector(Term... terms) {
         this.term = terms;
+
+         if (terms.length > Global.MAX_SUBTERMS)
+             throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Global.MAX_SUBTERMS);
 
         /**
          0: depVars

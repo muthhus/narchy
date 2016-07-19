@@ -314,6 +314,15 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return null;
     }
 
+    default ByteList structureKey() {
+        return structureKey(new ByteArrayList(volume()*2 /* estimate */));
+    }
+
+    default ByteList structureKey(ByteArrayList appendTo) {
+        appendTo.add((byte)op().ordinal());
+        return appendTo;
+    }
+
     @Nullable default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
         X ss = subterm.apply(this);
         if (ss!=null)

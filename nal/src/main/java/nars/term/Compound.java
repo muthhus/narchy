@@ -220,7 +220,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
                 }
                 if (s instanceof Compound) {
                     Compound cs = (Compound) s;
-                    p.add((byte)i);
                     if (!pathsTo(p, cs, subterm, receiver))
                         return false;
                 }
@@ -230,6 +229,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return true;
     }
 
+    default ByteList structureKey(ByteArrayList appendTo) {
+        appendTo.add((byte) op().ordinal());
+        appendTo.add((byte) size());
+        forEach(x -> {
+            x.structureKey(appendTo);
+        });
+        return appendTo;
+    }
 
     /**
      * unification matching entry point (default implementation)

@@ -44,7 +44,7 @@ public abstract class MaplikeIndex extends TermBuilder implements TermIndex {
     }
 
     @Override
-    protected boolean transform() {
+    protected boolean transformImmediates() {
         return true;
     }
 

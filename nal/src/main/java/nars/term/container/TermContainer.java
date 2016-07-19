@@ -1,9 +1,11 @@
 package nars.term.container;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.factory.Sets;
+import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -44,6 +46,21 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         }
 
         return TermSet.the(t);
+    }
+
+    default boolean equivalentStructures() {
+        ByteList structureKey = term(0).structureKey();
+        {
+            ByteArrayList reuseKey = new ByteArrayList(structureKey.size());
+            for (int i = 1; i < size(); i++) {
+                //all subterms must share the same structure
+                //TODO only needs to construct the key while comparing equality with the first
+                if (!term(i).structureKey(reuseKey).equals(structureKey))
+                    return false;
+                reuseKey.clear();
+            }
+        }
+        return true;
     }
 
 

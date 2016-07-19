@@ -479,7 +479,7 @@ public abstract class TermBuilder {
             switch (op) {
 
                 case INH:
-                    if (predicate instanceof TermTransform && transform() && subject.op() == PROD) {
+                    if (predicate instanceof TermTransform && transformImmediates() && subject.op() == PROD) {
                         return ((TermTransform) predicate).function((Compound) subject);
                     }
                     break;
@@ -562,7 +562,7 @@ public abstract class TermBuilder {
     }
 
     /** whether this builder applies immediate transforms */
-    protected abstract boolean transform();
+    protected abstract boolean transformImmediates();
 
 
     @Nullable

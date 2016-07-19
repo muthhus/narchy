@@ -48,6 +48,9 @@ public enum Global {
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
 
+    /** limited because some subterm paths are stored as byte[]. to be safe, use 7-bits */
+    public static final int MAX_SUBTERMS = 127;
+
 
     public static int DEFAULT_NAL_LEVEL = 8;
 
