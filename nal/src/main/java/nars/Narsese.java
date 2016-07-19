@@ -1069,6 +1069,8 @@ public class Narsese extends BaseParser<Object> {
             c.add(t);
             i[0]++;
         }, unparsed, m);
+        if (i[0] == 0)
+            unparsed.accept(new Object[]{input});
         return i[0];
     }
 

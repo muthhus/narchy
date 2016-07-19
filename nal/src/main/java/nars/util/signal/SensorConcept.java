@@ -44,27 +44,22 @@ public class SensorConcept extends CompoundConcept<Compound> implements FloatFun
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, this, this, truth) {
-            @Override
-            public float pri(float v, long now, float prevV, long lastV) {
-                return SensorConcept.this.pri(v, now, prevV, lastV);
-            }
-        };
+        this.sensor = new Sensor(n, this, this, truth);
         n.on(this);
 
         this.input = input;
 
     }
 
-    public float pri(float v, long now, float prevV, long lastV) {
-//        float m;
-//        if (prevV != prevV) //NaN
-//            m = 1f; //first input
-//        else
-//            m = (Math.abs(v-prevV)); //decrease by sameness
-//        return sensor.pri * m;
-        return sensor.pri;
-    }
+//    public float pri(float v, long now, float prevV, long lastV) {
+////        float m;
+////        if (prevV != prevV) //NaN
+////            m = 1f; //first input
+////        else
+////            m = (Math.abs(v-prevV)); //decrease by sameness
+////        return sensor.pri * m;
+//        return sensor.pri;
+//    }
 
 //    @NotNull
 //    public SensorConcept sensorDT(int newDT) {

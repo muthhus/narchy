@@ -283,7 +283,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return n.concept(term());
     }
 
-    @NotNull @Override Compound term();
+    @NotNull @Override Compound<?> term();
 
     @Nullable @Override
     Truth truth();

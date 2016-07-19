@@ -11,11 +11,9 @@ import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -462,6 +460,25 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         return true;
     }
 
+    default int count(Predicate<Term> match) {
+        int s = size();
+        int count = 0;
+        for (int i = 0; i < s; i++) {
+            Term t = term(i);
+            if (match.test(t)) {
+                count++;
+            }
+        }
+        return count;
+    }
+    default Set<Term> unique(Function<Term,Term> each) {
+        Set<Term> r = new HashSet(size());
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            r.add( each.apply(term(i) ));
+        }
+        return r;
+    }
 
     /**
      * produces the correct TermContainer for the given Op,

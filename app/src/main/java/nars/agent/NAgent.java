@@ -131,6 +131,14 @@ public class NAgent implements Agent {
     public NAgent(NAR n, DecideAction decideAction) {
         this.nar = n;
         this.decideAction = decideAction;
+
+
+        sensorPriority = nar.priorityDefault(Symbols.BELIEF);
+        rewardPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
+
+        alpha = nar.confidenceDefault(Symbols.BELIEF);
+        gamma = nar.confidenceDefault(Symbols.GOAL);
+
     }
 
     @Override
@@ -275,12 +283,6 @@ public class NAgent implements Agent {
         motivation = new float[this.actions.size()];
         lastMotivation = new float[this.actions.size()];
 
-        sensorPriority = nar.priorityDefault(Symbols.BELIEF);
-        rewardPriority = goalPriority = nar.priorityDefault(Symbols.GOAL);
-
-        alpha = nar.confidenceDefault(Symbols.BELIEF);
-        gamma = nar.confidenceDefault(Symbols.GOAL);
-
 
         rewardConcepts = rewardConcepts(() -> this.reward, nar).pri(rewardPriority);
         this.sad = rewardConcepts.sensors.get(0);
@@ -375,7 +377,7 @@ public class NAgent implements Agent {
 //                        float min = 0.5f;
 //                        return sensorPriority * (min /* min */ + (1f-min) * nar.conceptPriority(this));
 //                    }
-                }.resolution(0.02f).timing(-1, -1).pri(sensorPriority)
+                }.resolution(0.01f).timing(-1, -1).pri(sensorPriority)
         );
 
 

@@ -80,8 +80,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     @NotNull
-    public Sensor pri(float defaultPri) {
-        this.pri = defaultPri;
+    public Sensor pri(float p) {
+        this.pri = p;
         return this;
     }
 

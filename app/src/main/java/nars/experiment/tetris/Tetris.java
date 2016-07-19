@@ -25,6 +25,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.agent.NAgent;
+import nars.experiment.ArithmeticTest;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
@@ -308,12 +309,12 @@ public class Tetris extends TetrisState implements Environment {
                         //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
                         //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
                         //"(active,x)")
-                        .resolution(0.25f),
+                        .resolution(0.05f),
                 numericSensor(() -> t.currentY, nar, 0.7f,
                         "I(y)")
                         //"active:(y,t)", "active:(y,b)")
                         //"(active,y)")
-                        .resolution(0.1f)
+                        .resolution(0.05f)
         );
 
         NAgent n = new NAgent(nar) {
@@ -335,6 +336,7 @@ public class Tetris extends TetrisState implements Environment {
         };
 
 
+        new ArithmeticTest.NumericDifferenceRule(nar);
 
 
 

@@ -577,4 +577,6 @@ public class Terms   {
     public static boolean allNegated(TermContainer<?> subterms) {
         return subterms.and((Term t)-> t.op() == NEG);
     }
+
+
 }
