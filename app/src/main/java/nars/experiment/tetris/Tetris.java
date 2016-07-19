@@ -23,7 +23,6 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.agent.NAgent;
 import nars.experiment.ArithmeticTest;
 import nars.experiment.Environment;
@@ -31,14 +30,11 @@ import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
-import nars.index.TransformConcept;
 import nars.learn.Agent;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -50,7 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static nars.experiment.ArithmeticTest.intOrNull;
 import static nars.experiment.pong.Pong.numericSensor;
 
 
@@ -292,15 +287,15 @@ public class Tetris extends TetrisState implements Environment {
         //new Abbreviation2(nar, "_");
         new MySTMClustered(nar, 16, '.', 2);
         new MySTMClustered(nar, 16, '!', 2);
-        new ArithmeticTest.NumericDifferenceRule(nar);
+        new ArithmeticTest.ArtithmeticInduction1(nar);
         //new MySTMClustered(nar, 8, '!');
 
 
-        Tetris t = new Tetris(6, 12, 4) {
+        Tetris t = new Tetris(6, 10, 4) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock(); //all blocks
-                return 1; //square blocks
+                return super.nextBlock(); //all blocks
+                //return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -344,7 +339,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, 2000);
+        t.run(n, 20000);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

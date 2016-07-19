@@ -917,7 +917,7 @@ public class PremiseRule extends GenericCompound {
 
             //locate an occurrence of arg1
             int t1 = 0;
-            int[] p1 = nonCommutivePathTo(task, arg1);
+            byte[] p1 = nonCommutivePathTo(task, arg1);
             if (p1 == null) {
                 t1 = 1;
                 p1 = nonCommutivePathTo(belief, arg1);
@@ -926,7 +926,7 @@ public class PremiseRule extends GenericCompound {
 
                 //locate an occurrence of arg2
                 int t2 = 0;
-                int[] p2 = nonCommutivePathTo(task, arg2);
+                byte[] p2 = nonCommutivePathTo(task, arg2);
                 if (p2 == null) {
                     t2 = 1;
                     p2 = nonCommutivePathTo(belief, arg2);
@@ -945,8 +945,8 @@ public class PremiseRule extends GenericCompound {
 
     }
 
-    static @Nullable int[] nonCommutivePathTo(@NotNull Term term, @NotNull Term arg1) {
-        int[] p = term.pathTo(arg1);
+    static @Nullable byte[] nonCommutivePathTo(@NotNull Term term, @NotNull Term arg1) {
+        byte[] p = term.pathTo(arg1);
         if (p == null) return null;
         if (p.length == 0) return p;
         //verify that the path does not select a subterm of a commutive term

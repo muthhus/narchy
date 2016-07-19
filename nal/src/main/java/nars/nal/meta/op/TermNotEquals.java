@@ -13,8 +13,8 @@ import java.util.Arrays;
  */
 public final class TermNotEquals extends AtomicBoolCondition {
 
-    public final int[] aPath;
-    public final int[] bPath;
+    public final byte[] aPath;
+    public final byte[] bPath;
 
     //0=task, 1=belief term pattern
     private final int a, b;
@@ -22,7 +22,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
     private final String id;
 
     /** TODO the shorter path should be set for 'a' if possible, because it will be compared first */
-    public TermNotEquals(int a, int[] aPath, int b, int[] bPath) {
+    public TermNotEquals(int a, byte[] aPath, int b, byte[] bPath) {
         this.a = a;
         this.aPath = aPath;
         this.b = b;
@@ -57,7 +57,7 @@ public final class TermNotEquals extends AtomicBoolCondition {
         return !ta.equals(tb);
     }
 
-    public static Term resolve(@NotNull Term ca, @NotNull int[] aPath) {
+    public static Term resolve(@NotNull Term ca, @NotNull byte[] aPath) {
         if (aPath.length == 0)
             return ca;
         else {

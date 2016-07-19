@@ -1,5 +1,8 @@
 package nars.experiment;
 
+import com.gs.collections.api.list.primitive.ByteList;
+import com.gs.collections.api.list.primitive.IntList;
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -9,7 +12,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -17,14 +19,12 @@ import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import static nars.Op.INH;
 import static nars.Op.PROD;
-import static nars.Op.VAR_DEP;
 
 /**
  * Created by me on 7/18/16.
@@ -95,7 +95,7 @@ public class ArithmeticTest {
             }
         });
 
-        new NumericDifferenceRule(n);
+        new ArtithmeticInduction1(n);
 
         Global.DEBUG = true;
         n.log();
@@ -145,10 +145,163 @@ public class ArithmeticTest {
                     --> (&&, (x:#y), (diff(#y,1)) )
 
     */
-    public static class NumericDifferenceRule implements Consumer<Task> {
+    public static class ArtithmeticInduction1 implements Consumer<Task> {
         private final NAR n;
 
-        public NumericDifferenceRule(NAR n) {
+        public ArtithmeticInduction1(NAR n) {
+            this.n = n;
+            n.onTask(this);
+        }
+
+        @Override
+        public void accept(Task b) {
+
+            if (b.isBeliefOrGoal() && b.op() == Op.CONJ) {
+
+                Compound<?> bt = b.term();
+                TermContainer<?> subs = bt.subterms();
+                int negs = subs.count(x -> x.op() == Op.NEG);
+
+                boolean negate = (negs == bt.size());
+                if (negs != 0 && !negate) {
+                    //only if none or all of the subterms are negated
+                    return;
+                }
+
+                if (negate) {
+                    subs = $.neg((TermVector)subs);
+                }
+
+                //paths * extracted sequence of numbers at given path for each subterm
+                Map<ByteList,IntArrayList> numbers = new HashMap();
+
+                //first subterm: infer location of all inductables
+                BiPredicate<ByteList, @Nullable Integer> collect = (p, t) -> {
+                    IntArrayList c = numbers.computeIfAbsent(p, (pp) -> new IntArrayList(1));
+                    c.add(t);
+                    return false; //just the first
+                };
+
+                subs.term(0).pathsTo(t->ArithmeticTest.intOrNull(t), collect);
+                int paths = numbers.size();
+                if (paths != 1)
+                    return; //for now, just handle case where there is a uniform structure shared by all subterms
+
+                //analyze remaining subterms
+                for (int i = 1; i < subs.size(); i++) {
+                    subs.term(i).pathsTo(t->ArithmeticTest.intOrNull(t), collect);
+                    if (numbers.size() != paths)
+                        return;  //inconsistent with the first term
+                }
+
+                //type of subterms, must all be the same
+                Op subType = null;
+
+                if (subType == null) {
+                    int ins = subs.count(x -> x.op() == INH);
+                    if (ins == bt.size())
+                        subType = INH;
+                }
+                if (subType == null) {
+                    int ins = subs.count(x -> x.op() == PROD);
+                    if (ins == bt.size())
+                        subType = PROD;
+                }
+
+                if (subType == null)
+                    return;
+
+                Set<Term> subjs = subs.unique(x -> ((Compound) x).term(0));
+                Set<Term> preds = subs.unique(x -> ((Compound) x).term(1));
+
+                //use a generic variable so that it wont interfere with any existing
+                Term vv =
+                        //$.$("#relating");
+                        $.$("$relating");
+                        //$.varDep(1000);
+                        //$.varIndep(1000);
+
+
+                if (preds.size() == 1) {
+                    Term pp = preds.iterator().next();
+                    if (pp.op()!=vv.op() && subjs.size() == 2) {
+                        Term[] ss = subjs.toArray(new Term[subjs.size()]);
+                        Integer x = intOrNull(ss[0]);
+                        Integer y = intOrNull(ss[1]);
+                        if (x != null && y != null) {
+                            add(b, subType,
+                                    vv, pp, negate,
+                                    integerRelations(vv, x, y));
+                        }
+                    }
+
+                } else if (subjs.size() == 1) {
+                    Term ss = subjs.iterator().next();
+                    if (ss.op()!=vv.op() && preds.size() == 2) {
+                        Term[] pp = preds.toArray(new Term[preds.size()]);
+                        Integer x = intOrNull(pp[0]);
+                        Integer y = intOrNull(pp[1]);
+                        if (x != null && y != null) {
+                            add(b, subType,
+                                    ss, vv, negate,
+                                    integerRelations(vv, x, y));
+                        }
+                    }
+
+                }
+
+            }
+
+
+        }
+
+        public @NotNull Term[] integerRelations(Term vv, Integer x, Integer y) {
+            return new Term[] {
+                //l1Dist(vv, x, y),
+                iDelta(vv, x, y)
+            };
+        }
+
+        public @NotNull Term l1Dist(Term relatingVariable, Integer x, Integer y) {
+            //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
+            return $.p($.p($.the("l1Dist"), relatingVariable), $.the(Math.abs(x - y)));
+        }
+        public @NotNull Term iDelta(Term relatingVariable, Integer x, Integer y) {
+            int min = Math.min(x, y);
+            //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
+            return $.p($.p($.the("iDelta"), relatingVariable), $.the(min), $.the(Math.abs(x - y)));
+        }
+
+        public void add(Task b, Op type,  Term newSubj, Term newPred, boolean negate, Term... rules) {
+            Term pattern = $.compound(type, newSubj, newPred);
+
+            for (Term rule : rules) {
+                n.inputLater(
+                    task(b,
+                        $.conj(
+                            $.negIf(pattern, negate),
+                            b.dt(),
+                            rule
+                        )
+                    ).log("l1Dist")
+                );
+            }
+        }
+
+        @NotNull MutableTask task(Task b, Term tt) {
+            return new MutableTask(
+                    tt,
+                    b.punc(), b.truth())
+                    .time(n.time(), b.occurrence())
+                    .budget(b)
+                    .evidence(b.evidence());
+        }
+    }
+
+    static class NumericDifferenceRuleOld implements Consumer<Task> {
+        private final NAR n;
+
+        public NumericDifferenceRuleOld(NAR n) {
             this.n = n;
             n.onTask(this);
         }
@@ -194,10 +347,10 @@ public class ArithmeticTest {
 
                 //use a generic variable so that it wont interfere with any existing
                 Term vv =
-                        $.$("#relating");
-                        //$.$("$relating");
-                        //$.varDep(1000);
-                        //$.varIndep(1000);
+                        //$.$("#relating");
+                        $.$("$relating");
+                //$.varDep(1000);
+                //$.varIndep(1000);
 
                 if (preds.size() == 1) {
                     Term pp = preds.iterator().next();
@@ -232,8 +385,8 @@ public class ArithmeticTest {
 
         public @NotNull Term[] integerRelations(Term vv, Integer x, Integer y) {
             return new Term[] {
-                //l1Dist(vv, x, y),
-                iDelta(vv, x, y)
+                    //l1Dist(vv, x, y),
+                    iDelta(vv, x, y)
             };
         }
 
@@ -252,13 +405,13 @@ public class ArithmeticTest {
 
             for (Term rule : rules) {
                 n.inputLater(
-                    task(b,
-                        $.conj(
-                            $.negIf(pattern, negate),
-                            b.dt(),
-                            rule
-                        )
-                    ).log("l1Dist")
+                        task(b,
+                                $.conj(
+                                        $.negIf(pattern, negate),
+                                        b.dt(),
+                                        rule
+                                )
+                        ).log("l1Dist")
                 );
             }
         }
@@ -272,4 +425,5 @@ public class ArithmeticTest {
                     .evidence(b.evidence());
         }
     }
+
 }

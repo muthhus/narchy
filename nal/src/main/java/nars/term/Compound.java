@@ -20,6 +20,9 @@
  */
 package nars.term;
 
+import com.gs.collections.api.list.primitive.ByteList;
+import com.gs.collections.impl.factory.primitive.ByteLists;
+import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.Global;
 import nars.Op;
@@ -37,7 +40,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -157,32 +163,71 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @Nullable
-    default int[] pathTo(@NotNull Term subterm) {
-        if (subterm.equals(this)) return IntArrays.EMPTY_ARRAY;
+    default byte[] pathTo(@NotNull Term subterm) {
+        if (subterm.equals(this)) return IntArrays.EMPTY_BYTES;
         if (!containsTermRecursively(subterm)) return null;
-        return pathTo(new IntArrayList(0), this, subterm);
+        return pathTo(new ByteArrayList(0), this, subterm);
     }
 
     @Nullable
-    static int[] pathTo(@NotNull IntArrayList p, Term superTerm, @NotNull Term target) {
+    default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+        X ss = subterm.apply(this);
+        if (ss!=null) {
+            if (!receiver.test(ByteLists.immutable.empty(), ss))
+                return false;
+        }
+        return pathsTo(new ByteArrayList(0), this, subterm, receiver);
+    }
+
+    @Nullable
+    static byte[] pathTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Term target) {
         if (superTerm instanceof Compound) {
             Compound cc = (Compound) superTerm;
             for (int i = 0; i < cc.size(); i++) {
                 Term s = cc.term(i);
                 if (s.equals(target)) {
-                    p.add(i);
+                    p.add((byte)i);
                     return p.toArray();
                 }
                 if (s instanceof Compound) {
                     Compound cs = (Compound) s;
                     if (cs.containsTermRecursively(target)) {
-                        p.add(i);
+                        p.add((byte)i);
                         return pathTo(p, cs, target);
                     }
                 }
             }
         }
         return null;
+    }
+
+    @Nullable
+    static <X> boolean pathsTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+        if (superTerm instanceof Compound) {
+            Compound cc = (Compound) superTerm;
+
+            int ppp = p.size();
+
+            for (int i = 0; i < cc.size(); i++) {
+                Term s = cc.term(i);
+                X ss = subterm.apply(s);
+
+                p.add((byte)i);
+
+                if (ss!=null) {
+                    if (!receiver.test(p, ss))
+                        return false;
+                }
+                if (s instanceof Compound) {
+                    Compound cs = (Compound) s;
+                    p.add((byte)i);
+                    if (!pathsTo(p, cs, subterm, receiver))
+                        return false;
+                }
+                p.removeAtIndex(ppp);
+            }
+        }
+        return true;
     }
 
 
@@ -236,6 +281,15 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      */
     @Nullable
     default Term subterm(@NotNull int... path) {
+        Term ptr = this;
+        for (int i : path) {
+            if ((ptr = ptr.termOr(i, null)) == null)
+                return null;
+        }
+        return ptr;
+    }
+    @Nullable
+    default Term subterm(@NotNull byte... path) {
         Term ptr = this;
         for (int i : path) {
             if ((ptr = ptr.termOr(i, null)) == null)

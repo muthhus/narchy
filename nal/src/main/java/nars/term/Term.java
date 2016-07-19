@@ -21,6 +21,9 @@
 package nars.term;
 
 
+import com.gs.collections.api.list.primitive.ByteList;
+import com.gs.collections.impl.factory.primitive.ByteLists;
+import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
@@ -28,10 +31,14 @@ import nars.term.container.TermContainer;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;
+import org.apache.commons.math3.geometry.partitioning.Transform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -301,10 +308,17 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     /** returns an int[] path to the first occurrence of the specified subterm
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
      */
-    @Nullable default int[] pathTo(@NotNull Term subterm) {
+    @Nullable default byte[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this))
-            return IntArrays.EMPTY_ARRAY;
+            return IntArrays.EMPTY_BYTES;
         return null;
+    }
+
+    @Nullable default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
+        X ss = subterm.apply(this);
+        if (ss!=null)
+            return receiver.test(ByteLists.immutable.empty(), ss);
+        return true;
     }
 
 

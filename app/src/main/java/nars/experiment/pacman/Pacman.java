@@ -35,7 +35,6 @@ import nars.gui.BeliefTableChart;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
-import nars.nar.Multi;
 import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
@@ -66,7 +65,7 @@ public class Pacman extends cpcman implements Environment {
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 16;
+	private final int pacmanCyclesPerFrame = 4;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -91,17 +90,17 @@ public class Pacman extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.2f);
+		nar.conceptActivation.setValue(0.05f);
 
 		//new MemoryManager(nar);
 
 		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
-		nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
+		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(64);
+		nar.cyclesPerFrame.set(16);
 		nar.confMin.setValue(0.01f);
 
 
@@ -132,7 +131,7 @@ public class Pacman extends cpcman implements Environment {
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.', 2);
 		new MySTMClustered(nar, 16, '!', 2);
-		new ArithmeticTest.NumericDifferenceRule(nar);
+		new ArithmeticTest.ArtithmeticInduction1(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 

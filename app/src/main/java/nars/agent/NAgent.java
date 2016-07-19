@@ -115,6 +115,7 @@ public class NAgent implements Agent {
     public SensorConcept sad;
     public FuzzyConceptSet rewardConcepts;
     private Task beHappy, dontBeSad;
+    float eternalGoalSeekConf;
 
     /** normally 1, but can be increased to give NARS more frames of processing between environment frames */
     public int framesBeforeDecision = 1;
@@ -138,6 +139,10 @@ public class NAgent implements Agent {
 
         alpha = nar.confidenceDefault(Symbols.BELIEF);
         gamma = nar.confidenceDefault(Symbols.GOAL);
+
+        eternalGoalSeekConf =
+                //1f
+                gamma;
 
     }
 
@@ -401,7 +406,6 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        float eternalGoalSeekConf = 1f /* gamma */;
         this.beHappy = nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 

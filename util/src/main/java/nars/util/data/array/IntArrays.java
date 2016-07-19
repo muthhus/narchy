@@ -84,7 +84,8 @@ public enum IntArrays {
 	;
 
 	/** A static, final, empty array. */
-	public static final int[] EMPTY_ARRAY = {};
+	public static final int[] EMPTY_INTS = {};
+	public static final byte[] EMPTY_BYTES = {};
 
 	/** Ensures that an array can contain the given number of entries.
 	 *
@@ -171,7 +172,7 @@ public enum IntArrays {
 	public static int[] trim( int[] array, int length ) {
 		if ( length >= array.length ) return array;
 		int[] t =
-				length == 0 ? EMPTY_ARRAY : new int[length];
+				length == 0 ? EMPTY_INTS : new int[length];
 		System.arraycopy( array, 0, t, 0, length );
 		return t;
 	}
@@ -198,7 +199,7 @@ public enum IntArrays {
 	public static int[] copy( int[] array, int offset, int length ) {
 		ensureOffsetLength( array, offset, length );
 		int[] a =
-				length == 0 ? EMPTY_ARRAY : new int[ length ];
+				length == 0 ? EMPTY_INTS : new int[ length ];
 		System.arraycopy( array, offset, a, 0, length );
 		return a;
 	}
