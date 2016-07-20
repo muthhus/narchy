@@ -2,7 +2,6 @@ package nars.cfg.bytecode;
 
 
 import com.google.common.collect.Maps;
-import nars.Global;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;

@@ -1,6 +1,6 @@
 package nars.util.analyze;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.util.event.Active;
 import nars.util.event.Topic;
@@ -23,7 +23,7 @@ public class EventCount {
     public EventCount(@NotNull NAR nar) {
 
         Map<Object, HitMeter> eventMeters
-                = this.eventMeters = Global.newHashMap();
+                = this.eventMeters = $.newHashMap();
 
         Topic.each(nar, (field) -> {
             String nn = field.getName();

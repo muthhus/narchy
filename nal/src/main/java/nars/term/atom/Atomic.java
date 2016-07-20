@@ -1,6 +1,10 @@
 package nars.term.atom;
 
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.visit.SubtermVisitor;
+import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

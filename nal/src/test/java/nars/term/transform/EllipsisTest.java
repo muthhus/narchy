@@ -1,7 +1,6 @@
 package nars.term.transform;
 
 import nars.$;
-import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.index.Indexes;
@@ -18,7 +17,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.FindSubst;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +49,7 @@ public class EllipsisTest {
         Compound getMatchable(int arity);
 
         default Set<Term> test(int arity, int repeats) {
-            Set<Term> selectedFixed = Global.newHashSet(arity);
+            Set<Term> selectedFixed = $.newHashSet(arity);
 
             TermIndex index = new Indexes.DefaultTermIndex(1024, new XorShift128PlusRandom(1));
 
@@ -93,7 +92,7 @@ public class EllipsisTest {
 
                             assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
-                            Set<Term> varArgTerms = Global.newHashSet(1);
+                            Set<Term> varArgTerms = $.newHashSet(1);
                             Term u = term(varArgs);
                             if (u == null) {
                                 u = varArgs;
@@ -395,7 +394,7 @@ public class EllipsisTest {
 
         for (int seed = 0; seed < 1 /*expect*5*/; seed++) {
 
-            Set<String> results = Global.newHashSet(0);
+            Set<String> results = $.newHashSet(0);
 
             Random rng = new XorShift128PlusRandom(seed);
             FindSubst f = new FindSubst($.terms, VAR_PATTERN, rng) {

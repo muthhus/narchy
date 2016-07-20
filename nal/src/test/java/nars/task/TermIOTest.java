@@ -1,14 +1,14 @@
 package nars.task;
 
 import nars.$;
+import nars.IO;
 import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
-import nars.util.IO;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

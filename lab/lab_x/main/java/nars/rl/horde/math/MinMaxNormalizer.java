@@ -1,8 +1,6 @@
 package nars.rl.horde.math;
 
 
-import nars.Global;
-
 import java.io.Serializable;
 import java.util.Random;
 

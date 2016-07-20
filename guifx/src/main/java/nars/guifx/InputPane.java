@@ -9,9 +9,6 @@ import nars.guifx.space.WebMap;
 import nars.guifx.util.TabXLazy;
 import nars.guifx.wikipedia.NARWikiBrowser;
 
-import java.util.Map;
-
-import static javafx.application.Platform.runLater;
 import static nars.guifx.NARfx.scrolled;
 
 

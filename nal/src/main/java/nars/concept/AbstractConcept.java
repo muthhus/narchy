@@ -7,7 +7,7 @@ import nars.budget.policy.ConceptPolicy;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

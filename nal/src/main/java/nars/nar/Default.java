@@ -1,7 +1,7 @@
 package nars.nar;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.Indexes;
@@ -52,7 +52,7 @@ public class Default extends AbstractNAR {
         super(clock,
                 index,
                 random,
-                Global.DEFAULT_SELF);
+                Param.DEFAULT_SELF);
 
         the("reasoner", matcher = newMatcher());
 

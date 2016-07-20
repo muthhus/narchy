@@ -9,7 +9,6 @@ import nars.budget.merge.BudgetMerge;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.Peer;
 import nars.inter.gnutella.message.Message;
-import nars.link.BLink;
 import nars.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

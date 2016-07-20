@@ -1,7 +1,7 @@
 package nars.concept;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.task.Task;
 import nars.util.analyze.BeliefAnalysis;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class RevectionTest {
     @Test
     public void testTemporalProjectionInterpolation() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         int maxBeliefs = 12;
         NAR n = newNAR(maxBeliefs);
@@ -113,7 +113,7 @@ public class RevectionTest {
     @Test
     public void testTemporalRevection() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         int maxBeliefs = 4; //includes 3 eternal beliefs we arent using:
         NAR n = newNAR(maxBeliefs);

@@ -660,6 +660,12 @@ public class NAL7Test extends AbstractNALTest {
                 .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
                 .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
     }
+    @Test public void testWTFDontDecomposeConjunction1() {
+        test()
+                .input("((x) &&+0 (y)).")
+                .mustNotOutput(cycles,"(x)",'.',0,ETERNAL)
+                .mustNotOutput(cycles,"(y)",'.',0,ETERNAL);
+    }
 
     @Test public void testWTFDontDecomposeConjunction() {
         //$.07;.23;.24$ ((I-->happy) &&+0 (I-->neutral)). 3-2 %.06;.81%

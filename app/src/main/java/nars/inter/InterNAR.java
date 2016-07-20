@@ -2,6 +2,7 @@ package nars.inter;
 
 
 import nars.$;
+import nars.IO;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.budget.merge.BudgetMerge;
@@ -9,12 +10,10 @@ import nars.inter.gnutella.Peer;
 import nars.inter.gnutella.PeerModel;
 import nars.inter.gnutella.message.Message;
 import nars.inter.gnutella.message.QueryMessage;
-import nars.link.BLink;
 import nars.nal.Tense;
 import nars.op.mental.Inperience;
 import nars.task.Task;
 import nars.term.Term;
-import nars.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

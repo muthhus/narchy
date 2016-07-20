@@ -1,6 +1,6 @@
 package nars.nar.util;
 
-import nars.Global;
+import nars.$;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
@@ -71,8 +71,8 @@ public abstract class AbstractCore {
     /**
      * temporary re-usable array for batch firing
      */
-    transient private final List<BLink<Term>> terms = Global.newArrayList();
-    transient private final List<BLink<Task>> tasks = Global.newArrayList();
+    transient private final List<BLink<Term>> terms = $.newArrayList();
+    transient private final List<BLink<Task>> tasks = $.newArrayList();
 
 
     protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {

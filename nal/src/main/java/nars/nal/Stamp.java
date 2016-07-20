@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.truth;
+package nars.nal;
 
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
-import nars.Global;
+import nars.Param;
 import nars.task.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +40,7 @@ public interface Stamp {
 
     @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB) {
         return zip(a, b, aToB,
-                Global.STAMP_MAX_EVIDENCE,
+                Param.STAMP_MAX_EVIDENCE,
                 true);
     }
 
@@ -191,7 +191,7 @@ public interface Stamp {
      */
     static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
 
-        if (Global.DEBUG) {
+        if (Param.DEBUG) {
 //            if (a == null || b == null)
 //                throw new RuntimeException("null evidence");
             if (a == null || b == null || a.length == 0 || b.length == 0) {
@@ -246,7 +246,7 @@ public interface Stamp {
     }
 
     static int evidenceLength(int aLen, int bLen) {
-        return Math.max(Global.STAMP_MAX_EVIDENCE, aLen + bLen);
+        return Math.max(Param.STAMP_MAX_EVIDENCE, aLen + bLen);
     }
     static int evidenceLength(@NotNull Task a, @NotNull Task b) {
         return evidenceLength(a.evidence().length, b.evidence().length);

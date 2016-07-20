@@ -1,6 +1,6 @@
 package nars.guifx.demo;
 
-import nars.Global;
+import nars.Param;
 import nars.guifx.highdim.HighDim;
 import nars.guifx.highdim.TaskAxis;
 import nars.guifx.util.Animate;
@@ -10,7 +10,7 @@ import nars.task.Task;
 
 public class DemoTimeline {
     public static void main(String[] args) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         Default n = new Default(1024, 2, 3, 3);
         //n.core.activationRate.setValue(0.75f);

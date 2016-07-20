@@ -1,9 +1,9 @@
 package nars.op.java;
 
 import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;
 import nars.task.Task;
@@ -29,7 +29,7 @@ public class Predict_NARS_Core {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = false;
+        Param.DEBUG = false;
         int duration = 8;
         float freq = 1.0f / duration * 0.1f;
         int thinkInterval = 24;

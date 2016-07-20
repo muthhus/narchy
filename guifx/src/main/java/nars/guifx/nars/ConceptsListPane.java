@@ -1,7 +1,7 @@
 package nars.guifx.nars;
 
 import javafx.scene.Node;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.LogPane;
@@ -46,7 +46,7 @@ public abstract class ConceptsListPane extends LogPane {
             //  runLater(update);
             if (pendingShown.compareAndSet(false, true)) {
 
-                List<Node> toDisplay = this.displayed = Global.newArrayList( Math.max(maxShown, pendingDisplay.size()) );
+                List<Node> toDisplay = this.displayed = $.newArrayList( Math.max(maxShown, pendingDisplay.size()) );
                 Iterator<Concept> ii = pendingDisplay.iterator();
                 int toSkip = toDisplay.size() - maxShown;
 

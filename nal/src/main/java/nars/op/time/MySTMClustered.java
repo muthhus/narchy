@@ -2,17 +2,16 @@ package nars.op.time;
 
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.budget.BudgetFunctions;
+import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
-import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
-import nars.truth.Truthed;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +79,7 @@ public class MySTMClustered extends STMClustered {
 					//float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
 					float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
 
-					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Global.STAMP_MAX_EVIDENCE);
+					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_MAX_EVIDENCE);
 
 					if (negated)
 						$.neg(s);

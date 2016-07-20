@@ -28,17 +28,17 @@ import nars.$;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.Variable;
+import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
+import nars.term.visit.SubtermVisitor;
+import nars.term.visit.SubtermVisitorX;
 import nars.util.data.array.IntArrays;
-import org.apache.commons.math3.geometry.partitioning.Transform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 

@@ -4,11 +4,10 @@ import com.google.common.collect.ImmutableSet;
 import com.gs.collections.api.bimap.MutableBiMap;
 import com.gs.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
-import nars.Global;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -151,7 +150,7 @@ public class DefaultTermizer implements Termizer {
 
 
             Collection c = (Collection) o;
-            List<Term> arg = Global.newArrayList(c.size());
+            List<Term> arg = $.newArrayList(c.size());
             for (Object x : c) {
                 Term y = term(x);
                 arg.add(y);
@@ -173,7 +172,7 @@ public class DefaultTermizer implements Termizer {
         } else if (o instanceof Map) {
 
             Map mapo = (Map) o;
-            Set<Term> components = Global.newHashSet(mapo.size());
+            Set<Term> components = $.newHashSet(mapo.size());
             mapo.forEach((k, v) -> {
 
                 Term tv = obj2term(v);
@@ -416,7 +415,7 @@ public class DefaultTermizer implements Termizer {
     @NotNull
     public static <T extends Term> Map<Atom,T> mapStaticClassFields(@NotNull Class c, @NotNull Function<Field, T> each) {
         Field[] ff = c.getFields();
-        Map<Atom,T> t = Global.newHashMap(ff.length);
+        Map<Atom,T> t = $.newHashMap(ff.length);
         for (Field f : ff) {
             if (Modifier.isStatic(f.getModifiers())) {
                 T xx = each.apply(f);

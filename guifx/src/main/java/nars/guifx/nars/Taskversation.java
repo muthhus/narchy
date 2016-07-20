@@ -2,7 +2,7 @@ package nars.guifx.nars;
 
 import nars.NAR;
 import nars.task.Task;
-import nars.truth.Stamp;
+import nars.nal.Stamp;
 
 import java.util.LinkedHashMap;
 import java.util.function.Consumer;

@@ -8,8 +8,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.guifx.NARfx;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.util.ColorArray;
@@ -138,8 +138,8 @@ public class DemoRovers {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = false;
-        Global.EXIT_ON_EXCEPTION = false;
+        Param.DEBUG = false;
+        Param.EXIT_ON_EXCEPTION = false;
 
         final Sim sim = new Sim(new World2D());
 

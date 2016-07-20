@@ -1,12 +1,16 @@
-package nars.term;
+package nars.nal;
 
 import com.gs.collections.api.set.MutableSet;
 import nars.$;
-import nars.Global;
 import nars.Op;
+import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.match.Ellipsislike;
 import nars.nal.op.TermTransform;
+import nars.term.Compound;
+import nars.term.InvalidTerm;
+import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.compound.Statement;
 import nars.term.container.TermContainer;
@@ -235,7 +239,7 @@ public abstract class TermBuilder {
             }
         }
 
-        if (Global.DEBUG ) {
+        if (Param.DEBUG ) {
             //check for any imdex terms that may have not been removed
             for (Term x : args.terms()) {
                 if ((x == True) || (x == False)) {

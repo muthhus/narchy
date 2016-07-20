@@ -7,9 +7,12 @@ import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.factory.Sets;
 import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import nars.$;
-import nars.Global;
 import nars.Op;
-import nars.term.*;
+import nars.nal.TermBuilder;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -241,7 +244,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
 
         Term[] aa = a.terms();
 
-        List<Term> terms = Global.newArrayList(aa.length);
+        List<Term> terms = $.newArrayList(aa.length);
 
         int retained = 0, size = a.size();
         for (int i = 0; i < size; i++) {
@@ -277,7 +280,7 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
 
     @NotNull
     default Term[] terms(@NotNull IntObjectPredicate<T> filter) {
-        List<T> l = Global.newArrayList(size());
+        List<T> l = $.newArrayList(size());
         int s = size();
         int added = 0;
         for (int i = 0; i < s; i++) {

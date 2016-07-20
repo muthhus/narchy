@@ -1,13 +1,13 @@
 package nars.index;
 
-import nars.Global;
+import nars.IO;
+import nars.Param;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.util.IO;
 import org.infinispan.AdvancedCache;
 import org.infinispan.Cache;
 import org.infinispan.cache.impl.DecoratedCache;
@@ -163,7 +163,7 @@ strictlyLocal.put("local_3", "only");
 
     @Override
     public @NotNull String summary() {
-        if (Global.DEBUG) {
+        if (Param.DEBUG) {
             return conceptsLocal.size() + " concepts, " + subtermsLocal.size() + " subterms (WARNING: slow to count)";
         }
         else {

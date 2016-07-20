@@ -1,8 +1,8 @@
-package nars.term;
+package nars.term.atom;
 
 import nars.Op;
-import nars.term.atom.Atomic;
-import nars.term.atom.AtomicStringConstant;
+import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,8 +31,7 @@ public class Operator<T extends Term> extends AtomicStringConstant {
 
 
     /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */
-    @Nullable
-    public static Compound opArgs(@NotNull Compound operation) {
+    public static @Nullable Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
     @Nullable

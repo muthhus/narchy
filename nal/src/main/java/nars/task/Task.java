@@ -24,12 +24,12 @@ import nars.*;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.TermIndex;
+import nars.nal.Stamp;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.ProjectedTruth;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.data.LongString;
@@ -737,7 +737,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
                 }
             }
 
-            if (nextConf < Global.TRUTH_EPSILON)
+            if (nextConf < Param.TRUTH_EPSILON)
                 return null;
 
             return new ProjectedTruth(currentTruth.freq(), nextConf, nextOcc);
@@ -762,7 +762,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
     /** pre-verify tests to early disqualify terms that are not acceptable as Task content */
     static boolean preNormalize(@NotNull Term t, @NotNull Memory memory) {
 
-        if (Global.ensureValidVolume(t) && t.levelValid( memory.nal() ) ) {
+        if (Param.ensureValidVolume(t) && t.levelValid( memory.nal() ) ) {
 
             if (t.op().isStatement()) {
                 Compound ct = (Compound)t;

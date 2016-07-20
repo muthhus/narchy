@@ -9,7 +9,7 @@ import nars.term.subst.choice.Choose1;
 import nars.term.subst.choice.Choose2;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termutator;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

@@ -1,14 +1,15 @@
 package nars.nal.meta;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
 import nars.nal.ConceptProcess;
 import nars.nal.Deriver;
+import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
@@ -18,7 +19,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.FindSubst;
 import nars.term.subst.OneMatchFindSubst;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +60,7 @@ public class PremiseEval extends FindSubst {
 
 
     /** cached value */
-    public float confMin = Global.TRUTH_EPSILON;
+    public float confMin = Param.TRUTH_EPSILON;
     public int termSub0op, termSub1op;
     public int termSub0Struct, termSub1Struct;
     public boolean cyclic, overlap;
@@ -112,7 +112,7 @@ public class PremiseEval extends FindSubst {
     }
 
     public int matchesMax(float p) {
-        final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
+        final float min = Param.matchTermutationsMin, max = Param.matchTermutationsMax;
         return (int) Math.ceil(p * (max - min) + min);
     }
 

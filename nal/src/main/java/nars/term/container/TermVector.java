@@ -2,12 +2,12 @@ package nars.term.container;
 
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import nars.Global;
 import nars.Op;
+import nars.Param;
 import nars.term.Compound;
-import nars.term.SubtermVisitorX;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.visit.SubtermVisitorX;
 import nars.util.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -76,8 +76,8 @@ public class TermVector implements TermContainer<Term> {
      public TermVector(Term... terms) {
         this.term = terms;
 
-         if (terms.length > Global.MAX_SUBTERMS)
-             throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Global.MAX_SUBTERMS);
+         if (terms.length > Param.MAX_SUBTERMS)
+             throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.MAX_SUBTERMS);
 
         /**
          0: depVars

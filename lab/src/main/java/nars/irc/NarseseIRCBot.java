@@ -2,9 +2,9 @@ package nars.irc;
 
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.OperationConcept;
@@ -18,10 +18,10 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.time.MySTMClustered;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.Operator;
 import nars.time.RealtimeMSClock;
 import nars.util.Texts;
 import nars.util.Util;
@@ -161,7 +161,7 @@ public class NarseseIRCBot extends Talk {
 
 
     public static void main(String[] args) throws Exception {
-        Global.DEBUG = false;
+        Param.DEBUG = false;
 
         Random rng = new XorShift128PlusRandom(1);
         Default nar = new Default(

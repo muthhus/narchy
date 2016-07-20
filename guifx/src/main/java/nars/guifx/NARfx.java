@@ -10,7 +10,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.guifx.concept.AbstractConceptPane;
 import nars.guifx.concept.DetailedConceptPane;
@@ -130,7 +130,7 @@ public final class NARfx extends FX {
 
 
     /** Object instances -> GUI windows */
-    public static final Map<Object, Stage> window = Global.newHashMap();
+    public static final Map<Object, Stage> window = $.newHashMap();
 
 
     public static final ColorMatrix colors = new ColorMatrix(24, 24,

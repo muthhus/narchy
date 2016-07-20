@@ -1,6 +1,6 @@
 package nars.link;
 
-import nars.Global;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class StrongBLink<X> extends DefaultBLink<X> {
 
     @Override
     public boolean delete() {
-        if (!Global.DEBUG)
+        if (!Param.DEBUG)
             id = null;
         return super.delete();
     }

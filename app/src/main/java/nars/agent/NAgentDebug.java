@@ -1,9 +1,9 @@
 package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.util.math.FloatSupplier;
@@ -25,7 +25,7 @@ public class NAgentDebug extends NAgent  {
     public NAgentDebug(NAR n) {
         super(n);
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         log = System.out;
     }

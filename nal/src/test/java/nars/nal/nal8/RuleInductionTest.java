@@ -1,8 +1,8 @@
 package nars.nal.nal8;
 
 import com.google.common.base.Joiner;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.signal.FuzzyConceptSet;
@@ -21,7 +21,7 @@ public class RuleInductionTest {
     @Test
     public void testBalancedRuleInduction() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         Default d = new Default(1024, 6, 2, 2);
 

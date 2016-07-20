@@ -4,7 +4,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
 import nars.$;
-import nars.Global;
 import nars.Op;
 import nars.index.PatternIndex;
 import nars.index.TermIndex;
@@ -12,7 +11,6 @@ import nars.nal.TimeFunctions;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PostCondition;
 import nars.nal.meta.TaskBeliefPair;
-import nars.nal.meta.TruthOperator;
 import nars.nal.meta.constraint.*;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisOneOrMore;
@@ -33,11 +31,12 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.GenericVariable;
-import nars.term.variable.Variable;
-import nars.truth.BeliefFunction;
-import nars.truth.DesireFunction;
+import nars.term.var.AbstractVariable;
+import nars.term.var.GenericVariable;
+import nars.term.var.Variable;
+import nars.truth.func.BeliefFunction;
+import nars.truth.func.DesireFunction;
+import nars.truth.func.TruthOperator;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.UnifriedMap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -201,7 +200,7 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> conditions(@NotNull PostCondition post) {
 
-        Set<Term> s = Global.newHashSet(2); //for ensuring uniqueness / no duplicates
+        Set<Term> s = newHashSet(2); //for ensuring uniqueness / no duplicates
         Solve truth = solve(post, this, anticipate, eternalize, timeFunction);
 
         //PREFIX
@@ -547,7 +546,7 @@ public class PremiseRule extends GenericCompound {
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
-        List<BoolCondition> posts = Global.newArrayList(precon.length);
+        List<BoolCondition> posts = newArrayList(precon.length);
 
 
         Term taskTermPattern = getTask();
@@ -869,7 +868,7 @@ public class PremiseRule extends GenericCompound {
         this.precon = pres.toArray(new BoolCondition[pres.size()]);
 
 
-        List<PostCondition> postConditions = Global.newArrayList();
+        List<PostCondition> postConditions = newArrayList();
 
         for (int i = 0; i < postcons.length; ) {
             Term t = postcons[i++];

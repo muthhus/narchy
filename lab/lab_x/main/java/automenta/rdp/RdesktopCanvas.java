@@ -36,7 +36,6 @@ import automenta.rdp.keymapping.KeyCode_FileBased;
 import automenta.rdp.orders.*;
 import automenta.rdp.rdp.Input_Localised;
 import automenta.rdp.rdp.RdpPacket;
-import nars.Global;
 import org.apache.log4j.Logger;
 
 import java.awt.image.BufferedImage;

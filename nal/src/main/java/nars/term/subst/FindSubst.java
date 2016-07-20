@@ -1,7 +1,7 @@
 package nars.term.subst;
 
-import nars.Global;
 import nars.Op;
+import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Compound;
@@ -11,8 +11,8 @@ import nars.term.container.TermContainer;
 import nars.term.subst.choice.CommutivePermutations;
 import nars.term.subst.choice.Termunator;
 import nars.term.subst.choice.Termutator;
-import nars.term.variable.CommonVariable;
-import nars.term.variable.Variable;
+import nars.term.var.CommonVariable;
+import nars.term.var.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.data.list.LimitedFasterList;
 import nars.util.version.HeapVersioning;
@@ -82,7 +82,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
     public final Versioned<Compound> parent;
 
 
-    public final List<Termutator> termutes = new LimitedFasterList(Global.UnificationTermutesMax);
+    public final List<Termutator> termutes = new LimitedFasterList(Param.UnificationTermutesMax);
 
 
     @NotNull
@@ -102,7 +102,7 @@ public abstract class FindSubst implements Subst, Supplier<Versioned<Term>> {
 
     protected FindSubst(TermIndex index, Op type, Random random) {
         this(index, type, random,
-                new HeapVersioning(Global.UnificationStackMax, 4)
+                new HeapVersioning(Param.UnificationStackMax, 4)
                 //new PooledVersioning(Global.UnificationStackMax, 4)
         );
     }

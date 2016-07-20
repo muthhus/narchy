@@ -1,7 +1,10 @@
 package nars.util.condition;
 
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Symbols;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Compound;
@@ -63,7 +66,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //public Tense tense = Tense.Eternal;
 
 
-    public final List<Task> matched = Global.newArrayList(1);
+    public final List<Task> matched = $.newArrayList(1);
 
 
     final static int maxSimilars = 2;

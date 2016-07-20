@@ -2,11 +2,12 @@ package nars.nal.rule;
 
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
-import nars.Global;
+import nars.$;
+import nars.IO;
+import nars.Param;
 import nars.index.PatternIndex;
 import nars.nal.Deriver;
 import nars.term.Compound;
-import nars.util.IO;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static nars.util.IO.readTerm;
+import static nars.IO.readTerm;
 
 
 /**
@@ -97,7 +98,7 @@ public class PremiseRuleSet {
 
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
         this.patterns = new PatternIndex();
-        this.rules = Global.newArrayList(rules.length);
+        this.rules = $.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             this.rules.add(normalize ? p.normalizeRule(patterns) : p);
         }
@@ -130,7 +131,7 @@ public class PremiseRuleSet {
     @NotNull
     static Stream<CharSequence> load(@NotNull List<String> lines) {
 
-        List<CharSequence> unparsed_rules = Global.newArrayList(1024);
+        List<CharSequence> unparsed_rules = $.newArrayList(1024);
 
         StringBuilder current_rule = new StringBuilder();
         boolean single_rule_test = false;
@@ -216,7 +217,7 @@ public class PremiseRuleSet {
 
             String src = rawAndSrc.getTwo();
 
-            Set<PremiseRule> ur = Global.newHashSet(4);
+            Set<PremiseRule> ur = $.newHashSet(4);
             try {
                 PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, index, ur);
@@ -232,7 +233,7 @@ public class PremiseRuleSet {
     @NotNull
     public static Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
         Set<PremiseRule> ur;
-        permute(preNorm, "", new PatternIndex(), ur = Global.newHashSet(1));
+        permute(preNorm, "", new PatternIndex(), ur = $.newHashSet(1));
         return ur;
     }
 
@@ -245,7 +246,7 @@ public class PremiseRuleSet {
     }
 
     static void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
-        if (Global.BACKWARD_QUESTION_RULES && r.allowBackward) {
+        if (Param.BACKWARD_QUESTION_RULES && r.allowBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
 
@@ -276,7 +277,7 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (Global.SWAP_RULES && r.allowForward && permuteSwap(r)) {
+        if (Param.SWAP_RULES && r.allowForward && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));

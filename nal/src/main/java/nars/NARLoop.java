@@ -155,7 +155,7 @@ public class NARLoop implements Runnable {
                         frame(nar);
                 } catch (Throwable e) {
                     nar.eventError.emit(e);
-                    if (Global.DEBUG) {
+                    if (Param.DEBUG) {
                         try {
                             stop();
                         } catch (InterruptedException e1) {

@@ -1,11 +1,8 @@
 package nars.inter.gnutella.message;
 
-import ch.qos.logback.core.encoder.ByteArrayUtil;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
-import infinispan.com.mchange.util.ByteArrayComparator;
 import nars.inter.gnutella.GnutellaConstants;
 import nars.inter.gnutella.IdGenerator;
 import org.slf4j.Logger;

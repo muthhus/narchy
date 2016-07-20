@@ -2,7 +2,7 @@ package nars.guifx.graph2;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
@@ -38,7 +38,7 @@ public class ConceptsSource extends GraphSource {
 //            TLinkEdge::new;
 
     private float _maxPri = 1f, _minPri;
-    protected final List<Termed> concepts = Global.newArrayList();
+    protected final List<Termed> concepts = $.newArrayList();
     private String keywordFilter;
     private final ConceptFilter eachConcept = new ConceptFilter();
 

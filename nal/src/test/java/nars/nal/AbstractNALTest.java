@@ -1,8 +1,9 @@
 package nars.nal;
 
 import com.google.common.collect.Lists;
-import nars.Global;
+import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.util.signal.TestNAR;
@@ -29,12 +30,12 @@ public abstract class AbstractNALTest {
     protected TestNAR tester;
 
     protected AbstractNALTest(NAR nar) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         this.nar = () -> nar;
     }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         //this.the = nar.get();
         this.nar = nar;
     }
@@ -73,7 +74,7 @@ public abstract class AbstractNALTest {
     @NotNull
     public static Iterable<Supplier<NAR>> nars(int level, boolean single, boolean multi) {
 
-        List<Supplier<NAR>> l = Global.newArrayList(2);
+        List<Supplier<NAR>> l = $.newArrayList(2);
 
         if (multi) {
 

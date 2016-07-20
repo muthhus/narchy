@@ -1,6 +1,6 @@
 package nars.budget;
 
-import nars.Global;
+import nars.Param;
 import nars.Symbols;
 import nars.task.Task;
 import nars.util.Texts;
@@ -145,7 +145,7 @@ public interface Budget extends Budgeted {
 
     default void priLerpMult(float factor, float speed) {
 
-        if (Util.equals(factor, 1f, Global.BUDGET_EPSILON))
+        if (Util.equals(factor, 1f, Param.BUDGET_EPSILON))
             return; //no change
 
         float p = pri();

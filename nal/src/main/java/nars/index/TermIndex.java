@@ -1,24 +1,26 @@
 package nars.index;
 
 import com.gs.collections.api.list.primitive.ByteList;
-import nars.Global;
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
+import nars.nal.TermBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.TermTransform;
 import nars.term.*;
 import nars.term.atom.Atomic;
+import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -173,7 +175,7 @@ public interface TermIndex {
 
         Compound crc = (Compound) src;
 
-        List<Term> sub = Global.newArrayList(len /* estimate */);
+        List<Term> sub = $.newArrayList(len /* estimate */);
 
         boolean strict = f instanceof PremiseEval;
 

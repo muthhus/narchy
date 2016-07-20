@@ -1,7 +1,7 @@
 package nars.bag.impl;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.bag.Bag;
 import nars.budget.forget.BudgetForget;
 import nars.link.BLink;
@@ -40,7 +40,7 @@ public final class AutoBag<V> implements BudgetForget {
             this.ratio = r;
 
             return abag.commit(
-                    (r >= Global.BUDGET_EPSILON) ?
+                    (r >= Param.BUDGET_EPSILON) ?
                             this :
                             null /* no forgetting to be applied */
             );
@@ -58,7 +58,7 @@ public final class AutoBag<V> implements BudgetForget {
         float[] b = bag.preCommit();
 
         float pending = b[1];
-        if (pending <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
+        if (pending <= Param.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
             return -1f;
         float existing = b[0];
 

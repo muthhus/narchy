@@ -2,7 +2,7 @@ package nars.guifx.concept;
 
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
-import nars.Global;
+import nars.$;
 import nars.bag.Bag;
 import nars.link.BLink;
 
@@ -74,7 +74,7 @@ public class BagView<X> extends VBox /* FlowPane */  {
         if (size == 0) {
             x = null;
         } else {
-            x = Global.newArrayList(size);
+            x = $.newArrayList(size);
             bLinks.forEach(limit, a -> {
                 x.add(getNode(a));
             });

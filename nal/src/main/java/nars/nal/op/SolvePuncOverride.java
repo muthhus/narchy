@@ -1,7 +1,7 @@
 package nars.nal.op;
 
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.TruthOperator;
+import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
 /**

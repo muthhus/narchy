@@ -1,24 +1,24 @@
-package nars.term.variable;
+package nars.term.var;
 
 import nars.Op;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * normalized query variable
- */
-public final class VarQuery extends AbstractVariable {
 
-    public VarQuery(int id) {
-        super(Op.VAR_QUERY, id);
+/**
+ * normalized indep var
+ */
+public final class VarIndep extends AbstractVariable {
+
+    public VarIndep(int id) {
+        super(Op.VAR_INDEP, id);
     }
+
 
     @NotNull
     @Override
     public Op op() {
-        return Op.VAR_QUERY;
+        return Op.VAR_INDEP;
     }
-
-
 
     @Override
     public int vars() {
@@ -32,17 +32,16 @@ public final class VarQuery extends AbstractVariable {
 
     @Override
     public int varIndep() {
-        return 0;
+        return 1;
     }
 
     @Override
     public int varQuery() {
-        return 1;
+        return 0;
     }
 
     @Override
     public int varPattern() {
         return 0;
     }
-
 }

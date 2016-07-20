@@ -1,13 +1,13 @@
 package nars.concept.table;
 
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
+import nars.nal.Stamp;
 import nars.nal.Tense;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.task.TruthPolation;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -179,7 +179,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
             Task ii = get(i);
             if (excluding != null &&
-                    ((ii == excluding) || (!Global.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE && Stamp.overlapping(excludingEvidence, ii.evidence()))))
+                    ((ii == excluding) || (!Param.REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE && Stamp.overlapping(excludingEvidence, ii.evidence()))))
                 continue;
 
             //consider ii for being the weakest ranked task to remove
@@ -218,7 +218,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
            higher means it is easier to hold beliefs further away from current time at the expense of accuracy
            lower means more accuracy at the expense of shorter memory span
      */
-        float historyFactor = Global.TEMPORAL_DURATION;
+        float historyFactor = Param.TEMPORAL_DURATION;
         return (range == 0) ? 1 :
                 ((1f) / (range * historyFactor));
     }
@@ -303,7 +303,7 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
             float r = rank(x, when, now, ageFactor);
 
             if (against != null && Stamp.overlapping(x.evidence(), against.evidence())) {
-                r *= Global.PREMISE_MATCH_OVERLAP_MULTIPLIER;
+                r *= Param.PREMISE_MATCH_OVERLAP_MULTIPLIER;
             }
 
             if (r > bestRank) {

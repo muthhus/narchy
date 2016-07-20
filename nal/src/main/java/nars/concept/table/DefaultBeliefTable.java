@@ -1,8 +1,8 @@
 package nars.concept.table;
 
 import com.google.common.collect.Iterators;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.task.AnswerTask;
 import nars.task.Task;
 import nars.truth.Truth;
@@ -188,7 +188,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (!(input instanceof AnswerTask)) {
             revised = et.tryRevision(input, nar);
             if (revised != null) {
-                if (Global.DEBUG) {
+                if (Param.DEBUG) {
                     if (revised.isDeleted())
                         throw new RuntimeException("revised task is deleted");
                     if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {

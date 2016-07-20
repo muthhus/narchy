@@ -2,7 +2,6 @@ package nars.nal.meta.op;
 
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
-import nars.Global;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.Fork;
 import nars.nal.meta.PremiseEval;
@@ -43,7 +42,7 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
 
     /** derivation handlers; use the array form for fast iteration */
     //private final Set<Derive> derive = Global.newHashSet(1);
-    private final Set<Derive> derive = Global.newHashSet(1);
+    private final Set<Derive> derive = $.newHashSet(1);
 
 
     int matchFactor;

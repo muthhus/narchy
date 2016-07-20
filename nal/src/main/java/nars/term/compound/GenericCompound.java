@@ -1,9 +1,13 @@
 package nars.term.compound;
 
-import nars.Global;
+import nars.IO;
 import nars.Op;
+import nars.Param;
 import nars.nal.Tense;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.InvalidTerm;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Util;
@@ -46,7 +50,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         TermVector subterms = (TermVector) _subterms; //HACK for future support of alternate TermContainer impls
 
-        if (Global.DEBUG && dt != DTERNAL) {
+        if (Param.DEBUG && dt != DTERNAL) {
             if (!((op.isImage() && ((dt >= 0) || (dt < subterms.size()))) ||
                     (Op.isTemporal(op, dt, subterms.size()))))
                 throw new InvalidTerm(op, dt, subterms.terms());
@@ -72,7 +76,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @NotNull
     @Override
     public String toString() {
-        return TermPrinter.stringify(this).toString();
+        return IO.Printer.stringify(this).toString();
     }
 
 

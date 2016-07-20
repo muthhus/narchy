@@ -24,12 +24,14 @@ import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.impl.factory.primitive.ByteLists;
 import com.gs.collections.impl.list.mutable.primitive.ByteArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import javassist.bytecode.ByteArray;
-import nars.Global;
+import nars.$;
+import nars.IO;
 import nars.Op;
 import nars.nal.Tense;
 import nars.term.container.TermContainer;
 import nars.term.subst.FindSubst;
+import nars.term.visit.SubtermVisitor;
+import nars.term.visit.SubtermVisitorX;
 import nars.util.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.data.sexpression.IPair;
@@ -44,7 +46,6 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static nars.nal.Tense.DTERNAL;
 
@@ -61,7 +62,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      */
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        Set<Term> t = Global.newHashSet(volume());
+        Set<Term> t = $.newHashSet(volume());
         recurseTerms((t1) -> {
             if (t1.op() == onlyType)
                 t.add(t1);
@@ -279,7 +280,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default void append(@NotNull Appendable p) throws IOException {
-        TermPrinter.append(this, p);
+        IO.Printer.append(this, p);
     }
 
 

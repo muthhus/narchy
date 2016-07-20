@@ -2,7 +2,7 @@ package nars.util.signal;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.util.math.FloatSupplier;
@@ -57,7 +57,7 @@ public class FuzzyConceptSet implements Iterable<SensorConcept> {
 
         int numStates = states.length;
         centerPoints = new float[numStates];
-        this.sensors = Global.newArrayList(numStates);
+        this.sensors = $.newArrayList(numStates);
 
         if (states.length > 1) {
             float dr = 1f / (numStates-1);

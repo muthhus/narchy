@@ -4,9 +4,9 @@ import nars.Op;
 import nars.nal.rule.PremiseRule;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.GenericNormalizedVariable;
-import nars.term.variable.Variable;
+import nars.term.var.AbstractVariable;
+import nars.term.var.GenericNormalizedVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /** ellipsis that transforms one of its elements, which it is required to match within */

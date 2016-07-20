@@ -2,7 +2,7 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
@@ -59,10 +59,10 @@ public class BeliefTableChart extends JoglSpace2D {
 
         redraw = new AtomicBoolean(false);
 
-        beliefs = Global.newArrayList();
-        beliefProj = Global.newArrayList();
-        goals = Global.newArrayList();
-        goalProj = Global.newArrayList();
+        beliefs = $.newArrayList();
+        beliefProj = $.newArrayList();
+        goals = $.newArrayList();
+        goalProj = $.newArrayList();
         int numConcepts = terms.size();
         for (int i = 0; i < numConcepts; i++) {
             beliefs.add(new TruthWave(0));

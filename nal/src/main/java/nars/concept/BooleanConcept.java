@@ -2,18 +2,18 @@ package nars.concept;
 
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
+import nars.nal.Stamp;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Operator;
 import nars.truth.DefaultTruth;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,8 +62,8 @@ public class BooleanConcept extends CompoundConcept {
             float c = mode ? 1f : 0f;
 
 
-            LongArrayList ev = new LongArrayList(Global.STAMP_MAX_EVIDENCE);
-            int evidencePerArg = Math.max(Global.STAMP_MAX_EVIDENCE / args.length, 1);
+            LongArrayList ev = new LongArrayList(Param.STAMP_MAX_EVIDENCE);
+            int evidencePerArg = Math.max(Param.STAMP_MAX_EVIDENCE / args.length, 1);
 
             for (Termed t : args) {
 
@@ -129,7 +129,7 @@ public class BooleanConcept extends CompoundConcept {
 
         if (args.length < 2)
             throw new RuntimeException("too few args");
-        if (args.length > Global.STAMP_MAX_EVIDENCE)
+        if (args.length > Param.STAMP_MAX_EVIDENCE)
             throw new RuntimeException("too many args");
 
         this.params = (Compound) term().subterm(0,0);// (({...}) --> ^...)

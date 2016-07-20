@@ -1,7 +1,8 @@
 package nars.nal.nal7;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.task.Task;
 import nars.util.TimeMap;
 import org.jetbrains.annotations.NotNull;
@@ -15,12 +16,12 @@ abstract public class TemporalStabilityTest {
 
 
     public void test(int cycles, @NotNull NAR n) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         input(n);
         //n.log();
 
-        Set<Task> irregular = Global.newHashSet(1);
+        Set<Task> irregular = $.newHashSet(1);
 
         TimeMap m = null;
         for (int i = 0; i < cycles; i++) {

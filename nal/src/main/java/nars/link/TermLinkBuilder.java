@@ -3,7 +3,7 @@ package nars.link;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

@@ -1,12 +1,13 @@
-package nars.truth;
+package nars.truth.func;
 
-import nars.Global;
+import nars.$;
 import nars.Memory;
 import nars.Symbols;
 import nars.nal.meta.AllowOverlap;
 import nars.nal.meta.SinglePremise;
-import nars.nal.meta.TruthOperator;
 import nars.term.Term;
+import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,8 +34,7 @@ public enum BeliefFunction implements TruthOperator {
 //    },
 
     StructuralIntersection() {
-        @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public @Nullable Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
         }
     },
@@ -346,7 +346,7 @@ public enum BeliefFunction implements TruthOperator {
 
 
     //TODO use an enum map with terms bound to the enum values directly
-    static final Map<Term, TruthOperator> atomToTruthModifier = Global.newHashMap(BeliefFunction.values().length);
+    static final Map<Term, TruthOperator> atomToTruthModifier = $.newHashMap(BeliefFunction.values().length);
 
 
 

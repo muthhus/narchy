@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
-import static nars.Global.BUDGET_EPSILON;
+import static nars.Param.BUDGET_EPSILON;
 import static nars.nal.UtilityFunctions.or;
 
 /**

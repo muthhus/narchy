@@ -2,7 +2,6 @@ package nars.experiment;
 
 import com.google.common.base.Joiner;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.op.PrologCore;
@@ -28,13 +27,13 @@ import java.util.function.Function;
 public class BooleanSATTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BooleanSATTest.class);
-    final Map<Termed, Truth> queries = Global.newHashMap();
+    final Map<Termed, Truth> queries = $.newHashMap();
     float best;
     long bestAt;
 
     public final Truth unknown = new DefaultTruth(0.5f, 0);
     private final NAR nar;
-    private final Map<String, BooleanConcept> variables = Global.newHashMap();
+    private final Map<String, BooleanConcept> variables = $.newHashMap();
 
     public static class BooleanConcept extends MutableBoolean {
 

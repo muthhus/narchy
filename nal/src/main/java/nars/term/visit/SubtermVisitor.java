@@ -1,4 +1,6 @@
-package nars.term;
+package nars.term.visit;
+
+import nars.term.Term;
 
 import java.util.function.Consumer;
 

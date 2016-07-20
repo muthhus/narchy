@@ -1,6 +1,6 @@
 package nars.bag.impl;
 
-import nars.Global;
+import nars.Param;
 import nars.budget.RawBLink;
 import nars.budget.merge.BudgetMerge;
 import nars.util.data.list.CircularArrayList;
@@ -111,7 +111,7 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
                 }
             }
         }
-        if (sum < Global.BUDGET_EPSILON) {
+        if (sum < Param.BUDGET_EPSILON) {
             clear();
         }
         return sum;

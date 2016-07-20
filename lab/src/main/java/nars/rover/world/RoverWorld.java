@@ -7,7 +7,7 @@ package nars.rover.world;
 import com.artemis.Component;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
-import nars.Global;
+import nars.$;
 import nars.rover.Sim;
 import nars.rover.obj.MaterialColor;
 import nars.rover.obj.Physical;
@@ -76,7 +76,7 @@ because with random numbers you cannot take it that you always hit N vertexes th
         double minAngleInc = twopi / maxPoints;
         double maxAngleInc = twopi / minPoints;
 
-        List<Vec2> v = Global.newArrayList(maxPoints);
+        List<Vec2> v = $.newArrayList(maxPoints);
 
         PolygonShape p = new PolygonShape();
 

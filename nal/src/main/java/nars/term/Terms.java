@@ -3,7 +3,7 @@ package nars.term;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import nars.Global;
+import nars.$;
 import nars.Op;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.Statement;
@@ -377,7 +377,7 @@ public class Terms   {
     public static Set<Term> toSet(@NotNull Term[] t) {
         if (t.length == 1)
             return Collections.singleton(t[0]);
-        Set<Term> l = Global.newHashSet(t.length);
+        Set<Term> l = $.newHashSet(t.length);
         Collections.addAll(l, t);
         return l;
     }
@@ -433,7 +433,7 @@ public class Terms   {
 
         int s = input.length;
 
-        List<Term> l = Global.newArrayList(s);
+        List<Term> l = $.newArrayList(s);
 
         for (int i = 0; i < s; i++) {
             T t = input[i];

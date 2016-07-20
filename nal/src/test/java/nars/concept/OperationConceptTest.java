@@ -1,7 +1,7 @@
 package nars.concept;
 
 import com.google.common.base.Joiner;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Termed;
@@ -21,7 +21,7 @@ public class OperationConceptTest {
     @Test
     public void testMotivationBalanceEternal() {
 
-        List<String> history = Global.newArrayList();
+        List<String> history = $.newArrayList();
 
         NAR n = new Default();
 

@@ -1,7 +1,7 @@
 package nars.truth;
 
 import static nars.$.t;
-import static nars.Global.TRUTH_EPSILON;
+import static nars.Param.TRUTH_EPSILON;
 
 /**
  * Created by me on 5/26/16.

@@ -106,7 +106,7 @@ public class Memory extends Param {
         this.index = index;
 
 
-        self = Global.DEFAULT_SELF; //default value
+        self = Param.DEFAULT_SELF; //default value
 
 
         emotion = new Emotion();

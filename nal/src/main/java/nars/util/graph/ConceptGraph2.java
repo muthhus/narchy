@@ -1,6 +1,6 @@
 package nars.util.graph;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.data.ConceptMap;
@@ -51,8 +51,8 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         public Map<Concept, E> incoming;
         public Map<Concept, E> outgoing;
 
-        protected void ensureIncoming() {  if (incoming == null)  incoming = Global.newHashMap();       }
-        protected void ensureOutgoing() { if (outgoing == null) outgoing = Global.newHashMap();        }
+        protected void ensureIncoming() {  if (incoming == null)  incoming = $.newHashMap();       }
+        protected void ensureOutgoing() { if (outgoing == null) outgoing = $.newHashMap();        }
 
 
 

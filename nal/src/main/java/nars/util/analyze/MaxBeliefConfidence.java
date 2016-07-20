@@ -1,8 +1,8 @@
 package nars.util.analyze;
 
 import com.google.common.collect.Lists;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.concept.Concept;
 import nars.term.Termed;
 import nars.util.event.FrameReaction;
@@ -41,8 +41,8 @@ public class MaxBeliefConfidence extends FrameReaction implements Signals {
         else {
             float lastConf = conf;
             conf = c.beliefs().confMax(
-                    freq - Global.TRUTH_EPSILON / 2.0f,
-                    freq + Global.TRUTH_EPSILON / 2.0f
+                    freq - Param.TRUTH_EPSILON / 2.0f,
+                    freq + Param.TRUTH_EPSILON / 2.0f
             );
             if (lastConf < conf) {
                 bestAt = nar.time();

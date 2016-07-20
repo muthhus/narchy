@@ -2,7 +2,7 @@ package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import nars.Global;
+import nars.$;
 import nars.gui.ConceptBagInput;
 import nars.nar.Default;
 import nars.term.Termed;
@@ -12,7 +12,6 @@ import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.layout.FastOrganicLayout;
-import spacegraph.layout.Spiral;
 import spacegraph.phys.collision.dispatch.CollisionObject;
 import spacegraph.render.JoglPhysics;
 
@@ -64,7 +63,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
 
 
-    final List<SpaceTransform<O>> transforms = Global.newArrayList();
+    final List<SpaceTransform<O>> transforms = $.newArrayList();
 
     public SpaceGraph() {
         super();

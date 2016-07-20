@@ -1,12 +1,12 @@
 package nars.nal.nal8;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.concept.OperationConcept;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.term.Operator;
+import nars.term.atom.Operator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class GoalPrecisionTest {
 
     protected void run(@NotNull NAR n, int end) {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         n.onExecution($.oper("x"), (OperationConcept c) -> {
 
             for (Task a : c.goals()) {

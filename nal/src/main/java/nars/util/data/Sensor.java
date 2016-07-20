@@ -3,8 +3,8 @@ package nars.util.data;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -118,7 +118,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
         boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-        boolean different = !Util.equals(f, prevF, Global.TRUTH_EPSILON);
+        boolean different = !Util.equals(f, prevF, Param.TRUTH_EPSILON);
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 

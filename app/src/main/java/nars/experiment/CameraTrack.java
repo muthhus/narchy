@@ -4,8 +4,8 @@ import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.experiment.pong.Pong;
 import nars.learn.Agent;
 import nars.learn.ql.DQN;
@@ -107,7 +107,7 @@ public class CameraTrack implements Environment {
 
 
 
-        sensors = Global.newHashMap(width*height*3);
+        sensors = $.newHashMap(width*height*3);
 
         this.cam = new NARCamera(getClass().getSimpleName(), nar, swingCam,
                 (x, y) -> $.p($.the(x), $.the(y))
@@ -294,7 +294,7 @@ public class CameraTrack implements Environment {
 
         CameraTrack cam = new CameraTrack(256, 256, 16, 16, nar);
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         //nar.log();
 
 //        nar.run(16512);

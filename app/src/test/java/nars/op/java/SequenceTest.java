@@ -1,7 +1,7 @@
 package nars.op.java;
 
 import nars.$;
-import nars.Global;
+import nars.Param;
 import nars.index.TermIndex;
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
@@ -30,7 +30,7 @@ public class SequenceTest {
     final static Atom heard = $.the("heard");
 
     public static void main(String[] args) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
 
 

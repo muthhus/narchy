@@ -1,8 +1,8 @@
 package nars.nar;
 
 import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.budget.Budgeted;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
@@ -64,7 +64,7 @@ public class Multi extends AbstractNAR {
         super(clock,
                 index,
                 random,
-                Global.DEFAULT_SELF);
+                Param.DEFAULT_SELF);
 
         active = new ConcurrentHashMapUnsafe<>(cores * conceptsPerCore);
         //barrier = new CyclicBarrier(cores + 1);

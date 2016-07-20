@@ -1,6 +1,6 @@
 package nars.web;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.link.BLink;
@@ -37,7 +37,7 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
                 int n = maxConcepts.intValue();
                 this.now = nar.time();
 
-                List<O /*ConceptSummary*/> l = Global.newArrayList(n);
+                List<O /*ConceptSummary*/> l = $.newArrayList(n);
                 final int[] i = {0};
 
                 //SummaryStatistics s = new SummaryStatistics();

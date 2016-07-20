@@ -1,4 +1,4 @@
-package nars.term.variable;
+package nars.term.var;
 
 import nars.Op;
 import org.jetbrains.annotations.NotNull;

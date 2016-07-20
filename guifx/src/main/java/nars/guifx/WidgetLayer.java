@@ -9,7 +9,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.guifx.demo.NARide;
 
@@ -62,7 +62,7 @@ public class WidgetLayer extends MDICanvas {
 
         Map<String, Object> ss = nar.getSingletons();
 
-        List<Node> toAdd = Global.newArrayList(ss.size());
+        List<Node> toAdd = $.newArrayList(ss.size());
         ss.forEach((k, v) -> toAdd.add(node(k, v)));
 
 //        //TODO use faster comparison method

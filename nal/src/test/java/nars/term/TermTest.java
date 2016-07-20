@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
  */
 public class TermTest {
     static {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
     }
 
     @NotNull

@@ -1,14 +1,14 @@
 package nars.task;
 
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
-import nars.truth.Stamp;
+import nars.nal.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static junit.framework.TestCase.assertTrue;
-import static nars.truth.Stamp.*;
+import static nars.nal.Stamp.*;
 import static org.junit.Assert.*;
 
 /**

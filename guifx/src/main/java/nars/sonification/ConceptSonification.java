@@ -1,7 +1,7 @@
 package nars.sonification;
 
+import nars.$;
 import nars.Audio;
-import nars.Global;
 import nars.NAR;
 import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class ConceptSonification extends FrameReaction {
 
-    List<SonarSample> samples = Global.newArrayList();
+    List<SonarSample> samples = $.newArrayList();
 
 
     public final Audio sound;

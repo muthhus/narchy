@@ -20,7 +20,7 @@
  */
 package nars.truth;
 
-import nars.Global;
+import nars.Param;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.util.Util;
@@ -228,7 +228,7 @@ public final class TruthFunctions extends UtilityFunctions {
         if (c < minConf)
             return null;
 
-        float f = (Util.equals(f0, 0, Global.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
+        float f = (Util.equals(f0, 0, Param.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
         return t(f, c);
     }
 
@@ -545,7 +545,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     public static float c2w(float c) {
-        return Global.HORIZON * c / (1 - Math.min(c, 1.0f - Global.TRUTH_EPSILON));
+        return Param.HORIZON * c / (1 - Math.min(c, 1.0f - Param.TRUTH_EPSILON));
     }
 
     public static float confAnd(@NotNull Truthed... tt) {

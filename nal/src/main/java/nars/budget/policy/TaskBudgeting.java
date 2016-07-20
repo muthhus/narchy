@@ -1,8 +1,8 @@
 package nars.budget.policy;
 
 import nars.$;
-import nars.Global;
 import nars.Memory;
+import nars.Param;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -53,7 +53,7 @@ public class TaskBudgeting {
                 aveAri(taskLink.priIfFiniteElseZero(), termLink.priIfFiniteElseZero())
                     * volRatioScale
         ;
-        if (priority * durability < Global.BUDGET_EPSILON)
+        if (priority * durability < Param.BUDGET_EPSILON)
             return null;
 
         final float quality = qual * volRatioScale;

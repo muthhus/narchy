@@ -1,7 +1,7 @@
 package nars.concept;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.concept.table.BeliefTable;
 import nars.truth.DefaultTruth;
 import nars.util.analyze.BeliefAnalysis;
@@ -85,7 +85,7 @@ public class BeliefTableTest  {
     @Test
     public void testTemporalQueries() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         int maxBeliefs = 6; //includes 3 eternal beliefs we arent using:
         NAR n = newNAR(maxBeliefs*2);
@@ -125,7 +125,7 @@ public class BeliefTableTest  {
     @Test
     public void testEternalBeliefRanking() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         int maxBeliefs = 10;
         NAR n = newNAR(maxBeliefs);

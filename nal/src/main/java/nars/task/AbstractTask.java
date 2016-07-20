@@ -215,7 +215,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
             //if data arrives via a hardware device, can a virtual
             //task be used as the parent when it generates it?
             //doesnt everything originate from something else?
-            if (Global.DEBUG && (log == null))
+            if (Param.DEBUG && (log == null))
                 log("Input");
 
         }
@@ -421,7 +421,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @Override
     public boolean delete() {
         if (super.delete()) {
-            if (!Global.DEBUG)
+            if (!Param.DEBUG)
                 this.log = null; //.clear();
             return true;
         }
@@ -434,7 +434,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
 
     /** TODO for external use in MutableTask instances only */
     public final void setOccurrence(long o) {
-        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Global.DEBUG) {
+        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
             System.err.println("Likely an invalid occurrence time being set");
         }
         if (o != occurrence) {
@@ -529,7 +529,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @NotNull
     @Override
     public Task log(@Nullable List historyToCopy) {
-        if (!Global.DEBUG_TASK_LOG)
+        if (!Param.DEBUG_TASK_LOG)
             return this;
 
         if ((historyToCopy != null) && (!historyToCopy.isEmpty())) {
@@ -547,7 +547,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     @NotNull
     @Override
     public final Task log(Object entry) {
-        if (!Global.DEBUG_TASK_LOG)
+        if (!Param.DEBUG_TASK_LOG)
             return this;
 
         getOrCreateLog().add(entry);
@@ -571,7 +571,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
     final List getOrCreateLog() {
         List exist = log();
         if (exist == null) {
-            this.log = (exist = Global.newArrayList(1));
+            this.log = (exist = $.newArrayList(1));
         }
         return exist;
     }

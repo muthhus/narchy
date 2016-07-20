@@ -6,9 +6,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.GenericVariable;
-import nars.term.variable.Variable;
+import nars.term.var.AbstractVariable;
+import nars.term.var.GenericVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

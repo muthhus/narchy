@@ -24,7 +24,7 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;
@@ -65,7 +65,7 @@ public final class Anticipate {
 //    public static String teststring = "";
 
 
-    final List<Task> toRemove = Global.newArrayList();
+    final List<Task> toRemove = $.newArrayList();
 
 
     public Anticipate(@NotNull NAR nar) {

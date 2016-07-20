@@ -1,8 +1,8 @@
 package nars.nal.meta.match;
 
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.Variable;
+import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**

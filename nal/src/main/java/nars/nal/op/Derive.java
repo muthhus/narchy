@@ -7,7 +7,6 @@ import nars.nal.ConceptProcess;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
-import nars.nal.meta.TruthOperator;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
 import nars.task.Revision;
@@ -17,6 +16,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
+import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -247,7 +247,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     m, this, occReturn, confScale
             );
 
-            if (Global.DEBUG && occReturn[0] == DTERNAL) {
+            if (Param.DEBUG && occReturn[0] == DTERNAL) {
                 //temporalizer.compute(content.term(), m, this, occReturn, confScale);
                 throw new RuntimeException("temporalization resulted in suspicious occurrence time");
             }
@@ -265,7 +265,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             //apply the confidence scale
             if (truth!=null) {
                 float projection;
-                if (Global.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
+                if (Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
                     projection = Revision.truthProjection(m.task.occurrence(), m.belief.occurrence(), nar.time());
                 } else {
                     projection = 1f;
@@ -302,7 +302,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                 .time(now, occ)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
-                .log(Global.DEBUG ? d.rule : "Derived");
+                .log(Param.DEBUG ? d.rule : "Derived");
 
 
         //ETERNALIZE: (CURRENTLY DISABLED)

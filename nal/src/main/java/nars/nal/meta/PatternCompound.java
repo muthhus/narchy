@@ -1,7 +1,7 @@
 package nars.nal.meta;
 
 import com.gs.collections.api.set.MutableSet;
-import nars.Global;
+import nars.$;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
@@ -305,10 +305,10 @@ abstract public class PatternCompound extends GenericCompound {
             //);
             //public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
-            Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
+            Set<Term> xFree = $.newHashSet(0); //Global.newHashSet(0);
 
             //constant terms which have been verified existing in Y and will not need matched
-            Set<Term> alreadyInY = Global.newHashSet(0);
+            Set<Term> alreadyInY = $.newHashSet(0);
 
             final Ellipsis ellipsis = this.ellipsis;
 

@@ -18,7 +18,6 @@ package nars.op.in;
 
 import com.google.common.collect.Lists;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.MutableTask;
@@ -250,13 +249,13 @@ public class Twenglish {
     public List<MutableTask> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
 
         
-        List<MutableTask> results = Global.newArrayList();
+        List<MutableTask> results = $.newArrayList();
 
         List<Span> tokens = Twokenize.twokenize(s);
         
-        List<List<Span>> sentences = Global.newArrayList();
+        List<List<Span>> sentences = $.newArrayList();
         
-        List<Span> currentSentence = Global.newArrayList(tokens.size());
+        List<Span> currentSentence = $.newArrayList(tokens.size());
         for (Span p : tokens) {
             
             currentSentence.add(p);
@@ -268,7 +267,7 @@ public class Twenglish {
                     case "!":
                         if (!currentSentence.isEmpty()) {
                             sentences.add(currentSentence);
-                            currentSentence = Global.newArrayList();
+                            currentSentence = $.newArrayList();
                             break;
                         }
                 }

@@ -1,12 +1,13 @@
-package nars.truth;
+package nars.truth.func;
 
-import nars.Global;
+import nars.$;
 import nars.Memory;
 import nars.Symbols;
 import nars.nal.meta.AllowOverlap;
 import nars.nal.meta.SinglePremise;
-import nars.nal.meta.TruthOperator;
 import nars.term.Term;
+import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,8 +18,7 @@ public enum DesireFunction implements TruthOperator {
 
     @SinglePremise
     Negation() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return TruthFunctions.negation(T, minConf);
         }
     },
@@ -112,7 +112,7 @@ public enum DesireFunction implements TruthOperator {
     }
 
 
-    static final Map<Term, TruthOperator> atomToTruthModifier = Global.newHashMap(DesireFunction.values().length);
+    static final Map<Term, TruthOperator> atomToTruthModifier = $.newHashMap(DesireFunction.values().length);
 
     static {
         TruthOperator.permuteTruth(DesireFunction.values(), atomToTruthModifier);

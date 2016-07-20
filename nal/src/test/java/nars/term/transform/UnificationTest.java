@@ -44,7 +44,7 @@ public class UnificationTest {
     @NotNull
     FindSubst test(@NotNull Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         TestNAR test = test();
         NAR nar = test.nar;
 

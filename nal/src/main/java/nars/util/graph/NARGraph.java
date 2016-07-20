@@ -1,6 +1,6 @@
 package nars.util.graph;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
 
     @NotNull
     public <X> Set<X> vertices(@NotNull Class<? extends X> type) {
-        Set<X> s = Global.newHashSet(vertexSet().size());
+        Set<X> s = $.newHashSet(vertexSet().size());
         s.addAll(vertexSet().stream().filter(type::isInstance).map(o -> (X) o).collect(Collectors.toList()));
         return s;
     }

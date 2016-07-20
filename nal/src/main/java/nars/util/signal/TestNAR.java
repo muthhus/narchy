@@ -1,8 +1,8 @@
 package nars.util.signal;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -50,10 +50,10 @@ public class TestNAR  {
     final boolean showOutput = false;
 
     /** holds must (positive) conditions */
-    final List<NARCondition> requires = Global.newArrayList();
+    final List<NARCondition> requires = $.newArrayList();
 
     /** holds mustNot (negative) conditions which are tested at the end */
-    final List<NARCondition> disqualifies = Global.newArrayList();
+    final List<NARCondition> disqualifies = $.newArrayList();
 
     //public final List<ExplainableTask> explanations = new ArrayList();
     @Nullable
@@ -62,7 +62,7 @@ public class TestNAR  {
 
     public final List<Task> inputs = new ArrayList();
     private static final int temporalTolerance = 0;
-    protected static final float truthTolerance = Global.TESTS_TRUTH_ERROR_TOLERANCE;
+    protected static final float truthTolerance = Param.TESTS_TRUTH_ERROR_TOLERANCE;
 
 
     /** enable this to print reports even if the test was successful.
@@ -112,7 +112,7 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR debug() {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         //nar.stdout();
         return this;
     }

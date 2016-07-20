@@ -9,7 +9,7 @@ import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.AbstractVariable;
+import nars.term.var.AbstractVariable;
 import org.junit.Test;
 
 import static nars.Op.Imdex;

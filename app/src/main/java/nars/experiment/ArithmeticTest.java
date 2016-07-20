@@ -3,9 +3,9 @@ package nars.experiment;
 import com.gs.collections.api.list.primitive.ByteList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -80,7 +80,7 @@ public class ArithmeticTest {
 
         new ArithmeticTest.ArtithmeticInduction1(n);
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
         n.log();
 
         n.input("((x,1) && (x,2)). :|:"); //should find one pattern
@@ -240,7 +240,7 @@ public class ArithmeticTest {
             //first subterm: infer location of all inductables
             BiPredicate<ByteList, @Nullable Term> collect = (p, t) -> {
                 if (!p.isEmpty() && t!=null) {
-                    List<Term> c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> Global.newArrayList(1));
+                    List<Term> c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> $.newArrayList(1));
                     c.add(t);
                 }
                 return true;
@@ -322,7 +322,7 @@ public class ArithmeticTest {
         }
 
         private List<Term> features(IntArrayList numbers, Term relatingVar) {
-            FasterList<Term> ll = Global.newArrayList(0);
+            FasterList<Term> ll = $.newArrayList(0);
             ll.addIfNotNull(iRange(numbers, relatingVar));
 
             //...

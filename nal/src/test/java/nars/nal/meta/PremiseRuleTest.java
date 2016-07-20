@@ -1,8 +1,8 @@
 package nars.nal.meta;
 
 import com.google.common.base.Joiner;
-import nars.Global;
 import nars.Narsese;
+import nars.Param;
 import nars.index.PatternIndex;
 import nars.nal.rule.PremiseRule;
 import nars.nal.rule.PremiseRuleSet;
@@ -170,7 +170,7 @@ public class PremiseRuleTest {
 
     @Test
     public void testBackwardPermutations() {
-        if (Global.BACKWARD_QUESTION_RULES) {
+        if (Param.BACKWARD_QUESTION_RULES) {
             Set<PremiseRule> s = PremiseRuleSet.permute(
                     rule("<(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Desire:Strong, Derive:AllowBackward)>")
             );

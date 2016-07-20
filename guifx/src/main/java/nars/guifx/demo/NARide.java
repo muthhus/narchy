@@ -19,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.NARLoop;
 import nars.budget.Budget;
@@ -78,7 +77,7 @@ public class NARide extends StackPane {
     public final NARMenu controlPane;
     public final WidgetLayer pp;
 
-    public final Map<Class, Function<Object,Node>> nodeBuilders = Global.newHashMap();
+    public final Map<Class, Function<Object,Node>> nodeBuilders = $.newHashMap();
     public final LoopPane loopPane;
     //private final CornerMenu cornerMenu;
 

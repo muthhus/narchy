@@ -1,7 +1,7 @@
 package nars.bag;
 
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
-import nars.Global;
+import nars.Param;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.UnitBudget;
@@ -31,7 +31,7 @@ public class CurveBagTest  {
     static final Random rng = new XorShift128PlusRandom(1);
 
     static {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
     }
 
 

@@ -6,7 +6,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;

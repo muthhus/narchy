@@ -1,7 +1,7 @@
 package nars.truth;
 
-import nars.Global;
 import nars.Memory;
+import nars.Param;
 import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(float f, float c) {
-        this(f, c, Global.TRUTH_EPSILON);
+        this(f, c, Param.TRUTH_EPSILON);
     }
 
     public DefaultTruth(float f, float c, float epsilon) {
@@ -94,7 +94,7 @@ public class DefaultTruth implements Truth  {
 
     @Override
     public final int hashCode() {
-        return Truth.hash(freq, conf, Global.TRUTH_DISCRETION);
+        return Truth.hash(freq, conf, Param.TRUTH_DISCRETION);
         //return hash;
     }
 
@@ -110,10 +110,10 @@ public class DefaultTruth implements Truth  {
     }
 
     protected boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equals(freq, t.freq(), Global.TRUTH_EPSILON));
+        return (Util.equals(freq, t.freq(), Param.TRUTH_EPSILON));
     }
 
-    private static final int hashDiscreteness = (int)(1.0f / Global.TRUTH_EPSILON);
+    private static final int hashDiscreteness = (int)(1.0f / Param.TRUTH_EPSILON);
 
     /*    public float getEpsilon() {
         return DEFAULT_TRUTH_EPSILON;

@@ -2,8 +2,8 @@ package nars.concept;
 
 import com.gs.collections.api.tuple.primitive.FloatObjectPair;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.bag.Bag;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.nal.Tense;
@@ -65,7 +65,7 @@ public class RevisionTest {
 
 
     void testRevision(int delay1, boolean beliefOrGoal) {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         AbstractNAR n = newNAR(6);
         n.nal(1);
@@ -139,7 +139,7 @@ public class RevisionTest {
     @Test
     public void testTruthOscillation2() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         int maxBeliefs = 16;
         NAR n = newNAR(maxBeliefs);

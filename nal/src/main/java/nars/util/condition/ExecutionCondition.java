@@ -2,7 +2,7 @@ package nars.util.condition;
 
 import nars.$;
 import nars.NAR;
-import nars.term.Operator;
+import nars.term.atom.Operator;
 import org.jetbrains.annotations.NotNull;
 
 /**

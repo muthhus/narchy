@@ -8,7 +8,6 @@ import com.artemis.Entity;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.term.Compound;
@@ -18,7 +17,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Util;
 import nars.util.math.FloatSupplier;
-import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -413,7 +411,7 @@ public class NARover extends AbstractRover {
 
 
 
-        List<SensorConcept> sensorConcepts = Global.newArrayList(pixels * resolution);
+        List<SensorConcept> sensorConcepts = $.newArrayList(pixels * resolution);
 
         Term[] materials = {$.the("food"), $.the("poison"), $.the("wall")};
 

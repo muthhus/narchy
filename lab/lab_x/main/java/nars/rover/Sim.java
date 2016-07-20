@@ -1,6 +1,5 @@
 package nars.rover;
 
-import nars.Global;
 import nars.rover.physics.TestbedPanel;
 import nars.rover.physics.TestbedSettings;
 import nars.rover.physics.gl.JoglAbstractDraw;

@@ -18,14 +18,13 @@ import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
+import nars.term.atom.Operator;
+import nars.term.var.Variable;
 import nars.time.Clock;
 import nars.time.FrameClock;
-import nars.util.IO;
 import nars.util.data.MutableInteger;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -113,7 +112,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private NARLoop loop;
 
-    private final Collection<Object> on = Global.newArrayList(); //registered handlers, for strong-linking them when using soft-index
+    private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
 
     public NAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
@@ -134,7 +133,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 //TODO move this to a specific impl of error reaction:
                 ex.printStackTrace();
 
-                if (Global.DEBUG && Global.EXIT_ON_EXCEPTION) {
+                if (Param.DEBUG && Param.EXIT_ON_EXCEPTION) {
                     //throw the exception to the next lower stack catcher, or cause program exit if none exists
                     throw new RuntimeException(ex);
                 }
@@ -240,7 +239,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed)  {
-        List<Task> result = Global.newArrayList(1);
+        List<Task> result = $.newArrayList(1);
         Narsese.the().tasks(parse, result, unparsed, this);
         return result;
     }
@@ -1266,7 +1265,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Concept c = concept(input, true);
         if (c == null) {
-            if (Global.DEBUG) {
+            if (Param.DEBUG) {
                 //throw new InvalidTaskException(input, "Inconceivable");
                 logger.error("Inconceivable: {}", input);
             }
@@ -1282,7 +1281,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             c.policy(index.conceptBuilder().initialized());
         }
 
-        List<Task> displaced = Global.newArrayList();
+        List<Task> displaced = $.newArrayList();
 
         Task t = c.process(input, this, displaced);
 
@@ -1316,7 +1315,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             score = Math.max(0f, Math.min(dynamicRange, score));
             t.budget().priMult(score);
-            if (t.pri() > Global.BUDGET_EPSILON) {
+            if (t.pri() > Param.BUDGET_EPSILON) {
                 //propagate budget
                 MutableFloat overflow = new MutableFloat();
                 activate(c, t, activation, activation, overflow);

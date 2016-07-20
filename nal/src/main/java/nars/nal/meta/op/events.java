@@ -39,7 +39,8 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean booleanValueOf(PremiseEval p) {
-            return p.task.dt()!=DTERNAL;
+            Task t = p.task;
+            return !t.isEternal() && t.dt()!=DTERNAL;
         }
     };
 

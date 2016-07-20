@@ -1,6 +1,6 @@
 package nars.task;
 
-import nars.Global;
+import nars.Param;
 import nars.truth.Truth;
 import org.junit.Test;
 
@@ -17,11 +17,11 @@ public class TruthTest {
         Truth aCopy = t(1.0f, 0.9f);
         assertEquals(a, aCopy);
 
-        Truth aEqualWithinThresh = t(1.0f- Global.TRUTH_EPSILON / 2.0f, 0.9f);
+        Truth aEqualWithinThresh = t(1.0f- Param.TRUTH_EPSILON / 2.0f, 0.9f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = t(1.0f - Global.TRUTH_EPSILON * 1.0f, 0.9f);
+        Truth aNotWithinThresh = t(1.0f - Param.TRUTH_EPSILON * 1.0f, 0.9f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
 
@@ -31,11 +31,11 @@ public class TruthTest {
     public void testConfEquality() {
         Truth a = t(1.0f, 0.5f);
 
-        Truth aEqualWithinThresh = t(1.0f, 0.5f- Global.TRUTH_EPSILON / 2.0f);
+        Truth aEqualWithinThresh = t(1.0f, 0.5f- Param.TRUTH_EPSILON / 2.0f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = t(1.0f, 0.5f - Global.TRUTH_EPSILON * 1.0f);
+        Truth aNotWithinThresh = t(1.0f, 0.5f - Param.TRUTH_EPSILON * 1.0f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
     }

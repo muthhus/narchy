@@ -1,6 +1,5 @@
 package nars.rover.run;
 
-import nars.Global;
 import nars.NAR;
 import nars.NARSeed;
 import nars.Video;

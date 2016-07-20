@@ -2,7 +2,7 @@ package nars.op.out;
 
 import nars.concept.OperationConcept;
 import nars.nal.nal8.operator.ImmediateOperator;
-import nars.term.Operator;
+import nars.term.atom.Operator;
 import org.jetbrains.annotations.NotNull;
 
 /**

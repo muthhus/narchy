@@ -24,7 +24,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.concept.OperationConcept;
-import nars.term.Operator;
+import nars.term.atom.Operator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -21,7 +21,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.data.list.FasterList;
-import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 

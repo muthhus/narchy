@@ -1,7 +1,7 @@
 package nars.util.data;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import static nars.util.Texts.n2;
  */
 public class UniformVector  {
 
-    float epsilon = Global.TRUTH_EPSILON;
+    float epsilon = Param.TRUTH_EPSILON;
     @Nullable
     public float[] lastData;
     public final float[] data;

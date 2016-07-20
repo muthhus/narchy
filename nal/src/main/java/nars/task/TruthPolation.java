@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.$;
-import nars.Global;
+import nars.Param;
 import nars.learn.microsphere.InterpolatingMicrosphere;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -28,7 +28,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
     @NotNull final float[] freq;
     @NotNull final float[] conf;
     @Nullable
-    private static final Truth EterNull = $.t(0.5f, Global.TRUTH_EPSILON);
+    private static final Truth EterNull = $.t(0.5f, Param.TRUTH_EPSILON);
 
     public TruthPolation(int size) {
         super(1, 2 /* must be 2 for 1D */, null);
@@ -52,9 +52,9 @@ public final class TruthPolation extends InterpolatingMicrosphere {
         //float ecap = eternal.capacity();
         //float eternalization = ecap / (ecap + tcap));
 
-        float maxDarkFraction = 1f - Global.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
+        float maxDarkFraction = 1f - Param.TRUTH_EPSILON; // - (0.5f / (1f + tasks.size()));
 
-        float thresh = Global.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
+        float thresh = Param.TRUTH_EPSILON/2f; //c2w(Global.TRUTH_EPSILON);
 
         return truth(when, tasks,
                 (topEternal == null) ? EterNull : topEternal,
@@ -104,7 +104,7 @@ public final class TruthPolation extends InterpolatingMicrosphere {
             this.setBackground(Float.NaN, 0);
         }
 
-        float exp = Global.TEMPORAL_MICROSPHERE_EXPONENT;
+        float exp = Param.TEMPORAL_MICROSPHERE_EXPONENT;
         float[] v = this.value(
                 ZERO, times,
                 freq, conf,

@@ -1,6 +1,6 @@
 package spacegraph;
 
-import nars.Global;
+import nars.$;
 
 /**
  * Created by me on 6/26/16.
@@ -33,7 +33,7 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
 
     private void refresh() {
         int n = 0;
-        this.visible = Global.newArrayList(items.length);
+        this.visible = $.newArrayList(items.length);
         for (X x : items) {
             visible.add((Y) space.update(n++, x));
         }

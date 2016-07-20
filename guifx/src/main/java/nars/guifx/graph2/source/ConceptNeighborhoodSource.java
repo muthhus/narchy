@@ -1,7 +1,7 @@
 package nars.guifx.graph2.source;
 
 import com.google.common.collect.Lists;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.graph2.ConceptsSource;
@@ -26,7 +26,7 @@ public class ConceptNeighborhoodSource extends ConceptsSource {
         this.roots = Lists.newArrayList(c);
     }
 
-    final Set<Termed> conceptsSet = Global.newHashSet(1);
+    final Set<Termed> conceptsSet = $.newHashSet(1);
 
     final Consumer<BLink<? extends Termed>> onLink = n -> {
         Termed tn = n.get();

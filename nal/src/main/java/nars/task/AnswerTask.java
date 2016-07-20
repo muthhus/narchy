@@ -1,9 +1,9 @@
 package nars.task;
 
 import nars.budget.merge.BudgetMerge;
+import nars.nal.Stamp;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

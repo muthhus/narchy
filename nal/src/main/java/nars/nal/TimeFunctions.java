@@ -1,8 +1,8 @@
 package nars.nal;
 
 import nars.$;
-import nars.Global;
 import nars.Op;
+import nars.Param;
 import nars.nal.meta.OccurrenceSolver;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
@@ -500,7 +500,7 @@ public interface TimeFunctions {
         if (eventDelta == DTERNAL)
             return derived; //no change
 
-        if (!Global.DEBUG && !derived.op().temporal)
+        if (!Param.DEBUG && !derived.op().temporal)
             return derived; //disregard dt if not in debug mode
 
         return dt(derived, eventDelta * polarity, p, occReturn);

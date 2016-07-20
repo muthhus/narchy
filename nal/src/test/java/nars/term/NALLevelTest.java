@@ -1,8 +1,8 @@
 package nars.term;
 
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import nars.util.analyze.EventCount;
 import org.junit.Test;
@@ -16,10 +16,10 @@ public class NALLevelTest {
 
     @Test
     public void testLevel1vs8() {
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         NAR nDefault = new Default();
-        assertEquals(Global.DEFAULT_NAL_LEVEL, nDefault.nal());
+        assertEquals(Param.DEFAULT_NAL_LEVEL, nDefault.nal());
 
         NAR n1 = new Default();
         n1.nal(1);

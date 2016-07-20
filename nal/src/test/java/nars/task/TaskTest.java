@@ -2,8 +2,8 @@ package nars.task;
 
 import com.google.common.collect.Lists;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.truth.DefaultTruth;
@@ -86,7 +86,7 @@ public class TaskTest {
 
     public void inputTwoUniqueTasks(@NotNull NAR n) {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         Task x = n.inputTask("<a --> b>.");
         assertArrayEquals(new long[]{1}, x.evidence());

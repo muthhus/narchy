@@ -1,7 +1,7 @@
 package nars.nal.nal8;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.concept.BooleanConcept;
 import nars.nar.Default;
 import nars.util.signal.FloatConcept;
@@ -24,7 +24,7 @@ public class BooleanConceptTest {
     @Test
     public void testAndConcept() {
 
-        Global.DEBUG = true;
+        Param.DEBUG = true;
 
         NAR n = new Default(1024, 8, 2, 2).log();
 

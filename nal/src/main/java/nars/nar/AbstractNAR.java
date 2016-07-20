@@ -1,7 +1,7 @@
 package nars.nar;
 
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.index.TermIndex;
@@ -37,7 +37,7 @@ public abstract class AbstractNAR extends NAR {
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 4;
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random random) {
-        this(clock, index, random, Global.DEFAULT_SELF);
+        this(clock, index, random, Param.DEFAULT_SELF);
     }
 
     public AbstractNAR(@NotNull Clock clock, @NotNull TermIndex index, @NotNull Random rng, @NotNull Atom self) {
@@ -46,15 +46,15 @@ public abstract class AbstractNAR extends NAR {
         conceptWarm = index.conceptBuilder().activated();
         conceptCold = index.conceptBuilder().initialized();
 
-        durMin.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
+        durMin.setValue(Param.DERIVATION_DURABILITY_THRESHOLD);
 
         taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 
         //budget propagation thresholds
-        termLinkThreshold.setValue(Global.BUDGET_EPSILON);
-        taskLinkThreshold.setValue(Global.BUDGET_EPSILON);
+        termLinkThreshold.setValue(Param.BUDGET_EPSILON);
+        taskLinkThreshold.setValue(Param.BUDGET_EPSILON);
 
-        executionThreshold.setValue(Global.TRUTH_EPSILON);
+        executionThreshold.setValue(Param.TRUTH_EPSILON);
 
 
 

@@ -1,8 +1,8 @@
 package nars.util.experiment;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -38,7 +38,7 @@ public class DeductiveMeshTest {
         if (dims.length!=2)
             throw new UnsupportedOperationException("2-D only implemented");
 
-        coords = Global.newArrayList();
+        coords = $.newArrayList();
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
                 Compound c = c(x, y);
@@ -96,7 +96,7 @@ public class DeductiveMeshTest {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = false;
+        Param.DEBUG = false;
 
 
 

@@ -1,6 +1,6 @@
 package nars.task;
 
-import nars.Global;
+import nars.$;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
@@ -27,7 +27,7 @@ abstract public class DerivedTask extends MutableTask {
 
         evidence(p.evidence());
 
-        this.premise = Global.reference(p.premise);
+        this.premise = $.reference(p.premise);
     }
 
     @Override

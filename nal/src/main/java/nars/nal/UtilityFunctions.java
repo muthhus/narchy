@@ -20,7 +20,7 @@
  */
 package nars.nal;
 
-import nars.Global;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.pow;
@@ -127,7 +127,7 @@ public class UtilityFunctions   {
      * @return The corresponding confidence, in [0, 1)
      */
     public static float w2c(float w) {
-        return w / (w + Global.HORIZON);
+        return w / (w + Param.HORIZON);
     }
 
 }

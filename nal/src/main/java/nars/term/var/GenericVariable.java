@@ -1,4 +1,4 @@
-package nars.term.variable;
+package nars.term.var;
 
 import nars.$;
 import nars.Op;

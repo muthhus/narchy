@@ -5,11 +5,11 @@ import nars.nar.Terminal;
 import nars.op.out.echo;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.variable.Variable;
+import nars.term.atom.Operator;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -34,8 +34,8 @@ public class NarseseTest {
     static List<Task> tasks(@NotNull String s)  {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
-        List<Task> l = Global.newArrayList(1);
-        List<Object[]> errors = Global.newArrayList(1);
+        List<Task> l = $.newArrayList(1);
+        List<Object[]> errors = $.newArrayList(1);
         Narsese.tasks(s, l, errors::add, n);
         assertEquals(0, errors.size());
         return l;

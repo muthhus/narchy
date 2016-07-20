@@ -1,11 +1,8 @@
 package nars.op;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Op;
-import nars.experiment.ArithmeticTest;
-import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;

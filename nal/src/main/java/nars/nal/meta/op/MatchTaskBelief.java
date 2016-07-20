@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Ints;
 import com.gs.collections.api.map.ImmutableMap;
-import nars.Global;
+import nars.$;
 import nars.Op;
 import nars.nal.meta.AtomicBoolCondition;
 import nars.nal.meta.BoolCondition;
@@ -55,8 +55,8 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         this.id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
 
 
-        List<BoolCondition> pre = Global.newArrayList();
-        List<BoolCondition> code = Global.newArrayList();
+        List<BoolCondition> pre = $.newArrayList();
+        List<BoolCondition> code = $.newArrayList();
 
         compile(pattern, pre, code, constraints);
 
@@ -253,7 +253,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
     static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
         if (c.isEmpty()) return null;
 
-        Map<Term, MatchConstraint> con = Global.newHashMap(c.size());
+        Map<Term, MatchConstraint> con = $.newHashMap(c.size());
         c.asMap().forEach((t, cc) -> {
             switch (cc.size()) {
                 case 0:

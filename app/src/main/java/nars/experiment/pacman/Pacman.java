@@ -24,8 +24,8 @@ import com.google.common.collect.Iterables;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.agent.NAgent;
 import nars.budget.UnitBudget;
 import nars.experiment.ArithmeticTest;
@@ -487,7 +487,7 @@ public class Pacman extends cpcman implements Environment {
 
 		float linkMinLow = 4, linkMaxLow = 8, linkMinHigh = 16, linkMaxHigh = 32;
 		float confMinMin = 0.15f, confMinMax = 0.05f;
-		float durMinMin = 0.1f, durMinMax = Global.BUDGET_EPSILON*4f;
+		float durMinMin = 0.1f, durMinMax = Param.BUDGET_EPSILON*4f;
 
 		public MemoryManager(Default nar) {
 

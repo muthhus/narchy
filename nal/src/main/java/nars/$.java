@@ -6,33 +6,41 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.index.TermIndex;
+import nars.nal.TermBuilder;
 import nars.task.MutableTask;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.Operator;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.GenericVariable;
-import nars.term.variable.VarPattern;
-import nars.term.variable.Variable;
+import nars.term.var.AbstractVariable;
+import nars.term.var.GenericVariable;
+import nars.term.var.VarPattern;
+import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Util;
+import nars.util.data.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -724,7 +732,7 @@ public enum $ {
 
     @Nullable
     public static Truth t(float f, float c) {
-        return t(f, c, Global.TRUTH_EPSILON);
+        return t(f, c, Param.TRUTH_EPSILON);
     }
 
     @Nullable
@@ -806,6 +814,94 @@ public enum $ {
         } else {
             return possiblyNegative;
         }
+    }
+
+    @NotNull
+    public static <K,V> Map<K, V> newHashMap() {
+        return newHashMap(0);
+    }
+
+    @NotNull
+    public static <K, V> Map<K,V> newHashMap(int capacity) {
+        return new HashMap<>(capacity);
+
+        //return new UnifiedMap(capacity);
+        //return new UnifriedMap(capacity /*, loadFactor */);
+
+        //return new FasterHashMap(capacity);
+        //return new FastMap<>(); //javolution http://javolution.org/apidocs/javolution/util/FastMap.html
+
+        //return new LinkedHashMap(capacity);
+    }
+
+    public static @NotNull <X> FasterList<X> newArrayList() {
+        return new FasterList<>(); //GS
+        //return new ArrayList();
+    }
+
+    @NotNull
+    public static <X> FasterList<X> newArrayList(int capacity) {
+        return new FasterList(capacity);
+        //return new ArrayList(capacity);
+    }
+
+    public static @NotNull <X> Set<X> newHashSet(int capacity) {
+        if (capacity < 4) {
+            return new UnifiedSet(0);
+        } else {
+            //return new UnifiedSet(capacity);
+            //return new SimpleHashSet(capacity);
+            return new HashSet(capacity);
+            //return new LinkedHashSet(capacity);
+        }
+    }
+
+    @NotNull
+    public static <X> Set<X> newHashSet(@NotNull Collection<X> values) {
+        Set<X> s = newHashSet(values.size());
+        s.addAll(values);
+        return s;
+    }
+
+    public static @Nullable <C> Reference<C> reference(@Nullable C s) {
+        return s == null ? null :
+                //new SoftReference<>(s);
+                //new WeakReference<>(s);
+                Param.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
+    }
+
+    @Nullable
+    public static <C> Reference<C>[] reference(@Nullable C[] s) {
+        int l = Util.lastNonNull((Object[]) s);
+        if (l > -1) {
+            l++;
+            Reference<C>[] rr = new Reference[l];
+            for (int i = 0; i < l; i++) {
+                rr[i] = reference(s[i]);
+            }
+            return rr;
+        }
+        return null;
+    }
+
+    public static void dereference(@NotNull Reference[] p) {
+        for (int i = 0; i < p.length; i++) {
+            Reference x = p[i];
+            if (x != null)
+                x.clear();
+            p[i] = null;
+        }
+    }
+
+    @Nullable
+    public static <C> C dereference(@Nullable Reference<C> s) {
+        return s == null ? null : s.get();
+    }
+
+    @Nullable
+    public static <C> C dereference(@Nullable Reference<C>[] s, int index) {
+        if (s == null || index >= s.length) return null;
+        return dereference(s[index]);
     }
 
 

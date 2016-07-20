@@ -1,8 +1,8 @@
 package nars.util.experiment;
 
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.atom.Atom;
@@ -68,7 +68,7 @@ public class DeductiveChainTest  {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = false;
+        Param.DEBUG = false;
 
         for (int length = 3; length < 10; length++) {
             Default n = new Default(1024, 1, 1, 3);

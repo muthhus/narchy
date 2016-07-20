@@ -2,7 +2,7 @@ package nars.nal.derive;
 
 import com.google.common.collect.Lists;
 import javassist.*;
-import nars.Global;
+import nars.$;
 import nars.Op;
 import nars.nal.Deriver;
 import nars.nal.meta.*;
@@ -115,7 +115,7 @@ public class TrieDeriver extends Deriver {
     @NotNull
     private List<ProcTerm> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
-        List<ProcTerm> bb = Global.newArrayList(node.childCount());
+        List<ProcTerm> bb = $.newArrayList(node.childCount());
 
         node.forEach(n -> {
 
@@ -141,8 +141,8 @@ public class TrieDeriver extends Deriver {
 
     @NotNull
     private static List<ProcTerm> factorSubOpToSwitch(@NotNull List<ProcTerm> bb, int subterm, int minToCreateSwitch) {
-        Map<PatternOp, ProcTerm> cases = Global.newHashMap(8);
-        List<ProcTerm> removed = Global.newArrayList(); //in order to undo
+        Map<PatternOp, ProcTerm> cases = $.newHashMap(8);
+        List<ProcTerm> removed = $.newArrayList(); //in order to undo
         bb.removeIf(p -> {
             if (p instanceof IfThen) {
                 IfThen ii = (IfThen) p;

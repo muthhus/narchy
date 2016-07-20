@@ -1,4 +1,7 @@
-package nars.term;
+package nars.term.visit;
+
+import nars.term.Compound;
+import nars.term.Term;
 
 import java.util.function.BiConsumer;
 

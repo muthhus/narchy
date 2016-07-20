@@ -1,7 +1,7 @@
 package nars.util.data;
 
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 public abstract class MutableConceptMap<T extends Term> extends ConceptMap implements Iterable<T> {
 
-    public final Set<T> inclusions = Global.newHashSet(16);
+    public final Set<T> inclusions = $.newHashSet(16);
 
     protected MutableConceptMap(@NotNull NAR n) {
         super(n);

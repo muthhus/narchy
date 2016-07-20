@@ -2,7 +2,7 @@ package nars.guifx.graph2.layout;
 
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import javafx.beans.property.SimpleDoubleProperty;
-import nars.Global;
+import nars.$;
 import nars.data.Range;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
@@ -275,7 +275,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
         
         // Finds the relevant vertex for the layout
         if (vertexArray == null)
-            vertexArray = Global.newArrayList();
+            vertexArray = $.newArrayList();
         else
             vertexArray.clear();
         

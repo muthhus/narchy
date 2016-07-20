@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
-import nars.Global;
+import nars.$;
 import nars.guifx.NARfx;
 import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.NControl;
@@ -93,7 +93,7 @@ public class Plot2D extends NControl/*Canvas */  {
     private transient double minValue;
     private transient double maxValue;
 
-    public final List<Series> series = Global.newArrayList();
+    public final List<Series> series = $.newArrayList();
 
     private final int maxHistory;
 

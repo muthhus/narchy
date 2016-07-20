@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.Op;
 import nars.term.atom.AtomicString;
-import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
 /**

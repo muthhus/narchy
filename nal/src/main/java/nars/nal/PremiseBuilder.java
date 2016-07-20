@@ -1,8 +1,9 @@
 package nars.nal;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.QuestionTable;
@@ -182,8 +183,8 @@ public enum PremiseBuilder {
     }
 
     static void matchQueryQuestion(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief) {
-        List<Termed> result = Global.newArrayList(1);
-        new UnifySubst(Op.VAR_QUERY, nar, result, Global.QUERY_ANSWERS_PER_MATCH).matchAll(
+        List<Termed> result = $.newArrayList(1);
+        new UnifySubst(Op.VAR_QUERY, nar, result, Param.QUERY_ANSWERS_PER_MATCH).matchAll(
                 task.term(), belief.term()
         );
         if (!result.isEmpty()) {

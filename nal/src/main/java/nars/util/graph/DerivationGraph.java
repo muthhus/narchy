@@ -8,7 +8,7 @@ import nars.nal.rule.PremiseRuleSet;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.Variable;
+import nars.term.var.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

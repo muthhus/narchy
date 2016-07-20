@@ -2,9 +2,9 @@ package nars.term;
 
 import nars.Op;
 import nars.nar.Terminal;
-import nars.term.variable.CommonVariable;
-import nars.term.variable.GenericNormalizedVariable;
-import nars.term.variable.GenericVariable;
+import nars.term.var.CommonVariable;
+import nars.term.var.GenericNormalizedVariable;
+import nars.term.var.GenericVariable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.IO;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
@@ -9,7 +10,6 @@ import nars.concept.table.QuestionTable;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermPrinter;
 import nars.term.Termlike;
 import nars.term.proxy.ProxyCompound;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -86,12 +86,12 @@ public class ProxyCompoundConcept implements Concept, ProxyCompound<Compound<Ter
     @NotNull
     @Override
     public String toString() {
-        return TermPrinter.stringify(target.term()).toString();
+        return IO.Printer.stringify(target.term()).toString();
     }
 
     @Override
     public void append(@NotNull Appendable p) throws IOException {
-        TermPrinter.append(target.term(), p);
+        IO.Printer.append(target.term(), p);
     }
 
     @NotNull

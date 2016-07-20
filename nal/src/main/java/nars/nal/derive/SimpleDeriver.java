@@ -1,6 +1,6 @@
 package nars.nal.derive;
 
-import nars.Global;
+import nars.$;
 import nars.nal.Deriver;
 import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PostCondition;
@@ -21,7 +21,7 @@ public class SimpleDeriver extends Deriver {
     public SimpleDeriver(@NotNull PremiseRuleSet rules) {
         super(rules);
 
-        List<List<Term>> u = Global.newArrayList();
+        List<List<Term>> u = $.newArrayList();
         //return Collections.unmodifiableList(premiseRules);
         for (PremiseRule r : rules.rules) {
             for (PostCondition p : r.postconditions)

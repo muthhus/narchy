@@ -2,8 +2,8 @@ package nars.agent;
 
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
-import nars.Global;
 import nars.NAR;
+import nars.Param;
 import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
@@ -25,12 +25,10 @@ import nars.util.signal.Emotion;
 import nars.util.signal.FuzzyConceptSet;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.DoubleSummaryStatistics;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -41,7 +39,6 @@ import static java.util.stream.Collectors.toList;
 import static nars.$.$;
 import static nars.$.t;
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.UtilityFunctions.or;
 import static nars.util.Texts.n4;
 
 /**
@@ -610,7 +607,7 @@ public class NAgent implements Agent {
                 float offness = 1f - decisiveness(lastAction);
                 //float offness = 1f;
                 nar.goal(goalPriority, lastActionMotor, now-1,
-                        0, max(Global.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
+                        0, max(Param.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
             }
 
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
@@ -619,7 +616,7 @@ public class NAgent implements Agent {
             float onness = decisiveness(this.nextAction);
             //float onness = 1f;
             nar.goal(goalPriority, actions.get(this.nextAction), now,
-                    1, max(Global.TRUTH_EPSILON, onness * gamma)); //upward step function top
+                    1, max(Param.TRUTH_EPSILON, onness * gamma)); //upward step function top
         }
 
         //updateMotors();

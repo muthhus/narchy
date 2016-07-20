@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.term.variable;
+package nars.term.var;
 
 
-import nars.Global;
 import nars.Op;
+import nars.Param;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,7 +76,7 @@ public abstract class AbstractVariable implements Variable {
     /**
      * numerically-indexed variable instance cache; prevents duplicates and speeds comparisons
      */
-    private static final AbstractVariable[][] varCache = new AbstractVariable[4][Global.MAX_VARIABLE_CACHED_PER_TYPE];
+    private static final AbstractVariable[][] varCache = new AbstractVariable[4][Param.MAX_VARIABLE_CACHED_PER_TYPE];
 
     @NotNull
     public static Op typeIndex(char c) {
@@ -125,14 +125,14 @@ public abstract class AbstractVariable implements Variable {
         //precompute cached variable instances
         for (Op o : new Op[] { Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP } ) {
             int t = typeIndex(o);
-            for (int i = 0; i < Global.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
+            for (int i = 0; i < Param.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
                 varCache[t][i] = vNew(o, i);
             }
         }
     }
 
     public static AbstractVariable cached(@NotNull Op type, int counter) {
-        if (counter >= Global.MAX_VARIABLE_CACHED_PER_TYPE) {
+        if (counter >= Param.MAX_VARIABLE_CACHED_PER_TYPE) {
             return vNew(type, counter); //for special variables like ellipsis
         }
 

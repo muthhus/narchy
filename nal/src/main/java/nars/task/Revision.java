@@ -3,14 +3,14 @@ package nars.task;
 import com.gs.collections.api.tuple.primitive.FloatObjectPair;
 import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import nars.$;
-import nars.Global;
+import nars.Param;
 import nars.budget.Budget;
+import nars.nal.Stamp;
 import nars.nal.UtilityFunctions;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Util;
@@ -82,7 +82,7 @@ public class Revision {
             }
 
             float newConf = newTruth.conf() * confScale;
-            if (newConf < Global.TRUTH_EPSILON) {
+            if (newConf < Param.TRUTH_EPSILON) {
                 //too weak
                 return null;
             }

@@ -1,12 +1,12 @@
 package nars.concept.table;
 
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
+import nars.nal.Stamp;
 import nars.task.AnswerTask;
 import nars.task.Task;
-import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +33,7 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
     public ArrayQuestionTable(int capacity) {
         super();
 
-        this.list = Global.newArrayList(capacity);
+        this.list = $.newArrayList(capacity);
 
         this.capacity = capacity;
         //setCapacity(capacity);

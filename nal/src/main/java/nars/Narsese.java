@@ -24,9 +24,13 @@ import nars.nal.rule.PremiseRule;
 import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.term.*;
-import nars.term.variable.GenericVariable;
-import nars.term.variable.Variable;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
+import nars.term.atom.Operator;
+import nars.term.var.GenericVariable;
+import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
@@ -179,8 +183,8 @@ public class Narsese extends BaseParser<Object> {
     public PremiseRule popTaskRule() {
         //(Term)pop(), (Term)pop()
 
-        List<Term> r = Global.newArrayList(16);
-        List<Term> l = Global.newArrayList(16);
+        List<Term> r = $.newArrayList(16);
+        List<Term> l = $.newArrayList(16);
 
         Object popped;
         while ((popped = pop()) != PremiseRule.class) { //lets go back till to the start now
@@ -951,7 +955,7 @@ public class Narsese extends BaseParser<Object> {
 
         ArrayValueStack<Object> stack = (ArrayValueStack)getContext().getValueStack();
 
-        List vectorterms = Global.newArrayList(2); //stack.size() + 1);
+        List vectorterms = $.newArrayList(2); //stack.size() + 1);
 
         while (!stack.isEmpty()) {
             Object p = pop();
