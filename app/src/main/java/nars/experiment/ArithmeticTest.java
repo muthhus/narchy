@@ -167,7 +167,8 @@ public class ArithmeticTest {
                 TermContainer<?> subs = bt.subterms();
                 int negs = subs.count(x -> x.op() == Op.NEG);
 
-                boolean negate = (negs == bt.size());
+                int subCount = bt.size();
+                boolean negate = (negs == subCount);
                 if (negs != 0 && !negate) {
                     //only if none or all of the subterms are negated
                     return;
@@ -185,19 +186,19 @@ public class ArithmeticTest {
 
                 //first subterm: infer location of all inductables
                 BiPredicate<ByteList, @Nullable Integer> collect = (p, t) -> {
-                    IntArrayList c = numbers.computeIfAbsent(p, (pp) -> new IntArrayList(1));
+                    IntArrayList c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> new IntArrayList(1));
                     c.add(t);
-                    return false; //just the first
+                    return true;
                 };
 
                 Compound<?> first = (Compound)subs.term(0);
                 first.pathsTo(ArithmeticTest::intOrNull, collect);
                 int paths = numbers.size();
-                if (paths != 1)
-                    return; //HACK for now, just handle case where there is a uniform structure shared by all subterms
 
+                if (paths == 0)
+                    return;
                 //analyze remaining subterms
-                for (int i = 1; i < subs.size(); i++) {
+                for (int i = 1; i < subCount; i++) {
 
                     //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
                     if (!subs.term(i).pathsTo(
@@ -206,23 +207,25 @@ public class ArithmeticTest {
                         return;
 
                     subs.term(i).pathsTo(ArithmeticTest::intOrNull, collect);
-                    if (numbers.size() != paths)
-                        return;  //inconsistent with the first term
+
                 }
 
+                numbers.forEach((pp, nn) -> {
+                   if (nn.size()!=subCount)
+                       return; //ignore this path, it doesnt have a result from each subterm ?
 
+                    List<Term> features = features(nn, vv);
 
-                Map.Entry<ByteList, IntArrayList> ppnn = numbers.entrySet().iterator().next();
-                List<Term> features = features(ppnn.getValue(), vv);
+                    Term pattern = $.terms.transform(first, pp, vv);
+                    features.add(pattern);
 
-                Term pattern = $.terms.transform(first, ppnn.getKey(), vv);
-                features.add(pattern);
+                    Compound result = (Compound) $.compound(CONJ, bt.dt(), features);
 
-                Compound result = (Compound) $.compound(CONJ, bt.dt(), features);
+                    n.inputLater(
+                            task(b, result).log(getClass().getSimpleName())
+                    );
 
-                n.inputLater(
-                        task(b, result).log(getClass().getSimpleName())
-                );
+                });
 
 
             }
