@@ -100,9 +100,13 @@ public class TreemapChart<X> extends Surface {
 		for (X item : nextChildren) {
 			if (i-- <= 0)
 				break;
+			if (item==null)
+				continue;
 			ItemVis<X> e = cache.computeIfAbsent(item, itemBuilder);
-			update.accept(item, e);
-			newChildren.add(e);
+			if (e!=null) {
+				update.accept(item, e);
+				newChildren.add(e);
+			}
 		}
 
 		if (!newChildren.isEmpty()) {

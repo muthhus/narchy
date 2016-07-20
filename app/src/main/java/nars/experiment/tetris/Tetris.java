@@ -28,6 +28,7 @@ import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -52,6 +53,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 20000;
+    public static final int cyclesPerFrame = 64;
 
     private final TetrisVisualizer vis;
     private final JFrame window;
@@ -253,7 +255,7 @@ public class Tetris extends TetrisState implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(32);
+        nar.cyclesPerFrame.set(cyclesPerFrame);
         nar.confMin.setValue(0.01f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
@@ -287,10 +289,11 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 16, '.', 2);
+        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
         //new MySTMClustered(nar, 16, '!', 2);
         new ArithmeticInduction(nar);
         //new MySTMClustered(nar, 8, '!');
+
 
 
         Tetris t = new Tetris(6, 10, 2) {
@@ -329,7 +332,8 @@ public class Tetris extends TetrisState implements Environment {
 
                 if (nar instanceof Default) {
                     new BeliefTableChart(nar, charted).show(600, 900);
-                    BagChart.show((Default) nar, 128);
+                    //BagChart.show((Default) nar, 128);
+                    STMView.show(stm, 500, 500);
                 }
             }
         };

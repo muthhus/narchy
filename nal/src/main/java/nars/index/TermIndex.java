@@ -2,6 +2,7 @@ package nars.index;
 
 import com.gs.collections.api.list.primitive.ByteList;
 import nars.$;
+import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;
@@ -620,21 +621,6 @@ public interface TermIndex {
         }
     }
 
-    final class InvalidTaskTerm extends RuntimeException {
-
-        public final Termed term;
-
-        public InvalidTaskTerm(Termed term, String message) {
-            super(message);
-            this.term = term;
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return getMessage() + ": " + term;
-        }
-    }
 
 
 

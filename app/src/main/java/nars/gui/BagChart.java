@@ -7,6 +7,8 @@ import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
 import nars.term.atom.Atomic;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.Facial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.treechart.ItemVis;
@@ -101,10 +103,13 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
     protected void update(double w, double h) {
 
-        update(w, h, bag.size(), bag, this, i -> new ItemVis<>(i, label(i.get(), 16) ));
+        update(w, h, bag.size(), bag, this, i -> {
+            @Nullable X ii = i.get();
+            return ii != null ? new ItemVis<>(i, label(ii, 16)) : null;
+        });
     }
 
-    protected static <X> String label(X i, int MAX_LEN) {
+    protected static <X> String label(@NotNull X i, int MAX_LEN) {
         String s = i.toString();
         if (s.length() > MAX_LEN)
             s = s.substring(0, MAX_LEN);

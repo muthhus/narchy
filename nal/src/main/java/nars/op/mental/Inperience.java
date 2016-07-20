@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.atom.Operator;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,11 +75,11 @@ public class Inperience {
 //    }
 
 
-    public static final Atomic believe = $.oper("believe");
-    public static final Atomic want = $.oper("want");
-    public static final Atomic wonder = $.oper("wonder");
-    public static final Atomic evaluate = $.oper("evaluate");
-    public static final Atomic anticipate = $.oper("anticipate");
+    public static final Operator believe = $.oper("believe");
+    public static final Operator want = $.oper("want");
+    public static final Operator wonder = $.oper("wonder");
+    public static final Operator evaluate = $.oper("evaluate");
+    public static final Operator anticipate = $.oper("anticipate");
 
     static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
             $.oper("remind"),
@@ -123,8 +124,8 @@ public class Inperience {
 
 
     @Nullable
-    public static Atomic reify(char punc) {
-        Atomic opTerm;
+    public static Operator reify(char punc) {
+        Operator opTerm;
         switch (punc) {
             case Symbols.BELIEF:
                 opTerm = believe;
@@ -276,7 +277,7 @@ public class Inperience {
         }
     }
 
-    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Atomic op) {
+    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 

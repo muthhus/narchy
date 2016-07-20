@@ -1115,7 +1115,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             input(ap);
         } else {
             runLater((n) -> {
-                n.input(ap);
+                try {
+                    n.input(ap);
+                } catch (InvalidTaskException e) {
+                    logger.error("inputLater: {}", e);
+                    //e.printStackTrace();
+                }
             });
         }
     }
@@ -1136,19 +1141,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public static final class InvalidTaskException extends RuntimeException {
 
-        public final Task task;
+        public final Termed task;
 
 
-        public InvalidTaskException(Task t, String message) {
+        public InvalidTaskException(Termed t, String message) {
             super(message);
             this.task = t;
-            task.delete(message);
+            if (t instanceof Task)
+                ((Task)t).delete(message);
         }
 
         @NotNull
         @Override
         public String getMessage() {
-            return super.getMessage() + ": " + task.proof();
+            return super.getMessage() + ": " +
+                    ((task instanceof Task) ? ((Task)task).proof() : task.toString());
         }
 
     }

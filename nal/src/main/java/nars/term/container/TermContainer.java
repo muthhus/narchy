@@ -51,7 +51,14 @@ public interface TermContainer<T extends Term> extends Termlike, Iterable<T> {
         return TermSet.the(t);
     }
 
+    //TODO optionally allow atomic structure positions to differ
     default boolean equivalentStructures() {
+        int t0Struct = term(0).structure();
+        for (int i = 1; i < size(); i++) {
+            if (term(i).structure()!=t0Struct)
+                return false;
+        }
+
         ByteList structureKey = term(0).structureKey();
         {
             ByteArrayList reuseKey = new ByteArrayList(structureKey.size());

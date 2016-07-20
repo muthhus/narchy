@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.atom.Operator;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.GenericVariable;
@@ -29,18 +30,17 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import static nars.Op.CONJ;
-import static nars.Op.EQUI;
 import static nars.Op.IMPL;
 import static nars.nal.Tense.DTERNAL;
 
 /** arithmetic rule mining & variable introduction */
 public class ArithmeticInduction implements Consumer<Task> {
-    private final NAR n;
+    private final NAR nar;
 
 
-    public ArithmeticInduction(NAR n) {
-        this.n = n;
-        n.onTask(this);
+    public ArithmeticInduction(NAR nar) {
+        this.nar = nar;
+        nar.onTask(this);
     }
 
     @Nullable
@@ -93,7 +93,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
                 compress(b, (features, pattern) -> {
 
-                    n.inputLater(
+                    nar.inputLater(
                             task(b, $.conj(features, pattern)).log(getClass().getSimpleName())
                     );
                         /*n.inputLater(
@@ -107,15 +107,45 @@ public class ArithmeticInduction implements Consumer<Task> {
 
 
                 });
-            } else if ( ((b.op() == IMPL) || (b.op() == EQUI)) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
+            } else if ( ((b.op() == IMPL) /*|| (b.op() == EQUI)*/) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
                 compress(b, (features, pattern) -> {
 
                     //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
-                    n.inputLater(
-                            print(task(b, $.conj(features, pattern)).log(getClass().getSimpleName()))
+                    nar.inputLater(
+                            /*print*/(task(b, $.conj(features, pattern)).log(getClass().getSimpleName()))
                     );
 
                 });
+            }
+
+            if (b.op()!=CONJ && b.term().hasAny(CONJ)) {
+
+                //attempt to transform inner conjunctions
+                Map<ByteList, Compound> conjs = $.newHashMap();
+
+                //Map<Compound, List<ByteList>> revs = $.newHashMap(); //reverse mapping to detect duplicates
+
+                b.term().pathsTo(x -> x.op()==CONJ ? x : null, (p,v) -> {
+                    if (!p.isEmpty())
+                        conjs.put(p.toImmutable(), (Compound)v);
+                    return true;
+                });
+
+                //TODO see if duplicates exist and can be merged into one substitution
+
+                conjs.forEach((pp,vv) -> {
+                    compress(vv, (features, pattern) -> {
+
+                        Term c = nar.index.transform(b.term(), pp, $.conj(features, pattern));
+
+                        if (c!=null) {
+                            nar.inputLater(
+                                    /*print*/(task(b, c))
+                            );
+                        }
+                    });
+                });
+
             }
         }
     }
@@ -160,12 +190,10 @@ public class ArithmeticInduction implements Consumer<Task> {
         Compound<?> first = (Compound)subs.term(0);
         //first.pathsTo(ArithmeticTest::intOrNullTerm, collect);
         first.pathsTo(x -> x, collect);
-        int paths = numbers.size();
 
-        if (paths == 0)
+        //no actual integer numbers found
+        if (!numbers.values().stream().anyMatch(x -> intOrNull(x.get(0))!=null))
             return;
-
-
 
         //analyze remaining subterms
         for (int i = 1; i < subCount; i++) {
@@ -262,6 +290,8 @@ public class ArithmeticInduction implements Consumer<Task> {
     }
 
 
+    final static Operator intRange = $.oper("intRange");
+
     public Term iRange(IntArrayList l, Term relatingVariable) {
 
         int min = l.min();
@@ -277,15 +307,16 @@ public class ArithmeticInduction implements Consumer<Task> {
         }
 
         //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
-        return $.p($.the("intRange"), relatingVariable, $.the(min), $.the(max-min));
+
+        return $.exec(intRange, relatingVariable, $.p($.the(min), $.the(max-min)));
     }
 
 
-    @NotNull MutableTask task(Task b, Term tt) {
+    @NotNull MutableTask task(Task b, Term newTerm) {
         return new GeneratedTask(
-                tt,
+                newTerm,
                 b.punc(), b.truth())
-                .time(n.time(), b.occurrence())
+                .time(nar.time(), b.occurrence())
                 .budget(b)
                 .evidence(b.evidence());
     }

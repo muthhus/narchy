@@ -142,14 +142,14 @@ public enum $ {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Atomic opTerm, @Nullable Term... arg) {
+    public static Compound exec(@NotNull Operator opTerm, @Nullable Term... arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
         );
     }
-    @NotNull public static Compound exec(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
+    @NotNull public static Compound exec(@NotNull Operator opTerm, @Nullable Collection<Term> arg) {
         return (Compound) compound(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),

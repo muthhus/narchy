@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  * Short-term Memory Temporal Structure Formation
  */
 public abstract class STM implements Consumer<Task> {
-    protected final @NotNull NAR nar;
+    public final @NotNull NAR nar;
 
     public final MutableInteger capacity;
 

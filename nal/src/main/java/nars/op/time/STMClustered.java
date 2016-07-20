@@ -2,6 +2,7 @@ package nars.op.time;
 
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
+import nars.bag.impl.AutoBag;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
 import nars.learn.gng.NeuralGasNet;
@@ -34,13 +35,16 @@ public class STMClustered extends STM {
 
     final short clusters;
 
+    final AutoBag bagForget = new AutoBag();
+
     @NotNull
     public final ArrayBag<Task> bag;
+
     @NotNull
     public final NeuralGasNet<TasksNode> net;
+
     protected long now;
 
-    final float forgetRate = 0.01f; //TODO tune based on capacity, window size, etc.
 
     public final char punc;
 
@@ -227,10 +231,12 @@ public class STMClustered extends STM {
         }
     }
 
+    @Deprecated final float forgetRate = 0.1f;
+
     /**
      * amount of priority subtracted from the priority each iteration
      */
-    private float cycleCost(@NotNull Task id) {
+    @Deprecated private float cycleCost(@NotNull Task id) {
         float dt = Math.abs(id.occurrence() - now);
         return forgetRate * dt * (1f - id.conf());
     }
@@ -309,8 +315,11 @@ public class STMClustered extends STM {
         if (t - now > compactPeriod) {
             net.compact();
         }
+
         now = nar.time();
-        bag.commit();
+
+        bagForget.commit(bag);
+
 
 
         //net.compact();

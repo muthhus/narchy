@@ -21,6 +21,7 @@
 package nars.task;
 
 import nars.*;
+import nars.NAR.InvalidTaskException;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.index.TermIndex;
@@ -110,21 +111,21 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         t = memory.index.normalize(t, true);
 
         if (!(t instanceof Compound))
-            throw new TermIndex.InvalidTaskTerm(t, "Task Term Does Not Normalize to Compound");
+            throw new InvalidTaskException(t, "Task Term Does Not Normalize to Compound");
 
 
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
         if (op.isStatement() && subjectOrPredicateIsIndependentVar(t.term()))
-            throw new TermIndex.InvalidTaskTerm(t, "Statement Task's subject or predicate is VAR_INDEP");
+            throw new InvalidTaskException(t, "Statement Task's subject or predicate is VAR_INDEP");
 
 //        if (hasCoNegatedAtemporalConjunction(ct)) {
 //            throw new TermIndex.InvalidTaskTerm(t, "Co-negation in commutive conjunction");
 //        }
 
         if ((punc == Symbols.GOAL || punc == Symbols.QUEST) && (op ==Op.IMPL || op == Op.EQUI))
-            throw new TermIndex.InvalidTaskTerm(t, "Goal/Quest task term may not be Implication or Equivalence");
+            throw new InvalidTaskException(t, "Goal/Quest task term may not be Implication or Equivalence");
 
         return t;
     }
