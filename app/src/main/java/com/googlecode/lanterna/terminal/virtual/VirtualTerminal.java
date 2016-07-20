@@ -23,6 +23,8 @@ import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
 
+import java.io.IOException;
+
 /**
  * A virtual terminal is a kind of terminal emulator implemented inside of Lanterna that exposes the Terminal interface
  * and maintains its state completely internally. The {@link VirtualTerminal} interface extends this interface and
@@ -138,6 +140,11 @@ public interface VirtualTerminal extends IOSafeTerminal {
      * @param bufferWalker Callback to invoke on each row in the iteration
      */
     void forEachLine(int startRow, int endRow, BufferWalker bufferWalker);
+
+    default void putLine(String s) throws IOException {
+        put(s);
+        put('\n');
+    }
 
     /**
      * Interface used by {@link BufferWalker} to repressent a line in the text buffer when iterating over a range of

@@ -1,9 +1,9 @@
-package org.jewelsea.willow.logger;
+package nars.util;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
-abstract public class FXConsoleAppender extends AppenderBase<ILoggingEvent> {
+abstract public class DefaultConsoleAppender extends AppenderBase<ILoggingEvent> {
   static int DEFAULT_LIMIT = 10;
   int counter;
   int limit = DEFAULT_LIMIT;

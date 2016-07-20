@@ -42,7 +42,7 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
     }
 
     public static void show(Default d, int count) {
-        BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count, 1400, 800) {
+        BagChart<Concept> tc = new BagChart<Concept>(d.core.concepts, count) {
             @Override
             public void accept(BLink<Concept> x, ItemVis<BLink<Concept>> y) {
                 float p = x.pri();
@@ -69,30 +69,33 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
         d.onFrame(xx -> {
             now = xx.time();
-            if (tc.busy.compareAndSet(false, true)) {
-                tc.update();
-            }
+            tc.update();
         });
 
         SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
         s.show(1400, 800);
 
 
-        s.add(new Facial(tc));
+        s.add(new Facial(tc).scale(1400, 800));
         s.add(new Facial(new CrosshairSurface(s)));
     }
 
     public void update() {
-        update(width, height);
+        if (busy.compareAndSet(false, true)) {
+            update(1f, 1f, bag.size(), bag, this, i -> {
+                @Nullable X ii = i.get();
+                return ii != null ? new ItemVis<>(i, label(ii, 16)) : null;
+            });
+        }
     }
 
     private final Bag<X> bag;
 
-    public BagChart(Bag<X> b, int limit, float w, float h) {
+    public BagChart(Bag<X> b, int limit) {
         super();
         this.bag = b;
         this.limit = limit;
-        update(w, h);
+        update();
     }
 
     @Override
@@ -101,13 +104,6 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
         super.paint(gl);
     }
 
-    protected void update(double w, double h) {
-
-        update(w, h, bag.size(), bag, this, i -> {
-            @Nullable X ii = i.get();
-            return ii != null ? new ItemVis<>(i, label(ii, 16)) : null;
-        });
-    }
 
     protected static <X> String label(@NotNull X i, int MAX_LEN) {
         String s = i.toString();

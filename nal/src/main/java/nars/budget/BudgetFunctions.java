@@ -230,7 +230,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Budget taxCollection(@NotNull Task[] tt, float paymentProportion) {
+    public static Budget fund(@NotNull Task[] tt, float paymentProportion) {
         UnitBudget u = new UnitBudget();
         for (Task t : tt) {
             @NotNull Budget tbudget = t.budget();

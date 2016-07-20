@@ -38,7 +38,7 @@ public class STMClustered extends STM {
     final AutoBag bagForget = new AutoBag();
 
     @NotNull
-    public final ArrayBag<Task> bag;
+    public final ArrayBag<Task> input;
 
     @NotNull
     public final NeuralGasNet<TasksNode> net;
@@ -105,18 +105,27 @@ public class STMClustered extends STM {
             insert(x);
         }
 
-        protected void remove(TLink x) {
-            tasks.remove(x);
+        protected boolean remove(TLink x) {
+            x.node = null;
+            if (tasks.remove(x)) {
+                return true;
+            }
+            //if (requireRemoval)
+                //throw new RuntimeException("task not in set");
+            return false;
         }
 
         public int size() {
             return tasks.size();
         }
 
-        public void insert(@NotNull TLink x) {
-
-            tasks.add(x);
-            x.node = this;
+        public boolean insert(@NotNull TLink x) {
+            if (tasks.add(x)) {
+                x.node = this;
+                return true;
+            }
+            //throw new RuntimeException("already in set");
+            return false;
         }
 
         public void delete() {
@@ -158,7 +167,7 @@ public class STMClustered extends STM {
         public void clear() {
             tasks.forEach(t -> {
                 @Nullable Task tt = t.get();
-                if (tt !=null) bag.remove(tt);
+                if (tt !=null) input.remove(tt);
             } );
             tasks.clear();
         }
@@ -192,10 +201,12 @@ public class STMClustered extends STM {
 
         @Override
         public void commit() {
-            if (id == null || get().isDeleted()) {
+            @Nullable Task id = this.id;
+
+            if (id == null || id.isDeleted()) {
                 delete();
             } else {
-                priSub(cycleCost(id));
+                //priSub(cycleCost(id));
                 nearest().transfer(this);
                 super.commit();
             }
@@ -231,14 +242,15 @@ public class STMClustered extends STM {
         }
     }
 
-    @Deprecated final float forgetRate = 0.1f;
+    @Deprecated final float baseForgetRate = 0.01f;
+    @Deprecated final float forgetRate = 0.01f;
 
     /**
      * amount of priority subtracted from the priority each iteration
      */
     @Deprecated private float cycleCost(@NotNull Task id) {
-        float dt = Math.abs(id.occurrence() - now);
-        return forgetRate * dt * (1f - id.conf());
+        //float dt = Math.abs(id.occurrence() - now);
+        return baseForgetRate + forgetRate * (1f - id.conf() * id.originality());
     }
 
     @NotNull
@@ -251,16 +263,16 @@ public class STMClustered extends STM {
 
     final Deque<TasksNode> removed = new ArrayDeque<>();
 
-    final int expectedTasksPerNode = 4;
 
-    public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc) {
+
+    public STMClustered(@NotNull NAR nar, @NotNull MutableInteger capacity, char punc, int expectedTasksPerNode) {
         super(nar, capacity);
 
         //TODO make this adaptive
-        clusters = (short)Math.max(2, 1 + capacity.intValue() / expectedTasksPerNode);
+        clusters = (short)Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.bag = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(1)) {
+        this.input = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(1)) {
             @NotNull
             @Override
             protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
@@ -302,7 +314,7 @@ public class STMClustered extends STM {
     }
 
     protected void iterate() {
-        bag.setCapacity(capacity.intValue());
+        input.setCapacity(capacity.intValue());
 
         int rr = removed.size();
         for (int i = 0; i < rr; i++) {
@@ -316,20 +328,15 @@ public class STMClustered extends STM {
             net.compact();
         }
 
-        now = nar.time();
+        now = t;
 
-        bagForget.commit(bag);
+        bagForget.commit(input);
 
-
-
-        //net.compact();
-
-        //print(System.out);
     }
 
     @Override
     public void clear() {
-        bag.clear();
+        input.clear();
     }
 
     @Override
@@ -337,7 +344,7 @@ public class STMClustered extends STM {
 
         if (t.punc() == punc) {
 
-            bag.put(t, t.budget());
+            input.put(t, t.budget());
         }
 
     }
@@ -349,7 +356,7 @@ public class STMClustered extends STM {
     }
 
     public int size() {
-        return bag.size();
+        return input.size();
     }
 
     public void print(@NotNull PrintStream out) {
@@ -376,7 +383,7 @@ public class STMClustered extends STM {
     }
 
     public DoubleSummaryStatistics bagStatistics() {
-        return StreamSupport.stream(bag.spliterator(), false).mapToDouble(Budgeted::pri).summaryStatistics();
+        return StreamSupport.stream(input.spliterator(), false).mapToDouble(Budgeted::pri).summaryStatistics();
     }
 
 

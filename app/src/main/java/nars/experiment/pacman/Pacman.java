@@ -213,7 +213,7 @@ public class Pacman extends cpcman implements Environment {
 
 					BagChart.show((Default) nar);
 
-					STMView.show(stmGoal, 500, 500);
+					STMView.show(stm, 500, 500);
 
 
 				}

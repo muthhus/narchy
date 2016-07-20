@@ -15,6 +15,8 @@ import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -23,14 +25,21 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
+	public final Logger logger;
+
 	private final int maxConjunctionSize;
 
-	float timeCoherenceThresh = 1.0f;
+	float timeCoherenceThresh = 0.5f; //for sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
 
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxConjunctionSize) {
-        super(nar, new MutableInteger(size), punc);
+        super(nar, new MutableInteger(size), punc, maxConjunctionSize);
 		this.maxConjunctionSize = maxConjunctionSize;
+		this.logger = LoggerFactory.getLogger(toString());
+
+		net.setAlpha(0.8f);
+		net.setBeta(0.8f);
+		net.setWinnerUpdateRate(0.1f, 0.05f);
     }
 
     @Override
@@ -39,10 +48,27 @@ public class MySTMClustered extends STMClustered {
 
 		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
+		int maxConjunctionSize = this.maxConjunctionSize;
+		float timeCoherenceThresh = this.timeCoherenceThresh;
+		float freqCoherenceThresh = this.freqCoherenceThresh;
+
+		//clusters where all terms occurr simultaneously at precisely the same time
+		//cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
+
+		//clusters where dt is allowed, but these must be of length 2
+		cluster(2, timeCoherenceThresh, freqCoherenceThresh);
+
+
+	}
+
+	private void cluster(int maxConjunctionSize, float timeCoherenceThresh, float freqCoherenceThresh) {
 		net.nodeStream()
 			//.parallel()
 				//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
 			.filter(n -> {
+				if (n.size() < 2)
+					return false;
+
 				double[] tc = n.coherence(0);
 				if (tc==null)
 					return false;
@@ -74,17 +100,14 @@ public class MySTMClustered extends STMClustered {
 
 					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
-					Term[] s = Stream.of(uu).map(Task::term).toArray(Term[]::new);
 
 					//float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
 					float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
 
 					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_MAX_EVIDENCE);
 
-					if (negated)
-						$.neg(s);
+					@Nullable Term conj = conj(negated, uu);
 
-					@Nullable Term conj = $.parallel(s);
 					if (!(conj instanceof Compound))
 						return;
 
@@ -99,8 +122,10 @@ public class MySTMClustered extends STMClustered {
 							new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 							.time(now, t)
 							.evidence(evidence)
-							.budget(BudgetFunctions.taxCollection(uu, 1f / s.length))
+							.budget(BudgetFunctions.fund(uu, 1f / uu.length))
 							.log("STMCluster CoOccurr");
+
+					logger.info("{}", m);
 
 					//System.err.println(m + " " + Arrays.toString(m.evidence()));
 					nar.input(m);
@@ -110,8 +135,34 @@ public class MySTMClustered extends STMClustered {
 
 
 		});
+	}
 
-		//TODO create temporally inducted relations between centroids of different time indices
+	private Term conj(boolean negated, Task[] uu) {
 
+		if (uu.length == 2) {
+			//find the dt and construct a sequence
+			Task early, late;
+			if (uu[0].occurrence() <= uu[1].occurrence()) {
+				early = uu[0]; late = uu[1];
+			} else {
+				early = uu[1]; late = uu[0];
+			}
+			int dt = (int)(late.occurrence() - early.occurrence());
+
+			return $.conj(
+					$.negIf(early.term(), negated),
+					dt,
+					$.negIf(late.term(), negated)
+			);
+
+		} else {
+			Term[] s = Stream.of(uu).map(Task::term).toArray(Term[]::new);
+
+			if (negated)
+				$.neg(s);
+
+			//just assume they occurr simultaneously
+			return $.parallel(s);
+		}
 	}
 }

@@ -460,7 +460,7 @@ public abstract class AbstractTask extends UnitBudget implements Task, Temporal 
      * @return Whether the two sentences have the same content
      */
     @Override
-    public final boolean equals(@NotNull Object that) {
+    public final boolean equals(@Nullable Object that) {
 
         return this == that ||
                 (that!=null && hashCode() == that.hashCode() && that instanceof Task && equivalentTo((Task) that, true, true, true, true, false));

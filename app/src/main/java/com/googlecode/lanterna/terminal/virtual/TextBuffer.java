@@ -19,11 +19,11 @@
 package com.googlecode.lanterna.terminal.virtual;
 
 import com.googlecode.lanterna.TextCharacter;
+import nars.$;
+import nars.util.data.list.CircularArrayList;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * This class is used to store lines of text inside of a terminal emulator. As used by {@link DefaultVirtualTerminal}, it keeps
@@ -32,24 +32,34 @@ import java.util.ListIterator;
 class TextBuffer {
     private static final TextCharacter DOUBLE_WIDTH_CHAR_PADDING = new TextCharacter(' ');
 
-    private final LinkedList<List<TextCharacter>> lines;
+    @Deprecated private final List<List<TextCharacter>> lines;
+    private final int maxLineWidth;
 
-    TextBuffer() {
-        this.lines = new LinkedList<>();
+    TextBuffer(int maxLineWidth) {
+        this.lines =
+                //new ArrayDeque();
+                Collections.synchronizedList( new LinkedList<>() );
+        this.maxLineWidth = maxLineWidth;
         newLine();
     }
 
-    synchronized void newLine() {
-        lines.add(new ArrayList<>(200));
+    void newLine() {
+        lines.add($.newArrayList(maxLineWidth));
     }
 
-    synchronized void removeTopLines(int numberOfLinesToRemove) {
-        for(int i = 0; i < numberOfLinesToRemove; i++) {
-            lines.removeFirst();
+    void removeTopLines(int numberOfLinesToRemove) {
+        int n = Math.min(lines.size(), numberOfLinesToRemove);
+        Iterator<List<TextCharacter>> x = lines.iterator();
+        while (x.hasNext() && ((n--) > 0)) {
+            x.next();
+            x.remove();
         }
+//        for(int i = 0; i < numberOfLinesToRemove; i++) {
+//            lines.removeFirst();
+//        }
     }
 
-    synchronized void clear() {
+    void clear() {
         lines.clear();
         newLine();
     }
@@ -58,11 +68,15 @@ class TextBuffer {
         return lines.listIterator(rowNumber);
     }
 
-    synchronized int getLineCount() {
+    public List<TextCharacter> getLine(int l) {
+        return lines.get(l);
+    }
+
+    int getLineCount() {
         return lines.size();
     }
 
-    synchronized int set(int lineNumber, int columnIndex, TextCharacter textCharacter) {
+    int set(int lineNumber, int columnIndex, TextCharacter textCharacter) {
         if(lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.setCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);
@@ -70,7 +84,8 @@ class TextBuffer {
         if(textCharacter == null) {
             textCharacter = TextCharacter.DEFAULT_CHARACTER;
         }
-        while(lineNumber >= lines.size()) {
+        int s = lines.size();
+        while(lineNumber >= s) {
             newLine();
         }
         List<TextCharacter> line = lines.get(lineNumber);
@@ -82,11 +97,12 @@ class TextBuffer {
         int returnStyle = 0;
 
         // Check if we are overwriting a double-width character, in that case we need to reset the other half
-        if(line.get(columnIndex).isDoubleWidth()) {
-            line.set(columnIndex + 1, line.get(columnIndex).withCharacter(' '));
+        TextCharacter lc = line.get(columnIndex);
+        if(lc.isDoubleWidth()) {
+            line.set(columnIndex + 1, lc.withCharacter(' '));
             returnStyle = 1; // this character and the one to the right
         }
-        else if(line.get(columnIndex) == DOUBLE_WIDTH_CHAR_PADDING) {
+        else if(lc == DOUBLE_WIDTH_CHAR_PADDING) {
             line.set(columnIndex - 1, TextCharacter.DEFAULT_CHARACTER);
             returnStyle = 2; // this character and the one to the left
         }
@@ -99,7 +115,7 @@ class TextBuffer {
         return returnStyle;
     }
 
-    synchronized TextCharacter get(int lineNumber, int columnIndex) {
+    TextCharacter get(int lineNumber, int columnIndex) {
         if(lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.getCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);

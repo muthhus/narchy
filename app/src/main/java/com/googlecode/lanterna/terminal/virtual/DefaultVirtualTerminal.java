@@ -26,6 +26,7 @@ import com.googlecode.lanterna.terminal.AbstractTerminal;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualTerminal {
     private final TextBuffer regularTextBuffer;
     private final TextBuffer privateModeTextBuffer;
-    private final TreeSet<TerminalPosition> dirtyTerminalCells;
+    private TreeSet<TerminalPosition> dirtyTerminalCells;
     private final List<VirtualTerminalListener> listeners;
 
     private TextBuffer currentTextBuffer;
@@ -70,13 +71,15 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
      * @param initialSize Starting size of the virtual terminal
      */
     public DefaultVirtualTerminal(TerminalPosition initialSize) {
-        this.regularTextBuffer = new TextBuffer();
-        this.privateModeTextBuffer = new TextBuffer();
+        this.regularTextBuffer = new TextBuffer(200);
+        this.privateModeTextBuffer = new TextBuffer(200);
         this.dirtyTerminalCells = new TreeSet<>();
         this.listeners = new ArrayList<>();
 
         // Terminal state
-        this.inputQueue = new LinkedBlockingQueue<>();
+        this.inputQueue =
+                new LinkedBlockingQueue<>();
+
         this.activeModifiers = EnumSet.noneOf(SGR.class);
         this.activeForegroundColor = TextColor.ANSI.DEFAULT;
         this.activeBackgroundColor = TextColor.ANSI.DEFAULT;
@@ -88,7 +91,7 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
         this.cursorVisible = true;
         this.cursorPosition = TerminalPosition.TOP_LEFT_CORNER;
         this.savedCursorPosition = TerminalPosition.TOP_LEFT_CORNER;
-        this.backlogSize = 1000;
+        this.backlogSize = initialSize.row * 4;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +170,7 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     }
 
     @Override
-    public synchronized void put(char c)  {
+    public void put(char c)  {
         if(c == '\n') {
             moveCursorToNextLine();
         }
@@ -286,9 +289,9 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     }
 
     public synchronized TreeSet<TerminalPosition> getAndResetDirtyCells() {
-        TreeSet<TerminalPosition> copy = new TreeSet<>(dirtyTerminalCells);
-        dirtyTerminalCells.clear();
-        return copy;
+        TreeSet<TerminalPosition> e = dirtyTerminalCells;
+        dirtyTerminalCells = new TreeSet();
+        return e;
     }
 
     public synchronized boolean isWholeBufferDirtyThenReset() {

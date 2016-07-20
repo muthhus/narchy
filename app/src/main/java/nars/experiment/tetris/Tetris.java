@@ -53,7 +53,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 20000;
-    public static final int cyclesPerFrame = 24;
+    public static final int cyclesPerFrame = 96;
 
     private final TetrisVisualizer vis;
     private final JFrame window;
@@ -243,7 +243,7 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 5 * 100000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 100000, false)
 
                 ,new FrameClock());
         nar.conceptActivation.setValue(0.1f);
@@ -289,8 +289,8 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 5);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 5);
 
         //new ArithmeticInduction(nar);
 
@@ -333,7 +333,7 @@ public class Tetris extends TetrisState implements Environment {
                 if (nar instanceof Default) {
                     new BeliefTableChart(nar, charted).show(600, 900);
                     //BagChart.show((Default) nar, 128);
-                    STMView.show(stm, 500, 500);
+                    STMView.show(stm, 800, 600);
                 }
             }
         };

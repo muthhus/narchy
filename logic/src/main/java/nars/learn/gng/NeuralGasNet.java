@@ -27,8 +27,8 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     private int maxAge;
     private double alpha;
     private double beta;
-    private double epsW;
-    private double epsN;
+    private double winnerUpdateRate;
+    private double winnerNeighborUpdateRate;
 
     public int getLambda() {
         return lambda;
@@ -45,19 +45,16 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         this.alpha = alpha;
     }
 
-    public void setEpsN(double epsN) {
-        this.epsN = epsN;
-    }
-
-    public void setEpsW(double epsW) {
-        this.epsW = epsW;
+    public void setWinnerUpdateRate(double rate, double neighborRate) {
+        this.winnerUpdateRate = rate;
+        this.winnerNeighborUpdateRate = neighborRate;
     }
 
     public void setBeta(double beta) {
         this.beta = beta;
     }
 
-    public void setMaxAge(int maxAge) {
+    public void setMaxEdgeAge(int maxAge) {
         this.maxAge = maxAge;
     }
 
@@ -65,12 +62,12 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         return maxAge;
     }
 
-    public double getEpsW() {
-        return epsW;
+    public double getWinnerUpdateRate() {
+        return winnerUpdateRate;
     }
 
-    public double getEpsN() {
-        return epsN;
+    public double getWinnerNeighborUpdateRate() {
+        return winnerNeighborUpdateRate;
     }
 
 
@@ -89,14 +86,13 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         this.maxNodes = maxNodes;
 
         //default values
-        setLambda(20);
-        setMaxAge(20);
+        setLambda(maxNodes*2);
+        setMaxEdgeAge(maxNodes*2);
 
         setAlpha(0.8);
         setBeta(0.9);
 
-        setEpsW(0.05);
-        setEpsN(0.02);
+        setWinnerUpdateRate(0.05, 0.02);
 
 
         /** nodes should begin with randomized coordinates */
@@ -193,7 +189,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         closestNode.setLocalError(closestNode.getLocalError() + closestNode.getLocalDistance());
 
         //update weights for "winner"
-        closestNode.update(getEpsW(), x);
+        closestNode.update(getWinnerUpdateRate(), x);
 
         //update weights for "winner"'s neighbours
         short sc = closest;
@@ -201,7 +197,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
             Node toUpdate = node[connection];
 
             //if (toUpdate != null) { //should not be null
-            toUpdate.update(getEpsN(), x);
+            toUpdate.update(getWinnerNeighborUpdateRate(), x);
         });
         e.addToEdges(sc, +1);
 
@@ -360,6 +356,80 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         e.compact();
     }
 
+    public int size() { return node.length; }
+
+    /** snapshot state of the node status */
+    public static class NeuralGasNetState {
+
+        public double[][] range = new double[0][0];
+
+        public double[][] coord = new double[0][0];
+
+        //public double[] size = new double[0];
+
+        final static double epsilon = 0.001;
+
+        public NeuralGasNetState update(NeuralGasNet n) {
+
+            int dims = n.dimension;
+            if (this.range.length!= dims) {
+                this.range = new double[dims][2];
+            }
+            int s = n.size();
+            if (this.coord.length!= s) {
+                this.coord = new double[s][dims];
+                //this.size = new double[s];
+            }
+
+            double[][] range = this.range;
+            double[][] coord = this.coord;
+
+            for (int d = 0; d < dims; d++) {
+                range[d][0] = Float.POSITIVE_INFINITY;
+                range[d][1] = Float.NEGATIVE_INFINITY;
+            }
+            Node[] node1 = n.node;
+            for (int i = 0, node1Length = node1.length; i < node1Length; i++) {
+                Node x = node1[i];
+
+                double[] cc = coord[i];
+                double[] dd = x.getDataRef();
+
+                for (int d = 0; d < dims; d++) {
+                    double y;
+                    cc[d] = y = dd[d];
+                    double[] rr = range[d];
+                    rr[0] = Math.min(rr[0], y);
+                    rr[1] = Math.max(rr[1], y);
+                }
+
+            }
+            return this;
+        }
+
+        public void normalize() {
+            double[][] range = this.range;
+            double[][] coord = this.coord;
+
+            int dims = range.length;
+            double span[] = new double[dims];
+            for (int i = 0; i < dims; i++) {
+                double[] ri = range[i];
+                double dr = ri[1] - ri[0];
+                if (dr > epsilon)
+                    span[i] = dr;
+                //else = 0
+            }
+
+            for (double[] x : coord) {
+                for (int i = 0; i < dims; i++) {
+                    double s = span[i];
+                    x[i] = (s == 0) ? 0 : ((x[i] - range[i][0]) / s);
+                }
+            }
+        }
+
+    }
 //    private void addEdge(Connection<N> connection) {
 //
 //        addEdge(connection.from, connection.to, connection);
