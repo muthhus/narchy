@@ -26,6 +26,9 @@ public class MySTMClustered extends STMClustered {
 
 	private final int maxConjunctionSize;
 
+	float timeCoherenceThresh = 1.0f;
+	float freqCoherenceThresh = 0.9f;
+
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxConjunctionSize) {
         super(nar, new MutableInteger(size), punc);
 		this.maxConjunctionSize = maxConjunctionSize;
@@ -37,13 +40,14 @@ public class MySTMClustered extends STMClustered {
 
 		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
-		net.nodeStream().parallel()
-			//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
+		net.nodeStream()
+			//.parallel()
+				//.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
 			.filter(n -> {
 				double[] tc = n.coherence(0);
+				if (tc==null)
+					return false;
 
-				float timeCoherenceThresh = 0.98f;
-				float freqCoherenceThresh = 0.75f;
 
 				if (tc[1] >= timeCoherenceThresh) {
 					double[] fc = n.coherence(1);
@@ -69,12 +73,14 @@ public class MySTMClustered extends STMClustered {
 				float finalFreq = freq;
 				node.termSet(maxConjunctionSize).forEach(tt -> {
 
-					Term[] s = Stream.of(tt).map(Task::term).toArray(Term[]::new);
+					Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
-					//float confMin = (float) Stream.of(tt).mapToDouble(Task::conf).min().getAsDouble();
-					float conf = TruthFunctions.and((Truthed[]) tt); //used for emulation of 'intersection' truth function
+					Term[] s = Stream.of(uu).map(Task::term).toArray(Term[]::new);
 
-					long[] evidence = Stamp.zip(Stream.of(tt), tt.length, Global.STAMP_MAX_EVIDENCE);
+					//float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
+					float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+
+					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Global.STAMP_MAX_EVIDENCE);
 
 					if (negated)
 						$.neg(s);
@@ -84,13 +90,17 @@ public class MySTMClustered extends STMClustered {
 						return;
 
 
-					long t = Math.round(node.coherence(0)[0]);
+					@Nullable double[] nc = node.coherence(0);
+					if (nc == null)
+						return;
+
+					long t = Math.round(nc[0]);
 
 					Task m = new MutableTask(conj, punc,
 							new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 							.time(now, t)
 							.evidence(evidence)
-							.budget(BudgetFunctions.taxCollection(tt, 1f / s.length))
+							.budget(BudgetFunctions.taxCollection(uu, 1f / s.length))
 							.log("STMCluster CoOccurr");
 
 					//System.err.println(m + " " + Arrays.toString(m.evidence()));

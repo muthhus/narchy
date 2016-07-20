@@ -13,6 +13,7 @@ import nars.task.Task;
 import nars.util.Util;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -44,7 +45,6 @@ public class STMClustered extends STM {
 
     //final float timeResolution = 0.5f;
 
-    private static final double[] EmptyCoherence = new double[] { Double.NaN, Double.NaN };
 
     private static final int compactPeriod = 8;
 
@@ -107,6 +107,7 @@ public class STMClustered extends STM {
         }
 
         public void insert(@NotNull TLink x) {
+
             tasks.add(x);
             x.node = this;
         }
@@ -116,8 +117,9 @@ public class STMClustered extends STM {
         }
 
         /** 1f - variance measured from the items for a given vector dimension */
+        @Nullable
         public double[] coherence(int dim) {
-            if (size() == 0) return EmptyCoherence;
+            if (size() == 0) return null;
             double[] v = Util.avgvar(tasks.stream().mapToDouble(t -> t.coord[dim]).toArray()); //HACK slow
             v[1] = 1f - v[1]; //convert variance to coherence
             return v;
@@ -147,7 +149,10 @@ public class STMClustered extends STM {
 
         /** removes all tasks that are part of this node, and removes them from the bag also, effectively flushing these tasks out of this STM unit */
         public void clear() {
-            tasks.forEach(t -> bag.remove(t.get()));
+            tasks.forEach(t -> {
+                @Nullable Task tt = t.get();
+                if (tt !=null) bag.remove(tt);
+            } );
             tasks.clear();
         }
     }
@@ -180,12 +185,13 @@ public class STMClustered extends STM {
 
         @Override
         public void commit() {
-            if (get().isDeleted()) {
+            if (id == null || get().isDeleted()) {
                 delete();
+            } else {
+                priSub(cycleCost(id));
+                nearest().transfer(this);
+                super.commit();
             }
-            priSub(cycleCost(id));
-            nearest().transfer(this);
-            super.commit();
         }
 
         private TasksNode nearest() {

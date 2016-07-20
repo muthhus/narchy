@@ -836,16 +836,21 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         onFrame(nn->{
             int a = s.availablePermits();
             if (a < maxRunsPerFrame)
-                s.release(maxRunsPerFrame-a);
+                s.release(1); //maxRunsPerFrame-a);
         });
         return runAsync(()->{
-            while (true) {
-                try {
-                    s.acquire();
-                    t.run();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            try {
+                while (true) {
+                    try {
+                        s.acquire();
+                        t.run();
+                    } catch (InterruptedException e) {
+                     e.printStackTrace();
+                    }
                 }
+            }
+            catch (Throwable tt) {
+                tt.printStackTrace();
             }
         });
     }
