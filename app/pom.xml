@@ -62,6 +62,7 @@
 
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.googlecode.concurrent-trees/concurrent-trees -->
     <dependency>
       <groupId>com.googlecode.concurrent-trees</groupId>
       <artifactId>concurrent-trees</artifactId>
@@ -76,12 +77,14 @@
       <groupId>com.eclipsesource.minimal-json</groupId>
       <artifactId>minimal-json</artifactId>
       <version>0.9.4</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-embedded</artifactId>
       <version>9.0.0.Alpha3</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

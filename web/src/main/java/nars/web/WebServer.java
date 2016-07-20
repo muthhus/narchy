@@ -18,6 +18,7 @@ import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.RealtimeMSClock;
 import nars.truth.Truth;
@@ -117,7 +118,7 @@ public class WebServer /*extends PathHandler*/ {
                             final int minTermLinks = 0;
 
                             private Object[] termLinks(Concept c, int num) {
-                                Bag<Termed> b = c.termlinks();
+                                Bag<Term> b = c.termlinks();
                                 Object[] tl = new Object[ Math.min(num, b.size() )];
                                 final int[] n = {0};
                                 b.forEach(num, t -> {

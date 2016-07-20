@@ -139,6 +139,9 @@ public enum $ {
     }
 
 
+    public static Compound exec(@NotNull String opTerm, @Nullable Term... arg) {
+        return exec($.oper(opTerm), arg);
+    }
 
     /** execution (NARS "operation") */
     @NotNull
