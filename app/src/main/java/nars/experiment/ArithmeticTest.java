@@ -7,13 +7,11 @@ import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.nar.Default;
-import nars.op.StructuralSimilarity;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -84,8 +82,15 @@ public class ArithmeticTest {
 
         Global.DEBUG = true;
         n.log();
-        n.input("((x,1) && (x,2)). :|:");
-        n.input("((x,2) && (x,3)). :|:");
+
+        n.input("((x,1) && (x,2)). :|:"); //should find one pattern
+
+        //n.input("((x,1,2) && (x,2,4)). :|:"); //should find two patterns
+
+        //n.input("((x,1,2) && (y,2,4)). :|:"); //should not apply because x!=y
+
+
+        //n.input("((x,2,1) && (x,3,1)). :|:");
 
 //        n.input("numbers:{1,2,3,4}.");
 //        n.input("numbers:{1,2,3,4}.");
@@ -104,6 +109,28 @@ public class ArithmeticTest {
 
     }
 
+    @Nullable
+    public static IntArrayList intsOrNull(List<Term> term) {
+        IntArrayList l = new IntArrayList(term.size());
+        for (Term x : term) {
+            Integer i = intOrNull(x);
+            if (i == null)
+                return null;
+            l.add(i);
+        }
+        return l;
+    }
+
+    @Nullable
+    public static Term intOrNullTerm(Term term) {
+        if (term instanceof Atomic) {
+            int i = Texts.i(term.toString(), Integer.MIN_VALUE);
+            if (i == Integer.MIN_VALUE)
+                return null;
+            return term;
+        }
+        return null;
+    }
 
     @Nullable
     public static Integer intOrNull(Term term) {
@@ -113,12 +140,12 @@ public class ArithmeticTest {
                 return null;
             return i;
         }
-        if (term instanceof Compound && term.op() == Op.SETe) {
-            Compound c = ((Compound)term);
-            if (c.size() == 1) {
-                return intOrNull(c.term(0)); //unwrap singleton extset
-            }
-        }
+//        if (term instanceof Compound && term.op() == Op.SETe) {
+//            Compound c = ((Compound)term);
+//            if (c.size() == 1) {
+//                return intOrNull(c.term(0)); //unwrap singleton extset
+//            }
+//        }
         return null;
     }
 
@@ -208,17 +235,20 @@ public class ArithmeticTest {
             }
 
             //paths * extracted sequence of numbers at given path for each subterm
-            Map<ByteList,IntArrayList> numbers = new HashMap(), seed;
+            Map<ByteList,List<Term>> numbers = new HashMap();
 
             //first subterm: infer location of all inductables
-            BiPredicate<ByteList, @Nullable Integer> collect = (p, t) -> {
-                IntArrayList c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> new IntArrayList(1));
-                c.add(t);
+            BiPredicate<ByteList, @Nullable Term> collect = (p, t) -> {
+                if (!p.isEmpty() && t!=null) {
+                    List<Term> c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> Global.newArrayList(1));
+                    c.add(t);
+                }
                 return true;
             };
 
             Compound<?> first = (Compound)subs.term(0);
-            first.pathsTo(ArithmeticTest::intOrNull, collect);
+            //first.pathsTo(ArithmeticTest::intOrNullTerm, collect);
+            first.pathsTo(x -> x, collect);
             int paths = numbers.size();
 
             if (paths == 0)
@@ -230,37 +260,57 @@ public class ArithmeticTest {
             for (int i = 1; i < subCount; i++) {
 
                 //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-                if (!subs.term(i).pathsTo(
-                        (e) -> (e instanceof Atom && intOrNull(e)==null) ? e : null,
-                        (p, x) -> {
-                            return (x == null || first.subterm(p).equals(x));
+                subs.term(i).pathsTo(
+                        (e) -> e, //(e instanceof Atom && intOrNull(e)==null) ? e : null,
+                        collect);
+                        /*(p, x) -> {
 
-                        })) {
-                    return;
-                }
+                            if (!p.isEmpty()) { //ignore the root superterm
 
-                subs.term(i).pathsTo(ArithmeticTest::intOrNull, collect);
+                                //if this is is a potential variable path, add the subterm's value at it to the list of values
+                                List<Term> v = numbers.get(p);
+                                if (v != null) {
+                                    v.add(x);
+                                } else {
+                                    //else every atomic value must be consistently equal throughout
+                                    if (x instanceof Atomic && !first.subterm(p).equals(x))
+                                        return false;
+                                }
+                            }
+
+                            return true;
+
+
+                        }*/;
+
 
             }
 
             numbers.forEach((pp, nn) -> {
 
-                //if all subterms do not contribute a value, ignore this path, it doesnt have a result from each subterm ?
+                //all subterms must contribute a value for this path
                 if (nn.size()!=subCount)
                     return;
 
                 //for each path where the other numerics are uniformly equal (only one unique value)
-                if (nn.toSet().size()==1) {
+                if (new HashSet(nn).size()==1) {
 
+                    numbers.forEach((ppp, nnnt) -> {
 
-                    numbers.forEach((ppp, nnn) -> {
                         if (!pp.equals(ppp)) {
-                            //System.out.println(b + " " + pp + " " + nn + " : " + "\t" + numbers + " " + pattern);
 
-                            List<Term> features = features(nnn, vv);
-                            if (!features.isEmpty()) {
-                                Term pattern = $.negIf($.terms.transform(first, ppp, vv), negate);
-                                each.accept(features, pattern);
+                            IntArrayList nnn = intsOrNull(nnnt);
+                            if (nnn!=null) {
+
+                                //System.out.println(b + " " + pp + " " + nn + " : " + "\t" + numbers + " " + pattern);
+
+                                List<Term> features = features(nnn, vv);
+                                if (!features.isEmpty()) {
+                                    Term pattern = $.negIf(
+                                        $.terms.transform(first, ppp, vv), negate
+                                    );
+                                    each.accept(features, pattern);
+                                }
                             }
                         }
                     });

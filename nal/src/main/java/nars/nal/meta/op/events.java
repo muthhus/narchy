@@ -1,11 +1,13 @@
 package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBoolCondition;
+import nars.nal.meta.BoolCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -26,6 +28,19 @@ abstract public class events extends AtomicBoolCondition {
             return beliefBeforeOrDuringTask(m.task, m.belief);
         }
 
+    };
+
+    /** rejects any task term with dt==DTERNAL */
+    public static final BoolCondition taskIsTemporal = new AtomicBoolCondition() {
+        @Override
+        public @NotNull String toString() {
+            return "taskIsTemporal";
+        }
+
+        @Override
+        public boolean booleanValueOf(PremiseEval p) {
+            return p.task.dt()!=DTERNAL;
+        }
     };
 
     public static boolean beliefBeforeOrDuringTask(@NotNull Task task, @Nullable Task belief) {
