@@ -31,6 +31,7 @@ import nars.budget.UnitBudget;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
@@ -90,17 +91,17 @@ public class Pacman extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.05f);
+		nar.conceptActivation.setValue(0.1f);
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.9f);
+		nar.goalConfidence(0.9f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(16);
+		nar.cyclesPerFrame.set(32);
 		nar.confMin.setValue(0.01f);
 
 
@@ -129,8 +130,9 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.', 5);
-		//new MySTMClustered(nar, 16, '!', 2);
+		MySTMClustered stm = new MySTMClustered(nar, 128, '.', 5);
+		MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 2);
+
 		new ArithmeticInduction(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
@@ -139,9 +141,9 @@ public class Pacman extends cpcman implements Environment {
 		//PAC GPS global positioining
 		Iterable<Termed> cheats = Iterables.concat(
 				numericSensor(() -> pacman.pac.iX, nar, 0.7f,
-						"I:(x,n)", "I:(x,p)").resolution(0.1f),
+						"I(x,n)", "I(x,p)").resolution(0.1f),
 				numericSensor(() -> pacman.pac.iY, nar, 0.7f,
-						"I:(y,n)", "I:(y,p)").resolution(0.1f)
+						"I(y,n)", "I(y,p)").resolution(0.1f)
 		);
 
 		NAgent n = new NAgent(nar) {
@@ -210,6 +212,10 @@ public class Pacman extends cpcman implements Environment {
 					new BeliefTableChart(nar, charted).show(600, 900);
 
 					BagChart.show((Default) nar);
+
+					STMView.show(stmGoal, 500, 500);
+
+
 				}
 			}
 		};

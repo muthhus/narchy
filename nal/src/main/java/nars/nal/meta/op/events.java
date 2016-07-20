@@ -30,7 +30,7 @@ abstract public class events extends AtomicBoolCondition {
 
     };
 
-    /** rejects any task term with dt==DTERNAL */
+    /** rejects any task term with dt==DTERNAL and if task and belief are both eternal */
     public static final BoolCondition taskIsTemporal = new AtomicBoolCondition() {
         @Override
         public @NotNull String toString() {
@@ -40,7 +40,15 @@ abstract public class events extends AtomicBoolCondition {
         @Override
         public boolean booleanValueOf(PremiseEval p) {
             Task t = p.task;
-            return !t.isEternal() && t.dt()!=DTERNAL;
+            if (t.dt()!=DTERNAL) {
+                if (!t.isEternal())
+                    return true;
+                Task b = p.belief;
+                if (b!=null && !p.belief.isEternal())
+                    return true;
+            }
+
+            return false;
         }
     };
 

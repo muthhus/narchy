@@ -93,7 +93,7 @@ public class ArithmeticInduction implements Consumer<Task> {
 
                 compress(b, (features, pattern) -> {
 
-                    nar.inputLater(
+                    emit(
                             task(b, $.conj(features, pattern)).log(getClass().getSimpleName())
                     );
                         /*n.inputLater(
@@ -111,7 +111,7 @@ public class ArithmeticInduction implements Consumer<Task> {
                 compress(b, (features, pattern) -> {
 
                     //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
-                    nar.inputLater(
+                    emit(
                             /*print*/(task(b, $.conj(features, pattern)).log(getClass().getSimpleName()))
                     );
 
@@ -139,8 +139,8 @@ public class ArithmeticInduction implements Consumer<Task> {
                         Term c = nar.index.transform(b.term(), pp, $.conj(features, pattern));
 
                         if (c!=null) {
-                            nar.inputLater(
-                                    /*print*/(task(b, c))
+                            emit(
+                                    (task(b, c))
                             );
                         }
                     });
@@ -148,6 +148,12 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             }
         }
+    }
+
+    void emit(Task task) {
+        nar.inputLater(
+            /*print*/(task)
+        );
     }
 
     static Task print(Task t) {

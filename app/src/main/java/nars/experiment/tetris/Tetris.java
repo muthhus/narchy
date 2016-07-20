@@ -53,7 +53,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 20000;
-    public static final int cyclesPerFrame = 64;
+    public static final int cyclesPerFrame = 24;
 
     private final TetrisVisualizer vis;
     private final JFrame window;
@@ -249,14 +249,14 @@ public class Tetris extends TetrisState implements Environment {
         nar.conceptActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.7f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.01f);
+        nar.confMin.setValue(0.1f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -290,17 +290,17 @@ public class Tetris extends TetrisState implements Environment {
 
         //new Abbreviation2(nar, "_");
         MySTMClustered stm = new MySTMClustered(nar, 128, '.', 3);
-        //new MySTMClustered(nar, 16, '!', 2);
-        new ArithmeticInduction(nar);
-        //new MySTMClustered(nar, 8, '!');
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 3);
+
+        //new ArithmeticInduction(nar);
 
 
 
         Tetris t = new Tetris(6, 10, 2) {
             @Override
             protected int nextBlock() {
-                return super.nextBlock(); //all blocks
-                //return 1; //square blocks
+                //return super.nextBlock(); //all blocks
+                return 1; //square blocks
                 //return 0; //long blocks
             }
         };
