@@ -24,7 +24,6 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.agent.NAgent;
-import nars.experiment.ArithmeticTest;
 import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
@@ -33,6 +32,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -289,7 +289,7 @@ public class Tetris extends TetrisState implements Environment {
         //new Abbreviation2(nar, "_");
         new MySTMClustered(nar, 16, '.', 2);
         //new MySTMClustered(nar, 16, '!', 2);
-        new ArithmeticTest.ArtithmeticInduction1(nar);
+        new ArithmeticInduction(nar);
         //new MySTMClustered(nar, 8, '!');
 
 

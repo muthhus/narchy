@@ -28,7 +28,6 @@ import nars.NAR;
 import nars.Param;
 import nars.agent.NAgent;
 import nars.budget.UnitBudget;
-import nars.experiment.ArithmeticTest;
 import nars.experiment.Environment;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
@@ -36,6 +35,7 @@ import nars.index.CaffeineIndex;
 import nars.learn.Agent;
 import nars.nar.Default;
 import nars.nar.util.DefaultConceptBuilder;
+import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Term;
 import nars.term.Termed;
@@ -131,7 +131,7 @@ public class Pacman extends cpcman implements Environment {
 		//new Abbreviation2(nar, "_");
 		new MySTMClustered(nar, 16, '.', 5);
 		//new MySTMClustered(nar, 16, '!', 2);
-		new ArithmeticTest.ArtithmeticInduction1(nar);
+		new ArithmeticInduction(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);
 

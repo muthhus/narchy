@@ -28,6 +28,11 @@ public class AnswerTask extends MutableTask {
         time(creationTime, occTime);
     }
 
+    @Override
+    public final boolean isInput() {
+        return false;
+    }
+
     @Nullable
     @Override
     public Task getParentTask() {

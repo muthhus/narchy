@@ -375,6 +375,19 @@ public enum $ {
     public static Term conj(Term... a) {
         return compound(CONJ, a);
     }
+    @Nullable
+    public static Term conj(Collection<Term> collection, Term... append) {
+        if (append.length == 0)
+            throw new RuntimeException("unnecessary append");
+        int cs = collection.size();
+        Term[] ca = new Term[cs + append.length];
+        collection.toArray(ca);
+        int i = cs;
+        for (Term t : append) {
+            ca[i++] = t;
+        }
+        return compound(CONJ, ca);
+    }
 
 
 

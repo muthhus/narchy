@@ -38,7 +38,6 @@ public class MutableTask extends AbstractTask {
     }
 
 
-
     @NotNull
     @Override
     public final MutableTask budget(float p, float d, float q) {

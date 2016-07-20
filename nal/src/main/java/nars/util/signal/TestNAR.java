@@ -75,6 +75,7 @@ public class TestNAR  {
     static final boolean collectTrace = false;
 
     boolean finished;
+    private boolean requireConditions = true;
 
     public TestNAR(@NotNull NAR nar) {
 
@@ -161,6 +162,17 @@ public class TestNAR  {
     @NotNull
     public TestNAR log() {
         nar.log();
+        return this;
+    }
+
+    /** fails if anything non-input is processed */
+    public TestNAR mustNotOutput() {
+        exitOnAllSuccess = false;
+        requireConditions = false; //this is the condition
+        nar.onTask(c -> {
+            if (!c.isInput())
+                assertTrue(c.toString() + " output, but must not output anything", false);
+        });
         return this;
     }
 
@@ -507,11 +519,20 @@ public class TestNAR  {
     }
 
     protected boolean requireConditions() {
-        return true;
+        return requireConditions;
     }
 
     @NotNull
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
+        return run(0, testAndPrintReport);
+    }
+    @NotNull
+    public TestNAR test(long cycles) {
+        return run(cycles, true);
+    }
+
+    @NotNull
+    public TestNAR run(long finalCycle, boolean testAndPrintReport /* for use with JUnit */) {
 
         if (requireConditions())
             assertTrue("No conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
@@ -520,7 +541,6 @@ public class TestNAR  {
         //TODO cache requires & logger, it wont change often
         String id = requires.toString();
 
-        long finalCycle = 0;
         for (NARCondition oc : requires) {
             long oce = oc.getFinalCycle();
             if (oce > finalCycle)finalCycle = oce + 1;

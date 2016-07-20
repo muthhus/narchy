@@ -31,6 +31,11 @@ abstract public class DerivedTask extends MutableTask {
     }
 
     @Override
+    public final boolean isInput() {
+        return false;
+    }
+
+    @Override
     @Nullable
     public final Task getParentTask() {
         ConceptProcess p = this.premise.get();
