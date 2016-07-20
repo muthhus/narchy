@@ -476,6 +476,10 @@ public enum $ {
     public static Term equi(Term subject, Term pred) {
         return compound(EQUI, subject, pred);
     }
+    @Nullable
+    public static Term equi(Term subject, int dt, Term pred) {
+        return compound(EQUI, dt, subject, pred);
+    }
 
     @Nullable
     public static Term diffi(Term a, Term b) {

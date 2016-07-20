@@ -129,8 +129,8 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		new MySTMClustered(nar, 16, '.', 2);
-		new MySTMClustered(nar, 16, '!', 2);
+		new MySTMClustered(nar, 16, '.', 5);
+		//new MySTMClustered(nar, 16, '!', 2);
 		new ArithmeticTest.ArtithmeticInduction1(nar);
 
 		Pacman pacman = new Pacman(1 /* ghosts  */, 4 /* visionRadius */);

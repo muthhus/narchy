@@ -193,4 +193,10 @@ public class FasterList<X> extends FastList<X> {
         }
         return null;
     }
+
+    public final boolean addIfNotNull(X x) {
+        if (x!=null)
+            return add(x);
+        return false;
+    }
 }

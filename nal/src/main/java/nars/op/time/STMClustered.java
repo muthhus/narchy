@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -51,7 +52,9 @@ public class STMClustered extends STM {
     public final class TasksNode extends Node {
 
         /** current members */
-        public final Set<TLink> tasks = new HashSet();
+        public final Set<TLink> tasks =
+                new ConcurrentSkipListSet<>();
+                //new HashSet()
 
 
         public TasksNode(int id, int dimensions) {
@@ -160,7 +163,7 @@ public class STMClustered extends STM {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends StrongBLink<Task> {
+    public final class TLink extends StrongBLink<Task> implements Comparable<TLink> {
 
         /** feature vector representing the item as learned by clusterer */
         @NotNull
@@ -210,6 +213,17 @@ public class STMClustered extends STM {
 
         public void migrate() {
             nearest().insert(this);
+        }
+
+        @Override
+        public int compareTo(TLink o) {
+            if (id == o.id)
+                return 0;
+            if (id == null)
+                return 1;
+            if (o.id == null)
+                return -1;
+            return id.compareTo(o.id);
         }
     }
 

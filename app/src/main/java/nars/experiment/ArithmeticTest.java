@@ -7,30 +7,34 @@ import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.nar.Default;
+import nars.op.StructuralSimilarity;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.Texts;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import static nars.Op.CONJ;
-import static nars.Op.INH;
-import static nars.Op.PROD;
+import static nars.Op.*;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * Created by me on 7/18/16.
  */
 public class ArithmeticTest {
+
     public static void main(String[] args) {
         Default n = new Default();
 //        n.on(new TransformConcept("INT", (c) -> {
@@ -74,34 +78,14 @@ public class ArithmeticTest {
 //
 //            return $.inh($.p(X, Y), $.oper("ADD"));
 //        }));
-        n.onTask(q -> {
-            if (q.isQuestion() && q.op()== Op.SIM) {
-                Term a = q.term(0);
-                Term b = q.term(1);
-                if (a.op()==Op.SETe && b.op() == Op.SETe) {
-                    Compound A = (Compound)a;
-                    Compound B = (Compound)b;
-                    int bs = B.size();
-                    int as = A.size();
-                    int max = Math.max(as, bs);
-                    int plus = as + bs;
-                    Set<Term> e = new HashSet(plus);
-                    Collections.addAll(e, A.terms());
-                    Collections.addAll(e, B.terms());
-                    float uniques = plus - e.size();
-                    float similarity = ( uniques/max);
-                    if (similarity>0) //remain silent about cases where nothing is common
-                        n.inputLater(new MutableTask($.sim(a,b),'.',similarity,n).log("StructuralSimilarity"));
-                }
-            }
-        });
+        //n.onTask(new StructuralSimilarity(n));
 
-        new ArtithmeticInduction1(n);
+        new ArithmeticTest.ArtithmeticInduction1(n);
 
         Global.DEBUG = true;
         n.log();
-        n.input("((x,1) && (x,2)).");
-        n.input("((x,2) && (x,3)).");
+        n.input("((x,1) && (x,2)). :|:");
+        n.input("((x,2) && (x,3)). :|:");
 
 //        n.input("numbers:{1,2,3,4}.");
 //        n.input("numbers:{1,2,3,4}.");
@@ -116,9 +100,10 @@ public class ArithmeticTest {
 ////        //n.input("numbers:{3}.");
 ////        //n.input("numbers:{1,3}.");
 ////        ///n.input("numbers:{1,3}?");
-        n.run(1024);
+        n.run(128);
 
     }
+
 
     @Nullable
     public static Integer intOrNull(Term term) {
@@ -161,81 +146,134 @@ public class ArithmeticTest {
         @Override
         public void accept(Task b) {
 
-            if (b.isBeliefOrGoal() && b.op() == CONJ) {
+            if (!b.isBeliefOrGoal()) {
 
-                Compound<?> bt = b.term();
-                TermContainer<?> subs = bt.subterms();
-                int negs = subs.count(x -> x.op() == Op.NEG);
+            } else {
+                if ( (b.op() == CONJ) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
 
-                int subCount = bt.size();
-                boolean negate = (negs == subCount);
-                if (negs != 0 && !negate) {
-                    //only if none or all of the subterms are negated
+                    compress(b, (features, pattern) -> {
+
+                        for (Term f : features) {
+                            n.inputLater(
+                                    task(b, $.conj(f, pattern)).log(getClass().getSimpleName())
+                            );
+                            /*n.inputLater(
+                                    (new MutableTask(
+                                        $.sim(
+                                        //$.equi(
+                                            b.term(), $.conj(f, b.dt(), pattern)
+                                        ),
+                                    '.', 1f, n).log(getClass().getSimpleName()))
+                            );*/
+                        }
+
+                    });
+                } else if ( ((b.op() == IMPL) || (b.op() == EQUI)) && ((b.dt() == DTERNAL) || (b.dt() == 0))) {
+                    compress(b, (features, pattern) -> {
+
+                        for (Term f : features) {
+                            //after variable introduction, such implication is self-referential and probably this conjunction captures the semantics:
+                            n.inputLater(
+                                    print(task(b, $.conj(f, pattern)).log(getClass().getSimpleName()))
+                            );
+                        }
+                    });
+                }
+            }
+        }
+
+        static Task print(Task t) {
+            System.out.println(t);
+            return t;
+        }
+
+
+        protected void compress(Termed<Compound> b, BiConsumer<List<Term>,Term> each) {
+            Compound<?> bt = b.term();
+            TermContainer<?> subs = bt.subterms();
+            int negs = subs.count(x -> x.op() == Op.NEG);
+
+            int subCount = bt.size();
+            boolean negate = (negs == subCount);
+            if (negs != 0 && !negate) {
+                //only if none or all of the subterms are negated
+                return;
+            }
+
+            if (!subs.equivalentStructures())
+                return;
+
+            if (negate) {
+                subs = $.neg((TermVector)subs);
+            }
+
+            //paths * extracted sequence of numbers at given path for each subterm
+            Map<ByteList,IntArrayList> numbers = new HashMap(), seed;
+
+            //first subterm: infer location of all inductables
+            BiPredicate<ByteList, @Nullable Integer> collect = (p, t) -> {
+                IntArrayList c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> new IntArrayList(1));
+                c.add(t);
+                return true;
+            };
+
+            Compound<?> first = (Compound)subs.term(0);
+            first.pathsTo(ArithmeticTest::intOrNull, collect);
+            int paths = numbers.size();
+
+            if (paths == 0)
+                return;
+
+
+
+            //analyze remaining subterms
+            for (int i = 1; i < subCount; i++) {
+
+                //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
+                if (!subs.term(i).pathsTo(
+                        (e) -> (e instanceof Atom && intOrNull(e)==null) ? e : null,
+                        (p, x) -> {
+                            return (x == null || first.subterm(p).equals(x));
+
+                        })) {
                     return;
                 }
 
-                if (!subs.equivalentStructures())
-                    return;
-
-                if (negate) {
-                    subs = $.neg((TermVector)subs);
-                }
-
-                //paths * extracted sequence of numbers at given path for each subterm
-                Map<ByteList,IntArrayList> numbers = new HashMap();
-
-                //first subterm: infer location of all inductables
-                BiPredicate<ByteList, @Nullable Integer> collect = (p, t) -> {
-                    IntArrayList c = numbers.computeIfAbsent(p.toImmutable(), (pp) -> new IntArrayList(1));
-                    c.add(t);
-                    return true;
-                };
-
-                Compound<?> first = (Compound)subs.term(0);
-                first.pathsTo(ArithmeticTest::intOrNull, collect);
-                int paths = numbers.size();
-
-                if (paths == 0)
-                    return;
-                //analyze remaining subterms
-                for (int i = 1; i < subCount; i++) {
-
-                    //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-                    if (!subs.term(i).pathsTo(
-                            (e) -> (e instanceof Atom && intOrNull(e)==null) ? e : null,
-                            (p, x) -> (x == null || first.subterm(p).equals(x))))
-                        return;
-
-                    subs.term(i).pathsTo(ArithmeticTest::intOrNull, collect);
-
-                }
-
-                numbers.forEach((pp, nn) -> {
-                   if (nn.size()!=subCount)
-                       return; //ignore this path, it doesnt have a result from each subterm ?
-
-                    List<Term> features = features(nn, vv);
-
-                    Term pattern = $.terms.transform(first, pp, vv);
-                    features.add(pattern);
-
-                    Compound result = (Compound) $.compound(CONJ, bt.dt(), features);
-
-                    n.inputLater(
-                            task(b, result).log(getClass().getSimpleName())
-                    );
-
-                });
-
+                subs.term(i).pathsTo(ArithmeticTest::intOrNull, collect);
 
             }
+
+            numbers.forEach((pp, nn) -> {
+
+                //if all subterms do not contribute a value, ignore this path, it doesnt have a result from each subterm ?
+                if (nn.size()!=subCount)
+                    return;
+
+                //for each path where the other numerics are uniformly equal (only one unique value)
+                if (nn.toSet().size()==1) {
+
+
+                    numbers.forEach((ppp, nnn) -> {
+                        if (!pp.equals(ppp)) {
+                            //System.out.println(b + " " + pp + " " + nn + " : " + "\t" + numbers + " " + pattern);
+
+                            List<Term> features = features(nnn, vv);
+                            if (!features.isEmpty()) {
+                                Term pattern = $.negIf($.terms.transform(first, ppp, vv), negate);
+                                each.accept(features, pattern);
+                            }
+                        }
+                    });
+                }
+
+            });
 
 
         }
 
         private List<Term> features(IntArrayList numbers, Term relatingVar) {
-            List<Term> ll = Global.newArrayList();
-            ll.add(iRange(numbers, relatingVar));
+            FasterList<Term> ll = Global.newArrayList(0);
+            ll.addIfNotNull(iRange(numbers, relatingVar));
 
             //...
 
@@ -244,10 +282,21 @@ public class ArithmeticTest {
 
 
         public Term iRange(IntArrayList l, Term relatingVariable) {
+
             int min = l.min();
             int max = l.max();
+
+            if (l.size() == 1) {
+                throw new RuntimeException("invalid sample count");
+            }
+
+            if (min == max) {
+                //return $.p($.the("intEqual"), relatingVariable, $.the(min));
+                return null; //no new information needs to be provided
+            }
+
             //return $.$("l1Dist(" + $.varDep(1) + ", " + (Math.abs(x - y)) + ")");
-            return $.p($.p($.the("intRange"), relatingVariable), $.the(min), $.the(max-min));
+            return $.p($.the("intRange"), relatingVariable, $.the(min), $.the(max-min));
         }
 
 

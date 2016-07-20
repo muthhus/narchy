@@ -51,6 +51,8 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
+    public static final int runCycles = 20000;
+
     private final TetrisVisualizer vis;
     private final JFrame window;
     private double currentScore;
@@ -251,8 +253,8 @@ public class Tetris extends TetrisState implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(24);
-        nar.confMin.setValue(0.03f);
+        nar.cyclesPerFrame.set(32);
+        nar.confMin.setValue(0.01f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -285,13 +287,13 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        new MySTMClustered(nar, 16, '.', 3);
-        new MySTMClustered(nar, 16, '!', 3);
+        new MySTMClustered(nar, 16, '.', 2);
+        //new MySTMClustered(nar, 16, '!', 2);
         new ArithmeticTest.ArtithmeticInduction1(nar);
         //new MySTMClustered(nar, 8, '!');
 
 
-        Tetris t = new Tetris(6, 10, 4) {
+        Tetris t = new Tetris(6, 10, 2) {
             @Override
             protected int nextBlock() {
                 return super.nextBlock(); //all blocks
@@ -339,7 +341,7 @@ public class Tetris extends TetrisState implements Environment {
 
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, 20000);
+        t.run(n, runCycles);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

@@ -196,13 +196,13 @@ public enum Global {
 //    }
 
     @NotNull
-    public static <X> List<X> newArrayList() {
+    public static <X> FasterList<X> newArrayList() {
         return new FasterList<>(); //GS
         //return new ArrayList();
     }
 
     @NotNull
-    public static <X> List<X> newArrayList(int capacity) {
+    public static <X> FasterList<X> newArrayList(int capacity) {
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
