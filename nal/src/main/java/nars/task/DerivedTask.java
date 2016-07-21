@@ -4,7 +4,7 @@ import nars.$;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.link.BLink;
-import nars.nal.ConceptProcess;
+import nars.nal.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -18,7 +18,7 @@ import java.lang.ref.Reference;
 abstract public class DerivedTask extends MutableTask {
 
     @NotNull
-    public final Reference<ConceptProcess> premise;
+    public final Reference<Premise> premise;
 
     //TODO should this also affect the Belief task?
 
@@ -38,14 +38,14 @@ abstract public class DerivedTask extends MutableTask {
     @Override
     @Nullable
     public final Task getParentTask() {
-        ConceptProcess p = this.premise.get();
+        Premise p = this.premise.get();
         return p != null ? p.task() : null;
     }
 
     @Override
     @Nullable
     public final Task getParentBelief() {
-        ConceptProcess p = this.premise.get();
+        Premise p = this.premise.get();
         return p != null ? p.belief : null;
     }
 
@@ -122,11 +122,11 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean onConcept(@NotNull Concept c, float score) {
             if (super.onConcept(c, score)) {
-                ConceptProcess p = this.premise.get();
+                Premise p = this.premise.get();
                 if (p != null) {
-                    Concept pc = p.conceptLink.get();
-                    Concept.linkPeer(pc.termlinks(), p.termLink.get(), budget(), qua());
-                    Concept.linkPeer(pc.tasklinks(), p.taskLink.get(), budget(), qua());
+                    Concept pc = p.conceptLink;
+                    Concept.linkPeer(pc.termlinks(), p.termLink, budget(), qua());
+                    Concept.linkPeer(pc.tasklinks(), p.taskLink, budget(), qua());
                 }
                 return true;
             }
@@ -136,11 +136,11 @@ abstract public class DerivedTask extends MutableTask {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                ConceptProcess p = this.premise.get();
+                Premise p = this.premise.get();
                 if (p != null) {
-                    Concept pc = p.conceptLink.get();
-                    Concept.linkPeer(pc.termlinks(), p.termLink.get(), UnitBudget.Zero, qua());
-                    Concept.linkPeer(pc.tasklinks(), p.taskLink.get(), UnitBudget.Zero, qua());
+                    Concept pc = p.conceptLink;
+                    Concept.linkPeer(pc.termlinks(), p.termLink, UnitBudget.Zero, qua());
+                    Concept.linkPeer(pc.tasklinks(), p.taskLink, UnitBudget.Zero, qua());
                 }
 
                 this.premise.clear();

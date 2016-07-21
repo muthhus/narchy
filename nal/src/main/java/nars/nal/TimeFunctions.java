@@ -161,7 +161,7 @@ public interface TimeFunctions {
 
     @Nullable
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
-        ConceptProcess prem = p.premise;
+        Premise prem = p.premise;
 
         int eventDelta = DTERNAL;
 
@@ -200,7 +200,7 @@ public interface TimeFunctions {
      */
     TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> dtExact(derived, occReturn, p, true);
     TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        ConceptProcess prem = p.premise;
+        Premise prem = p.premise;
         return dtExact(derived, occReturn, p, false);
     };
 
@@ -213,7 +213,7 @@ public interface TimeFunctions {
 
     @Nullable
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
-        ConceptProcess prem = p.premise;
+        Premise prem = p.premise;
 
         Task premBelief = p.belief;
 
@@ -510,7 +510,7 @@ public interface TimeFunctions {
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
     @Nullable TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn, float[] confScale) -> {
-        ConceptProcess premise = p.premise;
+        Premise premise = p.premise;
 
         Task task = p.task;
         int taskDT = ((Compound)$.pos(p.taskTerm)).dt();

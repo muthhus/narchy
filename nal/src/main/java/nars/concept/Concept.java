@@ -75,13 +75,13 @@ public interface Concept extends Termed {
     <C> C meta(Object key, BiFunction value);
 
 
-    @Nullable BeliefTable beliefs();
+    @NotNull BeliefTable beliefs();
 
-    @Nullable BeliefTable goals();
+    @NotNull BeliefTable goals();
 
-    @Nullable QuestionTable questions();
+    @NotNull QuestionTable questions();
 
-    @Nullable QuestionTable quests();
+    @NotNull QuestionTable quests();
 
     @Nullable
     default Truth belief(long when, long now) {

@@ -83,24 +83,24 @@ public class AtomConcept extends AtomicStringConstant implements AbstractConcept
         this.meta = newMeta;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final BeliefTable beliefs() {
         return BeliefTable.EMPTY;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final BeliefTable goals() {
         return BeliefTable.EMPTY;
     }
 
-    @Override
+    @NotNull
     public final @Nullable QuestionTable questions() {
         return QuestionTable.EMPTY;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final QuestionTable quests() {
         return QuestionTable.EMPTY;

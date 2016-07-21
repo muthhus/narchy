@@ -7,7 +7,7 @@ import nars.Param;
 import nars.budget.Budget;
 import nars.budget.policy.TaskBudgeting;
 import nars.index.TermIndex;
-import nars.nal.ConceptProcess;
+import nars.nal.Premise;
 import nars.nal.Deriver;
 import nars.nal.Stamp;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -40,7 +40,7 @@ public class PremiseEval extends FindSubst {
 
 
     /** the current premise being evaluated in this context TODO make private again */
-    public transient ConceptProcess premise;
+    public transient Premise premise;
 
     @NotNull
     public final Versioned<Truth> truth;
@@ -185,7 +185,7 @@ public class PremiseEval extends FindSubst {
     /**
      * execute the next premise, be sure to call init() before a batch of run()'s
      */
-    public final boolean run(@NotNull ConceptProcess p) {
+    public final boolean run(@NotNull Premise p) {
 
         Task task = p.task();
         if (task == null)

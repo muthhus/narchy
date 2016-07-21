@@ -53,7 +53,7 @@ import static nars.truth.TruthFunctions.eternalize;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked, Supplier<Task> {
+public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed<Compound>, Tasked {
 
 
     static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
@@ -276,8 +276,8 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
-    @NotNull
-    @Override default Task get() { return this ;}
+//    @NotNull
+//    @Override default Task get() { return this ;}
 
     @NotNull
     default Concept concept(@NotNull NAR n) {

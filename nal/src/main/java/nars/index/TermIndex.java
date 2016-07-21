@@ -2,7 +2,6 @@ package nars.index;
 
 import com.gs.collections.api.list.primitive.ByteList;
 import nars.$;
-import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.policy.ConceptPolicy;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.$.unneg;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
 import static nars.term.Termed.termOrNull;
@@ -392,12 +392,9 @@ public interface TermIndex {
             r = t.term();
         }
 
-        if (insert) {
-            r = (Compound) termOrNull(the(r));
-        }
+        Compound s = (Compound) termOrNull(get(r, insert));
 
-        return r;
-
+        return s == null ? r : s; //if a concept does not exist and was not created, return the key
     }
 
 
@@ -543,25 +540,34 @@ public interface TermIndex {
         } else {
 
             Termed prenormalized = term;
+
+            //unwrap negation again if necessary?
+
+            term = unneg(term);
+
             if ((term = normalize(term, createIfMissing)) == null)
                 throw new InvalidTerm(prenormalized);
 
-            if ((term = atemporalize((Compound)term)) == null)
-                //throw new InvalidTerm(prenormalizetd);
-                return null; //probably unforseeable
+            @NotNull Termed aterm = atemporalize((Compound) term);
 
-            //unwrap negation again if necessary?
-            if (term.op() == NEG)
-                term = ((Compound)term.term()).term(0);
+            //optimization: atemporalization was unnecessary, normalization may have already provided the concept
+            if ((aterm == term) && (term instanceof Concept)) {
+                return (Concept)term;
+            }
+
+            if (aterm == null)
+                return null; //probably unforseeable
+                //throw new InvalidTerm(prenormalizetd);
+
+            term = unneg(aterm); //it can happen that atemporalization will result in a negation that was not unwrapped to begin with?
         }
 
 
         @Nullable Termed c = get(term, createIfMissing);
         if (c == null)
             return null;
-        if (!(c instanceof Concept)) {
-            throw new RuntimeException("not a concept: " + c + " (" + c.getClass() + ')');
-        }
+
+
         return (Concept) c;
     }
 

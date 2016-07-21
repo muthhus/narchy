@@ -71,9 +71,17 @@ public abstract class AbstractCore {
     /**
      * temporary re-usable array for batch firing
      */
-    transient private final List<BLink<Term>> terms = $.newArrayList();
-    transient private final List<BLink<Task>> tasks = $.newArrayList();
+    transient private final List<Term> terms = $.newArrayList();
+    transient private final List<Task> tasks = $.newArrayList();
 
+    protected final boolean queueTaskLink(BLink<Task> b) {
+        tasks.add(b.get());
+        return true;
+    }
+    protected final boolean queueTermLink(BLink<Term> b) {
+        terms.add(b.get());
+        return true;
+    }
 
     protected AbstractCore(@NotNull NAR nar, @NotNull PremiseEval matcher) {
 
@@ -152,20 +160,21 @@ public abstract class AbstractCore {
 
         matcher.init(nar);
 
-        List<BLink<Term>> termsBuffer = this.terms;
-        c.termlinks().sample(termlinks, termsBuffer::add);
+        List<Term> termsBuffer = this.terms;
+        c.termlinks().sample(termlinks, this::queueTermLink);
+
         int count = 0;
         if (!termsBuffer.isEmpty()) {
 
-            List<BLink<Task>> tasksBuffer = this.tasks;
+            List<Task> tasksBuffer = this.tasks;
 
-            c.tasklinks().sample(tasklinks, tasksBuffer::add);
+            c.tasklinks().sample(tasklinks, this::queueTaskLink);
 
             if (!tasksBuffer.isEmpty()) {
                 for (int i = 0, tasksBufferSize = tasksBuffer.size(); i < tasksBufferSize; i++) {
                     count += PremiseBuilder.run(
                             nar,
-                            conceptLink,
+                            c,
                             termsBuffer,
                             tasksBuffer.get(i),
                             matcher);

@@ -3,7 +3,7 @@ package nars.nal.op;
 import com.google.common.base.Joiner;
 import nars.*;
 import nars.budget.Budget;
-import nars.nal.ConceptProcess;
+import nars.nal.Premise;
 import nars.nal.TimeFunctions;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
@@ -203,7 +203,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
     final void derive(@NotNull PremiseEval m, @NotNull Compound raw, @Nullable Truth truth) {
-        ConceptProcess premise = m.premise;
+        Premise premise = m.premise;
         NAR nar = m.nar;
 
         if (raw.op() == NEG) {

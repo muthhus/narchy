@@ -920,6 +920,13 @@ public enum $ {
         return dereference(s[index]);
     }
 
+    /** unwraps any negation superterm */
+    @NotNull public static Termed unneg(@NotNull Termed term) {
+        if (term.op() == NEG)
+            term = ((Compound)term.term()).term(0);
+        return term;
+    }
+
 
     public static final class StaticTermBuilder extends TermBuilder implements TermIndex {
 

@@ -7,7 +7,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
 import nars.link.BLink;
-import nars.nal.ConceptProcess;
+import nars.nal.Premise;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.nal.meta.PremiseEval;
@@ -36,10 +36,10 @@ public class TaskBudgeting {
         //volRatioScale = volRatioScale * volRatioScale; //sharpen
 
 
-        ConceptProcess pp = p.premise;
+        Premise pp = p.premise;
 
-        BLink<? extends Task> taskLink = pp.taskLink;
-        BLink<? extends Termed> termLink = pp.termLink;
+        BLink<? extends Task> taskLink = pp.tasklink();
+        BLink<? extends Termed> termLink = pp.termlink();
 
         float linkDur = aveAri( taskLink.dur(), termLink.dur() );
         final float durability = linkDur * volRatioScale;

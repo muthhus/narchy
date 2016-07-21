@@ -45,34 +45,28 @@ public enum PremiseBuilder {
      * Main Entry point: begin matching the task half of a premise
      */
     @NotNull
-    public static int run(@NotNull NAR nar, BLink<? extends Concept> conceptLink, @NotNull List<BLink<Term>> termsArray, @NotNull BLink<Task> taskLink, @NotNull PremiseEval matcher) {
+    public static int run(@NotNull NAR nar, Concept conceptLink, @NotNull List<Term> termsArray, @NotNull Task taskLink, @NotNull PremiseEval matcher) {
 
         int count = 0;
         long now = nar.time();
 
-        Task task = taskLink.get(); //separate the task and hold ref to it so that GC doesnt lose it
-        if (task != null) {
+        if (taskLink != null) {
 
-            Compound taskTerm = task.term();
+            Compound taskTerm = taskLink.term();
 
 
             for (int i = 0, termsArraySize = termsArray.size(); i < termsArraySize; i++) {
 
-                if (task.isDeleted())
+                if (taskLink.isDeleted())
                     break;
 
-                BLink<? extends Term> termLink = termsArray.get(i);
+                Term termLink = termsArray.get(i);
 
-                Termed tl = termLink.get();
-                if (tl == null)
-                    continue;
 
-                Term termLinkTerm = tl.term();
-
-                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLinkTerm)) {
+                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskTerm, termLink)) {
                 //if (!taskTerm.equals( termLinkTerm )) {
                     if (matcher.run(
-                        newPremise(nar, now, conceptLink, termLink, taskLink, task, tl)
+                        newPremise(nar, now, conceptLink, taskLink, termLink)
                     )) {
                         count++;
                     }
@@ -86,68 +80,76 @@ public enum PremiseBuilder {
         return count;
     }
 
-    @Nullable
-    static ConceptProcess newPremise(@NotNull NAR nar, long now, BLink<? extends Concept> conceptLink, BLink<? extends Term> termLink, BLink<Task> taskLink, @NotNull Task task, @NotNull Termed tl) {
-        return new ConceptProcess(conceptLink, taskLink, termLink, match(nar, now, task, tl));
-    }
-
-
     /**
      * resolves the most relevant belief of a given term/concept
      *
      *   patham9 project-eternalize
-         patham9 depending on 4 cases
-         patham9 https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj
-         sseehh__ ok ill add that in a bit
-         patham9 you need  project-eternalize-to
-         sseehh__ btw i disabled immediate eternalization entirely
-         patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
-         patham9 especially try to understand the "temporal temporal" case
-         patham9 its using the result of higher confidence
+     patham9 depending on 4 cases
+     patham9 https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj
+     sseehh__ ok ill add that in a bit
+     patham9 you need  project-eternalize-to
+     sseehh__ btw i disabled immediate eternalization entirely
+     patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
+     patham9 especially try to understand the "temporal temporal" case
+     patham9 its using the result of higher confidence
      */
-    @Nullable
-    static Task match(@NotNull NAR nar, long now, @NotNull Task task, @NotNull Termed beliefConceptTerm) {
+    static @Nullable Premise newPremise(@NotNull NAR nar, long now, Concept conceptLink, @NotNull Task taskLink, @NotNull Term termLink) {
 
-        //atomic concepts will have no beliefs to match
-        if (!(beliefConceptTerm instanceof Compound))
-            return null;
 
-        Concept beliefConcept = nar.concept(beliefConceptTerm);
-        if (beliefConcept == null)
-            return null;
+        Task belief = null;
 
-        @Nullable BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
+        if (termLink instanceof Compound) { //atomic concepts will have no beliefs to match
 
-        Task belief = table.match(task, now);
+            Concept beliefConcept = nar.concept(termLink);
+            if (beliefConcept != null) {
 
-        if (belief!=null && task.isQuestOrQuestion()) {
+                if ( taskLink.isQuestOrQuestion()) {
 
-            long taskOcc = task.occurrence();
+                    //TODO is this correct handling for quests? this means a belief task may be a goal which may contradict deriver semantics
+                    BeliefTable table = taskLink.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-            //project the belief to the question's time
-            if (taskOcc != ETERNAL) {
-                @Nullable Concept cbel = nar.concept(belief);
-                belief = cbel != null ? cbel.merge(task, belief, taskOcc, nar) : null;
-            }
+                    Task solution = table.match(taskLink, now);
+                    if (solution!=null) {
+                        Task answered = answer(nar, taskLink, solution, beliefConcept);
+                        if (taskLink.isQuestion())
+                            belief = answered;
+                    }
 
-            if (belief != null) { //may have become null as a result of projection
 
-                //attempt to Unify any Query variables; answer if unifies
-                if (task.term().hasVarQuery()) {
-                    matchQueryQuestion(nar, task, belief);
-                } else if (beliefConcept instanceof Compound && Term.equalAtemporally(task, beliefConcept)) {
-                    matchAnswer(nar, task, belief);
+                } else {
+
+                    belief = beliefConcept.beliefs().match(taskLink, now);
+
                 }
-
             }
-
-
         }
 
-        return belief;
-
-
+        return new Premise(conceptLink, taskLink, termLink, belief);
     }
+
+    private static Task answer(@NotNull NAR nar, @NotNull Task taskLink, @NotNull Task solution, @NotNull Concept beliefConcept) {
+
+        long taskOcc = taskLink.occurrence();
+
+        //project the belief to the question's time
+        if (taskOcc != ETERNAL) {
+            @Nullable Concept cbel = nar.concept(solution);
+            solution = cbel != null ? cbel.merge(taskLink, solution, taskOcc, nar) : null;
+        }
+
+        if (solution != null) { //may have become null as a result of projection
+
+            //attempt to Unify any Query variables; answer if unifies
+            if (taskLink.term().hasVarQuery()) {
+                matchQueryQuestion(nar, taskLink, solution);
+            } else if (beliefConcept instanceof Compound && Term.equalAtemporally(taskLink, beliefConcept)) {
+                matchAnswer(nar, taskLink, solution);
+            }
+
+        }
+        return solution;
+    }
+
 
 //    /**
 //           (case [(get-eternal target-time) (get-eternal source-time)]

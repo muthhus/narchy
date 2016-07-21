@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
@@ -64,6 +65,8 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, int maxWeight, boolean soft) {
         super(conceptBuilder);
 
+        int maxSubtermWeight = maxWeight / 2; //estimate considering re-use of subterms in compounds
+
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
         builder
@@ -82,10 +85,11 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
 
         Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), false);
+
         subs = builderSubs
-                //.softValues()
+                //.weakValues() //.softValues()
                 .weigher(complexityWeigher)
-                .maximumWeight(maxWeight)
+                .maximumWeight(maxSubtermWeight)
                 .build();
 
 //        Caffeine<TermContainer, TermContainer> builderSubs = prepare(Caffeine.newBuilder(), soft);
@@ -120,27 +124,26 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 
     @Override
     public void remove(@NotNull Termed x) {
-        cacheFor(x).invalidate(x);
+        Term tx = x.term();
+        cacheFor(tx).invalidate(tx);
     }
 
     @Override
     public Termed get(@NotNull Termed x) {
-        return cacheFor(x).getIfPresent(x);
+        Term tx = x.term();
+        return cacheFor(tx).getIfPresent(tx);
     }
 
-    private final Cache<Termed,Termed> cacheFor(Termed x) {
-        if (x.term() instanceof Compound)
-            return compounds;
-        else
-            return atomics;
+    private final Cache<Termed,Termed> cacheFor(Term x) {
+        return x instanceof Compound ? compounds : atomics;
     }
 
     @Override
     public void set(@NotNull Termed src, @NotNull Termed target) {
-
-        cacheFor(src).
+        Term tx = src.term();
+        cacheFor(tx).
                 //.get(src, s -> target);
-                put(src, target);
+                put(tx, target);
 
         //Termed exist = data.getIfPresent(src);
 
@@ -220,7 +223,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
     }
 
     @Override
-    public void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
+    public final void onRemoval(Object key, Object value, @Nonnull RemovalCause cause) {
         if (value instanceof Concept) {
             ((Concept)value).delete();
         }

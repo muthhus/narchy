@@ -92,36 +92,43 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
     public void filter(IntPredicate toKeep, ShortArrayList tmp) {
-        if (this.sentinelValues != null) {
-            if (this.sentinelValues.containsZeroKey) {
-                if (!toKeep.accept(this.sentinelValues.zeroValue)) {
-                    removeKey((short) 0);
+        SentinelValues sv = this.sentinelValues;
+        {
+            if (sv != null) {
+                if (sv.containsZeroKey) {
+                    if (!toKeep.accept(sv.zeroValue)) {
+                        removeKey((short) 0);
+                        sv = this.sentinelValues; //because it may have changed
+                    }
                 }
             }
         }
-        if (this.sentinelValues != null) { //must check again
-            if (this.sentinelValues.containsOneKey) {
-                if (!toKeep.accept(this.sentinelValues.oneValue)) {
-                    removeKey((short) 1);
+        {
+            if (sv != null) { //must check again
+                if (sv.containsOneKey) {
+                    if (!toKeep.accept(sv.oneValue)) {
+                        removeKey((short) 1);
+                        sv = this.sentinelValues; //because it may have changed
+                    }
                 }
             }
-
         }
 
 
         short[] keys = this.keys;
         int sizeBefore = keys.length;
+        int[] values = this.values;
         for (int i = 0; i < sizeBefore; ++i) {
             short k = keys[i];
             if (isNonSentinel(k)) {
-                if (!toKeep.accept(this.values[i])) {
+                if (!toKeep.accept(values[i])) {
                     tmp.add(k);
                 }
             }
         }
 
-        if (!tmp.isEmpty()) {
-            int s = tmp.size();
+        int s = tmp.size();
+        if (s > 0) {
             for (int i = 0; i < s; i++) {
                 removeKey(tmp.get(i));
             }
@@ -1125,12 +1132,19 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         return key == 1;
     }
 
-    private static boolean isNonSentinel(short key) {
-        return !isEmptyKey(key) && !isRemovedKey(key);
+//    private static boolean isNonSentinel_(short key) {
+//        return key!=0 && key!=1;
+//        //return !isEmptyKey(key) && !isRemovedKey(key);
+//    }
+    private static boolean isNonSentinel(short k) {
+        //return !(k == 0 || k == 1);
+        return k > 1 || k < 0;
+        //return !isEmptyKey(key) && !isRemovedKey(key);
     }
 
     protected boolean isNonSentinelAtIndex(int index) {
-        return !isEmptyKey(this.keys[index]) && !isRemovedKey(this.keys[index]);
+        short k = this.keys[index];
+        return isNonSentinel(keys[index]);
     }
 
     private int maxOccupiedWithData() {

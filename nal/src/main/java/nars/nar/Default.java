@@ -9,6 +9,7 @@ import nars.index.TermIndex;
 import nars.link.BLink;
 import nars.nal.meta.PremiseEval;
 import nars.nar.util.DefaultCore;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
@@ -132,5 +133,14 @@ public class Default extends AbstractNAR {
     @Override
     public void clear() {
         core.concepts.clear();
+    }
+
+    /** faster access from active concept bag than the index */
+    @Nullable @Override public final Concept concept(@NotNull Term t, boolean createIfMissing) {
+        @Nullable BLink<Concept> activeLink = core.concepts.get(t);
+        if (activeLink!=null) {
+            return activeLink.get();
+        }
+        return super.concept(t, createIfMissing);
     }
 }

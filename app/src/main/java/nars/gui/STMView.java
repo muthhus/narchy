@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
+import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.opengl.GL2;
 import nars.learn.gng.NeuralGasNet;
 import nars.link.BLink;
@@ -94,15 +95,21 @@ public class STMView  {
             update();
         });
 
-        s.window.setUndecorated(true);
 
     }
 
     public static void show(MySTMClustered stm, int w, int h) {
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>();
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>() {
+            @Override
+            public void init(GL2 gl) {
+                super.init(gl);
+                //window.setUndecorated(true);
+            }
+        };
         s.show(w, h);
 
         STMView sv = new STMView(stm, s);
+
 
     }
 
