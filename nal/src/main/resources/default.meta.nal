@@ -524,8 +524,8 @@
 
 //Relation introduction (wastepaper experimental)
 //   (A --> C), (B --> D) |- ((A,B) --> (C,D)), (Belief:Intersection)
-   (A --> C), (A --> D) |- ((A,A) --> {C,D}), (Belief:Intersection)
-   (C --> A), (D --> A) |- ({C,D} --> (A,A)), (Belief:Intersection)
+//   (A --> C), (A --> D) |- ((A,A) --> {C,D}), (Belief:Intersection)
+//   (C --> A), (D --> A) |- ({C,D} --> (A,A)), (Belief:Intersection)
 
 //          #_#R[(A --> C) (B --> D) |- ((* A B) --> (* C D)) :post (:t/intersection)] //            ;this one cant be allowed due to control reasons:
 //          #R[(A --> C) (A --> D) |- ((* A A) --> (* C D)) :post (:t/intersection)]

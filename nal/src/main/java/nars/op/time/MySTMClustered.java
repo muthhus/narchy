@@ -46,9 +46,9 @@ public class MySTMClustered extends STMClustered {
 
 		allowNonInput = true;
 
-		net.setAlpha(0.8f);
-		net.setBeta(0.8f);
-		net.setWinnerUpdateRate(0.1f, 0.05f);
+		net.setAlpha(0.05f);
+		net.setBeta(0.05f);
+		net.setWinnerUpdateRate(0.03f, 0.01f);
     }
 
     @Override

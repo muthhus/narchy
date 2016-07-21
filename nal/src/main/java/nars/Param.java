@@ -99,7 +99,7 @@ public abstract class Param extends Container implements Level {
     /**
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
     /**
      * how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
      * used to discourage premise's choice of belief tasks which overlap with the task.

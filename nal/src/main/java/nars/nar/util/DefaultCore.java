@@ -76,7 +76,7 @@ public class DefaultCore extends AbstractCore {
         @NotNull
         @Override
         protected BagPendings<Concept> newPendings() {
-            return new MapBagPendings(mergeFunction);
+            return new MapBagPendings<>(mergeFunction);
         }
 
         @Override

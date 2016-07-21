@@ -3,8 +3,10 @@ package nars.op.time;
 import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.AutoBag;
+import nars.bag.impl.MapBagPendings;
 import nars.budget.Budgeted;
 import nars.budget.merge.BudgetMerge;
+import nars.concept.Concept;
 import nars.learn.gng.NeuralGasNet;
 import nars.learn.gng.Node;
 import nars.link.BLink;
@@ -273,6 +275,13 @@ public class STMClustered extends STM {
 
         this.punc = punc;
         this.input = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(capacity.intValue())) {
+
+            @NotNull
+            @Override
+            protected BagPendings<Task> newPendings() {
+                return new MapBagPendings<>(mergeFunction);
+            }
+
             @NotNull
             @Override
             protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
