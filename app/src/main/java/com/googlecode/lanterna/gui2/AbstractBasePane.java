@@ -178,9 +178,9 @@ public abstract class AbstractBasePane implements BasePane {
             return null;
         }
         //Don't allow the component to set the cursor outside of its own boundaries
-        if(position.column < 0 ||
+        if(position.col < 0 ||
                 position.row < 0 ||
-                position.column >= focusedInteractable.getSize().column ||
+                position.col >= focusedInteractable.getSize().col ||
                 position.row >= focusedInteractable.getSize().row) {
             return null;
         }

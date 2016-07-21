@@ -133,7 +133,7 @@ public class Button extends AbstractInteractableComponent<Button> {
             }
             graphics.fill(' ');
             graphics.set(0, 0, getThemeDefinition(graphics).getCharacter("LEFT_BORDER", '<'));
-            graphics.set(graphics.getSize().column - 1, 0, getThemeDefinition(graphics).getCharacter("RIGHT_BORDER", '>'));
+            graphics.set(graphics.getSize().col - 1, 0, getThemeDefinition(graphics).getCharacter("RIGHT_BORDER", '>'));
 
             if(button.isFocused()) {
                 graphics.applyThemeStyle(getThemeDefinition(graphics).getActive());
@@ -157,14 +157,14 @@ public class Button extends AbstractInteractableComponent<Button> {
         }
 
         private static int getLabelShift(Button button, TerminalPosition size) {
-            int availableSpace = size.column - 2;
+            int availableSpace = size.col - 2;
             if(availableSpace <= 0) {
                 return 0;
             }
             int labelShift = 0;
             int widthInColumns = TerminalTextUtils.getColumnWidth(button.getLabel());
             if(availableSpace > widthInColumns) {
-                labelShift = (size.column - 2 - widthInColumns) / 2;
+                labelShift = (size.col - 2 - widthInColumns) / 2;
             }
             return labelShift;
         }

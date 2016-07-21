@@ -270,7 +270,7 @@ public class Revision {
         return
             newBelief!=oldBelief &&
 
-            !(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
+            //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
 
             //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
             !Stamp.overlapping(newBelief, oldBelief);

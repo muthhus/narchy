@@ -24,6 +24,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A virtual terminal is a kind of terminal emulator implemented inside of Lanterna that exposes the Terminal interface
@@ -127,6 +128,8 @@ public interface VirtualTerminal extends IOSafeTerminal {
      */
     TextCharacter getView(int column, int row);
 
+    List<TextCharacter> getViewLine(int row);
+
     /**
      * Returns the number of lines in the entire text buffer, including any backlog
      * @return Number of lines in the buffer
@@ -144,6 +147,11 @@ public interface VirtualTerminal extends IOSafeTerminal {
     default void putLine(String s) throws IOException {
         put(s);
         put('\n');
+    }
+    default void putLinePre(String s) throws IOException {
+        if (!cursor().isZero())
+            put('\n');
+        put(s);
     }
 
     /**

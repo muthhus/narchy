@@ -177,4 +177,8 @@ public class MutableTask extends AbstractTask {
         setEvidence(evi);
         return this;
     }
+
+    public final MutableTask evidence(Task evidenceToCopy) {
+        return evidence(evidenceToCopy.evidence());
+    }
 }

@@ -5,11 +5,14 @@ import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Symbols;
 import nars.budget.policy.ConceptPolicy;
 import nars.budget.policy.DefaultConceptPolicy;
 import nars.concept.CompoundConcept;
+import nars.concept.table.BeliefTable;
 import nars.concept.table.DefaultBeliefTable;
 import nars.concept.table.TemporalBeliefTable;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,7 +27,16 @@ import java.util.List;
 
 import static nars.nal.Tense.ETERNAL;
 
-/** primarily a collector for believing time-changing input signals */
+/**
+ * primarily a collector for believing time-changing input signals
+ *
+ * warning: using action and sensor concepts with a term that can be structurally transformed
+ * culd have unpredictable results because their belief management policies
+ * may not be consistent with the SensorConcept.  one solution may be to
+ * create dummy placeholders for all possible transforms of a sensorconcept term
+ * to make them directly reflect the sensor concept as the authority.
+ *
+ * */
 public class SensorConcept extends CompoundConcept<Compound> implements FloatFunction<Term> {
 
     @NotNull
@@ -34,8 +46,11 @@ public class SensorConcept extends CompoundConcept<Compound> implements FloatFun
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    int beliefMultiplier = 3;
-    int goalMultiplier = 3;
+    int beliefCapacity = 16;
+    int goalCapacity = 16;
+
+    /** implicit motivation task */
+    private Task desire = null;
 
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier input, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, input, truth);
@@ -148,9 +163,33 @@ public class SensorConcept extends CompoundConcept<Compound> implements FloatFun
     }
 
     @Override
-    protected void beliefCapacity(ConceptPolicy p) {
-        DefaultConceptPolicy.beliefCapacityNonEternal(this, p, beliefMultiplier);
-        DefaultConceptPolicy.goalCapacityOneEternal(this, p, goalMultiplier);
+    final protected void beliefCapacity(ConceptPolicy p) {
+        beliefs().capacity(0, beliefCapacity);
+        goals().capacity(desire!=null ? 1 : 0, goalCapacity);
+    }
+
+    @Override
+    final protected @NotNull BeliefTable newBeliefTable() {
+        return newBeliefTable(0,beliefCapacity);
+    }
+    @Override
+    final protected @NotNull BeliefTable newGoalTable() {
+        return newGoalTable(desire!=null ? 1 : 0,goalCapacity);
+    }
+
+    public Task desire(Truth t) {
+        if (this.desire==null || !this.desire.truth().equals(t)) {
+            if (this.desire != null) {
+                this.desire.delete();
+            }
+
+            if (t!=null) {
+                this.desire = new MutableTask(term(), Symbols.GOAL, t).log("Sensor Goal");
+                beliefCapacity(null); //trigger capacity update
+                sensor.nar.input(this.desire);
+            }
+        }
+        return this.desire;
     }
 
 

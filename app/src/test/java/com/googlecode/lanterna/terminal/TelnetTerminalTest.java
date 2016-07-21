@@ -81,7 +81,7 @@ public class TelnetTerminalTest {
 
                         terminal.fore(foregroundIndex);
                         terminal.back(backgroundIndex);
-                        terminal.moveCursorTo(random.nextInt(size.column - string.length()), random.nextInt(size.row));
+                        terminal.moveCursorTo(random.nextInt(size.col - string.length()), random.nextInt(size.row));
                         printString(terminal, string);
 
                         try {

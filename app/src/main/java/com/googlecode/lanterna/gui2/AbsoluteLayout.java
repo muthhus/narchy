@@ -37,7 +37,7 @@ public class AbsoluteLayout implements LayoutManager {
         for(Component component: components) {
             size = size.max(
                     new TerminalPosition(
-                            component.getPosition().column + component.getSize().column,
+                            component.getPosition().col + component.getSize().col,
                             component.getPosition().row + component.getSize().row));
                     
         }

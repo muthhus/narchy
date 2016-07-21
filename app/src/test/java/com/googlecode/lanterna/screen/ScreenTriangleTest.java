@@ -98,11 +98,11 @@ public class ScreenTriangleTest {
             if(rotating) {
                 screen.clear();
                 double triangleSize = 15.0;
-                int x0 = (size.column / 2) + (int) (Math.cos(rad) * triangleSize);
+                int x0 = (size.col / 2) + (int) (Math.cos(rad) * triangleSize);
                 int y0 = (size.row / 2) + (int) (Math.sin(rad) * triangleSize);
-                int x1 = (size.column / 2) + (int) (Math.cos(rad + oneThirdOf2PI) * triangleSize);
+                int x1 = (size.col / 2) + (int) (Math.cos(rad + oneThirdOf2PI) * triangleSize);
                 int y1 = (size.row / 2) + (int) (Math.sin(rad + oneThirdOf2PI) * triangleSize);
-                int x2 = (size.column / 2) + (int) (Math.cos(rad + twoThirdsOf2PI) * triangleSize);
+                int x2 = (size.col / 2) + (int) (Math.cos(rad + twoThirdsOf2PI) * triangleSize);
                 int y2 = (size.row / 2) + (int) (Math.sin(rad + twoThirdsOf2PI) * triangleSize);
                 p1 = new TerminalPosition(x0, y0);
                 p2 = new TerminalPosition(x1, y1);
@@ -110,9 +110,9 @@ public class ScreenTriangleTest {
                 rad += Math.PI / 90.0;
             }
             else {
-                p1 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
-                p2 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
-                p3 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+                p1 = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
+                p2 = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
+                p3 = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
             }
 
             graphics.setBackgroundColor(color);

@@ -330,7 +330,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
         public void drawComponent(TextGUIGraphics graphics, T listBox) {
             //update the page size, used for page up and page down keys
             int componentHeight = graphics.getSize().row;
-            int componentWidth = graphics.getSize().column;
+            int componentWidth = graphics.getSize().col;
             int selectedIndex = listBox.getSelectedIndex();
             List<V> items = listBox.getItems();
             ListItemRenderer<V,T> listItemRenderer = listBox.getListItemRenderer();
@@ -440,7 +440,7 @@ public abstract class AbstractListBox<V, T extends AbstractListBox<V, T>> extend
                 graphics.applyThemeStyle(graphics.getThemeDefinition(AbstractListBox.class).getNormal());
             }
             String label = getLabel(listBox, index, item);
-            label = TerminalTextUtils.fitString(label, graphics.getSize().column);
+            label = TerminalTextUtils.fitString(label, graphics.getSize().col);
             graphics.putString(0, 0, label);
         }
     }

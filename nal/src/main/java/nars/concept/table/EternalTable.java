@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Comparator;
 import java.util.List;
 
+import static nars.concept.table.BeliefTable.rankEternalByConfAndOriginality;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -22,20 +23,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     int capacity;
 
     public EternalTable(int initialCapacity) {
-        super(Task[]::new, initialCapacity);
+        super(Task[]::new);
         capacity(initialCapacity);
     }
 
-    @Override
     public void capacity(int c) {
-        int s = size();
         if (this.capacity != c) {
 
             this.capacity = c;
 
+            int s = size();
+
             //TODO can be accelerated by batch remove operation
             while (c < s--) {
-                removeLast();
+                removeWeakest();
             }
         }
     }
@@ -49,21 +50,26 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 //        }
 //    }
 
-    public final Task highest() {
+    public final Task strongest() {
         if (isEmpty()) return null;
         return list[0];
     }
 
-    public final Task lowest() {
+    public final Task weakest() {
         if (isEmpty()) return null;
         return list[size()-1];
     }
 
+    public float minRank() {
+        Task w = weakest();
+        if ( w== null) return 0;
+        return rankEternalByConfAndOriginality(w);
+    }
 
     @Override
     public final int compare(@NotNull Task o1, @NotNull Task o2) {
-        float f1 = BeliefTable.rankEternalByOriginality(o2); //reversed
-        float f2 = BeliefTable.rankEternalByOriginality(o1);
+        float f1 = rankEternalByConfAndOriginality(o2); //reversed
+        float f2 = rankEternalByConfAndOriginality(o1);
         if (f1 < f2)
             return -1;
         if (f1 > f2)
@@ -116,7 +122,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
 
             float cconf = c.conf();
             final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length; //newBelief.evidence().length + x.evidence().length;
-            float rank = BeliefTable.rankEternalByOriginality(cconf, totalEvidence);
+            float rank = rank(cconf, totalEvidence);
 
             if (rank > bestRank) {
                 bestRank = rank;
@@ -145,9 +151,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
         Task displaced = null;
 
         if (size() == capacity()) {
-            Task l = lowest();
+            Task l = weakest();
             if (l.conf() <= t.conf()) {
-                displaced = removeLast();
+                displaced = removeWeakest();
             }
         }
 
@@ -157,7 +163,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     }
 
     public final Truth truth() {
-        Task s = highest();
+        Task s = strongest();
         return s!=null ? s.truth() : null;
     }
 
@@ -170,5 +176,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
     public void remove(@NotNull Task belief, List<Task> displ) {
         /*Task removed = */remove(indexOf(belief, this));
         TaskTable.removeTask(belief, null, displ);
+    }
+
+    public final float rank(float eConf, int length) {
+        return rankEternalByConfAndOriginality(eConf, length);
+    }
+
+    public boolean isFull() {
+        return size() == capacity();
     }
 }

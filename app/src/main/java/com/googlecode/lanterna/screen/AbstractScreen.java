@@ -92,14 +92,14 @@ public abstract class AbstractScreen implements Screen {
             this.cursorPosition = null;
             return;
         }
-        if(position.column < 0) {
+        if(position.col < 0) {
             position = position.withColumn(0);
         }
         if(position.row < 0) {
             position = position.withRow(0);
         }
-        if(position.column >= terminalPosition.column) {
-            position = position.withColumn(terminalPosition.column - 1);
+        if(position.col >= terminalPosition.col) {
+            position = position.withColumn(terminalPosition.col - 1);
         }
         if(position.row >= terminalPosition.row) {
             position = position.withRow(terminalPosition.row - 1);
@@ -121,7 +121,7 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void set(TerminalPosition position, TextCharacter screenCharacter) {
-        set(position.column, position.row, screenCharacter);
+        set(position.col, position.row, screenCharacter);
     }
 
     @Override
@@ -129,7 +129,7 @@ public abstract class AbstractScreen implements Screen {
         return new ScreenTextGraphics(this) {
             @Override
             public TextGraphics drawImage(TerminalPosition topLeft, TextImage image, TerminalPosition sourceImageTopLeft, TerminalPosition sourceImageSize) {
-                backBuffer.copyFrom(image, sourceImageTopLeft.row, sourceImageSize.row, sourceImageTopLeft.column, sourceImageSize.column, topLeft.row, topLeft.column);
+                backBuffer.copyFrom(image, sourceImageTopLeft.row, sourceImageSize.row, sourceImageTopLeft.col, sourceImageSize.col, topLeft.row, topLeft.col);
                 return this;
             }
         };
@@ -167,7 +167,7 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public synchronized TextCharacter front(TerminalPosition position) {
-        return front(position.column, position.row);
+        return front(position.col, position.row);
     }
 
     @Override
@@ -177,7 +177,7 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public synchronized TextCharacter back(TerminalPosition position) {
-        return back(position.column, position.row);
+        return back(position.col, position.row);
     }
 
     @Override

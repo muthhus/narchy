@@ -74,12 +74,12 @@ public class ScreenLineTest {
             TerminalPosition p1;
             TerminalPosition p2;
             if(circle) {
-                p1 = new TerminalPosition(size.column / 2, size.row / 2);
+                p1 = new TerminalPosition(size.col / 2, size.row / 2);
                 if(CIRCLE_LAST_POSITION == null) {
                     CIRCLE_LAST_POSITION = new TerminalPosition(0, 0);
                 }
                 else if(CIRCLE_LAST_POSITION.row == 0) {
-                    if(CIRCLE_LAST_POSITION.column < size.column - 1) {
+                    if(CIRCLE_LAST_POSITION.col < size.col - 1) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeColumn(1);
                     }
                     else {
@@ -87,7 +87,7 @@ public class ScreenLineTest {
                     }
                 }
                 else if(CIRCLE_LAST_POSITION.row < size.row - 1) {
-                    if(CIRCLE_LAST_POSITION.column == 0) {
+                    if(CIRCLE_LAST_POSITION.col == 0) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeRow(-1);
                     }
                     else {
@@ -95,7 +95,7 @@ public class ScreenLineTest {
                     }
                 }
                 else {
-                    if(CIRCLE_LAST_POSITION.column > 0) {
+                    if(CIRCLE_LAST_POSITION.col > 0) {
                         CIRCLE_LAST_POSITION = CIRCLE_LAST_POSITION.withRelativeColumn(-1);
                     }
                     else {
@@ -105,8 +105,8 @@ public class ScreenLineTest {
                 p2 = CIRCLE_LAST_POSITION;
             }
             else {
-                p1 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
-                p2 = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
+                p1 = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
+                p2 = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
             }
             textGraphics.setBackgroundColor(color);
             textGraphics.drawLine(p1, p2, ' ');

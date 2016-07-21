@@ -8,7 +8,7 @@ import com.gs.collections.impl.list.mutable.primitive.ShortArrayList;
 /**
  * Created by me on 5/25/16.
  */
-public class SemiDenseIntUndirectedGraph  {
+public class SemiDenseIntUndirectedGraph implements IntUndirectedGraph {
 
 
     protected final int V; //# of vertices
@@ -22,14 +22,16 @@ public class SemiDenseIntUndirectedGraph  {
         adj = new MyShortIntHashMap[V];
 
         for (int i = 0; i < V; i++) {
-            adj[i] = new MyShortIntHashMap(V);
+            adj[i] = new MyShortIntHashMap(0);
         }
 
     }
 
     public void compact() {
-        for (MyShortIntHashMap a : adj)
-            a.compact();
+        for (MyShortIntHashMap a : adj) {
+            if (a.capacity() > 8 && a.density() <= 0.5f)
+                a.compact();
+        }
     }
 
     public void clear() {

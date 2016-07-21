@@ -545,7 +545,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
         @Override
         public TerminalPosition getCursorLocation(ComboBox<V> comboBox) {
             if(comboBox.isDropDownFocused()) {
-                return new TerminalPosition(comboBox.getSize().column - 1, 0);
+                return new TerminalPosition(comboBox.getSize().col - 1, 0);
             }
             else {
                 int textInputPosition = comboBox.getTextInputPosition();
@@ -577,7 +577,7 @@ public class ComboBox<V> extends AbstractInteractableComponent<ComboBox<V>> {
                 graphics.enableModifiers(SGR.BOLD);
             }
             graphics.fill(' ');
-            int editableArea = graphics.getSize().column - 2; //This is exclusing the 'drop-down arrow'
+            int editableArea = graphics.getSize().col - 2; //This is exclusing the 'drop-down arrow'
             int textInputPosition = comboBox.getTextInputPosition();
             int columnsToInputPosition = TerminalTextUtils.getColumnWidth(comboBox.getText().substring(0, textInputPosition));
             if(columnsToInputPosition < textVisibleLeftPosition) {

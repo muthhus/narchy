@@ -26,7 +26,6 @@ import com.googlecode.lanterna.terminal.AbstractTerminal;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -62,8 +61,10 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     public DefaultVirtualTerminal() {
         this(80, 24);
     }
+
     public DefaultVirtualTerminal(int w, int  h) {
         this(new TerminalPosition(w, h));
+        fore(TextColor.ANSI.WHITE);
     }
 
     /**
@@ -110,7 +111,7 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
         for(VirtualTerminalListener listener: listeners) {
             listener.onResized(this, termSize);
         }
-        super.onResized(newSize.column, newSize.row);
+        super.onResized(newSize.col, newSize.row);
     }
 
     @Override
@@ -302,7 +303,7 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
 
     @Override
     public synchronized TextCharacter getView(TerminalPosition position) {
-        return getView(position.column, position.row);
+        return getView(position.col, position.row);
     }
 
     @Override
@@ -312,6 +313,14 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
         }
         return getBuffer(column, row);
     }
+    @Override
+    public synchronized List<TextCharacter> getViewLine(int row) {
+        if(termSize.row < currentTextBuffer.getLineCount()) {
+            row += currentTextBuffer.getLineCount() - termSize.row;
+        }
+        List<TextCharacter> l = currentTextBuffer.getLine(row);
+        return l;
+    }
 
     @Override
     public TextCharacter getBuffer(int column, int row) {
@@ -320,7 +329,7 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
 
     @Override
     public TextCharacter getBuffer(TerminalPosition position) {
-        return getBuffer(position.column, position.row);
+        return getBuffer(position.col, position.row);
     }
 
     @Override
@@ -357,8 +366,8 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
 
     synchronized void putCharacter(TextCharacter terminalCharacter) {
         if(terminalCharacter.c == '\t') {
-            int nrOfSpaces = TabBehaviour.ALIGN_TO_COLUMN_4.getTabReplacement(cursorPosition.column).length();
-            for(int i = 0; i < nrOfSpaces && cursorPosition.column < termSize.column - 1; i++) {
+            int nrOfSpaces = TabBehaviour.ALIGN_TO_COLUMN_4.getTabReplacement(cursorPosition.col).length();
+            for(int i = 0; i < nrOfSpaces && cursorPosition.col < termSize.col - 1; i++) {
                 putCharacter(terminalCharacter.withCharacter(' '));
             }
         }
@@ -366,32 +375,32 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
             boolean doubleWidth = TerminalTextUtils.isCharDoubleWidth(terminalCharacter.c);
             // If we're at the last column and the user tries to print a double-width character, reset the cell and move
             // to the next line
-            if(cursorPosition.column == termSize.column - 1 && doubleWidth) {
-                currentTextBuffer.set(cursorPosition.row, cursorPosition.column, TextCharacter.DEFAULT_CHARACTER);
+            if(cursorPosition.col == termSize.col - 1 && doubleWidth) {
+                currentTextBuffer.set(cursorPosition.row, cursorPosition.col, TextCharacter.DEFAULT_CHARACTER);
                 moveCursorToNextLine();
             }
-            if(cursorPosition.column == termSize.column) {
+            if(cursorPosition.col == termSize.col) {
                 moveCursorToNextLine();
             }
 
             // Update the buffer
-            int i = currentTextBuffer.set(cursorPosition.row, cursorPosition.column, terminalCharacter);
+            int i = currentTextBuffer.set(cursorPosition.row, cursorPosition.col, terminalCharacter);
             if(!wholeBufferDirty) {
-                dirtyTerminalCells.add(new TerminalPosition(cursorPosition.column, cursorPosition.row));
+                dirtyTerminalCells.add(new TerminalPosition(cursorPosition.col, cursorPosition.row));
                 if(i == 1) {
-                    dirtyTerminalCells.add(new TerminalPosition(cursorPosition.column + 1, cursorPosition.row));
+                    dirtyTerminalCells.add(new TerminalPosition(cursorPosition.col + 1, cursorPosition.row));
                 }
                 else if(i == 2) {
-                    dirtyTerminalCells.add(new TerminalPosition(cursorPosition.column - 1, cursorPosition.row));
+                    dirtyTerminalCells.add(new TerminalPosition(cursorPosition.col - 1, cursorPosition.row));
                 }
-                if(dirtyTerminalCells.size() > (termSize.column * termSize.row * 0.9)) {
+                if(dirtyTerminalCells.size() > (termSize.col * termSize.row * 0.9)) {
                     setWholeBufferDirty();
                 }
             }
 
             //Advance cursor
             cursorPosition = cursorPosition.withRelativeColumn(doubleWidth ? 2 : 1);
-            if(cursorPosition.column > termSize.column) {
+            if(cursorPosition.col > termSize.col) {
                 moveCursorToNextLine();
             }
         }
@@ -448,9 +457,9 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     private void correctCursor() {
         this.cursorPosition =
                 new TerminalPosition(
-                        Math.max(cursorPosition.column, 0),
+                        Math.max(cursorPosition.col, 0),
                         Math.max(cursorPosition.row, 0));
-        this.cursorPosition = cursorPosition.withColumn(Math.min(cursorPosition.column, termSize.column - 1));
+        this.cursorPosition = cursorPosition.withColumn(Math.min(cursorPosition.col, termSize.col - 1));
         this.cursorPosition = cursorPosition.withRow(Math.min(cursorPosition.row, Math.max(termSize.row, getBufferLineCount()) - 1));
     }
 

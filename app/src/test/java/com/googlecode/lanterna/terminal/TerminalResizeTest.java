@@ -61,7 +61,7 @@ public class TerminalResizeTest implements TerminalResizeListener {
     public void onResized(Terminal terminal, TerminalPosition newSize) {
         try {
             terminal.moveCursorTo(0, 0);
-            String string = newSize.column + "x" + newSize.row + "                     ";
+            String string = newSize.col + "x" + newSize.row + "                     ";
             char[] chars = string.toCharArray();
             for(char c : chars) {
                 terminal.put(c);

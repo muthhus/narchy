@@ -37,7 +37,7 @@ class VirtualTerminalTextGraphics extends AbstractTextGraphics {
     @Override
     public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
         TerminalPosition size = getSize();
-        if(columnIndex < 0 || columnIndex >= size.column ||
+        if(columnIndex < 0 || columnIndex >= size.col ||
                 rowIndex < 0 || rowIndex >= size.row) {
             return this;
         }

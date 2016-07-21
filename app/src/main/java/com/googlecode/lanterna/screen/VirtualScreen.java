@@ -108,8 +108,8 @@ public class VirtualScreen extends AbstractScreen {
             realScreen.moveCursorTo(null);
             return;
         }
-        position = position.withRelativeColumn(-viewportTopLeft.column).withRelativeRow(-viewportTopLeft.row);
-        if(position.column >= 0 && position.column < viewportSize.column &&
+        position = position.withRelativeColumn(-viewportTopLeft.col).withRelativeRow(-viewportTopLeft.row);
+        if(position.col >= 0 && position.col < viewportSize.col &&
                 position.row >= 0 && position.row < viewportSize.row) {
             realScreen.moveCursorTo(position);
         }
@@ -144,8 +144,8 @@ public class VirtualScreen extends AbstractScreen {
             if(newViewportSize.row > viewportSize.row) {
                 viewportTopLeft = viewportTopLeft.withRow(Math.max(0, viewportTopLeft.row - (newViewportSize.row - viewportSize.row)));
             }
-            if(newViewportSize.column > viewportSize.column) {
-                viewportTopLeft = viewportTopLeft.withColumn(Math.max(0, viewportTopLeft.column - (newViewportSize.column - viewportSize.column)));
+            if(newViewportSize.col > viewportSize.col) {
+                viewportTopLeft = viewportTopLeft.withColumn(Math.max(0, viewportTopLeft.col - (newViewportSize.col - viewportSize.col)));
             }
             viewportSize = newViewportSize;
         }
@@ -171,19 +171,19 @@ public class VirtualScreen extends AbstractScreen {
                     asAbstractScreen.getBackBuffer(),
                     viewportTopLeft.row,
                     viewportSize.row,
-                    viewportTopLeft.column,
-                    viewportSize.column,
+                    viewportTopLeft.col,
+                    viewportSize.col,
                     viewportOffset.row,
-                    viewportOffset.column);
+                    viewportOffset.col);
         }
         else {
             for(int y = 0; y < viewportSize.row; y++) {
-                for(int x = 0; x < viewportSize.column; x++) {
+                for(int x = 0; x < viewportSize.col; x++) {
                     realScreen.set(
-                            x + viewportOffset.column,
+                            x + viewportOffset.col,
                             y + viewportOffset.row,
                             getBackBuffer().get(
-                                    x + viewportTopLeft.column,
+                                    x + viewportTopLeft.col,
                                     y + viewportTopLeft.row));
                 }
             }
@@ -206,14 +206,14 @@ public class VirtualScreen extends AbstractScreen {
             return null;
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowLeft) {
-            if(viewportTopLeft.column > 0) {
+            if(viewportTopLeft.col > 0) {
                 viewportTopLeft = viewportTopLeft.withRelativeColumn(-1);
                 refresh();
                 return null;
             }
         }
         else if(keyStroke.isAltDown() && keyStroke.getKeyType() == KeyType.ArrowRight) {
-            if(viewportTopLeft.column + viewportSize.column < terminalSize().column) {
+            if(viewportTopLeft.col + viewportSize.col < terminalSize().col) {
                 viewportTopLeft = viewportTopLeft.withRelativeColumn(1);
                 refresh();
                 return null;
@@ -292,7 +292,7 @@ public class VirtualScreen extends AbstractScreen {
     private static class DefaultFrameRenderer implements FrameRenderer {
         @Override
         public TerminalPosition getViewportSize(TerminalPosition realSize, TerminalPosition virtualSize) {
-            if(realSize.column > 1 && realSize.row > 2) {
+            if(realSize.col > 1 && realSize.row > 2) {
                 return realSize.withRelativeColumn(-1).withRelativeRow(-2);
             }
             else {
@@ -312,7 +312,7 @@ public class VirtualScreen extends AbstractScreen {
                 TerminalPosition virtualSize,
                 TerminalPosition virtualScrollPosition) {
 
-            if(realSize.column == 1 || realSize.row <= 2) {
+            if(realSize.col == 1 || realSize.row <= 2) {
                 return;
             }
             TerminalPosition viewportSize = getViewportSize(realSize, virtualSize);
@@ -322,9 +322,9 @@ public class VirtualScreen extends AbstractScreen {
             graphics.fill(' ');
             graphics.putString(0, graphics.getSize().row - 1, "Terminal too small, use ALT+arrows to scroll");
 
-            int horizontalSize = (int)(((double)(viewportSize.column) / (double) virtualSize.column) * (viewportSize.column));
-            int scrollable = viewportSize.column - horizontalSize - 1;
-            int horizontalPosition = (int)((double)scrollable * ((double) virtualScrollPosition.column / (double)(virtualSize.column - viewportSize.column)));
+            int horizontalSize = (int)(((double)(viewportSize.col) / (double) virtualSize.col) * (viewportSize.col));
+            int scrollable = viewportSize.col - horizontalSize - 1;
+            int horizontalPosition = (int)((double)scrollable * ((double) virtualScrollPosition.col / (double)(virtualSize.col - viewportSize.col)));
             graphics.drawLine(
                     new TerminalPosition(horizontalPosition, graphics.getSize().row - 2),
                     new TerminalPosition(horizontalPosition + horizontalSize, graphics.getSize().row - 2),
@@ -334,8 +334,8 @@ public class VirtualScreen extends AbstractScreen {
             scrollable = viewportSize.row - verticalSize - 1;
             int verticalPosition = (int)((double)scrollable * ((double) virtualScrollPosition.row / (double)(virtualSize.row - viewportSize.row)));
             graphics.drawLine(
-                    new TerminalPosition(graphics.getSize().column - 1, verticalPosition),
-                    new TerminalPosition(graphics.getSize().column - 1, verticalPosition + verticalSize),
+                    new TerminalPosition(graphics.getSize().col - 1, verticalPosition),
+                    new TerminalPosition(graphics.getSize().col - 1, verticalPosition + verticalSize),
                     Symbols.BLOCK_MIDDLE);
         }
     }

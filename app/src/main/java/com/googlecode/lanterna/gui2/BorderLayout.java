@@ -91,19 +91,19 @@ public class BorderLayout implements LayoutManager {
 
         int preferredWidth =
                 Math.max(
-                    (layout.containsKey(Location.LEFT) ? layout.get(Location.LEFT).getPreferredSize().column : 0) +
-                        (layout.containsKey(Location.CENTER) ? layout.get(Location.CENTER).getPreferredSize().column : 0) +
-                        (layout.containsKey(Location.RIGHT) ? layout.get(Location.RIGHT).getPreferredSize().column : 0),
+                    (layout.containsKey(Location.LEFT) ? layout.get(Location.LEFT).getPreferredSize().col : 0) +
+                        (layout.containsKey(Location.CENTER) ? layout.get(Location.CENTER).getPreferredSize().col : 0) +
+                        (layout.containsKey(Location.RIGHT) ? layout.get(Location.RIGHT).getPreferredSize().col : 0),
                     Math.max(
-                        layout.containsKey(Location.TOP) ? layout.get(Location.TOP).getPreferredSize().column : 0,
-                        layout.containsKey(Location.BOTTOM) ? layout.get(Location.BOTTOM).getPreferredSize().column : 0));
+                        layout.containsKey(Location.TOP) ? layout.get(Location.TOP).getPreferredSize().col : 0,
+                        layout.containsKey(Location.BOTTOM) ? layout.get(Location.BOTTOM).getPreferredSize().col : 0));
         return new TerminalPosition(preferredWidth, preferredHeight);
     }
 
     @Override
     public void doLayout(TerminalPosition area, List<Component> components) {
         EnumMap<Location, Component> layout = makeLookupMap(components);
-        int availableHorizontalSpace = area.column;
+        int availableHorizontalSpace = area.col;
         int availableVerticalSpace = area.row;
         
         //We'll need this later on
@@ -131,15 +131,15 @@ public class BorderLayout implements LayoutManager {
         //Now divide the remaining space between LEFT, CENTER and RIGHT
         if(layout.containsKey(Location.LEFT)) {
             Component leftComponent = layout.get(Location.LEFT);
-            leftComponentWidth = Math.min(leftComponent.getPreferredSize().column, availableHorizontalSpace);
+            leftComponentWidth = Math.min(leftComponent.getPreferredSize().col, availableHorizontalSpace);
             leftComponent.setPosition(new TerminalPosition(0, topComponentHeight));
             leftComponent.setSize(new TerminalPosition(leftComponentWidth, availableVerticalSpace));
             availableHorizontalSpace -= leftComponentWidth;
         }
         if(layout.containsKey(Location.RIGHT)) {
             Component rightComponent = layout.get(Location.RIGHT);
-            int rightComponentWidth = Math.min(rightComponent.getPreferredSize().column, availableHorizontalSpace);
-            rightComponent.setPosition(new TerminalPosition(area.column - rightComponentWidth, topComponentHeight));
+            int rightComponentWidth = Math.min(rightComponent.getPreferredSize().col, availableHorizontalSpace);
+            rightComponent.setPosition(new TerminalPosition(area.col - rightComponentWidth, topComponentHeight));
             rightComponent.setSize(new TerminalPosition(rightComponentWidth, availableVerticalSpace));
             availableHorizontalSpace -= rightComponentWidth;
         }

@@ -24,6 +24,7 @@ import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Param;
 import nars.task.Task;
+import nars.truth.TruthFunctions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -223,7 +224,7 @@ public interface Stamp {
     /** originality monotonically decreases with evidence length increase.
      * it must always be < 1 (never equal to one) due to its use in the or(conf, originality) ranking */
     default float originality() {
-        return 1.0f / (evidence().length + 1);
+        return TruthFunctions.originality(evidence().length);
     }
 
     /**

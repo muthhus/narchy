@@ -55,6 +55,14 @@ public interface TextColor {
     float green();
     float blue();
 
+    static TextColor rgb(float r, float g, float b) {
+        return new RGB(r, g, b);
+    }
+
+    static TextColor hsb(float h, float s, float b) {
+        return new RGB(Color.getHSBColor(h, s, b));
+    }
+
     /**
      * This class represent classic ANSI colors that are likely to be very compatible with most terminal
      * implementations. It is limited to 8 colors (plus the 'default' color) but as a norm, using bold mode (SGR code)
@@ -536,10 +544,20 @@ public interface TextColor {
      * <a href="https://github.com/robertknight/konsole/blob/master/user-doc/README.moreColors">
      * this</a> commit log. Behavior on terminals that don't support these codes is undefined.
      */
-    class RGB implements TextColor {
-        private final Color color;
+    final class RGB implements TextColor {
+        //private final Color color;
 
         public final float red, green, blue;
+
+        public RGB(Color c) {
+            this(c.getRed(), c.getGreen(), c.getBlue());
+        }
+
+        public RGB(float r, float g, float b) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+        }
 
         /**
          * This class can be used to specify a color in 24-bit color space (RGB with 8-bit resolution per color). Please be
@@ -553,19 +571,7 @@ public interface TextColor {
          * @param b Blue intensity, from 0 to 255
          */
         public RGB(int r, int g, int b) {
-            if(r < 0 || r > 255) {
-                throw new IllegalArgumentException("RGB: r is outside of valid range (0-255)");
-            }
-            if(g < 0 || g > 255) {
-                throw new IllegalArgumentException("RGB: g is outside of valid range (0-255)");
-            }
-            if(b < 0 || b > 255) {
-                throw new IllegalArgumentException("RGB: b is outside of valid range (0-255)");
-            }
-            this.color = new Color(r, g, b);
-            this.red = r/256f;
-            this.green = g/256f;
-            this.blue = b/256f;
+            this(r/256f,g/256f,b/256f);
         }
 
         @Override
@@ -594,28 +600,32 @@ public interface TextColor {
 
         @Override
         public Color toColor() {
-            return color;
+            return new Color(red, green, blue);
+        }
+
+        static int index(float x) {
+            return (int)(x * 256f);
         }
 
         /**
          * @return Red intensity of this color, from 0 to 255
          */
         public int getRed() {
-            return color.getRed();
+            return index(red);
         }
 
         /**
          * @return Green intensity of this color, from 0 to 255
          */
         public int getGreen() {
-            return color.getGreen();
+            return index(green);
         }
 
         /**
          * @return Blue intensity of this color, from 0 to 255
          */
         public int getBlue() {
-            return color.getBlue();
+            return index(blue);
         }
 
         @Override
@@ -625,22 +635,24 @@ public interface TextColor {
 
         @Override
         public int hashCode() {
-            int hash = 7;
-            hash = 29 * hash + color.hashCode();
-            return hash;
+            throw new UnsupportedOperationException();
+//            int hash = 7;
+//            hash = 29 * hash + color.hashCode();
+//            return hash;
         }
 
         @SuppressWarnings("SimplifiableIfStatement")
         @Override
         public boolean equals(Object obj) {
-            if(obj == null) {
-                return false;
-            }
-            if(getClass() != obj.getClass()) {
-                return false;
-            }
-            final RGB other = (RGB) obj;
-            return color.equals(other.color);
+            throw new UnsupportedOperationException();
+//            if(obj == null) {
+//                return false;
+//            }
+//            if(getClass() != obj.getClass()) {
+//                return false;
+//            }
+//            final RGB other = (RGB) obj;
+//            return color.equals(other.color);
         }
     }
 }

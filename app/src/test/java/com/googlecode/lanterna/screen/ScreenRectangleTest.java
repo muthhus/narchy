@@ -72,8 +72,8 @@ public class ScreenRectangleTest {
                 color = new TextColor.Indexed(random.nextInt(256));
             }
 
-            TerminalPosition topLeft = new TerminalPosition(random.nextInt(size.column), random.nextInt(size.row));
-            final int column = random.nextInt(size.column - topLeft.column);
+            TerminalPosition topLeft = new TerminalPosition(random.nextInt(size.col), random.nextInt(size.row));
+            final int column = random.nextInt(size.col - topLeft.col);
             final int row = random.nextInt(size.row - topLeft.row);
             TerminalPosition rectangleSize = new TerminalPosition(column, row);
 

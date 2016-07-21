@@ -147,7 +147,7 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
             List<V> row = rows.get(rowIndex);
             for(int columnIndex = viewLeftColumn; columnIndex < Math.min(row.size(), viewLeftColumn + visibleColumns); columnIndex++) {
                 V cell = row.get(columnIndex);
-                int columnSize = tableCellRenderer.getPreferredSize(table, cell, columnIndex, rowIndex).column;
+                int columnSize = tableCellRenderer.getPreferredSize(table, cell, columnIndex, rowIndex).col;
                 int listOffset = columnIndex - viewLeftColumn;
                 if(columnSizes.size() == listOffset) {
                     columnSizes.add(columnSize);
@@ -162,7 +162,7 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
             //Do the headers too, on the first iteration
             if(rowIndex == 0) {
                 for(int columnIndex = viewLeftColumn; columnIndex < Math.min(row.size(), viewLeftColumn + visibleColumns); columnIndex++) {
-                    int columnSize = tableHeaderRenderer.getPreferredSize(table, columnHeaders.get(columnIndex), columnIndex).column;
+                    int columnSize = tableHeaderRenderer.getPreferredSize(table, columnHeaders.get(columnIndex), columnIndex).col;
                     int listOffset = columnIndex - viewLeftColumn;
                     if(columnSizes.size() == listOffset) {
                         columnSizes.add(columnSize);
@@ -247,7 +247,7 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
         TerminalPosition area = graphics.getSize();
 
         //Don't even bother
-        if(area.row == 0 || area.column == 0) {
+        if(area.row == 0 || area.col == 0) {
             return;
         }
 
@@ -270,7 +270,7 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
             String label = headers.get(index);
             TerminalPosition size = new TerminalPosition(columnSizes.get(index - viewLeftColumn), headerSizeInRows);
             tableHeaderRenderer.drawHeader(table, label, index, graphics.newTextGraphics(new TerminalPosition(leftPosition, 0), size));
-            leftPosition += size.column;
+            leftPosition += size.col;
             if(headerHorizontalBorderStyle != TableCellBorderStyle.None && index < (endColumnIndex - 1)) {
                 graphics.applyThemeStyle(graphics.getThemeDefinition(Table.class).getNormal());
                 graphics.set(leftPosition, 0, getVerticalCharacter(headerHorizontalBorderStyle));
@@ -298,8 +298,8 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
                 leftPosition += columnWidth;
             }
             //Expand out the line in case the area is bigger
-            if(leftPosition < graphics.getSize().column) {
-                graphics.drawLine(leftPosition, topPosition, graphics.getSize().column - 1, topPosition, getHorizontalCharacter(headerVerticalBorderStyle));
+            if(leftPosition < graphics.getSize().col) {
+                graphics.drawLine(leftPosition, topPosition, graphics.getSize().col - 1, topPosition, getHorizontalCharacter(headerVerticalBorderStyle));
             }
             topPosition++;
         }
@@ -329,17 +329,17 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
             if(visibleColumns < tableModel.getColumnCount()) {
                 scrollBarHeight--;
             }
-            verticalScrollBar.setPosition(new TerminalPosition(graphics.getSize().column - verticalScrollBarPreferredSize.column, topPosition));
+            verticalScrollBar.setPosition(new TerminalPosition(graphics.getSize().col - verticalScrollBarPreferredSize.col, topPosition));
             verticalScrollBar.setSize(verticalScrollBarPreferredSize.withRow(scrollBarHeight));
             verticalScrollBar.setScrollMaximum(rows.size());
             verticalScrollBar.setViewSize(visibleRows);
             verticalScrollBar.setScrollPosition(viewTopRow);
             verticalScrollBar.draw(graphics.newTextGraphics(verticalScrollBar.getPosition(), verticalScrollBar.getSize()));
-            graphics = graphics.newTextGraphics(TerminalPosition.TOP_LEFT_CORNER, graphics.getSize().withRelativeColumn(-verticalScrollBarPreferredSize.column));
+            graphics = graphics.newTextGraphics(TerminalPosition.TOP_LEFT_CORNER, graphics.getSize().withRelativeColumn(-verticalScrollBarPreferredSize.col));
         }
         if(visibleColumns < tableModel.getColumnCount()) {
             TerminalPosition horizontalScrollBarPreferredSize = horizontalScrollBar.getPreferredSize();
-            int scrollBarWidth = graphics.getSize().column;
+            int scrollBarWidth = graphics.getSize().col;
             horizontalScrollBar.setPosition(new TerminalPosition(0, graphics.getSize().row - horizontalScrollBarPreferredSize.row));
             horizontalScrollBar.setSize(horizontalScrollBarPreferredSize.withColumn(scrollBarWidth));
             horizontalScrollBar.setScrollMaximum(tableModel.getColumnCount());
@@ -373,8 +373,8 @@ public class DefaultTableRenderer<V> implements TableRenderer<V> {
                 TerminalPosition cellPosition = new TerminalPosition(leftPosition, topPosition);
                 TerminalPosition cellArea = new TerminalPosition(columnSizes.get(columnIndex - viewLeftColumn), rowSizes.get(rowIndex - viewTopRow));
                 tableCellRenderer.drawCell(table, cell, columnIndex, rowIndex, graphics.newTextGraphics(cellPosition, cellArea));
-                leftPosition += cellArea.column;
-                if(leftPosition > area.column) {
+                leftPosition += cellArea.col;
+                if(leftPosition > area.col) {
                     break;
                 }
             }

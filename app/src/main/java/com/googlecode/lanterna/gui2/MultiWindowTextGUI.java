@@ -211,7 +211,7 @@ public class MultiWindowTextGUI extends AbstractTextGUI implements WindowBasedTe
                 minimumTerminalPosition = minimumTerminalPosition.max(
                         //Add position to size to get the bottom-right corner of the window
                         window.getDecoratedSize().withRelative(
-                                Math.max(lastPosition.column, 0),
+                                Math.max(lastPosition.col, 0),
                                 Math.max(lastPosition.row, 0)));
             }
         }

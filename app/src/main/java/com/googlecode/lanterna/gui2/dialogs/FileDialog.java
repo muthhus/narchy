@@ -83,7 +83,7 @@ public class FileDialog extends DialogWindow {
                     .addTo(contentPane);
         }
 
-        int unitWidth = dialogSize.column / 3;
+        int unitWidth = dialogSize.col / 3;
         int unitHeight = dialogSize.row;
 
         new FileSystemLocationLabel()
@@ -246,8 +246,8 @@ public class FileDialog extends DialogWindow {
             TerminalPosition area = getSize();
             String absolutePath = directory.getAbsolutePath();
             int absolutePathLengthInColumns = TerminalTextUtils.getColumnWidth(absolutePath);
-            if(area.column < absolutePathLengthInColumns) {
-                absolutePath = absolutePath.substring(absolutePathLengthInColumns - area.column);
+            if(area.col < absolutePathLengthInColumns) {
+                absolutePath = absolutePath.substring(absolutePathLengthInColumns - area.col);
                 absolutePath = "..." + absolutePath.substring(Math.min(absolutePathLengthInColumns, 3));
             }
             setText(absolutePath);

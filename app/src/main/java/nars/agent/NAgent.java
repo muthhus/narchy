@@ -9,6 +9,7 @@ import nars.budget.UnitBudget;
 import nars.budget.merge.BudgetMerge;
 import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
+import nars.concept.table.BeliefTable;
 import nars.learn.Agent;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -103,8 +104,8 @@ public class NAgent implements Agent {
     private final boolean synchronousGoalInput = false;
 
 
-    private final int motorBeliefCapacity = 16;
-    private final int motorGoalCapacity = 16;
+    private final int motorBeliefCapacity = 24;
+    private final int motorGoalCapacity = 24;
 
     //private final int rewardBeliefCapacity = 2 * motorBeliefCapacity;
 
@@ -121,7 +122,7 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.5f, 0.1f, 0.998f)
+            new DecideActionSoftmax(0.5f, 0.2f, 0.998f)
             //new DecideActionEpsilonGreedy(0.05f)
         );
     }
@@ -138,8 +139,9 @@ public class NAgent implements Agent {
         gamma = nar.confidenceDefault(Symbols.GOAL);
 
         eternalGoalSeekConf =
-                //1f
-                gamma;
+                1f
+                //gamma
+        ;
 
     }
 
@@ -154,7 +156,16 @@ public class NAgent implements Agent {
                 @Override
                 protected void beliefCapacity(ConceptPolicy p) {
                     beliefs().capacity(0, motorBeliefCapacity);
-                    goals().capacity(1, motorGoalCapacity);
+                    goals().capacity(0, motorGoalCapacity);
+                }
+
+                @Override
+                protected @NotNull BeliefTable newBeliefTable() {
+                    return newBeliefTable(0,motorBeliefCapacity);
+                }
+                @Override
+                protected @NotNull BeliefTable newGoalTable() {
+                    return newGoalTable(0,motorGoalCapacity);
                 }
             }
 
@@ -302,7 +313,8 @@ public class NAgent implements Agent {
                 //"(I --> sad)", "(I --> neutral)", "(I --> happy)").resolution(0.02f);
                 //"(" + nar.self + " --> [sad])", "(" + nar.self + " --> [happy])").resolution(0.05f);
                 //nar.self + "(sad)", nar.self + "(happy)"
-                nar.self + "(happy)"
+                //nar.self + "(happy)"
+                "(happy)"
             ).resolution(0.02f);
                 //"(sad)", "(happy)").resolution(0.05f);
     }
@@ -403,11 +415,13 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        this.beHappy = nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
+        this.beHappy = happy.desire($.t(1f, eternalGoalSeekConf));
+                //nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 
         if (sad!=happy)
-            this.dontBeSad = nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
+            this.dontBeSad = sad.desire($.t(0f, eternalGoalSeekConf));
+                    //nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
         else
             this.dontBeSad = null;
 
@@ -697,10 +711,14 @@ public class NAgent implements Agent {
     }
 
 
+    /**
+     * @param i
+     * @return
+     */
     private String actionConceptName(int i) {
-        //return "(a" + i + ")";
+        return "(a" + i + ")";
         //return "a(a" + i + ")"; //operation
-        return nar.self + "(a" + i  + ")";
+        //return nar.self + "(a" + i  + ")";
         //return "a:a" + i;
         //return "A:a" + i;
         //return "A:{a" + i + "}";
@@ -714,8 +732,8 @@ public class NAgent implements Agent {
             return sensorNamer.apply(i);
         } else {
             //return inputConceptName(i, -1);
-            //return $("(i" + i + ")");
-            return $("i:i" + i);
+            return $("(i" + i + ")");
+            //return $("i:i" + i);
             //return "I:{i" + i + "}";
             //return $("{i" + i + "}");
 

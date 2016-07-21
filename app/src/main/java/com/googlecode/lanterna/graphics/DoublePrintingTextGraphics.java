@@ -58,6 +58,6 @@ public class DoublePrintingTextGraphics extends AbstractTextGraphics {
     @Override
     public TerminalPosition getSize() {
         TerminalPosition size = underlyingTextGraphics.getSize();
-        return size.withColumn(size.column / 2);
+        return size.withColumn(size.col / 2);
     }
 }

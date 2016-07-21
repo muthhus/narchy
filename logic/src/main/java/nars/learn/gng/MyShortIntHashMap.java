@@ -1170,6 +1170,15 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         throw new UnsupportedOperationException();
     }
 
+    public float density() {
+        int kl = capacity();
+        return kl == 0 ? 0 : size() / ((float) kl);
+    }
+
+    public int capacity() {
+        return keys.length;
+    }
+
 //    public MutableShortSet keySet() {
 //        return new MyShortIntHashMap.KeySet(null);
 //    }

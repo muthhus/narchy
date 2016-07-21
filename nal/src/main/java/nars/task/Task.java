@@ -537,7 +537,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
      *  null if not normalizable
      */
     @NotNull
-    Task normalize(@NotNull Memory memory);
+    Task normalize(@NotNull Memory memory) throws InvalidTaskException;
 
 
 //    default void ensureValidParentTaskRef() {

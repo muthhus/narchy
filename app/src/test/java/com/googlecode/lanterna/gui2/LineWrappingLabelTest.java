@@ -95,7 +95,7 @@ public class LineWrappingLabelTest extends TestBase {
                             windowSize = windowSize.withRelativeRow(1);
                             return true;
                         case ArrowLeft:
-                            if(windowSize.column > 1) {
+                            if(windowSize.col > 1) {
                                 windowSize = windowSize.withRelativeColumn(-1);
                                 return true;
                             }

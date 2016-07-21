@@ -32,7 +32,7 @@ public class InteractableLookupMap {
     private final List<Interactable> interactables;
 
     InteractableLookupMap(TerminalPosition size) {
-        lookupMap = new int[size.row][size.column];
+        lookupMap = new int[size.row][size.col];
         interactables = new ArrayList<>();
         for (int[] aLookupMap : lookupMap) {
             Arrays.fill(aLookupMap, -1);
@@ -62,7 +62,7 @@ public class InteractableLookupMap {
         interactables.add(interactable);
         int index = interactables.size() - 1;
         for(int y = topLeft.row; y < topLeft.row + size.row; y++) {
-            for(int x = topLeft.column; x < topLeft.column + size.column; x++) {
+            for(int x = topLeft.col; x < topLeft.col + size.col; x++) {
                 //Make sure it's not outside the map
                 if(y >= 0 && y < lookupMap.length &&
                         x >= 0 && x < lookupMap[y].length) {
@@ -81,13 +81,13 @@ public class InteractableLookupMap {
         if(position.row >= lookupMap.length) {
             return null;
         }
-        else if(position.column >= lookupMap[0].length) {
+        else if(position.col >= lookupMap[0].length) {
             return null;
         }
-        else if(lookupMap[position.row][position.column] == -1) {
+        else if(lookupMap[position.row][position.col] == -1) {
             return null;
         }
-        return interactables.get(lookupMap[position.row][position.column]);
+        return interactables.get(lookupMap[position.row][position.col]);
     }
 
     /**
@@ -141,11 +141,11 @@ public class InteractableLookupMap {
         }
         Set<Interactable> disqualified = getDisqualifiedInteractables(startPosition, true);
         TerminalPosition size = getSize();
-        int maxShiftLeft = interactable.toBasePane(TerminalPosition.TOP_LEFT_CORNER).column;
+        int maxShiftLeft = interactable.toBasePane(TerminalPosition.TOP_LEFT_CORNER).col;
         maxShiftLeft = Math.max(maxShiftLeft, 0);
-        int maxShiftRight = interactable.toBasePane(new TerminalPosition(interactable.getSize().column - 1, 0)).column;
-        maxShiftRight = Math.min(maxShiftRight, size.column - 1);
-        int maxShift = Math.max(startPosition.column - maxShiftLeft, maxShiftRight - startPosition.row);
+        int maxShiftRight = interactable.toBasePane(new TerminalPosition(interactable.getSize().col - 1, 0)).col;
+        maxShiftRight = Math.min(maxShiftRight, size.col - 1);
+        int maxShift = Math.max(startPosition.col - maxShiftLeft, maxShiftRight - startPosition.row);
         for (int searchRow = startPosition.row + directionTerm;
              searchRow >= 0 && searchRow < size.row;
              searchRow += directionTerm) {
@@ -155,7 +155,7 @@ public class InteractableLookupMap {
                     if (xShift == 0 && modifier == -1) {
                         break;
                     }
-                    int searchColumn = startPosition.column + (xShift * modifier);
+                    int searchColumn = startPosition.col + (xShift * modifier);
                     if (searchColumn < maxShiftLeft || searchColumn > maxShiftRight) {
                         continue;
                     }
@@ -198,7 +198,7 @@ public class InteractableLookupMap {
             // If the currently active interactable component is not showing the cursor, use the top-left position
             // instead if we're going left, or the top-right position if we're going right
             if(isRight) {
-                startPosition = new TerminalPosition(interactable.getSize().column - 1, 0);
+                startPosition = new TerminalPosition(interactable.getSize().col - 1, 0);
             }
             else {
                 startPosition = TerminalPosition.TOP_LEFT_CORNER;
@@ -208,7 +208,7 @@ public class InteractableLookupMap {
             //Adjust position so that it's on the left-most side if we're going left or right-most side if we're going
             //right. Otherwise the lookup might product odd results in certain cases
             if(isRight) {
-                startPosition = startPosition.withColumn(interactable.getSize().column - 1);
+                startPosition = startPosition.withColumn(interactable.getSize().col - 1);
             }
             else {
                 startPosition = startPosition.withColumn(0);
@@ -226,8 +226,8 @@ public class InteractableLookupMap {
         int maxShiftDown = interactable.toBasePane(new TerminalPosition(0, interactable.getSize().row - 1)).row;
         maxShiftDown = Math.min(maxShiftDown, size.row - 1);
         int maxShift = Math.max(startPosition.row - maxShiftUp, maxShiftDown - startPosition.row);
-        for(int searchColumn = startPosition.column + directionTerm;
-            searchColumn >= 0 && searchColumn < size.column;
+        for(int searchColumn = startPosition.col + directionTerm;
+            searchColumn >= 0 && searchColumn < size.col;
             searchColumn += directionTerm) {
 
             for(int yShift = 0; yShift <= maxShift; yShift++) {
@@ -262,15 +262,15 @@ public class InteractableLookupMap {
         else if(startPosition.row >= lookupMap.length) {
             startPosition = startPosition.withRow(lookupMap.length - 1);
         }
-        if(startPosition.column < 0) {
+        if(startPosition.col < 0) {
             startPosition = startPosition.withColumn(0);
         }
-        else if(startPosition.column >= lookupMap[startPosition.row].length) {
+        else if(startPosition.col >= lookupMap[startPosition.row].length) {
             startPosition = startPosition.withColumn(lookupMap[startPosition.row].length - 1);
         }
 
         if(scanHorizontally) {
-            for(int column = 0; column < size.column; column++) {
+            for(int column = 0; column < size.col; column++) {
                 int index = lookupMap[startPosition.row][column];
                 if(index != -1) {
                     disqualified.add(interactables.get(index));
@@ -279,7 +279,7 @@ public class InteractableLookupMap {
         }
         else {
             for(int row = 0; row < size.row; row++) {
-                int index = lookupMap[row][startPosition.column];
+                int index = lookupMap[row][startPosition.col];
                 if(index != -1) {
                     disqualified.add(interactables.get(index));
                 }

@@ -60,9 +60,12 @@ public class TruthWave {
 
         final int[] size = {0};
         b.forEach(x -> {
-            int j = (size[0]++) * 4;
-            long occ = x.occurrence();
-            load(t, x, j, occ, x.qua());
+            int ss = size[0];
+            if (ss < s) { //HACK in case the table size changed since allocating above
+                int j = (size[0]++) * 4;
+                long occ = x.occurrence();
+                load(t, x, j, occ, x.qua());
+            }
         });
         this.size = size[0];
 

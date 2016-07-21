@@ -74,12 +74,12 @@ class TerminalTextGraphics extends AbstractTextGraphics {
                     lastCharacter = textCharacter;
                 }
                 if(!Objects.equals(lastPosition, position)) {
-                    terminal.moveCursorTo(position.column, position.row);
+                    terminal.moveCursorTo(position.col, position.row);
                     lastPosition = position;
                 }
             }
             else {
-                terminal.moveCursorTo(position.column, position.row);
+                terminal.moveCursorTo(position.col, position.row);
                 applyGraphicState(textCharacter);
             }
             terminal.put(textCharacter.c);

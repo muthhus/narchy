@@ -131,13 +131,13 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics set(TerminalPosition position, TextCharacter textCharacter) {
-        set(position.column, position.row, textCharacter);
+        set(position.col, position.row, textCharacter);
         return this;
     }
 
     @Override
     public TextGraphics set(TerminalPosition position, char character) {
-        return set(position.column, position.row, character);
+        return set(position.col, position.row, character);
     }
 
     @Override
@@ -218,9 +218,9 @@ public abstract class AbstractTextGraphics implements TextGraphics {
             TerminalPosition sourceImageSize) {
 
         // If the source image position is negative, offset the whole image
-        if(sourceImageTopLeft.column < 0) {
-            topLeft = topLeft.withRelativeColumn(-sourceImageTopLeft.column);
-            sourceImageSize = sourceImageSize.withRelativeColumn(sourceImageTopLeft.column);
+        if(sourceImageTopLeft.col < 0) {
+            topLeft = topLeft.withRelativeColumn(-sourceImageTopLeft.col);
+            sourceImageSize = sourceImageSize.withRelativeColumn(sourceImageTopLeft.col);
             sourceImageTopLeft = sourceImageTopLeft.withColumn(0);
         }
         if(sourceImageTopLeft.row < 0) {
@@ -232,12 +232,12 @@ public abstract class AbstractTextGraphics implements TextGraphics {
         // cropping specified image-subrectangle to the image itself:
         int fromRow = Math.max(sourceImageTopLeft.row, 0);
         int untilRow = Math.min(sourceImageTopLeft.row + sourceImageSize.row, image.getSize().row);
-        int fromColumn = Math.max(sourceImageTopLeft.column, 0);
-        int untilColumn = Math.min(sourceImageTopLeft.column + sourceImageSize.column, image.getSize().column);
+        int fromColumn = Math.max(sourceImageTopLeft.col, 0);
+        int untilColumn = Math.min(sourceImageTopLeft.col + sourceImageSize.col, image.getSize().col);
 
         // difference between position in image and position on target:
         int diffRow = topLeft.row - sourceImageTopLeft.row;
-        int diffColumn = topLeft.column - sourceImageTopLeft.column;
+        int diffColumn = topLeft.col - sourceImageTopLeft.col;
 
         // top/left-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
         fromRow = Math.max(fromRow, -diffRow);
@@ -245,7 +245,7 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
         // bot/right-crop at target(TextGraphics) rectangle: (only matters, if topLeft has a negative coordinate)
         untilRow = Math.min(untilRow, getSize().row - diffRow);
-        untilColumn = Math.min(untilColumn, getSize().column - diffColumn);
+        untilColumn = Math.min(untilColumn, getSize().col - diffColumn);
 
         if (fromRow >= untilRow || fromColumn >= untilColumn) {
             return this;
@@ -293,7 +293,7 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics putString(TerminalPosition position, String string) {
-        putString(position.column, position.row, string);
+        putString(position.col, position.row, string);
         return this;
     }
 
@@ -313,20 +313,20 @@ public abstract class AbstractTextGraphics implements TextGraphics {
 
     @Override
     public TextGraphics putString(TerminalPosition position, String string, SGR extraModifier, SGR... optionalExtraModifiers) {
-        putString(position.column, position.row, string, extraModifier, optionalExtraModifiers);
+        putString(position.col, position.row, string, extraModifier, optionalExtraModifiers);
         return this;
     }
 
     @Override
     public TextCharacter get(TerminalPosition position) {
-        return get(position.column, position.row);
+        return get(position.col, position.row);
     }
 
     @Override
     public TextGraphics newTextGraphics(TerminalPosition topLeftCorner, TerminalPosition size) throws IllegalArgumentException {
         TerminalPosition writableArea = getSize();
-        if(topLeftCorner.column + size.column <= 0 ||
-                topLeftCorner.column >= writableArea.column ||
+        if(topLeftCorner.col + size.col <= 0 ||
+                topLeftCorner.col >= writableArea.col ||
                 topLeftCorner.row + size.row <= 0 ||
                 topLeftCorner.row >= writableArea.row) {
             //The area selected is completely outside of this TextGraphics, so we can return a "null" object that doesn't

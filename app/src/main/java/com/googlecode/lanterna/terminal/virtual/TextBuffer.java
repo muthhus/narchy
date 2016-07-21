@@ -21,6 +21,7 @@ package com.googlecode.lanterna.terminal.virtual;
 import com.googlecode.lanterna.TextCharacter;
 import nars.$;
 import nars.util.data.list.CircularArrayList;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -68,8 +69,12 @@ class TextBuffer {
         return lines.listIterator(rowNumber);
     }
 
+    @NotNull
     public List<TextCharacter> getLine(int l) {
-        return lines.get(l);
+        if (lines.size() > l)
+            return lines.get(l);
+        else
+            return Collections.emptyList();
     }
 
     int getLineCount() {
@@ -123,7 +128,9 @@ class TextBuffer {
         if(lineNumber >= lines.size()) {
             return TextCharacter.DEFAULT_CHARACTER;
         }
-        List<TextCharacter> line = lines.get(lineNumber);
+
+        List<TextCharacter> line = getLine(lineNumber);
+
         if(line.size() <= columnIndex) {
             return TextCharacter.DEFAULT_CHARACTER;
         }

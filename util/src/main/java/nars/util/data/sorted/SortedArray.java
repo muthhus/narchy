@@ -85,7 +85,6 @@ public class SortedArray<E> implements Iterable<E> {
     public final void clear() {
         final int s = size();
         if (s!=0) {
-            //Arrays.fill(list, 0, s, null);
             this.list = (E[])zeroList;
             this.size = 0;
         }
@@ -130,18 +129,11 @@ public class SortedArray<E> implements Iterable<E> {
      * @param preSort    if true the the list, which is the parameter in the
      *                   constructor will be sorted, before it will be decorated
      */
-    public SortedArray(final IntFunction<E[]> builder,
-                       int initialCapacity) {
+    public SortedArray(final IntFunction<E[]> builder) {
         //this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
 
         this.builder = builder;
-        capacity(initialCapacity);
-    }
-
-    public void capacity(int cap) {
-        if (this.list.length != cap) {
-            this.list = builder.apply(cap);
-        }
+        this.list = (E[])zeroList; //builder.apply(initialCapacity);
     }
 
 
@@ -245,7 +237,7 @@ public class SortedArray<E> implements Iterable<E> {
         return (int) Math.ceil(oldSize * 1.5f);
     }
 
-    public E removeLast() {
+    public E removeWeakest() {
         //if (size > 0)
             return this.list[--size];
         //else

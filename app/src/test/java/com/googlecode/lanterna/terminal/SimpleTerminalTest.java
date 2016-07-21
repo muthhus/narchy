@@ -65,25 +65,25 @@ public class SimpleTerminalTest {
                 case ArrowDown:
                     if(terminal.terminalSize().row > cursorPosition.row + 1) {
                         cursorPosition = cursorPosition.withRelativeRow(1);
-                        terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+                        terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
                     }
                     break;
                 case ArrowUp:
                     if(cursorPosition.row > 0) {
                         cursorPosition = cursorPosition.withRelativeRow(-1);
-                        terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+                        terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
                     }
                     break;
                 case ArrowRight:
-                    if(cursorPosition.column + 1 < terminal.terminalSize().column) {
+                    if(cursorPosition.col + 1 < terminal.terminalSize().col) {
                         cursorPosition = cursorPosition.withRelativeColumn(1);
-                        terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+                        terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
                     }
                     break;
                 case ArrowLeft:
-                    if(cursorPosition.column > 0) {
+                    if(cursorPosition.col > 0) {
                         cursorPosition = cursorPosition.withRelativeColumn(-1);
-                        terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+                        terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
                     }
                     break;
 
@@ -125,7 +125,7 @@ public class SimpleTerminalTest {
                             // Restore the background color which was reset in the call above
                             terminal.back(COLORS_TO_CYCLE[colorIndex]);
 
-                            terminal.moveCursorTo(position.column, position.row);
+                            terminal.moveCursorTo(position.col, position.row);
                             break;
 
                         case '1':
@@ -162,7 +162,7 @@ public class SimpleTerminalTest {
 
     private static TerminalPosition resetCursorPositionAfterHelp(Terminal terminal) throws IOException {
         TerminalPosition cursorPosition = new TerminalPosition(0, 10);
-        terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+        terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
         return cursorPosition;
     }
 

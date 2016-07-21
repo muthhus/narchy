@@ -59,7 +59,7 @@ public class ScreenBuffer implements TextImage {
         }
         int differences = 0;
         for(int y = 0; y < getSize().row; y++) {
-            for(int x = 0; x < getSize().column; x++) {
+            for(int x = 0; x < getSize().col; x++) {
                 if(!get(x, y).equals(other.get(x, y))) {
                     if(++differences >= threshold) {
                         return true;

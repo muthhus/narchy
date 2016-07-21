@@ -48,7 +48,7 @@ public class DefaultVirtualTerminalTest {
         assertEquals(new TerminalPosition(80, 24), terminalPosition);
 
         for(int row = 0; row < terminalPosition.row; row++) {
-            for(int column = 0; column < terminalPosition.column; column++) {
+            for(int column = 0; column < terminalPosition.col; column++) {
                 assertEquals(DEFAULT_CHARACTER, virtualTerminal.getView(column, row));
             }
         }
@@ -553,7 +553,7 @@ public class DefaultVirtualTerminalTest {
                 column++;
             }
         }
-        while(column < virtualTerminal.terminalSize().column) {
+        while(column < virtualTerminal.terminalSize().col) {
             assertEquals(DEFAULT_CHARACTER, virtualTerminal.getView(column++, rowNumber));
         }
     }
@@ -566,7 +566,7 @@ public class DefaultVirtualTerminalTest {
                 column++;
             }
         }
-        while(column < virtualTerminal.terminalSize().column) {
+        while(column < virtualTerminal.terminalSize().col) {
             assertEquals(DEFAULT_CHARACTER, virtualTerminal.getBuffer(column++, rowNumber));
         }
     }
@@ -579,7 +579,7 @@ public class DefaultVirtualTerminalTest {
                 column++;
             }
         }
-        while(column < virtualTerminal.terminalSize().column) {
+        while(column < virtualTerminal.terminalSize().col) {
             assertEquals(DEFAULT_CHARACTER, line.getCharacterAt(column++));
         }
     }

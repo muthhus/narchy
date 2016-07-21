@@ -24,7 +24,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     public SortedListTable(IntFunction<L[]> builder, Map<V, L> map) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
-        this.items = new SortedArray<>(builder, 1);
+        this.items = new SortedArray<>(builder);
     }
 
 
@@ -103,7 +103,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
                 return i;
             }
 
-            displaced = items.removeLast(); //remove last
+            displaced = items.removeWeakest(); //remove last
         }
 
         items.add(i, this);

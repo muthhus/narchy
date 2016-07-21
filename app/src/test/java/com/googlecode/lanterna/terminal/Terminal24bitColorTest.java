@@ -48,7 +48,7 @@ public class Terminal24bitColorTest {
 
             terminal.fore(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
             terminal.back(new TextColor.RGB(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-            terminal.moveCursorTo(random.nextInt(size.column - string.length()), random.nextInt(size.row));
+            terminal.moveCursorTo(random.nextInt(size.col - string.length()), random.nextInt(size.row));
             printString(terminal, string);
 
             try {

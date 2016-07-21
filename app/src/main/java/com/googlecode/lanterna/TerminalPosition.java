@@ -51,19 +51,19 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * Returns the index of the row this position is representing, zero indexed (the first row has index 0)
      * @return Index of the row this position has
      */
-    public final int column;
+    public final int col;
 
     /**
      * Creates a new TerminalPosition object, which represents a location on the screen. There is no check to verify
      * that the position you specified is within the size of the current terminal and you can specify negative positions
      * as well.
      *
-     * @param column Column of the location, or the "x" coordinate, zero indexed (the first column is 0)
+     * @param col Column of the location, or the "x" coordinate, zero indexed (the first column is 0)
      * @param row Row of the location, or the "y" coordinate, zero indexed (the first row is 0)
      */
-    public TerminalPosition(int column, int row) {
+    public TerminalPosition(int col, int row) {
         this.row = row;
-        this.column = column;
+        this.col = col;
     }
 
     /**
@@ -73,10 +73,10 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * @return A TerminalPosition object with the same column as this but with a specified row index
      */
     public TerminalPosition withRow(int row) {
-        if(row == 0 && this.column == 0) {
+        if(row == 0 && this.col == 0) {
             return TOP_LEFT_CORNER;
         }
-        return new TerminalPosition(this.column, row);
+        return new TerminalPosition(this.col, row);
     }
 
     /**
@@ -103,7 +103,7 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
         if(delta == 0) {
             return this;
         }
-        return withColumn(column + delta);
+        return withColumn(col + delta);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * @return New TerminalPosition that is the result of the original with added translation
      */
     public TerminalPosition withRelative(TerminalPosition translate) {
-        return withRelative(translate.column, translate.row);
+        return withRelative(translate.col, translate.row);
     }
 
     /**
@@ -152,21 +152,21 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
         } else if(r > or) {
             return 1;
         }
-        return Integer.compare(this.column, o.column);
+        return Integer.compare(this.col, o.col);
     }
 
     @Override
     public String toString() {
-        return "[" + column + ':' + row + "]";
+        return "[" + col + ':' + row + "]";
     }
 
     @Override
     public int hashCode() {
-        return Util.hashCombine(row, column);
+        return Util.hashCombine(row, col);
     }
 
     public boolean equals(int columnIndex, int rowIndex) {
-        return this.column == columnIndex && this.row == rowIndex;
+        return this.col == columnIndex && this.row == rowIndex;
     }
 
     @Override
@@ -176,7 +176,7 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
 
         if (obj instanceof TerminalPosition) {
             final TerminalPosition other = (TerminalPosition) obj;
-            return equals(other.column, other.row);
+            return equals(other.col, other.row);
         }
         return false;
     }
@@ -188,7 +188,7 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * @return TerminalSize that combines the maximum width between the two and the maximum height
      */
     public TerminalPosition max(TerminalPosition other) {
-        return withColumn(Math.max(column, other.column))
+        return withColumn(Math.max(col, other.col))
                 .withRow(Math.max(row, other.row));
     }
 
@@ -199,7 +199,7 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
      * @return TerminalSize that combines the minimum width between the two and the minimum height
      */
     public TerminalPosition min(TerminalPosition other) {
-        return withColumn(Math.min(column, other.column))
+        return withColumn(Math.min(col, other.col))
                 .withRow(Math.min(row, other.row));
     }
     public TerminalPosition with(TerminalPosition size) {
@@ -207,6 +207,10 @@ public final class TerminalPosition implements Comparable<TerminalPosition> {
             return this;
         }
         return size;
+    }
+
+    public final boolean isZero() {
+        return row==0 && col ==0;
     }
 }
 

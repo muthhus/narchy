@@ -181,7 +181,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
         if(caretPosition.row > lines.size() - 1) {
             caretPosition = caretPosition.withRow(lines.size() - 1);
         }
-        if(caretPosition.column > lines.get(caretPosition.row).length()) {
+        if(caretPosition.col > lines.get(caretPosition.row).length()) {
             caretPosition = caretPosition.withColumn(lines.get(caretPosition.row).length());
         }
         invalidate();
@@ -413,7 +413,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
         switch(keyStroke.getKeyType()) {
             case Character:
                 if(maxLineLength == -1 || maxLineLength > line.length() + 1) {
-                    line = line.substring(0, caretPosition.column) + keyStroke.getCharacter() + line.substring(caretPosition.column);
+                    line = line.substring(0, caretPosition.col) + keyStroke.getCharacter() + line.substring(caretPosition.col);
                     if(validated(line)) {
                         lines.set(caretPosition.row, line);
                         caretPosition = caretPosition.withRelativeColumn(1);
@@ -421,8 +421,8 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 }
                 return Result.HANDLED;
             case Backspace:
-                if(caretPosition.column > 0) {
-                    line = line.substring(0, caretPosition.column - 1) + line.substring(caretPosition.column);
+                if(caretPosition.col > 0) {
+                    line = line.substring(0, caretPosition.col - 1) + line.substring(caretPosition.col);
                     if(validated(line)) {
                         lines.set(caretPosition.row, line);
                         caretPosition = caretPosition.withRelativeColumn(-1);
@@ -439,8 +439,8 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 }
                 return Result.HANDLED;
             case Delete:
-                if(caretPosition.column < line.length()) {
-                    line = line.substring(0, caretPosition.column) + line.substring(caretPosition.column + 1);
+                if(caretPosition.col < line.length()) {
+                    line = line.substring(0, caretPosition.col) + line.substring(caretPosition.col + 1);
                     if(validated(line)) {
                         lines.set(caretPosition.row, line);
                     }
@@ -454,7 +454,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 }
                 return Result.HANDLED;
             case ArrowLeft:
-                if(caretPosition.column > 0) {
+                if(caretPosition.col > 0) {
                     caretPosition = caretPosition.withRelativeColumn(-1);
                 }
                 else if(style == Style.MULTI_LINE && caretWarp && caretPosition.row > 0) {
@@ -466,7 +466,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 }
                 return Result.HANDLED;
             case ArrowRight:
-                if(caretPosition.column < lines.get(caretPosition.row).length()) {
+                if(caretPosition.col < lines.get(caretPosition.row).length()) {
                     caretPosition = caretPosition.withRelativeColumn(1);
                 }
                 else if(style == Style.MULTI_LINE && caretWarp && caretPosition.row < lines.size() - 1) {
@@ -479,7 +479,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 return Result.HANDLED;
             case ArrowUp:
                 if(caretPosition.row > 0) {
-                    int trueColumnPosition = TerminalTextUtils.getColumnIndex(lines.get(caretPosition.row), caretPosition.column);
+                    int trueColumnPosition = TerminalTextUtils.getColumnIndex(lines.get(caretPosition.row), caretPosition.col);
                     caretPosition = caretPosition.withRelativeRow(-1);
                     line = lines.get(caretPosition.row);
                     if(trueColumnPosition > TerminalTextUtils.getColumnWidth(line)) {
@@ -495,7 +495,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 return Result.HANDLED;
             case ArrowDown:
                 if(caretPosition.row < lines.size() - 1) {
-                    int trueColumnPosition = TerminalTextUtils.getColumnIndex(lines.get(caretPosition.row), caretPosition.column);
+                    int trueColumnPosition = TerminalTextUtils.getColumnIndex(lines.get(caretPosition.row), caretPosition.col);
                     caretPosition = caretPosition.withRelativeRow(1);
                     line = lines.get(caretPosition.row);
                     if(trueColumnPosition > TerminalTextUtils.getColumnWidth(line)) {
@@ -516,8 +516,8 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 if(style == Style.SINGLE_LINE) {
                     return Result.MOVE_FOCUS_NEXT;
                 }
-                String newLine = line.substring(caretPosition.column);
-                String oldLine = line.substring(0, caretPosition.column);
+                String newLine = line.substring(caretPosition.col);
+                String oldLine = line.substring(0, caretPosition.col);
                 if(validated(newLine) && validated(oldLine)) {
                     lines.set(caretPosition.row, oldLine);
                     lines.add(caretPosition.row + 1, newLine);
@@ -532,7 +532,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 if(caretPosition.row > lines.size() - 1) {
                     caretPosition = caretPosition.withRow(lines.size() - 1);
                 }
-                if(lines.get(caretPosition.row).length() < caretPosition.column) {
+                if(lines.get(caretPosition.row).length() < caretPosition.col) {
                     caretPosition = caretPosition.withColumn(lines.get(caretPosition.row).length());
                 }
                 return Result.HANDLED;
@@ -541,7 +541,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 if(caretPosition.row < 0) {
                     caretPosition = caretPosition.withRow(0);
                 }
-                if(lines.get(caretPosition.row).length() < caretPosition.column) {
+                if(lines.get(caretPosition.row).length() < caretPosition.col) {
                     caretPosition = caretPosition.withColumn(lines.get(caretPosition.row).length());
                 }
                 return Result.HANDLED;
@@ -557,13 +557,13 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
     private Result handleKeyStrokeReadOnly(KeyStroke keyStroke) {
         switch (keyStroke.getKeyType()) {
             case ArrowLeft:
-                if(getRenderer().getViewTopLeft().column == 0 && horizontalFocusSwitching) {
+                if(getRenderer().getViewTopLeft().col == 0 && horizontalFocusSwitching) {
                     return Result.MOVE_FOCUS_LEFT;
                 }
                 getRenderer().setViewTopLeft(getRenderer().getViewTopLeft().withRelativeColumn(-1));
                 return Result.HANDLED;
             case ArrowRight:
-                if(getRenderer().getViewTopLeft().column + getSize().column == longestRow && horizontalFocusSwitching) {
+                if(getRenderer().getViewTopLeft().col + getSize().col == longestRow && horizontalFocusSwitching) {
                     return Result.MOVE_FOCUS_RIGHT;
                 }
                 getRenderer().setViewTopLeft(getRenderer().getViewTopLeft().withRelativeColumn(1));
@@ -633,7 +633,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
 
         @Override
         public void setViewTopLeft(TerminalPosition position) {
-            if(position.column < 0) {
+            if(position.col < 0) {
                 position = position.withColumn(0);
             }
             if(position.row < 0) {
@@ -651,11 +651,11 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
             //Adjust caret position if necessary
             TerminalPosition caretPosition = component.getCaretPosition();
             String line = component.getLine(caretPosition.row);
-            caretPosition = caretPosition.withColumn(Math.min(caretPosition.column, line.length()));
+            caretPosition = caretPosition.withColumn(Math.min(caretPosition.col, line.length()));
 
             return caretPosition
-                    .withColumn(TerminalTextUtils.getColumnIndex(line, caretPosition.column))
-                    .withRelativeColumn(-viewTopLeft.column)
+                    .withColumn(TerminalTextUtils.getColumnIndex(line, caretPosition.col))
+                    .withRelativeColumn(-viewTopLeft.col)
                     .withRelativeRow(-viewTopLeft.row);
         }
 
@@ -677,17 +677,17 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
         @Override
         public void drawComponent(TextGUIGraphics graphics, TextBox component) {
             TerminalPosition realTextArea = graphics.getSize();
-            if(realTextArea.row == 0 || realTextArea.column == 0) {
+            if(realTextArea.row == 0 || realTextArea.col == 0) {
                 return;
             }
             boolean drawVerticalScrollBar = false;
             boolean drawHorizontalScrollBar = false;
             int textBoxLineCount = component.getLineCount();
-            if(!hideScrollBars && textBoxLineCount > realTextArea.row && realTextArea.column > 1) {
+            if(!hideScrollBars && textBoxLineCount > realTextArea.row && realTextArea.col > 1) {
                 realTextArea = realTextArea.withRelativeColumn(-1);
                 drawVerticalScrollBar = true;
             }
-            if(!hideScrollBars && component.longestRow > realTextArea.column && realTextArea.row > 1) {
+            if(!hideScrollBars && component.longestRow > realTextArea.col && realTextArea.row > 1) {
                 realTextArea = realTextArea.withRelativeRow(-1);
                 drawHorizontalScrollBar = true;
                 if(textBoxLineCount > realTextArea.row && realTextArea.row == graphics.getSize().row) {
@@ -704,24 +704,24 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 verticalScrollBar.setScrollMaximum(textBoxLineCount);
                 verticalScrollBar.setScrollPosition(viewTopLeft.row);
                 verticalScrollBar.draw(graphics.newTextGraphics(
-                        new TerminalPosition(graphics.getSize().column - 1, 0),
+                        new TerminalPosition(graphics.getSize().col - 1, 0),
                         new TerminalPosition(1, graphics.getSize().row - 1)));
             }
             if(drawHorizontalScrollBar) {
-                horizontalScrollBar.setViewSize(realTextArea.column);
+                horizontalScrollBar.setViewSize(realTextArea.col);
                 horizontalScrollBar.setScrollMaximum(component.longestRow - 1);
-                horizontalScrollBar.setScrollPosition(viewTopLeft.column);
+                horizontalScrollBar.setScrollPosition(viewTopLeft.col);
                 horizontalScrollBar.draw(graphics.newTextGraphics(
                         new TerminalPosition(0, graphics.getSize().row - 1),
-                        new TerminalPosition(graphics.getSize().column - 1, 1)));
+                        new TerminalPosition(graphics.getSize().col - 1, 1)));
             }
         }
 
         private void drawTextArea(TextGUIGraphics graphics, TextBox component) {
             TerminalPosition textAreaSize = graphics.getSize();
-            if(viewTopLeft.column + textAreaSize.column > component.longestRow) {
-                viewTopLeft = viewTopLeft.withColumn(component.longestRow - textAreaSize.column);
-                if(viewTopLeft.column < 0) {
+            if(viewTopLeft.col + textAreaSize.col > component.longestRow) {
+                viewTopLeft = viewTopLeft.withColumn(component.longestRow - textAreaSize.col);
+                if(viewTopLeft.col < 0) {
                     viewTopLeft = viewTopLeft.withColumn(0);
                 }
             }
@@ -743,15 +743,15 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 //Adjust caret position if necessary
                 TerminalPosition caretPosition = component.getCaretPosition();
                 String caretLine = component.getLine(caretPosition.row);
-                caretPosition = caretPosition.withColumn(Math.min(caretPosition.column, caretLine.length()));
+                caretPosition = caretPosition.withColumn(Math.min(caretPosition.col, caretLine.length()));
 
                 //Adjust the view if necessary
-                int trueColumnPosition = TerminalTextUtils.getColumnIndex(caretLine, caretPosition.column);
-                if (trueColumnPosition < viewTopLeft.column) {
+                int trueColumnPosition = TerminalTextUtils.getColumnIndex(caretLine, caretPosition.col);
+                if (trueColumnPosition < viewTopLeft.col) {
                     viewTopLeft = viewTopLeft.withColumn(trueColumnPosition);
                 }
-                else if (trueColumnPosition >= textAreaSize.column + viewTopLeft.column) {
-                    viewTopLeft = viewTopLeft.withColumn(trueColumnPosition - textAreaSize.column + 1);
+                else if (trueColumnPosition >= textAreaSize.col + viewTopLeft.col) {
+                    viewTopLeft = viewTopLeft.withColumn(trueColumnPosition - textAreaSize.col + 1);
                 }
                 if (caretPosition.row < viewTopLeft.row) {
                     viewTopLeft = viewTopLeft.withRow(caretPosition.row);
@@ -761,9 +761,9 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                 }
 
                 //Additional corner-case for CJK characters
-                if(trueColumnPosition - viewTopLeft.column == graphics.getSize().column - 1) {
-                    if(caretLine.length() > caretPosition.column &&
-                            TerminalTextUtils.isCharCJK(caretLine.charAt(caretPosition.column))) {
+                if(trueColumnPosition - viewTopLeft.col == graphics.getSize().col - 1) {
+                    if(caretLine.length() > caretPosition.col &&
+                            TerminalTextUtils.isCharCJK(caretLine.charAt(caretPosition.col))) {
                         viewTopLeft = viewTopLeft.withRelativeColumn(1);
                     }
                 }
@@ -782,7 +782,7 @@ public class TextBox extends AbstractInteractableComponent<TextBox> {
                     }
                     line = builder.toString();
                 }
-                graphics.putString(0, row, TerminalTextUtils.fitString(line, viewTopLeft.column, textAreaSize.column));
+                graphics.putString(0, row, TerminalTextUtils.fitString(line, viewTopLeft.col, textAreaSize.col));
             }
         }
     }

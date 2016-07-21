@@ -50,7 +50,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
             p1 = p2;
             p2 = temp;
         }
-        int deltaX = p2.column - p1.column;
+        int deltaX = p2.col - p1.col;
         int deltaY = p2.row - p1.row;
         if(deltaX > 0) {
             if(deltaX > deltaY) {
@@ -72,7 +72,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
     }
 
     private void drawLine0(TerminalPosition start, int deltaX, int deltaY, boolean leftToRight, TextCharacter character) {
-        int x = start.column;
+        int x = start.col;
         int y = start.row;
         int deltaYx2 = deltaY * 2;
         int deltaYx2MinusDeltaXx2 = deltaYx2 - (deltaX * 2);
@@ -92,7 +92,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
     }
 
     private void drawLine1(TerminalPosition start, int deltaX, int deltaY, boolean leftToRight, TextCharacter character) {
-        int x = start.column;
+        int x = start.col;
         int y = start.row;
         int deltaXx2 = deltaX * 2;
         int deltaXx2MinusDeltaYx2 = deltaXx2 - (deltaY * 2);
@@ -120,7 +120,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
 
     @Override
     public void drawRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
-        TerminalPosition topRight = topLeft.withRelativeColumn(size.column - 1);
+        TerminalPosition topRight = topLeft.withRelativeColumn(size.col - 1);
         TerminalPosition bottomRight = topRight.withRelativeRow(size.row - 1);
         TerminalPosition bottomLeft = topLeft.withRelativeRow(size.row - 1);
         drawLine(topLeft, topRight, character);
@@ -143,32 +143,32 @@ class DefaultShapeRenderer implements ShapeRenderer {
 
         float dx1, dx2, dx3;
         if (points[1].row - points[0].row > 0) {
-            dx1 = (float)(points[1].column - points[0].column) / (float)(points[1].row - points[0].row);
+            dx1 = (float)(points[1].col - points[0].col) / (float)(points[1].row - points[0].row);
         }
         else {
             dx1 = 0;
         }
         if (points[2].row - points[0].row > 0) {
-            dx2 = (float)(points[2].column - points[0].column) / (float)(points[2].row - points[0].row);
+            dx2 = (float)(points[2].col - points[0].col) / (float)(points[2].row - points[0].row);
         }
         else {
             dx2 = 0;
         }
         if (points[2].row - points[1].row > 0) {
-            dx3 = (float)(points[2].column - points[1].column) / (float)(points[2].row - points[1].row);
+            dx3 = (float)(points[2].col - points[1].col) / (float)(points[2].row - points[1].row);
         }
         else {
             dx3 = 0;
         }
 
         float startX, startY, endX;
-        startX = endX = points[0].column;
+        startX = endX = points[0].col;
         startY = points[0].row;
         if (dx1 > dx2) {
             for (; startY <= points[1].row; startY++, startX += dx2, endX += dx1) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
-            endX = points[1].column;
+            endX = points[1].col;
             for (; startY <= points[2].row; startY++, startX += dx2, endX += dx3) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
@@ -176,7 +176,7 @@ class DefaultShapeRenderer implements ShapeRenderer {
             for (; startY <= points[1].row; startY++, startX += dx1, endX += dx2) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
             }
-            startX = points[1].column;
+            startX = points[1].col;
             startY = points[1].row;
             for (; startY <= points[2].row; startY++, startX += dx3, endX += dx2) {
                 drawLine(new TerminalPosition((int)startX, (int)startY), new TerminalPosition((int)endX, (int)startY), character);
@@ -187,8 +187,8 @@ class DefaultShapeRenderer implements ShapeRenderer {
     @Override
     public void fillRectangle(TerminalPosition topLeft, TerminalPosition size, TextCharacter character) {
         for(int y = 0; y < size.row; y++) {
-            for(int x = 0; x < size.column; x++) {
-                callback.onPoint(topLeft.column + x, topLeft.row + y, character);
+            for(int x = 0; x < size.col; x++) {
+                callback.onPoint(topLeft.col + x, topLeft.row + y, character);
             }
         }
     }

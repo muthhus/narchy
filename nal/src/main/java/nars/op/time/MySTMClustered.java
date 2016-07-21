@@ -7,7 +7,6 @@ import nars.Param;
 import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
 import nars.task.GeneratedTask;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,9 +17,6 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.NOPLogger;
 
 import java.util.stream.Stream;
 
@@ -29,7 +25,7 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
-	public final Topic<Task> logger = new DefaultTopic<>();
+	public final Topic<Task> generate = new DefaultTopic<>();
 
 	private final int maxConjunctionSize;
 
@@ -139,7 +135,7 @@ public class MySTMClustered extends STMClustered {
 							.log("STMCluster CoOccurr");
 
 					//logger.debug("{}", m);
-					logger.emit(m);
+					generate.emit(m);
 
 					//System.err.println(m + " " + Arrays.toString(m.evidence()));
 					nar.input(m);

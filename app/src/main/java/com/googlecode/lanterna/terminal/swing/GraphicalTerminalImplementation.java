@@ -234,7 +234,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
      * @return Preferred size of this terminal
      */
     synchronized Dimension getPreferredSize() {
-        return new Dimension(getFontWidth() * virtualTerminal.terminalSize().column,
+        return new Dimension(getFontWidth() * virtualTerminal.terminalSize().col,
                 getFontHeight() * virtualTerminal.terminalSize().row);
     }
 
@@ -397,13 +397,13 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         virtualTerminal.forEachLine(firstVisibleRowIndex, lastVisibleRowIndex, new VirtualTerminal.BufferWalker() {
             @Override
             public void onLine(int rowNumber, VirtualTerminal.BufferLine bufferLine) {
-                for(int column = 0; column < viewportSize.column; column++) {
+                for(int column = 0; column < viewportSize.col; column++) {
                     TextCharacter textCharacter = bufferLine.getCharacterAt(column);
                     boolean atCursorLocation = cursorPosition.equals(column, rowNumber);
                     //If next position is the cursor location and this is a CJK character (i.e. cursor is on the padding),
                     //consider this location the cursor position since otherwise the cursor will be skipped
                     if(!atCursorLocation &&
-                            cursorPosition.column == column + 1 &&
+                            cursorPosition.col == column + 1 &&
                             cursorPosition.row == rowNumber &&
                             TerminalTextUtils.isCharCJK(textCharacter.c)) {
                         atCursorLocation = true;
@@ -466,13 +466,13 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
         TerminalPosition viewportSize = virtualTerminal.terminalSize();
         TerminalPosition cursorPosition = virtualTerminal.bufferPos();
 
-        dirtyCellsLookupTable.resetAndInitialize(firstRowOffset, lastRowOffset, viewportSize.column);
+        dirtyCellsLookupTable.resetAndInitialize(firstRowOffset, lastRowOffset, viewportSize.col);
         dirtyCellsLookupTable.setDirty(cursorPosition);
         if(lastDrawnCursorPosition != null && !lastDrawnCursorPosition.equals(cursorPosition)) {
             if(virtualTerminal.getView(lastDrawnCursorPosition).isDoubleWidth()) {
                 dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition.withRelativeColumn(1));
             }
-            if(lastDrawnCursorPosition.column > 0 && virtualTerminal.getView(lastDrawnCursorPosition.withRelativeColumn(-1)).isDoubleWidth()) {
+            if(lastDrawnCursorPosition.col > 0 && virtualTerminal.getView(lastDrawnCursorPosition.withRelativeColumn(-1)).isDoubleWidth()) {
                 dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition.withRelativeColumn(-1));
             }
             dirtyCellsLookupTable.setDirty(lastDrawnCursorPosition);
@@ -686,7 +686,7 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
 
     @Override
     public synchronized void moveCursorTo(TerminalPosition position) {
-        if(position.column < 0) {
+        if(position.col < 0) {
             position = position.withColumn(0);
         }
         if(position.row < 0) {
@@ -962,8 +962,8 @@ public abstract class GraphicalTerminalImplementation implements IOSafeTerminal 
                 return;
             }
             BitSet tableRow = table.get(position.row - firstRowIndex);
-            if(position.column < tableRow.size()) {
-                tableRow.set(position.column);
+            if(position.col < tableRow.size()) {
+                tableRow.set(position.col);
             }
         }
 

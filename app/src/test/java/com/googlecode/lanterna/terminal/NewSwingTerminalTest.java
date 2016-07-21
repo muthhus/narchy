@@ -62,8 +62,8 @@ public class NewSwingTerminalTest extends javax.swing.JFrame {
 
             private void drawRandomHello(IOSafeTerminal terminal) throws IOException {
                 TerminalPosition size = terminal.terminalSize();
-                if(size.column > 6 && size.row > 1) {
-                    int positionX = RANDOM.nextInt(size.column - 6);
+                if(size.col > 6 && size.row > 1) {
+                    int positionX = RANDOM.nextInt(size.col - 6);
                     int positionY = RANDOM.nextInt(size.row);
 
                     terminal.moveCursorTo(positionX, positionY);

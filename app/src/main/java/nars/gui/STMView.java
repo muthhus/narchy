@@ -1,8 +1,9 @@
 package nars.gui;
 
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-import com.jogamp.newt.event.WindowAdapter;
 import com.jogamp.opengl.GL2;
+import nars.Op;
 import nars.learn.gng.NeuralGasNet;
 import nars.link.BLink;
 import nars.op.time.MySTMClustered;
@@ -78,6 +79,8 @@ public class STMView  {
         super();
         this.stm = stm;
 
+        final float maxVolume = 64;
+
         s.add(new Facial(
                     new GridSurface(
                         inputBagChart = new BagChart<Task>(stm.input, -1) {
@@ -85,8 +88,21 @@ public class STMView  {
                                 return new ItemVis<>(i, label(i.get().toStringWithoutBudget(), 16));
                             }
                         },
+
+
                         new LayerSurface(
-                            new ConsoleSurface(new LoggerTerminal(stm.logger, 50,20)),
+                            new ConsoleSurface(new TopicTerminal<Task>(
+                                stm.generate,
+                                    (Task t) -> t.toStringWithoutBudget(),
+                                    (Task t) -> {
+                                        float p = t.pri() * 0.5f + 0.5f;
+                                        float c = t.conf() * 0.5f + 0.5f;
+                                        float f = t.freq();
+                                        return TextColor.rgb((1f - f) * p * c, f * p * c, p * t.qua());
+                                    },
+                                    null,  //(Task t) -> TextColor.hsb(t.term().volume()/maxVolume, 0.8f, 0.25f),
+                                    50, 24
+                            )),
                             new BubbleChart()
                         )
                 )).maximize());

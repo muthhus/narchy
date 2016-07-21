@@ -18,8 +18,6 @@ import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
 
-import com.artemis.Component;
-
 /**
  * Created by me on 4/1/16.
  */
@@ -206,7 +204,7 @@ public class DemoTerminal {
 
             int rows = ts.row;
             for (int j = 0; j < rows; j++) {
-                for (int i = 0; i < ts.column; i++) {
+                for (int i = 0; i < ts.col; i++) {
 
 
 

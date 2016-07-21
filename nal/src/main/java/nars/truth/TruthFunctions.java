@@ -555,4 +555,9 @@ public final class TruthFunctions extends UtilityFunctions {
         }
         return c;
     }
+
+    public static float originality(int evidenceLength) {
+        return 1.0f / (evidenceLength + 1);
+    }
+
 }

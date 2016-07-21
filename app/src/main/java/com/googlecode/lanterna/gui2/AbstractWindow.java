@@ -152,7 +152,7 @@ public abstract class AbstractWindow extends AbstractBasePane implements Window 
             return null;
         }
         return globalPosition.withRelative(
-                -lastKnownPosition.column - contentOffset.column,
+                -lastKnownPosition.col - contentOffset.col,
                 -lastKnownPosition.row - contentOffset.row);
     }
 

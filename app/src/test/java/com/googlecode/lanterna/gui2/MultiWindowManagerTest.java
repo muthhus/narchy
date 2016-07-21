@@ -162,7 +162,7 @@ public class MultiWindowManagerTest extends TestBase {
                         if(key.isAltDown()) {
                             setPosition(getPosition().withRelativeColumn(-1));
                         }
-                        else if(key.isCtrlDown() && getSize().column > 1) {
+                        else if(key.isCtrlDown() && getSize().col > 1) {
                             setSize(getSize().withRelativeColumn(-1));
                         }
                         handled = true;
@@ -213,7 +213,7 @@ public class MultiWindowManagerTest extends TestBase {
                     graphics.setBackgroundColor(TextColor.ANSI.BLUE);
                     graphics.fill(' ');
                     String text = "Press <CTRL+Tab> and <CTRL+Shift+Tab> to cycle active window";
-                    graphics.putString(graphics.getSize().column - text.length() - 4, graphics.getSize().row - 1, text, SGR.BOLD);
+                    graphics.putString(graphics.getSize().col - text.length() - 4, graphics.getSize().row - 1, text, SGR.BOLD);
                 }
             };
         }

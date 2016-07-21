@@ -168,7 +168,7 @@ public class ScrollingSwingTerminalTest extends javax.swing.JFrame {
     private void buttonMoveCursorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMoveCursorActionPerformed
         TerminalPosition terminalPosition = scrollingSwingTerminal.terminalSize();
         Random random = new Random();
-        scrollingSwingTerminal.moveCursorTo(random.nextInt(terminalPosition.column), random.nextInt(terminalPosition.row));
+        scrollingSwingTerminal.moveCursorTo(random.nextInt(terminalPosition.col), random.nextInt(terminalPosition.row));
         scrollingSwingTerminal.flush();
     }//GEN-LAST:event_buttonMoveCursorActionPerformed
 

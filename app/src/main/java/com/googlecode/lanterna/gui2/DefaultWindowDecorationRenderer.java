@@ -49,26 +49,26 @@ public class DefaultWindowDecorationRenderer implements WindowDecorationRenderer
         TerminalPosition drawableArea = graphics.getSize();
         graphics.applyThemeStyle(themeDefinition.getPreLight());
         graphics.drawLine(new TerminalPosition(0, drawableArea.row - 2), new TerminalPosition(0, 1), verticalLine);
-        graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.column - 2, 0), horizontalLine);
+        graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.col - 2, 0), horizontalLine);
         graphics.set(0, 0, topLeftCorner);
         graphics.set(0, drawableArea.row - 1, bottomLeftCorner);
 
         graphics.applyThemeStyle(themeDefinition.getNormal());
 
         graphics.drawLine(
-                new TerminalPosition(drawableArea.column - 1, 1),
-                new TerminalPosition(drawableArea.column - 1, drawableArea.row - 2),
+                new TerminalPosition(drawableArea.col - 1, 1),
+                new TerminalPosition(drawableArea.col - 1, drawableArea.row - 2),
                 verticalLine);
         graphics.drawLine(
                 new TerminalPosition(1, drawableArea.row - 1),
-                new TerminalPosition(drawableArea.column - 2, drawableArea.row - 1),
+                new TerminalPosition(drawableArea.col - 2, drawableArea.row - 1),
                 horizontalLine);
 
-        graphics.set(drawableArea.column - 1, 0, topRightCorner);
-        graphics.set(drawableArea.column - 1, drawableArea.row - 1, bottomRightCorner);
+        graphics.set(drawableArea.col - 1, 0, topRightCorner);
+        graphics.set(drawableArea.col - 1, drawableArea.row - 1, bottomRightCorner);
 
         if(!title.isEmpty()) {
-            graphics.putString(2, 0, TerminalTextUtils.fitString(title, drawableArea.column - 3));
+            graphics.putString(2, 0, TerminalTextUtils.fitString(title, drawableArea.col - 3));
         }
 
         return graphics.newTextGraphics(new TerminalPosition(1, 1), graphics.getSize().withRelativeColumn(-2).withRelativeRow(-2));

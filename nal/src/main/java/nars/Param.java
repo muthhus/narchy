@@ -63,16 +63,12 @@ public abstract class Param extends Container implements Level {
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = 0.0001f;
+    public static final float BUDGET_EPSILON = 0.001f;
     /**
      * minimum durability and quality necessary for a derivation to form
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
-    /**
-     * relates time and evidence (confidence); how past and future beliefs decay in rank
-     * across time; width of the temporal focus
-     */
-    public static final float TEMPORAL_DURATION = 2f;
+
     public static int DEFAULT_NAL_LEVEL = 8;
     public static boolean EXIT_ON_EXCEPTION = true;
     /**
@@ -95,11 +91,20 @@ public abstract class Param extends Container implements Level {
      */
     public static float matchTermutationsMax = 3;
     public static int QUERY_ANSWERS_PER_MATCH = 1;
-    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE;
+    public static boolean REDUCE_TRUTH_BY_TEMPORAL_DISTANCE = false;
+
+    /**
+     * relates time and evidence (confidence); how past and future beliefs decay in rank
+     * across time; width of the temporal focus
+     */
+    public static final float TEMPORAL_DURATION = 2f;
+
     /**
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1.5f;
+
+
     /**
      * how much to multiply (shrink) the rank of a potential belief match if it overlaps with the task.
      * used to discourage premise's choice of belief tasks which overlap with the task.
@@ -109,6 +114,14 @@ public abstract class Param extends Container implements Level {
      * if false, then revection is not allowed to merge overlapping tasks when choosing a weakest pair to merge during compression
      */
     public static boolean REVECTION_ALLOW_MERGING_OVERLAPPING_EVIDENCE = true;
+
+    /** confidence factor to multiply eternalizable temporal beliefs.
+     *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
+     *  should be equal to or less than 1.0, so that resulting eternal beliefs dont override temporal beliefs of the smae confidence.
+     *  (although revision can accumulate higher confidence)
+     *  set to 0.0 to disable this functionality.
+     */
+    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS = 0.5f;
 
     @Nullable
     private Truth defaultGoalTruth, defaultJudgmentTruth;

@@ -54,6 +54,7 @@ public class STMClustered extends STM {
 
 
     private static final int compactPeriod = 8;
+    private long lastCompact;
 
     public final class TasksNode extends Node {
 
@@ -333,8 +334,9 @@ public class STMClustered extends STM {
         }
 
         long t = nar.time();
-        if (t - now > compactPeriod) {
+        if (t - lastCompact > compactPeriod) {
             net.compact();
+            lastCompact = t;
         }
 
         now = t;

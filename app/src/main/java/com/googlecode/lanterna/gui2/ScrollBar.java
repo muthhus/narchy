@@ -129,7 +129,7 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
             return viewSize;
         }
         if(direction == Direction.HORIZONTAL) {
-            return getSize().column;
+            return getSize().col;
         }
         else {
             return getSize().row;
@@ -184,7 +184,7 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
             int maximum = component.getScrollMaximum();
             int viewSize = component.getViewSize();
 
-            if(size.row == 0 || size.column == 0) {
+            if(size.row == 0 || size.col == 0) {
                 return;
             }
 
@@ -235,15 +235,15 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
                 }
             }
             else {
-                if(size.column == 1) {
+                if(size.col == 1) {
                     graphics.set(0, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
                 }
-                else if(size.column == 2) {
+                else if(size.col == 2) {
                     graphics.set(0, 0, Symbols.ARROW_LEFT);
                     graphics.set(1, 0, Symbols.ARROW_RIGHT);
                 }
                 else {
-                    int scrollableArea = size.column - 2;
+                    int scrollableArea = size.col - 2;
                     int scrollTrackerSize = 1;
                     if(growScrollTracker) {
                         float ratio = clampRatio((float) viewSize / (float) maximum);
@@ -254,8 +254,8 @@ public class ScrollBar extends AbstractComponent<ScrollBar> {
                     int scrollTrackerPosition = (int)(ratio * (float)(scrollableArea - scrollTrackerSize)) + 1;
 
                     graphics.set(0, 0, themeDefinition.getCharacter("LEFT_ARROW", Symbols.ARROW_LEFT));
-                    graphics.drawLine(1, 0, size.column - 2, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
-                    graphics.set(size.column - 1, 0, themeDefinition.getCharacter("RIGHT_ARROW", Symbols.ARROW_RIGHT));
+                    graphics.drawLine(1, 0, size.col - 2, 0, themeDefinition.getCharacter("HORIZONTAL_BACKGROUND", Symbols.BLOCK_MIDDLE));
+                    graphics.set(size.col - 1, 0, themeDefinition.getCharacter("RIGHT_ARROW", Symbols.ARROW_RIGHT));
                     if(scrollTrackerSize == 1) {
                         graphics.set(scrollTrackerPosition, 0, themeDefinition.getCharacter("HORIZONTAL_SMALL_TRACKER", Symbols.SOLID_SQUARE_SMALL));
                     }

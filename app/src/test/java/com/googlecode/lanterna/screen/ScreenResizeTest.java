@@ -48,7 +48,7 @@ public class ScreenResizeTest {
         while(System.currentTimeMillis() - now < 20 * 1000) {
             screen.pollInput();
             if(screen.doResizeIfNecessary() != null) {
-                putStrings("Size: " + screen.terminalSize().column + "x" + screen.terminalSize().row);
+                putStrings("Size: " + screen.terminalSize().col + "x" + screen.terminalSize().row);
             }
 
             Thread.sleep(1);

@@ -44,7 +44,7 @@ class SubTextGraphics extends AbstractTextGraphics {
     @Override
     public TextGraphics set(int columnIndex, int rowIndex, TextCharacter textCharacter) {
         TerminalPosition writableArea = getSize();
-        if(columnIndex < 0 || columnIndex >= writableArea.column ||
+        if(columnIndex < 0 || columnIndex >= writableArea.col ||
                 rowIndex < 0 || rowIndex >= writableArea.row) {
             return this;
         }
@@ -61,6 +61,6 @@ class SubTextGraphics extends AbstractTextGraphics {
     @Override
     public TextCharacter get(int column, int row) {
         TerminalPosition projectedPosition = project(column, row);
-        return underlyingTextGraphics.get(projectedPosition.column, projectedPosition.row);
+        return underlyingTextGraphics.get(projectedPosition.col, projectedPosition.row);
     }
 }

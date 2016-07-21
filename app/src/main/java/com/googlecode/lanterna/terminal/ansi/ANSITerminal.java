@@ -105,7 +105,7 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
         reportPosition();
         restoreCursorPosition();
         TerminalPosition terminalPosition = waitForCursorPositionReport();
-        return new TerminalPosition(terminalPosition.column, terminalPosition.row);
+        return new TerminalPosition(terminalPosition.col, terminalPosition.row);
     }
 
     @Override
@@ -231,7 +231,7 @@ public abstract class ANSITerminal extends StreamBasedTerminal implements Extend
 
     @Override
     public void moveCursorTo(TerminalPosition position) throws IOException {
-        moveCursorTo(position.column, position.row);
+        moveCursorTo(position.col, position.row);
     }
 
     @Override

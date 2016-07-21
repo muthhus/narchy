@@ -77,7 +77,7 @@ public class BasicTextImage implements TextImage {
         this.size = size;
 
         int rows = size.row;
-        int columns = size.column;
+        int columns = size.col;
         buffer = new TextCharacter[rows][];
         for(int y = 0; y < rows; y++) {
             buffer[y] = new TextCharacter[columns];
@@ -114,7 +114,7 @@ public class BasicTextImage implements TextImage {
                     (newSize == null ? "newSize" : "filler"));
         }
         if(newSize.row == buffer.length &&
-                (buffer.length == 0 || newSize.column == buffer[0].length)) {
+                (buffer.length == 0 || newSize.col == buffer[0].length)) {
             return this;
         }
         return new BasicTextImage(newSize, buffer, filler);
@@ -125,7 +125,7 @@ public class BasicTextImage implements TextImage {
         if(position == null) {
             throw new IllegalArgumentException("Cannot call BasicTextImage.setCharacterAt(..) with null position");
         }
-        set(position.column, position.row, character);
+        set(position.col, position.row, character);
     }
     
     @Override
@@ -156,7 +156,7 @@ public class BasicTextImage implements TextImage {
         if(position == null) {
             throw new IllegalArgumentException("Cannot call BasicTextImage.getCharacterAt(..) with null position");
         }
-        return get(position.column, position.row);
+        return get(position.col, position.row);
     }
     
     @Override
@@ -212,7 +212,7 @@ public class BasicTextImage implements TextImage {
         rows = Math.min(buffer.length - startRowIndex, rows);
 
         //Adjust target lengths as well
-        columns = Math.min(destination.getSize().column - destinationColumnOffset, columns);
+        columns = Math.min(destination.getSize().col - destinationColumnOffset, columns);
         rows = Math.min(destination.getSize().row - destinationRowOffset, rows);
 
         if(columns <= 0 || rows <= 0) {
@@ -261,7 +261,7 @@ public class BasicTextImage implements TextImage {
     }
 
     private TextCharacter[] newBlankLine() {
-        TextCharacter[] line = new TextCharacter[size.column];
+        TextCharacter[] line = new TextCharacter[size.col];
         Arrays.fill(line, TextCharacter.DEFAULT_CHARACTER);
         return line;
     }
@@ -301,8 +301,8 @@ public class BasicTextImage implements TextImage {
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(size.row *(size.column +1)+50);
-        sb.append('{').append(size.column).append('x').append(size.row).append('}').append('\n');
+        StringBuilder sb = new StringBuilder(size.row *(size.col +1)+50);
+        sb.append('{').append(size.col).append('x').append(size.row).append('}').append('\n');
         for (TextCharacter[] line : buffer) {
             for (TextCharacter tc : line) {
                 sb.append(tc.c);

@@ -17,6 +17,7 @@ import spacegraph.Surface;
 import spacegraph.render.ShapeDrawer;
 
 import java.io.IOException;
+import java.util.List;
 
 import static spacegraph.render.JoglSpace.glut;
 
@@ -26,8 +27,6 @@ import static spacegraph.render.JoglSpace.glut;
 public class ConsoleSurface extends Surface {
 
 
-    /** whether the background is not fully opaque */
-    boolean transparent = false;
 
     public static void main(String[] args) throws IOException {
 
@@ -58,6 +57,10 @@ public class ConsoleSurface extends Surface {
     final float fontUnscale;
     private final float fontHeight;
 
+    float bgAlpha = 0.5f;
+    float fgAlpha = 0.9f;
+
+
     public ConsoleSurface(int cols, int rows) {
         this(new DefaultVirtualTerminal(cols, rows));
     }
@@ -77,9 +80,9 @@ public class ConsoleSurface extends Surface {
     public ConsoleSurface(VirtualTerminal term) {
         this.term = term;
         fontWidth = glut.glutStrokeWidthf(font, 'X');
-        fontHeight = fontWidth * 1.6f; //glut.glutStrokeLengthf(font, "X");
+        fontHeight = fontWidth * 1.25f; //glut.glutStrokeLengthf(font, "X");
 
-        fontUnscale = 1 / fontWidth;
+        fontUnscale = 1 / fontHeight;
     }
 
 
@@ -88,13 +91,19 @@ public class ConsoleSurface extends Surface {
         TerminalPosition ts = term.terminalSize();
 
         int rows = ts.row;
-        int cols = ts.column;
+        int cols = ts.col;
+
 
         float cw = 1;
         float aspect = fontHeight / fontWidth;
         float ch = 1 * aspect;
+
         float charUnscaleX = fontUnscale * cw;
         float charUnscaleY = fontUnscale * ch;
+
+        float charScaleX = 1 * charUnscaleX;
+        float charScaleY = 1 * charUnscaleY ;
+
 
         float dz = 0.1f;
 
@@ -108,52 +117,54 @@ public class ConsoleSurface extends Surface {
         gl.glLineWidth(2f);
 
         int cury = term.cursor().row;
-        int curx = term.cursor().column;
+        int curx = term.cursor().col;
 
         long t = System.currentTimeMillis(); //HACK
 
         for (int j = 0; j < rows; j++) {
+
+            gl.glPushMatrix();
+
+            gl.glTranslatef(0, j * ch, dz);
+
+            int r = rows - 1 - j;
+            List<TextCharacter> line = term.getViewLine(r);
+
             for (int i = 0; i < cols; i++) {
 
-                float x = i;
-                int r = rows - 1 - j;
-                float y = j;
 
-                gl.glPushMatrix();
+                TextCharacter c = i < line.size() ? line.get(i) : null;
 
-                gl.glTranslatef(x * cw, y * ch, dz);
+                if (c!=null) {
 
-                TextCharacter c = term.getView(i, r);
+                    TextColor backColor = c.back;
+                    if (backColor!=null) {
 
-                TextColor backColor = c.back;
-                if (!transparent || !backColor.equals(TextColor.ANSI.DEFAULT)) {
+                        gl.glColor4f(
+                                backColor.red(),
+                                backColor.green(), backColor.blue(), bgAlpha);
+                        ShapeDrawer.rect(gl,
+                                cw * i, 0,
+                                cw, ch
+                                ,-dz
+                        );
+                    }
 
-                    float bgAlpha = 0.5f;
 
+                    char cc = displayChar(c);
+                    if ((cc != 0) && (cc != ' ')) {
+                        TextColor fg = c.fore;
 
-                    gl.glColor4f(
-                            backColor.red(),
-                            backColor.green(), backColor.blue(), bgAlpha);
-                    ShapeDrawer.rect(gl,
-                            0, 0,
-                            cw, ch
-                            ,-dz
-                    );
-                }
+                        gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
 
-                char cc = displayChar(c);
-                if ((cc != 0) && (cc != ' ')) {
-                    TextColor fg = c.fore;
-                    float fgAlpha = 0.9f;
+                        gl.glPushMatrix();
+                        gl.glTranslatef(cw*i, +charScaleY, 0);
 
-                    gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
+                        gl.glScalef(charScaleX, charScaleY, 1f);
+                        glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
+                        gl.glPopMatrix();
 
-                    gl.glPushMatrix();
-
-                    gl.glScalef(charUnscaleX, charUnscaleY, 1f);
-                    glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, cc);
-                    gl.glPopMatrix();
-
+                    }
                 }
 
                 if ((i == curx) && (r == cury)) {
@@ -161,14 +172,16 @@ public class ConsoleSurface extends Surface {
                     gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
                     float m = -(0.1f + 0.3f * p);
                     ShapeDrawer.rect(gl,
-                            0+m, 0+m,
+                            cw * i + m, 0+m,
                             cw-m, ch-m
                             ,-dz-m
                     );
                 }
 
-                gl.glPopMatrix();
             }
+
+            gl.glPopMatrix(); //next line
+
         }
 
         gl.glPopMatrix();

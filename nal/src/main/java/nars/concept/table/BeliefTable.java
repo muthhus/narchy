@@ -5,6 +5,7 @@ import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static java.util.stream.StreamSupport.stream;
+import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
 
 /**
@@ -84,6 +86,11 @@ public interface BeliefTable extends TaskTable {
         }
 
 
+        @Override
+        public float confMax(float minFreq, float maxFreq) {
+            return 0;
+        }
+
         @Nullable
         @Override
         public Truth truth(long when, long now) {
@@ -105,12 +112,15 @@ public interface BeliefTable extends TaskTable {
         return project(t, Stamp.TIMELESS);
     }*/
 
-    static float rankEternalByOriginality(@NotNull Task b) {
-        return or(b.conf(), b.originality());
+    static float rankEternalByConfAndOriginality(@NotNull Task b) {
+        return rankEternalByConfAndOriginality(b.conf(), b.originality());
+    }
+    static float rankEternalByConfAndOriginality(float conf, float originality) {
+        return and(conf, originality);
     }
 
-    static float rankEternalByOriginality(float conf, int hypotheticalEvidenceLength /* > 0 */) {
-        return or(conf, 1.0f / (hypotheticalEvidenceLength + 1));
+    static float rankEternalByConfAndOriginality(float conf, int hypotheticalEvidenceLength /* > 0 */) {
+        return rankEternalByConfAndOriginality(conf, TruthFunctions.originality(hypotheticalEvidenceLength));
     }
 
 //    /** returns value <= 1f */
@@ -342,24 +352,8 @@ public interface BeliefTable extends TaskTable {
         return confMax(0f, 1f);
     }
 
-    /** calculates the max confidence of a belief within the given frequency range */
-    default float confMax(float minFreq, float maxFreq) {
-        float max = Float.NEGATIVE_INFINITY;
+    float confMax(float minFreq, float maxFreq);
 
-
-        for (Task t : this) {
-            if (t!=null) {
-                float f = t.freq();
-                if ((f >= minFreq) && (f <= maxFreq)) {
-                    float c = t.conf();
-                    if (c > max)
-                        max = c;
-                }
-            }
-        }
-
-        return !Float.isFinite(max) ? 0 : max;
-    }
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available */

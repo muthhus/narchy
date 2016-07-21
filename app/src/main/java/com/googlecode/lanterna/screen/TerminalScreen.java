@@ -95,7 +95,7 @@ public class TerminalScreen extends AbstractScreen {
         TerminalPosition cursorPosition = cursorPosition();
         if(cursorPosition != null) {
             terminal.setCursorVisible(true);
-            terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+            terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
         } else {
             terminal.setCursorVisible(false);
         }
@@ -135,7 +135,7 @@ public class TerminalScreen extends AbstractScreen {
         }
         else if(refreshType == RefreshType.AUTOMATIC &&
                 (scrollHint == null || scrollHint == ScrollHint.INVALID)) {
-            double threshold = terminalSize().row * terminalSize().column * 0.75;
+            double threshold = terminalSize().row * terminalSize().col * 0.75;
             if(getBackBuffer().isVeryDifferent(getFrontBuffer(), (int) threshold)) {
                 refreshFull();
             }
@@ -151,11 +151,11 @@ public class TerminalScreen extends AbstractScreen {
         if(cursorPosition != null) {
             terminal.setCursorVisible(true);
             //If we are trying to move the cursor to the padding of a CJK character, put it on the actual character instead
-            if(cursorPosition.column > 0 && TerminalTextUtils.isCharCJK(getFrontBuffer().get(cursorPosition.withRelativeColumn(-1)).c)) {
-                terminal.moveCursorTo(cursorPosition.column - 1, cursorPosition.row);
+            if(cursorPosition.col > 0 && TerminalTextUtils.isCharCJK(getFrontBuffer().get(cursorPosition.withRelativeColumn(-1)).c)) {
+                terminal.moveCursorTo(cursorPosition.col - 1, cursorPosition.row);
             }
             else {
-                terminal.moveCursorTo(cursorPosition.column, cursorPosition.row);
+                terminal.moveCursorTo(cursorPosition.col, cursorPosition.row);
             }
         } else {
             terminal.setCursorVisible(false);
@@ -187,7 +187,7 @@ public class TerminalScreen extends AbstractScreen {
         useScrollHint();
 
         for(int y = 0; y < terminalPosition.row; y++) {
-            for(int x = 0; x < terminalPosition.column; x++) {
+            for(int x = 0; x < terminalPosition.col; x++) {
                 TextCharacter backBufferCharacter = getBackBuffer().get(x, y);
                 if(!backBufferCharacter.equals(getFrontBuffer().get(x, y))) {
                     updateMap.put(new TerminalPosition(x, y), backBufferCharacter);
@@ -202,7 +202,7 @@ public class TerminalScreen extends AbstractScreen {
             return;
         }
         TerminalPosition currentPosition = updateMap.keySet().iterator().next();
-        terminal.moveCursorTo(currentPosition.column, currentPosition.row);
+        terminal.moveCursorTo(currentPosition.col, currentPosition.row);
 
         TextCharacter firstScreenCharacterToUpdate = updateMap.values().iterator().next();
         EnumSet<SGR> currentSGR = firstScreenCharacterToUpdate.getModifiers();
@@ -216,7 +216,7 @@ public class TerminalScreen extends AbstractScreen {
         terminal.back(currentBackgroundColor);
         for(TerminalPosition position: updateMap.keySet()) {
             if(!position.equals(currentPosition)) {
-                terminal.moveCursorTo(position.column, position.row);
+                terminal.moveCursorTo(position.col, position.row);
                 currentPosition = position;
             }
             TextCharacter newCharacter = updateMap.get(position);
@@ -263,7 +263,7 @@ public class TerminalScreen extends AbstractScreen {
         for(int y = 0; y < terminalSize().row; y++) {
             terminal.moveCursorTo(0, y);
             int currentColumn = 0;
-            for(int x = 0; x < terminalSize().column; x++) {
+            for(int x = 0; x < terminalSize().col; x++) {
                 TextCharacter newCharacter = getBackBuffer().get(x, y);
                 if(newCharacter.equals(DEFAULT_CHARACTER)) {
                     continue;
@@ -371,10 +371,10 @@ public class TerminalScreen extends AbstractScreen {
         @Override
         public int compare(TerminalPosition o1, TerminalPosition o2) {
             if(o1.row == o2.row) {
-                if(o1.column == o2.column) {
+                if(o1.col == o2.col) {
                     return 0;
                 } else {
-                    return new Integer(o1.column).compareTo(o2.column);
+                    return new Integer(o1.col).compareTo(o2.col);
                 }
             } else {
                 return Integer.compare(o1.row, o2.row);

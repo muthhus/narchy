@@ -1,17 +1,22 @@
 package nars.concept.table;
 
 import com.google.common.collect.Iterators;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.task.AnswerTask;
+import nars.task.GeneratedTask;
 import nars.task.Task;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static nars.nal.Tense.ETERNAL;
 
 
 /**
@@ -114,6 +119,34 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal.clear();
     }
 
+    /** calculates the max confidence of a belief within the given frequency range */
+    public float confMax(float minFreq, float maxFreq) {
+        float max = 0;
+
+        //HACK eternal top task may not hold the highest confidence (since rank involves originality) however we'll use that value here
+        if (!eternal.isEmpty()) {
+            Task s = eternal.strongest();
+            float f = s.freq();
+            if ((f >= minFreq) && (f <= maxFreq)) {
+                max = s.conf();
+            }
+        }
+
+        List<Task> temporals = ((MicrosphereTemporalBeliefTable)temporal);
+        for (int i = 0, temporalsSize = temporals.size(); i < temporalsSize; i++) {
+            Task t = temporals.get(i);
+            if (t != null) {
+                float f = t.freq();
+                if ((f >= minFreq) && (f <= maxFreq)) {
+                    float c = t.conf();
+                    if (c > max)
+                        max = c;
+                }
+            }
+        }
+
+        return max;
+    }
 
 
     @Nullable
@@ -122,7 +155,7 @@ public class DefaultBeliefTable implements BeliefTable {
         EternalTable ee = eternal;
         if (!ee.isEmpty()) {
             synchronized (eternal) {
-                return ee.highest();
+                return ee.strongest();
             }
         }
         return null;
@@ -150,10 +183,15 @@ public class DefaultBeliefTable implements BeliefTable {
             synchronized (eternal) {
                 result = addEternal(input, displaced, nar);
             }
-        }
-        else {
+        } else {
             synchronized (temporal) {
+
                 result = temporal.add(input, eternal, displaced, nar);
+
+                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS;
+                if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
+                    eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
+                }
             }
         }
 
@@ -164,7 +202,51 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
+    protected void eternalizeForgottenTemporals(List<Task> displaced, @NotNull NAR nar, float factor) {
+        float confMin = nar.confMin.floatValue();
 
+        @NotNull EternalTable eternal = this.eternal;
+
+        float minRank = eternal.isFull() ? eternal.minRank() : 0;
+
+        int displacedSize = displaced.size();
+
+        //should use indexed list access because adding eternal might add new eternal tasks at the end (which should not be processed here
+        for (int i = 0; i < displacedSize; i++) {
+            Task d = displaced.get(i);
+
+            assert(d.occurrence()!=ETERNAL);
+
+            if (!d.isDeleted()) {
+                float eConf = TruthFunctions.eternalize(d.conf()) * factor;
+                if (eConf > confMin) {
+                    if (eternal.rank(eConf, d.evidence().length) > minRank) {
+
+                        Task ee = new GeneratedTask(
+                                d.term(), d.punc(),
+                                $.t(d.freq(), eConf)
+                            )
+                                .time(nar.time(), ETERNAL)
+                                .evidence(d)
+                                .budget(d.budget())
+                                .log("Eternalized");
+
+                        Task ff = addEternal(ee, displaced, nar);
+                        if (ff == null) {
+                            throw new RuntimeException("eternal rejected " + ee + " but this could have been prevented before constructing and inserting it");
+                        } else {
+                            if (d.term().toString().equals("I(a0)")) {
+                                System.out.println(eternal.size() + " / " + eternal.capacity());
+                                System.out.println(temporal.size() + " / " + temporal.capacity());
+                                System.out.println("eternalize: " + d + "\n\t" + ee + "\n\t\t" + ff);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
 
     private Task addEternal(@NotNull Task input, List<Task> displaced, @NotNull NAR nar) {
 
@@ -188,7 +270,16 @@ public class DefaultBeliefTable implements BeliefTable {
         if (!(input instanceof AnswerTask)) {
             revised = et.tryRevision(input, nar);
             if (revised != null) {
+
+                try {
+                    revised = revised.normalize(nar); //may throw an exception
+                } catch (NAR.InvalidTaskException e) {
+                    e.printStackTrace();
+                    revised = null;
+                }
+
                 if (Param.DEBUG) {
+
                     if (revised.isDeleted())
                         throw new RuntimeException("revised task is deleted");
                     if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
@@ -201,10 +292,19 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        Task result = insert(input, et, displaced) ? input : null;
-        if (result!=null && revised!=null) {
+        Task result = insert(input, displaced) ? input : null;
+        if (revised!=null) {
+
+            revised = insert(revised, displaced) ? revised : null;
+
+            if (result == null)
+                result = revised;
+
             //result = insert(revised, et) ? revised : result;
-            nar.runLater(()->nar.input(revised));
+//            nar.runLater(() -> {
+//                if (!revised.isDeleted())
+//                    nar.input(revised);
+//            });
         }
         return result;
     }
@@ -235,9 +335,9 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private static boolean insert(@NotNull Task incoming, @NotNull EternalTable table, List<Task> displ) {
+    private boolean insert(@NotNull Task incoming, List<Task> displ) {
 
-        Task displaced = table.put(incoming);
+        Task displaced = eternal.put(incoming);
 
         if (displaced!=null && !displaced.isDeleted()) {
             TaskTable.removeTask(displaced,

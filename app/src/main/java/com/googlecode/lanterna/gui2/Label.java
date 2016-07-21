@@ -258,16 +258,16 @@ public class Label extends AbstractComponent<Label> {
                 if (component.getLabelWidth() == null) {
                     linesToDraw = component.lines;
                 } else {
-                    List<String> var = TerminalTextUtils.getWordWrappedText(graphics.getSize().column, component.lines);
+                    List<String> var = TerminalTextUtils.getWordWrappedText(graphics.getSize().col, component.lines);
                     linesToDraw = var.toArray(new String[var.size()]);
                 }
 
                 for (int row = 0; row < Math.min(graphics.getSize().row, linesToDraw.length); row++) {
                     String line = linesToDraw[row];
-                    if (graphics.getSize().column >= labelSize.column) {
+                    if (graphics.getSize().col >= labelSize.col) {
                         graphics.putString(0, row, line);
                     } else {
-                        int availableColumns = graphics.getSize().column;
+                        int availableColumns = graphics.getSize().col;
                         String fitString = TerminalTextUtils.fitString(line, availableColumns);
                         graphics.putString(0, row, fitString);
                     }

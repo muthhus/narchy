@@ -203,7 +203,7 @@ public class Borders {
 
         @Override
         public TerminalPosition getWrappedComponentSize(TerminalPosition borderSize) {
-            int i = -Math.min(2, borderSize.column);
+            int i = -Math.min(2, borderSize.col);
             int i1 = -Math.min(2, borderSize.row);
             return borderSize.withRelativeColumn(i).withRelativeRow(i1);
         }
@@ -235,8 +235,8 @@ public class Borders {
                 graphics.drawLine(new TerminalPosition(0, drawableArea.row - 2), new TerminalPosition(0, 1), verticalLine);
             }
             graphics.set(0, 0, topLeftCorner);
-            if(drawableArea.column > 2) {
-                graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.column - 2, 0), horizontalLine);
+            if(drawableArea.col > 2) {
+                graphics.drawLine(new TerminalPosition(1, 0), new TerminalPosition(drawableArea.col - 2, 0), horizontalLine);
             }
 
             if(borderStyle == BorderStyle.ReverseBevel) {
@@ -245,20 +245,20 @@ public class Borders {
             else {
                 graphics.applyThemeStyle(graphics.getThemeDefinition(StandardBorder.class).getNormal());
             }
-            graphics.set(drawableArea.column - 1, 0, topRightCorner);
+            graphics.set(drawableArea.col - 1, 0, topRightCorner);
             if(drawableArea.row > 2) {
-                graphics.drawLine(new TerminalPosition(drawableArea.column - 1, 1),
-                        new TerminalPosition(drawableArea.column - 1, drawableArea.row - 2),
+                graphics.drawLine(new TerminalPosition(drawableArea.col - 1, 1),
+                        new TerminalPosition(drawableArea.col - 1, drawableArea.row - 2),
                         verticalLine);
             }
-            graphics.set(drawableArea.column - 1, drawableArea.row - 1, bottomRightCorner);
-            if(drawableArea.column > 2) {
+            graphics.set(drawableArea.col - 1, drawableArea.row - 1, bottomRightCorner);
+            if(drawableArea.col > 2) {
                 graphics.drawLine(new TerminalPosition(1, drawableArea.row - 1),
-                        new TerminalPosition(drawableArea.column - 2, drawableArea.row - 1),
+                        new TerminalPosition(drawableArea.col - 2, drawableArea.row - 1),
                         horizontalLine);
             }
 
-            if(drawableArea.column >= TerminalTextUtils.getColumnWidth(border.getTitle()) + 4) {
+            if(drawableArea.col >= TerminalTextUtils.getColumnWidth(border.getTitle()) + 4) {
                 graphics.putString(2, 0, border.getTitle());
             }
 
@@ -285,7 +285,7 @@ public class Borders {
      */
     public static void joinLinesWithFrame(TextGraphics graphics) {
         TerminalPosition drawableArea = graphics.getSize();
-        if(drawableArea.row <= 2 || drawableArea.column <= 2) {
+        if(drawableArea.row <= 2 || drawableArea.col <= 2) {
             //Too small
             return;
         }
@@ -293,7 +293,7 @@ public class Borders {
         int upperRow = 0;
         int lowerRow = drawableArea.row - 1;
         int leftRow = 0;
-        int rightRow = drawableArea.column - 1;
+        int rightRow = drawableArea.col - 1;
 
         List<Character> junctionFromBelowSingle = Arrays.asList(
                 Symbols.SINGLE_LINE_VERTICAL,
@@ -397,7 +397,7 @@ public class Borders {
                 Symbols.SINGLE_LINE_T_DOUBLE_LEFT);
 
         //Go horizontally and check vertical neighbours if it's possible to extend lines into the border
-        for(int column = 1; column < drawableArea.column - 1; column++) {
+        for(int column = 1; column < drawableArea.col - 1; column++) {
             //Check first row
             TextCharacter borderCharacter = graphics.get(column, upperRow);
             if(borderCharacter == null) {

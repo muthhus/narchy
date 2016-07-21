@@ -112,13 +112,13 @@ public class DefaultWindowManager implements WindowManager {
             window.setPosition(TerminalPosition.OFFSET_1x1);
         }
         else if(window.getHints().contains(Window.Hint.CENTERED)) {
-            int left = (lastKnownScreenSize.column - expectedDecoratedSize.column) / 2;
+            int left = (lastKnownScreenSize.col - expectedDecoratedSize.col) / 2;
             int top = (lastKnownScreenSize.row - expectedDecoratedSize.row) / 2;
             window.setPosition(new TerminalPosition(left, top));
         }
         else {
             TerminalPosition nextPosition = allWindows.get(allWindows.size() - 1).getPosition().withRelative(2, 1);
-            if(nextPosition.column + expectedDecoratedSize.column > lastKnownScreenSize.column ||
+            if(nextPosition.col + expectedDecoratedSize.col > lastKnownScreenSize.col ||
                     nextPosition.row + expectedDecoratedSize.row > lastKnownScreenSize.row) {
                 nextPosition = TerminalPosition.OFFSET_1x1;
             }
@@ -172,7 +172,7 @@ public class DefaultWindowManager implements WindowManager {
         else if(window.getHints().contains(Window.Hint.EXPANDED)) {
             position = TerminalPosition.OFFSET_1x1;
             size = screenSize.withRelative(
-                    -Math.min(4, screenSize.column),
+                    -Math.min(4, screenSize.col),
                     -Math.min(3, screenSize.row));
             if(!size.equals(window.getDecoratedSize())) {
                 window.invalidate();
@@ -185,17 +185,17 @@ public class DefaultWindowManager implements WindowManager {
             while(position.row > 0 && position.row + size.row > screenSize.row) {
                 position = position.withRelativeRow(-1);
             }
-            while(position.column > 0 && position.column + size.column > screenSize.column) {
+            while(position.col > 0 && position.col + size.col > screenSize.col) {
                 position = position.withRelativeColumn(-1);
             }
             if(position.row + size.row > screenSize.row) {
                 size = size.withRow(screenSize.row - position.row);
             }
-            if(position.column + size.column > screenSize.column) {
-                size = size.withColumn(screenSize.column - position.column);
+            if(position.col + size.col > screenSize.col) {
+                size = size.withColumn(screenSize.col - position.col);
             }
             if(window.getHints().contains(Window.Hint.CENTERED)) {
-                int left = (lastKnownScreenSize.column - size.column) / 2;
+                int left = (lastKnownScreenSize.col - size.col) / 2;
                 int top = (lastKnownScreenSize.row - size.row) / 2;
                 position = new TerminalPosition(left, top);
             }

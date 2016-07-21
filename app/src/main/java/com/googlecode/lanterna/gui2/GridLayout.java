@@ -403,7 +403,7 @@ public class GridLayout implements LayoutManager {
 
         if(area.equals(TerminalPosition.ZERO) ||
                 table.length == 0 ||
-                area.column <= leftMarginSize + rightMarginSize + ((table[0].length - 1) * horizontalSpacing) ||
+                area.col <= leftMarginSize + rightMarginSize + ((table[0].length - 1) * horizontalSpacing) ||
                 area.row <= bottomMarginSize + topMarginSize + ((table.length - 1) * verticalSpacing)) {
             return;
         }
@@ -427,7 +427,7 @@ public class GridLayout implements LayoutManager {
         int totalWidth = shrinkWidthToFitArea(areaWithoutHorizontalSpacing, columnWidths);
 
         //Finally, if there is extra space, make the expandable columns larger
-        while(areaWithoutHorizontalSpacing.column > totalWidth && !expandableColumns.isEmpty()) {
+        while(areaWithoutHorizontalSpacing.col > totalWidth && !expandableColumns.isEmpty()) {
             totalWidth = grabExtraHorizontalSpace(areaWithoutHorizontalSpacing, columnWidths, expandableColumns, totalWidth);
         }
 
@@ -463,15 +463,15 @@ public class GridLayout implements LayoutManager {
                     }
 
                     //Make sure to obey the size restrictions
-                    size = size.withColumn(Math.min(size.column, availableHorizontalSpace));
+                    size = size.withColumn(Math.min(size.col, availableHorizontalSpace));
                     size = size.withRow(Math.min(size.row, availableVerticalSpace));
 
                     switch (layoutData.horizontalAlignment) {
                         case CENTER:
-                            position = position.withRelativeColumn((availableHorizontalSpace - size.column) / 2);
+                            position = position.withRelativeColumn((availableHorizontalSpace - size.col) / 2);
                             break;
                         case END:
-                            position = position.withRelativeColumn(availableHorizontalSpace - size.column);
+                            position = position.withRelativeColumn(availableHorizontalSpace - size.col);
                             break;
                         case FILL:
                             size = size.withColumn(availableHorizontalSpace);
@@ -523,7 +523,7 @@ public class GridLayout implements LayoutManager {
                 }
                 GridLayoutData layoutData = getLayoutData(component);
                 if (layoutData.horizontalSpan == 1) {
-                    columnWidths[i] = Math.max(columnWidths[i], component.getPreferredSize().column);
+                    columnWidths[i] = Math.max(columnWidths[i], component.getPreferredSize().col);
                 }
             }
         }
@@ -543,7 +543,7 @@ public class GridLayout implements LayoutManager {
                         accumWidth += columnWidths[j];
                     }
 
-                    int preferredWidth = component.getPreferredSize().column;
+                    int preferredWidth = component.getPreferredSize().col;
                     if(preferredWidth > accumWidth) {
                         int columnOffset = 0;
                         do {
@@ -657,7 +657,7 @@ public class GridLayout implements LayoutManager {
         for(int width: columnWidths) {
             totalWidth += width;
         }
-        if(totalWidth > area.column) {
+        if(totalWidth > area.col) {
             int columnOffset = 0;
             do {
                 if(columnWidths[columnOffset] > 0) {
@@ -668,7 +668,7 @@ public class GridLayout implements LayoutManager {
                     columnOffset = 0;
                 }
             }
-            while(totalWidth > area.column);
+            while(totalWidth > area.col);
         }
         return totalWidth;
     }
@@ -698,7 +698,7 @@ public class GridLayout implements LayoutManager {
         for(int columnIndex: expandableColumns) {
             columnWidths[columnIndex]++;
             totalWidth++;
-            if(area.column == totalWidth) {
+            if(area.col == totalWidth) {
                 break;
             }
         }
@@ -709,7 +709,7 @@ public class GridLayout implements LayoutManager {
         for(int rowIndex: expandableRows) {
             rowHeights[rowIndex]++;
             totalHeight++;
-            if(area.column == totalHeight) {
+            if(area.col == totalHeight) {
                 break;
             }
         }

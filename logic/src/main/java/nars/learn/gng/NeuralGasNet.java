@@ -16,7 +16,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     private final int dimension;
 
 
-    private final SemiDenseIntUndirectedGraph e;
+    private final IntUndirectedGraph e;
     private final Node[] node;
 
     private int iteration;
@@ -76,7 +76,9 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         super();
 
 
-        this.e = new SemiDenseIntUndirectedGraph(maxNodes);
+        this.e =
+                new SemiDenseIntUndirectedGraph(maxNodes);
+                //new DenseIntUndirectedGraph(maxNodes);
         this.node = new Node[maxNodes];
         clear();
 

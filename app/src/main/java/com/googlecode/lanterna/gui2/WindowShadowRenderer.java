@@ -41,7 +41,7 @@ public class WindowShadowRenderer implements WindowPostRenderer {
         textGraphics.setBackgroundColor(TextColor.ANSI.BLACK);
         textGraphics.enableModifiers(SGR.BOLD);
         TerminalPosition lowerLeft = windowPosition.withRelativeColumn(2).withRelativeRow(decoratedWindowSize.row);
-        TerminalPosition lowerRight = lowerLeft.withRelativeColumn(decoratedWindowSize.column - 1);
+        TerminalPosition lowerRight = lowerLeft.withRelativeColumn(decoratedWindowSize.col - 1);
         textGraphics.drawLine(lowerLeft, lowerRight, ' ');
         TerminalPosition upperRight = lowerRight.withRelativeRow(-decoratedWindowSize.row + 1);
         textGraphics.drawLine(lowerRight, upperRight, ' ');
