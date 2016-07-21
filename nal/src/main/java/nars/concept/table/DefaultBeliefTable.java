@@ -295,12 +295,21 @@ public class DefaultBeliefTable implements BeliefTable {
         Task result = insert(input, displaced) ? input : null;
         if (revised!=null) {
 
-            revised = insert(revised, displaced) ? revised : null;
-
-            if (result == null)
-                result = revised;
-
+//            revised = insert(revised, displaced) ? revised : null;
+//
+//            if (revised!=null) {
+//                if (result == null) {
+//                    result = revised;
+//                } else {
+//                    //HACK
+//                    //insert a tasklink since it will not be created normally
+//                    nar.activate(revised, nar.conceptActivation.floatValue() /* correct? */);
+//                    revised.onConcept(revised.concept(nar), 0f);
+//
+//                }
+//            }
             //result = insert(revised, et) ? revised : result;
+            nar.input(revised);
 //            nar.runLater(() -> {
 //                if (!revised.isDeleted())
 //                    nar.input(revised);

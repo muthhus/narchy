@@ -18,9 +18,7 @@ import nars.term.container.TermSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -447,8 +445,36 @@ public abstract class TermBuilder {
 //        if (negate) {
 //            return negation( finish(op, dt, unwrappedNegs.toArray(new Term[n])) );
 //        } else {
+        if (dt == 0) {
+            s = junctionGroupNonDTSubterms(s, 0);
+        }
         return finish(op, dt, TermSet.the(s));
         //}
+    }
+
+    /** this is necessary to keep term structure consistent for intermpolation.
+     *  by grouping all non-sequence subterms into its own subterm, future
+     *  flattening and intermpolation is prevented from destroying temporal
+     *  measurements.
+     */
+    protected TreeSet<Term> junctionGroupNonDTSubterms(TreeSet<Term> s, int innerDT) {
+        TreeSet<Term> outer = new TreeSet();
+        Iterator<Term> ss = s.iterator();
+        while (ss.hasNext()) {
+            Term x = ss.next();
+            if (x.op() == CONJ /* dt will be something other than 'innerDT' having just been flattened */ ) {
+                outer.add(x);
+                ss.remove();
+            }
+        }
+        if (outer.isEmpty()) {
+            return s; //no change
+        }
+
+        Term groupedInner = finish(CONJ, innerDT, TermSet.the(s));
+        outer.add(groupedInner);
+
+        return outer;
     }
 
     /** returns # of terms negated */

@@ -666,14 +666,18 @@ public interface TermIndex {
         @Nullable
         Compound _atemporalize(@NotNull Compound c) {
             TermIndex i = index;
-            return compoundOrNull(i.transform(
-                    (c.op().temporal && c.dt()!=DTERNAL) ?
-                            //(Compound)(builder().build(c.op(), DTERNAL, c.subterms().terms())) :
-                            compoundOrNull(i.the((i.builder().build(c.op(), DTERNAL,
-                                    c.subterms().terms()
-                            ))).term()) :
-                            c,
-                    this));
+
+            Compound x;
+            if (c.op().temporal && c.dt() != DTERNAL) {
+                Term xx = i.builder().build(c.op(), DTERNAL, c.subterms().terms());
+                if (xx == null)
+                    return null;
+
+                x = compoundOrNull(i.the( xx ).term());
+            } else {
+                x = c;
+            }
+            return compoundOrNull(i.transform(x,this));
         }
 
         @Override

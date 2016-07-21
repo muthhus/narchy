@@ -178,9 +178,9 @@ public class TemporalTest {
         assertTrue(a == a0);
 
 
-        //a.beliefs().print();
+        a.beliefs().print();
 
-        assertEquals(4, a.beliefs().size());
+        assertEquals(6, a.beliefs().size());
     }
 
     @Nullable
