@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.budget.BudgetFunctions;
 import nars.nal.Stamp;
+import nars.task.GeneratedTask;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -13,10 +14,13 @@ import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.truth.TruthFunctions;
 import nars.util.data.MutableInteger;
+import nars.util.event.DefaultTopic;
+import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.NOPLogger;
 
 import java.util.stream.Stream;
 
@@ -25,17 +29,22 @@ import java.util.stream.Stream;
  */
 public class MySTMClustered extends STMClustered {
 
-	public final Logger logger;
+	public final Topic<Task> logger = new DefaultTopic<>();
 
 	private final int maxConjunctionSize;
 
 	float timeCoherenceThresh = 0.5f; //for sequence pairs phase
 	float freqCoherenceThresh = 0.9f;
 
+	float confMin;
+
 	public MySTMClustered(@NotNull NAR nar, int size, char punc, int maxConjunctionSize) {
         super(nar, new MutableInteger(size), punc, maxConjunctionSize);
 		this.maxConjunctionSize = maxConjunctionSize;
-		this.logger = LoggerFactory.getLogger(toString());
+
+		//this.logger = LoggerFactory.getLogger(toString());
+
+		allowNonInput = true;
 
 		net.setAlpha(0.8f);
 		net.setBeta(0.8f);
@@ -45,6 +54,8 @@ public class MySTMClustered extends STMClustered {
     @Override
 	protected void iterate() {
 		super.iterate();
+
+		confMin = nar.confMin.floatValue();
 
 		//LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
@@ -103,6 +114,8 @@ public class MySTMClustered extends STMClustered {
 
 					//float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
 					float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+					if (conf < confMin)
+						return;
 
 					long[] evidence = Stamp.zip(Stream.of(uu), uu.length, Param.STAMP_MAX_EVIDENCE);
 
@@ -118,14 +131,15 @@ public class MySTMClustered extends STMClustered {
 
 					long t = Math.round(nc[0]);
 
-					Task m = new MutableTask(conj, punc,
+					Task m = new GeneratedTask(conj, punc,
 							new DefaultTruth(finalFreq, conf)) //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 							.time(now, t)
 							.evidence(evidence)
 							.budget(BudgetFunctions.fund(uu, 1f / uu.length))
 							.log("STMCluster CoOccurr");
 
-					logger.info("{}", m);
+					//logger.debug("{}", m);
+					logger.emit(m);
 
 					//System.err.println(m + " " + Arrays.toString(m.evidence()));
 					nar.input(m);

@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import nars.util.DefaultConsoleAppender;
+import nars.util.event.Topic;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -13,18 +14,32 @@ import java.io.IOException;
  */
 public class LoggerTerminal extends DefaultVirtualTerminal {
 
-    private final Logger logger;
+    public LoggerTerminal(Topic logger, int c, int r) {
+        super(c, r);
+
+        logger.on(x -> {
+            try {
+                putLine(x.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        init();
+    }
+
+    protected void init() {
+        fore(TextColor.ANSI.WHITE);
+    }
 
     public LoggerTerminal(Logger logger, int c, int r) {
         super(c, r);
-        this.logger = logger;
-
-        fore(TextColor.ANSI.WHITE);
 
         DefaultConsoleAppender app = new MyDefaultConsoleAppender();
         app.start();
-
         ((ch.qos.logback.classic.Logger) logger).addAppender(app);
+
+        init();
     }
 
     private final class MyDefaultConsoleAppender extends DefaultConsoleAppender {

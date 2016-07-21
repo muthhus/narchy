@@ -11,12 +11,12 @@ public interface BudgetForget extends Consumer<BLink> {
     /**
      * called each frame to update parameters
      */
-    void update(@NotNull NAR nar);
+    default void update(@NotNull NAR nar) { }
 
     /**
      * called each frame to increment the cycle-advanced time within the frame
      * @param subFrame time offset to be applied to the last frame time value , 0 <= x < 1
      */
-    void cycle(float subFrame);
+    default void cycle(float subFrame) { }
 
 }

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * under capacity.
  */
 public final class AutoBag<V> implements BudgetForget {
-    private long now;
+
     volatile private float ratio;
 
     /** prevents durabilty=1.0 from avoiding forgetting, a value ~1.0 */
@@ -24,8 +24,6 @@ public final class AutoBag<V> implements BudgetForget {
         //this(new Forget.PercentForget(new MutableFloat(0), perfection));
     }
 
-
-
     /** @param bag
      * @return
      */
@@ -33,11 +31,12 @@ public final class AutoBag<V> implements BudgetForget {
 
         if (!(bag instanceof ArrayBag))
             return bag;
+
         ArrayBag<V> abag = (ArrayBag<V>) bag; //HACK
 
         synchronized (abag.map) {
-            float r = forgetRatio(abag);
-            this.ratio = r;
+            float r;;
+            this.ratio = r = forgetRatio(abag);
 
             return abag.commit(
                     (r >= Param.BUDGET_EPSILON) ?
@@ -84,21 +83,9 @@ public final class AutoBag<V> implements BudgetForget {
         return ratio;
     }
 
-    @Override
-    public final void update(@NotNull NAR nar) {
-
-        this.now = nar.time();
-        //forget.update(nar);
-    }
 
     @Override
-    @Deprecated public final void cycle(float subCycle) {
-
-        //forget.cycle(subCycle);
-    }
-
-    @Override
-    public void accept(@NotNull BLink bLink) {
+    public final void accept(@NotNull BLink bLink) {
 
         float eDur = bLink.dur() * maxEffectiveDurability;
         bLink.priMult( 1f - (ratio * (1f - eDur) ));

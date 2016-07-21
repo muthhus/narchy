@@ -24,8 +24,9 @@ import java.util.function.BiConsumer;
 public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BLink<X>, ItemVis<BLink<X>>> {
 
 
-    private static long now;
+    protected long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
+    private final Bag<X> bag;
 
     public static void main(String[] args) {
         Default d = new Default();
@@ -66,13 +67,17 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
 
             }
         };
+        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
+
 
         d.onFrame(xx -> {
-            now = xx.time();
-            tc.update();
+
+            //if (s.window.isVisible()) {
+                tc.now = xx.time();
+                tc.update();
+            //}
         });
 
-        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
         s.show(1400, 800);
 
 
@@ -84,12 +89,15 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
         if (busy.compareAndSet(false, true)) {
             update(1f, 1f, bag.size(), bag, this, i -> {
                 @Nullable X ii = i.get();
-                return ii != null ? new ItemVis<>(i, label(ii, 16)) : null;
+                return ii != null ? newItem(i) : null;
             });
         }
     }
 
-    private final Bag<X> bag;
+    protected ItemVis<BLink<X>> newItem(BLink<X> i) {
+        return new ItemVis<>(i, label(i.get(), 16));
+    }
+
 
     public BagChart(Bag<X> b, int limit) {
         super();

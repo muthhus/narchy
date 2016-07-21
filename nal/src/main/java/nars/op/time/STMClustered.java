@@ -242,16 +242,16 @@ public class STMClustered extends STM {
         }
     }
 
-    @Deprecated final float baseForgetRate = 0.01f;
-    @Deprecated final float forgetRate = 0.01f;
-
-    /**
-     * amount of priority subtracted from the priority each iteration
-     */
-    @Deprecated private float cycleCost(@NotNull Task id) {
-        //float dt = Math.abs(id.occurrence() - now);
-        return baseForgetRate + forgetRate * (1f - id.conf() * id.originality());
-    }
+//    @Deprecated final float baseForgetRate = 0.01f;
+//    @Deprecated final float forgetRate = 0.01f;
+//
+//    /**
+//     * amount of priority subtracted from the priority each iteration
+//     */
+//    @Deprecated private float cycleCost(@NotNull Task id) {
+//        //float dt = Math.abs(id.occurrence() - now);
+//        return baseForgetRate + forgetRate * (1f - id.conf() * id.originality());
+//    }
 
     @NotNull
     public static double[] getCoord(@NotNull Task t) {
@@ -272,7 +272,7 @@ public class STMClustered extends STM {
         clusters = (short)Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
 
         this.punc = punc;
-        this.input = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(1)) {
+        this.input = new ArrayBag<>(1, BudgetMerge.avgDQBlend, new HashMap<>(capacity.intValue())) {
             @NotNull
             @Override
             protected BLink<Task> newLink(@NotNull Task i, float p, float d, float q) {
@@ -329,6 +329,7 @@ public class STMClustered extends STM {
         }
 
         now = t;
+
 
         bagForget.commit(input);
 

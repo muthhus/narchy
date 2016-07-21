@@ -38,6 +38,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public final void init(GLAutoDrawable drawable) {
         this.window = (GLWindow)drawable;
         init(this.gl = drawable.getGL().getGL2());
+
     }
 
 

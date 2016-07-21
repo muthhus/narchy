@@ -289,14 +289,14 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 64, '.', 5);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, '!', 5);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
         //new ArithmeticInduction(nar);
 
 
 
-        Tetris t = new Tetris(6, 10, 2) {
+        Tetris t = new Tetris(6, 10, 5) {
             @Override
             protected int nextBlock() {
                 //return super.nextBlock(); //all blocks
@@ -306,13 +306,13 @@ public class Tetris extends TetrisState implements Environment {
         };
 
         Iterable<Termed> cheats = Iterables.concat(
-                numericSensor(() -> t.currentX, nar, 0.7f,
+                numericSensor(() -> t.currentX, nar, 0.5f,
                         "I(x)")
                         //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
                         //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
                         //"(active,x)")
                         .resolution(1f/t.width),
-                numericSensor(() -> t.currentY, nar, 0.7f,
+                numericSensor(() -> t.currentY, nar, 0.5f,
                         "I(y)")
                         //"active:(y,t)", "active:(y,b)")
                         //"(active,y)")

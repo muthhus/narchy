@@ -1,5 +1,6 @@
 package spacegraph;
 
+import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,10 @@ public class Surface {
 
     protected void layout() {
         //nothing by default
+    }
+
+    public void setChildren(Surface... s) {
+        setChildren(Lists.newArrayList(s));
     }
 
     public void setChildren(List<? extends Surface> children) {

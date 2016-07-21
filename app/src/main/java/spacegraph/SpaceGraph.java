@@ -86,7 +86,19 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
             add(c);
     }
 
+    final List<Facial> preAdd = $.newArrayList();
+
+
+
     public void add(Facial c) {
+        if (window == null) {
+            preAdd.add(c);
+        } else {
+            _add(c);
+        }
+    }
+
+    void _add(Facial c) {
         if (this.facials.add(c))
             c.start(this);
     }
@@ -140,6 +152,11 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     public void init(GL2 gl) {
         super.init(gl);
+
+        for (Facial f : preAdd) {
+            _add(f);
+        }
+        preAdd.clear();
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 

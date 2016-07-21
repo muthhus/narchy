@@ -4,7 +4,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
 abstract public class DefaultConsoleAppender extends AppenderBase<ILoggingEvent> {
-  static int DEFAULT_LIMIT = 10;
+  static int DEFAULT_LIMIT = 16;
   int counter;
   int limit = DEFAULT_LIMIT;
   

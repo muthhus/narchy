@@ -1,5 +1,6 @@
 package spacegraph.obj;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Surface;
 
@@ -10,32 +11,43 @@ import java.util.List;
     aspect ratio=+inf: col (x)
                  else: grid( %x, %(ratio * x) )
  */
-public class GridSurface extends Surface {
+public class GridSurface extends LayoutSurface {
 
-    private final MutableFloat aspect;
+    private final MutableFloat aspect = new MutableFloat(0f);
 
     public static final float HORIZONTAL = 0f;
     public static final float VERTICAL = Float.POSITIVE_INFINITY;
     public static final float GRID_SQUARE = 0.25f;
 
+    public GridSurface(Surface... children) {
+        this(0f, children);
+    }
+
     public GridSurface(List<? extends Surface> children) {
         this(children, 0f);
     }
 
+    public GridSurface(float aspect, Surface... children) {
+        super();
+        this.aspect.setValue(aspect);
+        setChildren(children);
+    }
+
     public GridSurface(List<? extends Surface> children, float aspect) {
         super();
-        this.aspect = new MutableFloat(aspect);
+        this.aspect.setValue(aspect);
         setChildren(children);
     }
 
 
-    public int length() {
-        return children.size();
-    }
 
     @Override
     protected void layout() {
+
         int n = children.size();
+        if (n == 0)
+            return;
+
         float a = aspect.floatValue();
 
         float margin = 0.1f;

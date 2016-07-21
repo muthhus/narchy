@@ -14,6 +14,7 @@ public abstract class STM implements Consumer<Task> {
     public final @NotNull NAR nar;
 
     public final MutableInteger capacity;
+    protected boolean allowNonInput = false;
 
     public STM(@NotNull NAR nar, MutableInteger capacity) {
         this.nar = nar;
@@ -23,7 +24,7 @@ public abstract class STM implements Consumer<Task> {
     /** call this in constructor */
     protected void start() {
         nar.eventTaskProcess.on(t -> {
-            if (temporallyInductable(t))
+            if (temporallyInductable(t, allowNonInput))
                 accept(t);
         } );
         nar.eventReset.on(n -> clear());
@@ -35,8 +36,8 @@ public abstract class STM implements Consumer<Task> {
 
     abstract public void clear();
 
-    static public boolean temporallyInductable(@NotNull Task newEvent) {
-        return (!newEvent.isDeleted() && newEvent.isInput() && !newEvent.isEternal());
+    static public boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
+        return (!newEvent.isDeleted() && (allowNonInput || newEvent.isInput()) && !newEvent.isEternal());
     }
 
 
