@@ -56,8 +56,7 @@ public class Revision {
     }
 
 
-    @Nullable
-    public static Task merge(@NotNull Task a, @NotNull Task b, long now, long newOcc, @NotNull Truth newTruth) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long when, long now, @NotNull Truth newTruth) {
 
         if (a.isBeliefOrGoal() && b.isBeliefOrGoal() && Term.equalAtemporally(a.term(), b.term())) {
             float aw = a.isQuestOrQuestion() ? 0 : a.confWeight(); //question
@@ -72,11 +71,11 @@ public class Revision {
             if (adjustedDifference > 0) {
                 //normalize relative to the total difference involved
                 long aocc = a.occurrence();
-                if (aocc == ETERNAL) aocc = newOcc;
+                if (aocc == ETERNAL) aocc = when;
                 long bocc = b.occurrence();
-                if (bocc == ETERNAL) bocc = newOcc;
+                if (bocc == ETERNAL) bocc = when;
                 confScale = (1f - (adjustedDifference /
-                        (1 + Math.abs(aocc - newOcc) + Math.abs(bocc - newOcc))));
+                        (1 + Math.abs(aocc - when) + Math.abs(bocc - when))));
             } else {
                 confScale = 1f;
             }
@@ -88,7 +87,7 @@ public class Revision {
             }
 
             return new RevisionTask(c.getTwo(),
-                    a, b, now, newOcc, aMix,
+                    a, b, now, when, aMix,
                     newTruth.withConf(newConf)
                     ).budget(a, b, aMix).log("Revection Merge");
 
@@ -133,7 +132,7 @@ public class Revision {
             if (bb.isDeleted()) return null;
 
             Task solution = new AnswerTask(b.term() /* question term in case it has different temporality */,
-                    b, a, newTruth, now, newOcc, 0.5f)
+                    b, a, newTruth, now, when, 0.5f)
                     .budget(bb)
                     //.state(state())
                     //.setEvidence(evidence())
@@ -150,15 +149,6 @@ public class Revision {
         }
     }
 
-
-    public static float truthProjection(long sourceTime, long targetTime, long currentTime) {
-        if (sourceTime == targetTime) {
-            return 1f;
-        } else {
-            long denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
-        }
-    }
 
     /**
      * heuristic which evaluates the semantic similarity of two terms

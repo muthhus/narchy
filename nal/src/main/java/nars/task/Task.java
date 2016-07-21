@@ -24,7 +24,6 @@ import nars.*;
 import nars.NAR.InvalidTaskException;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.index.TermIndex;
 import nars.nal.Stamp;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -38,11 +37,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.TIMELESS;
-import static nars.task.Revision.truthProjection;
+import static nars.truth.TruthFunctions.projection;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**
@@ -727,7 +725,7 @@ public interface Task extends Budgeted, Truthed, Comparable<Task>, Stamp, Termed
 
 
             float projConf = nextConf =
-                    conf * truthProjection(  targetTime, occ, now );
+                    conf * projection(  targetTime, occ, now );
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

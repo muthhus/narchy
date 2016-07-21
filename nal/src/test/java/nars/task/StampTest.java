@@ -217,4 +217,15 @@ public class StampTest {
 
     }
 
+    @Test public void testOverlapFraction() {
+        assertEquals(0f, Stamp.overlapFraction(a(1), a(3)), 0.01f);
+        assertEquals(0f, Stamp.overlapFraction(a(1, 2), a(3)), 0.01f);
+        assertEquals(0f, Stamp.overlapFraction(a(1, 2), a(3, 4)), 0.01f);
+    }
+    @Test public void testOverlapFraction2() {
+        assertEquals(0.33f, Stamp.overlapFraction(a(1,2), a(2,3)), 0.01f);
+        assertEquals(0.5f, Stamp.overlapFraction(a(1,2), a(2)), 0.01f);
+        assertEquals(0.75f, Stamp.overlapFraction(a(1,2,3,4), a(2,3,4)), 0.01f);
+    }
+
 }

@@ -20,6 +20,7 @@
  */
 package nars.nal;
 
+import com.gs.collections.impl.factory.primitive.LongSets;
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.Param;
@@ -185,7 +186,8 @@ public interface Stamp {
     }
 
     /**
-     * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
+     * true if there are any common elements;
+     * assumes the arrays are sorted and contain no duplicates
      *
      * @param a evidence stamp in sorted order
      * @param b evidence stamp in sorted order
@@ -215,6 +217,21 @@ public interface Stamp {
         return false;
     }
 
+    /**
+     * the fraction of components in common divided by the total amount of unique components.
+     * returns >0 if there is at least one common component; 1.0 if they are equal.
+     *
+     * assumes the arrays are sorted and contain no duplicates
+     */
+    static float overlapFraction(@Nullable long[] a, @Nullable long[] b) {
+        LongHashSet l = new LongHashSet(a);
+        if (!l.retainAll(b)) {
+            return 0f;
+        }
+        int common = l.size();
+        int unique = a.length + b.length - (common);
+        return (float)common / unique;
+    }
 
     long creation();
 
@@ -267,4 +284,6 @@ public interface Stamp {
         int ls = l.size();
         return ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls -maxLen), ls);
     }
+
+
 }

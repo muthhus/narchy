@@ -9,13 +9,13 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.ProcTerm;
 import nars.nal.rule.PremiseRule;
 import nars.task.DerivedTask;
-import nars.task.Revision;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -266,7 +266,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             if (truth!=null) {
                 float projection;
                 if (Param.REDUCE_TRUTH_BY_TEMPORAL_DISTANCE && premise.isEvent()) {
-                    projection = Revision.truthProjection(m.task.occurrence(), m.belief.occurrence(), nar.time());
+                    projection = TruthFunctions.projection(m.task.occurrence(), m.belief.occurrence(), nar.time());
                 } else {
                     projection = 1f;
                 }

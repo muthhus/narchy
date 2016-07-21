@@ -63,8 +63,11 @@ public class DefaultTruth implements Truth  {
 
     @Nullable
     @Override public final Truth withConf(float newConf) {
-//        if (newConf < Global.TRUTH_EPSILON)
-//            return null;
+        if (newConf == 1f)
+            return this;
+
+        if (newConf < Param.TRUTH_EPSILON)
+            return null;
         //return !Util.equals(conf, newConf, Global.TRUTH_EPSILON) ? new DefaultTruth(freq, newConf) : this;
         return new DefaultTruth(freq, newConf);
     }

@@ -69,6 +69,7 @@ public abstract class Param extends Container implements Level {
      */
     public static final float DERIVATION_DURABILITY_THRESHOLD = BUDGET_EPSILON * 2f;
 
+
     public static int DEFAULT_NAL_LEVEL = 8;
     public static boolean EXIT_ON_EXCEPTION = true;
     /**
@@ -118,10 +119,21 @@ public abstract class Param extends Container implements Level {
     /** confidence factor to multiply eternalizable temporal beliefs.
      *  displaced temporal beliefs and goals can be eternalized before being deleted, possibly preserving some of their truth value
      *  should be equal to or less than 1.0, so that resulting eternal beliefs dont override temporal beliefs of the smae confidence.
-     *  (although revision can accumulate higher confidence)
+     *  (although revision can accumulate higher confidence).
+     *
+     *  this is applied after the usual TruthFunctions.eternalize function
+     *  that determines a (lower) confidence value for the given temporal.
+     *
      *  set to 0.0 to disable this functionality.
      */
-    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS = 0.5f;
+    public static float ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR = 1f;
+
+    /** confidence multiplier for revection merges during temporal belief table compression.
+     *
+     *  a value less than 1.0 allows subsequent revections to decay faster, preventing
+     *  a compounding / "snowballing" of mergings into a highly confident rolling average task.
+     */
+    public static final float REVECTION_CONFIDENCE_FACTOR = 1f;
 
     @Nullable
     private Truth defaultGoalTruth, defaultJudgmentTruth;

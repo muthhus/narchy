@@ -149,7 +149,7 @@ public interface Concept extends Termed {
         Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
         if (truth == null)
             return null;
-        return Revision.merge(x, y, now, when, truth );
+        return Revision.merge(x, y, when, now, truth );
     }
 
     /**

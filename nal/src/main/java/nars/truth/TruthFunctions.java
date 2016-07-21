@@ -27,6 +27,7 @@ import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static java.lang.StrictMath.abs;
 import static nars.$.t;
 import static nars.util.Util.lerp;
 
@@ -560,4 +561,12 @@ public final class TruthFunctions extends UtilityFunctions {
         return 1.0f / (evidenceLength + 1);
     }
 
+    public static float projection(long sourceTime, long targetTime, long currentTime) {
+        if (sourceTime == targetTime) {
+            return 1f;
+        } else {
+            long denom = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+            return denom == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) denom;
+        }
+    }
 }

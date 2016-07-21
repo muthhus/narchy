@@ -178,7 +178,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
                 result = temporal.add(input, eternal, displaced, nar);
 
-                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS;
+                float eternalizationFactor = Param.ETERNALIZE_FORGOTTEN_TEMPORAL_TASKS_CONFIDENCE_FACTOR;
                 if (eternalizationFactor > 0f && displaced.size() > 0 && eternal.capacity() > 0) {
                     eternalizeForgottenTemporals(displaced, nar, eternalizationFactor);
                 }
