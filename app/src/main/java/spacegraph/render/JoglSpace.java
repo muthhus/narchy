@@ -1,16 +1,33 @@
 package spacegraph.render;
 
+import alice.util.OutputStreamAdapter;
+import alice.util.jedit.InputHandler;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
+import infinispan.com.google.common.io.NullOutputStream;
+import jogamp.opengl.FPSCounterImpl;
+import nars.util.Util;
+import org.infinispan.commons.util.concurrent.ConcurrentHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
-    final static int DEFAULT_FPS = 30;
+    final static int DEFAULT_FPS = 25;
+    public static final int MIN_FPS = 3;
+    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.DEFAULT_FPS, MIN_FPS, 25);
 
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
@@ -28,10 +45,53 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         w.addWindowListener(j);
 
         //TODO FPSAnimator
-        FPSAnimator a = new FPSAnimator(DEFAULT_FPS);
-        a.add(w);
-        a.start();
+        animate(w);
+
         return w;
+    }
+
+    public static final Set<GLWindow> windows = new ConcurrentHashSet<>();
+
+    public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
+
+    private static void animate(GLWindow w) {
+        synchronized (a) {
+            boolean wasEmpty = windows.isEmpty();
+
+            if (!windows.add(w))
+                return;
+
+            if (wasEmpty) {
+                if (!a.isStarted()) {
+                    a.start(Thread.MIN_PRIORITY);
+                    logger.info("START {}", a);
+                } else {
+                    a.resume();
+                    logger.info("RESUME {}", a);
+                }
+            }
+
+            a.add(w);
+        }
+
+        w.addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowDestroyed(WindowEvent e) {
+                windows.remove(w);
+
+                boolean nowEmpty = windows.isEmpty();
+                synchronized (a) {
+                    a.remove(w);
+                    if (nowEmpty) {
+                        a.pause();
+                        logger.info("PAUSE {}", a);
+                    }
+                }
+
+                super.windowDestroyed(e);
+            }
+        });
     }
 
     @Override
@@ -157,6 +217,86 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     public GL2 gl() {
         return gl;
+    }
+
+    private static class MyFPSAnimator extends FPSAnimator {
+
+        int idealFPS, minFPS;
+        float lagTolerancePercentFPS = 0.07f;
+
+        public MyFPSAnimator(int idealFPS, int minFPS, int updateEveryNFrames) {
+            super(idealFPS);
+
+
+
+            this.idealFPS = idealFPS;
+            this.minFPS = minFPS;
+
+            setUpdateFPSFrames(updateEveryNFrames, new PrintStream(new OutputStream() {
+
+                @Override
+                public void write(int b) throws IOException {
+                }
+
+                long lastUpdate = 0;
+                @Override
+                public void flush() throws IOException {
+                    long l = getLastFPSUpdateTime();
+                    if (lastUpdate==l)
+                        return;
+                    updateFPS();
+                    lastUpdate = l;
+                }
+
+            }, true));
+
+        }
+
+
+        protected synchronized void updateFPS() {
+            //logger.info("{}", MyFPSAnimator.this);
+
+            int currentFPS = getFPS();
+            float lag = currentFPS - getLastFPS();
+            if (lag < 1f)
+                return; //the fps can only be adjusted in integers
+
+            float error = lag/currentFPS;
+
+            float nextFPS = Float.NaN;
+
+            if (error > lagTolerancePercentFPS) {
+                if (currentFPS > minFPS)  {
+                    //decrease fps
+                    nextFPS = Util.lerp(minFPS, currentFPS, 0.25f);
+                }
+            } else {
+                if (currentFPS < idealFPS) {
+                    //increase fps
+                    nextFPS = Util.lerp(idealFPS, currentFPS, 0.25f);
+                }
+            }
+
+            int inextFPS = Math.round(nextFPS);
+            if (nextFPS==nextFPS && inextFPS!=currentFPS) {
+                //stop();
+                logger.warn("animator rate change from {} to {} fps", currentFPS, inextFPS);
+
+                Thread x = animThread; //HACK to make it think it's stopped when we just want to change the FPS value ffs!
+                animThread = null;
+
+                setFPS(inextFPS);
+                animThread = x;
+
+                //start();
+            }
+
+        }
+
+        public synchronized void start(int threadPriority) {
+            start();
+            animThread.setPriority(threadPriority);
+        }
     }
 
 

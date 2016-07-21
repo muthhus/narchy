@@ -97,7 +97,7 @@ public abstract class Param extends Container implements Level {
      * relates time and evidence (confidence); how past and future beliefs decay in rank
      * across time; width of the temporal focus
      */
-    public static final float TEMPORAL_DURATION = 2f;
+    public static final float TEMPORAL_DURATION = 0.5f;
 
     /**
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
