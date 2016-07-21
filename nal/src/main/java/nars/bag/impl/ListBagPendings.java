@@ -88,6 +88,14 @@ public class ListBagPendings<X extends Comparable<X>> extends ArrayBag.BagPendin
     }
 
     private void combine(@NotNull CircularArrayList<RawBLink<X>> p) {
+        //HACK remove nulls before sort
+        for (int i = 0; i < pending.size(); ) {
+            if (pending.get(i) == null) {
+                pending.remove(i);
+            } else {
+                i++;
+            }
+        }
         Collections.sort(p, this);
     }
 

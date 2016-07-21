@@ -364,6 +364,8 @@
 
     A, B, task("."), time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection)
 
+    A, B, task("!"), time(dtBefore), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Desire:Intersection)
+
 
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////

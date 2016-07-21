@@ -30,6 +30,22 @@ abstract public class events extends AtomicBoolCondition {
 
     };
 
+    /** true if belief is before or during task */
+    public static final events before = new events() {
+
+        @Override
+        public String toString() {
+            return "before";
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
+            @Nullable Task b = m.belief;
+            return b == null ? false : beliefBeforeOrDuringTask(b, m.task);
+        }
+
+    };
+
     /** rejects any task term with dt==DTERNAL and if task and belief are both eternal */
     public static final BoolCondition taskIsTemporal = new AtomicBoolCondition() {
         @Override
@@ -52,16 +68,16 @@ abstract public class events extends AtomicBoolCondition {
         }
     };
 
-    public static boolean beliefBeforeOrDuringTask(@NotNull Task task, @Nullable Task belief) {
+    public static boolean beliefBeforeOrDuringTask(@NotNull Task a, @Nullable Task b) {
 
-        if (belief == null)
+        if (b == null)
             return false;
 
-        long tOcc = task.occurrence();
+        long tOcc = a.occurrence();
         if (tOcc == ETERNAL)
             return false;
 
-        long bOcc = belief.occurrence();
+        long bOcc = b.occurrence();
         if (bOcc == ETERNAL)
             return false;
 

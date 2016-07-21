@@ -556,4 +556,8 @@ public class TermReductionsTest {
          .toString());
 
     }
+
+    @Test public void testConjunctiveCoNegationAcrossImpl() {
+        //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%
+    }
 }

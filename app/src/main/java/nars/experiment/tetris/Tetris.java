@@ -299,17 +299,17 @@ public class Tetris extends TetrisState implements Environment {
         };
 
         Iterable<Termed> cheats = Iterables.concat(
-                numericSensor(() -> t.currentX, nar, 0.1f,
-                        "I(x)")
+                numericSensor(() -> t.currentX, nar, 0.3f,
+                        "(cursor_x)")
                         //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
                         //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
                         //"(active,x)")
-                        .resolution(1f/t.width),
-                numericSensor(() -> t.currentY, nar, 0.1f,
-                        "I(y)")
+                        .resolution(0.5f/t.width),
+                numericSensor(() -> t.currentY, nar, 0.3f,
+                        "(cursor_y)")
                         //"active:(y,t)", "active:(y,b)")
                         //"(active,y)")
-                        .resolution(1f/t.height)
+                        .resolution(0.5f/t.height)
         );
 
         NAgent n = new NAgent(nar) {

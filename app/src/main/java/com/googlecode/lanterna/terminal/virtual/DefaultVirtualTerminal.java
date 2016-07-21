@@ -345,22 +345,24 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
                 return TextCharacter.DEFAULT_CHARACTER;
             }
         };
-        ListIterator<List<TextCharacter>> iterator = currentTextBuffer.getLinesFrom(startRow);
-        for(int row = startRow; row <= endRow; row++) {
-            BufferLine bufferLine = emptyLine;
-            if(iterator.hasNext()) {
-                final List<TextCharacter> list = iterator.next();
-                bufferLine = new BufferLine() {
-                    @Override
-                    public TextCharacter getCharacterAt(int column) {
-                        if(column >= list.size()) {
-                            return TextCharacter.DEFAULT_CHARACTER;
+        synchronized(currentTextBuffer.lines) {
+            ListIterator<List<TextCharacter>> iterator = currentTextBuffer.getLinesFrom(startRow);
+            for (int row = startRow; row <= endRow; row++) {
+                BufferLine bufferLine = emptyLine;
+                if (iterator.hasNext()) {
+                    final List<TextCharacter> list = iterator.next();
+                    bufferLine = new BufferLine() {
+                        @Override
+                        public TextCharacter getCharacterAt(int column) {
+                            if (column >= list.size()) {
+                                return TextCharacter.DEFAULT_CHARACTER;
+                            }
+                            return list.get(column);
                         }
-                        return list.get(column);
-                    }
-                };
+                    };
+                }
+                bufferWalker.onLine(row, bufferLine);
             }
-            bufferWalker.onLine(row, bufferLine);
         }
     }
 

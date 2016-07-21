@@ -74,13 +74,13 @@ public class Pong extends Player implements Environment {
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
                 //new Indexes.DefaultTermIndex(128 *1024, rng)
                 , new FrameClock());
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(32);
+        nar.cyclesPerFrame.set(128);
         nar.conceptActivation.setValue(0.05f);
         nar.confMin.setValue(0.05f);
 
@@ -121,8 +121,8 @@ public class Pong extends Player implements Environment {
 
         //new Abbreviation2(nar, "_");
         {
-            new MySTMClustered(nar, 256, '.', 2);
-            new MySTMClustered(nar, 256, '!', 2);
+            new MySTMClustered(nar, 256, '.', 3);
+            new MySTMClustered(nar, 256, '!', 3);
         }
 
 

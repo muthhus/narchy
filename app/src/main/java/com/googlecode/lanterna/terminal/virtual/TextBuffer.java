@@ -33,7 +33,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 class TextBuffer {
     private static final TextCharacter DOUBLE_WIDTH_CHAR_PADDING = new TextCharacter(' ');
 
-    @Deprecated private final List<List<TextCharacter>> lines;
+    @Deprecated
+    public final List<List<TextCharacter>> lines;
     private final int maxLineWidth;
 
     TextBuffer(int maxLineWidth) {
@@ -45,15 +46,19 @@ class TextBuffer {
     }
 
     void newLine() {
-        lines.add($.newArrayList(maxLineWidth));
+        synchronized(lines) {
+            lines.add($.newArrayList(maxLineWidth));
+        }
     }
 
     void removeTopLines(int numberOfLinesToRemove) {
-        int n = Math.min(lines.size(), numberOfLinesToRemove);
-        Iterator<List<TextCharacter>> x = lines.iterator();
-        while (x.hasNext() && ((n--) > 0)) {
-            x.next();
-            x.remove();
+        synchronized (lines) {
+            int n = Math.min(lines.size(), numberOfLinesToRemove);
+            Iterator<List<TextCharacter>> x = lines.iterator();
+            while (x.hasNext() && ((n--) > 0)) {
+                x.next();
+                x.remove();
+            }
         }
 //        for(int i = 0; i < numberOfLinesToRemove; i++) {
 //            lines.removeFirst();
@@ -61,7 +66,9 @@ class TextBuffer {
     }
 
     void clear() {
-        lines.clear();
+        synchronized(lines) {
+            lines.clear();
+        }
         newLine();
     }
 
@@ -71,10 +78,12 @@ class TextBuffer {
 
     @NotNull
     public List<TextCharacter> getLine(int l) {
-        if (lines.size() > l)
-            return lines.get(l);
-        else
-            return Collections.emptyList();
+        synchronized (lines) {
+            if (lines.size() > l)
+                return lines.get(l);
+            else
+                return Collections.emptyList();
+        }
     }
 
     int getLineCount() {
@@ -89,15 +98,20 @@ class TextBuffer {
         if(textCharacter == null) {
             textCharacter = TextCharacter.DEFAULT_CHARACTER;
         }
-        int s = lines.size();
-        while(lineNumber >= s) {
-            newLine();
-        }
-        List<TextCharacter> line = lines.get(lineNumber);
-        while(line.size() <= columnIndex) {
-            line.add(TextCharacter.DEFAULT_CHARACTER);
-        }
 
+        List<TextCharacter> line;
+        synchronized (lines) {
+            int s = lines.size();
+            while (lineNumber >= s) {
+                newLine();
+            }
+            line = lines.get(lineNumber);
+            while (line.size() <= columnIndex) {
+                line.add(TextCharacter.DEFAULT_CHARACTER);
+            }
+
+
+        }
         // Default
         int returnStyle = 0;
 

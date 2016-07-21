@@ -1,5 +1,6 @@
 package nars.agent;
 
+import com.google.common.base.Joiner;
 import com.gs.collections.api.block.function.primitive.FloatToObjectFunction;
 import nars.$;
 import nars.NAR;
@@ -11,15 +12,16 @@ import nars.budget.policy.ConceptPolicy;
 import nars.concept.Concept;
 import nars.concept.table.BeliefTable;
 import nars.learn.Agent;
-import nars.nal.Tense;
 import nars.nar.Default;
+import nars.task.GeneratedTask;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.Texts;
 import nars.util.Util;
+import nars.util.data.list.FasterList;
 import nars.util.math.FloatSupplier;
 import nars.util.math.PolarRangeNormalizedFloat;
 import nars.util.signal.Emotion;
@@ -112,11 +114,12 @@ public class NAgent implements Agent {
     public SensorConcept happy;
     public SensorConcept sad;
     public FuzzyConceptSet rewardConcepts;
-    private Task beHappy, dontBeSad;
+    private MutableTask beHappy, dontBeSad;
     float eternalGoalSeekConf;
 
     /** normally 1, but can be increased to give NARS more frames of processing between environment frames */
     public int framesBeforeDecision = 1;
+    private FasterList<MutableTask> predictors;
 
 
     public NAgent(NAR n) {
@@ -415,12 +418,12 @@ public class NAgent implements Agent {
         //nar.believe("((A:#x && I:#y) ==>+0 (R)).");
 
         //TODO specify goal via a method in the sensor/digitizers
-        this.beHappy = happy.desire($.t(1f, eternalGoalSeekConf));
+        this.beHappy = (MutableTask) happy.desire($.t(1f, eternalGoalSeekConf));
                 //nar.goal(happy, Tense.Eternal, 1f, eternalGoalSeekConf);
         //nar.goal(happy, Tense.Present, 1f, gamma);
 
         if (sad!=happy)
-            this.dontBeSad = sad.desire($.t(0f, eternalGoalSeekConf));
+            this.dontBeSad = (MutableTask) sad.desire($.t(0f, eternalGoalSeekConf));
                     //nar.goal(sad, Tense.Eternal, 0f, eternalGoalSeekConf);
         else
             this.dontBeSad = null;
@@ -451,10 +454,44 @@ public class NAgent implements Agent {
 
             //return true;
         //});
-        for (Termed x : new Termed[] { happy, sad } ) {
-            nar.ask($.impl($("?w"), x.term()), '?', ETERNAL);
-            nar.ask(x, '@', ETERNAL);
+
+        int dt = ticksBeforeDecide + ticksBeforeObserve;
+
+        predictors = $.newArrayList();
+        for (Concept x : rewardConcepts) {
+
+            @NotNull Term what = $("?w"); //#w
+
+            predictors.add(
+                //what imples reward R
+                (MutableTask) nar.ask($.impl(what, x.term()), '?', ETERNAL)
+            );
+
+            //what co-occurs with reward R
+            predictors.add(
+                (MutableTask) nar.ask($.conj(what, dt, x.term()), '?', ETERNAL)
+            );
+            predictors.add(
+                (MutableTask) nar.ask($.conj(what, dt, x.term()), '?', nar.time())
+            );
         }
+
+        for (Concept x : actions) {
+
+            //quest for each action
+            predictors.add( (MutableTask) nar.ask(x, '@', ETERNAL) );
+            predictors.add( (MutableTask) nar.ask(x, '@', nar.time()) );
+
+            for (Concept y : rewardConcepts) {
+                //does action A imply reward R?
+                predictors.add(
+                    (MutableTask) nar.ask($.conj(x.term(), dt, y.term()), '?', ETERNAL)
+                );
+            }
+
+        }
+        //logger.info
+        System.out.println("Predictors:\n" +  Joiner.on("\n").join(predictors));
 
 //        for (MotorConcept a : actions) {
 //            nar.ask(a, ETERNAL, '@', how -> {
@@ -507,21 +544,37 @@ public class NAgent implements Agent {
             //boost(happy);
             boost(beHappy);
             //boost(sad);
-            boost(dontBeSad);
+
+            if (dontBeSad!=null)
+                boost(dontBeSad);
 
             for (MotorConcept c : actions)
                 boost(c);
 
+            for (MutableTask x : predictors)
+                boost(x);
+
             //nar.goal(RewardAttentionPerFrame.pri(), sad, now+1, 0f, gamma);
             //nar.goal(RewardAttentionPerFrame.pri(), happy, now+1, 1f, gamma);
         }
+
+
+
     }
 
-    private void boost(Task t) {
-        if (t!=null) {
-            BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
+    private void boost(@NotNull MutableTask t) {
+        BudgetMerge.max.apply(t.budget(), UnitBudget.One, reinforcementAttention);
+        if (t.isDeleted())
+            throw new RuntimeException();
+
+        if (t.occurrence()!=ETERNAL) {
+            Task cloned = nar.inputTask(new GeneratedTask(t.term(), t.punc(), t.truth()).time(nar.time(), nar.time())
+                    .budget(reinforcementAttention, 0.5f, 0.5f).log("Predictor Clone"));
+        } else {
+            //just reactivate the existing eternal
             nar.activate(t);
         }
+
     }
 
 

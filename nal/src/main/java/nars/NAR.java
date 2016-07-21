@@ -83,10 +83,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
 
-
     private static final ExecutorService asyncs = //shared
             ForkJoinPool.commonPool();
-            //(ThreadPoolExecutor) Executors.newCachedThreadPool();
+    //(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
@@ -107,8 +106,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     private final transient Deque<Consumer<NAR>> nextTasks =
-                                                    new ConcurrentLinkedDeque<>();
-                                                    //new CopyOnWriteArrayList<>();
+            new ConcurrentLinkedDeque<>();
+    //new CopyOnWriteArrayList<>();
 
     private NARLoop loop;
 
@@ -151,18 +150,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     }
 
-    @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
+    @Deprecated
+    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals) {
         printTasks(n, beliefsOrGoals, (t) -> {
             System.out.println(t.proof());
         });
     }
 
-    @Deprecated public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, Consumer<Task> e) {
-        TreeSet<Task> bt = new TreeSet<>( (a, b) ->
-            //sort by name
+    @Deprecated
+    public static void printTasks(@NotNull NAR n, boolean beliefsOrGoals, Consumer<Task> e) {
+        TreeSet<Task> bt = new TreeSet<>((a, b) ->
+                //sort by name
                 //{ return a.term().toString().compareTo(b.term().toString()); }
-            //sort by confidence (descending)
-                { return Float.compare(b.conf(), a.conf()); }
+                //sort by confidence (descending)
+        {
+            return Float.compare(b.conf(), a.conf());
+        }
         );
         n.forEachActiveConcept(c -> {
             BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
@@ -175,15 +178,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         bt.forEach(e);
     }
 
-    /** change the identity of this NAR */
+    /**
+     * change the identity of this NAR
+     */
     @NotNull
     public NAR setSelf(@NotNull Atom nextSelf) {
         this.self = nextSelf;
         return this;
     }
+
     @NotNull
     public NAR setSelf(@NotNull String nextSelf) {
-        return setSelf((Atom)$.$(nextSelf));
+        return setSelf((Atom) $.$(nextSelf));
     }
 
     /**
@@ -196,13 +202,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         nextTasks.clear();
 
-        if (asyncs!=null)
+        if (asyncs != null)
             asyncs.shutdown();
 
         super.reset();
 
     }
-
 
 
     /**
@@ -231,14 +236,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse)  {
+    public List<Task> tasks(@NotNull String parse) {
         return tasks(parse, (o) -> {
-           logger.error("unparsed: {}", o );
+            logger.error("unparsed: {}", o);
         });
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed)  {
+    public List<Task> tasks(@NotNull String parse, @NotNull Consumer<Object[]> unparsed) {
         List<Task> result = $.newArrayList(1);
         Narsese.the().tasks(parse, result, unparsed, this);
         return result;
@@ -316,29 +321,33 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //    }
 
     @Nullable
-    public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException  {
-        return goal((Termed)$.$(goalTermString), tense, freq, conf);
+    public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+        return goal((Termed) $.$(goalTermString), tense, freq, conf);
     }
 
     /**
      * desire goal
      */
     @Nullable
-    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf)  {
+    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) {
         return goal(
                 priorityDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf)  {
+    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf) {
         believe(priorityDefault(BELIEF), term, time(tense), freq, conf);
         return this;
     }
-    @NotNull public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
+
+    @NotNull
+    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confidenceDefault(Symbols.BELIEF));
     }
-    @NotNull public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq)  {
+
+    @NotNull
+    public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
         return goal(term, tense, freq, confidenceDefault(Symbols.GOAL));
     }
 
@@ -356,10 +365,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR believe(@NotNull Termed term, float freq, float conf) throws NarseseException {
         return believe(term, Tense.Eternal, freq, conf);
     }
+
     @NotNull
-    public Task goal(@NotNull Termed term, float freq, float conf)  {
+    public Task goal(@NotNull Termed term, float freq, float conf) {
         return goal(term, Tense.Eternal, freq, conf);
     }
+
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
@@ -377,45 +388,51 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @NotNull
     public Task goal(@NotNull String termString) throws NarseseException {
-        return goal((Termed)term(termString), true);
+        return goal((Termed) term(termString), true);
     }
 
     @NotNull
     public NAR believe(@NotNull String termString) throws NarseseException {
         return believe(termString, true);
     }
+
     @NotNull
     public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
         return believe(term(termString), isTrue);
     }
+
     @NotNull
     public Task goal(@NotNull String termString, boolean isTrue) throws NarseseException {
         return goal(term(termString), isTrue);
     }
+
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term) throws NarseseException {
         return believe(term, true);
     }
+
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
         return believe(term, trueOrFalse, confidenceDefault(BELIEF));
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term)  {
+    public Task goal(@NotNull Termed<Compound> term) {
         return goal(term, true);
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse)  {
+    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse) {
         return goal(term, trueOrFalse, confidenceDefault(BELIEF));
     }
+
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
+
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf)  {
+    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) {
         return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -425,11 +442,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @Nullable public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf)  {
+    @Nullable
+    public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf) {
         return input(pri, durabilityDefault(GOAL), goal, GOAL, when, freq, conf);
     }
 
-    @Nullable public Task goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf)  {
+    @Nullable
+    public Task goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf) {
         return input(pri, durabilityDefault(GOAL), goal, GOAL, time(tense), freq, conf);
     }
 
@@ -448,13 +467,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         return t;
     }
+
     @NotNull
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest)  {
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest) {
         return ask(term, questionOrQuest, ETERNAL);
     }
 
     @NotNull
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when)  {
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
@@ -533,15 +553,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
-        On o = concept(op,true)
+    @NotNull
+    public final On onExecution(@NotNull Operator op, @NotNull Consumer<OperationConcept> each) {
+        On o = concept(op, true)
                 .<Topic<OperationConcept>>meta(Execution.class,
-                        (k, v) -> v!=null ?  v : new DefaultTopic<>())
+                        (k, v) -> v != null ? v : new DefaultTopic<>())
                 .on(each);
         this.on.add(o);
         return o;
     }
-
 
 
     /**
@@ -757,7 +777,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     final NARLoop loop(int initialFramePeriodMS) {
 //        //TODO use DescriptiveStatistics to track history of frametimes to slow down (to decrease speed rate away from desired) or speed up (to reach desired framerate).  current method is too nervous, it should use a rolling average
 
-        if (this.loop!=null) {
+        if (this.loop != null) {
             throw new RuntimeException("Already running: " + this.loop);
         }
 
@@ -782,12 +802,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public final boolean runLater(@NotNull Consumer<NAR> t) {
         //if (running.get()) {
-            return nextTasks.add(t);
+        return nextTasks.add(t);
         //} else {
-            //running.set(true); //prevents recursive invocation
+        //running.set(true); //prevents recursive invocation
 //            t.accept(this);
-            //running.set(false);
-          //  return true;
+        //running.set(false);
+        //  return true;
         //}
     }
 
@@ -832,24 +852,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
         final Semaphore s = new Semaphore(0);
-        onFrame(nn->{
+        onFrame(nn -> {
             int a = s.availablePermits();
             if (a < maxRunsPerFrame)
                 s.release(1); //maxRunsPerFrame-a);
         });
-        return runAsync(()->{
-            try {
-                while (true) {
-                    try {
-                        s.acquire();
-                        t.run();
-                    } catch (InterruptedException e) {
-                     e.printStackTrace();
-                    }
+        return runAsync(() -> {
+            while (true) {
+                try {
+                    s.acquire();
+                    t.run();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    //...then try again
                 }
-            }
-            catch (Throwable tt) {
-                tt.printStackTrace();
             }
         });
     }
@@ -859,7 +875,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public String toString() {
         return getClass().getSimpleName() + '[' + toString() + ']';
     }
-
 
 
     @Nullable
@@ -875,7 +890,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public Task ask(@NotNull Termed<Compound> term, long occ, char punc /* question or quest */, @NotNull Predicate<Task> eachAnswer) {
         return inputTask(new MutableTask(term, punc, null) {
-            @Override public boolean onAnswered(Task answer) {
+            @Override
+            public boolean onAnswered(Task answer) {
                 return eachAnswer.test(answer);
             }
         }.occurr(occ));
@@ -951,7 +967,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    /** clears active memory (but not memory indices) */
+    /**
+     * clears active memory (but not memory indices)
+     */
     abstract public void clear();
 
     @Nullable
@@ -1000,15 +1018,17 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
         index.forEach(x -> {
             if (x instanceof Concept)
-                recip.accept((Concept)x);
+                recip.accept((Concept) x);
         });
         return this;
     }
 
 
-    /** activate the concept and other features (termlinks, etc)
+    /**
+     * activate the concept and other features (termlinks, etc)
+     *
      * @param link whether to activate termlinks recursively
-     * */
+     */
     @Nullable
     public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
@@ -1017,9 +1037,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
         return activate(termed, b, 1f, 0f, null);
     }
+
     @Nullable
     final public Concept activate(@NotNull Termed<?> termed, float amount) {
-        return activate(termed, UnitBudget.One.cloneMult(amount,amount,amount));
+        return activate(termed, UnitBudget.One.cloneMult(amount, amount, amount));
     }
 
     @NotNull
@@ -1031,16 +1052,19 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-
-    /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
-     * must be run per control frame. */
-    @NotNull public On onFrame(@NotNull Consumer<NAR> each) {
+    /**
+     * a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
+     * must be run per control frame.
+     */
+    @NotNull
+    public On onFrame(@NotNull Consumer<NAR> each) {
         On r;
         on.add(r = eventFrameStart.on(each));
         return r;
     }
 
-    @NotNull public NAR eachFrame(@NotNull Consumer<NAR> each) {
+    @NotNull
+    public NAR eachFrame(@NotNull Consumer<NAR> each) {
         onFrame(each);
         return this;
     }
@@ -1055,7 +1079,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         taskStream.forEach(this::input);
         //input(new TaskStream(taskStream));
     }
-
 
 
     @Override
@@ -1073,14 +1096,15 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
-    /** text output */
+    /**
+     * text output
+     */
     public void outputTasks(@NotNull Predicate<Task> filter, @NotNull PrintStream out) {
-        forEachConceptTask(c-> {
+        forEachConceptTask(c -> {
             if (filter.test(c))
                 out.println(c.term().toString() + c.punc() + " " + c.truth()); //TODO occurence time
         }, true, true, true, true);
     }
-
 
 
 //    public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
@@ -1105,15 +1129,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(c, tense, 1f);
     }
 
-    /** installs a concept in the index and activates it, used for setup of custom concept implementations
-     *  implementations should apply active concept capacity policy
-     * */
+    /**
+     * installs a concept in the index and activates it, used for setup of custom concept implementations
+     * implementations should apply active concept capacity policy
+     */
     public final void on(@NotNull Concept c) {
         index.set(c);
         on.add(c);
     }
 
-    /** processes the input before the next frame has run */
+    /**
+     * processes the input before the next frame has run
+     */
     public final void inputLater(@NotNull Task ap) {
         if (!running.get()) {
             input(ap);
@@ -1128,8 +1155,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             });
         }
     }
-
-
 
 
 //    @Nullable
@@ -1152,14 +1177,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             super(message);
             this.task = t;
             if (t instanceof Task)
-                ((Task)t).delete(message);
+                ((Task) t).delete(message);
         }
 
         @NotNull
         @Override
         public String getMessage() {
             return super.getMessage() + ": " +
-                    ((task instanceof Task) ? ((Task)task).proof() : task.toString());
+                    ((task instanceof Task) ? ((Task) task).proof() : task.toString());
         }
 
     }
@@ -1191,7 +1216,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    /** byte codec output of matching concept tasks (blocking) */
+    /**
+     * byte codec output of matching concept tasks (blocking)
+     */
     @NotNull
     public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) throws IOException {
 
@@ -1201,7 +1228,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         MutableInteger total = new MutableInteger(0), filtered = new MutableInteger(0);
 
-        forEachConceptTask(t-> {
+        forEachConceptTask(t -> {
             total.increment();
             if (each.test(t)) {
                 try {
@@ -1229,7 +1256,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return output(o, x -> true);
     }
 
-    /** byte codec input stream of tasks, to be input after decode */
+    /**
+     * byte codec input stream of tasks, to be input after decode
+     */
     @NotNull
     public NAR input(@NotNull InputStream tasks) throws IOException {
 
@@ -1249,9 +1278,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
-    /** activates a concept via a task. the task may already be present in the system,
-     *  but it will be reinforced via peer tasklinks activation.
-     *  (a normal duplicate task going through process() will not have this behavior.)
+    /**
+     * activates a concept via a task. the task may already be present in the system,
+     * but it will be reinforced via peer tasklinks activation.
+     * (a normal duplicate task going through process() will not have this behavior.)
      */
     public final void activate(@NotNull Task t, float scale) {
         activate(t.concept(this), t, scale, scale, null);
@@ -1261,7 +1291,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         activate(t, 1f);
     }
 
-    /** called for new concepts */
+    /**
+     * called for new concepts
+     */
     abstract protected void init(@NotNull Concept c);
 
     /**
@@ -1288,7 +1320,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         emotion.busy(business);
 
 
-        if (c.policy()==null) {
+        if (c.policy() == null) {
             c.policy(index.conceptBuilder().initialized());
         }
 
@@ -1312,7 +1344,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
             if (clock instanceof FrameClock) {
                 //HACK for unique serial number w/ frameclock
-                ((FrameClock)clock).ensureStampSerialGreater(t.evidence());
+                ((FrameClock) clock).ensureStampSerialGreater(t.evidence());
             }
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
@@ -1321,7 +1353,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             //heuristic
             float dynamicRange = 2f;
             float score = 1 +
-                    Math.max(0, displacedPri-t.pri()) +  //economic bonus
+                    Math.max(0, displacedPri - t.pri()) +  //economic bonus
                     displacedConf; //knowledge bonus
 
             score = Math.max(0f, Math.min(dynamicRange, score));
@@ -1350,7 +1382,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return process(input, conceptActivation.floatValue());
     }
 
-    /** accepts null-terminated array */
+    /**
+     * accepts null-terminated array
+     */
     public final void process(@NotNull Task... input) {
         float activation = conceptActivation.floatValue();
         for (Task t : input) {
@@ -1363,10 +1397,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     public final Predicate<@NotNull Task> taskPast = (Task t) -> {
         long o = t.occurrence();
-        return o !=Tense.ETERNAL && o < time();
+        return o != Tense.ETERNAL && o < time();
     };
     public final Predicate<@NotNull Task> taskFuture = (Task t) -> {
         long o = t.occurrence();
-        return o !=Tense.ETERNAL && o > time();
+        return o != Tense.ETERNAL && o > time();
     };
 }
