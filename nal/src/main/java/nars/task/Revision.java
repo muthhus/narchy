@@ -277,7 +277,7 @@ public class Revision {
     }
 
     /** assumes the compounds are the same except for possible numeric metadata differences */
-    public static @NotNull Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
+    public static @Nullable Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         if (a.equals(b)) return a;
 
         float aWeight = c2w(aConf);

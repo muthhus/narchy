@@ -153,7 +153,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
         int num = terms.size();
         float dy = H / num;
-        gl.glPushMatrix();
+
 
         //compute bounds from combined min/max of beliefs and goals so they align correctly
         long minT = Long.MAX_VALUE;
@@ -185,6 +185,7 @@ public class BeliefTableChart extends JoglSpace2D {
         minT = newRange[0];
         maxT = newRange[1];
 
+        gl.glPushMatrix();
         for (int i = num-1; i >=0; i--) {
             float my = 0f;//dy * 0.15f;
             Concept cc = concepts[i];
@@ -232,7 +233,7 @@ public class BeliefTableChart extends JoglSpace2D {
     float[] beliefTheta, goalTheta;
 
     public void drawCrossHair(GL2 gl, float gew, float geh, Truth truth, double theta) {
-        float w = 2;
+        float w = 3;
         gl.glLineWidth(w);
 
         float conf = truth.conf();
@@ -243,7 +244,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
         //ge.strokeLine(bcx, border, bcx, geh - border);
         //ge.strokeLine(border, bcy, gew - border, bcy);
-        double r = gew * (0.25 + (0.25 * conf));
+        double r = gew * (0.15 + (0.2 * conf));
 
         double dx0 = Math.cos(theta) * r;
         double dy0 = Math.sin(theta) * r;
@@ -329,12 +330,10 @@ public class BeliefTableChart extends JoglSpace2D {
                 //g = ge;
             } else {
                 eh = teh;
-                x = xTime(tew, padding, minT, maxT, o, pw);
+                x = xTime(tew, padding, minT, maxT, o, pw) + gew + padding;
                 //g = te;
             }
             float y = yPos(freq, eh, padding, ph);
-            if (!eternal)
-                x += gew + padding;
 
             r.renderTask(gl, qua, conf, pw, ph, x, y);
         });
@@ -375,7 +374,7 @@ public class BeliefTableChart extends JoglSpace2D {
 
     private static float xTime(float tew, float b, float minT, float maxT, float o, float w) {
         float p = minT == maxT ? 0.5f : (o - minT) / (maxT - minT);
-        return b + p * (tew - b - w);
+        return b/2f + p * (tew - b - w);
     }
 
 

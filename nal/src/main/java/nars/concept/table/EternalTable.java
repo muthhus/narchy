@@ -4,6 +4,8 @@ import nars.NAR;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.task.Task;
+import nars.term.Compound;
+import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.data.sorted.SortedArray;
 import org.jetbrains.annotations.NotNull;
@@ -132,19 +134,25 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, Compar
             }
         }
 
-        return oldBelief != null ?
-                new RevisionTask(
-                    Revision.intermpolate(
-                        newBelief, oldBelief,
-                        newBeliefConf, oldBelief.conf()
-                    ),
+        if (oldBelief != null) {
+            @Nullable Termed<Compound> t = Revision.intermpolate(
                     newBelief, oldBelief,
-                    conclusion,
-                    nar.time(), ETERNAL).
+                    newBeliefConf, oldBelief.conf()
+            );
+            if (t!=null) {
+                return new RevisionTask(
+                        t,
+                        newBelief, oldBelief,
+                        conclusion,
+                        nar.time(), ETERNAL).
                         budget(oldBelief, newBelief).
-                        log("Insertion Revision")
-                :
-                null;
+                        log("Insertion Revision");
+            } else {
+                throw new RuntimeException("null interpolation " + newBelief + " with " + oldBelief);
+            }
+        }
+
+        return null;
     }
 
     public final Task put(final Task t) {

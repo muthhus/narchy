@@ -40,7 +40,9 @@ import java.util.List;
 
 public class Pong extends Player implements Environment {
 
-    public static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
+    static final String KNOWLEDGEFILE = "/tmp/pong.nal.bin";
+    static boolean loadKnowledgeFromFile = false;
+
     int actions = 3;
 
     boolean trace = true;
@@ -92,7 +94,7 @@ public class Pong extends Player implements Environment {
 
 
                 if (nar instanceof Default) {
-                    BagChart.show((Default) nar, 512);
+                    BagChart.show((Default) nar, 256);
                     beliefChart(this, cheats);
                 }
             }
@@ -104,12 +106,14 @@ public class Pong extends Player implements Environment {
 //			}
         };
 
-        try {
-            nar.input(new File(KNOWLEDGEFILE));
-        } catch (FileNotFoundException e) {
+        if (loadKnowledgeFromFile) {
+            try {
+                nar.input(new File(KNOWLEDGEFILE));
+            } catch (FileNotFoundException e) {
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         //a.epsilon = 0.6f;
@@ -164,31 +168,32 @@ public class Pong extends Player implements Environment {
         float halfPaddle = pong.PADDLE_HEIGHT / 2f;
 
         return Iterables.concat(
-                numericSensor("ball", "left", /*"midX",*/ "right", n,
-                        () -> pong.ball_x, pri).resolution(0.1f),
 
-                numericSensor(() -> pong.ball_y, n, pri,
-                        "(y --> bottom)",
+
+                numericSensor(() -> pong.ball_x, n, pri,
+                        "(ball_left)",
 //				"(y --> bottommid)",
-                        "(y --> midy)",
+                        //"(y --> midy)",
 //				"(y --> topmid)",
-                        "(y --> top)"
+                        "(ball_right)"
                 ).resolution(0.1f),
+                numericSensor(() -> pong.ball_y, n, pri,
+                        "(ball_bottom)",
+//				"(y --> bottommid)",
+                        //"(y --> midy)",
+//				"(y --> topmid)",
+                        "(ball_top)"
+                ).resolution(0.05f),
 //
 //                numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position + halfPaddle, pri).resolution(0.1f),
 //                numericSensor("padTheirs", "bottom", /*"midY",*/ "top", n, () -> pong.player2.position + halfPaddle, pri).resolution(0.1f),
 
                 rawNumericSensor(new RangeNormalizedFloat(() ->
                     /*(pong.ball_y - */(pong.player1.position + halfPaddle)
-                ), n, pri,
-                        "padMine:below",
-                        "padMine:belowmid",
-                        "padMine:centerbelow",
-                        "padMine:center",
-                        "padMine:centerabove",
-                        "padMine:abovemid",
-                        "padMine:above"
-                ).resolution(0.1f)
+                        ), n, pri,
+                        "(pad_top)",
+                        "(pad_bottom)"
+                ).resolution(0.04f)
         );
 
     }
@@ -282,7 +287,7 @@ public class Pong extends Player implements Environment {
         List<Concept> charted = new ArrayList(a.actions);
         Iterables.addAll(charted, a.rewardConcepts);
         charted.addAll(additional);
-        new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 100);
+        new BeliefTableChart(a.nar, charted).timeRadius(400).show(400, 600);
     }
 
     @Override

@@ -121,18 +121,27 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public synchronized static GLCapabilitiesImmutable newDefaultConfig() {
 
         GLCapabilities config = new GLCapabilities(
-                //GLProfile.getMaximum(true)
-                GLProfile.getDefault()
+                //GLProfile.getMinimum(true)
+                //GLProfile.getDefault()
+                GLProfile.getMaximum(true)
+
         );
 
-        config.setHardwareAccelerated(true);
 //        config.setBackgroundOpaque(false);
+//        config.setTransparentRedValue(-1);
+//        config.setTransparentGreenValue(-1);
+//        config.setTransparentBlueValue(-1);
+//        config.setTransparentAlphaValue(-1);
 
-        config.setAlphaBits(8);
-        config.setAccumAlphaBits(8);
-        config.setAccumRedBits(8);
-        config.setAccumGreenBits(8);
-        config.setAccumBlueBits(8);
+
+        config.setHardwareAccelerated(true);
+
+
+//        config.setAlphaBits(8);
+//        config.setAccumAlphaBits(8);
+//        config.setAccumRedBits(8);
+//        config.setAccumGreenBits(8);
+//        config.setAccumBlueBits(8);
         return config;
     }
 

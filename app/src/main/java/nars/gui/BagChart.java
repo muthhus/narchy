@@ -81,7 +81,7 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
         s.show(1400, 800);
 
 
-        s.add(new Facial(tc).scale(1400, 800));
+        s.add(new Facial(tc).maximize());
         s.add(new Facial(new CrosshairSurface(s)));
     }
 
