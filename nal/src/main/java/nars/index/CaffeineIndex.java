@@ -43,34 +43,57 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
                     return 0; //disallow removal of active concepts
             }
 
-            int w = v.complexity();// * weightFactor;
-
-            //w/=(1f + maxConfidence((CompoundConcept)v));
+            int w = v.complexity() * 100;
 
             return (int)w;
         //}
     };
 
+    private static final Weigher<Termlike, Termlike> complexityAndConfidenceWeigher = (k, v) -> {
+
+
+//        if (v instanceof Atomic) {
+//            return 0; //dont allow removal of atomic
+//        } else {
+        if (v instanceof Concept) {
+
+            if (!(v instanceof CompoundConcept)) {
+                //special implementation, dont allow removal
+                return 0;
+            }
+
+            Concept c = (Concept)v;
+            if (c.active())
+                return 0; //disallow removal of active concepts
+        }
+
+        float w = v.complexity() * (2f - maxConfidence((CompoundConcept)v)) * 100;
+
+        return (int)w;
+        //}
+    };
+
     private static float maxConfidence(@NotNull CompoundConcept v) {
-        return Math.max(v.beliefs().confMax(), v.goals().confMax());
+        //return Math.max(v.beliefs().confMax(), v.goals().confMax());
+        return v.beliefs().confMax() + v.goals().confMax();
     }
 
 
-    public CaffeineIndex(Concept.ConceptBuilder builder, int maxWeight) {
+    public CaffeineIndex(Concept.ConceptBuilder builder, long maxWeight) {
         this(builder, maxWeight, false);
     }
 
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, int maxWeight, boolean soft) {
+    public CaffeineIndex(Concept.ConceptBuilder conceptBuilder, long maxWeight, boolean soft) {
         super(conceptBuilder);
 
-        int maxSubtermWeight = maxWeight / 2; //estimate considering re-use of subterms in compounds
+        long maxSubtermWeight = maxWeight * 1 / 4; //estimate considering re-use of subterms in compounds
 
         Caffeine<Object, Object> builder = prepare(Caffeine.newBuilder(), soft);
 
         builder
-               .weigher(complexityWeigher)
+               .weigher(complexityAndConfidenceWeigher)
                .maximumWeight(maxWeight)
                .removalListener(this)
                //.recordStats()

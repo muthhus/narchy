@@ -121,7 +121,7 @@ public class NAgent implements Agent {
     public NAgent(NAR n) {
 
         this(n,
-            new DecideActionSoftmax(0.25f)
+            new DecideActionSoftmax(0.5f, 0.1f, 0.998f)
             //new DecideActionEpsilonGreedy(0.05f)
         );
     }

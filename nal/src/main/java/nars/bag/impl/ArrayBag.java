@@ -101,7 +101,7 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
 
 
     @Override
-    public final int compare(@NotNull BLink o1, @NotNull BLink o2) {
+    public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
         float f1 = priIfFiniteElseNeg1(o1);
         float f2 = priIfFiniteElseNeg1(o2);
 

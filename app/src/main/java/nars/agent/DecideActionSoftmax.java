@@ -9,6 +9,8 @@ import java.util.Random;
  */
 public class DecideActionSoftmax implements DecideAction {
 
+    private final float minTemperature;
+    private final float temperatureDecay;
     /**
      * normalized motivation
      */
@@ -21,12 +23,17 @@ public class DecideActionSoftmax implements DecideAction {
     float temperature;
     private float decisiveness;
 
-    public DecideActionSoftmax(float temperature) {
-        this.temperature = temperature;
+    public DecideActionSoftmax(float initialTemperature, float minTemperature, float decay) {
+        this.temperature = initialTemperature;
+        this.minTemperature = minTemperature;
+        this.temperatureDecay = decay;
     }
 
     @Override
     public int decideAction(float[] motivation, int lastAction, Random random) {
+
+        temperature = Math.max(minTemperature,temperature * temperatureDecay);
+
         int actions = motivation.length;
         if (motNorm == null) {
             motNorm = new float[actions];

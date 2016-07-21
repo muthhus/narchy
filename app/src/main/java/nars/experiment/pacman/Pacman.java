@@ -66,7 +66,7 @@ public class Pacman extends cpcman implements Environment {
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 4;
+	private final int pacmanCyclesPerFrame = 16;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -83,7 +83,7 @@ public class Pacman extends cpcman implements Environment {
 		//Multi nar = new Multi(4,512,
 		Default nar = new Default(1024,
 				4, 2, 2, rng,
-				new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
+				new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 20000000, false)
 				//new Cache2kIndex(100000, rng)
 				//new InfinispanIndex(new DefaultConceptBuilder(rng))
 				//new Indexes.WeakTermIndex(128 * 1024, rng)
@@ -91,18 +91,18 @@ public class Pacman extends cpcman implements Environment {
 				//new Indexes.DefaultTermIndex(128 *1024, rng)
 				,new FrameClock());
 		//nar.premiser.confMin.setValue(0.03f);
-		nar.conceptActivation.setValue(0.05f);
+		nar.conceptActivation.setValue(0.1f);
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.8f);
-		nar.goalConfidence(0.8f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.85f);
+		nar.goalConfidence(0.85f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 		nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-		nar.cyclesPerFrame.set(32);
-		nar.confMin.setValue(0.05f);
+		nar.cyclesPerFrame.set(64);
+		nar.confMin.setValue(0.2f);
 
 
 		//nar.inputAt(100,"$1.0;0.8;1.0$ ( ( ((#x,?r)-->#a) && ((#x,?s)-->#b) ) ==> col:(#x,#a,#b) ). %1.0;1.0%");
@@ -130,8 +130,8 @@ public class Pacman extends cpcman implements Environment {
 		//Global.DEBUG = true;
 
 		//new Abbreviation2(nar, "_");
-		MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-		MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 2);
+		MySTMClustered stm = new MySTMClustered(nar, 384, '.', 4);
+		MySTMClustered stmGoal = new MySTMClustered(nar, 128, '!', 4);
 
 		new ArithmeticInduction(nar);
 

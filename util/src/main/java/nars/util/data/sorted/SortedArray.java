@@ -82,10 +82,11 @@ public class SortedArray<E> implements Iterable<E> {
         return remove(i)!=null;
     }
 
-    public void clear() {
+    public final void clear() {
         final int s = size();
         if (s!=0) {
-            Arrays.fill(list, 0, s, null);
+            //Arrays.fill(list, 0, s, null);
+            this.list = (E[])zeroList;
             this.size = 0;
         }
     }

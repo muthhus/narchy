@@ -346,16 +346,19 @@ public interface BeliefTable extends TaskTable {
     default float confMax(float minFreq, float maxFreq) {
         float max = Float.NEGATIVE_INFINITY;
 
+
         for (Task t : this) {
-            float f = t.freq();
-            if ((f >= minFreq) && (f <= maxFreq)) {
-                float c = t.conf();
-                if (c > max)
-                    max = c;
+            if (t!=null) {
+                float f = t.freq();
+                if ((f >= minFreq) && (f <= maxFreq)) {
+                    float c = t.conf();
+                    if (c > max)
+                        max = c;
+                }
             }
         }
 
-        return !Float.isFinite(max) ? Float.NaN : max;
+        return !Float.isFinite(max) ? 0 : max;
     }
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;

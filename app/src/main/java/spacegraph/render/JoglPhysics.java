@@ -80,7 +80,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         this.simulating = simulating;
     }
 
-    protected final BulletStack stack = BulletStack.get();
+    //protected final BulletStack stack = BulletStack.get();
 
 
     public RigidBody pickedBody = null; // for deactivation state
@@ -359,17 +359,21 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         cameraDistance.setValue(Math.max(minCameraDistance, dist));
     }
 
-    public void updateCamera() {
-        stack.vectors.push();
-        stack.matrices.push();
-        stack.quats.push();
+    final Matrix3f tmpMat1 = new Matrix3f(); //stack.matrices.get();
+    final Matrix3f tmpMat2 = new Matrix3f(); //stack.matrices.get();
+    final Quat4f roll = new Quat4f(); //stack.quats.get();
+    final Quat4f rot = new Quat4f(); //stack.quats.get();
+
+    public synchronized void updateCamera() {
+//        stack.vectors.push();
+//        stack.matrices.push();
+//        stack.quats.push();
 
         gl.glMatrixMode(gl.GL_PROJECTION);
         gl.glLoadIdentity();
         float rele = ele.floatValue() * 0.01745329251994329547f; // rads per deg
         float razi = azi.floatValue() * 0.01745329251994329547f; // rads per deg
 
-        Quat4f rot = stack.quats.get();
         QuaternionUtil.setRotation(rot, camUp, razi);
 
         Vector3f eyePos = v();
@@ -383,11 +387,9 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         Vector3f camRight = v();
         camRight.cross(camUp, forward);
         camRight.normalize();
-        Quat4f roll = stack.quats.get();
         QuaternionUtil.setRotation(roll, camRight, -rele);
 
-        Matrix3f tmpMat1 = stack.matrices.get();
-        Matrix3f tmpMat2 = stack.matrices.get();
+
         tmpMat1.set(rot);
         tmpMat2.set(roll);
         tmpMat1.mul(tmpMat2);
@@ -410,9 +412,9 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         gl.glMatrixMode(gl.GL_MODELVIEW);
         gl.glLoadIdentity();
-        stack.vectors.pop();
-        stack.matrices.pop();
-        stack.quats.pop();
+//        stack.vectors.pop();
+//        stack.matrices.pop();
+//        stack.quats.pop();
 
     }
 

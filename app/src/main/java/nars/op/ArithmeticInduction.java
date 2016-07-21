@@ -36,6 +36,8 @@ import static nars.nal.Tense.DTERNAL;
 /** arithmetic rule mining & variable introduction */
 public class ArithmeticInduction implements Consumer<Task> {
     private final NAR nar;
+    boolean deleteOriginalTaskIfInducted = true;
+    private int count = 0;
 
 
     public ArithmeticInduction(NAR nar) {
@@ -85,6 +87,8 @@ public class ArithmeticInduction implements Consumer<Task> {
 
     @Override
     public void accept(Task b) {
+
+        int countStart = count;
 
         if (!b.isBeliefOrGoal()) {
 
@@ -148,9 +152,16 @@ public class ArithmeticInduction implements Consumer<Task> {
 
             }
         }
+
+        int countEnd = count;
+        if (countEnd > countStart) {
+            if (deleteOriginalTaskIfInducted)
+                b.delete();
+        }
     }
 
     void emit(Task task) {
+        count++;
         nar.inputLater(
             /*print*/(task)
         );

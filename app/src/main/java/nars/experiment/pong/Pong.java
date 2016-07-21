@@ -65,7 +65,7 @@ public class Pong extends Player implements Environment {
         //Multi nar = new Multi(2,
         Default nar = new Default(
                 1024, 3, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 1000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 100000000, false)
                 //new Cache2kIndex(250000, rng)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
@@ -78,9 +78,9 @@ public class Pong extends Player implements Environment {
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(64);
-        nar.conceptActivation.setValue(0.1f);
-        nar.confMin.setValue(0.02f);
+        nar.cyclesPerFrame.set(32);
+        nar.conceptActivation.setValue(0.05f);
+        nar.confMin.setValue(0.1f);
 
 
         List<SensorConcept> cheats = new ArrayList();
@@ -117,8 +117,8 @@ public class Pong extends Player implements Environment {
 
         //new Abbreviation2(nar, "_");
         {
-            new MySTMClustered(nar, 16, '.', 2);
-            new MySTMClustered(nar, 16, '!', 2);
+            new MySTMClustered(nar, 256, '.', 2);
+            new MySTMClustered(nar, 256, '!', 2);
         }
 
 
@@ -174,13 +174,21 @@ public class Pong extends Player implements Environment {
 //				"(y --> topmid)",
                         "(y --> top)"
                 ).resolution(0.1f),
+//
+//                numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position + halfPaddle, pri).resolution(0.1f),
+//                numericSensor("padTheirs", "bottom", /*"midY",*/ "top", n, () -> pong.player2.position + halfPaddle, pri).resolution(0.1f),
 
-                numericSensor("padMine", "bottom", /*"midY",*/ "top", n, () -> pong.player1.position + halfPaddle, pri).resolution(0.1f),
-                numericSensor("padTheirs", "bottom", /*"midY",*/ "top", n, () -> pong.player2.position + halfPaddle, pri).resolution(0.1f),
-
-                rawNumericSensor("(ball,padMine)", new PolarRangeNormalizedFloat(() ->
-                    pong.ball_y - (pong.player1.position + halfPaddle)
-                ), n, pri, "below", "same", "above").resolution(0.1f)
+                rawNumericSensor(new RangeNormalizedFloat(() ->
+                    /*(pong.ball_y - */(pong.player1.position + halfPaddle)
+                ), n, pri,
+                        "padMine:below",
+                        "padMine:belowmid",
+                        "padMine:centerbelow",
+                        "padMine:center",
+                        "padMine:centerabove",
+                        "padMine:abovemid",
+                        "padMine:above"
+                ).resolution(0.1f)
         );
 
     }

@@ -53,7 +53,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 public class Tetris extends TetrisState implements Environment {
 
     public static final int runCycles = 20000;
-    public static final int cyclesPerFrame = 96;
+    public static final int cyclesPerFrame = 64;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -70,7 +70,7 @@ public class Tetris extends TetrisState implements Environment {
      */
     public Tetris(int width, int height, int timePerFall) {
         super(width, height, timePerFall);
-        vis = new TetrisVisualizer(this, 32);
+        vis = new TetrisVisualizer(this, 64);
 
 
 
@@ -236,7 +236,7 @@ public class Tetris extends TetrisState implements Environment {
         //Multi nar = new Multi(3,512,
         Default nar = new Default(1024,
                 4, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 100000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 15 * 10000000, false)
 
                 ,new FrameClock());
         nar.conceptActivation.setValue(0.1f);
@@ -249,7 +249,7 @@ public class Tetris extends TetrisState implements Environment {
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.1f);
+        nar.confMin.setValue(0.05f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -292,20 +292,20 @@ public class Tetris extends TetrisState implements Environment {
         Tetris t = new Tetris(6, 10, 5) {
             @Override
             protected int nextBlock() {
-                return super.nextBlock(); //all blocks
-                //return 1; //square blocks
+                //return super.nextBlock(); //all blocks
+                return 1; //square blocks
                 //return 0; //long blocks
             }
         };
 
         Iterable<Termed> cheats = Iterables.concat(
-                numericSensor(() -> t.currentX, nar, 0.5f,
+                numericSensor(() -> t.currentX, nar, 0.1f,
                         "I(x)")
                         //"(active,a)","(active,b)","(active,c)","(active,d)","(active,e)","(active,f)","(active,g)","(active,h)")
                         //"I(a)","I(b)","I(c)","I(d)","I(e)","I(f)","I(g)","I(h)")
                         //"(active,x)")
                         .resolution(1f/t.width),
-                numericSensor(() -> t.currentY, nar, 0.5f,
+                numericSensor(() -> t.currentY, nar, 0.1f,
                         "I(y)")
                         //"active:(y,t)", "active:(y,b)")
                         //"(active,y)")
