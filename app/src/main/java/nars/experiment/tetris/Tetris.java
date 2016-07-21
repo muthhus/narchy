@@ -56,7 +56,6 @@ public class Tetris extends TetrisState implements Environment {
     public static final int cyclesPerFrame = 96;
 
     private final TetrisVisualizer vis;
-    private final JFrame window;
     private double currentScore;
 
     private double previousScore;
@@ -72,15 +71,9 @@ public class Tetris extends TetrisState implements Environment {
     public Tetris(int width, int height, int timePerFall) {
         super(width, height, timePerFall);
         vis = new TetrisVisualizer(this, 32);
-        window = new JFrame();
 
-        window.setSize(vis.getWidth(), vis.getHeight()+32);
 
-        SwingUtilities.invokeLater(()->{
-            window.setContentPane(vis);
-            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            window.setVisible(true);
-        });
+
 
         restart();
     }
@@ -208,7 +201,7 @@ public class Tetris extends TetrisState implements Environment {
         }
 
         toVector(false, seenState);
-        vis.repaint();
+        //vis.repaint();
 
 
         if (!gameOver()) {
@@ -299,8 +292,8 @@ public class Tetris extends TetrisState implements Environment {
         Tetris t = new Tetris(6, 10, 5) {
             @Override
             protected int nextBlock() {
-                //return super.nextBlock(); //all blocks
-                return 1; //square blocks
+                return super.nextBlock(); //all blocks
+                //return 1; //square blocks
                 //return 0; //long blocks
             }
         };
@@ -354,20 +347,20 @@ public class Tetris extends TetrisState implements Environment {
         nar.forEachActiveConcept(System.out::println);
     }
 
-    static void addCamera(Tetris t, NAR n, int w, int h) {
-        //n.framesBeforeDecision = GAME_DIVISOR;
-        SwingCamera s = new SwingCamera(t.vis);
-
-        NARCamera nc = new NARCamera("t", n, s, (x, y) -> $.p($.the(x), $.the(y)));
-
-        NARCamera.newWindow(s);
-
-        s.input(0, 0, t.vis.getWidth(),t.vis.getHeight());
-        s.output(w, h);
-
-        n.onFrame(nn -> {
-            s.update();
-        });
-    }
+//    static void addCamera(Tetris t, NAR n, int w, int h) {
+//        //n.framesBeforeDecision = GAME_DIVISOR;
+//        SwingCamera s = new SwingCamera(t.vis);
+//
+//        NARCamera nc = new NARCamera("t", n, s, (x, y) -> $.p($.the(x), $.the(y)));
+//
+//        NARCamera.newWindow(s);
+//
+//        s.input(0, 0, t.vis.getWidth(),t.vis.getHeight());
+//        s.output(w, h);
+//
+//        n.onFrame(nn -> {
+//            s.update();
+//        });
+//    }
 
 }

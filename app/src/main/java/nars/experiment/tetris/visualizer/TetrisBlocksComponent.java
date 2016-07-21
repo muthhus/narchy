@@ -18,6 +18,9 @@
  */
 package nars.experiment.tetris.visualizer;
 
+import com.jogamp.opengl.GL2;
+import spacegraph.render.ShapeDrawer;
+
 import java.awt.*;
 
 public class TetrisBlocksComponent {
@@ -33,7 +36,7 @@ public class TetrisBlocksComponent {
 	final Color alphaBlack = new Color(0, 0, 0);
 	final Color alphaWhite = new Color(1.0f, 1.0f, 1.0f);
 
-	public void render(Graphics2D g, int DABS, float[] state) {
+	public void render(GL2 gl, int DABS, float[] state) {
 
 		if (state == null)
 			return;
@@ -47,22 +50,23 @@ public class TetrisBlocksComponent {
 //		int scaleFactorX = numCols * DABS;
 //		int scaleFactorY = numRows * DABS;
 
-		int w = DABS;
-		int h = DABS;
-		int x = 0;
-		int y = 0;
+		float w = 1f/numCols;
+		float h = 1f/numRows;
+		float x = 0;
+		float y = 0;
 
 
 
-		g.setColor(alphaBlack);
-		g.fillRect(0, 0, w * numCols, h * numRows);
+//
+//		g.setColor(alphaBlack);
+//		g.fillRect(0, 0, w * numCols, h * numRows);
 
 		for (int i = 0; i < numRows; i++) {
-			y = i * DABS;
+			y = i * h;
 
 			for (int j = 0; j < numCols; j++) {
 
-				x = j * DABS;
+				x = j * w;
 
 				int in = i * numCols + j;
 
@@ -101,8 +105,10 @@ public class TetrisBlocksComponent {
 				}
 
 				if (c != null) {
-					g.setColor(c);
-					g.fillRect(x, y, w, h);
+
+
+					gl.glColor3f(c.getRed()/256f, c.getGreen()/256f, c.getBlue()/256f);
+					ShapeDrawer.rect(gl, x, 1f - y - h, w, h);
 				}
 
 			}

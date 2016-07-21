@@ -18,12 +18,16 @@ limitations under the License.
  */
 package nars.experiment.tetris.visualizer;
 
+import com.jogamp.opengl.GL2;
 import nars.experiment.tetris.Tetris;
+import spacegraph.Facial;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class TetrisVisualizer extends JPanel  {
+public class TetrisVisualizer extends Surface {
 
 	private final int blockSize;
 	private final int lastUpdateTimeStep = -1;
@@ -40,7 +44,10 @@ public class TetrisVisualizer extends JPanel  {
 
 	public TetrisVisualizer(Tetris t, int blockSize) {
 		super();
-		setSize(t.getWidth() * blockSize, t.getHeight() * blockSize);
+
+		SpaceGraph s = new SpaceGraph();
+		s.show(t.getWidth() * blockSize, t.getHeight() * blockSize);
+		s.add(new Facial(this).maximize());
 
 		tetris = t;
 		this.blockSize = blockSize;
@@ -69,9 +76,9 @@ public class TetrisVisualizer extends JPanel  {
 	}*/
 
 	 @Override
-	 public void paint(Graphics g) {
+	 public void paint(GL2 g) {
 	 //g.setPaintMode();
-	 blocks.render((Graphics2D) g, blockSize, tetris.seenState);
+	 blocks.render(g, 1, tetris.seenState);
 	 //g.setColor(Color.BLUE);
 	 //g.setXORMode(Color.GREEN);
 	 //g.drawString("Score: " + Texts.n4(tetris.reward()), 0, 400);
