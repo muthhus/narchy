@@ -35,7 +35,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public Task topEternal() {
+    public Task eternalTop() {
         return null;
     }
 

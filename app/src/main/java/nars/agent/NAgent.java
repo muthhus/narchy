@@ -105,10 +105,6 @@ public class NAgent implements Agent {
 
     private final boolean synchronousGoalInput = false;
 
-
-    private final int motorBeliefCapacity = 24;
-    private final int motorGoalCapacity = 24;
-
     //private final int rewardBeliefCapacity = 2 * motorBeliefCapacity;
 
     public SensorConcept happy;
@@ -153,24 +149,7 @@ public class NAgent implements Agent {
 
         List<MotorConcept> outputConcepts = IntStream.range(0, actions).mapToObj(i ->
 
-
-            new MotorConcept(actionConceptName(i), nar, motorFunction(i)) {
-
-                @Override
-                protected void beliefCapacity(ConceptPolicy p) {
-                    beliefs().capacity(0, motorBeliefCapacity);
-                    goals().capacity(0, motorGoalCapacity);
-                }
-
-                @Override
-                protected @NotNull BeliefTable newBeliefTable() {
-                    return newBeliefTable(0,motorBeliefCapacity);
-                }
-                @Override
-                protected @NotNull BeliefTable newGoalTable() {
-                    return newGoalTable(0,motorGoalCapacity);
-                }
-            }
+            new MotorConcept(actionConceptName(i), nar, motorFunction(i))
 
         ).collect(toList());
 

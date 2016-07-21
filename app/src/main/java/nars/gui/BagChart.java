@@ -94,12 +94,12 @@ public class BagChart<X> extends TreemapChart<BLink<X>> implements BiConsumer<BL
         }
     }
 
-    protected ItemVis<BLink<X>> newItem(BLink<X> i) {
+    @NotNull protected ItemVis<BLink<X>> newItem(@NotNull BLink<X> i) {
         return new ItemVis<>(i, label(i.get(), 16));
     }
 
 
-    public BagChart(Bag<X> b, int limit) {
+    public BagChart(@NotNull Bag<X> b, int limit) {
         super();
         this.bag = b;
         this.limit = limit;

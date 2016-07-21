@@ -52,7 +52,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 20000;
+    public static final int runCycles = 200;
     public static final int cyclesPerFrame = 64;
 
     private final TetrisVisualizer vis;
@@ -285,7 +285,7 @@ public class Tetris extends TetrisState implements Environment {
         MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
         MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        //new ArithmeticInduction(nar);
+        new ArithmeticInduction(nar);
 
 
 
@@ -344,7 +344,7 @@ public class Tetris extends TetrisState implements Environment {
         NAR.printTasks(nar, true);
         NAR.printTasks(nar, false);
         n.printActions();
-        nar.forEachActiveConcept(System.out::println);
+        //nar.forEachActiveConcept(System.out::println);
     }
 
 //    static void addCamera(Tetris t, NAR n, int w, int h) {

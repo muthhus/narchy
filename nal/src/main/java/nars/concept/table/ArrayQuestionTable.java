@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.$;
 import nars.NAR;
+import nars.budget.BudgetFunctions;
 import nars.budget.merge.BudgetMerge;
 import nars.concept.Concept;
 import nars.nal.Stamp;
@@ -145,7 +146,8 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
         }
 
 
-        q.budget().priMult(factor);
+        BudgetFunctions.transferPri(q.budget(), a.budget(), factor);
+
         if (!qEtern) {
             //if temporal question, also affect the quality so that it will get unranked by more relevant questions in the future
             q.budget().quaMult(factor);
@@ -172,21 +174,22 @@ public class ArrayQuestionTable implements QuestionTable, Comparator<Task> {
 
         }
 
-        //generate a projected answer
-        if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
-            Concept ac = nar.concept(a);
-            if (ac != null) { //??
-                Task ap = ac.merge(q, a, q.occurrence(), nar);
-                if (ap != null && !ap.isDeleted()) {
-                    if (Stamp.overlapping(q.evidence(), a.evidence()))
-                        nar.inputLater(ap); //avoid infinite loop
-                    else
-                        nar.input(ap);
-
-                    return;
-                }
-            }
-        }
+//        //generate a projected answer
+          //WARNING this creates a huge amount of useless answers
+//        if (!qEtern && !aEtern && q.occurrence()!=a.occurrence()) {
+//            Concept ac = nar.concept(a);
+//            if (ac != null) { //??
+//                Task ap = ac.merge(q, a, q.occurrence(), nar);
+//                if (ap != null && !ap.isDeleted()) {
+//                    if (Stamp.overlapping(q.evidence(), a.evidence()))
+//                        nar.inputLater(ap); //avoid infinite loop
+//                    else
+//                        nar.input(ap);
+//
+//                    return;
+//                }
+//            }
+//        }
 
         nar.activate(a, qBudget);
     }

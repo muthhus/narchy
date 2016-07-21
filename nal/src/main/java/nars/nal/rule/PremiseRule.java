@@ -718,7 +718,7 @@ public class PremiseRule extends GenericCompound {
 //                            break;
 
                         case "dtBefore":
-                            timeFunction = TimeFunctions.occReverse; //may need reversed or changed
+                            timeFunction = TimeFunctions.occForward; //may need reversed or changed
                             pres.add( events.before );
                             break;
 

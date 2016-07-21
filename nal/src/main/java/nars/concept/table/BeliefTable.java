@@ -75,7 +75,7 @@ public interface BeliefTable extends TaskTable {
 
 
         @Override
-        public Task topEternal() {
+        public Task eternalTop() {
             return null;
         }
 
@@ -214,7 +214,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable
     default Task top(long when, long now, @Nullable Task against) {
 
-        final Task ete = topEternal();
+        final Task ete = eternalTop();
         if (when == Tense.ETERNAL) {
             if (ete != null) {
                 return ete;
@@ -239,7 +239,7 @@ public interface BeliefTable extends TaskTable {
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
-    @Nullable Task topEternal();
+    @Nullable Task eternalTop();
 
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
     @Nullable Task topTemporal(long when, long now, @Nullable Task against);
@@ -279,7 +279,7 @@ public interface BeliefTable extends TaskTable {
 //    }
 
     @Nullable default Truth topEternalTruth(@Nullable Truth ifNone) {
-        Task t = topEternal();
+        Task t = eternalTop();
         return t == null ? ifNone : t.truth();
     }
 

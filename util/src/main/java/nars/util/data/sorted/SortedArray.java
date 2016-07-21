@@ -49,7 +49,7 @@ public class SortedArray<E> implements Iterable<E> {
     final static Object[] zeroList = new Object[0];
 
     protected static final int binarySearchThreshold = 8;
-    private final IntFunction<E[]> builder;
+    protected final IntFunction<E[]> builder;
     protected E[] list = (E[]) zeroList;
     private int size;
 
@@ -65,13 +65,14 @@ public class SortedArray<E> implements Iterable<E> {
         if (size < index)
             return null;
 
-        E previous = this.list[index];
+        E[] list = this.list;
+        E previous = list[index];
         int totalOffset = this.size - index - 1;
         if (totalOffset > 0)
         {
-            System.arraycopy(this.list , index + 1, this.list, index, totalOffset);
+            System.arraycopy(list , index + 1, list, index, totalOffset);
         }
-        this.list[--this.size] = null;
+        list[--this.size] = null;
         return previous;
     }
 
@@ -82,7 +83,7 @@ public class SortedArray<E> implements Iterable<E> {
         return remove(i)!=null;
     }
 
-    public final void clear() {
+    public void clear() {
         final int s = size();
         if (s!=0) {
             this.list = (E[])zeroList;

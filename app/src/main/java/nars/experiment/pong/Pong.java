@@ -67,22 +67,22 @@ public class Pong extends Player implements Environment {
         //Multi nar = new Multi(2,
         Default nar = new Default(
                 1024, 3, 2, 2, rng,
-                new CaffeineIndex(new DefaultConceptBuilder(rng), 100000000, false)
+                new CaffeineIndex(new DefaultConceptBuilder(rng), 300000000, false)
                 //new Cache2kIndex(250000, rng)
                 //new InfinispanIndex(Terms.terms, new DefaultConceptBuilder(rng))
                 //new Indexes.WeakTermIndex(256 * 1024, rng)
                 //new Indexes.SoftTermIndex(128 * 1024, rng)
                 //new Indexes.DefaultTermIndex(128 *1024, rng)
                 , new FrameClock());
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
         nar.DEFAULT_BELIEF_PRIORITY = 0.3f;
         nar.DEFAULT_GOAL_PRIORITY = 0.8f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
-        nar.cyclesPerFrame.set(128);
+        nar.cyclesPerFrame.set(32);
         nar.conceptActivation.setValue(0.05f);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 
         List<SensorConcept> cheats = new ArrayList();

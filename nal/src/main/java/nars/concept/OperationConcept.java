@@ -60,7 +60,7 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
     private Task executeLater(@Nullable Task t, @NotNull NAR nar) {
         if (t != null) {
 
-            if (!pendingRun && beliefModificationRequiresUpdate(t, nar)) {
+            if (!pendingRun && runLater(t, nar)) {
                 pendingRun = true;
                 nar.runLater(this);
             }
@@ -69,7 +69,7 @@ public class OperationConcept extends CompoundConcept<Compound> implements Consu
         return t;
     }
 
-    protected boolean beliefModificationRequiresUpdate(@NotNull Task t, @NotNull NAR nar) {
+    protected boolean runLater(@NotNull Task t, @NotNull NAR nar) {
         return hasGoals() && operationExec(operationConcept(nar))!=null;
     }
 
