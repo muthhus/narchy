@@ -52,7 +52,7 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 200;
+    public static final int runCycles = 2000;
     public static final int cyclesPerFrame = 64;
 
     private final TetrisVisualizer vis;

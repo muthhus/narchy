@@ -798,4 +798,13 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
+    @Test public void testTemporalInductionGoalConj() {
+        test()
+                .log()
+                .inputAt(0, "(x). :|:")
+                .inputAt(1, "(y)! :|:")
+                .mustDesire(cycles, "((x) &&+1 (y))", 1f,0.81f, 0)
+        ;
+    }
+
 }

@@ -98,12 +98,12 @@ public abstract class Param extends Container implements Level {
      * relates time and evidence (confidence); how past and future beliefs decay in rank
      * across time; width of the temporal focus
      */
-    public static final float TEMPORAL_DURATION = 0.75f;
+    public static final float TEMPORAL_DURATION = 2f;
 
     /**
      * exponent by which confidence (modeled as luminance) decays through the time axis (>=1)
      */
-    public static float TEMPORAL_MICROSPHERE_EXPONENT = 1.5f;
+    public static float TEMPORAL_MICROSPHERE_EXPONENT = 2f;
 
 
     /**
@@ -133,7 +133,7 @@ public abstract class Param extends Container implements Level {
      *  a value less than 1.0 allows subsequent revections to decay faster, preventing
      *  a compounding / "snowballing" of mergings into a highly confident rolling average task.
      */
-    public static final float REVECTION_CONFIDENCE_FACTOR = 1f;
+    public static final float REVECTION_CONFIDENCE_FACTOR = 0.9f;
 
     @Nullable
     private Truth defaultGoalTruth, defaultJudgmentTruth;

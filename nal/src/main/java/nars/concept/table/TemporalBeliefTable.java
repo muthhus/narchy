@@ -25,8 +25,8 @@ public interface TemporalBeliefTable extends TaskTable {
     long minTime();
     long maxTime();
 
-    void minTime(long minT);
-    void maxTime(long maxT);
+//    void minTime(long minT);
+//    void maxTime(long maxT);
 
     void capacity(int c);
 

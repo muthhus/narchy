@@ -140,7 +140,11 @@ public class ArithmeticInduction implements Consumer<Task> {
                 conjs.forEach((pp,vv) -> {
                     compress(vv, (features, pattern) -> {
 
-                        Term c = nar.index.transform(b.term(), pp, $.conj(features, pattern));
+                        @Nullable Term fp = $.conj(features, pattern);
+                        if (fp == null)
+                            return;
+
+                        Term c = nar.index.transform(b.term(), pp, fp);
 
                         if (c!=null) {
                             emit(
@@ -282,8 +286,9 @@ public class ArithmeticInduction implements Consumer<Task> {
                 });
 
                 if (!features.isEmpty()) {
-                    each.accept(features,
-                            $.negIf(pattern[0], negate));
+                    @Nullable Term p = $.negIf(pattern[0], negate);
+                    if (p!=null)
+                        each.accept(features, p);
                 }
 
             }

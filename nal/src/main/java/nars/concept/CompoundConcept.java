@@ -257,27 +257,29 @@ public class CompoundConcept<T extends Compound> implements AbstractConcept<T>,T
      */
     synchronized private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull NAR nar, @NotNull BeliefTable target, @NotNull QuestionTable questions, List<Task> displaced) {
 
-        if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
+        //this may be helpful but we need a different way of applying it to keep the two table's ranges consistent
 
-            //finds the temporal intersection of the two temporal belief tables:
-            //this affects the temporal belief compression's focus in time
-
-            long minT = Long.MAX_VALUE;
-            long maxT = Long.MIN_VALUE;
-
-                //max of the min
-                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.minTime() ));
-                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.minTime() ));
-
-                //..and min of the max
-                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.maxTime() ));
-                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.maxTime() ));
-
-            ((DefaultBeliefTable)beliefs()).temporal.minTime(minT);
-            ((DefaultBeliefTable)beliefs()).temporal.maxTime(maxT);
-            ((DefaultBeliefTable)goals()).temporal.minTime(minT);
-            ((DefaultBeliefTable)goals()).temporal.maxTime(maxT);
-        }
+//        if (belief.temporal() && (hasBeliefs()&&hasGoals())) {
+//
+//            //finds the temporal intersection of the two temporal belief tables:
+//            //this affects the temporal belief compression's focus in time
+//
+//            long minT = Long.MAX_VALUE;
+//            long maxT = Long.MIN_VALUE;
+//
+//                //max of the min
+//                minT = Math.max( minT,  (((DefaultBeliefTable)beliefs()).temporal.minTime() ));
+//                minT = Math.max( minT,  (((DefaultBeliefTable)goals()).temporal.minTime() ));
+//
+//                //..and min of the max
+//                maxT = Math.min( maxT,  (((DefaultBeliefTable)beliefs()).temporal.maxTime() ));
+//                maxT = Math.min( maxT,  (((DefaultBeliefTable)goals()).temporal.maxTime() ));
+//
+//            ((DefaultBeliefTable)beliefs()).temporal.minTime(minT);
+//            ((DefaultBeliefTable)beliefs()).temporal.maxTime(maxT);
+//            ((DefaultBeliefTable)goals()).temporal.minTime(minT);
+//            ((DefaultBeliefTable)goals()).temporal.maxTime(maxT);
+//        }
 
         //synchronized (target) {
             Task b = target.add(belief, questions, displaced, nar);

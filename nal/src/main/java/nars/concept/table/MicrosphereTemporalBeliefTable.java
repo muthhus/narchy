@@ -10,6 +10,7 @@ import nars.task.Task;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.util.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,37 +97,40 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return size() == capacity();
     }
 
-    @Override
-    public void minTime(long minT) {
-        this.min = minT;
-    }
-
-    @Override
-    public void maxTime(long maxT) {
-        this.max = maxT;
-    }
+//    @Override
+//    public void minTime(long minT) {
+//        this.min = minT;
+//    }
+//
+//    @Override
+//    public void maxTime(long maxT) {
+//        this.max = maxT;
+//    }
 
     @Override
     public long minTime() {
-        if (min == Tense.ETERNAL) ageFactor();
+        ageFactor();
         return min;
     }
 
     @Override
     public long maxTime() {
-        if (max == Tense.ETERNAL) ageFactor();
+        ageFactor();
         return max;
     }
 
-    @Nullable
-    public Task put(@NotNull Task i) {
-        super.add(i);
-        long occ = i.occurrence();
-        if ((occ < min) || (occ > max)) {
-            invalidateRange();
+    @Override
+    public boolean add(Task t) {
+        if (super.add(t)) {
+            long o = t.occurrence();
+            if ((o < min) || (o > max))
+                invalidateRange();
+            return true;
         }
-        return null;
+        return false;
     }
+
+
 
     @Override
     public void remove(@NotNull Task removed, List<Task> displ) {
@@ -138,15 +142,37 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
 
         displ.add(actuallyRemoved);
 
+        invalidRangeIfLimit(removed);
+
+    }
+
+    private void invalidRangeIfLimit(@NotNull Task removed) {
         long occ = removed.occurrence();
         if ((occ == min) || (occ == max)) {
             invalidateRange();
         }
-
     }
 
 
-    private void invalidateRange() {
+    @Override
+    public final boolean remove(Object object) {
+        if (super.remove(object)) {
+            invalidRangeIfLimit((Task)object);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public final Task remove(int index) {
+        Task t = super.remove(index);
+        if (t!=null) {
+            invalidRangeIfLimit(t);
+        }
+        return t;
+    }
+
+    private final void invalidateRange() {
         min = max = ETERNAL;
     }
 
@@ -201,10 +227,12 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         if (min == ETERNAL) {
             //invalidated, recalc:
             long tmin = Long.MAX_VALUE, tmax = Long.MIN_VALUE;
+
+            //TODO synchronized(..
+
             int s = size();
             for (int i = 0; i < s; i++) {
-                Task t = get(i);
-                long o = t.occurrence();
+                long o = get(i).occurrence();
                 if (o < tmin) tmin = o;
                 if (o > tmax) tmax = o;
             }
@@ -280,8 +308,15 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.evidence(), b.evidence());
 
-        float distanceFade = TruthFunctions.projection(a.occurrence(), b.occurrence(), now);
-        System.out.println(distanceFade);
+        float distanceFade = min!=ETERNAL ? TruthFunctions.projection(
+                //minTime(),
+                //maxTime(),
+                //mid
+                (a.occurrence()),
+                (b.occurrence()),
+                (now) //relative to current NAR time
+                //(mid) //relative to the midpoint of the tasks
+        ) : 1f;
 
         float confScale = Param.REVECTION_CONFIDENCE_FACTOR * distanceFade * (1f - overlap);
 
@@ -295,6 +330,17 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
         return truth != null ? Revision.merge(a, b, mid, now, truth) : null;
     }
 
+
+    public long range() {
+        return maxTime()-minTime();
+    }
+
+    /** normalize relative to the min/max span of this table */
+    public float tnorm(long absolute) {
+        double range = range();
+        if (range == 0) return 0;
+        return (float)((absolute - min) / range);
+    }
 
     @Nullable
     @Override

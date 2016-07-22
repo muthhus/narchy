@@ -40,7 +40,7 @@ public final class STMTemporalLinkage extends STM {
     @Override
     public final void accept(@NotNull Task t) {
 
-        if (t.punc() != Symbols.BELIEF) {
+        if (!t.isBeliefOrGoal()) {
             return;
         }
 
