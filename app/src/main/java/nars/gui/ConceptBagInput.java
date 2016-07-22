@@ -25,7 +25,7 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
 
     public static void main(String[] args) {
 
-        Default n = new Default(64, 4, 2, 2);
+        Default n = new Default(256, 4, 2, 2);
         n.conceptActivation.setValue(0.5f);
         //n.nal(4);
 
@@ -33,8 +33,8 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         new DeductiveMeshTest(n, new int[]{6,5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 32;
-        final int maxEdges = 8;
+        final int maxNodes = 16;
+        final int maxEdges = 4;
 
         new SpaceGraph<Term>(
                 new ConceptBagInput(n, maxNodes, maxEdges)
@@ -99,6 +99,7 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         List<ConceptWidget> v = rewind(capacity);
         Bag<Concept> x = ((Default) nar).core.concepts;
         x.topWhile(this::accept, capacity);
+        //System.out.println(capacity + " " + active.size() + " " + space.dyn.objects().size());
 
         float now = now();
         for (int i1 = 0, toDrawSize = v.size(); i1 < toDrawSize; i1++) {
@@ -179,8 +180,8 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.1f;
-        float maxLineWidth = 0.5f;
+        float minLineWidth = 0.02f;
+        float maxLineWidth = 0.1f;
         float width = minLineWidth + (maxLineWidth - minLineWidth) * (1 + pri + (dur) * (qua));
 
         float r, g, b;
