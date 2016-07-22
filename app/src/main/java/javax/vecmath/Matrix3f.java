@@ -217,6 +217,14 @@ public class Matrix3f implements java.io.Serializable, Cloneable {
                         this.m20 + ", " + this.m21 + ", " + this.m22 + '\n';
     }
 
+    public String toStringCompact() {
+        return
+                this.m00 + ", " + this.m01 + ", " + this.m02 + " | " +
+                        this.m10 + ", " + this.m11 + ", " + this.m12 + " | " +
+                        this.m20 + ", " + this.m21 + ", " + this.m22;
+    }
+
+
     /**
      * Sets this Matrix3f to identity.
      */

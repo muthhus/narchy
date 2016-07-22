@@ -124,5 +124,11 @@ public abstract class ConvexInternalShape extends ConvexShape {
 	public void getPreferredPenetrationDirection(int index, Vector3f penetrationVector) {
 		throw new InternalError();
 	}
-	
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "{" +
+				"implicitDim=" + implicitShapeDimensions +
+				'}';
+	}
 }

@@ -94,7 +94,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         //init physics
         center = motion.t.origin;
 
-        inactivate();
+        preactivate();
     }
 
     @Override
@@ -182,7 +182,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     public void reactivate() {
         RigidBody b = body;
-        if (b !=null && !b.isActive())
+        if (b !=null/* && !b.isActive()*/)
             b.activate(collidable());
     }
 
@@ -414,7 +414,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public <O> void stop(SpaceGraph s) {
-        inactivate();
+        order = -2;
         body = null;
     }
 }

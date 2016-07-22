@@ -274,8 +274,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    //Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f
-                    clock.getTimeThenReset()
+                    Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f
+                    //clock.getTimeThenReset()
             );
         }
 

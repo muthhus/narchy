@@ -128,8 +128,12 @@ public class FasterList<X> extends FastList<X> {
                 i++;
             }
         }
-        this.size = s;
-        return ps!=s;
+        if (ps!=s) {
+            this.size = s;
+            return true;
+        }
+
+        return false;
     }
 
     public X[] toArray(IntFunction<X[]> arrayBuilder) {

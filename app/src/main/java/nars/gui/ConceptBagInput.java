@@ -11,7 +11,9 @@ import nars.term.Termed;
 import nars.util.experiment.DeductiveMeshTest;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.*;
+import spacegraph.layout.FastOrganicLayout;
 import spacegraph.layout.Flatten;
+import spacegraph.layout.Spiral;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -31,15 +33,15 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
         new DeductiveMeshTest(n, new int[]{6,5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 1;
-        final int maxEdges = 2;
+        final int maxNodes = 32;
+        final int maxEdges = 8;
 
         new SpaceGraph<Term>(
                 new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
-                new Flatten()
+                //new Flatten()
                 //new Spiral()
-                //new FastOrganicLayout()
+                new FastOrganicLayout()
         ).show(1300, 900);
 
         n.loop(30f);
@@ -112,13 +114,13 @@ public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements C
 
         float p = v.pri;// = 1; //v.pri = v.key.priIfFiniteElseZero();
 
-        float nodeScale = 0.5f + p * 2f;//1f + 2f * p;
+        float nodeScale = 1f + p * 5f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
         v.scale(nodeScale, nodeScale, nodeScale * 1.5f);
 
 
         Concept c = nar.concept(tt);
-        if (c == null) {
+        if (c != null) {
             updateConcept(v, c, now);
         } else {
             //remove? hide?

@@ -181,6 +181,8 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
         super.display(drawable);
 
+        //ss.forEach(this::print);
+
         ss.forEach( SpaceInput::ready );
 
         renderHUD();
@@ -217,7 +219,6 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
             ll.get(i1).update(this, ((ListInput)s).active, dt);
         }
 
-        print(s);
 
     }
 
@@ -225,7 +226,10 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         System.out.println();
         //+ active.size() + " active, "
         System.out.println(s + ": "   + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
-        s.forEach(System.out::println);
+        /*s.forEach(System.out::println);
+        dyn.objects().forEach(x -> {
+            System.out.println("\t" + x.getUserPointer());
+        });*/
         System.out.println();
     }
 

@@ -112,9 +112,12 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 				i++;
 			}
 		}
-		this.size = s;
-		return ps!=s;
+		if (ps!=s) {
+			this.size = s;
+			return true;
+		}
 
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -126,8 +129,7 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 
 	public void removeQuick(int index) {
 		System.arraycopy(array, index+1, array, index, size - index - 1);
-		array[size-1] = null;
-		size--;
+		array[--size] = null;
 	}
 
 	@Override

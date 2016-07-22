@@ -54,7 +54,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
             buffer.remove(s);
         } else if (capacity == buffer.size()) {
             Object popped = buffer.removeFirst();
-            space.getOrAdd(popped).inactivate();
+            space.getOrAdd(popped).preactivate();
         }
         buffer.add(s);
         Object[] bb = buffer.toArray(new Object[buffer.size()]);

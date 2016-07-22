@@ -80,6 +80,13 @@ public class Transform {
         return new Transform(copy);
     }
 
+	@Override
+	public String toString() {
+		return "t(" +
+				origin + "," + basis.toStringCompact() +
+				')';
+	}
+
 	public void set(Transform tr) {
 		basis.set(tr.basis);
 		origin.set(tr.origin);
