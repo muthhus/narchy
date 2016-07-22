@@ -71,11 +71,15 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
         nar.onFrame(nn -> updateIfNotBusy());
     }
 
-    @Override
-    public int numEdgesFor(Termed x) {
+
+    public final int numEdgesFor(Termed x) {
         return edgeCapacity;
     }
 
+    @Override
+    final public ConceptWidget apply(Termed x) {
+        return new ConceptWidget(x, numEdgesFor(x));
+    }
 
     @Override
     public float now() {

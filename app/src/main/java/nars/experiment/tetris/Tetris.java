@@ -338,7 +338,7 @@ public class Tetris extends TetrisState implements Environment {
 
 
                     new SpaceGraph<Termed>(
-                            new ConceptBagInput(nar, 4, 4)
+                            new ConceptBagInput(nar, 32, 4)
                     ).with(
                             new Spiral()
                             //new FastOrganicLayout()

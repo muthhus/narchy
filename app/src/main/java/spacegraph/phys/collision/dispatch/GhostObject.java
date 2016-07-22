@@ -72,11 +72,13 @@ public class GhostObject extends CollisionObject {
 		CollisionObject otherObject = (CollisionObject) otherProxy.clientObject;
 		assert(otherObject != null);
 
-		int index = overlappingObjects.indexOf(otherObject);
+		ObjectArrayList<CollisionObject> o = this.overlappingObjects;
+		int index = o.indexOf(otherObject);
 		if (index != -1) {
             //return array[index];
-            overlappingObjects.set(index, overlappingObjects.get(overlappingObjects.size() - 1));
-			overlappingObjects.removeQuick(overlappingObjects.size()-1);
+			int num = o.size();
+			o.setQuick(index, o.get(num - 1));
+			o.removeQuick(num -1);
 		}
 	}
 

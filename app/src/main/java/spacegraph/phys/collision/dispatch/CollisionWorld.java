@@ -50,11 +50,10 @@ public class CollisionWorld<X> {
 
 	//protected final BulletStack stack = BulletStack.get();
 
-	protected ObjectArrayList<CollisionObject<X>> collisionObjects =
-			new ObjectArrayList<>();
+	protected final ObjectArrayList<CollisionObject<X>> objects = new ObjectArrayList<>();
 
 	protected Dispatcher dispatcher1;
-	protected DispatcherInfo dispatchInfo = new DispatcherInfo();
+	protected final DispatcherInfo dispatchInfo = new DispatcherInfo();
 	//protected btStackAlloc*	m_stackAlloc;
 	protected BroadphaseInterface broadphasePairCache;
 
@@ -68,9 +67,9 @@ public class CollisionWorld<X> {
 	
 	public void destroy() {
 		// clean up remaining objects
-		for (int i = 0; i < collisionObjects.size(); i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject collisionObject = collisionObjects.get(i);
+			CollisionObject collisionObject = objects.get(i);
 
 			BroadphaseProxy bp = collisionObject.getBroadphaseHandle();
 			if (bp != null) {
@@ -83,15 +82,15 @@ public class CollisionWorld<X> {
 		}
 	}
 	
-	public void addCollisionObject(CollisionObject collisionObject) {
-		addCollisionObject(collisionObject, CollisionFilterGroups.DEFAULT_FILTER, CollisionFilterGroups.ALL_FILTER);
+	public void add(CollisionObject collisionObject) {
+		add(collisionObject, CollisionFilterGroups.DEFAULT_FILTER, CollisionFilterGroups.ALL_FILTER);
 	}
 
-	public void addCollisionObject(CollisionObject collisionObject, short collisionFilterGroup, short collisionFilterMask) {
+	public void add(CollisionObject collisionObject, short collisionFilterGroup, short collisionFilterMask) {
 		// check that the object isn't already added
 		//assert (!collisionObjects.contains(collisionObject));
 
-		collisionObjects.add(collisionObject);
+		objects.add(collisionObject);
 
 		// calculate new AABB
 		// TODO: check if it's overwritten or not
@@ -144,7 +143,7 @@ public class CollisionWorld<X> {
 	}
 
 	public void removeIf(Predicate<CollisionObject<X>> removalCondition) {
-		collisionObjects.removeIf((c -> {
+		objects.removeIf((c -> {
 			if (removalCondition.test(c)) {
 				removeFromBroadphase(c);
 				return true;
@@ -156,7 +155,7 @@ public class CollisionWorld<X> {
 	public final void removeCollisionObject(CollisionObject collisionObject) {
 		removeFromBroadphase(collisionObject);
 
-		collisionObjects.remove(collisionObject);
+		objects.remove(collisionObject);
 	}
 
 	final void removeFromBroadphase(CollisionObject collisionObject) {
@@ -231,9 +230,9 @@ public class CollisionWorld<X> {
 	public void updateAabbs() {
 		BulletStats.pushProfile("updateAabbs");
 		try {
-			for (int i=0; i<collisionObjects.size(); i++) {
+			for (int i = 0; i< objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = collisionObjects.get(i);
+				CollisionObject colObj = objects.get(i);
 
 				// only update aabb of active objects
 				if (colObj.isActive()) {
@@ -248,7 +247,7 @@ public class CollisionWorld<X> {
 
 	
 	public int getNumCollisionObjects() {
-		return collisionObjects.size();
+		return objects.size();
 	}
 
 	// TODO
@@ -545,7 +544,7 @@ public class CollisionWorld<X> {
 
 		Transform tmpTrans = new Transform();
 
-		ObjectArrayList<CollisionObject<X>> objs = this.collisionObjects;
+		ObjectArrayList<CollisionObject<X>> objs = this.objects;
 		int n = objs.size();
 		for (int i = 0; i < n; i++) {
 			// terminate further ray tests, once the closestHitFraction reached zero
@@ -616,9 +615,9 @@ public class CollisionWorld<X> {
 
 		// go over all objects, and if the ray intersects their aabb + cast shape aabb,
 		// do a ray-shape query using convexCaster (CCD)
-		for (int i = 0; i < collisionObjects.size(); i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject collisionObject = collisionObjects.get(i);
+			CollisionObject collisionObject = objects.get(i);
 
 			// only perform raycast if filterMask matches
 			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
@@ -641,7 +640,7 @@ public class CollisionWorld<X> {
 	}
 
 	public ObjectArrayList<CollisionObject<X>> objects() {
-		return collisionObjects;
+		return objects;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////

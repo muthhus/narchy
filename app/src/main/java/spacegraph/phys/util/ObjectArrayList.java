@@ -47,7 +47,20 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 	public ObjectArrayList(int initialCapacity) {
 		array = (T[])new Object[initialCapacity];
 	}
-	
+
+
+	public void addAll(T... v) {
+		if (size-1 + v.length >= array.length) {
+			expand();
+			//HACK this might not have expanded enough, caution
+		}
+
+		T[] array = this.array;
+		for (T x : v) {
+			array[size++] = x;
+		}
+	}
+
 	@Override
 	public boolean add(T value) {
 		if (size == array.length) {
@@ -97,7 +110,7 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 	}
 
 	@Override
-    public T get(int index) {
+    public final T get(int index) {
 		//if (index >= size) throw new IndexOutOfBoundsException();
 		return array[index];
 	}
@@ -105,8 +118,9 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 	@Override
 	public T set(int index, T value) {
 		//if (index >= size) throw new IndexOutOfBoundsException();
-		T old = array[index];
-		array[index] = value;
+		T[] a = this.array;
+		T old = a[index];
+		a[index] = value;
 		return old;
 	}
 
@@ -158,5 +172,8 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 			array[i] = (T)in.readObject();
 		}
 	}
-	
+
+	public final T removeLast() {
+		return remove(size - 1);
+	}
 }

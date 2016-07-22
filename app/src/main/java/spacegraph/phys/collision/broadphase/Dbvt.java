@@ -241,40 +241,38 @@ public class Dbvt {
 		}
 	}
 
-	public static void collideTT(Node root0, Node root1, ICollide policy) {
+	static Node[] sStkNN(Node a, Node b) { return new Node[] { a, b }; }
+
+	public static void collideTT(Node root0, Node root1, ICollide policy, ObjectArrayList<Node[]> stack) {
 		//DBVT_CHECKTYPE
 		if (root0 != null && root1 != null) {
-			ObjectArrayList<sStkNN> stack = new ObjectArrayList<sStkNN>(DOUBLE_STACKSIZE);
-			stack.add(new sStkNN(root0, root1));
+			stack.add(sStkNN(root0, root1));
 			do {
-				sStkNN p = stack.remove(stack.size() - 1);
-				if (p.a == p.b) {
-					if (p.a.isinternal()) {
-						stack.add(new sStkNN(p.a.childs[0], p.a.childs[0]));
-						stack.add(new sStkNN(p.a.childs[1], p.a.childs[1]));
-						stack.add(new sStkNN(p.a.childs[0], p.a.childs[1]));
+				Node[] p = stack.removeLast();
+				Node pa = p[0];
+				Node[] pac = pa.childs;
+				Node pb = p[1];
+				if (pa == pb) {
+					if (pa.isinternal()) {
+						stack.addAll(sStkNN(pac[0], pac[0]),sStkNN(pac[1], pac[1]),sStkNN(pac[0], pac[1]));
 					}
 				}
-				else if (DbvtAabbMm.Intersect(p.a.volume, p.b.volume)) {
-					if (p.a.isinternal()) {
-						if (p.b.isinternal()) {
-							stack.add(new sStkNN(p.a.childs[0], p.b.childs[0]));
-							stack.add(new sStkNN(p.a.childs[1], p.b.childs[0]));
-							stack.add(new sStkNN(p.a.childs[0], p.b.childs[1]));
-							stack.add(new sStkNN(p.a.childs[1], p.b.childs[1]));
+				else if (DbvtAabbMm.Intersect(pa.volume, pb.volume)) {
+					Node[] pbc = pb.childs;
+					if (pa.isinternal()) {
+						if (pb.isinternal()) {
+							stack.addAll(sStkNN(pac[0], pbc[0]),sStkNN(pac[1], pbc[0]),sStkNN(pac[0], pbc[1]),sStkNN(pac[1], pbc[1]));
 						}
 						else {
-							stack.add(new sStkNN(p.a.childs[0], p.b));
-							stack.add(new sStkNN(p.a.childs[1], p.b));
+							stack.addAll(sStkNN(pac[0], pb),sStkNN(pac[1], pb));
 						}
 					}
 					else {
-						if (p.b.isinternal()) {
-							stack.add(new sStkNN(p.a, p.b.childs[0]));
-							stack.add(new sStkNN(p.a, p.b.childs[1]));
+						if (pb.isinternal()) {
+							stack.addAll(sStkNN(pa, pbc[0]),sStkNN(pa, pbc[1]));
 						}
 						else {
-							policy.Process(p.a, p.b);
+							policy.Process(pa, pb);
 						}
 					}
 				}
@@ -899,9 +897,9 @@ public class Dbvt {
 	}
 	
 	/** Stack element */
-	public static class sStkNN {
-		public Node a;
-		public Node b;
+	public static final class sStkNN {
+		public final Node a;
+		public final Node b;
 
 		public sStkNN(Node na, Node nb) {
 			a = na;
@@ -909,8 +907,8 @@ public class Dbvt {
 		}
 	}
 
-	public static class sStkNP {
-		public Node node;
+	public static final class sStkNP {
+		public final Node node;
 		public int mask;
 
 		public sStkNP(Node n, int m) {
@@ -919,13 +917,12 @@ public class Dbvt {
 		}
 	}
 
-	public static class sStkNPS {
+	public static final class sStkNPS {
 		public Node node;
 		public int mask;
 		public float value;
 
-		public sStkNPS() {
-		}
+
 
 		public sStkNPS(Node n, int m, float v) {
 			node = n;
@@ -940,15 +937,15 @@ public class Dbvt {
 		}
 	}
 	
-	public static class sStkCLN {
-		public Node node;
-		public Node parent;
-
-		public sStkCLN(Node n, Node p) {
-			node = n;
-			parent = p;
-		}
-	}
+//	public static class sStkCLN {
+//		public final Node node;
+//		public final Node parent;
+//
+//		public sStkCLN(Node n, Node p) {
+//			node = n;
+//			parent = p;
+//		}
+//	}
 
 	public static class ICollide {
 		public void Process(Node n1, Node n2) {

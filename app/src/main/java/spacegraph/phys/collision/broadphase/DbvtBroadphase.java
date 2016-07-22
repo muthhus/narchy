@@ -29,6 +29,8 @@ import spacegraph.phys.util.ObjectArrayList;
 
 import javax.vecmath.Vector3f;
 
+import static spacegraph.phys.collision.broadphase.Dbvt.DOUBLE_STACKSIZE;
+
 /**
  *
  * @author jezek2
@@ -89,6 +91,8 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		//#endif
 	}
 
+	final ObjectArrayList<Dbvt.Node[]> collideStack = new ObjectArrayList<>(DOUBLE_STACKSIZE);
+
 	public void collide(Dispatcher dispatcher) {
 		//SPC(m_profiling.m_total);
 
@@ -99,13 +103,14 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		// dynamic -> fixed set:
 		stageCurrent = (stageCurrent + 1) % STAGECOUNT;
 		DbvtProxy current = stageRoots[stageCurrent];
+
 		if (current != null) {
 			DbvtTreeCollider collider = new DbvtTreeCollider(this);
 			do {
 				DbvtProxy next = current.links[1];
 				stageRoots[current.stage] = listremove(current, stageRoots[current.stage]);
 				stageRoots[STAGECOUNT] = listappend(current, stageRoots[STAGECOUNT]);
-				Dbvt.collideTT(sets[1].root, current.leaf, collider);
+				Dbvt.collideTT(sets[1].root, current.leaf, collider, collideStack);
 				sets[0].remove(current.leaf);
 				current.leaf = sets[1].insert(current.aabb, current);
 				current.stage = STAGECOUNT;
@@ -116,9 +121,9 @@ public class DbvtBroadphase extends BroadphaseInterface {
 		// collide dynamics:
         DbvtTreeCollider collider = new DbvtTreeCollider(this);
         //SPC(m_profiling.m_fdcollide);
-        Dbvt.collideTT(sets[0].root, sets[1].root, collider);
+        Dbvt.collideTT(sets[0].root, sets[1].root, collider, collideStack);
         //SPC(m_profiling.m_ddcollide);
-        Dbvt.collideTT(sets[0].root, sets[0].root, collider);
+        Dbvt.collideTT(sets[0].root, sets[0].root, collider, collideStack);
 
         // clean up:
         //SPC(m_profiling.m_cleanup);

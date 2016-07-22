@@ -91,7 +91,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 	}
 
 	protected void saveKinematicState(float timeStep) {
-		collisionObjects.removeIf(colObj-> {
+		objects.removeIf(colObj-> {
 			if (!valid(colObj)) {
 				return true;
 			}
@@ -140,9 +140,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			Vector3f colorvec = new Vector3f();
 			
 			// todo: iterate over awake simulation islands!
-			for (i = 0; i < collisionObjects.size(); i++) {
+			for (i = 0; i < objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = collisionObjects.get(i);
+				CollisionObject colObj = objects.get(i);
 				if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
 					Vector3f color = new Vector3f();
 					color.set(255f, 255f, 255f);
@@ -233,9 +233,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 	 */
 	public void applyGravity() {
 		// todo: iterate over awake simulation islands!
-		for (int i = 0; i < collisionObjects.size(); i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = collisionObjects.get(i);
+			CollisionObject colObj = objects.get(i);
 
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null && body.isActive()) {
@@ -252,9 +252,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		Vector3f tmpAngVel = new Vector3f();
 
 		// todo: iterate over awake simulation islands!
-		for (int i = 0; i < collisionObjects.size(); i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = collisionObjects.get(i);
+			CollisionObject colObj = objects.get(i);
 
 			RigidBody body = RigidBody.upcast(colObj);
 
@@ -397,9 +397,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 	@Override
 	public void setGravity(Vector3f gravity) {
 		this.gravity.set(gravity);
-		for (int i = 0; i < collisionObjects.size(); i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = collisionObjects.get(i);
+			CollisionObject colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				body.setGravity(gravity);
@@ -429,7 +429,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			short collisionFilterGroup = isDynamic ? CollisionFilterGroups.DEFAULT_FILTER : CollisionFilterGroups.STATIC_FILTER;
 			short collisionFilterMask = isDynamic ? CollisionFilterGroups.ALL_FILTER : (short) (CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER);
 
-			addCollisionObject(body, collisionFilterGroup, collisionFilterMask);
+			add(body, collisionFilterGroup, collisionFilterMask);
 		}
 	}
 
@@ -439,7 +439,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		}
 
 		if (body.shape() != null) {
-			addCollisionObject(body, group, mask);
+			add(body, group, mask);
 		}
 	}
 
@@ -475,9 +475,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		try {
 			Vector3f tmp = new Vector3f();
 
-			for (int i=0; i<collisionObjects.size(); i++) {
+			for (int i = 0; i< objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = collisionObjects.get(i);
+				CollisionObject colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					body.updateDeactivation(timeStep);
@@ -680,9 +680,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			Transform tmpTrans = new Transform();
 
 			Transform predictedTrans = new Transform();
-			for (int i=0; i<collisionObjects.size(); i++) {
+			for (int i = 0; i< objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = collisionObjects.get(i);
+				CollisionObject colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					body.setHitFraction(1f);
@@ -736,9 +736,9 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		try {
 			Transform tmpTrans = new Transform();
 			
-			for (int i = 0; i < collisionObjects.size(); i++) {
+			for (int i = 0; i < objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = collisionObjects.get(i);
+				CollisionObject colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					if (!body.isStaticOrKinematicObject()) {
