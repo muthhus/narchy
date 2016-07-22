@@ -66,7 +66,9 @@ abstract public class SpaceInput<O, M extends Spatial<O>> {
      */
     public void updateIfNotBusy() {
         if (!isBusy()) {
-            update();
+            synchronized (busy) {
+                update();
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package spacegraph;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import nars.$;
@@ -12,6 +14,7 @@ import org.infinispan.commons.util.WeakValueHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.layout.FastOrganicLayout;
+import spacegraph.layout.Spiral;
 import spacegraph.phys.collision.dispatch.CollisionObject;
 import spacegraph.render.JoglPhysics;
 
@@ -23,29 +26,6 @@ import java.util.function.Function;
  * Created by me on 6/20/16.
  */
 public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
-
-    public static void main(String[] args) {
-
-        Default n = new Default(1024, 8, 6, 8);
-        n.conceptActivation.setValue(0.25f);
-        //n.nal(4);
-
-
-        new DeductiveMeshTest(n, new int[]{5,5}, 16384);
-
-        final int maxNodes = 128;
-        final int maxEdges = 10;
-
-        new SpaceGraph<Termed>(
-            new ConceptBagInput(n, maxNodes, maxEdges)
-        ).with(
-            //new Spiral()
-            new FastOrganicLayout()
-        ).show(900, 900);
-
-        n.loop(35f);
-
-    }
 
     public SpaceGraph with(SpaceTransform<O>... t) {
         for (SpaceTransform g : t)
@@ -60,7 +40,8 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
     private Function<O, Spatial<O>> materialize = x -> (Spatial<O>)x;
 
-    final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
+    //final WeakValueHashMap<O, Spatial<O>> atoms = new WeakValueHashMap<>(1024);
+    final Cache<O, Spatial<O>> atoms = Caffeine.newBuilder().weakValues().build();
 
 
     final List<SpaceTransform<O>> transforms = $.newArrayList();
@@ -127,14 +108,15 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
 
     public @NotNull Spatial getOrAdd(O t) {
-        return atoms.computeIfAbsent(t, materialize);
+        return getOrAdd(t, materialize);
     }
+
     public @NotNull Spatial<O> getOrAdd(O t, Function<? super O, ? extends Spatial<O>> materializer) {
-        return atoms.computeIfAbsent(t, materializer);
+        return atoms.get(t, materializer);
     }
 
     public @Nullable Spatial getIfActive(O t) {
-        Spatial v = atoms.get(t);
+        Spatial v = atoms.getIfPresent(t);
         return v != null && v.active() ? v : null;
     }
 
@@ -289,7 +271,7 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 
 
 
-    public final void update(SpaceInput s) {
+    public final synchronized void update(SpaceInput s) {
 
         float dt = s.setBusy();
 

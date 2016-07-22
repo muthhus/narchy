@@ -5,13 +5,18 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
+import nars.op.ArithmeticInduction;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.util.experiment.DeductiveMeshTest;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.EDraw;
+import spacegraph.SpaceGraph;
 import spacegraph.SpaceInput;
 import spacegraph.Spatial;
+import spacegraph.layout.FastOrganicLayout;
+import spacegraph.layout.Spiral;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -20,6 +25,32 @@ import java.util.function.Predicate;
  * Created by me on 6/26/16.
  */
 public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implements ConceptMaterializer {
+
+    public static void main(String[] args) {
+
+        Default n = new Default(128, 4, 2, 2);
+        n.conceptActivation.setValue(0.5f);
+        //n.nal(4);
+
+
+        new DeductiveMeshTest(n, new int[]{6,5}, 16384);
+        //new ArithmeticInduction(n);
+
+        final int maxNodes = 512;
+        final int maxEdges = 32;
+
+        new SpaceGraph<Termed>(
+                new ConceptBagInput(n, maxNodes, maxEdges)
+        ).with(
+                //new Spiral()
+                new FastOrganicLayout()
+        ).show(1300, 900);
+
+        n.loop(30f);
+
+    }
+
+
 
     public final NAR nar;
     private final int capacity;
@@ -78,11 +109,14 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
         Termed tt = v.key;
 
         //Budget b = v.instance;
-        float p = v.pri = 1; //v.pri = v.key.priIfFiniteElseZero();
 
-        float nodeScale = 1f + 2f * p;
-        nodeScale /= Math.sqrt(tt.volume());
-        v.scale(nodeScale, nodeScale, nodeScale / 3f);
+        float p = v.pri;// = 1; //v.pri = v.key.priIfFiniteElseZero();
+
+        float nodeScale = 0.25f + p * 1f;//1f + 2f * p;
+        //nodeScale /= Math.sqrt(tt.volume());
+        v.scale(nodeScale, nodeScale, nodeScale * 1.5f);
+
+
 
         if (tt instanceof Concept) {
             updateConcept(v, (Concept) tt, now);
@@ -142,23 +176,41 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
         float qua = l.qua();
 
         //width relative to the radius of the atom
-        float minLineWidth = 0.25f;
-        float maxLineWidth = 0.85f;
-        float width = minLineWidth + (maxLineWidth - minLineWidth) * (pri + (dur) * (qua));
+        float minLineWidth = 0.1f;
+        float maxLineWidth = 0.5f;
+        float width = minLineWidth + (maxLineWidth - minLineWidth) * (1 + pri + (dur) * (qua));
 
         float r, g, b;
-        float hp = 0.25f + 0.75f * pri;
+        float hp = 0.5f + 0.5f * pri;
         //float qh = 0.5f + 0.5f * qua;
         if (task) {
-            r = hp;
-            g = dur / 3f;
-            b = 0;
+            Task x = (Task) l.get();
+            if (x.isBeliefOrGoal()) {
+                float e = x.expectation();
+                if (e >= 0.5f) {
+                    //positive in green
+                    g = 0.5f + 0.5f * e;
+                    r = 0;
+                } else {
+                    //negative in red
+                    r = 0.5f + 0.5f * (1f-e);
+                    g = 0;
+                }
+                b = 0.5f * dur;
+
+            } else {
+                //blue for questions and quests
+                b = 0.5f + hp * qua;
+                r = 0.2f;
+                g = 0.2f;
+            }
         } else {
-            b = hp;
-            g = dur / 3f;
-            r = 0;
+            //gray for termlinks
+            r = g = b = hp;
         }
-        float a = 0.75f;
+
+        //int maxEdges = v.edges.length;
+        float a = 0.5f;// / (maxEdges*0.5f /* est. avg 0.5 per link */);
 
         int n;
         ee[n = (v.numEdges++)].set(target, width,
@@ -178,6 +230,7 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
 
         int nextID = this.visible.size();
         ConceptWidget w = (ConceptWidget) space.update(nextID, this, b.get());
+        w.pri = pri;
         return this.visible.add(w);
     }
 

@@ -3,6 +3,7 @@ package spacegraph;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Quaternion;
+import nars.util.Util;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.phys.collision.shapes.BoxShape;
 import spacegraph.phys.collision.shapes.CollisionShape;
@@ -128,6 +129,13 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         order = -1;
     }
 
+    public void move(float x, float y, float z, float rate) {
+        move(
+                Util.lerp(x, center.x, rate),
+                Util.lerp(y, center.y, rate),
+                Util.lerp(z, center.z, rate)
+        );
+    }
     public void move(float x, float y, float z) {
         if (!motionLock) {
 
@@ -277,11 +285,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     }
 
-    protected void renderLabel(GL2 gl) {
-        //float p = v.pri * 0.75f + 0.25f;
-        gl.glColor4f(1f, 1f, 1f, pri);
-
-        ShapeDrawer.renderLabel(gl, 0.0015f,0.0015f, label, 0, 0, 0.5f);
+    protected void renderLabel(GL2 gl, float scale) {
+        final float charAspect = 1.5f;
+        ShapeDrawer.renderLabel(gl, scale, scale / charAspect, label, 0, 0, 0.5f);
     }
 
     protected void renderShape(GL2 gl, RigidBody body) {
@@ -314,7 +320,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         gl.glColor4f(e.r, e.g, e.b, e.a);
 
         float width = e.width * v.radius;
-        if (width <= 1.5f) {
+        if (width <= 1.1f) {
             renderLineEdge(gl, v, e, width);
         } else {
             renderHalfTriEdge(gl, v, e, width);

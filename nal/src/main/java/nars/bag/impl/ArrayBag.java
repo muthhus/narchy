@@ -39,6 +39,10 @@ public class ArrayBag<V> extends SortedListTable<V, BLink<V>> implements Bag<V>,
         abstract public float mass(ArrayBag<V> bag);
 
         abstract public void clear();
+
+        public boolean isEmpty() {
+            return size()==0;
+        }
     }
 
 

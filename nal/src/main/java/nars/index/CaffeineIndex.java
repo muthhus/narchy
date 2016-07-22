@@ -9,6 +9,7 @@ import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.util.signal.WiredConcept;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -33,7 +34,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //        } else {
             if (v instanceof Concept) {
 
-                if (!(v instanceof CompoundConcept)) {
+                if (v instanceof WiredConcept) {
                     //special implementation, dont allow removal
                     return 0;
                 }
@@ -57,7 +58,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
 //        } else {
         if (v instanceof Concept) {
 
-            if (!(v instanceof CompoundConcept)) {
+            if (v instanceof WiredConcept) {
                 //special implementation, dont allow removal
                 return 0;
             }
@@ -66,6 +67,7 @@ public class CaffeineIndex extends MaplikeIndex implements RemovalListener {
             if (c.active())
                 return 0; //disallow removal of active concepts
         }
+
 
         float w = v.complexity() * (2f - maxConfidence((CompoundConcept)v)) * 100;
 

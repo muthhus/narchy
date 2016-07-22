@@ -5,6 +5,8 @@ import nars.Param;
 import nars.bag.Bag;
 import nars.budget.forget.BudgetForget;
 import nars.link.BLink;
+import nars.nar.util.DefaultCore;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,8 +37,33 @@ public final class AutoBag<V> implements BudgetForget {
         ArrayBag<V> abag = (ArrayBag<V>) bag; //HACK
 
         synchronized (abag.map) {
-            float r;;
-            this.ratio = r = forgetRatio(abag);
+            float r = -1f;
+
+            if (!abag.pending.isEmpty()) { //(((ArrayBag) bag).pending.isFull()) {
+
+                float[] b = abag.preCommit();
+
+                float pending = b[1];
+
+                if (pending > Param.BUDGET_EPSILON) { //TODO this threshold prolly can be increased some for more efficiency
+
+                    float existing = b[0];
+
+                    // TODO formalize some relationship between cycles and priority
+
+                    //TODO consider age in diminishing existing's value
+                    r = 1f - (existing / (existing + pending));
+
+//                    if (abag instanceof DefaultCore.MonitoredCurveBag) {
+//                        System.out.println(Texts.n4(abag.priHistogram(10)) + " " + r + " " + pending);
+//                    }
+                    //System.out.println("existing=" + existing + ", pending=" + pending + " .. ratio=" + ratio);
+
+                }
+            }
+
+            this.ratio = r;
+
 
             return abag.commit(
                     (r >= Param.BUDGET_EPSILON) ?
@@ -46,43 +73,6 @@ public final class AutoBag<V> implements BudgetForget {
         }
 
     }
-
-
-    protected float forgetRatio(@NotNull ArrayBag<V> bag) {
-
-        if (!bag.isFull()) {
-            return -1f;
-        }
-
-        float[] b = bag.preCommit();
-
-        float pending = b[1];
-        if (pending <= Param.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
-            return -1f;
-        float existing = b[0];
-
-        // TODO formalize some relationship between cycles and priority
-
-        //a load factor
-        //final float massMeanTarget = 0.25f; //ex: 0.5 pri * 0.5 dur = 0.25 mass
-
-        //float overflow = (existing+pending) - (massMeanTarget * bag.capacity());
-        //if (overflow <= Global.BUDGET_EPSILON) //TODO this threshold prolly can be increased some for more efficiency
-           //return -1;
-
-//        float decaySpeed = Global.AUTOBAG_NOVELTY_RATE; //< 1.0, smaller means slower forgetting rate / longer forgetting time
-//        float period = existing / (pending * decaySpeed);
-//
-//        //System.out.println("existing " + existing + " (est), pending: " + pending + " ==> " + overflow + " x " + bag.size() + " ==> " + period);
-//
-//        return period;
-
-        //TODO consider age in diminishing existing's value
-        float ratio = 1f - (existing / (existing + pending));
-        //System.out.println("existing=" + existing + ", pending=" + pending + " .. ratio=" + ratio);
-        return ratio;
-    }
-
 
     @Override
     public final void accept(@NotNull BLink bLink) {

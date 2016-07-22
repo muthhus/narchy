@@ -28,6 +28,7 @@ import nars.experiment.Environment;
 import nars.experiment.tetris.visualizer.TetrisVisualizer;
 import nars.gui.BagChart;
 import nars.gui.BeliefTableChart;
+import nars.gui.ConceptBagInput;
 import nars.gui.STMView;
 import nars.index.CaffeineIndex;
 import nars.learn.Agent;
@@ -41,6 +42,9 @@ import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.vision.NARCamera;
 import nars.vision.SwingCamera;
+import spacegraph.SpaceGraph;
+import spacegraph.layout.FastOrganicLayout;
+import spacegraph.layout.Spiral;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -52,8 +56,8 @@ import static nars.experiment.pong.Pong.numericSensor;
 
 public class Tetris extends TetrisState implements Environment {
 
-    public static final int runCycles = 2000;
-    public static final int cyclesPerFrame = 64;
+    public static final int runCycles = 12000;
+    public static final int cyclesPerFrame = 128;
 
     private final TetrisVisualizer vis;
     private double currentScore;
@@ -242,14 +246,14 @@ public class Tetris extends TetrisState implements Environment {
         nar.conceptActivation.setValue(0.1f);
 
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+        nar.beliefConfidence(0.6f);
+        nar.goalConfidence(0.6f); //must be slightly higher than epsilon's eternal otherwise it overrides
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.7f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.3f;
         nar.DEFAULT_QUEST_PRIORITY = 0.4f;
         nar.cyclesPerFrame.set(cyclesPerFrame);
-        nar.confMin.setValue(0.05f);
+        nar.confMin.setValue(0.02f);
 
 //        nar.on(new TransformConcept("seq", (c) -> {
 //            if (c.size() != 3)
@@ -282,10 +286,11 @@ public class Tetris extends TetrisState implements Environment {
         //Global.DEBUG = true;
 
         //new Abbreviation2(nar, "_");
-        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        new ArithmeticInduction(nar);
+        //MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+
+        //new ArithmeticInduction(nar);
 
 
 
@@ -324,10 +329,23 @@ public class Tetris extends TetrisState implements Environment {
                 Iterables.addAll(charted, cheats);
 
                 if (nar instanceof Default) {
+
                     new BeliefTableChart(nar, charted).show(600, 900);
-                    //BagChart.show((Default) nar, 128);
-                    STMView.show(stm, 800, 600);
+
+                    BagChart.show((Default) nar, 128);
+
+                    //STMView.show(stm, 800, 600);
+
+
+//                    new SpaceGraph<Termed>(
+//                            new ConceptBagInput(nar, 16, 4)
+//                    ).with(
+//                            new Spiral()
+//                            //new FastOrganicLayout()
+//                    ).show(1300, 900);
                 }
+
+
             }
         };
 

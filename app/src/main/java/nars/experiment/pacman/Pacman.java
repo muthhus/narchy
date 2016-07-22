@@ -62,11 +62,12 @@ public class Pacman extends cpcman implements Environment {
 
 	final int visionRadius;
 	final int itemTypes = 3;
+	final static int runCycles = 2512;
 
 	boolean trace = true;
 
 	final int inputs;
-	private final int pacmanCyclesPerFrame = 16;
+	private final int pacmanCyclesPerFrame = 8;
 	float bias = -0.05f; //pain of boredom, should be non-zero for the way it's used below
 	public float scoretoReward = 0.1f;
 
@@ -95,8 +96,8 @@ public class Pacman extends cpcman implements Environment {
 
 		//new MemoryManager(nar);
 
-		nar.beliefConfidence(0.7f);
-		nar.goalConfidence(0.7f); //must be slightly higher than epsilon's eternal otherwise it overrides
+		nar.beliefConfidence(0.5f);
+		nar.goalConfidence(0.5f); //must be slightly higher than epsilon's eternal otherwise it overrides
 		nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
 		nar.DEFAULT_GOAL_PRIORITY = 0.8f;
 		nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
@@ -250,7 +251,7 @@ public class Pacman extends cpcman implements Environment {
 				//new DPG(),
 				//new HaiQAgent(),
 				n,
-				512*64);
+				runCycles);
 
 
 
@@ -338,14 +339,14 @@ public class Pacman extends cpcman implements Environment {
 				else /*if (dy < 0)*/ dirY = $.the("d"); //down
 				Term squareTerm = $.p(
 						//$.p(dirX, $.the(Math.abs(dx))),
-						$.inh($.the(Math.abs(dx)), dirX),
+						$.p($.the(Math.abs(dx)), dirX),
 						//$.p(dirY, $.the(Math.abs(dy)))
-						$.inh($.the(Math.abs(dy)), dirY)
+						$.p($.the(Math.abs(dy)), dirY)
 				);
 				//System.out.println(dx + " " + dy + " " + squareTerm);
 
 				//return $.p(squareTerm, typeTerm);
-				return $.prop(squareTerm, typeTerm);
+				return $.p(typeTerm, squareTerm);
 				//return (Compound)$.inh($.the(square), typeTerm);
 			});
 		}

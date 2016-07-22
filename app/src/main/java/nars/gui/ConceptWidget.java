@@ -12,7 +12,7 @@ public class ConceptWidget extends Spatial<Termed> {
     /**
      * measure of inactivity, in time units
      */
-    public float lag;
+    //public float lag;
 
     public ConceptWidget(Termed x, int maxEdges) {
         super(x, maxEdges);
@@ -20,7 +20,8 @@ public class ConceptWidget extends Spatial<Termed> {
 
     @Override
     protected void renderRelativeAspect(GL2 gl) {
-        renderLabel(gl);
+        gl.glColor4f(1f, 1f, 1f, pri);
+        renderLabel(gl, 0.0005f);
     }
 
 

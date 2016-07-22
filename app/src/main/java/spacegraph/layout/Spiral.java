@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Spiral<O> implements SpaceTransform<O> {
 
-    float nodeSpeed = 0.05f;
+    float nodeSpeed = 0.3f;
 
     @Override
     public void update(SpaceGraph<O> g, List<Spatial<O>> verts, float dt) {
@@ -27,18 +27,24 @@ public class Spiral<O> implements SpaceTransform<O> {
         //float ni = n / (float) Math.E;
         //final float bn = 1f;
 
-        float baseRad = 5f;
+        float baseRad = 10f;
+        float angleRate = 0.2f;
         //float p = v.pri;
 
-        float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
+        //float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
 
         int o = v.order;
-        float theta = o;
 
+
+        float angle = o * angleRate;
+        float r = baseRad + o * angleRate * 1.6f /* ~phi */ ;
         v.move(
-                (float) Math.sin(theta / 10f) * (baseRad + 0.2f * (theta)),
-                (float) Math.cos(theta / 10f) * (baseRad + 0.2f * (theta)),
-                0);
+            (float) (Math.sin(angle) * r),
+            (float) (Math.cos(angle) * r),
+            0,
+            nodeSpeed
+        );
+
                 //1f/(1f+v.lag) * (baseRad/2f);
                 //v.budget.qua() * (baseRad + rad)
                 //v.tp[2] = act*10f;

@@ -36,7 +36,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
      * average radius there is of free space around each node. Default is 50.
      */
 
-    public final MutableFloat forceConstant = new MutableFloat(4f);
+    public final MutableFloat forceConstant = new MutableFloat(24f);
 
 //    @Range(min = 0.5f, max = 4f)
 //    public final MutableFloat spacing = new MutableFloat(1f);
@@ -102,6 +102,10 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
      * final normalization step to center all nodes
      */
     private static final boolean center = false;
+
+    private float nodeSpeed = 0.3f;
+    private float radiusScale = 3f;
+
     //private final FasterList<VDraw> cells = new FasterList<>();
 
 
@@ -262,7 +266,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
             // Set the X,Y value of the internal version of the cell to
             // the center point of the vertex for better positioning
 
-            float vr = radius[i] = V.radius; /*getRadius()*/
+            float vr = radius[i] = V.radius * radiusScale; /*getRadius()*/
             float width = vr * 2f; //bounds.getWidth();
             float height = width; //vr * 2f; //bounds.getHeight();
 
@@ -351,7 +355,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
             float y = /*graph.snap*/(ci[1] - r);
 
 
-            vd.move((float) x, (float) y, 0);
+            vd.move((float) x, (float) y, 0, nodeSpeed);
 
             if (i == 0) {
                 minx = maxx = x;

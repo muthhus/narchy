@@ -1032,15 +1032,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public abstract Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
-
-    @Nullable
-    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
-        return activate(termed, b, 1f, 0f, null);
+    /* zero avoids direct recursive linking, it should go through the target concept though and happen through there */
+    @Nullable final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b, float activation, @Nullable MutableFloat overflow) {
+        return activate(termed, b, activation * conceptActivation.floatValue(), 0f, overflow);
     }
 
     @Nullable
-    final public Concept activate(@NotNull Termed<?> termed, float amount) {
-        return activate(termed, UnitBudget.One.cloneMult(amount, amount, amount));
+    final public Concept activate(@NotNull Termed<?> termed, @NotNull Budgeted b) {
+        return activate(termed, b, 1f, null);
     }
 
     @NotNull
@@ -1284,7 +1283,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * (a normal duplicate task going through process() will not have this behavior.)
      */
     public final void activate(@NotNull Task t, float scale) {
-        activate(t.concept(this), t, scale, scale, null);
+        activate(t.concept(this), t, conceptActivation.floatValue() * scale, scale, null);
     }
 
     public final void activate(@NotNull Task t) {
@@ -1361,7 +1360,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (t.pri() > Param.BUDGET_EPSILON) {
                 //propagate budget
                 MutableFloat overflow = new MutableFloat();
-                activate(c, t, activation, activation, overflow);
+                activate(c, t, activation, 1f, overflow);
                 emotion.stress(overflow);
             }
 

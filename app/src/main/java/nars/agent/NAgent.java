@@ -559,7 +559,7 @@ public class NAgent implements Agent {
 
     public @Nullable Concept boost(Concept c) {
 
-        return nar.activate(c, UnitBudget.One, reinforcementAttention, reinforcementAttention, null);
+        return nar.activate(c, UnitBudget.One, nar.conceptActivation.floatValue() * reinforcementAttention, reinforcementAttention, null);
     }
 
     public void observe(float[] nextObservation) {
@@ -644,22 +644,24 @@ public class NAgent implements Agent {
 //            float preOff = (off+on*2f)/3f; //0.75f;
 //            float preOn = (on+off*2f)/3f; // 0.75f;
 
+            float onness = 1f;
+                    //decisiveness(this.nextAction);
 
             if (lastAction != -1) {
                 MotorConcept lastActionMotor = actions.get(lastAction);
 
                 //nar.goal(goalPriority, lastActionMotor, now-1, preOff, conf); //downward step function top
 
-                float offness = 1f - decisiveness(lastAction);
+                float offness = onness;
+
                 //float offness = 1f;
                 nar.goal(goalPriority, lastActionMotor, now-1,
-                        0, max(Param.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
+                        0.5f, max(Param.TRUTH_EPSILON, offness * gamma)); //downward step function bottom
             }
 
             //nar.goal(goalPriority, nextAction, now, preOn-1, conf); //upward step function bottom
 
 
-            float onness = decisiveness(this.nextAction);
             //float onness = 1f;
             nar.goal(goalPriority, actions.get(this.nextAction), now,
                     1, max(Param.TRUTH_EPSILON, onness * gamma)); //upward step function top
