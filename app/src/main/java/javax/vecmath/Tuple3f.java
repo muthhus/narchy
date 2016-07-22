@@ -273,6 +273,10 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         set(s * t1.x, s * t1.y, s * t1.z);
     }
 
+    public final void scale(Tuple3f t1) {
+        set(t1.x, t1.y, t1.z);
+    }
+
 
     /**
      * Sets the value of this tuple to the scalar multiplication
@@ -287,17 +291,25 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 
     /**
      * Sets the value of this tuple to the scalar multiplication
-     * of tuple t1 and then adds tuple t2 (this = s*t1 + t2).
+     * of tuple t1 and then adds tuple t2 (this = add + s*mul ).
      *
      * @param s  the scalar value
-     * @param t1 the tuple to be scaled and added
-     * @param t2 the tuple to be added without a scale
+     * @param mul the tuple to be scaled and added
+     * @param add the tuple to be added without a scale
      */
-    public final void scaleAdd(float s, Tuple3f t1, Tuple3f t2) {
+    public final void scaleAdd(float s, Tuple3f mul, Tuple3f add) {
 
-        set(s * t1.x + t2.x,
-                s * t1.y + t2.y,
-                s * t1.z + t2.z);
+        set(s * mul.x + add.x,
+                s * mul.y + add.y,
+                s * mul.z + add.z);
+    }
+
+    /** this = add + s * mul1 * mul2 */
+    public final void scaleAdd(float s, Tuple3f mul1, Tuple3f mul2, Tuple3f add) {
+
+        set(s * mul1.x * mul2.x + add.x,
+            s * mul1.y * mul2.y + add.y,
+            s * mul1.z * mul2.z + add.z);
     }
 
 

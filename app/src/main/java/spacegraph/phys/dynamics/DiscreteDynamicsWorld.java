@@ -26,7 +26,7 @@ package spacegraph.phys.dynamics;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.collision.broadphase.*;
 import spacegraph.phys.collision.dispatch.CollisionConfiguration;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.dispatch.CollisionWorld;
 import spacegraph.phys.collision.dispatch.SimulationIslandManager;
 import spacegraph.phys.collision.narrowphase.ManifoldPoint;
@@ -90,24 +90,32 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		ownsIslandManager = true;
 	}
 
+
+	private int nextID;
+
 	protected void saveKinematicState(float timeStep) {
-		objects.removeIf(colObj-> {
-			if (!valid(colObj)) {
+		nextID = 0;
+		objects.removeIf(c-> {
+			if (valid(nextID,c)) {
+				update(c);
+				RigidBody body = RigidBody.upcast(c);
+				if (body != null) {
+					if (body.getActivationState() != Collidable.ISLAND_SLEEPING) {
+						body.saveKinematicState(timeStep); // to calculate velocities next frame
+					}
+				}
+				nextID++;
+				return false;
+			} else {
+				removing(c);
 				return true;
 			}
-			RigidBody body = RigidBody.upcast(colObj);
-			if (body != null) {
-				if (body.getActivationState() != CollisionObject.ISLAND_SLEEPING) {
-					body.saveKinematicState(timeStep); // to calculate velocities next frame
-				}
-			}
-			return false;
 		});
 
 	}
 
 	/** override to remove objects at the beginning of each physics frame by returning false */
-	protected boolean valid(CollisionObject<X> c) {
+	protected boolean valid(int nextID, Collidable<X> c) {
 		return true;
 	}
 
@@ -142,24 +150,24 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			// todo: iterate over awake simulation islands!
 			for (i = 0; i < objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = objects.get(i);
+				Collidable colObj = objects.get(i);
 				if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_WIREFRAME) != 0) {
 					Vector3f color = new Vector3f();
 					color.set(255f, 255f, 255f);
 					switch (colObj.getActivationState()) {
-						case CollisionObject.ACTIVE_TAG:
+						case Collidable.ACTIVE_TAG:
 							color.set(255f, 255f, 255f);
 							break;
-						case CollisionObject.ISLAND_SLEEPING:
+						case Collidable.ISLAND_SLEEPING:
 							color.set(0f, 255f, 0f);
 							break;
-						case CollisionObject.WANTS_DEACTIVATION:
+						case Collidable.WANTS_DEACTIVATION:
 							color.set(0f, 255f, 255f);
 							break;
-						case CollisionObject.DISABLE_DEACTIVATION:
+						case Collidable.DISABLE_DEACTIVATION:
 							color.set(255f, 0f, 0f);
 							break;
-						case CollisionObject.DISABLE_SIMULATION:
+						case Collidable.DISABLE_SIMULATION:
 							color.set(255f, 255f, 0f);
 							break;
 						default: {
@@ -235,7 +243,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		// todo: iterate over awake simulation islands!
 		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = objects.get(i);
+			Collidable colObj = objects.get(i);
 
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null && body.isActive()) {
@@ -254,7 +262,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		// todo: iterate over awake simulation islands!
 		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = objects.get(i);
+			Collidable colObj = objects.get(i);
 
 			RigidBody body = RigidBody.upcast(colObj);
 
@@ -399,7 +407,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		this.gravity.set(gravity);
 		for (int i = 0; i < objects.size(); i++) {
 			//return array[index];
-			CollisionObject colObj = objects.get(i);
+			Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				body.setGravity(gravity);
@@ -415,7 +423,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 	@Override
 	public void removeRigidBody(RigidBody body) {
-		removeCollisionObject(body);
+		remove(body);
 	}
 
 	@Override
@@ -477,20 +485,20 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 			for (int i = 0; i< objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = objects.get(i);
+				Collidable colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					body.updateDeactivation(timeStep);
 
 					if (body.wantsSleeping()) {
 						if (body.isStaticOrKinematicObject()) {
-							body.setActivationState(CollisionObject.ISLAND_SLEEPING);
+							body.setActivationState(Collidable.ISLAND_SLEEPING);
 						}
 						else {
-							if (body.getActivationState() == CollisionObject.ACTIVE_TAG) {
-								body.setActivationState(CollisionObject.WANTS_DEACTIVATION);
+							if (body.getActivationState() == Collidable.ACTIVE_TAG) {
+								body.setActivationState(Collidable.WANTS_DEACTIVATION);
 							}
-							if (body.getActivationState() == CollisionObject.ISLAND_SLEEPING) {
+							if (body.getActivationState() == Collidable.ISLAND_SLEEPING) {
 								tmp.set(0f, 0f, 0f);
 								body.setAngularVelocity(tmp);
 								body.setLinearVelocity(tmp);
@@ -498,8 +506,8 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 						}
 					}
 					else {
-						if (body.getActivationState() != CollisionObject.DISABLE_DEACTIVATION) {
-							body.setActivationState(CollisionObject.ACTIVE_TAG);
+						if (body.getActivationState() != Collidable.DISABLE_DEACTIVATION) {
+							body.setActivationState(Collidable.ACTIVE_TAG);
 						}
 					}
 				}
@@ -549,8 +557,8 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 	private static int getConstraintIslandId(TypedConstraint lhs) {
 		int islandId;
 
-		CollisionObject rcolObj0 = lhs.getRigidBodyA();
-		CollisionObject rcolObj1 = lhs.getRigidBodyB();
+		Collidable rcolObj0 = lhs.getRigidBodyA();
+		Collidable rcolObj1 = lhs.getRigidBodyB();
 		islandId = rcolObj0.getIslandTag() >= 0 ? rcolObj0.getIslandTag() : rcolObj1.getIslandTag();
 		return islandId;
 	}
@@ -573,7 +581,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 		}
 
 		@Override
-		public void processIsland(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
+		public void processIsland(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId) {
 			if (islandId < 0) {
 				// we don't split islands, so all constraints/contact manifolds/bodies are passed into the solver regardless the island id
 				solver.solveGroup(bodies, numBodies, manifolds, manifolds_offset, numManifolds, sortedConstraints, 0, numConstraints, solverInfo/*,m_stackAlloc*/, dispatcher);
@@ -667,6 +675,8 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
             // Store the island id in each body
             islandManager.storeIslandActivationState(getCollisionWorld());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		finally {
 			BulletStats.popProfile();
@@ -682,7 +692,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			Transform predictedTrans = new Transform();
 			for (int i = 0; i< objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = objects.get(i);
+				Collidable colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					body.setHitFraction(1f);
@@ -738,7 +748,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 			
 			for (int i = 0; i < objects.size(); i++) {
 				//return array[index];
-				CollisionObject colObj = objects.get(i);
+				Collidable colObj = objects.get(i);
 				RigidBody body = RigidBody.upcast(colObj);
 				if (body != null) {
 					if (!body.isStaticOrKinematicObject()) {
@@ -1106,12 +1116,12 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 //	}
 
 	private static class ClosestNotMeConvexResultCallback extends ClosestConvexResultCallback {
-		private final CollisionObject me;
+		private final Collidable me;
 		private float allowedPenetration;
 		private final OverlappingPairCache pairCache;
 		private final Dispatcher dispatcher;
 
-		public ClosestNotMeConvexResultCallback(CollisionObject me, Vector3f fromA, Vector3f toA, OverlappingPairCache pairCache, Dispatcher dispatcher) {
+		public ClosestNotMeConvexResultCallback(Collidable me, Vector3f fromA, Vector3f toA, OverlappingPairCache pairCache, Dispatcher dispatcher) {
 			super(fromA, toA);
 			this.me = me;
 			this.pairCache = pairCache;
@@ -1120,7 +1130,7 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 
 		@Override
 		public float addSingleResult(LocalConvexResult convexResult, boolean normalInWorldSpace) {
-			if (convexResult.hitCollisionObject == me) {
+			if (convexResult.hitCollidable == me) {
 				return 1f;
 			}
 
@@ -1150,13 +1160,13 @@ public class DiscreteDynamicsWorld<X> extends DynamicsWorld<X> {
 				return false;
 			}
 
-			CollisionObject otherObj = (CollisionObject)proxy0.clientObject;
+			Collidable otherObj = (Collidable)proxy0.clientObject;
 
 			// call needsResponse, see http://code.google.com/p/bullet/issues/detail?id=179
 			if (dispatcher.needsResponse(me, otherObj)) {
 				// don't do CCD when there are already contact points (touching contact/penetration)
 				ObjectArrayList<PersistentManifold> manifoldArray = new ObjectArrayList<PersistentManifold>();
-				BroadphasePair collisionPair = pairCache.findPair(me.getBroadphaseHandle(), proxy0);
+				BroadphasePair collisionPair = pairCache.findPair(me.broadphase(), proxy0);
 				if (collisionPair != null) {
 					if (collisionPair.algorithm != null) {
 						//manifoldArray.resize(0);

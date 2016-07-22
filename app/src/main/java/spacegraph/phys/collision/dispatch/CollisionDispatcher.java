@@ -92,7 +92,7 @@ public class CollisionDispatcher extends Dispatcher {
 	}
 
 	@Override
-	public CollisionAlgorithm findAlgorithm(CollisionObject body0, CollisionObject body1, PersistentManifold sharedManifold) {
+	public CollisionAlgorithm findAlgorithm(Collidable body0, Collidable body1, PersistentManifold sharedManifold) {
 		CollisionAlgorithmConstructionInfo ci = tmpCI;
 		ci.dispatcher1 = this;
 		ci.manifold = sharedManifold;
@@ -117,8 +117,8 @@ public class CollisionDispatcher extends Dispatcher {
 
 		//btAssert(gNumManifold < 65535);
 
-		CollisionObject body0 = (CollisionObject)b0;
-		CollisionObject body1 = (CollisionObject)b1;
+		Collidable body0 = (Collidable)b0;
+		Collidable body1 = (Collidable)b1;
 
 		/*
 		void* mem = 0;
@@ -168,7 +168,7 @@ public class CollisionDispatcher extends Dispatcher {
 	}
 
 	@Override
-	public boolean needsCollision(CollisionObject body0, CollisionObject body1) {
+	public boolean needsCollision(Collidable body0, Collidable body1) {
 		assert (body0 != null);
 		assert (body1 != null);
 
@@ -196,7 +196,7 @@ public class CollisionDispatcher extends Dispatcher {
 	}
 
 	@Override
-	public boolean needsResponse(CollisionObject body0, CollisionObject body1) {
+	public boolean needsResponse(Collidable body0, Collidable body1) {
 		//here you can do filtering
 		boolean hasResponse = (body0.hasContactResponse() && body1.hasContactResponse());
 		//no response between two static/kinematic bodies:
@@ -207,15 +207,17 @@ public class CollisionDispatcher extends Dispatcher {
 	private static class CollisionPairCallback extends OverlapCallback {
 		private DispatcherInfo dispatchInfo;
 		private CollisionDispatcher dispatcher;
+		private NearCallback cb;
 
 		public void init(DispatcherInfo dispatchInfo, CollisionDispatcher dispatcher) {
 			this.dispatchInfo = dispatchInfo;
 			this.dispatcher = dispatcher;
+			this.cb = dispatcher.nearCallback;
 		}
 		
 		@Override
         public boolean processOverlap(BroadphasePair pair) {
-			dispatcher.getNearCallback().handleCollision(pair, dispatcher, dispatchInfo);
+			cb.handleCollision(pair, dispatcher, dispatchInfo);
 			return false;
 		}
 	}

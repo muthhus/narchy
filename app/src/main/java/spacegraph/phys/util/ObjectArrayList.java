@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.RandomAccess;
+import java.util.function.Predicate;
 
 /**
  *
@@ -95,7 +97,26 @@ public final class ObjectArrayList<T> extends AbstractList<T> implements RandomA
 		size--;
 		return prev;
     }
-	
+
+	@Override
+	public final boolean removeIf(Predicate<? super T> filter) {
+		int s = size();
+		int ps = s;
+		T[] a = this.array;
+		for (int i = 0; i < s; ) {
+			if (filter.test(a[i])) {
+				s--;
+				System.arraycopy(a, i+1, a, i, s - i);
+				Arrays.fill(a, s, ps,null);
+			} else {
+				i++;
+			}
+		}
+		this.size = s;
+		return ps!=s;
+
+	}
+
 	@SuppressWarnings("unchecked")
 	private void expand() {
 		T[] newArray = (T[])new Object[array.length << 1];

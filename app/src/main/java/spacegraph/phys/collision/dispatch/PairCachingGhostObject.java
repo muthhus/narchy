@@ -40,10 +40,10 @@ public class PairCachingGhostObject extends GhostObject {
 	 */
 	@Override
 	public void addOverlappingObjectInternal(BroadphaseProxy otherProxy, BroadphaseProxy thisProxy) {
-		BroadphaseProxy actualThisProxy = thisProxy != null? thisProxy : getBroadphaseHandle();
+		BroadphaseProxy actualThisProxy = thisProxy != null? thisProxy : broadphase();
 		assert(actualThisProxy != null);
 
-		CollisionObject otherObject = (CollisionObject) otherProxy.clientObject;
+		Collidable otherObject = (Collidable) otherProxy.clientObject;
 		assert (otherObject != null);
 
 		// if this linearSearch becomes too slow (too many overlapping objects) we should add a more appropriate data structure
@@ -56,8 +56,8 @@ public class PairCachingGhostObject extends GhostObject {
 
 	@Override
 	public void removeOverlappingObjectInternal(BroadphaseProxy otherProxy, Dispatcher dispatcher, BroadphaseProxy thisProxy1) {
-		CollisionObject otherObject = (CollisionObject)otherProxy.clientObject;
-		BroadphaseProxy actualThisProxy = thisProxy1 != null? thisProxy1 : getBroadphaseHandle();
+		Collidable otherObject = (Collidable)otherProxy.clientObject;
+		BroadphaseProxy actualThisProxy = thisProxy1 != null? thisProxy1 : broadphase();
 		assert(actualThisProxy != null);
 
 		assert (otherObject != null);

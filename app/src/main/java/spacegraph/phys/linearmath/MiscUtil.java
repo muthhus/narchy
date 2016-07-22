@@ -83,19 +83,39 @@ public class MiscUtil {
 			list.remove(list.size() - 1);
 		}
 	}
-	
+
+	/**
+	 * Resizes list to exact size, filling with new instances of given class type
+	 * when expanding.
+	 */
+	public static <T> void resizeIntArray(ObjectArrayList<int[]> list, int size, int arrayLen) {
+			int ls = list.size();
+			while (ls < size) {
+				list.add(new int[arrayLen]);
+				ls++;
+			}
+
+			while (ls > size) {
+				list.removeQuick(--ls);
+			}
+
+
+	}
+
 	/**
 	 * Resizes list to exact size, filling with new instances of given class type
 	 * when expanding.
 	 */
 	public static <T> void resize(ObjectArrayList<T> list, int size, Class<T> valueCls) {
 		try {
-			while (list.size() < size) {
+			int ls = list.size();
+			while (ls < size) {
 				list.add(valueCls != null? valueCls.newInstance() : null);
+				ls++;
 			}
 
-			while (list.size() > size) {
-				list.removeQuick(list.size() - 1);
+			while (ls > size) {
+				list.removeQuick(--ls);
 			}
 		}
 		catch (IllegalAccessException e) {
@@ -182,7 +202,13 @@ public class MiscUtil {
         list.setQuick(index0, list.get(index1));
 		list.setQuick(index1, temp);
 	}
-	
+
+	private static  void swap(int[][] list, int index0, int index1) {
+		int[] temp = list[index0];
+		list[index0] = list[index1];
+		list[index1] = temp;
+	}
+
 	/**
 	 * Sorts list using quick sort.<p>
 	 */
@@ -224,4 +250,42 @@ public class MiscUtil {
 		}
 	}
 
+	public static void quickSort(int[][] list, int n) {
+		// don't sort 0 or 1 elements
+		if (n > 1) {
+			quickSortInternal(list, 0, n - 1);
+		}
+	}
+
+	 /**         public int compare(int[] o1, int[] o2) { return o1[0] < o2[0] ? -1 : +1;	 }  	*/
+	 private static void quickSortInternal(int[][] list, int lo, int hi) {
+		// lo is the lower index, hi is the upper index
+		// of the region of array a that is to be sorted
+		int i = lo, j = hi;
+		//return array[index];
+		int[] x = list[((lo + hi) / 2)];
+
+		// partition
+		do {
+			//return array[index];
+			while (list[i][0]< x[0]) i++;
+			//return array[index];
+			while (x[0] < list[j][0]) j--;
+
+			if (i <= j) {
+				swap(list, i, j);
+				i++;
+				j--;
+			}
+		}
+		while (i <= j);
+
+		// recursion
+		if (lo < j) {
+			quickSortInternal(list, lo, j);
+		}
+		if (i < hi) {
+			quickSortInternal(list, i, hi);
+		}
+	}
 }

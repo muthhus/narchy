@@ -189,7 +189,9 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 		for (int i=0; i<overlappingPairArray.size(); ) {
 
 			//return array[index];
+
 			BroadphasePair pair = overlappingPairArray.get(i);
+
 			if (callback.processOverlap(pair)) {
 				removeOverlappingPair(pair.pProxy0, pair.pProxy1, dispatcher);
 

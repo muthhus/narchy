@@ -35,7 +35,7 @@ public abstract class CollisionAlgorithmCreateFunc {
 
 	public boolean swapped;
 	
-	public abstract CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1);
+	public abstract CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1);
 	
 	// JAVA NOTE: added
 	public abstract void releaseCollisionAlgorithm(CollisionAlgorithm algo);

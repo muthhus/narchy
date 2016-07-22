@@ -24,7 +24,6 @@
 package spacegraph.phys.linearmath;
 
 import com.jogamp.opengl.math.Quaternion;
-import spacegraph.phys.collision.shapes.UniformScalingShape;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
@@ -62,8 +61,8 @@ public class Transform {
 		return new Transform();
 	}
 
-	//TODO make this a ROTransform (read-only)
-	public static final Transform identity = new Transform().setIdentity();
+//	//TODO make this a ROTransform (read-only)
+//	public static final Transform identity = new Transform().setIdentity();
 
 	public Transform(Matrix3f mat) {
 		basis.set(mat);

@@ -38,7 +38,7 @@ import spacegraph.Spatial;
 import spacegraph.phys.collision.broadphase.BroadphaseInterface;
 import spacegraph.phys.collision.broadphase.SimpleBroadphase;
 import spacegraph.phys.collision.dispatch.CollisionDispatcher;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.dispatch.CollisionWorld;
 import spacegraph.phys.collision.dispatch.DefaultCollisionConfiguration;
 import spacegraph.phys.collision.shapes.CollisionShape;
@@ -150,8 +150,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         dyn = new DiscreteDynamicsWorld<>(dispatcher, overlappingPairCache, constraintSolver, collision_config) {
             @Override
-            protected boolean valid(CollisionObject<X> c) {
-                return JoglPhysics.this.valid(c);
+            protected boolean valid(int nextID, Collidable<X> c) {
+                return JoglPhysics.this.valid(nextID, c);
             }
         };
 
@@ -169,7 +169,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
     /**
      * return false to remove this object during the beginning of the physics frame
      */
-    protected boolean valid(CollisionObject<X> c) {
+    protected boolean valid(int nextID, Collidable<X> c) {
         return true;
     }
 
@@ -273,7 +273,10 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
-            dyn.stepSimulation(Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f);
+            dyn.stepSimulation(
+                    //Math.max(clock.getTimeThenReset(), 1000000f / 60f) / 1000000.f
+                    clock.getTimeThenReset()
+            );
         }
 
         updateCamera();
@@ -708,7 +711,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
             case MouseEvent.BUTTON3: {
                 CollisionWorld.ClosestRayResultCallback c = mousePick(x, y);
                 if (c.hasHit()) {
-                    CollisionObject co = c.collisionObject;
+                    Collidable co = c.collidable;
                     System.out.println("zooming to " + co);
 
                     //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
@@ -785,7 +788,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
             dyn.removeConstraint(pickConstraint);
             pickConstraint = null;
 
-            pickedBody.forceActivationState(CollisionObject.ACTIVE_TAG);
+            pickedBody.forceActivationState(Collidable.ACTIVE_TAG);
             pickedBody.setDeactivationTime(0f);
             pickedBody = null;
         }
@@ -811,10 +814,10 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
         CollisionWorld.ClosestRayResultCallback rayCallback = mousePick(sx, sy);
 
         if (rayCallback.hasHit()) {
-            RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+            RigidBody body = RigidBody.upcast(rayCallback.collidable);
             if (body != null) {
 
-                body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+                body.setActivationState(Collidable.DISABLE_DEACTIVATION);
                 Vector3f pickPos = v(rayCallback.hitPointWorld);
 
                 Transform tmpTrans = body.getCenterOfMassTransform(new Transform());
@@ -875,8 +878,8 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
                 Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
             );*/
 
-            if (mouseTouch.collisionObject != null) {
-                Object t = mouseTouch.collisionObject.getUserPointer();
+            if (mouseTouch.collidable != null) {
+                Object t = mouseTouch.collidable.getUserPointer();
                 if (t instanceof Spatial) {
                     Spatial a = ((Spatial) t);
                     if (a.onTouch(mouseTouch.hitPointWorld, buttons)) {
@@ -1113,7 +1116,7 @@ public class JoglPhysics<X extends Spatial> extends JoglSpace implements MouseLi
 
     };
 
-    public final void render(CollisionObject<X> c) {
+    public final void render(Collidable<X> c) {
         RigidBody<X> body = RigidBody.upcast(c);
         if (body != null) {
             BiConsumer<GL2,RigidBody> r = body.renderer();

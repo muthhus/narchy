@@ -24,7 +24,7 @@
 package spacegraph.phys;
 
 import spacegraph.phys.collision.dispatch.CollisionFlags;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.narrowphase.ManifoldPoint;
 
 /**
@@ -36,6 +36,6 @@ import spacegraph.phys.collision.narrowphase.ManifoldPoint;
  */
 public abstract class ContactAddedCallback {
 
-	public abstract boolean contactAdded(ManifoldPoint cp, CollisionObject colObj0, int partId0, int index0, CollisionObject colObj1, int partId1, int index1);
+	public abstract boolean contactAdded(ManifoldPoint cp, Collidable colObj0, int partId0, int index0, Collidable colObj1, int partId1, int index1);
 	
 }

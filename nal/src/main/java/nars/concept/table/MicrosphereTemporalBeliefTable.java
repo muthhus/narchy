@@ -409,19 +409,19 @@ public class MicrosphereTemporalBeliefTable extends FasterList<Task> implements 
     }
 
 
-    public final boolean removeIf(@NotNull Predicate<? super Task> o) {
-
-        IntArrayList toRemove = new IntArrayList();
-        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
-            Task x = this.get(i);
-            if ((x == null) || (o.test(x)))
-                toRemove.add(i);
-        }
-        if (toRemove.isEmpty())
-            return false;
-        toRemove.forEach(this::remove);
-        return true;
-    }
+//    public final boolean removeIf(@NotNull Predicate<? super Task> o) {
+//
+//        IntArrayList toRemove = new IntArrayList();
+//        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
+//            Task x = this.get(i);
+//            if ((x == null) || (o.test(x)))
+//                toRemove.add(i);
+//        }
+//        if (toRemove.isEmpty())
+//            return false;
+//        toRemove.forEach(this::remove);
+//        return true;
+//    }
 
     //    public Task weakest(Task input, NAR nar) {
 //

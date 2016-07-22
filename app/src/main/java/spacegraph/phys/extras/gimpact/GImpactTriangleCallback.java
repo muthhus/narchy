@@ -27,7 +27,7 @@
 
 package spacegraph.phys.extras.gimpact;
 
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.shapes.TriangleCallback;
 
 import javax.vecmath.Vector3f;
@@ -39,8 +39,8 @@ import javax.vecmath.Vector3f;
 class GImpactTriangleCallback extends TriangleCallback {
 
 	public GImpactCollisionAlgorithm algorithm;
-	public CollisionObject body0;
-	public CollisionObject body1;
+	public Collidable body0;
+	public Collidable body1;
 	public GImpactShapeInterface gimpactshape0;
 	public boolean swapped;
 	public float margin;

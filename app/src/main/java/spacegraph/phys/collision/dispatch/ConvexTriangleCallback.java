@@ -45,8 +45,8 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 	//protected final BulletStack stack = BulletStack.get();
 	
-	private final CollisionObject convexBody;
-	private final CollisionObject triBody;
+	private final Collidable convexBody;
+	private final Collidable triBody;
 
 	private final Vector3f aabbMin = new Vector3f();
 	private final Vector3f aabbMax = new Vector3f();
@@ -60,7 +60,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 	public int triangleCount;
 	public PersistentManifold manifoldPtr;
 	
-	public ConvexTriangleCallback(Dispatcher dispatcher, CollisionObject body0, CollisionObject body1, boolean isSwapped) {
+	public ConvexTriangleCallback(Dispatcher dispatcher, Collidable body0, Collidable body1, boolean isSwapped) {
 		this.dispatcher = dispatcher;
 		this.dispatchInfoPtr = null;
 
@@ -115,7 +115,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 
 		ci.dispatcher1 = dispatcher;
 
-		CollisionObject ob = triBody;
+		Collidable ob = triBody;
 
 //		// debug drawing of the overlapping triangles
 //		if (dispatchInfoPtr != null && dispatchInfoPtr.debugDraw != null && dispatchInfoPtr.debugDraw.getDebugMode() > 0) {

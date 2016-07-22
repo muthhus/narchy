@@ -49,7 +49,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 	public PersistentManifold manifoldPtr;
 	public boolean lowLevelOfDetail;
 	
-	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, SimplexSolverInterface simplexSolver, ConvexPenetrationDepthSolver pdSolver) {
+	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1, SimplexSolverInterface simplexSolver, ConvexPenetrationDepthSolver pdSolver) {
 		super.init(ci);
 		gjkPairDetector.init(null, null, simplexSolver, pdSolver);
 		this.manifoldPtr = mf;
@@ -75,7 +75,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 	 * Convex-Convex collision algorithm.
 	 */
 	@Override
-	public void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public void processCollision(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		if (manifoldPtr == null) {
 			// swapped?
 			manifoldPtr = dispatcher.getNewManifold(body0, body1);
@@ -125,7 +125,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 	private static final boolean disableCcd = false;
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject col0, CollisionObject col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public float calculateTimeOfImpact(Collidable col0, Collidable col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		Vector3f tmp = new Vector3f();
 
 		Transform tmpTrans1 = new Transform();
@@ -246,7 +246,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		}
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			ConvexConvexAlgorithm algo = new ConvexConvexAlgorithm();
 			algo.init(ci.manifold, ci, body0, body1, simplexSolver, pdSolver);
 			return algo;

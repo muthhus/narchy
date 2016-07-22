@@ -25,7 +25,7 @@ package spacegraph.phys.dynamics.character;
 
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.collision.broadphase.BroadphasePair;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.dispatch.CollisionWorld;
 import spacegraph.phys.collision.dispatch.GhostObject;
 import spacegraph.phys.collision.dispatch.PairCachingGhostObject;
@@ -107,7 +107,7 @@ public class KinematicCharacterController extends ActionInterface {
 	protected float velocityTimeInterval;
 	protected int upAxis;
 
-	protected CollisionObject me;
+	protected Collidable me;
 
 	public KinematicCharacterController(PairCachingGhostObject ghostObject, ConvexShape convexShape, float stepHeight) {
 		this(ghostObject, convexShape, stepHeight, 1);
@@ -386,8 +386,8 @@ public class KinematicCharacterController extends ActionInterface {
 			//return array[index];
 			BroadphasePair collisionPair = ghostObject.getOverlappingPairCache().getOverlappingPairArray().get(i);
                         //XXX: added no contact response
-                        if (!((CollisionObject)collisionPair.pProxy0.clientObject).hasContactResponse()
-                                 || !((CollisionObject)collisionPair.pProxy1.clientObject).hasContactResponse())
+                        if (!((Collidable)collisionPair.pProxy0.clientObject).hasContactResponse()
+                                 || !((Collidable)collisionPair.pProxy1.clientObject).hasContactResponse())
                                  continue;
 			if (collisionPair.algorithm != null) {
 				collisionPair.algorithm.getAllContactManifolds(manifoldArray);
@@ -448,8 +448,8 @@ public class KinematicCharacterController extends ActionInterface {
 		Vector3f up = new Vector3f();
 		up.scale(-1f, upAxisDirection[upAxis]);
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, up, 0.7071f);
-        callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
-        callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, world.getDispatchInfo().allowedCcdPenetration);
@@ -544,8 +544,8 @@ public class KinematicCharacterController extends ActionInterface {
 
 			KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, sweepDirNegative, -1.0f);
 
-            callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
-            callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
+            callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
+            callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
 
 			float margin = convexShape.getMargin();
 			convexShape.setMargin(margin + addedMargin);
@@ -631,8 +631,8 @@ public class KinematicCharacterController extends ActionInterface {
 		end.origin.set(targetPosition);
 
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, upAxisDirection[upAxis], maxSlopeCosine);
-        callback.collisionFilterGroup = ghostObject.getBroadphaseHandle().collisionFilterGroup;
-        callback.collisionFilterMask = ghostObject.getBroadphaseHandle().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, collisionWorld.getDispatchInfo().allowedCcdPenetration);
@@ -657,16 +657,16 @@ public class KinematicCharacterController extends ActionInterface {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static class KinematicClosestNotMeRayResultCallback extends CollisionWorld.ClosestRayResultCallback {
-		protected CollisionObject me;
+		protected Collidable me;
 
-		public KinematicClosestNotMeRayResultCallback(CollisionObject me) {
+		public KinematicClosestNotMeRayResultCallback(Collidable me) {
 			super(new Vector3f(), new Vector3f());
 			this.me = me;
 		}
 
 		@Override
 		public float addSingleResult(CollisionWorld.LocalRayResult rayResult, boolean normalInWorldSpace) {
-			if (rayResult.collisionObject == me) {
+			if (rayResult.collidable == me) {
 				return 1.0f;
 			}
 
@@ -677,11 +677,11 @@ public class KinematicCharacterController extends ActionInterface {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static class KinematicClosestNotMeConvexResultCallback extends CollisionWorld.ClosestConvexResultCallback {
-		protected CollisionObject me;
+		protected Collidable me;
 		protected final Vector3f up;
 		protected float minSlopeDot;
 
-		public KinematicClosestNotMeConvexResultCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
+		public KinematicClosestNotMeConvexResultCallback(Collidable me, final Vector3f up, float minSlopeDot) {
 			super(new Vector3f(), new Vector3f());
 			this.me = me;
 			this.up = up;
@@ -691,9 +691,9 @@ public class KinematicCharacterController extends ActionInterface {
 		@Override
 		public float addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
                         //XXX: no contact response
-                        if (!convexResult.hitCollisionObject.hasContactResponse())
+                        if (!convexResult.hitCollidable.hasContactResponse())
                            return 1.0f;
-                        if (convexResult.hitCollisionObject == me) {
+                        if (convexResult.hitCollidable == me) {
 				return 1.0f;
 			}
 			
@@ -703,7 +703,7 @@ public class KinematicCharacterController extends ActionInterface {
 			} else {
 				//need to transform normal into worldspace
 				hitNormalWorld = new Vector3f();
-				convexResult.hitCollisionObject.getWorldTransform(new Transform()).basis.transform(convexResult.hitNormalLocal, hitNormalWorld);
+				convexResult.hitCollidable.getWorldTransform(new Transform()).basis.transform(convexResult.hitNormalLocal, hitNormalWorld);
 			}
 			
 			float dotUp = up.dot(hitNormalWorld);

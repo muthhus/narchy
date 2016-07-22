@@ -44,7 +44,7 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 	private boolean ownManifold;
 	private PersistentManifold manifoldPtr;
 	
-	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, CollisionObject col0, CollisionObject col1) {
+	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, Collidable col0, Collidable col1) {
 		super.init(ci);
 		manifoldPtr = mf;
 
@@ -70,7 +70,7 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public void processCollision(CollisionObject col0, CollisionObject col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public void processCollision(Collidable col0, Collidable col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		if (manifoldPtr == null) {
 			return;
 		}
@@ -131,7 +131,7 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public float calculateTimeOfImpact(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		return 1f;
 	}
 
@@ -146,7 +146,7 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			SphereSphereCollisionAlgorithm algo = new SphereSphereCollisionAlgorithm();
 			algo.init(null, ci, body0, body1);
 			return algo;

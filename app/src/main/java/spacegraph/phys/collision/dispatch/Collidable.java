@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision.dispatch;
 
+import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.collision.broadphase.BroadphaseProxy;
 import spacegraph.phys.collision.shapes.CollisionShape;
 import spacegraph.phys.linearmath.Transform;
@@ -36,7 +37,7 @@ import javax.vecmath.Vector3f;
  * 
  * @author jezek2
  */
-public class CollisionObject<X> {
+public class Collidable<X> {
 
 	//protected final BulletStack stack = BulletStack.get();
 
@@ -87,12 +88,14 @@ public class CollisionObject<X> {
 	protected float ccdMotionThreshold;
 	/// If some object should have elaborate collision filtering by sub-classes
 	protected boolean checkCollideWith;
+	public short collisionFilterMask;
+	public short collisionFilterGroup;
 
-	public CollisionObject() {
+	public Collidable() {
 		this(CollisionObjectType.COLLISION_OBJECT);
 	}
 
-	public CollisionObject(CollisionObjectType type) {
+	public Collidable(CollisionObjectType type) {
 		this.internalType = type;
 		this.collisionFlags = CollisionFlags.STATIC_OBJECT;
 		this.islandTag1 = -1;
@@ -102,11 +105,11 @@ public class CollisionObject<X> {
 		this.hitFraction = 1f;
 	}
 
-	public boolean checkCollideWithOverride(CollisionObject co) {
+	public boolean checkCollideWithOverride(Collidable co) {
 		return true;
 	}
 
-	public boolean mergesSimulationIslands() {
+	public final boolean mergesSimulationIslands() {
 		///static objects, kinematic and object without contact response don't merge islands
 		return ((collisionFlags & (CollisionFlags.STATIC_OBJECT | CollisionFlags.KINEMATIC_OBJECT | CollisionFlags.NO_CONTACT_RESPONSE)) == 0);
 	}
@@ -216,15 +219,19 @@ public class CollisionObject<X> {
 		this.worldTransform.set(worldTransform);
 	}
 
-	public BroadphaseProxy getBroadphaseHandle() {
+	public final BroadphaseProxy broadphase() {
 		return broadphaseHandle;
 	}
 
-	public void setBroadphaseHandle(BroadphaseProxy broadphaseHandle) {
+	public void broadphase(@Nullable BroadphaseProxy broadphaseHandle) {
+		if (broadphaseHandle!=null && this.broadphaseHandle!=null)
+			throw new RuntimeException();
+		if (broadphaseHandle==null && this.broadphaseHandle==null)
+			throw new RuntimeException();
 		this.broadphaseHandle = broadphaseHandle;
 	}
 
-	public Transform getInterpolationWorldTransform(Transform out) {
+	public final Transform getInterpolationWorldTransform(Transform out) {
 		out.set(interpolationWorldTransform);
 		return out;
 	}
@@ -251,7 +258,7 @@ public class CollisionObject<X> {
 		return out;
 	}
 
-	public int getIslandTag() {
+	public final int getIslandTag() {
 		return islandTag1;
 	}
 
@@ -259,7 +266,7 @@ public class CollisionObject<X> {
 		this.islandTag1 = islandTag;
 	}
 
-	public int getCompanionId() {
+	public final int getCompanionId() {
 		return companionId;
 	}
 
@@ -315,7 +322,7 @@ public class CollisionObject<X> {
 		this.userObjectPointer = userObjectPointer;
 	}
 
-	public boolean checkCollideWith(CollisionObject co) {
+	public boolean checkCollideWith(Collidable co) {
 		if (checkCollideWith) {
 			return checkCollideWithOverride(co);
 		}

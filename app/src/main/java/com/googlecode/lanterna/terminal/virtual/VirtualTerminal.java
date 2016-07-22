@@ -25,6 +25,7 @@ import com.googlecode.lanterna.terminal.IOSafeTerminal;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A virtual terminal is a kind of terminal emulator implemented inside of Lanterna that exposes the Terminal interface
@@ -101,7 +102,7 @@ public interface VirtualTerminal extends IOSafeTerminal {
     /**
      * Returns a character from this virtual terminal, relative to the top-left position of the text buffer including
      * any backlog. If you want to get a character from the bottom viewport, please use
-     * {@link #getView(int, int)} instead.
+     * {@link #view(int, int)} instead.
      *
      * @param column Column to get the character from
      * @param row Row, counting from the first line in the backlog, to get the character from
@@ -126,9 +127,11 @@ public interface VirtualTerminal extends IOSafeTerminal {
      * @param row Row in the viewport to get the character form
      * @return Text character at the specific position in the viewport
      */
-    TextCharacter getView(int column, int row);
+    TextCharacter view(int column, int row);
 
-    List<TextCharacter> getViewLine(int row);
+    List<TextCharacter> view(int row);
+
+    void view(int rowStart, int rowEnd, Consumer<List<TextCharacter>> c);
 
     /**
      * Returns the number of lines in the entire text buffer, including any backlog

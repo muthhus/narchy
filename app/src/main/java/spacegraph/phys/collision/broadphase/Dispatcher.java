@@ -23,7 +23,7 @@
 
 package spacegraph.phys.collision.broadphase;
 
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.util.ObjectArrayList;
 
@@ -37,11 +37,11 @@ import spacegraph.phys.util.ObjectArrayList;
  */
 public abstract class Dispatcher {
 
-	public final CollisionAlgorithm findAlgorithm(CollisionObject body0, CollisionObject body1) {
+	public final CollisionAlgorithm findAlgorithm(Collidable body0, Collidable body1) {
 		return findAlgorithm(body0, body1, null);
 	}
 
-	public abstract CollisionAlgorithm findAlgorithm(CollisionObject body0, CollisionObject body1, PersistentManifold sharedManifold);
+	public abstract CollisionAlgorithm findAlgorithm(Collidable body0, Collidable body1, PersistentManifold sharedManifold);
 
 	public abstract PersistentManifold getNewManifold(Object body0, Object body1);
 
@@ -49,9 +49,9 @@ public abstract class Dispatcher {
 
 	public abstract void clearManifold(PersistentManifold manifold);
 
-	public abstract boolean needsCollision(CollisionObject body0, CollisionObject body1);
+	public abstract boolean needsCollision(Collidable body0, Collidable body1);
 
-	public abstract boolean needsResponse(CollisionObject body0, CollisionObject body1);
+	public abstract boolean needsResponse(Collidable body0, Collidable body1);
 
 	public abstract void dispatchAllCollisionPairs(OverlappingPairCache pairCache, DispatcherInfo dispatchInfo, Dispatcher dispatcher);
 

@@ -24,14 +24,14 @@
 package spacegraph.phys.collision.shapes;
 
 import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.linearmath.Transform;
 
 import javax.vecmath.Vector3f;
 
 /**
  * CollisionShape class provides an interface for collision shapes that can be
- * shared among {@link CollisionObject}s.
+ * shared among {@link Collidable}s.
  * 
  * @author jezek2
  */
@@ -51,7 +51,7 @@ public abstract class CollisionShape {
 	public float getBoundingSphere(Vector3f center) {
 
 		Vector3f aabbMin = new Vector3f(), aabbMax = new Vector3f();
-		getAabb(Transform.identity, aabbMin, aabbMax);
+		getAabb(new Transform().setIdentity(), aabbMin, aabbMax);
 
 		Vector3f tmp = new Vector3f();
 		tmp.sub(aabbMax, aabbMin);

@@ -44,13 +44,13 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	private final ObjectArrayList<CollisionAlgorithm> childCollisionAlgorithms = new ObjectArrayList<CollisionAlgorithm>();
 	private boolean isSwapped;
 	
-	public void init(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, boolean isSwapped) {
+	public void init(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1, boolean isSwapped) {
 		super.init(ci);
 
 		this.isSwapped = isSwapped;
 
-		CollisionObject colObj = isSwapped ? body1 : body0;
-		CollisionObject otherObj = isSwapped ? body0 : body1;
+		Collidable colObj = isSwapped ? body1 : body0;
+		Collidable otherObj = isSwapped ? body0 : body1;
 		assert (colObj.shape().isCompound());
 
 		CompoundShape compoundShape = (CompoundShape) colObj.shape();
@@ -79,9 +79,9 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
-		CollisionObject colObj = isSwapped ? body1 : body0;
-		CollisionObject otherObj = isSwapped ? body0 : body1;
+	public void processCollision(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+		Collidable colObj = isSwapped ? body1 : body0;
+		Collidable otherObj = isSwapped ? body0 : body1;
 
 		assert (colObj.shape().isCompound());
 		CompoundShape compoundShape = (CompoundShape) colObj.shape();
@@ -127,9 +127,9 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
-		CollisionObject colObj = isSwapped ? body1 : body0;
-		CollisionObject otherObj = isSwapped ? body0 : body1;
+	public float calculateTimeOfImpact(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+		Collidable colObj = isSwapped ? body1 : body0;
+		Collidable otherObj = isSwapped ? body0 : body1;
 
 		assert (colObj.shape().isCompound());
 
@@ -189,7 +189,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			CompoundCollisionAlgorithm algo = new CompoundCollisionAlgorithm();
 			algo.init(ci, body0, body1, false);
 			return algo;
@@ -204,7 +204,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			CompoundCollisionAlgorithm algo = new CompoundCollisionAlgorithm();
 			algo.init(ci, body0, body1, true);
 			return algo;

@@ -72,10 +72,9 @@ public class RagDoll extends Spatial {
     }
 
 
-    @Override
-    public RigidBody newBody(SpaceGraph graphSpace) {
-        return newRagDoll(graphSpace.dyn, v(), 10f);
-    }
+//    public RigidBody newBody(SpaceGraph graphSpace) {
+//        return newRagDoll(graphSpace.dyn, v(), 10f);
+//    }
 
     public static void spawnGround(JoglPhysics d) {
         // Setup a big ground box
@@ -455,12 +454,7 @@ public class RagDoll extends Spatial {
         for (i = 0; i < BodyPart.BODYPART_COUNT.ordinal(); ++i) {
             w.removeRigidBody(bodies[i]);
 
-            //bodies[i].getMotionState().destroy();
-
-            bodies[i].destroy();
             bodies[i] = null;
-
-            //shapes[i].destroy();
             shapes[i] = null;
         }
     }

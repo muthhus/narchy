@@ -20,11 +20,10 @@ package com.googlecode.lanterna.terminal.virtual;
 
 import com.googlecode.lanterna.TextCharacter;
 import nars.$;
-import nars.util.data.list.CircularArrayList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Consumer;
 
 /**
  * This class is used to store lines of text inside of a terminal emulator. As used by {@link DefaultVirtualTerminal}, it keeps
@@ -40,13 +39,13 @@ class TextBuffer {
     TextBuffer(int maxLineWidth) {
         this.lines =
                 //new ArrayDeque();
-                Collections.synchronizedList( new LinkedList<>() );
+                new LinkedList<>();
         this.maxLineWidth = maxLineWidth;
         newLine();
     }
 
     void newLine() {
-        synchronized(lines) {
+        synchronized (lines) {
             lines.add($.newArrayList(maxLineWidth));
         }
     }
@@ -54,10 +53,13 @@ class TextBuffer {
     void removeTopLines(int numberOfLinesToRemove) {
         synchronized (lines) {
             int n = Math.min(lines.size(), numberOfLinesToRemove);
-            Iterator<List<TextCharacter>> x = lines.iterator();
-            while (x.hasNext() && ((n--) > 0)) {
-                x.next();
-                x.remove();
+            if (n > 0) {
+
+                Iterator<List<TextCharacter>> x = lines.iterator();
+                while (x.hasNext() && ((n--) > 0)) {
+                    x.next();
+                    x.remove();
+                }
             }
         }
 //        for(int i = 0; i < numberOfLinesToRemove; i++) {
@@ -66,15 +68,12 @@ class TextBuffer {
     }
 
     void clear() {
-        synchronized(lines) {
+        synchronized (lines) {
             lines.clear();
         }
         newLine();
     }
 
-    ListIterator<List<TextCharacter>> getLinesFrom(int rowNumber) {
-        return lines.listIterator(rowNumber);
-    }
 
     @NotNull
     public List<TextCharacter> getLine(int l) {
@@ -91,11 +90,11 @@ class TextBuffer {
     }
 
     int set(int lineNumber, int columnIndex, TextCharacter textCharacter) {
-        if(lineNumber < 0 || columnIndex < 0) {
+        if (lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.setCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);
         }
-        if(textCharacter == null) {
+        if (textCharacter == null) {
             textCharacter = TextCharacter.DEFAULT_CHARACTER;
         }
 
@@ -104,30 +103,31 @@ class TextBuffer {
             int s = lines.size();
             while (lineNumber >= s) {
                 newLine();
+                s++;
             }
             line = lines.get(lineNumber);
-            while (line.size() <= columnIndex) {
-                line.add(TextCharacter.DEFAULT_CHARACTER);
-            }
-
-
         }
+
+        while (line.size() <= columnIndex) {
+            line.add(TextCharacter.DEFAULT_CHARACTER);
+        }
+
+
         // Default
         int returnStyle = 0;
 
         // Check if we are overwriting a double-width character, in that case we need to reset the other half
         TextCharacter lc = line.get(columnIndex);
-        if(lc.isDoubleWidth()) {
+        if (lc.isDoubleWidth()) {
             line.set(columnIndex + 1, lc.withCharacter(' '));
             returnStyle = 1; // this character and the one to the right
-        }
-        else if(lc == DOUBLE_WIDTH_CHAR_PADDING) {
+        } else if (lc == DOUBLE_WIDTH_CHAR_PADDING) {
             line.set(columnIndex - 1, TextCharacter.DEFAULT_CHARACTER);
             returnStyle = 2; // this character and the one to the left
         }
         line.set(columnIndex, textCharacter);
 
-        if(textCharacter.isDoubleWidth()) {
+        if (textCharacter.isDoubleWidth()) {
             // We don't report this column as dirty (yet), it's implied since a double-width character is reported
             set(lineNumber, columnIndex + 1, DOUBLE_WIDTH_CHAR_PADDING);
         }
@@ -135,23 +135,67 @@ class TextBuffer {
     }
 
     TextCharacter get(int lineNumber, int columnIndex) {
-        if(lineNumber < 0 || columnIndex < 0) {
+        if (lineNumber < 0 || columnIndex < 0) {
             throw new IllegalArgumentException("Illegal argument to TextBuffer.getCharacter(..), lineNumber = " +
                     lineNumber + ", columnIndex = " + columnIndex);
         }
-        if(lineNumber >= lines.size()) {
-            return TextCharacter.DEFAULT_CHARACTER;
+
+        List<TextCharacter> line;
+        synchronized (lines) {
+            if (lineNumber >= lines.size()) {
+                return TextCharacter.DEFAULT_CHARACTER;
+            }
+
+            line = getLine(lineNumber);
         }
 
-        List<TextCharacter> line = getLine(lineNumber);
-
-        if(line.size() <= columnIndex) {
+        if (line.size() <= columnIndex) {
             return TextCharacter.DEFAULT_CHARACTER;
         }
         TextCharacter textCharacter = line.get(columnIndex);
-        if(textCharacter == DOUBLE_WIDTH_CHAR_PADDING) {
+        if (textCharacter == DOUBLE_WIDTH_CHAR_PADDING) {
             return line.get(columnIndex - 1);
         }
         return textCharacter;
     }
+
+    final static VirtualTerminal.BufferLine emptyLine = new VirtualTerminal.BufferLine() {
+        @Override
+        public TextCharacter getCharacterAt(int column) {
+            return TextCharacter.DEFAULT_CHARACTER;
+        }
+    };
+
+    @Deprecated public void forEachLine(int startRow, int endRow, VirtualTerminal.BufferWalker bufferWalker) {
+
+        synchronized (lines) {
+            ListIterator<List<TextCharacter>> iterator = lines.listIterator(startRow);
+            for (int row = startRow; row <= endRow; row++) {
+                VirtualTerminal.BufferLine bufferLine = emptyLine;
+                if (iterator.hasNext()) {
+                    final List<TextCharacter> list = iterator.next();
+                    bufferLine = column -> {
+                        if (column >= list.size()) {
+                            return TextCharacter.DEFAULT_CHARACTER;
+                        }
+                        return list.get(column);
+                    };
+                }
+                bufferWalker.onLine(row, bufferLine);
+            }
+        }
+
+    }
+    public void forEachLine(int startRow, int endRow, Consumer<List<TextCharacter>> each) {
+
+        synchronized (lines) {
+            ListIterator<List<TextCharacter>> iterator = lines.listIterator(startRow);
+            for (int row = startRow; iterator.hasNext() && row <= endRow; row++) {
+                final List<TextCharacter> list = iterator.next();
+                each.accept(list);
+            }
+        }
+
+    }
+
 }

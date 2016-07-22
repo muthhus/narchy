@@ -43,8 +43,8 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 	// we need this for compounds
 	private final Transform rootTransA = new Transform();
 	private final Transform rootTransB = new Transform();
-	private CollisionObject body0;
-	private CollisionObject body1;
+	private Collidable body0;
+	private Collidable body1;
 	private int partId0;
 	private int partId1;
 	private int index0;
@@ -53,11 +53,11 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 	public ManifoldResult() {
 	}
 
-	public ManifoldResult(CollisionObject body0, CollisionObject body1) {
+	public ManifoldResult(Collidable body0, Collidable body1) {
 		init(body0, body1);
 	}
 
-	public void init(CollisionObject body0, CollisionObject body1) {
+	public void init(Collidable body0, Collidable body1) {
 		this.body0 = body0;
 		this.body1 = body1;
 		body0.getWorldTransform(this.rootTransA);
@@ -138,15 +138,15 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 				((body0.getCollisionFlags() & CollisionFlags.CUSTOM_MATERIAL_CALLBACK) != 0 ||
 				(body1.getCollisionFlags() & CollisionFlags.CUSTOM_MATERIAL_CALLBACK) != 0)) {
 			//experimental feature info, for per-triangle material etc.
-			CollisionObject obj0 = isSwapped ? body1 : body0;
-			CollisionObject obj1 = isSwapped ? body0 : body1;
+			Collidable obj0 = isSwapped ? body1 : body0;
+			Collidable obj1 = isSwapped ? body0 : body1;
 			BulletGlobals.getContactAddedCallback().contactAdded(manifoldPtr.getContactPoint(insertIndex), obj0, partId0, index0, obj1, partId1, index1);
 		}
 
 	}
 
 	///User can override this material combiner by implementing gContactAddedCallback and setting body0->m_collisionFlags |= btCollisionObject::customMaterialCallback;
-	private static float calculateCombinedFriction(CollisionObject body0, CollisionObject body1) {
+	private static float calculateCombinedFriction(Collidable body0, Collidable body1) {
 		float friction = body0.getFriction() * body1.getFriction();
 
 		float MAX_FRICTION = 10f;
@@ -159,7 +159,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		return friction;
 	}
 
-	private static float calculateCombinedRestitution(CollisionObject body0, CollisionObject body1) {
+	private static float calculateCombinedRestitution(Collidable body0, Collidable body1) {
 		return body0.getRestitution() * body1.getRestitution();
 	}
 

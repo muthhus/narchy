@@ -43,7 +43,7 @@ public class SolverBody {
 	public float angularFactor;
 	public float invMass;
 	public float friction;
-	public RigidBody originalBody;
+	public RigidBody body;
 	public final Vector3f linearVelocity = new Vector3f();
 	public final Vector3f centerOfMassPosition = new Vector3f();
 
@@ -75,22 +75,22 @@ public class SolverBody {
 	
 	public void writebackVelocity() {
 		if (invMass != 0f) {
-			originalBody.setLinearVelocity(linearVelocity);
-			originalBody.setAngularVelocity(angularVelocity);
+			body.setLinearVelocity(linearVelocity);
+			body.setAngularVelocity(angularVelocity);
 			//m_originalBody->setCompanionId(-1);
 		}
 	}
 
 	public void writebackVelocity(float timeStep) {
 		if (invMass != 0f) {
-			originalBody.setLinearVelocity(linearVelocity);
-			originalBody.setAngularVelocity(angularVelocity);
+			body.setLinearVelocity(linearVelocity);
+			body.setAngularVelocity(angularVelocity);
 
 			// correct the position/orientation based on push/turn recovery
 			Transform newTransform = new Transform();
-			Transform curTrans = originalBody.getWorldTransform(new Transform());
+			Transform curTrans = body.getWorldTransform(new Transform());
 			TransformUtil.integrateTransform(curTrans, pushVelocity, turnVelocity, timeStep, newTransform);
-			originalBody.setWorldTransform(newTransform);
+			body.setWorldTransform(newTransform);
 
 			//m_originalBody->setCompanionId(-1);
 		}
@@ -98,8 +98,8 @@ public class SolverBody {
 	
 	public void readVelocity() {
 		if (invMass != 0f) {
-			originalBody.getLinearVelocity(linearVelocity);
-			originalBody.getAngularVelocity(angularVelocity);
+			body.getLinearVelocity(linearVelocity);
+			body.getAngularVelocity(angularVelocity);
 		}
 	}
 	

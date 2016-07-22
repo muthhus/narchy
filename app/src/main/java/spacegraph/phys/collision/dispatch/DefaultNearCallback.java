@@ -38,8 +38,8 @@ public class DefaultNearCallback extends NearCallback {
 
 	@Override
 	public void handleCollision(BroadphasePair collisionPair, CollisionDispatcher dispatcher, DispatcherInfo dispatchInfo) {
-		CollisionObject colObj0 = (CollisionObject) collisionPair.pProxy0.clientObject;
-		CollisionObject colObj1 = (CollisionObject) collisionPair.pProxy1.clientObject;
+		Collidable colObj0 = (Collidable) collisionPair.pProxy0.clientObject;
+		Collidable colObj1 = (Collidable) collisionPair.pProxy1.clientObject;
 
 		if (dispatcher.needsCollision(colObj0, colObj1)) {
 			// dispatcher will keep algorithms persistent in the collision pair

@@ -33,7 +33,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     public RigidBody body;
 
     /** cached center reference */
-    transient private final Vector3f center; //references a field in MotionState's transform
+    public transient final Vector3f center; //references a field in MotionState's transform
 
     /** physics motion state */
     public final Motion motion = new Motion();
@@ -53,10 +53,17 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 
     /**
      * the draw order if being drawn
+     * order = -2: inactive
+     * order = -1: active but unsequenced
+     * order > =0: live
      */
     transient public short order;
 
 
+//    //TODO
+//    public boolean physical() {
+//        return true;
+//    }
 
 
 
@@ -117,21 +124,29 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     @Deprecated public transient int numEdges = 0;
 
 
+    public void start(SpaceGraph s) {
+        if (body == null) {
+            RigidBody b = body = newBody(s, newShape(), collidable());
+            b.setUserPointer(this);
+            b.setRenderer(this);
+        }
+    }
 
     public void clearEdges() {
         this.numEdges = 0;
     }
 
     public boolean active() {
-        return order >= 0;
+        return order >= -1;
     }
 
-    public final void activate(short order) {
-        this.order = order;
+    public final void preactivate() {
+        this.order = -1;
+        reactivate();
     }
 
     public final void inactivate() {
-        order = -1;
+        order = -2;
     }
 
     public void move(float x, float y, float z, float rate) {
@@ -153,8 +168,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 //                    t.origin.set(x, y, z);
 //                    body.setCenterOfMassTransform(t);
 
-                if (!b.isActive())
-                    b.activate(true);
+                reactivate();
             } else {
                 motion.t.origin.set(x, y, z);
             }
@@ -164,6 +178,12 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
 //            p[0] = x;
 //            p[1] = y;
 //            p[2] = z;
+    }
+
+    public void reactivate() {
+        RigidBody b = body;
+        if (b !=null && !b.isActive())
+            b.activate(collidable());
     }
 
     public int edgeCount() {
@@ -184,27 +204,29 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
     }
 
     public void scale(float sx, float sy, float sz) {
-        if (body!=null)
-            this.body.shape().setLocalScaling(Vector3f.v(sx, sy, sz));
-        this.radius = Math.max(Math.max(sx, sy), sz);
+
+        if (body!=null) {
+            ((BoxShape) this.body.shape()).size(sx, sy, sz);
+            this.radius = Math.max(sx, Math.max(sy, sz));
+        } else {
+            this.radius = 0;
+        }
+
     }
 
     public void motionLock(boolean b) {
         motionLock = b;
     }
 
-    public void update(SpaceGraph graphSpace) {
+    /** called on registration into the physics engine list of objects */
+    public void activate(short order) {
 
-        if (active()) {
+        this.order = order;
 
-            if (body == null) {
-                RigidBody b = body = newBody(graphSpace, newShape(), false);
-                b.setUserPointer(this);
-                b.setRenderer(this);
-            }
+    }
 
-        }
-
+    public boolean collidable() {
+        return true;
     }
 
     /** returns true if the event has been absorbed, false if it should continue propagating */
@@ -223,10 +245,7 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         return new BoxShape(Vector3f.v(1, 1, 1));
     }
 
-    public RigidBody newBody(SpaceGraph graphSpace) {
-        final boolean collidesWithOthersLikeThis = false;
-        return newBody(graphSpace, newShape(), collidesWithOthersLikeThis);
-    }
+
 
     public RigidBody newBody(SpaceGraph graphSpace, CollisionShape shape, boolean collidesWithOthersLikeThis) {
         RigidBody b;
@@ -236,6 +255,9 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
                 +1, //group
                 collidesWithOthersLikeThis ? -1 : -1 & ~(+1) //exclude collisions with self
         );
+
+        //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
+
 
         b.setDamping(0.99f, 0.5f);
         b.setFriction(0.9f);
@@ -391,4 +413,8 @@ public class Spatial<O> implements BiConsumer<GL2, RigidBody> {
         gl.glEnd();
     }
 
+    public <O> void stop(SpaceGraph s) {
+        inactivate();
+        body = null;
+    }
 }

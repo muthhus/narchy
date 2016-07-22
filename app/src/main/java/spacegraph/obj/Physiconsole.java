@@ -88,7 +88,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
 
         float marginY = 0.5f;
 
-        for (Spatial v : visible) {
+        for (Spatial v : active) {
             RigidBody body = v.body;
             if (body == null)
                 continue;
@@ -227,13 +227,13 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         n.onTask(t -> {
             p.append(t.toString());
         });
-        n.loop(5f);
 
 
         s.add(new Facial(new ConsoleSurface(edit)).scale(500f, 400f));
         s.add(new Facial(new CrosshairSurface(s)));
 
 
+        n.loop(5f);
         s.show(1200, 800);
 
 
@@ -246,7 +246,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
     }
 
     @Override
-    public float now() {
+    public long now() {
         return 0;
     }
 
@@ -258,7 +258,7 @@ public class Physiconsole extends ListInput<Object, Spatial<Object>> implements 
         float sx = s.length() / cAspect;
         float sy = 1f;
 
-        ConceptWidget w = new ConceptWidget($.the(s), 0) {
+        ConceptWidget w = new ConceptWidget($.quote(s), 0) {
             protected CollisionShape newShape() {
 
                 return new BoxShape(v(sx, sy, 0.1f));

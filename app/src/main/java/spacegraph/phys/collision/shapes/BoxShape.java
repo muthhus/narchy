@@ -24,7 +24,7 @@
 package spacegraph.phys.collision.shapes;
 
 import spacegraph.phys.collision.broadphase.BroadphaseNativeType;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.phys.linearmath.AabbUtil2;
 import spacegraph.phys.linearmath.ScalarUtil;
@@ -37,19 +37,25 @@ import javax.vecmath.Vector4f;
 /**
  * BoxShape is a box primitive around the origin, its sides axis aligned with length
  * specified by half extents, in local shape coordinates. When used as part of a
- * {@link CollisionObject} or {@link RigidBody} it will be an oriented box in world space.
+ * {@link Collidable} or {@link RigidBody} it will be an oriented box in world space.
  *
  * @author jezek2
  */
 public class BoxShape extends PolyhedralConvexShape {
 
 	public BoxShape(Vector3f boxHalfExtents) {
+		super();
 
-		VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
+		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
+		implicitShapeDimensions.set(boxHalfExtents); //localscaling is by default 1,1,1 anyway
 
 		float m = getMargin();
 
 		implicitShapeDimensions.add(-m, -m, -m);
+	}
+
+	public void size(float x, float y, float z) {
+		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
 	}
 
 	public Vector3f getHalfExtentsWithMargin(Vector3f out) {
@@ -147,19 +153,24 @@ public class BoxShape extends PolyhedralConvexShape {
 
 	@Override
 	public void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax) {
-		AabbUtil2.transformAabb(getHalfExtentsWithoutMargin(new Vector3f()), getMargin(), t, aabbMin, aabbMax);
+		AabbUtil2.transformAabb(getHalfExtentsWithoutMargin(), getMargin(), t, aabbMin, aabbMax);
+	}
+
+	public final Vector3f getHalfExtentsWithoutMargin() {
+		return getHalfExtentsWithoutMargin(new Vector3f());
 	}
 
 	@Override
 	public void calculateLocalInertia(float mass, Vector3f inertia) {
-		//btScalar margin = btScalar(0.);
+
 		Vector3f halfExtents = getHalfExtentsWithMargin(new Vector3f());
 
 		float lx = 2f * halfExtents.x;
 		float ly = 2f * halfExtents.y;
 		float lz = 2f * halfExtents.z;
 
-		inertia.set(mass / 12f * (ly * ly + lz * lz),
+		inertia.set(
+				mass / 12f * (ly * ly + lz * lz),
 				mass / 12f * (lx * lx + lz * lz),
 				mass / 12f * (lx * lx + ly * ly));
 	}
@@ -168,9 +179,10 @@ public class BoxShape extends PolyhedralConvexShape {
 	public void getPlane(Vector3f planeNormal, Vector3f planeSupport, int i) {
 		// this plane might not be aligned...
 		Vector4f plane = new Vector4f();
-		getPlaneEquation(plane, i);
-		planeNormal.set(plane.x, plane.y, plane.z);
 		Vector3f tmp = new Vector3f();
+		getPlaneEquation(plane, i, tmp);
+		planeNormal.set(plane.x, plane.y, plane.z);
+
 		tmp.negate(planeNormal);
 		localGetSupportingVertex(tmp, planeSupport);
 	}
@@ -199,8 +211,8 @@ public class BoxShape extends PolyhedralConvexShape {
 				halfExtents.z * (1 - ((i & 4) >> 2)) - halfExtents.z * ((i & 4) >> 2));
 	}
 	
-	public void getPlaneEquation(Vector4f plane, int i) {
-		Vector3f halfExtents = getHalfExtentsWithoutMargin(new Vector3f());
+	public void getPlaneEquation(Vector4f plane, int i, Vector3f tmp) {
+		Vector3f halfExtents = getHalfExtentsWithoutMargin(tmp);
 
 		switch (i) {
 			case 0:
@@ -291,20 +303,29 @@ public class BoxShape extends PolyhedralConvexShape {
 	}
 
 	@Override
-	public boolean isInside(Vector3f pt, float tolerance) {
-		Vector3f halfExtents = getHalfExtentsWithoutMargin(new Vector3f());
+	public final boolean isInside(Vector3f pt, float tolerance) {
+		Vector3f halfExtents = getHalfExtentsWithoutMargin();
 
-		//btScalar minDist = 2*tolerance;
-
-		boolean result =
-				(pt.x <= (halfExtents.x + tolerance)) &&
-				(pt.x >= (-halfExtents.x - tolerance)) &&
-				(pt.y <= (halfExtents.y + tolerance)) &&
-				(pt.y >= (-halfExtents.y - tolerance)) &&
-				(pt.z <= (halfExtents.z + tolerance)) &&
-				(pt.z >= (-halfExtents.z - tolerance));
-
-		return result;
+		float px = pt.x;
+		float hx = halfExtents.x;
+		if (px <= (hx + tolerance)) {
+			if (px >= (-hx - tolerance)) {
+				float py = pt.y;
+				float hy = halfExtents.y;
+				if (py <= (hy + tolerance)) {
+					if (py >= (-hy - tolerance)) {
+						float pz = pt.z;
+						float hz = halfExtents.z;
+						if (pz <= (hz + tolerance)) {
+							if (pz >= (-hz - tolerance)) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override

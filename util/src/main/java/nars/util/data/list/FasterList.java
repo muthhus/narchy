@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 
 /**
  * Less-safe faster FastList with direct array access
@@ -112,6 +113,24 @@ public class FasterList<X> extends FastList<X> {
 //        }
 //        return array;
 //    }
+
+    @Override
+    public final boolean removeIf(Predicate<? super X> filter) {
+        int s = size();
+        int ps = s;
+        X[] a = this.items;
+        for (int i = 0; i < s; ) {
+            if (filter.test(a[i])) {
+                s--;
+                System.arraycopy(a, i+1, a, i, s - i);
+                Arrays.fill(a, s, ps,null);
+            } else {
+                i++;
+            }
+        }
+        this.size = s;
+        return ps!=s;
+    }
 
     public X[] toArray(IntFunction<X[]> arrayBuilder) {
 //HACK broken return the internal array if of the necessary size, otherwise returns a new array of precise size

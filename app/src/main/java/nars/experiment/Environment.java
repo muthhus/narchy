@@ -2,6 +2,7 @@ package nars.experiment;
 
 import com.gs.collections.api.tuple.Twin;
 import nars.learn.Agent;
+import nars.util.Util;
 
 import java.util.Arrays;
 
@@ -13,6 +14,10 @@ public interface Environment {
     Twin<Integer> start();
 
     default float run(Agent a, int cycles) {
+        return run(a, cycles, 0);
+    }
+
+    default float run(Agent a, int cycles, long periodMS) {
 
         Twin<Integer> x = start();
 
@@ -33,6 +38,9 @@ public interface Environment {
             rewardSum += reward;
 
             post(t, a.act(reward, ins), ins, a);
+
+            if (periodMS > 0)
+                Util.pause(periodMS);
         }
 
         float scoreAvg = rewardSum/cycles;

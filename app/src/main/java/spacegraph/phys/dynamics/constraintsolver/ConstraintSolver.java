@@ -24,7 +24,7 @@
 package spacegraph.phys.dynamics.constraintsolver;
 
 import spacegraph.phys.collision.broadphase.Dispatcher;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.util.ObjectArrayList;
 
@@ -42,7 +42,7 @@ public abstract class ConstraintSolver {
 	/**
 	 * Solve a group of constraints.
 	 */
-	public abstract float solveGroup(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Dispatcher dispatcher);
+	public abstract float solveGroup(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifold, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo info/*, btStackAlloc* stackAlloc*/, Dispatcher dispatcher);
 
 	public void allSolved(ContactSolverInfo info /*, btStackAlloc* stackAlloc*/) {}
 

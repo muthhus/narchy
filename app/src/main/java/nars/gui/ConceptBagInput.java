@@ -5,18 +5,13 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.link.BLink;
 import nars.nar.Default;
-import nars.op.ArithmeticInduction;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.experiment.DeductiveMeshTest;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.EDraw;
-import spacegraph.SpaceGraph;
-import spacegraph.SpaceInput;
-import spacegraph.Spatial;
-import spacegraph.layout.FastOrganicLayout;
-import spacegraph.layout.Spiral;
+import spacegraph.*;
+import spacegraph.layout.Flatten;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,11 +19,11 @@ import java.util.function.Predicate;
 /**
  * Created by me on 6/26/16.
  */
-public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implements ConceptMaterializer {
+public class ConceptBagInput extends ListInput<Term, ConceptWidget> implements ConceptMaterializer {
 
     public static void main(String[] args) {
 
-        Default n = new Default(128, 4, 2, 2);
+        Default n = new Default(64, 4, 2, 2);
         n.conceptActivation.setValue(0.5f);
         //n.nal(4);
 
@@ -36,14 +31,15 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
         new DeductiveMeshTest(n, new int[]{6,5}, 16384);
         //new ArithmeticInduction(n);
 
-        final int maxNodes = 512;
-        final int maxEdges = 32;
+        final int maxNodes = 1;
+        final int maxEdges = 2;
 
-        new SpaceGraph<Termed>(
+        new SpaceGraph<Term>(
                 new ConceptBagInput(n, maxNodes, maxEdges)
         ).with(
+                new Flatten()
                 //new Spiral()
-                new FastOrganicLayout()
+                //new FastOrganicLayout()
         ).show(1300, 900);
 
         n.loop(30f);
@@ -72,17 +68,17 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
     }
 
 
-    public final int numEdgesFor(Termed x) {
+    public final int numEdgesFor(Term x) {
         return edgeCapacity;
     }
 
     @Override
-    final public ConceptWidget apply(Termed x) {
+    final public ConceptWidget apply(Term x) {
         return new ConceptWidget(x, numEdgesFor(x));
     }
 
     @Override
-    public float now() {
+    public long now() {
         return nar.time();
     }
 
@@ -110,23 +106,24 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
 
 
     protected void update(float now, ConceptWidget v) {
-        Termed tt = v.key;
+        Term tt = v.key;
 
         //Budget b = v.instance;
 
         float p = v.pri;// = 1; //v.pri = v.key.priIfFiniteElseZero();
 
-        float nodeScale = 0.25f + p * 1f;//1f + 2f * p;
+        float nodeScale = 0.5f + p * 2f;//1f + 2f * p;
         //nodeScale /= Math.sqrt(tt.volume());
         v.scale(nodeScale, nodeScale, nodeScale * 1.5f);
 
 
-
-        if (tt instanceof Concept) {
-            updateConcept(v, (Concept) tt, now);
+        Concept c = nar.concept(tt);
+        if (c == null) {
+            updateConcept(v, c, now);
         } else {
-            throw new UnsupportedOperationException();
+            //remove? hide?
         }
+
     }
 
     private void updateConcept(ConceptWidget v, Concept cc, float now) {
@@ -232,10 +229,9 @@ public class ConceptBagInput extends SpaceInput<Termed, ConceptWidget> implement
             return true;
         }
 
-        int nextID = this.visible.size();
-        ConceptWidget w = (ConceptWidget) space.update(nextID, this, b.get());
+        ConceptWidget w = (ConceptWidget) space.update(this, b.get().term());
         w.pri = pri;
-        return this.visible.add(w);
+        return this.active.add(w);
     }
 
 

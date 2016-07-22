@@ -68,9 +68,13 @@ public class BroadphasePair {
 			BroadphaseProxy b0 = b.pProxy0;
 			BroadphaseProxy a1 = a.pProxy1;
 			BroadphaseProxy b1 = b.pProxy1;
-			boolean result = a0.uid > b0.uid ||
-					(a0.uid == b0.uid && a1.uid > b1.uid) ||
-					(a0.uid == b0.uid && a1.uid == b1.uid /*&& a.algorithm > b.m_algorithm*/);
+			int a0uid = a0.uid;
+			int b0uid = b0.uid;
+			int a1uid = a1.uid;
+			int b1uid = b1.uid;
+			boolean result = a0uid > b0uid ||
+					(a0uid == b0uid && a1uid > b1uid) ||
+					(a0uid == b0uid && a1uid == b1uid /*&& a.algorithm > b.m_algorithm*/);
 			return result? -1 : 1;
 		}
 	};

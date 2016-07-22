@@ -24,7 +24,7 @@
 package spacegraph.phys.collision.broadphase;
 
 import spacegraph.phys.collision.dispatch.CollisionAlgorithmCreateFunc;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.dispatch.ManifoldResult;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.util.ObjectArrayList;
@@ -53,9 +53,9 @@ public abstract class CollisionAlgorithm {
 
 	public abstract void destroy();
 
-	public abstract void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut);
+	public abstract void processCollision(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut);
 
-	public abstract float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut);
+	public abstract float calculateTimeOfImpact(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut);
 	
 	public abstract void getAllContactManifolds(ObjectArrayList<PersistentManifold> manifoldArray);
 	

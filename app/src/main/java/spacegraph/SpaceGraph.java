@@ -8,7 +8,8 @@ import nars.$;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
+import spacegraph.phys.dynamics.RigidBody;
 import spacegraph.render.JoglPhysics;
 
 import javax.vecmath.Vector3f;
@@ -88,14 +89,14 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
         }
     }
 
-    public @NotNull Spatial update(int order, O instance) {
-        return update(order, getOrAdd(instance));
+    public @NotNull Spatial update(O instance) {
+        return update(getOrAdd(instance));
     }
-    public @NotNull Spatial<O> update(int order, Function<? super O, Spatial<O>> materializer, O instance) {
-        return update(order, getOrAdd(instance, materializer));
+    public @NotNull Spatial<O> update(Function<? super O, Spatial<O>> materializer, O instance) {
+        return update(getOrAdd(instance, materializer));
     }
-    public @NotNull Spatial<O> update(int order, Spatial<O> t) {
-        t.activate((short) order);
+    public @NotNull Spatial<O> update(Spatial<O> t) {
+        t.preactivate();
         return t;
     }
 
@@ -158,12 +159,16 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
     }
 
-    @Override protected final boolean valid(CollisionObject<Spatial<O>> c) {
+    @Override protected final boolean valid(int nextID, Collidable<Spatial<O>> c) {
+
         Spatial vd = c.getUserPointer();
-        if (vd!=null && !vd.active()) {
-            vd.body.setUserPointer(null); //remove reference so vd can be GC
-            vd.body = null;
-            return false;
+        if (vd!=null) {
+            if (vd.active()) {
+                vd.activate((short)nextID);
+            } else {
+                vd.stop(this);
+                return false; //remove
+            }
         }
         return true;
     }
@@ -193,28 +198,34 @@ public class SpaceGraph<O> extends JoglPhysics<Spatial<O>> {
     }
 
 
+    public void add(Spatial s) {
+
+        if (s.body == null) {
+            s.start(this);
+        }
+
+    }
+
     public final synchronized void update(SpaceInput s) {
 
         float dt = s.setBusy();
 
-        List<Spatial<O>> active = s.active();
-
-        for (int i = 0, toDrawSize = active.size(); i < toDrawSize; i++) {
-            active.get(i).update(this);
-        }
+        s.update(this);
 
         List<SpaceTransform<O>> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
-            ll.get(i1).update(this, active, dt);
+            ll.get(i1).update(this, ((ListInput)s).active, dt);
         }
 
-        print(s, active);
+        print(s);
+
     }
 
-    public void print(SpaceInput s, List<Spatial<O>> active) {
+    void print(SpaceInput s) {
         System.out.println();
-        System.out.println(s + ": " + active.size() + " active, "  + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
-        active.forEach(x -> System.out.println(x));
+        //+ active.size() + " active, "
+        System.out.println(s + ": "   + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
+        s.forEach(System.out::println);
         System.out.println();
     }
 

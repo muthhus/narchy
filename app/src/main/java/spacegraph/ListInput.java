@@ -1,11 +1,18 @@
 package spacegraph;
 
 import nars.$;
+import nars.util.data.list.FasterList;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 6/26/16.
  */
 public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
+
+    protected List<Y> active = new FasterList<>(0);
 
     private X[] items;
 
@@ -14,7 +21,17 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
         this.items = xx;
     }
 
-    public void commit(X[] xx) {
+    @Override
+    public final Iterator<Y> iterator() {
+        return active.iterator();
+    }
+
+    @Override
+    public final void forEach(Consumer<? super Y> action) {
+        active.forEach(action);
+    }
+
+    public void commit(X... xx) {
         this.items = xx;
         if (space!=null)
             refresh();
@@ -26,6 +43,14 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
         commit(items);
     }
 
+    /**
+     * rewinds the buffer of visible items, when collecting a new batch
+     */
+    public List<Y> rewind(int capacity) {
+        active.forEach(Spatial::inactivate);
+        return active = new FasterList<>(capacity);
+    }
+
     @Override
     protected void updateImpl() {
 
@@ -33,14 +58,26 @@ public class ListInput<X,Y extends Spatial<X>> extends SpaceInput<X,Y> {
 
     private void refresh() {
         int n = 0;
-        this.visible = $.newArrayList(items.length);
+        this.active = $.newArrayList(items.length);
         for (X x : items) {
-            visible.add((Y) space.update(n++, x));
+            active.add((Y) space.update(x));
         }
     }
 
     @Override
-    public float now() {
+    public int size() {
+        return active.size();
+    }
+
+
+    @Override
+    public long now() {
         return 0;
     }
+
+    @Override
+    public void update(SpaceGraph<X> space) {
+        active.forEach(a -> a.start(space));
+    }
+
 }

@@ -212,7 +212,7 @@ public class DemoTerminal {
                     int r = rows - 1 - j;
                     float y = j * ch;
 
-                    TextCharacter c = term.getView(i, r);
+                    TextCharacter c = term.view(i, r);
                     char cc = c.c;
 
                     Color bg = c.back.toColor();

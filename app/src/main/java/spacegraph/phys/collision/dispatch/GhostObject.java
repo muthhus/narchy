@@ -42,9 +42,9 @@ import javax.vecmath.Vector3f;
  *
  * @author tomrbryn
  */
-public class GhostObject extends CollisionObject {
+public class GhostObject extends Collidable {
 
-	protected ObjectArrayList<CollisionObject> overlappingObjects = new ObjectArrayList<CollisionObject>();
+	protected ObjectArrayList<Collidable> overlappingObjects = new ObjectArrayList<Collidable>();
 
 	public GhostObject() {
 		super(CollisionObjectType.GHOST_OBJECT);
@@ -54,7 +54,7 @@ public class GhostObject extends CollisionObject {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void addOverlappingObjectInternal(BroadphaseProxy otherProxy, BroadphaseProxy thisProxy) {
-		CollisionObject otherObject = (CollisionObject)otherProxy.clientObject;
+		Collidable otherObject = (Collidable)otherProxy.clientObject;
 		assert(otherObject != null);
 
 		// if this linearSearch becomes too slow (too many overlapping objects) we should add a more appropriate data structure
@@ -69,10 +69,10 @@ public class GhostObject extends CollisionObject {
 	 * This method is mainly for expert/internal use only.
 	 */
 	public void removeOverlappingObjectInternal(BroadphaseProxy otherProxy, Dispatcher dispatcher, BroadphaseProxy thisProxy) {
-		CollisionObject otherObject = (CollisionObject) otherProxy.clientObject;
+		Collidable otherObject = (Collidable) otherProxy.clientObject;
 		assert(otherObject != null);
 
-		ObjectArrayList<CollisionObject> o = this.overlappingObjects;
+		ObjectArrayList<Collidable> o = this.overlappingObjects;
 		int index = o.indexOf(otherObject);
 		if (index != -1) {
             //return array[index];
@@ -107,22 +107,22 @@ public class GhostObject extends CollisionObject {
 		// do a ray-shape query using convexCaster (CCD)
 		for (int i=0; i<overlappingObjects.size(); i++) {
             //return array[index];
-            CollisionObject collisionObject = overlappingObjects.get(i);
+            Collidable collidable = overlappingObjects.get(i);
 
 			// only perform raycast if filterMask matches
-			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
+			if (resultCallback.needsCollision(collidable.broadphase())) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
 				Vector3f collisionObjectAabbMin = new Vector3f();
 				Vector3f collisionObjectAabbMax = new Vector3f();
-				collisionObject.shape().getAabb(collisionObject.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
+				collidable.shape().getAabb(collidable.getWorldTransform(tmpTrans), collisionObjectAabbMin, collisionObjectAabbMax);
 				AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
 				float[] hitLambda = new float[]{1f}; // could use resultCallback.closestHitFraction, but needs testing
 				Vector3f hitNormal = new Vector3f();
 				if (AabbUtil2.rayAabb(convexFromWorld.origin, convexToWorld.origin, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
 					CollisionWorld.objectQuerySingle(castShape, convexFromTrans, convexToTrans,
-					                                 collisionObject,
-					                                 collisionObject.shape(),
-					                                 collisionObject.getWorldTransform(tmpTrans),
+                            collidable,
+					                                 collidable.shape(),
+					                                 collidable.getWorldTransform(tmpTrans),
 					                                 resultCallback,
 					                                 allowedCcdPenetration);
 				}
@@ -144,14 +144,14 @@ public class GhostObject extends CollisionObject {
 
 		for (int i=0; i<overlappingObjects.size(); i++) {
             //return array[index];
-            CollisionObject collisionObject = overlappingObjects.get(i);
+            Collidable collidable = overlappingObjects.get(i);
 
 			// only perform raycast if filterMask matches
-			if (resultCallback.needsCollision(collisionObject.getBroadphaseHandle())) {
+			if (resultCallback.needsCollision(collidable.broadphase())) {
 				CollisionWorld.rayTestSingle(rayFromTrans, rayToTrans,
-				                             collisionObject,
-				                             collisionObject.shape(),
-				                             collisionObject.getWorldTransform(tmpTrans),
+                        collidable,
+				                             collidable.shape(),
+				                             collidable.getWorldTransform(tmpTrans),
 											 solver,
 				                             resultCallback);
 			}
@@ -162,12 +162,12 @@ public class GhostObject extends CollisionObject {
 		return overlappingObjects.size();
 	}
 
-	public CollisionObject getOverlappingObject(int index) {
+	public Collidable getOverlappingObject(int index) {
         return overlappingObjects.get(index);
         //return array[index];
     }
 
-	public ObjectArrayList<CollisionObject> getOverlappingPairs() {
+	public ObjectArrayList<Collidable> getOverlappingPairs() {
 		return overlappingObjects;
 	}
 
@@ -175,7 +175,7 @@ public class GhostObject extends CollisionObject {
 	// internal cast
 	//
 
-	public static GhostObject upcast(CollisionObject colObj) {
+	public static GhostObject upcast(Collidable colObj) {
 		if (colObj.getInternalType() == CollisionObjectType.GHOST_OBJECT) {
 			return (GhostObject)colObj;
 		}

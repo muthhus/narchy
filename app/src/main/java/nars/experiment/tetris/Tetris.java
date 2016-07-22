@@ -37,6 +37,7 @@ import nars.nar.util.DefaultConceptBuilder;
 import nars.op.ArithmeticInduction;
 import nars.op.time.MySTMClustered;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -287,10 +288,10 @@ public class Tetris extends TetrisState implements Environment {
 
         //new Abbreviation2(nar, "_");
 
-        //MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
+        MySTMClustered stm = new MySTMClustered(nar, 256, '.', 3);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 64, '!', 3);
 
-        //new ArithmeticInduction(nar);
+        new ArithmeticInduction(nar);
 
 
 
@@ -337,7 +338,7 @@ public class Tetris extends TetrisState implements Environment {
                     //STMView.show(stm, 800, 600);
 
 
-                    new SpaceGraph<Termed>(
+                    new SpaceGraph<>(
                             new ConceptBagInput(nar, 32, 4)
                     ).with(
                             new Spiral()
@@ -350,13 +351,9 @@ public class Tetris extends TetrisState implements Environment {
         };
 
 
-
-
-
-
         //addCamera(t, nar, 8, 8);
 
-        t.run(n, runCycles);
+        t.run(n, runCycles, 10);
 
         nar.index.print(System.out);
         NAR.printTasks(nar, true);

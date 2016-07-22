@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualTerminal {
     private final TextBuffer regularTextBuffer;
@@ -303,23 +304,37 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
 
     @Override
     public synchronized TextCharacter getView(TerminalPosition position) {
-        return getView(position.col, position.row);
+        return view(position.col, position.row);
     }
 
     @Override
-    public synchronized TextCharacter getView(int column, int row) {
+    public synchronized TextCharacter view(int column, int row) {
         if(termSize.row < currentTextBuffer.getLineCount()) {
             row += currentTextBuffer.getLineCount() - termSize.row;
         }
         return getBuffer(column, row);
     }
     @Override
-    public synchronized List<TextCharacter> getViewLine(int row) {
-        if(termSize.row < currentTextBuffer.getLineCount()) {
-            row += currentTextBuffer.getLineCount() - termSize.row;
-        }
-        List<TextCharacter> l = currentTextBuffer.getLine(row);
+    public synchronized List<TextCharacter> view(int row) {
+        List<TextCharacter> l = currentTextBuffer.getLine(norm(row));
         return l;
+    }
+
+    /** selects the bottom part of the buffer which is visible */
+    int norm(int row) {
+        int lines = currentTextBuffer.getLineCount();
+        int linesShown = termSize.row;
+        if(linesShown < lines) {
+            row += lines - linesShown;
+        }
+        return row;
+    }
+
+    @Override
+    public void view(int start, int end, Consumer<List<TextCharacter>> c) {
+        int n = end-start;
+        start = norm(start);
+        currentTextBuffer.forEachLine(start, start+n, c);
     }
 
     @Override
@@ -338,32 +353,8 @@ public class DefaultVirtualTerminal extends AbstractTerminal implements VirtualT
     }
 
     @Override
-    public synchronized void forEachLine(int startRow, int endRow, BufferWalker bufferWalker) {
-        final BufferLine emptyLine = new BufferLine() {
-            @Override
-            public TextCharacter getCharacterAt(int column) {
-                return TextCharacter.DEFAULT_CHARACTER;
-            }
-        };
-        synchronized(currentTextBuffer.lines) {
-            ListIterator<List<TextCharacter>> iterator = currentTextBuffer.getLinesFrom(startRow);
-            for (int row = startRow; row <= endRow; row++) {
-                BufferLine bufferLine = emptyLine;
-                if (iterator.hasNext()) {
-                    final List<TextCharacter> list = iterator.next();
-                    bufferLine = new BufferLine() {
-                        @Override
-                        public TextCharacter getCharacterAt(int column) {
-                            if (column >= list.size()) {
-                                return TextCharacter.DEFAULT_CHARACTER;
-                            }
-                            return list.get(column);
-                        }
-                    };
-                }
-                bufferWalker.onLine(row, bufferLine);
-            }
-        }
+    public void forEachLine(int startRow, int endRow, BufferWalker bufferWalker) {
+        currentTextBuffer.forEachLine(startRow, endRow, bufferWalker);
     }
 
     synchronized void putCharacter(TextCharacter terminalCharacter) {

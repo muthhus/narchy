@@ -51,7 +51,7 @@ public class DefaultVehicleRaycaster extends VehicleRaycaster {
 		dynamicsWorld.rayTest(from, to, rayCallback);
 
 		if (rayCallback.hasHit()) {
-			RigidBody body = RigidBody.upcast(rayCallback.collisionObject);
+			RigidBody body = RigidBody.upcast(rayCallback.collidable);
 			if (body != null && body.hasContactResponse()) {
 				result.hitPointInWorld.set(rayCallback.hitPointWorld);
 				result.hitNormalInWorld.set(rayCallback.hitNormalWorld);

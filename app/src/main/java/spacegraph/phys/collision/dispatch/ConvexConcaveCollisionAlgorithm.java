@@ -51,7 +51,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	private boolean isSwapped;
 	private ConvexTriangleCallback btConvexTriangleCallback;
 
-	public void init(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, boolean isSwapped) {
+	public void init(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1, boolean isSwapped) {
 		super.init(ci);
 		this.isSwapped = isSwapped;
 		this.btConvexTriangleCallback = new ConvexTriangleCallback(dispatcher, body0, body1, isSwapped);
@@ -63,12 +63,12 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
-		CollisionObject convexBody = isSwapped ? body1 : body0;
-		CollisionObject triBody = isSwapped ? body0 : body1;
+	public void processCollision(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+		Collidable convexBody = isSwapped ? body1 : body0;
+		Collidable triBody = isSwapped ? body0 : body1;
 
 		if (triBody.shape().isConcave()) {
-			CollisionObject triOb = triBody;
+			Collidable triOb = triBody;
 			ConcaveShape concaveShape = (ConcaveShape)triOb.shape();
 
 			if (convexBody.shape().isConvex()) {
@@ -93,11 +93,11 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public float calculateTimeOfImpact(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		Vector3f tmp = new Vector3f();
 
-		CollisionObject convexbody = isSwapped ? body1 : body0;
-		CollisionObject triBody = isSwapped ? body0 : body1;
+		Collidable convexbody = isSwapped ? body1 : body0;
+		Collidable triBody = isSwapped ? body0 : body1;
 
 		// quick approximation using raycast, todo: hook up to the continuous collision detection (one of the btConvexCast)
 
@@ -142,7 +142,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 
 			raycastCallback.hitFraction = convexbody.getHitFraction();
 
-			CollisionObject concavebody = triBody;
+			Collidable concavebody = triBody;
 
 			ConcaveShape triangleMesh = (ConcaveShape)concavebody.shape();
 
@@ -222,7 +222,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			ConvexConcaveCollisionAlgorithm algo = new ConvexConcaveCollisionAlgorithm();
 			algo.init(ci, body0, body1, false);
 			return algo;
@@ -236,7 +236,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			ConvexConcaveCollisionAlgorithm algo = new ConvexConcaveCollisionAlgorithm();
 			algo.init(ci, body0, body1, true);
 			return algo;

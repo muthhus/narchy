@@ -159,10 +159,11 @@ public enum ShapeDrawer {
                 switch (shape.getShapeType()) {
                     case BOX_SHAPE_PROXYTYPE: {
                         BoxShape boxShape = (BoxShape) shape;
-                        Vector3f halfExtent = stack.vectors.get(boxShape.getHalfExtentsWithMargin(new Vector3f()));
+                        Vector3f halfExtent = boxShape.getHalfExtentsWithMargin(stack.vectors.get());
                         gl.glScalef(2f * halfExtent.x, 2f * halfExtent.y, 2f * halfExtent.z);
                         //glsrt.drawCube(gl, 1f);
                         glut.glutSolidCube(1f);
+
                         useWireframeFallback = false;
                         break;
                     }

@@ -23,6 +23,8 @@
 
 package spacegraph.phys.collision.broadphase;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.vecmath.Vector3f;
 
 /**

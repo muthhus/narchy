@@ -8,12 +8,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * maintains a set of objects which are used as input for representation in a SpaceGraph
  */
-abstract public class SpaceInput<O, M extends Spatial<O>> {
+abstract public class SpaceInput<O, M extends Spatial<O>> implements Iterable<M> {
 
-    protected List<M> visible = new FasterList(0);
     final AtomicBoolean busy = new AtomicBoolean(true);
     protected SpaceGraph space;
-    private float now;
+    private long now;
     private float dt;
 
 
@@ -23,10 +22,6 @@ abstract public class SpaceInput<O, M extends Spatial<O>> {
 
     public void stop() {
         this.space = null;
-    }
-
-    public final List<M> active() {
-        return visible;
     }
 
     public void ready() {
@@ -46,13 +41,7 @@ abstract public class SpaceInput<O, M extends Spatial<O>> {
         return dt;
     }
 
-    /**
-     * rewinds the buffer of visible items, when collecting a new batch
-     */
-    public List<M> rewind(int capacity) {
-        visible.forEach(Spatial::inactivate);
-        return visible = new FasterList<>(capacity);
-    }
+
 
 
     public void update() {
@@ -74,7 +63,11 @@ abstract public class SpaceInput<O, M extends Spatial<O>> {
 
     abstract protected void updateImpl();
 
-    abstract public float now();
+    abstract public long now();
 
 
+    /** needs to call update(space) for each active item */
+    abstract public void update(SpaceGraph<O> space);
+
+    public abstract int size();
 }

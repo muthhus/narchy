@@ -660,6 +660,7 @@ public abstract class AxisSweep3Internal extends BroadphaseInterface {
 	}
 	
 	protected static abstract class Handle extends BroadphaseProxy {
+
 		public abstract int getMinEdges(int edgeIndex);
 		public abstract void setMinEdges(int edgeIndex, int value);
 		

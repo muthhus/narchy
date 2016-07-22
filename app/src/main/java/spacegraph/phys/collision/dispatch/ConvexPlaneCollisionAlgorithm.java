@@ -45,14 +45,14 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 	private PersistentManifold manifoldPtr;
 	private boolean isSwapped;
 	
-	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, CollisionObject col0, CollisionObject col1, boolean isSwapped) {
+	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, Collidable col0, Collidable col1, boolean isSwapped) {
 		super.init(ci);
 		this.ownManifold = false;
 		this.manifoldPtr = mf;
 		this.isSwapped = isSwapped;
 
-		CollisionObject convexObj = isSwapped ? col1 : col0;
-		CollisionObject planeObj = isSwapped ? col0 : col1;
+		Collidable convexObj = isSwapped ? col1 : col0;
+		Collidable planeObj = isSwapped ? col0 : col1;
 
 		if (manifoldPtr == null && dispatcher.needsCollision(convexObj, planeObj)) {
 			manifoldPtr = dispatcher.getNewManifold(convexObj, planeObj);
@@ -71,15 +71,15 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public void processCollision(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		if (manifoldPtr == null) {
 			return;
 		}
 
 		Transform tmpTrans = new Transform();
 
-		CollisionObject convexObj = isSwapped ? body1 : body0;
-		CollisionObject planeObj = isSwapped ? body0 : body1;
+		Collidable convexObj = isSwapped ? body1 : body0;
+		Collidable planeObj = isSwapped ? body0 : body1;
 
 		ConvexShape convexShape = (ConvexShape) convexObj.shape();
 		StaticPlaneShape planeShape = (StaticPlaneShape) planeObj.shape();
@@ -132,7 +132,7 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public float calculateTimeOfImpact(Collidable body0, Collidable body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		// not yet
 		return 1f;
 	}
@@ -149,7 +149,7 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 
 		@Override
-		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
+		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, Collidable body0, Collidable body1) {
 			ConvexPlaneCollisionAlgorithm algo = new ConvexPlaneCollisionAlgorithm();
 			if (!swapped) {
 				algo.init(null, ci, body0, body1, false);

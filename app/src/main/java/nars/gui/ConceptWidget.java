@@ -1,20 +1,21 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.Spatial;
 
 /**
  * Created by me on 6/26/16.
  */
-public class ConceptWidget extends Spatial<Termed> {
+public class ConceptWidget extends Spatial<Term> {
 
     /**
      * measure of inactivity, in time units
      */
     //public float lag;
 
-    public ConceptWidget(Termed x, int maxEdges) {
+    public ConceptWidget(Term x, int maxEdges) {
         super(x, maxEdges);
     }
 

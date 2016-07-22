@@ -27,7 +27,7 @@ import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.BulletStats;
 import spacegraph.phys.ContactDestroyedCallback;
 import spacegraph.phys.collision.broadphase.Dispatcher;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.narrowphase.ManifoldPoint;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.dynamics.RigidBody;
@@ -135,24 +135,24 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 		return (int) Math.abs(r % un);
 	}
 	
-	private static void initSolverBody(SolverBody solverBody, CollisionObject collisionObject) {
-		RigidBody rb = RigidBody.upcast(collisionObject);
+	private static void initSolverBody(SolverBody solverBody, Collidable collidable) {
+		RigidBody rb = RigidBody.upcast(collidable);
 		if (rb != null) {
 			rb.getAngularVelocity(solverBody.angularVelocity);
-			solverBody.centerOfMassPosition.set(collisionObject.getWorldTransform(new Transform()).origin);
-			solverBody.friction = collisionObject.getFriction();
+			solverBody.centerOfMassPosition.set(collidable.getWorldTransform(new Transform()).origin);
+			solverBody.friction = collidable.getFriction();
 			solverBody.invMass = rb.getInvMass();
 			rb.getLinearVelocity(solverBody.linearVelocity);
-			solverBody.originalBody = rb;
+			solverBody.body = rb;
 			solverBody.angularFactor = rb.getAngularFactor();
 		}
 		else {
 			solverBody.angularVelocity.set(0f, 0f, 0f);
-			solverBody.centerOfMassPosition.set(collisionObject.getWorldTransform(new Transform()).origin);
-			solverBody.friction = collisionObject.getFriction();
+			solverBody.centerOfMassPosition.set(collidable.getWorldTransform(new Transform()).origin);
+			solverBody.friction = collidable.getFriction();
 			solverBody.invMass = 0f;
 			solverBody.linearVelocity.set(0f, 0f, 0f);
-			solverBody.originalBody = null;
+			solverBody.body = null;
 			solverBody.angularFactor = 1f;
 		}
 
@@ -206,9 +206,11 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 			Vector3f tmp = new Vector3f();
 
 			tmp.scale(body1.invMass, contactConstraint.contactNormal);
+			//tmp.scale(body1.linearFactor);
 			body1.internalApplyPushImpulse(tmp, contactConstraint.angularComponentA, normalImpulse);
 
 			tmp.scale(body2.invMass, contactConstraint.contactNormal);
+			//tmp.scale(body2.linearFactor);
 			body2.internalApplyPushImpulse(tmp, contactConstraint.angularComponentB, -normalImpulse);
 		}
 	}
@@ -260,9 +262,11 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 			Vector3f tmp = new Vector3f();
 
 			tmp.scale(body1.invMass, contactConstraint.contactNormal);
+			//tmp.scale(body1.linearFactor);
 			body1.internalApplyImpulse(tmp, contactConstraint.angularComponentA, normalImpulse);
 
 			tmp.scale(body2.invMass, contactConstraint.contactNormal);
+			//tmp.scale(body2.linearFactor);
 			body2.internalApplyImpulse(tmp, contactConstraint.angularComponentB, -normalImpulse);
 		}
 
@@ -333,7 +337,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 	}
 
 
-	protected void addFrictionConstraint(Vector3f normalAxis, int solverBodyIdA, int solverBodyIdB, int frictionIndex, ManifoldPoint cp, Vector3f rel_pos1, Vector3f rel_pos2, CollisionObject colObj0, CollisionObject colObj1, float relaxation) {
+	protected void addFrictionConstraint(Vector3f normalAxis, int solverBodyIdA, int solverBodyIdB, int frictionIndex, ManifoldPoint cp, Vector3f rel_pos1, Vector3f rel_pos2, Collidable colObj0, Collidable colObj1, float relaxation) {
 		RigidBody body0 = RigidBody.upcast(colObj0);
 		RigidBody body1 = RigidBody.upcast(colObj1);
 
@@ -401,7 +405,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 		solverConstraint.jacDiagABInv = denom;
 	}
 
-	public float solveGroupCacheFriendlySetup(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+	public float solveGroupCacheFriendlySetup(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
 		BulletStats.pushProfile("solveGroupCacheFriendlySetup");
 		try {
 
@@ -410,7 +414,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 				return 0f;
 			}
 			PersistentManifold manifold = null;
-			CollisionObject colObj0 = null, colObj1 = null;
+			Collidable colObj0 = null, colObj1 = null;
 
 			//btRigidBody* rb0=0,*rb1=0;
 
@@ -497,8 +501,8 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
                 for (i = 0; i < numManifolds; i++) {
 					//return array[index];
 					manifold = manifoldPtr.get(manifold_offset + i);
-                    colObj0 = (CollisionObject) manifold.getBody0();
-                    colObj1 = (CollisionObject) manifold.getBody1();
+                    colObj0 = (Collidable) manifold.getBody0();
+                    colObj1 = (Collidable) manifold.getBody1();
 
                     int solverBodyIdA = -1;
                     int solverBodyIdB = -1;
@@ -791,7 +795,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 		}
 	}
 
-	public float solveGroupCacheFriendlyIterations(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+	public float solveGroupCacheFriendlyIterations(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
 		BulletStats.pushProfile("solveGroupCacheFriendlyIterations");
 		try {
 			int numConstraintPool = tmpSolverConstraintPool.size();
@@ -910,7 +914,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 		pool.set(swapi, tmp);
 	}
 
-	public float solveGroupCacheFriendly(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
+	public float solveGroupCacheFriendly(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
 		solveGroupCacheFriendlySetup(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
 		solveGroupCacheFriendlyIterations(bodies, numBodies, manifoldPtr, manifold_offset, numManifolds, constraints, constraints_offset, numConstraints, infoGlobal/*, stackAlloc*/);
 
@@ -922,6 +926,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 			ManifoldPoint pt = (ManifoldPoint) solveManifold.originalContactPoint;
 			assert (pt != null);
 			pt.appliedImpulse = solveManifold.appliedImpulse;
+
 			//return array[index];
 			pt.appliedImpulseLateral1 = tmpSolverFrictionConstraintPool.get(solveManifold.frictionIndex).appliedImpulse;
 			//return array[index];
@@ -967,7 +972,7 @@ public class SequentialImpulseConstraintSolver extends ConstraintSolver {
 	 * Sequentially applies impulses.
 	 */
 	@Override
-	public float solveGroup(ObjectArrayList<CollisionObject> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Dispatcher dispatcher) {
+	public float solveGroup(ObjectArrayList<Collidable> bodies, int numBodies, ObjectArrayList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, ObjectArrayList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Dispatcher dispatcher) {
 		BulletStats.pushProfile("solveGroup");
 		try {
 			// TODO: solver cache friendly

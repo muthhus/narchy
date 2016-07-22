@@ -23,19 +23,22 @@
 
 package spacegraph.phys.collision.broadphase;
 
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import org.codehaus.commons.nullanalysis.NotNull;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.dynamics.RigidBody;
 
 /**
  * BroadphaseProxy is the main class that can be used with the Bullet broadphases.
  * It stores collision shape type information, collision filter information and
- * a client object, typically a {@link CollisionObject} or {@link RigidBody}.
+ * a client object, typically a {@link Collidable} or {@link RigidBody}.
  * 
  * @author jezek2
  */
 public class BroadphaseProxy {
 
 	// Usually the client CollisionObject or Rigidbody class
+	@Nullable
 	public Object clientObject;
 	
 	// TODO: mask
@@ -46,10 +49,12 @@ public class BroadphaseProxy {
 	
 	public int uid; // uniqueId is introduced for paircache. could get rid of this, by calculating the address offset etc.
 
-	public BroadphaseProxy() {
+
+	protected BroadphaseProxy() {
+
 	}
 	
-	public BroadphaseProxy(Object userPtr, short collisionFilterGroup, short collisionFilterMask) {
+	public BroadphaseProxy(@NotNull Object userPtr, short collisionFilterGroup, short collisionFilterMask) {
 		this(userPtr, collisionFilterGroup, collisionFilterMask, null);
 	}
 	

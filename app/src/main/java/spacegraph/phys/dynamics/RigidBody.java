@@ -27,7 +27,7 @@ import com.jogamp.opengl.GL2;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.collision.broadphase.BroadphaseProxy;
 import spacegraph.phys.collision.dispatch.CollisionFlags;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.dispatch.CollisionObjectType;
 import spacegraph.phys.collision.shapes.CollisionShape;
 import spacegraph.phys.dynamics.constraintsolver.TypedConstraint;
@@ -43,7 +43,7 @@ import static spacegraph.render.JoglPhysics.defaultRenderer;
 
 /**
  * RigidBody is the main class for rigid body objects. It is derived from
- * {@link CollisionObject}, so it keeps reference to {@link CollisionShape}.<p>
+ * {@link Collidable}, so it keeps reference to {@link CollisionShape}.<p>
  * 
  * It is recommended for performance and memory use to share {@link CollisionShape}
  * objects whenever possible.<p>
@@ -66,7 +66,7 @@ import static spacegraph.render.JoglPhysics.defaultRenderer;
  * 
  * @author jezek2
  */
-public class RigidBody<X> extends CollisionObject<X> {
+public class RigidBody<X> extends Collidable<X> {
 
 	private static final float MAX_ANGVEL = BulletGlobals.SIMD_HALF_PI;
 	
@@ -80,7 +80,8 @@ public class RigidBody<X> extends CollisionObject<X> {
 	private final Vector3f invInertiaLocal = new Vector3f();
 	private final Vector3f totalForce = new Vector3f();
 	private final Vector3f totalTorque = new Vector3f();
-	
+
+
 	private float linearDamping;
 	private float angularDamping;
 
@@ -185,7 +186,7 @@ public class RigidBody<X> extends CollisionObject<X> {
 	 * To keep collision detection and dynamics separate we don't store a rigidbody pointer,
 	 * but a rigidbody is derived from CollisionObject, so we can safely perform an upcast.
 	 */
-	public static <X> RigidBody<X> upcast(CollisionObject<X> colObj) {
+	public static <X> RigidBody<X> upcast(Collidable<X> colObj) {
 		return colObj.getInternalType() == CollisionObjectType.RIGID_BODY ? (RigidBody) colObj : null;
 	}
 
@@ -559,9 +560,6 @@ public class RigidBody<X> extends CollisionObject<X> {
 		return broadphaseHandle;
 	}
 
-	public void setNewBroadphaseProxy(BroadphaseProxy broadphaseProxy) {
-		this.broadphaseHandle = broadphaseProxy;
-	}
 
 	public MotionState getMotionState() {
 		return optionalMotionState;
@@ -590,7 +588,7 @@ public class RigidBody<X> extends CollisionObject<X> {
 	}
 
 	@Override
-	public boolean checkCollideWithOverride(CollisionObject co) {
+	public boolean checkCollideWithOverride(Collidable co) {
 		// TODO: change to cast
 		RigidBody otherRb = upcast(co);
 		if (otherRb == null) {
@@ -641,4 +639,6 @@ public class RigidBody<X> extends CollisionObject<X> {
 	public final void setRenderer(BiConsumer<GL2,RigidBody> renderer) {
 		this.renderer = renderer;
 	}
+
+
 }

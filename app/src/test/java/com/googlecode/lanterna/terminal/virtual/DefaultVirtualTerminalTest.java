@@ -49,7 +49,7 @@ public class DefaultVirtualTerminalTest {
 
         for(int row = 0; row < terminalPosition.row; row++) {
             for(int column = 0; column < terminalPosition.col; column++) {
-                assertEquals(DEFAULT_CHARACTER, virtualTerminal.getView(column, row));
+                assertEquals(DEFAULT_CHARACTER, virtualTerminal.view(column, row));
             }
         }
     }
@@ -406,11 +406,11 @@ public class DefaultVirtualTerminalTest {
         virtualTerminal.resetColorAndSGR();
         virtualTerminal.put('E');
 
-        assertEquals(TextCharacter.DEFAULT_CHARACTER.withCharacter('A'), virtualTerminal.getView(0, 0));
-        assertEquals(new TextCharacter('B', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE), virtualTerminal.getView(1, 0));
-        assertEquals(new TextCharacter('C', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD, SGR.UNDERLINE), virtualTerminal.getView(2, 0));
-        assertEquals(new TextCharacter('D', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.UNDERLINE), virtualTerminal.getView(3, 0));
-        assertEquals(TextCharacter.DEFAULT_CHARACTER.withCharacter('E'), virtualTerminal.getView(4, 0));
+        assertEquals(TextCharacter.DEFAULT_CHARACTER.withCharacter('A'), virtualTerminal.view(0, 0));
+        assertEquals(new TextCharacter('B', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE), virtualTerminal.view(1, 0));
+        assertEquals(new TextCharacter('C', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD, SGR.UNDERLINE), virtualTerminal.view(2, 0));
+        assertEquals(new TextCharacter('D', TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.UNDERLINE), virtualTerminal.view(3, 0));
+        assertEquals(TextCharacter.DEFAULT_CHARACTER.withCharacter('E'), virtualTerminal.view(4, 0));
     }
 
     @Test
@@ -532,7 +532,7 @@ public class DefaultVirtualTerminalTest {
         assertEquals(new TerminalPosition(10, 2), virtualTerminal.cursor());
         virtualTerminal.put('C');
         assertEquals(new TerminalPosition(1, 3), virtualTerminal.cursor());
-        assertEquals(DEFAULT_CHARACTER.withCharacter('C'), virtualTerminal.getView(0, 3));
+        assertEquals(DEFAULT_CHARACTER.withCharacter('C'), virtualTerminal.view(0, 3));
     }
 
     private void putString(String string) {
@@ -548,13 +548,13 @@ public class DefaultVirtualTerminalTest {
     private void assertLineEquals(String expectedLineContent, int rowNumber) {
         int column = 0;
         for(char c: expectedLineContent.toCharArray()) {
-            assertEquals(DEFAULT_CHARACTER.withCharacter(c), virtualTerminal.getView(column++, rowNumber));
+            assertEquals(DEFAULT_CHARACTER.withCharacter(c), virtualTerminal.view(column++, rowNumber));
             if(TerminalTextUtils.isCharDoubleWidth(c)) {
                 column++;
             }
         }
         while(column < virtualTerminal.terminalSize().col) {
-            assertEquals(DEFAULT_CHARACTER, virtualTerminal.getView(column++, rowNumber));
+            assertEquals(DEFAULT_CHARACTER, virtualTerminal.view(column++, rowNumber));
         }
     }
 

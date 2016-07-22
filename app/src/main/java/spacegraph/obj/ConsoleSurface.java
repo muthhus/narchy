@@ -121,14 +121,14 @@ public class ConsoleSurface extends Surface {
 
         long t = System.currentTimeMillis(); //HACK
 
-        for (int j = 0; j < rows; j++) {
+        final int[] j = {0};
+
+        term.view(0, rows, (List<TextCharacter> line) -> {
 
             gl.glPushMatrix();
 
-            gl.glTranslatef(0, j * ch, dz);
-
-            int r = rows - 1 - j;
-            List<TextCharacter> line = term.getViewLine(r);
+            int jj = j[0];
+            gl.glTranslatef(0, (rows - 1 - jj) * ch, dz);
 
             for (int i = 0; i < cols; i++) {
 
@@ -167,7 +167,7 @@ public class ConsoleSurface extends Surface {
                     }
                 }
 
-                if ((i == curx) && (r == cury)) {
+                if ((i == curx) && (jj == cury)) {
                     float p = (1f + (float)Math.sin(t/100.0)) * 0.5f;
                     gl.glColor4f( 1f, 0.5f,0f, 0.3f + p * 0.4f);
                     float m = -(0.1f + 0.3f * p);
@@ -182,7 +182,8 @@ public class ConsoleSurface extends Surface {
 
             gl.glPopMatrix(); //next line
 
-        }
+            j[0]++;
+        });
 
         gl.glPopMatrix();
 

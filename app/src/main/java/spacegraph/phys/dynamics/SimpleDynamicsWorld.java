@@ -27,7 +27,7 @@ import spacegraph.phys.collision.broadphase.BroadphaseInterface;
 import spacegraph.phys.collision.broadphase.Dispatcher;
 import spacegraph.phys.collision.broadphase.DispatcherInfo;
 import spacegraph.phys.collision.dispatch.CollisionConfiguration;
-import spacegraph.phys.collision.dispatch.CollisionObject;
+import spacegraph.phys.collision.dispatch.Collidable;
 import spacegraph.phys.collision.narrowphase.PersistentManifold;
 import spacegraph.phys.dynamics.constraintsolver.ConstraintSolver;
 import spacegraph.phys.dynamics.constraintsolver.ContactSolverInfo;
@@ -61,7 +61,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				if (!body.isStaticObject()) {
@@ -80,7 +80,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		Transform predictedTrans = new Transform();
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				if (body.isActive() && (!body.isStaticObject())) {
@@ -136,7 +136,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
@@ -150,7 +150,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		this.gravity.set(gravity);
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				body.setGravity(gravity);
@@ -175,7 +175,7 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 
 	@Override
 	public void removeRigidBody(RigidBody body) {
-		removeCollisionObject(body);
+		remove(body);
 	}
 
 	@Override
@@ -186,13 +186,13 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null) {
 				if (body.isActive() && (!body.isStaticObject())) {
 					colObj.shape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
 					BroadphaseInterface bp = getBroadphase();
-					bp.setAabb(body.getBroadphaseHandle(), minAabb, maxAabb, dispatcher1);
+					bp.setAabb(body.broadphase(), minAabb, maxAabb, dispatcher1);
 				}
 			}
 		}
@@ -204,10 +204,10 @@ public class SimpleDynamicsWorld<X> extends DynamicsWorld<X> {
 		// todo: iterate over awake simulation islands!
 		for (int i = 0; i < objects.size(); i++) {
             //return array[index];
-            CollisionObject colObj = objects.get(i);
+            Collidable colObj = objects.get(i);
 			RigidBody body = RigidBody.upcast(colObj);
 			if (body != null && body.getMotionState() != null) {
-				if (body.getActivationState() != CollisionObject.ISLAND_SLEEPING) {
+				if (body.getActivationState() != Collidable.ISLAND_SLEEPING) {
 					body.getMotionState().setWorldTransform(body.getWorldTransform(tmpTrans));
 				}
 			}

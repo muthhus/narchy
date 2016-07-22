@@ -56,7 +56,7 @@ public abstract class DynamicsWorld<X> extends CollisionWorld<X> {
 	}
 
 	public final int stepSimulation(float timeStep) {
-		return stepSimulation(timeStep, 1);
+		return stepSimulation(timeStep, 0);
 	}
 
 	public final int stepSimulation(float dt, int maxSubSteps) {

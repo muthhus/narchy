@@ -1,10 +1,7 @@
 package spacegraph.layout;
 
 import org.apache.commons.lang3.mutable.MutableFloat;
-import spacegraph.EDraw;
-import spacegraph.SpaceGraph;
-import spacegraph.SpaceTransform;
-import spacegraph.Spatial;
+import spacegraph.*;
 
 import java.awt.*;
 import java.util.List;
@@ -311,7 +308,7 @@ public class FastOrganicLayout<O> implements SpaceTransform<O> {
 
             for (int j = 0; j < ne; j++) {
 
-                ni[j] = edges[j].target.order;
+                ni[j] = edges[j].target.order; //THIS CAN CAUSE A PROBLEM
 
 
                 // Check the connected cell in part of the vertex list to be
